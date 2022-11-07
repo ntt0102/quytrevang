@@ -8,12 +8,19 @@
     </head>
     <body>
         <script>
-            var window = window.open(
+            var popup = window.open(
                 "https://smartpro.vps.com.vn",
                 "VPS",
                 "width=" + screen.availWidth + ",height=" + screen.availHeight
             );
-            window.close();
+            setTimeout(function() {
+                if (!popup || popup.outerHeight === 0)
+                    alert("Pop-ups were blocked on this page.");
+                else {
+                    window.open("", "_self");
+                    window.close();
+                }
+            }, 25);
         </script>
     </body>
 </html>
