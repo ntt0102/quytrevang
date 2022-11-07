@@ -1,0 +1,11 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <image style="position:absolute;top:-20px;left:-20px;" href="https://quytrevang.nguyenvanxuanphu.com/images/android-chrome-reverse-512x512.png" height="200" width="200" />
+  <circle cx="100" cy="86.5" r="37" fill="none" stroke="#2A2A32" stroke-width="15" />
+  <g>
+    <circle transform="rotate(99 100 86.5)" cx="100" cy="86.5" r="37" fill="none" stroke="#FF5722" stroke-width="14" stroke-dasharray="221" />
+    <polygon points="104.6,115.5 104.6,130.4 107,130.1" fill="#FF5722" />
+    <polygon points="95.5,116 95.5,130.4 93,130" fill="#FF5722" />
+    <animateTransform attributeName="transform" type="rotate" from="0 100 86.5" to="360 100 86.5" dur="2s" repeatCount="indefinite" />
+  </g>
+</svg>

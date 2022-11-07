@@ -1,0 +1,304 @@
+#continuousButton {
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  background: green;
+  color: white;
+  width: 80px;
+  border-radius: 20px;
+  padding: 1px;
+  font-size: 16px;
+  z-index: 2001;
+}
+#periodicButton {
+  position: fixed;
+  bottom: 0px;
+  left: 95px;
+  background: yellow;
+  color: black;
+  width: 80px;
+  border-radius: 20px;
+  padding: 1px;
+  font-size: 16px;
+}
+#reportButton {
+  position: fixed;
+  bottom: 0px;
+  left: 210px;
+  background: red;
+  color: white;
+  width: 80px;
+  border-radius: 20px;
+  padding: 1px;
+  font-size: 16px;
+}
+
+#periodicChart {
+  position: fixed;
+  bottom: 31px;
+  left: 0px;
+  width: 794px;
+  background: #E3E6E8;
+  border: solid 1px yellow;
+  z-index: -1;
+  opacity: 0;
+}
+
+#periodicChart > #clearButton {
+  position: absolute;
+  top: 0.5px;
+  right: 0.5px;
+}
+
+#periodicChart > #exportButton {
+  position: absolute;
+  top: 0.5px;
+  right: 100px;
+}
+
+#periodicChart > #orderCountP {
+  position: absolute;
+  top: 5px;
+  right: 550px;
+  color: white;
+}
+
+.periodic-order #periodicChart {
+  z-index: 3;
+  opacity: 1;
+}
+
+.continuous-order {
+  overflow-y: hidden;
+}
+
+  .continuous-order #chartFrame {
+    position: fixed;
+    top: 0px;
+    z-index: 2000;
+  }
+
+  .continuous-order .aside-menu {
+    position: fixed;
+    top: 40px;
+    right: 60px !important;
+    z-index: 2001 !important;
+    height: 420px !important;
+    width: 150px !important;
+    border-left: 0px !important;
+    border-radius: 10px;
+    padding: 3px 0;
+  }
+
+    .continuous-order .aside-menu .tab-content {
+      height: 100% !important;
+      overflow-y: hidden !important;
+      border-radius: 10px;
+    }
+
+    .continuous-order .aside-menu > .nav,
+    .continuous-order .aside-menu .list-group-item:nth-child(2),
+    .continuous-order .aside-menu .list-group-item:nth-child(3) {
+      display: none;
+    }
+
+    .continuous-order .aside-menu .wrapper_select_order {
+      display: block;
+    }
+
+    .continuous-order .aside-menu .btnTypeOrder > span:nth-child(1),
+    .continuous-order .aside-menu .btnTypeOrder>span:nth-child(2),
+    .continuous-order .aside-menu .btnTypeOrder>span:nth-child(4),
+    .continuous-order .aside-menu .btnTypeOrder>span:nth-child(5) {
+      display: none;
+    }
+
+    .continuous-order .aside-menu .list-group-item:nth-child(7) > label:nth-child(2) {
+      display: none;
+    }
+
+    .continuous-order .aside-menu .list-group-item {
+      padding: 0 5px !important;
+    }
+
+    .continuous-order .aside-menu .list-group-item-accent-success {
+      border-left: 0px !important;
+    }
+
+    .continuous-order .aside-menu .custom-select-wrapper {
+      text-align: center;
+    }
+
+    .continuous-order .aside-menu #select_condition_order_wrapper {
+      display: block !important;
+    }
+
+    .continuous-order .aside-menu #select_condition_order_wrapper .arrow{
+      display: none;
+    }
+
+    .continuous-order .aside-menu #select_order_type_wrapper {
+      display: none !important;
+    }
+
+  .continuous-order #mainFooter > div:nth-child(2) {
+    position: fixed;
+    bottom: 4px;
+    right: 280px;
+    z-index: 2001;
+  }
+
+  .continuous-order #footerPanel {
+    position: fixed;
+    bottom: 35px;
+    width: 100%;
+    z-index: 2001;
+    margin-bottom: -110px;
+  }
+
+  .continuous-order #updateOrderConditionModal,
+  .continuous-order #updateOrderModal {
+    z-index: 2002;
+  }
+
+  .continuous-order #taisanAccount > div:first-child > div:first-child > div:last-child {
+    position: fixed;
+    bottom: 7px;
+    right: 700px;
+    z-index: 2001;
+    width: 100px;
+  }
+
+  .continuous-order #status-danhmuc-content > tr > td:nth-child(2) {
+    position: fixed;
+    bottom: 3px;
+    right: 800px;
+    z-index: 2001;
+    width: 50px;
+    border-bottom: none;
+  }
+
+  .continuous-order #tbodyPhaisinhContent > tr:first-child > td:nth-child(11) {
+    position: fixed;
+    bottom: 5px;
+    right: 850px;
+    z-index: 2001;
+    text-align: center;
+    width: 60px;
+    min-height: 30px;
+    border-bottom: none;
+  }
+
+.timeStamp {
+  cursor: pointer;
+}
+
+@media (max-width: 991.98px) {
+  #periodicButton {
+    bottom: 35px;
+    left: 0px;
+    padding: 3px !important;
+    z-index: 1022;
+  }
+
+  #reportButton {
+    bottom: 85px;
+    left: 0px;
+    padding: 3px !important;
+    z-index: 1022;
+  }
+
+  .periodic-order #periodicChart {
+    z-index: 1021;
+    width: 713px;
+    right: 0px;
+    bottom: 1px;
+    left: unset;
+  }
+    
+  .periodic-order.fullscreen #periodicChart {
+    width: 760px !important;
+    bottom: 5px !important;
+  }
+
+  .periodic-order .aside-menu {
+    position: fixed;
+    top: 35px;
+    left: 0px !important;
+    z-index: 2001 !important;
+    height: 190px !important;
+    width: 78px !important;
+    border-left: 0px !important;
+  }
+  
+    .periodic-order .aside-menu>.nav,
+    .periodic-order .aside-menu .list-group-item:nth-child(2),
+    .periodic-order .aside-menu .list-group-item:nth-child(3),
+    .periodic-order .aside-menu .list-group-item:nth-child(4),
+    .periodic-order .aside-menu .list-group-item:nth-child(5),
+    .periodic-order .aside-menu .list-group-item:nth-child(6) > label,
+    .periodic-order .aside-menu .list-group-item:nth-child(7) > label,
+    .periodic-order .aside-menu .button-order-group > div:last-child
+    {
+      display: none;
+    }
+
+    .periodic-order .aside-menu .list-group-item, 
+    .periodic-order .aside-menu .button-order-group {
+      padding: 0;
+      border-left: unset !important;
+    }
+    
+    .periodic-order .aside-menu .button-order-group > div:first-child {
+      flex-direction: column;
+    }
+      .periodic-order .aside-menu .button-order-group > div:first-child button {
+        padding: 12px;
+      }
+
+  .periodic-order .timeStamp {
+    position: fixed !important;
+    top: -12px !important;
+    left: -10px !important;
+    z-index: 1022;
+  }
+
+  .continuous-order .aside-menu {
+    top: 0px;
+    margin-right: 0px !important;
+    height: calc(100vh - 38px) !important;
+  }
+
+  .continuous-order .aside-menu .tab-content {
+    overflow-y: auto !important;
+  }
+
+    .continuous-order .aside-menu .tab-content::-webkit-scrollbar {
+      display: none;
+    }
+
+  .continuous-order #footerPanel {
+    margin-bottom: -110px;
+  }
+
+  .continuous-order #taisanAccount>div:first-child>div:first-child>div:last-child {
+    top: 7px;
+    left: 330px;
+    bottom: unset;
+    right: unset;
+  }
+
+  .continuous-order #status-danhmuc-content>tr>td:nth-child(2) {
+    top: 3px;
+    left: 270px;
+    bottom: unset;
+    right: unset;
+  }
+
+  .continuous-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(11) {
+    top: 4px;
+    left: 200px;
+    bottom: unset;
+    right: unset;
+  }
+}

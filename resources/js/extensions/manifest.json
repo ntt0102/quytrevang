@@ -1,0 +1,38 @@
+{
+  "name": "VPS Extention",
+  "version": "1.0",
+  "manifest_version": 3,
+  "description": "Google extension for VPS. By Tho.",
+  "icons": {
+    "128": "icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://smartpro.vps.com.vn/v1/"
+      ],
+      "js": [
+        "smartpro/moment.min.js",
+        "smartpro/chart.min.js",
+        "smartpro/chartjs-plugin-annotation.min.js",
+        "smartpro/socket.io.js",
+        "smartpro/script.js"
+      ],
+      "css": [
+        "smartpro/style.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "config.json"
+      ],
+      "matches": [
+        "https://smartpro.vps.com.vn/*"
+      ]
+    }
+  ]
+}

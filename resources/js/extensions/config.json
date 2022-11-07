@@ -1,0 +1,24 @@
+{
+    "endpoint": {
+        "socket": "https://bgdatafeed.vps.com.vn",
+        "check": "https://quytrevang.nguyenvanxuanphu.com/api/check-market-open",
+        "update": "https://quytrevang.nguyenvanxuanphu.com/api/update-trades",
+        "upload": "https://quytrevang.nguyenvanxuanphu.com/api/upload-atimage",
+        "check1": "http://localhost/api/check-market-open",
+        "update1": "http://localhost/api/update-trades",
+        "upload1": "http://localhost/api/upload-atimage"
+    },
+    "PMF": 2550,
+    "time": {
+        "atoStart": "08:45:13",
+        "atoEnd": "09:00:08",
+        "atcStart": "14:30:13",
+        "atcEnd": "14:45:08",
+        "atoPoint1": "08:50:03",
+        "atoPoint2": "08:55:03",
+        "atcPoint1": "14:35:03",
+        "atcPoint2": "14:40:03",
+        "breakStart": "11:30:03",
+        "breakEnd": "13:00:03"
+    }
+}

@@ -1,0 +1,74 @@
+import Vue from "vue";
+
+function initialState() {
+    return {
+        roles: [],
+        permissions: []
+    };
+}
+
+const getters = {
+    roles: state => state.roles,
+    permissions: state => state.permissions
+};
+
+const actions = {
+    validateDuplicateName({ state, rootGetters }, param) {
+        const oldRole = state.roles.find(x => x.id === param.data.id);
+        if (!!oldRole && param.value == oldRole.name)
+            return Promise.resolve(true);
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "settings/roles/validate-duplicate-name",
+                    { name: param.value },
+                    { noLoading: true }
+                )
+                .then(response => {
+                    // console.log(response);
+                    resolve(response.data);
+                });
+        });
+    },
+    fetch({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios.get("settings/roles").then(response => {
+                // console.log(response.data);
+                commit("setState", response.data);
+                resolve();
+            });
+        });
+    },
+    save({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("settings/roles", { changes: param.changes })
+                .then(response => {
+                    // console.log(response.data);
+                    resolve();
+                    dispatch("fetch");
+                });
+        });
+    },
+    resetState({ commit }) {
+        commit("resetState");
+    }
+};
+
+const mutations = {
+    setState(state, data) {
+        state.roles = data.roles;
+        state.permissions = data.permissions;
+    },
+    resetState(state) {
+        state = Object.assign(state, initialState());
+    }
+};
+
+export default {
+    namespaced: true,
+    state: initialState,
+    getters,
+    actions,
+    mutations
+};

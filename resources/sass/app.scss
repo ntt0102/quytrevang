@@ -1,0 +1,271 @@
+@import "~devextreme/dist/css/dx.common.css";
+@import "~devextreme/dist/css/dx.material.orange.dark.css";
+// @import "~vue-tour/dist/vue-tour.css";
+@import "./fontawesome/css/fontawesome.min.css";
+@import "./fontawesome/css/regular.min.css";
+@import "./variables.scss";
+
+.dx-widget,
+.dx-overlay-wrapper,
+.dx-context-menu .dx-menu-item,
+.dx-datagrid .dx-row > td,
+.dx-layout-manager .dx-field-item,
+.dx-field-label,
+.dx-field-value {
+    font-size: 16px !important;
+}
+
+.footer,
+.content {
+    line-height: 1.5;
+
+    .content-block {
+        margin-left: 20px;
+        margin-right: 20px;
+        margin-top: 20px;
+    }
+
+    h2 {
+        font-size: 25px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+        padding-left: 0;
+    }
+
+    .responsive-paddings {
+        padding: 15px;
+    }
+}
+
+body[screen-size="small"] {
+    .content {
+        .content-block {
+            margin-left: 0;
+            margin-right: 0;
+        }
+
+        h2 {
+            padding-left: 20px;
+        }
+    }
+}
+
+.dx-card.wide-card {
+    border-radius: 0;
+    margin-left: 0;
+    margin-right: 0;
+    border-right: 0;
+    border-left: 0;
+}
+
+.with-footer
+    > .dx-scrollable-wrapper
+    > .dx-scrollable-container
+    > .dx-scrollable-content {
+    height: 100%;
+
+    & > .dx-scrollview-content {
+        display: flex;
+        flex-direction: column;
+        min-height: 100%;
+    }
+}
+
+.dx-datagrid
+    .dx-datagrid-content
+    .dx-datagrid-table
+    .dx-row
+    > td:not(.dx-validation-pending):not(.dx-datagrid-select-all) {
+    &.dx-command-select,
+    &.dx-command-edit.dx-command-edit-with-icons {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+.dx-datagrid-header-panel {
+    padding: 0;
+}
+
+.dx-editor-cell:first-of-type > .dx-texteditor .dx-texteditor-input {
+    padding-left: 14px;
+}
+
+.has-error {
+    color: $base-accent;
+}
+
+.v-toast {
+    z-index: 1509;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+.center {
+    text-align: center;
+}
+
+.pswipe-gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 0;
+
+    > div {
+        -ms-flex: 20%;
+        flex: 20%;
+        max-width: 20%;
+        padding: 0 4px;
+
+        > img {
+            margin-top: 8px;
+            vertical-align: middle;
+            width: 100%;
+        }
+    }
+}
+
+.link {
+    color: rgba($base-text-color, alpha($base-text-color) * 0.7);
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+body[screen-size="medium"] {
+    .pswipe-gallery > div {
+        flex-grow: 1;
+        -ms-flex: 33%;
+        flex: 33%;
+        max-width: 33%;
+    }
+}
+body[screen-size="small"] {
+    .pswipe-gallery > div {
+        -ms-flex: 50%;
+        flex: 50%;
+        max-width: 50%;
+    }
+}
+
+.dx-datagrid-command-column {
+    padding: 5px !important;
+
+    .dx-toolbar {
+        .dx-toolbar-items-container {
+            height: 38px;
+
+            .dx-button-has-icon {
+                height: 24px;
+                min-width: 24px;
+
+                .dx-button-content {
+                    padding: 2px;
+
+                    .dx-icon {
+                        width: 18px;
+                        height: 18px;
+                        background-size: 18px 18px;
+                        padding-top: 1px;
+                        font-size: 18px;
+                        line-height: 18px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.dx-dropdownmenu-popup-wrapper > .dx-overlay-content,
+.dx-selectbox-popup-wrapper .dx-list {
+    background: lighten($base-bg, 10);
+}
+
+.dx-toolbar-menu-section .dx-toolbar-hidden-button .dx-button {
+    height: 30px;
+
+    &.dx-button-default .dx-icon {
+        color: $base-accent !important;
+    }
+}
+
+.dx-icon {
+    &.small {
+        font-size: 19px !important;
+    }
+    &.smaller {
+        font-size: 13px !important;
+    }
+}
+
+.pswp {
+    z-index: 1509 !important;
+}
+
+.qkb-bot-ui {
+    z-index: 1508 !important;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.display-none {
+    display: none;
+}
+
+.upload-browser {
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &:not(:last-child) {
+        margin-bottom: 5px;
+    }
+
+    input {
+        width: 0.1px;
+        height: 0.1px;
+        opacity: 0;
+        overflow: hidden;
+        position: absolute;
+        z-index: -1;
+    }
+    input + label {
+        font-weight: 700;
+        color: white;
+        padding: 5px;
+        display: inline-block;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    input:focus + label,
+    input + label:hover {
+        background-color: $base-accent;
+    }
+
+    input:focus + label {
+        outline: 1px dotted white;
+        outline: -webkit-focus-ring-color auto 5px;
+    }
+}
+
+.text-dark {
+    color: darken($base-text-color, 20);
+}
+.text-darker {
+    color: darken($base-text-color, 30);
+}
