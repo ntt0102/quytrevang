@@ -111,7 +111,6 @@ class AppService extends CoreService
                 $imageName = $request->imageName;
                 $isOk = Storage::put($path . $imageName, $imageData);
                 return ['isOk' => $isOk, 'ss' => $request->session];
-                return ['isOk' => $isOk, 'ss' => $request->session];
             }
         );
     }
