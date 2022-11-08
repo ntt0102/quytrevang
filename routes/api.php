@@ -19,9 +19,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('send-comment', 'AppController@sendComment');
     Route::get('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
-    Route::post('update-trades', 'AppController@updateTrades')->middleware('cors');
-    Route::post('upload-atimage', 'AppController@uploadAtImage')->middleware('cors');
-    Route::post('check-market-open', 'AppController@checkMarketOpen')->middleware('cors');
+    Route::post('vps-report', 'AppController@updateTrades')->middleware('cors');
+    Route::post('vps-export', 'AppController@uploadAtImage')->middleware('cors');
+    Route::post('vps-config', 'AppController@checkMarketOpen')->middleware('cors');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login');

@@ -121,7 +121,7 @@ class AppService extends CoreService
      * @param $request
      * 
      */
-    public function checkMarketOpen($request = null)
+    public function checkMarketOpen()
     {
         $currentDay = date("w");
         if ($currentDay == 0 || $currentDay == 6) return ['isOpening' => false];
@@ -148,7 +148,7 @@ class AppService extends CoreService
             }, []);
         if (in_array($currentDate, $holidays)) return ['isOpening' => false];
         $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
-        return ['isOpening' => true, 'contractNumber' => $tradeContracts];
+        return ['isOpeningMarket' => true, 'contractNumber' => $tradeContracts];
     }
 
     /**
