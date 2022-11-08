@@ -6,16 +6,20 @@
   "icons": {
     "128": "icon.png"
   },
+  "permissions": ["activeTab"],
   "content_scripts": [
     {
       "matches": [
         "https://smartpro.vps.com.vn/v1/"
       ],
       "js": [
+        "smartpro/socket.io.js",
         "smartpro/moment.min.js",
+        "smartpro/hammer.min.js",
         "smartpro/chart.min.js",
         "smartpro/chartjs-plugin-annotation.min.js",
-        "smartpro/socket.io.js",
+        "smartpro/chartjs-plugin-zoom.min.js",
+        "smartpro/chartjs-adapter-moment.min.js",
         "smartpro/script.js"
       ],
       "css": [
@@ -34,5 +38,5 @@
         "https://smartpro.vps.com.vn/*"
       ]
     }
-  ]
+  ]  
 }

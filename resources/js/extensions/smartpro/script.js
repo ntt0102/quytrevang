@@ -3,6 +3,7 @@ var mIsReportedData = false;
 var mIsOpeningMarket = false;
 var mPeriodicChart = {};
 var mExtra = {};
+var mDatabase = null;
 
 getConfig()
     .then(() => checkOpeningMarket())
@@ -13,6 +14,7 @@ getConfig()
             createOrderListButton();
             intervalHandler();
             initSocket();
+            createPriceDB();
         }
         createContinuousButton();
         registerEvent();
@@ -76,16 +78,24 @@ function createPeriodicButton() {
     var canvas = document.createElement("canvas");
     var clearButton = document.createElement("button");
     clearButton.setAttribute("id", "clearButton");
-    clearButton.innerText = "Xoá dữ liệu";
+    clearButton.innerText = "Reset zoom";
     clearButton.addEventListener("click", () => {
-        removeData(mPeriodicChart);
+        // removeData(mPeriodicChart);
+        // mPeriodicChart.resetZoom();
+        // exportToFile();
+        chrome.downloads.download({
+            url:
+                "http://upload.wikimedia.org/wikipedia/commons/6/6e/Moonbeam_UFO.JPG",
+            filename: "ufo.jpg"
+        });
     });
     var exportButton = document.createElement("button");
     exportButton.setAttribute("id", "exportButton");
     exportButton.innerText = "Xuất ảnh";
     exportButton.addEventListener("click", () => {
-        // exportImage(mPeriodicChart, false);
-        exportImage(mPeriodicChart, true, "ATO");
+        // exportImage(mPeriodicChart, false, "ATC");
+        // exportImage(mPeriodicChart, true, "ATO");
+        zoomScale("ATO");
     });
     var p = document.createElement("p");
     p.setAttribute("id", "orderCountP");
@@ -101,7 +111,7 @@ function createPeriodicButton() {
     mPeriodicChart = new Chart(canvas.getContext("2d"), {
         type: "line",
         data: {
-            labels: [],
+            // labels: [],
             datasets: [
                 {
                     label: "Giá",
@@ -133,6 +143,17 @@ function createPeriodicButton() {
         options: {
             scales: {
                 x: {
+                    type: "time",
+                    time: {
+                        displayFormats: {
+                            month: "MM-YYYY",
+                            day: "DD-MM-YYYY",
+                            hour: "HH:mm",
+                            minute: "HH:mm",
+                            second: "HH:mm:ss",
+                            millisecond: "mm:ss.SSS"
+                        }
+                    },
                     grid: {
                         color: "#696969",
                         borderDash: [2, 2]
@@ -154,32 +175,47 @@ function createPeriodicButton() {
                     display: true,
                     text: "Biểu đồ"
                 },
-                annotation: {
-                    annotations: {
-                        line1: {
-                            type: "line",
-                            xMin: mConfig.time.atoPoint1,
-                            xMax: mConfig.time.atoPoint1,
-                            adjustScaleRange: false
+                // annotation: {
+                //     annotations: {
+                //         line1: {
+                //             type: "line",
+                //             xMin: mConfig.time.atoPoint1,
+                //             xMax: mConfig.time.atoPoint1,
+                //             adjustScaleRange: false
+                //         },
+                //         line2: {
+                //             type: "line",
+                //             xMin: mConfig.time.atoPoint2,
+                //             xMax: mConfig.time.atoPoint2,
+                //             adjustScaleRange: false
+                //         },
+                //         line3: {
+                //             type: "line",
+                //             xMin: mConfig.time.atcPoint1,
+                //             xMax: mConfig.time.atcPoint1,
+                //             adjustScaleRange: false
+                //         },
+                //         line4: {
+                //             type: "line",
+                //             xMin: mConfig.time.atcPoint2,
+                //             xMax: mConfig.time.atcPoint2,
+                //             adjustScaleRange: false
+                //         }
+                //     }
+                // },
+                zoom: {
+                    zoom: {
+                        wheel: {
+                            enabled: true
                         },
-                        line2: {
-                            type: "line",
-                            xMin: mConfig.time.atoPoint2,
-                            xMax: mConfig.time.atoPoint2,
-                            adjustScaleRange: false
+                        pinch: {
+                            enabled: true
                         },
-                        line3: {
-                            type: "line",
-                            xMin: mConfig.time.atcPoint1,
-                            xMax: mConfig.time.atcPoint1,
-                            adjustScaleRange: false
-                        },
-                        line4: {
-                            type: "line",
-                            xMin: mConfig.time.atcPoint2,
-                            xMax: mConfig.time.atcPoint2,
-                            adjustScaleRange: false
-                        }
+                        mode: "x"
+                    },
+                    pan: {
+                        enabled: true,
+                        mode: "x"
                     }
                 }
             },
@@ -225,16 +261,16 @@ function intervalHandler() {
     setInterval(() => {
         var currentTime = moment().format("HH:mm:ss");
         var isAtoSession =
-            currentTime >= mConfig.time.atoStart &&
-            currentTime <= mConfig.time.atoEnd;
+            currentTime >= mConfig.time.ATO.start &&
+            currentTime <= mConfig.time.ATO.end;
         var isAtcSession =
-            currentTime >= mConfig.time.atcStart &&
-            currentTime <= mConfig.time.atcEnd;
+            currentTime >= mConfig.time.ATC.start &&
+            currentTime <= mConfig.time.ATC.end;
         var isLoSession =
-            (currentTime > mConfig.time.atoEnd &&
+            (currentTime > mConfig.time.ATO.end &&
                 currentTime < mConfig.time.breakStart) ||
             (currentTime > mConfig.time.breakEnd &&
-                currentTime < mConfig.time.atcStart);
+                currentTime < mConfig.time.ATC.start);
         var session = isAtoSession
             ? "ATO"
             : isAtcSession
@@ -246,24 +282,24 @@ function intervalHandler() {
             document.getElementById("right_price").value = session;
         //
         if (
-            currentTime == mConfig.time.atoStart ||
-            currentTime == mConfig.time.atcStart
+            currentTime == mConfig.time.ATO.start ||
+            currentTime == mConfig.time.ATC.start
         )
             removeData(mPeriodicChart);
         //
-        if (session != "") {
-            addData(mPeriodicChart, currentTime, session);
-            mPeriodicChart.options.plugins.title.text = `Biểu đồ ${session} ngày ${currentDate}`;
-            mPeriodicChart.update();
-        }
+        // if (session != "") {
+        addData(mPeriodicChart, currentTime, session);
+        mPeriodicChart.options.plugins.title.text = `Biểu đồ ${session} ngày ${currentDate}`;
+        mPeriodicChart.update();
+        // }
         // Export
         if (
-            currentTime == mConfig.time.atoEnd ||
-            currentTime == mConfig.time.atcEnd
+            currentTime == mConfig.time.ATO.end ||
+            currentTime == mConfig.time.ATC.end
         )
             exportImage(mPeriodicChart, true, session);
         // Report
-        if (currentTime == mConfig.time.atcEnd && !mIsReportedData) {
+        if (currentTime >= mConfig.time.ATC.end && !mIsReportedData) {
             mIsReportedData = true;
             setTimeout(() => reportHandler(), 30000);
         }
@@ -391,28 +427,32 @@ function stopOrderType() {
 }
 
 function addData(chart, label, session) {
+    var time = moment();
     var row = document.getElementById("tbodyPhaisinhContent").rows[0];
     var price = +row.cells[10].innerText.replace(",", "");
-    chart.data.labels.push(label);
-    chart.data.datasets[0].data.push(price);
-    chart.data.datasets[1].data.push(mExtra.BVolume - mExtra.SVolume);
+    // chart.data.labels.push(label);
+    chart.data.datasets[0].data.push({ x: time, y: price });
+    chart.data.datasets[1].data.push({ x: time, y: mExtra.volume });
     if (session != "LO") {
         var buyAtVol = +row.cells[9].innerText.replace(",", "");
         var sellAtVol = +row.cells[15].innerText.replace(",", "");
-        chart.data.datasets[2].data.push(buyAtVol - sellAtVol);
+        chart.data.datasets[2].data.push({ x: time, y: buyAtVol - sellAtVol });
     }
-    chart.update();
+    // chart.data.datasets[0].data.push({ x: moment(), y: Math.random() });
+    chart.update("none");
 }
 
 function removeData(chart) {
     console.log("removeData");
-    chart.data.labels = [];
     chart.data.datasets[0].data = [];
+    chart.data.datasets[1].data = [];
+    chart.data.datasets[2].data = [];
     chart.update();
 }
 
 function exportImage(chart, isUpload, session) {
     // console.log("exportImage", isUpload);
+    zoomScale(session);
     var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
     var imageData = chart.toBase64Image();
     if (isUpload) {
@@ -449,6 +489,19 @@ function exportImage(chart, isUpload, session) {
     }
 }
 
+function zoomScale(session) {
+    var [hStart, mStart, sStart] = mConfig.time[session].start.split(":");
+    var [hEnd, mEnd, sEnd] = mConfig.time[session].end.split(":");
+    mPeriodicChart.zoomScale(
+        "x",
+        {
+            min: moment().set({ hour: hStart, minute: mStart, second: sStart }),
+            max: moment().set({ hour: hEnd, minute: mEnd, second: sEnd })
+        },
+        "none"
+    );
+}
+
 function toggleFullScreen() {
     if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen();
@@ -469,8 +522,24 @@ function initSocket() {
     socket.on("boardps", data => {
         if (data.data.id == 3310) {
             // console.log("boardps-3310", data.data);
-            mExtra.BVolume = data.data.BVolume;
-            mExtra.SVolume = data.data.SVolume;
+            mExtra.volume = data.data.BVolume - data.data.SVolume;
         }
     });
+}
+
+function createPriceDB() {
+    const request = indexedDB.open("vpsDB", 1);
+    request.onupgradeneeded = e => {
+        console.log("onupgradeneeded");
+        mDatabase = e.target.result;
+        mDatabase.createObjectStore("prices", { keyPath: "time" });
+        mDatabase.createObjectStore("volumes", { keyPath: "time" });
+    };
+    request.onsuccess = e => {
+        console.log("onupgradeneeded");
+        mDatabase = e.target.result;
+    };
+    request.onerror = () => {
+        console.log("onerror");
+    };
 }
