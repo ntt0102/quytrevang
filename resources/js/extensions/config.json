@@ -1,12 +1,12 @@
 {
     "endpoint": {
-        "socket": "https://bgdatafeed.vps.com.vn",
-        "check": "https://quytrevang.nguyenvanxuanphu.com/api/check-market-open",
-        "update": "https://quytrevang.nguyenvanxuanphu.com/api/update-trades",
-        "upload": "https://quytrevang.nguyenvanxuanphu.com/api/upload-atimage",
-        "check1": "http://localhost/api/check-market-open",
-        "update1": "http://localhost/api/update-trades",
-        "upload1": "http://localhost/api/upload-atimage"
+        "socket": "https://datafeed.vps.com.vn",
+        "config": "https://quytrevang.nguyenvanxuanphu.com/api/vps-config",
+        "report": "https://quytrevang.nguyenvanxuanphu.com/api/vps-report",
+        "export": "https://quytrevang.nguyenvanxuanphu.com/api/vps-export",
+        "check1": "http://localhost/api/vps-config",
+        "report1": "http://localhost/api/vps-report",
+        "export1": "http://localhost/api/vps-export"
     },
     "PMF": 2550,
     "time": {
@@ -18,10 +18,6 @@
             "start": "14:30:13",
             "end": "14:45:08"
         },
-        "atoPoint1": "08:50:03",
-        "atoPoint2": "08:55:03",
-        "atcPoint1": "14:35:03",
-        "atcPoint2": "14:40:03",
         "breakStart": "11:30:03",
         "breakEnd": "13:00:03"
     }

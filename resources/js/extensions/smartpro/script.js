@@ -1,26 +1,21 @@
 var mConfig = {};
-var mIsReportedData = false;
-var mIsOpeningMarket = false;
-var mPeriodicChart = {};
-var mExtra = {};
+var mChart = {};
 var mDatabase = null;
 
-getConfig()
-    .then(() => checkOpeningMarket())
+getLocalConfig()
+    .then(() => getServerConfig())
     .then(() => {
-        if (mIsOpeningMarket) {
-            createPeriodicButton();
-            createReportButton();
-            createOrderListButton();
-            intervalHandler();
-            initSocket();
-            createPriceDB();
-        }
+        createPeriodicButton();
+        // createReportButton();
+        createOrderListButton();
+        intervalHandler();
+        initSocket();
+        createDatabase();
         createContinuousButton();
         registerEvent();
     });
 
-function getConfig() {
+function getLocalConfig() {
     return new Promise((resolve, reject) => {
         const file = chrome.runtime.getURL("config.json");
         fetch(file)
@@ -33,19 +28,20 @@ function getConfig() {
     });
 }
 
-function checkOpeningMarket() {
+function getServerConfig() {
     return new Promise((resolve, reject) => {
-        const url = mConfig.endpoint.check;
+        const url = mConfig.endpoint.config;
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" }
         })
             .then(response => response.json())
             .then(json => {
-                console.log("checkOpeningMarket", json);
-                mIsOpeningMarket = json.isOpening;
-                if (mIsOpeningMarket)
-                    mConfig.contractNumber = json.contractNumber;
+                console.log("getServerConfig", json);
+                mConfig.isOpeningMarket = json.isOpeningMarket;
+                mConfig.contractNumber = json.contractNumber;
+                mConfig.isReportedResult = false;
+                mConfig.session = null;
                 resolve();
             });
     });
@@ -66,13 +62,13 @@ function createContinuousButton() {
     document.body.append(button);
 }
 
-function createReportButton() {
-    var button = document.createElement("button");
-    button.setAttribute("id", "reportButton");
-    button.innerText = "Báo cáo";
-    button.addEventListener("click", reportHandler);
-    document.body.append(button);
-}
+// function createReportButton() {
+//     var button = document.createElement("button");
+//     button.setAttribute("id", "reportButton");
+//     button.innerText = "Báo cáo";
+//     button.addEventListener("click", reportHandler);
+//     document.body.append(button);
+// }
 
 function createPeriodicButton() {
     var canvas = document.createElement("canvas");
@@ -80,22 +76,23 @@ function createPeriodicButton() {
     clearButton.setAttribute("id", "clearButton");
     clearButton.innerText = "Reset zoom";
     clearButton.addEventListener("click", () => {
-        // removeData(mPeriodicChart);
-        // mPeriodicChart.resetZoom();
-        // exportToFile();
-        chrome.downloads.download({
-            url:
-                "http://upload.wikimedia.org/wikipedia/commons/6/6e/Moonbeam_UFO.JPG",
-            filename: "ufo.jpg"
-        });
+        // removeData(mChart);
+        // mChart.resetZoom();
+        mChart.zoomScale(
+            "x",
+            {
+                max: moment()
+            },
+            "none"
+        );
     });
     var exportButton = document.createElement("button");
     exportButton.setAttribute("id", "exportButton");
     exportButton.innerText = "Xuất ảnh";
     exportButton.addEventListener("click", () => {
-        // exportImage(mPeriodicChart, false, "ATC");
-        // exportImage(mPeriodicChart, true, "ATO");
-        zoomScale("ATO");
+        // exportImage(mChart, false, "ATC");
+        // exportImage(mChart, true, "ATO");
+        zoomScale("ATC");
     });
     var p = document.createElement("p");
     p.setAttribute("id", "orderCountP");
@@ -108,10 +105,9 @@ function createPeriodicButton() {
     document.body.append(div);
 
     Chart.defaults.color = "white";
-    mPeriodicChart = new Chart(canvas.getContext("2d"), {
+    mChart = new Chart(canvas.getContext("2d"), {
         type: "line",
         data: {
-            // labels: [],
             datasets: [
                 {
                     label: "Giá",
@@ -127,14 +123,6 @@ function createPeriodicButton() {
                     data: [],
                     borderColor: "magenta",
                     backgroundColor: "magenta",
-                    yAxisID: "y1",
-                    pointRadius: 0
-                },
-                {
-                    label: "KL1",
-                    data: [],
-                    borderColor: "cyan",
-                    backgroundColor: "cyan",
                     yAxisID: "y1",
                     pointRadius: 0
                 }
@@ -175,34 +163,6 @@ function createPeriodicButton() {
                     display: true,
                     text: "Biểu đồ"
                 },
-                // annotation: {
-                //     annotations: {
-                //         line1: {
-                //             type: "line",
-                //             xMin: mConfig.time.atoPoint1,
-                //             xMax: mConfig.time.atoPoint1,
-                //             adjustScaleRange: false
-                //         },
-                //         line2: {
-                //             type: "line",
-                //             xMin: mConfig.time.atoPoint2,
-                //             xMax: mConfig.time.atoPoint2,
-                //             adjustScaleRange: false
-                //         },
-                //         line3: {
-                //             type: "line",
-                //             xMin: mConfig.time.atcPoint1,
-                //             xMax: mConfig.time.atcPoint1,
-                //             adjustScaleRange: false
-                //         },
-                //         line4: {
-                //             type: "line",
-                //             xMin: mConfig.time.atcPoint2,
-                //             xMax: mConfig.time.atcPoint2,
-                //             adjustScaleRange: false
-                //         }
-                //     }
-                // },
                 zoom: {
                     zoom: {
                         wheel: {
@@ -256,7 +216,10 @@ function createOrderListButton() {
 function intervalHandler() {
     document.getElementById("orderListButton").click();
     document.getElementById("sohopdong").value = mConfig.contractNumber;
-    var currentDate = moment().format("DD/MM/YYYY");
+    mChart.options.plugins.title.text = `Biểu đồ ngày ${moment().format(
+        "DD/MM/YYYY"
+    )}`;
+    mChart.update();
 
     setInterval(() => {
         var currentTime = moment().format("HH:mm:ss");
@@ -266,41 +229,29 @@ function intervalHandler() {
         var isAtcSession =
             currentTime >= mConfig.time.ATC.start &&
             currentTime <= mConfig.time.ATC.end;
-        var isLoSession =
-            (currentTime > mConfig.time.ATO.end &&
-                currentTime < mConfig.time.breakStart) ||
-            (currentTime > mConfig.time.breakEnd &&
-                currentTime < mConfig.time.ATC.start);
-        var session = isAtoSession
+        // var isLoSession =
+        //     (currentTime > mConfig.time.ATO.end &&
+        //         currentTime < mConfig.time.breakStart) ||
+        //     (currentTime > mConfig.time.breakEnd &&
+        //         currentTime < mConfig.time.ATC.start);
+        mConfig.session = isAtoSession
             ? "ATO"
             : isAtcSession
             ? "ATC"
-            : isLoSession
-            ? "LO"
-            : "";
+            : // : isLoSession
+              // ? "LO"
+              null;
         if (isAtoSession || isAtcSession)
-            document.getElementById("right_price").value = session;
-        //
-        if (
-            currentTime == mConfig.time.ATO.start ||
-            currentTime == mConfig.time.ATC.start
-        )
-            removeData(mPeriodicChart);
-        //
-        // if (session != "") {
-        addData(mPeriodicChart, currentTime, session);
-        mPeriodicChart.options.plugins.title.text = `Biểu đồ ${session} ngày ${currentDate}`;
-        mPeriodicChart.update();
-        // }
+            document.getElementById("right_price").value = mConfig.session;
         // Export
         if (
             currentTime == mConfig.time.ATO.end ||
             currentTime == mConfig.time.ATC.end
         )
-            exportImage(mPeriodicChart, true, session);
+            exportImage(session, true);
         // Report
-        if (currentTime >= mConfig.time.ATC.end && !mIsReportedData) {
-            mIsReportedData = true;
+        if (currentTime >= mConfig.time.ATC.end && !mConfig.isReportedResult) {
+            mConfig.isReportedResult = true;
             setTimeout(() => reportHandler(), 30000);
         }
         //
@@ -316,58 +267,62 @@ function intervalHandler() {
 }
 
 function reportHandler() {
-    const url = mConfig.endpoint.update;
-    const data = {
-        revenue: +document
-            .getElementById("vmAccInfo")
-            .innerText.replaceAll(",", ""),
-        fees: +document
-            .getElementById("othersAccInfo")
-            .innerText.replaceAll(",", ""),
-        scores: +document.getElementById("tbodyPhaisinhContent").rows[0]
-            .cells[1].innerText
-    };
-    for (var item of document.getElementById("tbodyContent").rows) {
-        if (item.cells[0].innerText == "") break;
-        else {
-            var volume = +item.cells[6].innerText;
-            if (!isNaN(volume) && item.cells[7].innerText == "ATO") {
-                var days = moment().day() == 1 ? 3 : 1;
-                data.fees += days * volume * mConfig.PMF;
+    if (mConfig.isOpeningMarket) {
+        const url = mConfig.endpoint.report;
+        const data = {
+            revenue: +document
+                .getElementById("vmAccInfo")
+                .innerText.replaceAll(",", ""),
+            fees: +document
+                .getElementById("othersAccInfo")
+                .innerText.replaceAll(",", ""),
+            scores: +document.getElementById("tbodyPhaisinhContent").rows[0]
+                .cells[1].innerText
+        };
+        for (var item of document.getElementById("tbodyContent").rows) {
+            if (item.cells[0].innerText == "") break;
+            else {
+                var volume = +item.cells[6].innerText;
+                if (!isNaN(volume) && item.cells[7].innerText == "ATO") {
+                    var days = moment().day() == 1 ? 3 : 1;
+                    data.fees += days * volume * mConfig.PMF;
+                }
             }
         }
+        mConfig.isReportedResult = true;
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(response.statusText);
+            })
+            .then(jsondata => {
+                console.log("Report-Start ##############################");
+                console.log(jsondata);
+                console.log("Report-End ##############################");
+                mConfig.isReportedResult = jsondata.isOk;
+                if (jsondata.isOk)
+                    alert(
+                        `Báo cáo đã gửi ${
+                            jsondata.isExecuted
+                                ? "thành công."
+                                : "trước đó rồi."
+                        }`
+                    );
+            })
+            .catch(error => {
+                mConfig.isReportedResult = false;
+                console.log("Report-Start ##############################");
+                console.log(error);
+                console.log("Report-End ##############################");
+                alert("Gửi báo cáo thất bại");
+            });
     }
-    mIsReportedData = true;
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw new Error(response.statusText);
-        })
-        .then(jsondata => {
-            console.log("Report-Start ##############################");
-            console.log(jsondata);
-            console.log("Report-End ##############################");
-            mIsReportedData = jsondata.isOk;
-            if (jsondata.isOk)
-                alert(
-                    `Báo cáo đã gửi ${
-                        jsondata.isExecuted ? "thành công." : "trước đó rồi."
-                    }`
-                );
-        })
-        .catch(error => {
-            mIsReportedData = false;
-            console.log("Report-Start ##############################");
-            console.log(error);
-            console.log("Report-End ##############################");
-            alert("Gửi báo cáo thất bại");
-        });
 }
 
 function registerEvent() {
@@ -426,37 +381,16 @@ function stopOrderType() {
     if (isError) alert("Đặt sai điều kiện");
 }
 
-function addData(chart, label, session) {
-    var time = moment();
-    var row = document.getElementById("tbodyPhaisinhContent").rows[0];
-    var price = +row.cells[10].innerText.replace(",", "");
-    // chart.data.labels.push(label);
-    chart.data.datasets[0].data.push({ x: time, y: price });
-    chart.data.datasets[1].data.push({ x: time, y: mExtra.volume });
-    if (session != "LO") {
-        var buyAtVol = +row.cells[9].innerText.replace(",", "");
-        var sellAtVol = +row.cells[15].innerText.replace(",", "");
-        chart.data.datasets[2].data.push({ x: time, y: buyAtVol - sellAtVol });
-    }
-    // chart.data.datasets[0].data.push({ x: moment(), y: Math.random() });
-    chart.update("none");
-}
-
-function removeData(chart) {
-    console.log("removeData");
-    chart.data.datasets[0].data = [];
-    chart.data.datasets[1].data = [];
-    chart.data.datasets[2].data = [];
-    chart.update();
-}
-
-function exportImage(chart, isUpload, session) {
-    // console.log("exportImage", isUpload);
+function exportImage(session, isUpload) {
+    mChart.options.plugins.title.text = `Biểu đồ ${session} ngày ${moment().format(
+        "DD/MM/YYYY"
+    )}`;
+    mChart.update();
     zoomScale(session);
     var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
-    var imageData = chart.toBase64Image();
+    var imageData = mChart.toBase64Image();
     if (isUpload) {
-        const url = mConfig.endpoint.upload;
+        const url = mConfig.endpoint.export;
         const data = { imageData, imageName, session };
         fetch(url, {
             method: "POST",
@@ -492,7 +426,7 @@ function exportImage(chart, isUpload, session) {
 function zoomScale(session) {
     var [hStart, mStart, sStart] = mConfig.time[session].start.split(":");
     var [hEnd, mEnd, sEnd] = mConfig.time[session].end.split(":");
-    mPeriodicChart.zoomScale(
+    mChart.zoomScale(
         "x",
         {
             min: moment().set({ hour: hStart, minute: mStart, second: sStart }),
@@ -520,24 +454,77 @@ function initSocket() {
     socket.on("connect", () => socket.emit("regs", msg));
     socket.on("reconnect", () => socket.emit("regs", msg));
     socket.on("boardps", data => {
+        // console.log("boardps" + data.data.id, data.data);
+        if (data.data.id == 3220) {
+            console.log("boardps" + data.data.id);
+            const price = {
+                x: new Date(),
+                y: data.data.lastPrice
+            };
+            mChart.data.datasets[0].data.push(price);
+            mChart.update("none");
+            setDatabase("price", price);
+        }
         if (data.data.id == 3310) {
-            // console.log("boardps-3310", data.data);
-            mExtra.volume = data.data.BVolume - data.data.SVolume;
+            console.log("boardps" + data.data.id);
+            const volume = {
+                x: new Date(),
+                y: data.data.BVolume - data.data.SVolume
+            };
+            mChart.data.datasets[1].data.push(volume);
+            mChart.update("none");
+            setDatabase("volume", volume);
+        }
+    });
+    socket.on("stockps", data => {
+        if (data.data.id == 3220) {
+            console.log("stockps" + data.data.id);
+            const price = {
+                x: new Date(),
+                y: data.data.lastPrice
+            };
+            mChart.data.datasets[0].data.push(price);
+            mChart.update("none");
+            setDatabase("price", price);
         }
     });
 }
 
-function createPriceDB() {
+function createDatabase() {
     const request = indexedDB.open("vpsDB", 1);
     request.onupgradeneeded = e => {
         console.log("onupgradeneeded");
         mDatabase = e.target.result;
-        mDatabase.createObjectStore("prices", { keyPath: "time" });
-        mDatabase.createObjectStore("volumes", { keyPath: "time" });
+        mDatabase.createObjectStore("price", { keyPath: "x" });
+        mDatabase.createObjectStore("volume", { keyPath: "x" });
     };
     request.onsuccess = e => {
-        console.log("onupgradeneeded");
+        console.log("onsuccess");
         mDatabase = e.target.result;
+    };
+    request.onerror = () => {
+        console.log("onerror");
+    };
+}
+
+function setDatabase(table, data) {
+    const transaction = mDatabase.transaction(table, "readwrite");
+    const records = transaction.objectStore(table);
+    const request = records.add(data);
+    request.onsuccess = () => {
+        console.log("onsuccess");
+    };
+    request.onerror = () => {
+        console.log("onerror");
+    };
+}
+
+function getDatabase(table) {
+    const transaction = mDatabase.transaction(table, "readonly");
+    const records = transaction.objectStore(table);
+    const request = records.getAll();
+    request.onsuccess = e => {
+        console.log("onsuccess", e);
     };
     request.onerror = () => {
         console.log("onerror");

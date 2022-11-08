@@ -6,7 +6,6 @@
   "icons": {
     "128": "icon.png"
   },
-  "permissions": ["activeTab"],
   "content_scripts": [
     {
       "matches": [
@@ -17,7 +16,6 @@
         "smartpro/moment.min.js",
         "smartpro/hammer.min.js",
         "smartpro/chart.min.js",
-        "smartpro/chartjs-plugin-annotation.min.js",
         "smartpro/chartjs-plugin-zoom.min.js",
         "smartpro/chartjs-adapter-moment.min.js",
         "smartpro/script.js"
