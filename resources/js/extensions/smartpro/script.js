@@ -415,6 +415,18 @@ function registerEvent() {
 }
 
 function loadPage() {
+    // const price = {
+    //     x: moment(),
+    //     y: 100 * Math.random(),
+    //     type: false
+    // };
+    // setData(price);
+    // const volume = {
+    //     x: moment(),
+    //     y: 1000 * Math.random(),
+    //     type: true
+    // };
+    // setData(volume);
     // Load Order List
     var button = document.createElement("button");
     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
@@ -608,70 +620,3 @@ function changeDisplayMode(mode) {
     select.value = mode;
     select.dispatchEvent(new Event("change"));
 }
-
-// function createDatabase() {
-//     return new Promise((resolve, reject) => {
-//         const request = indexedDB.open("vpsDB", 1);
-//         request.onupgradeneeded = e => {
-//             console.log("onupgradeneeded");
-//             mDatabase = e.target.result;
-//             mDatabase.createObjectStore("price", { keyPath: "x" });
-//             mDatabase.createObjectStore("volume", { keyPath: "x" });
-//             resolve();
-//         };
-//         request.onsuccess = e => {
-//             console.log("onsuccess");
-//             mDatabase = e.target.result;
-//             resolve();
-//         };
-//         request.onerror = () => {
-//             console.log("onerror");
-//             reject();
-//         };
-//     });
-// }
-
-// function setDatabase(table, data) {
-//     const request = mDatabase
-//         .transaction(table, "readwrite")
-//         .objectStore(table)
-//         .add(data);
-//     request.onsuccess = () => {
-//         console.log("onsuccess");
-//     };
-//     request.onerror = () => {
-//         console.log("onerror");
-//     };
-// }
-
-// function getDatabase(table) {
-//     return new Promise((resolve, reject) => {
-//         const request = mDatabase
-//             .transaction(table, "readonly")
-//             .objectStore(table)
-//             .getAll();
-//         request.onsuccess = e => {
-//             console.log("onsuccess", e);
-//             resolve(e.target.result);
-//         };
-//         request.onerror = () => {
-//             console.log("onerror");
-//             reject();
-//         };
-//     });
-// }
-
-// function emptyDatabase(table) {
-//     const request = mDatabase
-//         .transaction(table, "readwrite")
-//         .objectStore(table)
-//         .clear();
-
-//     request.onsuccess = () => {
-//         console.log(`Object Store "${table}" emptied`);
-//     };
-
-//     request.onerror = err => {
-//         console.error(`Error to empty Object Store: ${table}`);
-//     };
-// }
