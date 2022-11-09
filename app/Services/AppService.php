@@ -125,7 +125,7 @@ class AppService extends CoreService
      * @param $request
      * 
      */
-    public function vpsConfig()
+    public function vpsConfig($request)
     {
         $currentDay = date("w");
         if ($currentDay == 0 || $currentDay == 6) return ['isOpening' => false];
@@ -151,6 +151,9 @@ class AppService extends CoreService
                 return $days;
             }, []);
         if (in_array($currentDate, $holidays)) return ['isOpening' => false];
+        //
+        $this->parameterRepository->setValue('VN30F1M', $request->VN30F1M);
+        //
         $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
         return ['isOpeningMarket' => true, 'contractNumber' => $tradeContracts];
     }
@@ -179,6 +182,45 @@ class AppService extends CoreService
                 }
             }
         );
+    }
+
+    public function vpsWebSocket()
+    {
+        $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
+        \Ratchet\Client\connect($uri)->then(function ($conn) {
+            $conn->on('open', function () use ($conn) {
+                error_log("open\n");
+                $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
+                $msg = ['action' => 'join', 'list' => $VN30F1M];
+                $conn->send(json_encode(["regs", $msg]));
+            });
+            $conn->on('message', function ($msg) {
+                error_log("message: {$msg}\n");
+                try {
+                    $text = substr($msg, 2);
+                    $json = json_decode($text)[1]->data;
+                    if ($json->id == 3220) {
+                        $data = ['x' => now(), 'y' => $json->lastPrice, 'type' => false];
+                        $this->vpsRepository->create($data);
+                    }
+                    if ($json->id == 3310) {
+                        $data = ['x' => now(), 'y' => $json->BVolume - $json->SVolume, 'type' => true];
+                        $this->vpsRepository->create($data);
+                    }
+                } catch (\Exception $e) {
+                    error_log("message error: {$e->getMessage()}\n");
+                }
+            });
+            $conn->on('close', function () {
+                error_log("close\n");
+                $this->vpsWebSocket();
+            });
+            $conn->on('error', function () {
+                error_log("error\n");
+            });
+        }, function ($e) {
+            error_log("Could not connect: {$e->getMessage()}\n");
+        });
     }
 
     /**

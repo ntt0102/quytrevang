@@ -36,6 +36,5 @@ class ParameterRepository extends CoreRepository
     {
         $parameter = $this->findOne([['slug', $slug]]);
         $this->update($parameter, ['value' => $value]);
-        // return $parameter;
     }
 }

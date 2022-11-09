@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,14 +33,16 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    $port_number    = 8000;
-    $IPadress_host    = "103.131.79.34";
-    $hello_msg = "This is server";
-    echo "Hitting the server :" . $hello_msg;
-    $socket_creation = socket_create(AF_INET, SOCK_STREAM, 0) or die("Unable to create connection with socket\n");
-    $server_connect = socket_connect($socket_creation, $IPadress_host, $port_number) or die("Unable to create connection with server\n");
-    socket_write($socket_creation, $hello_msg, strlen($hello_msg)) or die("Unable to send data to the  server\n");
-    $server_connect = socket_read($socket_creation, 1024) or die("Unable to read response from the server\n");
-    echo "Message from the server :" . $server_connect;
-    socket_close($socket_creation);
+    // error_log('Some message here.');
+    // $text = '["stockps",{"data":{"cmd":"ALGO.VN30","date":"09/11/2022 03:17:58","index":979.68,"change":"-0.41","calculate":"-0.49","ff":"0","id":8888}}]';
+    // $json = json_decode($text)[1]->data;
+    // if ($json->id == 3220) {
+    //     $data = ['x' => now(), 'y' => $json->lastPrice, 'type' => false];
+    // }
+    // if ($json->id == 3310) {
+    //     $data = ['x' => now(), 'y' => $json->BVolume - $json->SVolume, 'type' => true];
+    // }
+    $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
+    $socket = \Ratchet\Client\connect($uri);
+    dd($socket);
 })->middleware('cors');

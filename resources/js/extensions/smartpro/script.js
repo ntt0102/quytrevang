@@ -20,6 +20,13 @@ function getLocalConfig() {
             .then(response => response.json())
             .then(json => {
                 mConfig = json;
+                mConfig.isReportedResult = false;
+                mConfig.zoomLevel = 1;
+                setTimeout(() => {
+                    mConfig.VN30F1M = document.getElementById(
+                        "tbodyPhaisinhContent"
+                    ).rows[0].cells[0].innerText;
+                }, 0);
                 console.log("mConfig", mConfig);
                 resolve();
             });
@@ -31,15 +38,14 @@ function getServerConfig() {
         const url = mConfig.endpoint.config;
         fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" }
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ VN30F1M: mConfig.VN30F1M })
         })
             .then(response => response.json())
             .then(json => {
                 console.log("getServerConfig", json);
                 mConfig.isOpeningMarket = json.isOpeningMarket;
                 mConfig.contractNumber = json.contractNumber;
-                mConfig.isReportedResult = false;
-                mConfig.zoomLevel = 1;
                 resolve();
             });
     });
@@ -307,17 +313,19 @@ function clearData() {
 }
 
 function initSocket() {
-    var symbol = document.getElementById("tbodyPhaisinhContent").rows[0]
-        .cells[0].innerText;
-    var msg = `{"action":"join","list":"${symbol}"}`;
+    var msg = { action: "join", list: mConfig.VN30F1M };
     var socket = io(mConfig.endpoint.socket);
     socket.on("connect", () => socket.emit("regs", msg));
     socket.on("reconnect", () => socket.emit("regs", msg));
     socket.on("boardps", data => {
+        console.log("boardps");
         priceHandler(data.data);
         volumeHandler(data.data);
     });
-    socket.on("stockps", data => priceHandler(data.data));
+    socket.on("stockps", data => {
+        console.log("stockps");
+        priceHandler(data.data);
+    });
     function priceHandler(data) {
         if (data.id == 3220) {
             console.log("price" + data.id);

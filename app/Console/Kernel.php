@@ -16,6 +16,7 @@ class Kernel extends ConsoleKernel
         'App\Console\Commands\BackupDatabaseCommand',
         'App\Console\Commands\SubscriptionCleanCommand',
         'App\Console\Commands\TradesUpdateCommand',
+        'App\Console\Commands\ConnectSocketCommand',
     ];
 
     /**
@@ -29,6 +30,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
         $schedule->command('trades:update')->dailyAt('08:45');
+        $schedule->command('socket:connect')->everyMinute()->withoutOverlapping();
     }
 
     /**

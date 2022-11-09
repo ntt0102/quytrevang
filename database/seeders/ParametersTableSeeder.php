@@ -44,5 +44,10 @@ class ParametersTableSeeder extends Seeder
             'value' => "2",
             'description' => "Số hợp đồng phái sinh",
         ]);
+        Parameter::create([
+            'slug' => "VN30F1M",
+            'value' => "VN30F2211",
+            'description' => "Hơp đồng VN30F1M",
+        ]);
     }
 }
