@@ -285,18 +285,18 @@ function getDatabase(table) {
     });
 }
 
-function emptyDatabase(storeName) {
+function emptyDatabase(table) {
     const request = mDatabase
-        .transaction(storeName, "readwrite")
-        .objectStore(storeName)
+        .transaction(table, "readwrite")
+        .objectStore(table)
         .clear();
 
     request.onsuccess = () => {
-        console.log(`Object Store "${storeName}" emptied`);
+        console.log(`Object Store "${table}" emptied`);
     };
 
     request.onerror = err => {
-        console.error(`Error to empty Object Store: ${storeName}`);
+        console.error(`Error to empty Object Store: ${table}`);
     };
 }
 
@@ -460,8 +460,11 @@ function intervalHandler() {
     if (
         currentTime == mConfig.time.ATO.start ||
         currentTime == mConfig.time.ATC.start
-    )
+    ) {
+        emptyDatabase("price");
+        emptyDatabase("volume");
         zoomScaleForSession(mConfig.session);
+    }
     // Export
     if (
         currentTime == mConfig.time.ATO.end ||
