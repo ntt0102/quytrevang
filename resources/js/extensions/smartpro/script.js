@@ -415,20 +415,6 @@ function registerEvent() {
 }
 
 function loadPage() {
-    const price = {
-        x: moment(),
-        y: Math.random(),
-        type: false
-    };
-    // setData(price);
-    const volume = {
-        x: moment(),
-        y: Math.random(),
-        type: true
-    };
-    // setData(volume);
-    // clearData();
-
     // Load Order List
     var button = document.createElement("button");
     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
@@ -445,6 +431,16 @@ function loadPage() {
         mChart.data.datasets[1].data = result.volume;
         mChart.update("none");
     });
+    // getDatabase("volume").then(r => {
+    //     r.forEach(item => {
+    //         setTimeout(() => {
+    //             item.x = moment(item.x);
+    //             item.type = true;
+    //             console.log(item);
+    //             setData(item);
+    //         }, 5000);
+    //     });
+    // });
 }
 
 function intervalHandler() {
@@ -612,3 +608,70 @@ function changeDisplayMode(mode) {
     select.value = mode;
     select.dispatchEvent(new Event("change"));
 }
+
+// function createDatabase() {
+//     return new Promise((resolve, reject) => {
+//         const request = indexedDB.open("vpsDB", 1);
+//         request.onupgradeneeded = e => {
+//             console.log("onupgradeneeded");
+//             mDatabase = e.target.result;
+//             mDatabase.createObjectStore("price", { keyPath: "x" });
+//             mDatabase.createObjectStore("volume", { keyPath: "x" });
+//             resolve();
+//         };
+//         request.onsuccess = e => {
+//             console.log("onsuccess");
+//             mDatabase = e.target.result;
+//             resolve();
+//         };
+//         request.onerror = () => {
+//             console.log("onerror");
+//             reject();
+//         };
+//     });
+// }
+
+// function setDatabase(table, data) {
+//     const request = mDatabase
+//         .transaction(table, "readwrite")
+//         .objectStore(table)
+//         .add(data);
+//     request.onsuccess = () => {
+//         console.log("onsuccess");
+//     };
+//     request.onerror = () => {
+//         console.log("onerror");
+//     };
+// }
+
+// function getDatabase(table) {
+//     return new Promise((resolve, reject) => {
+//         const request = mDatabase
+//             .transaction(table, "readonly")
+//             .objectStore(table)
+//             .getAll();
+//         request.onsuccess = e => {
+//             console.log("onsuccess", e);
+//             resolve(e.target.result);
+//         };
+//         request.onerror = () => {
+//             console.log("onerror");
+//             reject();
+//         };
+//     });
+// }
+
+// function emptyDatabase(table) {
+//     const request = mDatabase
+//         .transaction(table, "readwrite")
+//         .objectStore(table)
+//         .clear();
+
+//     request.onsuccess = () => {
+//         console.log(`Object Store "${table}" emptied`);
+//     };
+
+//     request.onerror = err => {
+//         console.error(`Error to empty Object Store: ${table}`);
+//     };
+// }
