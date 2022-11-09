@@ -5,14 +5,14 @@ var mDatabase = null;
 getLocalConfig()
     .then(() => getServerConfig())
     .then(() => {
-        createPeriodicButton();
-        // createReportButton();
-        createOrderListButton();
-        intervalHandler();
-        initSocket();
-        createDatabase();
-        createContinuousButton();
+        createButtons();
+        createChart();
         registerEvent();
+        createDatabase().then(() => {
+            initSocket();
+            loadPage();
+            setInterval(intervalHandler, 1000);
+        });
     });
 
 function getLocalConfig() {
@@ -42,14 +42,15 @@ function getServerConfig() {
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.isReportedResult = false;
                 mConfig.session = null;
+                mConfig.zoomLevel = 1;
                 resolve();
             });
     });
 }
 
-function createContinuousButton() {
+function createButtons() {
     var button = document.createElement("button");
-    button.setAttribute("id", "continuousButton");
+    button.id = "continuousButton";
     button.innerText = "Liên tục";
     button.addEventListener("click", () => {
         if (document.body.classList.contains("continuous-order")) {
@@ -60,50 +61,72 @@ function createContinuousButton() {
         }
     });
     document.body.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "periodicButton";
+    button.innerText = "Định kỳ";
+    button.addEventListener("click", () => {
+        if (document.body.classList.contains("periodic-order")) {
+            document.body.classList.remove("periodic-order");
+        } else {
+            document.body.classList.add("periodic-order");
+            document.body.classList.remove("continuous-order");
+        }
+    });
+    document.body.append(button);
 }
 
-// function createReportButton() {
-//     var button = document.createElement("button");
-//     button.setAttribute("id", "reportButton");
-//     button.innerText = "Báo cáo";
-//     button.addEventListener("click", reportHandler);
-//     document.body.append(button);
-// }
-
-function createPeriodicButton() {
-    var canvas = document.createElement("canvas");
-    var clearButton = document.createElement("button");
-    clearButton.setAttribute("id", "clearButton");
-    clearButton.innerText = "Reset zoom";
-    clearButton.addEventListener("click", () => {
-        // removeData(mChart);
-        // mChart.resetZoom();
-        mChart.zoomScale(
-            "x",
-            {
-                max: moment()
-            },
-            "none"
-        );
-    });
-    var exportButton = document.createElement("button");
-    exportButton.setAttribute("id", "exportButton");
-    exportButton.innerText = "Xuất ảnh";
-    exportButton.addEventListener("click", () => {
-        // exportImage(mChart, false, "ATC");
-        // exportImage(mChart, true, "ATO");
-        zoomScale("ATC");
-    });
-    var p = document.createElement("p");
-    p.setAttribute("id", "orderCountP");
+function createChart() {
     var div = document.createElement("div");
-    div.setAttribute("id", "periodicChart");
-    div.append(clearButton);
-    div.append(exportButton);
+    div.id = "periodicChart";
+    //
+    var select = document.createElement("select");
+    select.id = "displaySelect";
+    ["Full", "Stream", "ATO", "ATC"].forEach((item, index) => {
+        var option = document.createElement("option");
+        option.value = item;
+        option.text = item;
+        select.appendChild(option);
+    });
+    select.addEventListener("change", e => {
+        mConfig.displayMode = e.target.value;
+        var input = document.getElementById("streamInput");
+        if (e.target.value == "Stream") {
+            input.style.zIndex = 1;
+            input.value = mConfig.streamScale;
+        } else {
+            input.style.zIndex = -1;
+            if (e.target.value == "Full") mChart.resetZoom();
+            else zoomScaleForSession(e.target.value);
+        }
+    });
+    div.append(select);
+    //
+    var input = document.createElement("input");
+    input.id = "streamInput";
+    input.style.zIndex = -1;
+    input.setAttribute("type", "number");
+    input.setAttribute("min", 1);
+    input.addEventListener("input", e => {
+        mConfig.streamScale = e.target.value;
+    });
+    div.append(input);
+    //
+    //
+    var button = document.createElement("button");
+    button.id = "exportButton";
+    button.innerText = "Export";
+    button.addEventListener("click", () => exportHandler(mConfig.displayMode));
+    div.append(button);
+    //
+    var p = document.createElement("p");
+    p.id = "orderCountP";
     div.append(p);
+    //
+    var canvas = document.createElement("canvas");
     div.append(canvas);
     document.body.append(div);
-
+    //
     Chart.defaults.color = "white";
     mChart = new Chart(canvas.getContext("2d"), {
         type: "line",
@@ -115,8 +138,8 @@ function createPeriodicButton() {
                     borderColor: "yellow",
                     backgroundColor: "yellow",
                     yAxisID: "y",
-                    borderWidth: 5,
-                    pointRadius: 0
+                    pointRadius: 0,
+                    order: 2
                 },
                 {
                     label: "KL",
@@ -124,7 +147,8 @@ function createPeriodicButton() {
                     borderColor: "magenta",
                     backgroundColor: "magenta",
                     yAxisID: "y1",
-                    pointRadius: 0
+                    pointRadius: 0,
+                    order: 1
                 }
             ]
         },
@@ -179,7 +203,24 @@ function createPeriodicButton() {
                     }
                 }
             },
-            elements: { line: { tension: 0.4 } }
+            elements: { line: { tension: 0.4 } },
+            events: ["mousemove", "click"],
+            onHover: (e, elements) => {
+                if (elements.length) {
+                    var datasetIndex = elements[0].datasetIndex;
+                    mChart.data.datasets[datasetIndex].order = 1;
+                    mChart.data.datasets[datasetIndex == 0 ? 1 : 0].order = 2;
+                    mChart.update();
+                }
+            },
+            onClick: (e, elements) => {
+                if (elements.length) {
+                    var datasetIndex = elements[0].datasetIndex;
+                    var index = elements[0].index;
+                    var data = mChart.data.datasets[datasetIndex].data[index];
+                    console.log("onClick", data);
+                }
+            }
         },
         plugins: [
             {
@@ -190,80 +231,257 @@ function createPeriodicButton() {
             }
         ]
     });
+}
 
-    var periodicButton = document.createElement("button");
-    periodicButton.setAttribute("id", "periodicButton");
-    periodicButton.innerText = "Định kỳ";
-    periodicButton.addEventListener("click", () => {
-        if (document.body.classList.contains("periodic-order")) {
-            document.body.classList.remove("periodic-order");
-        } else {
-            document.body.classList.add("periodic-order");
-            document.body.classList.remove("continuous-order");
-        }
+function createDatabase() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("vpsDB", 1);
+        request.onupgradeneeded = e => {
+            console.log("onupgradeneeded");
+            mDatabase = e.target.result;
+            mDatabase.createObjectStore("price", { keyPath: "x" });
+            mDatabase.createObjectStore("volume", { keyPath: "x" });
+            resolve();
+        };
+        request.onsuccess = e => {
+            console.log("onsuccess");
+            mDatabase = e.target.result;
+            resolve();
+        };
+        request.onerror = () => {
+            console.log("onerror");
+            reject();
+        };
     });
-    document.body.append(periodicButton);
 }
 
-function createOrderListButton() {
+function setDatabase(table, data) {
+    const request = mDatabase
+        .transaction(table, "readwrite")
+        .objectStore(table)
+        .add(data);
+    request.onsuccess = () => {
+        console.log("onsuccess");
+    };
+    request.onerror = () => {
+        console.log("onerror");
+    };
+}
+
+function getDatabase(table) {
+    return new Promise((resolve, reject) => {
+        const request = mDatabase
+            .transaction(table, "readonly")
+            .objectStore(table)
+            .getAll();
+        request.onsuccess = e => {
+            console.log("onsuccess", e);
+            resolve(e.target.result);
+        };
+        request.onerror = () => {
+            console.log("onerror");
+            reject();
+        };
+    });
+}
+
+function emptyDatabase(storeName) {
+    const request = mDatabase
+        .transaction(storeName, "readwrite")
+        .objectStore(storeName)
+        .clear();
+
+    request.onsuccess = () => {
+        console.log(`Object Store "${storeName}" emptied`);
+    };
+
+    request.onerror = err => {
+        console.error(`Error to empty Object Store: ${storeName}`);
+    };
+}
+
+function initSocket() {
+    var symbol = document.getElementById("tbodyPhaisinhContent").rows[0]
+        .cells[0].innerText;
+    var msg = `{"action":"join","list":"${symbol}"}`;
+    var socket = io(mConfig.endpoint.socket);
+    socket.on("connect", () => socket.emit("regs", msg));
+    socket.on("reconnect", () => socket.emit("regs", msg));
+    socket.on("boardps", data => {
+        priceHandler(data.data);
+        volumeHandler(data.data);
+    });
+    socket.on("stockps", data => priceHandler(data.data));
+    function priceHandler(data) {
+        if (data.id == 3220) {
+            console.log("price" + data.id);
+            const price = {
+                x: new Date(),
+                y: data.lastPrice
+            };
+            mChart.data.datasets[0].data.push(price);
+            mChart.update("none");
+            setDatabase("price", price);
+        }
+    }
+    function volumeHandler(data) {
+        if (data.id == 3310) {
+            console.log("volume" + data.id);
+            const volume = {
+                x: new Date(),
+                y: data.BVolume - data.SVolume
+            };
+            mChart.data.datasets[1].data.push(volume);
+            mChart.update("none");
+            setDatabase("volume", volume);
+        }
+    }
+}
+
+function registerEvent() {
+    document
+        .getElementById("select_condition_order_wrapper")
+        .addEventListener("click", conditionOrderSelect);
+    document
+        .getElementById("btn_long")
+        .addEventListener("click", orderButtonClick);
+    document
+        .getElementById("btn_short")
+        .addEventListener("click", orderButtonClick);
+    document
+        .getElementById("right_selStopOrderType")
+        .addEventListener("change", stopOrderSelect);
+    document
+        .getElementById("right_stopOrderIndex")
+        .addEventListener("input", stopOrderType);
+    document
+        .querySelector(".timeStamp")
+        .addEventListener("dblclick", toggleFullScreen);
+
+    function conditionOrderSelect() {
+        document.getElementById("right_price").value = "MTL";
+        document.getElementById("right_selStopOrderType").focus();
+    }
+
+    function orderButtonClick() {
+        if (
+            document
+                .getElementById("select_condition_order")
+                .classList.contains("select-active") &&
+            document.getElementById("right_price").value != "MTL"
+        )
+            alert("Giá đặt khác MTL");
+    }
+
+    function stopOrderSelect() {
+        var el = document.getElementById("right_stopOrderIndex");
+        el.value = "";
+        el.focus();
+    }
+
+    function stopOrderType() {
+        var isError = false;
+        var stopOperation = document.getElementById("right_selStopOrderType")
+            .value;
+        var stopPrice = document.getElementById("right_stopOrderIndex").value;
+        var currentPrice = document.getElementById("tbodyPhaisinhContent")
+            .rows[0].cells[10].innerText;
+        if (Math.abs(currentPrice - stopPrice) < 20) {
+            if (stopOperation == "SOL" && currentPrice >= stopPrice)
+                isError = true;
+            else if (stopOperation == "SOU" && currentPrice <= stopPrice)
+                isError = true;
+        }
+        if (isError) alert("Đặt sai điều kiện");
+    }
+
+    function toggleFullScreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+            document.body.classList.add("fullscreen");
+        } else if (document.exitFullscreen) {
+            document.exitFullscreen();
+            document.body.classList.remove("fullscreen");
+        }
+    }
+}
+
+function loadPage() {
+    // Load Order List
     var button = document.createElement("button");
-    button.setAttribute("id", "orderListButton");
-    button.style.zIndex = "-1";
     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
-    document.body.append(button);
-}
-
-function intervalHandler() {
-    document.getElementById("orderListButton").click();
+    button.click();
+    //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
     mChart.options.plugins.title.text = `Biểu đồ ngày ${moment().format(
         "DD/MM/YYYY"
     )}`;
-    mChart.update();
+    mChart.update("none");
+    getDatabase("price", moment()).then(result => {
+        mChart.data.datasets[0].data = result;
+        mChart.update("none");
+    });
+    getDatabase("volume", moment()).then(result => {
+        mChart.data.datasets[1].data = result;
+        mChart.update("none");
+    });
+}
 
-    setInterval(() => {
-        var currentTime = moment().format("HH:mm:ss");
-        var isAtoSession =
-            currentTime >= mConfig.time.ATO.start &&
-            currentTime <= mConfig.time.ATO.end;
-        var isAtcSession =
-            currentTime >= mConfig.time.ATC.start &&
-            currentTime <= mConfig.time.ATC.end;
-        // var isLoSession =
-        //     (currentTime > mConfig.time.ATO.end &&
-        //         currentTime < mConfig.time.breakStart) ||
-        //     (currentTime > mConfig.time.breakEnd &&
-        //         currentTime < mConfig.time.ATC.start);
-        mConfig.session = isAtoSession
-            ? "ATO"
-            : isAtcSession
-            ? "ATC"
-            : // : isLoSession
-              // ? "LO"
-              null;
-        if (isAtoSession || isAtcSession)
-            document.getElementById("right_price").value = mConfig.session;
-        // Export
-        if (
-            currentTime == mConfig.time.ATO.end ||
-            currentTime == mConfig.time.ATC.end
-        )
-            exportImage(session, true);
-        // Report
-        if (currentTime >= mConfig.time.ATC.end && !mConfig.isReportedResult) {
-            mConfig.isReportedResult = true;
-            setTimeout(() => reportHandler(), 30000);
-        }
-        //
-        var orderCounter = 0;
-        for (var item of document.getElementById("tbodyContent").rows) {
-            if (item.cells[0].innerText == "") break;
-            else orderCounter++;
-        }
-        document.getElementById(
-            "orderCountP"
-        ).innerText = `Tổng số lệnh: ${orderCounter}`;
-    }, 1000);
+function intervalHandler() {
+    // const volume = {
+    //     x: new Date(),
+    //     y: Math.random()
+    // };
+    // mChart.data.datasets[1].data.push(volume);
+    // mChart.update("none");
+    //
+    if (mConfig.displayMode == "Stream") {
+        mChart.zoomScale(
+            "x",
+            {
+                min: moment().subtract(mConfig.streamScale, "minutes"),
+                max: moment()
+            },
+            "none"
+        );
+    }
+    //
+    var currentTime = moment().format("HH:mm:ss");
+    var isAtoSession =
+        currentTime >= mConfig.time.ATO.start &&
+        currentTime <= mConfig.time.ATO.end;
+    var isAtcSession =
+        currentTime >= mConfig.time.ATC.start &&
+        currentTime <= mConfig.time.ATC.end;
+    mConfig.session = isAtoSession ? "ATO" : isAtcSession ? "ATC" : null;
+    if (isAtoSession || isAtcSession)
+        document.getElementById("right_price").value = mConfig.session;
+    //Display
+    if (
+        currentTime == mConfig.time.ATO.start ||
+        currentTime == mConfig.time.ATC.start
+    )
+        zoomScaleForSession(mConfig.session);
+    // Export
+    if (
+        currentTime == mConfig.time.ATO.end ||
+        currentTime == mConfig.time.ATC.end
+    )
+        exportHandler(mConfig.session);
+    // Report
+    if (currentTime >= mConfig.time.ATC.end && !mConfig.isReportedResult) {
+        mConfig.isReportedResult = true;
+        setTimeout(() => reportHandler(), 30000);
+    }
+    //
+    var orderCounter = 0;
+    for (var item of document.getElementById("tbodyContent").rows) {
+        if (item.cells[0].innerText == "") break;
+        else orderCounter++;
+    }
+    document.getElementById(
+        "orderCountP"
+    ).innerText = `Tổng số lệnh: ${orderCounter}`;
 }
 
 function reportHandler() {
@@ -306,14 +524,8 @@ function reportHandler() {
                 console.log(jsondata);
                 console.log("Report-End ##############################");
                 mConfig.isReportedResult = jsondata.isOk;
-                if (jsondata.isOk)
-                    alert(
-                        `Báo cáo đã gửi ${
-                            jsondata.isExecuted
-                                ? "thành công."
-                                : "trước đó rồi."
-                        }`
-                    );
+                if (jsondata.isOk && jsondata.isExecuted)
+                    alert("Báo cáo đã gửi thành công.");
             })
             .catch(error => {
                 mConfig.isReportedResult = false;
@@ -325,71 +537,16 @@ function reportHandler() {
     }
 }
 
-function registerEvent() {
-    document
-        .getElementById("select_condition_order_wrapper")
-        .addEventListener("click", conditionOrderSelect);
-    document
-        .getElementById("btn_long")
-        .addEventListener("click", orderButtonClick);
-    document
-        .getElementById("btn_short")
-        .addEventListener("click", orderButtonClick);
-    document
-        .getElementById("right_selStopOrderType")
-        .addEventListener("change", stopOrderSelect);
-    document
-        .getElementById("right_stopOrderIndex")
-        .addEventListener("input", stopOrderType);
-    document
-        .querySelector(".timeStamp")
-        .addEventListener("dblclick", toggleFullScreen);
-}
-
-function conditionOrderSelect() {
-    document.getElementById("right_price").value = "MTL";
-    document.getElementById("right_selStopOrderType").focus();
-}
-
-function orderButtonClick() {
-    if (
-        document
-            .getElementById("select_condition_order")
-            .classList.contains("select-active") &&
-        document.getElementById("right_price").value != "MTL"
-    )
-        alert("Giá đặt khác MTL");
-}
-
-function stopOrderSelect() {
-    var el = document.getElementById("right_stopOrderIndex");
-    el.value = "";
-    el.focus();
-}
-
-function stopOrderType() {
-    var isError = false;
-    var stopOperation = document.getElementById("right_selStopOrderType").value;
-    var stopPrice = document.getElementById("right_stopOrderIndex").value;
-    var currentPrice = document.getElementById("tbodyPhaisinhContent").rows[0]
-        .cells[10].innerText;
-    if (Math.abs(currentPrice - stopPrice) < 20) {
-        if (stopOperation == "SOL" && currentPrice >= stopPrice) isError = true;
-        else if (stopOperation == "SOU" && currentPrice <= stopPrice)
-            isError = true;
-    }
-    if (isError) alert("Đặt sai điều kiện");
-}
-
-function exportImage(session, isUpload) {
-    mChart.options.plugins.title.text = `Biểu đồ ${session} ngày ${moment().format(
-        "DD/MM/YYYY"
-    )}`;
-    mChart.update();
-    zoomScale(session);
+function exportHandler(session) {
     var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
     var imageData = mChart.toBase64Image();
-    if (isUpload) {
+
+    if (["ATO", "ATC"].includes(session)) {
+        mChart.options.plugins.title.text = `Biểu đồ ${session} ngày ${moment().format(
+            "DD/MM/YYYY"
+        )}`;
+        mChart.update();
+        zoomScaleForSession(session);
         const url = mConfig.endpoint.export;
         const data = { imageData, imageName, session };
         fetch(url, {
@@ -423,7 +580,7 @@ function exportImage(session, isUpload) {
     }
 }
 
-function zoomScale(session) {
+function zoomScaleForSession(session) {
     var [hStart, mStart, sStart] = mConfig.time[session].start.split(":");
     var [hEnd, mEnd, sEnd] = mConfig.time[session].end.split(":");
     mChart.zoomScale(
@@ -434,99 +591,4 @@ function zoomScale(session) {
         },
         "none"
     );
-}
-
-function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen();
-        document.body.classList.add("fullscreen");
-    } else if (document.exitFullscreen) {
-        document.exitFullscreen();
-        document.body.classList.remove("fullscreen");
-    }
-}
-
-function initSocket() {
-    var symbol = document.getElementById("tbodyPhaisinhContent").rows[0]
-        .cells[0].innerText;
-    var msg = `{"action":"join","list":"${symbol}"}`;
-    var socket = io(mConfig.endpoint.socket);
-    socket.on("connect", () => socket.emit("regs", msg));
-    socket.on("reconnect", () => socket.emit("regs", msg));
-    socket.on("boardps", data => {
-        // console.log("boardps" + data.data.id, data.data);
-        if (data.data.id == 3220) {
-            console.log("boardps" + data.data.id);
-            const price = {
-                x: new Date(),
-                y: data.data.lastPrice
-            };
-            mChart.data.datasets[0].data.push(price);
-            mChart.update("none");
-            setDatabase("price", price);
-        }
-        if (data.data.id == 3310) {
-            console.log("boardps" + data.data.id);
-            const volume = {
-                x: new Date(),
-                y: data.data.BVolume - data.data.SVolume
-            };
-            mChart.data.datasets[1].data.push(volume);
-            mChart.update("none");
-            setDatabase("volume", volume);
-        }
-    });
-    socket.on("stockps", data => {
-        if (data.data.id == 3220) {
-            console.log("stockps" + data.data.id);
-            const price = {
-                x: new Date(),
-                y: data.data.lastPrice
-            };
-            mChart.data.datasets[0].data.push(price);
-            mChart.update("none");
-            setDatabase("price", price);
-        }
-    });
-}
-
-function createDatabase() {
-    const request = indexedDB.open("vpsDB", 1);
-    request.onupgradeneeded = e => {
-        console.log("onupgradeneeded");
-        mDatabase = e.target.result;
-        mDatabase.createObjectStore("price", { keyPath: "x" });
-        mDatabase.createObjectStore("volume", { keyPath: "x" });
-    };
-    request.onsuccess = e => {
-        console.log("onsuccess");
-        mDatabase = e.target.result;
-    };
-    request.onerror = () => {
-        console.log("onerror");
-    };
-}
-
-function setDatabase(table, data) {
-    const transaction = mDatabase.transaction(table, "readwrite");
-    const records = transaction.objectStore(table);
-    const request = records.add(data);
-    request.onsuccess = () => {
-        console.log("onsuccess");
-    };
-    request.onerror = () => {
-        console.log("onerror");
-    };
-}
-
-function getDatabase(table) {
-    const transaction = mDatabase.transaction(table, "readonly");
-    const records = transaction.objectStore(table);
-    const request = records.getAll();
-    request.onsuccess = e => {
-        console.log("onsuccess", e);
-    };
-    request.onerror = () => {
-        console.log("onerror");
-    };
 }
