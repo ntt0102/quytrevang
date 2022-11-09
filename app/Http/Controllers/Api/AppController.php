@@ -25,9 +25,9 @@ class AppController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function updateTrades(Request $request)
+    public function vpsReport(Request $request)
     {
-        $data = $this->appService->updateTrades($request);
+        $data = $this->appService->vpsReport($request);
         return $this->sendResponse($data);
     }
 
@@ -38,9 +38,9 @@ class AppController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function uploadAtImage(Request $request)
+    public function vpsExport(Request $request)
     {
-        $data = $this->appService->uploadAtImage($request);
+        $data = $this->appService->vpsExport($request);
         return $this->sendResponse($data);
     }
 
@@ -51,9 +51,22 @@ class AppController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function checkMarketOpen(Request $request)
+    public function vpsConfig(Request $request)
     {
-        $data = $this->appService->checkMarketOpen($request);
+        $data = $this->appService->vpsConfig($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Get, set and Clear Data
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function vpsData(Request $request)
+    {
+        $data = $this->appService->vpsData($request);
         return $this->sendResponse($data);
     }
 

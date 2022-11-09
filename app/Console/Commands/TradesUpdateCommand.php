@@ -38,7 +38,7 @@ class TradesUpdateCommand extends Command
     public function handle()
     {
         if (
-            app(\App\Services\AppService::class)->checkMarketOpen()
+            app(\App\Services\AppService::class)->vpsConfig()
             && get_global_value('updatedTradesFlag') == '1'
         ) {
             set_global_value('updatedTradesFlag', '0');

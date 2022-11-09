@@ -262,6 +262,55 @@ function createChart() {
     });
 }
 
+function setData(data) {
+    data.action = "SET";
+    const url = mConfig.endpoint.data;
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+        .then(response => response.json())
+        .then(json => {
+            console.log("setData", json.isOk);
+        });
+}
+
+function clearData(data) {
+    data.action = "CLEAR";
+    const url = mConfig.endpoint.data;
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+        .then(response => response.json())
+        .then(json => {
+            console.log("clearData", json.isOk);
+        });
+}
+
+function getData(data) {
+    data.action = "GET";
+    return new Promise((resolve, reject) => {
+        const url = mConfig.endpoint.data;
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(json => {
+                console.log("getServerConfig", json);
+                mConfig.isOpeningMarket = json.isOpeningMarket;
+                mConfig.contractNumber = json.contractNumber;
+                mConfig.isReportedResult = false;
+                mConfig.zoomLevel = 1;
+                resolve();
+            });
+    });
+}
+
 function createDatabase() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open("vpsDB", 1);
@@ -457,6 +506,13 @@ function loadPage() {
 }
 
 function intervalHandler() {
+    const price = {
+        x: new Date(),
+        y: Math.random(),
+        type: false
+    };
+    setData(price);
+    //
     var currentTime = moment().format("HH:mm:ss");
     var isAtoSession =
         currentTime >= mConfig.time.ATO.start &&

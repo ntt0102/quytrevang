@@ -21,12 +21,4 @@ class PermissionRepository extends CoreRepository
     {
         parent::__construct($model);
     }
-
-    // /**
-    //  * @inheritdoc
-    //  */
-    // public function findByNames(array $names = [], $guardName = ['web'])
-    // {
-    //     return $this->model->whereIn('name', $names)->where('guard_name', $guardName)->get();
-    // }
 }

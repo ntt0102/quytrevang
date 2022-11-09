@@ -12,6 +12,7 @@ use App\Repositories\CommentRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\ContractRepository;
 use App\Repositories\TradeRepository;
+use App\Repositories\VpsRepository;
 use Illuminate\Support\Facades\Storage;
 use App\Events\UpdateTradeEvent;
 
@@ -23,6 +24,7 @@ class AppService extends CoreService
     private $userRepository;
     private $contractRepository;
     private $tradeRepository;
+    private $vpsRepository;
 
     public function __construct(
         ParameterRepository $parameterRepository,
@@ -30,7 +32,8 @@ class AppService extends CoreService
         CommentRepository $commentRepository,
         UserRepository $userRepository,
         ContractRepository $contractRepository,
-        TradeRepository $tradeRepository
+        TradeRepository $tradeRepository,
+        VpsRepository $vpsRepository
     ) {
         $this->parameterRepository = $parameterRepository;
         $this->faqRepository = $faqRepository;
@@ -38,6 +41,7 @@ class AppService extends CoreService
         $this->userRepository = $userRepository;
         $this->contractRepository = $contractRepository;
         $this->tradeRepository = $tradeRepository;
+        $this->vpsRepository = $vpsRepository;
     }
 
     /**
@@ -46,7 +50,7 @@ class AppService extends CoreService
      * @param $request
      * 
      */
-    public function updateTrades($request)
+    public function vpsReport($request)
     {
         return $this->transaction(
             function () use ($request) {
@@ -99,7 +103,7 @@ class AppService extends CoreService
      * @param $request
      * 
      */
-    public function uploadAtImage($request)
+    public function vpsExport($request)
     {
         return $this->transaction(
             function () use ($request) {
@@ -121,7 +125,7 @@ class AppService extends CoreService
      * @param $request
      * 
      */
-    public function checkMarketOpen()
+    public function vpsConfig()
     {
         $currentDay = date("w");
         if ($currentDay == 0 || $currentDay == 6) return ['isOpening' => false];
@@ -149,6 +153,35 @@ class AppService extends CoreService
         if (in_array($currentDate, $holidays)) return ['isOpening' => false];
         $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
         return ['isOpeningMarket' => true, 'contractNumber' => $tradeContracts];
+    }
+
+    /**
+     * Get, set and Clear Data
+     *
+     * @param $request
+     * 
+     */
+    public function vpsData($request)
+    {
+        return $this->transaction(
+            function () use ($request) {
+                $action = $request->action;
+                switch ($action) {
+                    case 'SET':
+                        $vps = $this->vpsRepository->create($request);
+                        $isOk = !!$vps;
+                        break;
+                    case 'GET':
+                        $vps = $this->vpsRepository->create($request);
+                        $isOk = !!$vps;
+                        break;
+                    case 'CLEAR':
+                        $isOk = $this->vpsRepository->clear();
+                        break;
+                }
+                return ['isOk' => $isOk, 'request' => $request];
+            }
+        );
     }
 
     /**

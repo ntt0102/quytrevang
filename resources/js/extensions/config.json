@@ -1,12 +1,14 @@
 {
     "endpoint": {
         "socket": "https://datafeed.vps.com.vn",
-        "config": "https://quytrevang.nguyenvanxuanphu.com/api/vps-config",
-        "report": "https://quytrevang.nguyenvanxuanphu.com/api/vps-report",
-        "export": "https://quytrevang.nguyenvanxuanphu.com/api/vps-export",
-        "check1": "http://localhost/api/vps-config",
-        "report1": "http://localhost/api/vps-report",
-        "export1": "http://localhost/api/vps-export"
+        "config": "https://quytrevang.nguyenvanxuanphu.com/api/vps/config",
+        "report": "https://quytrevang.nguyenvanxuanphu.com/api/vps/report",
+        "export": "https://quytrevang.nguyenvanxuanphu.com/api/vps/export",
+        "data": "https://quytrevang.nguyenvanxuanphu.com/api/vps/data",
+        "check1": "http://localhost/api/vps/config",
+        "report1": "http://localhost/api/vps/report",
+        "export1": "http://localhost/api/vps/export",
+        "data1": "http://localhost/api/vps/data"
     },
     "PMF": 2550,
     "displayMode": "Free",
