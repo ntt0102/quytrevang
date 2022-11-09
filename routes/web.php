@@ -34,11 +34,14 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-
-    // $read = \App\Models\User::find(1)->readNotifications()->limit(20)->get();
-    // dd($read);
-    // $a = getimagesize('http://localhost/storage/files/cccd2.jpg');
-    // $a = is_file(public_path('storage/files/cccd20.jpg'));
-    $a = get_url_image('http://localhost/storage/files/cccd2.jpg');
-    dd($a);
+    $port_number    = 8000;
+    $IPadress_host    = "103.131.79.34";
+    $hello_msg = "This is server";
+    echo "Hitting the server :" . $hello_msg;
+    $socket_creation = socket_create(AF_INET, SOCK_STREAM, 0) or die("Unable to create connection with socket\n");
+    $server_connect = socket_connect($socket_creation, $IPadress_host, $port_number) or die("Unable to create connection with server\n");
+    socket_write($socket_creation, $hello_msg, strlen($hello_msg)) or die("Unable to send data to the  server\n");
+    $server_connect = socket_read($socket_creation, 1024) or die("Unable to read response from the server\n");
+    echo "Message from the server :" . $server_connect;
+    socket_close($socket_creation);
 })->middleware('cors');
