@@ -41,7 +41,6 @@ function getServerConfig() {
                 mConfig.isOpeningMarket = json.isOpeningMarket;
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.isReportedResult = false;
-                mConfig.session = null;
                 mConfig.zoomLevel = 1;
                 resolve();
             });
@@ -71,6 +70,7 @@ function createButtons() {
         } else {
             document.body.classList.add("periodic-order");
             document.body.classList.remove("continuous-order");
+            mChart.resetZoom();
         }
     });
     document.body.append(button);
@@ -82,7 +82,7 @@ function createChart() {
     //
     var select = document.createElement("select");
     select.id = "displaySelect";
-    ["Full", "Stream", "ATO", "ATC"].forEach((item, index) => {
+    ["Free", "ATO", "ATC", "Stream"].forEach((item, index) => {
         var option = document.createElement("option");
         option.value = item;
         option.text = item;
@@ -91,13 +91,35 @@ function createChart() {
     select.addEventListener("change", e => {
         mConfig.displayMode = e.target.value;
         var input = document.getElementById("streamInput");
-        if (e.target.value == "Stream") {
+        if (mConfig.displayMode == "Stream") {
             input.style.zIndex = 1;
             input.value = mConfig.streamScale;
         } else {
             input.style.zIndex = -1;
-            if (e.target.value == "Full") mChart.resetZoom();
-            else zoomScaleForSession(e.target.value);
+            if (mConfig.displayMode != "Free") {
+                var [hStart, mStart, sStart] = mConfig.time[
+                    mConfig.displayMode
+                ].start.split(":");
+                var [hEnd, mEnd, sEnd] = mConfig.time[
+                    mConfig.displayMode
+                ].end.split(":");
+                mChart.zoomScale(
+                    "x",
+                    {
+                        min: moment().set({
+                            hour: hStart,
+                            minute: mStart,
+                            second: sStart
+                        }),
+                        max: moment().set({
+                            hour: hEnd,
+                            minute: mEnd,
+                            second: sEnd
+                        })
+                    },
+                    "none"
+                );
+            }
         }
     });
     div.append(select);
@@ -139,6 +161,8 @@ function createChart() {
                     backgroundColor: "yellow",
                     yAxisID: "y",
                     pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHitRadius: 20,
                     order: 2
                 },
                 {
@@ -148,6 +172,8 @@ function createChart() {
                     backgroundColor: "magenta",
                     yAxisID: "y1",
                     pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHitRadius: 20,
                     order: 1
                 }
             ]
@@ -157,6 +183,7 @@ function createChart() {
                 x: {
                     type: "time",
                     time: {
+                        tooltipFormat: "DD-MM-YYYY HH:mm:ss",
                         displayFormats: {
                             month: "MM-YYYY",
                             day: "DD-MM-YYYY",
@@ -195,11 +222,13 @@ function createChart() {
                         pinch: {
                             enabled: true
                         },
-                        mode: "x"
+                        mode: "x",
+                        onZoomComplete: () => changeDisplayMode("Free")
                     },
                     pan: {
                         enabled: true,
-                        mode: "x"
+                        mode: "x",
+                        onPanComplete: () => changeDisplayMode("Free")
                     }
                 }
             },
@@ -416,7 +445,7 @@ function loadPage() {
     mChart.options.plugins.title.text = `Biểu đồ ngày ${moment().format(
         "DD/MM/YYYY"
     )}`;
-    mChart.update("none");
+    mChart.update();
     getDatabase("price", moment()).then(result => {
         mChart.data.datasets[0].data = result;
         mChart.update("none");
@@ -428,12 +457,41 @@ function loadPage() {
 }
 
 function intervalHandler() {
-    // const volume = {
-    //     x: new Date(),
-    //     y: Math.random()
-    // };
-    // mChart.data.datasets[1].data.push(volume);
-    // mChart.update("none");
+    var currentTime = moment().format("HH:mm:ss");
+    var isAtoSession =
+        currentTime >= mConfig.time.ATO.start &&
+        currentTime <= mConfig.time.ATO.end;
+    var isAtcSession =
+        currentTime >= mConfig.time.ATC.start &&
+        currentTime <= mConfig.time.ATC.end;
+    var session = isAtoSession ? "ATO" : isAtcSession ? "ATC" : null;
+    if (isAtoSession || isAtcSession)
+        document.getElementById("right_price").value = session;
+    //
+    if (currentTime == mConfig.time.ATO.start) {
+        emptyDatabase("price");
+        emptyDatabase("volume");
+    }
+    //Display
+    if (
+        currentTime == mConfig.time.ATO.start ||
+        currentTime == mConfig.time.ATC.start
+    ) {
+        if (!document.body.classList.contains("periodic-order"))
+            document.body.classList.add("periodic-order");
+        changeDisplayMode(session);
+    }
+    // Export
+    if (
+        currentTime == mConfig.time.ATO.end ||
+        currentTime == mConfig.time.ATC.end
+    )
+        exportHandler(session);
+    // Report
+    if (currentTime >= mConfig.time.ATC.end && !mConfig.isReportedResult) {
+        mConfig.isReportedResult = true;
+        setTimeout(() => reportHandler(), 30000);
+    }
     //
     if (mConfig.displayMode == "Stream") {
         mChart.zoomScale(
@@ -444,37 +502,6 @@ function intervalHandler() {
             },
             "none"
         );
-    }
-    //
-    var currentTime = moment().format("HH:mm:ss");
-    var isAtoSession =
-        currentTime >= mConfig.time.ATO.start &&
-        currentTime <= mConfig.time.ATO.end;
-    var isAtcSession =
-        currentTime >= mConfig.time.ATC.start &&
-        currentTime <= mConfig.time.ATC.end;
-    mConfig.session = isAtoSession ? "ATO" : isAtcSession ? "ATC" : null;
-    if (isAtoSession || isAtcSession)
-        document.getElementById("right_price").value = mConfig.session;
-    //Display
-    if (
-        currentTime == mConfig.time.ATO.start ||
-        currentTime == mConfig.time.ATC.start
-    ) {
-        emptyDatabase("price");
-        emptyDatabase("volume");
-        zoomScaleForSession(mConfig.session);
-    }
-    // Export
-    if (
-        currentTime == mConfig.time.ATO.end ||
-        currentTime == mConfig.time.ATC.end
-    )
-        exportHandler(mConfig.session);
-    // Report
-    if (currentTime >= mConfig.time.ATC.end && !mConfig.isReportedResult) {
-        mConfig.isReportedResult = true;
-        setTimeout(() => reportHandler(), 30000);
     }
     //
     var orderCounter = 0;
@@ -541,57 +568,59 @@ function reportHandler() {
 }
 
 function exportHandler(session) {
-    var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
-    var imageData = mChart.toBase64Image();
-
-    if (["ATO", "ATC"].includes(session)) {
-        mChart.options.plugins.title.text = `Biểu đồ ${session} ngày ${moment().format(
-            "DD/MM/YYYY"
-        )}`;
-        mChart.update();
-        zoomScaleForSession(session);
-        const url = mConfig.endpoint.export;
-        const data = { imageData, imageName, session };
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error(response.statusText);
+    mChart.options.plugins.title.text = `Biểu đồ ${session} ngày ${moment().format(
+        "DD/MM/YYYY"
+    )}`;
+    mChart.update();
+    changeDisplayMode(session);
+    setTimeout(() => {
+        var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
+        var imageData = mChart.toBase64Image();
+        if (["ATO", "ATC"].includes(session)) {
+            const url = mConfig.endpoint.export;
+            const data = { imageData, imageName, session };
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
             })
-            .then(jsondata => {
-                console.log("UploadImage-Start ##############################");
-                console.log(jsondata);
-                console.log("UploadImage-End ##############################");
-                if (jsondata.isOk) alert("Đăng ảnh thành công");
-            })
-            .catch(error => {
-                console.log("UploadImage-Start ##############################");
-                console.log(error);
-                console.log("UploadImage-End ##############################");
-                alert("Đăng ảnh thất bại");
-            });
-    } else {
-        var a = document.createElement("a");
-        a.href = imageData;
-        a.download = imageName;
-        a.click();
-    }
+                .then(response => {
+                    if (response.ok) {
+                        return response.json();
+                    }
+                    throw new Error(response.statusText);
+                })
+                .then(jsondata => {
+                    console.log(
+                        "UploadImage-Start ##############################"
+                    );
+                    console.log(jsondata);
+                    console.log(
+                        "UploadImage-End ##############################"
+                    );
+                    if (jsondata.isOk) alert("Đăng ảnh thành công");
+                })
+                .catch(error => {
+                    console.log(
+                        "UploadImage-Start ##############################"
+                    );
+                    console.log(error);
+                    console.log(
+                        "UploadImage-End ##############################"
+                    );
+                    alert("Đăng ảnh thất bại");
+                });
+        } else {
+            var a = document.createElement("a");
+            a.href = imageData;
+            a.download = imageName;
+            a.click();
+        }
+    }, 0);
 }
 
-function zoomScaleForSession(session) {
-    var [hStart, mStart, sStart] = mConfig.time[session].start.split(":");
-    var [hEnd, mEnd, sEnd] = mConfig.time[session].end.split(":");
-    mChart.zoomScale(
-        "x",
-        {
-            min: moment().set({ hour: hStart, minute: mStart, second: sStart }),
-            max: moment().set({ hour: hEnd, minute: mEnd, second: sEnd })
-        },
-        "none"
-    );
+function changeDisplayMode(mode) {
+    var select = document.getElementById("displaySelect");
+    select.value = mode;
+    select.dispatchEvent(new Event("change"));
 }
