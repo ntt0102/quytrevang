@@ -25,6 +25,17 @@ class VpsRepository extends CoreRepository
     /**
      * @inheritdoc
      */
+    public function getVps()
+    {
+        return [
+            'price' => $this->model->where('type', 0)->get(),
+            'volume' => $this->model->where('type', 1)->get()
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function clear()
     {
         return Vps::truncate();

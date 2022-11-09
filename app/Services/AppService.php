@@ -168,18 +168,15 @@ class AppService extends CoreService
                 $action = $request->action;
                 switch ($action) {
                     case 'SET':
-                        $vps = $this->vpsRepository->create($request);
-                        $isOk = !!$vps;
+                        $this->vpsRepository->create($request->all());
                         break;
                     case 'GET':
-                        $vps = $this->vpsRepository->create($request);
-                        $isOk = !!$vps;
+                        return $this->vpsRepository->getVps();
                         break;
                     case 'CLEAR':
-                        $isOk = $this->vpsRepository->clear();
+                        $this->vpsRepository->clear();
                         break;
                 }
-                return ['isOk' => $isOk, 'request' => $request];
             }
         );
     }

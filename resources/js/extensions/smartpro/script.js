@@ -8,11 +8,9 @@ getLocalConfig()
         createButtons();
         createChart();
         registerEvent();
-        createDatabase().then(() => {
-            initSocket();
-            loadPage();
-            setInterval(intervalHandler, 1000);
-        });
+        initSocket();
+        loadPage();
+        setInterval(intervalHandler, 1000);
     });
 
 function getLocalConfig() {
@@ -264,34 +262,17 @@ function createChart() {
 
 function setData(data) {
     data.action = "SET";
+    data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
     const url = mConfig.endpoint.data;
     fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-    })
-        .then(response => response.json())
-        .then(json => {
-            console.log("setData", json.isOk);
-        });
+    }).then(response => console.log("setData"));
 }
 
-function clearData(data) {
-    data.action = "CLEAR";
-    const url = mConfig.endpoint.data;
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    })
-        .then(response => response.json())
-        .then(json => {
-            console.log("clearData", json.isOk);
-        });
-}
-
-function getData(data) {
-    data.action = "GET";
+function getData() {
+    var data = { action: "GET" };
     return new Promise((resolve, reject) => {
         const url = mConfig.endpoint.data;
         fetch(url, {
@@ -301,81 +282,28 @@ function getData(data) {
         })
             .then(response => response.json())
             .then(json => {
-                console.log("getServerConfig", json);
-                mConfig.isOpeningMarket = json.isOpeningMarket;
-                mConfig.contractNumber = json.contractNumber;
-                mConfig.isReportedResult = false;
-                mConfig.zoomLevel = 1;
-                resolve();
+                console.log("getData", json);
+                json.price.map(item => {
+                    item.x = moment(item.x);
+                    return item;
+                });
+                json.volume.map(item => {
+                    item.x = moment(item.x);
+                    return item;
+                });
+                resolve(json);
             });
     });
 }
 
-function createDatabase() {
-    return new Promise((resolve, reject) => {
-        const request = indexedDB.open("vpsDB", 1);
-        request.onupgradeneeded = e => {
-            console.log("onupgradeneeded");
-            mDatabase = e.target.result;
-            mDatabase.createObjectStore("price", { keyPath: "x" });
-            mDatabase.createObjectStore("volume", { keyPath: "x" });
-            resolve();
-        };
-        request.onsuccess = e => {
-            console.log("onsuccess");
-            mDatabase = e.target.result;
-            resolve();
-        };
-        request.onerror = () => {
-            console.log("onerror");
-            reject();
-        };
-    });
-}
-
-function setDatabase(table, data) {
-    const request = mDatabase
-        .transaction(table, "readwrite")
-        .objectStore(table)
-        .add(data);
-    request.onsuccess = () => {
-        console.log("onsuccess");
-    };
-    request.onerror = () => {
-        console.log("onerror");
-    };
-}
-
-function getDatabase(table) {
-    return new Promise((resolve, reject) => {
-        const request = mDatabase
-            .transaction(table, "readonly")
-            .objectStore(table)
-            .getAll();
-        request.onsuccess = e => {
-            console.log("onsuccess", e);
-            resolve(e.target.result);
-        };
-        request.onerror = () => {
-            console.log("onerror");
-            reject();
-        };
-    });
-}
-
-function emptyDatabase(table) {
-    const request = mDatabase
-        .transaction(table, "readwrite")
-        .objectStore(table)
-        .clear();
-
-    request.onsuccess = () => {
-        console.log(`Object Store "${table}" emptied`);
-    };
-
-    request.onerror = err => {
-        console.error(`Error to empty Object Store: ${table}`);
-    };
+function clearData() {
+    var data = { action: "CLEAR" };
+    const url = mConfig.endpoint.data;
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    }).then(response => console.log("clearData"));
 }
 
 function initSocket() {
@@ -399,7 +327,8 @@ function initSocket() {
             };
             mChart.data.datasets[0].data.push(price);
             mChart.update("none");
-            setDatabase("price", price);
+            price.type = false;
+            setData(price);
         }
     }
     function volumeHandler(data) {
@@ -411,7 +340,8 @@ function initSocket() {
             };
             mChart.data.datasets[1].data.push(volume);
             mChart.update("none");
-            setDatabase("volume", volume);
+            price.type = true;
+            setData(volume);
         }
     }
 }
@@ -485,6 +415,20 @@ function registerEvent() {
 }
 
 function loadPage() {
+    const price = {
+        x: moment(),
+        y: Math.random(),
+        type: false
+    };
+    // setData(price);
+    const volume = {
+        x: moment(),
+        y: Math.random(),
+        type: true
+    };
+    // setData(volume);
+    // clearData();
+
     // Load Order List
     var button = document.createElement("button");
     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
@@ -495,24 +439,15 @@ function loadPage() {
         "DD/MM/YYYY"
     )}`;
     mChart.update();
-    getDatabase("price", moment()).then(result => {
-        mChart.data.datasets[0].data = result;
-        mChart.update("none");
-    });
-    getDatabase("volume", moment()).then(result => {
-        mChart.data.datasets[1].data = result;
+    //
+    getData().then(result => {
+        mChart.data.datasets[0].data = result.price;
+        mChart.data.datasets[1].data = result.volume;
         mChart.update("none");
     });
 }
 
 function intervalHandler() {
-    const price = {
-        x: new Date(),
-        y: Math.random(),
-        type: false
-    };
-    setData(price);
-    //
     var currentTime = moment().format("HH:mm:ss");
     var isAtoSession =
         currentTime >= mConfig.time.ATO.start &&
@@ -524,10 +459,7 @@ function intervalHandler() {
     if (isAtoSession || isAtcSession)
         document.getElementById("right_price").value = session;
     //
-    if (currentTime == mConfig.time.ATO.start) {
-        emptyDatabase("price");
-        emptyDatabase("volume");
-    }
+    if (currentTime == mConfig.time.ATO.start) clearData();
     //Display
     if (
         currentTime == mConfig.time.ATO.start ||
