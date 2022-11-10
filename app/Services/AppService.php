@@ -156,7 +156,7 @@ class AppService extends CoreService
         //
         $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
         date_default_timezone_set('Asia/Ho_Chi_Minh');
-        return ['isOpeningMarket' => true, 'contractNumber' => $tradeContracts, 'time' => now()];
+        return ['isOpeningMarket' => true, 'contractNumber' => $tradeContracts, 'time' => now(), 'timezone' => date_default_timezone_get()];
     }
 
     /**
