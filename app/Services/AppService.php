@@ -201,7 +201,7 @@ class AppService extends CoreService
     {
         $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
         \Ratchet\Client\connect($uri)->then(function ($conn) {
-            $closeTime = strtotime('14:46:00');
+            $closeTime = strtotime('14:00:00');
             $conn->on('message', function ($msg) use ($conn, $closeTime) {
                 if (time() >= $closeTime) $conn->close();
                 $first = substr($msg, 0, 1);
