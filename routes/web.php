@@ -42,6 +42,8 @@ Route::get('test', function () {
     // if ($json->id == 3310) {
     //     $data = ['x' => now(), 'y' => $json->BVolume - $json->SVolume, 'type' => true];
     // }
+    // date_default_timezone_set('Asia/Ho_Chi_Minh');
+    dd(phpinfo());
     $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
     $socket = \Ratchet\Client\connect($uri);
     dd($socket);

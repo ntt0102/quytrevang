@@ -26,9 +26,9 @@ function getLocalConfig() {
                     mConfig.VN30F1M = document.getElementById(
                         "tbodyPhaisinhContent"
                     ).rows[0].cells[0].innerText;
-                }, 0);
+                    resolve();
+                }, 1000);
                 console.log("mConfig", mConfig);
-                resolve();
             });
     });
 }
@@ -36,6 +36,7 @@ function getLocalConfig() {
 function getServerConfig() {
     return new Promise((resolve, reject) => {
         const url = mConfig.endpoint.config;
+        console.log("getServerConfig", mConfig.VN30F1M);
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -315,8 +316,8 @@ function clearData() {
 function initSocket() {
     var msg = { action: "join", list: mConfig.VN30F1M };
     var socket = io(mConfig.endpoint.socket);
-    socket.on("connect", () => socket.emit("regs", msg));
-    socket.on("reconnect", () => socket.emit("regs", msg));
+    socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
+    socket.on("reconnect", () => socket.emit("regs", JSON.stringify(msg)));
     socket.on("boardps", data => {
         console.log("boardps");
         priceHandler(data.data);
@@ -330,26 +331,26 @@ function initSocket() {
         if (data.id == 3220) {
             console.log("price" + data.id);
             const price = {
-                x: new Date(),
+                x: moment(),
                 y: data.lastPrice
             };
             mChart.data.datasets[0].data.push(price);
             mChart.update("none");
-            price.type = false;
-            setData(price);
+            // price.type = false;
+            // setData(price);
         }
     }
     function volumeHandler(data) {
         if (data.id == 3310) {
             console.log("volume" + data.id);
             const volume = {
-                x: new Date(),
+                x: moment(),
                 y: data.BVolume - data.SVolume
             };
             mChart.data.datasets[1].data.push(volume);
             mChart.update("none");
-            price.type = true;
-            setData(volume);
+            // volume.type = true;
+            // setData(volume);
         }
     }
 }
@@ -435,6 +436,7 @@ function loadPage() {
     //     type: true
     // };
     // setData(volume);
+    // clearData();
     // Load Order List
     var button = document.createElement("button");
     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
@@ -502,7 +504,7 @@ function intervalHandler() {
             "x",
             {
                 min: moment().subtract(mConfig.streamScale, "minutes"),
-                max: moment()
+                max: moment().add(mConfig.streamScale * 0.05, "minutes")
             },
             "none"
         );
