@@ -127,8 +127,24 @@ class AppService extends CoreService
      */
     public function vpsConfig($request)
     {
+        $this->parameterRepository->setValue('VN30F1M', $request->VN30F1M);
+        //
+        $isOpeningMarket = $this->vpsCheckOpeningMarket();
+        $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
+        return [
+            'isOpeningMarket' => $isOpeningMarket,
+            'contractNumber' => $tradeContracts
+        ];
+    }
+
+    /**
+     * Check Opening Market
+     * @return boolean
+     */
+    public function vpsCheckOpeningMarket()
+    {
         $currentDay = date("w");
-        if ($currentDay == 0 || $currentDay == 6) return ['isOpening' => false];
+        if ($currentDay == 0 || $currentDay == 6) return false;
 
         $currentDate = date("Y-m-d");
         $currentYear = date("Y");
@@ -150,12 +166,8 @@ class AppService extends CoreService
                 $days[] = $item->start->date;
                 return $days;
             }, []);
-        if (in_array($currentDate, $holidays)) return ['isOpening' => false];
-        //
-        $this->parameterRepository->setValue('VN30F1M', $request->VN30F1M);
-        //
-        $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
-        return ['isOpeningMarket' => true, 'contractNumber' => $tradeContracts, 'time' => now()->format('Y-m-d H:i:s')];
+        if (in_array($currentDate, $holidays)) return false;
+        return true;
     }
 
     /**
@@ -188,7 +200,9 @@ class AppService extends CoreService
     {
         $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
         \Ratchet\Client\connect($uri)->then(function ($conn) {
-            $conn->on('message', function ($msg) use ($conn) {
+            $closeTime = strtotime('14:46:00');
+            $conn->on('message', function ($msg) use ($conn, $closeTime) {
+                if (time() >= $closeTime) $conn->close();
                 $first = substr($msg, 0, 1);
                 if ($first == 4) {
                     $second = substr($msg, 1, 1);
@@ -218,15 +232,15 @@ class AppService extends CoreService
                     }
                 }
             });
-            $conn->on('close', function () {
-                error_log("close\n");
-                $this->vpsWebSocket();
+            $conn->on('close', function () use ($closeTime) {
+                error_log("WebSocket closed.");
+                if (time() < $closeTime) $this->vpsWebSocket();
             });
             $conn->on('error', function () {
-                error_log("error\n");
+                error_log("WebSocket error.");
             });
         }, function ($e) {
-            error_log("Could not connect: {$e->getMessage()}\n");
+            error_log("WebSocket could not connect: {$e->getMessage()}\n");
         });
     }
 

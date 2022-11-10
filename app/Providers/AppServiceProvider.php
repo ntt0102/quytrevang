@@ -45,6 +45,6 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
         //
-        date_default_timezone_set('Asia/Ho_Chi_Minh');
+        // date_default_timezone_set('Asia/Ho_Chi_Minh');
     }
 }

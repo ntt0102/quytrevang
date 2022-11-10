@@ -43,8 +43,10 @@ Route::get('test', function () {
     //     $data = ['x' => now(), 'y' => $json->BVolume - $json->SVolume, 'type' => true];
     // }
     // date_default_timezone_set('Asia/Ho_Chi_Minh');
-    dd(phpinfo());
-    $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
-    $socket = \Ratchet\Client\connect($uri);
-    dd($socket);
+    // dd(app(\App\Services\AppService::class)->vpsCheckOpeningMarket());
+    // dd(time() >= strtotime('11:20:00'));
+    // dd(phpinfo());
+    // $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
+    // $socket = \Ratchet\Client\connect($uri);
+    // dd($socket);
 })->middleware('cors');
