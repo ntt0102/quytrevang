@@ -278,15 +278,15 @@ function createChart() {
 //     }).then(response => console.log("setData"));
 // }
 
-// function clearData() {
-//     var data = { action: "CLEAR" };
-//     const url = mConfig.endpoint.data;
-//     fetch(url, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(data)
-//     }).then(response => console.log("clearData"));
-// }
+function clearData() {
+    var data = { action: "CLEAR" };
+    const url = mConfig.endpoint.data;
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    }).then(response => console.log("clearData"));
+}
 
 function getData() {
     var data = { action: "GET" };
@@ -420,6 +420,7 @@ function registerEvent() {
 }
 
 function loadPage() {
+    // clearData();
     // Load Order List
     var button = document.createElement("button");
     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
@@ -450,7 +451,7 @@ function intervalHandler() {
     if (isAtoSession || isAtcSession)
         document.getElementById("right_price").value = session;
     //
-    if (currentTime == mConfig.time.ATO.start) clearData();
+    // if (currentTime == mConfig.time.ATO.start) clearData();
     //Display
     if (
         currentTime == mConfig.time.ATO.start ||

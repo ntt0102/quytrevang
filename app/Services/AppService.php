@@ -54,7 +54,7 @@ class AppService extends CoreService
     {
         return $this->transaction(
             function () use ($request) {
-                if (get_global_value('updatedTradesFlag') == '1') return ['isOk' => true, 'isExecuted' => false];
+                if (get_global_value('reportedTradingFlag') == '1') return ['isOk' => true, 'isExecuted' => false];
                 $revenue = $request->revenue > 0 ? $request->revenue : 0;
                 $loss = $request->revenue < 0 ? -$request->revenue : 0;
                 $currentDate = date_create();
@@ -82,7 +82,7 @@ class AppService extends CoreService
                     }
                 }
                 if ($isOk) {
-                    set_global_value('updatedTradesFlag', '1');
+                    set_global_value('reportedTradingFlag', '1');
                     Notification::send(
                         $this->userRepository->getUsersHasPermission('trades@view'),
                         new UpdatedTradesNotification(

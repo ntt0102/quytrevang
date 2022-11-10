@@ -40,10 +40,10 @@ class TradingBeginCommand extends Command
         $isOpeningMarket = app(\App\Services\AppService::class)->vpsCheckOpeningMarket();
         if ($isOpeningMarket) {
             if (
-                get_global_value('updatedTradesFlag') == '1'
+                get_global_value('reportedTradingFlag') == '1'
             ) {
-                set_global_value('updatedTradesFlag', '0');
-                error_log('Delete updatedTradesFlag done.');
+                set_global_value('reportedTradingFlag', '0');
+                error_log('Delete reportedTradingFlag done.');
             }
             //
             if (time() < strtotime('08:45:00')) {

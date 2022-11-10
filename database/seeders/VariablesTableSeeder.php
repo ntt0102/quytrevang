@@ -19,7 +19,11 @@ class VariablesTableSeeder extends Seeder
             'value' => "0",
         ]);
         Variable::create([
-            'name' => "updatedTradesFlag",
+            'name' => "reportedTradingFlag",
+            'value' => "0",
+        ]);
+        Variable::create([
+            'name' => "runningSocketFlag",
             'value' => "0",
         ]);
     }
