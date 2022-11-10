@@ -202,7 +202,6 @@ class AppService extends CoreService
         $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
         \Ratchet\Client\connect($uri)->then(function ($conn) {
             $conn->on('message', function ($msg) use ($conn) {
-                error_log("WebSocket message." . now()->format('H-i-s'));
                 $stopSocketTime = $this->parameterRepository->getValue('stopSocketTime');
                 if (time() >= strtotime($stopSocketTime)) {
                     error_log("Timeout.");
