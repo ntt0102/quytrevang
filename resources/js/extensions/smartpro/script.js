@@ -267,16 +267,26 @@ function createChart() {
     });
 }
 
-function setData(data) {
-    data.action = "SET";
-    data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
-    const url = mConfig.endpoint.data;
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    }).then(response => console.log("setData"));
-}
+// function setData(data) {
+//     data.action = "SET";
+//     data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
+//     const url = mConfig.endpoint.data;
+//     fetch(url, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(data)
+//     }).then(response => console.log("setData"));
+// }
+
+// function clearData() {
+//     var data = { action: "CLEAR" };
+//     const url = mConfig.endpoint.data;
+//     fetch(url, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(data)
+//     }).then(response => console.log("clearData"));
+// }
 
 function getData() {
     var data = { action: "GET" };
@@ -303,16 +313,6 @@ function getData() {
     });
 }
 
-function clearData() {
-    var data = { action: "CLEAR" };
-    const url = mConfig.endpoint.data;
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    }).then(response => console.log("clearData"));
-}
-
 function initSocket() {
     var msg = { action: "join", list: mConfig.VN30F1M };
     var socket = io(mConfig.endpoint.socket);
@@ -336,8 +336,6 @@ function initSocket() {
             };
             mChart.data.datasets[0].data.push(price);
             mChart.update("none");
-            // price.type = false;
-            // setData(price);
         }
     }
     function volumeHandler(data) {
@@ -349,8 +347,6 @@ function initSocket() {
             };
             mChart.data.datasets[1].data.push(volume);
             mChart.update("none");
-            // volume.type = true;
-            // setData(volume);
         }
     }
 }
@@ -424,19 +420,6 @@ function registerEvent() {
 }
 
 function loadPage() {
-    // const price = {
-    //     x: moment(),
-    //     y: 100 * Math.random(),
-    //     type: false
-    // };
-    // setData(price);
-    // const volume = {
-    //     x: moment(),
-    //     y: 1000 * Math.random(),
-    //     type: true
-    // };
-    // setData(volume);
-    // clearData();
     // Load Order List
     var button = document.createElement("button");
     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
@@ -453,16 +436,6 @@ function loadPage() {
         mChart.data.datasets[1].data = result.volume;
         mChart.update("none");
     });
-    // getDatabase("volume").then(r => {
-    //     r.forEach(item => {
-    //         setTimeout(() => {
-    //             item.x = moment(item.x);
-    //             item.type = true;
-    //             console.log(item);
-    //             setData(item);
-    //         }, 5000);
-    //     });
-    // });
 }
 
 function intervalHandler() {
