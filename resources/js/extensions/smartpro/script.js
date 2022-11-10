@@ -55,7 +55,7 @@ function getServerConfig() {
 function createButtons() {
     var button = document.createElement("button");
     button.id = "continuousButton";
-    button.innerText = "Liên tục";
+    button.innerText = "Candle";
     button.addEventListener("click", () => {
         if (document.body.classList.contains("continuous-order")) {
             document.body.classList.remove("continuous-order");
@@ -68,7 +68,7 @@ function createButtons() {
     //
     button = document.createElement("button");
     button.id = "periodicButton";
-    button.innerText = "Định kỳ";
+    button.innerText = "Line";
     button.addEventListener("click", () => {
         if (document.body.classList.contains("periodic-order")) {
             document.body.classList.remove("periodic-order");
