@@ -201,9 +201,18 @@ class AppService extends CoreService
     {
         $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
         \Ratchet\Client\connect($uri)->then(function ($conn) {
-            $closeTime = strtotime('14:00:00');
-            $conn->on('message', function ($msg) use ($conn, $closeTime) {
-                if (time() >= $closeTime) $conn->close();
+            $conn->on('message', function ($msg) use ($conn) {
+                error_log("WebSocket message." . now()->format('H-i-s'));
+                $stopSocketTime = $this->parameterRepository->getValue('stopSocketTime');
+                if (time() >= strtotime($stopSocketTime)) {
+                    error_log("Timeout.");
+                    set_global_value('runningSocketFlag', '0');
+                    $conn->close();
+                } else if (
+                    get_global_value('runningSocketFlag') == '0'
+                )
+                    set_global_value('runningSocketFlag', '1');
+                //
                 $first = substr($msg, 0, 1);
                 if ($first == 4) {
                     $second = substr($msg, 1, 1);
@@ -233,9 +242,10 @@ class AppService extends CoreService
                     }
                 }
             });
-            $conn->on('close', function () use ($closeTime) {
+            $conn->on('close', function () {
                 error_log("WebSocket closed.");
-                if (time() < $closeTime) $this->vpsWebSocket();
+                $stopSocketTime = $this->parameterRepository->getValue('stopSocketTime');
+                if (time() < strtotime($stopSocketTime)) $this->vpsWebSocket();
             });
             $conn->on('error', function () {
                 error_log("WebSocket error.");

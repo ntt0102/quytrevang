@@ -51,7 +51,10 @@ class TradingBeginCommand extends Command
                 error_log('Clear Vps database done.');
             }
             //
-            app(\App\Services\AppService::class)->vpsWebSocket();
+            if (
+                get_global_value('runningSocketFlag') == '0'
+            )
+                app(\App\Services\AppService::class)->vpsWebSocket();
         }
     }
 }

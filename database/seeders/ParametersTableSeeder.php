@@ -49,5 +49,10 @@ class ParametersTableSeeder extends Seeder
             'value' => "VN30F2211",
             'description' => "Hơp đồng VN30F1M",
         ]);
+        Parameter::create([
+            'slug' => "stopSocketTime",
+            'value' => "14:46:00",
+            'description' => "Thời gian dừng Socket",
+        ]);
     }
 }
