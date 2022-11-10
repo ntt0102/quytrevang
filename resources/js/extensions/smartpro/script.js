@@ -146,6 +146,28 @@ function createChart() {
     button.addEventListener("click", () => exportHandler(mConfig.displayMode));
     div.append(button);
     //
+    button = document.createElement("button");
+    button.id = "refreshButton";
+    button.innerText = "Refresh";
+    button.addEventListener("click", () => {
+        getData().then(result => {
+            mChart.data.datasets[0].data = result.price;
+            mChart.data.datasets[1].data = result.volume;
+            mChart.update("none");
+            mChart.resetZoom();
+        });
+    });
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "clearButton";
+    button.innerText = "Clear";
+    button.addEventListener("click", () => {
+        var choice = confirm("Xoá toàn bộ dữ liệu?");
+        if (choice) clearData();
+    });
+    div.append(button);
+    //
     var p = document.createElement("p");
     p.id = "orderCountP";
     div.append(p);
@@ -267,16 +289,16 @@ function createChart() {
     });
 }
 
-// function setData(data) {
-//     data.action = "SET";
-//     data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
-//     const url = mConfig.endpoint.data;
-//     fetch(url, {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify(data)
-//     }).then(response => console.log("setData"));
-// }
+function setData(data) {
+    data.action = "SET";
+    data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
+    const url = mConfig.endpoint.data;
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    }).then(response => console.log("setData"));
+}
 
 function clearData() {
     var data = { action: "CLEAR" };
