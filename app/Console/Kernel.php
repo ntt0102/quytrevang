@@ -30,7 +30,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
         $schedule->command('trades:update')->dailyAt('08:45');
-        $schedule->command('socket:connect')->everyMinute()->withoutOverlapping();
+        // $schedule->command('socket:connect')->everyMinute()->withoutOverlapping();
     }
 
     /**
