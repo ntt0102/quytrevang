@@ -155,7 +155,7 @@ class AppService extends CoreService
         $this->parameterRepository->setValue('VN30F1M', $request->VN30F1M);
         //
         $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
-        return ['isOpeningMarket' => true, 'contractNumber' => $tradeContracts, 'serverTime' => now()];
+        return ['isOpeningMarket' => true, 'contractNumber' => $tradeContracts, 'time' => now()->format('Y-m-d H:i:s')];
     }
 
     /**
