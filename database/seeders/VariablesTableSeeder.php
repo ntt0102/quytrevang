@@ -26,5 +26,9 @@ class VariablesTableSeeder extends Seeder
             'name' => "runningSocketFlag",
             'value' => "0",
         ]);
+        Variable::create([
+            'name' => "testCounter",
+            'value' => "0",
+        ]);
     }
 }
