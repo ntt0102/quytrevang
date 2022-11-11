@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Repositories\UserRepository;
 
-class SubscriptionCleanCommand extends Command
+class CleanSubscriptionCommand extends Command
 {
     /**
      * The name and signature of the console command.

@@ -14,8 +14,8 @@ class Kernel extends ConsoleKernel
      */
     protected $commands = [
         'App\Console\Commands\BackupDatabaseCommand',
-        'App\Console\Commands\SubscriptionCleanCommand',
-        'App\Console\Commands\TradingBeginCommand',
+        'App\Console\Commands\CleanSubscriptionCommand',
+        'App\Console\Commands\TradeVpsCommand',
     ];
 
     /**
@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
         $stopSocketTime = app(\App\Repositories\ParameterRepository::class)->getValue('stopSocketTime');
-        $schedule->command('trading:begin')->everyMinute()->between('08:44:00', $stopSocketTime);
+        $schedule->command('vps:trade')->everyMinute()->between('08:44:00', $stopSocketTime);
     }
 
     /**
