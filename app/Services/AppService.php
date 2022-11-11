@@ -210,7 +210,7 @@ class AppService extends CoreService
                     $conn->close();
                 } else {
                     $startSocketTime = strtotime(get_global_value('startSocketTime'));
-                    if ($time >= $startSocketTime + 200 * 60 + 30) {
+                    if ($time >= $startSocketTime + 25 * 60 + 30) {
                         error_log("Timeout connection.");
                         $conn->close();
                     }
@@ -259,7 +259,7 @@ class AppService extends CoreService
                 $time = time();
                 $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
                 $startSocketTime = strtotime(get_global_value('startSocketTime'));
-                if ($time < $stopSocketTime && $time < $startSocketTime  + 200 * 60 + 30) $this->vpsWebSocket();
+                if ($time < $stopSocketTime && $time < $startSocketTime  + 25 * 60 + 30) $this->vpsWebSocket();
             });
             $conn->on('error', function () use ($conn) {
                 error_log("WebSocket error.");
