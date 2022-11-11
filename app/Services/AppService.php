@@ -199,6 +199,7 @@ class AppService extends CoreService
 
     public function vpsWebSocket()
     {
+        set_global_value('runningSocketFlag', '1');
         $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
         \Ratchet\Client\connect($uri)->then(function ($conn) {
             $conn->on('message', function ($msg) use ($conn) {
@@ -209,13 +210,14 @@ class AppService extends CoreService
                     $conn->close();
                 } else {
                     $startSocketTime = strtotime(get_global_value('startSocketTime'));
-                    if ($time >= $startSocketTime + 1 * 60 + 30) {
+                    if ($time >= $startSocketTime + 200 * 60 + 30) {
                         error_log("Timeout connection.");
                         $conn->close();
-                    } else if (
-                        get_global_value('runningSocketFlag') == '0'
-                    )
-                        set_global_value('runningSocketFlag', '1');
+                    }
+                    // else if (
+                    //     get_global_value('runningSocketFlag') == '0'
+                    // )
+                    //     set_global_value('runningSocketFlag', '1');
                 }
                 //
                 $counter = (int) get_global_value('testCounter');
@@ -257,7 +259,7 @@ class AppService extends CoreService
                 $time = time();
                 $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
                 $startSocketTime = strtotime(get_global_value('startSocketTime'));
-                if ($time < $stopSocketTime && $time < $startSocketTime  + 1 * 60 + 30) $this->vpsWebSocket();
+                if ($time < $stopSocketTime && $time < $startSocketTime  + 200 * 60 + 30) $this->vpsWebSocket();
             });
             $conn->on('error', function () use ($conn) {
                 error_log("WebSocket error.");
