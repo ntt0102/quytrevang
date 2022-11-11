@@ -30,5 +30,9 @@ class VariablesTableSeeder extends Seeder
             'name' => "testCounter",
             'value' => "0",
         ]);
+        Variable::create([
+            'name' => "startSocketTime",
+            'value' => "17:48:00",
+        ]);
     }
 }

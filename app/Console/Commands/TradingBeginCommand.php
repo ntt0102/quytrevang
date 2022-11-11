@@ -54,8 +54,10 @@ class TradingBeginCommand extends Command
             //
             if (
                 get_global_value('runningSocketFlag') == '0' && $time >= strtotime('08:45:00')
-            )
+            ) {
+                set_global_value('startSocketTime', now()->format('H:i:s'));
                 app(\App\Services\AppService::class)->vpsWebSocket();
+            }
         }
     }
 }

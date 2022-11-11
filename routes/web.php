@@ -33,20 +33,9 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    // error_log('Some message here.');
-    // $text = '["stockps",{"data":{"cmd":"ALGO.VN30","date":"09/11/2022 03:17:58","index":979.68,"change":"-0.41","calculate":"-0.49","ff":"0","id":8888}}]';
-    // $json = json_decode($text)[1]->data;
-    // if ($json->id == 3220) {
-    //     $data = ['x' => now(), 'y' => $json->lastPrice, 'type' => false];
-    // }
-    // if ($json->id == 3310) {
-    //     $data = ['x' => now(), 'y' => $json->BVolume - $json->SVolume, 'type' => true];
-    // }
-    // date_default_timezone_set('Asia/Ho_Chi_Minh');
-    // dd(app(\App\Services\AppService::class)->vpsCheckOpeningMarket());
-    // dd(time() >= strtotime('11:20:00'));
-    // dd(phpinfo());
-    // $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
-    // $socket = \Ratchet\Client\connect($uri);
-    // dd($socket);
+    $start = now()->format('H:i:s');
+    echo $start;
+    $time = strtotime($start);
+    dd(time() >= $time + 1 * 60 + 30);
+    // dd(now());
 })->middleware('cors');
