@@ -28,10 +28,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
-        // $schedule->command('trading:begin')->timezone('Asia/Ho_Chi_Minh')->everyMinute(); //->between('08:44:00', '14:46:00'); //->withoutOverlapping();
-        $schedule->command('trading:begin')->everyMinute()->when(function () {
-            return get_global_value('runningSocketFlag') == '0';
-        });;
+        $schedule->command('trading:begin')->everyMinute()->between('08:44:00', '14:46:00');
     }
 
     /**
