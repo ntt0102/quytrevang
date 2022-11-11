@@ -28,7 +28,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
-        $schedule->command('trading:begin')->everyMinute()->between('08:44:00', '14:46:00');
+        $stopSocketTime = app(\App\Repositories\ParameterRepository::class)->getValue('stopSocketTime');
+        $schedule->command('trading:begin')->everyMinute()->between('08:44:00', $stopSocketTime);
     }
 
     /**
