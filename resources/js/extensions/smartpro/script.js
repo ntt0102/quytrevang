@@ -74,7 +74,6 @@ function createButtons() {
         } else {
             document.body.classList.add("periodic-order");
             document.body.classList.remove("continuous-order");
-            mChart.resetZoom();
         }
     });
     document.body.append(button);
@@ -86,7 +85,7 @@ function createChart() {
     //
     var select = document.createElement("select");
     select.id = "displaySelect";
-    ["Free", "ATO", "ATC", "Stream"].forEach((item, index) => {
+    ["Full", "Free", "Stream", "ATO", "ATC"].forEach((item, index) => {
         var option = document.createElement("option");
         option.value = item;
         option.text = item;
@@ -95,12 +94,17 @@ function createChart() {
     select.addEventListener("change", e => {
         mConfig.displayMode = e.target.value;
         var input = document.getElementById("streamInput");
-        if (mConfig.displayMode == "Stream") {
-            input.style.zIndex = 1;
-            input.value = mConfig.streamScale;
-        } else {
-            input.style.zIndex = -1;
-            if (mConfig.displayMode != "Free") {
+        input.style.zIndex = -1;
+        switch (mConfig.displayMode) {
+            case "Full":
+                mChart.resetZoom();
+                break;
+            case "Stream":
+                input.style.zIndex = 1;
+                input.value = mConfig.streamScale;
+                break;
+            case "ATO":
+            case "ATC":
                 var [hStart, mStart, sStart] = mConfig.time[
                     mConfig.displayMode
                 ].start.split(":");
@@ -123,7 +127,7 @@ function createChart() {
                     },
                     "none"
                 );
-            }
+                break;
         }
     });
     div.append(select);
@@ -153,8 +157,6 @@ function createChart() {
             mChart.data.datasets[0].data = result.price;
             mChart.data.datasets[1].data = result.volume;
             mChart.update("none");
-            mChart.resetZoom();
-            changeDisplayMode("Free");
         });
     });
     div.append(button);
@@ -169,8 +171,7 @@ function createChart() {
                 mChart.data.datasets[0].data = [];
                 mChart.data.datasets[1].data = [];
                 mChart.update("none");
-                mChart.resetZoom();
-                changeDisplayMode("Free");
+                changeDisplayMode("Stream");
             });
     });
     div.append(button);
