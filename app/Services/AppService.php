@@ -199,75 +199,77 @@ class AppService extends CoreService
 
     public function vpsWebSocket()
     {
-        set_global_value('runningSocketFlag', '1');
-        $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
-        \Ratchet\Client\connect($uri)->then(function ($conn) {
-            $conn->on('message', function ($msg) use ($conn) {
-                $time = time();
-                $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
-                if ($time >= $stopSocketTime) {
-                    error_log("Timeout market.");
-                    $conn->close();
-                } else {
-                    $startSocketTime = strtotime(get_global_value('startSocketTime'));
-                    if ($time >= $startSocketTime + 25 * 60 + 30) {
-                        error_log("Timeout connection.");
+        if (get_global_value('runningSocketFlag') == '0') {
+            set_global_value('runningSocketFlag', '1');
+            $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
+            \Ratchet\Client\connect($uri)->then(function ($conn) {
+                $conn->on('message', function ($msg) use ($conn) {
+                    $time = time();
+                    $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
+                    if ($time >= $stopSocketTime) {
+                        error_log("Timeout market.");
                         $conn->close();
+                    } else {
+                        $startSocketTime = strtotime(get_global_value('startSocketTime'));
+                        if ($time >= $startSocketTime + 25 * 60 + 30) {
+                            error_log("Timeout connection.");
+                            $conn->close();
+                        }
+                        // else if (
+                        //     get_global_value('runningSocketFlag') == '0'
+                        // )
+                        //     set_global_value('runningSocketFlag', '1');
                     }
-                    // else if (
-                    //     get_global_value('runningSocketFlag') == '0'
-                    // )
-                    //     set_global_value('runningSocketFlag', '1');
-                }
-                //
-                $counter = (int) get_global_value('testCounter');
-                error_log("Counter: " . $counter);
-                set_global_value('testCounter', $counter + 1);
-                //
-                // $first = substr($msg, 0, 1);
-                // if ($first == 4) {
-                //     $second = substr($msg, 1, 1);
-                //     if ($second == 0) {
-                //         $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
-                //         $data = ['action' => 'join', 'list' => $VN30F1M];
-                //         $conn->send('42' . json_encode(["regs", json_encode($data)]));
-                //     } else if ($second == 2) {
-                //         $json = json_decode(substr($msg, 2));
-                //         $event = $json[0];
-                //         if ($event == 'boardps') {
-                //             $data = $json[1]->data;
-                //             if ($data->id == 3220) {
-                //                 error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
-                //                 $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => false]);
-                //             } else if ($data->id == 3310) {
-                //                 error_log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
-                //                 $this->vpsRepository->create(['x' => now(), 'y' => $data->BVolume - $data->SVolume, 'type' => true]);
-                //             };
-                //         } else if ($event == 'stockps') {
-                //             $data = $json[1]->data;
-                //             if ($data->id == 3220) {
-                //                 error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
-                //                 $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => false]);
-                //             };
-                //         }
-                //     }
-                // }
+                    //
+                    $counter = (int) get_global_value('testCounter');
+                    error_log("Counter: " . $counter);
+                    set_global_value('testCounter', $counter + 1);
+                    //
+                    // $first = substr($msg, 0, 1);
+                    // if ($first == 4) {
+                    //     $second = substr($msg, 1, 1);
+                    //     if ($second == 0) {
+                    //         $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
+                    //         $data = ['action' => 'join', 'list' => $VN30F1M];
+                    //         $conn->send('42' . json_encode(["regs", json_encode($data)]));
+                    //     } else if ($second == 2) {
+                    //         $json = json_decode(substr($msg, 2));
+                    //         $event = $json[0];
+                    //         if ($event == 'boardps') {
+                    //             $data = $json[1]->data;
+                    //             if ($data->id == 3220) {
+                    //                 error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
+                    //                 $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => false]);
+                    //             } else if ($data->id == 3310) {
+                    //                 error_log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
+                    //                 $this->vpsRepository->create(['x' => now(), 'y' => $data->BVolume - $data->SVolume, 'type' => true]);
+                    //             };
+                    //         } else if ($event == 'stockps') {
+                    //             $data = $json[1]->data;
+                    //             if ($data->id == 3220) {
+                    //                 error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
+                    //                 $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => false]);
+                    //             };
+                    //         }
+                    //     }
+                    // }
+                });
+                $conn->on('close', function () {
+                    error_log("WebSocket closed.");
+                    set_global_value('runningSocketFlag', '0');
+                    $time = time();
+                    $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
+                    $startSocketTime = strtotime(get_global_value('startSocketTime'));
+                    if ($time < $stopSocketTime && $time < $startSocketTime  + 25 * 60 + 30) $this->vpsWebSocket();
+                });
+                $conn->on('error', function () use ($conn) {
+                    error_log("WebSocket error.");
+                    $conn->close();
+                });
+            }, function ($e) {
+                error_log("WebSocket could not connect: {$e->getMessage()}\n");
             });
-            $conn->on('close', function () {
-                error_log("WebSocket closed.");
-                set_global_value('runningSocketFlag', '0');
-                $time = time();
-                $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
-                $startSocketTime = strtotime(get_global_value('startSocketTime'));
-                if ($time < $stopSocketTime && $time < $startSocketTime  + 25 * 60 + 30) $this->vpsWebSocket();
-            });
-            $conn->on('error', function () use ($conn) {
-                error_log("WebSocket error.");
-                $conn->close();
-            });
-        }, function ($e) {
-            error_log("WebSocket could not connect: {$e->getMessage()}\n");
-        });
+        }
     }
 
     /**
