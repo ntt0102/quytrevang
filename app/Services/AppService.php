@@ -205,7 +205,6 @@ class AppService extends CoreService
                 $stopSocketTime = $this->parameterRepository->getValue('stopSocketTime');
                 if (time() >= strtotime($stopSocketTime)) {
                     error_log("Timeout.");
-                    set_global_value('runningSocketFlag', '0');
                     $conn->close();
                 } else if (
                     get_global_value('runningSocketFlag') == '0'
@@ -243,6 +242,7 @@ class AppService extends CoreService
             });
             $conn->on('close', function () {
                 error_log("WebSocket closed.");
+                set_global_value('runningSocketFlag', '0');
                 $stopSocketTime = $this->parameterRepository->getValue('stopSocketTime');
                 if (time() < strtotime($stopSocketTime)) $this->vpsWebSocket();
             });

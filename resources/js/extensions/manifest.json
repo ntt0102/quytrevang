@@ -30,11 +30,12 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "config.json"
+        "config.json",
+        "spinner.gif"
       ],
       "matches": [
         "https://smartpro.vps.com.vn/*"
       ]
     }
-  ]  
+  ]
 }

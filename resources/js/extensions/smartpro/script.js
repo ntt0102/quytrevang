@@ -1,6 +1,5 @@
 var mConfig = {};
 var mChart = {};
-var mDatabase = null;
 
 getLocalConfig()
     .then(() => getServerConfig())
@@ -155,6 +154,7 @@ function createChart() {
             mChart.data.datasets[1].data = result.volume;
             mChart.update("none");
             mChart.resetZoom();
+            changeDisplayMode("Free");
         });
     });
     div.append(button);
@@ -164,9 +164,22 @@ function createChart() {
     button.innerText = "Clear";
     button.addEventListener("click", () => {
         var choice = confirm("Xoá toàn bộ dữ liệu?");
-        if (choice) clearData();
+        if (choice)
+            clearData().then(() => {
+                mChart.data.datasets[0].data = [];
+                mChart.data.datasets[1].data = [];
+                mChart.update("none");
+                mChart.resetZoom();
+                changeDisplayMode("Free");
+            });
     });
     div.append(button);
+    //
+    var img = document.createElement("img");
+    img.id = "spinnerImg";
+    img.style.opacity = 0;
+    img.src = chrome.runtime.getURL("spinner.gif");
+    div.append(img);
     //
     var p = document.createElement("p");
     p.id = "orderCountP";
@@ -243,23 +256,19 @@ function createChart() {
                 },
                 zoom: {
                     zoom: {
-                        wheel: {
-                            enabled: true
-                        },
-                        pinch: {
-                            enabled: true
-                        },
+                        wheel: { enabled: true },
+                        pinch: { enabled: true },
                         mode: "x",
-                        onZoomComplete: () => changeDisplayMode("Free")
+                        onZoom: () => changeDisplayMode("Free")
                     },
                     pan: {
                         enabled: true,
                         mode: "x",
-                        onPanComplete: () => changeDisplayMode("Free")
+                        onPan: () => changeDisplayMode("Free")
                     }
                 }
             },
-            elements: { line: { tension: 0.4 } },
+            elements: { line: { tension: 0.1 } },
             events: ["mousemove", "click"],
             onHover: (e, elements) => {
                 if (elements.length) {
@@ -293,27 +302,35 @@ function setData(data) {
     data.action = "SET";
     data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
     const url = mConfig.endpoint.data;
+    toggleSpinner(true);
     fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)
-    }).then(response => console.log("setData"));
+    }).then(() => toggleSpinner(false));
 }
 
 function clearData() {
-    var data = { action: "CLEAR" };
-    const url = mConfig.endpoint.data;
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    }).then(response => console.log("clearData"));
+    return new Promise((resolve, reject) => {
+        var data = { action: "CLEAR" };
+        const url = mConfig.endpoint.data;
+        toggleSpinner(true);
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(() => {
+            resolve();
+            toggleSpinner(false);
+        });
+    });
 }
 
 function getData() {
-    var data = { action: "GET" };
     return new Promise((resolve, reject) => {
+        var data = { action: "GET" };
         const url = mConfig.endpoint.data;
+        toggleSpinner(true);
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -331,6 +348,7 @@ function getData() {
                     return item;
                 });
                 resolve(json);
+                toggleSpinner(false);
             });
     });
 }
@@ -442,7 +460,6 @@ function registerEvent() {
 }
 
 function loadPage() {
-    // clearData();
     // Load Order List
     var button = document.createElement("button");
     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
@@ -473,7 +490,6 @@ function intervalHandler() {
     if (isAtoSession || isAtcSession)
         document.getElementById("right_price").value = session;
     //
-    // if (currentTime == mConfig.time.ATO.start) clearData();
     //Display
     if (
         currentTime == mConfig.time.ATO.start ||
@@ -540,6 +556,7 @@ function reportHandler() {
             }
         }
         mConfig.isReportedResult = true;
+        toggleSpinner(true);
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -558,6 +575,8 @@ function reportHandler() {
                 mConfig.isReportedResult = jsondata.isOk;
                 if (jsondata.isOk && jsondata.isExecuted)
                     alert("Báo cáo đã gửi thành công.");
+                //
+                toggleSpinner(false);
             })
             .catch(error => {
                 mConfig.isReportedResult = false;
@@ -581,6 +600,7 @@ function exportHandler(session) {
         if (["ATO", "ATC"].includes(session)) {
             const url = mConfig.endpoint.export;
             const data = { imageData, imageName, session };
+            toggleSpinner(true);
             fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -601,6 +621,7 @@ function exportHandler(session) {
                         "UploadImage-End ##############################"
                     );
                     if (jsondata.isOk) alert("Đăng ảnh thành công");
+                    toggleSpinner(false);
                 })
                 .catch(error => {
                     console.log(
@@ -625,4 +646,9 @@ function changeDisplayMode(mode) {
     var select = document.getElementById("displaySelect");
     select.value = mode;
     select.dispatchEvent(new Event("change"));
+}
+
+function toggleSpinner(status) {
+    var img = document.getElementById("spinnerImg");
+    img.style.opacity = status ? 1 : 0;
 }

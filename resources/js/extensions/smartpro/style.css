@@ -21,17 +21,6 @@
   padding: 1px;
   font-size: 16px;
 }
-#reportButton {
-  position: fixed;
-  bottom: 0px;
-  left: 210px;
-  background: red;
-  color: white;
-  width: 80px;
-  border-radius: 20px;
-  padding: 1px;
-  font-size: 16px;
-}
 
 #periodicChart {
   position: fixed;
@@ -79,6 +68,13 @@
   top: -0.5px;
   right: 194px;
   padding: 0.99px 5px;
+}
+
+#periodicChart > #spinnerImg {
+  position: absolute;
+  top: 0px;
+  right: 250px;
+  width: 25px;
 }
 
 #periodicChart > #orderCountP {
@@ -219,17 +215,14 @@
 }
 
 @media (max-width: 991.98px) {
-  #periodicButton {
-    bottom: 35px;
-    left: 0px;
-    padding: 3px !important;
-    z-index: 1022;
+  #continuousButton {
+    padding: 10px 1px !important;
   }
-
-  #reportButton {
-    bottom: 85px;
+  
+  #periodicButton {
+    bottom: 55px;
     left: 0px;
-    padding: 3px !important;
+    padding: 10px 3px !important;
     z-index: 1022;
   }
 
