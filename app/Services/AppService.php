@@ -246,8 +246,9 @@ class AppService extends CoreService
                 $stopSocketTime = $this->parameterRepository->getValue('stopSocketTime');
                 if (time() < strtotime($stopSocketTime)) $this->vpsWebSocket();
             });
-            $conn->on('error', function () {
+            $conn->on('error', function () use ($conn) {
                 error_log("WebSocket error.");
+                $conn->close();
             });
         }, function ($e) {
             error_log("WebSocket could not connect: {$e->getMessage()}\n");
