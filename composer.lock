@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d7f492b93ebe454cea73eabb8eb13527",
+    "content-hash": "621e6de3ea4b361acf482456a92edf51",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -701,53 +701,6 @@
                 }
             ],
             "time": "2020-12-29T14:50:06+00:00"
-        },
-        {
-            "name": "eislambey/eventsource",
-            "version": "v0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/eislambey/php-eventsource.git",
-                "reference": "6cb41018eec429b3607fd47b3c42bd2f89a1209f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/eislambey/php-eventsource/zipball/6cb41018eec429b3607fd47b3c42bd2f89a1209f",
-                "reference": "6cb41018eec429b3607fd47b3c42bd2f89a1209f",
-                "shasum": ""
-            },
-            "require": {
-                "ext-curl": "*",
-                "ext-json": "*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "EventSource\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "emre can islambey",
-                    "email": "eislambey@gmail.com"
-                }
-            ],
-            "description": "A simple EventSource / SSE (Server-Sent Events) client.",
-            "keywords": [
-                "Server-Sent Events",
-                "client",
-                "eventsource",
-                "sse"
-            ],
-            "support": {
-                "issues": "https://github.com/eislambey/php-eventsource/issues",
-                "source": "https://github.com/eislambey/php-eventsource/tree/v0.1.0"
-            },
-            "time": "2019-08-07T16:41:36+00:00"
         },
         {
             "name": "evenement/evenement",
