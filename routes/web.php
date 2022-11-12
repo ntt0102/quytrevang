@@ -33,9 +33,7 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    $start = now()->format('H:i:s');
-    echo $start;
-    $time = strtotime($start);
-    dd(time() >= $time + 1 * 60 + 30);
-    // dd(now());
+
+
+    dd(json_encode([["name" => "pushhub"]]));
 })->middleware('cors');

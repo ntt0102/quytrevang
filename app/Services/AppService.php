@@ -264,6 +264,38 @@ class AppService extends CoreService
         }
     }
 
+    public function hnxSSE()
+    {
+        $data = urlencode(json_encode([["name" => "pushhub"]]));
+        $url = "https://banggia.hnx.vn/signalr/negotiate?clientProtocol=1.5&connectionData={$data}";
+        error_log($url);
+        $client = new \GuzzleHttp\Client(['verify' => false]);
+        $res = $client->get($url);
+        $resp = json_decode($res->getBody());
+        $token = urlencode($resp->ConnectionToken);
+        $sseUrl = "https://banggia.hnx.vn/signalr/connect?transport=serverSentEvents&clientProtocol=1.5&connectionToken={$token}&connectionData={$data}";
+        error_log($sseUrl);
+        $es = new \EventSource\EventSource($sseUrl);
+        // $es->setCurlOptions([CURLOPT_SSL_VERIFYPEER => false]);
+        $messageReceived = 0;
+        $es->onMessage(function (\EventSource\Event $event) use ($messageReceived, $es) {
+            if ($es === 4) {
+                $es->abort();
+            }
+            $messageReceived++;
+            $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
+            if (time() >= $stopSocketTime) {
+                error_log("Timeout market.");
+                $es->abort();
+            }
+            set_global_value('startSocketTime', $event->data);
+            // echo $event->data, "\n";
+            // error_log(json_encode($event));
+        });
+
+        $es->connect();
+    }
+
     /**
      * Get the policy params
      *
