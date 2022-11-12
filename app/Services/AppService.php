@@ -268,32 +268,52 @@ class AppService extends CoreService
     {
         $data = urlencode(json_encode([["name" => "pushhub"]]));
         $url = "https://banggia.hnx.vn/signalr/negotiate?clientProtocol=1.5&connectionData={$data}";
-        error_log($url);
         $client = new \GuzzleHttp\Client(['verify' => false]);
         $res = $client->get($url);
         $resp = json_decode($res->getBody());
         $token = urlencode($resp->ConnectionToken);
         $sseUrl = "https://banggia.hnx.vn/signalr/connect?transport=serverSentEvents&clientProtocol=1.5&connectionToken={$token}&connectionData={$data}";
-        error_log($sseUrl);
-        $es = new \EventSource\EventSource($sseUrl);
-        // $es->setCurlOptions([CURLOPT_SSL_VERIFYPEER => false]);
-        $messageReceived = 0;
-        $es->onMessage(function (\EventSource\Event $event) use ($messageReceived, $es) {
-            if ($es === 4) {
-                $es->abort();
-            }
-            $messageReceived++;
-            $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
-            if (time() >= $stopSocketTime) {
-                error_log("Timeout market.");
-                $es->abort();
-            }
-            set_global_value('startSocketTime', $event->data);
-            // echo $event->data, "\n";
-            // error_log(json_encode($event));
-        });
+        $clientSse = new \GuzzleHttp\Client([
+            'verify' => false,
+            'stream' => true, 'debug' => false
+        ]);
+        $response = $clientSse->request('GET', $sseUrl);
+        // error_log(222222222);
+        // error_log($response->getStatusCode());
+        // if ($response->getStatusCode() == 204) {
+        //     error_log('error 204');
+        // }
+        $body = $response->getBody();
+        // error_log(3333333);
+        // error_log('Body: ' . $body);
+        while (!$body->eof()) {
+            echo $body->read(1024);
 
-        $es->connect();
+            break;
+        }
+        // while (true) {
+        //     $buffer .= $body->read(1);
+        //     error_log($buffer);
+        // }
+        // $es = new \EventSource\EventSource($sseUrl);
+        // // $es->setCurlOptions([CURLOPT_SSL_VERIFYPEER => false]);
+        // $messageReceived = 0;
+        // $es->onMessage(function (\EventSource\Event $event) use ($messageReceived, $es) {
+        //     if ($es === 4) {
+        //         $es->abort();
+        //     }
+        //     $messageReceived++;
+        //     $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
+        //     if (time() >= $stopSocketTime) {
+        //         error_log("Timeout market.");
+        //         $es->abort();
+        //     }
+        //     set_global_value('startSocketTime', $event->data);
+        //     // echo $event->data, "\n";
+        //     // error_log(json_encode($event));
+        // });
+
+        // $es->connect();
     }
 
     /**
