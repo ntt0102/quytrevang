@@ -187,7 +187,7 @@ class AppService extends CoreService
                         $this->vpsRepository->create($request->all());
                         break;
                     case 'GET':
-                        return $this->vpsRepository->getVps();
+                        return $this->vpsRepository->getVps($request->date);
                         break;
                     case 'CLEAR':
                         $this->vpsRepository->clear();

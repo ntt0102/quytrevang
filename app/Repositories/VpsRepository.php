@@ -25,12 +25,14 @@ class VpsRepository extends CoreRepository
     /**
      * @inheritdoc
      */
-    public function getVps()
+    public function getVps($date)
     {
+        $model = $this->model;
+        if ($date) $model = $model->whereDate('x', $date);
         return [
-            'price' => $this->model->where('type', 0)->get(),
-            'volume' => $this->model->where('type', 1)->get(),
-            'vol10' => $this->model->where('type', 2)->get()
+            'price' => $model->where('type', 0)->get(),
+            'volume' => $model->where('type', 1)->get(),
+            'vol10' => $model->where('type', 2)->get()
         ];
     }
 
