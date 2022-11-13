@@ -29,7 +29,8 @@ class VpsRepository extends CoreRepository
     {
         return [
             'price' => $this->model->where('type', 0)->get(),
-            'volume' => $this->model->where('type', 1)->get()
+            'volume' => $this->model->where('type', 1)->get(),
+            'vol10' => $this->model->where('type', 2)->get()
         ];
     }
 
