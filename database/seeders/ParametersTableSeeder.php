@@ -50,9 +50,14 @@ class ParametersTableSeeder extends Seeder
             'description' => "Hơp đồng VN30F1M",
         ]);
         Parameter::create([
-            'slug' => "stopSocketTime",
+            'slug' => "startTradingTime",
+            'value' => "08:44:00",
+            'description' => "Thời gian kết thúc giao dịch",
+        ]);
+        Parameter::create([
+            'slug' => "stopTradingTime",
             'value' => "14:46:00",
-            'description' => "Thời gian dừng Socket",
+            'description' => "Thời gian bắt đầu giao dịch",
         ]);
     }
 }

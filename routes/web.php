@@ -35,5 +35,5 @@ Route::get('migrate', function () {
 Route::get('test', function () {
 
 
-    dd(json_encode([["name" => "pushhub"]]));
+    dd(strtotime('08:44') == strtotime('08:44:00'));
 })->middleware('cors');

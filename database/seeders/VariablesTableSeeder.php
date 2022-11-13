@@ -31,7 +31,7 @@ class VariablesTableSeeder extends Seeder
             'value' => "0",
         ]);
         Variable::create([
-            'name' => "startSocketTime",
+            'name' => "startScheduleTime",
             'value' => "17:48:00",
         ]);
     }

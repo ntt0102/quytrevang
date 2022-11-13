@@ -28,6 +28,42 @@ if (!function_exists('set_global_value')) {
     }
 }
 
+if (!function_exists('check_opening_market')) {
+    /**
+     * Check opening market
+     *
+     * @return bool
+     */
+    function check_opening_market()
+    {
+        return app(\App\Services\AppService::class)->vpsCheckOpeningMarket();
+    }
+}
+
+if (!function_exists('get_start_trading_time')) {
+    /**
+     * Get start trading time.
+     *
+     * @return string
+     */
+    function get_start_trading_time()
+    {
+        return app(\App\Repositories\ParameterRepository::class)->getValue('startTradingTime');
+    }
+}
+
+if (!function_exists('get_stop_trading_time')) {
+    /**
+     * Get stop trading time.
+     *
+     * @return string
+     */
+    function get_stop_trading_time()
+    {
+        return app(\App\Repositories\ParameterRepository::class)->getValue('stopTradingTime');
+    }
+}
+
 if (!function_exists('text2code')) {
     /**
      * Convert text to code

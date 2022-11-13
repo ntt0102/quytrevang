@@ -43,8 +43,8 @@ class TradeVpsCommand extends Command
                 set_global_value('reportedTradingFlag', '0');
                 app(\App\Repositories\VpsRepository::class)->clear();
             } else {
-                set_global_value('startSocketTime', now()->format('H:i:s'));
-                app(\App\Services\AppService::class)->vpsWebSocket();
+                set_global_value('startScheduleTime', now()->format('H:i:s'));
+                app(\App\Services\Special\SocketService::class)->connectVps();
             }
         }
     }

@@ -28,8 +28,20 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
-        $stopSocketTime = app(\App\Repositories\ParameterRepository::class)->getValue('stopSocketTime');
-        $schedule->command('vps:trade')->everyMinute()->between('08:44:00', $stopSocketTime);
+        //
+        $schedule->call(function () {
+            if (check_opening_market()) {
+                set_global_value('reportedTradingFlag', '0');
+                // app(\App\Repositories\VpsRepository::class)->clear();
+            }
+        })->dailyAt(get_start_trading_time());
+        $schedule->call(function () {
+            if (check_opening_market()) {
+                set_global_value('startScheduleTime', now()->format('H:i:s'));
+                app(\App\Services\Special\SocketService::class)->connectVps();
+            }
+        })->everyMinute()->between(get_start_trading_time(), get_stop_trading_time());
+        // $schedule->command('vps:trade')->everyMinute()->between(get_start_trading_time(), get_stop_trading_time());
     }
 
     /**
