@@ -21,6 +21,7 @@ function getLocalConfig() {
                 mConfig = json;
                 mConfig.isReportedResult = false;
                 mConfig.zoomLevel = 1;
+                mConfig.displayDate = moment().format("YYYY-MM-DD");
                 setTimeout(() => {
                     mConfig.VN30F1M = document.getElementById(
                         "tbodyPhaisinhContent"
@@ -105,25 +106,19 @@ function createChart() {
                 break;
             case "ATO":
             case "ATC":
-                var [hStart, mStart, sStart] = mConfig.time[
-                    mConfig.displayMode
-                ].start.split(":");
-                var [hEnd, mEnd, sEnd] = mConfig.time[
-                    mConfig.displayMode
-                ].end.split(":");
                 mChart.zoomScale(
                     "x",
                     {
-                        min: moment().set({
-                            hour: hStart,
-                            minute: mStart,
-                            second: sStart
-                        }),
-                        max: moment().set({
-                            hour: hEnd,
-                            minute: mEnd,
-                            second: sEnd
-                        })
+                        min: moment(
+                            `${mConfig.displayDate} ${
+                                mConfig.time[mConfig.displayMode].start
+                            }`
+                        ),
+                        max: moment(
+                            `${mConfig.displayDate} ${
+                                mConfig.time[mConfig.displayMode].end
+                            }`
+                        )
                     },
                     "none"
                 );
@@ -142,6 +137,32 @@ function createChart() {
     });
     div.append(input);
     //
+    input = document.createElement("input");
+    input.id = "dateInput";
+    input.setAttribute("type", "date");
+    input.setAttribute("value", mConfig.displayDate);
+    input.addEventListener("change", e => {
+        mConfig.displayDate = e.target.value;
+        getData().then(() => {
+            if (mConfig.displayDate) {
+                mChart.zoomScale(
+                    "x",
+                    {
+                        min: moment(
+                            `${mConfig.displayDate} ${mConfig.time.ATO.start}`
+                        ),
+                        max: moment(
+                            `${mConfig.displayDate} ${mConfig.time.ATC.end}`
+                        )
+                    },
+                    "none"
+                );
+                changeDisplayMode("Free");
+            } else changeDisplayMode("Full");
+        });
+    });
+    div.append(input);
+    //
     //
     var button = document.createElement("button");
     button.id = "exportButton";
@@ -152,13 +173,7 @@ function createChart() {
     button = document.createElement("button");
     button.id = "refreshButton";
     button.innerText = "Refresh";
-    button.addEventListener("click", () => {
-        getData().then(result => {
-            mChart.data.datasets[0].data = result.price;
-            mChart.data.datasets[1].data = result.volume;
-            mChart.update("none");
-        });
-    });
+    button.addEventListener("click", getData);
     div.append(button);
     //
     button = document.createElement("button");
@@ -166,13 +181,7 @@ function createChart() {
     button.innerText = "Clear";
     button.addEventListener("click", () => {
         var choice = confirm("Xoá toàn bộ dữ liệu?");
-        if (choice)
-            clearData().then(() => {
-                mChart.data.datasets[0].data = [];
-                mChart.data.datasets[1].data = [];
-                mChart.update("none");
-                changeDisplayMode("Stream");
-            });
+        if (choice) clearData().then(() => changeDisplayMode("Stream"));
     });
     div.append(button);
     //
@@ -204,7 +213,7 @@ function createChart() {
                     pointRadius: 0,
                     pointHoverRadius: 5,
                     pointHitRadius: 20,
-                    order: 2
+                    order: 1
                 },
                 {
                     label: "KL",
@@ -215,7 +224,18 @@ function createChart() {
                     pointRadius: 0,
                     pointHoverRadius: 5,
                     pointHitRadius: 20,
-                    order: 1
+                    order: 2
+                },
+                {
+                    label: "KL10",
+                    data: [],
+                    borderColor: "cyan",
+                    backgroundColor: "cyan",
+                    yAxisID: "y2",
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHitRadius: 20,
+                    order: 2
                 }
             ]
         },
@@ -224,14 +244,14 @@ function createChart() {
                 x: {
                     type: "time",
                     time: {
-                        tooltipFormat: "DD-MM-YYYY HH:mm:ss",
+                        tooltipFormat: "D/M/YYYY H:mm:ss",
                         displayFormats: {
-                            month: "MM-YYYY",
-                            day: "DD-MM-YYYY",
-                            hour: "HH:mm",
-                            minute: "HH:mm",
-                            second: "HH:mm:ss",
-                            millisecond: "mm:ss.SSS"
+                            month: "[tháng] M",
+                            day: "[ngày] D",
+                            hour: "H [giờ]",
+                            minute: "H [h] mm",
+                            second: "mm [m] ss",
+                            millisecond: `ss [s] SSS`
                         }
                     },
                     grid: {
@@ -246,8 +266,10 @@ function createChart() {
                     }
                 },
                 y1: {
-                    position: "right",
-                    grid: { display: true }
+                    display: false
+                },
+                y2: {
+                    display: false
                 }
             },
             plugins: {
@@ -267,6 +289,28 @@ function createChart() {
                         mode: "x",
                         onPan: () => changeDisplayMode("Free")
                     }
+                },
+                annotation: {
+                    annotations: {
+                        line1: {
+                            type: "line",
+                            yScaleID: "y1",
+                            yMin: 0,
+                            yMax: 0,
+                            borderColor: "magenta",
+                            borderWidth: 1,
+                            borderDash: [5, 5]
+                        },
+                        line2: {
+                            type: "line",
+                            yScaleID: "y2",
+                            yMin: 0,
+                            yMax: 0,
+                            borderColor: "cyan",
+                            borderWidth: 1,
+                            borderDash: [5, 5]
+                        }
+                    }
                 }
             },
             elements: { line: { tension: 0.1 } },
@@ -274,8 +318,10 @@ function createChart() {
             onHover: (e, elements) => {
                 if (elements.length) {
                     var datasetIndex = elements[0].datasetIndex;
+                    mChart.data.datasets[0].order = 2;
+                    mChart.data.datasets[1].order = 2;
+                    mChart.data.datasets[2].order = 2;
                     mChart.data.datasets[datasetIndex].order = 1;
-                    mChart.data.datasets[datasetIndex == 0 ? 1 : 0].order = 2;
                     mChart.update();
                 }
             },
@@ -321,15 +367,18 @@ function clearData() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
         }).then(() => {
-            resolve();
+            mChart.data.datasets[0].data = [];
+            mChart.data.datasets[1].data = [];
+            mChart.update("none");
             toggleSpinner(false);
+            resolve();
         });
     });
 }
 
 function getData() {
     return new Promise((resolve, reject) => {
-        var data = { action: "GET" };
+        var data = { action: "GET", date: mConfig.displayDate };
         const url = mConfig.endpoint.data;
         toggleSpinner(true);
         fetch(url, {
@@ -348,8 +397,12 @@ function getData() {
                     item.x = moment(item.x);
                     return item;
                 });
-                resolve(json);
+                mChart.data.datasets[0].data = json.price;
+                mChart.data.datasets[1].data = json.volume;
+                mChart.data.datasets[2].data = json.vol10;
+                mChart.update("none");
                 toggleSpinner(false);
+                resolve();
             });
     });
 }
@@ -472,11 +525,7 @@ function loadPage() {
     )}`;
     mChart.update();
     //
-    getData().then(result => {
-        mChart.data.datasets[0].data = result.price;
-        mChart.data.datasets[1].data = result.volume;
-        mChart.update("none");
-    });
+    getData();
 }
 
 function intervalHandler() {

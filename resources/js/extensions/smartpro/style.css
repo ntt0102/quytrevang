@@ -49,6 +49,15 @@
   padding: 0px;
 }
 
+
+#periodicChart > #dateInput {
+  position: absolute;
+  top: 28px;
+  right: 74px;
+  width: 105px;
+  padding: 0px;
+}
+
 #periodicChart > #exportButton {
   position: absolute;
   top: -0.5px;
