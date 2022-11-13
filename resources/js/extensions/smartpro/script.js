@@ -299,7 +299,8 @@ function createChart() {
                             yMax: 0,
                             borderColor: "magenta",
                             borderWidth: 1,
-                            borderDash: [5, 5]
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
                         },
                         line2: {
                             type: "line",
@@ -308,7 +309,8 @@ function createChart() {
                             yMax: 0,
                             borderColor: "cyan",
                             borderWidth: 1,
-                            borderDash: [5, 5]
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
                         }
                     }
                 }
