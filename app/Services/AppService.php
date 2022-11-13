@@ -231,16 +231,16 @@ class AppService extends CoreService
                                 $data = $json[1]->data;
                                 if ($data->id == 3220) {
                                     error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
-                                    $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => false]);
+                                    $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => 0]);
                                 } else if ($data->id == 3310) {
                                     error_log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
-                                    $this->vpsRepository->create(['x' => now(), 'y' => $data->BVolume - $data->SVolume, 'type' => true]);
+                                    $this->vpsRepository->create(['x' => now(), 'y' => $data->BVolume - $data->SVolume, 'type' => 1]);
                                 };
                             } else if ($event == 'stockps') {
                                 $data = $json[1]->data;
                                 if ($data->id == 3220) {
                                     error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
-                                    $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => false]);
+                                    $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => 0]);
                                 };
                             }
                         }
@@ -266,54 +266,70 @@ class AppService extends CoreService
 
     public function hnxSSE()
     {
-        $data = urlencode(json_encode([["name" => "pushhub"]]));
-        $url = "https://banggia.hnx.vn/signalr/negotiate?clientProtocol=1.5&connectionData={$data}";
-        $client = new \GuzzleHttp\Client(['verify' => false]);
-        $res = $client->get($url);
-        $resp = json_decode($res->getBody());
-        $token = urlencode($resp->ConnectionToken);
-        $sseUrl = "https://banggia.hnx.vn/signalr/connect?transport=serverSentEvents&clientProtocol=1.5&connectionToken={$token}&connectionData={$data}";
-        $clientSse = new \GuzzleHttp\Client([
-            'verify' => false,
-            'stream' => true, 'debug' => false
-        ]);
-        $response = $clientSse->request('GET', $sseUrl);
-        // error_log(222222222);
-        // error_log($response->getStatusCode());
-        // if ($response->getStatusCode() == 204) {
-        //     error_log('error 204');
-        // }
-        $body = $response->getBody();
-        // error_log(3333333);
-        // error_log('Body: ' . $body);
-        while (!$body->eof()) {
-            echo $body->read(1024);
+        // $data = urlencode(json_encode([["name" => "pushhub"]]));
+        // $url = "https://banggia.hnx.vn/signalr/negotiate?clientProtocol=1.5&connectionData={$data}";
+        // $client = new \GuzzleHttp\Client(['verify' => false]);
+        // $res = $client->get($url);
+        // $resp = json_decode($res->getBody());
+        // $token = urlencode($resp->ConnectionToken);
+        // $sseUrl = "https://banggia.hnx.vn/signalr/connect?transport=serverSentEvents&clientProtocol=1.5&connectionToken={$token}&connectionData={$data}";
+        // $clientSse = new \GuzzleHttp\Client([
+        //     'verify' => false,
+        //     'stream' => true, 'debug' => false
+        // ]);
+        // $response = $clientSse->request('GET', $sseUrl);
+        // // error_log(222222222);
+        // // error_log($response->getStatusCode());
+        // // if ($response->getStatusCode() == 204) {
+        // //     error_log('error 204');
+        // // }
+        // $body = $response->getBody();
+        // // error_log(3333333);
+        // // error_log('Body: ' . $body);
+        // while (!$body->eof()) {
+        //     echo $body->read(1024);
 
-            break;
-        }
-        // while (true) {
-        //     $buffer .= $body->read(1);
-        //     error_log($buffer);
+        //     break;
         // }
-        // $es = new \EventSource\EventSource($sseUrl);
-        // // $es->setCurlOptions([CURLOPT_SSL_VERIFYPEER => false]);
-        // $messageReceived = 0;
-        // $es->onMessage(function (\EventSource\Event $event) use ($messageReceived, $es) {
-        //     if ($es === 4) {
-        //         $es->abort();
-        //     }
-        //     $messageReceived++;
-        //     $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
-        //     if (time() >= $stopSocketTime) {
-        //         error_log("Timeout market.");
-        //         $es->abort();
-        //     }
-        //     set_global_value('startSocketTime', $event->data);
-        //     // echo $event->data, "\n";
-        //     // error_log(json_encode($event));
-        // });
+        // // while (true) {
+        // //     $buffer .= $body->read(1);
+        // //     error_log($buffer);
+        // // }
+        // // $es = new \EventSource\EventSource($sseUrl);
+        // // // $es->setCurlOptions([CURLOPT_SSL_VERIFYPEER => false]);
+        // // $messageReceived = 0;
+        // // $es->onMessage(function (\EventSource\Event $event) use ($messageReceived, $es) {
+        // //     if ($es === 4) {
+        // //         $es->abort();
+        // //     }
+        // //     $messageReceived++;
+        // //     $stopSocketTime = strtotime($this->parameterRepository->getValue('stopSocketTime'));
+        // //     if (time() >= $stopSocketTime) {
+        // //         error_log("Timeout market.");
+        // //         $es->abort();
+        // //     }
+        // //     set_global_value('startSocketTime', $event->data);
+        // //     // echo $event->data, "\n";
+        // //     // error_log(json_encode($event));
+        // // });
 
-        // $es->connect();
+        // // $es->connect();
+        /////////////////////////////////////////////////////////
+        $uri = 'wss://pricestream-iboard.ssi.com.vn/realtime';
+        \Ratchet\Client\connect($uri)->then(function ($conn) {
+            $conn->on('message', function ($msg) use ($conn) {
+                error_log("WebSocket message.");
+            });
+            $conn->on('close', function () {
+                error_log("WebSocket closed.");
+            });
+            $conn->on('error', function () use ($conn) {
+                error_log("WebSocket error.");
+            });
+        }, function ($e) {
+            error_log("WebSocket could not connect: {$e->getMessage()}\n");
+        });
+        // error_log($uri);
     }
 
     /**

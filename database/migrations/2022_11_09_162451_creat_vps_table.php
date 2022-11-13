@@ -15,9 +15,9 @@ class CreatVpsTable extends Migration
     {
         Schema::create('vps', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->boolean('type');
+            $table->string('type');
             $table->timestamp('x');
-            $table->float('y');
+            $table->string('y');
         });
     }
 
