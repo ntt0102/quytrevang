@@ -15,7 +15,7 @@ class VariablesTableSeeder extends Seeder
     public function run()
     {
         Variable::create([
-            'name' => "backupedDatabaseFlag",
+            'name' => "changedDatabaseFlag",
             'value' => "0",
         ]);
         Variable::create([
@@ -24,10 +24,6 @@ class VariablesTableSeeder extends Seeder
         ]);
         Variable::create([
             'name' => "runningSocketFlag",
-            'value' => "0",
-        ]);
-        Variable::create([
-            'name' => "testCounter",
             'value' => "0",
         ]);
         Variable::create([

@@ -38,14 +38,14 @@ class BackupDatabaseCommand extends Command
      */
     public function handle()
     {
-        if (get_global_value('backupedDatabaseFlag') == '1') {
+        if (get_global_value('changedDatabaseFlag') == '1') {
             $db = new DatabaseService();
             $param = new \stdClass();
             $param->download = false;
             $param->sendMail = true;
             $db->backup($param);
             //
-            set_global_value('backupedDatabaseFlag', '0');
+            set_global_value('changedDatabaseFlag', '0');
         }
     }
 }

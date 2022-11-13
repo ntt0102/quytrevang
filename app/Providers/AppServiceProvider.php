@@ -36,8 +36,8 @@ class AppServiceProvider extends ServiceProvider
         ], function ($model) {
             list(,, $name) = explode('\\', $model);
             if ($name != 'Variable') {
-                if (get_global_value('backupedDatabaseFlag') == '0')
-                    set_global_value('backupedDatabaseFlag', '1');
+                if (get_global_value('changedDatabaseFlag') == '0')
+                    set_global_value('changedDatabaseFlag', '1');
             }
         });
         //
