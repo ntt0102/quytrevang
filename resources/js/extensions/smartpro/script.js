@@ -157,6 +157,7 @@ function createChart() {
                     },
                     "none"
                 );
+                drawTimeLine();
                 changeDisplayMode("Free");
             } else changeDisplayMode("Full");
         });
@@ -292,7 +293,7 @@ function createChart() {
                 },
                 annotation: {
                     annotations: {
-                        line1: {
+                        volume_0: {
                             type: "line",
                             yScaleID: "y1",
                             yMin: 0,
@@ -302,12 +303,64 @@ function createChart() {
                             borderDash: [5, 5],
                             adjustScaleRange: false
                         },
-                        line2: {
+                        vol10_0: {
                             type: "line",
                             yScaleID: "y2",
                             yMin: 0,
                             yMax: 0,
                             borderColor: "cyan",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        startATO: {
+                            type: "line",
+                            xMin: moment(
+                                `${mConfig.displayDate} ${mConfig.time.ATO.start}`
+                            ),
+                            xMax: moment(
+                                `${mConfig.displayDate} ${mConfig.time.ATO.start}`
+                            ),
+                            borderColor: "lime",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        endATO: {
+                            type: "line",
+                            xMin: moment(
+                                `${mConfig.displayDate} ${mConfig.time.ATO.end}`
+                            ),
+                            xMax: moment(
+                                `${mConfig.displayDate} ${mConfig.time.ATO.end}`
+                            ),
+                            borderColor: "lime",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        startATC: {
+                            type: "line",
+                            xMin: moment(
+                                `${mConfig.displayDate} ${mConfig.time.ATC.start}`
+                            ),
+                            xMax: moment(
+                                `${mConfig.displayDate} ${mConfig.time.ATC.start}`
+                            ),
+                            borderColor: "red",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        endATC: {
+                            type: "line",
+                            xMin: moment(
+                                `${mConfig.displayDate} ${mConfig.time.ATC.end}`
+                            ),
+                            xMax: moment(
+                                `${mConfig.displayDate} ${mConfig.time.ATC.end}`
+                            ),
+                            borderColor: "red",
                             borderWidth: 1,
                             borderDash: [5, 5],
                             adjustScaleRange: false
@@ -703,4 +756,22 @@ function changeDisplayMode(mode) {
 function toggleSpinner(status) {
     var img = document.getElementById("spinnerImg");
     img.style.opacity = status ? 1 : 0;
+}
+
+function drawTimeLine() {
+    ["ATO", "ATC"].forEach(session => {
+        ["start", "end"].forEach(event => {
+            var annotation =
+                mChart.options.plugins.annotation.annotations[
+                    `${event}${session}`
+                ];
+            annotation.xMin = moment(
+                `${mConfig.displayDate} ${mConfig.time[session][event]}`
+            );
+            annotation.xMax = moment(
+                `${mConfig.displayDate} ${mConfig.time[session][event]}`
+            );
+        });
+    });
+    mChart.update("none");
 }
