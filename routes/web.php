@@ -33,7 +33,12 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-
-    $a = app(\App\Repositories\VpsRepository::class)->getLastWithType(2);
+    // $a = ['side' => 'B', 'B' => 0, 'S' => 0];
+    $a = [];
+    dd($a['side'] == 'S');
+    $a = json_encode($a);
+    echo $a;
+    $a = (json_decode($a, true));
+    // echo $a;
     dd($a);
 })->middleware('cors');

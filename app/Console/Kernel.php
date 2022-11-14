@@ -32,6 +32,8 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             if (check_opening_market()) {
                 set_global_value('reportedTradingFlag', '0');
+                set_global_value('runningSocketFlag', '0');
+                set_global_value('socketVol10Temp', '{"D":"B","B":0,"S":0}');
                 // app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt(get_start_trading_time());

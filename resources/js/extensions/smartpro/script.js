@@ -22,6 +22,7 @@ function getLocalConfig() {
                 mConfig.isReportedResult = false;
                 mConfig.zoomLevel = 1;
                 mConfig.displayDate = moment().format("YYYY-MM-DD");
+                mConfig.socketVol10Temp = { side: "B", B: 0, S: 0 };
                 setTimeout(() => {
                     mConfig.VN30F1M = document.getElementById(
                         "tbodyPhaisinhContent"
@@ -422,8 +423,7 @@ function clearData() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
         }).then(() => {
-            mChart.data.datasets[0].data = [];
-            mChart.data.datasets[1].data = [];
+            mChart.data.datasets.forEach(item => (item.data = []));
             mChart.update("none");
             toggleSpinner(false);
             resolve();
@@ -479,7 +479,7 @@ function connectSocket() {
     });
     function priceHandler(data) {
         if (data.id == 3220) {
-            console.log("price" + data.id);
+            // console.log("price" + data.id);
             const price = {
                 x: moment(),
                 y: data.lastPrice
@@ -490,7 +490,7 @@ function connectSocket() {
     }
     function volumeHandler(data) {
         if (data.id == 3310) {
-            console.log("volume" + data.id);
+            // console.log("volume" + data.id);
             const volume = {
                 x: moment(),
                 y: data.BVolume - data.SVolume
@@ -501,21 +501,24 @@ function connectSocket() {
     }
     function vol10Handler(data) {
         if (data.id == 3211) {
-            // console.log("vol10" + data.id);
-            var dir = data.side == "B" ? 1 : -1;
             var sum = data.ndata
                 .split("SOH")
                 .reduce((acc, item) => acc + +item.split(":")[1], 0);
-            sum *= dir;
-            var vol10 = {
-                x: moment(),
-                y: sum
-            };
-            var dataset = mChart.data.datasets[2].data;
-            var lastData = dataset.at(-1);
-            if (lastData) vol10.y += +lastData.y;
-            dataset.push(vol10);
-            mChart.update("none");
+
+            if (
+                data.side == "B" &&
+                mConfig.socketVol10Temp.side == "S" &&
+                mConfig.socketVol10Temp.B != 0
+            ) {
+                const vol10 = {
+                    x: moment(),
+                    y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
+                };
+                mChart.data.datasets[2].data.push(vol10);
+                mChart.update("none");
+            }
+            mConfig.socketVol10Temp.side = data.side;
+            mConfig.socketVol10Temp[data.side] = sum;
         }
     }
 }

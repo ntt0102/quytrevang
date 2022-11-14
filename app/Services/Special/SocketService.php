@@ -52,28 +52,30 @@ class SocketService extends CoreService
                             if ($event == 'boardps') {
                                 $data = $json[1]->data;
                                 if ($data->id == 3220) {
-                                    error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
+                                    // error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
                                     $param = ['x' => now(), 'y' => $data->lastPrice, 'type' => 0];
                                     $this->vpsRepository->create($param);
                                 } else if ($data->id == 3310) {
-                                    error_log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
+                                    // error_log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
                                     $param = ['x' => now(), 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
                                     $this->vpsRepository->create($param);
                                 } else if ($data->id == 3211) {
-                                    $dir = $data->side == "B" ? 1 : -1;
                                     $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
                                         return $acc + (int)explode(":", $item)[1];
                                     }, 0);
-                                    $sum *= $dir;
-                                    $param = ['x' => now(), 'y' => $sum, 'type' => 2];
-                                    $lastData = $this->vpsRepository->getLastWithType(2);
-                                    if ($lastData) $param['y'] += (int)$lastData->y;
-                                    $this->vpsRepository->create($param);
+                                    $socketVol10Temp = json_decode(get_global_value('socketVol10Temp'), true);
+                                    if ($data->side == 'B' && $socketVol10Temp['side'] == 'S' && $socketVol10Temp['B'] != 0) {
+                                        $param = ['x' => now(), 'y' => $socketVol10Temp['B'] - $socketVol10Temp['S'], 'type' => 2];
+                                        $this->vpsRepository->create($param);
+                                    }
+                                    $socketVol10Temp['side'] = $data->side;
+                                    $socketVol10Temp[$data->side] = $sum;
+                                    set_global_value('socketVol10Temp', json_encode($socketVol10Temp));
                                 };
                             } else if ($event == 'stockps') {
                                 $data = $json[1]->data;
                                 if ($data->id == 3220) {
-                                    error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
+                                    // error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
                                     $param = ['x' => now(), 'y' => $data->lastPrice, 'type' => 0];
                                     $this->vpsRepository->create($param);
                                 };

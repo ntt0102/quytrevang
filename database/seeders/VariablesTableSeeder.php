@@ -30,5 +30,9 @@ class VariablesTableSeeder extends Seeder
             'name' => "startScheduleTime",
             'value' => "17:48:00",
         ]);
+        Variable::create([
+            'name' => "socketVol10Temp",
+            'value' => '{"side":"B","B":0,"S":0}',
+        ]);
     }
 }
