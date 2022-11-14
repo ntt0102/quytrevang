@@ -7,7 +7,7 @@ getLocalConfig()
         createButtons();
         createChart();
         registerEvent();
-        initSocket();
+        connectSocket();
         loadPage();
         setInterval(intervalHandler, 1000);
     });
@@ -462,18 +462,19 @@ function getData() {
     });
 }
 
-function initSocket() {
+function connectSocket() {
     var msg = { action: "join", list: mConfig.VN30F1M };
     var socket = io(mConfig.endpoint.socket);
     socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
     socket.on("reconnect", () => socket.emit("regs", JSON.stringify(msg)));
     socket.on("boardps", data => {
-        console.log("boardps");
+        // console.log("boardps", data.data);
         priceHandler(data.data);
         volumeHandler(data.data);
+        vol10Handler(data.data);
     });
     socket.on("stockps", data => {
-        console.log("stockps");
+        // console.log("stockps", data.data);
         priceHandler(data.data);
     });
     function priceHandler(data) {
@@ -495,6 +496,29 @@ function initSocket() {
                 y: data.BVolume - data.SVolume
             };
             mChart.data.datasets[1].data.push(volume);
+            mChart.update("none");
+        }
+    }
+    function vol10Handler(data) {
+        if (data.id == 3211) {
+            // console.log("vol10" + data.id);
+            var dir = data.side == "B" ? 1 : -1;
+            var sum = data.ndata
+                .split("SOH")
+                .reduce((acc, item) => acc + +item.split(":")[1], 0);
+            sum *= dir;
+            var vol10 = {
+                x: moment(),
+                y: sum
+            };
+            var dataset = mChart.data.datasets[2].data;
+            var lastData = dataset.at(-1);
+            if (lastData) {
+                if (lastData.isFirst) dataset.pop();
+                vol10.y += lastData.y;
+            } else vol10.isFirst = true;
+            dataset.push(vol10);
+            // console.log("dataset_1: ", JSON.parse(JSON.stringify(dataset)));
             mChart.update("none");
         }
     }

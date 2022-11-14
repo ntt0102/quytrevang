@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Repositories\CoreRepository;
 use App\Models\Vps;
+use Carbon\Carbon;
 
 class VpsRepository extends CoreRepository
 {
@@ -39,6 +40,14 @@ class VpsRepository extends CoreRepository
                 'volume' => $this->model->where('type', 1)->get(),
                 'vol10' => $this->model->where('type', 2)->get()
             ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLastOfType($type)
+    {
+        return $this->model->whereDate('x', Carbon::today())->where('type', $type)->orderBy('x', 'DESC')->first();
     }
 
     /**

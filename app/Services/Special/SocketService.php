@@ -53,16 +53,35 @@ class SocketService extends CoreService
                                 $data = $json[1]->data;
                                 if ($data->id == 3220) {
                                     error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
-                                    $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => 0]);
+                                    $param = ['x' => now(), 'y' => $data->lastPrice, 'type' => 0];
+                                    $this->vpsRepository->create($param);
                                 } else if ($data->id == 3310) {
                                     error_log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
-                                    $this->vpsRepository->create(['x' => now(), 'y' => $data->BVolume - $data->SVolume, 'type' => 1]);
+                                    $param = ['x' => now(), 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
+                                    $this->vpsRepository->create($param);
+                                } else if ($data->id == 3211) {
+                                    $dir = $data->side == "B" ? 1 : -1;
+                                    $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
+                                        return $acc + explode(":", $item)[1];
+                                    }, 0);
+                                    $sum *= $dir;
+                                    $param = ['x' => now(), 'y' => $sum, 'type' => 2];
+                                    $isUpdate = false;
+                                    $lastData = $this->vpsRepository->getLastOfType(2);
+                                    if ($lastData) {
+                                        [$value, $flag] = explode(".", $lastData->y);
+                                        if ($flag) $isUpdate = true;
+                                        $param['y'] += $value;
+                                    } else $param['y'] += '.1';
+                                    if ($isUpdate) $this->vpsRepository->update($lastData, $param);
+                                    else $this->vpsRepository->create($param);
                                 };
                             } else if ($event == 'stockps') {
                                 $data = $json[1]->data;
                                 if ($data->id == 3220) {
                                     error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
-                                    $this->vpsRepository->create(['x' => now(), 'y' => $data->lastPrice, 'type' => 0]);
+                                    $param = ['x' => now(), 'y' => $data->lastPrice, 'type' => 0];
+                                    $this->vpsRepository->create($param);
                                 };
                             }
                         }
