@@ -69,9 +69,10 @@ class SocketService extends CoreService
                                     $isUpdate = false;
                                     $lastData = $this->vpsRepository->getLastWithType(2);
                                     if ($lastData) {
-                                        [$value, $flag] = explode(".", $lastData->y);
-                                        if ($flag) $isUpdate = true;
-                                        $param['y'] += $value;
+                                        if (str_contains($lastData->y, '.1')) {
+                                            $param['y'] += (int)str_replace(".1", "", $lastData->y);
+                                            $isUpdate = true;
+                                        } else $param['y'] += $lastData->y;
                                     } else $param['y'] += '.1';
                                     if ($isUpdate) $this->vpsRepository->update($lastData, $param);
                                     else $this->vpsRepository->create($param);
