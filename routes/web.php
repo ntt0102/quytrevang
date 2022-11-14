@@ -34,6 +34,6 @@ Route::get('migrate', function () {
 
 Route::get('test', function () {
 
-
-    dd(strtotime('08:44') == strtotime('08:44:00'));
+    $a = app(\App\Repositories\VpsRepository::class)->getLastWithType(2);
+    dd($a);
 })->middleware('cors');

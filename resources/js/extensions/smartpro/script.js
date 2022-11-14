@@ -513,12 +513,8 @@ function connectSocket() {
             };
             var dataset = mChart.data.datasets[2].data;
             var lastData = dataset.at(-1);
-            if (lastData) {
-                if (lastData.isFirst) dataset.pop();
-                vol10.y += lastData.y;
-            } else vol10.isFirst = true;
+            if (lastData) vol10.y += +lastData.y;
             dataset.push(vol10);
-            // console.log("dataset_1: ", JSON.parse(JSON.stringify(dataset)));
             mChart.update("none");
         }
     }

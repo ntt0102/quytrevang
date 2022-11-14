@@ -66,16 +66,9 @@ class SocketService extends CoreService
                                     }, 0);
                                     $sum *= $dir;
                                     $param = ['x' => now(), 'y' => $sum, 'type' => 2];
-                                    $isUpdate = false;
                                     $lastData = $this->vpsRepository->getLastWithType(2);
-                                    if ($lastData) {
-                                        if (str_contains($lastData->y, '.1')) {
-                                            $param['y'] += (int)str_replace(".1", "", $lastData->y);
-                                            $isUpdate = true;
-                                        } else $param['y'] += (int)$lastData->y;
-                                    } else $param['y'] .= '.1';
-                                    if ($isUpdate) $this->vpsRepository->update($lastData, $param);
-                                    else $this->vpsRepository->create($param);
+                                    if ($lastData) $param['y'] += (int)$lastData->y;
+                                    $this->vpsRepository->create($param);
                                 };
                             } else if ($event == 'stockps') {
                                 $data = $json[1]->data;
