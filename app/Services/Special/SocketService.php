@@ -67,7 +67,7 @@ class SocketService extends CoreService
                                     $sum *= $dir;
                                     $param = ['x' => now(), 'y' => $sum, 'type' => 2];
                                     $isUpdate = false;
-                                    $lastData = $this->vpsRepository->getLastOfType(2);
+                                    $lastData = $this->vpsRepository->getLastWithType(2);
                                     if ($lastData) {
                                         [$value, $flag] = explode(".", $lastData->y);
                                         if ($flag) $isUpdate = true;

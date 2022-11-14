@@ -45,7 +45,7 @@ class VpsRepository extends CoreRepository
     /**
      * @inheritdoc
      */
-    public function getLastOfType($type)
+    public function getLastWithType($type)
     {
         return $this->model->whereDate('x', Carbon::today())->where('type', $type)->orderBy('x', 'DESC')->first();
     }
