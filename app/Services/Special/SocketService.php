@@ -62,7 +62,7 @@ class SocketService extends CoreService
                                 } else if ($data->id == 3211) {
                                     $dir = $data->side == "B" ? 1 : -1;
                                     $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
-                                        return $acc + explode(":", $item)[1];
+                                        return $acc + (int)explode(":", $item)[1];
                                     }, 0);
                                     $sum *= $dir;
                                     $param = ['x' => now(), 'y' => $sum, 'type' => 2];
@@ -72,8 +72,8 @@ class SocketService extends CoreService
                                         if (str_contains($lastData->y, '.1')) {
                                             $param['y'] += (int)str_replace(".1", "", $lastData->y);
                                             $isUpdate = true;
-                                        } else $param['y'] += $lastData->y;
-                                    } else $param['y'] += '.1';
+                                        } else $param['y'] += (int)$lastData->y;
+                                    } else $param['y'] .= '.1';
                                     if ($isUpdate) $this->vpsRepository->update($lastData, $param);
                                     else $this->vpsRepository->create($param);
                                 };
