@@ -23,6 +23,7 @@ function getLocalConfig() {
                 mConfig.zoomLevel = 1;
                 mConfig.displayDate = moment().format("YYYY-MM-DD");
                 mConfig.currentDate = mConfig.displayDate;
+                mConfig.currentTime = moment().format("HH:mm:ss");
                 mConfig.socketVol10Temp = { side: "B", B: 0, S: 0 };
                 setTimeout(() => {
                     mConfig.VN30F1M = document.getElementById(
@@ -85,7 +86,7 @@ function createButtons() {
     button.id = "reportButton";
     button.innerText = "Report";
     button.addEventListener("click", () => {
-        reportHandler();
+        if (mConfig.currentTime > mConfig.time.ATC.end) reportHandler();
     });
     document.body.append(button);
 }
@@ -310,8 +311,7 @@ function createChart() {
                             yMax: 0,
                             borderColor: "magenta",
                             borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
+                            borderDash: [5, 5]
                         },
                         vol10_0: {
                             type: "line",
@@ -320,8 +320,7 @@ function createChart() {
                             yMax: 0,
                             borderColor: "cyan",
                             borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
+                            borderDash: [5, 5]
                         },
                         startATO: {
                             type: "line",
@@ -475,7 +474,10 @@ function connectSocket() {
     var msg = { action: "join", list: mConfig.VN30F1M };
     var socket = io(mConfig.endpoint.socket);
     socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
-    socket.on("reconnect", () => socket.emit("regs", JSON.stringify(msg)));
+    socket.on("reconnect", () => {
+        socket.emit("regs", JSON.stringify(msg));
+        getData();
+    });
     socket.on("boardps", data => {
         console.log("boardps", data.data);
         priceHandler(data.data);
@@ -490,7 +492,7 @@ function connectSocket() {
         if (data.id == 3220) {
             // console.log("price" + data.id);
             const price = {
-                x: moment(),
+                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
                 y: data.lastPrice
             };
             mChart.data.datasets[0].data.push(price);
@@ -501,7 +503,7 @@ function connectSocket() {
         if (data.id == 3310) {
             // console.log("volume" + data.id);
             const volume = {
-                x: moment(),
+                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
                 y: data.BVolume - data.SVolume
             };
             mChart.data.datasets[1].data.push(volume);
@@ -520,7 +522,7 @@ function connectSocket() {
                 mConfig.socketVol10Temp.B != 0
             ) {
                 const vol10 = {
-                    x: moment(),
+                    x: moment(`${mConfig.currentDate} ${mConfig.currentTime}`),
                     y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
                 };
                 mChart.data.datasets[2].data.push(vol10);
@@ -616,7 +618,7 @@ function loadPage() {
 }
 
 function intervalHandler() {
-    var currentTime = moment(
+    mConfig.currentTime = moment(
         `${mConfig.currentDate} ${
             document.querySelector(".timeStamp").innerText
         }`,
@@ -624,19 +626,19 @@ function intervalHandler() {
     ).format("HH:mm:ss");
 
     var isAtoSession =
-        currentTime >= mConfig.time.ATO.start &&
-        currentTime <= mConfig.time.ATO.end;
+        mConfig.currentTime >= mConfig.time.ATO.start &&
+        mConfig.currentTime <= mConfig.time.ATO.end;
     var isAtcSession =
-        currentTime >= mConfig.time.ATC.start &&
-        currentTime <= mConfig.time.ATC.end;
+        mConfig.currentTime >= mConfig.time.ATC.start &&
+        mConfig.currentTime <= mConfig.time.ATC.end;
     var session = isAtoSession ? "ATO" : isAtcSession ? "ATC" : null;
     if (isAtoSession || isAtcSession)
         document.getElementById("right_price").value = session;
     //
     //Display
     if (
-        currentTime == mConfig.time.ATO.start ||
-        currentTime == mConfig.time.ATC.start
+        mConfig.currentTime == mConfig.time.ATO.start ||
+        mConfig.currentTime == mConfig.time.ATC.start
     ) {
         if (!document.body.classList.contains("periodic-order"))
             document.body.classList.add("periodic-order");
@@ -644,12 +646,15 @@ function intervalHandler() {
     }
     // Export
     if (
-        currentTime == mConfig.time.ATO.end ||
-        currentTime == mConfig.time.ATC.end
+        mConfig.currentTime == mConfig.time.ATO.end ||
+        mConfig.currentTime == mConfig.time.ATC.end
     )
         exportHandler(session);
     // Report
-    if (currentTime == mConfig.time.ATC.end && !mConfig.isReportedResult) {
+    if (
+        mConfig.currentTime == mConfig.time.ATC.end &&
+        !mConfig.isReportedResult
+    ) {
         mConfig.isReportedResult = true;
         setTimeout(() => reportHandler(), 30000);
     }
@@ -797,8 +802,8 @@ function toggleSpinner(status) {
 }
 
 function drawTimeLine() {
-    ["ATO", "ATC"].forEach(session => {
-        ["start", "end"].forEach(event => {
+    for (const session in mConfig.time) {
+        for (const event in mConfig.time[session]) {
             var annotation =
                 mChart.options.plugins.annotation.annotations[
                     `${event}${session}`
@@ -809,7 +814,7 @@ function drawTimeLine() {
             annotation.xMax = moment(
                 `${mConfig.displayDate} ${mConfig.time[session][event]}`
             );
-        });
-    });
+        }
+    }
     mChart.update("none");
 }
