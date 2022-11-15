@@ -260,15 +260,19 @@ function createChart() {
                         displayFormats: {
                             month: "[tháng] M",
                             day: "[ngày] D",
-                            hour: "H [giờ]",
-                            minute: "H [h] mm",
-                            second: "mm [m] ss",
-                            millisecond: `ss [s] SSS`
+                            hour: "HH [giờ]",
+                            minute: "HH:mm",
+                            second: "HH:mm:ss",
+                            millisecond: "HH:mm:ss"
                         }
                     },
                     grid: {
                         color: "#696969",
                         borderDash: [2, 2]
+                    },
+                    ticks: {
+                        maxTicksLimit: 10,
+                        maxRotation: 0
                     }
                 },
                 y: {
@@ -311,7 +315,8 @@ function createChart() {
                             yMax: 0,
                             borderColor: "magenta",
                             borderWidth: 1,
-                            borderDash: [5, 5]
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
                         },
                         vol10_0: {
                             type: "line",
@@ -320,7 +325,8 @@ function createChart() {
                             yMax: 0,
                             borderColor: "cyan",
                             borderWidth: 1,
-                            borderDash: [5, 5]
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
                         },
                         startATO: {
                             type: "line",
@@ -749,7 +755,7 @@ function exportHandler(session) {
     )}`;
     mChart.update();
     changeDisplayMode(session);
-    setTimeout(() => {
+    getData().then(() => {
         var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
         var imageData = mChart.toBase64Image();
         if (["ATO", "ATC"].includes(session)) {
@@ -794,7 +800,7 @@ function exportHandler(session) {
             a.download = imageName;
             a.click();
         }
-    }, 0);
+    });
 }
 
 function changeDisplayMode(mode) {
