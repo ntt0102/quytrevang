@@ -512,24 +512,31 @@ function connectSocket() {
     }
     function vol10Handler(data) {
         if (data.id == 3211) {
-            var sum = data.ndata
-                .split("SOH")
-                .reduce((acc, item) => acc + +item.split(":")[1], 0);
-
             if (
-                data.side == "B" &&
-                mConfig.socketVol10Temp.side == "S" &&
-                mConfig.socketVol10Temp.B != 0
+                mConfig.currentTime <= mConfig.time.ATO.end ||
+                mConfig.currentTime >= mConfig.time.ATC.start
             ) {
-                const vol10 = {
-                    x: moment(`${mConfig.currentDate} ${mConfig.currentTime}`),
-                    y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
-                };
-                mChart.data.datasets[2].data.push(vol10);
-                mChart.update("none");
+                var sum = data.ndata
+                    .split("SOH")
+                    .reduce((acc, item) => acc + +item.split(":")[1], 0);
+
+                if (
+                    data.side == "B" &&
+                    mConfig.socketVol10Temp.side == "S" &&
+                    mConfig.socketVol10Temp.B != 0
+                ) {
+                    const vol10 = {
+                        x: moment(
+                            `${mConfig.currentDate} ${mConfig.currentTime}`
+                        ),
+                        y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
+                    };
+                    mChart.data.datasets[2].data.push(vol10);
+                    mChart.update("none");
+                }
+                mConfig.socketVol10Temp.side = data.side;
+                mConfig.socketVol10Temp[data.side] = sum;
             }
-            mConfig.socketVol10Temp.side = data.side;
-            mConfig.socketVol10Temp[data.side] = sum;
         }
     }
 }
