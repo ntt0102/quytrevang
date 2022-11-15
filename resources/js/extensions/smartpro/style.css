@@ -258,6 +258,10 @@
     left: 80px;
     bottom: 1px;
   }
+
+  .periodic-order #reportButton {
+    z-index: -1;
+  }
     
   .periodic-order.fullscreen #periodicChart {
     width: 760px !important;

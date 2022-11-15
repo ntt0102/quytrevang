@@ -734,8 +734,11 @@ function reportHandler() {
                 console.log(jsondata);
                 console.log("Report-End ##############################");
                 mConfig.isReportedResult = jsondata.isOk;
-                if (jsondata.isOk && jsondata.isExecuted)
-                    alert("Báo cáo đã gửi thành công.");
+                if (jsondata.isOk) {
+                    if (jsondata.isExecuted)
+                        alert("Báo cáo đã gửi thành công.");
+                    else alert("Đã gửi báo cáo");
+                }
                 //
                 toggleSpinner(false);
             })
