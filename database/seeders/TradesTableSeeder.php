@@ -785,9 +785,9 @@ class TradesTableSeeder extends Seeder
         Trade::create([
             'amount' => 3,
             'scores' => 938,
-            'revenue' => 1200000,
+            'revenue' => 3000000,
             'loss' => 0,
-            'fees' => 81537,
+            'fees' => 118344,
             'monday' => date_create_from_format('d/m/Y', '14/11/2022'),
         ]);
     }
