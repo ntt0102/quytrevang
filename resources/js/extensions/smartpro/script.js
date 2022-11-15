@@ -22,6 +22,7 @@ function getLocalConfig() {
                 mConfig.isReportedResult = false;
                 mConfig.zoomLevel = 1;
                 mConfig.displayDate = moment().format("YYYY-MM-DD");
+                mConfig.currentDate = mConfig.displayDate;
                 mConfig.socketVol10Temp = { side: "B", B: 0, S: 0 };
                 setTimeout(() => {
                     mConfig.VN30F1M = document.getElementById(
@@ -77,6 +78,14 @@ function createButtons() {
             document.body.classList.add("periodic-order");
             document.body.classList.remove("continuous-order");
         }
+    });
+    document.body.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "reportButton";
+    button.innerText = "Report";
+    button.addEventListener("click", () => {
+        reportHandler();
     });
     document.body.append(button);
 }
@@ -468,13 +477,13 @@ function connectSocket() {
     socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
     socket.on("reconnect", () => socket.emit("regs", JSON.stringify(msg)));
     socket.on("boardps", data => {
-        // console.log("boardps", data.data);
+        console.log("boardps", data.data);
         priceHandler(data.data);
         volumeHandler(data.data);
         vol10Handler(data.data);
     });
     socket.on("stockps", data => {
-        // console.log("stockps", data.data);
+        console.log("stockps", data.data);
         priceHandler(data.data);
     });
     function priceHandler(data) {
@@ -607,7 +616,13 @@ function loadPage() {
 }
 
 function intervalHandler() {
-    var currentTime = moment().format("HH:mm:ss");
+    var currentTime = moment(
+        `${mConfig.currentDate} ${
+            document.querySelector(".timeStamp").innerText
+        }`,
+        "YYYY-MM-DD H:mm:ss"
+    ).format("HH:mm:ss");
+
     var isAtoSession =
         currentTime >= mConfig.time.ATO.start &&
         currentTime <= mConfig.time.ATO.end;
@@ -634,7 +649,7 @@ function intervalHandler() {
     )
         exportHandler(session);
     // Report
-    if (currentTime >= mConfig.time.ATC.end && !mConfig.isReportedResult) {
+    if (currentTime == mConfig.time.ATC.end && !mConfig.isReportedResult) {
         mConfig.isReportedResult = true;
         setTimeout(() => reportHandler(), 30000);
     }

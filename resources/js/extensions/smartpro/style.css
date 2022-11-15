@@ -21,6 +21,17 @@
   padding: 1px;
   font-size: 16px;
 }
+#reportButton {
+  position: fixed;
+  bottom: 0px;
+  left: 190px;
+  background: red;
+  color: black;
+  width: 80px;
+  border-radius: 20px;
+  padding: 1px;
+  font-size: 16px;
+}
 
 #periodicChart {
   position: fixed;
@@ -230,6 +241,12 @@
   
   #periodicButton {
     bottom: 55px;
+    left: 0px;
+    padding: 10px 3px !important;
+    z-index: 1022;
+  }
+  #reportButton {
+    bottom: 110px;
     left: 0px;
     padding: 10px 3px !important;
     z-index: 1022;
