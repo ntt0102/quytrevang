@@ -340,7 +340,6 @@ function createChart() {
                 }
             },
             elements: { line: { tension: 0.1 } },
-            events: ["mousemove", "click"],
             onHover: (e, elements) => {
                 if (elements.length) {
                     var datasetIndex = elements[0].datasetIndex;
