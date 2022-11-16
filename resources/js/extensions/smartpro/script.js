@@ -103,39 +103,7 @@ function createChart() {
         option.text = item;
         select.appendChild(option);
     });
-    select.addEventListener("change", e => {
-        mConfig.displayMode = e.target.value;
-        var input = document.getElementById("streamInput");
-        input.style.zIndex = -1;
-        switch (mConfig.displayMode) {
-            case "Full":
-                mChart.resetZoom();
-                break;
-            case "Stream":
-                input.style.zIndex = 1;
-                input.value = mConfig.streamScale;
-                break;
-            case "ATO":
-            case "ATC":
-                mChart.zoomScale(
-                    "x",
-                    {
-                        min: moment(
-                            `${mConfig.displayDate} ${
-                                mConfig.time[mConfig.displayMode].start
-                            }`
-                        ),
-                        max: moment(
-                            `${mConfig.displayDate} ${
-                                mConfig.time[mConfig.displayMode].end
-                            }`
-                        )
-                    },
-                    "none"
-                );
-                break;
-        }
-    });
+    select.addEventListener("change", e => showdisplayMode(e.target.value));
     div.append(select);
     //
     var input = document.createElement("input");
@@ -145,6 +113,7 @@ function createChart() {
     input.setAttribute("min", 1);
     input.addEventListener("input", e => {
         mConfig.streamScale = e.target.value;
+        showStreamMode();
     });
     div.append(input);
     //
@@ -154,24 +123,11 @@ function createChart() {
     input.setAttribute("value", mConfig.displayDate);
     input.addEventListener("change", e => {
         mConfig.displayDate = e.target.value;
-        getData().then(() => {
-            if (mConfig.displayDate) {
-                mChart.zoomScale(
-                    "x",
-                    {
-                        min: moment(
-                            `${mConfig.displayDate} ${mConfig.time.ATO.start}`
-                        ),
-                        max: moment(
-                            `${mConfig.displayDate} ${mConfig.time.ATC.end}`
-                        )
-                    },
-                    "none"
-                );
-                drawTimeLine();
-                changeDisplayMode("Free");
-            } else changeDisplayMode("Full");
-        });
+        if (mConfig.displayDate) {
+            showdisplayMode(mConfig.displayMode);
+            drawTimeLine();
+        } else changeDisplayMode("Full");
+        getData();
     });
     div.append(input);
     //
@@ -622,10 +578,7 @@ function loadPage() {
     button.click();
     //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
-    mChart.options.plugins.title.text = `Biểu đồ ngày ${moment().format(
-        "DD/MM/YYYY"
-    )}`;
-    mChart.update();
+    updateChartTitle();
     //
     getData();
 }
@@ -672,16 +625,7 @@ function intervalHandler() {
         setTimeout(() => reportHandler(), 30000);
     }
     //
-    if (mConfig.displayMode == "Stream") {
-        mChart.zoomScale(
-            "x",
-            {
-                min: moment().subtract(mConfig.streamScale, "minutes"),
-                max: moment().add(mConfig.streamScale * 0.05, "minutes")
-            },
-            "none"
-        );
-    }
+    if (mConfig.displayMode == "Stream") showStreamMode();
     //
     var orderCounter = 0;
     for (var item of document.getElementById("tbodyContent").rows) {
@@ -753,15 +697,11 @@ function reportHandler() {
 }
 
 function exportHandler(session) {
-    mChart.options.plugins.title.text = `Biểu đồ ${session} ngày ${moment().format(
-        "DD/MM/YYYY"
-    )}`;
-    mChart.update();
     changeDisplayMode(session);
     getData().then(() => {
         var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
         var imageData = mChart.toBase64Image();
-        if (["ATO", "ATC"].includes(session)) {
+        if (Object.keys(mConfig.time).includes(session)) {
             const url = mConfig.endpoint.export;
             const data = { imageData, imageName, session };
             toggleSpinner(true);
@@ -810,6 +750,60 @@ function changeDisplayMode(mode) {
     var select = document.getElementById("displaySelect");
     select.value = mode;
     select.dispatchEvent(new Event("change"));
+}
+
+function showdisplayMode(mode) {
+    mConfig.displayMode = mode;
+    updateChartTitle();
+    var input = document.getElementById("streamInput");
+    input.style.zIndex = -1;
+    switch (mConfig.displayMode) {
+        case "Full":
+            mChart.resetZoom();
+            break;
+        case "Stream":
+            input.style.zIndex = 1;
+            input.value = mConfig.streamScale;
+            showStreamMode();
+            break;
+        case "ATO":
+        case "ATC":
+            mChart.zoomScale(
+                "x",
+                {
+                    min: moment(
+                        `${mConfig.displayDate} ${
+                            mConfig.time[mConfig.displayMode].start
+                        }`
+                    ),
+                    max: moment(
+                        `${mConfig.displayDate} ${
+                            mConfig.time[mConfig.displayMode].end
+                        }`
+                    )
+                },
+                "none"
+            );
+            break;
+    }
+}
+
+function showStreamMode() {
+    mChart.zoomScale(
+        "x",
+        {
+            min: moment().subtract(mConfig.streamScale, "minutes"),
+            max: moment().add(mConfig.streamScale * 0.05, "minutes")
+        },
+        "none"
+    );
+}
+
+function updateChartTitle() {
+    mChart.options.plugins.title.text = `Biểu đồ ${
+        mConfig.displayMode
+    } ngày ${moment(mConfig.displayDate).format("DD/MM/YYYY")}`;
+    mChart.update();
 }
 
 function toggleSpinner(status) {
