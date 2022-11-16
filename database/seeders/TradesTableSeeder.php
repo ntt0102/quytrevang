@@ -787,7 +787,7 @@ class TradesTableSeeder extends Seeder
             'scores' => 938,
             'revenue' => 3000000,
             'loss' => 0,
-            'fees' => 118344,
+            'fees' => 148117,
             'monday' => date_create_from_format('d/m/Y', '14/11/2022'),
         ]);
     }
