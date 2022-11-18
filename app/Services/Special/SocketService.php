@@ -27,7 +27,7 @@ class SocketService extends CoreService
             \Ratchet\Client\connect($uri)->then(function ($conn) {
                 $conn->on('message', function ($msg) use ($conn) {
                     if (!$this->inTradingTimeRange()) {
-                        error_log("Timeout market.");
+                        activity()->log("Timeout market.");
                         set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
                         $conn->close();
                     } else {
@@ -35,6 +35,7 @@ class SocketService extends CoreService
                         if ($first == 4) {
                             $second = substr($msg, 1, 1);
                             if ($second == 0) {
+                                activity()->log("Socket opened.");
                                 $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
                                 $data = ['action' => 'join', 'list' => $VN30F1M];
                                 $conn->send('42' . json_encode(["regs", json_encode($data)]));
@@ -45,11 +46,11 @@ class SocketService extends CoreService
                                 if ($event == 'boardps') {
                                     $data = $json[1]->data;
                                     if ($data->id == 3220) {
-                                        // error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
+                                        // activity()->log($event . ': ' . $data->id . ': ' . $data->lastPrice);
                                         $param = ['x' => $now . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
                                         $this->vpsRepository->create($param);
                                     } else if ($data->id == 3310) {
-                                        // error_log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
+                                        // activity()->log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
                                         $param = ['x' => $now . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
                                         $this->vpsRepository->create($param);
                                     } else if ($data->id == 3211) {
@@ -59,7 +60,7 @@ class SocketService extends CoreService
                                         $socketVol10Temp = json_decode(get_global_value('socketVol10Temp'), true);
                                         if ($data->side == 'B' && $socketVol10Temp['side'] == 'S' && $socketVol10Temp['B'] != 0) {
                                             $param = ['x' => now(), 'y' => $socketVol10Temp['B'] - $socketVol10Temp['S'], 'type' => 2];
-                                            error_log(json_encode($param));
+                                            activity()->log(json_encode($param));
                                             $this->vpsRepository->create($param);
                                         }
                                         $socketVol10Temp['side'] = $data->side;
@@ -69,7 +70,7 @@ class SocketService extends CoreService
                                 } else if ($event == 'stockps') {
                                     $data = $json[1]->data;
                                     if ($data->id == 3220) {
-                                        // error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
+                                        // activity()->log($event . ': ' . $data->id . ': ' . $data->lastPrice);
                                         $param = [
                                             'x' => $now . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0
                                         ];
@@ -80,23 +81,23 @@ class SocketService extends CoreService
                         }
                         //
                         if (!$this->inScheduleTimeLimit()) {
-                            error_log("Timeout connection.");
+                            activity()->log("Timeout schedule");
                             $conn->close();
                         }
                     }
                 });
                 $conn->on('close', function () {
-                    error_log("WebSocket closed.");
+                    activity()->log("WebSocket closed.");
                     set_global_value('runningSocketFlag', '0');
                     if ($this->inTradingTimeRange() && $this->inScheduleTimeLimit())
                         $this->connectVps();
                 });
                 $conn->on('error', function () use ($conn) {
-                    error_log("WebSocket error.");
+                    activity()->log("WebSocket error.");
                     $conn->close();
                 });
             }, function ($e) {
-                error_log("WebSocket could not connect: {$e->getMessage()}\n");
+                activity()->log("WebSocket could not connect: {$e->getMessage()}\n");
             });
         }
     }
@@ -131,14 +132,14 @@ class SocketService extends CoreService
         //     'stream' => true, 'debug' => false
         // ]);
         // $response = $clientSse->request('GET', $sseUrl);
-        // // error_log(222222222);
-        // // error_log($response->getStatusCode());
+        // // activity()->log(222222222);
+        // // activity()->log($response->getStatusCode());
         // // if ($response->getStatusCode() == 204) {
-        // //     error_log('error 204');
+        // //     activity()->log('error 204');
         // // }
         // $body = $response->getBody();
-        // // error_log(3333333);
-        // // error_log('Body: ' . $body);
+        // // activity()->log(3333333);
+        // // activity()->log('Body: ' . $body);
         // while (!$body->eof()) {
         //     echo $body->read(1024);
 
@@ -146,7 +147,7 @@ class SocketService extends CoreService
         // }
         // // while (true) {
         // //     $buffer .= $body->read(1);
-        // //     error_log($buffer);
+        // //     activity()->log($buffer);
         // // }
         // // $es = new \EventSource\EventSource($sseUrl);
         // // // $es->setCurlOptions([CURLOPT_SSL_VERIFYPEER => false]);
@@ -162,17 +163,17 @@ class SocketService extends CoreService
         $uri = 'wss://pricestream-iboard.ssi.com.vn/realtime';
         \Ratchet\Client\connect($uri)->then(function ($conn) {
             $conn->on('message', function ($msg) use ($conn) {
-                error_log("WebSocket message.");
+                activity()->log("WebSocket message.");
             });
             $conn->on('close', function () {
-                error_log("WebSocket closed.");
+                activity()->log("WebSocket closed.");
             });
             $conn->on('error', function () use ($conn) {
-                error_log("WebSocket error.");
+                activity()->log("WebSocket error.");
             });
         }, function ($e) {
-            error_log("WebSocket could not connect: {$e->getMessage()}\n");
+            activity()->log("WebSocket could not connect: {$e->getMessage()}\n");
         });
-        // error_log($uri);
+        // activity()->log($uri);
     }
 }
