@@ -50,6 +50,7 @@ function getServerConfig() {
                 console.log("getServerConfig", json);
                 mConfig.isOpeningMarket = json.isOpeningMarket;
                 mConfig.contractNumber = json.contractNumber;
+                mConfig.time = json.time;
                 resolve();
             });
     });
@@ -442,58 +443,61 @@ function connectSocket() {
     socket.on("boardps", data => {
         var session = inTradingTimeRange();
         if (!!session) {
-            console.log("boardps", data.data);
-            if (data.id == 3220) priceHandler(data.data);
-            if (data.id == 3310) volumeHandler(data.data);
-            if (data.id == 3211) {
-                if (session == "ATC") vol10Handler(data.data);
-                else mConfig.socketVol10Temp = { side: "B", B: 0, S: 0 };
-            }
+            // console.log("boardps", data.data);
+            priceHandler(data.data);
+            volumeHandler(data.data);
+            vol10Handler(data.data, session);
         }
     });
     socket.on("stockps", data => {
         if (!!inTradingTimeRange()) {
-            console.log("stockps", data.data);
-            if (data.id == 3220) priceHandler(data.data);
+            // console.log("stockps", data.data);
+            priceHandler(data.data);
         }
     });
     function priceHandler(data) {
-        // console.log("price" + data.id);
-        const price = {
-            x: moment(`${mConfig.currentDate} ${data.timeServer}`),
-            y: data.lastPrice
-        };
-        mChart.data.datasets[0].data.push(price);
-        mChart.update("none");
-    }
-    function volumeHandler(data) {
-        // console.log("volume" + data.id);
-        const volume = {
-            x: moment(`${mConfig.currentDate} ${data.timeServer}`),
-            y: data.BVolume - data.SVolume
-        };
-        mChart.data.datasets[1].data.push(volume);
-        mChart.update("none");
-    }
-    function vol10Handler(data) {
-        var sum = data.ndata
-            .split("SOH")
-            .reduce((acc, item) => acc + +item.split(":")[1], 0);
-
-        if (
-            data.side == "B" &&
-            mConfig.socketVol10Temp.side == "S" &&
-            mConfig.socketVol10Temp.B != 0
-        ) {
-            const vol10 = {
-                x: moment(`${mConfig.currentDate} ${mConfig.currentTime}`),
-                y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
+        if (data.id == 3220) {
+            // console.log("price" + data.id);
+            const price = {
+                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
+                y: data.lastPrice
             };
-            mChart.data.datasets[2].data.push(vol10);
+            mChart.data.datasets[0].data.push(price);
             mChart.update("none");
         }
-        mConfig.socketVol10Temp.side = data.side;
-        mConfig.socketVol10Temp[data.side] = sum;
+    }
+    function volumeHandler(data) {
+        if (data.id == 3310) {
+            // console.log("volume" + data.id);
+            const volume = {
+                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
+                y: data.BVolume - data.SVolume
+            };
+            mChart.data.datasets[1].data.push(volume);
+            mChart.update("none");
+        }
+    }
+    function vol10Handler(data, session) {
+        if (data.id == 3211 && session == "ATC") {
+            var sum = data.ndata
+                .split("SOH")
+                .reduce((acc, item) => acc + +item.split(":")[1], 0);
+
+            if (
+                data.side == "B" &&
+                mConfig.socketVol10Temp.side == "S" &&
+                mConfig.socketVol10Temp.B != 0
+            ) {
+                const vol10 = {
+                    x: moment(`${mConfig.currentDate} ${mConfig.currentTime}`),
+                    y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
+                };
+                mChart.data.datasets[2].data.push(vol10);
+                mChart.update("none");
+            }
+            mConfig.socketVol10Temp.side = data.side;
+            mConfig.socketVol10Temp[data.side] = sum;
+        }
     }
 }
 

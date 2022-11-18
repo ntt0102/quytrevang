@@ -26,9 +26,9 @@ class SocketService extends CoreService
             $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
             \Ratchet\Client\connect($uri)->then(function ($conn) {
                 $conn->on('message', function ($msg) use ($conn) {
-                    if (!$this->inTradingTimeRange()) {
+                    $session = $this->inTradingTimeRange();
+                    if (!$session) {
                         error_log("Timeout market.");
-                        set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
                         $conn->close();
                     } else {
                         $first = substr($msg, 0, 1);
@@ -53,18 +53,20 @@ class SocketService extends CoreService
                                         $param = ['x' => $now . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
                                         $this->vpsRepository->create($param);
                                     } else if ($data->id == 3211) {
-                                        $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
-                                            return $acc + (int)explode(":", $item)[1];
-                                        }, 0);
-                                        $socketVol10Temp = json_decode(get_global_value('socketVol10Temp'), true);
-                                        if ($data->side == 'B' && $socketVol10Temp['side'] == 'S' && $socketVol10Temp['B'] != 0) {
-                                            $param = ['x' => now(), 'y' => $socketVol10Temp['B'] - $socketVol10Temp['S'], 'type' => 2];
-                                            error_log(json_encode($param));
-                                            $this->vpsRepository->create($param);
+                                        if ($session == 'ATC') {
+                                            $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
+                                                return $acc + (int)explode(":", $item)[1];
+                                            }, 0);
+                                            $socketVol10Temp = json_decode(get_global_value('socketVol10Temp'), true);
+                                            if ($data->side == 'B' && $socketVol10Temp['side'] == 'S' && $socketVol10Temp['B'] != 0) {
+                                                $param = ['x' => now(), 'y' => $socketVol10Temp['B'] - $socketVol10Temp['S'], 'type' => 2];
+                                                error_log(json_encode($param));
+                                                $this->vpsRepository->create($param);
+                                            }
+                                            $socketVol10Temp['side'] = $data->side;
+                                            $socketVol10Temp[$data->side] = $sum;
+                                            set_global_value('socketVol10Temp', json_encode($socketVol10Temp));
                                         }
-                                        $socketVol10Temp['side'] = $data->side;
-                                        $socketVol10Temp[$data->side] = $sum;
-                                        set_global_value('socketVol10Temp', json_encode($socketVol10Temp));
                                     };
                                 } else if ($event == 'stockps') {
                                     $data = $json[1]->data;
@@ -104,12 +106,11 @@ class SocketService extends CoreService
     private function inTradingTimeRange()
     {
         $time = time();
-        return ($time >= strtotime(trading_time('startAtoTime'))
-            && $time <= strtotime(trading_time('endAtoTime'))
-        ) ||
-            ($time >= strtotime(trading_time('startAtcTime'))
-                && $time <= strtotime(trading_time('endAtcTime'))
-            );
+        $isAtoSession = $time >= strtotime(trading_time('startAtoTime'))
+            && $time <= strtotime(trading_time('endAtoTime'));
+        $isAtcSession = $time >= strtotime(trading_time('startAtcTime'))
+            && $time <= strtotime(trading_time('endAtcTime'));
+        return $isAtoSession ? "ATO" : ($isAtcSession ? "ATC" : false);
     }
 
     private function inScheduleTimeLimit()
