@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Repositories\CoreRepository;
 use App\Models\Vps;
-use Carbon\Carbon;
 
 class VpsRepository extends CoreRepository
 {
@@ -44,17 +43,11 @@ class VpsRepository extends CoreRepository
 
     /**
      * @inheritdoc
+     * @param int $days
      */
-    public function getLastWithType($type)
+    public function clear($days)
     {
-        return $this->model->whereDate('x', Carbon::today())->where('type', $type)->orderBy('x', 'DESC')->first();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function clear()
-    {
-        return Vps::truncate();
+        if ($days) return $this->model->whereDate('x', '<', now()->subDays($days))->delete();
+        else return Vps::truncate();
     }
 }

@@ -33,6 +33,6 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    $now = now()->format('Y-m-d ');
-    dd($now);
+    $vps = app(\App\Repositories\VpsRepository::class)->clear(7);
+    dd($vps);
 })->middleware('cors');

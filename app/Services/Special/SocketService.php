@@ -26,44 +26,33 @@ class SocketService extends CoreService
             $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
             \Ratchet\Client\connect($uri)->then(function ($conn) {
                 $conn->on('message', function ($msg) use ($conn) {
-                    $time = time();
-                    $stopTradingTime = strtotime(get_stop_trading_time());
-                    if ($time >= $stopTradingTime) {
+                    if (!$this->inTradingTimeRange()) {
                         error_log("Timeout market.");
+                        set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
                         $conn->close();
                     } else {
-                        $startSocketTime = strtotime(get_global_value('startScheduleTime'));
-                        if ($time >= $startSocketTime + 25 * 60 + 30) {
-                            error_log("Timeout connection.");
-                            $conn->close();
-                        }
-                    }
-                    //
-                    $first = substr($msg, 0, 1);
-                    if ($first == 4) {
-                        $second = substr($msg, 1, 1);
-                        if ($second == 0) {
-                            $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
-                            $data = ['action' => 'join', 'list' => $VN30F1M];
-                            $conn->send('42' . json_encode(["regs", json_encode($data)]));
-                        } else if ($second == 2) {
-                            $json = json_decode(substr($msg, 2));
-                            $event = $json[0];
-                            $now = now()->format('Y-m-d ');
-                            if ($event == 'boardps') {
-                                $data = $json[1]->data;
-                                if ($data->id == 3220) {
-                                    // error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
-                                    $param = ['x' => $now . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
-                                    $this->vpsRepository->create($param);
-                                } else if ($data->id == 3310) {
-                                    // error_log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
-                                    $param = ['x' => $now . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
-                                    $this->vpsRepository->create($param);
-                                } else if ($data->id == 3211) {
-                                    if ($time > strtotime('09:00:00') && $time < strtotime('14:30:00'))
-                                        set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
-                                    else {
+                        $first = substr($msg, 0, 1);
+                        if ($first == 4) {
+                            $second = substr($msg, 1, 1);
+                            if ($second == 0) {
+                                $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
+                                $data = ['action' => 'join', 'list' => $VN30F1M];
+                                $conn->send('42' . json_encode(["regs", json_encode($data)]));
+                            } else if ($second == 2) {
+                                $json = json_decode(substr($msg, 2));
+                                $event = $json[0];
+                                $now = now()->format('Y-m-d ');
+                                if ($event == 'boardps') {
+                                    $data = $json[1]->data;
+                                    if ($data->id == 3220) {
+                                        // error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
+                                        $param = ['x' => $now . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
+                                        $this->vpsRepository->create($param);
+                                    } else if ($data->id == 3310) {
+                                        // error_log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
+                                        $param = ['x' => $now . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
+                                        $this->vpsRepository->create($param);
+                                    } else if ($data->id == 3211) {
                                         $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
                                             return $acc + (int)explode(":", $item)[1];
                                         }, 0);
@@ -76,28 +65,31 @@ class SocketService extends CoreService
                                         $socketVol10Temp['side'] = $data->side;
                                         $socketVol10Temp[$data->side] = $sum;
                                         set_global_value('socketVol10Temp', json_encode($socketVol10Temp));
-                                    }
-                                };
-                            } else if ($event == 'stockps') {
-                                $data = $json[1]->data;
-                                if ($data->id == 3220) {
-                                    // error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
-                                    $param = [
-                                        'x' => $now . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0
-                                    ];
-                                    $this->vpsRepository->create($param);
-                                };
+                                    };
+                                } else if ($event == 'stockps') {
+                                    $data = $json[1]->data;
+                                    if ($data->id == 3220) {
+                                        // error_log($event . ': ' . $data->id . ': ' . $data->lastPrice);
+                                        $param = [
+                                            'x' => $now . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0
+                                        ];
+                                        $this->vpsRepository->create($param);
+                                    };
+                                }
                             }
+                        }
+                        //
+                        if (!$this->inScheduleTimeLimit()) {
+                            error_log("Timeout connection.");
+                            $conn->close();
                         }
                     }
                 });
                 $conn->on('close', function () {
                     error_log("WebSocket closed.");
                     set_global_value('runningSocketFlag', '0');
-                    $time = time();
-                    $stopTradingTime = strtotime(get_stop_trading_time());
-                    $startSocketTime = strtotime(get_global_value('startScheduleTime'));
-                    if ($time < $stopTradingTime && $time < $startSocketTime  + 25 * 60 + 30) $this->connectVps();
+                    if ($this->inTradingTimeRange() && $this->inScheduleTimeLimit())
+                        $this->connectVps();
                 });
                 $conn->on('error', function () use ($conn) {
                     error_log("WebSocket error.");
@@ -107,6 +99,23 @@ class SocketService extends CoreService
                 error_log("WebSocket could not connect: {$e->getMessage()}\n");
             });
         }
+    }
+
+    private function inTradingTimeRange()
+    {
+        $time = time();
+        return ($time >= strtotime(trading_time('startAtoTime'))
+            && $time <= strtotime(trading_time('endAtoTime'))
+        ) ||
+            ($time >= strtotime(trading_time('startAtcTime'))
+                && $time <= strtotime(trading_time('endAtcTime'))
+            );
+    }
+
+    private function inScheduleTimeLimit()
+    {
+        $startScheduleTime = strtotime(get_global_value('startScheduleTime'));
+        return time() <= $startScheduleTime  + 25 * 60 + 30;
     }
 
     public function connectHnx()
@@ -147,15 +156,6 @@ class SocketService extends CoreService
         // //     if ($es === 4) {
         // //         $es->abort();
         // //     }
-        // //     $messageReceived++;
-        // //     $stopTradingTime = strtotime(get_stop_trading_time());
-        // //     if (time() >= $stopTradingTime) {
-        // //         error_log("Timeout market.");
-        // //         $es->abort();
-        // //     }
-        // //     set_global_value('startScheduleTime', $event->data);
-        // //     // echo $event->data, "\n";
-        // //     // error_log(json_encode($event));
         // // });
 
         // // $es->connect();

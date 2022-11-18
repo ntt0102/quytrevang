@@ -40,27 +40,15 @@ if (!function_exists('check_opening_market')) {
     }
 }
 
-if (!function_exists('get_start_trading_time')) {
+if (!function_exists('trading_time')) {
     /**
      * Get start trading time.
      *
      * @return string
      */
-    function get_start_trading_time()
+    function trading_time($time)
     {
-        return app(\App\Repositories\ParameterRepository::class)->getValue('startTradingTime');
-    }
-}
-
-if (!function_exists('get_stop_trading_time')) {
-    /**
-     * Get stop trading time.
-     *
-     * @return string
-     */
-    function get_stop_trading_time()
-    {
-        return app(\App\Repositories\ParameterRepository::class)->getValue('stopTradingTime');
+        return app(\App\Repositories\ParameterRepository::class)->getValue($time);
     }
 }
 

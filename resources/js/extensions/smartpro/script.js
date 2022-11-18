@@ -440,65 +440,60 @@ function connectSocket() {
         getData();
     });
     socket.on("boardps", data => {
-        console.log("boardps", data.data);
-        priceHandler(data.data);
-        volumeHandler(data.data);
-        vol10Handler(data.data);
-    });
-    socket.on("stockps", data => {
-        console.log("stockps", data.data);
-        priceHandler(data.data);
-    });
-    function priceHandler(data) {
-        if (data.id == 3220) {
-            // console.log("price" + data.id);
-            const price = {
-                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                y: data.lastPrice
-            };
-            mChart.data.datasets[0].data.push(price);
-            mChart.update("none");
-        }
-    }
-    function volumeHandler(data) {
-        if (data.id == 3310) {
-            // console.log("volume" + data.id);
-            const volume = {
-                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                y: data.BVolume - data.SVolume
-            };
-            mChart.data.datasets[1].data.push(volume);
-            mChart.update("none");
-        }
-    }
-    function vol10Handler(data) {
-        if (data.id == 3211) {
-            if (
-                mConfig.currentTime <= mConfig.time.ATO.end ||
-                mConfig.currentTime >= mConfig.time.ATC.start
-            ) {
-                var sum = data.ndata
-                    .split("SOH")
-                    .reduce((acc, item) => acc + +item.split(":")[1], 0);
-
-                if (
-                    data.side == "B" &&
-                    mConfig.socketVol10Temp.side == "S" &&
-                    mConfig.socketVol10Temp.B != 0
-                ) {
-                    const vol10 = {
-                        x: moment(
-                            `${mConfig.currentDate} ${mConfig.currentTime}`
-                        ),
-                        y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
-                    };
-                    mChart.data.datasets[2].data.push(vol10);
-                    mChart.update("none");
-                }
-                mConfig.socketVol10Temp.side = data.side;
-                mConfig.socketVol10Temp[data.side] = sum;
+        var session = inTradingTimeRange();
+        if (!!session) {
+            console.log("boardps", data.data);
+            if (data.id == 3220) priceHandler(data.data);
+            if (data.id == 3310) volumeHandler(data.data);
+            if (data.id == 3211) {
+                if (session == "ATC") vol10Handler(data.data);
+                else mConfig.socketVol10Temp = { side: "B", B: 0, S: 0 };
             }
         }
+    });
+    socket.on("stockps", data => {
+        if (!!inTradingTimeRange()) {
+            console.log("stockps", data.data);
+            if (data.id == 3220) priceHandler(data.data);
+        }
+    });
+    function priceHandler(data) {
+        // console.log("price" + data.id);
+        const price = {
+            x: moment(`${mConfig.currentDate} ${data.timeServer}`),
+            y: data.lastPrice
+        };
+        mChart.data.datasets[0].data.push(price);
+        mChart.update("none");
+    }
+    function volumeHandler(data) {
+        // console.log("volume" + data.id);
+        const volume = {
+            x: moment(`${mConfig.currentDate} ${data.timeServer}`),
+            y: data.BVolume - data.SVolume
+        };
+        mChart.data.datasets[1].data.push(volume);
+        mChart.update("none");
+    }
+    function vol10Handler(data) {
+        var sum = data.ndata
+            .split("SOH")
+            .reduce((acc, item) => acc + +item.split(":")[1], 0);
+
+        if (
+            data.side == "B" &&
+            mConfig.socketVol10Temp.side == "S" &&
+            mConfig.socketVol10Temp.B != 0
+        ) {
+            const vol10 = {
+                x: moment(`${mConfig.currentDate} ${mConfig.currentTime}`),
+                y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
+            };
+            mChart.data.datasets[2].data.push(vol10);
+            mChart.update("none");
+        }
+        mConfig.socketVol10Temp.side = data.side;
+        mConfig.socketVol10Temp[data.side] = sum;
     }
 }
 
@@ -589,32 +584,17 @@ function intervalHandler() {
         }`,
         "YYYY-MM-DD H:mm:ss"
     ).format("HH:mm:ss");
-
-    var isAtoSession =
-        mConfig.currentTime >= mConfig.time.ATO.start &&
-        mConfig.currentTime <= mConfig.time.ATO.end;
-    var isAtcSession =
-        mConfig.currentTime >= mConfig.time.ATC.start &&
-        mConfig.currentTime <= mConfig.time.ATC.end;
-    var session = isAtoSession ? "ATO" : isAtcSession ? "ATC" : null;
-    if (isAtoSession || isAtcSession)
-        document.getElementById("right_price").value = session;
+    var session = inTradingTimeRange();
+    if (!!session) document.getElementById("right_price").value = session;
     //
     //Display
-    if (
-        mConfig.currentTime == mConfig.time.ATO.start ||
-        mConfig.currentTime == mConfig.time.ATC.start
-    ) {
+    if (isTradingTime("start")) {
         if (!document.body.classList.contains("periodic-order"))
             document.body.classList.add("periodic-order");
         changeDisplayMode(session);
     }
     // Export
-    if (
-        mConfig.currentTime == mConfig.time.ATO.end ||
-        mConfig.currentTime == mConfig.time.ATC.end
-    )
-        exportHandler(session);
+    if (isTradingTime("end")) exportHandler(session);
     // Report
     if (
         mConfig.currentTime == mConfig.time.ATC.end &&
@@ -826,4 +806,21 @@ function drawTimeLine() {
         }
     }
     mChart.update("none");
+}
+
+function inTradingTimeRange() {
+    var isAtoSession =
+        mConfig.currentTime >= mConfig.time.ATO.start &&
+        mConfig.currentTime <= mConfig.time.ATO.end;
+    var isAtcSession =
+        mConfig.currentTime >= mConfig.time.ATC.start &&
+        mConfig.currentTime <= mConfig.time.ATC.end;
+    return isAtoSession ? "ATO" : isAtcSession ? "ATC" : false;
+}
+
+function isTradingTime(event) {
+    return (
+        mConfig.currentTime == mConfig.time.ATO[event] ||
+        mConfig.currentTime == mConfig.time.ATC[event]
+    );
 }

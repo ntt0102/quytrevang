@@ -131,10 +131,23 @@ class AppService extends CoreService
         //
         $isOpeningMarket = $this->vpsCheckOpeningMarket();
         $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
+        $startAtoTime = $this->parameterRepository->getValue('startAtoTime');
+        $endAtoTime = $this->parameterRepository->getValue('endAtoTime');
+        $startAtcTime = $this->parameterRepository->getValue('startAtcTime');
+        $endAtcTime = $this->parameterRepository->getValue('endAtcTime');
         return [
             'isOpeningMarket' => $isOpeningMarket,
             'contractNumber' => $tradeContracts,
-            'time' => now()->format('Y-m-d H-i-s')
+            'time' => [
+                'ATO' => [
+                    'start' => $startAtoTime,
+                    'end' => $endAtoTime,
+                ],
+                'ATC' => [
+                    'start' => $startAtcTime,
+                    'end' => $endAtcTime,
+                ],
+            ]
         ];
     }
 
@@ -190,7 +203,7 @@ class AppService extends CoreService
                         return $this->vpsRepository->getVps($request->date);
                         break;
                     case 'CLEAR':
-                        $this->vpsRepository->clear();
+                        $this->vpsRepository->clear(0);
                         break;
                 }
             }
