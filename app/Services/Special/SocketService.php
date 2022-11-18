@@ -46,12 +46,12 @@ class SocketService extends CoreService
                                 if ($event == 'boardps') {
                                     $data = $json[1]->data;
                                     if ($data->id == 3220) {
-                                        // activity()->log($event . ': ' . $data->id . ': ' . $data->lastPrice);
                                         $param = ['x' => $now . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
+                                        // activity()->withProperties($param)->log('price');
                                         $this->vpsRepository->create($param);
                                     } else if ($data->id == 3310) {
-                                        // activity()->log($event . ': ' . $data->id . ': ' . $data->BVolume . ',' . $data->SVolume);
                                         $param = ['x' => $now . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
+                                        // activity()->withProperties($param)->log('volume');
                                         $this->vpsRepository->create($param);
                                     } else if ($data->id == 3211) {
                                         $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
@@ -60,7 +60,7 @@ class SocketService extends CoreService
                                         $socketVol10Temp = json_decode(get_global_value('socketVol10Temp'), true);
                                         if ($data->side == 'B' && $socketVol10Temp['side'] == 'S' && $socketVol10Temp['B'] != 0) {
                                             $param = ['x' => now(), 'y' => $socketVol10Temp['B'] - $socketVol10Temp['S'], 'type' => 2];
-                                            activity()->log(json_encode($param));
+                                            // activity()->withProperties($param)->log('vol10');
                                             $this->vpsRepository->create($param);
                                         }
                                         $socketVol10Temp['side'] = $data->side;
@@ -70,10 +70,10 @@ class SocketService extends CoreService
                                 } else if ($event == 'stockps') {
                                     $data = $json[1]->data;
                                     if ($data->id == 3220) {
-                                        // activity()->log($event . ': ' . $data->id . ': ' . $data->lastPrice);
                                         $param = [
                                             'x' => $now . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0
                                         ];
+                                        // activity()->withProperties($param)->log('price');
                                         $this->vpsRepository->create($param);
                                     };
                                 }
