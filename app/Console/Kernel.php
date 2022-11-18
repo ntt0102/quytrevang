@@ -15,7 +15,6 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         'App\Console\Commands\BackupDatabaseCommand',
         'App\Console\Commands\CleanSubscriptionCommand',
-        'App\Console\Commands\TradeVpsCommand',
     ];
 
     /**
