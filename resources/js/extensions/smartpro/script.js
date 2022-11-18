@@ -205,39 +205,6 @@ function createChart() {
                     pointHoverRadius: 5,
                     pointHitRadius: 20,
                     order: 2
-                },
-                {
-                    label: "Giá",
-                    data: [],
-                    borderColor: "yellow",
-                    backgroundColor: "yellow",
-                    yAxisID: "y",
-                    pointRadius: 0,
-                    pointHoverRadius: 5,
-                    pointHitRadius: 20,
-                    order: 1
-                },
-                {
-                    label: "KL",
-                    data: [],
-                    borderColor: "magenta",
-                    backgroundColor: "magenta",
-                    yAxisID: "y1",
-                    pointRadius: 0,
-                    pointHoverRadius: 5,
-                    pointHitRadius: 20,
-                    order: 2
-                },
-                {
-                    label: "KL10",
-                    data: [],
-                    borderColor: "cyan",
-                    backgroundColor: "cyan",
-                    yAxisID: "y2",
-                    pointRadius: 0,
-                    pointHoverRadius: 5,
-                    pointHitRadius: 20,
-                    order: 2
                 }
             ]
         },
@@ -474,12 +441,11 @@ function connectSocket() {
         getData();
     });
     socket.on("boardps", data => {
-        var session = inTradingTimeRange();
-        if (!!session) {
+        if (!!inTradingTimeRange()) {
             // console.log("boardps", data.data);
             priceHandler(data.data);
             volumeHandler(data.data);
-            vol10Handler(data.data, session);
+            vol10Handler(data.data);
         }
     });
     socket.on("stockps", data => {
@@ -510,8 +476,8 @@ function connectSocket() {
             mChart.update("none");
         }
     }
-    function vol10Handler(data, session) {
-        if (data.id == 3211 && session == "ATC") {
+    function vol10Handler(data) {
+        if (data.id == 3211) {
             var sum = data.ndata
                 .split("SOH")
                 .reduce((acc, item) => acc + +item.split(":")[1], 0);
