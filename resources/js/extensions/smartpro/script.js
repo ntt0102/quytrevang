@@ -205,6 +205,39 @@ function createChart() {
                     pointHoverRadius: 5,
                     pointHitRadius: 20,
                     order: 2
+                },
+                {
+                    label: "Giá",
+                    data: [],
+                    borderColor: "yellow",
+                    backgroundColor: "yellow",
+                    yAxisID: "y",
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHitRadius: 20,
+                    order: 1
+                },
+                {
+                    label: "KL",
+                    data: [],
+                    borderColor: "magenta",
+                    backgroundColor: "magenta",
+                    yAxisID: "y1",
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHitRadius: 20,
+                    order: 2
+                },
+                {
+                    label: "KL10",
+                    data: [],
+                    borderColor: "cyan",
+                    backgroundColor: "cyan",
+                    yAxisID: "y2",
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHitRadius: 20,
+                    order: 2
                 }
             ]
         },
@@ -414,17 +447,20 @@ function getData() {
             .then(response => response.json())
             .then(json => {
                 console.log("getData", json);
-                json.price.map(item => {
-                    item.x = moment(item.x);
-                    return item;
-                });
-                json.volume.map(item => {
-                    item.x = moment(item.x);
-                    return item;
-                });
-                mChart.data.datasets[0].data = json.price;
-                mChart.data.datasets[1].data = json.volume;
-                mChart.data.datasets[2].data = json.vol10;
+                // json.price.map(item => {
+                //     item.x = moment(item.x);
+                //     return item;
+                // });
+                // json.volume.map(item => {
+                //     item.x = moment(item.x);
+                //     return item;
+                // });
+                mChart.data.datasets[0].data = json.ATO.price;
+                mChart.data.datasets[1].data = json.ATO.volume;
+                mChart.data.datasets[2].data = json.ATO.vol10;
+                mChart.data.datasets[3].data = json.ATC.price;
+                mChart.data.datasets[4].data = json.ATC.volume;
+                mChart.data.datasets[5].data = json.ATC.vol10;
                 mChart.update("none");
                 toggleSpinner(false);
                 resolve();

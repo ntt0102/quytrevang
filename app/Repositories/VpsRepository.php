@@ -29,16 +29,30 @@ class VpsRepository extends CoreRepository
     {
         if ($date)
             return [
-                'price' => $this->model->whereDate('x', $date)->where('type', 0)->get(),
-                'volume' => $this->model->whereDate('x', $date)->where('type', 1)->get(),
-                'vol10' => $this->model->whereDate('x', $date)->where('type', 2)->get()
+                'ATO' => [
+                    'price' => $this->getQueryTimeRange($date, 'ATO')->where('type', 0)->get(),
+                    'volume' => $this->getQueryTimeRange($date, 'ATO')->where('type', 1)->get(),
+                    'vol10' => $this->getQueryTimeRange($date, 'ATO')->where('type', 2)->get()
+                ],
+                'ATC' => [
+                    'price' => $this->getQueryTimeRange($date, 'ATC')->where('type', 0)->get(),
+                    'volume' => $this->getQueryTimeRange($date, 'ATC')->where('type', 1)->get(),
+                    'vol10' => $this->getQueryTimeRange($date, 'ATC')->where('type', 2)->get()
+                ],
             ];
-        else
-            return [
-                'price' => $this->model->where('type', 0)->get(),
-                'volume' => $this->model->where('type', 1)->get(),
-                'vol10' => $this->model->where('type', 2)->get()
-            ];
+        else [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    private function getQueryTimeRange($date, $session)
+    {
+        $startTime = trading_time('start' . $session . 'Time');
+        $endTime = trading_time('end' . $session . 'Time');
+        return $this->model->whereDate('x', $date)
+            ->whereTime('x', '>=', $startTime)
+            ->whereTime('x', '<=', $endTime);
     }
 
     /**
