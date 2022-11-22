@@ -394,7 +394,7 @@ function clearData() {
             body: JSON.stringify(data)
         }).then(() => {
             mChart.data.datasets.forEach(item => (item.data = []));
-            mChart.update("none");
+            mChart.update("show");
             toggleSpinner(false);
             resolve();
         });
@@ -425,7 +425,7 @@ function getData() {
                 mChart.data.datasets[0].data = json.price;
                 mChart.data.datasets[1].data = json.volume;
                 mChart.data.datasets[2].data = json.vol10;
-                mChart.update("none");
+                mChart.update("show");
                 toggleSpinner(false);
                 resolve();
             });
