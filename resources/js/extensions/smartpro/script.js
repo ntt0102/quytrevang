@@ -114,7 +114,7 @@ function createChart() {
     input.setAttribute("min", 1);
     input.addEventListener("input", e => {
         mConfig.streamScale = e.target.value;
-        showStreamMode();
+        showStreamMode("show");
     });
     div.append(input);
     //
@@ -616,7 +616,7 @@ function intervalHandler() {
     }
     document.getElementById(
         "orderCountP"
-    ).innerText = `Tổng số lệnh: ${orderCounter}`;
+    ).innerText = `Số lệnh: ${orderCounter}`;
 }
 
 function reportHandler() {
@@ -746,7 +746,7 @@ function showdisplayMode(mode) {
         case "Stream":
             input.style.zIndex = 1;
             input.value = mConfig.streamScale;
-            showStreamMode();
+            showStreamMode("show");
             break;
         case "ATO":
         case "ATC":
@@ -764,20 +764,20 @@ function showdisplayMode(mode) {
                         }`
                     )
                 },
-                "none"
+                "show"
             );
             break;
     }
 }
 
-function showStreamMode() {
+function showStreamMode(mode = "none") {
     mChart.zoomScale(
         "x",
         {
             min: moment().subtract(mConfig.streamScale, "minutes"),
             max: moment().add(mConfig.streamScale * 0.05, "minutes")
         },
-        "none"
+        mode
     );
 }
 

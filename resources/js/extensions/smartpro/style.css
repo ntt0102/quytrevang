@@ -92,8 +92,8 @@
 
 #periodicChart > #spinnerImg {
   position: absolute;
-  top: 0px;
-  right: 250px;
+  top: 30px;
+  right: 200px;
   width: 25px;
 }
 
@@ -302,6 +302,19 @@
       .periodic-order .aside-menu .button-order-group > div:first-child button {
         padding: 12px;
       }
+
+  .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(11) {
+    position: fixed;
+    top: 35px;
+    left: 270px;
+    bottom: unset;
+    right: unset;
+    z-index: 1022;
+  }
+
+    .periodic-order.fullscreen #tbodyPhaisinhContent>tr:first-child>td:nth-child(11) {
+      top: 3px !important;
+    }
 
   .periodic-order .timeStamp {
     position: fixed !important;
