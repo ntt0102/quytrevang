@@ -20,7 +20,6 @@ function getLocalConfig() {
             .then(json => {
                 mConfig = json;
                 mConfig.isReportedResult = false;
-                mConfig.zoomLevel = 1;
                 mConfig.currentDate = moment().format("YYYY-MM-DD");
                 mConfig.currentTime = moment().format("HH:mm:ss");
                 mConfig.priceBackgroundLine = {
@@ -103,26 +102,35 @@ function createChart() {
     //
     var select = document.createElement("select");
     select.id = "displaySelect";
-    ["Full", "Free", "Stream", "ATO", "ATC"].forEach((item, index) => {
+    ["", "ATO", "ATC"].forEach((item, index) => {
         var option = document.createElement("option");
         option.value = item;
         option.text = item;
         select.appendChild(option);
     });
-    select.addEventListener("change", e => showdisplayMode(e.target.value));
-    div.append(select);
-    //
-    var input = document.createElement("input");
-    input.id = "streamInput";
-    input.style.zIndex = -1;
-    input.setAttribute("type", "number");
-    input.setAttribute("min", 1);
-    input.addEventListener("input", e => {
-        mConfig.streamScale = e.target.value;
-        showStreamMode("show");
+    select.addEventListener("change", e => {
+        mConfig.displayMode = e.target.value;
+        updateChartTitle();
+        if (["ATO", "ATC"].includes(mConfig.displayMode)) {
+            mChart.zoomScale(
+                "x",
+                {
+                    min: moment(
+                        `${mConfig.currentDate} ${
+                            mConfig.time[mConfig.displayMode].start
+                        }`
+                    ),
+                    max: moment(
+                        `${mConfig.currentDate} ${
+                            mConfig.time[mConfig.displayMode].end
+                        }`
+                    )
+                },
+                "show"
+            );
+        }
     });
-    div.append(input);
-    //
+    div.append(select);
     //
     var button = document.createElement("button");
     button.id = "exportButton";
@@ -141,7 +149,7 @@ function createChart() {
     button.innerText = "Clear";
     button.addEventListener("click", () => {
         var choice = confirm("Xoá toàn bộ dữ liệu?");
-        if (choice) clearData().then(() => changeDisplayMode("Stream"));
+        if (choice) clearData();
     });
     div.append(button);
     //
@@ -246,12 +254,12 @@ function createChart() {
                         wheel: { enabled: true },
                         pinch: { enabled: true },
                         mode: "x",
-                        onZoom: () => changeDisplayMode("Free")
+                        onZoom: () => changeDisplayMode("")
                     },
                     pan: {
                         enabled: true,
                         mode: "x",
-                        onPan: () => changeDisplayMode("Free")
+                        onPan: () => changeDisplayMode("")
                     }
                 },
                 annotation: {
@@ -280,7 +288,7 @@ function createChart() {
                             borderWidth: 1,
                             borderDash: [5, 5],
                             adjustScaleRange: false
-                        },
+                        }
                         // vol10_0: {
                         //     type: "line",
                         //     yScaleID: "y2",
@@ -291,58 +299,58 @@ function createChart() {
                         //     borderDash: [5, 5],
                         //     adjustScaleRange: false
                         // },
-                        startATO: {
-                            type: "line",
-                            xMin: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATO.start}`
-                            ),
-                            xMax: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATO.start}`
-                            ),
-                            borderColor: "lime",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        endATO: {
-                            type: "line",
-                            xMin: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATO.end}`
-                            ),
-                            xMax: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATO.end}`
-                            ),
-                            borderColor: "lime",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        startATC: {
-                            type: "line",
-                            xMin: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATC.start}`
-                            ),
-                            xMax: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATC.start}`
-                            ),
-                            borderColor: "red",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        endATC: {
-                            type: "line",
-                            xMin: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATC.end}`
-                            ),
-                            xMax: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATC.end}`
-                            ),
-                            borderColor: "red",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        }
+                        // startATO: {
+                        //     type: "line",
+                        //     xMin: moment(
+                        //         `${mConfig.currentDate} ${mConfig.time.ATO.start}`
+                        //     ),
+                        //     xMax: moment(
+                        //         `${mConfig.currentDate} ${mConfig.time.ATO.start}`
+                        //     ),
+                        //     borderColor: "lime",
+                        //     borderWidth: 1,
+                        //     borderDash: [5, 5],
+                        //     adjustScaleRange: false
+                        // },
+                        // endATO: {
+                        //     type: "line",
+                        //     xMin: moment(
+                        //         `${mConfig.currentDate} ${mConfig.time.ATO.end}`
+                        //     ),
+                        //     xMax: moment(
+                        //         `${mConfig.currentDate} ${mConfig.time.ATO.end}`
+                        //     ),
+                        //     borderColor: "lime",
+                        //     borderWidth: 1,
+                        //     borderDash: [5, 5],
+                        //     adjustScaleRange: false
+                        // },
+                        // startATC: {
+                        //     type: "line",
+                        //     xMin: moment(
+                        //         `${mConfig.currentDate} ${mConfig.time.ATC.start}`
+                        //     ),
+                        //     xMax: moment(
+                        //         `${mConfig.currentDate} ${mConfig.time.ATC.start}`
+                        //     ),
+                        //     borderColor: "red",
+                        //     borderWidth: 1,
+                        //     borderDash: [5, 5],
+                        //     adjustScaleRange: false
+                        // },
+                        // endATC: {
+                        //     type: "line",
+                        //     xMin: moment(
+                        //         `${mConfig.currentDate} ${mConfig.time.ATC.end}`
+                        //     ),
+                        //     xMax: moment(
+                        //         `${mConfig.currentDate} ${mConfig.time.ATC.end}`
+                        //     ),
+                        //     borderColor: "red",
+                        //     borderWidth: 1,
+                        //     borderDash: [5, 5],
+                        //     adjustScaleRange: false
+                        // }
                     }
                 }
             },
@@ -400,7 +408,7 @@ function clearData() {
             body: JSON.stringify(data)
         }).then(() => {
             mChart.data.datasets.forEach(item => (item.data = []));
-            mChart.update("show");
+            mChart.update("none");
             toggleSpinner(false);
             resolve();
         });
@@ -442,7 +450,7 @@ function getData() {
                     mChart.options.plugins.annotation.annotations.price.label.content =
                         json.line.price;
                 }
-                mChart.update("show");
+                mChart.update("none");
                 toggleSpinner(false);
                 resolve();
             });
@@ -645,8 +653,6 @@ function intervalHandler() {
         setTimeout(() => reportHandler(), 30000);
     }
     //
-    if (mConfig.displayMode == "Stream") showStreamMode();
-    //
     var orderCounter = 0;
     for (var item of document.getElementById("tbodyContent").rows) {
         if (item.cells[0].innerText == "") break;
@@ -770,53 +776,6 @@ function changeDisplayMode(mode) {
     var select = document.getElementById("displaySelect");
     select.value = mode;
     select.dispatchEvent(new Event("change"));
-}
-
-function showdisplayMode(mode) {
-    mConfig.displayMode = mode;
-    updateChartTitle();
-    var input = document.getElementById("streamInput");
-    input.style.zIndex = -1;
-    switch (mConfig.displayMode) {
-        case "Full":
-            mChart.resetZoom();
-            break;
-        case "Stream":
-            input.style.zIndex = 1;
-            input.value = mConfig.streamScale;
-            showStreamMode("show");
-            break;
-        case "ATO":
-        case "ATC":
-            mChart.zoomScale(
-                "x",
-                {
-                    min: moment(
-                        `${mConfig.currentDate} ${
-                            mConfig.time[mConfig.displayMode].start
-                        }`
-                    ),
-                    max: moment(
-                        `${mConfig.currentDate} ${
-                            mConfig.time[mConfig.displayMode].end
-                        }`
-                    )
-                },
-                "show"
-            );
-            break;
-    }
-}
-
-function showStreamMode(mode = "none") {
-    mChart.zoomScale(
-        "x",
-        {
-            min: moment().subtract(mConfig.streamScale, "minutes"),
-            max: moment().add(mConfig.streamScale * 0.05, "minutes")
-        },
-        mode
-    );
 }
 
 function updateChartTitle() {

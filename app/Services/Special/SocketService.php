@@ -28,8 +28,6 @@ class SocketService extends CoreService
                 $conn->on('message', function ($msg) use ($conn) {
                     if (!$this->inTradingTimeRange()) {
                         activity()->log("Timeout market.");
-                        set_global_value('priceBackgroundLine', '{"prevTime":"","prevPrice":0,"interval":0,"price":0}');
-                        // set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
                         $conn->close();
                     } else {
                         $first = substr($msg, 0, 1);

@@ -52,39 +52,31 @@
   padding: 2px 0 !important;
 }
 
-#periodicChart > #streamInput {
-  position: absolute;
-  top: 28px;
-  right: 0px;
-  width: 40px;
-  padding: 0px;
-}
-
 #periodicChart > #exportButton {
   position: absolute;
   top: -0.5px;
-  right: 73px;
+  right: 56px;
   padding: 0.99px 5px;
 }
 
 #periodicChart > #refreshButton {
   position: absolute;
   top: -0.5px;
-  right: 129px;
+  right: 112px;
   padding: 0.99px 5px;
 }
 
 #periodicChart > #clearButton {
   position: absolute;
   top: -0.5px;
-  right: 194px;
+  right: 177px;
   padding: 0.99px 5px;
 }
 
 #periodicChart > #spinnerImg {
   position: absolute;
   top: 30px;
-  right: 74px;
+  right: 5px;
   width: 25px;
 }
 
