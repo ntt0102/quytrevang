@@ -200,10 +200,9 @@ class AppService extends CoreService
                         $this->vpsRepository->create($request->all());
                         break;
                     case 'GET':
-                        $line = json_decode(get_global_value('priceBackgroundLine'), true);
                         return [
                             'data' => $this->vpsRepository->getVps($request->date),
-                            'line' => $line['price']
+                            'line' => json_decode(get_global_value('priceBackgroundLine'), true)
                         ];
                         break;
                     case 'CLEAR':
