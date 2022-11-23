@@ -31,6 +31,10 @@ class VariablesTableSeeder extends Seeder
             'value' => "17:48:00",
         ]);
         Variable::create([
+            'name' => "priceBackgroundLine",
+            'value' => '{"time":"","interval":0,"price":0}',
+        ]);
+        Variable::create([
             'name' => "socketVol10Temp",
             'value' => '{"side":"B","B":0,"S":0}',
         ]);
