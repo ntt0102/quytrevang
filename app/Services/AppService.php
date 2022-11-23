@@ -204,6 +204,7 @@ class AppService extends CoreService
                             'data' => $this->vpsRepository->getVps($request->date),
                             'line' => json_decode(get_global_value('priceBackgroundLine'), true)
                         ];
+                        //
                         break;
                     case 'CLEAR':
                         $this->vpsRepository->clear(0);
