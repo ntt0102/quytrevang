@@ -273,9 +273,14 @@ function createChart() {
                     annotations: {
                         price: {
                             type: "line",
-                            yScaleID: "y1",
+                            yScaleID: "y",
                             yMin: 0,
                             yMax: 0,
+                            label: {
+                                content: null,
+                                display: true,
+                                position: "start"
+                            },
                             borderColor: "yellow",
                             borderWidth: 1,
                             borderDash: [5, 5],
@@ -445,9 +450,11 @@ function getData() {
                 console.log("json.line: ", json.line);
                 if (json.line.price > 0) {
                     mConfig.priceBackgroundLine = json.line;
-                    mChart.options.plugins.annotation.annotations.price.xMin =
+                    mChart.options.plugins.annotation.annotations.price.yMin =
                         json.line.price;
-                    mChart.options.plugins.annotation.annotations.price.xMax =
+                    mChart.options.plugins.annotation.annotations.price.yMax =
+                        json.line.price;
+                    mChart.options.plugins.annotation.annotations.price.label.content =
                         json.line.price;
                 }
                 mChart.update("show");
@@ -498,9 +505,11 @@ function connectSocket() {
                     mConfig.priceBackgroundLine.interval = interval;
                     mConfig.priceBackgroundLine.price =
                         mConfig.priceBackgroundLine.prevPrice;
-                    mChart.options.plugins.annotation.annotations.price.xMin =
+                    mChart.options.plugins.annotation.annotations.price.yMin =
                         mConfig.priceBackgroundLine.price;
-                    mChart.options.plugins.annotation.annotations.price.xMax =
+                    mChart.options.plugins.annotation.annotations.price.yMax =
+                        mConfig.priceBackgroundLine.price;
+                    mChart.options.plugins.annotation.annotations.price.label.content =
                         mConfig.priceBackgroundLine.price;
                     mChart.update("show");
                 }
@@ -641,7 +650,7 @@ function intervalHandler() {
         changeDisplayMode(session);
     }
     // Export
-    if (isTradingTime("end")) exportHandler(session);
+    if (isTradingTime("end")) setTimeout(() => exportHandler(session), 15000);
     // Report
     if (
         mConfig.currentTime == mConfig.time.ATC.end &&
