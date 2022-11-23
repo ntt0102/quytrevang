@@ -47,7 +47,7 @@ class SocketService extends CoreService
                                     $data = $json[1]->data;
                                     $this->priceHandler($data);
                                     $this->volumeHandler($data);
-                                    $this->vol10Handler($data);
+                                    // $this->vol10Handler($data);
                                 } else if ($event == 'stockps') {
                                     $data = $json[1]->data;
                                     $this->priceHandler($data);
