@@ -25,7 +25,8 @@ function getLocalConfig() {
                 mConfig.currentDate = mConfig.displayDate;
                 mConfig.currentTime = moment().format("HH:mm:ss");
                 mConfig.priceBackgroundLine = {
-                    time: "",
+                    prevTime: "",
+                    prevPrice: 0,
                     interval: 0,
                     price: 0
                 };
@@ -488,21 +489,23 @@ function connectSocket() {
             mChart.data.datasets[0].data.push(price);
             mChart.update("none");
             //
-            if (!!mConfig.priceBackgroundLine.time) {
-                var lastTime = moment(
-                    `${mConfig.currentDate} ${mConfig.priceBackgroundLine.time}`
+            if (!!mConfig.priceBackgroundLine.prevTime) {
+                var prevTime = moment(
+                    `${mConfig.currentDate} ${mConfig.priceBackgroundLine.prevTime}`
                 );
-                var interval = price.x.diff(lastTime, "seconds");
+                var interval = price.x.diff(prevTime, "seconds");
                 if (interval > mConfig.priceBackgroundLine.interval) {
                     mConfig.priceBackgroundLine.interval = interval;
-                    mConfig.priceBackgroundLine.price = price.y;
+                    mConfig.priceBackgroundLine.price =
+                        mConfig.priceBackgroundLine.prevPrice;
                     mChart.options.plugins.annotation.annotations.price.xMin =
-                        price.y;
+                        mConfig.priceBackgroundLine.price;
                     mChart.options.plugins.annotation.annotations.price.xMax =
-                        price.y;
+                        mConfig.priceBackgroundLine.price;
                     mChart.update("show");
                 }
-                mConfig.priceBackgroundLine.time = data.timeServer;
+                mConfig.priceBackgroundLine.prevTime = data.timeServer;
+                mConfig.priceBackgroundLine.prevPrice = data.lastPrice;
             }
         }
     }

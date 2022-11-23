@@ -28,7 +28,7 @@ class SocketService extends CoreService
                 $conn->on('message', function ($msg) use ($conn) {
                     if (!$this->inTradingTimeRange()) {
                         activity()->log("Timeout market.");
-                        set_global_value('priceBackgroundLine', '{"time":"","interval":0,"price":0}');
+                        set_global_value('priceBackgroundLine', '{"prevTime":"","prevPrice":0,"interval":0,"price":0}');
                         // set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
                         $conn->close();
                     } else {
@@ -87,14 +87,15 @@ class SocketService extends CoreService
             $this->vpsRepository->create($param);
             //
             $line = json_decode(get_global_value('priceBackgroundLine'), true);
-            if ($line['time']) {
-                $interval = strtotime($data->timeServer) - strtotime($line['time']);
+            if ($line['prevTime']) {
+                $interval = strtotime($data->timeServer) - strtotime($line['prevTime']);
                 if ($interval > $line['interval']) {
                     $line['interval'] = $interval;
-                    $line['price'] = $data->lastPrice;
+                    $line['price'] = $line['prevPrice'];
                 }
             }
-            $line['time'] = $data->timeServer;
+            $line['prevTime'] = $data->timeServer;
+            $line['prevPrice'] = $data->lastPrice;
             set_global_value('priceBackgroundLine', json_encode($line));
         }
     }
