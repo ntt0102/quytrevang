@@ -194,18 +194,18 @@ function createChart() {
                     pointHoverRadius: 5,
                     pointHitRadius: 20,
                     order: 2
-                },
-                {
-                    label: "KL10",
-                    data: [],
-                    borderColor: "cyan",
-                    backgroundColor: "cyan",
-                    yAxisID: "y2",
-                    pointRadius: 0,
-                    pointHoverRadius: 5,
-                    pointHitRadius: 20,
-                    order: 2
                 }
+                // {
+                //     label: "KL10",
+                //     data: [],
+                //     borderColor: "cyan",
+                //     backgroundColor: "cyan",
+                //     yAxisID: "y2",
+                //     pointRadius: 0,
+                //     pointHoverRadius: 5,
+                //     pointHitRadius: 20,
+                //     order: 2
+                // }
             ]
         },
         options: {
@@ -346,7 +346,7 @@ function createChart() {
                     var datasetIndex = elements[0].datasetIndex;
                     mChart.data.datasets[0].order = 2;
                     mChart.data.datasets[1].order = 2;
-                    mChart.data.datasets[2].order = 2;
+                    // mChart.data.datasets[2].order = 2;
                     mChart.data.datasets[datasetIndex].order = 1;
                     mChart.update();
                 }
@@ -424,7 +424,7 @@ function getData() {
                 });
                 mChart.data.datasets[0].data = json.price;
                 mChart.data.datasets[1].data = json.volume;
-                mChart.data.datasets[2].data = json.vol10;
+                // mChart.data.datasets[2].data = json.vol10;
                 mChart.update("show");
                 toggleSpinner(false);
                 resolve();
@@ -445,7 +445,7 @@ function connectSocket() {
             // console.log("boardps", data.data);
             priceHandler(data.data);
             volumeHandler(data.data);
-            vol10Handler(data.data);
+            // vol10Handler(data.data);
         }
     });
     socket.on("stockps", data => {
