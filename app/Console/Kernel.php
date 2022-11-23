@@ -33,7 +33,7 @@ class Kernel extends ConsoleKernel
                 set_global_value('reportedTradingFlag', '0');
                 set_global_value('runningSocketFlag', '0');
                 // set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
-                app(\App\Repositories\VpsRepository::class)->clear(7);
+                app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt('08:40');
         $schedule->call(function () {

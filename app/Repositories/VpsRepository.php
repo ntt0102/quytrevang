@@ -25,29 +25,20 @@ class VpsRepository extends CoreRepository
     /**
      * @inheritdoc
      */
-    public function getVps($date)
+    public function getVps()
     {
-        if ($date)
-            return [
-                'price' => $this->model->whereDate('x', $date)->where('type', 0)->get(),
-                'volume' => $this->model->whereDate('x', $date)->where('type', 1)->get(),
-                'vol10' => $this->model->whereDate('x', $date)->where('type', 2)->get()
-            ];
-        else
-            return [
-                'price' => $this->model->where('type', 0)->get(),
-                'volume' => $this->model->where('type', 1)->get(),
-                'vol10' => $this->model->where('type', 2)->get()
-            ];
+        return [
+            'price' => $this->model->where('type', 0)->get(),
+            'volume' => $this->model->where('type', 1)->get(),
+            // 'vol10' => $this->model->where('type', 2)->get()
+        ];
     }
 
     /**
      * @inheritdoc
-     * @param int $days
      */
-    public function clear($days)
+    public function clear()
     {
-        if ($days) return $this->model->whereDate('x', '<', now()->subDays($days))->delete();
-        else return Vps::truncate();
+        return Vps::truncate();
     }
 }

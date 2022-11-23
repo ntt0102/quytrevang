@@ -21,8 +21,7 @@ function getLocalConfig() {
                 mConfig = json;
                 mConfig.isReportedResult = false;
                 mConfig.zoomLevel = 1;
-                mConfig.displayDate = moment().format("YYYY-MM-DD");
-                mConfig.currentDate = mConfig.displayDate;
+                mConfig.currentDate = moment().format("YYYY-MM-DD");
                 mConfig.currentTime = moment().format("HH:mm:ss");
                 mConfig.priceBackgroundLine = {
                     prevTime: "",
@@ -121,20 +120,6 @@ function createChart() {
     input.addEventListener("input", e => {
         mConfig.streamScale = e.target.value;
         showStreamMode("show");
-    });
-    div.append(input);
-    //
-    input = document.createElement("input");
-    input.id = "dateInput";
-    input.setAttribute("type", "date");
-    input.setAttribute("value", mConfig.displayDate);
-    input.addEventListener("change", e => {
-        mConfig.displayDate = e.target.value;
-        if (mConfig.displayDate) {
-            showdisplayMode(mConfig.displayMode);
-            drawTimeLine();
-        } else changeDisplayMode("Full");
-        getData();
     });
     div.append(input);
     //
@@ -309,10 +294,10 @@ function createChart() {
                         startATO: {
                             type: "line",
                             xMin: moment(
-                                `${mConfig.displayDate} ${mConfig.time.ATO.start}`
+                                `${mConfig.currentDate} ${mConfig.time.ATO.start}`
                             ),
                             xMax: moment(
-                                `${mConfig.displayDate} ${mConfig.time.ATO.start}`
+                                `${mConfig.currentDate} ${mConfig.time.ATO.start}`
                             ),
                             borderColor: "lime",
                             borderWidth: 1,
@@ -322,10 +307,10 @@ function createChart() {
                         endATO: {
                             type: "line",
                             xMin: moment(
-                                `${mConfig.displayDate} ${mConfig.time.ATO.end}`
+                                `${mConfig.currentDate} ${mConfig.time.ATO.end}`
                             ),
                             xMax: moment(
-                                `${mConfig.displayDate} ${mConfig.time.ATO.end}`
+                                `${mConfig.currentDate} ${mConfig.time.ATO.end}`
                             ),
                             borderColor: "lime",
                             borderWidth: 1,
@@ -335,10 +320,10 @@ function createChart() {
                         startATC: {
                             type: "line",
                             xMin: moment(
-                                `${mConfig.displayDate} ${mConfig.time.ATC.start}`
+                                `${mConfig.currentDate} ${mConfig.time.ATC.start}`
                             ),
                             xMax: moment(
-                                `${mConfig.displayDate} ${mConfig.time.ATC.start}`
+                                `${mConfig.currentDate} ${mConfig.time.ATC.start}`
                             ),
                             borderColor: "red",
                             borderWidth: 1,
@@ -348,10 +333,10 @@ function createChart() {
                         endATC: {
                             type: "line",
                             xMin: moment(
-                                `${mConfig.displayDate} ${mConfig.time.ATC.end}`
+                                `${mConfig.currentDate} ${mConfig.time.ATC.end}`
                             ),
                             xMax: moment(
-                                `${mConfig.displayDate} ${mConfig.time.ATC.end}`
+                                `${mConfig.currentDate} ${mConfig.time.ATC.end}`
                             ),
                             borderColor: "red",
                             borderWidth: 1,
@@ -424,7 +409,7 @@ function clearData() {
 
 function getData() {
     return new Promise((resolve, reject) => {
-        var data = { action: "GET", date: mConfig.displayDate };
+        var data = { action: "GET" };
         const url = mConfig.endpoint.data;
         toggleSpinner(true);
         fetch(url, {
@@ -650,7 +635,7 @@ function intervalHandler() {
         changeDisplayMode(session);
     }
     // Export
-    if (isTradingTime("end")) setTimeout(() => exportHandler(session), 15000);
+    if (isTradingTime("end")) exportHandler(session);
     // Report
     if (
         mConfig.currentTime == mConfig.time.ATC.end &&
@@ -807,12 +792,12 @@ function showdisplayMode(mode) {
                 "x",
                 {
                     min: moment(
-                        `${mConfig.displayDate} ${
+                        `${mConfig.currentDate} ${
                             mConfig.time[mConfig.displayMode].start
                         }`
                     ),
                     max: moment(
-                        `${mConfig.displayDate} ${
+                        `${mConfig.currentDate} ${
                             mConfig.time[mConfig.displayMode].end
                         }`
                     )
@@ -837,31 +822,13 @@ function showStreamMode(mode = "none") {
 function updateChartTitle() {
     mChart.options.plugins.title.text = `Biểu đồ ${
         mConfig.displayMode
-    } ngày ${moment(mConfig.displayDate).format("DD/MM/YYYY")}`;
+    } ngày ${moment(mConfig.currentDate).format("DD/MM/YYYY")}`;
     mChart.update();
 }
 
 function toggleSpinner(status) {
     var img = document.getElementById("spinnerImg");
     img.style.opacity = status ? 1 : 0;
-}
-
-function drawTimeLine() {
-    for (const session in mConfig.time) {
-        for (const event in mConfig.time[session]) {
-            var annotation =
-                mChart.options.plugins.annotation.annotations[
-                    `${event}${session}`
-                ];
-            annotation.xMin = moment(
-                `${mConfig.displayDate} ${mConfig.time[session][event]}`
-            );
-            annotation.xMax = moment(
-                `${mConfig.displayDate} ${mConfig.time[session][event]}`
-            );
-        }
-    }
-    mChart.update("show");
 }
 
 function inTradingTimeRange() {

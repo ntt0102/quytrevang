@@ -201,13 +201,12 @@ class AppService extends CoreService
                         break;
                     case 'GET':
                         return [
-                            'data' => $this->vpsRepository->getVps($request->date),
+                            'data' => $this->vpsRepository->getVps(),
                             'line' => json_decode(get_global_value('priceBackgroundLine'), true)
                         ];
-                        //
                         break;
                     case 'CLEAR':
-                        $this->vpsRepository->clear(0);
+                        $this->vpsRepository->clear();
                         break;
                 }
             }
