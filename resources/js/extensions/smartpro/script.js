@@ -24,7 +24,12 @@ function getLocalConfig() {
                 mConfig.displayDate = moment().format("YYYY-MM-DD");
                 mConfig.currentDate = mConfig.displayDate;
                 mConfig.currentTime = moment().format("HH:mm:ss");
-                mConfig.socketVol10Temp = { side: "B", B: 0, S: 0 };
+                mConfig.priceBackgroundLine = {
+                    time: "",
+                    interval: 0,
+                    price: 0
+                };
+                // mConfig.socketVol10Temp = { side: "B", B: 0, S: 0 };
                 setTimeout(() => {
                     mConfig.VN30F1M = document.getElementById(
                         "tbodyPhaisinhContent"
@@ -265,6 +270,16 @@ function createChart() {
                 },
                 annotation: {
                     annotations: {
+                        price: {
+                            type: "line",
+                            yScaleID: "y1",
+                            yMin: 0,
+                            yMax: 0,
+                            borderColor: "yellow",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
                         volume_0: {
                             type: "line",
                             yScaleID: "y1",
@@ -275,16 +290,16 @@ function createChart() {
                             borderDash: [5, 5],
                             adjustScaleRange: false
                         },
-                        vol10_0: {
-                            type: "line",
-                            yScaleID: "y2",
-                            yMin: 0,
-                            yMax: 0,
-                            borderColor: "cyan",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
+                        // vol10_0: {
+                        //     type: "line",
+                        //     yScaleID: "y2",
+                        //     yMin: 0,
+                        //     yMax: 0,
+                        //     borderColor: "cyan",
+                        //     borderWidth: 1,
+                        //     borderDash: [5, 5],
+                        //     adjustScaleRange: false
+                        // },
                         startATO: {
                             type: "line",
                             xMin: moment(
@@ -414,17 +429,26 @@ function getData() {
             .then(response => response.json())
             .then(json => {
                 console.log("getData", json);
-                json.price.map(item => {
+                json.data.price.map(item => {
                     item.x = moment(item.x);
                     return item;
                 });
-                json.volume.map(item => {
+                json.data.volume.map(item => {
                     item.x = moment(item.x);
                     return item;
                 });
-                mChart.data.datasets[0].data = json.price;
-                mChart.data.datasets[1].data = json.volume;
-                // mChart.data.datasets[2].data = json.vol10;
+                mChart.data.datasets[0].data = json.data.price;
+                mChart.data.datasets[1].data = json.data.volume;
+                // mChart.data.datasets[2].data = json.data.vol10;
+                //
+                console.log("json.line: ", json.line);
+                if (json.line.price > 0) {
+                    mConfig.priceBackgroundLine = json.line;
+                    mChart.options.plugins.annotation.annotations.price.xMin =
+                        json.line.price;
+                    mChart.options.plugins.annotation.annotations.price.xMax =
+                        json.line.price;
+                }
                 mChart.update("show");
                 toggleSpinner(false);
                 resolve();
@@ -463,6 +487,23 @@ function connectSocket() {
             };
             mChart.data.datasets[0].data.push(price);
             mChart.update("none");
+            //
+            if (!!mConfig.priceBackgroundLine.time) {
+                var lastTime = moment(
+                    `${mConfig.currentDate} ${mConfig.priceBackgroundLine.time}`
+                );
+                var interval = price.x.diff(lastTime, "seconds");
+                if (interval > mConfig.priceBackgroundLine.interval) {
+                    mConfig.priceBackgroundLine.interval = interval;
+                    mConfig.priceBackgroundLine.price = price.y;
+                    mChart.options.plugins.annotation.annotations.price.xMin =
+                        price.y;
+                    mChart.options.plugins.annotation.annotations.price.xMax =
+                        price.y;
+                    mChart.update("show");
+                }
+                mConfig.priceBackgroundLine.time = data.timeServer;
+            }
         }
     }
     function volumeHandler(data) {
@@ -808,7 +849,7 @@ function drawTimeLine() {
             );
         }
     }
-    mChart.update("none");
+    mChart.update("show");
 }
 
 function inTradingTimeRange() {
