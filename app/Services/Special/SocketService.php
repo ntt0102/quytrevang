@@ -79,7 +79,6 @@ class SocketService extends CoreService
 
     private function priceHandler($data)
     {
-        error_log('price');
         $date = now()->format('Y-m-d ');
         if ($data->id == 3220) {
             $param = ['x' => $date . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
