@@ -109,23 +109,23 @@ class SocketService extends CoreService
         }
     }
 
-    private function vol10Handler($data)
-    {
-        if ($data->id == 3211) {
-            $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
-                return $acc + (int)explode(":", $item)[1];
-            }, 0);
-            $socketVol10Temp = json_decode(get_global_value('socketVol10Temp'), true);
-            if ($data->side == 'B' && $socketVol10Temp['side'] == 'S' && $socketVol10Temp['B'] != 0) {
-                $param = ['x' => now(), 'y' => $socketVol10Temp['B'] - $socketVol10Temp['S'], 'type' => 2];
-                // activity()->withProperties($param)->log('vol10');
-                $this->vpsRepository->create($param);
-            }
-            $socketVol10Temp['side'] = $data->side;
-            $socketVol10Temp[$data->side] = $sum;
-            set_global_value('socketVol10Temp', json_encode($socketVol10Temp));
-        };
-    }
+    // private function vol10Handler($data)
+    // {
+    //     if ($data->id == 3211) {
+    //         $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
+    //             return $acc + (int)explode(":", $item)[1];
+    //         }, 0);
+    //         $socketVol10Temp = json_decode(get_global_value('socketVol10Temp'), true);
+    //         if ($data->side == 'B' && $socketVol10Temp['side'] == 'S' && $socketVol10Temp['B'] != 0) {
+    //             $param = ['x' => now(), 'y' => $socketVol10Temp['B'] - $socketVol10Temp['S'], 'type' => 2];
+    //             // activity()->withProperties($param)->log('vol10');
+    //             $this->vpsRepository->create($param);
+    //         }
+    //         $socketVol10Temp['side'] = $data->side;
+    //         $socketVol10Temp[$data->side] = $sum;
+    //         set_global_value('socketVol10Temp', json_encode($socketVol10Temp));
+    //     };
+    // }
 
     private function inTradingTimeRange()
     {
