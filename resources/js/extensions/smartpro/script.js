@@ -724,54 +724,42 @@ function reportHandler() {
 
 function exportHandler(session) {
     changeDisplayMode(session);
-    getData().then(() => {
-        setTimeout(() => {
-            var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
-            var imageData = mChart.toBase64Image();
-            if (Object.keys(mConfig.time).includes(session)) {
-                const url = mConfig.endpoint.export;
-                const data = { imageData, imageName, session };
-                toggleSpinner(true);
-                fetch(url, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data)
-                })
-                    .then(response => {
-                        if (response.ok) {
-                            return response.json();
-                        }
-                        throw new Error(response.statusText);
-                    })
-                    .then(jsondata => {
-                        console.log(
-                            "UploadImage-Start ##############################"
-                        );
-                        console.log(jsondata);
-                        console.log(
-                            "UploadImage-End ##############################"
-                        );
-                        if (jsondata.isOk) alert("Đăng ảnh thành công");
-                        toggleSpinner(false);
-                    })
-                    .catch(error => {
-                        console.log(
-                            "UploadImage-Start ##############################"
-                        );
-                        console.log(error);
-                        console.log(
-                            "UploadImage-End ##############################"
-                        );
-                        alert("Đăng ảnh thất bại");
-                    });
-            } else {
-                var a = document.createElement("a");
-                a.href = imageData;
-                a.download = imageName;
-                a.click();
-            }
-        }, 0);
-    });
+    var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
+    var imageData = mChart.toBase64Image();
+    if (Object.keys(mConfig.time).includes(session)) {
+        const url = mConfig.endpoint.export;
+        const data = { imageData, imageName, session };
+        toggleSpinner(true);
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error(response.statusText);
+            })
+            .then(jsondata => {
+                console.log("UploadImage-Start ##############################");
+                console.log(jsondata);
+                console.log("UploadImage-End ##############################");
+                if (jsondata.isOk) alert("Đăng ảnh thành công");
+                toggleSpinner(false);
+            })
+            .catch(error => {
+                console.log("UploadImage-Start ##############################");
+                console.log(error);
+                console.log("UploadImage-End ##############################");
+                alert("Đăng ảnh thất bại");
+            });
+    } else {
+        var a = document.createElement("a");
+        a.href = imageData;
+        a.download = imageName;
+        a.click();
+    }
 }
 
 function changeDisplayMode(mode) {

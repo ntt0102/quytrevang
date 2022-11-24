@@ -18,4 +18,5 @@ class Vps extends CoreModel
         'x',
         'y'
     ];
+    protected static $recordEvents = [];
 }
