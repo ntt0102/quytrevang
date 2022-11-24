@@ -87,7 +87,7 @@ class SocketService extends CoreService
             $line = json_decode(get_global_value('priceBackgroundLine'), true);
             if ($line['prevTime']) {
                 $interval = strtotime($data->timeServer) - strtotime($line['prevTime']);
-                if ($interval > $line['interval']) {
+                if ($interval >= $line['interval']) {
                     $line['interval'] = $interval;
                     $line['price'] = $line['prevPrice'];
                 }
