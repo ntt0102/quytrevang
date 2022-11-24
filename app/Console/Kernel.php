@@ -35,7 +35,7 @@ class Kernel extends ConsoleKernel
                 // set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
                 app(\App\Repositories\VpsRepository::class)->clear();
             }
-        })->dailyAt(trading_time('startAtoTime'));
+        })->dailyAt(substr(trading_time('startAtoTime'), 0, 5));
         $schedule->call(function () {
             if (check_opening_market()) {
                 set_global_value('reportedTradingFlag', '0');
@@ -44,7 +44,7 @@ class Kernel extends ConsoleKernel
                 // set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
                 app(\App\Repositories\VpsRepository::class)->clear();
             }
-        })->dailyAt(trading_time('startAtcTime'));
+        })->dailyAt(substr(trading_time('startAtcTime'), 0, 5));
         $schedule->call(function () {
             if (check_opening_market()) {
                 set_global_value('startScheduleTime', now()->format('H:i:s'));
