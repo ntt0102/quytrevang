@@ -481,24 +481,14 @@ function connectSocket() {
         if (inTradingTimeRange()) getData();
     });
     socket.on("boardps", data => {
-        if (
-            inTradingTimeRange() ||
-            mConfig.currentTime < mConfig.time.ATC.start
-        ) {
-            // console.log("boardps", data.data);
-            priceHandler(data.data);
-            volumeHandler(data.data);
-            // vol10Handler(data.data);
-        }
+        // console.log("boardps", data.data);
+        priceHandler(data.data);
+        volumeHandler(data.data);
+        // vol10Handler(data.data);
     });
     socket.on("stockps", data => {
-        if (
-            inTradingTimeRange() ||
-            mConfig.currentTime < mConfig.time.ATC.start
-        ) {
-            // console.log("stockps", data.data);
-            priceHandler(data.data);
-        }
+        // console.log("stockps", data.data);
+        priceHandler(data.data);
     });
 
     function priceHandler(data) {
@@ -527,11 +517,14 @@ function connectSocket() {
             }
             mConfig.priceBackgroundLine.prevTime = data.timeServer;
             mConfig.priceBackgroundLine.prevPrice = data.lastPrice;
-            setLocalData("line", mConfig.priceBackgroundLine, true);
             //
             mChart.data.datasets[0].data.push(price);
             mChart.update("none");
-            setLocalData("price", price);
+            //
+            if (inTradingTimeRange()) {
+                setLocalData("line", mConfig.priceBackgroundLine, true);
+                setLocalData("price", price);
+            }
         }
     }
     function volumeHandler(data) {
@@ -543,33 +536,33 @@ function connectSocket() {
             };
             mChart.data.datasets[1].data.push(volume);
             mChart.update("none");
-            setLocalData("volume", volume);
+            if (inTradingTimeRange()) setLocalData("volume", volume);
         }
     }
-    function vol10Handler(data) {
-        if (data.id == 3211) {
-            var sum = data.ndata
-                .split("SOH")
-                .reduce((acc, item) => acc + +item.split(":")[1], 0);
+    // function vol10Handler(data) {
+    //     if (data.id == 3211) {
+    //         var sum = data.ndata
+    //             .split("SOH")
+    //             .reduce((acc, item) => acc + +item.split(":")[1], 0);
 
-            if (
-                data.side == "B" &&
-                mConfig.socketVol10Temp.side == "S" &&
-                mConfig.socketVol10Temp.B != 0
-            ) {
-                const vol10 = {
-                    x: new Date(
-                        `${mConfig.currentDate} ${mConfig.currentTime}`
-                    ),
-                    y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
-                };
-                mChart.data.datasets[2].data.push(vol10);
-                mChart.update("none");
-            }
-            mConfig.socketVol10Temp.side = data.side;
-            mConfig.socketVol10Temp[data.side] = sum;
-        }
-    }
+    //         if (
+    //             data.side == "B" &&
+    //             mConfig.socketVol10Temp.side == "S" &&
+    //             mConfig.socketVol10Temp.B != 0
+    //         ) {
+    //             const vol10 = {
+    //                 x: new Date(
+    //                     `${mConfig.currentDate} ${mConfig.currentTime}`
+    //                 ),
+    //                 y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
+    //             };
+    //             mChart.data.datasets[2].data.push(vol10);
+    //             mChart.update("none");
+    //         }
+    //         mConfig.socketVol10Temp.side = data.side;
+    //         mConfig.socketVol10Temp[data.side] = sum;
+    //     }
+    // }
 }
 
 function loadPage() {

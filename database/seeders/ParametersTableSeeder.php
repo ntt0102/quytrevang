@@ -51,12 +51,12 @@ class ParametersTableSeeder extends Seeder
         ]);
         Parameter::create([
             'slug' => "startAtoTime",
-            'value' => "08:44:00",
+            'value' => "08:45:00",
             'description' => "Thời gian kết thúc ATO",
         ]);
         Parameter::create([
             'slug' => "endAtoTime",
-            'value' => "09:00:15",
+            'value' => "09:00:00",
             'description' => "Thời gian bắt đầu ATO",
         ]);
         Parameter::create([
@@ -66,7 +66,7 @@ class ParametersTableSeeder extends Seeder
         ]);
         Parameter::create([
             'slug' => "endAtcTime",
-            'value' => "14:45:15",
+            'value' => "14:45:00",
             'description' => "Thời gian bắt đầu ATC",
         ]);
     }

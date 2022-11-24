@@ -27,6 +27,7 @@ class SocketService extends CoreService
             \Ratchet\Client\connect($uri)->then(function ($conn) {
                 $conn->on('message', function ($msg) use ($conn) {
                     if (!$this->inTradingTimeRange()) {
+                        error_log("Timeout market.");
                         activity()->log("Timeout market.");
                         $conn->close();
                     } else {
@@ -34,6 +35,7 @@ class SocketService extends CoreService
                         if ($first == 4) {
                             $second = substr($msg, 1, 1);
                             if ($second == 0) {
+                                error_log("Socket opened.");
                                 activity()->log("Socket opened.");
                                 $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
                                 $data = ['action' => 'join', 'list' => $VN30F1M];
@@ -49,22 +51,26 @@ class SocketService extends CoreService
                         }
                         //
                         if (!$this->inScheduleTimeLimit()) {
+                            error_log("Timeout schedule");
                             activity()->log("Timeout schedule");
                             $conn->close();
                         }
                     }
                 });
                 $conn->on('close', function () {
+                    error_log("WebSocket closed.");
                     activity()->log("WebSocket closed.");
                     set_global_value('runningSocketFlag', '0');
                     if ($this->inTradingTimeRange() && $this->inScheduleTimeLimit())
                         $this->connectVps();
                 });
                 $conn->on('error', function () use ($conn) {
+                    error_log("WebSocket error.");
                     activity()->log("WebSocket error.");
                     $conn->close();
                 });
             }, function ($e) {
+                error_log("WebSocket could not connect: {$e->getMessage()}\n");
                 activity()->log("WebSocket could not connect: {$e->getMessage()}\n");
                 set_global_value('runningSocketFlag', '0');
             });
@@ -73,6 +79,7 @@ class SocketService extends CoreService
 
     private function priceHandler($data)
     {
+        error_log('price');
         $date = now()->format('Y-m-d ');
         if ($data->id == 3220) {
             $param = ['x' => $date . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];

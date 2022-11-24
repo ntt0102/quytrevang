@@ -48,7 +48,8 @@ if (!function_exists('trading_time')) {
      */
     function trading_time($time)
     {
-        return app(\App\Repositories\ParameterRepository::class)->getValue($time);
+        $str = app(\App\Repositories\ParameterRepository::class)->getValue($time);
+        return substr($str, 0, 5);
     }
 }
 
