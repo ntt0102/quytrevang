@@ -102,40 +102,30 @@ function createChart() {
     //
     var select = document.createElement("select");
     select.id = "displaySelect";
-    ["", "ATO", "ATC"].forEach((item, index) => {
+    ["Full", "Free", "Stream", "ATO", "ATC"].forEach((item, index) => {
         var option = document.createElement("option");
         option.value = item;
         option.text = item;
         select.appendChild(option);
     });
-    select.addEventListener("change", e => {
-        mConfig.displayMode = e.target.value;
-        updateChartTitle();
-        if (["ATO", "ATC"].includes(mConfig.displayMode)) {
-            mChart.zoomScale(
-                "x",
-                {
-                    min: moment(
-                        `${mConfig.currentDate} ${
-                            mConfig.time[mConfig.displayMode].start
-                        }`
-                    ),
-                    max: moment(
-                        `${mConfig.currentDate} ${
-                            mConfig.time[mConfig.displayMode].end
-                        }`
-                    )
-                },
-                "show"
-            );
-        }
-    });
+    select.addEventListener("change", e => showdisplayMode(e.target.value));
     div.append(select);
+    //
+    var input = document.createElement("input");
+    input.id = "streamInput";
+    input.style.zIndex = -1;
+    input.setAttribute("type", "number");
+    input.setAttribute("min", 1);
+    input.addEventListener("input", e => {
+        mConfig.streamScale = e.target.value;
+        showStreamMode("show");
+    });
+    div.append(input);
     //
     var button = document.createElement("button");
     button.id = "exportButton";
     button.innerText = "Export";
-    button.addEventListener("click", () => exportHandler(mConfig.displayMode));
+    button.addEventListener("click", () => exportHandler());
     div.append(button);
     //
     button = document.createElement("button");
@@ -254,12 +244,12 @@ function createChart() {
                         wheel: { enabled: true },
                         pinch: { enabled: true },
                         mode: "x",
-                        onZoom: () => changeDisplayMode("")
+                        onZoom: () => changeDisplayMode("Free")
                     },
                     pan: {
                         enabled: true,
                         mode: "x",
-                        onPan: () => changeDisplayMode("")
+                        onPan: () => changeDisplayMode("Free")
                     }
                 },
                 annotation: {
@@ -288,7 +278,7 @@ function createChart() {
                             borderWidth: 1,
                             borderDash: [5, 5],
                             adjustScaleRange: false
-                        }
+                        },
                         // vol10_0: {
                         //     type: "line",
                         //     yScaleID: "y2",
@@ -299,58 +289,58 @@ function createChart() {
                         //     borderDash: [5, 5],
                         //     adjustScaleRange: false
                         // },
-                        // startATO: {
-                        //     type: "line",
-                        //     xMin: moment(
-                        //         `${mConfig.currentDate} ${mConfig.time.ATO.start}`
-                        //     ),
-                        //     xMax: moment(
-                        //         `${mConfig.currentDate} ${mConfig.time.ATO.start}`
-                        //     ),
-                        //     borderColor: "lime",
-                        //     borderWidth: 1,
-                        //     borderDash: [5, 5],
-                        //     adjustScaleRange: false
-                        // },
-                        // endATO: {
-                        //     type: "line",
-                        //     xMin: moment(
-                        //         `${mConfig.currentDate} ${mConfig.time.ATO.end}`
-                        //     ),
-                        //     xMax: moment(
-                        //         `${mConfig.currentDate} ${mConfig.time.ATO.end}`
-                        //     ),
-                        //     borderColor: "lime",
-                        //     borderWidth: 1,
-                        //     borderDash: [5, 5],
-                        //     adjustScaleRange: false
-                        // },
-                        // startATC: {
-                        //     type: "line",
-                        //     xMin: moment(
-                        //         `${mConfig.currentDate} ${mConfig.time.ATC.start}`
-                        //     ),
-                        //     xMax: moment(
-                        //         `${mConfig.currentDate} ${mConfig.time.ATC.start}`
-                        //     ),
-                        //     borderColor: "red",
-                        //     borderWidth: 1,
-                        //     borderDash: [5, 5],
-                        //     adjustScaleRange: false
-                        // },
-                        // endATC: {
-                        //     type: "line",
-                        //     xMin: moment(
-                        //         `${mConfig.currentDate} ${mConfig.time.ATC.end}`
-                        //     ),
-                        //     xMax: moment(
-                        //         `${mConfig.currentDate} ${mConfig.time.ATC.end}`
-                        //     ),
-                        //     borderColor: "red",
-                        //     borderWidth: 1,
-                        //     borderDash: [5, 5],
-                        //     adjustScaleRange: false
-                        // }
+                        startATO: {
+                            type: "line",
+                            xMin: moment(
+                                `${mConfig.currentDate} ${mConfig.time.ATO.start}`
+                            ),
+                            xMax: moment(
+                                `${mConfig.currentDate} ${mConfig.time.ATO.start}`
+                            ),
+                            borderColor: "lime",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        endATO: {
+                            type: "line",
+                            xMin: moment(
+                                `${mConfig.currentDate} ${mConfig.time.ATO.end}`
+                            ),
+                            xMax: moment(
+                                `${mConfig.currentDate} ${mConfig.time.ATO.end}`
+                            ),
+                            borderColor: "lime",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        startATC: {
+                            type: "line",
+                            xMin: moment(
+                                `${mConfig.currentDate} ${mConfig.time.ATC.start}`
+                            ),
+                            xMax: moment(
+                                `${mConfig.currentDate} ${mConfig.time.ATC.start}`
+                            ),
+                            borderColor: "red",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        endATC: {
+                            type: "line",
+                            xMin: moment(
+                                `${mConfig.currentDate} ${mConfig.time.ATC.end}`
+                            ),
+                            xMax: moment(
+                                `${mConfig.currentDate} ${mConfig.time.ATC.end}`
+                            ),
+                            borderColor: "red",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        }
                     }
                 }
             },
@@ -428,29 +418,27 @@ function getData() {
             .then(response => response.json())
             .then(json => {
                 console.log("getData", json);
-                json.data.price.map(item => {
-                    item.x = moment(item.x);
-                    return item;
-                });
-                json.data.volume.map(item => {
-                    item.x = moment(item.x);
-                    return item;
-                });
-                mChart.data.datasets[0].data = json.data.price;
-                mChart.data.datasets[1].data = json.data.volume;
-                // mChart.data.datasets[2].data = json.data.vol10;
-                //
-                console.log("json.line: ", json.line);
-                if (json.line.price > 0) {
-                    mConfig.priceBackgroundLine = json.line;
-                    mChart.options.plugins.annotation.annotations.price.yMin =
-                        json.line.price;
-                    mChart.options.plugins.annotation.annotations.price.yMax =
-                        json.line.price;
-                    mChart.options.plugins.annotation.annotations.price.label.content =
-                        json.line.price;
+                if (json.data[0].length > mChart.data.datasets[0].data.length) {
+                    mChart.data.datasets.forEach((dataset, index) => {
+                        json.data[index].map(item => ({
+                            ...item,
+                            ...{ x: moment(item.x) }
+                        }));
+                        dataset.data = json.data[index];
+                    });
+                    //
+                    console.log("json.line: ", json.line);
+                    if (inTradingTimeRange() && json.line.price > 0) {
+                        mConfig.priceBackgroundLine = json.line;
+                        mChart.options.plugins.annotation.annotations.price.yMin =
+                            json.line.price;
+                        mChart.options.plugins.annotation.annotations.price.yMax =
+                            json.line.price;
+                        mChart.options.plugins.annotation.annotations.price.label.content =
+                            json.line.price;
+                    }
+                    mChart.update("none");
                 }
-                mChart.update("none");
                 toggleSpinner(false);
                 resolve();
             });
@@ -463,10 +451,13 @@ function connectSocket() {
     socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
     socket.on("reconnect", () => {
         socket.emit("regs", JSON.stringify(msg));
-        getData();
+        if (inTradingTimeRange()) getData();
     });
     socket.on("boardps", data => {
-        if (!!inTradingTimeRange()) {
+        if (
+            inTradingTimeRange() ||
+            mConfig.currentTime < mConfig.time.ATC.start
+        ) {
             // console.log("boardps", data.data);
             priceHandler(data.data);
             volumeHandler(data.data);
@@ -474,11 +465,15 @@ function connectSocket() {
         }
     });
     socket.on("stockps", data => {
-        if (!!inTradingTimeRange()) {
+        if (
+            inTradingTimeRange() ||
+            mConfig.currentTime < mConfig.time.ATC.start
+        ) {
             // console.log("stockps", data.data);
             priceHandler(data.data);
         }
     });
+
     function priceHandler(data) {
         if (data.id == 3220) {
             // console.log("price" + data.id);
@@ -486,15 +481,13 @@ function connectSocket() {
                 x: moment(`${mConfig.currentDate} ${data.timeServer}`),
                 y: data.lastPrice
             };
-            mChart.data.datasets[0].data.push(price);
-            mChart.update("none");
             //
             if (!!mConfig.priceBackgroundLine.prevTime) {
                 var prevTime = moment(
                     `${mConfig.currentDate} ${mConfig.priceBackgroundLine.prevTime}`
                 );
                 var interval = price.x.diff(prevTime, "seconds");
-                if (interval > mConfig.priceBackgroundLine.interval) {
+                if (interval >= mConfig.priceBackgroundLine.interval) {
                     mConfig.priceBackgroundLine.interval = interval;
                     mConfig.priceBackgroundLine.price =
                         mConfig.priceBackgroundLine.prevPrice;
@@ -504,11 +497,13 @@ function connectSocket() {
                         mConfig.priceBackgroundLine.price;
                     mChart.options.plugins.annotation.annotations.price.label.content =
                         mConfig.priceBackgroundLine.price;
-                    mChart.update("show");
                 }
-                mConfig.priceBackgroundLine.prevTime = data.timeServer;
-                mConfig.priceBackgroundLine.prevPrice = data.lastPrice;
             }
+            mConfig.priceBackgroundLine.prevTime = data.timeServer;
+            mConfig.priceBackgroundLine.prevPrice = data.lastPrice;
+            //
+            mChart.data.datasets[0].data.push(price);
+            mChart.update("none");
         }
     }
     function volumeHandler(data) {
@@ -633,14 +628,16 @@ function intervalHandler() {
         }`,
         "YYYY-MM-DD H:mm:ss"
     ).format("HH:mm:ss");
-    var session = inTradingTimeRange();
+    var session = inTradingTimeRange(true);
     if (!!session) document.getElementById("right_price").value = session;
     //
     //Display
     if (isTradingTime("start")) {
+        mChart.data.datasets.forEach(item => (item.data = []));
+        mChart.update("none");
+        changeDisplayMode(session);
         if (!document.body.classList.contains("periodic-order"))
             document.body.classList.add("periodic-order");
-        changeDisplayMode(session);
     }
     // Export
     if (isTradingTime("end")) exportHandler(session);
@@ -652,6 +649,8 @@ function intervalHandler() {
         mConfig.isReportedResult = true;
         setTimeout(() => reportHandler(), 30000);
     }
+    //
+    if (mConfig.displayMode == "Stream") showStreamMode();
     //
     var orderCounter = 0;
     for (var item of document.getElementById("tbodyContent").rows) {
@@ -722,8 +721,8 @@ function reportHandler() {
     }
 }
 
-function exportHandler(session) {
-    changeDisplayMode(session);
+function exportHandler(session = false) {
+    if (!!session) changeDisplayMode(session);
     var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
     var imageData = mChart.toBase64Image();
     if (Object.keys(mConfig.time).includes(session)) {
@@ -768,6 +767,53 @@ function changeDisplayMode(mode) {
     select.dispatchEvent(new Event("change"));
 }
 
+function showdisplayMode(mode) {
+    mConfig.displayMode = mode;
+    updateChartTitle();
+    var input = document.getElementById("streamInput");
+    input.style.zIndex = -1;
+    switch (mConfig.displayMode) {
+        case "Full":
+            mChart.resetZoom();
+            break;
+        case "Stream":
+            input.style.zIndex = 1;
+            input.value = mConfig.streamScale;
+            showStreamMode("show");
+            break;
+        case "ATO":
+        case "ATC":
+            mChart.zoomScale(
+                "x",
+                {
+                    min: moment(
+                        `${mConfig.currentDate} ${
+                            mConfig.time[mConfig.displayMode].start
+                        }`
+                    ),
+                    max: moment(
+                        `${mConfig.currentDate} ${
+                            mConfig.time[mConfig.displayMode].end
+                        }`
+                    )
+                },
+                "show"
+            );
+            break;
+    }
+}
+
+function showStreamMode(mode = "none") {
+    mChart.zoomScale(
+        "x",
+        {
+            min: moment().subtract(mConfig.streamScale, "minutes"),
+            max: moment().add(mConfig.streamScale * 0.05, "minutes")
+        },
+        mode
+    );
+}
+
 function updateChartTitle() {
     mChart.options.plugins.title.text = `Biểu đồ ${
         mConfig.displayMode
@@ -780,14 +826,15 @@ function toggleSpinner(status) {
     img.style.opacity = status ? 1 : 0;
 }
 
-function inTradingTimeRange() {
+function inTradingTimeRange(sessionName = false) {
     var isAtoSession =
         mConfig.currentTime >= mConfig.time.ATO.start &&
         mConfig.currentTime <= mConfig.time.ATO.end;
     var isAtcSession =
         mConfig.currentTime >= mConfig.time.ATC.start &&
         mConfig.currentTime <= mConfig.time.ATC.end;
-    return isAtoSession ? "ATO" : isAtcSession ? "ATC" : false;
+    if (sessionName) return isAtoSession ? "ATO" : isAtcSession ? "ATC" : "";
+    else return isAtoSession || isAtcSession;
 }
 
 function isTradingTime(event) {
