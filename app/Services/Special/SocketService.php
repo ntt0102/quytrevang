@@ -40,16 +40,11 @@ class SocketService extends CoreService
                                 $conn->send('42' . json_encode(["regs", json_encode($data)]));
                             } else if ($second == 2) {
                                 $json = json_decode(substr($msg, 2));
-                                $event = $json[0];
-                                if ($event == 'boardps') {
-                                    $data = $json[1]->data;
-                                    $this->priceHandler($data);
-                                    $this->volumeHandler($data);
-                                    // $this->vol10Handler($data);
-                                } else if ($event == 'stockps') {
-                                    $data = $json[1]->data;
-                                    $this->priceHandler($data);
-                                }
+                                if ($json[0] == 'boardps') {
+                                    $this->priceHandler($json[1]->data);
+                                    $this->volumeHandler($json[1]->data);
+                                    // $this->vol10Handler($json[1]->data);
+                                } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
                             }
                         }
                         //
@@ -81,7 +76,7 @@ class SocketService extends CoreService
         $date = now()->format('Y-m-d ');
         if ($data->id == 3220) {
             $param = ['x' => $date . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
-            // activity()->withProperties($param)->log('price');
+            activity()->withProperties($param)->log('price');
             $this->vpsRepository->create($param);
             //
             $line = json_decode(get_global_value('priceBackgroundLine'), true);
@@ -103,7 +98,7 @@ class SocketService extends CoreService
         $date = now()->format('Y-m-d ');
         if ($data->id == 3310) {
             $param = ['x' => $date . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
-            // activity()->withProperties($param)->log('volume');
+            activity()->withProperties($param)->log('volume');
             $this->vpsRepository->create($param);
         }
     }

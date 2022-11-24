@@ -1,5 +1,14 @@
 var mConfig = {};
 var mChart = {};
+var mDatabase = null;
+const mConstant = {
+    priceBackgroundLine: {
+        prevTime: "",
+        prevPrice: 0,
+        interval: 0,
+        price: 0
+    }
+};
 
 getLocalConfig()
     .then(() => getServerConfig())
@@ -7,9 +16,11 @@ getLocalConfig()
         createButtons();
         createChart();
         registerEvent();
-        connectSocket();
-        loadPage();
-        setInterval(intervalHandler, 1000);
+        createIndexedDB().then(() => {
+            connectSocket();
+            loadPage();
+            setInterval(intervalHandler, 1000);
+        });
     });
 
 function getLocalConfig() {
@@ -22,12 +33,7 @@ function getLocalConfig() {
                 mConfig.isReportedResult = false;
                 mConfig.currentDate = moment().format("YYYY-MM-DD");
                 mConfig.currentTime = moment().format("HH:mm:ss");
-                mConfig.priceBackgroundLine = {
-                    prevTime: "",
-                    prevPrice: 0,
-                    interval: 0,
-                    price: 0
-                };
+                mConfig.priceBackgroundLine = mConstant.priceBackgroundLine;
                 // mConfig.socketVol10Temp = { side: "B", B: 0, S: 0 };
                 setTimeout(() => {
                     mConfig.VN30F1M = document.getElementById(
@@ -139,7 +145,7 @@ function createChart() {
     button.innerText = "Clear";
     button.addEventListener("click", () => {
         var choice = confirm("Xoá toàn bộ dữ liệu?");
-        if (choice) clearData();
+        if (choice) clearServerData();
     });
     div.append(button);
     //
@@ -375,172 +381,6 @@ function createChart() {
     });
 }
 
-function setData(data) {
-    data.action = "SET";
-    data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
-    const url = mConfig.endpoint.data;
-    toggleSpinner(true);
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    }).then(() => toggleSpinner(false));
-}
-
-function clearData() {
-    return new Promise((resolve, reject) => {
-        var data = { action: "CLEAR" };
-        const url = mConfig.endpoint.data;
-        toggleSpinner(true);
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        }).then(() => {
-            mChart.data.datasets.forEach(item => (item.data = []));
-            mChart.update("none");
-            toggleSpinner(false);
-            resolve();
-        });
-    });
-}
-
-function getData() {
-    return new Promise((resolve, reject) => {
-        var data = { action: "GET" };
-        const url = mConfig.endpoint.data;
-        toggleSpinner(true);
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(json => {
-                console.log("getData", json);
-                if (json.data[0].length > mChart.data.datasets[0].data.length) {
-                    mChart.data.datasets.forEach((dataset, index) => {
-                        json.data[index].map(item => ({
-                            ...item,
-                            ...{ x: moment(item.x) }
-                        }));
-                        dataset.data = json.data[index];
-                    });
-                    //
-                    console.log("json.line: ", json.line);
-                    if (inTradingTimeRange() && json.line.price > 0) {
-                        mConfig.priceBackgroundLine = json.line;
-                        mChart.options.plugins.annotation.annotations.price.yMin =
-                            json.line.price;
-                        mChart.options.plugins.annotation.annotations.price.yMax =
-                            json.line.price;
-                        mChart.options.plugins.annotation.annotations.price.label.content =
-                            json.line.price;
-                    }
-                    mChart.update("none");
-                }
-                toggleSpinner(false);
-                resolve();
-            });
-    });
-}
-
-function connectSocket() {
-    var msg = { action: "join", list: mConfig.VN30F1M };
-    var socket = io(mConfig.endpoint.socket);
-    socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
-    socket.on("reconnect", () => {
-        socket.emit("regs", JSON.stringify(msg));
-        if (inTradingTimeRange()) getData();
-    });
-    socket.on("boardps", data => {
-        if (
-            inTradingTimeRange() ||
-            mConfig.currentTime < mConfig.time.ATC.start
-        ) {
-            // console.log("boardps", data.data);
-            priceHandler(data.data);
-            volumeHandler(data.data);
-            // vol10Handler(data.data);
-        }
-    });
-    socket.on("stockps", data => {
-        if (
-            inTradingTimeRange() ||
-            mConfig.currentTime < mConfig.time.ATC.start
-        ) {
-            // console.log("stockps", data.data);
-            priceHandler(data.data);
-        }
-    });
-
-    function priceHandler(data) {
-        if (data.id == 3220) {
-            // console.log("price" + data.id);
-            const price = {
-                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                y: data.lastPrice
-            };
-            //
-            if (!!mConfig.priceBackgroundLine.prevTime) {
-                var prevTime = moment(
-                    `${mConfig.currentDate} ${mConfig.priceBackgroundLine.prevTime}`
-                );
-                var interval = price.x.diff(prevTime, "seconds");
-                if (interval >= mConfig.priceBackgroundLine.interval) {
-                    mConfig.priceBackgroundLine.interval = interval;
-                    mConfig.priceBackgroundLine.price =
-                        mConfig.priceBackgroundLine.prevPrice;
-                    mChart.options.plugins.annotation.annotations.price.yMin =
-                        mConfig.priceBackgroundLine.price;
-                    mChart.options.plugins.annotation.annotations.price.yMax =
-                        mConfig.priceBackgroundLine.price;
-                    mChart.options.plugins.annotation.annotations.price.label.content =
-                        mConfig.priceBackgroundLine.price;
-                }
-            }
-            mConfig.priceBackgroundLine.prevTime = data.timeServer;
-            mConfig.priceBackgroundLine.prevPrice = data.lastPrice;
-            //
-            mChart.data.datasets[0].data.push(price);
-            mChart.update("none");
-        }
-    }
-    function volumeHandler(data) {
-        if (data.id == 3310) {
-            // console.log("volume" + data.id);
-            const volume = {
-                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                y: data.BVolume - data.SVolume
-            };
-            mChart.data.datasets[1].data.push(volume);
-            mChart.update("none");
-        }
-    }
-    function vol10Handler(data) {
-        if (data.id == 3211) {
-            var sum = data.ndata
-                .split("SOH")
-                .reduce((acc, item) => acc + +item.split(":")[1], 0);
-
-            if (
-                data.side == "B" &&
-                mConfig.socketVol10Temp.side == "S" &&
-                mConfig.socketVol10Temp.B != 0
-            ) {
-                const vol10 = {
-                    x: moment(`${mConfig.currentDate} ${mConfig.currentTime}`),
-                    y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
-                };
-                mChart.data.datasets[2].data.push(vol10);
-                mChart.update("none");
-            }
-            mConfig.socketVol10Temp.side = data.side;
-            mConfig.socketVol10Temp[data.side] = sum;
-        }
-    }
-}
-
 function registerEvent() {
     document
         .getElementById("select_condition_order_wrapper")
@@ -609,6 +449,129 @@ function registerEvent() {
     }
 }
 
+function createIndexedDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open("vpsDB", 1);
+        request.onupgradeneeded = e => {
+            console.log("onupgradeneeded");
+            mDatabase = e.target.result;
+            mDatabase.createObjectStore("price", { keyPath: "x" });
+            mDatabase.createObjectStore("volume", { keyPath: "x" });
+            mDatabase.createObjectStore("line", { keyPath: "price" });
+            resolve();
+        };
+        request.onsuccess = e => {
+            console.log("onsuccess");
+            mDatabase = e.target.result;
+            resolve();
+        };
+        request.onerror = () => {
+            console.log("onerror");
+            reject();
+        };
+    });
+}
+
+function connectSocket() {
+    var msg = { action: "join", list: mConfig.VN30F1M };
+    var socket = io(mConfig.endpoint.socket);
+    socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
+    socket.on("reconnect", () => {
+        socket.emit("regs", JSON.stringify(msg));
+        if (inTradingTimeRange()) getData();
+    });
+    socket.on("boardps", data => {
+        if (
+            inTradingTimeRange() ||
+            mConfig.currentTime < mConfig.time.ATC.start
+        ) {
+            // console.log("boardps", data.data);
+            priceHandler(data.data);
+            volumeHandler(data.data);
+            // vol10Handler(data.data);
+        }
+    });
+    socket.on("stockps", data => {
+        if (
+            inTradingTimeRange() ||
+            mConfig.currentTime < mConfig.time.ATC.start
+        ) {
+            // console.log("stockps", data.data);
+            priceHandler(data.data);
+        }
+    });
+
+    function priceHandler(data) {
+        if (data.id == 3220) {
+            // console.log("price" + data.id);
+            const price = {
+                x: new Date(`${mConfig.currentDate} ${data.timeServer}`),
+                y: data.lastPrice
+            };
+            //
+            if (!!mConfig.priceBackgroundLine.prevTime) {
+                var prevTime = moment(
+                    `${mConfig.currentDate} ${mConfig.priceBackgroundLine.prevTime}`
+                );
+                var interval = moment(price.x).diff(prevTime, "seconds");
+                if (interval >= mConfig.priceBackgroundLine.interval) {
+                    mConfig.priceBackgroundLine.interval = interval;
+                    mConfig.priceBackgroundLine.price =
+                        mConfig.priceBackgroundLine.prevPrice;
+                    var pa =
+                        mChart.options.plugins.annotation.annotations.price;
+                    pa.yMin = mConfig.priceBackgroundLine.price;
+                    pa.yMax = mConfig.priceBackgroundLine.price;
+                    pa.label.content = mConfig.priceBackgroundLine.price;
+                }
+            }
+            mConfig.priceBackgroundLine.prevTime = data.timeServer;
+            mConfig.priceBackgroundLine.prevPrice = data.lastPrice;
+            setLocalData("line", mConfig.priceBackgroundLine, true);
+            //
+            mChart.data.datasets[0].data.push(price);
+            mChart.update("none");
+            setLocalData("price", price);
+        }
+    }
+    function volumeHandler(data) {
+        if (data.id == 3310) {
+            // console.log("volume" + data.id);
+            const volume = {
+                x: new Date(`${mConfig.currentDate} ${data.timeServer}`),
+                y: data.BVolume - data.SVolume
+            };
+            mChart.data.datasets[1].data.push(volume);
+            mChart.update("none");
+            setLocalData("volume", volume);
+        }
+    }
+    function vol10Handler(data) {
+        if (data.id == 3211) {
+            var sum = data.ndata
+                .split("SOH")
+                .reduce((acc, item) => acc + +item.split(":")[1], 0);
+
+            if (
+                data.side == "B" &&
+                mConfig.socketVol10Temp.side == "S" &&
+                mConfig.socketVol10Temp.B != 0
+            ) {
+                const vol10 = {
+                    x: new Date(
+                        `${mConfig.currentDate} ${mConfig.currentTime}`
+                    ),
+                    y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
+                };
+                mChart.data.datasets[2].data.push(vol10);
+                mChart.update("none");
+            }
+            mConfig.socketVol10Temp.side = data.side;
+            mConfig.socketVol10Temp[data.side] = sum;
+        }
+    }
+}
+
 function loadPage() {
     // Load Order List
     var button = document.createElement("button");
@@ -633,6 +596,9 @@ function intervalHandler() {
     //
     //Display
     if (isTradingTime("start")) {
+        clearLocalData("price");
+        clearLocalData("volume");
+        setLocalData("line", mConstant.priceBackgroundLine, true);
         mChart.data.datasets.forEach(item => (item.data = []));
         mChart.update("none");
         changeDisplayMode(session);
@@ -660,6 +626,134 @@ function intervalHandler() {
     document.getElementById(
         "orderCountP"
     ).innerText = `Số lệnh: ${orderCounter}`;
+}
+
+function getData() {
+    return new Promise((resolve, reject) => {
+        toggleSpinner(true);
+        Promise.all([getServerData(), getLocalData()]).then(arr => {
+            var data =
+                arr[0].data[0].length >= arr[1].data[0].length
+                    ? arr[0]
+                    : arr[1];
+            mChart.data.datasets.forEach((dataset, index) => {
+                data.data[index].map(item => ({
+                    ...item,
+                    ...{ x: moment(item.x) }
+                }));
+                dataset.data = data.data[index];
+            });
+            if (inTradingTimeRange() && data.line.price > 0) {
+                mConfig.priceBackgroundLine = data.line;
+                var pa = mChart.options.plugins.annotation.annotations.price;
+                pa.yMin = data.line.price;
+                pa.yMax = data.line.price;
+                pa.label.content = data.line.price;
+            }
+            mChart.update("none");
+            toggleSpinner(false);
+            resolve();
+        });
+    });
+
+    function getServerData() {
+        return new Promise((resolve, reject) => {
+            var data = { action: "GET" };
+            const url = mConfig.endpoint.data;
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data)
+            })
+                .then(response => response.json())
+                .then(json => {
+                    console.log("getData", json);
+                    resolve(json);
+                });
+        });
+    }
+
+    function getLocalData() {
+        return new Promise(function(resolve, reject) {
+            const tables = ["price", "volume", "line"];
+            var tx = mDatabase.transaction(tables, "readonly");
+            var stores = tables.map(table => tx.objectStore(table));
+            var promises = stores.map(loadStore);
+            Promise.all(promises).then(arr =>
+                resolve({
+                    data: [arr[0], arr[1]],
+                    line: arr[2].length ? arr[2] : mConstant.priceBackgroundLine
+                })
+            );
+        });
+
+        function loadStore(store) {
+            return new Promise(function(resolve, reject) {
+                const request = store.getAll();
+                request.onsuccess = e => resolve(e.target.result);
+                request.onerror = () => reject();
+            });
+        }
+    }
+}
+
+function setServerData(data) {
+    data.action = "SET";
+    data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
+    const url = mConfig.endpoint.data;
+    toggleSpinner(true);
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    }).then(() => toggleSpinner(false));
+}
+
+function clearServerData() {
+    return new Promise((resolve, reject) => {
+        var data = { action: "CLEAR" };
+        const url = mConfig.endpoint.data;
+        toggleSpinner(true);
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).then(() => {
+            clearLocalData("price");
+            clearLocalData("volume");
+            setLocalData("line", mConstant.priceBackgroundLine, true);
+            mChart.data.datasets.forEach(item => (item.data = []));
+            mChart.update("none");
+            toggleSpinner(false);
+            resolve();
+        });
+    });
+}
+
+function setLocalData(table, data, isUpdate = false) {
+    const store = mDatabase.transaction(table, "readwrite").objectStore(table);
+    const request = isUpdate ? store.put(data) : store.add(data);
+    request.onsuccess = () => {
+        console.log("onsuccess");
+    };
+    request.onerror = () => {
+        console.log("onerror");
+    };
+}
+
+function clearLocalData(table) {
+    const request = mDatabase
+        .transaction(table, "readwrite")
+        .objectStore(table)
+        .clear();
+
+    request.onsuccess = () => {
+        console.log(`Object Store "${table}" emptied`);
+    };
+
+    request.onerror = err => {
+        console.error(`Error to empty Object Store: ${table}`);
+    };
 }
 
 function reportHandler() {
