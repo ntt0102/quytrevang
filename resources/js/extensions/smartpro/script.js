@@ -3,6 +3,7 @@ var mChart = {};
 var mDatabase = null;
 const mConstant = {
     priceBackgroundLine: {
+        key: 1,
         prevTime: "",
         prevPrice: 0,
         interval: 0,
@@ -457,7 +458,7 @@ function createIndexedDB() {
             mDatabase = e.target.result;
             mDatabase.createObjectStore("price", { keyPath: "x" });
             mDatabase.createObjectStore("volume", { keyPath: "x" });
-            mDatabase.createObjectStore("line", { keyPath: "price" });
+            mDatabase.createObjectStore("line", { keyPath: "key" });
             resolve();
         };
         request.onsuccess = e => {
@@ -587,7 +588,7 @@ function intervalHandler() {
     var session = inTradingTimeRange(true);
     if (!!session) document.getElementById("right_price").value = session;
     //
-    //Display
+    // Start ATO|ATC
     if (isTradingTime("start")) {
         clearLocalData("price");
         clearLocalData("volume");
@@ -599,15 +600,10 @@ function intervalHandler() {
             document.body.classList.add("periodic-order");
     }
     // Export
-    if (isTradingTime("end")) exportHandler(session);
+    if (isTradingTime("end")) setTimeout(() => exportHandler(session), 15000);
     // Report
-    if (
-        mConfig.currentTime == mConfig.time.ATC.end &&
-        !mConfig.isReportedResult
-    ) {
-        mConfig.isReportedResult = true;
+    if (mConfig.currentTime == mConfig.time.ATC.end)
         setTimeout(() => reportHandler(), 30000);
-    }
     //
     if (mConfig.displayMode == "Stream") showStreamMode();
     //
@@ -625,6 +621,7 @@ function getData() {
     return new Promise((resolve, reject) => {
         toggleSpinner(true);
         Promise.all([getServerData(), getLocalData()]).then(arr => {
+            console.log("getData: ", arr);
             var data =
                 arr[0].data[0].length >= arr[1].data[0].length
                     ? arr[0]
@@ -660,7 +657,8 @@ function getData() {
             })
                 .then(response => response.json())
                 .then(json => {
-                    console.log("getData", json);
+                    json.line.key = 1;
+                    // console.log("getData", json);
                     resolve(json);
                 });
         });
@@ -675,7 +673,9 @@ function getData() {
             Promise.all(promises).then(arr =>
                 resolve({
                     data: [arr[0], arr[1]],
-                    line: arr[2].length ? arr[2] : mConstant.priceBackgroundLine
+                    line: arr[2].length
+                        ? arr[2][0]
+                        : mConstant.priceBackgroundLine
                 })
             );
         });
@@ -750,7 +750,9 @@ function clearLocalData(table) {
 }
 
 function reportHandler() {
-    if (mConfig.isOpeningMarket) {
+    if (mConfig.isOpeningMarket && !mConfig.isReportedResult) {
+        mConfig.isReportedResult = true;
+        toggleSpinner(true);
         const url = mConfig.endpoint.report;
         const data = {
             revenue: +document
@@ -772,8 +774,6 @@ function reportHandler() {
                 }
             }
         }
-        mConfig.isReportedResult = true;
-        toggleSpinner(true);
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -804,6 +804,7 @@ function reportHandler() {
                 console.log(error);
                 console.log("Report-End ##############################");
                 alert("Gửi báo cáo thất bại");
+                toggleSpinner(false);
             });
     }
 }
