@@ -47,7 +47,7 @@ class ParametersTableSeeder extends Seeder
         Parameter::create([
             'slug' => "VN30F1M",
             'value' => "VN30F2211",
-            'description' => "Hơp đồng VN30F1M",
+            'description' => "Hợp đồng VN30F1M",
         ]);
         Parameter::create([
             'slug' => "startAtoTime",
