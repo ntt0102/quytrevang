@@ -43,7 +43,8 @@ function getLocalConfig() {
                     resolve();
                 }, 1000);
                 console.log("mConfig", mConfig);
-            });
+            })
+            .catch(() => location.reload());
     });
 }
 
@@ -63,7 +64,8 @@ function getServerConfig() {
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.time = json.time;
                 resolve();
-            });
+            })
+            .catch(() => location.reload());
     });
 }
 
@@ -468,6 +470,7 @@ function createIndexedDB() {
         };
         request.onerror = () => {
             console.log("onerror");
+            location.reload();
             reject();
         };
     });
@@ -586,6 +589,7 @@ function intervalHandler() {
         "YYYY-MM-DD H:mm:ss"
     ).format("HH:mm:ss");
     var session = inTradingTimeRange(true);
+    console.log(mConfig.currentTime + ": ", session);
     if (!!session) document.getElementById("right_price").value = session;
     //
     // Start ATO|ATC
@@ -813,7 +817,7 @@ function exportHandler(session = false) {
     if (!!session) changeDisplayMode(session);
     var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
     var imageData = mChart.toBase64Image();
-    if (Object.keys(mConfig.time).includes(session)) {
+    if (Object.keys(mConfig.time).includes(mConfig.displayMode)) {
         const url = mConfig.endpoint.export;
         const data = { imageData, imageName, session };
         toggleSpinner(true);
