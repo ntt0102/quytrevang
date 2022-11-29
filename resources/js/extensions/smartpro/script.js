@@ -819,7 +819,7 @@ function exportHandler(session = false) {
     var imageData = mChart.toBase64Image();
     if (Object.keys(mConfig.time).includes(mConfig.displayMode)) {
         const url = mConfig.endpoint.export;
-        const data = { imageData, imageName, session };
+        const data = { imageData, imageName, session: mConfig.displayMode };
         toggleSpinner(true);
         fetch(url, {
             method: "POST",
