@@ -21,6 +21,11 @@
   padding: 1px;
   font-size: 16px;
 }
+#periodicButton.dark {
+  background: black;
+  color: yellow;
+  border-color: yellow;
+}
 #reportButton {
   position: fixed;
   bottom: 0px;

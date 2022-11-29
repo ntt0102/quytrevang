@@ -589,7 +589,6 @@ function intervalHandler() {
         "YYYY-MM-DD H:mm:ss"
     ).format("HH:mm:ss");
     var session = inTradingTimeRange(true);
-    console.log(mConfig.currentTime + ": ", session);
     if (!!session) document.getElementById("right_price").value = session;
     //
     // Start ATO|ATC
@@ -619,6 +618,8 @@ function intervalHandler() {
     document.getElementById(
         "orderCountP"
     ).innerText = `Số lệnh: ${orderCounter}`;
+    //
+    showRunningStatus();
 }
 
 function getData() {
@@ -934,4 +935,10 @@ function isTradingTime(event) {
         mConfig.currentTime == mConfig.time.ATO[event] ||
         mConfig.currentTime == mConfig.time.ATC[event]
     );
+}
+
+function showRunningStatus() {
+    var button = document.getElementById("periodicButton");
+    if (button.classList.contains("dark")) button.classList.remove("dark");
+    else button.classList.add("dark");
 }
