@@ -182,17 +182,6 @@ function createChart() {
                     pointHitRadius: 20,
                     order: 2
                 }
-                // {
-                //     label: "KL10",
-                //     data: [],
-                //     borderColor: "cyan",
-                //     backgroundColor: "cyan",
-                //     yAxisID: "y2",
-                //     pointRadius: 0,
-                //     pointHoverRadius: 5,
-                //     pointHitRadius: 20,
-                //     order: 2
-                // }
             ]
         },
         options: {
@@ -226,9 +215,6 @@ function createChart() {
                     }
                 },
                 y1: {
-                    display: false
-                },
-                y2: {
                     display: false
                 }
             },
@@ -267,7 +253,7 @@ function createChart() {
                             borderDash: [5, 5],
                             adjustScaleRange: false
                         },
-                        volume_0: {
+                        volume: {
                             type: "line",
                             yScaleID: "y1",
                             yMin: 0,
@@ -277,16 +263,6 @@ function createChart() {
                             borderDash: [5, 5],
                             adjustScaleRange: false
                         },
-                        // vol10_0: {
-                        //     type: "line",
-                        //     yScaleID: "y2",
-                        //     yMin: 0,
-                        //     yMax: 0,
-                        //     borderColor: "cyan",
-                        //     borderWidth: 1,
-                        //     borderDash: [5, 5],
-                        //     adjustScaleRange: false
-                        // },
                         startATO: {
                             type: "line",
                             xMin: moment(
@@ -476,7 +452,6 @@ function connectSocket() {
         // console.log("boardps", data.data);
         priceHandler(data.data);
         volumeHandler(data.data);
-        // vol10Handler(data.data);
     });
     socket.on("stockps", data => {
         // console.log("stockps", data.data);
@@ -509,35 +484,17 @@ function connectSocket() {
                 x: new Date(`${mConfig.currentDate} ${data.timeServer}`),
                 y: data.BVolume - data.SVolume
             };
+            //
+            var va = mChart.options.plugins.annotation.annotations.volume;
+            va.yMin = volume.y;
+            va.yMax = volume.y;
+            va.label.content = volume.y;
+            //
             mChart.data.datasets[1].data.push(volume);
             mChart.update("none");
             if (inTradingTimeRange()) setLocalData("volume", volume);
         }
     }
-    // function vol10Handler(data) {
-    //     if (data.id == 3211) {
-    //         var sum = data.ndata
-    //             .split("SOH")
-    //             .reduce((acc, item) => acc + +item.split(":")[1], 0);
-
-    //         if (
-    //             data.side == "B" &&
-    //             mConfig.socketVol10Temp.side == "S" &&
-    //             mConfig.socketVol10Temp.B != 0
-    //         ) {
-    //             const vol10 = {
-    //                 x: new Date(
-    //                     `${mConfig.currentDate} ${mConfig.currentTime}`
-    //                 ),
-    //                 y: mConfig.socketVol10Temp.B - mConfig.socketVol10Temp.S
-    //             };
-    //             mChart.data.datasets[2].data.push(vol10);
-    //             mChart.update("none");
-    //         }
-    //         mConfig.socketVol10Temp.side = data.side;
-    //         mConfig.socketVol10Temp[data.side] = sum;
-    //     }
-    // }
 }
 
 function loadPage() {
