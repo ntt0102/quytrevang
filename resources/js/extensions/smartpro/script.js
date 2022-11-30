@@ -615,9 +615,7 @@ function intervalHandler() {
         if (item.cells[0].innerText == "") break;
         else orderCounter++;
     }
-    document.getElementById(
-        "orderCountP"
-    ).innerText = `Số lệnh: ${orderCounter}`;
+    document.getElementById("orderCountP").innerText = `ΣOD: ${orderCounter}`;
     //
     showRunningStatus();
 }

@@ -95,8 +95,8 @@
 
 #periodicChart > #orderCountP {
   position: absolute;
-  top: 5px;
-  right: 550px;
+  top: 30px;
+  right: 110px;
   color: white;
 }
 
@@ -136,22 +136,22 @@
     .continuous-order .aside-menu > .nav,
     .continuous-order .aside-menu .list-group-item:nth-child(2),
     .continuous-order .aside-menu .list-group-item:nth-child(3) {
-      display: none;
+      display: none !important;
     }
 
     .continuous-order .aside-menu .wrapper_select_order {
-      display: block;
+      display: block !important;
     }
 
     .continuous-order .aside-menu .btnTypeOrder > span:nth-child(1),
     .continuous-order .aside-menu .btnTypeOrder>span:nth-child(2),
     .continuous-order .aside-menu .btnTypeOrder>span:nth-child(4),
     .continuous-order .aside-menu .btnTypeOrder>span:nth-child(5) {
-      display: none;
+      display: none !important;
     }
 
     .continuous-order .aside-menu .list-group-item:nth-child(7) > label:nth-child(2) {
-      display: none;
+      display: none !important;
     }
 
     .continuous-order .aside-menu .list-group-item {
@@ -171,7 +171,7 @@
     }
 
     .continuous-order .aside-menu #select_condition_order_wrapper .arrow{
-      display: none;
+      display: none !important;
     }
 
     .continuous-order .aside-menu #select_order_type_wrapper {
@@ -283,7 +283,7 @@
     .periodic-order .aside-menu .list-group-item:nth-child(7) > label,
     .periodic-order .aside-menu .button-order-group > div:last-child
     {
-      display: none;
+      display: none !important;
     }
 
     .periodic-order .aside-menu .list-group-item, 
@@ -299,12 +299,39 @@
         padding: 12px;
       }
 
+  .periodic-order #taisanAccount>div:first-child>div:first-child>div:last-child {
+    position: fixed;
+    top: 12px;
+    left: 250px;
+    width: unset;
+    z-index: 1022;
+  }
+
+  .periodic-order #status-danhmuc-content>tr>td:nth-child(2) {
+    position: fixed;
+    top: 12px;
+    left: 220px;
+    border-bottom: unset;
+    z-index: 1022;
+  }
+
+  .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(18) {
+    position: fixed;
+    top: 10px;
+    left: 175px;
+    z-index: 1022;
+  }
+
   .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(11) {
     position: fixed;
     top: 10px;
+    left: 120px;
+    z-index: 1022;
+  }
+  .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(8) {
+    position: fixed;
+    top: 10px;
     left: 85px;
-    bottom: unset;
-    right: unset;
     z-index: 1022;
   }
 
@@ -336,6 +363,7 @@
   .continuous-order #taisanAccount>div:first-child>div:first-child>div:last-child {
     top: 7px;
     left: 330px;
+    width: unset;
     bottom: unset;
     right: unset;
   }
@@ -343,6 +371,7 @@
   .continuous-order #status-danhmuc-content>tr>td:nth-child(2) {
     top: 3px;
     left: 270px;
+    border-bottom: unset;
     bottom: unset;
     right: unset;
   }
