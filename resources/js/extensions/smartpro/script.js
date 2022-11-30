@@ -1,15 +1,6 @@
 var mConfig = {};
 var mChart = {};
 var mDatabase = null;
-const mConstant = {
-    priceBackgroundLine: {
-        key: 1,
-        prevTime: "",
-        prevPrice: 0,
-        interval: 0,
-        price: 0
-    }
-};
 
 getLocalConfig()
     .then(() => getServerConfig())
@@ -34,8 +25,6 @@ function getLocalConfig() {
                 mConfig.isReportedResult = false;
                 mConfig.currentDate = moment().format("YYYY-MM-DD");
                 mConfig.currentTime = moment().format("HH:mm:ss");
-                mConfig.priceBackgroundLine = mConstant.priceBackgroundLine;
-                // mConfig.socketVol10Temp = { side: "B", B: 0, S: 0 };
                 setTimeout(() => {
                     mConfig.VN30F1M = document.getElementById(
                         "tbodyPhaisinhContent"
@@ -460,7 +449,6 @@ function createIndexedDB() {
             mDatabase = e.target.result;
             mDatabase.createObjectStore("price", { keyPath: "x" });
             mDatabase.createObjectStore("volume", { keyPath: "x" });
-            mDatabase.createObjectStore("line", { keyPath: "key" });
             resolve();
         };
         request.onsuccess = e => {
@@ -503,32 +491,10 @@ function connectSocket() {
                 y: data.lastPrice
             };
             //
-            if (!!mConfig.priceBackgroundLine.prevTime) {
-                var prevTime = moment(
-                    `${mConfig.currentDate} ${mConfig.priceBackgroundLine.prevTime}`
-                );
-                var interval = moment(price.x).diff(prevTime, "seconds");
-                if (interval >= mConfig.priceBackgroundLine.interval) {
-                    mConfig.priceBackgroundLine.interval = interval;
-                    mConfig.priceBackgroundLine.price =
-                        mConfig.priceBackgroundLine.prevPrice;
-                    var pa =
-                        mChart.options.plugins.annotation.annotations.price;
-                    pa.yMin = mConfig.priceBackgroundLine.price;
-                    pa.yMax = mConfig.priceBackgroundLine.price;
-                    pa.label.content = mConfig.priceBackgroundLine.price;
-                }
-            }
-            mConfig.priceBackgroundLine.prevTime = data.timeServer;
-            mConfig.priceBackgroundLine.prevPrice = data.lastPrice;
-            //
             mChart.data.datasets[0].data.push(price);
             mChart.update("none");
             //
-            if (inTradingTimeRange()) {
-                setLocalData("line", mConfig.priceBackgroundLine, true);
-                setLocalData("price", price);
-            }
+            if (inTradingTimeRange()) setLocalData("price", price);
         }
     }
     function volumeHandler(data) {
@@ -595,7 +561,6 @@ function intervalHandler() {
     if (isTradingTime("start")) {
         clearLocalData("price");
         clearLocalData("volume");
-        setLocalData("line", mConstant.priceBackgroundLine, true);
         mChart.data.datasets.forEach(item => (item.data = []));
         mChart.update("none");
         changeDisplayMode(session);
@@ -625,24 +590,14 @@ function getData() {
         toggleSpinner(true);
         Promise.all([getServerData(), getLocalData()]).then(arr => {
             console.log("getData: ", arr);
-            var data =
-                arr[0].data[0].length >= arr[1].data[0].length
-                    ? arr[0]
-                    : arr[1];
+            var data = arr[0][0].length >= arr[1][0].length ? arr[0] : arr[1];
             mChart.data.datasets.forEach((dataset, index) => {
-                data.data[index].map(item => ({
+                data[index].map(item => ({
                     ...item,
                     ...{ x: moment(item.x) }
                 }));
-                dataset.data = data.data[index];
+                dataset.data = data[index];
             });
-            if (inTradingTimeRange() && data.line.price > 0) {
-                mConfig.priceBackgroundLine = data.line;
-                var pa = mChart.options.plugins.annotation.annotations.price;
-                pa.yMin = data.line.price;
-                pa.yMax = data.line.price;
-                pa.label.content = data.line.price;
-            }
             mChart.update("none");
             toggleSpinner(false);
             resolve();
@@ -659,28 +614,17 @@ function getData() {
                 body: JSON.stringify(data)
             })
                 .then(response => response.json())
-                .then(json => {
-                    json.line.key = 1;
-                    // console.log("getData", json);
-                    resolve(json);
-                });
+                .then(json => resolve(json));
         });
     }
 
     function getLocalData() {
         return new Promise(function(resolve, reject) {
-            const tables = ["price", "volume", "line"];
+            const tables = ["price", "volume"];
             var tx = mDatabase.transaction(tables, "readonly");
             var stores = tables.map(table => tx.objectStore(table));
             var promises = stores.map(loadStore);
-            Promise.all(promises).then(arr =>
-                resolve({
-                    data: [arr[0], arr[1]],
-                    line: arr[2].length
-                        ? arr[2][0]
-                        : mConstant.priceBackgroundLine
-                })
-            );
+            Promise.all(promises).then(arr => resolve(arr));
         });
 
         function loadStore(store) {
@@ -717,7 +661,6 @@ function clearServerData() {
         }).then(() => {
             clearLocalData("price");
             clearLocalData("volume");
-            setLocalData("line", mConstant.priceBackgroundLine, true);
             mChart.data.datasets.forEach(item => (item.data = []));
             mChart.update("none");
             toggleSpinner(false);

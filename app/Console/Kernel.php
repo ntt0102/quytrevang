@@ -31,8 +31,6 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             if (check_opening_market()) {
                 set_global_value('runningSocketFlag', '0');
-                set_global_value('priceBackgroundLine', '{"prevTime":"","prevPrice":0,"interval":0,"price":0}');
-                // set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
                 app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt('08:40');
@@ -40,8 +38,6 @@ class Kernel extends ConsoleKernel
             if (check_opening_market()) {
                 set_global_value('reportedTradingFlag', '0');
                 set_global_value('runningSocketFlag', '0');
-                set_global_value('priceBackgroundLine', '{"prevTime":"","prevPrice":0,"interval":0,"price":0}');
-                // set_global_value('socketVol10Temp', '{"side":"B","B":0,"S":0}');
                 app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt('14:25');

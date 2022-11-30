@@ -45,7 +45,6 @@ class SocketService extends CoreService
                                 if ($json[0] == 'boardps') {
                                     $this->priceHandler($json[1]->data);
                                     $this->volumeHandler($json[1]->data);
-                                    // $this->vol10Handler($json[1]->data);
                                 } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
                             }
                         }
@@ -82,20 +81,8 @@ class SocketService extends CoreService
         $date = now()->format('Y-m-d ');
         if ($data->id == 3220) {
             $param = ['x' => $date . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
-            activity()->withProperties($param)->log('price');
+            // activity()->withProperties($param)->log('price');
             $this->vpsRepository->create($param);
-            //
-            $line = json_decode(get_global_value('priceBackgroundLine'), true);
-            if ($line['prevTime']) {
-                $interval = strtotime($data->timeServer) - strtotime($line['prevTime']);
-                if ($interval >= $line['interval']) {
-                    $line['interval'] = $interval;
-                    $line['price'] = $line['prevPrice'];
-                }
-            }
-            $line['prevTime'] = $data->timeServer;
-            $line['prevPrice'] = $data->lastPrice;
-            set_global_value('priceBackgroundLine', json_encode($line));
         }
     }
 
@@ -104,28 +91,10 @@ class SocketService extends CoreService
         $date = now()->format('Y-m-d ');
         if ($data->id == 3310) {
             $param = ['x' => $date . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
-            activity()->withProperties($param)->log('volume');
+            // activity()->withProperties($param)->log('volume');
             $this->vpsRepository->create($param);
         }
     }
-
-    // private function vol10Handler($data)
-    // {
-    //     if ($data->id == 3211) {
-    //         $sum =  collect(explode("SOH", $data->ndata))->reduce(function ($acc, $item) {
-    //             return $acc + (int)explode(":", $item)[1];
-    //         }, 0);
-    //         $socketVol10Temp = json_decode(get_global_value('socketVol10Temp'), true);
-    //         if ($data->side == 'B' && $socketVol10Temp['side'] == 'S' && $socketVol10Temp['B'] != 0) {
-    //             $param = ['x' => now(), 'y' => $socketVol10Temp['B'] - $socketVol10Temp['S'], 'type' => 2];
-    //             // activity()->withProperties($param)->log('vol10');
-    //             $this->vpsRepository->create($param);
-    //         }
-    //         $socketVol10Temp['side'] = $data->side;
-    //         $socketVol10Temp[$data->side] = $sum;
-    //         set_global_value('socketVol10Temp', json_encode($socketVol10Temp));
-    //     };
-    // }
 
     private function inTradingTimeRange()
     {
