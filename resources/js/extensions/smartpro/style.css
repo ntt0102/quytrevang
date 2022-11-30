@@ -301,8 +301,8 @@
 
   .periodic-order #taisanAccount>div:first-child>div:first-child>div:last-child {
     position: fixed;
-    top: 12px;
-    left: 250px;
+    top: 43px;
+    left: 120px;
     width: unset;
     z-index: 1022;
   }
@@ -310,7 +310,7 @@
   .periodic-order #status-danhmuc-content>tr>td:nth-child(2) {
     position: fixed;
     top: 12px;
-    left: 220px;
+    left: 270px;
     border-bottom: unset;
     z-index: 1022;
   }
@@ -318,17 +318,23 @@
   .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(18) {
     position: fixed;
     top: 10px;
-    left: 175px;
-    z-index: 1022;
-  }
-
-  .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(11) {
-    position: fixed;
-    top: 10px;
-    left: 120px;
+    left: 220px;
     z-index: 1022;
   }
   .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(8) {
+    position: fixed;
+    top: 10px;
+    left: 185px;
+    z-index: 1022;
+  }
+
+  .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(13) {
+    position: fixed;
+    top: 10px;
+    left: 140px;
+    z-index: 1022;
+  }
+  .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(11) {
     position: fixed;
     top: 10px;
     left: 85px;

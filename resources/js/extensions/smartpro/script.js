@@ -491,6 +491,11 @@ function connectSocket() {
                 y: data.lastPrice
             };
             //
+            var pa = mChart.options.plugins.annotation.annotations.price;
+            pa.yMin = price.y;
+            pa.yMax = price.y;
+            pa.label.content = price.y;
+            //
             mChart.data.datasets[0].data.push(price);
             mChart.update("none");
             //
