@@ -498,15 +498,16 @@ function connectSocket() {
 }
 
 function loadPage() {
-    // Load Order List
-    var button = document.createElement("button");
-    button.setAttribute("onclick", "objOrderPanel.showOrderList()");
-    button.click();
+    getData();
     //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
     updateChartTitle();
-    //
-    getData();
+    // Load Order List
+    setTimeout(() => {
+        var button = document.createElement("button");
+        button.setAttribute("onclick", "objOrderPanel.showOrderList()");
+        button.click();
+    }, 5000);
 }
 
 function intervalHandler() {
