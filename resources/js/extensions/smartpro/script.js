@@ -50,7 +50,7 @@ function getLocalConfig() {
 
 function getServerConfig() {
     return new Promise((resolve, reject) => {
-        const url = mConfig.endpoint.config;
+        const url = mConfig.root + mConfig.endpoint.config;
         console.log("getServerConfig", mConfig.VN30F1M);
         fetch(url, {
             method: "POST",
@@ -652,7 +652,7 @@ function getData() {
     function getServerData() {
         return new Promise((resolve, reject) => {
             var data = { action: "GET" };
-            const url = mConfig.endpoint.data;
+            const url = mConfig.root + mConfig.endpoint.data;
             fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -696,7 +696,7 @@ function getData() {
 function setServerData(data) {
     data.action = "SET";
     data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
-    const url = mConfig.endpoint.data;
+    const url = mConfig.root + mConfig.endpoint.data;
     toggleSpinner(true);
     fetch(url, {
         method: "POST",
@@ -708,7 +708,7 @@ function setServerData(data) {
 function clearServerData() {
     return new Promise((resolve, reject) => {
         var data = { action: "CLEAR" };
-        const url = mConfig.endpoint.data;
+        const url = mConfig.root + mConfig.endpoint.data;
         toggleSpinner(true);
         fetch(url, {
             method: "POST",
@@ -756,7 +756,7 @@ function reportHandler() {
     if (mConfig.isOpeningMarket && !mConfig.isReportedResult) {
         mConfig.isReportedResult = true;
         toggleSpinner(true);
-        const url = mConfig.endpoint.report;
+        const url = mConfig.root + mConfig.endpoint.report;
         const data = {
             revenue: +document
                 .getElementById("vmAccInfo")
@@ -817,7 +817,7 @@ function exportHandler(session = false) {
     var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
     var imageData = mChart.toBase64Image();
     if (Object.keys(mConfig.time).includes(mConfig.displayMode)) {
-        const url = mConfig.endpoint.export;
+        const url = mConfig.root + mConfig.endpoint.export;
         const data = { imageData, imageName, session: mConfig.displayMode };
         toggleSpinner(true);
         fetch(url, {

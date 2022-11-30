@@ -1,14 +1,12 @@
 {
+    "root": "https://quytrevang.nguyenvanxuanphu.com",
+    "root1": "http://localhost",
     "endpoint": {
         "socket": "https://datafeed.vps.com.vn",
-        "config": "https://quytrevang.nguyenvanxuanphu.com/api/vps/config",
-        "report": "https://quytrevang.nguyenvanxuanphu.com/api/vps/report",
-        "export": "https://quytrevang.nguyenvanxuanphu.com/api/vps/export",
-        "data": "https://quytrevang.nguyenvanxuanphu.com/api/vps/data",
-        "config1": "http://localhost/api/vps/config",
-        "report1": "http://localhost/api/vps/report",
-        "export1": "http://localhost/api/vps/export",
-        "data1": "http://localhost/api/vps/data"
+        "config": "/api/vps/config",
+        "data": "/api/vps/data",
+        "export": "/api/vps/export",
+        "report": "/api/vps/report"
     },
     "PMF": 2550,
     "displayMode": "Full",
