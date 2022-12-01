@@ -33,6 +33,6 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    $s = app(\App\Services\Admin\ShareService::class)->getData();
+    $s = app(\App\Services\Admin\ShareService::class)->fetch(null);
     dd($s);
 })->middleware('cors');

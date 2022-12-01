@@ -25,20 +25,19 @@ class ShareRepository extends CoreRepository
     /**
      * @inheritdoc
      */
-    public function getShare()
+    public function getShare($symbol)
     {
         return [
-            $this->model->where('type', 0)->get(),
-            $this->model->where('type', 1)->get(),
-            // $this->model->where('type', 2)->get()
+            $this->model->where('symbol', $symbol)->get(['date AS time', 'price AS value']),
+            $this->model->where('symbol', $symbol)->get(['date AS time', 'foreign AS value']),
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public function clear()
+    public function getSymbol()
     {
-        return Share::truncate();
+        return $this->model->select('symbol')->distinct()->get()->pluck('symbol');
     }
 }

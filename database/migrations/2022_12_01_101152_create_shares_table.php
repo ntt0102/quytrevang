@@ -19,7 +19,6 @@ class CreateSharesTable extends Migration
             $table->date('date');
             $table->float('price', 8, 2);
             $table->integer('foreign')->nullable();
-            $table->timestamps();
         });
     }
 

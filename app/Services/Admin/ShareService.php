@@ -16,78 +16,27 @@ class ShareService extends CoreService
     }
 
     /**
-     * Return all the Shares
+     * Get price and foreign of symbol
      * 
      * @param $request
      *
      * @return array
      */
-    public function fetch($request)
+    public function getShare($request)
     {
-        $Shares = $this->shareRepository->findAll(['*'], ['display', 'asc']);
+        $Shares = $this->shareRepository->getShare($request->symbol);
         return $Shares;
     }
 
     /**
-     * Save
+     * Get Symbol
      * 
-     * @param $request
-     * 
-     */
-    public function save($request)
-    {
-        return $this->transaction(function () use ($request) {
-            foreach ($request->changes as $change) {
-                $response = [];
-                switch ($change['type']) {
-                    case 'insert':
-                        $data = [
-                            "display" => $change['data']['display'],
-                            "name" => $change['data']['name'],
-                            "balance" => $change['data']['balance'],
-                            "last_transaction" => $change['data']['last_transaction']
-                        ];
-                        $Share = $this->shareRepository->create($data);
-                        $isOk = !!$Share;
-                        $response['isOk'] = $isOk;
-                        break;
-
-                    case 'update':
-                        $Share = $this->shareRepository->findById($change['key']);
-                        $data = [
-                            "display" => $change['data']['display'],
-                            "name" => $change['data']['name'],
-                            "balance" => $change['data']['balance'],
-                            "last_transaction" => $change['data']['last_transaction']
-                        ];
-                        $hasChangedBalance = $data["balance"] != $Share->balance;
-                        $isOk = $this->shareRepository->update($Share, $data);
-                        $response['isOk'] = $isOk;
-                        break;
-
-                    case 'remove':
-                        $Share = $this->shareRepository->findById($change['key']);
-                        $isOk = $this->shareRepository->delete($Share);
-                        $response['isOk'] = $isOk;
-                        break;
-                }
-                if (!$response['isOk']) break;
-            }
-            return $response;
-        });
-    }
-
-    /**
-     * Get Shares Name
-     * 
-     * @param $request
      *
      * @return array
      */
-    public function getSharesName($request)
+    public function getSymbol()
     {
-        $Shares = $this->shareRepository->findAll(['id', 'name'], ['display', 'asc']);
-        return $Shares;
+        return $this->shareRepository->getSymbol();
     }
 
     /**

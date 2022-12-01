@@ -5,14 +5,17 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Api\CoreController;
 use Illuminate\Http\Request;
 use App\Services\Admin\TradeService;
+use App\Services\Admin\ShareService;
 
 class TradeController extends CoreController
 {
     protected $tradeService;
+    protected $shareService;
 
-    public function __construct(TradeService $tradeService)
+    public function __construct(TradeService $tradeService, ShareService $shareService)
     {
         $this->tradeService = $tradeService;
+        $this->shareService = $shareService;
     }
 
     /**
@@ -65,6 +68,34 @@ class TradeController extends CoreController
     public function save(Request $request)
     {
         $data = $this->tradeService->save($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Get Symbol
+     *
+     * @param Illuminate\Http\Request $request
+     * @param int $id
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getSymbol(Request $request)
+    {
+        $data = $this->shareService->getSymbol($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Get Share
+     *
+     * @param Illuminate\Http\Request $request
+     * @param int $id
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getShare(Request $request)
+    {
+        $data = $this->shareService->getShare($request);
         return $this->sendResponse($data);
     }
 
