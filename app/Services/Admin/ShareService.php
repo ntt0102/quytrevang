@@ -99,7 +99,7 @@ class ShareService extends CoreService
     {
         return $this->transaction(function () {
             $currentDate = now()->format('Y-m-d');
-            if ($this->shareRepository->count([['date', $currentDate]])) return false;
+            if ($this->shareRepository->count([['date', $currentDate]])) return true;
             $client = new \GuzzleHttp\Client();
             $isOk = true;
             // $url = "https://bgapidatafeed.vps.com.vn/getlistindexdetail/10";
