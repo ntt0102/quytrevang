@@ -238,31 +238,6 @@ function createChart() {
                 },
                 annotation: {
                     annotations: {
-                        price: {
-                            type: "line",
-                            yScaleID: "y",
-                            yMin: 0,
-                            yMax: 0,
-                            label: {
-                                content: null,
-                                display: true,
-                                position: "start"
-                            },
-                            borderColor: "yellow",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        volume: {
-                            type: "line",
-                            yScaleID: "y1",
-                            yMin: 0,
-                            yMax: 0,
-                            borderColor: "magenta",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
                         startATO: {
                             type: "line",
                             xMin: moment(
@@ -311,6 +286,36 @@ function createChart() {
                                 `${mConfig.currentDate} ${mConfig.time.ATC.end}`
                             ),
                             borderColor: "red",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        volume: {
+                            type: "line",
+                            yScaleID: "y1",
+                            yMin: 0,
+                            yMax: 0,
+                            label: {
+                                content: null,
+                                display: true,
+                                position: "start"
+                            },
+                            borderColor: "magenta",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        price: {
+                            type: "line",
+                            yScaleID: "y",
+                            yMin: 0,
+                            yMax: 0,
+                            label: {
+                                content: null,
+                                display: true,
+                                position: "start"
+                            },
+                            borderColor: "yellow",
                             borderWidth: 1,
                             borderDash: [5, 5],
                             adjustScaleRange: false
