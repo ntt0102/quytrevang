@@ -116,7 +116,7 @@ class ShareService extends CoreService
                 $data = ['date' => $currentDate, 'symbol' => $item->sym, 'price' => $item->lastPrice, 'foreign' => $item->fBVol - $item->fSVolume];
                 $isOk &= !!$this->shareRepository->create($data);
             }
-            if (!$isOk) $this->getData();
+            if (!$isOk) return $this->getData();
             else return $isOk;
         });
     }
