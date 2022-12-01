@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[5],{
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[23],{
 
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Popups/PickImagePopup.vue?vue&type=script&lang=js&":
 /*!********************************************************************************************************************************************************************************!*\
@@ -74,9 +74,199 @@ __webpack_require__.r(__webpack_exports__);
   !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/Popups/ShareChartPopup.vue?vue&type=script&lang=js& ***!
   \*********************************************************************************************************************************************************************************/
 /*! exports provided: default */
-/***/ (function(module, exports) {
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
 
-throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: C:\\xampp\\htdocs\\quytrevang\\resources\\js\\components\\Popups\\ShareChartPopup.vue: Unexpected token, expected \",\" (32:6)\n\n\u001b[0m \u001b[90m 30 | \u001b[39m    rightPriceScale\u001b[33m:\u001b[39m {\u001b[0m\n\u001b[0m \u001b[90m 31 | \u001b[39m      visible\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 32 | \u001b[39m      borderColor\u001b[33m:\u001b[39mrgba(\u001b[35m32\u001b[39m\u001b[33m,\u001b[39m \u001b[35m226\u001b[39m\u001b[33m,\u001b[39m \u001b[35m47\u001b[39m\u001b[33m,\u001b[39m \u001b[35m1\u001b[39m)\u001b[0m\n\u001b[0m \u001b[90m    | \u001b[39m      \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 33 | \u001b[39m    }\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 34 | \u001b[39m    leftPriceScale\u001b[33m:\u001b[39m {\u001b[0m\n\u001b[0m \u001b[90m 35 | \u001b[39m        visible\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m\u001b[0m\n    at Parser._raise (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:748:17)\n    at Parser.raiseWithData (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:741:17)\n    at Parser.raise (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:735:17)\n    at Parser.unexpected (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9101:16)\n    at Parser.expect (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9087:28)\n    at Parser.parseObjectLike (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10923:14)\n    at Parser.parseExprAtom (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10491:23)\n    at Parser.parseExprSubscripts (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10150:23)\n    at Parser.parseUpdate (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10130:21)\n    at Parser.parseMaybeUnary (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10119:17)\n    at Parser.parseExprOps (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9989:23)\n    at Parser.parseMaybeConditional (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9963:23)\n    at Parser.parseMaybeAssign (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9926:21)\n    at C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9893:39\n    at Parser.allowInAnd (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11547:12)\n    at Parser.parseMaybeAssignAllowIn (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9893:17)\n    at Parser.parseObjectProperty (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11092:101)\n    at Parser.parseObjPropValue (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11117:100)\n    at Parser.parsePropertyDefinition (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11041:10)\n    at Parser.parseObjectLike (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10931:25)\n    at Parser.parseExprAtom (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10491:23)\n    at Parser.parseExprSubscripts (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10150:23)\n    at Parser.parseUpdate (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10130:21)\n    at Parser.parseMaybeUnary (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10119:17)\n    at Parser.parseExprOps (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9989:23)\n    at Parser.parseMaybeConditional (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9963:23)\n    at Parser.parseMaybeAssign (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9926:21)\n    at C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9893:39\n    at Parser.allowInAnd (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11541:16)\n    at Parser.parseMaybeAssignAllowIn (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:9893:17)\n    at Parser.parseVar (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12339:70)\n    at Parser.parseVarStatement (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12151:10)\n    at Parser.parseStatementContent (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11743:21)\n    at Parser.parseStatement (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11676:17)\n    at Parser.parseBlockOrModuleBlockBody (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12258:25)\n    at Parser.parseBlockBody (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12249:10)");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var devextreme_vue_select_box__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! devextreme-vue/select-box */ "./node_modules/devextreme-vue/select-box.js");
+/* harmony import */ var devextreme_vue_select_box__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(devextreme_vue_select_box__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var lightweight_charts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lightweight-charts */ "./node_modules/lightweight-charts/dist/lightweight-charts.esm.production.js");
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+
+var chartOptions = {
+  localization: {
+    locale: "vi-VN"
+  },
+  rightPriceScale: {
+    scaleMargins: {
+      top: 0.3,
+      bottom: 0.25
+    },
+    borderVisible: false
+  },
+  layout: {
+    backgroundColor: "#131722",
+    textColor: "#d1d4dc",
+    lineColor: "#2B2B43"
+  },
+  watermark: {
+    visible: true,
+    fontSize: 100,
+    horzAlign: "center",
+    vertAlign: "center",
+    color: "rgba(255, 255, 255, 0.1)",
+    text: ""
+  },
+  grid: {
+    vertLines: {
+      color: "#2B2B43"
+    },
+    horzLines: {
+      color: "#363C4E"
+    }
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = ({
+  components: {
+    DxSelectBox: devextreme_vue_select_box__WEBPACK_IMPORTED_MODULE_1___default.a
+  },
+  data: function data() {
+    return {
+      symbol: null,
+      symbols: [],
+      chart: null,
+      priceSeries: null,
+      foreignSeries: null
+    };
+  },
+  created: function created() {
+    var _this = this;
+
+    this.getSymbol().then(function (symbols) {
+      _this.symbols = symbols;
+      _this.symbol = symbols[0];
+    });
+  },
+  computed: {
+    popup: function popup() {
+      return this.$refs.popup.instance;
+    }
+  },
+  methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapActions"])("Admin.trades", ["getSymbol", "getShare"])), {}, {
+    show: function show() {
+      var _this2 = this;
+
+      this.popup.show();
+      this.getShare(this.symbol).then(function (data) {
+        if (!_this2.chart) {
+          var container = _this2.popup.content().querySelector(".lightweight");
+
+          var toolTip = document.createElement("div");
+          toolTip.className = "floating-tooltip";
+          container.appendChild(toolTip);
+          _this2.chart = Object(lightweight_charts__WEBPACK_IMPORTED_MODULE_2__["createChart"])(container, chartOptions);
+
+          _this2.chart.subscribeCrosshairMove(function (param) {
+            if (!param.time || param.point.x < 0 || param.point.x > width || param.point.y < 0 || param.point.y > height) {
+              toolTip.style.display = "none";
+              return;
+            }
+
+            var width = container.offsetWidth;
+            var height = container.offsetHeight;
+            var toolTipWidth = 100;
+            var toolTipHeight = 80;
+            var toolTipMargin = 15;
+            var price = param.seriesPrices.get(_this2.priceSeries);
+            var foreign = param.seriesPrices.get(_this2.foreignSeries);
+            toolTip.style.display = "block";
+            toolTip.innerHTML = "<div>".concat(param.time.day, "/").concat(param.time.month, "/").concat(param.time.year, "</div>") + "<div style=\"font-size: 20px; color: rgba(33,150,243, 1)\">".concat(price, "</div>") + "<div style=\"font-size: 20px; color: rgba(171, 71, 188, 1)\">".concat(foreign, "</div>");
+            var y = param.point.y;
+            var left = param.point.x + toolTipMargin;
+
+            if (left > width - toolTipWidth) {
+              left = param.point.x - toolTipMargin - toolTipWidth;
+            }
+
+            var top = y + toolTipMargin;
+
+            if (top > height - toolTipHeight) {
+              top = y - toolTipHeight - toolTipMargin;
+            }
+
+            toolTip.style.left = left + "px";
+            toolTip.style.top = top + "px";
+          });
+
+          _this2.chart.applyOptions({
+            watermark: {
+              text: _this2.symbol
+            }
+          });
+
+          _this2.foreignSeries = _this2.chart.addAreaSeries({
+            priceScaleId: "",
+            topColor: "rgba(171, 71, 188, 0.56)",
+            bottomColor: "rgba(171, 71, 188, 0.04)",
+            lineColor: "rgba(171, 71, 188, 1)",
+            lineWidth: 2,
+            priceFormat: {
+              precision: 0,
+              minMove: 1
+            }
+          });
+          _this2.priceSeries = _this2.chart.addLineSeries();
+        }
+
+        _this2.priceSeries.setData(data.price);
+
+        _this2.foreignSeries.setData(data.foreign);
+
+        _this2.chart.timeScale().fitContent();
+      });
+      this.$mf.pushPopupToHistoryState(function () {
+        return _this2.popup.hide();
+      });
+    },
+    onSymbolChanged: function onSymbolChanged(e) {
+      var _this3 = this;
+
+      this.getShare(e.value).then(function (data) {
+        _this3.priceSeries.setData(data.price);
+
+        _this3.foreignSeries.setData(data.foreign);
+
+        _this3.chart.applyOptions({
+          watermark: {
+            text: e.value
+          }
+        });
+      });
+    }
+  })
+});
 
 /***/ }),
 
@@ -730,7 +920,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".symbol-selectbox {\n  width: 100px;\n}\n.lightweight {\n  width: 100%;\n  height: 400px;\n  margin-top: 15px;\n}", ""]);
+exports.push([module.i, ".share-chart-popup .symbol-selectbox {\n  width: 75px;\n}\n.share-chart-popup .lightweight {\n  width: 100%;\n  height: calc(100vh - 200px);\n  margin-top: 15px;\n}\nbody[screen-size=small] .share-chart-popup .symbol-selectbox {\n  margin-left: 20px;\n}\nbody[screen-size=small] .share-chart-popup .lightweight {\n  height: calc(100vh - 180px);\n}\nbody[screen-size=small] .share-chart-popup .dx-popup-content {\n  padding: 24px 0 !important;\n}\n.floating-tooltip {\n  width: 96px;\n  height: 80px;\n  position: absolute;\n  display: none;\n  padding: 8px;\n  box-sizing: border-box;\n  font-size: 12px;\n  color: #131722;\n  background-color: rgb(255, 255, 255);\n  text-align: center;\n  z-index: 1000;\n  pointer-events: none;\n  border: 1px solid rgb(255, 70, 70);\n  border-radius: 2px;\n}", ""]);
 
 // exports
 
@@ -935,14 +1125,14 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("DxPopup", {
     ref: "popup",
-    staticClass: "share-chart-popup",
     attrs: {
       showCloseButton: true,
       fullScreen: true,
       "show-title": true,
-      title: _vm.$t("admin.trades.buttons.shareChart")
+      title: _vm.$t("admin.trades.buttons.shareChart"),
+      wrapperAttr: { class: "share-chart-popup" }
     },
-    on: { shown: _vm.onShown, hiding: _vm.$mf.popRouteHistoryState },
+    on: { hiding: _vm.$mf.popRouteHistoryState },
     scopedSlots: _vm._u([
       {
         key: "content",
@@ -953,7 +1143,7 @@ var render = function() {
               [
                 _c("DxSelectBox", {
                   staticClass: "symbol-selectbox",
-                  attrs: { items: _vm.symbols },
+                  attrs: { items: _vm.symbols, searchEnabled: true },
                   on: { "value-changed": _vm.onSymbolChanged },
                   model: {
                     value: _vm.symbol,
@@ -1909,7 +2099,7 @@ var actions = {
         rootGetters = _ref6.rootGetters;
     return new Promise(function (resolve, reject) {
       axios.post("trades/symbol").then(function (response) {
-        console.log(response.data);
+        // console.log(response.data);
         resolve(response.data);
       });
     });
@@ -1924,7 +2114,7 @@ var actions = {
       axios.post("trades/share", {
         symbol: symbol
       }).then(function (response) {
-        console.log(response.data);
+        // console.log(response.data);
         resolve(response.data);
       });
     });

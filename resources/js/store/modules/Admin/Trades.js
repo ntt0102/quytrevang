@@ -96,7 +96,7 @@ const actions = {
     getSymbol({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios.post("trades/symbol").then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 resolve(response.data);
             });
         });
@@ -104,7 +104,7 @@ const actions = {
     getShare({ commit, dispatch, getters, state, rootGetters }, symbol) {
         return new Promise((resolve, reject) => {
             axios.post("trades/share", { symbol }).then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 resolve(response.data);
             });
         });

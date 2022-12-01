@@ -592,7 +592,7 @@ var actions = {
         rootGetters = _ref6.rootGetters;
     return new Promise(function (resolve, reject) {
       axios.post("trades/symbol").then(function (response) {
-        console.log(response.data);
+        // console.log(response.data);
         resolve(response.data);
       });
     });
@@ -607,7 +607,7 @@ var actions = {
       axios.post("trades/share", {
         symbol: symbol
       }).then(function (response) {
-        console.log(response.data);
+        // console.log(response.data);
         resolve(response.data);
       });
     });
