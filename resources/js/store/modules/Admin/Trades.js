@@ -93,6 +93,22 @@ const actions = {
             });
         });
     },
+    getSymbol({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios.post("trades/symbol").then(response => {
+                console.log(response.data);
+                resolve(response.data);
+            });
+        });
+    },
+    getShare({ commit, dispatch, getters, state, rootGetters }, symbol) {
+        return new Promise((resolve, reject) => {
+            axios.post("trades/share", { symbol }).then(response => {
+                console.log(response.data);
+                resolve(response.data);
+            });
+        });
+    },
     getFlow({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios.get(`trades/flow`).then(response => {

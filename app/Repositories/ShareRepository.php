@@ -28,8 +28,8 @@ class ShareRepository extends CoreRepository
     public function getShare($symbol)
     {
         return [
-            $this->model->where('symbol', $symbol)->get(['date AS time', 'price AS value']),
-            $this->model->where('symbol', $symbol)->get(['date AS time', 'foreign AS value']),
+            'price' => $this->model->where('symbol', $symbol)->get(['date AS time', 'price AS value']),
+            'foreign' => $this->model->where('symbol', $symbol)->get(['date AS time', 'foreign AS value']),
         ];
     }
 

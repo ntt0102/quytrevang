@@ -41,7 +41,7 @@ export default [
     {
         text: i18n.t("admin.trades.title"),
         name: "trades",
-        icon: "far fa-chart-line",
+        icon: "far fa-analytics",
         permission: "trades@view"
     },
     {

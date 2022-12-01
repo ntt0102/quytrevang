@@ -24,6 +24,7 @@ class ShareService extends CoreService
      */
     public function getShare($request)
     {
+        // return $request->symbol;
         $Shares = $this->shareRepository->getShare($request->symbol);
         return $Shares;
     }

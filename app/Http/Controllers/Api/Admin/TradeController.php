@@ -61,7 +61,6 @@ class TradeController extends CoreController
      * Save changed trades.
      *
      * @param Illuminate\Http\Request $request
-     * @param int $id
      *
      * @return \Illuminate\Http\Response
      */
@@ -75,7 +74,6 @@ class TradeController extends CoreController
      * Get Symbol
      *
      * @param Illuminate\Http\Request $request
-     * @param int $id
      *
      * @return \Illuminate\Http\Response
      */
@@ -89,7 +87,6 @@ class TradeController extends CoreController
      * Get Share
      *
      * @param Illuminate\Http\Request $request
-     * @param int $id
      *
      * @return \Illuminate\Http\Response
      */

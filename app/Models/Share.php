@@ -9,10 +9,8 @@ class Share extends CoreModel
     public $timestamps = false;
 
     protected $visible = [
-        'symbol',
-        'date',
-        'price',
-        'foreign',
+        'time',
+        'value',
     ];
 
     protected $fillable = [

@@ -33,6 +33,9 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    $s = app(\App\Services\Admin\ShareService::class)->fetch(null);
+    $r = new stdClass();
+    $r->symbol = 'BID';
+    // $s = app(\App\Services\Admin\ShareService::class)->getShare($r);
+    $s = app(\App\Services\Admin\ShareService::class)->getData();
     dd($s);
 })->middleware('cors');
