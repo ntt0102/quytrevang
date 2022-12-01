@@ -99,25 +99,25 @@ class ShareService extends CoreService
     {
         return $this->transaction(function () {
             $currentDate = now()->format('Y-m-d');
-            if ($this->shareRepository->count([['date', $currentDate]])) {
-                $client = new \GuzzleHttp\Client();
-                $isOk = true;
-                // $url = "https://bgapidatafeed.vps.com.vn/getlistindexdetail/10";
-                // $res = $client->get($url);
-                // $data = ['date' => $currentDate, 'symbol' => 'VNINDEX', 'price' => json_decode($res->getBody())[0]->cIndex];
-                // $isOk = !!$this->shareRepository->create($data);
-                //
-                $url = "https://bgapidatafeed.vps.com.vn/listvn30";
-                $res = $client->get($url);
-                $listvn30 = implode(",", json_decode($res->getBody()));
-                $url = "https://bgapidatafeed.vps.com.vn/getliststockdata/{$listvn30}";
-                $res = $client->get($url);
-                foreach (json_decode($res->getBody()) as $item) {
-                    $data = ['date' => $currentDate, 'symbol' => $item->sym, 'price' => $item->lastPrice, 'foreign' => $item->fBVol - $item->fSVolume];
-                    $isOk &= !!$this->shareRepository->create($data);
-                }
-                if (!$isOk) $this->getData();
+            if ($this->shareRepository->count([['date', $currentDate]])) return false;
+            $client = new \GuzzleHttp\Client();
+            $isOk = true;
+            // $url = "https://bgapidatafeed.vps.com.vn/getlistindexdetail/10";
+            // $res = $client->get($url);
+            // $data = ['date' => $currentDate, 'symbol' => 'VNINDEX', 'price' => json_decode($res->getBody())[0]->cIndex];
+            // $isOk = !!$this->shareRepository->create($data);
+            //
+            $url = "https://bgapidatafeed.vps.com.vn/listvn30";
+            $res = $client->get($url);
+            $listvn30 = implode(",", json_decode($res->getBody()));
+            $url = "https://bgapidatafeed.vps.com.vn/getliststockdata/{$listvn30}";
+            $res = $client->get($url);
+            foreach (json_decode($res->getBody()) as $item) {
+                $data = ['date' => $currentDate, 'symbol' => $item->sym, 'price' => $item->lastPrice, 'foreign' => $item->fBVol - $item->fSVolume];
+                $isOk &= !!$this->shareRepository->create($data);
             }
+            if (!$isOk) $this->getData();
+            else return $isOk;
         });
     }
 }
