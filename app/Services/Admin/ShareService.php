@@ -97,16 +97,11 @@ class ShareService extends CoreService
      */
     public function getData()
     {
-        return $this->transaction(function () {
+        $result =  $this->transaction(function () {
             $currentDate = now()->format('Y-m-d');
             if ($this->shareRepository->count([['date', $currentDate]])) return true;
-            $client = new \GuzzleHttp\Client();
             $isOk = true;
-            // $url = "https://bgapidatafeed.vps.com.vn/getlistindexdetail/10";
-            // $res = $client->get($url);
-            // $data = ['date' => $currentDate, 'symbol' => 'VNINDEX', 'price' => json_decode($res->getBody())[0]->cIndex];
-            // $isOk = !!$this->shareRepository->create($data);
-            //
+            $client = new \GuzzleHttp\Client();
             $url = "https://bgapidatafeed.vps.com.vn/listvn30";
             $res = $client->get($url);
             $listvn30 = implode(",", json_decode($res->getBody()));
@@ -116,8 +111,9 @@ class ShareService extends CoreService
                 $data = ['date' => $currentDate, 'symbol' => $item->sym, 'price' => $item->lastPrice, 'foreign' => $item->fBVol - $item->fSVolume];
                 $isOk &= !!$this->shareRepository->create($data);
             }
-            if (!$isOk) return $this->getData();
-            else return $isOk;
+            return $isOk;
         });
+        if ($result) return $result;
+        return $this->getData();
     }
 }
