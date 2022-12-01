@@ -34,6 +34,7 @@ class Kernel extends ConsoleKernel
                 app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt('08:40');
+        //
         $schedule->call(function () {
             if (check_opening_market()) {
                 set_global_value('reportedTradingFlag', '0');
@@ -41,6 +42,7 @@ class Kernel extends ConsoleKernel
                 app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt('14:25');
+        //
         $schedule->call(function () {
             if (check_opening_market()) {
                 set_global_value('startScheduleTime', now()->format('H:i:s'));
@@ -49,6 +51,11 @@ class Kernel extends ConsoleKernel
         })->everyMinute()
             ->between(trading_time('startAtoTime'), trading_time('endAtcTime'))
             ->unlessBetween(trading_time('endAtoTime'), trading_time('startAtcTime'));
+        //
+        $schedule->call(function () {
+            if (check_opening_market())
+                app(\App\Services\Admin\ShareService::class)->getData();
+        })->dailyAt('15:00');
     }
 
     /**

@@ -33,9 +33,6 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    $vps = app(\App\Repositories\VpsRepository::class)->getVps('2022-11-17');
-    dd($vps);
-    // $m = \App\Models\Vps::whereDate('x', '2022-11-17');
-    // // $m->where('type', 0)->get();
-    // dd($m->where('type', 1)->get());
+    $s = app(\App\Services\Admin\ShareService::class)->getData();
+    dd($s);
 })->middleware('cors');

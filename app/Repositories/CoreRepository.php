@@ -29,6 +29,13 @@ class CoreRepository
     /**
      * @inheritdoc
      */
+    public function count(array $conditions = [])
+    {
+        return $this->model->where($conditions)->count();
+    }
+    /**
+     * @inheritdoc
+     */
     public function where(array $conditions = [], $columns = ['*'], $orderBy = ['id', 'desc'])
     {
         return $this->model->where($conditions)->when(!empty($orderBy), function ($query) use ($orderBy) {
