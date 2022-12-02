@@ -166,80 +166,82 @@ var chartOptions = {
           symbol: this.symbol,
           symbols: true
         }).then(function (data) {
-          var container = _this.popup.content().firstChild;
+          setTimeout(function () {
+            var container = _this.popup.content().firstChild;
 
-          var toolTip = document.createElement("div");
-          toolTip.className = "floating-tooltip";
-          container.appendChild(toolTip);
-          _this.chart = Object(lightweight_charts__WEBPACK_IMPORTED_MODULE_2__["createChart"])(container, chartOptions);
+            var toolTip = document.createElement("div");
+            toolTip.className = "floating-tooltip";
+            container.appendChild(toolTip);
+            _this.chart = Object(lightweight_charts__WEBPACK_IMPORTED_MODULE_2__["createChart"])(container, chartOptions);
 
-          _this.chart.subscribeCrosshairMove(function (param) {
-            if (!param.time || param.point.x < 0 || param.point.x > width || param.point.y < 0 || param.point.y > height) {
-              toolTip.style.display = "none";
-              return;
-            }
+            _this.chart.subscribeCrosshairMove(function (param) {
+              if (!param.time || param.point.x < 0 || param.point.x > width || param.point.y < 0 || param.point.y > height) {
+                toolTip.style.display = "none";
+                return;
+              }
 
-            var width = container.offsetWidth;
-            var height = container.offsetHeight;
-            var toolTipWidth = 85;
-            var toolTipHeight = 100;
-            var vnindex = param.seriesPrices.get(_this.vnindexSeries);
-            var price = param.seriesPrices.get(_this.priceSeries);
-            var foreign = param.seriesPrices.get(_this.foreignSeries);
-            toolTip.style.display = "block";
-            toolTip.innerHTML = "<div>".concat(param.time.day, "/").concat(param.time.month, "/").concat(param.time.year, "</div>") + "<hr/>" + "<div style=\"font-size: 16px; color: rgba(32, 226, 47, 1)\">".concat(vnindex, "</div>") + "<div style=\"font-size: 16px; color: rgba(33, 150, 243, 1)\">".concat(price !== null && price !== void 0 ? price : "-", "</div>") + "<div style=\"font-size: 16px; color: rgba(171, 71, 188, 1)\">".concat(foreign !== null && foreign !== void 0 ? foreign : "-", "</div>");
-            var left = param.point.x;
-            if (left > width - toolTipWidth) left = param.point.x - toolTipWidth;
-            var top = param.point.y + 67;
-            if (top > height - toolTipHeight) top = param.point.y - toolTipHeight + 67;
-            toolTip.style.left = left + "px";
-            toolTip.style.top = top + "px";
-          });
+              var width = container.offsetWidth;
+              var height = container.offsetHeight;
+              var toolTipWidth = 85;
+              var toolTipHeight = 100;
+              var vnindex = param.seriesPrices.get(_this.vnindexSeries);
+              var price = param.seriesPrices.get(_this.priceSeries);
+              var foreign = param.seriesPrices.get(_this.foreignSeries);
+              toolTip.style.display = "block";
+              toolTip.innerHTML = "<div>".concat(param.time.day, "/").concat(param.time.month, "/").concat(param.time.year, "</div>") + "<hr/>" + "<div style=\"font-size: 16px; color: rgba(32, 226, 47, 1)\">".concat(vnindex, "</div>") + "<div style=\"font-size: 16px; color: rgba(33, 150, 243, 1)\">".concat(price !== null && price !== void 0 ? price : "-", "</div>") + "<div style=\"font-size: 16px; color: rgba(171, 71, 188, 1)\">".concat(foreign !== null && foreign !== void 0 ? foreign : "-", "</div>");
+              var left = param.point.x;
+              if (left > width - toolTipWidth) left = param.point.x - toolTipWidth;
+              var top = param.point.y + 67;
+              if (top > height - toolTipHeight) top = param.point.y - toolTipHeight + 67;
+              toolTip.style.left = left + "px";
+              toolTip.style.top = top + "px";
+            });
 
-          _this.foreignSeries = _this.chart.addAreaSeries({
-            priceScaleId: "foreign",
-            topColor: "rgba(171, 71, 188, 0.56)",
-            bottomColor: "rgba(171, 71, 188, 0.04)",
-            lineColor: "rgba(171, 71, 188, 1)",
-            lineWidth: 2,
-            priceFormat: {
-              precision: 0
-            },
-            scaleMargins: {
-              top: 0.7,
-              bottom: 0
-            },
-            lastValueVisible: false
-          });
-          _this.vnindexSeries = _this.chart.addLineSeries({
-            priceScaleId: "vnindex",
-            color: "rgba(32, 226, 47, 1)",
-            scaleMargins: {
-              top: 0,
-              bottom: 0.7
-            },
-            lastValueVisible: false
-          });
-          _this.priceSeries = _this.chart.addLineSeries(); //
+            _this.foreignSeries = _this.chart.addAreaSeries({
+              priceScaleId: "foreign",
+              topColor: "rgba(171, 71, 188, 0.56)",
+              bottomColor: "rgba(171, 71, 188, 0.04)",
+              lineColor: "rgba(171, 71, 188, 1)",
+              lineWidth: 2,
+              priceFormat: {
+                precision: 0
+              },
+              scaleMargins: {
+                top: 0.7,
+                bottom: 0
+              },
+              lastValueVisible: false
+            });
+            _this.vnindexSeries = _this.chart.addLineSeries({
+              priceScaleId: "vnindex",
+              color: "rgba(32, 226, 47, 1)",
+              scaleMargins: {
+                top: 0,
+                bottom: 0.7
+              },
+              lastValueVisible: false
+            });
+            _this.priceSeries = _this.chart.addLineSeries(); //
 
-          _this.symbols = data.symbols;
-          _this.symbol = data.symbol;
+            _this.symbols = data.symbols;
+            _this.symbol = data.symbol;
 
-          _this.addSelectBox();
+            _this.addSelectBox();
 
-          _this.chart.applyOptions({
-            watermark: {
-              text: _this.symbol
-            }
-          });
+            _this.chart.applyOptions({
+              watermark: {
+                text: _this.symbol
+              }
+            });
 
-          _this.foreignSeries.setData(data.shares.foreign);
+            _this.foreignSeries.setData(data.shares.foreign);
 
-          _this.vnindexSeries.setData(data.shares.vnindex);
+            _this.vnindexSeries.setData(data.shares.vnindex);
 
-          _this.priceSeries.setData(data.shares.price);
+            _this.priceSeries.setData(data.shares.price);
 
-          _this.chart.timeScale().fitContent();
+            _this.chart.timeScale().fitContent();
+          }, 1000);
         });
       }
 

@@ -70,82 +70,84 @@ export default {
             if (!this.chart) {
                 this.getShare({ symbol: this.symbol, symbols: true }).then(
                     data => {
-                        let container = this.popup.content().firstChild;
-                        let toolTip = document.createElement("div");
-                        toolTip.className = "floating-tooltip";
-                        container.appendChild(toolTip);
-                        this.chart = createChart(container, chartOptions);
-                        this.chart.subscribeCrosshairMove(param => {
-                            if (
-                                !param.time ||
-                                param.point.x < 0 ||
-                                param.point.x > width ||
-                                param.point.y < 0 ||
-                                param.point.y > height
-                            ) {
-                                toolTip.style.display = "none";
-                                return;
-                            }
-                            let width = container.offsetWidth;
-                            let height = container.offsetHeight;
-                            let toolTipWidth = 85;
-                            let toolTipHeight = 100;
+                        setTimeout(() => {
+                            let container = this.popup.content().firstChild;
+                            let toolTip = document.createElement("div");
+                            toolTip.className = "floating-tooltip";
+                            container.appendChild(toolTip);
+                            this.chart = createChart(container, chartOptions);
+                            this.chart.subscribeCrosshairMove(param => {
+                                if (
+                                    !param.time ||
+                                    param.point.x < 0 ||
+                                    param.point.x > width ||
+                                    param.point.y < 0 ||
+                                    param.point.y > height
+                                ) {
+                                    toolTip.style.display = "none";
+                                    return;
+                                }
+                                let width = container.offsetWidth;
+                                let height = container.offsetHeight;
+                                let toolTipWidth = 85;
+                                let toolTipHeight = 100;
 
-                            let vnindex = param.seriesPrices.get(
-                                this.vnindexSeries
-                            );
-                            let price = param.seriesPrices.get(
-                                this.priceSeries
-                            );
-                            let foreign = param.seriesPrices.get(
-                                this.foreignSeries
-                            );
-                            toolTip.style.display = "block";
-                            toolTip.innerHTML =
-                                `<div>${param.time.day}/${param.time.month}/${param.time.year}</div>` +
-                                `<hr/>` +
-                                `<div style="font-size: 16px; color: rgba(32, 226, 47, 1)">${vnindex}</div>` +
-                                `<div style="font-size: 16px; color: rgba(33, 150, 243, 1)">${price ??
-                                    "-"}</div>` +
-                                `<div style="font-size: 16px; color: rgba(171, 71, 188, 1)">${foreign ??
-                                    "-"}</div>`;
-                            let left = param.point.x;
-                            if (left > width - toolTipWidth)
-                                left = param.point.x - toolTipWidth;
-                            let top = param.point.y + 67;
-                            if (top > height - toolTipHeight)
-                                top = param.point.y - toolTipHeight + 67;
-                            toolTip.style.left = left + "px";
-                            toolTip.style.top = top + "px";
-                        });
-                        this.foreignSeries = this.chart.addAreaSeries({
-                            priceScaleId: "foreign",
-                            topColor: "rgba(171, 71, 188, 0.56)",
-                            bottomColor: "rgba(171, 71, 188, 0.04)",
-                            lineColor: "rgba(171, 71, 188, 1)",
-                            lineWidth: 2,
-                            priceFormat: { precision: 0 },
-                            scaleMargins: { top: 0.7, bottom: 0 },
-                            lastValueVisible: false
-                        });
-                        this.vnindexSeries = this.chart.addLineSeries({
-                            priceScaleId: "vnindex",
-                            color: "rgba(32, 226, 47, 1)",
-                            scaleMargins: { top: 0, bottom: 0.7 },
-                            lastValueVisible: false
-                        });
-                        this.priceSeries = this.chart.addLineSeries();
-                        //
-                        this.symbols = data.symbols;
-                        this.symbol = data.symbol;
-                        this.addSelectBox();
-                        this.chart.applyOptions({
-                            watermark: { text: this.symbol }
-                        });
-                        this.foreignSeries.setData(data.shares.foreign);
-                        this.vnindexSeries.setData(data.shares.vnindex);
-                        this.priceSeries.setData(data.shares.price);
-                        this.chart.timeScale().fitContent();
+                                let vnindex = param.seriesPrices.get(
+                                    this.vnindexSeries
+                                );
+                                let price = param.seriesPrices.get(
+                                    this.priceSeries
+                                );
+                                let foreign = param.seriesPrices.get(
+                                    this.foreignSeries
+                                );
+                                toolTip.style.display = "block";
+                                toolTip.innerHTML =
+                                    `<div>${param.time.day}/${param.time.month}/${param.time.year}</div>` +
+                                    `<hr/>` +
+                                    `<div style="font-size: 16px; color: rgba(32, 226, 47, 1)">${vnindex}</div>` +
+                                    `<div style="font-size: 16px; color: rgba(33, 150, 243, 1)">${price ??
+                                        "-"}</div>` +
+                                    `<div style="font-size: 16px; color: rgba(171, 71, 188, 1)">${foreign ??
+                                        "-"}</div>`;
+                                let left = param.point.x;
+                                if (left > width - toolTipWidth)
+                                    left = param.point.x - toolTipWidth;
+                                let top = param.point.y + 67;
+                                if (top > height - toolTipHeight)
+                                    top = param.point.y - toolTipHeight + 67;
+                                toolTip.style.left = left + "px";
+                                toolTip.style.top = top + "px";
+                            });
+                            this.foreignSeries = this.chart.addAreaSeries({
+                                priceScaleId: "foreign",
+                                topColor: "rgba(171, 71, 188, 0.56)",
+                                bottomColor: "rgba(171, 71, 188, 0.04)",
+                                lineColor: "rgba(171, 71, 188, 1)",
+                                lineWidth: 2,
+                                priceFormat: { precision: 0 },
+                                scaleMargins: { top: 0.7, bottom: 0 },
+                                lastValueVisible: false
+                            });
+                            this.vnindexSeries = this.chart.addLineSeries({
+                                priceScaleId: "vnindex",
+                                color: "rgba(32, 226, 47, 1)",
+                                scaleMargins: { top: 0, bottom: 0.7 },
+                                lastValueVisible: false
+                            });
+                            this.priceSeries = this.chart.addLineSeries();
+                            //
+                            this.symbols = data.symbols;
+                            this.symbol = data.symbol;
+                            this.addSelectBox();
+                            this.chart.applyOptions({
+                                watermark: { text: this.symbol }
+                            });
+                            this.foreignSeries.setData(data.shares.foreign);
+                            this.vnindexSeries.setData(data.shares.vnindex);
+                            this.priceSeries.setData(data.shares.price);
+                            this.chart.timeScale().fitContent();
+                        }, 1000);
                     }
                 );
             }
