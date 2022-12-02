@@ -28,6 +28,7 @@ class ShareRepository extends CoreRepository
     public function getShare($symbol)
     {
         return [
+            'vnindex' => $this->model->where('symbol', 'VNINDEX')->get(['date AS time', 'price AS value']),
             'price' => $this->model->where('symbol', $symbol)->get(['date AS time', 'price AS value']),
             'foreign' => $this->model->where('symbol', $symbol)->get(['date AS time', 'foreign AS value']),
         ];
@@ -38,6 +39,6 @@ class ShareRepository extends CoreRepository
      */
     public function getSymbol()
     {
-        return $this->model->select('symbol')->distinct()->get()->pluck('symbol');
+        return $this->model->where('symbol', '<>', 'VNINDEX')->select('symbol')->distinct()->get()->pluck('symbol');
     }
 }

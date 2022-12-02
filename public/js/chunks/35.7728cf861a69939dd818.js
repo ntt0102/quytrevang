@@ -584,40 +584,25 @@ var actions = {
       });
     });
   },
-  getSymbol: function getSymbol(_ref6) {
+  getShare: function getShare(_ref6, param) {
     var commit = _ref6.commit,
         dispatch = _ref6.dispatch,
         getters = _ref6.getters,
         state = _ref6.state,
         rootGetters = _ref6.rootGetters;
     return new Promise(function (resolve, reject) {
-      axios.post("trades/symbol").then(function (response) {
+      axios.post("trades/share", param).then(function (response) {
         // console.log(response.data);
         resolve(response.data);
       });
     });
   },
-  getShare: function getShare(_ref7, symbol) {
+  getFlow: function getFlow(_ref7) {
     var commit = _ref7.commit,
         dispatch = _ref7.dispatch,
         getters = _ref7.getters,
         state = _ref7.state,
         rootGetters = _ref7.rootGetters;
-    return new Promise(function (resolve, reject) {
-      axios.post("trades/share", {
-        symbol: symbol
-      }).then(function (response) {
-        // console.log(response.data);
-        resolve(response.data);
-      });
-    });
-  },
-  getFlow: function getFlow(_ref8) {
-    var commit = _ref8.commit,
-        dispatch = _ref8.dispatch,
-        getters = _ref8.getters,
-        state = _ref8.state,
-        rootGetters = _ref8.rootGetters;
     return new Promise(function (resolve, reject) {
       axios.get("trades/flow").then(function (response) {
         // console.log(response.data);
@@ -625,12 +610,12 @@ var actions = {
       });
     });
   },
-  saveFlow: function saveFlow(_ref9, param) {
-    var commit = _ref9.commit,
-        dispatch = _ref9.dispatch,
-        getters = _ref9.getters,
-        state = _ref9.state,
-        rootGetters = _ref9.rootGetters;
+  saveFlow: function saveFlow(_ref8, param) {
+    var commit = _ref8.commit,
+        dispatch = _ref8.dispatch,
+        getters = _ref8.getters,
+        state = _ref8.state,
+        rootGetters = _ref8.rootGetters;
     return new Promise(function (resolve, reject) {
       axios.post("trades/flow/save", {
         data: param
@@ -640,8 +625,8 @@ var actions = {
       });
     });
   },
-  resetState: function resetState(_ref10) {
-    var commit = _ref10.commit;
+  resetState: function resetState(_ref9) {
+    var commit = _ref9.commit;
     commit("resetState");
   }
 };

@@ -101,17 +101,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -161,34 +150,30 @@ var chartOptions = {
       foreignSeries: null
     };
   },
-  created: function created() {
-    var _this = this;
-
-    this.getSymbol().then(function (symbols) {
-      _this.symbols = symbols;
-      _this.symbol = symbols[0];
-    });
-  },
   computed: {
     popup: function popup() {
       return this.$refs.popup.instance;
     }
   },
-  methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapActions"])("Admin.trades", ["getSymbol", "getShare"])), {}, {
+  methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapActions"])("Admin.trades", ["getShare"])), {}, {
     show: function show() {
-      var _this2 = this;
+      var _this = this;
 
       this.popup.show();
-      this.getShare(this.symbol).then(function (data) {
-        if (!_this2.chart) {
-          var container = _this2.popup.content().querySelector(".lightweight");
+
+      if (!this.chart) {
+        this.getShare({
+          symbol: this.symbol,
+          symbols: true
+        }).then(function (data) {
+          var container = _this.popup.content().firstChild;
 
           var toolTip = document.createElement("div");
           toolTip.className = "floating-tooltip";
           container.appendChild(toolTip);
-          _this2.chart = Object(lightweight_charts__WEBPACK_IMPORTED_MODULE_2__["createChart"])(container, chartOptions);
+          _this.chart = Object(lightweight_charts__WEBPACK_IMPORTED_MODULE_2__["createChart"])(container, chartOptions);
 
-          _this2.chart.subscribeCrosshairMove(function (param) {
+          _this.chart.subscribeCrosshairMove(function (param) {
             if (!param.time || param.point.x < 0 || param.point.x > width || param.point.y < 0 || param.point.y > height) {
               toolTip.style.display = "none";
               return;
@@ -196,74 +181,106 @@ var chartOptions = {
 
             var width = container.offsetWidth;
             var height = container.offsetHeight;
-            var toolTipWidth = 100;
-            var toolTipHeight = 80;
-            var toolTipMargin = 15;
-            var price = param.seriesPrices.get(_this2.priceSeries);
-            var foreign = param.seriesPrices.get(_this2.foreignSeries);
+            var toolTipWidth = 85;
+            var toolTipHeight = 100;
+            var vnindex = param.seriesPrices.get(_this.vnindexSeries);
+            var price = param.seriesPrices.get(_this.priceSeries);
+            var foreign = param.seriesPrices.get(_this.foreignSeries);
             toolTip.style.display = "block";
-            toolTip.innerHTML = "<div>".concat(param.time.day, "/").concat(param.time.month, "/").concat(param.time.year, "</div>") + "<div style=\"font-size: 20px; color: rgba(33,150,243, 1)\">".concat(price, "</div>") + "<div style=\"font-size: 20px; color: rgba(171, 71, 188, 1)\">".concat(foreign, "</div>");
-            var y = param.point.y;
-            var left = param.point.x + toolTipMargin;
-
-            if (left > width - toolTipWidth) {
-              left = param.point.x - toolTipMargin - toolTipWidth;
-            }
-
-            var top = y + toolTipMargin;
-
-            if (top > height - toolTipHeight) {
-              top = y - toolTipHeight - toolTipMargin;
-            }
-
+            toolTip.innerHTML = "<div>".concat(param.time.day, "/").concat(param.time.month, "/").concat(param.time.year, "</div>") + "<hr/>" + "<div style=\"font-size: 16px; color: rgba(32, 226, 47, 1)\">".concat(vnindex, "</div>") + "<div style=\"font-size: 16px; color: rgba(33, 150, 243, 1)\">".concat(price, "</div>") + "<div style=\"font-size: 16px; color: rgba(171, 71, 188, 1)\">".concat(foreign, "</div>");
+            var left = param.point.x;
+            if (left > width - toolTipWidth) left = param.point.x - toolTipWidth;
+            var top = param.point.y + 67;
+            if (top > height - toolTipHeight) top = param.point.y - toolTipMargin - 18;
             toolTip.style.left = left + "px";
             toolTip.style.top = top + "px";
           });
 
-          _this2.chart.applyOptions({
-            watermark: {
-              text: _this2.symbol
-            }
-          });
-
-          _this2.foreignSeries = _this2.chart.addAreaSeries({
-            priceScaleId: "",
+          _this.foreignSeries = _this.chart.addAreaSeries({
+            priceScaleId: "foreign",
             topColor: "rgba(171, 71, 188, 0.56)",
             bottomColor: "rgba(171, 71, 188, 0.04)",
             lineColor: "rgba(171, 71, 188, 1)",
             lineWidth: 2,
             priceFormat: {
-              precision: 0,
-              minMove: 1
+              precision: 0
+            },
+            scaleMargins: {
+              top: 0.7,
+              bottom: 0
             }
           });
-          _this2.priceSeries = _this2.chart.addLineSeries();
-        }
+          _this.vnindexSeries = _this.chart.addLineSeries({
+            priceScaleId: "vnindex",
+            color: "rgba(32, 226, 47, 1)",
+            scaleMargins: {
+              top: 0,
+              bottom: 0.7
+            }
+          });
+          _this.priceSeries = _this.chart.addLineSeries(); //
 
-        _this2.priceSeries.setData(data.price);
+          _this.symbols = data.symbols;
+          _this.symbol = data.symbol;
 
-        _this2.foreignSeries.setData(data.foreign);
+          _this.addSelectBox();
 
-        _this2.chart.timeScale().fitContent();
-      });
+          _this.chart.applyOptions({
+            watermark: {
+              text: _this.symbol
+            }
+          });
+
+          _this.foreignSeries.setData(data.shares.foreign);
+
+          _this.vnindexSeries.setData(data.shares.vnindex);
+
+          _this.priceSeries.setData(data.shares.price);
+
+          _this.chart.timeScale().fitContent();
+        });
+      }
+
       this.$mf.pushPopupToHistoryState(function () {
-        return _this2.popup.hide();
+        return _this.popup.hide();
       });
     },
     onSymbolChanged: function onSymbolChanged(e) {
-      var _this3 = this;
+      var _this2 = this;
 
-      this.getShare(e.value).then(function (data) {
-        _this3.priceSeries.setData(data.price);
+      this.symbol = e.value;
+      this.getShare({
+        symbol: e.value,
+        symbols: false
+      }).then(function (data) {
+        _this2.foreignSeries.setData(data.shares.foreign);
 
-        _this3.foreignSeries.setData(data.foreign);
+        _this2.vnindexSeries.setData(data.shares.vnindex);
 
-        _this3.chart.applyOptions({
+        _this2.priceSeries.setData(data.shares.price);
+
+        _this2.chart.applyOptions({
           watermark: {
             text: e.value
           }
         });
       });
+    },
+    addSelectBox: function addSelectBox() {
+      var items = this.popup.option("toolbarItems");
+      items.push({
+        toolbar: "top",
+        location: "after",
+        widget: "dxSelectBox",
+        options: {
+          width: 75,
+          items: this.symbols,
+          searchEnabled: true,
+          value: this.symbol,
+          onValueChanged: this.onSymbolChanged
+        }
+      });
+      this.popup.option("toolbarItems", items);
     }
   })
 });
@@ -920,7 +937,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".share-chart-popup .symbol-selectbox {\n  width: 75px;\n}\n.share-chart-popup .lightweight {\n  width: 100%;\n  height: calc(100vh - 200px);\n  margin-top: 15px;\n}\nbody[screen-size=small] .share-chart-popup .symbol-selectbox {\n  margin-left: 20px;\n}\nbody[screen-size=small] .share-chart-popup .lightweight {\n  height: calc(100vh - 180px);\n}\nbody[screen-size=small] .share-chart-popup .dx-popup-content {\n  padding: 24px 0 !important;\n}\n.floating-tooltip {\n  width: 96px;\n  height: 80px;\n  position: absolute;\n  display: none;\n  padding: 8px;\n  box-sizing: border-box;\n  font-size: 12px;\n  color: #131722;\n  background-color: rgb(255, 255, 255);\n  text-align: center;\n  z-index: 1000;\n  pointer-events: none;\n  border: 1px solid rgb(255, 70, 70);\n  border-radius: 2px;\n}", ""]);
+exports.push([module.i, ".share-chart-popup .dx-popup-content {\n  padding: 0 !important;\n}\n.share-chart-popup .floating-tooltip {\n  width: 85px;\n  height: 100px;\n  position: absolute;\n  display: none;\n  padding: 5px;\n  box-sizing: border-box;\n  font-size: 12px;\n  color: #131722;\n  background-color: rgb(255, 255, 255);\n  text-align: center;\n  z-index: 1000;\n  pointer-events: none;\n  border: 1px solid rgb(255, 70, 70);\n  border-radius: 2px;\n}", ""]);
 
 // exports
 
@@ -1137,28 +1154,7 @@ var render = function() {
       {
         key: "content",
         fn: function() {
-          return [
-            _c(
-              "DxScrollView",
-              [
-                _c("DxSelectBox", {
-                  staticClass: "symbol-selectbox",
-                  attrs: { items: _vm.symbols, searchEnabled: true },
-                  on: { "value-changed": _vm.onSymbolChanged },
-                  model: {
-                    value: _vm.symbol,
-                    callback: function($$v) {
-                      _vm.symbol = $$v
-                    },
-                    expression: "symbol"
-                  }
-                }),
-                _vm._v(" "),
-                _c("div", { staticClass: "lightweight" })
-              ],
-              1
-            )
-          ]
+          return undefined
         },
         proxy: true
       }
@@ -2091,40 +2087,25 @@ var actions = {
       });
     });
   },
-  getSymbol: function getSymbol(_ref6) {
+  getShare: function getShare(_ref6, param) {
     var commit = _ref6.commit,
         dispatch = _ref6.dispatch,
         getters = _ref6.getters,
         state = _ref6.state,
         rootGetters = _ref6.rootGetters;
     return new Promise(function (resolve, reject) {
-      axios.post("trades/symbol").then(function (response) {
+      axios.post("trades/share", param).then(function (response) {
         // console.log(response.data);
         resolve(response.data);
       });
     });
   },
-  getShare: function getShare(_ref7, symbol) {
+  getFlow: function getFlow(_ref7) {
     var commit = _ref7.commit,
         dispatch = _ref7.dispatch,
         getters = _ref7.getters,
         state = _ref7.state,
         rootGetters = _ref7.rootGetters;
-    return new Promise(function (resolve, reject) {
-      axios.post("trades/share", {
-        symbol: symbol
-      }).then(function (response) {
-        // console.log(response.data);
-        resolve(response.data);
-      });
-    });
-  },
-  getFlow: function getFlow(_ref8) {
-    var commit = _ref8.commit,
-        dispatch = _ref8.dispatch,
-        getters = _ref8.getters,
-        state = _ref8.state,
-        rootGetters = _ref8.rootGetters;
     return new Promise(function (resolve, reject) {
       axios.get("trades/flow").then(function (response) {
         // console.log(response.data);
@@ -2132,12 +2113,12 @@ var actions = {
       });
     });
   },
-  saveFlow: function saveFlow(_ref9, param) {
-    var commit = _ref9.commit,
-        dispatch = _ref9.dispatch,
-        getters = _ref9.getters,
-        state = _ref9.state,
-        rootGetters = _ref9.rootGetters;
+  saveFlow: function saveFlow(_ref8, param) {
+    var commit = _ref8.commit,
+        dispatch = _ref8.dispatch,
+        getters = _ref8.getters,
+        state = _ref8.state,
+        rootGetters = _ref8.rootGetters;
     return new Promise(function (resolve, reject) {
       axios.post("trades/flow/save", {
         data: param
@@ -2147,8 +2128,8 @@ var actions = {
       });
     });
   },
-  resetState: function resetState(_ref10) {
-    var commit = _ref10.commit;
+  resetState: function resetState(_ref9) {
+    var commit = _ref9.commit;
     commit("resetState");
   }
 };

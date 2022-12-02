@@ -24,20 +24,15 @@ class ShareService extends CoreService
      */
     public function getShare($request)
     {
-        // return $request->symbol;
-        $Shares = $this->shareRepository->getShare($request->symbol);
-        return $Shares;
-    }
-
-    /**
-     * Get Symbol
-     * 
-     *
-     * @return array
-     */
-    public function getSymbol()
-    {
-        return $this->shareRepository->getSymbol();
+        $return = [];
+        if ($request->symbols) {
+            $symbols = $this->shareRepository->getSymbol();
+            $return['symbols'] = $symbols;
+            $symbol = $symbols[0];
+            $return['symbol'] = $symbol;
+        } else $symbol = $request->symbol;
+        $return['shares'] = $this->shareRepository->getShare($symbol);
+        return $return;
     }
 
     /**
@@ -50,8 +45,12 @@ class ShareService extends CoreService
         $result =  $this->transaction(function () {
             $currentDate = now()->format('Y-m-d');
             if ($this->shareRepository->count([['date', $currentDate]])) return true;
-            $isOk = true;
             $client = new \GuzzleHttp\Client();
+            $url = "https://bgapidatafeed.vps.com.vn/getlistindexdetail/10";
+            $res = $client->get($url);
+            $data = ['date' => $currentDate, 'symbol' => 'VNINDEX', 'price' => json_decode($res->getBody())[0]->cIndex];
+            $isOk = !!$this->shareRepository->create($data);
+            //
             $url = "https://bgapidatafeed.vps.com.vn/listvn30";
             $res = $client->get($url);
             $listvn30 = implode(",", json_decode($res->getBody()));

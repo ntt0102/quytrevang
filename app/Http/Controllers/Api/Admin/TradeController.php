@@ -71,19 +71,6 @@ class TradeController extends CoreController
     }
 
     /**
-     * Get Symbol
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getSymbol(Request $request)
-    {
-        $data = $this->shareService->getSymbol($request);
-        return $this->sendResponse($data);
-    }
-
-    /**
      * Get Share
      *
      * @param Illuminate\Http\Request $request

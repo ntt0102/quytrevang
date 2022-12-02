@@ -145,7 +145,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::get('summary', 'TradeController@getSummary');
                     Route::group(['middleware' => 'can:trades@edit'], function () {
                         Route::post('/', 'TradeController@save');
-                        Route::post('/symbol', 'TradeController@getSymbol');
                         Route::post('/share', 'TradeController@getShare');
                         Route::group(['prefix' => 'flow'], function () {
                             Route::get('/', 'TradeController@getFlow');
