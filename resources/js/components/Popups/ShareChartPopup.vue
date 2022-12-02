@@ -112,7 +112,7 @@ export default {
                                 left = param.point.x - toolTipWidth;
                             let top = param.point.y + 67;
                             if (top > height - toolTipHeight)
-                                top = param.point.y - toolTipMargin - 18;
+                                top = param.point.y - toolTipHeight + 67;
                             toolTip.style.left = left + "px";
                             toolTip.style.top = top + "px";
                         });
@@ -123,12 +123,14 @@ export default {
                             lineColor: "rgba(171, 71, 188, 1)",
                             lineWidth: 2,
                             priceFormat: { precision: 0 },
-                            scaleMargins: { top: 0.7, bottom: 0 }
+                            scaleMargins: { top: 0.7, bottom: 0 },
+                            lastValueVisible: false
                         });
                         this.vnindexSeries = this.chart.addLineSeries({
                             priceScaleId: "vnindex",
                             color: "rgba(32, 226, 47, 1)",
-                            scaleMargins: { top: 0, bottom: 0.7 }
+                            scaleMargins: { top: 0, bottom: 0.7 },
+                            lastValueVisible: false
                         });
                         this.priceSeries = this.chart.addLineSeries();
                         //

@@ -191,7 +191,7 @@ var chartOptions = {
             var left = param.point.x;
             if (left > width - toolTipWidth) left = param.point.x - toolTipWidth;
             var top = param.point.y + 67;
-            if (top > height - toolTipHeight) top = param.point.y - toolTipMargin - 18;
+            if (top > height - toolTipHeight) top = param.point.y - toolTipHeight + 67;
             toolTip.style.left = left + "px";
             toolTip.style.top = top + "px";
           });
@@ -208,7 +208,8 @@ var chartOptions = {
             scaleMargins: {
               top: 0.7,
               bottom: 0
-            }
+            },
+            lastValueVisible: false
           });
           _this.vnindexSeries = _this.chart.addLineSeries({
             priceScaleId: "vnindex",
@@ -216,7 +217,8 @@ var chartOptions = {
             scaleMargins: {
               top: 0,
               bottom: 0.7
-            }
+            },
+            lastValueVisible: false
           });
           _this.priceSeries = _this.chart.addLineSeries(); //
 
