@@ -187,7 +187,7 @@ var chartOptions = {
             var price = param.seriesPrices.get(_this.priceSeries);
             var foreign = param.seriesPrices.get(_this.foreignSeries);
             toolTip.style.display = "block";
-            toolTip.innerHTML = "<div>".concat(param.time.day, "/").concat(param.time.month, "/").concat(param.time.year, "</div>") + "<hr/>" + "<div style=\"font-size: 16px; color: rgba(32, 226, 47, 1)\">".concat(vnindex, "</div>") + "<div style=\"font-size: 16px; color: rgba(33, 150, 243, 1)\">".concat(price, "</div>") + "<div style=\"font-size: 16px; color: rgba(171, 71, 188, 1)\">".concat(foreign, "</div>");
+            toolTip.innerHTML = "<div>".concat(param.time.day, "/").concat(param.time.month, "/").concat(param.time.year, "</div>") + "<hr/>" + "<div style=\"font-size: 16px; color: rgba(32, 226, 47, 1)\">".concat(vnindex, "</div>") + "<div style=\"font-size: 16px; color: rgba(33, 150, 243, 1)\">".concat(price !== null && price !== void 0 ? price : "-", "</div>") + "<div style=\"font-size: 16px; color: rgba(171, 71, 188, 1)\">".concat(foreign !== null && foreign !== void 0 ? foreign : "-", "</div>");
             var left = param.point.x;
             if (left > width - toolTipWidth) left = param.point.x - toolTipWidth;
             var top = param.point.y + 67;
@@ -255,6 +255,8 @@ var chartOptions = {
         symbol: e.value,
         symbols: false
       }).then(function (data) {
+        var _e$value;
+
         _this2.foreignSeries.setData(data.shares.foreign);
 
         _this2.vnindexSeries.setData(data.shares.vnindex);
@@ -263,7 +265,7 @@ var chartOptions = {
 
         _this2.chart.applyOptions({
           watermark: {
-            text: e.value
+            text: (_e$value = e.value) !== null && _e$value !== void 0 ? _e$value : ""
           }
         });
       });

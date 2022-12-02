@@ -105,8 +105,10 @@ export default {
                                 `<div>${param.time.day}/${param.time.month}/${param.time.year}</div>` +
                                 `<hr/>` +
                                 `<div style="font-size: 16px; color: rgba(32, 226, 47, 1)">${vnindex}</div>` +
-                                `<div style="font-size: 16px; color: rgba(33, 150, 243, 1)">${price}</div>` +
-                                `<div style="font-size: 16px; color: rgba(171, 71, 188, 1)">${foreign}</div>`;
+                                `<div style="font-size: 16px; color: rgba(33, 150, 243, 1)">${price ??
+                                    "-"}</div>` +
+                                `<div style="font-size: 16px; color: rgba(171, 71, 188, 1)">${foreign ??
+                                    "-"}</div>`;
                             let left = param.point.x;
                             if (left > width - toolTipWidth)
                                 left = param.point.x - toolTipWidth;
@@ -156,7 +158,7 @@ export default {
                 this.vnindexSeries.setData(data.shares.vnindex);
                 this.priceSeries.setData(data.shares.price);
                 this.chart.applyOptions({
-                    watermark: { text: e.value }
+                    watermark: { text: e.value ?? "" }
                 });
             });
         },
