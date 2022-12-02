@@ -241,7 +241,7 @@ var chartOptions = {
             _this.priceSeries.setData(data.shares.price);
 
             _this.chart.timeScale().fitContent();
-          }, 1000);
+          }, 0);
         });
       }
 

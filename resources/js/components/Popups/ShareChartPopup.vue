@@ -147,7 +147,7 @@ export default {
                             this.vnindexSeries.setData(data.shares.vnindex);
                             this.priceSeries.setData(data.shares.price);
                             this.chart.timeScale().fitContent();
-                        }, 1000);
+                        }, 0);
                     }
                 );
             }
