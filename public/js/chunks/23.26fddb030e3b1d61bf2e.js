@@ -1567,7 +1567,7 @@ var render = function() {
               "customize-point": _vm.customizePoint,
               title: {
                 text: _vm.$t("admin.trades.charTitle"),
-                subtitle: { text: "  " },
+                subtitle: { text: " " },
                 horizontalAlignment: "center"
               },
               size: { width: "100%" },
