@@ -75,7 +75,10 @@
                 ref="chart"
                 :data-source="charts.data"
                 :customize-point="customizePoint"
-                :title="$t('admin.trades.charTitle')"
+                :title="{
+                    text: $t('admin.trades.charTitle'),
+                    horizontalAlignment: 'center'
+                }"
                 :size="{ width: '100%' }"
                 :zoomAndPan="{ argumentAxis: 'both' }"
                 :loadingIndicator="{

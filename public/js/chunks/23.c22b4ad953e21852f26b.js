@@ -840,6 +840,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
 
 
 var DxChart = function DxChart() {
@@ -1547,7 +1550,10 @@ var render = function() {
             attrs: {
               "data-source": _vm.charts.data,
               "customize-point": _vm.customizePoint,
-              title: _vm.$t("admin.trades.charTitle"),
+              title: {
+                text: _vm.$t("admin.trades.charTitle"),
+                horizontalAlignment: "center"
+              },
               size: { width: "100%" },
               zoomAndPan: { argumentAxis: "both" },
               loadingIndicator: {
