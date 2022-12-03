@@ -801,6 +801,45 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var DxChart = function DxChart() {
@@ -823,9 +862,7 @@ var DxChart = function DxChart() {
       principalTargetThreshold: 5,
       feesTargetThreshold: 5,
       visibleSeries: {
-        revenue: true,
-        loss: true,
-        fees: true,
+        money: true,
         profitPerPrincipal: false,
         profitPerFees: false,
         accumulatedProfit: false
@@ -894,7 +931,7 @@ var DxChart = function DxChart() {
       }
 
       return {
-        html: "<div class='trade-chart-tooltip'>\n                <div class='tooltip-header'>\n                  ".concat(pointInfo.argumentText, "\n                </div>\n                <div class='tooltip-body'>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.principalAvg"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(pointInfo.point.data.principal), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.revenueSum"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(pointInfo.point.data.revenue), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.lossSum"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(-pointInfo.point.data.loss), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.feesSum"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(-pointInfo.point.data.fees), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.profitSum"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value' style='font-weight: bold; color:").concat(pointInfo.point.data.profit >= 0 ? "green" : "red", "'>\n                      ").concat(this.$options.filters.currency(pointInfo.point.data.profit), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='top-series-name'>\n                      ").concat(this.$t("admin.trades.profitPerPrincipal"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='top-series-value'>\n                      ").concat(this.$options.filters.numberVnFormat(pointInfo.point.data.profitPerPrincipal, 1), "%\n                      (").concat((100 * pointInfo.point.data.profitPerPrincipal / (this.principalTargetThreshold * this.charts.period)).toFixed(0), "%\n                      ").concat(this.$t("admin.trades.kpi"), ")\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.profitPerFees"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.numberVnFormat(pointInfo.point.data.profitPerFees, 1), "\n                      (").concat((100 * pointInfo.point.data.profitPerFees / this.feesTargetThreshold).toFixed(0), "%\n                      ").concat(this.$t("admin.trades.kpi"), ")\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.accumulatedProfit"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(accumulatedProfit), "\n                    </span>\n                  </div>\n                </div>\n              </div>")
+        html: "<div class='trade-chart-tooltip'>\n                <div class='tooltip-header'>\n                  ".concat(pointInfo.argumentText, "\n                </div>\n                <div class='tooltip-body'>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.principalAvg"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(pointInfo.point.data.principal), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.revenueSum"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(pointInfo.point.data.revenue), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.lossSum"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(pointInfo.point.data.loss), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.feesSum"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(pointInfo.point.data.fees), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.profitSum"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value' style='font-weight: bold; color:").concat(pointInfo.point.data.profit >= 0 ? "green" : "red", "'>\n                      ").concat(this.$options.filters.currency(pointInfo.point.data.profit), "\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='top-series-name'>\n                      ").concat(this.$t("admin.trades.profitPerPrincipal"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='top-series-value'>\n                      ").concat(this.$options.filters.numberVnFormat(pointInfo.point.data.profitPerPrincipal, 1), "%\n                      (").concat((100 * pointInfo.point.data.profitPerPrincipal / (this.principalTargetThreshold * this.charts.period)).toFixed(0), "%\n                      ").concat(this.$t("admin.trades.kpi"), ")\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.profitPerFees"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.numberVnFormat(pointInfo.point.data.profitPerFees, 1), "\n                      (").concat((100 * pointInfo.point.data.profitPerFees / this.feesTargetThreshold).toFixed(0), "%\n                      ").concat(this.$t("admin.trades.kpi"), ")\n                    </span>\n                  </div>\n                  <div class='series-name'>\n                    <span class='bottom-series-name'>\n                      ").concat(this.$t("admin.trades.accumulatedProfit"), "\n                    </span>:\n                  </div>\n                  <div class='value-text'>\n                    <span class='bottom-series-value'>\n                      ").concat(this.$options.filters.currency(accumulatedProfit), "\n                    </span>\n                  </div>\n                </div>\n              </div>")
       };
     },
     onPointClick: function onPointClick(_ref3) {
@@ -905,6 +942,7 @@ var DxChart = function DxChart() {
     onLegendClick: function onLegendClick(e) {
       var _this2 = this;
 
+      console.log("onLegendClick", e);
       var series = e.target;
       var referenceTime = this.getReferenceTime();
 
@@ -1414,7 +1452,7 @@ var render = function() {
     { staticClass: "trades-page" },
     [
       _c("h2", { staticClass: "content-block" }, [
-        _vm._v("\n    " + _vm._s(_vm.$t("admin.trades.title")) + "\n  ")
+        _vm._v("\n        " + _vm._s(_vm.$t("admin.trades.title")) + "\n    ")
       ]),
       _vm._v(" "),
       _c(
@@ -1526,35 +1564,57 @@ var render = function() {
               commonSeriesSettings: { argumentField: "time", barPadding: 0 },
               series: [
                 {
-                  name: _vm.$t("admin.trades.revenueSum"),
-                  tag: "revenue",
-                  valueField: "revenue",
+                  name: _vm.$t("admin.trades.profitSum"),
+                  tag: "money",
+                  valueField: "s3",
                   axis: "money",
                   type: "stackedbar",
                   stack: "money",
                   color: "DarkGreen",
-                  visible: _vm.visibleSeries.revenue
+                  visible: _vm.visibleSeries.money
                 },
                 {
                   name: _vm.$t("admin.trades.lossSum"),
-                  tag: "loss",
-                  valueField: "loss",
+                  valueField: "s4",
                   axis: "money",
                   type: "stackedbar",
                   stack: "money",
                   color: "FireBrick",
-                  visible: _vm.visibleSeries.loss
+                  showInLegend: false,
+                  visible: _vm.visibleSeries.money
                 },
                 {
                   name: _vm.$t("admin.trades.feesSum"),
-                  tag: "fees",
-                  valueField: "fees",
+                  valueField: "s5",
                   axis: "money",
                   type: "stackedbar",
                   stack: "money",
                   color: "DarkOrange",
-                  visible: _vm.visibleSeries.fees
+                  showInLegend: false,
+                  visible: _vm.visibleSeries.money
                 },
+
+                {
+                  name: _vm.$t("admin.trades.feesSum"),
+                  valueField: "s2",
+                  axis: "money",
+                  type: "stackedbar",
+                  stack: "money",
+                  color: "DarkOrange",
+                  showInLegend: false,
+                  visible: _vm.visibleSeries.money
+                },
+                {
+                  name: _vm.$t("admin.trades.lossSum"),
+                  valueField: "s1",
+                  axis: "money",
+                  type: "stackedbar",
+                  stack: "money",
+                  color: "FireBrick",
+                  showInLegend: false,
+                  visible: _vm.visibleSeries.money
+                },
+
                 {
                   name: _vm.$t("admin.trades.profitPerPrincipal"),
                   tag: "profitPerPrincipal",
@@ -1589,15 +1649,7 @@ var render = function() {
                 {
                   name: "money",
                   synchronizedValue: 0,
-                  label: { customizeText: _vm.customizeText },
-                  constantLines: [
-                    {
-                      value: 0,
-                      color: "Gray",
-                      label: { visible: false },
-                      displayBehindSeries: true
-                    }
-                  ]
+                  label: { customizeText: _vm.customizeText }
                 },
                 {
                   name: "profitPerPrincipal",
@@ -1631,6 +1683,7 @@ var render = function() {
               legend: {
                 verticalAlignment: "top",
                 horizontalAlignment: "center",
+                hoverMode: "none",
                 markerTemplate: "markerTemplate"
               },
               argumentAxis: {
@@ -1655,7 +1708,7 @@ var render = function() {
                   var data = ref.data
                   return [
                     _c("g", [
-                      data.series.type === "spline"
+                      data.series.tag === "accumulatedProfit"
                         ? _c("g", [
                             _c("rect", {
                               attrs: {
@@ -1671,6 +1724,38 @@ var render = function() {
                               attrs: {
                                 d: "M0,0a5,5 0 1,0 10,0a5,5 0 1,0 -10,0",
                                 fill: data.marker.fill
+                              }
+                            })
+                          ])
+                        : data.series.tag === "money"
+                        ? _c("g", [
+                            _c("rect", {
+                              attrs: {
+                                x: 0,
+                                y: 0,
+                                width: 10,
+                                height: 10,
+                                fill: "DarkGreen"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("rect", {
+                              attrs: {
+                                x: 10,
+                                y: 0,
+                                width: 7,
+                                height: 10,
+                                fill: "FireBrick"
+                              }
+                            }),
+                            _vm._v(" "),
+                            _c("rect", {
+                              attrs: {
+                                x: 17,
+                                y: 0,
+                                width: 3,
+                                height: 10,
+                                fill: "DarkOrange"
                               }
                             })
                           ])

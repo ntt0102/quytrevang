@@ -91,16 +91,35 @@ class TradeService extends CoreService
                 $marginRate = (float) $this->parameterRepository->getValue('marginRate');
                 $principal = ($ch->amount / $ch->id) * ($ch->scores / $ch->id) * 100000 * $marginRate;
                 $year = date_create($ch->monday)->format('Y');
-                $carry[] =  [
+                $temp =  [
+                    's1' => 0,
+                    's2' => 0,
+                    's3' => $profit,
+                    's4' => $ch->loss,
+                    's5' => $ch->fees,
                     'revenue' => $ch->revenue,
-                    'loss' => -$ch->loss,
-                    'fees' => -$ch->fees,
+                    'loss' => $ch->loss,
+                    'fees' => $ch->fees,
                     'profit' => $profit,
                     'principal' => (int) $principal,
                     'profitPerFees' => round($profit / $ch->fees, 1),
                     'profitPerPrincipal' => round(100 * $profit / ($principal), 1),
                     'time' => trans('custom.chart.period.' . $period) . ' ' . ($period == 52 ? $year : $ch->time . ($year != date("Y") ? '/' . $year : ''))
                 ];
+                if ($profit < 0) {
+                    $temp['s3'] = 0;
+                    if (-$profit <=  $ch->loss) {
+                        $temp['s1'] = $profit;
+                        $temp['s2'] = 0;
+                        $temp['s4'] = $ch->loss + $profit;
+                    } else {
+                        $temp['s1'] = $profit;
+                        $temp['s2'] = $ch->loss + $profit;
+                        $temp['s4'] = 0;
+                        $temp['s5'] = $ch->loss + $ch->fees + $profit;
+                    }
+                }
+                $carry[] = $temp;
             }
             return $carry;
         }, []);
