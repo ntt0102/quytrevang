@@ -62,7 +62,7 @@
                         widget: 'dxSelectBox',
                         options: {
                             width: 80,
-                            items: $mf.getChartPeriodList(),
+                            items: periods,
                             displayExpr: 'name',
                             valueExpr: 'value',
                             value: charts.period,
@@ -77,6 +77,7 @@
                 :customize-point="customizePoint"
                 :title="{
                     text: $t('admin.trades.charTitle'),
+                    subtitle: { text: null },
                     horizontalAlignment: 'center'
                 }"
                 :size="{ width: '100%' }"
@@ -220,10 +221,10 @@
                 :argumentAxis="{
                     constantLines: [
                         {
-                            value: null,
                             width: 2,
                             color: 'white',
-                            dashStyle: 'dot'
+                            dashStyle: 'dot',
+                            value: null
                         }
                     ]
                 }"
@@ -318,7 +319,7 @@ export default {
         this.$store.registerModule("Admin.trades", adminTradesStore);
     },
     created() {
-        this.getChart(this.$route.query.period || 1);
+        this.getChart(this.$route.query.period ?? 1);
         this.$bus.on("toggleMenu", () => {
             setTimeout(() => this.chart.render(), 300);
         });
@@ -332,9 +333,28 @@ export default {
     },
     computed: {
         ...mapGetters("Auth", ["permissions"]),
-        ...mapGetters("Admin.trades", ["charts", "page"]),
+        ...mapGetters("Admin.trades", ["charts", "page", "period"]),
         chart() {
             return this.$refs.chart.instance;
+        },
+        periods() {
+            return this.$mf.getChartPeriodList();
+        }
+    },
+    watch: {
+        charts() {
+            setTimeout(
+                () =>
+                    this.chart.option(
+                        "title.subtitle.text",
+                        `${this.$t(
+                            "admin.trades.chartSubtitle"
+                        )} ${this.periods
+                            .find(p => p.value == this.period)
+                            .name.toLowerCase()}`
+                    ),
+                0
+            );
         }
     },
     methods: {
@@ -495,7 +515,6 @@ export default {
             this.setReferenceTime(referenceTime);
         },
         onLegendClick(e) {
-            console.log("onLegendClick", e);
             const series = e.target;
             let referenceTime = this.getReferenceTime();
             if (series.isVisible()) {
