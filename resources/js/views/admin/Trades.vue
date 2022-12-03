@@ -77,7 +77,7 @@
                 :customize-point="customizePoint"
                 :title="{
                     text: $t('admin.trades.charTitle'),
-                    subtitle: { text: ' ' },
+                    subtitle: { text: '  ' },
                     horizontalAlignment: 'center'
                 }"
                 :size="{ width: '100%' }"
