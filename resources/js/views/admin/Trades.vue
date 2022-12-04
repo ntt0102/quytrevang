@@ -62,7 +62,7 @@
                         widget: 'dxSelectBox',
                         options: {
                             width: 80,
-                            items: periods,
+                            items: $mf.getChartPeriodList(),
                             displayExpr: 'name',
                             valueExpr: 'value',
                             value: charts.period,
@@ -77,7 +77,6 @@
                 :customize-point="customizePoint"
                 :title="{
                     text: $t('admin.trades.charTitle'),
-                    subtitle: { text: ' ' },
                     horizontalAlignment: 'center'
                 }"
                 :size="{ width: '100%' }"
@@ -336,25 +335,6 @@ export default {
         ...mapGetters("Admin.trades", ["charts", "page", "period"]),
         chart() {
             return this.$refs.chart.instance;
-        },
-        periods() {
-            return this.$mf.getChartPeriodList();
-        }
-    },
-    watch: {
-        charts() {
-            setTimeout(
-                () =>
-                    this.chart.option(
-                        "title.subtitle.text",
-                        `${this.$t(
-                            "admin.trades.chartSubtitle"
-                        )} ${this.periods
-                            .find(p => p.value == this.period)
-                            .name.toLowerCase()}`
-                    ),
-                0
-            );
         }
     },
     methods: {

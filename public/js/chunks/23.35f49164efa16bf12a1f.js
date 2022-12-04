@@ -843,7 +843,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
 
 
 var DxChart = function DxChart() {
@@ -897,22 +896,8 @@ var DxChart = function DxChart() {
   computed: _objectSpread(_objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapGetters"])("Auth", ["permissions"])), Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapGetters"])("Admin.trades", ["charts", "page", "period"])), {}, {
     chart: function chart() {
       return this.$refs.chart.instance;
-    },
-    periods: function periods() {
-      return this.$mf.getChartPeriodList();
     }
   }),
-  watch: {
-    charts: function charts() {
-      var _this2 = this;
-
-      setTimeout(function () {
-        return _this2.chart.option("title.subtitle.text", "".concat(_this2.$t("admin.trades.chartSubtitle"), " ").concat(_this2.periods.find(function (p) {
-          return p.value == _this2.period;
-        }).name.toLowerCase()));
-      }, 0);
-    }
-  },
   methods: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapActions"])("Admin.trades", ["getChart", "lazyLoad", "resetState"])), {}, {
     customizePoint: function customizePoint(_ref) {
       var value = _ref.value,
@@ -959,7 +944,7 @@ var DxChart = function DxChart() {
       this.setReferenceTime(referenceTime);
     },
     onLegendClick: function onLegendClick(e) {
-      var _this3 = this;
+      var _this2 = this;
 
       var series = e.target;
       var referenceTime = this.getReferenceTime();
@@ -973,7 +958,7 @@ var DxChart = function DxChart() {
       }
 
       setTimeout(function () {
-        return _this3.setReferenceTime(referenceTime);
+        return _this2.setReferenceTime(referenceTime);
       }, 0);
     },
     getReferenceTime: function getReferenceTime() {
@@ -1547,7 +1532,7 @@ var render = function() {
                   widget: "dxSelectBox",
                   options: {
                     width: 80,
-                    items: _vm.periods,
+                    items: _vm.$mf.getChartPeriodList(),
                     displayExpr: "name",
                     valueExpr: "value",
                     value: _vm.charts.period,
@@ -1567,7 +1552,6 @@ var render = function() {
               "customize-point": _vm.customizePoint,
               title: {
                 text: _vm.$t("admin.trades.charTitle"),
-                subtitle: { text: " " },
                 horizontalAlignment: "center"
               },
               size: { width: "100%" },
