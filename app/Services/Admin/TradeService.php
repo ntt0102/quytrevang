@@ -113,7 +113,7 @@ class TradeService extends CoreService
                         $temp['s2'] = 0;
                         $temp['s4'] = $ch->loss + $profit;
                     } else {
-                        $temp['s1'] = $profit;
+                        $temp['s1'] = -$ch->loss;
                         $temp['s2'] = $ch->loss + $profit;
                         $temp['s4'] = 0;
                         $temp['s5'] = $ch->loss + $ch->fees + $profit;
