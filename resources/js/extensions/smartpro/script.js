@@ -136,8 +136,12 @@ function createChart() {
     button.id = "clearButton";
     button.innerText = "Clear";
     button.addEventListener("click", () => {
-        var choice = confirm("Xoá toàn bộ dữ liệu?");
-        if (choice) clearServerData();
+        var choice = confirm("Xoá toàn bộ dữ liệu local database?");
+        if (choice) {
+            clearLocalData("price");
+            clearLocalData("volume");
+            getData();
+        }
     });
     div.append(button);
     //
