@@ -404,8 +404,8 @@ function registerEvent() {
         var stopOperation = document.getElementById("right_selStopOrderType")
             .value;
         var stopPrice = document.getElementById("right_stopOrderIndex").value;
-        var currentPrice = document.getElementById("tbodyPhaisinhContent")
-            .rows[0].cells[10].innerText;
+        var currentPrice = document.getElementById(`${mConfig.VN30F1M}pri`)
+            .innerText;
         if (Math.abs(currentPrice - stopPrice) < 20) {
             if (stopOperation == "SOL" && currentPrice >= stopPrice)
                 isError = true;
@@ -679,8 +679,7 @@ function reportHandler() {
             fees: +document
                 .getElementById("othersAccInfo")
                 .innerText.replaceAll(",", ""),
-            scores: +document.getElementById("tbodyPhaisinhContent").rows[0]
-                .cells[1].innerText
+            scores: +document.getElementById(`${mConfig.VN30F1M}ref`).innerText
         };
         for (var item of document.getElementById("tbodyContent").rows) {
             if (item.cells[0].innerText == "") break;
@@ -729,9 +728,13 @@ function reportHandler() {
 
 function exportHandler(session = false) {
     if (!!session) changeDisplayMode(session);
-    var imageName = `vps-${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
     var imageData = mChart.toBase64Image();
     if (Object.keys(mConfig.time).includes(mConfig.displayMode)) {
+        var bV2 = document.getElementById(`${mConfig.VN30F1M}bV2`);
+        var oV2 = document.getElementById(`${mConfig.VN30F1M}oV2`);
+        var imageName = `vps_${moment().format(
+            "YYYY.MM.DD-HH.mm.ss"
+        )}_${getVolume2(bV2)}-${getVolume2(oV2)}.png`;
         const url = mConfig.root + mConfig.endpoint.export;
         const data = { imageData, imageName, session: mConfig.displayMode };
         toggleSpinner(true);
@@ -760,10 +763,30 @@ function exportHandler(session = false) {
                 alert("Đăng ảnh thất bại");
             });
     } else {
+        var imageName = `vps_${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
         var a = document.createElement("a");
         a.href = imageData;
         a.download = imageName;
         a.click();
+    }
+
+    function getVolume2(el) {
+        var color = "";
+        switch (el.style.color) {
+            case "rgb(255, 0, 254)":
+                color = "T";
+                break;
+            case "rgb(3, 255, 4)":
+                color = "X";
+                break;
+            case "rgb(255, 0, 0)":
+                color = "D";
+                break;
+            case "rgb(0, 255, 255)":
+                color = "S";
+                break;
+        }
+        return `${color}${el.innerText}`;
     }
 }
 
