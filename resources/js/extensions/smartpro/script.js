@@ -540,7 +540,11 @@ function intervalHandler() {
             document.body.classList.add("periodic-order");
     }
     // Export
-    if (isTradingTime("end")) setTimeout(() => exportHandler(session), 15000);
+    if (isTradingTime("end")) {
+        var bV2 = document.getElementById(`${mConfig.VN30F1M}bV2`);
+        var oV2 = document.getElementById(`${mConfig.VN30F1M}oV2`);
+        setTimeout(() => exportHandler(session, bV2, oV2), 15000);
+    }
     // Report
     if (mConfig.currentTime == mConfig.time.ATC.end)
         setTimeout(() => reportHandler(), 30000);
@@ -726,15 +730,13 @@ function reportHandler() {
     }
 }
 
-function exportHandler(session = false) {
+function exportHandler(session = false, bV2 = null, oV2 = null) {
     if (!!session) changeDisplayMode(session);
+    var imageName = `vps_${moment().format("YYYY.MM.DD-HH.mm.ss")}`;
+    if (!!bV2 && !!oV2) imageName += `_${getVolume2(bV2)}-${getVolume2(oV2)}`;
+    imageName += ".png";
     var imageData = mChart.toBase64Image();
     if (Object.keys(mConfig.time).includes(mConfig.displayMode)) {
-        var bV2 = document.getElementById(`${mConfig.VN30F1M}bV2`);
-        var oV2 = document.getElementById(`${mConfig.VN30F1M}oV2`);
-        var imageName = `vps_${moment().format(
-            "YYYY.MM.DD-HH.mm.ss"
-        )}_${getVolume2(bV2)}-${getVolume2(oV2)}.png`;
         const url = mConfig.root + mConfig.endpoint.export;
         const data = { imageData, imageName, session: mConfig.displayMode };
         toggleSpinner(true);
@@ -763,7 +765,6 @@ function exportHandler(session = false) {
                 alert("Đăng ảnh thất bại");
             });
     } else {
-        var imageName = `vps_${moment().format("YYYY.MM.DD-HH.mm.ss")}.png`;
         var a = document.createElement("a");
         a.href = imageData;
         a.download = imageName;
