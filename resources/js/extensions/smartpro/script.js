@@ -52,6 +52,17 @@ function getServerConfig() {
                 mConfig.isOpeningMarket = json.isOpeningMarket;
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.time = json.time;
+                mConfig.refPrice = +document.getElementById(
+                    `${mConfig.VN30F1M}ref`
+                ).innerText;
+                mConfig.celPrice = +document.getElementById(
+                    `${mConfig.VN30F1M}cel`
+                ).innerText;
+                mConfig.floPrice = +document.getElementById(
+                    `${mConfig.VN30F1M}flo`
+                ).innerText;
+                mConfig.bV2 = "";
+                mConfig.sV2 = "";
                 resolve();
             })
             .catch(() => location.reload());
@@ -461,6 +472,7 @@ function connectSocket() {
         // console.log("boardps", data.data);
         priceHandler(data.data);
         volumeHandler(data.data);
+        vol2Handler(data.data);
     });
     socket.on("stockps", data => {
         // console.log("stockps", data.data);
@@ -504,6 +516,35 @@ function connectSocket() {
             if (inTradingTimeRange()) setLocalData("volume", volume);
         }
     }
+    function vol2Handler(data) {
+        if (inTradingTimeRange() && data.id == 3210) {
+            // console.log("vol2" + data.id);
+            var arr = data.g2.split("|");
+            var value = `${getColor(+arr[0])}${arr[1]}`;
+            if (data.side == "B") mConfig.bV2 = value;
+            else mConfig.sV2 = value;
+            // console.log(mConfig.bV2 + " : ", mConfig.sV2);
+        }
+
+        function getColor(price) {
+            var ret = "";
+            switch (price) {
+                case mConfig.celPrice:
+                    ret = "C";
+                    break;
+                case mConfig.floPrice:
+                    ret = "F";
+                    break;
+                case mConfig.refPrice:
+                    ret = "R";
+                    break;
+                default:
+                    ret = price > mConfig.refPrice ? "U" : "D";
+                    break;
+            }
+            return ret;
+        }
+    }
 }
 
 function loadPage() {
@@ -540,11 +581,7 @@ function intervalHandler() {
             document.body.classList.add("periodic-order");
     }
     // Export
-    if (isTradingTime("end")) {
-        var bV2 = document.getElementById(`${mConfig.VN30F1M}bV2`);
-        var oV2 = document.getElementById(`${mConfig.VN30F1M}oV2`);
-        setTimeout(() => exportHandler(session, bV2, oV2), 15000);
-    }
+    if (isTradingTime("end")) setTimeout(() => exportHandler(session), 15000);
     // Report
     if (mConfig.currentTime == mConfig.time.ATC.end)
         setTimeout(() => reportHandler(), 30000);
@@ -683,7 +720,7 @@ function reportHandler() {
             fees: +document
                 .getElementById("othersAccInfo")
                 .innerText.replaceAll(",", ""),
-            scores: +document.getElementById(`${mConfig.VN30F1M}ref`).innerText
+            scores: mConfig.price.ref
         };
         for (var item of document.getElementById("tbodyContent").rows) {
             if (item.cells[0].innerText == "") break;
@@ -730,11 +767,11 @@ function reportHandler() {
     }
 }
 
-function exportHandler(session = false, bV2 = null, oV2 = null) {
+function exportHandler(session = false) {
     if (!!session) changeDisplayMode(session);
-    var imageName = `vps_${moment().format("YYYY.MM.DD-HH.mm.ss")}`;
-    if (!!bV2 && !!oV2) imageName += `_${getVolume2(bV2)}-${getVolume2(oV2)}`;
-    imageName += ".png";
+    var imageName = `vps_${moment().format("YYYY.MM.DD-HH.mm.ss")}_${
+        mConfig.bV2
+    }-${mConfig.sV2}.png`;
     var imageData = mChart.toBase64Image();
     if (Object.keys(mConfig.time).includes(mConfig.displayMode)) {
         const url = mConfig.root + mConfig.endpoint.export;
@@ -769,25 +806,6 @@ function exportHandler(session = false, bV2 = null, oV2 = null) {
         a.href = imageData;
         a.download = imageName;
         a.click();
-    }
-
-    function getVolume2(el) {
-        var color = "";
-        switch (el.style.color) {
-            case "rgb(255, 0, 254)":
-                color = "T";
-                break;
-            case "rgb(3, 255, 4)":
-                color = "X";
-                break;
-            case "rgb(255, 0, 0)":
-                color = "D";
-                break;
-            case "rgb(0, 255, 255)":
-                color = "S";
-                break;
-        }
-        return `${color}${el.innerText}`;
     }
 }
 
