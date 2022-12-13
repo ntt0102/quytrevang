@@ -720,7 +720,7 @@ function reportHandler() {
             fees: +document
                 .getElementById("othersAccInfo")
                 .innerText.replaceAll(",", ""),
-            scores: mConfig.price.ref
+            scores: mConfig.refPrice
         };
         for (var item of document.getElementById("tbodyContent").rows) {
             if (item.cells[0].innerText == "") break;
