@@ -13,7 +13,7 @@ class CreateVn30f1mTable extends Migration
      */
     public function up()
     {
-        Schema::create('vn30f1m', function (Blueprint $table) {
+        Schema::create('vn30f1ms', function (Blueprint $table) {
             $table->id();
             $table->date('date');
             $table->float('price1', 8, 1);
@@ -29,6 +29,6 @@ class CreateVn30f1mTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('vn30f1m');
+        Schema::dropIfExists('vn30f1ms');
     }
 }

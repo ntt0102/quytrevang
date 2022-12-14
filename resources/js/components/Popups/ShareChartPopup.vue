@@ -55,7 +55,8 @@ export default {
             symbols: [],
             chart: null,
             priceSeries: null,
-            foreignSeries: null
+            foreignSeries: null,
+            vnindexSeries: null
         };
     },
     computed: {

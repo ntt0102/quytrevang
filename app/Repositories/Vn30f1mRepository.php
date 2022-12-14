@@ -28,9 +28,9 @@ class Vn30f1mRepository extends CoreRepository
     public function getVn30f1m()
     {
         return [
-            $this->model->get(['date AS time', 'price1 AS value']),
-            $this->model->get(['date AS time', 'price2 AS value']),
-            $this->model->get(['date AS time', 'price3 AS value']),
+            'price1' => $this->model->get(['date AS time', 'price1 AS value']),
+            'price2' => $this->model->get(['date AS time', 'price2 AS value']),
+            'price3' => $this->model->get(['date AS time', 'price3 AS value']),
         ];
     }
 

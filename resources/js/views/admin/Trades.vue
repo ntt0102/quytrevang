@@ -54,6 +54,16 @@
                         options: {
                             icon: 'far fa-chart-line small',
                             hint: $t('admin.trades.buttons.shareChart'),
+                            onClick: () => $refs.vn30f1mChartPopup.show()
+                        }
+                    },
+                    {
+                        visible: permissions.includes('trades@edit'),
+                        location: 'before',
+                        widget: 'dxButton',
+                        options: {
+                            icon: 'far fa-chart-area small',
+                            hint: $t('admin.trades.buttons.shareChart'),
                             onClick: () => $refs.shareChartPopup.show()
                         }
                     },
@@ -283,6 +293,7 @@
         </div>
         <TrackTradePopup ref="trackTradePopup" />
         <PickImagePopup ref="pickImagePopup" />
+        <Vn30f1mChartPopup ref="vn30f1mChartPopup" />
         <ShareChartPopup ref="shareChartPopup" />
     </div>
 </template>
@@ -292,6 +303,7 @@ const DxChart = () =>
     import(/* webpackPrefetch: true */ "devextreme-vue/chart");
 import TrackTradePopup from "../../components/Popups/TrackTradePopup.vue";
 import PickImagePopup from "../../components/Popups/PickImagePopup.vue";
+import Vn30f1mChartPopup from "../../components/Popups/Vn30f1mChartPopup.vue";
 import ShareChartPopup from "../../components/Popups/ShareChartPopup.vue";
 import adminTradesStore from "../../store/modules/Admin/Trades";
 
@@ -300,6 +312,7 @@ export default {
         DxChart,
         TrackTradePopup,
         PickImagePopup,
+        Vn30f1mChartPopup,
         ShareChartPopup
     },
     data() {

@@ -101,6 +101,14 @@ const actions = {
             });
         });
     },
+    getVn30f1m({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios.post("trades/vn30f1m").then(response => {
+                // console.log(response.data);
+                resolve(response.data);
+            });
+        });
+    },
     getFlow({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios.get(`trades/flow`).then(response => {
