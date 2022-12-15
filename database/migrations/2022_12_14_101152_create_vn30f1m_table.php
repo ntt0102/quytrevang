@@ -18,7 +18,7 @@ class CreateVn30f1mTable extends Migration
             $table->date('date');
             $table->float('price1', 8, 1);
             $table->float('price2', 8, 1);
-            $table->float('price3', 8, 1);
+            $table->float('price3', 8, 1)->nullable();
         });
     }
 

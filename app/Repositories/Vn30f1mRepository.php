@@ -37,6 +37,14 @@ class Vn30f1mRepository extends CoreRepository
     /**
      * @inheritdoc
      */
+    public function getLast()
+    {
+        return $this->model->whereNull('price3')->first();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function clear()
     {
         return Vn30f1m::truncate();

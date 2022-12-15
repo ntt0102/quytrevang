@@ -53,8 +53,10 @@ class Kernel extends ConsoleKernel
             ->unlessBetween(trading_time('endAtoTime'), trading_time('startAtcTime'));
         //
         $schedule->call(function () {
-            if (check_opening_market())
+            if (check_opening_market()) {
                 app(\App\Services\Admin\ShareService::class)->getData();
+                app(\App\Services\Admin\Vn30f1mService::class)->getData();
+            }
         })->dailyAt('15:00');
     }
 

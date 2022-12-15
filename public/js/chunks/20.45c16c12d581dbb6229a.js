@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[23],{
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[20],{
 
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Popups/PickImagePopup.vue?vue&type=script&lang=js&":
 /*!********************************************************************************************************************************************************************************!*\
@@ -546,9 +546,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-/* harmony import */ var devextreme_vue_select_box__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! devextreme-vue/select-box */ "./node_modules/devextreme-vue/select-box.js");
-/* harmony import */ var devextreme_vue_select_box__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(devextreme_vue_select_box__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var lightweight_charts__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! lightweight-charts */ "./node_modules/lightweight-charts/dist/lightweight-charts.esm.production.js");
+/* harmony import */ var lightweight_charts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! lightweight-charts */ "./node_modules/lightweight-charts/dist/lightweight-charts.esm.production.js");
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -568,7 +566,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-
 
 
 var chartOptions = {
@@ -605,9 +602,7 @@ var chartOptions = {
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = ({
-  components: {
-    DxSelectBox: devextreme_vue_select_box__WEBPACK_IMPORTED_MODULE_1___default.a
-  },
+  components: {},
   data: function data() {
     return {
       chart: null,
@@ -635,60 +630,50 @@ var chartOptions = {
             var toolTip = document.createElement("div");
             toolTip.className = "floating-tooltip";
             container.appendChild(toolTip);
-            _this.chart = Object(lightweight_charts__WEBPACK_IMPORTED_MODULE_2__["createChart"])(container, chartOptions); // this.chart.subscribeCrosshairMove(param => {
-            //     if (
-            //         !param.time ||
-            //         param.point.x < 0 ||
-            //         param.point.x > width ||
-            //         param.point.y < 0 ||
-            //         param.point.y > height
-            //     ) {
-            //         toolTip.style.display = "none";
-            //         return;
-            //     }
-            //     let width = container.offsetWidth;
-            //     let height = container.offsetHeight;
-            //     let toolTipWidth = 85;
-            //     let toolTipHeight = 100;
-            //     let vnindex = param.seriesPrices.get(
-            //         this.vnindexSeries
-            //     );
-            //     let price = param.seriesPrices.get(
-            //         this.priceSeries
-            //     );
-            //     let foreign = param.seriesPrices.get(
-            //         this.foreignSeries
-            //     );
-            //     toolTip.style.display = "block";
-            //     toolTip.innerHTML =
-            //         `<div>${param.time.day}/${param.time.month}/${param.time.year}</div>` +
-            //         `<hr/>` +
-            //         `<div style="font-size: 16px; color: rgba(32, 226, 47, 1)">${vnindex}</div>` +
-            //         `<div style="font-size: 16px; color: rgba(33, 150, 243, 1)">${price ??
-            //             "-"}</div>` +
-            //         `<div style="font-size: 16px; color: rgba(171, 71, 188, 1)">${foreign ??
-            //             "-"}</div>`;
-            //     let left = param.point.x;
-            //     if (left > width - toolTipWidth)
-            //         left = param.point.x - toolTipWidth;
-            //     let top = param.point.y + 67;
-            //     if (top > height - toolTipHeight)
-            //         top = param.point.y - toolTipHeight + 67;
-            //     toolTip.style.left = left + "px";
-            //     toolTip.style.top = top + "px";
-            // });
+            _this.chart = Object(lightweight_charts__WEBPACK_IMPORTED_MODULE_1__["createChart"])(container, chartOptions);
+
+            _this.chart.subscribeCrosshairMove(function (param) {
+              if (!param.time || param.point.x < 0 || param.point.x > width || param.point.y < 0 || param.point.y > height) {
+                toolTip.style.display = "none";
+                return;
+              }
+
+              var width = container.offsetWidth;
+              var height = container.offsetHeight;
+              var toolTipWidth = 85;
+              var toolTipHeight = 100;
+              var price1 = param.seriesPrices.get(_this.price1Series);
+              var price2 = param.seriesPrices.get(_this.price2Series);
+              var price3 = param.seriesPrices.get(_this.price3Series);
+              toolTip.style.display = "block";
+              toolTip.innerHTML = "<div>".concat(param.time.day, "/").concat(param.time.month, "/").concat(param.time.year, "</div>") + "<hr/>" + "<div style=\"font-size: 16px; color: rgba(255, 0, 255, 1)\">".concat(price3, "</div>") + "<div style=\"font-size: 16px; color: rgba(255, 225, 0, 1)\">".concat(price2, "</div>") + "<div style=\"font-size: 16px; color: rgba(0, 255, 255, 1)\">".concat(price1, "</div>");
+              var left = param.point.x;
+              if (left > width - toolTipWidth) left = param.point.x - toolTipWidth;
+              var top = param.point.y + 67;
+              if (top > height - toolTipHeight) top = param.point.y - toolTipHeight + 67;
+              toolTip.style.left = left + "px";
+              toolTip.style.top = top + "px";
+            });
 
             _this.price1Series = _this.chart.addLineSeries({
               color: "rgba(0, 255, 255, 1)",
-              lineStyle: 0
+              priceFormat: {
+                precision: 1
+              }
             });
             _this.price2Series = _this.chart.addLineSeries({
-              color: "rgba(255, 225, 0, 1)"
+              color: "rgba(255, 225, 0, 1)",
+              priceFormat: {
+                precision: 1
+              }
             });
             _this.price3Series = _this.chart.addLineSeries({
               color: "rgba(255, 0, 255, 1)",
-              lineStyle: 0
-            }); //
+              priceFormat: {
+                precision: 1
+              }
+            });
+            if (!data.price3.at(-1).value) data.price3[data.price3.length - 1].value = data.price2.at(-1).value; //
 
             _this.price1Series.setData(data.price1);
 
@@ -1802,7 +1787,7 @@ var render = function() {
                   widget: "dxButton",
                   options: {
                     icon: "far fa-chart-line small",
-                    hint: _vm.$t("admin.trades.buttons.shareChart"),
+                    hint: _vm.$t("admin.trades.buttons.vn30f1mChart"),
                     onClick: function() {
                       return _vm.$refs.vn30f1mChartPopup.show()
                     }

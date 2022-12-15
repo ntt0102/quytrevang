@@ -38,20 +38,12 @@ class Vn30f1mService extends CoreService
             $currentDate = now()->format('Y-m-d');
             if ($this->vn30f1mRepository->count([['date', $currentDate]])) return true;
             $client = new \GuzzleHttp\Client();
-            $url = "https://bgapidatafeed.vps.com.vn/getlistindexdetail/10";
+            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
             $res = $client->get($url);
-            $data = ['date' => $currentDate, 'symbol' => 'VNINDEX', 'price' => json_decode($res->getBody())[0]->cIndex];
+            $rep = json_decode($res->getBody());
+            $data = ['date' => $currentDate, 'price1' => array_pop($rep)->lastPrice, 'price2' => array_pop($rep)->lastPrice];
             $isOk = !!$this->vn30f1mRepository->create($data);
-            //
-            $url = "https://bgapidatafeed.vps.com.vn/listvn30";
-            $res = $client->get($url);
-            $listvn30 = implode(",", json_decode($res->getBody()));
-            $url = "https://bgapidatafeed.vps.com.vn/getliststockdata/{$listvn30}";
-            $res = $client->get($url);
-            foreach (json_decode($res->getBody()) as $item) {
-                $data = ['date' => $currentDate, 'symbol' => $item->sym, 'price' => $item->lastPrice, 'foreign' => $item->fBVol - $item->fSVolume];
-                $isOk &= !!$this->vn30f1mRepository->create($data);
-            }
+            $isOk &= $this->vn30f1mRepository->update($this->vn30f1mRepository->getLast(), ['price3' => $rep[0]->lastPrice]);
             return $isOk;
         });
         if ($result) return $result;

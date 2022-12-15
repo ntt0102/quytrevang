@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[21],{
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[22],{
 
 /***/ "./node_modules/devextreme-quill/dist/dx-quill.js":
 /*!********************************************************!*\

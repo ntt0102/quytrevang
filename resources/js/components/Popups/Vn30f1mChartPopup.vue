@@ -13,7 +13,6 @@
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
-import DxSelectBox from "devextreme-vue/select-box";
 import { createChart } from "lightweight-charts";
 const chartOptions = {
     localization: {
@@ -46,9 +45,7 @@ const chartOptions = {
 };
 
 export default {
-    components: {
-        DxSelectBox
-    },
+    components: {},
     data() {
         return {
             chart: null,
@@ -74,60 +71,64 @@ export default {
                         toolTip.className = "floating-tooltip";
                         container.appendChild(toolTip);
                         this.chart = createChart(container, chartOptions);
-                        // this.chart.subscribeCrosshairMove(param => {
-                        //     if (
-                        //         !param.time ||
-                        //         param.point.x < 0 ||
-                        //         param.point.x > width ||
-                        //         param.point.y < 0 ||
-                        //         param.point.y > height
-                        //     ) {
-                        //         toolTip.style.display = "none";
-                        //         return;
-                        //     }
-                        //     let width = container.offsetWidth;
-                        //     let height = container.offsetHeight;
-                        //     let toolTipWidth = 85;
-                        //     let toolTipHeight = 100;
+                        this.chart.subscribeCrosshairMove(param => {
+                            if (
+                                !param.time ||
+                                param.point.x < 0 ||
+                                param.point.x > width ||
+                                param.point.y < 0 ||
+                                param.point.y > height
+                            ) {
+                                toolTip.style.display = "none";
+                                return;
+                            }
+                            let width = container.offsetWidth;
+                            let height = container.offsetHeight;
+                            let toolTipWidth = 85;
+                            let toolTipHeight = 100;
 
-                        //     let vnindex = param.seriesPrices.get(
-                        //         this.vnindexSeries
-                        //     );
-                        //     let price = param.seriesPrices.get(
-                        //         this.priceSeries
-                        //     );
-                        //     let foreign = param.seriesPrices.get(
-                        //         this.foreignSeries
-                        //     );
-                        //     toolTip.style.display = "block";
-                        //     toolTip.innerHTML =
-                        //         `<div>${param.time.day}/${param.time.month}/${param.time.year}</div>` +
-                        //         `<hr/>` +
-                        //         `<div style="font-size: 16px; color: rgba(32, 226, 47, 1)">${vnindex}</div>` +
-                        //         `<div style="font-size: 16px; color: rgba(33, 150, 243, 1)">${price ??
-                        //             "-"}</div>` +
-                        //         `<div style="font-size: 16px; color: rgba(171, 71, 188, 1)">${foreign ??
-                        //             "-"}</div>`;
-                        //     let left = param.point.x;
-                        //     if (left > width - toolTipWidth)
-                        //         left = param.point.x - toolTipWidth;
-                        //     let top = param.point.y + 67;
-                        //     if (top > height - toolTipHeight)
-                        //         top = param.point.y - toolTipHeight + 67;
-                        //     toolTip.style.left = left + "px";
-                        //     toolTip.style.top = top + "px";
-                        // });
+                            let price1 = param.seriesPrices.get(
+                                this.price1Series
+                            );
+                            let price2 = param.seriesPrices.get(
+                                this.price2Series
+                            );
+                            let price3 = param.seriesPrices.get(
+                                this.price3Series
+                            );
+
+                            toolTip.style.display = "block";
+                            toolTip.innerHTML =
+                                `<div>${param.time.day}/${param.time.month}/${param.time.year}</div>` +
+                                `<hr/>` +
+                                `<div style="font-size: 16px; color: rgba(255, 0, 255, 1)">${price3}</div>` +
+                                `<div style="font-size: 16px; color: rgba(255, 225, 0, 1)">${price2}</div>` +
+                                `<div style="font-size: 16px; color: rgba(0, 255, 255, 1)">${price1}</div>`;
+                            let left = param.point.x;
+                            if (left > width - toolTipWidth)
+                                left = param.point.x - toolTipWidth;
+                            let top = param.point.y + 67;
+                            if (top > height - toolTipHeight)
+                                top = param.point.y - toolTipHeight + 67;
+                            toolTip.style.left = left + "px";
+                            toolTip.style.top = top + "px";
+                        });
                         this.price1Series = this.chart.addLineSeries({
                             color: "rgba(0, 255, 255, 1)",
-                            lineStyle: 0
+                            priceFormat: { precision: 1 }
                         });
                         this.price2Series = this.chart.addLineSeries({
-                            color: "rgba(255, 225, 0, 1)"
+                            color: "rgba(255, 225, 0, 1)",
+                            priceFormat: { precision: 1 }
                         });
                         this.price3Series = this.chart.addLineSeries({
                             color: "rgba(255, 0, 255, 1)",
-                            lineStyle: 0
+                            priceFormat: { precision: 1 }
                         });
+                        if (!data.price3.at(-1).value)
+                            data.price3[
+                                data.price3.length - 1
+                            ].value = data.price2.at(-1).value;
                         //
                         this.price1Series.setData(data.price1);
                         this.price2Series.setData(data.price2);

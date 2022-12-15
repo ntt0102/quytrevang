@@ -108,7 +108,7 @@ var Parameters = function Parameters() {
 };
 
 var Faqs = function Faqs() {
-  return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(3), __webpack_require__.e(4), __webpack_require__.e(21), __webpack_require__.e(5), __webpack_require__.e(29)]).then(__webpack_require__.bind(null, /*! ./Settings/Faqs.vue */ "./resources/js/views/admin/Settings/Faqs.vue"));
+  return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(3), __webpack_require__.e(4), __webpack_require__.e(22), __webpack_require__.e(5), __webpack_require__.e(29)]).then(__webpack_require__.bind(null, /*! ./Settings/Faqs.vue */ "./resources/js/views/admin/Settings/Faqs.vue"));
 };
 
 var Database = function Database() {
@@ -889,4 +889,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ })
 
-},0,[0,1,2,3,4,21,5,29,27,49,28,40,47,48,16,38,7,39]]);
+},0,[0,1,2,3,4,22,5,29,27,49,28,40,47,48,16,38,7,39]]);

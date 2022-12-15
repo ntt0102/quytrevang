@@ -53,7 +53,7 @@
                         widget: 'dxButton',
                         options: {
                             icon: 'far fa-chart-line small',
-                            hint: $t('admin.trades.buttons.shareChart'),
+                            hint: $t('admin.trades.buttons.vn30f1mChart'),
                             onClick: () => $refs.vn30f1mChartPopup.show()
                         }
                     },
