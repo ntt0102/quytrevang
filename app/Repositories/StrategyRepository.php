@@ -28,7 +28,8 @@ class StrategyRepository extends CoreRepository
      */
     public function getStrategies($trend, $atc)
     {
-        $trendOpe = $trend >= 0 ? '>' : '<';
+        if ($trend == 0) return [];
+        $trendOpe = $trend > 0 ? '>' : '<';
         $atcOpe = $atc >= 0 ? '>' . ($trend >= 0 ? '=' : '') : '<' . ($trend < 0 ? '=' : '');
         $orderDir = $trend >= 0 ? 'DESC' : 'ASC';
         return $this->model->select(DB::raw('trend, atc, ROUND(`atc`/`trend`*100, 1) AS per, ato'))
