@@ -4,17 +4,11 @@ namespace App\Services;
 
 use App\Services\CoreService;
 use Illuminate\Support\Facades\Notification;
-use App\Notifications\UpdatedTradesNotification;
 use App\Notifications\SentCommentNotification;
 use App\Repositories\ParameterRepository;
 use App\Repositories\FaqRepository;
 use App\Repositories\CommentRepository;
 use App\Repositories\UserRepository;
-use App\Repositories\TradeRepository;
-use App\Repositories\VpsRepository;
-use App\Repositories\StrategyRepository;
-use Illuminate\Support\Facades\Storage;
-use App\Events\UpdateTradeEvent;
 
 class AppService extends CoreService
 {
@@ -22,217 +16,17 @@ class AppService extends CoreService
     private $faqRepository;
     private $commentRepository;
     private $userRepository;
-    private $strategyRepository;
-    private $tradeRepository;
-    private $vpsRepository;
 
     public function __construct(
         ParameterRepository $parameterRepository,
         FaqRepository $faqRepository,
         CommentRepository $commentRepository,
-        UserRepository $userRepository,
-        TradeRepository $tradeRepository,
-        VpsRepository $vpsRepository,
-        StrategyRepository $strategyRepository
+        UserRepository $userRepository
     ) {
         $this->parameterRepository = $parameterRepository;
         $this->faqRepository = $faqRepository;
         $this->commentRepository = $commentRepository;
         $this->userRepository = $userRepository;
-        $this->tradeRepository = $tradeRepository;
-        $this->vpsRepository = $vpsRepository;
-        $this->strategyRepository = $strategyRepository;
-    }
-
-    /**
-     * Update trades
-     *
-     * @param $request
-     * 
-     */
-    public function vpsReport($request)
-    {
-        return $this->transaction(
-            function () use ($request) {
-                if (get_global_value('reportedTradingFlag') == '1') return ['isOk' => true, 'isExecuted' => false];
-                $revenue = $request->revenue > 0 ? $request->revenue : 0;
-                $loss = $request->revenue < 0 ? -$request->revenue : 0;
-                $currentDate = date_create();
-                $lastTrade = $this->tradeRepository->latest('monday');
-                if ($currentDate->format('W') != date_create($lastTrade->monday)->format('W')) {
-                    $amount = (int) $this->parameterRepository->getValue('tradeContracts');
-                    $pmFee = (int) $this->parameterRepository->getValue('positionManagementFee');
-                    $trade = $this->tradeRepository->create([
-                        "amount" => $amount,
-                        "scores" => $request->scores,
-                        "revenue" => $revenue,
-                        "loss" => $loss,
-                        "fees" => $request->fees + ($request->pmNight * $amount * $pmFee),
-                        "monday" => $currentDate->sub(date_interval_create_from_date_string(($currentDate->format('w') - 1) . ' days'))->format('Y-m-d'),
-                    ]);
-                    $isOk = !!$trade;
-                } else {
-                    if (!$request->fees) $isOk = true;
-                    else {
-                        $isOk = $this->tradeRepository->update($lastTrade, [
-                            "revenue" => $revenue + $lastTrade->revenue,
-                            "loss" => $loss + $lastTrade->loss,
-                            "fees" => $request->fees + $lastTrade->fees,
-                        ]);
-                    }
-                }
-                if ($isOk) {
-                    set_global_value('reportedTradingFlag', '1');
-                    Notification::send(
-                        $this->userRepository->getUsersHasPermission('trades@view'),
-                        new UpdatedTradesNotification(
-                            number_format($request->revenue, 0, ",", ".") . ' ₫',
-                            number_format($request->fees, 0, ",", ".") . ' ₫'
-                        )
-                    );
-                    event(new UpdateTradeEvent());
-                }
-                return ['isOk' => $isOk, 'isExecuted' => true, 'data' => $request->all()];
-            }
-        );
-    }
-
-    /**
-     * Upload AT Image
-     *
-     * @param $request
-     * 
-     */
-    public function vpsExport($request)
-    {
-        return $this->transaction(
-            function () use ($request) {
-                $path = 'public/vps/' . $request->session . '/';
-                $img = $request->imageData;
-                $img = str_replace('data:image/png;base64,', '', $img);
-                $img = str_replace(' ', '+', $img);
-                $imageData = base64_decode($img);
-                $imageName = $request->imageName;
-                $isOk = Storage::put($path . $imageName, $imageData);
-                return ['isOk' => $isOk];
-            }
-        );
-    }
-
-    /**
-     * Check Market Open
-     *
-     * @param $request
-     * 
-     */
-    public function vpsConfig($request)
-    {
-        $this->parameterRepository->setValue('VN30F1M', $request->VN30F1M);
-        //
-        $isOpeningMarket = $this->vpsCheckOpeningMarket();
-        $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
-        $startAtoTime = $this->parameterRepository->getValue('startAtoTime');
-        $endAtoTime = $this->parameterRepository->getValue('endAtoTime');
-        $startAtcTime = $this->parameterRepository->getValue('startAtcTime');
-        $endAtcTime = $this->parameterRepository->getValue('endAtcTime');
-        return [
-            'isOpeningMarket' => $isOpeningMarket,
-            'contractNumber' => $tradeContracts,
-            'time' => [
-                'ATO' => [
-                    'start' => $startAtoTime,
-                    'end' => $endAtoTime,
-                ],
-                'ATC' => [
-                    'start' => $startAtcTime,
-                    'end' => $endAtcTime,
-                ],
-            ]
-        ];
-    }
-
-    /**
-     * Check Opening Market
-     * @return boolean
-     */
-    public function vpsCheckOpeningMarket()
-    {
-        $currentDay = date("w");
-        if ($currentDay == 0 || $currentDay == 6) return false;
-
-        $currentDate = date("Y-m-d");
-        $currentYear = date("Y");
-        $BASE_CALENDAR_URL = "https://www.googleapis.com/calendar/v3/calendars";
-        $BASE_CALENDAR_ID_FOR_PUBLIC_HOLIDAY =
-            "holiday@group.v.calendar.google.com";
-        $API_KEY = env('GOOGLE_CALENDAR_API_KEY');
-        $CALENDAR_REGION = "en.vietnamese";
-        $url = $BASE_CALENDAR_URL . '/' . $CALENDAR_REGION . '%23' . $BASE_CALENDAR_ID_FOR_PUBLIC_HOLIDAY . '/events?key=' . $API_KEY;
-        $client = new \GuzzleHttp\Client();
-        $res = $client->get($url);
-        $resp = json_decode($res->getBody());
-        $holidays = collect($resp->items)
-            ->filter(function ($item) use ($currentYear) {
-                return $item->start->date >= $currentYear . '-01-01' && $item->start->date <= $currentYear . '-31-12';
-            })
-            ->sortBy('start.date')
-            ->reduce(function ($days, $item) {
-                $days[] = $item->start->date;
-                return $days;
-            }, []);
-        if (in_array($currentDate, $holidays)) return false;
-        return true;
-    }
-
-    /**
-     * Get, set and Clear Data
-     *
-     * @param $request
-     * 
-     */
-    public function vpsData($request)
-    {
-        return $this->transaction(
-            function () use ($request) {
-                $action = $request->action;
-                switch ($action) {
-                    case 'SET':
-                        $this->vpsRepository->create($request->all());
-                        break;
-                    case 'GET':
-                        return $this->vpsRepository->getVps();
-                        break;
-                    case 'CLEAR':
-                        $this->vpsRepository->clear();
-                        break;
-                }
-            }
-        );
-    }
-
-    /**
-     * Get strategy
-     *
-     * @param $request
-     * 
-     */
-    public function vpsGetStrategy($request)
-    {
-        return $this->strategyRepository->getStrategies($request->trend, $request->atc);
-    }
-
-    /**
-     * Set strategy
-     *
-     * @param $request
-     * 
-     */
-    public function vpsSetStrategy($request)
-    {
-        return $this->transaction(
-            function () use ($request) {
-            }
-        );
     }
 
     /**

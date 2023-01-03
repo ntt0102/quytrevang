@@ -38,4 +38,12 @@ class StrategyRepository extends CoreRepository
             ->orderBy('per', $orderDir)
             ->get();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLast()
+    {
+        return $this->model->whereNull('ato')->first();
+    }
 }

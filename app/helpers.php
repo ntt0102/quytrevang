@@ -36,7 +36,7 @@ if (!function_exists('check_opening_market')) {
      */
     function check_opening_market()
     {
-        return app(\App\Services\AppService::class)->vpsCheckOpeningMarket();
+        return app(\App\Services\VpsService::class)->checkOpeningMarket();
     }
 }
 

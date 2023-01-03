@@ -20,12 +20,13 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::get('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
     Route::group(['prefix' => 'vps', 'middleware' => 'cors'], function () {
-        Route::post('report', 'AppController@vpsReport');
-        Route::post('export', 'AppController@vpsExport');
-        Route::post('config', 'AppController@vpsConfig');
-        Route::post('data', 'AppController@vpsData');
-        Route::post('get-strategy', 'AppController@vpsGetStrategy');
-        Route::post('set-strategy', 'AppController@vpsSetStrategy');
+        Route::post('report', 'VpsController@report');
+        Route::post('export', 'VpsController@export');
+        Route::post('config', 'VpsController@getConfig');
+        Route::post('data', 'VpsController@controlData');
+        Route::post('get-strategy', 'VpsController@getStrategy');
+        Route::post('set-strategy', 'VpsController@setStrategy');
+        Route::post('get-vn30f1m', 'VpsController@getVn30f1m');
     });
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
