@@ -6,7 +6,10 @@
         "config": "/api/vps/config",
         "data": "/api/vps/data",
         "export": "/api/vps/export",
-        "report": "/api/vps/report"
+        "report": "/api/vps/report",
+        "getStrategy": "/api/vps/get-strategy",
+        "setStrategy": "/api/vps/set-strategy",
+        "getVn30f1m": "/api/vps/get-vn30f1m"
     },
     "PMF": 2550,
     "displayMode": "Full",

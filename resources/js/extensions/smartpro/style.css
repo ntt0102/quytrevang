@@ -49,6 +49,78 @@
   opacity: 0;
 }
 
+#periodicChart > #trendInput {
+  position: absolute;
+  top: 40px;
+  left: 45px;
+  width: 60px;
+  padding: 0px;
+}
+
+#periodicChart > #atcInput {
+  position: absolute;
+  top: 40px;
+  left: 110px;
+  width: 50px;
+  padding: 0px;
+}
+
+#periodicChart > #perP {
+  position: absolute;
+  top: 42px;
+  left: 170px;
+  color: white;
+}
+
+#periodicChart > #listButton {
+  position: absolute;
+  top: 38px;
+  left: 230px;
+  padding: 0.99px 5px;
+  border-radius: 5px;
+}
+
+#periodicChart > #listTable {
+  position: absolute;
+  top: 70px;
+  left: 150px;
+  background: white;
+  color: black;
+  z-index: -1;
+  opacity: 0;
+  width: 300px;
+  overflow-y: auto;
+}
+
+#periodicChart > table#listTable, #periodicChart > #listTable th, #periodicChart > #listTable td {
+  border: 1px solid;
+}
+
+#periodicChart > #listTable td {
+  padding: 5px;
+}
+
+#periodicChart > #listTable tbody {
+  display: block;
+  /* height: 200px; */
+  overflow: auto;
+  text-align: center;
+}
+#periodicChart > #listTable thead, #periodicChart > #listTable tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+#periodicChart > #listTable thead {
+  text-align: center;
+  background: cornflowerblue;
+  color: white;
+}
+
+#periodicChart > #listTable.has-scroll thead {
+  width: calc(100% - 17px);
+}
+
 #periodicChart > #displaySelect {
   position: absolute;
   top: 0.5px;
@@ -102,6 +174,11 @@
 
 .periodic-order #periodicChart {
   z-index: 3;
+  opacity: 1;
+}
+
+.periodic-order #periodicChart.list-show > #listTable  {
+  z-index: 4;
   opacity: 1;
 }
 
@@ -230,6 +307,8 @@
   cursor: pointer;
 }
 
+
+
 @media (max-width: 991.98px) {
   #continuousButton {
     padding: 10px 1px !important;
@@ -301,8 +380,8 @@
 
   .periodic-order #taisanAccount>div:first-child>div:first-child>div:last-child {
     position: fixed;
-    top: 43px;
-    left: 120px;
+    top: 12px;
+    left: 230px;
     width: unset;
     z-index: 1022;
   }
@@ -310,12 +389,12 @@
   .periodic-order #status-danhmuc-content>tr>td:nth-child(2) {
     position: fixed;
     top: 12px;
-    left: 270px;
+    left: 195px;
     border-bottom: unset;
     z-index: 1022;
   }
 
-  .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(18) {
+  /* .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(18) {
     position: fixed;
     top: 10px;
     left: 220px;
@@ -326,7 +405,7 @@
     top: 10px;
     left: 185px;
     z-index: 1022;
-  }
+  } */
 
   .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(13) {
     position: fixed;

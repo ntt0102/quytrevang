@@ -63,6 +63,10 @@ function getServerConfig() {
                 ).innerText;
                 mConfig.bV2 = "";
                 mConfig.sV2 = "";
+                mConfig.trend = 0;
+                mConfig.atc = 0;
+                mConfig.ato = 0;
+                mConfig.p24h30 = 0;
                 resolve();
             })
             .catch(() => location.reload());
@@ -131,6 +135,32 @@ function createChart() {
     });
     div.append(input);
     //
+    input = document.createElement("input");
+    input.id = "trendInput";
+    input.value = mConfig.trend;
+    input.setAttribute("type", "number");
+    input.setAttribute("step", "0.1");
+    input.addEventListener("change", e => {
+        mConfig.trend = e.target.value;
+        updatePercent();
+        getStrategy();
+        setLocalData("trend", { key: 1, value: mConfig.trend }, true);
+    });
+    div.append(input);
+    //
+    input = document.createElement("input");
+    input.id = "atcInput";
+    input.value = mConfig.atc;
+    input.setAttribute("type", "number");
+    input.setAttribute("step", "0.1");
+    input.addEventListener("change", e => {
+        mConfig.atc = e.target.value;
+        updatePercent();
+        getStrategy();
+        setLocalData("atc", { key: 1, value: mConfig.atc }, true);
+    });
+    div.append(input);
+    //
     var button = document.createElement("button");
     button.id = "exportButton";
     button.innerText = "Export";
@@ -156,6 +186,16 @@ function createChart() {
     });
     div.append(button);
     //
+    button = document.createElement("button");
+    button.id = "listButton";
+    button.innerText = "List";
+    button.addEventListener("click", () => {
+        if (div.classList.contains("list-show"))
+            div.classList.remove("list-show");
+        else div.classList.add("list-show");
+    });
+    div.append(button);
+    //
     var img = document.createElement("img");
     img.id = "spinnerImg";
     img.style.opacity = 0;
@@ -165,6 +205,27 @@ function createChart() {
     var p = document.createElement("p");
     p.id = "orderCountP";
     div.append(p);
+    //
+    p = document.createElement("p");
+    p.id = "perP";
+    p.innerText = "0%";
+    div.append(p);
+    //
+    var table = document.createElement("table");
+    table.id = "listTable";
+    var header = table.createTHead();
+    var row = header.insertRow(0);
+    var cell = row.insertCell(0);
+    cell.innerText = "No.";
+    cell = row.insertCell(1);
+    cell.innerText = "Trend";
+    cell = row.insertCell(2);
+    cell.innerText = "ATC";
+    cell = row.insertCell(3);
+    cell.innerText = "%";
+    cell = row.insertCell(4);
+    cell.innerText = "ATO";
+    div.append(table);
     //
     var canvas = document.createElement("canvas");
     div.append(canvas);
@@ -445,6 +506,8 @@ function createIndexedDB() {
             mDatabase = e.target.result;
             mDatabase.createObjectStore("price", { keyPath: "x" });
             mDatabase.createObjectStore("volume", { keyPath: "x" });
+            mDatabase.createObjectStore("trend", { keyPath: "key" });
+            mDatabase.createObjectStore("atc", { keyPath: "key" });
             resolve();
         };
         request.onsuccess = e => {
@@ -496,6 +559,13 @@ function connectSocket() {
             mChart.update("none");
             //
             if (inTradingTimeRange()) setLocalData("price", price);
+            //
+            if (inAtcTimeRange()) {
+                mConfig.atc = (data.lastPrice - mConfig.p24h30).toFixed(1);
+                document.getElementById("atcInput").value = mConfig.atc;
+                updatePercent();
+                setLocalData("atc", { key: 1, value: mConfig.atc }, true);
+            }
         }
     }
     function volumeHandler(data) {
@@ -549,6 +619,14 @@ function connectSocket() {
 
 function loadPage() {
     getData();
+    getLocalData(["trend", "atc"]).then(data => {
+        mConfig.trend = data[0].length > 0 ? data[0][0].value : 0;
+        mConfig.atc = data[1].length > 0 ? data[1][0].value : 0;
+        document.getElementById("trendInput").value = mConfig.trend;
+        document.getElementById("atcInput").value = mConfig.atc;
+        updatePercent();
+        getStrategy();
+    });
     //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
     updateChartTitle();
@@ -581,10 +659,19 @@ function intervalHandler() {
             document.body.classList.add("periodic-order");
     }
     // Export
-    if (isTradingTime("end")) setTimeout(() => exportHandler(session), 15000);
+    if (isTradingTime("end")) setTimeout(() => exportHandler(session), 30000);
     // Report
     if (mConfig.currentTime == mConfig.time.ATC.end)
-        setTimeout(() => reportHandler(), 30000);
+        setTimeout(() => reportHandler(), 60000);
+    // Get 09h00 price
+    if (mConfig.currentTime == mConfig.time.ATO.end)
+        setTimeout(
+            () => getVn30f1m("ATO").then(() => setStrategy("ATO")),
+            60000
+        );
+    // Get 14h30 price
+    if (mConfig.currentTime == mConfig.time.ATC.start)
+        setTimeout(() => getVn30f1m("ATC"), 60000);
     //
     if (mConfig.displayMode == "Stream") showStreamMode();
     //
@@ -593,7 +680,7 @@ function intervalHandler() {
         if (item.cells[0].innerText == "") break;
         else orderCounter++;
     }
-    document.getElementById("orderCountP").innerText = `ΣOD: ${orderCounter}`;
+    document.getElementById("orderCountP").innerText = `[${orderCounter}]`;
     //
     showRunningStatus();
 }
@@ -616,38 +703,20 @@ function getData() {
             resolve();
         });
     });
+}
 
-    function getServerData() {
-        return new Promise((resolve, reject) => {
-            var data = { action: "GET" };
-            const url = mConfig.root + mConfig.endpoint.data;
-            fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
-            })
-                .then(response => response.json())
-                .then(json => resolve(json));
-        });
-    }
-
-    function getLocalData() {
-        return new Promise(function(resolve, reject) {
-            const tables = ["price", "volume"];
-            var tx = mDatabase.transaction(tables, "readonly");
-            var stores = tables.map(table => tx.objectStore(table));
-            var promises = stores.map(loadStore);
-            Promise.all(promises).then(arr => resolve(arr));
-        });
-
-        function loadStore(store) {
-            return new Promise(function(resolve, reject) {
-                const request = store.getAll();
-                request.onsuccess = e => resolve(e.target.result);
-                request.onerror = () => reject();
-            });
-        }
-    }
+function getServerData() {
+    return new Promise((resolve, reject) => {
+        var data = { action: "GET" };
+        const url = mConfig.root + mConfig.endpoint.data;
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(json => resolve(json));
+    });
 }
 
 function setServerData(data) {
@@ -680,6 +749,23 @@ function clearServerData() {
             resolve();
         });
     });
+}
+
+function getLocalData(tables = ["price", "volume"]) {
+    return new Promise(function(resolve, reject) {
+        var tx = mDatabase.transaction(tables, "readonly");
+        var stores = tables.map(table => tx.objectStore(table));
+        var promises = stores.map(loadStore);
+        Promise.all(promises).then(arr => resolve(arr));
+    });
+
+    function loadStore(store) {
+        return new Promise(function(resolve, reject) {
+            const request = store.getAll();
+            request.onsuccess = e => resolve(e.target.result);
+            request.onerror = () => reject();
+        });
+    }
 }
 
 function setLocalData(table, data, isUpdate = false) {
@@ -874,13 +960,18 @@ function toggleSpinner(status) {
     img.style.opacity = status ? 1 : 0;
 }
 
+function inAtcTimeRange() {
+    return (
+        mConfig.currentTime >= mConfig.time.ATC.start &&
+        mConfig.currentTime <= mConfig.time.ATC.end
+    );
+}
+
 function inTradingTimeRange(sessionName = false) {
     var isAtoSession =
         mConfig.currentTime >= mConfig.time.ATO.start &&
         mConfig.currentTime <= mConfig.time.ATO.end;
-    var isAtcSession =
-        mConfig.currentTime >= mConfig.time.ATC.start &&
-        mConfig.currentTime <= mConfig.time.ATC.end;
+    var isAtcSession = inAtcTimeRange();
     if (sessionName) return isAtoSession ? "ATO" : isAtcSession ? "ATC" : "";
     else return isAtoSession || isAtcSession;
 }
@@ -896,4 +987,113 @@ function showRunningStatus() {
     var button = document.getElementById("periodicButton");
     if (button.classList.contains("dark")) button.classList.remove("dark");
     else button.classList.add("dark");
+}
+
+function updatePercent() {
+    var per = mConfig.trend != 0 ? (mConfig.atc / mConfig.trend) * 100 : 0;
+    document.getElementById("perP").innerText = `${per.toFixed(1)}%`;
+}
+
+function getStrategy() {
+    return new Promise((resolve, reject) => {
+        toggleSpinner(true);
+        const url = mConfig.root + mConfig.endpoint.getStrategy;
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ trend: mConfig.trend, atc: mConfig.atc })
+        })
+            .then(response => response.json())
+            .then(json => {
+                console.log("getStrategy", json);
+                var table = document.getElementById("listTable");
+                var tbody = table.querySelector("tbody");
+                if (tbody) table.removeChild(tbody);
+                tbody = table.createTBody();
+                if (json.length > 6) {
+                    table.classList.add("has-scroll");
+                    tbody.style.height = "200px";
+                } else {
+                    table.classList.remove("has-scroll");
+                    tbody.style.height = "unset";
+                }
+                json.forEach((item, index) => {
+                    var row = tbody.insertRow(index);
+                    var cell = row.insertCell(0);
+                    cell.innerText = index + 1;
+                    cell = row.insertCell(1);
+                    cell.innerText = item.trend;
+                    cell = row.insertCell(2);
+                    cell.innerText = item.atc;
+                    cell = row.insertCell(3);
+                    cell.innerText = item.per;
+                    cell = row.insertCell(4);
+                    cell.innerText = item.ato ? item.ato.toFixed(1) : item.ato;
+                    cell.style.backgroundColor = item.ato
+                        ? item.ato >= 0
+                            ? "LimeGreen"
+                            : "red"
+                        : "white";
+                });
+                toggleSpinner(false);
+                resolve();
+            });
+    });
+}
+
+function setStrategy(type) {
+    toggleSpinner(true);
+    const url = mConfig.root + mConfig.endpoint.setStrategy;
+    var data = { type };
+    if (type == "ATC") {
+        data.trend = mConfig.trend;
+        data.atc = mConfig.atc;
+    } else data.ato = mConfig.ato;
+    fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            }
+            throw new Error(response.statusText);
+        })
+        .then(jsondata => {
+            console.log(`Set${type}-Start ##############################`);
+            console.log(jsondata);
+            console.log(`Set${type}-End ##############################`);
+            if (jsondata.isOk) alert(`Lưu ${type} thành công`);
+            toggleSpinner(false);
+        })
+        .catch(error => {
+            console.log(`Set${type}-Start ##############################`);
+            console.log(error);
+            console.log(`Set${type}-End ##############################`);
+            alert(`Lưu ${type} thất bại`);
+        });
+}
+
+function getVn30f1m(type) {
+    return new Promise((resolve, reject) => {
+        toggleSpinner(true);
+        const url = mConfig.root + mConfig.endpoint.getVn30f1m;
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type })
+        })
+            .then(response => response.json())
+            .then(json => {
+                console.log("getVn30f1m", json);
+                if (type == "ATC") mConfig.p24h30 = json;
+                else mConfig.ato = json - mConfig.refPrice;
+                toggleSpinner(false);
+                resolve();
+            })
+            .catch(error => {
+                getVn30f1m(type);
+            });
+    });
 }
