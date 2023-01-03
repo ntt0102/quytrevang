@@ -11,7 +11,8 @@ class Strategy extends CoreModel
     protected $visible = [
         'trend',
         'atc',
-        'ato'
+        'ato',
+        'per'
     ];
 
     protected $fillable = [
