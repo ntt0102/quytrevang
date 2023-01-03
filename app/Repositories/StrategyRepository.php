@@ -30,11 +30,12 @@ class StrategyRepository extends CoreRepository
     {
         $trendOpe = $trend >= 0 ? '>' : '<';
         $otcOpe = $atc >= 0 ? '>' . ($trend >= 0 ? '=' : '') : '<' . ($trend < 0 ? '=' : '');
+        $orderDir = $trend >= 0 ? 'ASC' : 'DESC';
         return $this->model->select(DB::raw('trend, atc, ROUND(`atc`/`trend`*100, 1) AS per, ato'))
             ->where('trend', $trendOpe, 0)
             ->where('trend', $otcOpe, 0)
-            ->orderBy('ato', 'ASC')
-            ->orderBy('per', 'ASC')
+            ->orderBy('ato', $orderDir)
+            ->orderBy('per', $orderDir)
             ->get();
     }
 }
