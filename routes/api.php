@@ -24,6 +24,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
         Route::post('export', 'AppController@vpsExport');
         Route::post('config', 'AppController@vpsConfig');
         Route::post('data', 'AppController@vpsData');
+        Route::post('get-strategy', 'AppController@vpsGetStrategy');
+        Route::post('set-strategy', 'AppController@vpsSetStrategy');
     });
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {

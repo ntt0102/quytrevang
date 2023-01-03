@@ -10,9 +10,9 @@ use App\Repositories\ParameterRepository;
 use App\Repositories\FaqRepository;
 use App\Repositories\CommentRepository;
 use App\Repositories\UserRepository;
-use App\Repositories\ContractRepository;
 use App\Repositories\TradeRepository;
 use App\Repositories\VpsRepository;
+use App\Repositories\StrategyRepository;
 use Illuminate\Support\Facades\Storage;
 use App\Events\UpdateTradeEvent;
 
@@ -22,7 +22,7 @@ class AppService extends CoreService
     private $faqRepository;
     private $commentRepository;
     private $userRepository;
-    private $contractRepository;
+    private $strategyRepository;
     private $tradeRepository;
     private $vpsRepository;
 
@@ -31,17 +31,17 @@ class AppService extends CoreService
         FaqRepository $faqRepository,
         CommentRepository $commentRepository,
         UserRepository $userRepository,
-        ContractRepository $contractRepository,
         TradeRepository $tradeRepository,
-        VpsRepository $vpsRepository
+        VpsRepository $vpsRepository,
+        StrategyRepository $strategyRepository
     ) {
         $this->parameterRepository = $parameterRepository;
         $this->faqRepository = $faqRepository;
         $this->commentRepository = $commentRepository;
         $this->userRepository = $userRepository;
-        $this->contractRepository = $contractRepository;
         $this->tradeRepository = $tradeRepository;
         $this->vpsRepository = $vpsRepository;
+        $this->strategyRepository = $strategyRepository;
     }
 
     /**
@@ -206,6 +206,31 @@ class AppService extends CoreService
                         $this->vpsRepository->clear();
                         break;
                 }
+            }
+        );
+    }
+
+    /**
+     * Get strategy
+     *
+     * @param $request
+     * 
+     */
+    public function vpsGetStrategy($request)
+    {
+        return $this->strategyRepository->getStrategies($request->trend, $request->atc);
+    }
+
+    /**
+     * Set strategy
+     *
+     * @param $request
+     * 
+     */
+    public function vpsSetStrategy($request)
+    {
+        return $this->transaction(
+            function () use ($request) {
             }
         );
     }

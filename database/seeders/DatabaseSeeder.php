@@ -14,6 +14,7 @@ use Database\Seeders\VariablesTableSeeder;
 use Database\Seeders\TradesTableSeeder;
 use Database\Seeders\FinbooksTableSeeder;
 use Database\Seeders\Vn30f1mTableSeeder;
+use Database\Seeders\StrategiesTableSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -38,6 +39,7 @@ class DatabaseSeeder extends Seeder
         $this->call(TradesTableSeeder::class);
         $this->call(FinbooksTableSeeder::class);
         $this->call(Vn30f1mTableSeeder::class);
+        $this->call(StrategiesTableSeeder::class);
 
         Model::reguard();
     }

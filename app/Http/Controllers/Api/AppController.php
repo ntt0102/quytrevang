@@ -71,6 +71,32 @@ class AppController extends CoreController
     }
 
     /**
+     * Get strategy
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function vpsGetStrategy(Request $request)
+    {
+        $data = $this->appService->vpsGetStrategy($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Set strategy
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function vpsSetStrategy(Request $request)
+    {
+        $data = $this->appService->vpsSetStrategy($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Get the policy params
      *
      * @param \Illuminate\Http\Request $request
