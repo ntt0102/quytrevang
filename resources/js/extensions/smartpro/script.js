@@ -661,8 +661,10 @@ function intervalHandler() {
     // Export
     if (isTradingTime("end")) setTimeout(() => exportHandler(session), 30000);
     // Report
-    if (mConfig.currentTime == mConfig.time.ATC.end)
+    if (mConfig.currentTime == mConfig.time.ATC.end) {
         setTimeout(() => reportHandler(), 60000);
+        setTimeout(() => setStrategy("ATC"), 45000);
+    }
     // Get 09h00 price
     if (mConfig.currentTime == mConfig.time.ATO.end)
         setTimeout(
