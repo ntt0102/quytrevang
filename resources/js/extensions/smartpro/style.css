@@ -10,6 +10,7 @@
   font-size: 16px;
   z-index: 2001;
 }
+
 #periodicButton {
   position: fixed;
   bottom: 0px;
@@ -21,11 +22,13 @@
   padding: 1px;
   font-size: 16px;
 }
+
 #periodicButton.dark {
   background: black;
   color: yellow;
   border-color: yellow;
 }
+
 #reportButton {
   position: fixed;
   bottom: 0px;
@@ -49,7 +52,7 @@
   opacity: 0;
 }
 
-#periodicChart > #trendInput {
+#periodicChart>#trendInput {
   position: absolute;
   top: 40px;
   left: 45px;
@@ -57,7 +60,7 @@
   padding: 0px;
 }
 
-#periodicChart > #atcInput {
+#periodicChart>#atcInput {
   position: absolute;
   top: 40px;
   left: 110px;
@@ -65,14 +68,14 @@
   padding: 0px;
 }
 
-#periodicChart > #perP {
+#periodicChart>#perP {
   position: absolute;
   top: 42px;
   left: 170px;
   color: white;
 }
 
-#periodicChart > #listButton {
+#periodicChart>#listButton {
   position: absolute;
   top: 38px;
   left: 230px;
@@ -80,7 +83,7 @@
   border-radius: 5px;
 }
 
-#periodicChart > #listTable {
+#periodicChart>#listTable {
   position: absolute;
   top: 70px;
   left: 150px;
@@ -89,39 +92,46 @@
   z-index: -1;
   opacity: 0;
   width: 300px;
-  overflow-y: auto;
 }
 
-#periodicChart > table#listTable, #periodicChart > #listTable th, #periodicChart > #listTable td {
+#periodicChart>table#listTable,
+#periodicChart>#listTable th,
+#periodicChart>#listTable td {
   border: 1px solid;
 }
 
-#periodicChart > #listTable td {
+#periodicChart>#listTable td {
   padding: 5px;
 }
 
-#periodicChart > #listTable tbody {
+#periodicChart>#listTable tbody {
   display: block;
-  /* height: 200px; */
-  overflow: auto;
+  overflow-y: auto;
   text-align: center;
 }
-#periodicChart > #listTable thead, #periodicChart > #listTable tbody tr {
+
+#periodicChart>#listTable tbody::-webkit-scrollbar {
+  width: 0px;
+}
+
+#periodicChart>#listTable thead,
+#periodicChart>#listTable tbody tr {
   display: table;
   width: 100%;
   table-layout: fixed;
 }
-#periodicChart > #listTable thead {
+
+#periodicChart>#listTable thead {
   text-align: center;
   background: cornflowerblue;
   color: white;
 }
 
-#periodicChart > #listTable.has-scroll thead {
+/* #periodicChart > #listTable.has-scroll thead {
   width: calc(100% - 17px);
-}
+} */
 
-#periodicChart > #displaySelect {
+#periodicChart>#displaySelect {
   position: absolute;
   top: 0.5px;
   right: 0.5px;
@@ -129,7 +139,7 @@
   padding: 2px 0 !important;
 }
 
-#periodicChart > #streamInput {
+#periodicChart>#streamInput {
   position: absolute;
   top: 28px;
   right: 0px;
@@ -137,35 +147,35 @@
   padding: 0px;
 }
 
-#periodicChart > #exportButton {
+#periodicChart>#exportButton {
   position: absolute;
   top: -0.5px;
   right: 73px;
   padding: 0.99px 5px;
 }
 
-#periodicChart > #refreshButton {
+#periodicChart>#refreshButton {
   position: absolute;
   top: -0.5px;
   right: 129px;
   padding: 0.99px 5px;
 }
 
-#periodicChart > #clearButton {
+#periodicChart>#clearButton {
   position: absolute;
   top: -0.5px;
   right: 194px;
   padding: 0.99px 5px;
 }
 
-#periodicChart > #spinnerImg {
+#periodicChart>#spinnerImg {
   position: absolute;
   top: 30px;
   right: 74px;
   width: 25px;
 }
 
-#periodicChart > #orderCountP {
+#periodicChart>#orderCountP {
   position: absolute;
   top: 30px;
   right: 110px;
@@ -177,7 +187,7 @@
   opacity: 1;
 }
 
-.periodic-order #periodicChart.list-show > #listTable  {
+.periodic-order #periodicChart.list-show>#listTable {
   z-index: 4;
   opacity: 1;
 }
@@ -186,122 +196,122 @@
   overflow-y: hidden;
 }
 
-  .continuous-order #chartFrame {
-    position: fixed;
-    top: 0px;
-    z-index: 2000;
-  }
+.continuous-order #chartFrame {
+  position: fixed;
+  top: 0px;
+  z-index: 2000;
+}
 
-  .continuous-order .aside-menu {
-    position: fixed;
-    top: 40px;
-    right: 60px !important;
-    z-index: 2001 !important;
-    height: 420px !important;
-    width: 150px !important;
-    border-left: 0px !important;
-    border-radius: 10px;
-    padding: 3px 0;
-  }
+.continuous-order .aside-menu {
+  position: fixed;
+  top: 40px;
+  right: 60px !important;
+  z-index: 2001 !important;
+  height: 420px !important;
+  width: 150px !important;
+  border-left: 0px !important;
+  border-radius: 10px;
+  padding: 3px 0;
+}
 
-    .continuous-order .aside-menu .tab-content {
-      height: 100% !important;
-      overflow-y: hidden !important;
-      border-radius: 10px;
-    }
+.continuous-order .aside-menu .tab-content {
+  height: 100% !important;
+  overflow-y: hidden !important;
+  border-radius: 10px;
+}
 
-    .continuous-order .aside-menu > .nav,
-    .continuous-order .aside-menu .list-group-item:nth-child(2),
-    .continuous-order .aside-menu .list-group-item:nth-child(3) {
-      display: none !important;
-    }
+.continuous-order .aside-menu>.nav,
+.continuous-order .aside-menu .list-group-item:nth-child(2),
+.continuous-order .aside-menu .list-group-item:nth-child(3) {
+  display: none !important;
+}
 
-    .continuous-order .aside-menu .wrapper_select_order {
-      display: block !important;
-    }
+.continuous-order .aside-menu .wrapper_select_order {
+  display: block !important;
+}
 
-    .continuous-order .aside-menu .btnTypeOrder > span:nth-child(1),
-    .continuous-order .aside-menu .btnTypeOrder>span:nth-child(2),
-    .continuous-order .aside-menu .btnTypeOrder>span:nth-child(4),
-    .continuous-order .aside-menu .btnTypeOrder>span:nth-child(5) {
-      display: none !important;
-    }
+.continuous-order .aside-menu .btnTypeOrder>span:nth-child(1),
+.continuous-order .aside-menu .btnTypeOrder>span:nth-child(2),
+.continuous-order .aside-menu .btnTypeOrder>span:nth-child(4),
+.continuous-order .aside-menu .btnTypeOrder>span:nth-child(5) {
+  display: none !important;
+}
 
-    .continuous-order .aside-menu .list-group-item:nth-child(7) > label:nth-child(2) {
-      display: none !important;
-    }
+.continuous-order .aside-menu .list-group-item:nth-child(7)>label:nth-child(2) {
+  display: none !important;
+}
 
-    .continuous-order .aside-menu .list-group-item {
-      padding: 0 5px !important;
-    }
+.continuous-order .aside-menu .list-group-item {
+  padding: 0 5px !important;
+}
 
-    .continuous-order .aside-menu .list-group-item-accent-success {
-      border-left: 0px !important;
-    }
+.continuous-order .aside-menu .list-group-item-accent-success {
+  border-left: 0px !important;
+}
 
-    .continuous-order .aside-menu .custom-select-wrapper {
-      text-align: center;
-    }
+.continuous-order .aside-menu .custom-select-wrapper {
+  text-align: center;
+}
 
-    .continuous-order .aside-menu #select_condition_order_wrapper {
-      display: block !important;
-    }
+.continuous-order .aside-menu #select_condition_order_wrapper {
+  display: block !important;
+}
 
-    .continuous-order .aside-menu #select_condition_order_wrapper .arrow{
-      display: none !important;
-    }
+.continuous-order .aside-menu #select_condition_order_wrapper .arrow {
+  display: none !important;
+}
 
-    .continuous-order .aside-menu #select_order_type_wrapper {
-      display: none !important;
-    }
+.continuous-order .aside-menu #select_order_type_wrapper {
+  display: none !important;
+}
 
-  .continuous-order #mainFooter > div:nth-child(2) {
-    position: fixed;
-    bottom: 4px;
-    right: 280px;
-    z-index: 2001;
-  }
+.continuous-order #mainFooter>div:nth-child(2) {
+  position: fixed;
+  bottom: 4px;
+  right: 280px;
+  z-index: 2001;
+}
 
-  .continuous-order #footerPanel {
-    position: fixed;
-    bottom: 35px;
-    width: 100%;
-    z-index: 2001;
-    margin-bottom: -110px;
-  }
+.continuous-order #footerPanel {
+  position: fixed;
+  bottom: 35px;
+  width: 100%;
+  z-index: 2001;
+  margin-bottom: -110px;
+}
 
-  .continuous-order #updateOrderConditionModal,
-  .continuous-order #updateOrderModal {
-    z-index: 2002;
-  }
+.continuous-order #updateOrderConditionModal,
+.continuous-order #updateOrderModal {
+  z-index: 2002;
+}
 
-  .continuous-order #taisanAccount > div:first-child > div:first-child > div:last-child {
-    position: fixed;
-    bottom: 7px;
-    right: 700px;
-    z-index: 2001;
-    width: 100px;
-  }
+.continuous-order #taisanAccount>div:first-child>div:first-child>div:last-child {
+  position: fixed;
+  bottom: 7px;
+  right: 700px;
+  z-index: 2001;
+  width: 100px;
+}
 
-  .continuous-order #status-danhmuc-content > tr > td:nth-child(2) {
-    position: fixed;
-    bottom: 3px;
-    right: 800px;
-    z-index: 2001;
-    width: 50px;
-    border-bottom: none;
-  }
+.continuous-order #status-danhmuc-content>tr>td:nth-child(2) {
+  position: fixed;
+  bottom: 3px;
+  right: 800px;
+  z-index: 2001;
+  width: 50px;
+  border-bottom: none;
+}
 
-  .continuous-order #tbodyPhaisinhContent > tr:first-child > td:nth-child(11) {
-    position: fixed;
-    bottom: 5px;
-    right: 850px;
-    z-index: 2001;
-    text-align: center;
-    width: 60px;
-    min-height: 30px;
-    border-bottom: none;
-  }
+.continuous-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(11) {
+  position: fixed;
+  bottom: 5px;
+  right: 850px;
+  z-index: 2001;
+  text-align: center;
+  width: 60px;
+  min-height: 30px;
+  border-bottom: none;
+}
 
 .timeStamp {
   cursor: pointer;
@@ -313,13 +323,14 @@
   #continuousButton {
     padding: 10px 1px !important;
   }
-  
+
   #periodicButton {
     bottom: 55px;
     left: 0px;
     padding: 10px 3px !important;
     z-index: 1022;
   }
+
   #reportButton {
     bottom: 110px;
     left: 0px;
@@ -337,7 +348,7 @@
   .periodic-order #reportButton {
     z-index: -1;
   }
-    
+
   .periodic-order.fullscreen #periodicChart {
     width: 760px !important;
     bottom: 5px !important;
@@ -352,31 +363,31 @@
     width: 78px !important;
     border-left: 0px !important;
   }
-  
-    .periodic-order .aside-menu>.nav,
-    .periodic-order .aside-menu .list-group-item:nth-child(2),
-    .periodic-order .aside-menu .list-group-item:nth-child(3),
-    .periodic-order .aside-menu .list-group-item:nth-child(4),
-    .periodic-order .aside-menu .list-group-item:nth-child(5),
-    .periodic-order .aside-menu .list-group-item:nth-child(6) > label,
-    .periodic-order .aside-menu .list-group-item:nth-child(7) > label,
-    .periodic-order .aside-menu .button-order-group > div:last-child
-    {
-      display: none !important;
-    }
 
-    .periodic-order .aside-menu .list-group-item, 
-    .periodic-order .aside-menu .button-order-group {
-      padding: 0;
-      border-left: unset !important;
-    }
-    
-    .periodic-order .aside-menu .button-order-group > div:first-child {
-      flex-direction: column;
-    }
-      .periodic-order .aside-menu .button-order-group > div:first-child button {
-        padding: 12px;
-      }
+  .periodic-order .aside-menu>.nav,
+  .periodic-order .aside-menu .list-group-item:nth-child(2),
+  .periodic-order .aside-menu .list-group-item:nth-child(3),
+  .periodic-order .aside-menu .list-group-item:nth-child(4),
+  .periodic-order .aside-menu .list-group-item:nth-child(5),
+  .periodic-order .aside-menu .list-group-item:nth-child(6)>label,
+  .periodic-order .aside-menu .list-group-item:nth-child(7)>label,
+  .periodic-order .aside-menu .button-order-group>div:last-child {
+    display: none !important;
+  }
+
+  .periodic-order .aside-menu .list-group-item,
+  .periodic-order .aside-menu .button-order-group {
+    padding: 0;
+    border-left: unset !important;
+  }
+
+  .periodic-order .aside-menu .button-order-group>div:first-child {
+    flex-direction: column;
+  }
+
+  .periodic-order .aside-menu .button-order-group>div:first-child button {
+    padding: 12px;
+  }
 
   .periodic-order #taisanAccount>div:first-child>div:first-child>div:last-child {
     position: fixed;
@@ -413,6 +424,7 @@
     left: 140px;
     z-index: 1022;
   }
+
   .periodic-order #tbodyPhaisinhContent>tr:first-child>td:nth-child(11) {
     position: fixed;
     top: 10px;
@@ -437,9 +449,9 @@
     overflow-y: auto !important;
   }
 
-    .continuous-order .aside-menu .tab-content::-webkit-scrollbar {
-      display: none;
-    }
+  .continuous-order .aside-menu .tab-content::-webkit-scrollbar {
+    display: none;
+  }
 
   .continuous-order #footerPanel {
     margin-bottom: -110px;

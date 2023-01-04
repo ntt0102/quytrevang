@@ -1013,10 +1013,10 @@ function getStrategy() {
                 if (tbody) table.removeChild(tbody);
                 tbody = table.createTBody();
                 if (json.length > 6) {
-                    table.classList.add("has-scroll");
+                    //table.classList.add("has-scroll");
                     tbody.style.height = "200px";
                 } else {
-                    table.classList.remove("has-scroll");
+                    //table.classList.remove("has-scroll");
                     tbody.style.height = "unset";
                 }
                 json.forEach((item, index) => {
