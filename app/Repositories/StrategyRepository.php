@@ -30,7 +30,7 @@ class StrategyRepository extends CoreRepository
      */
     public function getStrategies($trend, $momentum, $atc)
     {
-        return $this->model->where('trend', $trend)
+        return $this->model->where('trend', $trend > 0 ? '>' : '<', 0)
             ->where('momentum', $momentum > 0 ? '>=' : '<=', 0)
             ->where('atc', $atc > 0 ? '>=' : '<=', 0)
             ->orderBy('ato', 'DESC')
