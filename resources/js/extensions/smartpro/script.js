@@ -153,6 +153,30 @@ function createChart() {
     });
     div.append(input);
     //
+    input = document.createElement("input");
+    input.id = "momentumInput";
+    input.value = mConfig.momentum;
+    input.setAttribute("type", "number");
+    input.setAttribute("step", "0.1");
+    input.addEventListener("change", e => {
+        mConfig.momentum = e.target.value;
+        getStrategy();
+        setLocalData("momentum", { key: 1, value: mConfig.momentum }, true);
+    });
+    div.append(input);
+    //
+    input = document.createElement("input");
+    input.id = "atcInput";
+    input.value = mConfig.atc;
+    input.setAttribute("type", "number");
+    input.setAttribute("step", "0.1");
+    input.addEventListener("change", e => {
+        mConfig.atc = e.target.value;
+        getStrategy();
+        setLocalData("atc", { key: 1, value: mConfig.atc }, true);
+    });
+    div.append(input);
+    //
     var button = document.createElement("button");
     button.id = "exportButton";
     button.innerText = "Export";
@@ -196,16 +220,6 @@ function createChart() {
     //
     var p = document.createElement("p");
     p.id = "orderCountP";
-    div.append(p);
-    //
-    p = document.createElement("p");
-    p.id = "momentumP";
-    p.innerText = "";
-    div.append(p);
-    //
-    p = document.createElement("p");
-    p.id = "atcP";
-    p.innerText = "";
     div.append(p);
     //
     var table = document.createElement("table");
@@ -563,7 +577,7 @@ function connectSocket() {
             if (inAtcTimeRange()) {
                 if (mConfig.momentum != null) {
                     mConfig.atc = (data.lastPrice - mConfig.p24h30).toFixed(1);
-                    document.getElementById("atcP").innerText = mConfig.atc;
+                    document.getElementById("atcInput").innerText = mConfig.atc;
                     setLocalData("atc", { key: 1, value: mConfig.atc }, true);
                 } else getVn30f1m();
             }
@@ -573,7 +587,7 @@ function connectSocket() {
             else if (data.timeServer.includes("24:30")) {
                 mConfig.p24h30 = data.lastPrice;
                 mConfig.momentum = mConfig.p24h30 - mConfig.p24h29;
-                document.getElementById("momentumP").innerText =
+                document.getElementById("momentumInput").value =
                     mConfig.momentum;
                 setLocalData(
                     "momentum",
@@ -639,8 +653,8 @@ function loadPage() {
         mConfig.momentum = data[1].length > 0 ? data[1][0].value : 0;
         mConfig.atc = data[2].length > 0 ? data[2][0].value : 0;
         document.getElementById("trendSelect").value = mConfig.trend;
-        document.getElementById("momentumP").innerText = mConfig.momentum;
-        document.getElementById("atcP").innerText = mConfig.atc;
+        document.getElementById("momentumInput").value = mConfig.momentum;
+        document.getElementById("atcInput").value = mConfig.atc;
         getStrategy();
     });
     //
@@ -1034,9 +1048,9 @@ function getStrategy() {
                     cell = row.insertCell(2);
                     cell.innerText = item.trend;
                     cell = row.insertCell(3);
-                    cell.innerText = item.momentum;
+                    cell.innerText = item.momentum.toFixed(1);
                     cell = row.insertCell(4);
-                    cell.innerText = item.atc;
+                    cell.innerText = item.atc.toFixed(1);
                     cell = row.insertCell(5);
                     cell.innerText = item.ato ? item.ato.toFixed(1) : item.ato;
                     cell.style.backgroundColor = item.ato
@@ -1099,7 +1113,7 @@ function getVn30f1m() {
                 mConfig.p24h29 = json[0];
                 mConfig.p24h30 = json[1];
                 mConfig.momentum = mConfig.p24h30 - mConfig.p24h29;
-                document.getElementById("momentumP").innerText =
+                document.getElementById("momentumInput").value =
                     mConfig.momentum;
                 setLocalData(
                     "momentum",

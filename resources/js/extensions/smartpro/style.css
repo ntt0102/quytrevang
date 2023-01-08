@@ -56,22 +56,23 @@
     position: absolute;
     top: 40px;
     left: 45px;
-    width: 60px;
+    padding: 2px 0 !important;
+}
+
+#periodicChart > #momentumInput {
+    position: absolute;
+    top: 40px;
+    left: 90px;
+    width: 47px;
     padding: 0px;
 }
 
-#periodicChart > #momentumP {
+#periodicChart > #atcInput {
     position: absolute;
-    top: 42px;
-    left: 110px;
-    color: white;
-}
-
-#periodicChart > #atcP {
-    position: absolute;
-    top: 42px;
-    left: 170px;
-    color: white;
+    top: 40px;
+    left: 145px;
+    width: 47px;
+    padding: 0px;
 }
 
 #periodicChart > #listButton {
@@ -90,7 +91,7 @@
     color: black;
     z-index: -1;
     opacity: 0;
-    width: 300px;
+    width: 500px;
 }
 
 #periodicChart > table#listTable,
