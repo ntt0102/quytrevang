@@ -209,7 +209,7 @@ class VpsService extends CoreService
      */
     public function getStrategy($request)
     {
-        return $this->strategyRepository->getStrategies($request->trend, $request->atc);
+        return $this->strategyRepository->getStrategies($request->trend, $request->momentum, $request->atc);
     }
 
     /**
@@ -224,15 +224,32 @@ class VpsService extends CoreService
         if ($this->strategyRepository->count([['date', $currentDate]])) return true;
         return $this->transaction(
             function () use ($request, $currentDate) {
-                if ($request->type == 'ATC') {
-                    $data = ['date' => $currentDate, 'trend' => $request->trend, 'atc' => $request->atc];
-                    return !!$this->strategyRepository->create($data);
-                } else {
-                    $strategy = $this->strategyRepository->getLast();
-                    return $this->strategyRepository->update($strategy, ['ato' => $request->ato]);
-                }
+                $data = [
+                    'date' => $currentDate,
+                    'trend' => $request->trend,
+                    'momentum' => $request->momentum,
+                    'atc' => $request->atc
+                ];
+                return !!$this->strategyRepository->create($data);
             }
         );
+    }
+
+    /**
+     * Set ATO strategy
+     *
+     */
+    public function setAtoStrategy()
+    {
+        $client = new \GuzzleHttp\Client();
+        $url = "https://spwapidatafeed.vps.com.vn/pslistdata";
+        $res = $client->get($url);
+        $rep = json_decode($res->getBody());
+        $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/" . $rep[0];
+        $res = $client->get($url);
+        $rep = json_decode($res->getBody());
+        $strategy = $this->strategyRepository->getLast();
+        return $this->strategyRepository->update($strategy, ['ato' => round($rep[0]->openPrice - $rep[0]->r, 1)]);
     }
 
     /**
@@ -246,7 +263,15 @@ class VpsService extends CoreService
         $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
         $res = $client->get($url);
         $rep = json_decode($res->getBody());
-        if ($request->type == 'ATC') return array_pop($rep)->lastPrice;
-        else return $rep[0]->lastPrice;
+        $p2 = array_pop($rep)->lastPrice;
+        $p1 = null;
+        while (true) {
+            $ojb = array_pop($rep);
+            if (str_contains($ojb->timeServer, '14:29')) {
+                $p1 = $ojb->lastPrice;
+                break;
+            } else continue;
+        }
+        return [$p1, $p2];
     }
 }

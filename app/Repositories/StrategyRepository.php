@@ -22,21 +22,18 @@ class StrategyRepository extends CoreRepository
     {
         parent::__construct($model);
     }
+
     /**
      * @param $trend
+     * @param $momentum
      * @param $atc
      */
-    public function getStrategies($trend, $atc)
+    public function getStrategies($trend, $momentum, $atc)
     {
-        if ($trend == 0) return [];
-        $trendOpe = $trend > 0 ? '>' : '<';
-        $atcOpe = $atc >= 0 ? '>' . ($trend >= 0 ? '=' : '') : '<' . ($trend < 0 ? '=' : '');
-        $orderDir = $trend >= 0 ? 'DESC' : 'ASC';
-        return $this->model->select(DB::raw('trend, atc, ROUND(`atc`/`trend`*100, 1) AS per, ato'))
-            ->where('trend', $trendOpe, 0)
-            ->where('atc', $atcOpe, 0)
-            ->orderBy('ato', $orderDir)
-            ->orderBy('per', $orderDir)
+        return $this->model->where('trend', $trend)
+            ->where('momentum', $momentum > 0 ? '>=' : '<=', 0)
+            ->where('atc', $atc > 0 ? '>=' : '<=', 0)
+            ->orderBy('ato', 'DESC')
             ->get();
     }
 

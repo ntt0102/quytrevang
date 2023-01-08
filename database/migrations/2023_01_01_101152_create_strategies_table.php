@@ -16,7 +16,8 @@ class CreateStrategiesTable extends Migration
         Schema::create('strategies', function (Blueprint $table) {
             $table->id();
             $table->date('date');
-            $table->float('trend', 8, 1);
+            $table->integer('trend');
+            $table->float('momentum', 8, 1);
             $table->float('atc', 8, 1);
             $table->float('ato', 8, 1)->nullable();
         });

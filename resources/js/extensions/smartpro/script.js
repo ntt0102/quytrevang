@@ -63,10 +63,12 @@ function getServerConfig() {
                 ).innerText;
                 mConfig.bV2 = "";
                 mConfig.sV2 = "";
-                mConfig.trend = 0;
-                mConfig.atc = 0;
-                mConfig.ato = 0;
-                mConfig.p24h30 = 0;
+                mConfig.trend = null;
+                mConfig.momentum = null;
+                mConfig.atc = null;
+                mConfig.ato = null;
+                mConfig.p24h29 = null;
+                mConfig.p24h30 = null;
                 resolve();
             })
             .catch(() => location.reload());
@@ -124,6 +126,22 @@ function createChart() {
     select.addEventListener("change", e => showdisplayMode(e.target.value));
     div.append(select);
     //
+    select = document.createElement("select");
+    select.id = "trendSelect";
+    ["", "2", "1", "-1", "-2"].forEach((item, index) => {
+        var option = document.createElement("option");
+        option.value = item;
+        option.text = item;
+        select.appendChild(option);
+    });
+    select.value = mConfig.trend;
+    select.addEventListener("change", e => {
+        mConfig.trend = e.target.value;
+        getStrategy();
+        setLocalData("trend", { key: 1, value: mConfig.trend }, true);
+    });
+    div.append(select);
+    //
     var input = document.createElement("input");
     input.id = "streamInput";
     input.style.zIndex = -1;
@@ -132,32 +150,6 @@ function createChart() {
     input.addEventListener("input", e => {
         mConfig.streamScale = e.target.value;
         showStreamMode("show");
-    });
-    div.append(input);
-    //
-    input = document.createElement("input");
-    input.id = "trendInput";
-    input.value = mConfig.trend;
-    input.setAttribute("type", "number");
-    input.setAttribute("step", "0.1");
-    input.addEventListener("change", e => {
-        mConfig.trend = e.target.value;
-        updatePercent();
-        getStrategy();
-        setLocalData("trend", { key: 1, value: mConfig.trend }, true);
-    });
-    div.append(input);
-    //
-    input = document.createElement("input");
-    input.id = "atcInput";
-    input.value = mConfig.atc;
-    input.setAttribute("type", "number");
-    input.setAttribute("step", "0.1");
-    input.addEventListener("change", e => {
-        mConfig.atc = e.target.value;
-        updatePercent();
-        getStrategy();
-        setLocalData("atc", { key: 1, value: mConfig.atc }, true);
     });
     div.append(input);
     //
@@ -207,8 +199,13 @@ function createChart() {
     div.append(p);
     //
     p = document.createElement("p");
-    p.id = "perP";
-    p.innerText = "0%";
+    p.id = "momentumP";
+    p.innerText = "";
+    div.append(p);
+    //
+    p = document.createElement("p");
+    p.id = "atcP";
+    p.innerText = "";
     div.append(p);
     //
     var table = document.createElement("table");
@@ -218,12 +215,14 @@ function createChart() {
     var cell = row.insertCell(0);
     cell.innerText = "No.";
     cell = row.insertCell(1);
-    cell.innerText = "Trend";
+    cell.innerText = "Date";
     cell = row.insertCell(2);
-    cell.innerText = "ATC";
+    cell.innerText = "Trend";
     cell = row.insertCell(3);
-    cell.innerText = "%";
+    cell.innerText = "Momentum";
     cell = row.insertCell(4);
+    cell.innerText = "ATC";
+    cell = row.insertCell(5);
     cell.innerText = "ATO";
     div.append(table);
     //
@@ -507,6 +506,7 @@ function createIndexedDB() {
             mDatabase.createObjectStore("price", { keyPath: "x" });
             mDatabase.createObjectStore("volume", { keyPath: "x" });
             mDatabase.createObjectStore("trend", { keyPath: "key" });
+            mDatabase.createObjectStore("momentum", { keyPath: "key" });
             mDatabase.createObjectStore("atc", { keyPath: "key" });
             resolve();
         };
@@ -561,10 +561,25 @@ function connectSocket() {
             if (inTradingTimeRange()) setLocalData("price", price);
             //
             if (inAtcTimeRange()) {
-                mConfig.atc = (data.lastPrice - mConfig.p24h30).toFixed(1);
-                document.getElementById("atcInput").value = mConfig.atc;
-                updatePercent();
-                setLocalData("atc", { key: 1, value: mConfig.atc }, true);
+                if (mConfig.momentum != null) {
+                    mConfig.atc = (data.lastPrice - mConfig.p24h30).toFixed(1);
+                    document.getElementById("atcP").innerText = mConfig.atc;
+                    setLocalData("atc", { key: 1, value: mConfig.atc }, true);
+                } else getVn30f1m();
+            }
+            //
+            if (data.timeServer.includes("24:29"))
+                mConfig.p24h29 = data.lastPrice;
+            else if (data.timeServer.includes("24:30")) {
+                mConfig.p24h30 = data.lastPrice;
+                mConfig.momentum = mConfig.p24h30 - mConfig.p24h29;
+                document.getElementById("momentumP").innerText =
+                    mConfig.momentum;
+                setLocalData(
+                    "momentum",
+                    { key: 1, value: mConfig.momentum },
+                    true
+                );
             }
         }
     }
@@ -619,12 +634,13 @@ function connectSocket() {
 
 function loadPage() {
     getData();
-    getLocalData(["trend", "atc"]).then(data => {
+    getLocalData(["trend", "momentum", "atc"]).then(data => {
         mConfig.trend = data[0].length > 0 ? data[0][0].value : 0;
-        mConfig.atc = data[1].length > 0 ? data[1][0].value : 0;
-        document.getElementById("trendInput").value = mConfig.trend;
-        document.getElementById("atcInput").value = mConfig.atc;
-        updatePercent();
+        mConfig.momentum = data[1].length > 0 ? data[1][0].value : 0;
+        mConfig.atc = data[2].length > 0 ? data[2][0].value : 0;
+        document.getElementById("trendSelect").value = mConfig.trend;
+        document.getElementById("momentumP").innerText = mConfig.momentum;
+        document.getElementById("atcP").innerText = mConfig.atc;
         getStrategy();
     });
     //
@@ -663,17 +679,8 @@ function intervalHandler() {
     // Report
     if (mConfig.currentTime == mConfig.time.ATC.end) {
         setTimeout(() => reportHandler(), 60000);
-        setTimeout(() => setStrategy("ATC"), 45000);
+        setTimeout(() => setStrategy(), 45000);
     }
-    // Get 09h00 price
-    if (mConfig.currentTime == mConfig.time.ATO.end)
-        setTimeout(
-            () => getVn30f1m("ATO").then(() => setStrategy("ATO")),
-            60000
-        );
-    // Get 14h30 price
-    if (mConfig.currentTime == mConfig.time.ATC.start)
-        setTimeout(() => getVn30f1m("ATC"), 60000);
     //
     if (mConfig.displayMode == "Stream") showStreamMode();
     //
@@ -880,7 +887,7 @@ function exportHandler(session = false) {
                 console.log("UploadImage-Start ##############################");
                 console.log(jsondata);
                 console.log("UploadImage-End ##############################");
-                if (jsondata.isOk) alert("Đăng ảnh thành công");
+                // if (jsondata.isOk) alert("Đăng ảnh thành công");
                 toggleSpinner(false);
             })
             .catch(error => {
@@ -991,11 +998,6 @@ function showRunningStatus() {
     else button.classList.add("dark");
 }
 
-function updatePercent() {
-    var per = mConfig.trend != 0 ? (mConfig.atc / mConfig.trend) * 100 : 0;
-    document.getElementById("perP").innerText = `${per.toFixed(1)}%`;
-}
-
 function getStrategy() {
     return new Promise((resolve, reject) => {
         toggleSpinner(true);
@@ -1003,7 +1005,11 @@ function getStrategy() {
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ trend: mConfig.trend, atc: mConfig.atc })
+            body: JSON.stringify({
+                trend: mConfig.trend,
+                momentum: mConfig.momentum,
+                atc: mConfig.atc
+            })
         })
             .then(response => response.json())
             .then(json => {
@@ -1024,12 +1030,14 @@ function getStrategy() {
                     var cell = row.insertCell(0);
                     cell.innerText = index + 1;
                     cell = row.insertCell(1);
-                    cell.innerText = item.trend;
+                    cell.innerText = item.date;
                     cell = row.insertCell(2);
-                    cell.innerText = item.atc;
+                    cell.innerText = item.trend;
                     cell = row.insertCell(3);
-                    cell.innerText = item.per;
+                    cell.innerText = item.momentum;
                     cell = row.insertCell(4);
+                    cell.innerText = item.atc;
+                    cell = row.insertCell(5);
                     cell.innerText = item.ato ? item.ato.toFixed(1) : item.ato;
                     cell.style.backgroundColor = item.ato
                         ? item.ato >= 0
@@ -1043,14 +1051,14 @@ function getStrategy() {
     });
 }
 
-function setStrategy(type) {
+function setStrategy() {
     toggleSpinner(true);
     const url = mConfig.root + mConfig.endpoint.setStrategy;
-    var data = { type };
-    if (type == "ATC") {
-        data.trend = mConfig.trend;
-        data.atc = mConfig.atc;
-    } else data.ato = mConfig.ato;
+    var data = {
+        trend: mConfig.trend,
+        momentum: mConfig.momentum,
+        atc: mConfig.atc
+    };
     fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1063,39 +1071,46 @@ function setStrategy(type) {
             throw new Error(response.statusText);
         })
         .then(jsondata => {
-            console.log(`Set${type}-Start ##############################`);
+            console.log(`SetStrategy-Start ##############################`);
             console.log(jsondata);
-            console.log(`Set${type}-End ##############################`);
-            if (jsondata.isOk) alert(`Lưu ${type} thành công`);
+            console.log(`SetStrategy-End ##############################`);
+            if (jsondata.isOk) alert(`Lưu Strategy thành công`);
             toggleSpinner(false);
         })
         .catch(error => {
-            console.log(`Set${type}-Start ##############################`);
+            console.log(`SetStrategy-Start ##############################`);
             console.log(error);
-            console.log(`Set${type}-End ##############################`);
-            alert(`Lưu ${type} thất bại`);
+            console.log(`SetStrategy-End ##############################`);
+            alert(`Lưu Strategy thất bại`);
         });
 }
 
-function getVn30f1m(type) {
+function getVn30f1m() {
     return new Promise((resolve, reject) => {
         toggleSpinner(true);
         const url = mConfig.root + mConfig.endpoint.getVn30f1m;
         fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ type })
+            headers: { "Content-Type": "application/json" }
         })
             .then(response => response.json())
             .then(json => {
                 console.log("getVn30f1m", json);
-                if (type == "ATC") mConfig.p24h30 = json;
-                else mConfig.ato = json - mConfig.refPrice;
+                mConfig.p24h29 = json[0];
+                mConfig.p24h30 = json[1];
+                mConfig.momentum = mConfig.p24h30 - mConfig.p24h29;
+                document.getElementById("momentumP").innerText =
+                    mConfig.momentum;
+                setLocalData(
+                    "momentum",
+                    { key: 1, value: mConfig.momentum },
+                    true
+                );
                 toggleSpinner(false);
                 resolve();
             })
             .catch(error => {
-                getVn30f1m(type);
+                getVn30f1m();
             });
     });
 }

@@ -33,7 +33,7 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    // $s = app(\App\Services\Admin\Vn30f1mService::class)->getData();
-    $s = app(\App\Repositories\StrategyRepository::class)->getStrategies(-10, -5);
+    $s = app(\App\Services\VpsService::class)->setAtoStrategy();
+    // $s = app(\App\Repositories\StrategyRepository::class)->getStrategies(-10, -5);
     dd($s);
 })->middleware('cors');

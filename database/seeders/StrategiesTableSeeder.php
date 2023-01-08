@@ -16,143 +16,171 @@ class StrategiesTableSeeder extends Seeder
     {
         Strategy::create([
             'date' => "2022-12-05",
-            // 'trend' => -35.7,
-            'trend' => -24.5,
+            'trend' => -1,
+            'momentum' => -1.2,
             'atc' => 7.7,
             'ato' => -1,
         ]);
         Strategy::create([
             'date' => "2022-12-06",
-            // 'trend' => -13.2,
-            'trend' => -13.1,
+            'trend' => -2,
+            'momentum' => 0.7,
             'atc' => -5.9,
             'ato' => -6,
         ]);
         Strategy::create([
             'date' => "2022-12-07",
-            // 'trend' => -14.4,
-            'trend' => -8.2,
+            'trend' => -1,
+            'momentum' => 0,
             'atc' => 12,
             'ato' => -1,
         ]);
         Strategy::create([
             'date' => "2022-12-08",
-            // 'trend' => 12.8,
-            'trend' => 12.1,
+            'trend' => 2,
+            'momentum' => -0.6,
             'atc' => -9.7,
             'ato' => 4,
         ]);
         Strategy::create([
             'date' => "2022-12-09",
-            // 'trend' => 17,
-            'trend' => 16,
+            'trend' => 2,
+            'momentum' => -0.5,
             'atc' => -1,
             'ato' => -1,
         ]);
         Strategy::create([
             'date' => "2022-12-12",
-            // 'trend' => -18.4,
-            'trend' => -16.8,
+            'trend' => -1,
+            'momentum' => -0.2,
             'atc' => -4,
             'ato' => 3.9,
         ]);
         Strategy::create([
             'date' => "2022-12-13",
-            // 'trend' => 28.9,
-            'trend' => 28.9,
+            'trend' => 2,
+            'momentum' => 0.5,
             'atc' => 0.4,
             'ato' => 10,
         ]);
         Strategy::create([
             'date' => "2022-12-14",
-            // 'trend' => -9.1,
-            'trend' => -9.1,
+            'trend' => -2,
+            'momentum' => -0.1,
             'atc' => 7,
             'ato' => -0.2,
         ]);
         Strategy::create([
             'date' => "2022-12-15",
-            // 'trend' => -14.8,
-            'trend' => -9.7,
+            'trend' => -1,
+            'momentum' => 0.5,
             'atc' => 0,
             'ato' => -6,
         ]);
         Strategy::create([
             'date' => "2022-12-16",
-            // 'trend' => -9.5,
-            'trend' => -8.7,
+            'trend' => -2,
+            'momentum' => 0.8,
             'atc' => 0,
             'ato' => -4,
         ]);
         Strategy::create([
             'date' => "2022-12-19",
-            // 'trend' => -24.4,
-            'trend' => -24.4,
+            'trend' => -2,
+            'momentum' => -0.5,
             'atc' => -4.2,
             'ato' => -3.5,
         ]);
         Strategy::create([
             'date' => "2022-12-20",
-            // 'trend' => 29.1,
-            'trend' => 19.6,
+            'trend' => 1,
+            'momentum' => 0.4,
             'atc' => 0,
             'ato' => 3,
         ]);
         Strategy::create([
             'date' => "2022-12-21",
-            // 'trend' => 18.5,
-            'trend' => 18.5,
+            'trend' => 2,
+            'momentum' => 0,
             'atc' => 9,
             'ato' => 6.5,
         ]);
         Strategy::create([
             'date' => "2022-12-22",
-            // 'trend' => 8.3,
-            'trend' => 7.2,
+            'trend' => 1,
+            'momentum' => -0.1,
             'atc' => -1.8,
             'ato' => -6.7,
         ]);
         Strategy::create([
             'date' => "2022-12-23",
-            // 'trend' => 28.4,
-            'trend' => 21.2,
+            'trend' => 2,
+            'momentum' => -1,
             'atc' => -9.2,
             'ato' => -4.4,
         ]);
         Strategy::create([
             'date' => "2022-12-26",
-            // 'trend' => -19,
-            'trend' => -17.4,
+            'trend' => -1,
+            'momentum' => 1.1,
             'atc' => -7.3,
             'ato' => 3.5,
         ]);
         Strategy::create([
             'date' => "2022-12-27",
-            // 'trend' => 26.5,
-            'trend' => 26.5,
+            'trend' => 1,
+            'momentum' => 0,
             'atc' => -9,
             'ato' => -2.9,
         ]);
         Strategy::create([
             'date' => "2022-12-28",
-            // 'trend' => -11.7,
-            'trend' => -8.7,
+            'trend' => 1,
+            'momentum' => 0,
             'atc' => -1,
             'ato' => -5.5,
         ]);
         Strategy::create([
             'date' => "2022-12-29",
-            // 'trend' => -12.5,
-            'trend' => -11.9,
+            'trend' => -2,
+            'momentum' => 0.1,
             'atc' => -9.1,
             'ato' => 4,
         ]);
         Strategy::create([
             'date' => "2022-12-30",
-            // 'trend' => -12.2,
-            'trend' => -9.8,
+            'trend' => -2,
+            'momentum' => -0.5,
             'atc' => 6.5,
             'ato' => -4.6,
+        ]);
+        Strategy::create([
+            'date' => "2023-01-03",
+            'trend' => 1,
+            'momentum' => 0.1,
+            'atc' => 8,
+            'ato' => 1,
+        ]);
+        Strategy::create([
+            'date' => "2023-01-04",
+            'trend' => 1,
+            'momentum' => -0.1,
+            'atc' => -0.7,
+            'ato' => 1.5,
+        ]);
+        Strategy::create([
+            'date' => "2023-01-05",
+            'trend' => -2,
+            'momentum' => 0.8,
+            'atc' => -1.2,
+            'ato' => -0.6,
+        ]);
+        Strategy::create([
+            'date' => "2023-01-06",
+            'trend' => 1,
+            'momentum' => 0.3,
+            'atc' => 0.3,
+            'ato' => null,
         ]);
     }
 }

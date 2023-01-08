@@ -9,15 +9,17 @@ class Strategy extends CoreModel
     public $timestamps = false;
 
     protected $visible = [
+        'date',
         'trend',
+        'momentum',
         'atc',
-        'ato',
-        'per'
+        'ato'
     ];
 
     protected $fillable = [
         'date',
         'trend',
+        'momentum',
         'atc',
         'ato'
     ];
