@@ -231,7 +231,7 @@ function createChart() {
     cell = row.insertCell(1);
     cell.innerText = "Date";
     cell = row.insertCell(2);
-    cell.innerText = "Trend";
+    cell.innerText = "Trending";
     cell = row.insertCell(3);
     cell.innerText = "Momentum";
     cell = row.insertCell(4);
@@ -462,6 +462,7 @@ function registerEvent() {
     document
         .querySelector(".timeStamp")
         .addEventListener("dblclick", toggleFullScreen);
+    document.addEventListener("fullscreenchange", fullscreenchange);
 
     function conditionOrderSelect() {
         document.getElementById("right_price").value = "MTL";
@@ -501,13 +502,14 @@ function registerEvent() {
     }
 
     function toggleFullScreen() {
-        if (!document.fullscreenElement) {
-            document.documentElement.requestFullscreen();
+        if (document.fullscreenElement) document.exitFullscreen();
+        else document.documentElement.requestFullscreen();
+    }
+
+    function fullscreenchange() {
+        if (document.fullscreenElement)
             document.body.classList.add("fullscreen");
-        } else if (document.exitFullscreen) {
-            document.exitFullscreen();
-            document.body.classList.remove("fullscreen");
-        }
+        else document.body.classList.remove("fullscreen");
     }
 }
 
@@ -1032,13 +1034,8 @@ function getStrategy() {
                 var tbody = table.querySelector("tbody");
                 if (tbody) table.removeChild(tbody);
                 tbody = table.createTBody();
-                if (json.length > 6) {
-                    //table.classList.add("has-scroll");
-                    tbody.style.height = "200px";
-                } else {
-                    //table.classList.remove("has-scroll");
-                    tbody.style.height = "unset";
-                }
+                if (json.length > 6) tbody.style.height = "200px";
+                else tbody.style.height = "unset";
                 json.forEach((item, index) => {
                     var row = tbody.insertRow(index);
                     var cell = row.insertCell(0);
@@ -1059,6 +1056,13 @@ function getStrategy() {
                             : "red"
                         : "white";
                 });
+                //
+                var posList = json.filter(item => item.ato >= 0);
+                var posPer = ((posList.length / json.length) * 100).toFixed(0);
+                var btn = document.getElementById("listButton");
+                btn.innerText = `List (${posPer} - ${100 - posPer})`;
+                btn.style.background = `linear-gradient(to right, LimeGreen ${posPer}%, red ${posPer}% ${100 -
+                    posPer}%)`;
                 toggleSpinner(false);
                 resolve();
             });

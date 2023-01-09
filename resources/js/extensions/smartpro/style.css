@@ -56,13 +56,13 @@
     position: absolute;
     top: 40px;
     left: 45px;
-    padding: 2px 0 !important;
+    padding: 2.5px 0 !important;
 }
 
 #periodicChart > #momentumInput {
     position: absolute;
     top: 40px;
-    left: 90px;
+    left: 80px;
     width: 47px;
     padding: 0px;
 }
@@ -70,23 +70,23 @@
 #periodicChart > #atcInput {
     position: absolute;
     top: 40px;
-    left: 145px;
+    left: 125px;
     width: 47px;
     padding: 0px;
 }
 
 #periodicChart > #listButton {
     position: absolute;
-    top: 38px;
-    left: 230px;
-    padding: 0.99px 5px;
+    top: 39px;
+    left: 175px;
+    padding: 1px 5px;
     border-radius: 5px;
 }
 
 #periodicChart > #listTable {
     position: absolute;
     top: 70px;
-    left: 150px;
+    left: 110px;
     background: white;
     color: black;
     z-index: -1;
@@ -102,6 +102,14 @@
 
 #periodicChart > #listTable td {
     padding: 5px;
+}
+
+#periodicChart > #listTable td:nth-child(1) {
+    width: 40px;
+}
+
+#periodicChart > #listTable td:nth-child(2) {
+    width: 100px;
 }
 
 #periodicChart > #listTable tbody {
@@ -124,12 +132,7 @@
 #periodicChart > #listTable thead {
     text-align: center;
     background: cornflowerblue;
-    color: white;
 }
-
-/* #periodicChart > #listTable.has-scroll thead {
-  width: calc(100% - 17px);
-} */
 
 #periodicChart > #displaySelect {
     position: absolute;
@@ -471,7 +474,7 @@
         > div:first-child
         > div:first-child
         > div:last-child {
-        top: 7px;
+        top: 10px;
         left: 330px;
         width: unset;
         bottom: unset;
