@@ -204,7 +204,7 @@ function createChart() {
     //
     button = document.createElement("button");
     button.id = "listButton";
-    button.innerText = "List";
+    button.innerText = "-";
     button.addEventListener("click", () => {
         if (div.classList.contains("list-show"))
             div.classList.remove("list-show");
@@ -1060,7 +1060,7 @@ function getStrategy() {
                 var posList = json.filter(item => item.ato >= 0);
                 var posPer = ((posList.length / json.length) * 100).toFixed(0);
                 var btn = document.getElementById("listButton");
-                btn.innerText = `List (${posPer} - ${100 - posPer})`;
+                btn.innerText = `${posPer} - ${100 - posPer}`;
                 btn.style.background = `linear-gradient(to right, LimeGreen ${posPer}%, red ${posPer}% ${100 -
                     posPer}%)`;
                 toggleSpinner(false);
