@@ -82,9 +82,27 @@ function createButtons() {
     button.addEventListener("click", () => {
         if (document.body.classList.contains("continuous-order")) {
             document.body.classList.remove("continuous-order");
+            document.getElementById("left_order_type").innerText =
+                "Lệnh thường";
+            document.getElementById("right_order_type").innerText =
+                "Lệnh điều kiện";
+            document.querySelector(
+                "#mainFooter .foot_tab:nth-child(1)"
+            ).innerText = "DANH SÁCH LỆNH";
+            document.querySelector(
+                "#mainFooter .foot_tab:nth-child(2)"
+            ).innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
             document.body.classList.add("continuous-order");
             document.body.classList.remove("periodic-order");
+            document.getElementById("left_order_type").innerText = "LT";
+            document.getElementById("right_order_type").innerText = "LĐK";
+            document.querySelector(
+                "#mainFooter .foot_tab:nth-child(1)"
+            ).innerText = "LỆNH";
+            document.querySelector(
+                "#mainFooter .foot_tab:nth-child(2)"
+            ).innerText = "ĐIỀU KIỆN";
         }
     });
     document.body.append(button);
