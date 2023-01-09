@@ -447,10 +447,6 @@
         overflow-y: auto !important;
     }
 
-    .continuous-order .aside-menu .tab-content::-webkit-scrollbar {
-        display: none;
-    }
-
     .continuous-order #footerPanel {
         margin-bottom: -110px;
     }
@@ -483,5 +479,9 @@
         left: 200px;
         bottom: unset;
         right: unset;
+    }
+
+    .aside-menu .tab-content::-webkit-scrollbar {
+        display: none;
     }
 }
