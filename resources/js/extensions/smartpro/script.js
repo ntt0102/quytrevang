@@ -116,6 +116,16 @@ function createButtons() {
         } else {
             document.body.classList.add("periodic-order");
             document.body.classList.remove("continuous-order");
+            document.getElementById("left_order_type").innerText =
+                "Lệnh thường";
+            document.getElementById("right_order_type").innerText =
+                "Lệnh điều kiện";
+            document.querySelector(
+                "#mainFooter .foot_tab:nth-child(1)"
+            ).innerText = "DANH SÁCH LỆNH";
+            document.querySelector(
+                "#mainFooter .foot_tab:nth-child(2)"
+            ).innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         }
     });
     document.body.append(button);
@@ -595,9 +605,12 @@ function connectSocket() {
             if (inTradingTimeRange()) setLocalData("price", price);
             //
             if (inAtcTimeRange()) {
-                if (mConfig.momentum != null) {
-                    mConfig.atc = (data.lastPrice - mConfig.p24h30).toFixed(1);
-                    document.getElementById("atcInput").innerText = mConfig.atc;
+                if (!!mConfig.p24h30) {
+                    var newAtc = (data.lastPrice - mConfig.p24h30).toFixed(1);
+                    var isGet = newAtc != 0 && mConfig.atc / newAtc < 0;
+                    mConfig.atc = newAtc;
+                    if (isGet) getStrategy();
+                    document.getElementById("atcInput").value = mConfig.atc;
                     setLocalData("atc", { key: 1, value: mConfig.atc }, true);
                 } else getVn30f1m();
             }
@@ -606,7 +619,8 @@ function connectSocket() {
                 mConfig.p24h29 = data.lastPrice;
             else if (data.timeServer.includes("24:30")) {
                 mConfig.p24h30 = data.lastPrice;
-                mConfig.momentum = mConfig.p24h30 - mConfig.p24h29;
+                mConfig.momentum = (mConfig.p24h30 - mConfig.p24h29).toFixed(1);
+                getStrategy();
                 document.getElementById("momentumInput").value =
                     mConfig.momentum;
                 setLocalData(
@@ -1134,7 +1148,8 @@ function getVn30f1m() {
                 console.log("getVn30f1m", json);
                 mConfig.p24h29 = json[0];
                 mConfig.p24h30 = json[1];
-                mConfig.momentum = mConfig.p24h30 - mConfig.p24h29;
+                mConfig.momentum = (mConfig.p24h30 - mConfig.p24h29).toFixed(1);
+                getStrategy();
                 document.getElementById("momentumInput").value =
                     mConfig.momentum;
                 setLocalData(

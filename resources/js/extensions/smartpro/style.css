@@ -56,30 +56,33 @@
 #periodicChart > #trendSelect {
     position: absolute;
     top: 40px;
-    left: 45px;
+    left: 55px;
     padding: 2.5px 0 !important;
+    text-align: center;
 }
 
 #periodicChart > #momentumInput {
     position: absolute;
     top: 40px;
-    left: 80px;
+    left: 90px;
     width: 47px;
     padding: 0px;
+    text-align: right;
 }
 
 #periodicChart > #atcInput {
     position: absolute;
     top: 40px;
-    left: 125px;
+    left: 135px;
     width: 47px;
     padding: 0px;
+    text-align: right;
 }
 
 #periodicChart > #listButton {
     position: absolute;
     top: 39px;
-    left: 175px;
+    left: 185px;
     padding: 1px 5px;
     border-radius: 5px;
 }
@@ -211,7 +214,7 @@
     top: 40px;
     right: 60px !important;
     z-index: 2001 !important;
-    height: 420px !important;
+    height: 350px !important;
     width: 150px !important;
     border-left: 0px !important;
     border-radius: 10px;
