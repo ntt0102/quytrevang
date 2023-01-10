@@ -616,21 +616,6 @@ function connectSocket() {
                     setLocalData("atc", { key: 1, value: mConfig.atc }, true);
                 } else getVn30f1m();
             }
-            //
-            if (data.timeServer.includes("24:29"))
-                mConfig.p24h29 = data.lastPrice;
-            else if (data.timeServer.includes("24:30")) {
-                mConfig.p24h30 = data.lastPrice;
-                mConfig.momentum = (mConfig.p24h30 - mConfig.p24h29).toFixed(1);
-                getStrategy();
-                document.getElementById("momentumInput").value =
-                    mConfig.momentum;
-                setLocalData(
-                    "momentum",
-                    { key: 1, value: mConfig.momentum },
-                    true
-                );
-            }
         }
     }
     function volumeHandler(data) {
