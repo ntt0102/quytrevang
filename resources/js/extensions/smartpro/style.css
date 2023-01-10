@@ -276,17 +276,18 @@
 
 .continuous-order #mainFooter > div:nth-child(2) {
     position: fixed;
-    bottom: 4px;
+    bottom: 8px;
     right: 280px;
     z-index: 2001;
 }
 
 .continuous-order #footerPanel {
     position: fixed;
-    bottom: 35px;
+    left: 0px;
+    bottom: 38px;
     width: 100%;
+    overflow-y: auto;
     z-index: 2001;
-    margin-bottom: -110px;
 }
 
 .continuous-order #updateOrderConditionModal,
@@ -300,8 +301,8 @@
     > div:first-child
     > div:last-child {
     position: fixed;
-    bottom: 7px;
-    right: 700px;
+    bottom: 6px;
+    right: 500px;
     z-index: 2001;
     width: 100px;
 }
@@ -309,7 +310,16 @@
 .continuous-order #status-danhmuc-content > tr > td:nth-child(2) {
     position: fixed;
     bottom: 3px;
-    right: 800px;
+    right: 650px;
+    z-index: 2001;
+    width: 50px;
+    border-bottom: none;
+}
+
+.continuous-order #tbodyPhaisinhContent > tr:first-child > td:nth-child(13) {
+    position: fixed;
+    bottom: 5px;
+    right: 700px;
     z-index: 2001;
     width: 50px;
     border-bottom: none;
@@ -318,7 +328,7 @@
 .continuous-order #tbodyPhaisinhContent > tr:first-child > td:nth-child(11) {
     position: fixed;
     bottom: 5px;
-    right: 850px;
+    right: 750px;
     z-index: 2001;
     text-align: center;
     width: 60px;
@@ -451,7 +461,9 @@
     }
 
     .continuous-order #footerPanel {
-        margin-bottom: -110px;
+        left: 80px;
+        width: calc(100% - 80px);
+        height: 300px;
     }
 
     .continuous-order
@@ -459,8 +471,8 @@
         > div:first-child
         > div:first-child
         > div:last-child {
-        top: 10px;
-        left: 330px;
+        top: 6px;
+        left: 480px;
         width: unset;
         bottom: unset;
         right: unset;
@@ -468,8 +480,18 @@
 
     .continuous-order #status-danhmuc-content > tr > td:nth-child(2) {
         top: 3px;
-        left: 270px;
+        left: 330px;
         border-bottom: unset;
+        bottom: unset;
+        right: unset;
+    }
+
+    .continuous-order
+        #tbodyPhaisinhContent
+        > tr:first-child
+        > td:nth-child(13) {
+        top: 4px;
+        left: 260px;
         bottom: unset;
         right: unset;
     }
