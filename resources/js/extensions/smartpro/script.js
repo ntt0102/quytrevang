@@ -607,7 +607,9 @@ function connectSocket() {
             if (inAtcTimeRange()) {
                 if (!!mConfig.p24h30) {
                     var newAtc = (data.lastPrice - mConfig.p24h30).toFixed(1);
-                    var isGet = newAtc != 0 && mConfig.atc / newAtc < 0;
+                    var isGet =
+                        newAtc == 0 ||
+                        (newAtc != 0 && mConfig.atc / newAtc < 0);
                     mConfig.atc = newAtc;
                     if (isGet) getStrategy();
                     document.getElementById("atcInput").value = mConfig.atc;
