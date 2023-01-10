@@ -1064,11 +1064,17 @@ function getStrategy() {
                     cell = row.insertCell(2);
                     cell.innerText = item.trend;
                     cell = row.insertCell(3);
-                    cell.innerText = item.momentum.toFixed(1);
+                    cell.innerText = !!item.momentum
+                        ? item.momentum.toFixed(1)
+                        : item.momentum;
                     cell = row.insertCell(4);
-                    cell.innerText = item.atc.toFixed(1);
+                    cell.innerText = !!item.atc
+                        ? item.atc.toFixed(1)
+                        : item.atc;
                     cell = row.insertCell(5);
-                    cell.innerText = item.ato ? item.ato.toFixed(1) : item.ato;
+                    cell.innerText = !!item.ato
+                        ? item.ato.toFixed(1)
+                        : item.ato;
                     cell.style.backgroundColor = item.ato
                         ? item.ato >= 0
                             ? "LimeGreen"
