@@ -52,6 +52,12 @@ function getServerConfig() {
                 mConfig.isOpeningMarket = json.isOpeningMarket;
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.time = json.time;
+                mConfig.trend = json.strategy.trend;
+                mConfig.momentum = !!json.strategy.momentum
+                    ? json.strategy.momentum.toFixed(1)
+                    : json.strategy.momentum;
+                mConfig.atc = json.strategy.atc;
+                mConfig.ato = null;
                 mConfig.refPrice = +document.getElementById(
                     `${mConfig.VN30F1M}ref`
                 ).innerText;
@@ -63,10 +69,7 @@ function getServerConfig() {
                 ).innerText;
                 mConfig.bV2 = "";
                 mConfig.sV2 = "";
-                mConfig.trend = null;
-                mConfig.momentum = null;
-                mConfig.atc = null;
-                mConfig.ato = null;
+                //
                 mConfig.p24h29 = null;
                 mConfig.p24h30 = null;
                 mConfig.buyPrice = null;
@@ -235,7 +238,7 @@ function createChart() {
     //
     button = document.createElement("button");
     button.id = "listButton";
-    button.innerText = "-";
+    button.innerText = "? - ?";
     button.addEventListener("click", () => {
         if (div.classList.contains("list-show"))
             div.classList.remove("list-show");
@@ -705,20 +708,22 @@ function connectSocket() {
 
 function loadPage() {
     getData();
-    getLocalData(["trend", "momentum", "atc"]).then(data => {
-        mConfig.trend = data[0].length > 0 ? data[0][0].value : 0;
-        mConfig.momentum = data[1].length > 0 ? data[1][0].value : 0;
-        mConfig.atc = data[2].length > 0 ? data[2][0].value : 0;
-        document.getElementById("trendSelect").value = mConfig.trend;
-        document.getElementById("momentumInput").value = mConfig.momentum;
-        document.getElementById("atcInput").value = mConfig.atc;
-        getStrategy();
-    });
     //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
     updateChartTitle();
-    // Load Order List
     setTimeout(() => {
+        getLocalData(["trend", "momentum", "atc"]).then(data => {
+            if (inTradingTimeRange()) {
+                mConfig.trend = data[0].length > 0 ? data[0][0].value : 0;
+                mConfig.momentum = data[1].length > 0 ? data[1][0].value : 0;
+                mConfig.atc = data[2].length > 0 ? data[2][0].value : 0;
+            }
+            document.getElementById("trendSelect").value = mConfig.trend;
+            document.getElementById("momentumInput").value = mConfig.momentum;
+            document.getElementById("atcInput").value = mConfig.atc;
+            getStrategy();
+        });
+        // Load Order List
         var button = document.createElement("button");
         button.setAttribute("onclick", "objOrderPanel.showOrderList()");
         button.click();
