@@ -69,6 +69,9 @@ function getServerConfig() {
                 mConfig.ato = null;
                 mConfig.p24h29 = null;
                 mConfig.p24h30 = null;
+                mConfig.buyPrice = null;
+                mConfig.sellPrice = null;
+                mConfig.activeVolume = 0;
                 resolve();
             })
             .catch(() => location.reload());
@@ -298,6 +301,17 @@ function createChart() {
                     pointHoverRadius: 5,
                     pointHitRadius: 20,
                     order: 2
+                },
+                {
+                    label: "AV",
+                    data: [],
+                    borderColor: "aqua",
+                    backgroundColor: "aqua",
+                    yAxisID: "y2",
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointHitRadius: 20,
+                    order: 2
                 }
             ]
         },
@@ -332,6 +346,9 @@ function createChart() {
                     }
                 },
                 y1: {
+                    display: false
+                },
+                y2: {
                     display: false
                 }
             },
@@ -589,25 +606,38 @@ function connectSocket() {
     function priceHandler(data) {
         if (data.id == 3220) {
             // console.log("price" + data.id);
-            const price = {
+            var price = {
                 x: new Date(`${mConfig.currentDate} ${data.timeServer}`),
                 y: data.lastPrice
             };
+            mChart.data.datasets[0].data.push(price);
             //
             var pa = mChart.options.plugins.annotation.annotations.price;
             pa.yMin = price.y;
             pa.yMax = price.y;
             pa.label.content = price.y;
             //
-            mChart.data.datasets[0].data.push(price);
-            mChart.update("none");
-            //
             if (inTradingTimeRange()) setLocalData("price", price);
+            else {
+                if (data.lastPrice <= mConfig.buyPrice)
+                    mConfig.activeVolume -= data.lastVol;
+                else if (data.lastPrice >= mConfig.sellPrice)
+                    mConfig.activeVolume += data.lastVol;
+                //
+                console.log("mConfig.activeVolume", mConfig.activeVolume);
+                var activeVol = {
+                    x: new Date(`${mConfig.currentDate} ${data.timeServer}`),
+                    y: mConfig.activeVolume
+                };
+                mChart.data.datasets[2].data.push(activeVol);
+            }
+            mChart.update("none");
             //
             if (inAtcTimeRange()) {
                 if (!!mConfig.p24h30) {
                     var newAtc = (data.lastPrice - mConfig.p24h30).toFixed(1);
                     var isGet =
+                        mConfig.atc == 0 ||
                         newAtc == 0 ||
                         (newAtc != 0 && mConfig.atc / newAtc < 0);
                     mConfig.atc = newAtc;
@@ -637,13 +667,19 @@ function connectSocket() {
         }
     }
     function vol2Handler(data) {
-        if (inTradingTimeRange() && data.id == 3210) {
-            // console.log("vol2" + data.id);
-            var arr = data.g2.split("|");
-            var value = `${getColor(+arr[0])}${arr[1]}`;
-            if (data.side == "B") mConfig.bV2 = value;
-            else mConfig.sV2 = value;
-            // console.log(mConfig.bV2 + " : ", mConfig.sV2);
+        if (data.id == 3210) {
+            if (inTradingTimeRange()) {
+                // console.log("vol2" + data.id);
+                var arr = data.g2.split("|");
+                var value = `${getColor(+arr[0])}${arr[1]}`;
+                if (data.side == "B") mConfig.bV2 = value;
+                else mConfig.sV2 = value;
+                // console.log(mConfig.bV2 + " : ", mConfig.sV2);
+            } else {
+                var arr = data.g1.split("|");
+                if (data.side == "B") mConfig.buyPrice = +arr[0];
+                else mConfig.sellPrice = +arr[0];
+            }
         }
 
         function getColor(price) {
@@ -736,11 +772,13 @@ function getData() {
             console.log("getData: ", arr);
             var data = arr[0][0].length >= arr[1][0].length ? arr[0] : arr[1];
             mChart.data.datasets.forEach((dataset, index) => {
-                data[index].map(item => ({
-                    ...item,
-                    ...{ x: moment(item.x) }
-                }));
-                dataset.data = data[index];
+                if (index < 2) {
+                    data[index].map(item => ({
+                        ...item,
+                        ...{ x: moment(item.x) }
+                    }));
+                    dataset.data = data[index];
+                }
             });
             mChart.update("none");
             toggleSpinner(false);
