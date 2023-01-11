@@ -138,7 +138,8 @@ class VpsService extends CoreService
                     'start' => $startAtcTime,
                     'end' => $endAtcTime,
                 ],
-            ]
+            ],
+            'strategy' => $this->strategyRepository->getLast()
         ];
     }
 
