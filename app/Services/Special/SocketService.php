@@ -45,6 +45,7 @@ class SocketService extends CoreService
                                 if ($json[0] == 'boardps') {
                                     $this->priceHandler($json[1]->data);
                                     $this->volumeHandler($json[1]->data);
+                                    $this->valueHandler($json[1]->data);
                                 } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
                             }
                         }
@@ -83,6 +84,21 @@ class SocketService extends CoreService
             $param = ['x' => $date . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
             // activity()->withProperties($param)->log('price');
             $this->vpsRepository->create($param);
+            //
+            if (!$this->inTradingTimeRange()) {
+                $activeValue = 0;
+                if ($data->lastPrice <= get_global_value('buyPrice'))
+                    $activeValue = -$data->lastVol * $data->lastPrice;
+                else if ($data->lastPrice >= get_global_value('sellPrice'))
+                    $activeValue = $data->lastVol * $data->lastPrice;
+                //
+                $param = ['x' => $date . $data->timeServer, 'y' => $activeValue, 'type' => 2];
+                // activity()->withProperties($param)->log('value');
+                $this->vpsRepository->create($param);
+                //
+                $prevTime = now()->sub(date_interval_create_from_date_string('2 minutes'));
+                $this->vpsRepository->deleteMultiple([['type', 2], ['x', '<=', $prevTime->format('Y-m-d H:i:s')]]);
+            }
         }
     }
 
@@ -93,6 +109,15 @@ class SocketService extends CoreService
             $param = ['x' => $date . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
             // activity()->withProperties($param)->log('volume');
             $this->vpsRepository->create($param);
+        }
+    }
+
+    private function valueHandler($data)
+    {
+        if ($data->id == 3310 && !$this->inTradingTimeRange()) {
+            [$price] = explode("|", $data->g1);
+            if ($data->side == "B") set_global_value('buyPrice', $price);
+            else set_global_value('sellPrice', $price);
         }
     }
 
@@ -110,64 +135,5 @@ class SocketService extends CoreService
     {
         $startScheduleTime = strtotime(get_global_value('startScheduleTime'));
         return time() <= $startScheduleTime  + 25 * 60 + 30;
-    }
-
-    public function connectHnx()
-    {
-        // $data = urlencode(json_encode([["name" => "pushhub"]]));
-        // $url = "https://banggia.hnx.vn/signalr/negotiate?clientProtocol=1.5&connectionData={$data}";
-        // $client = new \GuzzleHttp\Client(['verify' => false]);
-        // $res = $client->get($url);
-        // $resp = json_decode($res->getBody());
-        // $token = urlencode($resp->ConnectionToken);
-        // $sseUrl = "https://banggia.hnx.vn/signalr/connect?transport=serverSentEvents&clientProtocol=1.5&connectionToken={$token}&connectionData={$data}";
-        // $clientSse = new \GuzzleHttp\Client([
-        //     'verify' => false,
-        //     'stream' => true, 'debug' => false
-        // ]);
-        // $response = $clientSse->request('GET', $sseUrl);
-        // // activity()->log(222222222);
-        // // activity()->log($response->getStatusCode());
-        // // if ($response->getStatusCode() == 204) {
-        // //     activity()->log('error 204');
-        // // }
-        // $body = $response->getBody();
-        // // activity()->log(3333333);
-        // // activity()->log('Body: ' . $body);
-        // while (!$body->eof()) {
-        //     echo $body->read(1024);
-
-        //     break;
-        // }
-        // // while (true) {
-        // //     $buffer .= $body->read(1);
-        // //     activity()->log($buffer);
-        // // }
-        // // $es = new \EventSource\EventSource($sseUrl);
-        // // // $es->setCurlOptions([CURLOPT_SSL_VERIFYPEER => false]);
-        // // $messageReceived = 0;
-        // // $es->onMessage(function (\EventSource\Event $event) use ($messageReceived, $es) {
-        // //     if ($es === 4) {
-        // //         $es->abort();
-        // //     }
-        // // });
-
-        // // $es->connect();
-        /////////////////////////////////////////////////////////
-        $uri = 'wss://pricestream-iboard.ssi.com.vn/realtime';
-        \Ratchet\Client\connect($uri)->then(function ($conn) {
-            $conn->on('message', function ($msg) use ($conn) {
-                activity()->log("WebSocket message.");
-            });
-            $conn->on('close', function () {
-                activity()->log("WebSocket closed.");
-            });
-            $conn->on('error', function () use ($conn) {
-                activity()->log("WebSocket error.");
-            });
-        }, function ($e) {
-            activity()->log("WebSocket could not connect: {$e->getMessage()}\n");
-        });
-        // activity()->log($uri);
     }
 }

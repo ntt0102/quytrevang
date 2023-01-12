@@ -144,6 +144,13 @@ class CoreRepository
     /**
      * @inheritdoc
      */
+    public function deleteMultiple(array $conditions = [])
+    {
+        return $this->model->where($conditions)->delete();
+    }
+    /**
+     * @inheritdoc
+     */
     public function get($query)
     {
         return $query->get();
