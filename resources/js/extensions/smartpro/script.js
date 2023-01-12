@@ -240,6 +240,7 @@ function createChart() {
         if (choice) {
             clearLocalData("price");
             clearLocalData("volume");
+            clearLocalData("value");
             getData();
         }
     });
