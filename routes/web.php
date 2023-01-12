@@ -33,7 +33,11 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    $s = app(\App\Services\VpsService::class)->setAtoStrategy();
+    // $s = app(\App\Services\VpsService::class)->setAtoStrategy();
     // $s = app(\App\Repositories\StrategyRepository::class)->getStrategies(-10, -5);
-    dd($s);
+    // dd($s);
+    $n = now()->sub(date_interval_create_from_date_string('178 minutes'));
+    // dd($n->format('Y-m-d H:i:s'));
+    $v = app(\App\Repositories\VpsRepository::class)->where([['type', 0], ['x', '<=', $n->format('Y-m-d H:i:s')]]);
+    dd($v);
 })->middleware('cors');
