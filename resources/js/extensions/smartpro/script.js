@@ -236,7 +236,7 @@ function createChart() {
     button.id = "clearButton";
     button.innerText = "Clear";
     button.addEventListener("click", () => {
-        var choice = confirm("Xoá toàn bộ dữ liệu local database?");
+        var choice = confirm("Delete local database?");
         if (choice) {
             clearLocalData("price");
             clearLocalData("volume");
