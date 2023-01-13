@@ -119,7 +119,7 @@ class SocketService extends CoreService
 
     private function valueHandler($data)
     {
-        if ($data->id == 3310) {
+        if ($data->id == 3210) {
             if (!$this->inPeriodicTimeRange()) {
                 [$price] = explode("|", $data->g1);
                 if ($data->side == "B") set_global_value('buyPrice', $price);
