@@ -20,6 +20,7 @@ class Vps extends CoreModel
         'x',
         'y'
     ];
+    protected $appends = ['z'];
     protected static $recordEvents = [];
 
     public function getZAttribute()
