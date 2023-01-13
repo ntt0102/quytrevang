@@ -19,17 +19,5 @@ class Vps extends CoreModel
         'x',
         'y'
     ];
-    protected $casts = [
-        'x' => 'string',
-        'y' => 'float'
-    ];
     protected static $recordEvents = [];
-    public function getXAttribute()
-    {
-        return (string) $this->x;
-    }
-    public function getYAttribute()
-    {
-        return number_format($this->y, 1);
-    }
 }
