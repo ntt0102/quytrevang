@@ -630,13 +630,13 @@ function connectSocket() {
             pa.label.content = data.lastPrice;
             //
             mChart.data.datasets[0].data.push({
-                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                y: data.lastPrice
+                time: moment(`${mConfig.currentDate} ${data.timeServer}`),
+                value: data.lastPrice
             });
             //
             setLocalData("price", {
-                x: `${mConfig.currentDate} ${data.timeServer}`,
-                y: data.lastPrice
+                time: `${mConfig.currentDate} ${data.timeServer}`,
+                value: data.lastPrice
             });
             if (!inTradingTimeRange()) {
                 var activeValue = 0;
@@ -646,7 +646,7 @@ function connectSocket() {
                     activeValue = data.lastVol * data.lastPrice;
                 //
                 mChart.data.datasets[2].data.push({
-                    x: moment(`${mConfig.currentDate} ${data.timeServer}`),
+                    time: moment(`${mConfig.currentDate} ${data.timeServer}`),
                     y:
                         (mChart.data.datasets[2].data.length > 0
                             ? mChart.data.datasets[2].data.slice(-1)[0].value
@@ -654,8 +654,8 @@ function connectSocket() {
                 });
                 //
                 setLocalData("value", {
-                    x: `${mConfig.currentDate} ${data.timeServer}`,
-                    y: activeValue
+                    time: `${mConfig.currentDate} ${data.timeServer}`,
+                    value: activeValue
                 });
             }
             mChart.update("none");
@@ -687,13 +687,13 @@ function connectSocket() {
             va.label.content = volume;
             //
             mChart.data.datasets[1].data.push({
-                x: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                y: volume
+                time: moment(`${mConfig.currentDate} ${data.timeServer}`),
+                value: volume
             });
             mChart.update("none");
             setLocalData("volume", {
-                x: `${mConfig.currentDate} ${data.timeServer}`,
-                y: volume
+                time: `${mConfig.currentDate} ${data.timeServer}`,
+                value: volume
             });
             //
             mConfig.hasChangedData = true;
@@ -867,16 +867,7 @@ function getServerData() {
             body: JSON.stringify(data)
         })
             .then(response => response.json())
-            .then(json => {
-                json.forEach(type =>
-                    type.map(item => {
-                        if (typeof item.time === "object")
-                            item.time = item.time._i;
-                        return item;
-                    })
-                );
-                resolve(json);
-            });
+            .then(json => resolve(json));
     });
 }
 

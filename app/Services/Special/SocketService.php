@@ -119,7 +119,7 @@ class SocketService extends CoreService
         if ($data->id == 3210) {
             if (!$this->inPeriodicTimeRange()) {
                 [$price] = explode("|", $data->g1);
-                // activity()->withProperties($price)->log('value');
+                activity()->withProperties($price)->log('value');
                 if ($data->side == "B") set_global_value('buyPrice', $price);
                 else set_global_value('sellPrice', $price);
             }
