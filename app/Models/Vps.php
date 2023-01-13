@@ -20,10 +20,12 @@ class Vps extends CoreModel
     ];
     protected $appends = ['x', 'y'];
     protected static $recordEvents = [];
-
+    protected $casts = [
+        'x' => 'string',
+    ];
     public function getXAttribute()
     {
-        return $this->value;
+        return $this->time->format('Y-m-d H:i:s');
     }
     public function getYAttribute()
     {
