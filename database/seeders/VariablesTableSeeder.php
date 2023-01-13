@@ -30,5 +30,13 @@ class VariablesTableSeeder extends Seeder
             'name' => "startSocketTime",
             'value' => "17:48:00",
         ]);
+        Variable::create([
+            'name' => "buyPrice",
+            'value' => "0",
+        ]);
+        Variable::create([
+            'name' => "sellPrice",
+            'value' => "0",
+        ]);
     }
 }

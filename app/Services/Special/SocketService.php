@@ -30,7 +30,8 @@ class SocketService extends CoreService
                 \Ratchet\Client\connect($uri)->then(function ($conn) {
                     $this->connection = $conn;
                     $conn->on('message', function ($msg) use ($conn) {
-                        activity()->log("WebSocket message.");
+                        error_log("WebSocket message.");
+                        // activity()->log("WebSocket message.");
                         if (!$this->inTradingTimeRange()) {
                             error_log("Timeout market.");
                             activity()->log("Timeout market.");
@@ -89,6 +90,7 @@ class SocketService extends CoreService
             $date = now()->format('Y-m-d ');
             if ($this->inPeriodicTimeRange()) {
                 $param = ['time' => $date . $data->timeServer, 'value' => $data->lastPrice, 'type' => 0];
+                error_log("price");
                 // activity()->withProperties($param)->log('price');
                 $this->vpsRepository->create($param);
             } else {
@@ -99,6 +101,7 @@ class SocketService extends CoreService
                     $activeValue = $data->lastVol * $data->lastPrice;
                 //
                 $param = ['time' => $date . $data->timeServer, 'value' => $activeValue, 'type' => 2];
+                error_log("value");
                 // activity()->withProperties($param)->log('value');
                 $this->vpsRepository->create($param);
                 //
@@ -114,7 +117,8 @@ class SocketService extends CoreService
             if ($this->inPeriodicTimeRange()) {
                 $date = now()->format('Y-m-d ');
                 $param = ['time' => $date . $data->timeServer, 'value' => $data->BVolume - $data->SVolume, 'type' => 1];
-                // activity()->withProperties($param)->log('volume');
+                error_log("volume");
+                activity()->withProperties($param)->log('volume');
                 $this->vpsRepository->create($param);
             }
         }
@@ -125,7 +129,8 @@ class SocketService extends CoreService
         if ($data->id == 3210) {
             if (!$this->inPeriodicTimeRange()) {
                 [$price] = explode("|", $data->g1);
-                activity()->withProperties($price)->log('value');
+                error_log("value: " . $price);
+                // activity()->withProperties($price)->log('value');
                 if ($data->side == "B") set_global_value('buyPrice', $price);
                 else set_global_value('sellPrice', $price);
             }
