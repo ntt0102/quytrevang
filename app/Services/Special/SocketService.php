@@ -82,8 +82,8 @@ class SocketService extends CoreService
 
     private function priceHandler($data)
     {
-        $date = now()->format('Y-m-d ');
         if ($data->id == 3220) {
+            $date = now()->format('Y-m-d ');
             if ($this->inPeriodicTimeRange()) {
                 $param = ['x' => $date . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
                 // activity()->withProperties($param)->log('price');
@@ -107,9 +107,9 @@ class SocketService extends CoreService
 
     private function volumeHandler($data)
     {
-        $date = now()->format('Y-m-d ');
         if ($data->id == 3310) {
             if ($this->inPeriodicTimeRange()) {
+                $date = now()->format('Y-m-d ');
                 $param = ['x' => $date . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
                 // activity()->withProperties($param)->log('volume');
                 $this->vpsRepository->create($param);
