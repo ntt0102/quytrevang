@@ -329,6 +329,10 @@ function createChart() {
             ]
         },
         options: {
+            parsing: {
+                xAxisKey: "time",
+                yAxisKey: "value"
+            },
             scales: {
                 x: {
                     type: "time",
