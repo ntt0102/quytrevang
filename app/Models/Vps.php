@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\CoreModel;
+use Carbon\Carbon;
 
 class Vps extends CoreModel
 {
@@ -19,4 +20,9 @@ class Vps extends CoreModel
         'y'
     ];
     protected static $recordEvents = [];
+
+    public function getXAttribute($date)
+    {
+        return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i:s');
+    }
 }
