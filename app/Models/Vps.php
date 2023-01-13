@@ -21,14 +21,15 @@ class Vps extends CoreModel
     ];
     protected $casts = [
         'x' => 'string',
-        'y' => 'string'
+        'y' => 'float'
     ];
     protected static $recordEvents = [];
-
     public function getXAttribute()
     {
-        // return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i:s');
-        // return  $date->format('Y-m-d');
-        return $this->y;
+        return (string) $this->x;
+    }
+    public function getYAttribute()
+    {
+        return number_format($this->y, 1);
     }
 }
