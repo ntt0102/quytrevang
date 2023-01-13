@@ -26,10 +26,7 @@ class SocketService extends CoreService
             $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
             \Ratchet\Client\connect($uri)->then(function ($conn) {
                 $conn->on('message', function ($msg) use ($conn) {
-                    if (
-                        !$this->inTradingTimeRange()
-                        || get_global_value('runningSocketFlag') == '0'
-                    ) {
+                    if (!$this->inTradingTimeRange()) {
                         error_log("Timeout market.");
                         activity()->log("Timeout market.");
                         $conn->close();
