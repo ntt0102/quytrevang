@@ -43,7 +43,6 @@ function getLocalConfig() {
 function getServerConfig() {
     return new Promise((resolve, reject) => {
         const url = mConfig.root + mConfig.endpoint.config;
-        console.log("getServerConfig", mConfig.VN30F1M);
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },

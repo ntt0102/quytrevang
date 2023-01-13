@@ -19,8 +19,4 @@ class Vps extends CoreModel
         'value'
     ];
     protected static $recordEvents = [];
-    public function getTimeAttribute($time)
-    {
-        return strtotime($time->format('Y-m-d H:i:s'));
-    }
 }
