@@ -181,7 +181,7 @@ function createChart() {
     select.addEventListener("change", e => {
         mConfig.trend = e.target.value;
         getStrategy();
-        setLocalData("trend", { key: 1, value: mConfig.trend }, true);
+        setLocalData("trend", { key: 1, value: mConfig.trend });
     });
     div.append(select);
     //
@@ -204,7 +204,7 @@ function createChart() {
     input.addEventListener("change", e => {
         mConfig.momentum = e.target.value;
         getStrategy();
-        setLocalData("momentum", { key: 1, value: mConfig.momentum }, true);
+        setLocalData("momentum", { key: 1, value: mConfig.momentum });
     });
     div.append(input);
     //
@@ -216,7 +216,7 @@ function createChart() {
     input.addEventListener("change", e => {
         mConfig.atc = e.target.value;
         getStrategy();
-        setLocalData("atc", { key: 1, value: mConfig.atc }, true);
+        setLocalData("atc", { key: 1, value: mConfig.atc });
     });
     div.append(input);
     //
@@ -581,9 +581,9 @@ function createIndexedDB() {
         request.onupgradeneeded = e => {
             console.log("onupgradeneeded");
             mDatabase = e.target.result;
-            mDatabase.createObjectStore("price", { keyPath: "x" });
-            mDatabase.createObjectStore("volume", { keyPath: "x" });
-            mDatabase.createObjectStore("value", { keyPath: "x" });
+            mDatabase.createObjectStore("price", { keyPath: "time" });
+            mDatabase.createObjectStore("volume", { keyPath: "time" });
+            mDatabase.createObjectStore("value", { keyPath: "time" });
             mDatabase.createObjectStore("trend", { keyPath: "key" });
             mDatabase.createObjectStore("momentum", { keyPath: "key" });
             mDatabase.createObjectStore("atc", { keyPath: "key" });
@@ -649,7 +649,7 @@ function connectSocket() {
                     x: moment(`${mConfig.currentDate} ${data.timeServer}`),
                     y:
                         (mChart.data.datasets[2].data.length > 0
-                            ? mChart.data.datasets[2].data.slice(-1)[0].y
+                            ? mChart.data.datasets[2].data.slice(-1)[0].value
                             : 0) + activeValue
                 });
                 //
@@ -670,7 +670,7 @@ function connectSocket() {
                     mConfig.atc = newAtc;
                     if (isGet) getStrategy();
                     document.getElementById("atcInput").value = mConfig.atc;
-                    setLocalData("atc", { key: 1, value: mConfig.atc }, true);
+                    setLocalData("atc", { key: 1, value: mConfig.atc });
                 }
             }
             //
@@ -808,17 +808,27 @@ function getData() {
         toggleSpinner(true);
         Promise.all([getServerData(), getLocalData()]).then(arr => {
             console.log("getData: ", arr);
-            var ids = new Set(arr[0][0].map(d => d.x));
+            var ids = new Set(arr[0][0].map(d => d.time));
             var data = [];
-            data[0] = [...arr[0][0], ...arr[1][0].filter(d => !ids.has(d.x))];
+            data[0] = [
+                ...arr[0][0],
+                ...arr[1][0].filter(d => !ids.has(d.time))
+            ];
             //
-            ids = new Set(arr[0][1].map(d => d.x));
-            data[1] = [...arr[0][1], ...arr[1][1].filter(d => !ids.has(d.x))];
+            ids = new Set(arr[0][1].map(d => d.time));
+            data[1] = [
+                ...arr[0][1],
+                ...arr[1][1].filter(d => !ids.has(d.time))
+            ];
             //
-            ids = new Set(arr[0][2].map(d => d.x));
-            data[2] = [...arr[0][2], ...arr[1][2].filter(d => !ids.has(d.x))];
+            ids = new Set(arr[0][2].map(d => d.time));
+            data[2] = [
+                ...arr[0][2],
+                ...arr[1][2].filter(d => !ids.has(d.time))
+            ];
             //
             if (!mConfig.hasChangedData) {
+                console.log("data", data);
                 clearLocalData("price");
                 clearLocalData("volume");
                 clearLocalData("value");
@@ -830,10 +840,11 @@ function getData() {
             mChart.data.datasets.forEach((dataset, index) => {
                 if (index <= 2) {
                     dataset.data = data[index].reduce((r, item) => {
-                        item.x = moment(item.x);
+                        item.time = moment(item.time);
                         if (index == 2)
-                            item.y =
-                                (r.length > 0 ? r.slice(-1)[0].y : 0) + +item.y;
+                            item.value =
+                                (r.length > 0 ? r.slice(-1)[0].value : 0) +
+                                +item.value;
                         r.push(item);
                         return r;
                     }, []);
@@ -856,13 +867,22 @@ function getServerData() {
             body: JSON.stringify(data)
         })
             .then(response => response.json())
-            .then(json => resolve(json));
+            .then(json => {
+                json.forEach(type =>
+                    type.map(item => {
+                        if (typeof item.time === "object")
+                            item.time = item.time._i;
+                        return item;
+                    })
+                );
+                resolve(json);
+            });
     });
 }
 
 function setServerData(data) {
     data.action = "SET";
-    data.x = data.x.format("YYYY-MM-DD HH:mm:ss");
+    data.time = data.time.format("YYYY-MM-DD HH:mm:ss");
     const url = mConfig.root + mConfig.endpoint.data;
     toggleSpinner(true);
     fetch(url, {
@@ -909,13 +929,11 @@ function getLocalData(tables = ["price", "volume", "value"]) {
     }
 }
 
-function setLocalData(table, data, isUpdate = false) {
+function setLocalData(table, data) {
     const store = mDatabase.transaction(table, "readwrite").objectStore(table);
     if (Array.isArray(data)) {
-        data.forEach(item => {
-            isUpdate ? store.put(item) : store.add(item);
-        });
-    } else isUpdate ? store.put(data) : store.add(data);
+        if (data.length > 0) data.forEach(item => store.put(item));
+    } else store.put(data);
     // const request = isUpdate ? store.put(data) : store.add(data);
     // request.onsuccess = () => {
     //     console.log("onsuccess");
@@ -1246,19 +1264,15 @@ function getVn30f1m() {
                 mConfig.momentum = (mConfig.p24h30 - mConfig.p24h29).toFixed(1);
                 document.getElementById("momentumInput").value =
                     mConfig.momentum;
-                setLocalData(
-                    "momentum",
-                    { key: 1, value: mConfig.momentum },
-                    true
-                );
+                setLocalData("momentum", { key: 1, value: mConfig.momentum });
                 //
                 if (mChart.data.datasets[0].data.length > 0) {
                     mConfig.atc = (
-                        mChart.data.datasets[0].data.slice(-1)[0].y -
+                        mChart.data.datasets[0].data.slice(-1)[0].value -
                         mConfig.p24h30
                     ).toFixed(1);
                     document.getElementById("atcInput").value = mConfig.atc;
-                    setLocalData("atc", { key: 1, value: mConfig.atc }, true);
+                    setLocalData("atc", { key: 1, value: mConfig.atc });
                 }
                 getStrategy();
                 toggleSpinner(false);
