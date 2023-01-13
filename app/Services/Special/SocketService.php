@@ -85,7 +85,7 @@ class SocketService extends CoreService
         if ($data->id == 3220) {
             $date = now()->format('Y-m-d ');
             if ($this->inPeriodicTimeRange()) {
-                $param = ['x' => $date . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
+                $param = ['time' => $date . $data->timeServer, 'value' => $data->lastPrice, 'type' => 0];
                 // activity()->withProperties($param)->log('price');
                 $this->vpsRepository->create($param);
             } else {
@@ -95,7 +95,7 @@ class SocketService extends CoreService
                 else if ($data->lastPrice >= get_global_value('sellPrice'))
                     $activeValue = $data->lastVol * $data->lastPrice;
                 //
-                $param = ['x' => $date . $data->timeServer, 'y' => $activeValue, 'type' => 2];
+                $param = ['time' => $date . $data->timeServer, 'value' => $activeValue, 'type' => 2];
                 // activity()->withProperties($param)->log('value');
                 $this->vpsRepository->create($param);
                 //
@@ -110,7 +110,7 @@ class SocketService extends CoreService
         if ($data->id == 3310) {
             if ($this->inPeriodicTimeRange()) {
                 $date = now()->format('Y-m-d ');
-                $param = ['x' => $date . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
+                $param = ['time' => $date . $data->timeServer, 'value' => $data->BVolume - $data->SVolume, 'type' => 1];
                 // activity()->withProperties($param)->log('volume');
                 $this->vpsRepository->create($param);
             }
