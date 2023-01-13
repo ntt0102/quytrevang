@@ -38,7 +38,7 @@ Route::get('test', function () {
     // dd($s);
     // $n = now()->sub(date_interval_create_from_date_string('178 minutes'));
     // dd($n->format('Y-m-d H:i:s'));
-    // $v = app(\App\Repositories\VpsRepository::class)->latest('x');
-    $v = number_format('123.452', 2);
+    $v = app(\App\Repositories\VpsRepository::class)->latest('x');
+    // $v = number_format('123.452', 2);
     dd($v);
 })->middleware('cors');
