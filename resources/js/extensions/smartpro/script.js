@@ -925,13 +925,6 @@ function setLocalData(table, data) {
     if (Array.isArray(data)) {
         if (data.length > 0) data.forEach(item => store.put(item));
     } else store.put(data);
-    // const request = isUpdate ? store.put(data) : store.add(data);
-    // request.onsuccess = () => {
-    //     console.log("onsuccess");
-    // };
-    // request.onerror = () => {
-    //     console.log("onerror");
-    // };
 }
 
 function clearLocalData(table) {
