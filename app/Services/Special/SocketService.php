@@ -23,9 +23,11 @@ class SocketService extends CoreService
     {
         if (get_global_value('runningSocketFlag') == '0') {
             set_global_value('runningSocketFlag', '1');
+            set_global_value('startSocketTime', now()->format('H:i:s'));
             $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
             \Ratchet\Client\connect($uri)->then(function ($conn) {
                 $conn->on('message', function ($msg) use ($conn) {
+                    activity()->log("WebSocket message.");
                     if (!$this->inTradingTimeRange()) {
                         error_log("Timeout market.");
                         activity()->log("Timeout market.");
@@ -146,7 +148,7 @@ class SocketService extends CoreService
 
     private function inScheduleTimeLimit()
     {
-        $startScheduleTime = strtotime(get_global_value('startScheduleTime'));
-        return time() <= $startScheduleTime  + 25 * 60 + 30;
+        $startSocketTime = strtotime(get_global_value('startSocketTime'));
+        return time() <= $startSocketTime  + 25 * 60 + 30;
     }
 }

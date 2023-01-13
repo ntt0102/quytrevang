@@ -50,10 +50,8 @@ class Kernel extends ConsoleKernel
         })->dailyAt('14:25');
         //
         $schedule->call(function () {
-            if (check_opening_market()) {
-                set_global_value('startScheduleTime', now()->format('H:i:s'));
+            if (check_opening_market())
                 app(\App\Services\Special\SocketService::class)->connectVps();
-            }
         })->everyMinute()
             ->between(trading_time('startAtoTime'), trading_time('endAtcTime'));
         //
