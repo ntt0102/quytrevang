@@ -23,7 +23,7 @@ class Vps extends CoreModel
 
     public function getXAttribute()
     {
-        return $this->time->format('Y-m-d H:i:s');
+        return $this->value;
     }
     public function getYAttribute()
     {
