@@ -26,7 +26,10 @@ class SocketService extends CoreService
             $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
             \Ratchet\Client\connect($uri)->then(function ($conn) {
                 $conn->on('message', function ($msg) use ($conn) {
-                    if (!$this->inTradingTimeRange()) {
+                    if (
+                        !$this->inTradingTimeRange()
+                        || get_global_value('runningSocketFlag') == '0'
+                    ) {
                         error_log("Timeout market.");
                         activity()->log("Timeout market.");
                         $conn->close();
@@ -81,11 +84,11 @@ class SocketService extends CoreService
     {
         $date = now()->format('Y-m-d ');
         if ($data->id == 3220) {
-            $param = ['x' => $date . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
-            // activity()->withProperties($param)->log('price');
-            $this->vpsRepository->create($param);
-            //
-            if (!$this->inTradingTimeRange()) {
+            if ($this->inPeriodicTimeRange()) {
+                $param = ['x' => $date . $data->timeServer, 'y' => $data->lastPrice, 'type' => 0];
+                // activity()->withProperties($param)->log('price');
+                $this->vpsRepository->create($param);
+            } else {
                 $activeValue = 0;
                 if ($data->lastPrice <= get_global_value('buyPrice'))
                     $activeValue = -$data->lastVol * $data->lastPrice;
@@ -106,29 +109,41 @@ class SocketService extends CoreService
     {
         $date = now()->format('Y-m-d ');
         if ($data->id == 3310) {
-            $param = ['x' => $date . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
-            // activity()->withProperties($param)->log('volume');
-            $this->vpsRepository->create($param);
+            if ($this->inPeriodicTimeRange()) {
+                $param = ['x' => $date . $data->timeServer, 'y' => $data->BVolume - $data->SVolume, 'type' => 1];
+                // activity()->withProperties($param)->log('volume');
+                $this->vpsRepository->create($param);
+            }
         }
     }
 
     private function valueHandler($data)
     {
-        if ($data->id == 3310 && !$this->inTradingTimeRange()) {
-            [$price] = explode("|", $data->g1);
-            if ($data->side == "B") set_global_value('buyPrice', $price);
-            else set_global_value('sellPrice', $price);
+        if ($data->id == 3310) {
+            if (!$this->inPeriodicTimeRange()) {
+                [$price] = explode("|", $data->g1);
+                if ($data->side == "B") set_global_value('buyPrice', $price);
+                else set_global_value('sellPrice', $price);
+            }
         }
     }
 
-    private function inTradingTimeRange()
+    private function inPeriodicTimeRange()
     {
         $time = time();
         $isAtoSession = $time >= strtotime(trading_time('startAtoTime'))
             && $time <= strtotime(trading_time('endAtoTime'));
         $isAtcSession = $time >= strtotime(trading_time('startAtcTime'))
             && $time <= strtotime(trading_time('endAtcTime'));
-        return $isAtoSession ? "ATO" : ($isAtcSession ? "ATC" : false);
+        // return $isAtoSession ? "ATO" : ($isAtcSession ? "ATC" : false);
+        return $isAtoSession || $isAtcSession;
+    }
+
+    private function inTradingTimeRange()
+    {
+        $time = time();
+        return $time >= strtotime(trading_time('startAtoTime'))
+            && $time <= strtotime(trading_time('endAtcTime'));
     }
 
     private function inScheduleTimeLimit()
