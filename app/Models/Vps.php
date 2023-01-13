@@ -21,7 +21,7 @@ class Vps extends CoreModel
     protected $appends = ['x', 'y'];
     protected static $recordEvents = [];
     protected $casts = [
-        'x' => 'string',
+        'x' => 'string'
     ];
     public function getXAttribute()
     {
