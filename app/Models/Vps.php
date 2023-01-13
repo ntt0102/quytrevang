@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use App\Models\CoreModel;
-use Carbon\Carbon;
 
 class Vps extends CoreModel
 {
@@ -11,23 +10,26 @@ class Vps extends CoreModel
 
     protected $visible = [
         'x',
-        'y',
-        'z'
+        'y'
     ];
 
     protected $fillable = [
         'type',
-        'x',
-        'y'
+        'time',
+        'value'
     ];
-    protected $appends = ['z'];
+    protected $appends = ['x', 'y'];
     protected static $recordEvents = [];
 
-    public function getZAttribute()
+    public function getXAttribute()
     {
         // return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i:s');
         // return  $date->format('Y-m-d');
-        return $this->x;
+        return $this->time->format('Y-m-d H:i:s');
         //
+    }
+    public function getYAttribute()
+    {
+        return $this->value;
     }
 }
