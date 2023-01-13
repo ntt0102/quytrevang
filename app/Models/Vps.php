@@ -11,7 +11,8 @@ class Vps extends CoreModel
 
     protected $visible = [
         'x',
-        'y'
+        'y',
+        'z'
     ];
 
     protected $fillable = [
@@ -21,10 +22,10 @@ class Vps extends CoreModel
     ];
     protected static $recordEvents = [];
 
-    public function getXAttribute()
+    public function getZAttribute()
     {
         // return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i:s');
         // return  $date->format('Y-m-d');
-        return $this->y;
+        return $this->x;
     }
 }
