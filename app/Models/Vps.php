@@ -28,6 +28,5 @@ class Vps extends CoreModel
         // return Carbon::createFromFormat('Y-m-d H:i:s', $date)->format('Y-m-d H:i:s');
         // return  $date->format('Y-m-d');
         return $this->x;
-        //
     }
 }
