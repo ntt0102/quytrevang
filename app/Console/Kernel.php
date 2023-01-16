@@ -39,7 +39,8 @@ class Kernel extends ConsoleKernel
             if (check_opening_market())
                 app(\App\Services\Special\SocketService::class)->connectVps();
         })->everyMinute()
-            ->between(trading_time('startAtoTime'), trading_time('endAtcTime'));
+            ->between(trading_time('startAtoTime'), trading_time('endAtcTime'))
+            ->unlessBetween(trading_time('startBreakTime'), trading_time('endBreakTime'));
         //
         $schedule->call(function () {
             if (check_opening_market()) {

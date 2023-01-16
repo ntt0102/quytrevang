@@ -139,18 +139,19 @@ class SocketService extends CoreService
     private function inPeriodicTimeRange()
     {
         $time = time();
-        $isAtoSession = $time >= strtotime(trading_time('startAtoTime'))
-            && $time <= strtotime(trading_time('endAtoTime'));
-        $isAtcSession = $time >= strtotime(trading_time('startAtcTime'))
-            && $time <= strtotime(trading_time('endAtcTime'));
-        return $isAtoSession || $isAtcSession;
+        return ($time >= strtotime(trading_time('startAtoTime'))
+            && $time <= strtotime(trading_time('endAtoTime'))
+        ) || ($time >= strtotime(trading_time('startAtcTime'))
+            && $time <= strtotime(trading_time('endAtcTime')));
     }
 
     private function inTradingTimeRange()
     {
         $time = time();
-        return $time >= strtotime(trading_time('startAtoTime'))
-            && $time <= strtotime(trading_time('endAtcTime'));
+        return ($time >= strtotime(trading_time('startAtoTime'))
+            && $time <= strtotime(trading_time('startBreakTime'))
+        ) || ($time >= strtotime(trading_time('endBreakTime'))
+            && $time <= strtotime(trading_time('endAtcTime')));
     }
 
     private function inSocketTimeLimit()
