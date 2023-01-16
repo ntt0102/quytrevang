@@ -442,6 +442,21 @@ function createChart() {
                         },
                         volume: {
                             type: "line",
+                            yScaleID: "y2",
+                            yMin: 0,
+                            yMax: 0,
+                            label: {
+                                content: null,
+                                display: true,
+                                position: "start"
+                            },
+                            borderColor: "aqua",
+                            borderWidth: 1,
+                            borderDash: [5, 5],
+                            adjustScaleRange: false
+                        },
+                        volume: {
+                            type: "line",
                             yScaleID: "y1",
                             yMin: 0,
                             yMax: 0,
@@ -644,12 +659,19 @@ function connectSocket() {
                 else if (data.lastPrice >= mConfig.sellPrice)
                     activeValue = data.lastVol * data.lastPrice;
                 //
+                var acculateValue =
+                    (mChart.data.datasets[2].data.length > 0
+                        ? mChart.data.datasets[2].data.slice(-1)[0].value
+                        : 0) + activeValue;
+                //
+                var pa = mChart.options.plugins.annotation.annotations.price;
+                pa.yMin = acculateValue;
+                pa.yMax = acculateValue;
+                pa.label.content = acculateValue;
+                //
                 mChart.data.datasets[2].data.push({
                     time: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                    y:
-                        (mChart.data.datasets[2].data.length > 0
-                            ? mChart.data.datasets[2].data.slice(-1)[0].value
-                            : 0) + activeValue
+                    value: acculateValue
                 });
                 //
                 setLocalData("value", {
@@ -812,19 +834,19 @@ function getData() {
             data[0] = [
                 ...arr[0][0],
                 ...arr[1][0].filter(d => !ids.has(d.time))
-            ];
+            ].sort((a, b) => a.time.localeCompare(b.time));
             //
             ids = new Set(arr[0][1].map(d => d.time));
             data[1] = [
                 ...arr[0][1],
                 ...arr[1][1].filter(d => !ids.has(d.time))
-            ];
+            ].sort((a, b) => a.time.localeCompare(b.time));
             //
             ids = new Set(arr[0][2].map(d => d.time));
             data[2] = [
                 ...arr[0][2],
                 ...arr[1][2].filter(d => !ids.has(d.time))
-            ];
+            ].sort((a, b) => a.time.localeCompare(b.time));
             //
             if (!mConfig.hasChangedData) {
                 console.log("data", data);
