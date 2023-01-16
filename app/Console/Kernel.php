@@ -30,24 +30,10 @@ class Kernel extends ConsoleKernel
         //
         $schedule->call(function () {
             if (check_opening_market()) {
-                set_global_value('runningSocketFlag', '0');
-                app(\App\Repositories\VpsRepository::class)->clear();
-            }
-        })->dailyAt('08:40');
-        //
-        $schedule->call(function () {
-            if (check_opening_market()) {
+                set_global_value('reportedTradingFlag', '0');
                 app(\App\Services\VpsService::class)->setAtoStrategy();
             }
         })->dailyAt('09:01');
-        //
-        $schedule->call(function () {
-            if (check_opening_market()) {
-                set_global_value('reportedTradingFlag', '0');
-                set_global_value('runningSocketFlag', '0');
-                app(\App\Repositories\VpsRepository::class)->clear();
-            }
-        })->dailyAt('14:25');
         //
         $schedule->call(function () {
             if (check_opening_market())
@@ -60,7 +46,7 @@ class Kernel extends ConsoleKernel
                 app(\App\Services\Admin\ShareService::class)->getData();
                 app(\App\Services\Admin\Vn30f1mService::class)->getData();
             }
-        })->dailyAt('15:00');
+        })->dailyAt('14:46');
     }
 
     /**
