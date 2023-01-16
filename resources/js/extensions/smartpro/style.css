@@ -154,11 +154,12 @@
     padding: 0px;
 }
 
-#periodicChart > #exportButton {
+#periodicChart > #timeFrameSelect {
     position: absolute;
-    top: -0.5px;
+    top: 0.5px;
     right: 73px;
-    padding: 0.99px 5px;
+    text-align: center;
+    padding: 2px 0 !important;
 }
 
 #periodicChart > #refreshButton {

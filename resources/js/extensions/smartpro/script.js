@@ -62,6 +62,7 @@ function getServerConfig() {
                     : null;
                 mConfig.atc = !!json.strategy ? json.strategy.atc : null;
                 //
+                mConfig.timeFrame = 0;
                 mConfig.hasChangedData = false;
                 mConfig.refPrice = +document.getElementById(
                     `${mConfig.VN30F1M}ref`
@@ -169,6 +170,27 @@ function createChart() {
     div.append(select);
     //
     select = document.createElement("select");
+    select.id = "timeFrameSelect";
+    [
+        { text: "Tick", value: 0 },
+        { text: "1m", value: 1 },
+        { text: "2m", value: 2 },
+        { text: "3m", value: 3 },
+        { text: "5m", value: 5 }
+    ].forEach((item, index) => {
+        var option = document.createElement("option");
+        option.value = item.value;
+        option.text = item.text;
+        select.appendChild(option);
+    });
+    select.value = mConfig.timeFrame;
+    select.addEventListener("change", e => {
+        mConfig.timeFrame = e.target.value;
+        getData();
+    });
+    div.append(select);
+    //
+    select = document.createElement("select");
     select.id = "trendSelect";
     ["", "2", "1", "-1", "-2"].forEach((item, index) => {
         var option = document.createElement("option");
@@ -218,12 +240,6 @@ function createChart() {
         setLocalData("atc", { key: 1, value: mConfig.atc });
     });
     div.append(input);
-    //
-    var button = document.createElement("button");
-    button.id = "exportButton";
-    button.innerText = "Export";
-    button.addEventListener("click", () => exportHandler());
-    div.append(button);
     //
     button = document.createElement("button");
     button.id = "refreshButton";
@@ -860,13 +876,46 @@ function getData() {
             //
             mChart.data.datasets.forEach((dataset, index) => {
                 if (index <= 2) {
+                    var ms = moment(data[index][0].time).diff(
+                        moment().startOf("day"),
+                        "minutes"
+                    );
+                    console.log(data[index][0].time, ms);
                     dataset.data = data[index].reduce((r, item) => {
-                        item.time = moment(item.time);
-                        if (index == 2)
-                            item.value =
-                                (r.length > 0 ? r.slice(-1)[0].value : 0) +
-                                +item.value;
-                        r.push(item);
+                        var newItem = {};
+                        var isUpdate = false;
+                        var prevValue = 0;
+                        var currMoment = moment(item.time);
+                        var startDayMoment = moment().startOf("day");
+                        var currMin = currMoment.diff(
+                            startDayMoment,
+                            "minutes"
+                        );
+                        currMin = currMin - (currMin % mConfig.timeFrame);
+                        if (r.length > 0) {
+                            var prevItem = r.slice(-1)[0];
+                            prevValue = prevItem.value;
+                            var prevMin = prevItem.time.diff(
+                                startDayMoment,
+                                "minutes"
+                            );
+                            prevMin = prevMin - (prevMin % mConfig.timeFrame);
+                            if (currMin == prevMin) isUpdate = true;
+                        }
+                        //
+                        if (mConfig.timeFrame == 0) newItem.time = currMoment;
+                        else {
+                            if (isUpdate) newItem = r.pop();
+                            else
+                                newItem.time = startDayMoment.add(
+                                    currMin,
+                                    "minutes"
+                                );
+                        }
+                        //
+                        newItem.value =
+                            (index == 2 ? prevValue : 0) + +item.value;
+                        r.push(newItem);
                         return r;
                     }, []);
                 }
