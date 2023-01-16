@@ -86,14 +86,14 @@ class SocketService extends CoreService
     {
         if ($data->id == 3220) {
             $date = now()->format('Y-m-d ');
-            if ($this->inPeriodicTimeRange()) {
-                $param = ['time' => $date . $data->timeServer, 'value' => $data->lastPrice, 'type' => 0];
-                error_log("price");
-                // activity()->withProperties($param)->log('price');
-                $this->vpsRepository->create($param);
-                $prevTime = now()->sub(date_interval_create_from_date_string('15 minutes'));
-                $this->vpsRepository->deleteMultiple([['type', 0], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
-            } else {
+            $param = ['time' => $date . $data->timeServer, 'value' => $data->lastPrice, 'type' => 0];
+            error_log("price");
+            // activity()->withProperties($param)->log('price');
+            $this->vpsRepository->create($param);
+            $prevTime = now()->sub(date_interval_create_from_date_string('15 minutes'));
+            $this->vpsRepository->deleteMultiple([['type', 0], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
+            //
+            if (!$this->inPeriodicTimeRange()) {
                 $activeValue = 0;
                 if ($data->lastPrice <= get_global_value('buyPrice'))
                     $activeValue = -$data->lastVol * $data->lastPrice;
@@ -113,15 +113,13 @@ class SocketService extends CoreService
     private function volumeHandler($data)
     {
         if ($data->id == 3310) {
-            if ($this->inPeriodicTimeRange()) {
-                $date = now()->format('Y-m-d ');
-                $param = ['time' => $date . $data->timeServer, 'value' => $data->BVolume - $data->SVolume, 'type' => 1];
-                error_log("volume");
-                // activity()->withProperties($param)->log('volume');
-                $this->vpsRepository->create($param);
-                $prevTime = now()->sub(date_interval_create_from_date_string('15 minutes'));
-                $this->vpsRepository->deleteMultiple([['type', 1], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
-            }
+            $date = now()->format('Y-m-d ');
+            $param = ['time' => $date . $data->timeServer, 'value' => $data->BVolume - $data->SVolume, 'type' => 1];
+            error_log("volume");
+            // activity()->withProperties($param)->log('volume');
+            $this->vpsRepository->create($param);
+            $prevTime = now()->sub(date_interval_create_from_date_string('15 minutes'));
+            $this->vpsRepository->deleteMultiple([['type', 1], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
         }
     }
 
