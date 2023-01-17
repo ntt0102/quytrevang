@@ -90,22 +90,27 @@ class SocketService extends CoreService
             error_log("price");
             // activity()->withProperties($param)->log('price');
             $this->vpsRepository->create($param);
-            $prevTime = now()->sub(date_interval_create_from_date_string('15 minutes'));
+            $prevTime = now()->sub(date_interval_create_from_date_string(($this->inPeriodicTimeRange() ? '15' : '2') . ' minutes'));
             $this->vpsRepository->deleteMultiple([['type', 0], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
             //
             if (!$this->inPeriodicTimeRange()) {
                 $activeValue = 0;
-                if ($data->lastPrice <= get_global_value('buyPrice'))
-                    $activeValue = -$data->lastVol * $data->lastPrice;
-                else if ($data->lastPrice >= get_global_value('sellPrice'))
-                    $activeValue = $data->lastVol * $data->lastPrice;
+                $buyPrice = get_global_value('buyPrice');
+                $sellPrice = get_global_value('sellPrice');
                 //
-                $param = ['time' => $date . $data->timeServer, 'value' => $activeValue, 'type' => 2];
-                error_log("value");
-                // activity()->withProperties($param)->log('value');
-                $this->vpsRepository->create($param);
-                $prevTime = now()->sub(date_interval_create_from_date_string('15 minutes'));
-                $this->vpsRepository->deleteMultiple([['type', 2], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
+                if (abs($data->lastPrice - $buyPrice) < 1) {
+                    if ($data->lastPrice <= $buyPrice)
+                        $activeValue = -$data->lastVol * $data->lastPrice;
+                    else if ($data->lastPrice >= $sellPrice)
+                        $activeValue = $data->lastVol * $data->lastPrice;
+                    //
+                    $param = ['time' => $date . $data->timeServer, 'value' => $activeValue, 'type' => 2];
+                    error_log("value");
+                    // activity()->withProperties($param)->log('value');
+                    $this->vpsRepository->create($param);
+                    $prevTime = now()->sub(date_interval_create_from_date_string('2 minutes'));
+                    $this->vpsRepository->deleteMultiple([['type', 2], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
+                }
             }
         }
     }
@@ -118,7 +123,7 @@ class SocketService extends CoreService
             error_log("volume");
             // activity()->withProperties($param)->log('volume');
             $this->vpsRepository->create($param);
-            $prevTime = now()->sub(date_interval_create_from_date_string('15 minutes'));
+            $prevTime = now()->sub(date_interval_create_from_date_string(($this->inPeriodicTimeRange() ? '15' : '2') . ' minutes'));
             $this->vpsRepository->deleteMultiple([['type', 1], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
         }
     }
@@ -157,6 +162,6 @@ class SocketService extends CoreService
     private function inSocketTimeLimit()
     {
         $startSocketTime = strtotime(get_global_value('startSocketTime'));
-        return time() <= $startSocketTime  + 15 * 60 + 30;
+        return time() <= $startSocketTime  + 5 * 60 + 30;
     }
 }
