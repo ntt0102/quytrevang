@@ -13,6 +13,7 @@ class Strategy extends CoreModel
         'trend',
         'momentum',
         'atc',
+        'order',
         'ato'
     ];
 
@@ -21,6 +22,7 @@ class Strategy extends CoreModel
         'trend',
         'momentum',
         'atc',
+        'order',
         'ato'
     ];
 }

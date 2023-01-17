@@ -19,6 +19,7 @@ class CreateStrategiesTable extends Migration
             $table->integer('trend');
             $table->float('momentum', 8, 1);
             $table->float('atc', 8, 1);
+            $table->integer('order')->nullable();
             $table->float('ato', 8, 1)->nullable();
         });
     }
