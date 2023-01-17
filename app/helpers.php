@@ -46,10 +46,11 @@ if (!function_exists('trading_time')) {
      *
      * @return string
      */
-    function trading_time($time)
+    function trading_time($time, $onlyMin = false)
     {
         $str = app(\App\Repositories\ParameterRepository::class)->getValue($time);
-        return substr($str, 0, 5);
+        if ($onlyMin) return substr($str, 0, 5);
+        else return $str;
     }
 }
 
