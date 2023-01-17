@@ -19,6 +19,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -1,
             'momentum' => -1.2,
             'atc' => 7.7,
+            'order' => null,
             'ato' => -1,
         ]);
         Strategy::create([
@@ -26,6 +27,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -2,
             'momentum' => 0.7,
             'atc' => -5.9,
+            'order' => null,
             'ato' => -6,
         ]);
         Strategy::create([
@@ -33,6 +35,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -1,
             'momentum' => 0,
             'atc' => 12,
+            'order' => null,
             'ato' => -1,
         ]);
         Strategy::create([
@@ -40,6 +43,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 2,
             'momentum' => -0.6,
             'atc' => -9.7,
+            'order' => null,
             'ato' => 4,
         ]);
         Strategy::create([
@@ -47,6 +51,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 2,
             'momentum' => -0.5,
             'atc' => -1,
+            'order' => null,
             'ato' => -1,
         ]);
         Strategy::create([
@@ -54,6 +59,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -1,
             'momentum' => -0.2,
             'atc' => -4,
+            'order' => null,
             'ato' => 3.9,
         ]);
         Strategy::create([
@@ -61,6 +67,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 2,
             'momentum' => 0.5,
             'atc' => 0.4,
+            'order' => null,
             'ato' => 10,
         ]);
         Strategy::create([
@@ -68,6 +75,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -2,
             'momentum' => -0.1,
             'atc' => 7,
+            'order' => null,
             'ato' => -0.2,
         ]);
         Strategy::create([
@@ -75,6 +83,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -1,
             'momentum' => 0.5,
             'atc' => 0,
+            'order' => null,
             'ato' => -6,
         ]);
         Strategy::create([
@@ -82,6 +91,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -2,
             'momentum' => 0.8,
             'atc' => 0,
+            'order' => 4,
             'ato' => -4,
         ]);
         Strategy::create([
@@ -89,6 +99,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -2,
             'momentum' => -0.5,
             'atc' => -4.2,
+            'order' => -4,
             'ato' => -3.5,
         ]);
         Strategy::create([
@@ -96,6 +107,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 1,
             'momentum' => 0.4,
             'atc' => 0,
+            'order' => null,
             'ato' => 3,
         ]);
         Strategy::create([
@@ -103,6 +115,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 2,
             'momentum' => 0,
             'atc' => 9,
+            'order' => 4,
             'ato' => 6.5,
         ]);
         Strategy::create([
@@ -110,6 +123,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 1,
             'momentum' => -0.1,
             'atc' => -1.8,
+            'order' => null,
             'ato' => -6.7,
         ]);
         Strategy::create([
@@ -117,6 +131,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 2,
             'momentum' => -1,
             'atc' => -9.2,
+            'order' => -4,
             'ato' => -4.4,
         ]);
         Strategy::create([
@@ -124,6 +139,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -1,
             'momentum' => 1.1,
             'atc' => -7.3,
+            'order' => null,
             'ato' => 3.5,
         ]);
         Strategy::create([
@@ -131,6 +147,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 1,
             'momentum' => 0,
             'atc' => -9,
+            'order' => null,
             'ato' => -2.9,
         ]);
         Strategy::create([
@@ -138,6 +155,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 1,
             'momentum' => 0,
             'atc' => -1,
+            'order' => -4,
             'ato' => -5.5,
         ]);
         Strategy::create([
@@ -145,6 +163,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -2,
             'momentum' => 0.1,
             'atc' => -9.1,
+            'order' => -4,
             'ato' => 4,
         ]);
         Strategy::create([
@@ -152,6 +171,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -2,
             'momentum' => -0.5,
             'atc' => 6.5,
+            'order' => null,
             'ato' => -4.6,
         ]);
         Strategy::create([
@@ -159,6 +179,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 1,
             'momentum' => 0.1,
             'atc' => 8,
+            'order' => 5,
             'ato' => 1,
         ]);
         Strategy::create([
@@ -166,6 +187,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 1,
             'momentum' => -0.1,
             'atc' => -0.7,
+            'order' => -5,
             'ato' => 1.5,
         ]);
         Strategy::create([
@@ -173,6 +195,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => -2,
             'momentum' => 0.8,
             'atc' => -1.2,
+            'order' => 5,
             'ato' => -0.6,
         ]);
         Strategy::create([
@@ -180,6 +203,7 @@ class StrategiesTableSeeder extends Seeder
             'trend' => 1,
             'momentum' => 0.3,
             'atc' => 0.3,
+            'order' => null,
             'ato' => null,
         ]);
     }
