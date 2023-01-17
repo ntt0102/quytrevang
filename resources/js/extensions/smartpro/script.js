@@ -297,6 +297,9 @@ function createChart() {
     cell.innerText = "ATC";
     cell = row.insertCell(5);
     cell.innerText = "ATO";
+    cell = row.insertCell(6);
+    cell.id = "orderStatistic";
+    cell.innerText = "Order";
     div.append(table);
     //
     var canvas = document.createElement("canvas");
@@ -456,7 +459,7 @@ function createChart() {
                             borderDash: [5, 5],
                             adjustScaleRange: false
                         },
-                        volume: {
+                        value: {
                             type: "line",
                             yScaleID: "y2",
                             yMin: 0,
@@ -654,20 +657,19 @@ function connectSocket() {
     function priceHandler(data) {
         if (data.id == 3220) {
             // console.log("price" + data.id);
-            var pa = mChart.options.plugins.annotation.annotations.price;
-            pa.yMin = data.lastPrice;
-            pa.yMax = data.lastPrice;
-            pa.label.content = data.lastPrice;
-            //
-            mChart.data.datasets[0].data.push({
-                time: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                value: data.lastPrice
-            });
-            //
-            setLocalData("price", {
+            var index = 0;
+            var price = {
                 time: `${mConfig.currentDate} ${data.timeServer}`,
                 value: data.lastPrice
-            });
+            };
+            var pa = mChart.options.plugins.annotation.annotations.price;
+            pa.yMin = price.value;
+            pa.yMax = price.value;
+            pa.label.content = price.value;
+            //
+            createTimeFrameData(mChart.data.datasets[index].data, price, index);
+            //
+            setLocalData("price", price);
             if (!inTradingTimeRange()) {
                 var activeValue = 0;
                 if (data.lastPrice <= mConfig.buyPrice)
@@ -675,24 +677,27 @@ function connectSocket() {
                 else if (data.lastPrice >= mConfig.sellPrice)
                     activeValue = data.lastVol * data.lastPrice;
                 //
-                var acculateValue =
-                    (mChart.data.datasets[2].data.length > 0
-                        ? mChart.data.datasets[2].data.slice(-1)[0].value
-                        : 0) + activeValue;
-                //
-                var pa = mChart.options.plugins.annotation.annotations.price;
-                pa.yMin = acculateValue;
-                pa.yMax = acculateValue;
-                pa.label.content = acculateValue;
-                //
-                mChart.data.datasets[2].data.push({
-                    time: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                    value: acculateValue
-                });
-                //
-                setLocalData("value", {
+                var index = 2;
+                var value = {
                     time: `${mConfig.currentDate} ${data.timeServer}`,
                     value: activeValue
+                };
+                //
+                var acculateValue = createTimeFrameData(
+                    mChart.data.datasets[index].data,
+                    value,
+                    index
+                );
+                //
+                var line = acculateValue.slice(-1)[0].value;
+                var va = mChart.options.plugins.annotation.annotations.value;
+                va.yMin = line;
+                va.yMax = line;
+                va.label.content = line;
+                //
+                setLocalData("value", {
+                    ...value,
+                    ...{ value: activeValue.toFixed(1) }
                 });
             }
             mChart.update("none");
@@ -717,21 +722,24 @@ function connectSocket() {
     function volumeHandler(data) {
         if (data.id == 3310) {
             // console.log("volume" + data.id);
-            var volume = data.BVolume - data.SVolume;
-            var va = mChart.options.plugins.annotation.annotations.volume;
-            va.yMin = volume;
-            va.yMax = volume;
-            va.label.content = volume;
-            //
-            mChart.data.datasets[1].data.push({
-                time: moment(`${mConfig.currentDate} ${data.timeServer}`),
-                value: volume
-            });
-            mChart.update("none");
-            setLocalData("volume", {
+            var index = 1;
+            var volume = {
                 time: `${mConfig.currentDate} ${data.timeServer}`,
-                value: volume
-            });
+                value: data.BVolume - data.SVolume
+            };
+            var va = mChart.options.plugins.annotation.annotations.volume;
+            va.yMin = volume.value;
+            va.yMax = volume.value;
+            va.label.content = volume.value;
+            //
+            createTimeFrameData(
+                mChart.data.datasets[index].data,
+                volume,
+                index
+            );
+            //
+            mChart.update("none");
+            setLocalData("volume", volume);
             //
             mConfig.hasChangedData = true;
         }
@@ -875,56 +883,43 @@ function getData() {
             } else return getData();
             //
             mChart.data.datasets.forEach((dataset, index) => {
-                if (index <= 2) {
-                    var ms = moment(data[index][0].time).diff(
-                        moment().startOf("day"),
-                        "minutes"
-                    );
-                    console.log(data[index][0].time, ms);
-                    dataset.data = data[index].reduce((r, item) => {
-                        var newItem = {};
-                        var isUpdate = false;
-                        var prevValue = 0;
-                        var currMoment = moment(item.time);
-                        var startDayMoment = moment().startOf("day");
-                        var currMin = currMoment.diff(
-                            startDayMoment,
-                            "minutes"
-                        );
-                        currMin = currMin - (currMin % mConfig.timeFrame);
-                        if (r.length > 0) {
-                            var prevItem = r.slice(-1)[0];
-                            prevValue = prevItem.value;
-                            var prevMin = prevItem.time.diff(
-                                startDayMoment,
-                                "minutes"
-                            );
-                            prevMin = prevMin - (prevMin % mConfig.timeFrame);
-                            if (currMin == prevMin) isUpdate = true;
-                        }
-                        //
-                        if (mConfig.timeFrame == 0) newItem.time = currMoment;
-                        else {
-                            if (isUpdate) newItem = r.pop();
-                            else
-                                newItem.time = startDayMoment.add(
-                                    currMin,
-                                    "minutes"
-                                );
-                        }
-                        //
-                        newItem.value =
-                            (index == 2 ? prevValue : 0) + +item.value;
-                        r.push(newItem);
-                        return r;
-                    }, []);
-                }
+                dataset.data = data[index].reduce(
+                    (r, item) => createTimeFrameData(r, item, index),
+                    []
+                );
             });
             mChart.update("none");
             toggleSpinner(false);
             resolve();
         });
     });
+}
+
+function createTimeFrameData(r, item, index) {
+    var newItem = {};
+    var isUpdate = false;
+    var prevValue = 0;
+    var currMoment = moment(item.time);
+    var startDayMoment = moment().startOf("day");
+    var currMin = currMoment.diff(startDayMoment, "minutes");
+    currMin = currMin - (currMin % mConfig.timeFrame);
+    if (r.length > 0) {
+        var prevItem = r.slice(-1)[0];
+        prevValue = prevItem.value;
+        var prevMin = prevItem.time.diff(startDayMoment, "minutes");
+        prevMin = prevMin - (prevMin % mConfig.timeFrame);
+        if (currMin == prevMin) isUpdate = true;
+    }
+    //
+    if (mConfig.timeFrame == 0) newItem.time = currMoment;
+    else {
+        if (isUpdate) newItem = r.pop();
+        else newItem.time = startDayMoment.add(currMin, "minutes");
+    }
+    //
+    newItem.value = (index == 2 ? Math.round(prevValue) : 0) + +item.value;
+    r.push(newItem);
+    return r;
 }
 
 function getServerData() {
@@ -1249,19 +1244,46 @@ function getStrategy() {
                     cell.innerText = !!item.ato
                         ? item.ato.toFixed(1)
                         : item.ato;
-                    cell.style.backgroundColor = item.ato
+                    cell.style.backgroundColor = !!item.ato
                         ? item.ato >= 0
                             ? "LimeGreen"
                             : "red"
                         : "white";
+                    cell = row.insertCell(6);
+                    cell.innerText = item.order;
+                    cell.style.backgroundColor =
+                        !!item.ato && !!item.order
+                            ? item.ato / item.order >= 0
+                                ? "LimeGreen"
+                                : "red"
+                            : "white";
                 });
                 //
-                var posList = json.filter(item => item.ato >= 0);
+                var posList = json.filter(item => !!item.ato && item.ato >= 0);
                 var posPer = ((posList.length / json.length) * 100).toFixed(0);
                 var btn = document.getElementById("listButton");
                 btn.innerText = `${posPer} - ${100 - posPer}`;
                 btn.style.background = `linear-gradient(to right, LimeGreen ${posPer}%, red ${posPer}% ${100 -
                     posPer}%)`;
+                //
+                var posOrdList = json.filter(
+                    item =>
+                        !!item.ato && !!item.order && item.ato / item.order >= 0
+                );
+                var negOrdList = json.filter(
+                    item =>
+                        !!item.ato && !!item.order && item.ato / item.order < 0
+                );
+                var posOrdPer = (
+                    (posOrdList.length /
+                        (posOrdList.length + negOrdList.length)) *
+                    100
+                ).toFixed(0);
+                var td = document.getElementById("orderStatistic");
+                td.innerText = `${posOrdPer} - ${100 - posOrdPer}`;
+                td.style.background = `linear-gradient(to right, LimeGreen ${posOrdPer}%, red ${posPer}% ${100 -
+                    posOrdPer}%)`;
+                //
                 toggleSpinner(false);
                 resolve();
             });
@@ -1271,10 +1293,15 @@ function getStrategy() {
 function setStrategy() {
     toggleSpinner(true);
     const url = mConfig.root + mConfig.endpoint.setStrategy;
+    var order = parseInt(
+        document.querySelector("#status-danhmuc-content > tr > td:nth-child(2)")
+            .innerText
+    );
     var data = {
         trend: mConfig.trend,
         momentum: mConfig.momentum,
-        atc: mConfig.atc
+        atc: mConfig.atc,
+        order: !isNaN(order) ? order : null
     };
     fetch(url, {
         method: "POST",
