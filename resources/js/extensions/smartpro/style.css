@@ -87,6 +87,34 @@
     border-radius: 5px;
 }
 
+#periodicChart #orderMenu {
+    position: fixed;
+    border: 1px solid #dedede;
+    background: white;
+    list-style: none;
+    border-radius: 6px;
+    padding: 2px;
+}
+#periodicChart #orderMenu li {
+    font-size: 14px;
+    text-align: center;
+    line-height: 24px;
+    width: 70px;
+    padding: 4px;
+    cursor: pointer;
+}
+#periodicChart #orderMenu li:first-child {
+    border-bottom: 1px solid #aaa;
+}
+#periodicChart #orderMenu li:first-child:hover {
+    background: Green;
+    color: white;
+}
+#periodicChart #orderMenu li:last-child:hover {
+    background: red;
+    color: white;
+}
+
 #periodicChart > #listTable {
     position: absolute;
     top: 70px;
@@ -263,18 +291,6 @@
     display: flex !important;
 }
 
-.continuous-order .aside-menu #select_condition_order_wrapper {
-    display: block !important;
-}
-
-.continuous-order .aside-menu #select_condition_order_wrapper .arrow {
-    display: none !important;
-}
-
-.continuous-order .aside-menu #select_order_type_wrapper {
-    display: none !important;
-}
-
 .continuous-order #mainFooter > div:nth-child(2) {
     position: fixed;
     bottom: 8px;
@@ -335,6 +351,18 @@
     width: 60px;
     min-height: 30px;
     border-bottom: none;
+}
+
+.aside-menu #select_condition_order_wrapper {
+    display: block !important;
+}
+
+.aside-menu #select_condition_order_wrapper .arrow {
+    display: none !important;
+}
+
+.aside-menu #select_order_type_wrapper {
+    display: none !important;
 }
 
 .timeStamp {

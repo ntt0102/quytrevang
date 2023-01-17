@@ -80,7 +80,7 @@ function getServerConfig() {
                 mConfig.p24h30 = null;
                 mConfig.buyPrice = null;
                 mConfig.sellPrice = null;
-                mConfig.activeVolume = 0;
+                //
                 resolve();
             })
             .catch(() => {
@@ -302,6 +302,19 @@ function createChart() {
     cell.innerText = "Order";
     div.append(table);
     //
+    var ul = document.createElement("ul");
+    ul.id = "orderMenu";
+    ul.style.display = "none";
+    var li = document.createElement("li");
+    li.innerText = "LONG";
+    li.addEventListener("click", () => conditionOrder("SOL"));
+    ul.appendChild(li);
+    li = document.createElement("li");
+    li.innerText = "SHORT";
+    li.addEventListener("click", () => conditionOrder("SOU"));
+    ul.appendChild(li);
+    div.append(ul);
+    //
     var canvas = document.createElement("canvas");
     div.append(canvas);
     document.body.append(div);
@@ -513,18 +526,25 @@ function createChart() {
                     var datasetIndex = elements[0].datasetIndex;
                     mChart.data.datasets[0].order = 2;
                     mChart.data.datasets[1].order = 2;
-                    // mChart.data.datasets[2].order = 2;
+                    mChart.data.datasets[2].order = 2;
                     mChart.data.datasets[datasetIndex].order = 1;
                     mChart.update();
                 }
             },
             onClick: (e, elements) => {
+                var menu = document.getElementById("orderMenu");
                 if (elements.length) {
-                    var datasetIndex = elements[0].datasetIndex;
-                    var index = elements[0].index;
-                    var data = mChart.data.datasets[datasetIndex].data[index];
-                    console.log("onClick", data);
-                }
+                    elements.forEach(el => {
+                        if (el.datasetIndex == 0) {
+                            menu.style.left = +(e.native.clientX - 76) + "px";
+                            menu.style.top = +(e.native.clientY - 71) + "px";
+                            menu.style.display = "block";
+                            //
+                            var price = mChart.data.datasets[0].data[el.index];
+                            mConfig.orderPrice = price.value;
+                        }
+                    });
+                } else menu.style.display = "none";
             }
         },
         plugins: [
@@ -704,12 +724,12 @@ function connectSocket() {
             //
             if (inAtcTimeRange()) {
                 if (!!mConfig.p24h30) {
-                    var newAtc = (data.lastPrice - mConfig.p24h30).toFixed(1);
+                    var newAtc = data.lastPrice - mConfig.p24h30;
                     var isGet =
                         mConfig.atc == 0 ||
                         newAtc == 0 ||
                         (newAtc != 0 && mConfig.atc / newAtc < 0);
-                    mConfig.atc = newAtc;
+                    mConfig.atc = newAtc != 0 ? newAtc.toFixed(1) : 0;
                     if (isGet) getStrategy();
                     document.getElementById("atcInput").value = mConfig.atc;
                     setLocalData("atc", { key: 1, value: mConfig.atc });
@@ -1361,4 +1381,17 @@ function getVn30f1m() {
             })
             .catch(error => getVn30f1m());
     });
+}
+
+function conditionOrder(type) {
+    document.getElementById("select_condition_order_wrapper").click();
+    document.getElementById("right_stopOrderIndex").value = mConfig.orderPrice;
+    document.getElementById("right_selStopOrderType").value = type;
+    document.getElementById("btn_cancel_all_order_condition").click();
+    setTimeout(() => {
+        if (type == "SOL") {
+            document.getElementById("btn_long").click();
+        } else if (type == "SOU") document.getElementById("btn_short").click();
+        document.getElementById("orderMenu").style.display = "none";
+    }, 0);
 }
