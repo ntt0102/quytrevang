@@ -229,7 +229,8 @@ class VpsService extends CoreService
                     'date' => $currentDate,
                     'trend' => $request->trend,
                     'momentum' => $request->momentum,
-                    'atc' => $request->atc
+                    'atc' => $request->atc,
+                    'order' => $request->order,
                 ];
                 return !!$this->strategyRepository->create($data);
             }

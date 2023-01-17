@@ -157,6 +157,6 @@ class SocketService extends CoreService
     private function inSocketTimeLimit()
     {
         $startSocketTime = strtotime(get_global_value('startSocketTime'));
-        return time() <= $startSocketTime  + 25 * 60 + 30;
+        return time() <= $startSocketTime  + 15 * 60 + 30;
     }
 }
