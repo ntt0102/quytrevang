@@ -408,7 +408,7 @@
         top: 35px;
         left: 0px !important;
         z-index: 2001 !important;
-        height: 190px !important;
+        height: 150px !important;
         width: 78px !important;
         border-left: 0px !important;
     }
@@ -420,18 +420,46 @@
     .periodic-order .aside-menu .list-group-item:nth-child(5),
     .periodic-order .aside-menu .list-group-item:nth-child(6) > label,
     .periodic-order .aside-menu .list-group-item:nth-child(7) > label,
+    .periodic-order .aside-menu #right_sell_stop_order label,
     .periodic-order .aside-menu .button-order-group > div:last-child {
         display: none !important;
+    }
+    .periodic-order .aside-menu #right_sell_stop_order {
+        height: 37px;
+    }
+
+    .periodic-order .aside-menu .input-group > .form-control {
+        padding: 1px;
+        text-align: center;
+    }
+    .periodic-order
+        .aside-menu
+        .input-group
+        > .form-control.formatIntOnlyNumber {
+        margin-left: 32px;
+    }
+    .periodic-order
+        .aside-menu
+        .input-group
+        > .form-control.formatDoubleOnlyNumber {
+        margin-left: -32px;
+    }
+
+    .periodic-order .aside-menu #right_selStopOrderType {
+        margin-bottom: 37px;
+        margin-top: -37px;
     }
 
     .periodic-order .aside-menu .list-group-item,
     .periodic-order .aside-menu .button-order-group {
-        padding: 0;
+        padding: 0 !important;
+        margin: 0 !important;
         border-left: unset !important;
     }
 
     .periodic-order .aside-menu .button-order-group > div:first-child {
         flex-direction: column;
+        display: block !important;
     }
 
     .periodic-order .aside-menu .button-order-group > div:first-child button {
