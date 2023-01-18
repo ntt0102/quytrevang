@@ -64,6 +64,9 @@ function getServerConfig() {
                 //
                 mConfig.timeFrame = 0;
                 mConfig.hasChangedData = false;
+                mConfig.orderValue = null;
+                mConfig.orderConfirm = false;
+                //
                 mConfig.refPrice = +document.getElementById(
                     `${mConfig.VN30F1M}ref`
                 ).innerText;
@@ -241,7 +244,7 @@ function createChart() {
     });
     div.append(input);
     //
-    button = document.createElement("button");
+    var button = document.createElement("button");
     button.id = "refreshButton";
     button.innerText = "Refresh";
     button.addEventListener("click", getData);
@@ -269,6 +272,23 @@ function createChart() {
             div.classList.remove("list-show");
         else div.classList.add("list-show");
     });
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "cancelButton";
+    button.innerText = "Cancel";
+    button.style.display = "none";
+    button.addEventListener("click", () => {
+        document.getElementById("cancelButton").style.display = "none";
+        mConfig.orderConfirm = false;
+    });
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "orderButton";
+    button.innerText = "Order?";
+    button.style.display = "none";
+    button.addEventListener("click", conditionOrder);
     div.append(button);
     //
     var img = document.createElement("img");
@@ -301,19 +321,6 @@ function createChart() {
     cell.id = "orderStatistic";
     cell.innerText = "Order";
     div.append(table);
-    //
-    var ul = document.createElement("ul");
-    ul.id = "orderMenu";
-    ul.style.display = "none";
-    var li = document.createElement("li");
-    li.innerText = "LONG";
-    li.addEventListener("click", () => conditionOrder("SOL"));
-    ul.appendChild(li);
-    li = document.createElement("li");
-    li.innerText = "SHORT";
-    li.addEventListener("click", () => conditionOrder("SOU"));
-    ul.appendChild(li);
-    div.append(ul);
     //
     var canvas = document.createElement("canvas");
     div.append(canvas);
@@ -532,13 +539,12 @@ function createChart() {
                 }
             },
             onClick: (e, elements) => {
-                var menu = document.getElementById("orderMenu");
+                var ordBtn = document.getElementById("orderButton");
                 if (elements.length) {
                     elements.forEach(el => {
+                        var hasOrder = false;
                         if (el.datasetIndex == 0) {
-                            menu.style.left = +(e.native.clientX - 76) + "px";
-                            menu.style.top = +(e.native.clientY - 71) + "px";
-                            menu.style.display = "block";
+                            mConfig.orderKind = 1;
                             //
                             var price = mChart.data.datasets[0].data[el.index];
                             document
@@ -549,9 +555,43 @@ function createChart() {
                             document.getElementById(
                                 "right_stopOrderIndex"
                             ).value = price.value;
+                            mConfig.orderType =
+                                price.value >= mConfig.currPrice ? 1 : 2;
+                            document.getElementById(
+                                "right_selStopOrderType"
+                            ).value = mConfig.orderType == 1 ? "SOL" : "SOU";
+                            //
+                            hasOrder = true;
+                        } else if (el.datasetIndex == 2) {
+                            mConfig.orderKind = 2;
+                            mConfig.orderConfirm = false;
+                            //
+                            var value = mChart.data.datasets[2].data[el.index];
+                            mConfig.orderValue = value.value;
+                            mConfig.orderType =
+                                value.value >= mConfig.currValue ? 1 : 2;
+                            document
+                                .getElementById("select_normal_order_wrapper")
+                                .click();
+                            document.getElementById("right_price").value =
+                                "MTL";
+                            //
+                            hasOrder = true;
+                        }
+                        if (hasOrder) {
+                            ordBtn.style.left = +(e.native.clientX - 54) + "px";
+                            ordBtn.style.top = +(e.native.clientY - 27) + "px";
+                            ordBtn.style.display = "block";
+                            if (mConfig.orderType == 1) {
+                                ordBtn.innerText = "LONG";
+                                ordBtn.style.background = "green";
+                            } else {
+                                ordBtn.innerText = "SHORT";
+                                ordBtn.style.background = "red";
+                            }
                         }
                     });
-                } else menu.style.display = "none";
+                } else ordBtn.style.display = "none";
             }
         },
         plugins: [
@@ -685,6 +725,7 @@ function connectSocket() {
         if (data.id == 3220) {
             // console.log("price" + data.id);
             var index = 0;
+            mConfig.currPrice = data.lastPrice;
             var price = {
                 time: `${mConfig.currentDate} ${data.timeServer}`,
                 value: data.lastPrice
@@ -710,17 +751,39 @@ function connectSocket() {
                     value: activeValue
                 };
                 //
-                var acculateValue = createTimeFrameData(
+                var dataList = createTimeFrameData(
                     mChart.data.datasets[index].data,
                     value,
                     index
                 );
                 //
-                var line = acculateValue.slice(-1)[0].value;
+                var accumulateValue = dataList.slice(-1)[0].value;
+                mConfig.currValue = accumulateValue;
+                //
+                if (mConfig.orderConfirm) {
+                    mConfig.orderConfirm = false;
+                    document.getElementById("btn_cancel_all_normal").click();
+                    setTimeout(() => {
+                        if (
+                            mConfig.orderType == 1 &&
+                            accumulateValue >= mConfig.orderValue
+                        )
+                            document.getElementById("btn_long").click();
+                        else if (
+                            mConfig.orderType == 2 &&
+                            accumulateValue <= mConfig.orderValue
+                        )
+                            document.getElementById("btn_short").click();
+                        //
+                        document.getElementById("cancelButton").style.display =
+                            "none";
+                    }, 500);
+                }
+                //
                 var va = mChart.options.plugins.annotation.annotations.value;
-                va.yMin = line;
-                va.yMax = line;
-                va.label.content = line;
+                va.yMin = accumulateValue;
+                va.yMax = accumulateValue;
+                va.label.content = accumulateValue;
                 //
                 setLocalData("value", {
                     ...value,
@@ -915,6 +978,8 @@ function getData() {
                     []
                 );
             });
+            mConfig.currPrice = mChart.data.datasets[0].data.slice(-1)[0].value;
+            mConfig.currValue = mChart.data.datasets[2].data.slice(-1)[0].value;
             mChart.update("none");
             toggleSpinner(false);
             resolve();
@@ -1391,12 +1456,21 @@ function getVn30f1m() {
 }
 
 function conditionOrder(type) {
-    document.getElementById("right_selStopOrderType").value = type;
-    document.getElementById("btn_cancel_all_order_condition").click();
-    setTimeout(() => {
-        if (type == "SOL") {
-            document.getElementById("btn_long").click();
-        } else if (type == "SOU") document.getElementById("btn_short").click();
-        document.getElementById("orderMenu").style.display = "none";
-    }, 500);
+    if (mConfig.orderKind == 1) {
+        document.getElementById("btn_cancel_all_order_condition").click();
+        setTimeout(() => {
+            document
+                .getElementById(
+                    `btn_${mConfig.orderType == 1 ? "long" : "short"}`
+                )
+                .click();
+        }, 500);
+    } else if (mConfig.orderKind == 2) {
+        mConfig.orderConfirm = true;
+        var btn = document.getElementById("cancelButton");
+        btn.style.display = "block";
+        btn.innerText = `Cancel ${mConfig.orderType == 1 ? "LONG" : "SHORT"}`;
+        btn.style.background = mConfig.orderType == 1 ? "green" : "red";
+    }
+    document.getElementById("orderButton").style.display = "none";
 }

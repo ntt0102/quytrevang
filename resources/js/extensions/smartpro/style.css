@@ -87,31 +87,19 @@
     border-radius: 5px;
 }
 
-#periodicChart #orderMenu {
-    position: fixed;
-    border: 1px solid #dedede;
-    background: white;
-    list-style: none;
-    border-radius: 6px;
-    padding: 2px;
-}
-#periodicChart #orderMenu li {
-    font-size: 14px;
-    text-align: center;
-    line-height: 24px;
-    width: 70px;
-    padding: 4px;
-    cursor: pointer;
-}
-#periodicChart #orderMenu li:first-child {
-    border-bottom: 1px solid #aaa;
-}
-#periodicChart #orderMenu li:first-child:hover {
-    background: Green;
+#periodicChart > #cancelButton {
+    position: absolute;
+    top: 30px;
+    right: 140px;
+    padding: 1px 5px;
+    border-radius: 5px;
     color: white;
 }
-#periodicChart #orderMenu li:last-child:hover {
-    background: red;
+
+#periodicChart > #orderButton {
+    position: fixed;
+    padding: 1px 5px;
+    border-radius: 5px;
     color: white;
 }
 
