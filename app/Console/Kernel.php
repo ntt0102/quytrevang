@@ -37,17 +37,12 @@ class Kernel extends ConsoleKernel
         //
         $schedule->call(function () {
             if (check_opening_market()) {
-                app(\App\Services\VpsService::class)->setAtoStrategy();
-            }
-        })->dailyAt('09:01');
-        //
-        $schedule->call(function () {
-            if (check_opening_market()) {
                 set_global_value('reportedTradingFlag', '0');
                 set_global_value('runningSocketFlag', '0');
+                app(\App\Services\VpsService::class)->setAtoStrategy();
                 app(\App\Repositories\VpsRepository::class)->clear();
             }
-        })->dailyAt('14:25');
+        })->dailyAt('11:35');
         //
         $schedule->call(function () {
             if (check_opening_market())
