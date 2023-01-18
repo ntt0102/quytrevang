@@ -541,7 +541,14 @@ function createChart() {
                             menu.style.display = "block";
                             //
                             var price = mChart.data.datasets[0].data[el.index];
-                            mConfig.orderPrice = price.value;
+                            document
+                                .getElementById(
+                                    "select_condition_order_wrapper"
+                                )
+                                .click();
+                            document.getElementById(
+                                "right_stopOrderIndex"
+                            ).value = price.value;
                         }
                     });
                 } else menu.style.display = "none";
@@ -1384,8 +1391,6 @@ function getVn30f1m() {
 }
 
 function conditionOrder(type) {
-    document.getElementById("select_condition_order_wrapper").click();
-    document.getElementById("right_stopOrderIndex").value = mConfig.orderPrice;
     document.getElementById("right_selStopOrderType").value = type;
     document.getElementById("btn_cancel_all_order_condition").click();
     setTimeout(() => {
@@ -1393,5 +1398,5 @@ function conditionOrder(type) {
             document.getElementById("btn_long").click();
         } else if (type == "SOU") document.getElementById("btn_short").click();
         document.getElementById("orderMenu").style.display = "none";
-    }, 0);
+    }, 500);
 }
