@@ -22,64 +22,60 @@ class SocketService extends CoreService
 
     public function connectVps()
     {
-        if (get_global_value('runningSocketFlag') == '0') {
-            set_global_value('runningSocketFlag', '1');
-            set_global_value('startSocketTime', now()->format('H:i:s'));
-            $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
-            \Ratchet\Client\connect($uri)->then(function ($conn) {
-                $this->connection = $conn;
-                $conn->on('message', function ($msg) use ($conn) {
-                    error_log("WebSocket message.");
-                    // activity()->log("WebSocket message.");
-                    if (!$this->inTradingTimeRange()) {
-                        error_log("Timeout market.");
-                        activity()->log("Timeout market.");
-                        $conn->close();
-                    } else {
-                        $first = substr($msg, 0, 1);
-                        if ($first == 4) {
-                            $second = substr($msg, 1, 1);
-                            if ($second == 0) {
-                                error_log("Socket opened.");
-                                activity()->log("Socket opened.");
-                                $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
-                                $data = ['action' => 'join', 'list' => $VN30F1M];
-                                $conn->send('42' . json_encode(["regs", json_encode($data)]));
-                            } else if ($second == 2) {
-                                $json = json_decode(substr($msg, 2));
-                                if ($json[0] == 'boardps') {
-                                    $this->priceHandler($json[1]->data);
-                                    $this->volumeHandler($json[1]->data);
-                                    $this->valueHandler($json[1]->data);
-                                } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
-                            }
-                        }
-                        //
-                        if (!$this->inSocketTimeLimit()) {
-                            error_log("Timeout schedule");
-                            activity()->log("Timeout schedule");
-                            $conn->close();
+        $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
+        \Ratchet\Client\connect($uri)->then(function ($conn) {
+            $this->connection = $conn;
+            $conn->on('message', function ($msg) use ($conn) {
+                error_log("WebSocket message.");
+                // activity()->log("WebSocket message.");
+                if (!$this->inTradingTimeRange()) {
+                    error_log("Timeout market.");
+                    activity()->log("Timeout market.");
+                    $conn->close();
+                } else {
+                    $first = substr($msg, 0, 1);
+                    if ($first == 4) {
+                        $second = substr($msg, 1, 1);
+                        if ($second == 0) {
+                            error_log("Socket opened.");
+                            activity()->log("Socket opened.");
+                            $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
+                            $data = ['action' => 'join', 'list' => $VN30F1M];
+                            $conn->send('42' . json_encode(["regs", json_encode($data)]));
+                        } else if ($second == 2) {
+                            $json = json_decode(substr($msg, 2));
+                            if ($json[0] == 'boardps') {
+                                $this->priceHandler($json[1]->data);
+                                $this->volumeHandler($json[1]->data);
+                                $this->valueHandler($json[1]->data);
+                            } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
                         }
                     }
-                });
-                $conn->on('close', function () {
-                    error_log("WebSocket closed.");
-                    activity()->log("WebSocket closed.");
-                    set_global_value('runningSocketFlag', '0');
-                    if ($this->inTradingTimeRange() && $this->inSocketTimeLimit())
-                        $this->connectVps();
-                });
-                $conn->on('error', function () use ($conn) {
-                    error_log("WebSocket error.");
-                    activity()->log("WebSocket error.");
-                    $conn->close();
-                });
-            }, function ($e) {
-                error_log("WebSocket could not connect: {$e->getMessage()}\n");
-                activity()->log("WebSocket could not connect: {$e->getMessage()}\n");
-                set_global_value('runningSocketFlag', '0');
+                    //
+                    if (!$this->inSocketTimeLimit()) {
+                        error_log("Timeout schedule");
+                        activity()->log("Timeout schedule");
+                        $conn->close();
+                    }
+                }
             });
-        }
+            $conn->on('close', function () {
+                error_log("WebSocket closed.");
+                activity()->log("WebSocket closed.");
+                if ($this->inTradingTimeRange() && $this->inSocketTimeLimit())
+                    $this->connectVps();
+                else set_global_value('runningSocketFlag', '0');
+            });
+            $conn->on('error', function () use ($conn) {
+                error_log("WebSocket error.");
+                activity()->log("WebSocket error.");
+                $conn->close();
+            });
+        }, function ($e) {
+            error_log("WebSocket could not connect: {$e->getMessage()}\n");
+            activity()->log("WebSocket could not connect: {$e->getMessage()}\n");
+            set_global_value('runningSocketFlag', '0');
+        });
     }
 
     private function priceHandler($data)
