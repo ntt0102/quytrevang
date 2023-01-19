@@ -681,9 +681,10 @@ function createIndexedDB() {
         request.onupgradeneeded = e => {
             console.log("onupgradeneeded");
             mDatabase = e.target.result;
-            mDatabase.createObjectStore("price", { keyPath: "time" });
-            mDatabase.createObjectStore("volume", { keyPath: "time" });
-            mDatabase.createObjectStore("value", { keyPath: "time" });
+            mDatabase.createObjectStore("data", { keyPath: "time" });
+            // mDatabase.createObjectStore("price", { keyPath: "time" });
+            // mDatabase.createObjectStore("volume", { keyPath: "time" });
+            // mDatabase.createObjectStore("value", { keyPath: "time" });
             mDatabase.createObjectStore("trend", { keyPath: "key" });
             mDatabase.createObjectStore("momentum", { keyPath: "key" });
             mDatabase.createObjectStore("atc", { keyPath: "key" });
@@ -941,43 +942,35 @@ function getData() {
     mConfig.hasChangedData = false;
     return new Promise((resolve, reject) => {
         toggleSpinner(true);
-        Promise.all([getServerData(), getLocalData()]).then(arr => {
+        Promise.all([getServerData(), getLocalData("data")]).then(arr => {
             console.log("getData: ", arr);
-            var ids = new Set(arr[0][0].map(d => d.time));
-            var data = [];
-            data[0] = [
-                ...arr[0][0],
-                ...arr[1][0].filter(d => !ids.has(d.time))
-            ].sort((a, b) => a.time.localeCompare(b.time));
-            //
-            ids = new Set(arr[0][1].map(d => d.time));
-            data[1] = [
-                ...arr[0][1],
-                ...arr[1][1].filter(d => !ids.has(d.time))
-            ].sort((a, b) => a.time.localeCompare(b.time));
-            //
-            ids = new Set(arr[0][2].map(d => d.time));
-            data[2] = [
-                ...arr[0][2],
-                ...arr[1][2].filter(d => !ids.has(d.time))
+            var ids = new Set(arr[0].map(d => d.time));
+            var data = [
+                ...arr[0],
+                ...arr[1].filter(d => !ids.has(d.time))
             ].sort((a, b) => a.time.localeCompare(b.time));
             //
             if (!mConfig.hasChangedData) {
                 console.log("data", data);
-                clearLocalData("price");
-                clearLocalData("volume");
-                clearLocalData("value");
-                setLocalData("price", data[0]);
-                setLocalData("volume", data[1]);
-                setLocalData("value", data[2]);
+                clearLocalData("data");
+                // clearLocalData("volume");
+                // clearLocalData("value");
+                setLocalData("data", data);
+                // setLocalData("volume", data[1]);
+                // setLocalData("value", data[2]);
             } else return getData();
             //
-            mChart.data.datasets.forEach((dataset, index) => {
-                dataset.data = data[index].reduce(
-                    (r, item) => createTimeFrameData(r, item, index),
-                    []
-                );
-            });
+            var chartData = data.reduce(
+                (r, item) => createTimeFrameData(r, item, true),
+                [{ data: [] }, { data: [] }]
+            );
+            console.log("chartData", chartData);
+            // mChart.data.datasets.forEach((dataset, index) => {
+            //     dataset.data = data[index].reduce(
+            //         (r, item) => createTimeFrameData(r, item, index),
+            //         []
+            //     );
+            // });
             mConfig.currPrice = mChart.data.datasets[0].data.slice(-1)[0].value;
             mConfig.currValue = mChart.data.datasets[2].data.slice(-1)[0].value;
             mChart.update("none");
@@ -987,30 +980,43 @@ function getData() {
     });
 }
 
-function createTimeFrameData(r, item, index) {
-    var newItem = {};
-    var isUpdate = false;
+function createTimeFrameData(r, item, hasValue = true) {
+    var priceItem = {};
+    var valueItem = {};
+    var isPriceUpdate = false;
+    var isValueUpdate = false;
     var prevValue = 0;
     var currMoment = moment(item.time);
     var startDayMoment = moment().startOf("day");
     var currMin = currMoment.diff(startDayMoment, "minutes");
     currMin = currMin - (currMin % mConfig.timeFrame);
-    if (r.length > 0) {
-        var prevItem = r.slice(-1)[0];
-        prevValue = prevItem.value;
-        var prevMin = prevItem.time.diff(startDayMoment, "minutes");
+    if (r[0].data.length > 0) {
+        var prevMin = r[0].data
+            .slice(-1)[0]
+            .time.diff(startDayMoment, "minutes");
         prevMin = prevMin - (prevMin % mConfig.timeFrame);
-        if (currMin == prevMin) isUpdate = true;
+        if (currMin == prevMin) isPriceUpdate = true;
+    }
+    if (hasValue && r[1].data.length > 0) isValueUpdate = isPriceUpdate;
+    //
+    if (mConfig.timeFrame == 0) {
+        priceItem.time = currMoment;
+        if (hasValue) valueItem.time = currMoment;
+    } else {
+        if (isPriceUpdate) priceItem = r[0].data.pop();
+        else priceItem.time = startDayMoment.add(currMin, "minutes");
+        //
+        if (hasValue) {
+            if (isValueUpdate) valueItem = r[1].data.pop();
+            else valueItem.time = startDayMoment.add(currMin, "minutes");
+        }
     }
     //
-    if (mConfig.timeFrame == 0) newItem.time = currMoment;
-    else {
-        if (isUpdate) newItem = r.pop();
-        else newItem.time = startDayMoment.add(currMin, "minutes");
-    }
+    priceItem.value = item.value;
+    if (hasValue) valueItem.value = prevValue + item.value;
     //
-    newItem.value = (index == 2 ? Math.round(prevValue) : 0) + +item.value;
-    r.push(newItem);
+    r[0].data.push(priceItem);
+    if (hasValue) r[1].data.push(valueItem);
     return r;
 }
 
@@ -1060,12 +1066,17 @@ function clearServerData() {
     });
 }
 
-function getLocalData(tables = ["price", "volume", "value"]) {
+function getLocalData(tables) {
     return new Promise(function(resolve, reject) {
         var tx = mDatabase.transaction(tables, "readonly");
-        var stores = tables.map(table => tx.objectStore(table));
-        var promises = stores.map(loadStore);
-        Promise.all(promises).then(arr => resolve(arr));
+        if (Array.isArray(tables)) {
+            var stores = tables.map(table => tx.objectStore(table));
+            var promises = stores.map(loadStore);
+            Promise.all(promises).then(arr => resolve(arr));
+        } else {
+            var store = tx.objectStore(tables);
+            loadStore(store).then(d => resolve(d));
+        }
     });
 
     function loadStore(store) {
