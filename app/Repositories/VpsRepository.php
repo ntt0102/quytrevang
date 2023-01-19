@@ -27,11 +27,7 @@ class VpsRepository extends CoreRepository
      */
     public function getVps()
     {
-        return [
-            $this->model->where('type', 0)->get(),
-            $this->model->where('type', 1)->get(),
-            $this->model->where('type', 2)->get(),
-        ];
+        return $this->model->get();
     }
 
     /**
