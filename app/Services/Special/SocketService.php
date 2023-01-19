@@ -83,6 +83,7 @@ class SocketService extends CoreService
                 'time' => now()->format('Y-m-d ') . $data->timeServer,
                 'price' => $data->lastPrice
             ];
+            $isSave = false;
             if (!$this->inPeriodicTimeRange()) {
                 $bid = get_global_value('bid');
                 $ask = get_global_value('ask');
@@ -90,11 +91,14 @@ class SocketService extends CoreService
                     $param['vol'] = $data->lastVol;
                     $param['bid'] = get_global_value('bid');
                     $param['ask'] = get_global_value('ask');
+                    $isSave = true;
                 }
+            } else $isSave = true;
+            if ($isSave) {
+                error_log("price");
+                // activity()->withProperties($param)->log('price');
+                $this->vpsRepository->create($param);
             }
-            error_log("price");
-            // activity()->withProperties($param)->log('price');
-            $this->vpsRepository->create($param);
         }
     }
 
