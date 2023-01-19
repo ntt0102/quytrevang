@@ -40,7 +40,6 @@ class Kernel extends ConsoleKernel
                 set_global_value('reportedTradingFlag', '0');
                 set_global_value('runningSocketFlag', '0');
                 app(\App\Services\VpsService::class)->setAtoStrategy();
-                app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt('11:35');
         //

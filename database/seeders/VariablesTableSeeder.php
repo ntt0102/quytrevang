@@ -31,11 +31,11 @@ class VariablesTableSeeder extends Seeder
             'value' => "17:48:00",
         ]);
         Variable::create([
-            'name' => "buyPrice",
+            'name' => "bid",
             'value' => "0",
         ]);
         Variable::create([
-            'name' => "sellPrice",
+            'name' => "ask",
             'value' => "0",
         ]);
     }

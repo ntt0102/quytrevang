@@ -10,13 +10,18 @@ class Vps extends CoreModel
 
     protected $visible = [
         'time',
-        'value'
+        'price',
+        'vol',
+        'bid',
+        'ask'
     ];
 
     protected $fillable = [
-        'type',
         'time',
-        'value'
+        'price',
+        'vol',
+        'bid',
+        'ask'
     ];
     protected static $recordEvents = [];
 }

@@ -10,7 +10,6 @@ class SocketService extends CoreService
 {
     private $parameterRepository;
     private $vpsRepository;
-    private $connection;
 
     public function __construct(
         ParameterRepository $parameterRepository,
@@ -24,7 +23,6 @@ class SocketService extends CoreService
     {
         $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
         \Ratchet\Client\connect($uri)->then(function ($conn) {
-            $this->connection = $conn;
             $conn->on('message', function ($msg) use ($conn) {
                 error_log("WebSocket message.");
                 // activity()->log("WebSocket message.");
@@ -46,8 +44,8 @@ class SocketService extends CoreService
                             $json = json_decode(substr($msg, 2));
                             if ($json[0] == 'boardps') {
                                 $this->priceHandler($json[1]->data);
-                                $this->volumeHandler($json[1]->data);
-                                $this->valueHandler($json[1]->data);
+                                // $this->volumeHandler($json[1]->data);
+                                $this->bidAskHandler($json[1]->data);
                             } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
                         }
                     }
@@ -81,58 +79,34 @@ class SocketService extends CoreService
     private function priceHandler($data)
     {
         if ($data->id == 3220) {
-            $date = now()->format('Y-m-d ');
-            $param = ['time' => $date . $data->timeServer, 'value' => $data->lastPrice, 'type' => 0];
+            $param = [
+                'time' => now()->format('Y-m-d ') . $data->timeServer,
+                'price' => $data->lastPrice
+            ];
+            if (!$this->inPeriodicTimeRange()) {
+                $bid = get_global_value('bid');
+                $ask = get_global_value('ask');
+                if (abs($data->lastPrice - $bid) < 1 && abs($data->lastPrice - $ask) < 1) {
+                    $param['vol'] = $data->lastVol;
+                    $param['bid'] = get_global_value('bid');
+                    $param['ask'] = get_global_value('ask');
+                }
+            }
             error_log("price");
             // activity()->withProperties($param)->log('price');
             $this->vpsRepository->create($param);
-            $prevTime = now()->sub(date_interval_create_from_date_string(($this->inPeriodicTimeRange() ? '15' : '2') . ' minutes'));
-            $this->vpsRepository->deleteMultiple([['type', 0], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
-            //
-            if (!$this->inPeriodicTimeRange()) {
-                $activeValue = 0;
-                $buyPrice = get_global_value('buyPrice');
-                $sellPrice = get_global_value('sellPrice');
-                //
-                if (abs($data->lastPrice - $buyPrice) < 1) {
-                    if ($data->lastPrice <= $buyPrice)
-                        $activeValue = -$data->lastVol * $data->lastPrice;
-                    else if ($data->lastPrice >= $sellPrice)
-                        $activeValue = $data->lastVol * $data->lastPrice;
-                    //
-                    $param = ['time' => $date . $data->timeServer, 'value' => $activeValue, 'type' => 2];
-                    error_log("value");
-                    // activity()->withProperties($param)->log('value');
-                    $this->vpsRepository->create($param);
-                    $prevTime = now()->sub(date_interval_create_from_date_string('2 minutes'));
-                    $this->vpsRepository->deleteMultiple([['type', 2], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
-                }
-            }
         }
     }
 
-    private function volumeHandler($data)
-    {
-        if ($data->id == 3310) {
-            $date = now()->format('Y-m-d ');
-            $param = ['time' => $date . $data->timeServer, 'value' => $data->BVolume - $data->SVolume, 'type' => 1];
-            error_log("volume");
-            // activity()->withProperties($param)->log('volume');
-            $this->vpsRepository->create($param);
-            $prevTime = now()->sub(date_interval_create_from_date_string(($this->inPeriodicTimeRange() ? '15' : '2') . ' minutes'));
-            $this->vpsRepository->deleteMultiple([['type', 1], ['time', '<=', $prevTime->format('Y-m-d H:i:s')]]);
-        }
-    }
-
-    private function valueHandler($data)
+    private function bidAskHandler($data)
     {
         if ($data->id == 3210) {
             if (!$this->inPeriodicTimeRange()) {
                 [$price] = explode("|", $data->g1);
-                error_log("value: " . $price);
-                // activity()->withProperties($price)->log('value');
-                if ($data->side == "B") set_global_value('buyPrice', $price);
-                else set_global_value('sellPrice', $price);
+                // error_log("bidask: " . $price);
+                // activity()->withProperties($price)->log('bidask');
+                if ($data->side == "B") set_global_value('bid', $price);
+                else set_global_value('ask', $price);
             }
         }
     }
