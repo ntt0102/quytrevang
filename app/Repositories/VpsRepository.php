@@ -28,6 +28,7 @@ class VpsRepository extends CoreRepository
     public function getVps()
     {
         return $this->model->get();
+        //
     }
 
     /**
