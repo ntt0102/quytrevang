@@ -53,6 +53,22 @@
     opacity: 0;
 }
 
+#periodicChart > #refreshButton {
+    position: absolute;
+    top: -0.5px;
+    left: 0;
+    padding: 1px 5px;
+    z-index: 3;
+}
+
+#periodicChart > #clearButton {
+    position: absolute;
+    top: -0.5px;
+    left: 30px;
+    padding: 1px 5px;
+    z-index: 3;
+}
+
 #periodicChart > #trendSelect {
     position: absolute;
     top: 40px;
@@ -94,13 +110,27 @@
     padding: 1px 5px;
     border-radius: 5px;
     color: white;
+    z-index: 3;
 }
 
-#periodicChart > #orderButton {
-    position: fixed;
-    padding: 1px 5px;
+#periodicChart > #priceOrderButton {
+    position: absolute;
+    padding: 0px 10px;
     border-radius: 5px;
     color: white;
+    background: #20e22f;
+    z-index: 3;
+    font-size: 25px;
+}
+
+#periodicChart > #valueOrderButton {
+    position: absolute;
+    padding: 0px 10px;
+    border-radius: 5px;
+    color: white;
+    background: #ab47bc;
+    z-index: 3;
+    font-size: 25px;
 }
 
 #periodicChart > #listTable {
@@ -152,44 +182,6 @@
 #periodicChart > #listTable thead {
     text-align: center;
     background: cornflowerblue;
-}
-
-#periodicChart > #displaySelect {
-    position: absolute;
-    top: 0.5px;
-    right: 0.5px;
-    text-align: center;
-    padding: 2px 0 !important;
-}
-
-#periodicChart > #streamInput {
-    position: absolute;
-    top: 28px;
-    right: 0px;
-    width: 40px;
-    padding: 0px;
-}
-
-#periodicChart > #timeFrameSelect {
-    position: absolute;
-    top: 0.5px;
-    right: 73px;
-    text-align: center;
-    padding: 2px 0 !important;
-}
-
-#periodicChart > #refreshButton {
-    position: absolute;
-    top: -0.5px;
-    right: 129px;
-    padding: 0.99px 5px;
-}
-
-#periodicChart > #clearButton {
-    position: absolute;
-    top: -0.5px;
-    right: 194px;
-    padding: 0.99px 5px;
 }
 
 #periodicChart > #spinnerImg {

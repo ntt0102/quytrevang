@@ -1,12 +1,16 @@
 var mConfig = {};
 var mChart = {};
 var mDatabase = null;
+var mPriceSeries = null;
+var mValueSeries = null;
+var mChartData = [];
 
 getLocalConfig()
     .then(() => getServerConfig())
     .then(() => {
         createButtons();
-        createChart();
+        createChart1();
+        // createLightweightChart();
         registerEvent();
         createIndexedDB().then(() => {
             connectSocket();
@@ -157,43 +161,15 @@ function createButtons() {
     document.body.append(button);
 }
 
-function createChart() {
+function createChart1() {
     var div = document.createElement("div");
     div.id = "periodicChart";
+    div.style.height = "400px";
+    document.body.append(div);
+    // var div = document.createElement("div");
+    // div.id = "periodicChart";
     //
     var select = document.createElement("select");
-    select.id = "displaySelect";
-    ["Full", "Free", "Stream", "ATO", "ATC"].forEach((item, index) => {
-        var option = document.createElement("option");
-        option.value = item;
-        option.text = item;
-        select.appendChild(option);
-    });
-    select.addEventListener("change", e => showdisplayMode(e.target.value));
-    div.append(select);
-    //
-    select = document.createElement("select");
-    select.id = "timeFrameSelect";
-    [
-        { text: "Tick", value: 0 },
-        { text: "1m", value: 1 },
-        { text: "2m", value: 2 },
-        { text: "3m", value: 3 },
-        { text: "5m", value: 5 }
-    ].forEach((item, index) => {
-        var option = document.createElement("option");
-        option.value = item.value;
-        option.text = item.text;
-        select.appendChild(option);
-    });
-    select.value = mConfig.timeFrame;
-    select.addEventListener("change", e => {
-        mConfig.timeFrame = e.target.value;
-        getData();
-    });
-    div.append(select);
-    //
-    select = document.createElement("select");
     select.id = "trendSelect";
     ["", "2", "1", "-1", "-2"].forEach((item, index) => {
         var option = document.createElement("option");
@@ -210,17 +186,6 @@ function createChart() {
     div.append(select);
     //
     var input = document.createElement("input");
-    input.id = "streamInput";
-    input.style.zIndex = -1;
-    input.setAttribute("type", "number");
-    input.setAttribute("min", 1);
-    input.addEventListener("input", e => {
-        mConfig.streamScale = e.target.value;
-        showStreamMode("show");
-    });
-    div.append(input);
-    //
-    input = document.createElement("input");
     input.id = "momentumInput";
     input.value = mConfig.momentum;
     input.setAttribute("type", "number");
@@ -246,19 +211,17 @@ function createChart() {
     //
     var button = document.createElement("button");
     button.id = "refreshButton";
-    button.innerText = "Refresh";
+    button.innerText = "🔄";
     button.addEventListener("click", getData);
     div.append(button);
     //
     button = document.createElement("button");
     button.id = "clearButton";
-    button.innerText = "Clear";
+    button.innerText = "🔂";
     button.addEventListener("click", () => {
         var choice = confirm("Delete local database?");
         if (choice) {
-            clearLocalData("price");
-            clearLocalData("volume");
-            clearLocalData("value");
+            clearLocalData("data");
             getData();
         }
     });
@@ -276,7 +239,7 @@ function createChart() {
     //
     button = document.createElement("button");
     button.id = "cancelButton";
-    button.innerText = "Cancel";
+    button.innerText = "✘";
     button.style.display = "none";
     button.addEventListener("click", () => {
         document.getElementById("cancelButton").style.display = "none";
@@ -285,7 +248,14 @@ function createChart() {
     div.append(button);
     //
     button = document.createElement("button");
-    button.id = "orderButton";
+    button.id = "priceOrderButton";
+    button.innerText = "Order?";
+    button.style.display = "none";
+    button.addEventListener("click", conditionOrder);
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "valueOrderButton";
     button.innerText = "Order?";
     button.style.display = "none";
     button.addEventListener("click", conditionOrder);
@@ -322,286 +292,98 @@ function createChart() {
     cell.innerText = "Order";
     div.append(table);
     //
-    var canvas = document.createElement("canvas");
-    div.append(canvas);
-    document.body.append(div);
-    //
-    Chart.defaults.color = "white";
-    mChart = new Chart(canvas.getContext("2d"), {
-        type: "line",
-        data: {
-            datasets: [
-                {
-                    label: "Giá",
-                    data: [],
-                    borderColor: "yellow",
-                    backgroundColor: "yellow",
-                    yAxisID: "y",
-                    pointRadius: 0,
-                    pointHoverRadius: 5,
-                    pointHitRadius: 20,
-                    order: 1
-                },
-                {
-                    label: "KL",
-                    data: [],
-                    borderColor: "magenta",
-                    backgroundColor: "magenta",
-                    yAxisID: "y1",
-                    pointRadius: 0,
-                    pointHoverRadius: 5,
-                    pointHitRadius: 20,
-                    order: 2
-                },
-                {
-                    label: "AV",
-                    data: [],
-                    borderColor: "aqua",
-                    backgroundColor: "aqua",
-                    yAxisID: "y2",
-                    pointRadius: 0,
-                    pointHoverRadius: 5,
-                    pointHitRadius: 20,
-                    order: 2
-                }
-            ]
+    // document.body.append(div);
+    const chartOptions = {
+        localization: { locale: "vi-VN" },
+        rightPriceScale: { visible: true },
+        leftPriceScale: { visible: false },
+        layout: {
+            backgroundColor: "#131722",
+            textColor: "#d1d4dc",
+            lineColor: "#2B2B43"
         },
-        options: {
-            parsing: {
-                xAxisKey: "time",
-                yAxisKey: "value"
-            },
-            scales: {
-                x: {
-                    type: "time",
-                    time: {
-                        tooltipFormat: "D/M/YYYY H:mm:ss",
-                        displayFormats: {
-                            month: "[tháng] M",
-                            day: "[ngày] D",
-                            hour: "HH [giờ]",
-                            minute: "HH:mm",
-                            second: "HH:mm:ss",
-                            millisecond: "HH:mm:ss"
-                        }
-                    },
-                    grid: {
-                        color: "#696969",
-                        borderDash: [2, 2]
-                    },
-                    ticks: {
-                        maxTicksLimit: 10,
-                        maxRotation: 0
-                    }
-                },
-                y: {
-                    grid: {
-                        color: "#696969",
-                        borderDash: [2, 2]
-                    }
-                },
-                y1: {
-                    display: false
-                },
-                y2: {
-                    display: false
-                }
-            },
-            plugins: {
-                title: {
-                    display: true,
-                    text: "Biểu đồ"
-                },
-                zoom: {
-                    zoom: {
-                        wheel: { enabled: true },
-                        pinch: { enabled: true },
-                        mode: "x",
-                        onZoom: () => changeDisplayMode("Free")
-                    },
-                    pan: {
-                        enabled: true,
-                        mode: "x",
-                        onPan: () => changeDisplayMode("Free")
-                    }
-                },
-                annotation: {
-                    annotations: {
-                        startATO: {
-                            type: "line",
-                            xMin: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATO.start}`
-                            ),
-                            xMax: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATO.start}`
-                            ),
-                            borderColor: "lime",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        endATO: {
-                            type: "line",
-                            xMin: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATO.end}`
-                            ),
-                            xMax: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATO.end}`
-                            ),
-                            borderColor: "lime",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        startATC: {
-                            type: "line",
-                            xMin: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATC.start}`
-                            ),
-                            xMax: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATC.start}`
-                            ),
-                            borderColor: "red",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        endATC: {
-                            type: "line",
-                            xMin: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATC.end}`
-                            ),
-                            xMax: moment(
-                                `${mConfig.currentDate} ${mConfig.time.ATC.end}`
-                            ),
-                            borderColor: "red",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        value: {
-                            type: "line",
-                            yScaleID: "y2",
-                            yMin: 0,
-                            yMax: 0,
-                            label: {
-                                content: null,
-                                display: true,
-                                position: "start"
-                            },
-                            borderColor: "aqua",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        volume: {
-                            type: "line",
-                            yScaleID: "y1",
-                            yMin: 0,
-                            yMax: 0,
-                            label: {
-                                content: null,
-                                display: true,
-                                position: "start"
-                            },
-                            borderColor: "magenta",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        },
-                        price: {
-                            type: "line",
-                            yScaleID: "y",
-                            yMin: 0,
-                            yMax: 0,
-                            label: {
-                                content: null,
-                                display: true,
-                                position: "start"
-                            },
-                            borderColor: "yellow",
-                            borderWidth: 1,
-                            borderDash: [5, 5],
-                            adjustScaleRange: false
-                        }
-                    }
-                }
-            },
-            elements: { line: { tension: 0.1 } },
-            onHover: (e, elements) => {
-                if (elements.length) {
-                    var datasetIndex = elements[0].datasetIndex;
-                    mChart.data.datasets[0].order = 2;
-                    mChart.data.datasets[1].order = 2;
-                    mChart.data.datasets[2].order = 2;
-                    mChart.data.datasets[datasetIndex].order = 1;
-                    mChart.update();
-                }
-            },
-            onClick: (e, elements) => {
-                var ordBtn = document.getElementById("orderButton");
-                if (elements.length) {
-                    elements.forEach(el => {
-                        var hasOrder = false;
-                        if (el.datasetIndex == 0) {
-                            mConfig.orderKind = 1;
-                            //
-                            var price = mChart.data.datasets[0].data[el.index];
-                            document
-                                .getElementById(
-                                    "select_condition_order_wrapper"
-                                )
-                                .click();
-                            document.getElementById(
-                                "right_stopOrderIndex"
-                            ).value = price.value;
-                            mConfig.orderType =
-                                price.value >= mConfig.currPrice ? 1 : 2;
-                            document.getElementById(
-                                "right_selStopOrderType"
-                            ).value = mConfig.orderType == 1 ? "SOL" : "SOU";
-                            //
-                            hasOrder = true;
-                        } else if (el.datasetIndex == 2) {
-                            mConfig.orderKind = 2;
-                            mConfig.orderConfirm = false;
-                            //
-                            var value = mChart.data.datasets[2].data[el.index];
-                            mConfig.orderValue = value.value;
-                            mConfig.orderType =
-                                value.value >= mConfig.currValue ? 1 : 2;
-                            document
-                                .getElementById("select_normal_order_wrapper")
-                                .click();
-                            document.getElementById("right_price").value =
-                                "MTL";
-                            //
-                            hasOrder = true;
-                        }
-                        if (hasOrder) {
-                            ordBtn.style.left = +(e.native.clientX - 54) + "px";
-                            ordBtn.style.top = +(e.native.clientY - 27) + "px";
-                            ordBtn.style.display = "block";
-                            if (mConfig.orderType == 1) {
-                                ordBtn.innerText = "LONG";
-                                ordBtn.style.background = "green";
-                            } else {
-                                ordBtn.innerText = "SHORT";
-                                ordBtn.style.background = "red";
-                            }
-                        }
-                    });
-                } else ordBtn.style.display = "none";
-            }
+        grid: {
+            vertLines: { color: "#2B2B43" },
+            horzLines: { color: "#363C4E" }
         },
-        plugins: [
-            {
-                beforeDraw: chart => {
-                    chart.ctx.fillStyle = "black";
-                    chart.ctx.fillRect(0, 0, chart.width, chart.height);
-                }
-            }
-        ]
+        timeScale: {
+            timeVisible: true,
+            secondsVisible: false
+        }
+    };
+    const myChart = LightweightCharts.createChart(div, chartOptions);
+    console.log("myChart: ", myChart);
+    myChart.subscribeClick(e => {
+        console.log("subscribeClick", e);
+        var values = Array.from(e.seriesPrices.values());
+        var pOrdBtn = document.getElementById("priceOrderButton");
+        var vOrdBtn = document.getElementById("valueOrderButton");
+        if (e.seriesPrices.size) {
+            pOrdBtn.style.left = +(e.point.x - 60) + "px";
+            pOrdBtn.style.top = +(e.point.y - 40) + "px";
+            pOrdBtn.style.display = "block";
+            console.log(values[0], mChartData[0].slice(-1)[0].value);
+            mConfig.priceOrderType =
+                values[0] >= mChartData[0].slice(-1)[0].value ? 1 : 2;
+            pOrdBtn.innerText = mConfig.priceOrderType == 1 ? "↗" : "↘";
+            if (e.seriesPrices.size == 2) {
+                vOrdBtn.style.left = +(e.point.x - 60) + "px";
+                vOrdBtn.style.top = +e.point.y + "px";
+                vOrdBtn.style.display = "block";
+                mConfig.valueOrderType =
+                    values[1] >= mChartData[1].slice(-1)[0].value ? 1 : 2;
+                vOrdBtn.innerText = mConfig.valueOrderType == 1 ? "↗" : "↘";
+            } else vOrdBtn.style.display = "none";
+            // if (e.seriesPrices.size == 2) {
+            //     mConfig.orderKind = 1;
+            //     //
+            //     var price = mChart.data.datasets[0].data[el.index];
+            //     document
+            //         .getElementById("select_condition_order_wrapper")
+            //         .click();
+            //     document.getElementById("right_stopOrderIndex").value =
+            //         price.value;
+            //     mConfig.orderType = price.value >= mConfig.currPrice ? 1 : 2;
+            //     document.getElementById("right_selStopOrderType").value =
+            //         mConfig.orderType == 1 ? "SOL" : "SOU";
+            //     //
+            //     hasOrder = true;
+            // } else if (el.datasetIndex == 2) {
+            //     mConfig.orderKind = 2;
+            //     mConfig.orderConfirm = false;
+            //     //
+            //     var value = mChart.data.datasets[2].data[el.index];
+            //     mConfig.orderValue = value.value;
+            //     mConfig.orderType = value.value >= mConfig.currValue ? 1 : 2;
+            //     document.getElementById("select_normal_order_wrapper").click();
+            //     document.getElementById("right_price").value = "MTL";
+            //     //
+            //     hasOrder = true;
+            // }
+            // if (hasOrder) {
+            //     ordBtn.style.left = +(e.native.clientX - 54) + "px";
+            //     ordBtn.style.top = +(e.native.clientY - 27) + "px";
+            //     ordBtn.style.display = "block";
+            //     if (mConfig.orderType == 1) {
+            //         ordBtn.innerText = "LONG";
+            //         ordBtn.style.background = "green";
+            //     } else {
+            //         ordBtn.innerText = "SHORT";
+            //         ordBtn.style.background = "red";
+            //     }
+            // }
+        } else {
+            pOrdBtn.style.display = "none";
+            vOrdBtn.style.display = "none";
+        }
+    });
+    mPriceSeries = myChart.addLineSeries({
+        priceScaleId: "right",
+        color: "rgba(32, 226, 47, 1)"
+    });
+    mValueSeries = myChart.addLineSeries({
+        priceScaleId: "left",
+        color: "rgba(171, 71, 188, 1)"
     });
 }
 
@@ -714,8 +496,7 @@ function connectSocket() {
     socket.on("boardps", data => {
         // console.log("boardps", data.data);
         priceHandler(data.data);
-        volumeHandler(data.data);
-        valueHandler(data.data);
+        bidAskHandler(data.data);
     });
     socket.on("stockps", data => {
         // console.log("stockps", data.data);
@@ -810,64 +591,14 @@ function connectSocket() {
             mConfig.hasChangedData = true;
         }
     }
-    function volumeHandler(data) {
-        if (data.id == 3310) {
-            // console.log("volume" + data.id);
-            var index = 1;
-            var volume = {
-                time: `${mConfig.currentDate} ${data.timeServer}`,
-                value: data.BVolume - data.SVolume
-            };
-            var va = mChart.options.plugins.annotation.annotations.volume;
-            va.yMin = volume.value;
-            va.yMax = volume.value;
-            va.label.content = volume.value;
-            //
-            createTimeFrameData(
-                mChart.data.datasets[index].data,
-                volume,
-                index
-            );
-            //
-            mChart.update("none");
-            setLocalData("volume", volume);
-            //
-            mConfig.hasChangedData = true;
-        }
-    }
-    function valueHandler(data) {
+
+    function bidAskHandler(data) {
         if (data.id == 3210) {
-            if (inTradingTimeRange()) {
-                // console.log("vol2" + data.id);
-                var arr = data.g2.split("|");
-                var value = `${getColor(+arr[0])}${arr[1]}`;
-                if (data.side == "B") mConfig.bV2 = value;
-                else mConfig.sV2 = value;
-                // console.log(mConfig.bV2 + " : ", mConfig.sV2);
-            } else {
+            if (!inTradingTimeRange()) {
                 var arr = data.g1.split("|");
                 if (data.side == "B") mConfig.buyPrice = +arr[0];
                 else mConfig.sellPrice = +arr[0];
             }
-        }
-
-        function getColor(price) {
-            var ret = "";
-            switch (price) {
-                case mConfig.celPrice:
-                    ret = "C";
-                    break;
-                case mConfig.floPrice:
-                    ret = "F";
-                    break;
-                case mConfig.refPrice:
-                    ret = "R";
-                    break;
-                default:
-                    ret = price > mConfig.refPrice ? "U" : "D";
-                    break;
-            }
-            return ret;
         }
     }
 }
@@ -875,67 +606,83 @@ function connectSocket() {
 function loadPage() {
     getData();
     //
-    document.getElementById("sohopdong").value = mConfig.contractNumber;
-    updateChartTitle();
-    setTimeout(() => {
-        getLocalData(["trend", "momentum", "atc"]).then(data => {
-            if (inAtcTimeRange()) {
-                mConfig.trend = data[0].length > 0 ? data[0][0].value : 0;
-                mConfig.momentum = data[1].length > 0 ? data[1][0].value : 0;
-                mConfig.atc = data[2].length > 0 ? data[2][0].value : 0;
-            }
-            document.getElementById("trendSelect").value = mConfig.trend;
-            document.getElementById("momentumInput").value = mConfig.momentum;
-            document.getElementById("atcInput").value = mConfig.atc;
-            getStrategy();
-        });
-        // Load Order List
-        var button = document.createElement("button");
-        button.setAttribute("onclick", "objOrderPanel.showOrderList()");
-        button.click();
-    }, 5000);
+    // document.getElementById("sohopdong").value = mConfig.contractNumber;
+    // updateChartTitle();
+    // setTimeout(() => {
+    //     getLocalData(["trend", "momentum", "atc"]).then(data => {
+    //         if (inAtcTimeRange()) {
+    //             mConfig.trend = data[0].length > 0 ? data[0][0].value : 0;
+    //             mConfig.momentum = data[1].length > 0 ? data[1][0].value : 0;
+    //             mConfig.atc = data[2].length > 0 ? data[2][0].value : 0;
+    //         }
+    //         document.getElementById("trendSelect").value = mConfig.trend;
+    //         document.getElementById("momentumInput").value = mConfig.momentum;
+    //         document.getElementById("atcInput").value = mConfig.atc;
+    //         getStrategy();
+    //     });
+    //     // Load Order List
+    //     var button = document.createElement("button");
+    //     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
+    //     button.click();
+    // }, 5000);
 }
 
 function intervalHandler() {
-    mConfig.currentTime = moment(
-        `${mConfig.currentDate} ${
-            document.querySelector(".timeStamp").innerText
-        }`,
-        "YYYY-MM-DD H:mm:ss"
-    ).format("HH:mm:ss");
-    var session = inTradingTimeRange(true);
-    if (!!session) document.getElementById("right_price").value = session;
+    // mConfig.currentTime = moment(
+    //     `${mConfig.currentDate} ${
+    //         document.querySelector(".timeStamp").innerText
+    //     }`,
+    //     "YYYY-MM-DD H:mm:ss"
+    // ).format("HH:mm:ss");
+    // var session = inTradingTimeRange(true);
+    // if (!!session) document.getElementById("right_price").value = session;
+    // //
+    // if (inAtcTimeRange() && !mConfig.p24h30) getVn30f1m();
+    // //
+    // // Start ATO|ATC
+    // if (isTradingTime("start")) {
+    //     clearLocalData("price");
+    //     clearLocalData("volume");
+    //     mChart.data.datasets.forEach(item => (item.data = []));
+    //     mChart.update("none");
+    //     changeDisplayMode(session);
+    //     if (!document.body.classList.contains("periodic-order"))
+    //         document.body.classList.add("periodic-order");
+    // }
+    // // Export
+    // if (isTradingTime("end")) setTimeout(() => exportHandler(session), 30000);
+    // // Report
+    // if (mConfig.currentTime == mConfig.time.ATC.end) {
+    //     setTimeout(() => reportHandler(), 60000);
+    //     setTimeout(() => setStrategy(), 45000);
+    // }
+    // //
+    // if (mConfig.displayMode == "Stream") showStreamMode();
+    // //
+    // var orderCounter = 0;
+    // for (var item of document.getElementById("tbodyContent").rows) {
+    //     if (item.cells[0].innerText == "") break;
+    //     else orderCounter++;
+    // }
+    // document.getElementById("orderCountP").innerText = `[${orderCounter}]`;
+    // //
+    // showRunningStatus();
     //
-    if (inAtcTimeRange() && !mConfig.p24h30) getVn30f1m();
-    //
-    // Start ATO|ATC
-    if (isTradingTime("start")) {
-        clearLocalData("price");
-        clearLocalData("volume");
-        mChart.data.datasets.forEach(item => (item.data = []));
-        mChart.update("none");
-        changeDisplayMode(session);
-        if (!document.body.classList.contains("periodic-order"))
-            document.body.classList.add("periodic-order");
-    }
-    // Export
-    if (isTradingTime("end")) setTimeout(() => exportHandler(session), 30000);
-    // Report
-    if (mConfig.currentTime == mConfig.time.ATC.end) {
-        setTimeout(() => reportHandler(), 60000);
-        setTimeout(() => setStrategy(), 45000);
-    }
-    //
-    if (mConfig.displayMode == "Stream") showStreamMode();
-    //
-    var orderCounter = 0;
-    for (var item of document.getElementById("tbodyContent").rows) {
-        if (item.cells[0].innerText == "") break;
-        else orderCounter++;
-    }
-    document.getElementById("orderCountP").innerText = `[${orderCounter}]`;
-    //
-    showRunningStatus();
+    var time = moment()
+        .add(7, "hours")
+        .unix();
+    var temp = {
+        time: time,
+        value: 1000 + 100 * (Math.random() - 0.5)
+    };
+    mPriceSeries.update(temp);
+    mChartData[0].push(temp);
+    temp = {
+        time: time,
+        value: mChartData[1].slice(-1)[0].value + 200000 * (Math.random() - 0.5)
+    };
+    mValueSeries.update(temp);
+    mChartData[1].push(temp);
 }
 
 function getData() {
@@ -953,71 +700,55 @@ function getData() {
             if (!mConfig.hasChangedData) {
                 console.log("data", data);
                 clearLocalData("data");
-                // clearLocalData("volume");
-                // clearLocalData("value");
                 setLocalData("data", data);
-                // setLocalData("volume", data[1]);
-                // setLocalData("value", data[2]);
             } else return getData();
             //
-            var chartData = data.reduce(
-                (r, item) => createTimeFrameData(r, item, true),
-                [{ data: [] }, { data: [] }]
+            // var chartData = data.reduce(
+            //     (r, item) => createTimeFrameData(r, item),
+            //     [{ data: [] }, { data: [] }]
+            // );
+            mChartData = data.reduce(
+                (r, item) => {
+                    var temp = createChartData(r, item);
+                    r[0].push(temp[0]);
+                    if (temp.length == 2) r[1].push(temp[1]);
+                    return r;
+                },
+                [[], []]
             );
-            console.log("chartData", chartData);
-            // mChart.data.datasets.forEach((dataset, index) => {
-            //     dataset.data = data[index].reduce(
-            //         (r, item) => createTimeFrameData(r, item, index),
-            //         []
-            //     );
-            // });
-            mConfig.currPrice = mChart.data.datasets[0].data.slice(-1)[0].value;
-            mConfig.currValue = mChart.data.datasets[2].data.slice(-1)[0].value;
-            mChart.update("none");
+            mPriceSeries.setData(mChartData[0]);
+            mValueSeries.setData(mChartData[1]);
+            console.log("chartData", JSON.parse(JSON.stringify(mChartData)));
+            // mChart.data.datasets[0].data = chartData[0].data;
+            // mChart.data.datasets[1].data = chartData[1].data;
+            // mConfig.currPrice = mChartData[0].slice(-1)[0].value;
+            // mConfig.currValue = mChartData[1].slice(-1)[0].value;
+
+            // mChart.update("none");
             toggleSpinner(false);
             resolve();
         });
     });
 }
 
-function createTimeFrameData(r, item, hasValue = true) {
-    var priceItem = {};
-    var valueItem = {};
-    var isPriceUpdate = false;
-    var isValueUpdate = false;
-    var prevValue = 0;
-    var currMoment = moment(item.time);
-    var startDayMoment = moment().startOf("day");
-    var currMin = currMoment.diff(startDayMoment, "minutes");
-    currMin = currMin - (currMin % mConfig.timeFrame);
-    if (r[0].data.length > 0) {
-        var prevMin = r[0].data
-            .slice(-1)[0]
-            .time.diff(startDayMoment, "minutes");
-        prevMin = prevMin - (prevMin % mConfig.timeFrame);
-        if (currMin == prevMin) isPriceUpdate = true;
+function createChartData(r, item) {
+    var ret = [];
+    var time = moment(item.time)
+        .add(7, "hours")
+        .unix();
+    ret.push({ time: time, value: item.price });
+    if (!!item.vol) {
+        var prevValue = 0;
+        if (r[1].length > 0) prevValue = r[1].slice(-1)[0].value;
+        var temp = 0;
+        if (item.price <= item.bid) temp = -item.vol * item.price;
+        else if (item.price >= item.ask) temp = item.vol * item.price;
+        ret.push({
+            time: time,
+            value: +(prevValue + temp).toFixed(1)
+        });
     }
-    if (hasValue && r[1].data.length > 0) isValueUpdate = isPriceUpdate;
-    //
-    if (mConfig.timeFrame == 0) {
-        priceItem.time = currMoment;
-        if (hasValue) valueItem.time = currMoment;
-    } else {
-        if (isPriceUpdate) priceItem = r[0].data.pop();
-        else priceItem.time = startDayMoment.add(currMin, "minutes");
-        //
-        if (hasValue) {
-            if (isValueUpdate) valueItem = r[1].data.pop();
-            else valueItem.time = startDayMoment.add(currMin, "minutes");
-        }
-    }
-    //
-    priceItem.value = item.value;
-    if (hasValue) valueItem.value = prevValue + item.value;
-    //
-    r[0].data.push(priceItem);
-    if (hasValue) r[1].data.push(valueItem);
-    return r;
+    return ret;
 }
 
 function getServerData() {
@@ -1227,28 +958,39 @@ function showdisplayMode(mode) {
             mChart.resetZoom();
             break;
         case "Stream":
-            input.style.zIndex = 1;
-            input.value = mConfig.streamScale;
-            showStreamMode("show");
+            // input.style.zIndex = 1;
+            // input.value = mConfig.streamScale;
+            // showStreamMode("show");
+            // mChart.options.scales.x.type = "realtime";
+            mChart.options.plugins.streaming.pause = false;
+            // mChart.options.scales.x.realtime.duration = 1000;
+            mChart.update();
             break;
         case "ATO":
         case "ATC":
-            mChart.zoomScale(
-                "x",
-                {
-                    min: moment(
-                        `${mConfig.currentDate} ${
-                            mConfig.time[mConfig.displayMode].start
-                        }`
-                    ),
-                    max: moment(
-                        `${mConfig.currentDate} ${
-                            mConfig.time[mConfig.displayMode].end
-                        }`
-                    )
-                },
-                "show"
-            );
+            // mChart.options.scales.x.type = "time";
+            // mChart.options.scales.x.realtime.pause = true;
+            // mChart.options.scales.x.realtime.duration = 86400000;
+            mChart.options.plugins.streaming.pause = true;
+            mChart.update();
+            // setTimeout(() => {
+            //     mChart.zoomScale(
+            //         "x",
+            //         {
+            //             min: moment(
+            //                 `${mConfig.currentDate} ${
+            //                     mConfig.time[mConfig.displayMode].start
+            //                 }`
+            //             ),
+            //             max: moment(
+            //                 `${mConfig.currentDate} ${
+            //                     mConfig.time[mConfig.displayMode].end
+            //                 }`
+            //             )
+            //         },
+            //         "show"
+            //     );
+            // }, 1000);
             break;
     }
 }
@@ -1272,8 +1014,8 @@ function updateChartTitle() {
 }
 
 function toggleSpinner(status) {
-    var img = document.getElementById("spinnerImg");
-    img.style.opacity = status ? 1 : 0;
+    // var img = document.getElementById("spinnerImg");
+    // img.style.opacity = status ? 1 : 0;
 }
 
 function inAtcTimeRange() {
@@ -1484,4 +1226,83 @@ function conditionOrder(type) {
         btn.style.background = mConfig.orderType == 1 ? "green" : "red";
     }
     document.getElementById("orderButton").style.display = "none";
+}
+
+function createLightweightChart() {
+    var div = document.createElement("div");
+    div.id = "periodicChart";
+    div.style.height = "300px";
+    document.body.append(div);
+    const chartOptions = {
+        localization: { locale: "vi-VN" },
+        rightPriceScale: { visible: true },
+        leftPriceScale: { visible: false },
+        layout: {
+            backgroundColor: "#131722",
+            textColor: "#d1d4dc",
+            lineColor: "#2B2B43"
+        },
+        grid: {
+            vertLines: { color: "#2B2B43" },
+            horzLines: { color: "#363C4E" }
+        },
+        timeScale: {
+            timeVisible: true,
+            secondsVisible: false
+        }
+    };
+
+    const myChart = LightweightCharts.createChart(div, chartOptions);
+    console.log("myChart: ", myChart);
+    myChart.subscribeClick(e => {
+        console.log("subscribeClick", e);
+    });
+    mPriceSeries = myChart.addLineSeries({
+        priceScaleId: "right",
+        color: "rgba(32, 226, 47, 1)"
+    });
+    mValueSeries = myChart.addLineSeries({
+        priceScaleId: "left",
+        color: "rgba(171, 71, 188, 1)"
+    });
+    // mPriceSeries.setData([
+    //     {
+    //         time:
+    //             Math.floor(new Date("2023-01-22 09:00:00").getTime() / 1000) +
+    //             7 * 3600,
+    //         value: 32.51
+    //     },
+    //     {
+    //         time:
+    //             Math.floor(new Date("2023-01-22 10:00:00").getTime() / 1000) +
+    //             7 * 3600,
+    //         value: 31.11
+    //     },
+    //     {
+    //         time:
+    //             Math.floor(new Date("2023-01-22 12:00:00").getTime() / 1000) +
+    //             7 * 3600,
+    //         value: 27.02
+    //     }
+    // ]);
+    // mValueSeries.setData([
+    //     {
+    //         time:
+    //             Math.floor(new Date("2023-01-22 09:00:00").getTime() / 1000) +
+    //             7 * 3600,
+    //         value: 132.51
+    //     },
+    //     {
+    //         time:
+    //             Math.floor(new Date("2023-01-22 10:00:00").getTime() / 1000) +
+    //             7 * 3600,
+    //         value: 131.11
+    //     },
+    //     {
+    //         time:
+    //             Math.floor(new Date("2023-01-22 12:00:00").getTime() / 1000) +
+    //             7 * 3600,
+    //         value: 147.02
+    //     }
+    // ]);
 }
