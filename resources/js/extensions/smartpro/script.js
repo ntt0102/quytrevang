@@ -1,9 +1,6 @@
 var mConfig = {};
-var mChart = {};
+var mChart = { series: {}, data: {}, order: {}, line: {} };
 var mDatabase = null;
-var mPriceSeries = null;
-var mValueSeries = null;
-var mChartData = [];
 
 getLocalConfig()
     .then(() => getServerConfig())
@@ -251,14 +248,14 @@ function createChart1() {
     button.id = "priceOrderButton";
     button.innerText = "Order?";
     button.style.display = "none";
-    button.addEventListener("click", conditionOrder);
+    button.addEventListener("click", orderByPrice);
     div.append(button);
     //
     button = document.createElement("button");
     button.id = "valueOrderButton";
     button.innerText = "Order?";
     button.style.display = "none";
-    button.addEventListener("click", conditionOrder);
+    button.addEventListener("click", orderByValue);
     div.append(button);
     //
     var img = document.createElement("img");
@@ -313,26 +310,43 @@ function createChart1() {
     };
     const myChart = LightweightCharts.createChart(div, chartOptions);
     console.log("myChart: ", myChart);
-    myChart.subscribeClick(e => {
+    myChart.subscribeClick(chartClick);
+    mChart.series.price = myChart.addLineSeries({
+        priceScaleId: "right",
+        color: "rgba(32, 226, 47, 1)",
+        priceFormat: { precision: 1 }
+    });
+    mChart.series.value = myChart.addLineSeries({
+        priceScaleId: "left",
+        color: "rgba(171, 71, 188, 1)",
+        priceFormat: { precision: 1 }
+    });
+    myChart.timeScale().fitContent();
+
+    function chartClick(e) {
         console.log("subscribeClick", e);
         var values = Array.from(e.seriesPrices.values());
         var pOrdBtn = document.getElementById("priceOrderButton");
         var vOrdBtn = document.getElementById("valueOrderButton");
         if (e.seriesPrices.size) {
-            pOrdBtn.style.left = +(e.point.x - 60) + "px";
+            pOrdBtn.style.left = +(e.point.x - 41) + "px";
             pOrdBtn.style.top = +(e.point.y - 40) + "px";
             pOrdBtn.style.display = "block";
-            console.log(values[0], mChartData[0].slice(-1)[0].value);
-            mConfig.priceOrderType =
-                values[0] >= mChartData[0].slice(-1)[0].value ? 1 : 2;
-            pOrdBtn.innerText = mConfig.priceOrderType == 1 ? "↗" : "↘";
+            console.log(values[0], mChart.data.price.slice(-1)[0].value);
+            mChart.order.price = {
+                value: values[0],
+                type: values[0] >= mChart.data.price.slice(-1)[0].value
+            };
+            pOrdBtn.innerText = mChart.order.price.type ? "↗" : "↘";
             if (e.seriesPrices.size == 2) {
-                vOrdBtn.style.left = +(e.point.x - 60) + "px";
+                vOrdBtn.style.left = +(e.point.x - 41) + "px";
                 vOrdBtn.style.top = +e.point.y + "px";
                 vOrdBtn.style.display = "block";
-                mConfig.valueOrderType =
-                    values[1] >= mChartData[1].slice(-1)[0].value ? 1 : 2;
-                vOrdBtn.innerText = mConfig.valueOrderType == 1 ? "↗" : "↘";
+                mChart.order.value = {
+                    value: values[1],
+                    type: values[1] >= mChart.data.value.slice(-1)[0].value
+                };
+                vOrdBtn.innerText = mChart.order.value.type ? "↗" : "↘";
             } else vOrdBtn.style.display = "none";
             // if (e.seriesPrices.size == 2) {
             //     mConfig.orderKind = 1;
@@ -376,15 +390,7 @@ function createChart1() {
             pOrdBtn.style.display = "none";
             vOrdBtn.style.display = "none";
         }
-    });
-    mPriceSeries = myChart.addLineSeries({
-        priceScaleId: "right",
-        color: "rgba(32, 226, 47, 1)"
-    });
-    mValueSeries = myChart.addLineSeries({
-        priceScaleId: "left",
-        color: "rgba(171, 71, 188, 1)"
-    });
+    }
 }
 
 function registerEvent() {
@@ -675,14 +681,18 @@ function intervalHandler() {
         time: time,
         value: 1000 + 100 * (Math.random() - 0.5)
     };
-    mPriceSeries.update(temp);
-    mChartData[0].push(temp);
+    mChart.series.price.update(temp);
+    mChart.data.price.push(temp);
     temp = {
         time: time,
-        value: mChartData[1].slice(-1)[0].value + 200000 * (Math.random() - 0.5)
+        value:
+            (mChart.data.value.length
+                ? mChart.data.value.slice(-1)[0].value
+                : 0) +
+            200000 * (Math.random() - 0.5)
     };
-    mValueSeries.update(temp);
-    mChartData[1].push(temp);
+    mChart.series.value.update(temp);
+    mChart.data.value.push(temp);
 }
 
 function getData() {
@@ -707,18 +717,18 @@ function getData() {
             //     (r, item) => createTimeFrameData(r, item),
             //     [{ data: [] }, { data: [] }]
             // );
-            mChartData = data.reduce(
+            mChart.data = data.reduce(
                 (r, item) => {
                     var temp = createChartData(r, item);
-                    r[0].push(temp[0]);
-                    if (temp.length == 2) r[1].push(temp[1]);
+                    r.price.push(temp.price);
+                    if (temp.hasOwnProperty("value")) r.value.push(temp.value);
                     return r;
                 },
-                [[], []]
+                { price: [], value: [] }
             );
-            mPriceSeries.setData(mChartData[0]);
-            mValueSeries.setData(mChartData[1]);
-            console.log("chartData", JSON.parse(JSON.stringify(mChartData)));
+            console.log("chartData", JSON.parse(JSON.stringify(mChart.data)));
+            mChart.series.price.setData(mChart.data.price);
+            mChart.series.value.setData(mChart.data.value);
             // mChart.data.datasets[0].data = chartData[0].data;
             // mChart.data.datasets[1].data = chartData[1].data;
             // mConfig.currPrice = mChartData[0].slice(-1)[0].value;
@@ -732,21 +742,21 @@ function getData() {
 }
 
 function createChartData(r, item) {
-    var ret = [];
+    var ret = {};
     var time = moment(item.time)
         .add(7, "hours")
         .unix();
-    ret.push({ time: time, value: item.price });
+    ret.price = { time: time, value: item.price };
     if (!!item.vol) {
         var prevValue = 0;
-        if (r[1].length > 0) prevValue = r[1].slice(-1)[0].value;
+        if (r.value.length > 0) prevValue = r.value.slice(-1)[0].value;
         var temp = 0;
         if (item.price <= item.bid) temp = -item.vol * item.price;
         else if (item.price >= item.ask) temp = item.vol * item.price;
-        ret.push({
+        ret.value = {
             time: time,
             value: +(prevValue + temp).toFixed(1)
-        });
+        };
     }
     return ret;
 }
@@ -1208,7 +1218,9 @@ function getVn30f1m() {
     });
 }
 
-function conditionOrder(type) {
+function orderByPrice() {
+    console.log("orderByPrice");
+    createLine("price");
     if (mConfig.orderKind == 1) {
         document.getElementById("btn_cancel_all_order_condition").click();
         setTimeout(() => {
@@ -1227,82 +1239,61 @@ function conditionOrder(type) {
     }
     document.getElementById("orderButton").style.display = "none";
 }
-
-function createLightweightChart() {
-    var div = document.createElement("div");
-    div.id = "periodicChart";
-    div.style.height = "300px";
-    document.body.append(div);
-    const chartOptions = {
-        localization: { locale: "vi-VN" },
-        rightPriceScale: { visible: true },
-        leftPriceScale: { visible: false },
-        layout: {
-            backgroundColor: "#131722",
-            textColor: "#d1d4dc",
-            lineColor: "#2B2B43"
-        },
-        grid: {
-            vertLines: { color: "#2B2B43" },
-            horzLines: { color: "#363C4E" }
-        },
-        timeScale: {
-            timeVisible: true,
-            secondsVisible: false
-        }
-    };
-
-    const myChart = LightweightCharts.createChart(div, chartOptions);
-    console.log("myChart: ", myChart);
-    myChart.subscribeClick(e => {
-        console.log("subscribeClick", e);
-    });
-    mPriceSeries = myChart.addLineSeries({
-        priceScaleId: "right",
-        color: "rgba(32, 226, 47, 1)"
-    });
-    mValueSeries = myChart.addLineSeries({
-        priceScaleId: "left",
-        color: "rgba(171, 71, 188, 1)"
-    });
-    // mPriceSeries.setData([
-    //     {
-    //         time:
-    //             Math.floor(new Date("2023-01-22 09:00:00").getTime() / 1000) +
-    //             7 * 3600,
-    //         value: 32.51
-    //     },
-    //     {
-    //         time:
-    //             Math.floor(new Date("2023-01-22 10:00:00").getTime() / 1000) +
-    //             7 * 3600,
-    //         value: 31.11
-    //     },
-    //     {
-    //         time:
-    //             Math.floor(new Date("2023-01-22 12:00:00").getTime() / 1000) +
-    //             7 * 3600,
-    //         value: 27.02
-    //     }
-    // ]);
-    // mValueSeries.setData([
-    //     {
-    //         time:
-    //             Math.floor(new Date("2023-01-22 09:00:00").getTime() / 1000) +
-    //             7 * 3600,
-    //         value: 132.51
-    //     },
-    //     {
-    //         time:
-    //             Math.floor(new Date("2023-01-22 10:00:00").getTime() / 1000) +
-    //             7 * 3600,
-    //         value: 131.11
-    //     },
-    //     {
-    //         time:
-    //             Math.floor(new Date("2023-01-22 12:00:00").getTime() / 1000) +
-    //             7 * 3600,
-    //         value: 147.02
-    //     }
-    // ]);
+function orderByValue() {
+    createLine("value");
 }
+// function conditionOrder(type) {
+//     if (mConfig.orderKind == 1) {
+//         document.getElementById("btn_cancel_all_order_condition").click();
+//         setTimeout(() => {
+//             document
+//                 .getElementById(
+//                     `btn_${mConfig.orderType == 1 ? "long" : "short"}`
+//                 )
+//                 .click();
+//         }, 500);
+//     } else if (mConfig.orderKind == 2) {
+//         mConfig.orderConfirm = true;
+//         var btn = document.getElementById("cancelButton");
+//         btn.style.display = "block";
+//         btn.innerText = `Cancel ${mConfig.orderType == 1 ? "LONG" : "SHORT"}`;
+//         btn.style.background = mConfig.orderType == 1 ? "green" : "red";
+//     }
+//     document.getElementById("orderButton").style.display = "none";
+// }
+
+function createLine(series) {
+    // console.log(
+    //     "order " + series,
+    //     JSON.parse(JSON.stringify(mChart.line[series]))
+    // );
+    console.log("remove line: ", mChart.line.hasOwnProperty(series));
+    if (mChart.line.hasOwnProperty(series)) {
+        // console.log("mChart.order[series].line: ", mChart.order[series].line);
+        mChart.series[series].removePriceLine(mChart.line[series]);
+        delete mChart.line[series];
+    }
+    mChart.line[series] = mChart.series[series].createPriceLine({
+        price: mChart.order[series].value,
+        color: `rgba(${series == "price" ? "32, 226, 47" : "171, 71, 188"}, 1)`,
+        lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Solid,
+        title: mChart.order[series].type ? "LONG" : "SHORT",
+        draggable: true
+    });
+    // mChart.series[series].removePriceLine(line);
+    // console.log("new line: ", line);
+    // mChart.line[series] = line;
+    console.log("sau order " + series, { ...mChart.line });
+}
+
+// mChart.series.price = myChart.addLineSeries({
+//     priceScaleId: "right",
+//     color: "rgba(32, 226, 47, 1)",
+//     priceFormat: { precision: 1 }
+// });
+// mChart.series.value = myChart.addLineSeries({
+//     priceScaleId: "left",
+//     color: "rgba(171, 71, 188, 1)",
+//     priceFormat: { precision: 1 }
+// });
