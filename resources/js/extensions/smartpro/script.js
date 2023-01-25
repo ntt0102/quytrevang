@@ -1,5 +1,5 @@
 var mConfig = {};
-var mChart = { series: {}, data: {}, order: {}, line: {} };
+var mChart = { object: {}, series: {}, data: {}, order: {}, line: {} };
 var mDatabase = null;
 
 getLocalConfig()
@@ -96,11 +96,11 @@ function getServerConfig() {
 
 function createButtons() {
     var button = document.createElement("button");
-    button.id = "continuousButton";
+    button.id = "candleButton";
     button.innerText = "Candle";
     button.addEventListener("click", () => {
-        if (document.body.classList.contains("continuous-order")) {
-            document.body.classList.remove("continuous-order");
+        if (document.body.classList.contains("candle-chart")) {
+            document.body.classList.remove("candle-chart");
             document.getElementById("left_order_type").innerText =
                 "Lệnh thường";
             document.getElementById("right_order_type").innerText =
@@ -112,8 +112,8 @@ function createButtons() {
                 "#mainFooter .foot_tab:nth-child(2)"
             ).innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
-            document.body.classList.add("continuous-order");
-            document.body.classList.remove("periodic-order");
+            document.body.classList.add("candle-chart");
+            document.body.classList.remove("line-chart");
             document.getElementById("left_order_type").innerText = "LT";
             document.getElementById("right_order_type").innerText = "LĐK";
             document.querySelector(
@@ -127,24 +127,30 @@ function createButtons() {
     document.body.append(button);
     //
     button = document.createElement("button");
-    button.id = "periodicButton";
+    button.id = "lineButton";
     button.innerText = "Line";
     button.addEventListener("click", () => {
-        if (document.body.classList.contains("periodic-order")) {
-            document.body.classList.remove("periodic-order");
+        if (document.body.classList.contains("line-chart")) {
+            document.body.classList.remove("line-chart");
         } else {
-            document.body.classList.add("periodic-order");
-            document.body.classList.remove("continuous-order");
+            document.body.classList.add("line-chart");
+            document.body.classList.remove("candle-chart");
             document.getElementById("left_order_type").innerText =
                 "Lệnh thường";
             document.getElementById("right_order_type").innerText =
                 "Lệnh điều kiện";
+            // document.querySelector(
+            //     "#mainFooter .foot_tab:nth-child(1)"
+            // ).innerText = "DANH SÁCH LỆNH";
+            // document.querySelector(
+            //     "#mainFooter .foot_tab:nth-child(2)"
+            // ).innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(1)"
-            ).innerText = "DANH SÁCH LỆNH";
+            ).innerText = "≃";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(2)"
-            ).innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            ).innerText = "≥";
         }
     });
     document.body.append(button);
@@ -160,11 +166,10 @@ function createButtons() {
 
 function createChart1() {
     var div = document.createElement("div");
-    div.id = "periodicChart";
-    div.style.height = "400px";
+    div.id = "lightWeightChart";
+    div.style.width = "100vw";
+    div.style.height = "100vh";
     document.body.append(div);
-    // var div = document.createElement("div");
-    // div.id = "periodicChart";
     //
     var select = document.createElement("select");
     select.id = "trendSelect";
@@ -260,7 +265,7 @@ function createChart1() {
     //
     var img = document.createElement("img");
     img.id = "spinnerImg";
-    img.style.opacity = 0;
+    // img.style.opacity = 0;
     img.src = chrome.runtime.getURL("spinner.gif");
     div.append(img);
     //
@@ -304,24 +309,25 @@ function createChart1() {
             horzLines: { color: "#363C4E" }
         },
         timeScale: {
-            timeVisible: true,
-            secondsVisible: false
+            timeVisible: true
+            // secondsVisible: false
         }
     };
-    const myChart = LightweightCharts.createChart(div, chartOptions);
-    console.log("myChart: ", myChart);
-    myChart.subscribeClick(chartClick);
-    mChart.series.price = myChart.addLineSeries({
+    mChart.object = LightweightCharts.createChart(div, chartOptions);
+    if (navigator.userAgentData.mobile)
+        mChart.object.subscribeCrosshairMove(chartClick);
+    else mChart.object.subscribeClick(chartClick);
+    mChart.series.price = mChart.object.addLineSeries({
         priceScaleId: "right",
         color: "rgba(32, 226, 47, 1)",
         priceFormat: { precision: 1 }
     });
-    mChart.series.value = myChart.addLineSeries({
+    mChart.series.value = mChart.object.addLineSeries({
         priceScaleId: "left",
         color: "rgba(171, 71, 188, 1)",
         priceFormat: { precision: 1 }
     });
-    myChart.timeScale().fitContent();
+    mChart.object.timeScale().fitContent();
 
     function chartClick(e) {
         console.log("subscribeClick", e);
@@ -457,6 +463,7 @@ function registerEvent() {
     }
 
     function fullscreenchange() {
+        mChart.object.resize(window.innerWidth, window.innerHeight);
         if (document.fullscreenElement)
             document.body.classList.add("fullscreen");
         else document.body.classList.remove("fullscreen");
@@ -652,8 +659,8 @@ function intervalHandler() {
     //     mChart.data.datasets.forEach(item => (item.data = []));
     //     mChart.update("none");
     //     changeDisplayMode(session);
-    //     if (!document.body.classList.contains("periodic-order"))
-    //         document.body.classList.add("periodic-order");
+    //     if (!document.body.classList.contains("line-chart"))
+    //         document.body.classList.add("line-chart");
     // }
     // // Export
     // if (isTradingTime("end")) setTimeout(() => exportHandler(session), 30000);
@@ -1052,7 +1059,7 @@ function isTradingTime(event) {
 }
 
 function showRunningStatus() {
-    var button = document.getElementById("periodicButton");
+    var button = document.getElementById("lineButton");
     if (button.classList.contains("dark")) button.classList.remove("dark");
     else button.classList.add("dark");
 }
@@ -1220,7 +1227,7 @@ function getVn30f1m() {
 
 function orderByPrice() {
     console.log("orderByPrice");
-    createLine("price");
+    createOrderLine("price");
     if (mConfig.orderKind == 1) {
         document.getElementById("btn_cancel_all_order_condition").click();
         setTimeout(() => {
@@ -1240,7 +1247,7 @@ function orderByPrice() {
     document.getElementById("orderButton").style.display = "none";
 }
 function orderByValue() {
-    createLine("value");
+    createOrderLine("value");
 }
 // function conditionOrder(type) {
 //     if (mConfig.orderKind == 1) {
@@ -1262,14 +1269,8 @@ function orderByValue() {
 //     document.getElementById("orderButton").style.display = "none";
 // }
 
-function createLine(series) {
-    // console.log(
-    //     "order " + series,
-    //     JSON.parse(JSON.stringify(mChart.line[series]))
-    // );
-    console.log("remove line: ", mChart.line.hasOwnProperty(series));
+function createOrderLine(series) {
     if (mChart.line.hasOwnProperty(series)) {
-        // console.log("mChart.order[series].line: ", mChart.order[series].line);
         mChart.series[series].removePriceLine(mChart.line[series]);
         delete mChart.line[series];
     }
@@ -1281,19 +1282,4 @@ function createLine(series) {
         title: mChart.order[series].type ? "LONG" : "SHORT",
         draggable: true
     });
-    // mChart.series[series].removePriceLine(line);
-    // console.log("new line: ", line);
-    // mChart.line[series] = line;
-    console.log("sau order " + series, { ...mChart.line });
 }
-
-// mChart.series.price = myChart.addLineSeries({
-//     priceScaleId: "right",
-//     color: "rgba(32, 226, 47, 1)",
-//     priceFormat: { precision: 1 }
-// });
-// mChart.series.value = myChart.addLineSeries({
-//     priceScaleId: "left",
-//     color: "rgba(171, 71, 188, 1)",
-//     priceFormat: { precision: 1 }
-// });
