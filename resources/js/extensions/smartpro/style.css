@@ -148,13 +148,25 @@
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #cancelButton {
+.line-chart #lightWeightChart > #priceCancelButton {
     position: absolute;
     top: 30px;
-    right: 140px;
-    padding: 1px 5px;
+    right: 80px;
+    padding: 0px 7px;
     border-radius: 5px;
     color: white;
+    background: #20e22f;
+    z-index: 3;
+}
+
+.line-chart #lightWeightChart > #valueCancelButton {
+    position: absolute;
+    top: 30px;
+    right: 110px;
+    padding: 0px 7px;
+    border-radius: 5px;
+    color: white;
+    background: #ab47bc;
     z-index: 3;
 }
 
@@ -180,8 +192,8 @@
 
 .line-chart #lightWeightChart > #listTable {
     position: absolute;
-    top: 70px;
-    left: 110px;
+    top: 30px;
+    right: 50px;
     background: white;
     color: black;
     z-index: -1;
@@ -229,12 +241,12 @@
     background: cornflowerblue;
 }
 
-.line-chart #lightWeightChart > #orderCountP {
+/* .line-chart #lightWeightChart > #orderCountP {
     position: absolute;
     top: 30px;
     right: 110px;
     color: white;
-}
+} */
 
 .line-chart #lightWeightChart.list-show > #listTable {
     z-index: 4;

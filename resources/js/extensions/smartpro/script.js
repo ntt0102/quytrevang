@@ -1,13 +1,16 @@
 var mConfig = {};
-var mChart = { object: {}, series: {}, data: {}, order: {}, line: {} };
-var mDatabase = null;
+var mChart = {};
+var mChartSeries = {};
+var mChartData = {};
+var mChartOrder = {};
+var mChartLine = {};
+var mDatabase = {};
 
 getLocalConfig()
     .then(() => getServerConfig())
     .then(() => {
         createButtons();
-        createChart1();
-        // createLightweightChart();
+        createLightWeightChart();
         registerEvent();
         createIndexedDB().then(() => {
             connectSocket();
@@ -65,8 +68,7 @@ function getServerConfig() {
                 //
                 mConfig.timeFrame = 0;
                 mConfig.hasChangedData = false;
-                mConfig.orderValue = null;
-                mConfig.orderConfirm = false;
+                mConfig.valueOrderConfirm = false;
                 //
                 mConfig.refPrice = +document.getElementById(
                     `${mConfig.VN30F1M}ref`
@@ -82,8 +84,8 @@ function getServerConfig() {
                 //
                 mConfig.p24h29 = null;
                 mConfig.p24h30 = null;
-                mConfig.buyPrice = null;
-                mConfig.sellPrice = null;
+                mConfig.bid = 0;
+                mConfig.ask = 0;
                 //
                 resolve();
             })
@@ -132,6 +134,12 @@ function createButtons() {
     button.addEventListener("click", () => {
         if (document.body.classList.contains("line-chart")) {
             document.body.classList.remove("line-chart");
+            document.querySelector(
+                "#mainFooter .foot_tab:nth-child(1)"
+            ).innerText = "DANH SÁCH LỆNH";
+            document.querySelector(
+                "#mainFooter .foot_tab:nth-child(2)"
+            ).innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
             document.body.classList.add("line-chart");
             document.body.classList.remove("candle-chart");
@@ -139,12 +147,6 @@ function createButtons() {
                 "Lệnh thường";
             document.getElementById("right_order_type").innerText =
                 "Lệnh điều kiện";
-            // document.querySelector(
-            //     "#mainFooter .foot_tab:nth-child(1)"
-            // ).innerText = "DANH SÁCH LỆNH";
-            // document.querySelector(
-            //     "#mainFooter .foot_tab:nth-child(2)"
-            // ).innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(1)"
             ).innerText = "≃";
@@ -164,7 +166,7 @@ function createButtons() {
     document.body.append(button);
 }
 
-function createChart1() {
+function createLightWeightChart() {
     var div = document.createElement("div");
     div.id = "lightWeightChart";
     div.style.width = "100vw";
@@ -240,12 +242,23 @@ function createChart1() {
     div.append(button);
     //
     button = document.createElement("button");
-    button.id = "cancelButton";
+    button.id = "priceCancelButton";
     button.innerText = "✘";
     button.style.display = "none";
     button.addEventListener("click", () => {
-        document.getElementById("cancelButton").style.display = "none";
-        mConfig.orderConfirm = false;
+        document.getElementById("priceCancelButton").style.display = "none";
+        removeOrderLine("price");
+    });
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "valueCancelButton";
+    button.innerText = "✘";
+    button.style.display = "none";
+    button.addEventListener("click", () => {
+        document.getElementById("valueCancelButton").style.display = "none";
+        mConfig.valueOrderConfirm = false;
+        removeOrderLine("value");
     });
     div.append(button);
     //
@@ -265,13 +278,13 @@ function createChart1() {
     //
     var img = document.createElement("img");
     img.id = "spinnerImg";
-    // img.style.opacity = 0;
+    img.style.opacity = 0;
     img.src = chrome.runtime.getURL("spinner.gif");
     div.append(img);
     //
-    var p = document.createElement("p");
-    p.id = "orderCountP";
-    div.append(p);
+    // var p = document.createElement("p");
+    // p.id = "orderCountP";
+    // div.append(p);
     //
     var table = document.createElement("table");
     table.id = "listTable";
@@ -294,7 +307,6 @@ function createChart1() {
     cell.innerText = "Order";
     div.append(table);
     //
-    // document.body.append(div);
     const chartOptions = {
         localization: { locale: "vi-VN" },
         rightPriceScale: { visible: true },
@@ -308,29 +320,25 @@ function createChart1() {
             vertLines: { color: "#2B2B43" },
             horzLines: { color: "#363C4E" }
         },
-        timeScale: {
-            timeVisible: true
-            // secondsVisible: false
-        }
+        timeScale: { timeVisible: true }
     };
-    mChart.object = LightweightCharts.createChart(div, chartOptions);
+    mChart = LightweightCharts.createChart(div, chartOptions);
     if (navigator.userAgentData.mobile)
-        mChart.object.subscribeCrosshairMove(chartClick);
-    else mChart.object.subscribeClick(chartClick);
-    mChart.series.price = mChart.object.addLineSeries({
+        mChart.subscribeCrosshairMove(chartClick);
+    else mChart.subscribeClick(chartClick);
+    mChartSeries.price = mChart.addLineSeries({
         priceScaleId: "right",
         color: "rgba(32, 226, 47, 1)",
         priceFormat: { precision: 1 }
     });
-    mChart.series.value = mChart.object.addLineSeries({
+    mChartSeries.value = mChart.addLineSeries({
         priceScaleId: "left",
         color: "rgba(171, 71, 188, 1)",
         priceFormat: { precision: 1 }
     });
-    mChart.object.timeScale().fitContent();
+    mChart.timeScale().fitContent();
 
     function chartClick(e) {
-        console.log("subscribeClick", e);
         var values = Array.from(e.seriesPrices.values());
         var pOrdBtn = document.getElementById("priceOrderButton");
         var vOrdBtn = document.getElementById("valueOrderButton");
@@ -338,60 +346,21 @@ function createChart1() {
             pOrdBtn.style.left = +(e.point.x - 41) + "px";
             pOrdBtn.style.top = +(e.point.y - 40) + "px";
             pOrdBtn.style.display = "block";
-            console.log(values[0], mChart.data.price.slice(-1)[0].value);
-            mChart.order.price = {
+            mChartOrder.price = {
                 value: values[0],
-                type: values[0] >= mChart.data.price.slice(-1)[0].value
+                type: values[0] >= mChartData.price.slice(-1)[0].value
             };
-            pOrdBtn.innerText = mChart.order.price.type ? "↗" : "↘";
+            pOrdBtn.innerText = mChartOrder.price.type ? "↗" : "↘";
             if (e.seriesPrices.size == 2) {
                 vOrdBtn.style.left = +(e.point.x - 41) + "px";
                 vOrdBtn.style.top = +e.point.y + "px";
                 vOrdBtn.style.display = "block";
-                mChart.order.value = {
+                mChartOrder.value = {
                     value: values[1],
-                    type: values[1] >= mChart.data.value.slice(-1)[0].value
+                    type: values[1] >= mChartData.value.slice(-1)[0].value
                 };
-                vOrdBtn.innerText = mChart.order.value.type ? "↗" : "↘";
+                vOrdBtn.innerText = mChartOrder.value.type ? "↗" : "↘";
             } else vOrdBtn.style.display = "none";
-            // if (e.seriesPrices.size == 2) {
-            //     mConfig.orderKind = 1;
-            //     //
-            //     var price = mChart.data.datasets[0].data[el.index];
-            //     document
-            //         .getElementById("select_condition_order_wrapper")
-            //         .click();
-            //     document.getElementById("right_stopOrderIndex").value =
-            //         price.value;
-            //     mConfig.orderType = price.value >= mConfig.currPrice ? 1 : 2;
-            //     document.getElementById("right_selStopOrderType").value =
-            //         mConfig.orderType == 1 ? "SOL" : "SOU";
-            //     //
-            //     hasOrder = true;
-            // } else if (el.datasetIndex == 2) {
-            //     mConfig.orderKind = 2;
-            //     mConfig.orderConfirm = false;
-            //     //
-            //     var value = mChart.data.datasets[2].data[el.index];
-            //     mConfig.orderValue = value.value;
-            //     mConfig.orderType = value.value >= mConfig.currValue ? 1 : 2;
-            //     document.getElementById("select_normal_order_wrapper").click();
-            //     document.getElementById("right_price").value = "MTL";
-            //     //
-            //     hasOrder = true;
-            // }
-            // if (hasOrder) {
-            //     ordBtn.style.left = +(e.native.clientX - 54) + "px";
-            //     ordBtn.style.top = +(e.native.clientY - 27) + "px";
-            //     ordBtn.style.display = "block";
-            //     if (mConfig.orderType == 1) {
-            //         ordBtn.innerText = "LONG";
-            //         ordBtn.style.background = "green";
-            //     } else {
-            //         ordBtn.innerText = "SHORT";
-            //         ordBtn.style.background = "red";
-            //     }
-            // }
         } else {
             pOrdBtn.style.display = "none";
             vOrdBtn.style.display = "none";
@@ -463,7 +432,7 @@ function registerEvent() {
     }
 
     function fullscreenchange() {
-        mChart.object.resize(window.innerWidth, window.innerHeight);
+        mChart.resize(window.innerWidth, window.innerHeight);
         if (document.fullscreenElement)
             document.body.classList.add("fullscreen");
         else document.body.classList.remove("fullscreen");
@@ -477,9 +446,6 @@ function createIndexedDB() {
             console.log("onupgradeneeded");
             mDatabase = e.target.result;
             mDatabase.createObjectStore("data", { keyPath: "time" });
-            // mDatabase.createObjectStore("price", { keyPath: "time" });
-            // mDatabase.createObjectStore("volume", { keyPath: "time" });
-            // mDatabase.createObjectStore("value", { keyPath: "time" });
             mDatabase.createObjectStore("trend", { keyPath: "key" });
             mDatabase.createObjectStore("momentum", { keyPath: "key" });
             mDatabase.createObjectStore("atc", { keyPath: "key" });
@@ -504,7 +470,7 @@ function connectSocket() {
     socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
     socket.on("reconnect", () => {
         socket.emit("regs", JSON.stringify(msg));
-        if (inTradingTimeRange()) getData();
+        if (inPeriodicTimeRange()) getData();
     });
     socket.on("boardps", data => {
         // console.log("boardps", data.data);
@@ -519,73 +485,53 @@ function connectSocket() {
     function priceHandler(data) {
         if (data.id == 3220) {
             // console.log("price" + data.id);
-            var index = 0;
-            mConfig.currPrice = data.lastPrice;
-            var price = {
+            var param = {
                 time: `${mConfig.currentDate} ${data.timeServer}`,
-                value: data.lastPrice
+                price: data.lastPrice,
+                vol: null,
+                bid: null,
+                ask: null
             };
-            var pa = mChart.options.plugins.annotation.annotations.price;
-            pa.yMin = price.value;
-            pa.yMax = price.value;
-            pa.label.content = price.value;
+            if (!inPeriodicTimeRange()) {
+                if (
+                    Math.abs(data.lastPrice - mConfig.bid) < 1 &&
+                    Math.abs(data.lastPrice - mConfig.ask) < 1
+                ) {
+                    param.vol = data.lastVol;
+                    param.bid = mConfig.bid;
+                    param.ask = mConfig.ask;
+                }
+            }
+            setLocalData("data", param);
             //
-            createTimeFrameData(mChart.data.datasets[index].data, price, index);
-            //
-            setLocalData("price", price);
-            if (!inTradingTimeRange()) {
-                var activeValue = 0;
-                if (data.lastPrice <= mConfig.buyPrice)
-                    activeValue = -data.lastVol * data.lastPrice;
-                else if (data.lastPrice >= mConfig.sellPrice)
-                    activeValue = data.lastVol * data.lastPrice;
+            var temp = createChartData(mChartData, param);
+            mChartSeries.price.update(temp.price);
+            mChartData.price.push(temp.price);
+            if (temp.hasOwnProperty("value")) {
+                mChartSeries.value.update(temp.value);
+                mChartData.value.push(temp.value);
                 //
-                var index = 2;
-                var value = {
-                    time: `${mConfig.currentDate} ${data.timeServer}`,
-                    value: activeValue
-                };
-                //
-                var dataList = createTimeFrameData(
-                    mChart.data.datasets[index].data,
-                    value,
-                    index
-                );
-                //
-                var accumulateValue = dataList.slice(-1)[0].value;
-                mConfig.currValue = accumulateValue;
-                //
-                if (mConfig.orderConfirm) {
-                    mConfig.orderConfirm = false;
+                if (mConfig.valueOrderConfirm) {
+                    mConfig.valueOrderConfirm = false;
                     document.getElementById("btn_cancel_all_normal").click();
                     setTimeout(() => {
                         if (
-                            mConfig.orderType == 1 &&
-                            accumulateValue >= mConfig.orderValue
+                            mChartOrder.value.type == 1 &&
+                            temp.value >= mChartOrder.value.value
                         )
                             document.getElementById("btn_long").click();
                         else if (
-                            mConfig.orderType == 2 &&
-                            accumulateValue <= mConfig.orderValue
+                            mChartOrder.value.type == 2 &&
+                            temp.value <= mChartOrder.value.value
                         )
                             document.getElementById("btn_short").click();
                         //
-                        document.getElementById("cancelButton").style.display =
-                            "none";
+                        document.getElementById(
+                            "valueCancelButton"
+                        ).style.display = "none";
                     }, 500);
                 }
-                //
-                var va = mChart.options.plugins.annotation.annotations.value;
-                va.yMin = accumulateValue;
-                va.yMax = accumulateValue;
-                va.label.content = accumulateValue;
-                //
-                setLocalData("value", {
-                    ...value,
-                    ...{ value: activeValue.toFixed(1) }
-                });
             }
-            mChart.update("none");
             //
             if (inAtcTimeRange()) {
                 if (!!mConfig.p24h30) {
@@ -607,10 +553,10 @@ function connectSocket() {
 
     function bidAskHandler(data) {
         if (data.id == 3210) {
-            if (!inTradingTimeRange()) {
+            if (!inPeriodicTimeRange()) {
                 var arr = data.g1.split("|");
-                if (data.side == "B") mConfig.buyPrice = +arr[0];
-                else mConfig.sellPrice = +arr[0];
+                if (data.side == "B") mConfig.bid = +arr[0];
+                else mConfig.ask = +arr[0];
             }
         }
     }
@@ -619,67 +565,70 @@ function connectSocket() {
 function loadPage() {
     getData();
     //
-    // document.getElementById("sohopdong").value = mConfig.contractNumber;
-    // updateChartTitle();
-    // setTimeout(() => {
-    //     getLocalData(["trend", "momentum", "atc"]).then(data => {
-    //         if (inAtcTimeRange()) {
-    //             mConfig.trend = data[0].length > 0 ? data[0][0].value : 0;
-    //             mConfig.momentum = data[1].length > 0 ? data[1][0].value : 0;
-    //             mConfig.atc = data[2].length > 0 ? data[2][0].value : 0;
-    //         }
-    //         document.getElementById("trendSelect").value = mConfig.trend;
-    //         document.getElementById("momentumInput").value = mConfig.momentum;
-    //         document.getElementById("atcInput").value = mConfig.atc;
-    //         getStrategy();
-    //     });
-    //     // Load Order List
-    //     var button = document.createElement("button");
-    //     button.setAttribute("onclick", "objOrderPanel.showOrderList()");
-    //     button.click();
-    // }, 5000);
+    document.getElementById("sohopdong").value = mConfig.contractNumber;
+    setTimeout(() => {
+        getLocalData(["trend", "momentum", "atc"]).then(data => {
+            if (inAtcTimeRange()) {
+                mConfig.trend = data[0].length > 0 ? data[0][0].value : 0;
+                mConfig.momentum = data[1].length > 0 ? data[1][0].value : 0;
+                mConfig.atc = data[2].length > 0 ? data[2][0].value : 0;
+            }
+            document.getElementById("trendSelect").value = mConfig.trend;
+            document.getElementById("momentumInput").value = mConfig.momentum;
+            document.getElementById("atcInput").value = mConfig.atc;
+            getStrategy();
+        });
+        // Load Order List
+        // var button = document.createElement("button");
+        // button.setAttribute("onclick", "objOrderPanel.showOrderList()");
+        // button.click();
+    }, 5000);
 }
 
 function intervalHandler() {
-    // mConfig.currentTime = moment(
-    //     `${mConfig.currentDate} ${
-    //         document.querySelector(".timeStamp").innerText
-    //     }`,
-    //     "YYYY-MM-DD H:mm:ss"
-    // ).format("HH:mm:ss");
-    // var session = inTradingTimeRange(true);
-    // if (!!session) document.getElementById("right_price").value = session;
-    // //
-    // if (inAtcTimeRange() && !mConfig.p24h30) getVn30f1m();
-    // //
-    // // Start ATO|ATC
-    // if (isTradingTime("start")) {
-    //     clearLocalData("price");
-    //     clearLocalData("volume");
-    //     mChart.data.datasets.forEach(item => (item.data = []));
-    //     mChart.update("none");
-    //     changeDisplayMode(session);
-    //     if (!document.body.classList.contains("line-chart"))
-    //         document.body.classList.add("line-chart");
-    // }
-    // // Export
+    if (mChartOrder.value)
+        console.log("intervalHandler.confirm: ", mConfig.valueOrderConfirm);
+    mConfig.currentTime = moment(
+        `${mConfig.currentDate} ${
+            document.querySelector(".timeStamp").innerText
+        }`,
+        "YYYY-MM-DD H:mm:ss"
+    ).format("HH:mm:ss");
+    var session = inPeriodicTimeRange(true);
+    if (!!session) document.getElementById("right_price").value = session;
+    //
+    if (inAtcTimeRange() && !mConfig.p24h30) getVn30f1m();
+    //
+    // Start ATO|ATC
+    if (isTradingTime("start")) {
+        // clearLocalData("price");
+        // clearLocalData("volume");
+        // mChartData.datasets.forEach(item => (item.data = []));
+        // mChart.update("none");
+        // changeDisplayMode(session);
+        if (!document.body.classList.contains("line-chart"))
+            document.body.classList.add("line-chart");
+    }
+    // Export
     // if (isTradingTime("end")) setTimeout(() => exportHandler(session), 30000);
-    // // Report
-    // if (mConfig.currentTime == mConfig.time.ATC.end) {
-    //     setTimeout(() => reportHandler(), 60000);
-    //     setTimeout(() => setStrategy(), 45000);
-    // }
-    // //
+    // Report
+    if (mConfig.currentTime == mConfig.time.ATC.end) {
+        setTimeout(() => reportHandler(), 60000);
+        setTimeout(() => setStrategy(), 45000);
+    }
+    //
     // if (mConfig.displayMode == "Stream") showStreamMode();
-    // //
+    //
     // var orderCounter = 0;
     // for (var item of document.getElementById("tbodyContent").rows) {
     //     if (item.cells[0].innerText == "") break;
     //     else orderCounter++;
     // }
     // document.getElementById("orderCountP").innerText = `[${orderCounter}]`;
-    // //
-    // showRunningStatus();
+    //
+    removePriceOrderLine();
+    //
+    showRunningStatus();
     //
     var time = moment()
         .add(7, "hours")
@@ -688,18 +637,18 @@ function intervalHandler() {
         time: time,
         value: 1000 + 100 * (Math.random() - 0.5)
     };
-    mChart.series.price.update(temp);
-    mChart.data.price.push(temp);
+    mChartSeries.price.update(temp);
+    mChartData.price.push(temp);
     temp = {
         time: time,
         value:
-            (mChart.data.value.length
-                ? mChart.data.value.slice(-1)[0].value
+            (mChartData.value.length
+                ? mChartData.value.slice(-1)[0].value
                 : 0) +
             200000 * (Math.random() - 0.5)
     };
-    mChart.series.value.update(temp);
-    mChart.data.value.push(temp);
+    mChartSeries.value.update(temp);
+    mChartData.value.push(temp);
 }
 
 function getData() {
@@ -720,11 +669,7 @@ function getData() {
                 setLocalData("data", data);
             } else return getData();
             //
-            // var chartData = data.reduce(
-            //     (r, item) => createTimeFrameData(r, item),
-            //     [{ data: [] }, { data: [] }]
-            // );
-            mChart.data = data.reduce(
+            mChartData = data.reduce(
                 (r, item) => {
                     var temp = createChartData(r, item);
                     r.price.push(temp.price);
@@ -733,15 +678,9 @@ function getData() {
                 },
                 { price: [], value: [] }
             );
-            console.log("chartData", JSON.parse(JSON.stringify(mChart.data)));
-            mChart.series.price.setData(mChart.data.price);
-            mChart.series.value.setData(mChart.data.value);
-            // mChart.data.datasets[0].data = chartData[0].data;
-            // mChart.data.datasets[1].data = chartData[1].data;
-            // mConfig.currPrice = mChartData[0].slice(-1)[0].value;
-            // mConfig.currValue = mChartData[1].slice(-1)[0].value;
-
-            // mChart.update("none");
+            console.log("chartData", JSON.parse(JSON.stringify(mChartData)));
+            mChartSeries.price.setData(mChartData.price);
+            mChartSeries.value.setData(mChartData.value);
             toggleSpinner(false);
             resolve();
         });
@@ -806,7 +745,7 @@ function clearServerData() {
         }).then(() => {
             clearLocalData("price");
             clearLocalData("volume");
-            mChart.data.datasets.forEach(item => (item.data = []));
+            mChartData.datasets.forEach(item => (item.data = []));
             mChart.update("none");
             toggleSpinner(false);
             resolve();
@@ -917,122 +856,115 @@ function reportHandler() {
     }
 }
 
-function exportHandler(session = false) {
-    if (!!session) changeDisplayMode(session);
-    var imageName = `vps_${moment().format("YYYY.MM.DD-HH.mm.ss")}_${
-        mConfig.bV2
-    }-${mConfig.sV2}.png`;
-    var imageData = mChart.toBase64Image();
-    if (Object.keys(mConfig.time).includes(mConfig.displayMode)) {
-        const url = mConfig.root + mConfig.endpoint.export;
-        const data = { imageData, imageName, session: mConfig.displayMode };
-        toggleSpinner(true);
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        })
-            .then(response => {
-                if (response.ok) {
-                    return response.json();
-                }
-                throw new Error(response.statusText);
-            })
-            .then(jsondata => {
-                console.log("UploadImage-Start ##############################");
-                console.log(jsondata);
-                console.log("UploadImage-End ##############################");
-                // if (jsondata.isOk) alert("Đăng ảnh thành công");
-                toggleSpinner(false);
-            })
-            .catch(error => {
-                console.log("UploadImage-Start ##############################");
-                console.log(error);
-                console.log("UploadImage-End ##############################");
-                alert("Đăng ảnh thất bại");
-            });
-    } else {
-        var a = document.createElement("a");
-        a.href = imageData;
-        a.download = imageName;
-        a.click();
-    }
-}
+// function exportHandler(session = false) {
+//     if (!!session) changeDisplayMode(session);
+//     var imageName = `vps_${moment().format("YYYY.MM.DD-HH.mm.ss")}_${
+//         mConfig.bV2
+//     }-${mConfig.sV2}.png`;
+//     var imageData = mChart.toBase64Image();
+//     if (Object.keys(mConfig.time).includes(mConfig.displayMode)) {
+//         const url = mConfig.root + mConfig.endpoint.export;
+//         const data = { imageData, imageName, session: mConfig.displayMode };
+//         toggleSpinner(true);
+//         fetch(url, {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify(data)
+//         })
+//             .then(response => {
+//                 if (response.ok) {
+//                     return response.json();
+//                 }
+//                 throw new Error(response.statusText);
+//             })
+//             .then(jsondata => {
+//                 console.log("UploadImage-Start ##############################");
+//                 console.log(jsondata);
+//                 console.log("UploadImage-End ##############################");
+//                 // if (jsondata.isOk) alert("Đăng ảnh thành công");
+//                 toggleSpinner(false);
+//             })
+//             .catch(error => {
+//                 console.log("UploadImage-Start ##############################");
+//                 console.log(error);
+//                 console.log("UploadImage-End ##############################");
+//                 alert("Đăng ảnh thất bại");
+//             });
+//     } else {
+//         var a = document.createElement("a");
+//         a.href = imageData;
+//         a.download = imageName;
+//         a.click();
+//     }
+// }
 
-function changeDisplayMode(mode) {
-    var select = document.getElementById("displaySelect");
-    select.value = mode;
-    select.dispatchEvent(new Event("change"));
-}
+// function changeDisplayMode(mode) {
+//     var select = document.getElementById("displaySelect");
+//     select.value = mode;
+//     select.dispatchEvent(new Event("change"));
+// }
 
-function showdisplayMode(mode) {
-    mConfig.displayMode = mode;
-    updateChartTitle();
-    var input = document.getElementById("streamInput");
-    input.style.zIndex = -1;
-    switch (mConfig.displayMode) {
-        case "Full":
-            mChart.resetZoom();
-            break;
-        case "Stream":
-            // input.style.zIndex = 1;
-            // input.value = mConfig.streamScale;
-            // showStreamMode("show");
-            // mChart.options.scales.x.type = "realtime";
-            mChart.options.plugins.streaming.pause = false;
-            // mChart.options.scales.x.realtime.duration = 1000;
-            mChart.update();
-            break;
-        case "ATO":
-        case "ATC":
-            // mChart.options.scales.x.type = "time";
-            // mChart.options.scales.x.realtime.pause = true;
-            // mChart.options.scales.x.realtime.duration = 86400000;
-            mChart.options.plugins.streaming.pause = true;
-            mChart.update();
-            // setTimeout(() => {
-            //     mChart.zoomScale(
-            //         "x",
-            //         {
-            //             min: moment(
-            //                 `${mConfig.currentDate} ${
-            //                     mConfig.time[mConfig.displayMode].start
-            //                 }`
-            //             ),
-            //             max: moment(
-            //                 `${mConfig.currentDate} ${
-            //                     mConfig.time[mConfig.displayMode].end
-            //                 }`
-            //             )
-            //         },
-            //         "show"
-            //     );
-            // }, 1000);
-            break;
-    }
-}
+// function showdisplayMode(mode) {
+//     mConfig.displayMode = mode;
+//     updateChartTitle();
+//     var input = document.getElementById("streamInput");
+//     input.style.zIndex = -1;
+//     switch (mConfig.displayMode) {
+//         case "Full":
+//             mChart.resetZoom();
+//             break;
+//         case "Stream":
+//             // input.style.zIndex = 1;
+//             // input.value = mConfig.streamScale;
+//             // showStreamMode("show");
+//             // mChart.options.scales.x.type = "realtime";
+//             mChart.options.plugins.streaming.pause = false;
+//             // mChart.options.scales.x.realtime.duration = 1000;
+//             mChart.update();
+//             break;
+//         case "ATO":
+//         case "ATC":
+//             // mChart.options.scales.x.type = "time";
+//             // mChart.options.scales.x.realtime.pause = true;
+//             // mChart.options.scales.x.realtime.duration = 86400000;
+//             mChart.options.plugins.streaming.pause = true;
+//             mChart.update();
+//             // setTimeout(() => {
+//             //     mChart.zoomScale(
+//             //         "x",
+//             //         {
+//             //             min: moment(
+//             //                 `${mConfig.currentDate} ${
+//             //                     mConfig.time[mConfig.displayMode].start
+//             //                 }`
+//             //             ),
+//             //             max: moment(
+//             //                 `${mConfig.currentDate} ${
+//             //                     mConfig.time[mConfig.displayMode].end
+//             //                 }`
+//             //             )
+//             //         },
+//             //         "show"
+//             //     );
+//             // }, 1000);
+//             break;
+//     }
+// }
 
-function showStreamMode(mode = "none") {
-    mChart.zoomScale(
-        "x",
-        {
-            min: moment().subtract(mConfig.streamScale, "minutes"),
-            max: moment().add(mConfig.streamScale * 0.05, "minutes")
-        },
-        mode
-    );
-}
-
-function updateChartTitle() {
-    mChart.options.plugins.title.text = `Biểu đồ ${
-        mConfig.displayMode
-    } ngày ${moment(mConfig.currentDate).format("DD/MM/YYYY")}`;
-    mChart.update();
-}
+// function showStreamMode(mode = "none") {
+//     mChart.zoomScale(
+//         "x",
+//         {
+//             min: moment().subtract(mConfig.streamScale, "minutes"),
+//             max: moment().add(mConfig.streamScale * 0.05, "minutes")
+//         },
+//         mode
+//     );
+// }
 
 function toggleSpinner(status) {
-    // var img = document.getElementById("spinnerImg");
-    // img.style.opacity = status ? 1 : 0;
+    var img = document.getElementById("spinnerImg");
+    img.style.opacity = status ? 1 : 0;
 }
 
 function inAtcTimeRange() {
@@ -1042,7 +974,7 @@ function inAtcTimeRange() {
     );
 }
 
-function inTradingTimeRange(sessionName = false) {
+function inPeriodicTimeRange(sessionName = false) {
     var isAtoSession =
         mConfig.currentTime >= mConfig.time.ATO.start &&
         mConfig.currentTime <= mConfig.time.ATO.end;
@@ -1209,9 +1141,9 @@ function getVn30f1m() {
                     mConfig.momentum;
                 setLocalData("momentum", { key: 1, value: mConfig.momentum });
                 //
-                if (mChart.data.datasets[0].data.length > 0) {
+                if (mChartData.datasets[0].data.length > 0) {
                     mConfig.atc = (
-                        mChart.data.datasets[0].data.slice(-1)[0].value -
+                        mChartData.datasets[0].data.slice(-1)[0].value -
                         mConfig.p24h30
                     ).toFixed(1);
                     document.getElementById("atcInput").value = mConfig.atc;
@@ -1226,10 +1158,24 @@ function getVn30f1m() {
 }
 
 function orderByPrice() {
-    console.log("orderByPrice");
-    createOrderLine("price");
-    if (mConfig.orderKind == 1) {
-        document.getElementById("btn_cancel_all_order_condition").click();
+    if (!mConfig.valueOrderConfirm) {
+        createOrderLine("price");
+        document.getElementById("select_condition_order_wrapper").click();
+        document.getElementById(
+            "right_stopOrderIndex"
+        ).value = mChartOrder.price.value.toFixed(1);
+        document.getElementById("right_selStopOrderType").value =
+            mChartOrder.price.type == 1 ? "SOL" : "SOU";
+        var cancelBtn = document.getElementById(
+            "btn_cancel_all_order_condition"
+        );
+        if (!cancelBtn.hasAttribute("disabled")) cancelBtn.click();
+        //
+        var btn = document.getElementById("priceCancelButton");
+        btn.style.display = "block";
+        btn.style.border = `2px solid ${
+            mChartOrder.price.type == 1 ? "green" : "red"
+        }`;
         setTimeout(() => {
             document
                 .getElementById(
@@ -1237,49 +1183,54 @@ function orderByPrice() {
                 )
                 .click();
         }, 500);
-    } else if (mConfig.orderKind == 2) {
-        mConfig.orderConfirm = true;
-        var btn = document.getElementById("cancelButton");
-        btn.style.display = "block";
-        btn.innerText = `Cancel ${mConfig.orderType == 1 ? "LONG" : "SHORT"}`;
-        btn.style.background = mConfig.orderType == 1 ? "green" : "red";
     }
-    document.getElementById("orderButton").style.display = "none";
+    document.getElementById("priceOrderButton").style.display = "none";
+    document.getElementById("valueOrderButton").style.display = "none";
 }
+
 function orderByValue() {
+    mConfig.valueOrderConfirm = true;
     createOrderLine("value");
+    document.getElementById("select_normal_order_wrapper").click();
+    document.getElementById("right_price").value = "MTL";
+    var btn = document.getElementById("valueCancelButton");
+    btn.style.display = "block";
+    btn.style.border = `2px solid ${
+        mChartOrder.value.type == 1 ? "green" : "red"
+    }`;
+    document.getElementById("priceOrderButton").style.display = "none";
+    document.getElementById("valueOrderButton").style.display = "none";
 }
-// function conditionOrder(type) {
-//     if (mConfig.orderKind == 1) {
-//         document.getElementById("btn_cancel_all_order_condition").click();
-//         setTimeout(() => {
-//             document
-//                 .getElementById(
-//                     `btn_${mConfig.orderType == 1 ? "long" : "short"}`
-//                 )
-//                 .click();
-//         }, 500);
-//     } else if (mConfig.orderKind == 2) {
-//         mConfig.orderConfirm = true;
-//         var btn = document.getElementById("cancelButton");
-//         btn.style.display = "block";
-//         btn.innerText = `Cancel ${mConfig.orderType == 1 ? "LONG" : "SHORT"}`;
-//         btn.style.background = mConfig.orderType == 1 ? "green" : "red";
-//     }
-//     document.getElementById("orderButton").style.display = "none";
-// }
 
 function createOrderLine(series) {
-    if (mChart.line.hasOwnProperty(series)) {
-        mChart.series[series].removePriceLine(mChart.line[series]);
-        delete mChart.line[series];
-    }
-    mChart.line[series] = mChart.series[series].createPriceLine({
-        price: mChart.order[series].value,
+    removeOrderLine(series);
+    mChartLine[series] = mChartSeries[series].createPriceLine({
+        price: mChartOrder[series].value,
         color: `rgba(${series == "price" ? "32, 226, 47" : "171, 71, 188"}, 1)`,
         lineWidth: 1,
         lineStyle: LightweightCharts.LineStyle.Solid,
-        title: mChart.order[series].type ? "LONG" : "SHORT",
+        title: mChartOrder[series].type ? "LONG" : "SHORT",
         draggable: true
     });
+}
+function removeOrderLine(series) {
+    if (mChartLine.hasOwnProperty(series)) {
+        mChartSeries[series].removePriceLine(mChartLine[series]);
+        delete mChartLine[series];
+    }
+}
+
+function removePriceOrderLine() {
+    var removeBtn = document.getElementById("priceCancelButton");
+    if (removeBtn.style.display == "block") {
+        var cancelBtn = document.getElementById(
+            "btn_cancel_all_order_condition"
+        );
+        console.log("cancelBtn: ", cancelBtn.style);
+        if (
+            cancelBtn.style.display != "block" ||
+            cancelBtn.hasAttribute("disabled")
+        )
+            removeBtn.click();
+    }
 }
