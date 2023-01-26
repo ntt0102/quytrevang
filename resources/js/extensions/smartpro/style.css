@@ -155,7 +155,7 @@
     padding: 0px 7px;
     border-radius: 5px;
     color: white;
-    background: #20e22f;
+    background: #00FFFF;
     z-index: 3;
 }
 
@@ -166,7 +166,7 @@
     padding: 0px 7px;
     border-radius: 5px;
     color: white;
-    background: #ab47bc;
+    background: #FF00FF;
     z-index: 3;
 }
 
@@ -175,7 +175,7 @@
     padding: 0px 10px;
     border-radius: 5px;
     color: white;
-    background: #20e22f;
+    background: #00FFFF;
     z-index: 3;
     font-size: 25px;
 }
@@ -185,7 +185,7 @@
     padding: 0px 10px;
     border-radius: 5px;
     color: white;
-    background: #ab47bc;
+    background: #FF00FF;
     z-index: 3;
     font-size: 25px;
 }
@@ -525,20 +525,8 @@
         z-index: 1022;
     }
 
-    /* .line-chart #lightWeightChart {
-        z-index: 1021;
-        width: 713px;
-        left: 80px;
-        bottom: 1px;
-    } */
-
     .line-chart #reportButton {
         z-index: -1;
-    }
-
-    .line-chart.fullscreen #lightWeightChart {
-        width: 760px !important;
-        bottom: 5px !important;
     }
 
     .line-chart #footerPanel {

@@ -34,6 +34,7 @@ function getLocalConfig() {
         console.log("mConfig", mConfig);
       })
       .catch(() => {
+        console.log(err);
         var choice = confirm("Get config error. Refresh now?");
         if (choice) location.reload();
       });
@@ -54,26 +55,18 @@ function getServerConfig() {
         mConfig.isOpeningMarket = json.isOpeningMarket;
         mConfig.contractNumber = json.contractNumber;
         mConfig.time = json.time;
-        mConfig.trend = !!json.strategy ? json.strategy.trend : null;
-        mConfig.momentum = !!json.strategy
-          ? !!json.strategy.momentum
-            ? json.strategy.momentum.toFixed(1)
-            : json.strategy.momentum
-          : null;
-        mConfig.atc = !!json.strategy ? json.strategy.atc : null;
+        mConfig.strategy = {
+          trend: !!json.strategy ? json.strategy.trend : null,
+          momentum: !!json.strategy
+            ? !!json.strategy.momentum
+              ? json.strategy.momentum.toFixed(1)
+              : json.strategy.momentum
+            : null,
+          atc: !!json.strategy ? json.strategy.atc : null,
+        };
         //
-        mConfig.timeFrame = 0;
         mConfig.hasChangedData = false;
         mConfig.valueOrderConfirm = false;
-        //
-        mConfig.refPrice = +document.getElementById(`${mConfig.VN30F1M}ref`)
-          .innerText;
-        mConfig.celPrice = +document.getElementById(`${mConfig.VN30F1M}cel`)
-          .innerText;
-        mConfig.floPrice = +document.getElementById(`${mConfig.VN30F1M}flo`)
-          .innerText;
-        mConfig.bV2 = "";
-        mConfig.sV2 = "";
         //
         mConfig.p24h29 = null;
         mConfig.p24h30 = null;
@@ -82,7 +75,8 @@ function getServerConfig() {
         //
         resolve();
       })
-      .catch(() => {
+      .catch((err) => {
+        console.log(err);
         var choice = confirm("Get config error. Refresh now?");
         if (choice) location.reload();
       });
@@ -162,35 +156,35 @@ function createLightWeightChart() {
     option.text = item;
     select.appendChild(option);
   });
-  select.value = mConfig.trend;
+  select.value = mConfig.strategy.trend;
   select.addEventListener("change", (e) => {
-    mConfig.trend = e.target.value;
+    mConfig.strategy.trend = e.target.value;
     getStrategy();
-    setLocalData("trend", { key: 1, value: mConfig.trend });
+    setLocalData("trend", { key: 1, value: mConfig.strategy.trend });
   });
   div.append(select);
   //
   var input = document.createElement("input");
   input.id = "momentumInput";
-  input.value = mConfig.momentum;
+  input.value = mConfig.strategy.momentum;
   input.setAttribute("type", "number");
   input.setAttribute("step", "0.1");
   input.addEventListener("change", (e) => {
-    mConfig.momentum = e.target.value;
+    mConfig.strategy.momentum = e.target.value;
     getStrategy();
-    setLocalData("momentum", { key: 1, value: mConfig.momentum });
+    setLocalData("momentum", { key: 1, value: mConfig.strategy.momentum });
   });
   div.append(input);
   //
   input = document.createElement("input");
   input.id = "atcInput";
-  input.value = mConfig.atc;
+  input.value = mConfig.strategy.atc;
   input.setAttribute("type", "number");
   input.setAttribute("step", "0.1");
   input.addEventListener("change", (e) => {
-    mConfig.atc = e.target.value;
+    mConfig.strategy.atc = e.target.value;
     getStrategy();
-    setLocalData("atc", { key: 1, value: mConfig.atc });
+    setLocalData("atc", { key: 1, value: mConfig.strategy.atc });
   });
   div.append(input);
   //
@@ -305,15 +299,15 @@ function createLightWeightChart() {
   mChart.object = LightweightCharts.createChart(div, chartOptions);
   if (navigator.userAgentData.mobile)
     mChart.object.subscribeCrosshairMove(chartClick);
-  else mChart.subscribeClick(chartClick);
+  else mChart.object.subscribeClick(chartClick);
   mChart.series.price = mChart.object.addLineSeries({
     priceScaleId: "right",
-    color: "rgba(32, 226, 47, 1)",
+    color: "#00FFFF",
     priceFormat: { precision: 1 },
   });
   mChart.series.value = mChart.object.addLineSeries({
     priceScaleId: "left",
-    color: "rgba(171, 71, 188, 1)",
+    color: "#FF00FF",
     priceFormat: { precision: 1 },
   });
   mChart.object.timeScale().fitContent();
@@ -367,7 +361,7 @@ function registerEvent() {
   document
     .querySelector(".timeStamp")
     .addEventListener("dblclick", toggleFullScreen);
-  document.addEventListener("fullscreenchange", fullscreenchange);
+  window.addEventListener("resize", resizeChart);
 
   function conditionOrderSelect() {
     document.getElementById("right_price").value = "MTL";
@@ -410,10 +404,8 @@ function registerEvent() {
     else document.documentElement.requestFullscreen();
   }
 
-  function fullscreenchange() {
+  function resizeChart() {
     mChart.object.resize(window.innerWidth, window.innerHeight);
-    if (document.fullscreenElement) document.body.classList.add("fullscreen");
-    else document.body.classList.remove("fullscreen");
   }
 }
 
@@ -513,13 +505,13 @@ function connectSocket() {
         if (!!mConfig.p24h30) {
           var newAtc = data.lastPrice - mConfig.p24h30;
           var isGet =
-            mConfig.atc == 0 ||
+            mConfig.strategy.atc == 0 ||
             newAtc == 0 ||
-            (newAtc != 0 && mConfig.atc / newAtc < 0);
-          mConfig.atc = newAtc != 0 ? newAtc.toFixed(1) : 0;
+            (newAtc != 0 && mConfig.strategy.atc / newAtc < 0);
+          mConfig.strategy.atc = newAtc != 0 ? newAtc.toFixed(1) : 0;
           if (isGet) getStrategy();
-          document.getElementById("atcInput").value = mConfig.atc;
-          setLocalData("atc", { key: 1, value: mConfig.atc });
+          document.getElementById("atcInput").value = mConfig.strategy.atc;
+          setLocalData("atc", { key: 1, value: mConfig.strategy.atc });
         }
       }
       //
@@ -545,13 +537,14 @@ function loadPage() {
   setTimeout(() => {
     getLocalData(["trend", "momentum", "atc"]).then((data) => {
       if (inAtcTimeRange()) {
-        mConfig.trend = data[0].length > 0 ? data[0][0].value : 0;
-        mConfig.momentum = data[1].length > 0 ? data[1][0].value : 0;
-        mConfig.atc = data[2].length > 0 ? data[2][0].value : 0;
+        mConfig.strategy.trend = data[0].length > 0 ? data[0][0].value : 0;
+        mConfig.strategy.momentum = data[1].length > 0 ? data[1][0].value : 0;
+        mConfig.strategy.atc = data[2].length > 0 ? data[2][0].value : 0;
       }
-      document.getElementById("trendSelect").value = mConfig.trend;
-      document.getElementById("momentumInput").value = mConfig.momentum;
-      document.getElementById("atcInput").value = mConfig.atc;
+      document.getElementById("trendSelect").value = mConfig.strategy.trend;
+      document.getElementById("momentumInput").value =
+        mConfig.strategy.momentum;
+      document.getElementById("atcInput").value = mConfig.strategy.atc;
       getStrategy();
     });
     // Load Order List
@@ -562,8 +555,6 @@ function loadPage() {
 }
 
 function intervalHandler() {
-  if (mChart.order.value)
-    console.log("intervalHandler.confirm: ", mConfig.valueOrderConfirm);
   mConfig.currentTime = moment(
     `${mConfig.currentDate} ${document.querySelector(".timeStamp").innerText}`,
     "YYYY-MM-DD H:mm:ss"
@@ -575,23 +566,14 @@ function intervalHandler() {
   //
   // Start ATO|ATC
   if (isTradingTime("start")) {
-    // clearLocalData("price");
-    // clearLocalData("volume");
-    // mChart.data.datasets.forEach(item => (item.data = []));
-    // mChart.update("none");
-    // changeDisplayMode(session);
     if (!document.body.classList.contains("line-chart"))
       document.body.classList.add("line-chart");
   }
-  // Export
-  // if (isTradingTime("end")) setTimeout(() => exportHandler(session), 30000);
   // Report
   if (mConfig.currentTime == mConfig.time.ATC.end) {
     setTimeout(() => reportHandler(), 60000);
     setTimeout(() => setStrategy(), 45000);
   }
-  //
-  // if (mConfig.displayMode == "Stream") showStreamMode();
   //
   // var orderCounter = 0;
   // for (var item of document.getElementById("tbodyContent").rows) {
@@ -604,21 +586,21 @@ function intervalHandler() {
   //
   showRunningStatus();
   //
-  var time = moment().add(7, "hours").unix();
-  var temp = {
-    time: time,
-    value: 1000 + 100 * (Math.random() - 0.5),
-  };
-  mChart.series.price.update(temp);
-  mChart.data.price.push(temp);
-  temp = {
-    time: time,
-    value:
-      (mChart.data.value.length ? mChart.data.value.slice(-1)[0].value : 0) +
-      200000 * (Math.random() - 0.5),
-  };
-  mChart.series.value.update(temp);
-  mChart.data.value.push(temp);
+  // var time = moment().add(7, "hours").unix();
+  // var temp = {
+  //   time: time,
+  //   value: 1000 + 100 * (Math.random() - 0.5),
+  // };
+  // mChart.series.price.update(temp);
+  // mChart.data.price.push(temp);
+  // temp = {
+  //   time: time,
+  //   value:
+  //     (mChart.data.value.length ? mChart.data.value.slice(-1)[0].value : 0) +
+  //     200000 * (Math.random() - 0.5),
+  // };
+  // mChart.series.value.update(temp);
+  // mChart.data.value.push(temp);
 }
 
 function getData() {
@@ -776,7 +758,7 @@ function reportHandler() {
       fees: +document
         .getElementById("othersAccInfo")
         .innerText.replaceAll(",", ""),
-      scores: mConfig.refPrice,
+      scores: +document.getElementById(`${mConfig.VN30F1M}ref`).innerText,
     };
     for (var item of document.getElementById("tbodyContent").rows) {
       if (item.cells[0].innerText == "") break;
@@ -822,112 +804,6 @@ function reportHandler() {
   }
 }
 
-// function exportHandler(session = false) {
-//     if (!!session) changeDisplayMode(session);
-//     var imageName = `vps_${moment().format("YYYY.MM.DD-HH.mm.ss")}_${
-//         mConfig.bV2
-//     }-${mConfig.sV2}.png`;
-//     var imageData = mChart.toBase64Image();
-//     if (Object.keys(mConfig.time).includes(mConfig.displayMode)) {
-//         const url = mConfig.root + mConfig.endpoint.export;
-//         const data = { imageData, imageName, session: mConfig.displayMode };
-//         toggleSpinner(true);
-//         fetch(url, {
-//             method: "POST",
-//             headers: { "Content-Type": "application/json" },
-//             body: JSON.stringify(data)
-//         })
-//             .then(response => {
-//                 if (response.ok) {
-//                     return response.json();
-//                 }
-//                 throw new Error(response.statusText);
-//             })
-//             .then(jsondata => {
-//                 console.log("UploadImage-Start ##############################");
-//                 console.log(jsondata);
-//                 console.log("UploadImage-End ##############################");
-//                 // if (jsondata.isOk) alert("Đăng ảnh thành công");
-//                 toggleSpinner(false);
-//             })
-//             .catch(error => {
-//                 console.log("UploadImage-Start ##############################");
-//                 console.log(error);
-//                 console.log("UploadImage-End ##############################");
-//                 alert("Đăng ảnh thất bại");
-//             });
-//     } else {
-//         var a = document.createElement("a");
-//         a.href = imageData;
-//         a.download = imageName;
-//         a.click();
-//     }
-// }
-
-// function changeDisplayMode(mode) {
-//     var select = document.getElementById("displaySelect");
-//     select.value = mode;
-//     select.dispatchEvent(new Event("change"));
-// }
-
-// function showdisplayMode(mode) {
-//     mConfig.displayMode = mode;
-//     updateChartTitle();
-//     var input = document.getElementById("streamInput");
-//     input.style.zIndex = -1;
-//     switch (mConfig.displayMode) {
-//         case "Full":
-//             mChart.resetZoom();
-//             break;
-//         case "Stream":
-//             // input.style.zIndex = 1;
-//             // input.value = mConfig.streamScale;
-//             // showStreamMode("show");
-//             // mChart.options.scales.x.type = "realtime";
-//             mChart.options.plugins.streaming.pause = false;
-//             // mChart.options.scales.x.realtime.duration = 1000;
-//             mChart.update();
-//             break;
-//         case "ATO":
-//         case "ATC":
-//             // mChart.options.scales.x.type = "time";
-//             // mChart.options.scales.x.realtime.pause = true;
-//             // mChart.options.scales.x.realtime.duration = 86400000;
-//             mChart.options.plugins.streaming.pause = true;
-//             mChart.update();
-//             // setTimeout(() => {
-//             //     mChart.zoomScale(
-//             //         "x",
-//             //         {
-//             //             min: moment(
-//             //                 `${mConfig.currentDate} ${
-//             //                     mConfig.time[mConfig.displayMode].start
-//             //                 }`
-//             //             ),
-//             //             max: moment(
-//             //                 `${mConfig.currentDate} ${
-//             //                     mConfig.time[mConfig.displayMode].end
-//             //                 }`
-//             //             )
-//             //         },
-//             //         "show"
-//             //     );
-//             // }, 1000);
-//             break;
-//     }
-// }
-
-// function showStreamMode(mode = "none") {
-//     mChart.zoomScale(
-//         "x",
-//         {
-//             min: moment().subtract(mConfig.streamScale, "minutes"),
-//             max: moment().add(mConfig.streamScale * 0.05, "minutes")
-//         },
-//         mode
-//     );
-// }
-
 function toggleSpinner(status) {
   var img = document.getElementById("spinnerImg");
   img.style.opacity = status ? 1 : 0;
@@ -970,9 +846,9 @@ function getStrategy() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        trend: mConfig.trend,
-        momentum: mConfig.momentum,
-        atc: mConfig.atc,
+        trend: mConfig.strategy.trend,
+        momentum: mConfig.strategy.momentum,
+        atc: mConfig.strategy.atc,
       }),
     })
       .then((response) => response.json())
@@ -1053,9 +929,9 @@ function setStrategy() {
       .innerText
   );
   var data = {
-    trend: mConfig.trend,
-    momentum: mConfig.momentum,
-    atc: mConfig.atc,
+    trend: mConfig.strategy.trend,
+    momentum: mConfig.strategy.momentum,
+    atc: mConfig.strategy.atc,
     order: !isNaN(order) ? order : null,
   };
   fetch(url, {
@@ -1097,16 +973,19 @@ function getVn30f1m() {
         console.log("getVn30f1m", json);
         mConfig.p24h29 = json[0];
         mConfig.p24h30 = json[1];
-        mConfig.momentum = (mConfig.p24h30 - mConfig.p24h29).toFixed(1);
-        document.getElementById("momentumInput").value = mConfig.momentum;
-        setLocalData("momentum", { key: 1, value: mConfig.momentum });
+        mConfig.strategy.momentum = (mConfig.p24h30 - mConfig.p24h29).toFixed(
+          1
+        );
+        document.getElementById("momentumInput").value =
+          mConfig.strategy.momentum;
+        setLocalData("momentum", { key: 1, value: mConfig.strategy.momentum });
         //
         if (mChart.data.datasets[0].data.length > 0) {
-          mConfig.atc = (
+          mConfig.strategy.atc = (
             mChart.data.datasets[0].data.slice(-1)[0].value - mConfig.p24h30
           ).toFixed(1);
-          document.getElementById("atcInput").value = mConfig.atc;
-          setLocalData("atc", { key: 1, value: mConfig.atc });
+          document.getElementById("atcInput").value = mConfig.strategy.atc;
+          setLocalData("atc", { key: 1, value: mConfig.strategy.atc });
         }
         getStrategy();
         toggleSpinner(false);
@@ -1160,11 +1039,10 @@ function createOrderLine(series) {
   removeOrderLine(series);
   mChart.line[series] = mChart.series[series].createPriceLine({
     price: mChart.order[series].value,
-    color: `rgba(${series == "price" ? "32, 226, 47" : "171, 71, 188"}, 1)`,
+    color: series == "price" ? "#00FFFF" : "#FF00FF",
     lineWidth: 1,
     lineStyle: LightweightCharts.LineStyle.Solid,
     title: mChart.order[series].type ? "LONG" : "SHORT",
-    draggable: true,
   });
 }
 function removeOrderLine(series) {
@@ -1178,7 +1056,6 @@ function removePriceOrderLine() {
   var removeBtn = document.getElementById("priceCancelButton");
   if (removeBtn.style.display == "block") {
     var cancelBtn = document.getElementById("btn_cancel_all_order_condition");
-    console.log("cancelBtn: ", cancelBtn.style);
     if (
       cancelBtn.style.display != "block" ||
       cancelBtn.hasAttribute("disabled")
