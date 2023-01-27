@@ -50,6 +50,11 @@ class Kernel extends ConsoleKernel
                     set_global_value('startSocketTime', now()->format('H:i:s'));
                     app(\App\Services\Special\SocketService::class)->connectVps();
                 }
+                else {
+                    $startSocketTime = strtotime(get_global_value('startSocketTime'));
+                    if(time() > $startSocketTime  + 5 * 60 + 30)
+                        set_global_value('runningSocketFlag', '0');
+                }
             }
         })->everyMinute()
             ->between(trading_time('startAtoTime', true), trading_time('endAtcTime', true))
