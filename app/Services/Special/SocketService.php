@@ -120,7 +120,7 @@ class SocketService extends CoreService
             && $time <= strtotime(trading_time('endAtcTime')));
     }
 
-    private function inTradingTimeRange()
+    public function inTradingTimeRange()
     {
         $time = time();
         return ($time >= strtotime(trading_time('startAtoTime'))
@@ -129,7 +129,7 @@ class SocketService extends CoreService
             && $time <= strtotime(trading_time('endAtcTime')));
     }
 
-    private function inSocketTimeLimit()
+    public function inSocketTimeLimit()
     {
         $startSocketTime = strtotime(get_global_value('startSocketTime'));
         return time() <= $startSocketTime  + 5 * 60 + 30;

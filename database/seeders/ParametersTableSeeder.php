@@ -79,5 +79,10 @@ class ParametersTableSeeder extends Seeder
             'value' => "13:00:00",
             'description' => "Thời gian kết thúc nghỉ trưa",
         ]);
+        Parameter::create([
+            'slug' => "socketEnable",
+            'value' => "1",
+            'description' => "Bật socket",
+        ]);
     }
 }

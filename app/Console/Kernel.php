@@ -47,20 +47,20 @@ class Kernel extends ConsoleKernel
         //
         $schedule->call(function () {
             if (get_global_value('openingMarketFlag') == '1') {
-                if (get_global_value('runningSocketFlag') == '0') {
-                    set_global_value('runningSocketFlag', '1');
-                    set_global_value('startSocketTime', now()->format('H:i:s'));
-                    app(\App\Services\Special\SocketService::class)->connectVps();
-                }
-                else {
-                    $startSocketTime = strtotime(get_global_value('startSocketTime'));
-                    if(time() > $startSocketTime  + 5 * 60 + 30)
-                        set_global_value('runningSocketFlag', '0');
-                }
+                if(app(\App\Services\Special\SocketService::class)->inTradingTimeRange()) {
+                    if (get_global_value('runningSocketFlag') == '0') {
+                        set_global_value('runningSocketFlag', '1');
+                        set_global_value('startSocketTime', now()->format('H:i:s'));
+                        app(\App\Services\Special\SocketService::class)->connectVps();
+                    }
+                    else if(!app(\App\Services\Special\SocketService::class)->inSocketTimeLimit())
+                            set_global_value('runningSocketFlag', '0');
+                } else if (get_global_value('runningSocketFlag') == '1')
+                    set_global_value('runningSocketFlag', '0');
             }
-        })->everyMinute()
-            ->between(trading_time('startAtoTime', true), trading_time('endAtcTime', true))
-            ->unlessBetween(trading_time('startBreakTime', true), trading_time('endBreakTime', true));
+        })->everyMinute();
+            // ->between(trading_time('startAtoTime', true), trading_time('endAtcTime', true))
+            // ->unlessBetween(trading_time('startBreakTime', true), trading_time('endBreakTime', true));
         //
         $schedule->call(function () {
             if (get_global_value('openingMarketFlag') == '1') {
