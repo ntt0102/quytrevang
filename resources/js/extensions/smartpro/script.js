@@ -362,6 +362,7 @@ function registerEvent() {
     .querySelector(".timeStamp")
     .addEventListener("dblclick", toggleFullScreen);
   window.addEventListener("resize", resizeChart);
+  window.addEventListener("keydown", zoomChart);
 
   function conditionOrderSelect() {
     document.getElementById("right_price").value = "MTL";
@@ -406,6 +407,22 @@ function registerEvent() {
 
   function resizeChart() {
     mChart.object.resize(window.innerWidth, window.innerHeight);
+  }
+
+  function zoomChart(event) {
+    if (event.ctrlKey || event.metaKey) {
+      if (event.keyCode == 38) {
+        mConfig.barSpacing += 0.5;
+        mChart.object
+          .timeScale()
+          .applyOptions({ barSpacing: mConfig.barSpacing });
+      } else if (event.keyCode == 40) {
+        mConfig.barSpacing -= 0.5;
+        mChart.object
+          .timeScale()
+          .applyOptions({ barSpacing: mConfig.barSpacing });
+      }
+    }
   }
 }
 

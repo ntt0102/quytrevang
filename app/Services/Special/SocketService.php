@@ -29,6 +29,7 @@ class SocketService extends CoreService
                 if (!$this->inTradingTimeRange()) {
                     error_log("Timeout market.");
                     activity()->log("Timeout market.");
+                    set_global_value('runningSocketFlag', '0');
                     $conn->close();
                 } else {
                     $first = substr($msg, 0, 1);
@@ -52,6 +53,7 @@ class SocketService extends CoreService
                     if (!$this->inSocketTimeLimit()) {
                         error_log("Timeout schedule");
                         activity()->log("Timeout schedule");
+                        set_global_value('runningSocketFlag', '0');
                         $conn->close();
                     }
                 }
@@ -59,9 +61,8 @@ class SocketService extends CoreService
             $conn->on('close', function () {
                 error_log("WebSocket closed.");
                 activity()->log("WebSocket closed.");
-                if ($this->inTradingTimeRange() && $this->inSocketTimeLimit())
+                if (get_global_value('runningSocketFlag') == '1')
                     $this->connectVps();
-                else set_global_value('runningSocketFlag', '0');
             });
             $conn->on('error', function () use ($conn) {
                 error_log("WebSocket error.");
