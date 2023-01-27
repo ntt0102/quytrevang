@@ -44,7 +44,6 @@ class SocketService extends CoreService
                             $json = json_decode(substr($msg, 2));
                             if ($json[0] == 'boardps') {
                                 $this->priceHandler($json[1]->data);
-                                // $this->volumeHandler($json[1]->data);
                                 $this->bidAskHandler($json[1]->data);
                             } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
                         }
@@ -93,7 +92,7 @@ class SocketService extends CoreService
                 }
             }
             error_log("price");
-            // activity()->withProperties($param)->log('price');
+            activity()->withProperties($param)->log('price');
             $this->vpsRepository->create($param);
         }
     }
@@ -104,7 +103,7 @@ class SocketService extends CoreService
             if (!$this->inPeriodicTimeRange()) {
                 [$price] = explode("|", $data->g1);
                 // error_log("bidask: " . $price);
-                // activity()->withProperties($price)->log('bidask');
+                activity()->withProperties($price)->log('bidask');
                 if ($data->side == "B") set_global_value('bid', $price);
                 else set_global_value('ask', $price);
             }
