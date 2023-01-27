@@ -25,7 +25,7 @@ class SocketService extends CoreService
         \Ratchet\Client\connect($uri)->then(function ($conn) {
             $conn->on('message', function ($msg) use ($conn) {
                 error_log("WebSocket message.");
-                // activity()->log("WebSocket message.");
+                activity()->log("WebSocket message.");
                 if (!$this->inTradingTimeRange()) {
                     error_log("Timeout market.");
                     activity()->log("Timeout market.");
