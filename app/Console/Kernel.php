@@ -29,14 +29,16 @@ class Kernel extends ConsoleKernel
         $schedule->command('subscription:clean')->yearly();
         //
         $schedule->call(function () {
-            if (check_opening_market()) {
+            $openingMarketFlag = app(\App\Services\VpsService::class)->checkOpeningMarket();
+            set_global_value('openingMarketFlag', $openingMarketFlag ? '1' : '0');
+            if ($openingMarketFlag) {
                 set_global_value('runningSocketFlag', '0');
                 app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt('08:40');
         //
         $schedule->call(function () {
-            if (check_opening_market()) {
+            if (get_global_value('openingMarketFlag') == '1') {
                 set_global_value('reportedTradingFlag', '0');
                 set_global_value('runningSocketFlag', '0');
                 app(\App\Services\VpsService::class)->setAtoStrategy();
@@ -44,7 +46,7 @@ class Kernel extends ConsoleKernel
         })->dailyAt('11:35');
         //
         $schedule->call(function () {
-            if (check_opening_market()) {
+            if (get_global_value('openingMarketFlag') == '1') {
                 if (get_global_value('runningSocketFlag') == '0') {
                     set_global_value('runningSocketFlag', '1');
                     set_global_value('startSocketTime', now()->format('H:i:s'));
@@ -61,7 +63,7 @@ class Kernel extends ConsoleKernel
             ->unlessBetween(trading_time('startBreakTime', true), trading_time('endBreakTime', true));
         //
         $schedule->call(function () {
-            if (check_opening_market()) {
+            if (get_global_value('openingMarketFlag') == '1') {
                 app(\App\Services\Admin\ShareService::class)->getData();
                 app(\App\Services\Admin\Vn30f1mService::class)->getData();
             }

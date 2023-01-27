@@ -28,18 +28,6 @@ if (!function_exists('set_global_value')) {
     }
 }
 
-if (!function_exists('check_opening_market')) {
-    /**
-     * Check opening market
-     *
-     * @return bool
-     */
-    function check_opening_market()
-    {
-        return app(\App\Services\VpsService::class)->checkOpeningMarket();
-    }
-}
-
 if (!function_exists('trading_time')) {
     /**
      * Get start trading time.
