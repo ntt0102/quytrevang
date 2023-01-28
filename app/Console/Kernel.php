@@ -15,6 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         'App\Console\Commands\BackupDatabaseCommand',
         'App\Console\Commands\CleanSubscriptionCommand',
+        'App\Console\Commands\RunSocketCommand',
     ];
 
     /**
@@ -27,6 +28,8 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
+        //
+        $schedule->command('socket:run')->everyMinute();
         //
         $schedule->call(function () {
             $openingMarketFlag = app(\App\Services\VpsService::class)->checkOpeningMarket();
@@ -47,20 +50,19 @@ class Kernel extends ConsoleKernel
         //
         $schedule->call(function () {
             if (get_global_value('openingMarketFlag') == '1') {
-                if(app(\App\Services\Special\SocketService::class)->inTradingTimeRange()) {
+                if (app(\App\Services\Special\SocketService::class)->inTradingTimeRange()) {
                     if (get_global_value('runningSocketFlag') == '0') {
                         set_global_value('runningSocketFlag', '1');
                         set_global_value('startSocketTime', now()->format('H:i:s'));
                         app(\App\Services\Special\SocketService::class)->connectVps();
-                    }
-                    else if(!app(\App\Services\Special\SocketService::class)->inSocketTimeLimit())
-                            set_global_value('runningSocketFlag', '0');
+                    } else if (!app(\App\Services\Special\SocketService::class)->inSocketTimeLimit())
+                        set_global_value('runningSocketFlag', '0');
                 } else if (get_global_value('runningSocketFlag') == '1')
                     set_global_value('runningSocketFlag', '0');
             }
         })->everyMinute();
-            // ->between(trading_time('startAtoTime', true), trading_time('endAtcTime', true))
-            // ->unlessBetween(trading_time('startBreakTime', true), trading_time('endBreakTime', true));
+        // ->between(trading_time('startAtoTime', true), trading_time('endAtcTime', true))
+        // ->unlessBetween(trading_time('startBreakTime', true), trading_time('endBreakTime', true));
         //
         $schedule->call(function () {
             if (get_global_value('openingMarketFlag') == '1') {
