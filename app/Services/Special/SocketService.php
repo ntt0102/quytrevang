@@ -31,21 +31,25 @@ class SocketService extends CoreService
                     set_global_value('socketTimeout', date('H:i:s'));
                     $conn->close();
                 } else {
-                    $first = substr($msg, 0, 1);
-                    if ($first == 4) {
-                        $second = substr($msg, 1, 1);
-                        if ($second == 0) {
-                            activity()->log("Socket opened.");
-                            $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
-                            $data = ['action' => 'join', 'list' => $VN30F1M];
-                            $conn->send('42' . json_encode(["regs", json_encode($data)]));
-                        } else if ($second == 2) {
-                            $json = json_decode(substr($msg, 2));
-                            if ($json[0] == 'boardps') {
-                                $this->priceHandler($json[1]->data);
-                                $this->bidAskHandler($json[1]->data);
-                            } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
+                    try {
+                        $first = substr($msg, 0, 1);
+                        if ($first == 4) {
+                            $second = substr($msg, 1, 1);
+                            if ($second == 0) {
+                                activity()->log("Socket opened.");
+                                $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
+                                $data = ['action' => 'join', 'list' => $VN30F1M];
+                                $conn->send('42' . json_encode(["regs", json_encode($data)]));
+                            } else if ($second == 2) {
+                                $json = json_decode(substr($msg, 2));
+                                if ($json[0] == 'boardps') {
+                                    $this->priceHandler($json[1]->data);
+                                    $this->bidAskHandler($json[1]->data);
+                                } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
+                            }
                         }
+                    } catch (\Throwable $th) {
+                        set_global_value('socketError', 'Socket data: ' . date('H:i:s'));
                     }
                     //
                     if (!$this->inSocketTimeLimit()) {
@@ -63,10 +67,12 @@ class SocketService extends CoreService
             });
             $conn->on('error', function () use ($conn) {
                 activity()->log("WebSocket error.");
+                set_global_value('socketError', 'Socket error: ' . date('H:i:s'));
                 $conn->close();
             });
         }, function ($e) {
             activity()->log("WebSocket could not connect: {$e->getMessage()}\n");
+            set_global_value('socketError', 'Socket connect: ' . date('H:i:s'));
         });
     }
 

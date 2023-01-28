@@ -29,21 +29,16 @@ class Kernel extends ConsoleKernel
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
         //
-        // $schedule->command('socket:run')->everyMinute();
-        //
         $schedule->call(function () {
             $openingMarketFlag = app(\App\Services\VpsService::class)->checkOpeningMarket();
             set_global_value('openingMarketFlag', $openingMarketFlag ? '1' : '0');
-            if ($openingMarketFlag) {
-                // set_global_value('runningSocketFlag', '0');
+            if ($openingMarketFlag)
                 app(\App\Repositories\VpsRepository::class)->clear();
-            }
         })->dailyAt('08:40');
         //
         $schedule->call(function () {
             if (get_global_value('openingMarketFlag') == '1') {
                 set_global_value('reportedTradingFlag', '0');
-                // set_global_value('runningSocketFlag', '0');
                 app(\App\Services\VpsService::class)->setAtoStrategy();
             }
         })->dailyAt('11:35');
