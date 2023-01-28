@@ -155,18 +155,18 @@
     padding: 0px 7px;
     border-radius: 5px;
     color: white;
-    background: #00FFFF;
+    background: #00ffff;
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #valueCancelButton {
+.line-chart #lightWeightChart > #volumeCancelButton {
     position: absolute;
     top: 30px;
     right: 110px;
     padding: 0px 7px;
     border-radius: 5px;
     color: white;
-    background: #FF00FF;
+    background: #ff00ff;
     z-index: 3;
 }
 
@@ -175,17 +175,17 @@
     padding: 0px 10px;
     border-radius: 5px;
     color: white;
-    background: #00FFFF;
+    background: #00ffff;
     z-index: 3;
     font-size: 25px;
 }
 
-.line-chart #lightWeightChart > #valueOrderButton {
+.line-chart #lightWeightChart > #volumeOrderButton {
     position: absolute;
     padding: 0px 10px;
     border-radius: 5px;
     color: white;
-    background: #FF00FF;
+    background: #ff00ff;
     z-index: 3;
     font-size: 25px;
 }
