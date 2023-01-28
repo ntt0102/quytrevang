@@ -83,14 +83,12 @@ class SocketService extends CoreService
                 'time' => now()->format('Y-m-d ') . $data->timeServer,
                 'price' => $data->lastPrice
             ];
-            if (!$this->inPeriodicTimeRange()) {
-                $bid = get_global_value('bid');
-                $ask = get_global_value('ask');
-                if (abs($data->lastPrice - $bid) < 1 && abs($data->lastPrice - $ask) < 1) {
-                    $param['vol'] = $data->lastVol;
-                    $param['bid'] = get_global_value('bid');
-                    $param['ask'] = get_global_value('ask');
-                }
+            $bid = get_global_value('bid');
+            $ask = get_global_value('ask');
+            if (!!$bid || !!$ask) {
+                $param['vol'] = $data->lastVol;
+                $param['bid'] = get_global_value('bid');
+                $param['ask'] = get_global_value('ask');
             }
             activity()->withProperties($param)->log('price');
             $this->vpsRepository->create($param);
@@ -100,31 +98,20 @@ class SocketService extends CoreService
     private function bidAskHandler($data)
     {
         if ($data->id == 3210) {
-            if (!$this->inPeriodicTimeRange()) {
-                [$price] = explode("|", $data->g1);
-                activity()->withProperties($price)->log('bidask');
-                if ($data->side == "B") set_global_value('bid', $price);
-                else set_global_value('ask', $price);
-            }
+            [$price] = explode("|", $data->g1);
+            activity()->withProperties($price)->log('bidask');
+            if ($data->side == "B") set_global_value('bid', $price);
+            else set_global_value('ask', $price);
         }
-    }
-
-    private function inPeriodicTimeRange()
-    {
-        $time = time();
-        return ($time >= strtotime(trading_time('startAtoTime'))
-            && $time <= strtotime(trading_time('endAtoTime'))
-        ) || ($time >= strtotime(trading_time('startAtcTime'))
-            && $time <= strtotime(trading_time('endAtcTime')));
     }
 
     public function inTradingTimeRange()
     {
         $time = time();
-        return ($time >= strtotime(trading_time('startAtoTime'))
+        return ($time >= strtotime(trading_time('startTradingTime'))
             && $time <= strtotime(trading_time('startBreakTime'))
         ) || ($time >= strtotime(trading_time('endBreakTime'))
-            && $time <= strtotime(trading_time('endAtcTime')));
+            && $time <= strtotime(trading_time('endTradingTime')));
     }
 
     public function inSocketTimeLimit()

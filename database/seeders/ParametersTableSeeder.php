@@ -50,24 +50,14 @@ class ParametersTableSeeder extends Seeder
             'description' => "Hợp đồng VN30F1M",
         ]);
         Parameter::create([
-            'slug' => "startAtoTime",
+            'slug' => "startTradingTime",
             'value' => "08:45:00",
-            'description' => "Thời gian bắt đầu ATO",
+            'description' => "Thời gian bắt đầu giao dịch",
         ]);
         Parameter::create([
-            'slug' => "endAtoTime",
-            'value' => "09:00:00",
-            'description' => "Thời gian kết thúc ATO",
-        ]);
-        Parameter::create([
-            'slug' => "startAtcTime",
-            'value' => "14:30:00",
-            'description' => "Thời gian bắt đầu ATC",
-        ]);
-        Parameter::create([
-            'slug' => "endAtcTime",
+            'slug' => "endTradingTime",
             'value' => "14:45:00",
-            'description' => "Thời gian kết thúc ATC",
+            'description' => "Thời gian kết thúc giao dịch",
         ]);
         Parameter::create([
             'slug' => "startBreakTime",

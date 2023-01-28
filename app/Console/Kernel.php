@@ -32,8 +32,11 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () {
             $openingMarketFlag = app(\App\Services\VpsService::class)->checkOpeningMarket();
             set_global_value('openingMarketFlag', $openingMarketFlag ? '1' : '0');
-            if ($openingMarketFlag)
+            if ($openingMarketFlag) {
+                set_global_value('bid', '0');
+                set_global_value('ask', '0');
                 app(\App\Repositories\VpsRepository::class)->clear();
+            }
         })->dailyAt('08:40');
         //
         $schedule->call(function () {
@@ -49,7 +52,7 @@ class Kernel extends ConsoleKernel
                 app(\App\Services\Special\SocketService::class)->connectVps();
             }
         })->everyMinute()
-            ->between(trading_time('startAtoTime', true), trading_time('endAtcTime', true))
+            ->between(trading_time('startTradingTime', true), trading_time('endTradingTime', true))
             ->unlessBetween(trading_time('startBreakTime', true), trading_time('endBreakTime', true));
         //
         $schedule->call(function () {

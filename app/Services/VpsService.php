@@ -122,22 +122,14 @@ class VpsService extends CoreService
         //
         $isOpeningMarket = $this->checkOpeningMarket();
         $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
-        $startAtoTime = $this->parameterRepository->getValue('startAtoTime');
-        $endAtoTime = $this->parameterRepository->getValue('endAtoTime');
-        $startAtcTime = $this->parameterRepository->getValue('startAtcTime');
-        $endAtcTime = $this->parameterRepository->getValue('endAtcTime');
+        $startTime = $this->parameterRepository->getValue('startTradingTime');
+        $endTime = $this->parameterRepository->getValue('endTradingTime');
         return [
             'isOpeningMarket' => $isOpeningMarket,
             'contractNumber' => $tradeContracts,
             'time' => [
-                'ATO' => [
-                    'start' => $startAtoTime,
-                    'end' => $endAtoTime,
-                ],
-                'ATC' => [
-                    'start' => $startAtcTime,
-                    'end' => $endAtcTime,
-                ],
+                'start' => $startTime,
+                'end' => $endTime
             ],
             'strategy' => $this->strategyRepository->getLast()
         ];
