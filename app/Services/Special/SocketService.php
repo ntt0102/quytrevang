@@ -24,19 +24,17 @@ class SocketService extends CoreService
         $uri = 'wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket';
         \Ratchet\Client\connect($uri)->then(function ($conn) {
             $conn->on('message', function ($msg) use ($conn) {
-                error_log("WebSocket message.");
-                activity()->log("WebSocket message.");
+                // activity()->log("WebSocket message.");
+                set_global_value('socket', date('H:i:s'));
                 if (!$this->inTradingTimeRange()) {
-                    error_log("Timeout market.");
                     activity()->log("Timeout market.");
-                    set_global_value('runningSocketFlag', '0');
+                    // set_global_value('runningSocketFlag', '0');
                     $conn->close();
                 } else {
                     $first = substr($msg, 0, 1);
                     if ($first == 4) {
                         $second = substr($msg, 1, 1);
                         if ($second == 0) {
-                            error_log("Socket opened.");
                             activity()->log("Socket opened.");
                             $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
                             $data = ['action' => 'join', 'list' => $VN30F1M];
@@ -51,28 +49,24 @@ class SocketService extends CoreService
                     }
                     //
                     if (!$this->inSocketTimeLimit()) {
-                        error_log("Timeout schedule");
                         activity()->log("Timeout schedule");
-                        set_global_value('runningSocketFlag', '0');
+                        // set_global_value('runningSocketFlag', '0');
                         $conn->close();
                     }
                 }
             });
             $conn->on('close', function () {
-                error_log("WebSocket closed.");
+                set_global_value('test', date('H:i:s'));
                 activity()->log("WebSocket closed.");
-                if (get_global_value('runningSocketFlag') == '1')
+                if ($this->inTradingTimeRange() && $this->inSocketTimeLimit())
                     $this->connectVps();
             });
             $conn->on('error', function () use ($conn) {
-                error_log("WebSocket error.");
                 activity()->log("WebSocket error.");
                 $conn->close();
             });
         }, function ($e) {
-            error_log("WebSocket could not connect: {$e->getMessage()}\n");
             activity()->log("WebSocket could not connect: {$e->getMessage()}\n");
-            set_global_value('runningSocketFlag', '0');
         });
     }
 
@@ -132,6 +126,6 @@ class SocketService extends CoreService
     public function inSocketTimeLimit()
     {
         $startSocketTime = strtotime(get_global_value('startSocketTime'));
-        return time() <= $startSocketTime  + 5 * 60 + 30;
+        return time() <= $startSocketTime  + 1 * 60 + 30;
     }
 }
