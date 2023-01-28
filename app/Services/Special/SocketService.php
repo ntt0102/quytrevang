@@ -25,10 +25,10 @@ class SocketService extends CoreService
         \Ratchet\Client\connect($uri)->then(function ($conn) {
             $conn->on('message', function ($msg) use ($conn) {
                 // activity()->log("WebSocket message.");
-                set_global_value('socket', date('H:i:s'));
+                set_global_value('socketMessage', date('H:i:s'));
                 if (!$this->inTradingTimeRange()) {
                     activity()->log("Timeout market.");
-                    // set_global_value('runningSocketFlag', '0');
+                    set_global_value('socketTimeout', date('H:i:s'));
                     $conn->close();
                 } else {
                     $first = substr($msg, 0, 1);
@@ -50,14 +50,14 @@ class SocketService extends CoreService
                     //
                     if (!$this->inSocketTimeLimit()) {
                         activity()->log("Timeout schedule");
-                        // set_global_value('runningSocketFlag', '0');
+                        set_global_value('socketLimit', date('H:i:s'));
                         $conn->close();
                     }
                 }
             });
             $conn->on('close', function () {
-                set_global_value('test', date('H:i:s'));
                 activity()->log("WebSocket closed.");
+                set_global_value('socketClose', date('H:i:s'));
                 if ($this->inTradingTimeRange() && $this->inSocketTimeLimit())
                     $this->connectVps();
             });
@@ -86,7 +86,6 @@ class SocketService extends CoreService
                     $param['ask'] = get_global_value('ask');
                 }
             }
-            error_log("price");
             activity()->withProperties($param)->log('price');
             $this->vpsRepository->create($param);
         }
@@ -97,7 +96,6 @@ class SocketService extends CoreService
         if ($data->id == 3210) {
             if (!$this->inPeriodicTimeRange()) {
                 [$price] = explode("|", $data->g1);
-                // error_log("bidask: " . $price);
                 activity()->withProperties($price)->log('bidask');
                 if ($data->side == "B") set_global_value('bid', $price);
                 else set_global_value('ask', $price);
@@ -126,6 +124,6 @@ class SocketService extends CoreService
     public function inSocketTimeLimit()
     {
         $startSocketTime = strtotime(get_global_value('startSocketTime'));
-        return time() <= $startSocketTime  + 1 * 60 + 30;
+        return time() <= $startSocketTime  + 1 * 60 + 50;
     }
 }
