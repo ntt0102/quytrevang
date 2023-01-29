@@ -59,7 +59,7 @@ class Kernel extends ConsoleKernel
                 app(\App\Services\Admin\ShareService::class)->getData();
                 app(\App\Services\Admin\Vn30f1mService::class)->getData();
             }
-        })->dailyAt('14:46');
+        })->dailyAt('14:47');
     }
 
     /**
