@@ -83,12 +83,12 @@ class SocketService extends CoreService
                 'time' => now()->format('Y-m-d ') . $data->timeServer,
                 'price' => $data->lastPrice
             ];
-            $bid = get_global_value('bid');
-            $ask = get_global_value('ask');
+            $bid = get_global_value('bidPrice');
+            $ask = get_global_value('askPrice');
             if (!!$bid && !!$ask) {
                 $param['vol'] = $data->lastVol;
-                $param['bid'] = get_global_value('bid');
-                $param['ask'] = get_global_value('ask');
+                $param['bid'] = $bid;
+                $param['ask'] = $ask;
             }
             activity()->withProperties($param)->log('price');
             $this->vpsRepository->create($param);
@@ -100,8 +100,8 @@ class SocketService extends CoreService
         if ($data->id == 3210) {
             [$price] = explode("|", $data->g1);
             activity()->withProperties($price)->log('bidask');
-            if ($data->side == "B") set_global_value('bid', $price);
-            else set_global_value('ask', $price);
+            if ($data->side == "B") set_global_value('bidPrice', $price);
+            else set_global_value('askPrice', $price);
         }
     }
 

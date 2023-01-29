@@ -32,8 +32,8 @@ class Kernel extends ConsoleKernel
             $openingMarketFlag = app(\App\Services\VpsService::class)->checkOpeningMarket();
             set_global_value('openingMarketFlag', $openingMarketFlag ? '1' : '0');
             if ($openingMarketFlag) {
-                set_global_value('bid', '0');
-                set_global_value('ask', '0');
+                set_global_value('bidPrice', '0');
+                set_global_value('askPrice', '0');
                 app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt('08:40');
