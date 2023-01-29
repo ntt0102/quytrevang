@@ -67,7 +67,7 @@ function getServerConfig() {
                 //
                 mConfig.hasChangedData = false;
                 mConfig.volumeOrderConfirm = false;
-                mConfig.Crosshair = false;
+                mConfig.crosshair = false;
                 //
                 mConfig.p24h29 = null;
                 mConfig.p24h30 = null;
@@ -332,7 +332,7 @@ function createLightWeightChart() {
     //
     mChart.object.subscribeCrosshairMove(e => {
         if (e.time) {
-            mConfig.Crosshair = true;
+            mConfig.crosshair = true;
             const price = e.seriesPrices.get(mChart.series.price);
             document.getElementById("priceLegendP").innerText = !!price
                 ? price
@@ -341,7 +341,7 @@ function createLightWeightChart() {
             document.getElementById("volumeLegendP").innerText = !!volume
                 ? volume
                 : null;
-        } else mConfig.Crosshair = false;
+        } else mConfig.crosshair = false;
     });
     //
     mChart.series.price = mChart.object.addLineSeries({
@@ -552,14 +552,14 @@ function connectSocket() {
                 //
                 mChart.series.volume.update(temp.volume);
                 mChart.data.volume.push(temp.volume);
-                if (!mConfig.Crosshair)
+                if (!mConfig.crosshair)
                     document.getElementById("volumeLegendP").innerText =
                         temp.volume.value;
                 //
             }
             mChart.series.price.update(temp.price);
             mChart.data.price.push(temp.price);
-            if (!mConfig.Crosshair)
+            if (!mConfig.crosshair)
                 document.getElementById("priceLegendP").innerText =
                     temp.price.value;
             setLocalData("data", param);
@@ -661,7 +661,7 @@ function intervalHandler() {
     // };
     // mChart.series.price.update(temp);
     // mChart.data.price.push(temp);
-    // if (!mConfig.Crosshair)
+    // if (!mConfig.crosshair)
     //     document.getElementById("priceLegendP").innerText = temp.value.toFixed(
     //         1
     //     );
@@ -675,7 +675,7 @@ function intervalHandler() {
     // };
     // mChart.series.volume.update(temp);
     // mChart.data.volume.push(temp);
-    // if (!mConfig.Crosshair)
+    // if (!mConfig.crosshair)
     //     document.getElementById("volumeLegendP").innerText = temp.value.toFixed(
     //         0
     //     );
