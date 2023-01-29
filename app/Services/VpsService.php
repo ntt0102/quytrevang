@@ -299,13 +299,15 @@ class VpsService extends CoreService
         $filename = storage_path('app/backup/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
+        $keys = ['time', 'price', 'vol', 'bid', 'ask'];
         while (!feof($fp)) {
             $line = fgetcsv($fp);
-            $keys = ['time', 'price', 'vol', 'bid', 'ask'];
-            $lines[] = collect($line)->reduce(function ($carry, $item, $index) use ($keys) {
-                $carry[$keys[$index]] = $index > 0 ? (is_numeric($item) ? $item + 0 : null) : $item;
-                return $carry;
-            }, []);
+            if (count($line) == 5) {
+                $lines[] = collect($line)->reduce(function ($carry, $item, $index) use ($keys) {
+                    $carry[$keys[$index]] = $index > 0 ? (is_numeric($item) ? $item + 0 : null) : $item;
+                    return $carry;
+                }, []);
+            }
         }
         fclose($fp);
         return $lines;
