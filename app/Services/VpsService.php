@@ -184,7 +184,9 @@ class VpsService extends CoreService
                         $this->vpsRepository->create($request->all());
                         break;
                     case 'GET':
-                        return $this->vpsRepository->getVps();
+                        if (!!$request->date)
+                            return $this->getFromCsv($request->date);
+                        else return $this->vpsRepository->getVps();
                         break;
                     case 'CLEAR':
                         $this->vpsRepository->clear();
@@ -267,5 +269,44 @@ class VpsService extends CoreService
             } else continue;
         }
         return [$p1, $p2];
+    }
+
+    /**
+     * 
+     */
+    public function exportToCsv()
+    {
+        $filename = storage_path('app/backup/vn30f1m/' . date('Y-m-d') . '.csv');
+        $list = \App\Models\Vps::all();
+        $fp = fopen($filename, 'w');
+        foreach ($list as $obj) {
+            $a = [];
+            $a[] = $obj->time;
+            $a[] = $obj->price;
+            $a[] = $obj->vol;
+            $a[] = $obj->bid;
+            $a[] = $obj->ask;
+            fputcsv($fp, $a);
+        }
+        fclose($fp);
+    }
+
+    /**
+     * 
+     */
+    private function getFromCsv($date)
+    {
+        $filename = storage_path('app/backup/vn30f1m/' . $date . '.csv');
+        $fp = fopen($filename, 'r');
+        while (!feof($fp)) {
+            $line = fgetcsv($fp);
+            $keys = ['time', 'price', 'vol', 'bid', 'ask'];
+            $lines[] = collect($line)->reduce(function ($carry, $item, $index) use ($keys) {
+                $carry[$keys[$index]] = $item;
+                return $carry;
+            }, []);
+        }
+        fclose($fp);
+        return $lines;
     }
 }

@@ -17,7 +17,7 @@ class DatabaseService extends CoreService
         $this->password = config('database.connections.mysql.password');
         $this->host = config('database.connections.mysql.host');
         $this->database = config('database.connections.mysql.database');
-        $this->directory = storage_path() . "/app/backup/";
+        $this->directory = storage_path() . "/app/backup/database/";
         // Delete old file
         array_map('unlink', array_filter((array) glob($this->directory . "*.sql")));
     }

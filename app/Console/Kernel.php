@@ -58,6 +58,7 @@ class Kernel extends ConsoleKernel
             if (get_global_value('openingMarketFlag') == '1') {
                 app(\App\Services\Admin\ShareService::class)->getData();
                 app(\App\Services\Admin\Vn30f1mService::class)->getData();
+                app(\App\Services\VpsService::class)->exportToCsv();
             }
         })->dailyAt('14:47');
     }
