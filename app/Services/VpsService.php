@@ -297,6 +297,7 @@ class VpsService extends CoreService
     private function getFromCsv($date)
     {
         $filename = storage_path('app/backup/vn30f1m/' . $date . '.csv');
+        if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
         while (!feof($fp)) {
             $line = fgetcsv($fp);
