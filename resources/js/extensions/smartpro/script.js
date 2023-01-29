@@ -335,11 +335,11 @@ function createLightWeightChart() {
             mConfig.Crosshair = true;
             const price = e.seriesPrices.get(mChart.series.price);
             document.getElementById("priceLegendP").innerText = !!price
-                ? price.toFixed(1)
+                ? price
                 : null;
             const volume = e.seriesPrices.get(mChart.series.volume);
             document.getElementById("volumeLegendP").innerText = !!volume
-                ? volume.toFixed(0)
+                ? volume
                 : null;
         } else mConfig.Crosshair = false;
     });
@@ -529,36 +529,40 @@ function connectSocket() {
                 param.bid = mConfig.bid;
                 param.ask = mConfig.ask;
             }
-            setLocalData("data", param);
             //
             var temp = createChartData(mChart.data, param);
-            mChart.series.price.update(temp.price);
-            mChart.data.price.push(temp.price);
             if (temp.hasOwnProperty("volume")) {
-                mChart.series.volume.update(temp.volume);
-                mChart.data.volume.push(temp.volume);
-                //
                 if (mConfig.volumeOrderConfirm) {
                     mConfig.volumeOrderConfirm = false;
-                    document.getElementById("btn_cancel_all_normal").click();
-                    setTimeout(() => {
-                        if (
-                            mChart.order.volume.type == 1 &&
-                            temp.volume >= mChart.order.volume.value
-                        )
-                            document.getElementById("btn_long").click();
-                        else if (
-                            mChart.order.volume.type == 2 &&
-                            temp.volume <= mChart.order.volume.value
-                        )
-                            document.getElementById("btn_short").click();
-                        //
-                        document.getElementById(
-                            "volumeCancelButton"
-                        ).style.display = "none";
-                    }, 500);
+                    if (
+                        mChart.order.volume.type == 1 &&
+                        temp.volume >= mChart.order.volume.value
+                    )
+                        document.getElementById("btn_long").click();
+                    else if (
+                        mChart.order.volume.type == 2 &&
+                        temp.volume <= mChart.order.volume.value
+                    )
+                        document.getElementById("btn_short").click();
+                    //
+                    document.getElementById(
+                        "volumeCancelButton"
+                    ).style.display = "none";
                 }
+                //
+                mChart.series.volume.update(temp.volume);
+                mChart.data.volume.push(temp.volume);
+                if (!mConfig.Crosshair)
+                    document.getElementById("volumeLegendP").innerText =
+                        temp.volume.value;
+                //
             }
+            mChart.series.price.update(temp.price);
+            mChart.data.price.push(temp.price);
+            if (!mConfig.Crosshair)
+                document.getElementById("priceLegendP").innerText =
+                    temp.price.value;
+            setLocalData("data", param);
             //
             if (inAtcTimeRange()) {
                 if (!!mConfig.p24h30) {
@@ -648,33 +652,33 @@ function intervalHandler() {
     //
     showRunningStatus();
     //
-    var time = moment()
-        .add(7, "hours")
-        .unix();
-    var temp = {
-        time: time,
-        value: 1000 + 100 * (Math.random() - 0.5)
-    };
-    mChart.series.price.update(temp);
-    mChart.data.price.push(temp);
-    if (!mConfig.Crosshair)
-        document.getElementById("priceLegendP").innerText = temp.value.toFixed(
-            1
-        );
-    temp = {
-        time: time,
-        value:
-            (mChart.data.volume.length
-                ? mChart.data.volume.slice(-1)[0].value
-                : 0) +
-            200000 * (Math.random() - 0.5)
-    };
-    mChart.series.volume.update(temp);
-    mChart.data.volume.push(temp);
-    if (!mConfig.Crosshair)
-        document.getElementById("volumeLegendP").innerText = temp.value.toFixed(
-            0
-        );
+    // var time = moment()
+    //     .add(7, "hours")
+    //     .unix();
+    // var temp = {
+    //     time: time,
+    //     value: 1000 + 100 * (Math.random() - 0.5)
+    // };
+    // mChart.series.price.update(temp);
+    // mChart.data.price.push(temp);
+    // if (!mConfig.Crosshair)
+    //     document.getElementById("priceLegendP").innerText = temp.value.toFixed(
+    //         1
+    //     );
+    // temp = {
+    //     time: time,
+    //     value:
+    //         (mChart.data.volume.length
+    //             ? mChart.data.volume.slice(-1)[0].value
+    //             : 0) +
+    //         200000 * (Math.random() - 0.5)
+    // };
+    // mChart.series.volume.update(temp);
+    // mChart.data.volume.push(temp);
+    // if (!mConfig.Crosshair)
+    //     document.getElementById("volumeLegendP").innerText = temp.value.toFixed(
+    //         0
+    //     );
 }
 
 function getData(date = null) {
