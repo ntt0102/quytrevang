@@ -303,7 +303,7 @@ class VpsService extends CoreService
             $line = fgetcsv($fp);
             $keys = ['time', 'price', 'vol', 'bid', 'ask'];
             $lines[] = collect($line)->reduce(function ($carry, $item, $index) use ($keys) {
-                $carry[$keys[$index]] = $item;
+                $carry[$keys[$index]] = is_numeric($item) ? $item + 0 : null;
                 return $carry;
             }, []);
         }
