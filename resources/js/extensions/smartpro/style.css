@@ -170,6 +170,32 @@
     z-index: 3;
 }
 
+.line-chart #lightWeightChart > #priceLegendP {
+    position: absolute;
+    top: 32px;
+    left: 90px;
+    color: #00ffff;
+    z-index: 3;
+}
+
+.line-chart #lightWeightChart > #volumeLegendP {
+    position: absolute;
+    top: 32px;
+    left: 140px;
+    color: #ff00ff;
+    z-index: 3;
+}
+
+.line-chart #lightWeightChart > #dateInput {
+    position: absolute;
+    top: 30px;
+    right: 150px;
+    /* width: 47px; */
+    padding: 0px;
+    text-align: center;
+    z-index: 3;
+}
+
 .line-chart #lightWeightChart > #priceOrderButton {
     position: absolute;
     padding: 0px 10px;

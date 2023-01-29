@@ -67,6 +67,7 @@ function getServerConfig() {
                 //
                 mConfig.hasChangedData = false;
                 mConfig.volumeOrderConfirm = false;
+                mConfig.Crosshair = false;
                 //
                 mConfig.p24h29 = null;
                 mConfig.p24h30 = null;
@@ -200,10 +201,18 @@ function createLightWeightChart() {
     });
     div.append(input);
     //
+    input = document.createElement("input");
+    input.id = "dateInput";
+    input.type = "date";
+    input.addEventListener("change", e => {
+        if (!!e.target.value) getData(e.target.value);
+    });
+    div.append(input);
+    //
     var button = document.createElement("button");
     button.id = "refreshButton";
     button.innerText = "🔄";
-    button.addEventListener("click", getData);
+    button.addEventListener("click", () => getData());
     div.append(button);
     //
     button = document.createElement("button");
@@ -272,6 +281,13 @@ function createLightWeightChart() {
     // var p = document.createElement("p");
     // p.id = "orderCountP";
     // div.append(p);
+    var p = document.createElement("p");
+    p.id = "priceLegendP";
+    div.append(p);
+    //
+    p = document.createElement("p");
+    p.id = "volumeLegendP";
+    div.append(p);
     //
     var table = document.createElement("table");
     table.id = "listTable";
@@ -313,6 +329,21 @@ function createLightWeightChart() {
     if (navigator.userAgentData.mobile)
         mChart.object.subscribeCrosshairMove(chartClick);
     else mChart.object.subscribeClick(chartClick);
+    //
+    mChart.object.subscribeCrosshairMove(e => {
+        if (e.time) {
+            mConfig.Crosshair = true;
+            const price = e.seriesPrices.get(mChart.series.price);
+            document.getElementById("priceLegendP").innerText = !!price
+                ? price.toFixed(1)
+                : null;
+            const volume = e.seriesPrices.get(mChart.series.volume);
+            document.getElementById("volumeLegendP").innerText = !!volume
+                ? volume.toFixed(0)
+                : null;
+        } else mConfig.Crosshair = false;
+    });
+    //
     mChart.series.price = mChart.object.addLineSeries({
         priceScaleId: "right",
         color: "#00FFFF",
@@ -617,57 +648,80 @@ function intervalHandler() {
     //
     showRunningStatus();
     //
-    // var time = moment().add(7, "hours").unix();
-    // var temp = {
-    //   time: time,
-    //   value: 1000 + 100 * (Math.random() - 0.5),
-    // };
-    // mChart.series.price.update(temp);
-    // mChart.data.price.push(temp);
-    // temp = {
-    //   time: time,
-    //   value:
-    //     (mChart.data.volume.length ? mChart.data.volume.slice(-1)[0].value : 0) +
-    //     200000 * (Math.random() - 0.5),
-    // };
-    // mChart.series.volume.update(temp);
-    // mChart.data.volume.push(temp);
+    var time = moment()
+        .add(7, "hours")
+        .unix();
+    var temp = {
+        time: time,
+        value: 1000 + 100 * (Math.random() - 0.5)
+    };
+    mChart.series.price.update(temp);
+    mChart.data.price.push(temp);
+    if (!mConfig.Crosshair)
+        document.getElementById("priceLegendP").innerText = temp.value.toFixed(
+            1
+        );
+    temp = {
+        time: time,
+        value:
+            (mChart.data.volume.length
+                ? mChart.data.volume.slice(-1)[0].value
+                : 0) +
+            200000 * (Math.random() - 0.5)
+    };
+    mChart.series.volume.update(temp);
+    mChart.data.volume.push(temp);
+    if (!mConfig.Crosshair)
+        document.getElementById("volumeLegendP").innerText = temp.value.toFixed(
+            0
+        );
 }
 
-function getData() {
+function getData(date = null) {
     mConfig.hasChangedData = false;
     return new Promise((resolve, reject) => {
         toggleSpinner(true);
-        Promise.all([getServerData(), getLocalData("data")]).then(arr => {
-            console.log("getData: ", arr);
-            var ids = new Set(arr[0].map(d => d.time));
-            var data = [
-                ...arr[0],
-                ...arr[1].filter(d => !ids.has(d.time))
-            ].sort((a, b) => a.time.localeCompare(b.time));
-            //
-            if (!mConfig.hasChangedData) {
+        Promise.all([getServerData(date), getLocalData("data")])
+            .then(arr => {
+                console.log("getData: ", arr);
+                var ids = new Set(arr[0].map(d => d.time));
+                var data = [
+                    ...arr[0],
+                    ...arr[1].filter(d => !ids.has(d.time))
+                ].sort((a, b) => (a.time >= b.time ? 1 : -1));
                 console.log("data", data);
-                clearLocalData("data");
-                setLocalData("data", data);
-            } else return getData();
-            //
-            mChart.data = data.reduce(
-                (r, item) => {
-                    var temp = createChartData(r, item);
-                    r.price.push(temp.price);
-                    if (temp.hasOwnProperty("volume"))
-                        r.volume.push(temp.volume);
-                    return r;
-                },
-                { price: [], volume: [] }
-            );
-            console.log("chartData", JSON.parse(JSON.stringify(mChart.data)));
-            mChart.series.price.setData(mChart.data.price);
-            mChart.series.volume.setData(mChart.data.volume);
-            toggleSpinner(false);
-            resolve();
-        });
+                //
+                if (!mConfig.hasChangedData) {
+                    clearLocalData("data").then(() =>
+                        setLocalData("data", data)
+                    );
+                } else return getData();
+                //
+                mChart.data = data.reduce(
+                    (r, item) => {
+                        var temp = createChartData(r, item);
+                        r.price.push(temp.price);
+                        if (temp.hasOwnProperty("volume"))
+                            r.volume.push(temp.volume);
+                        return r;
+                    },
+                    { price: [], volume: [] }
+                );
+                console.log(
+                    "chartData",
+                    JSON.parse(JSON.stringify(mChart.data))
+                );
+                mChart.series.price.setData(mChart.data.price);
+                mChart.series.volume.setData(mChart.data.volume);
+                //
+                toggleSpinner(false);
+                resolve();
+            })
+            .catch(error => {
+                console.log(error);
+                toggleSpinner(false);
+                resolve();
+            });
     });
 }
 
@@ -691,9 +745,9 @@ function createChartData(r, item) {
     return ret;
 }
 
-function getServerData() {
+function getServerData(date = null) {
     return new Promise((resolve, reject) => {
-        var data = { action: "GET" };
+        var data = { action: "GET", date: date };
         const url = mConfig.root + mConfig.endpoint.data;
         fetch(url, {
             method: "POST",
@@ -763,18 +817,22 @@ function setLocalData(table, data) {
 }
 
 function clearLocalData(table) {
-    const request = mDatabase
-        .transaction(table, "readwrite")
-        .objectStore(table)
-        .clear();
+    return new Promise(function(resolve, reject) {
+        const request = mDatabase
+            .transaction(table, "readwrite")
+            .objectStore(table)
+            .clear();
 
-    request.onsuccess = () => {
-        console.log(`Object Store "${table}" emptied`);
-    };
+        request.onsuccess = () => {
+            console.log(`Object Store "${table}" emptied`);
+            resolve();
+        };
 
-    request.onerror = err => {
-        console.error(`Error to empty Object Store: ${table}`);
-    };
+        request.onerror = err => {
+            console.error(`Error to empty Object Store: ${table}`);
+            reject();
+        };
+    });
 }
 
 function reportHandler() {
@@ -1038,6 +1096,7 @@ function orderByPrice() {
         document.getElementById(
             "right_stopOrderIndex"
         ).value = mChart.order.price.value.toFixed(1);
+        document.getElementById("right_price").value = "MTL";
         document.getElementById("right_selStopOrderType").value =
             mChart.order.price.type == 1 ? "SOL" : "SOU";
         var cancelBtn = document.getElementById(
