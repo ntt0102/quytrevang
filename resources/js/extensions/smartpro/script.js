@@ -222,7 +222,8 @@ function createLightWeightChart() {
         var choice = confirm("Delete local database?");
         if (choice) {
             clearLocalData("data");
-            getData();
+            var date = document.getElementById("dateInput").value;
+            getData(date);
         }
     });
     div.append(button);
