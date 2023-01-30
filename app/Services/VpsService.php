@@ -327,7 +327,7 @@ class VpsService extends CoreService
             $carry['data'][] = [
                 'time' => date('Y-m-d ') . $item->t,
                 'price' => $item->p,
-                'volume' => $item->v,
+                'vol' => $item->v,
                 'side' => $item->a
             ];
             $carry['times'][] = $item->t;
