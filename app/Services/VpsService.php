@@ -323,7 +323,7 @@ class VpsService extends CoreService
      */
     public function exportToCsv()
     {
-        $filename = storage_path('app/backup/vn30f1m/' . date('Y-m-d') . '.csv');
+        $filename = storage_path('app/public/vn30f1m/' . date('Y-m-d') . '.csv');
         $list = \App\Models\Vps::all();
         $fp = fopen($filename, 'w');
         foreach ($list as $obj) {
@@ -331,8 +331,7 @@ class VpsService extends CoreService
             $a[] = $obj->time;
             $a[] = $obj->price;
             $a[] = $obj->vol;
-            $a[] = $obj->bid;
-            $a[] = $obj->ask;
+            $a[] = $obj->side;
             fputcsv($fp, $a);
         }
         fclose($fp);
@@ -343,15 +342,15 @@ class VpsService extends CoreService
      */
     private function getFromCsv($date)
     {
-        $filename = storage_path('app/backup/vn30f1m/' . $date . '.csv');
+        $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
-        $keys = ['time', 'price', 'vol', 'bid', 'ask'];
+        $keys = ['time', 'price', 'vol', 'side'];
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
                 $lines[] = collect($line)->reduce(function ($carry, $item, $index) use ($keys) {
-                    $carry[$keys[$index]] = $index > 0 ? (is_numeric($item) ? $item + 0 : null) : $item;
+                    $carry[$keys[$index]] = $keys[$index] == 'price' || $keys[$index] == 'vol' ? $item + 0 : $item;
                     return $carry;
                 }, []);
             }
