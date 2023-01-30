@@ -17,9 +17,9 @@ class CreatVpsTable extends Migration
             $table->bigIncrements('id');
             $table->timestamp('time');
             $table->float('price');
-            $table->integer('vol')->nullable();
-            $table->float('bid')->nullable();
-            $table->float('ask')->nullable();
+            $table->integer('vol');
+            $table->float('bid');
+            $table->float('ask');
         });
     }
 
