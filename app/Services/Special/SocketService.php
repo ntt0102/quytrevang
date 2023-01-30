@@ -83,7 +83,7 @@ class SocketService extends CoreService
             $ask = get_global_value('askPrice');
             if (!!$bid && !!$ask && $data->lastVol != $data->totalVol) {
                 $param = [
-                    'time' => now()->format('Y-m-d ') . $data->timeServer,
+                    'time' => now()->format('Y-m-d ') . $data->time,
                     'price' => $data->lastPrice,
                     'vol' => $data->lastVol,
                     'bid' => $bid,
