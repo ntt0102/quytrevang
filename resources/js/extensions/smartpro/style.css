@@ -2,43 +2,38 @@
     position: fixed;
     bottom: 0px;
     left: 0px;
-    background: green;
-    color: white;
-    width: 80px;
+    background: #848484;
     border-radius: 20px;
-    padding: 1px;
-    font-size: 16px;
+    padding: 0px 5px;
+    font-size: 20px;
     z-index: 2001;
 }
 
 #lineButton {
     position: fixed;
     bottom: 0px;
-    left: 95px;
-    background: yellow;
-    color: black;
-    width: 80px;
+    left: 40px;
+    background: #3f433f;
     border-radius: 20px;
-    padding: 1px;
+    padding: 2px 6px;
     font-size: 16px;
     z-index: 2001;
 }
 
 #lineButton.dark {
-    background: black;
-    color: yellow;
-    border-color: yellow;
+    border-color: lime;
+    border-width: 6px;
+    bottom: -3.5px;
+    left: 36.3px;
 }
 
 #reportButton {
     position: fixed;
     bottom: 0px;
-    left: 190px;
-    background: red;
-    color: white;
-    width: 80px;
+    left: 78px;
+    background: black;
     border-radius: 20px;
-    padding: 1px;
+    padding: 2px 6px;
     font-size: 16px;
 }
 
@@ -111,7 +106,7 @@
 
 .line-chart #lightWeightChart > #listButton {
     position: absolute;
-    top: 1px;
+    top: 40px;
     right: 200px;
     padding: 1px 5px;
     border-radius: 5px;
@@ -121,7 +116,7 @@
 
 .line-chart #lightWeightChart > #atcInput {
     position: absolute;
-    top: 1px;
+    top: 40px;
     right: 258px;
     width: 47px;
     padding: 0px;
@@ -131,7 +126,7 @@
 
 .line-chart #lightWeightChart > #momentumInput {
     position: absolute;
-    top: 1px;
+    top: 40px;
     right: 305px;
     width: 47px;
     padding: 0px;
@@ -141,7 +136,7 @@
 
 .line-chart #lightWeightChart > #trendSelect {
     position: absolute;
-    top: 1px;
+    top: 40px;
     right: 352px;
     padding: 2.5px 0 !important;
     text-align: center;
@@ -188,9 +183,9 @@
 
 .line-chart #lightWeightChart > #dateInput {
     position: absolute;
-    top: 30px;
-    right: 150px;
-    /* width: 47px; */
+    top: 0px;
+    right: 200px;
+    width: 105px;
     padding: 0px;
     text-align: center;
     z-index: 3;
@@ -218,7 +213,7 @@
 
 .line-chart #lightWeightChart > #listTable {
     position: absolute;
-    top: 30px;
+    top: 70px;
     right: 50px;
     background: white;
     color: black;
@@ -267,13 +262,6 @@
     background: cornflowerblue;
 }
 
-/* .line-chart #lightWeightChart > #orderCountP {
-    position: absolute;
-    top: 30px;
-    right: 110px;
-    color: white;
-} */
-
 .line-chart #lightWeightChart.list-show > #listTable {
     z-index: 4;
     opacity: 1;
@@ -295,14 +283,35 @@
 .line-chart .aside-menu > .nav,
 .line-chart .aside-menu .list-group-item:nth-child(2),
 .line-chart .aside-menu .list-group-item:nth-child(3),
-.line-chart .aside-menu .list-group-item:nth-child(4),
-.line-chart .aside-menu .list-group-item:nth-child(5),
-.line-chart .aside-menu .list-group-item:nth-child(6) > label,
+/* .line-chart .aside-menu .list-group-item:nth-child(4), */
+/* .line-chart .aside-menu .list-group-item:nth-child(5), */
+.line-chart .aside-menu .btnTypeOrder > span:nth-child(1),
+.line-chart .aside-menu .btnTypeOrder > span:nth-child(2),
+.line-chart .aside-menu .btnTypeOrder > span:nth-child(4),
+.line-chart .aside-menu .btnTypeOrder > span:nth-child(5),
+.line-chart .aside-menu #right_btnordertype > label,
+.line-chart .aside-menu .list-group-item:nth-child(6) > label:first-child,
 .line-chart .aside-menu .list-group-item:nth-child(7) > label,
 .line-chart .aside-menu #right_sell_stop_order label,
 .line-chart .aside-menu .button-order-group > div:last-child {
     display: none !important;
 }
+.line-chart .aside-menu .custom-select-wrapper {
+    text-align: center;
+}
+
+.line-chart .aside-menu .wrapper_select_order {
+    display: flex !important;
+}
+
+.line-chart .aside-menu #select_condition_order {
+    margin-left: -2px;
+}
+
+.line-chart .aside-menu .btnTypeOrder > span:nth-child(3) {
+    margin-bottom: -7px;
+}
+
 .line-chart .aside-menu #right_sell_stop_order {
     height: 37px;
 }
@@ -534,23 +543,6 @@
 }
 
 @media (max-width: 991.98px) {
-    #candleButton {
-        padding: 10px 1px !important;
-    }
-
-    #lineButton {
-        bottom: 55px;
-        left: 0px;
-        padding: 10px 3px !important;
-    }
-
-    #reportButton {
-        bottom: 110px;
-        left: 0px;
-        padding: 10px 3px !important;
-        z-index: 1022;
-    }
-
     .line-chart #reportButton {
         z-index: -1;
     }

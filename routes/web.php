@@ -33,8 +33,10 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
+    // $s = app(\App\Services\VpsService::class)->getTcbs();
+    // $s = app(\App\Services\VpsService::class)->getVps();
     // $s = app(\App\Services\VpsService::class)->exportToCsv();
-    // $s = app(\App\Services\VpsService::class)->getFromCsv('2023-01-26');
+    $s = app(\App\Services\VpsService::class)->getFromCsv('2023-01-30');
     // $s = app(\App\Repositories\StrategyRepository::class)->getStrategies(-10, -5);
     // dd($s);
     // $n = now()->sub(date_interval_create_from_date_string('178 minutes'));
@@ -42,6 +44,7 @@ Route::get('test', function () {
     // $v = app(\App\Repositories\VpsRepository::class)->latest('x');
     // $v = number_format('123.452', 2);
     // $s = is_numeric("1000.1");
-    $s = !![1, 2];
+    // $s = !![1, 2];
+    // $s = \App\Models\Vps::all();
     dd($s);
 })->middleware('cors');

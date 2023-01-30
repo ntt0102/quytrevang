@@ -87,7 +87,8 @@ function getServerConfig() {
 function createButtons() {
     var button = document.createElement("button");
     button.id = "candleButton";
-    button.innerText = "Candle";
+    button.innerText = "📊";
+    button.title = "Candle chart";
     button.addEventListener("click", () => {
         if (document.body.classList.contains("candle-chart")) {
             document.body.classList.remove("candle-chart");
@@ -118,7 +119,8 @@ function createButtons() {
     //
     button = document.createElement("button");
     button.id = "lineButton";
-    button.innerText = "Line";
+    button.innerText = "💹";
+    button.title = "Line chart";
     button.addEventListener("click", () => {
         if (document.body.classList.contains("line-chart")) {
             document.body.classList.remove("line-chart");
@@ -131,10 +133,8 @@ function createButtons() {
         } else {
             document.body.classList.add("line-chart");
             document.body.classList.remove("candle-chart");
-            document.getElementById("left_order_type").innerText =
-                "Lệnh thường";
-            document.getElementById("right_order_type").innerText =
-                "Lệnh điều kiện";
+            document.getElementById("left_order_type").innerText = "LT";
+            document.getElementById("right_order_type").innerText = "LĐK";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(1)"
             ).innerText = "≃";
@@ -147,7 +147,8 @@ function createButtons() {
     //
     button = document.createElement("button");
     button.id = "reportButton";
-    button.innerText = "Report";
+    button.innerText = "📔";
+    button.title = "Report";
     button.addEventListener("click", () => {
         if (mConfig.currentTime > mConfig.time.end) reportHandler();
     });
@@ -212,12 +213,14 @@ function createLightWeightChart() {
     var button = document.createElement("button");
     button.id = "refreshButton";
     button.innerText = "🔄";
+    button.title = "Refresh chart";
     button.addEventListener("click", () => getData());
     div.append(button);
     //
     button = document.createElement("button");
     button.id = "clearButton";
-    button.innerText = "🔂";
+    button.innerText = "🚮";
+    button.title = "Delete local data";
     button.addEventListener("click", () => {
         var choice = confirm("Delete local database?");
         if (choice) {
@@ -231,6 +234,7 @@ function createLightWeightChart() {
     button = document.createElement("button");
     button.id = "listButton";
     button.innerText = "? - ?";
+    button.title = "Toggle list";
     button.addEventListener("click", () => {
         if (div.classList.contains("list-show"))
             div.classList.remove("list-show");
@@ -279,9 +283,6 @@ function createLightWeightChart() {
     img.src = chrome.runtime.getURL("spinner.gif");
     div.append(img);
     //
-    // var p = document.createElement("p");
-    // p.id = "orderCountP";
-    // div.append(p);
     var p = document.createElement("p");
     p.id = "priceLegendP";
     div.append(p);
@@ -358,25 +359,28 @@ function createLightWeightChart() {
     mChart.object.timeScale().fitContent();
 
     function chartClick(e) {
-        var values = Array.from(e.seriesPrices.values());
         var pOrdBtn = document.getElementById("priceOrderButton");
         var vOrdBtn = document.getElementById("volumeOrderButton");
-        if (e.seriesPrices.size) {
-            pOrdBtn.style.left = +(e.point.x - 41) + "px";
-            pOrdBtn.style.top = +(e.point.y - 40) + "px";
-            pOrdBtn.style.display = "block";
-            mChart.order.price = {
-                value: values[0],
-                type: values[0] >= mChart.data.price.slice(-1)[0].value
-            };
-            pOrdBtn.innerText = mChart.order.price.type ? "↗" : "↘";
-            if (e.seriesPrices.size == 2) {
+        if (e.time) {
+            const price = e.seriesPrices.get(mChart.series.price);
+            if (!!price) {
+                pOrdBtn.style.left = +(e.point.x - 41) + "px";
+                pOrdBtn.style.top = +(e.point.y - 40) + "px";
+                pOrdBtn.style.display = "block";
+                mChart.order.price = {
+                    value: price,
+                    type: price >= mChart.data.price.slice(-1)[0].value
+                };
+                pOrdBtn.innerText = mChart.order.price.type ? "↗" : "↘";
+            }
+            const volume = e.seriesPrices.get(mChart.series.volume);
+            if (!!volume) {
                 vOrdBtn.style.left = +(e.point.x - 41) + "px";
                 vOrdBtn.style.top = +e.point.y + "px";
                 vOrdBtn.style.display = "block";
                 mChart.order.volume = {
-                    value: values[1],
-                    type: values[1] >= mChart.data.volume.slice(-1)[0].value
+                    value: volume,
+                    type: volume >= mChart.data.volume.slice(-1)[0].value
                 };
                 vOrdBtn.innerText = mChart.order.volume.type ? "↗" : "↘";
             } else vOrdBtn.style.display = "none";
@@ -524,11 +528,10 @@ function connectSocket() {
                 data.lastVol != data.totalVol
             ) {
                 var param = {
-                    time: `${mConfig.currentDate} ${data.timeServer}`,
+                    time: `${mConfig.currentDate} ${data.time}`,
                     price: data.lastPrice,
                     vol: data.lastVol,
-                    bid: mConfig.bid,
-                    ask: mConfig.ask
+                    side: data.lastPrice <= mConfig.bid ? "SD" : "BU"
                 };
                 var temp = createChartData(mChart.data, param);
                 if (mConfig.volumeOrderConfirm) {
@@ -580,7 +583,7 @@ function connectSocket() {
         if (data.id == 3220) {
             // console.log("price" + data.id);
             var price = {
-                time: moment(`${mConfig.currentDate} ${data.timeServer}`)
+                time: moment(`${mConfig.currentDate} ${data.time}`)
                     .add(7, "hours")
                     .unix(),
                 value: data.lastPrice
@@ -708,7 +711,7 @@ function getData(date = null) {
                 var data = [
                     ...arr[0],
                     ...arr[1].filter(d => !ids.has(d.time))
-                ].sort((a, b) => (a.time >= b.time ? 1 : -1));
+                ].sort((a, b) => a.time.localeCompare(b.time));
                 console.log("data", data);
                 //
                 if (!mConfig.hasChangedData) {
@@ -721,8 +724,7 @@ function getData(date = null) {
                     (r, item) => {
                         var temp = createChartData(r, item);
                         r.price.push(temp.price);
-                        if (temp.hasOwnProperty("volume"))
-                            r.volume.push(temp.volume);
+                        r.volume.push(temp.volume);
                         return r;
                     },
                     { price: [], volume: [] }
@@ -752,14 +754,15 @@ function createChartData(r, item) {
         .unix();
     ret.price = { time: time, value: item.price };
     //
-    var prevVolume = 0;
-    if (r.volume.length > 0) prevVolume = r.volume.slice(-1)[0].value;
-    var vol = 0;
-    if (item.price <= item.bid) vol = -item.vol;
-    else if (item.price >= item.ask) vol = item.vol;
+    var prevVolume = r.volume.length > 0 ? r.volume.slice(-1)[0].value : 0;
+    // if (r.volume.length > 0) prevVolume = r.volume.slice(-1)[0].value;
+    // var vol = 0;
+    // if (item.price <= item.bid) vol = -item.vol;
+    // else if (item.price >= item.ask) vol = item.vol;
+    var volume = (item.side == "BU" ? 1 : -1) * item.vol;
     ret.volume = {
         time: time,
-        value: +(prevVolume + vol).toFixed(0)
+        value: prevVolume + volume
     };
     //
     return ret;
