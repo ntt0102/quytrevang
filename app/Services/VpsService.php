@@ -325,7 +325,7 @@ class VpsService extends CoreService
         });
         $temp = collect($array)->reduce(function ($carry, $item) {
             $carry['data'][] = [
-                'time' => $item->t,
+                'time' => date('Y-m-d ') . $item->t,
                 'price' => $item->p,
                 'volume' => $item->v,
                 'side' => $item->a
