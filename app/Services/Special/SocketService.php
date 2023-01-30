@@ -86,8 +86,7 @@ class SocketService extends CoreService
                     'time' => now()->format('Y-m-d ') . $data->time,
                     'price' => $data->lastPrice,
                     'vol' => $data->lastVol,
-                    'bid' => $bid,
-                    'ask' => $ask,
+                    'side' => $data->lastPrice <= $bid ? 'SD' : 'BU',
                 ];
                 activity()->withProperties($param)->log('price');
                 $this->vpsRepository->create($param);

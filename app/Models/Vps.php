@@ -12,16 +12,14 @@ class Vps extends CoreModel
         'time',
         'price',
         'vol',
-        'bid',
-        'ask'
+        'side'
     ];
 
     protected $fillable = [
         'time',
         'price',
         'vol',
-        'bid',
-        'ask'
+        'side'
     ];
     protected static $recordEvents = [];
 }

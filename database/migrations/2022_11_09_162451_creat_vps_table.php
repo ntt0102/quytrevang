@@ -18,8 +18,7 @@ class CreatVpsTable extends Migration
             $table->timestamp('time');
             $table->float('price');
             $table->integer('vol');
-            $table->float('bid');
-            $table->float('ask');
+            $table->string('side');
         });
     }
 

@@ -196,6 +196,52 @@ class VpsService extends CoreService
             }
         );
     }
+    /**
+     * 
+     */
+    public function getVps()
+    {
+        $data = $this->vpsRepository->getVps();
+        $times = $data->reduce(function ($ts, $item) {
+            $ts[] = $item->time;
+            return $ts;
+        }, []);
+        $unique_times = array_unique($times);
+        return array_values(array_intersect_key($data->toArray(), $unique_times));
+    }
+
+    /**
+     * get From TCBS
+     */
+    public function getTcbs()
+    {
+        $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
+        $client = new \GuzzleHttp\Client();
+        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size=5000";
+        $res = $client->get($url);
+        $array = json_decode($res->getBody())->data;
+        // collect($array)->map(function ($item) {
+        //     $param = [
+        //         'time' => date('Y-m-d ') . $item->t,
+        //         'price' => $item->p,
+        //         'vol' => $item->v,
+        //         'side' => $item->a
+        //     ];
+        //     $this->vpsRepository->create($param);
+        // });
+        $temp = collect($array)->reduce(function ($carry, $item) {
+            $carry['data'][] = [
+                'time' => date('Y-m-d ') . $item->t,
+                'price' => $item->p,
+                'vol' => $item->v,
+                'side' => $item->a
+            ];
+            $carry['times'][] = $item->t;
+            return $carry;
+        }, ['data' => [], 'times' => []]);
+        $unique_times = array_unique($temp['times']);
+        return array_values(array_intersect_key($temp['data'], $unique_times));
+    }
 
     /**
      * Get strategy
@@ -312,28 +358,5 @@ class VpsService extends CoreService
         }
         fclose($fp);
         return $lines;
-    }
-    /**
-     * get From TCBS
-     */
-    public function getTcbs()
-    {
-        $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
-        $client = new \GuzzleHttp\Client();
-        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size=5000";
-        $res = $client->get($url);
-        $array = json_decode($res->getBody())->data;
-        $temp = collect($array)->reduce(function ($carry, $item) {
-            $carry['data'][] = [
-                'time' => date('Y-m-d ') . $item->t,
-                'price' => $item->p,
-                'vol' => $item->v,
-                'side' => $item->a
-            ];
-            $carry['times'][] = $item->t;
-            return $carry;
-        }, ['data' => [], 'times' => []]);
-        $unique_times = array_unique($temp['times']);
-        return array_values(array_intersect_key($temp['data'], $unique_times));
     }
 }
