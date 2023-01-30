@@ -320,9 +320,9 @@ class VpsService extends CoreService
         $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size=5000";
         $res = $client->get($url);
         $array = json_decode($res->getBody())->data;
-        usort($array, function ($a, $b) {
-            return strcmp($a->t, $b->t);
-        });
+        // usort($array, function ($a, $b) {
+        //     return strcmp($a->t, $b->t);
+        // });
         $temp = collect($array)->reduce(function ($carry, $item) {
             $carry['data'][] = [
                 'time' => date('Y-m-d ') . $item->t,
