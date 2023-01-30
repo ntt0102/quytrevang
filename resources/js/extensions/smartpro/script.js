@@ -512,31 +512,25 @@ function connectSocket() {
     });
     socket.on("stockps", data => {
         // console.log("stockps", data.data);
-        priceHandler(data.data);
+        periodicHandler(data.data);
     });
 
     function priceHandler(data) {
         if (data.id == 3220) {
             // console.log("price" + data.id);
-            var param = {
-                time: `${mConfig.currentDate} ${data.timeServer}`,
-                price: data.lastPrice,
-                vol: null,
-                bid: null,
-                ask: null
-            };
             if (
                 !!mConfig.bid &&
                 !!mConfig.ask &&
                 data.lastVol != data.totalVol
             ) {
-                param.vol = data.lastVol;
-                param.bid = mConfig.bid;
-                param.ask = mConfig.ask;
-            }
-            //
-            var temp = createChartData(mChart.data, param);
-            if (temp.hasOwnProperty("volume")) {
+                var param = {
+                    time: `${mConfig.currentDate} ${data.timeServer}`,
+                    price: data.lastPrice,
+                    vol: data.lastVol,
+                    bid: mConfig.bid,
+                    ask: mConfig.ask
+                };
+                var temp = createChartData(mChart.data, param);
                 if (mConfig.volumeOrderConfirm) {
                     mConfig.volumeOrderConfirm = false;
                     if (
@@ -555,19 +549,45 @@ function connectSocket() {
                     ).style.display = "none";
                 }
                 //
+                mChart.series.price.update(temp.price);
+                mChart.data.price.push(temp.price);
+                if (!mConfig.crosshair)
+                    document.getElementById("priceLegendP").innerText =
+                        temp.price.value;
+                //
                 mChart.series.volume.update(temp.volume);
                 mChart.data.volume.push(temp.volume);
                 if (!mConfig.crosshair)
                     document.getElementById("volumeLegendP").innerText =
                         temp.volume.value;
                 //
+                setLocalData("data", param);
+                mConfig.hasChangedData = true;
             }
-            mChart.series.price.update(temp.price);
-            mChart.data.price.push(temp.price);
+        }
+    }
+
+    function bidAskHandler(data) {
+        if (data.id == 3210) {
+            var arr = data.g1.split("|");
+            if (data.side == "B") mConfig.bid = +arr[0];
+            else mConfig.ask = +arr[0];
+        }
+    }
+
+    function periodicHandler(data) {
+        if (data.id == 3220) {
+            // console.log("price" + data.id);
+            var price = {
+                time: moment(`${mConfig.currentDate} ${data.timeServer}`)
+                    .add(7, "hours")
+                    .unix(),
+                value: data.lastPrice
+            };
+            mChart.series.price.update(price);
+            mChart.data.price.push(price);
             if (!mConfig.crosshair)
-                document.getElementById("priceLegendP").innerText =
-                    temp.price.value;
-            setLocalData("data", param);
+                document.getElementById("priceLegendP").innerText = price.value;
             //
             if (inAtcTimeRange()) {
                 if (!!mConfig.p24h30) {
@@ -586,16 +606,6 @@ function connectSocket() {
                     });
                 }
             }
-            //
-            mConfig.hasChangedData = true;
-        }
-    }
-
-    function bidAskHandler(data) {
-        if (data.id == 3210) {
-            var arr = data.g1.split("|");
-            if (data.side == "B") mConfig.bid = +arr[0];
-            else mConfig.ask = +arr[0];
         }
     }
 }

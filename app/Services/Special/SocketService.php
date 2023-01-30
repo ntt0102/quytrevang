@@ -45,7 +45,8 @@ class SocketService extends CoreService
                                 if ($json[0] == 'boardps') {
                                     $this->priceHandler($json[1]->data);
                                     $this->bidAskHandler($json[1]->data);
-                                } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
+                                }
+                                // else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
                             }
                         }
                     } catch (\Throwable $th) {
