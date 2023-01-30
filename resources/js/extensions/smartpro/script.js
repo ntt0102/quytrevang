@@ -525,7 +525,11 @@ function connectSocket() {
                 bid: null,
                 ask: null
             };
-            if (!!mConfig.bid && !!mConfig.ask) {
+            if (
+                !!mConfig.bid &&
+                !!mConfig.ask &&
+                data.lastVol != data.totalVol
+            ) {
                 param.vol = data.lastVol;
                 param.bid = mConfig.bid;
                 param.ask = mConfig.ask;

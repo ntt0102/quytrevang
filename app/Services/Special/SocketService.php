@@ -85,7 +85,7 @@ class SocketService extends CoreService
             ];
             $bid = get_global_value('bidPrice');
             $ask = get_global_value('askPrice');
-            if (!!$bid && !!$ask) {
+            if (!!$bid && !!$ask && $data->lastVol != $data->totalVol) {
                 $param['vol'] = $data->lastVol;
                 $param['bid'] = $bid;
                 $param['ask'] = $ask;
