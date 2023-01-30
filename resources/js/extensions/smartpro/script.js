@@ -507,12 +507,12 @@ function connectSocket() {
     });
     socket.on("boardps", data => {
         // console.log("boardps", data.data);
-        priceHandler(data.data);
         bidAskHandler(data.data);
+        periodicHandler(data.data);
     });
     socket.on("stockps", data => {
         // console.log("stockps", data.data);
-        periodicHandler(data.data);
+        priceHandler(data.data);
     });
 
     function priceHandler(data) {
@@ -555,6 +555,7 @@ function connectSocket() {
                     document.getElementById("priceLegendP").innerText =
                         temp.price.value;
                 //
+                console.log("temp.volume: ", temp.volume);
                 mChart.series.volume.update(temp.volume);
                 mChart.data.volume.push(temp.volume);
                 if (!mConfig.crosshair)
@@ -750,17 +751,17 @@ function createChartData(r, item) {
         .add(7, "hours")
         .unix();
     ret.price = { time: time, value: item.price };
-    if (!!item.vol) {
-        var prevVolume = 0;
-        if (r.volume.length > 0) prevVolume = r.volume.slice(-1)[0].value;
-        var vol = 0;
-        if (item.price <= item.bid) vol = -item.vol;
-        else if (item.price >= item.ask) vol = item.vol;
-        ret.volume = {
-            time: time,
-            value: +(prevVolume + vol).toFixed(0)
-        };
-    }
+    //
+    var prevVolume = 0;
+    if (r.volume.length > 0) prevVolume = r.volume.slice(-1)[0].value;
+    var vol = 0;
+    if (item.price <= item.bid) vol = -item.vol;
+    else if (item.price >= item.ask) vol = item.vol;
+    ret.volume = {
+        time: time,
+        value: +(prevVolume + vol).toFixed(0)
+    };
+    //
     return ret;
 }
 

@@ -79,19 +79,19 @@ class SocketService extends CoreService
     private function priceHandler($data)
     {
         if ($data->id == 3220) {
-            $param = [
-                'time' => now()->format('Y-m-d ') . $data->timeServer,
-                'price' => $data->lastPrice
-            ];
             $bid = get_global_value('bidPrice');
             $ask = get_global_value('askPrice');
             if (!!$bid && !!$ask && $data->lastVol != $data->totalVol) {
-                $param['vol'] = $data->lastVol;
-                $param['bid'] = $bid;
-                $param['ask'] = $ask;
+                $param = [
+                    'time' => now()->format('Y-m-d ') . $data->timeServer,
+                    'price' => $data->lastPrice,
+                    'vol' => $data->lastVol,
+                    'bid' => $bid,
+                    'ask' => $ask,
+                ];
+                activity()->withProperties($param)->log('price');
+                $this->vpsRepository->create($param);
             }
-            activity()->withProperties($param)->log('price');
-            $this->vpsRepository->create($param);
         }
     }
 
