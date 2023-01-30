@@ -186,7 +186,8 @@ class VpsService extends CoreService
                     case 'GET':
                         if (!!$request->date)
                             return $this->getFromCsv($request->date);
-                        else return $this->vpsRepository->getVps();
+                        else return $this->getTcbs();
+                        // else return $this->vpsRepository->getVps();
                         break;
                     case 'CLEAR':
                         $this->vpsRepository->clear();
@@ -311,5 +312,28 @@ class VpsService extends CoreService
         }
         fclose($fp);
         return $lines;
+    }
+    public function getTcbs()
+    {
+        $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
+        $client = new \GuzzleHttp\Client();
+        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size=5000";
+        $res = $client->get($url);
+        $array = json_decode($res->getBody())->data;
+        usort($array, function ($a, $b) {
+            return strcmp($a->t, $b->t);
+        });
+        $temp = collect($array)->reduce(function ($carry, $item) {
+            $carry['data'][] = [
+                'time' => $item->t,
+                'price' => $item->p,
+                'buyVol' => intval($item->ba),
+                'sellVol' => intval($item->sa)
+            ];
+            $carry['times'][] = $item->t;
+            return $carry;
+        }, ['data' => [], 'times' => []]);
+        $unique_times = array_unique($temp['times']);
+        return array_values(array_intersect_key($temp['data'], $unique_times));
     }
 }
