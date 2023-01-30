@@ -340,7 +340,7 @@ class VpsService extends CoreService
     /**
      * 
      */
-    private function getFromCsv($date)
+    public function getFromCsv($date)
     {
         $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
@@ -356,6 +356,11 @@ class VpsService extends CoreService
             }
         }
         fclose($fp);
-        return $lines;
+        $times = collect($lines)->reduce(function ($ts, $item) {
+            $ts[] = $item['time'];
+            return $ts;
+        }, []);
+        $unique_times = array_unique($times);
+        return array_values(array_intersect_key($lines, $unique_times));
     }
 }
