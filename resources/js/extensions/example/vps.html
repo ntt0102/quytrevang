@@ -1,32 +1,35 @@
 <!DOCTYPE html>
 
 <head>
-  <title>WebSocket client test</title>
+    <title>WebSocket client test</title>
 </head>
 
 <body>
-  <h1>WebSocket VPS</h1>
+    <h1>WebSocket VPS</h1>
 </body>
 
 <script language="javascript" type="text/javascript">
-  var wsUri = "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
-  function testWebSocket() {
-    websocket = new WebSocket(wsUri);
-    websocket.onopen = function (evt) {
-      console.log("onopen", evt);
-      var msg = { action: "join", list: "VN30F2211" };
-      websocket.send("42" + JSON.stringify(["regs", JSON.stringify(msg)]));
-    };
-    websocket.onclose = function (evt) {
-      console.log("onclose", evt);
-      testWebSocket();
-    };
-    websocket.onmessage = function (evt) {
-      console.log("onmessage", evt.data);
-    };
-    websocket.onerror = function (evt) {
-      console.log("onerror", evt);
-    };
-  }
-  window.addEventListener("load", testWebSocket, false);
+    var wsUri =
+        "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
+    function testWebSocket() {
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function(evt) {
+            console.log("onopen", evt);
+            var msg = { action: "join", list: "VN30F2302" };
+            websocket.send(
+                "42" + JSON.stringify(["regs", JSON.stringify(msg)])
+            );
+        };
+        websocket.onclose = function(evt) {
+            console.log("onclose", evt);
+            testWebSocket();
+        };
+        websocket.onmessage = function(evt) {
+            console.log("onmessage", evt.data);
+        };
+        websocket.onerror = function(evt) {
+            console.log("onerror", evt);
+        };
+    }
+    window.addEventListener("load", testWebSocket, false);
 </script>
