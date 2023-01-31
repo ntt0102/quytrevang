@@ -35,6 +35,7 @@ class VariableRepository extends CoreRepository
     public function setValue(string $slug, string $value)
     {
         $variable = $this->findOne([['name', $slug]]);
-        $this->update($variable, ['value' => $value]);
+        if (!!$variable)
+            $this->update($variable, ['value' => $value]);
     }
 }

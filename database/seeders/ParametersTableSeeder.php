@@ -51,22 +51,22 @@ class ParametersTableSeeder extends Seeder
         ]);
         Parameter::create([
             'slug' => "startTradingTime",
-            'value' => "08:45:00",
+            'value' => "08:59:00",
             'description' => "Thời gian bắt đầu giao dịch",
         ]);
         Parameter::create([
             'slug' => "endTradingTime",
-            'value' => "14:45:00",
+            'value' => "14:31:00",
             'description' => "Thời gian kết thúc giao dịch",
         ]);
         Parameter::create([
             'slug' => "startBreakTime",
-            'value' => "11:30:00",
+            'value' => "11:31:00",
             'description' => "Thời gian bắt đầu nghỉ trưa",
         ]);
         Parameter::create([
             'slug' => "endBreakTime",
-            'value' => "13:00:00",
+            'value' => "12:59:00",
             'description' => "Thời gian kết thúc nghỉ trưa",
         ]);
     }

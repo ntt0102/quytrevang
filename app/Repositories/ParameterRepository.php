@@ -28,13 +28,13 @@ class ParameterRepository extends CoreRepository
     public function getValue(string $slug, string $default = '')
     {
         $parameter = $this->findOne([['slug', $slug]]);
-        if ($parameter) return $parameter->value;
+        if (!!$parameter) return $parameter->value;
         return $default;
     }
 
     public function setValue(string $slug, string $value)
     {
         $parameter = $this->findOne([['slug', $slug]]);
-        $this->update($parameter, ['value' => $value]);
+        if (!!$parameter) $this->update($parameter, ['value' => $value]);
     }
 }
