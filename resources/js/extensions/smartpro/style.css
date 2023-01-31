@@ -244,8 +244,8 @@
 
 .line-chart #mainFooter .foot_tab:nth-child(2) {
     position: fixed;
-    bottom: 0px;
-    left: 140px;
+    top: 310px;
+    left: 36px;
     z-index: 2001;
     font-size: 20px;
     padding: 0px 11px !important;
@@ -257,8 +257,8 @@
 
 .line-chart #mainFooter .foot_tab:nth-child(1) {
     position: fixed;
-    bottom: 0px;
-    left: 100px;
+    top: 310px;
+    left: 0px;
     z-index: 2001;
     font-size: 20px;
     padding: 0px 11px !important;
