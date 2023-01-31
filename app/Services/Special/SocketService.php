@@ -43,7 +43,6 @@ class SocketService extends CoreService
                             } else if ($second == 2) {
                                 $json = json_decode(substr($msg, 2));
                                 if ($json[0] == 'boardps') {
-                                    // $this->priceHandler($json[1]->data);
                                     $this->bidAskHandler($json[1]->data);
                                 } else if ($json[0] == 'stockps') $this->priceHandler($json[1]->data);
                             }
@@ -81,11 +80,7 @@ class SocketService extends CoreService
         if ($data->id == 3220) {
             $bid = get_global_value('bidPrice');
             $ask = get_global_value('askPrice');
-            if (
-                !!$bid && !!$ask
-                && $data->lastVol != $data->totalVol
-                && time() < strtotime('14:31:00')
-            ) {
+            if (!!$bid && !!$ask && $data->lastVol != $data->totalVol) {
                 $param = [
                     'time' => now()->format('Y-m-d ') . $data->time,
                     'price' => $data->lastPrice,
