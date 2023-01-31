@@ -39,13 +39,6 @@ class Kernel extends ConsoleKernel
             }
         })->dailyAt('08:55');
         //
-        // $schedule->call(function () {
-        //     if (get_global_value('openingMarketFlag') == '1') {
-        //         set_global_value('reportedTradingFlag', '0');
-        //         app(\App\Services\VpsService::class)->setAtoStrategy();
-        //     }
-        // })->dailyAt('11:35');
-        //
         $schedule->call(function () {
             if (get_global_value('openingMarketFlag') == '1') {
                 set_global_value('startSocketTime', now()->format('H:i:s'));
@@ -57,8 +50,6 @@ class Kernel extends ConsoleKernel
         //
         $schedule->call(function () {
             if (get_global_value('openingMarketFlag') == '1')
-                // app(\App\Services\Admin\ShareService::class)->getData();
-                // app(\App\Services\Admin\Vn30f1mService::class)->getData();
                 app(\App\Services\VpsService::class)->exportToCsv();
         })->dailyAt('14:35');
     }
