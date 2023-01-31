@@ -247,6 +247,7 @@ function createLightWeightChart() {
     button.innerText = "✘";
     button.style.display = "none";
     button.addEventListener("click", () => {
+        document.getElementById("btn_cancel_all_order_condition").click();
         document.getElementById("priceCancelButton").style.display = "none";
         removeOrderLine("price");
     });
@@ -347,14 +348,14 @@ function createLightWeightChart() {
     });
     //
     mChart.series.price = mChart.object.addLineSeries({
-        priceScaleId: "right",
+        // priceScaleId: "right",
         color: "#00FFFF",
         priceFormat: { precision: 1 }
     });
     mChart.series.volume = mChart.object.addLineSeries({
-        priceScaleId: "left",
+        priceScaleId: "volume",
         color: "#FF00FF",
-        priceFormat: { precision: 1 }
+        priceFormat: { precision: 0 }
     });
     mChart.object.timeScale().fitContent();
 
@@ -528,28 +529,34 @@ function connectSocket() {
                 data.lastVol != data.totalVol
             ) {
                 var param = {
-                    time: `${mConfig.currentDate} ${data.time}`,
+                    time: `${mConfig.currentDate} ${data.timeServer}`,
                     price: data.lastPrice,
                     vol: data.lastVol,
                     side: data.lastPrice <= mConfig.bid ? "SD" : "BU"
                 };
                 var temp = createChartData(mChart.data, param);
                 if (mConfig.volumeOrderConfirm) {
-                    mConfig.volumeOrderConfirm = false;
+                    var isOrder = false;
                     if (
                         mChart.order.volume.type == 1 &&
                         temp.volume >= mChart.order.volume.value
-                    )
+                    ) {
                         document.getElementById("btn_long").click();
-                    else if (
+                        isOrder = true;
+                    } else if (
                         mChart.order.volume.type == 2 &&
                         temp.volume <= mChart.order.volume.value
-                    )
+                    ) {
                         document.getElementById("btn_short").click();
+                        isOrder = true;
+                    }
                     //
-                    document.getElementById(
-                        "volumeCancelButton"
-                    ).style.display = "none";
+                    if (isOrder) {
+                        mConfig.volumeOrderConfirm = false;
+                        document.getElementById(
+                            "volumeCancelButton"
+                        ).style.display = "none";
+                    }
                 }
                 //
                 mChart.series.price.update(temp.price);
@@ -558,7 +565,6 @@ function connectSocket() {
                     document.getElementById("priceLegendP").innerText =
                         temp.price.value;
                 //
-                console.log("temp.volume: ", temp.volume);
                 mChart.series.volume.update(temp.volume);
                 mChart.data.volume.push(temp.volume);
                 if (!mConfig.crosshair)
@@ -581,9 +587,9 @@ function connectSocket() {
 
     function periodicHandler(data) {
         if (data.id == 3220) {
-            // console.log("price" + data.id);
+            // console.log("price", data);
             var price = {
-                time: moment(`${mConfig.currentDate} ${data.time}`)
+                time: moment(`${mConfig.currentDate} ${data.timeServer}`)
                     .add(7, "hours")
                     .unix(),
                 value: data.lastPrice
@@ -635,11 +641,14 @@ function loadPage() {
             document.getElementById("atcInput").value = mConfig.strategy.atc;
             getStrategy();
         });
-        // Load Order List
-        // var button = document.createElement("button");
-        // button.setAttribute("onclick", "objOrderPanel.showOrderList()");
-        // button.click();
     }, 5000);
+    // Load Order List
+    var button = document.createElement("button");
+    button.setAttribute(
+        "onclick",
+        "openPanel('conditionOrder');openPanel('conditionOrder');"
+    );
+    button.click();
 }
 
 function intervalHandler() {
@@ -755,10 +764,6 @@ function createChartData(r, item) {
     ret.price = { time: time, value: item.price };
     //
     var prevVolume = r.volume.length > 0 ? r.volume.slice(-1)[0].value : 0;
-    // if (r.volume.length > 0) prevVolume = r.volume.slice(-1)[0].value;
-    // var vol = 0;
-    // if (item.price <= item.bid) vol = -item.vol;
-    // else if (item.price >= item.ask) vol = item.vol;
     var volume = (item.side == "BU" ? 1 : -1) * item.vol;
     ret.volume = {
         time: time,
@@ -1114,6 +1119,7 @@ function getVn30f1m() {
 
 function orderByPrice() {
     if (!mConfig.volumeOrderConfirm) {
+        document.getElementById("btn_cancel_all_order_condition").click();
         createOrderLine("price");
         document.getElementById("select_condition_order_wrapper").click();
         document.getElementById(
@@ -1122,10 +1128,6 @@ function orderByPrice() {
         document.getElementById("right_price").value = "MTL";
         document.getElementById("right_selStopOrderType").value =
             mChart.order.price.type == 1 ? "SOL" : "SOU";
-        var cancelBtn = document.getElementById(
-            "btn_cancel_all_order_condition"
-        );
-        if (!cancelBtn.hasAttribute("disabled")) cancelBtn.click();
         //
         var btn = document.getElementById("priceCancelButton");
         btn.style.display = "block";
@@ -1138,7 +1140,16 @@ function orderByPrice() {
                     `btn_${mConfig.orderType == 1 ? "long" : "short"}`
                 )
                 .click();
-        }, 500);
+        }, 1000);
+        // setTimeout(() => {
+        //     if (
+        //         document.getElementById("footerPanel").style.display == "block"
+        //     ) {
+        //         var button = document.createElement("button");
+        //         button.setAttribute("onclick", "openPanel('conditionOrder')");
+        //         button.click();
+        //     }
+        // }, 5000);
     }
     document.getElementById("priceOrderButton").style.display = "none";
     document.getElementById("volumeOrderButton").style.display = "none";
@@ -1176,15 +1187,24 @@ function removeOrderLine(series) {
 }
 
 function removePriceOrderLine() {
-    var removeBtn = document.getElementById("priceCancelButton");
-    if (removeBtn.style.display == "block") {
-        var cancelBtn = document.getElementById(
-            "btn_cancel_all_order_condition"
-        );
-        if (
-            cancelBtn.style.display != "block" ||
-            cancelBtn.hasAttribute("disabled")
-        )
-            removeBtn.click();
-    }
+    var button = document.createElement("button");
+    button.setAttribute("onclick", "objOrderPanel.showConditionOrderList();");
+    button.click();
+    setTimeout(() => {
+        var removeBtn = document.getElementById("priceCancelButton");
+        if (removeBtn.style.display == "block") {
+            var hasOrder = false;
+            var rows = document.getElementById("tbodyContentCondition").rows;
+            for (var item of rows) {
+                if (item.cells[9].innerText == "Chờ kích hoạt") {
+                    hasOrder = true;
+                    break;
+                }
+            }
+            if (!hasOrder) {
+                removeBtn.style.display = "none";
+                removeOrderLine("price");
+            }
+        }
+    }, 20000);
 }
