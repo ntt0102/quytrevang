@@ -55,24 +55,24 @@ function getServerConfig() {
                 mConfig.isOpeningMarket = json.isOpeningMarket;
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.time = { ...mConfig.time, ...json.time };
-                mConfig.strategy = {
-                    trend: !!json.strategy ? json.strategy.trend : null,
-                    momentum: !!json.strategy
-                        ? !!json.strategy.momentum
-                            ? json.strategy.momentum.toFixed(1)
-                            : json.strategy.momentum
-                        : null,
-                    atc: !!json.strategy ? json.strategy.atc : null
-                };
+                // mConfig.strategy = {
+                //     trend: !!json.strategy ? json.strategy.trend : null,
+                //     momentum: !!json.strategy
+                //         ? !!json.strategy.momentum
+                //             ? json.strategy.momentum.toFixed(1)
+                //             : json.strategy.momentum
+                //         : null,
+                //     atc: !!json.strategy ? json.strategy.atc : null
+                // };
                 //
                 mConfig.hasChangedData = false;
                 mConfig.volumeOrderConfirm = false;
                 mConfig.crosshair = false;
                 //
-                mConfig.p24h29 = null;
-                mConfig.p24h30 = null;
-                mConfig.bid = 0;
-                mConfig.ask = 0;
+                // mConfig.p24h29 = null;
+                // mConfig.p24h30 = null;
+                mConfig.bidPrice = 0;
+                mConfig.askPrice = 0;
                 //
                 resolve();
             })
@@ -137,10 +137,10 @@ function createButtons() {
             document.getElementById("right_order_type").innerText = "LĐK";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(1)"
-            ).innerText = "≃";
+            ).innerText = "≗";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(2)"
-            ).innerText = "≥";
+            ).innerText = "≟";
         }
     });
     document.body.append(button);
@@ -162,47 +162,47 @@ function createLightWeightChart() {
     div.style.height = "100vh";
     document.body.append(div);
     //
-    var select = document.createElement("select");
-    select.id = "trendSelect";
-    ["", "2", "1", "-1", "-2"].forEach((item, index) => {
-        var option = document.createElement("option");
-        option.value = item;
-        option.text = item;
-        select.appendChild(option);
-    });
-    select.value = mConfig.strategy.trend;
-    select.addEventListener("change", e => {
-        mConfig.strategy.trend = e.target.value;
-        getStrategy();
-        setLocalData("trend", { key: 1, value: mConfig.strategy.trend });
-    });
-    div.append(select);
+    // var select = document.createElement("select");
+    // select.id = "trendSelect";
+    // ["", "2", "1", "-1", "-2"].forEach((item, index) => {
+    //     var option = document.createElement("option");
+    //     option.value = item;
+    //     option.text = item;
+    //     select.appendChild(option);
+    // });
+    // select.value = mConfig.strategy.trend;
+    // select.addEventListener("change", e => {
+    //     mConfig.strategy.trend = e.target.value;
+    //     getStrategy();
+    //     setLocalData("trend", { key: 1, value: mConfig.strategy.trend });
+    // });
+    // div.append(select);
+    // //
+    // var input = document.createElement("input");
+    // input.id = "momentumInput";
+    // input.value = mConfig.strategy.momentum;
+    // input.setAttribute("type", "number");
+    // input.setAttribute("step", "0.1");
+    // input.addEventListener("change", e => {
+    //     mConfig.strategy.momentum = e.target.value;
+    //     getStrategy();
+    //     setLocalData("momentum", { key: 1, value: mConfig.strategy.momentum });
+    // });
+    // div.append(input);
+    // //
+    // input = document.createElement("input");
+    // input.id = "atcInput";
+    // input.value = mConfig.strategy.atc;
+    // input.setAttribute("type", "number");
+    // input.setAttribute("step", "0.1");
+    // input.addEventListener("change", e => {
+    //     mConfig.strategy.atc = e.target.value;
+    //     getStrategy();
+    //     setLocalData("atc", { key: 1, value: mConfig.strategy.atc });
+    // });
+    // div.append(input);
     //
     var input = document.createElement("input");
-    input.id = "momentumInput";
-    input.value = mConfig.strategy.momentum;
-    input.setAttribute("type", "number");
-    input.setAttribute("step", "0.1");
-    input.addEventListener("change", e => {
-        mConfig.strategy.momentum = e.target.value;
-        getStrategy();
-        setLocalData("momentum", { key: 1, value: mConfig.strategy.momentum });
-    });
-    div.append(input);
-    //
-    input = document.createElement("input");
-    input.id = "atcInput";
-    input.value = mConfig.strategy.atc;
-    input.setAttribute("type", "number");
-    input.setAttribute("step", "0.1");
-    input.addEventListener("change", e => {
-        mConfig.strategy.atc = e.target.value;
-        getStrategy();
-        setLocalData("atc", { key: 1, value: mConfig.strategy.atc });
-    });
-    div.append(input);
-    //
-    input = document.createElement("input");
     input.id = "dateInput";
     input.type = "date";
     input.addEventListener("change", e => {
@@ -231,16 +231,16 @@ function createLightWeightChart() {
     });
     div.append(button);
     //
-    button = document.createElement("button");
-    button.id = "listButton";
-    button.innerText = "? - ?";
-    button.title = "Toggle list";
-    button.addEventListener("click", () => {
-        if (div.classList.contains("list-show"))
-            div.classList.remove("list-show");
-        else div.classList.add("list-show");
-    });
-    div.append(button);
+    // button = document.createElement("button");
+    // button.id = "listButton";
+    // button.innerText = "? - ?";
+    // button.title = "Toggle list";
+    // button.addEventListener("click", () => {
+    //     if (div.classList.contains("list-show"))
+    //         div.classList.remove("list-show");
+    //     else div.classList.add("list-show");
+    // });
+    // div.append(button);
     //
     button = document.createElement("button");
     button.id = "priceCancelButton";
@@ -292,26 +292,26 @@ function createLightWeightChart() {
     p.id = "volumeLegendP";
     div.append(p);
     //
-    var table = document.createElement("table");
-    table.id = "listTable";
-    var header = table.createTHead();
-    var row = header.insertRow(0);
-    var cell = row.insertCell(0);
-    cell.innerText = "No.";
-    cell = row.insertCell(1);
-    cell.innerText = "Date";
-    cell = row.insertCell(2);
-    cell.innerText = "Trending";
-    cell = row.insertCell(3);
-    cell.innerText = "Momentum";
-    cell = row.insertCell(4);
-    cell.innerText = "ATC";
-    cell = row.insertCell(5);
-    cell.innerText = "ATO";
-    cell = row.insertCell(6);
-    cell.id = "orderStatistic";
-    cell.innerText = "Order";
-    div.append(table);
+    // var table = document.createElement("table");
+    // table.id = "listTable";
+    // var header = table.createTHead();
+    // var row = header.insertRow(0);
+    // var cell = row.insertCell(0);
+    // cell.innerText = "No.";
+    // cell = row.insertCell(1);
+    // cell.innerText = "Date";
+    // cell = row.insertCell(2);
+    // cell.innerText = "Trending";
+    // cell = row.insertCell(3);
+    // cell.innerText = "Momentum";
+    // cell = row.insertCell(4);
+    // cell.innerText = "ATC";
+    // cell = row.insertCell(5);
+    // cell.innerText = "ATO";
+    // cell = row.insertCell(6);
+    // cell.id = "orderStatistic";
+    // cell.innerText = "Order";
+    // div.append(table);
     //
     const chartOptions = {
         localization: { locale: "vi-VN" },
@@ -348,7 +348,6 @@ function createLightWeightChart() {
     });
     //
     mChart.series.price = mChart.object.addLineSeries({
-        // priceScaleId: "right",
         color: "#00FFFF",
         priceFormat: { precision: 1 }
     });
@@ -473,6 +472,9 @@ function registerEvent() {
                     .timeScale()
                     .applyOptions({ barSpacing: mConfig.barSpacing });
             }
+        } else if (event.which === 27) {
+            document.getElementById("priceOrderButton").style.display = "none";
+            document.getElementById("volumeOrderButton").style.display = "none";
         }
     }
 }
@@ -484,9 +486,9 @@ function createIndexedDB() {
             console.log("onupgradeneeded");
             mDatabase = e.target.result;
             mDatabase.createObjectStore("data", { keyPath: "time" });
-            mDatabase.createObjectStore("trend", { keyPath: "key" });
-            mDatabase.createObjectStore("momentum", { keyPath: "key" });
-            mDatabase.createObjectStore("atc", { keyPath: "key" });
+            // mDatabase.createObjectStore("trend", { keyPath: "key" });
+            // mDatabase.createObjectStore("momentum", { keyPath: "key" });
+            // mDatabase.createObjectStore("atc", { keyPath: "key" });
             resolve();
         };
         request.onsuccess = e => {
@@ -513,7 +515,7 @@ function connectSocket() {
     socket.on("boardps", data => {
         // console.log("boardps", data.data);
         bidAskHandler(data.data);
-        periodicHandler(data.data);
+        // periodicHandler(data.data);
     });
     socket.on("stockps", data => {
         // console.log("stockps", data.data);
@@ -524,15 +526,15 @@ function connectSocket() {
         if (data.id == 3220) {
             // console.log("price" + data.id);
             if (
-                !!mConfig.bid &&
-                !!mConfig.ask &&
+                !!mConfig.bidPrice &&
+                !!mConfig.askPrice &&
                 data.lastVol != data.totalVol
             ) {
                 var param = {
                     time: `${mConfig.currentDate} ${data.timeServer}`,
                     price: data.lastPrice,
                     vol: data.lastVol,
-                    side: data.lastPrice <= mConfig.bid ? "SD" : "BU"
+                    side: data.lastPrice <= mConfig.bidPrice ? "SD" : "BU"
                 };
                 var temp = createChartData(mChart.data, param);
                 if (mConfig.volumeOrderConfirm) {
@@ -580,68 +582,68 @@ function connectSocket() {
     function bidAskHandler(data) {
         if (data.id == 3210) {
             var arr = data.g1.split("|");
-            if (data.side == "B") mConfig.bid = +arr[0];
-            else mConfig.ask = +arr[0];
+            if (data.side == "B") mConfig.bidPrice = +arr[0];
+            else mConfig.askPrice = +arr[0];
         }
     }
 
-    function periodicHandler(data) {
-        if (data.id == 3220) {
-            // console.log("price", data);
-            var price = {
-                time: moment(`${mConfig.currentDate} ${data.timeServer}`)
-                    .add(7, "hours")
-                    .unix(),
-                value: data.lastPrice
-            };
-            mChart.series.price.update(price);
-            mChart.data.price.push(price);
-            if (!mConfig.crosshair)
-                document.getElementById("priceLegendP").innerText = price.value;
-            //
-            if (inAtcTimeRange()) {
-                if (!!mConfig.p24h30) {
-                    var newAtc = data.lastPrice - mConfig.p24h30;
-                    var isGet =
-                        mConfig.strategy.atc == 0 ||
-                        newAtc == 0 ||
-                        (newAtc != 0 && mConfig.strategy.atc / newAtc < 0);
-                    mConfig.strategy.atc = newAtc != 0 ? newAtc.toFixed(1) : 0;
-                    if (isGet) getStrategy();
-                    document.getElementById("atcInput").value =
-                        mConfig.strategy.atc;
-                    setLocalData("atc", {
-                        key: 1,
-                        value: mConfig.strategy.atc
-                    });
-                }
-            }
-        }
-    }
+    // function periodicHandler(data) {
+    //     if (data.id == 3220) {
+    //         // console.log("price", data);
+    //         var price = {
+    //             time: moment(`${mConfig.currentDate} ${data.timeServer}`)
+    //                 .add(7, "hours")
+    //                 .unix(),
+    //             value: data.lastPrice
+    //         };
+    //         mChart.series.price.update(price);
+    //         mChart.data.price.push(price);
+    //         if (!mConfig.crosshair)
+    //             document.getElementById("priceLegendP").innerText = price.value;
+    //         //
+    //         if (inAtcTimeRange()) {
+    //             if (!!mConfig.p24h30) {
+    //                 var newAtc = data.lastPrice - mConfig.p24h30;
+    //                 var isGet =
+    //                     mConfig.strategy.atc == 0 ||
+    //                     newAtc == 0 ||
+    //                     (newAtc != 0 && mConfig.strategy.atc / newAtc < 0);
+    //                 mConfig.strategy.atc = newAtc != 0 ? newAtc.toFixed(1) : 0;
+    //                 if (isGet) getStrategy();
+    //                 document.getElementById("atcInput").value =
+    //                     mConfig.strategy.atc;
+    //                 setLocalData("atc", {
+    //                     key: 1,
+    //                     value: mConfig.strategy.atc
+    //                 });
+    //             }
+    //         }
+    //     }
+    // }
 }
 
 function loadPage() {
     getData();
     //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
-    setTimeout(() => {
-        getLocalData(["trend", "momentum", "atc"]).then(data => {
-            if (inAtcTimeRange()) {
-                mConfig.strategy.trend =
-                    data[0].length > 0 ? data[0][0].value : 0;
-                mConfig.strategy.momentum =
-                    data[1].length > 0 ? data[1][0].value : 0;
-                mConfig.strategy.atc =
-                    data[2].length > 0 ? data[2][0].value : 0;
-            }
-            document.getElementById("trendSelect").value =
-                mConfig.strategy.trend;
-            document.getElementById("momentumInput").value =
-                mConfig.strategy.momentum;
-            document.getElementById("atcInput").value = mConfig.strategy.atc;
-            getStrategy();
-        });
-    }, 5000);
+    // setTimeout(() => {
+    //     getLocalData(["trend", "momentum", "atc"]).then(data => {
+    //         if (inAtcTimeRange()) {
+    //             mConfig.strategy.trend =
+    //                 data[0].length > 0 ? data[0][0].value : 0;
+    //             mConfig.strategy.momentum =
+    //                 data[1].length > 0 ? data[1][0].value : 0;
+    //             mConfig.strategy.atc =
+    //                 data[2].length > 0 ? data[2][0].value : 0;
+    //         }
+    //         document.getElementById("trendSelect").value =
+    //             mConfig.strategy.trend;
+    //         document.getElementById("momentumInput").value =
+    //             mConfig.strategy.momentum;
+    //         document.getElementById("atcInput").value = mConfig.strategy.atc;
+    //         getStrategy();
+    //     });
+    // }, 5000);
     // Load Order List
     var button = document.createElement("button");
     button.setAttribute(
@@ -658,23 +660,17 @@ function intervalHandler() {
         }`,
         "YYYY-MM-DD H:mm:ss"
     ).format("HH:mm:ss");
-    var session = inPeriodicTimeRange();
-    if (!!session) document.getElementById("right_price").value = session;
+    // var session = inPeriodicTimeRange();
+    // if (!!session) document.getElementById("right_price").value = session;
     //
-    if (inAtcTimeRange() && !mConfig.p24h30) getVn30f1m();
+    // if (inAtcTimeRange() && !mConfig.p24h30) getVn30f1m();
     //
     // Report
     if (mConfig.currentTime == mConfig.time.end) {
         setTimeout(() => reportHandler(), 60000);
-        setTimeout(() => setStrategy(), 45000);
+        // setTimeout(() => setStrategy(), 45000);
     }
     //
-    // var orderCounter = 0;
-    // for (var item of document.getElementById("tbodyContent").rows) {
-    //     if (item.cells[0].innerText == "") break;
-    //     else orderCounter++;
-    // }
-    // document.getElementById("orderCountP").innerText = `[${orderCounter}]`;
     //
     removePriceOrderLine();
     //
@@ -948,174 +944,174 @@ function showRunningStatus() {
     else button.classList.add("dark");
 }
 
-function getStrategy() {
-    return new Promise((resolve, reject) => {
-        toggleSpinner(true);
-        const url = mConfig.root + mConfig.endpoint.getStrategy;
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                trend: mConfig.strategy.trend,
-                momentum: mConfig.strategy.momentum,
-                atc: mConfig.strategy.atc
-            })
-        })
-            .then(response => response.json())
-            .then(json => {
-                console.log("getStrategy", json);
-                var table = document.getElementById("listTable");
-                var tbody = table.querySelector("tbody");
-                if (tbody) table.removeChild(tbody);
-                tbody = table.createTBody();
-                if (json.length > 6) tbody.style.height = "200px";
-                else tbody.style.height = "unset";
-                json.forEach((item, index) => {
-                    var row = tbody.insertRow(index);
-                    var cell = row.insertCell(0);
-                    cell.innerText = index + 1;
-                    cell = row.insertCell(1);
-                    cell.innerText = item.date;
-                    cell = row.insertCell(2);
-                    cell.innerText = item.trend;
-                    cell = row.insertCell(3);
-                    cell.innerText = !!item.momentum
-                        ? item.momentum.toFixed(1)
-                        : item.momentum;
-                    cell = row.insertCell(4);
-                    cell.innerText = !!item.atc
-                        ? item.atc.toFixed(1)
-                        : item.atc;
-                    cell = row.insertCell(5);
-                    cell.innerText = !!item.ato
-                        ? item.ato.toFixed(1)
-                        : item.ato;
-                    cell.style.backgroundColor = !!item.ato
-                        ? item.ato >= 0
-                            ? "LimeGreen"
-                            : "red"
-                        : "white";
-                    cell = row.insertCell(6);
-                    cell.innerText = item.order;
-                    cell.style.backgroundColor =
-                        !!item.ato && !!item.order
-                            ? item.ato / item.order >= 0
-                                ? "LimeGreen"
-                                : "red"
-                            : "white";
-                });
-                //
-                var posList = json.filter(item => !!item.ato && item.ato >= 0);
-                var posPer = ((posList.length / json.length) * 100).toFixed(0);
-                var btn = document.getElementById("listButton");
-                btn.innerText = `${posPer} - ${100 - posPer}`;
-                btn.style.background = `linear-gradient(to right, LimeGreen ${posPer}%, red ${posPer}% ${100 -
-                    posPer}%)`;
-                //
-                var posOrdList = json.filter(
-                    item =>
-                        !!item.ato && !!item.order && item.ato / item.order >= 0
-                );
-                var negOrdList = json.filter(
-                    item =>
-                        !!item.ato && !!item.order && item.ato / item.order < 0
-                );
-                var posOrdPer = (
-                    (posOrdList.length /
-                        (posOrdList.length + negOrdList.length)) *
-                    100
-                ).toFixed(0);
-                var td = document.getElementById("orderStatistic");
-                td.innerText = `${posOrdPer} - ${100 - posOrdPer}`;
-                td.style.background = `linear-gradient(to right, LimeGreen ${posOrdPer}%, red ${posPer}% ${100 -
-                    posOrdPer}%)`;
-                //
-                toggleSpinner(false);
-                resolve();
-            });
-    });
-}
+// function getStrategy() {
+//     return new Promise((resolve, reject) => {
+//         toggleSpinner(true);
+//         const url = mConfig.root + mConfig.endpoint.getStrategy;
+//         fetch(url, {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" },
+//             body: JSON.stringify({
+//                 trend: mConfig.strategy.trend,
+//                 momentum: mConfig.strategy.momentum,
+//                 atc: mConfig.strategy.atc
+//             })
+//         })
+//             .then(response => response.json())
+//             .then(json => {
+//                 console.log("getStrategy", json);
+//                 var table = document.getElementById("listTable");
+//                 var tbody = table.querySelector("tbody");
+//                 if (tbody) table.removeChild(tbody);
+//                 tbody = table.createTBody();
+//                 if (json.length > 6) tbody.style.height = "200px";
+//                 else tbody.style.height = "unset";
+//                 json.forEach((item, index) => {
+//                     var row = tbody.insertRow(index);
+//                     var cell = row.insertCell(0);
+//                     cell.innerText = index + 1;
+//                     cell = row.insertCell(1);
+//                     cell.innerText = item.date;
+//                     cell = row.insertCell(2);
+//                     cell.innerText = item.trend;
+//                     cell = row.insertCell(3);
+//                     cell.innerText = !!item.momentum
+//                         ? item.momentum.toFixed(1)
+//                         : item.momentum;
+//                     cell = row.insertCell(4);
+//                     cell.innerText = !!item.atc
+//                         ? item.atc.toFixed(1)
+//                         : item.atc;
+//                     cell = row.insertCell(5);
+//                     cell.innerText = !!item.ato
+//                         ? item.ato.toFixed(1)
+//                         : item.ato;
+//                     cell.style.backgroundColor = !!item.ato
+//                         ? item.ato >= 0
+//                             ? "LimeGreen"
+//                             : "red"
+//                         : "white";
+//                     cell = row.insertCell(6);
+//                     cell.innerText = item.order;
+//                     cell.style.backgroundColor =
+//                         !!item.ato && !!item.order
+//                             ? item.ato / item.order >= 0
+//                                 ? "LimeGreen"
+//                                 : "red"
+//                             : "white";
+//                 });
+//                 //
+//                 var posList = json.filter(item => !!item.ato && item.ato >= 0);
+//                 var posPer = ((posList.length / json.length) * 100).toFixed(0);
+//                 var btn = document.getElementById("listButton");
+//                 btn.innerText = `${posPer} - ${100 - posPer}`;
+//                 btn.style.background = `linear-gradient(to right, LimeGreen ${posPer}%, red ${posPer}% ${100 -
+//                     posPer}%)`;
+//                 //
+//                 var posOrdList = json.filter(
+//                     item =>
+//                         !!item.ato && !!item.order && item.ato / item.order >= 0
+//                 );
+//                 var negOrdList = json.filter(
+//                     item =>
+//                         !!item.ato && !!item.order && item.ato / item.order < 0
+//                 );
+//                 var posOrdPer = (
+//                     (posOrdList.length /
+//                         (posOrdList.length + negOrdList.length)) *
+//                     100
+//                 ).toFixed(0);
+//                 var td = document.getElementById("orderStatistic");
+//                 td.innerText = `${posOrdPer} - ${100 - posOrdPer}`;
+//                 td.style.background = `linear-gradient(to right, LimeGreen ${posOrdPer}%, red ${posPer}% ${100 -
+//                     posOrdPer}%)`;
+//                 //
+//                 toggleSpinner(false);
+//                 resolve();
+//             });
+//     });
+// }
 
-function setStrategy() {
-    toggleSpinner(true);
-    const url = mConfig.root + mConfig.endpoint.setStrategy;
-    var order = parseInt(
-        document.querySelector("#status-danhmuc-content > tr > td:nth-child(2)")
-            .innerText
-    );
-    var data = {
-        trend: mConfig.strategy.trend,
-        momentum: mConfig.strategy.momentum,
-        atc: mConfig.strategy.atc,
-        order: !isNaN(order) ? order : null
-    };
-    fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data)
-    })
-        .then(response => {
-            if (response.ok) {
-                return response.json();
-            }
-            throw new Error(response.statusText);
-        })
-        .then(jsondata => {
-            console.log(`SetStrategy-Start ##############################`);
-            console.log(jsondata);
-            console.log(`SetStrategy-End ##############################`);
-            if (jsondata.isOk) alert(`Lưu Strategy thành công`);
-            toggleSpinner(false);
-        })
-        .catch(error => {
-            console.log(`SetStrategy-Start ##############################`);
-            console.log(error);
-            console.log(`SetStrategy-End ##############################`);
-            alert(`Lưu Strategy thất bại`);
-        });
-}
+// function setStrategy() {
+//     toggleSpinner(true);
+//     const url = mConfig.root + mConfig.endpoint.setStrategy;
+//     var order = parseInt(
+//         document.querySelector("#status-danhmuc-content > tr > td:nth-child(2)")
+//             .innerText
+//     );
+//     var data = {
+//         trend: mConfig.strategy.trend,
+//         momentum: mConfig.strategy.momentum,
+//         atc: mConfig.strategy.atc,
+//         order: !isNaN(order) ? order : null
+//     };
+//     fetch(url, {
+//         method: "POST",
+//         headers: { "Content-Type": "application/json" },
+//         body: JSON.stringify(data)
+//     })
+//         .then(response => {
+//             if (response.ok) {
+//                 return response.json();
+//             }
+//             throw new Error(response.statusText);
+//         })
+//         .then(jsondata => {
+//             console.log(`SetStrategy-Start ##############################`);
+//             console.log(jsondata);
+//             console.log(`SetStrategy-End ##############################`);
+//             if (jsondata.isOk) alert(`Lưu Strategy thành công`);
+//             toggleSpinner(false);
+//         })
+//         .catch(error => {
+//             console.log(`SetStrategy-Start ##############################`);
+//             console.log(error);
+//             console.log(`SetStrategy-End ##############################`);
+//             alert(`Lưu Strategy thất bại`);
+//         });
+// }
 
-function getVn30f1m() {
-    return new Promise((resolve, reject) => {
-        toggleSpinner(true);
-        const url = mConfig.root + mConfig.endpoint.getVn30f1m;
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" }
-        })
-            .then(response => response.json())
-            .then(json => {
-                console.log("getVn30f1m", json);
-                mConfig.p24h29 = json[0];
-                mConfig.p24h30 = json[1];
-                mConfig.strategy.momentum = (
-                    mConfig.p24h30 - mConfig.p24h29
-                ).toFixed(1);
-                document.getElementById("momentumInput").value =
-                    mConfig.strategy.momentum;
-                setLocalData("momentum", {
-                    key: 1,
-                    value: mConfig.strategy.momentum
-                });
-                //
-                if (mChart.data.price.length > 0) {
-                    mConfig.strategy.atc = (
-                        mChart.data.price.slice(-1)[0].value - mConfig.p24h30
-                    ).toFixed(1);
-                    document.getElementById("atcInput").value =
-                        mConfig.strategy.atc;
-                    setLocalData("atc", {
-                        key: 1,
-                        value: mConfig.strategy.atc
-                    });
-                }
-                getStrategy();
-                toggleSpinner(false);
-                resolve();
-            })
-            .catch(error => getVn30f1m());
-    });
-}
+// function getVn30f1m() {
+//     return new Promise((resolve, reject) => {
+//         toggleSpinner(true);
+//         const url = mConfig.root + mConfig.endpoint.getVn30f1m;
+//         fetch(url, {
+//             method: "POST",
+//             headers: { "Content-Type": "application/json" }
+//         })
+//             .then(response => response.json())
+//             .then(json => {
+//                 console.log("getVn30f1m", json);
+//                 mConfig.p24h29 = json[0];
+//                 mConfig.p24h30 = json[1];
+//                 mConfig.strategy.momentum = (
+//                     mConfig.p24h30 - mConfig.p24h29
+//                 ).toFixed(1);
+//                 document.getElementById("momentumInput").value =
+//                     mConfig.strategy.momentum;
+//                 setLocalData("momentum", {
+//                     key: 1,
+//                     value: mConfig.strategy.momentum
+//                 });
+//                 //
+//                 if (mChart.data.price.length > 0) {
+//                     mConfig.strategy.atc = (
+//                         mChart.data.price.slice(-1)[0].value - mConfig.p24h30
+//                     ).toFixed(1);
+//                     document.getElementById("atcInput").value =
+//                         mConfig.strategy.atc;
+//                     setLocalData("atc", {
+//                         key: 1,
+//                         value: mConfig.strategy.atc
+//                     });
+//                 }
+//                 getStrategy();
+//                 toggleSpinner(false);
+//                 resolve();
+//             })
+//             .catch(error => getVn30f1m());
+//     });
+// }
 
 function orderByPrice() {
     if (!mConfig.volumeOrderConfirm) {
@@ -1141,15 +1137,6 @@ function orderByPrice() {
                 )
                 .click();
         }, 1000);
-        // setTimeout(() => {
-        //     if (
-        //         document.getElementById("footerPanel").style.display == "block"
-        //     ) {
-        //         var button = document.createElement("button");
-        //         button.setAttribute("onclick", "openPanel('conditionOrder')");
-        //         button.click();
-        //     }
-        // }, 5000);
     }
     document.getElementById("priceOrderButton").style.display = "none";
     document.getElementById("volumeOrderButton").style.display = "none";

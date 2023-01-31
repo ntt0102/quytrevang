@@ -51,45 +51,10 @@
     opacity: 1;
 }
 
-.line-chart #lightWeightChart > #spinnerImg {
-    position: absolute;
-    top: 2px;
-    right: 50px;
-    width: 25px;
-    z-index: 2001;
-}
-
-.line-chart #mainFooter .foot_tab:nth-child(1) {
-    position: fixed;
-    top: 1px;
-    right: 80px;
-    z-index: 2001;
-    font-size: 17px;
-    padding: 0px 8px !important;
-    border-radius: 3px !important;
-    background: #f0f0f0 !important;
-    color: #848484 !important;
-    font-weight: bold;
-}
-
-.line-chart #mainFooter .foot_tab:nth-child(2) {
-    position: fixed;
-    top: 1px;
-    right: 110px;
-    z-index: 2001;
-    font-size: 17px;
-    padding: 0px 10px !important;
-    margin: unset !important;
-    border-radius: 3px !important;
-    background: #f0f0f0 !important;
-    color: #848484 !important;
-    font-weight: bold;
-}
-
 .line-chart #lightWeightChart > #clearButton {
     position: absolute;
     top: -0.5px;
-    right: 138px;
+    right: 55px;
     padding: 2px 7px;
     border-radius: 5px;
     z-index: 3;
@@ -98,13 +63,33 @@
 .line-chart #lightWeightChart > #refreshButton {
     position: absolute;
     top: -0.5px;
-    right: 168px;
+    right: 85px;
     padding: 2px 7px;
     border-radius: 5px;
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #listButton {
+.line-chart #lightWeightChart > #dateInput {
+    position: absolute;
+    top: 0px;
+    right: 116px;
+    width: 105px;
+    padding: 0px;
+    line-height: 20px;
+    margin-top: 1px;
+    text-align: center;
+    z-index: 3;
+}
+
+.line-chart #lightWeightChart > #spinnerImg {
+    position: absolute;
+    top: 2px;
+    right: 225px;
+    width: 25px;
+    z-index: 2001;
+}
+
+/* .line-chart #lightWeightChart > #listButton {
     position: absolute;
     top: 40px;
     right: 200px;
@@ -141,12 +126,12 @@
     padding: 2.5px 0 !important;
     text-align: center;
     z-index: 3;
-}
+} */
 
 .line-chart #lightWeightChart > #priceCancelButton {
     position: absolute;
     top: 30px;
-    right: 80px;
+    right: 85px;
     padding: 0px 7px;
     border-radius: 5px;
     color: white;
@@ -157,7 +142,7 @@
 .line-chart #lightWeightChart > #volumeCancelButton {
     position: absolute;
     top: 30px;
-    right: 110px;
+    right: 55px;
     padding: 0px 7px;
     border-radius: 5px;
     color: white;
@@ -181,18 +166,6 @@
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #dateInput {
-    position: absolute;
-    top: 0px;
-    right: 200px;
-    width: 105px;
-    padding: 0px;
-    line-height: 20px;
-    margin-top: 1px;
-    text-align: center;
-    z-index: 3;
-}
-
 .line-chart #lightWeightChart > #priceOrderButton {
     position: absolute;
     padding: 0px 10px;
@@ -213,7 +186,7 @@
     font-size: 25px;
 }
 
-.line-chart #lightWeightChart > #listTable {
+/* .line-chart #lightWeightChart > #listTable {
     position: absolute;
     top: 70px;
     right: 50px;
@@ -267,6 +240,37 @@
 .line-chart #lightWeightChart.list-show > #listTable {
     z-index: 4;
     opacity: 1;
+} */
+
+.line-chart #mainFooter .foot_tab:nth-child(2) {
+    position: fixed;
+    top: 340px;
+    left: 36px;
+    z-index: 2001;
+    font-size: 20px;
+    padding: 0px 11px !important;
+    border-radius: 3px !important;
+    background: #f0f0f0 !important;
+    color: #848484 !important;
+    font-weight: bold;
+}
+
+.line-chart #mainFooter .foot_tab:nth-child(1) {
+    position: fixed;
+    top: 340px;
+    left: 0px;
+    z-index: 2001;
+    font-size: 20px;
+    padding: 0px 11px !important;
+    margin: unset !important;
+    border-radius: 3px !important;
+    background: #f0f0f0 !important;
+    color: #848484 !important;
+    font-weight: bold;
+}
+
+.line-chart #mainFooter .foot_tab:hover {
+    text-decoration: none !important;
 }
 
 .line-chart .aside-menu {
@@ -285,8 +289,6 @@
 .line-chart .aside-menu > .nav,
 .line-chart .aside-menu .list-group-item:nth-child(2),
 .line-chart .aside-menu .list-group-item:nth-child(3),
-/* .line-chart .aside-menu .list-group-item:nth-child(4), */
-/* .line-chart .aside-menu .list-group-item:nth-child(5), */
 .line-chart .aside-menu .btnTypeOrder > span:nth-child(1),
 .line-chart .aside-menu .btnTypeOrder > span:nth-child(2),
 .line-chart .aside-menu .btnTypeOrder > span:nth-child(4),
@@ -294,10 +296,18 @@
 .line-chart .aside-menu #right_btnordertype > label,
 .line-chart .aside-menu .list-group-item:nth-child(6) > label:first-child,
 .line-chart .aside-menu .list-group-item:nth-child(7) > label,
-.line-chart .aside-menu #right_sell_stop_order label,
-.line-chart .aside-menu .button-order-group > div:last-child {
+.line-chart .aside-menu #right_sell_stop_order label {
     display: none !important;
 }
+
+.line-chart .aside-menu #button_cancel_all_order_normal {
+    padding-left: 4px;
+}
+
+.line-chart .aside-menu .button-order-group {
+    gap: unset !important;
+}
+
 .line-chart .aside-menu .custom-select-wrapper {
     text-align: center;
 }
@@ -389,7 +399,6 @@
     left: 0px;
     bottom: 30px;
     width: 100%;
-    max-height: calc(100vh - 230px);
     overflow-y: auto;
     z-index: 2001;
 }
