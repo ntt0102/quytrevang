@@ -88,27 +88,27 @@ class VpsService extends CoreService
         );
     }
 
-    /**
-     * Export
-     *
-     * @param $request
-     * 
-     */
-    public function export($request)
-    {
-        return $this->transaction(
-            function () use ($request) {
-                $path = 'public/vps/' . $request->session . '/';
-                $img = $request->imageData;
-                $img = str_replace('data:image/png;base64,', '', $img);
-                $img = str_replace(' ', '+', $img);
-                $imageData = base64_decode($img);
-                $imageName = $request->imageName;
-                $isOk = Storage::put($path . $imageName, $imageData);
-                return ['isOk' => $isOk];
-            }
-        );
-    }
+    // /**
+    //  * Export
+    //  *
+    //  * @param $request
+    //  * 
+    //  */
+    // public function export($request)
+    // {
+    //     return $this->transaction(
+    //         function () use ($request) {
+    //             $path = 'public/vps/' . $request->session . '/';
+    //             $img = $request->imageData;
+    //             $img = str_replace('data:image/png;base64,', '', $img);
+    //             $img = str_replace(' ', '+', $img);
+    //             $imageData = base64_decode($img);
+    //             $imageName = $request->imageName;
+    //             $isOk = Storage::put($path . $imageName, $imageData);
+    //             return ['isOk' => $isOk];
+    //         }
+    //     );
+    // }
 
     /**
      * Get Config
@@ -243,80 +243,80 @@ class VpsService extends CoreService
         return array_values(array_intersect_key($temp['data'], $unique_times));
     }
 
-    /**
-     * Get strategy
-     *
-     * @param $request
-     * 
-     */
-    public function getStrategy($request)
-    {
-        return $this->strategyRepository->getStrategies($request->trend, $request->momentum, $request->atc);
-    }
+    // /**
+    //  * Get strategy
+    //  *
+    //  * @param $request
+    //  * 
+    //  */
+    // public function getStrategy($request)
+    // {
+    //     return $this->strategyRepository->getStrategies($request->trend, $request->momentum, $request->atc);
+    // }
 
-    /**
-     * Set strategy
-     *
-     * @param $request
-     * 
-     */
-    public function setStrategy($request)
-    {
-        $currentDate = now()->format('Y-m-d');
-        if ($this->strategyRepository->count([['date', $currentDate]])) return true;
-        return $this->transaction(
-            function () use ($request, $currentDate) {
-                $data = [
-                    'date' => $currentDate,
-                    'trend' => $request->trend,
-                    'momentum' => $request->momentum,
-                    'atc' => $request->atc,
-                    'order' => $request->order,
-                ];
-                return !!$this->strategyRepository->create($data);
-            }
-        );
-    }
+    // /**
+    //  * Set strategy
+    //  *
+    //  * @param $request
+    //  * 
+    //  */
+    // public function setStrategy($request)
+    // {
+    //     $currentDate = now()->format('Y-m-d');
+    //     if ($this->strategyRepository->count([['date', $currentDate]])) return true;
+    //     return $this->transaction(
+    //         function () use ($request, $currentDate) {
+    //             $data = [
+    //                 'date' => $currentDate,
+    //                 'trend' => $request->trend,
+    //                 'momentum' => $request->momentum,
+    //                 'atc' => $request->atc,
+    //                 'order' => $request->order,
+    //             ];
+    //             return !!$this->strategyRepository->create($data);
+    //         }
+    //     );
+    // }
 
-    /**
-     * Set ATO strategy
-     *
-     */
-    public function setAtoStrategy()
-    {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://spwapidatafeed.vps.com.vn/pslistdata";
-        $res = $client->get($url);
-        $rep = json_decode($res->getBody());
-        $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/" . $rep[0];
-        $res = $client->get($url);
-        $rep = json_decode($res->getBody());
-        $strategy = $this->strategyRepository->getLast();
-        return $this->strategyRepository->update($strategy, ['ato' => round($rep[0]->openPrice - $rep[0]->r, 1)]);
-    }
+    // /**
+    //  * Set ATO strategy
+    //  *
+    //  */
+    // public function setAtoStrategy()
+    // {
+    //     $client = new \GuzzleHttp\Client();
+    //     $url = "https://spwapidatafeed.vps.com.vn/pslistdata";
+    //     $res = $client->get($url);
+    //     $rep = json_decode($res->getBody());
+    //     $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/" . $rep[0];
+    //     $res = $client->get($url);
+    //     $rep = json_decode($res->getBody());
+    //     $strategy = $this->strategyRepository->getLast();
+    //     return $this->strategyRepository->update($strategy, ['ato' => round($rep[0]->openPrice - $rep[0]->r, 1)]);
+    // }
 
-    /**
-     * Get Data
-     * 
-     * 
-     */
-    public function getVn30f1m($request)
-    {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-        $res = $client->get($url);
-        $rep = json_decode($res->getBody());
-        $p2 = array_pop($rep)->lastPrice;
-        $p1 = null;
-        while (true) {
-            $ojb = array_pop($rep);
-            if (str_contains($ojb->timeServer, '14:29')) {
-                $p1 = $ojb->lastPrice;
-                break;
-            } else continue;
-        }
-        return [$p1, $p2];
-    }
+    // /**
+    //  * Get Data
+    //  * 
+    //  * 
+    //  */
+    // public function getVn30f1m($request)
+    // {
+    //     $client = new \GuzzleHttp\Client();
+    //     $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+    //     $res = $client->get($url);
+    //     $rep = json_decode($res->getBody());
+    //     $p2 = array_pop($rep)->lastPrice;
+    //     $p1 = null;
+    //     while (true) {
+    //         $ojb = array_pop($rep);
+    //         if (str_contains($ojb->timeServer, '14:29')) {
+    //             $p1 = $ojb->lastPrice;
+    //             break;
+    //         } else continue;
+    //     }
+    //     return [$p1, $p2];
+    // }
 
     /**
      * 
