@@ -186,7 +186,7 @@ class VpsService extends CoreService
                     case 'GET':
                         if (!!$request->date)
                             return $this->getFromCsv($request->date);
-                        // else return $this->getTcbs();
+                        else if ($request->tcbs) return $this->getTcbs();
                         else return $this->getVps();
                         break;
                     case 'CLEAR':
