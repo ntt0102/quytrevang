@@ -46,6 +46,10 @@
     opacity: 0;
 }
 
+.line-chart {
+    overflow-y: hidden;
+}
+
 .line-chart #lightWeightChart {
     z-index: 1021;
     opacity: 1;
@@ -55,12 +59,13 @@
     position: absolute;
     top: -0.5px;
     right: 55px;
-    padding: 2px 7px;
+    padding: 0px 8px;
+    font-size: 17px;
     border-radius: 5px;
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #refreshButton {
+.line-chart #lightWeightChart > #tcbsButton {
     position: absolute;
     top: -0.5px;
     right: 90px;
@@ -69,10 +74,19 @@
     z-index: 3;
 }
 
+.line-chart #lightWeightChart > #refreshButton {
+    position: absolute;
+    top: -0.5px;
+    right: 125px;
+    padding: 2px 7px;
+    border-radius: 5px;
+    z-index: 3;
+}
+
 .line-chart #lightWeightChart > #timeFrameSelect {
     position: absolute;
     top: 0.5px;
-    right: 126px;
+    right: 161px;
     height: 26px;
     text-align: center;
     padding: 2px 0 !important;
@@ -82,7 +96,7 @@
 .line-chart #lightWeightChart > #dateInput {
     position: absolute;
     top: 0px;
-    right: 190px;
+    right: 235px;
     width: 105px;
     padding: 0px;
     line-height: 20px;
@@ -94,7 +108,7 @@
 .line-chart #lightWeightChart > #spinnerImg {
     position: absolute;
     top: 2px;
-    right: 300px;
+    right: 345px;
     width: 25px;
     z-index: 2001;
 }
@@ -144,7 +158,7 @@
     right: 85px;
     padding: 0px 7px;
     border-radius: 5px;
-    color: white;
+    color: black;
     background: #00ffff;
     z-index: 3;
 }
@@ -180,7 +194,7 @@
     position: absolute;
     padding: 0px 10px;
     border-radius: 5px;
-    color: white;
+    color: black;
     background: #00ffff;
     z-index: 3;
     font-size: 25px;
@@ -258,7 +272,7 @@
     left: 36px;
     z-index: 2001;
     font-size: 20px;
-    padding: 0px 11px !important;
+    padding: 0px 8px !important;
     border-radius: 3px !important;
     background: #f0f0f0 !important;
     color: #848484 !important;
@@ -271,7 +285,7 @@
     left: 0px;
     z-index: 2001;
     font-size: 20px;
-    padding: 0px 11px !important;
+    padding: 0px 8px !important;
     margin: unset !important;
     border-radius: 3px !important;
     background: #f0f0f0 !important;

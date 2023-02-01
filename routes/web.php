@@ -41,7 +41,7 @@ Route::get('test', function () {
     // dd($s);
     // $n = now()->sub(date_interval_create_from_date_string('178 minutes'));
     // dd($n->format('Y-m-d H:i:s'));
-    // $v = app(\App\Repositories\VpsRepository::class)->latest('x');
+    $s = app(\App\Repositories\VpsRepository::class)->latest('time')->side;
     // $v = number_format('123.452', 2);
     // $s = is_numeric("1000.1");
     // $s = !![1, 2];

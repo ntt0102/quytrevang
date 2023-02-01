@@ -1,4 +1,5 @@
 var mConfig = {};
+var mData = [];
 var mChart = { object: {}, series: {}, data: {}, order: {}, line: {} };
 var mDatabase = {};
 
@@ -137,10 +138,10 @@ function createButtons() {
             document.getElementById("right_order_type").innerText = "LĐK";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(1)"
-            ).innerText = "≗";
+            ).innerText = "🅞";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(2)"
-            ).innerText = "≟";
+            ).innerText = "❓";
         }
     });
     document.body.append(button);
@@ -167,9 +168,10 @@ function createLightWeightChart() {
     [
         { text: "Tick", value: 0 },
         { text: "1 min", value: 1 },
-        { text: "2 min", value: 2 },
-        { text: "3 min", value: 3 },
-        { text: "5 min", value: 5 }
+        { text: "5 min", value: 5 },
+        { text: "15 min", value: 15 },
+        { text: "1 day", value: 1440 },
+        { text: "1 week", value: 10080 }
     ].forEach((item, index) => {
         var option = document.createElement("option");
         option.value = item.value;
@@ -238,8 +240,15 @@ function createLightWeightChart() {
     div.append(button);
     //
     button = document.createElement("button");
+    button.id = "tcbsButton";
+    button.innerText = "🔂";
+    button.title = "TCBS chart";
+    button.addEventListener("click", () => getData(null, true));
+    div.append(button);
+    //
+    button = document.createElement("button");
     button.id = "clearButton";
-    button.innerText = "🚮";
+    button.innerText = "↺";
     button.title = "Delete local data";
     button.addEventListener("click", () => {
         var choice = confirm("Delete local database?");
@@ -550,11 +559,16 @@ function connectSocket() {
                 !!mConfig.askPrice &&
                 data.lastVol != data.totalVol
             ) {
+                // mData
+                var side = "";
+                if (data.lastPrice <= mConfig.bidPrice) side = "SD";
+                else if (data.lastPrice >= mConfig.askPrice) side = "BU";
+                else if (!side) side = mData.slice(-1)[0].side;
                 var param = {
                     time: `${mConfig.currentDate} ${data.timeServer}`,
                     price: data.lastPrice,
                     vol: data.lastVol,
-                    side: data.lastPrice <= mConfig.bidPrice ? "SD" : "BU"
+                    side: side
                 };
                 mChart.data = createChartData(mChart.data, param);
                 var lastPrice = mChart.data.price.slice(-1)[0];
@@ -576,6 +590,7 @@ function connectSocket() {
                 }
                 //
                 setLocalData("data", param);
+                mData.push(param);
                 mConfig.hasChangedData = true;
             }
         }
@@ -736,27 +751,29 @@ function intervalHandler() {
     //     );
 }
 
-function getData(date = null) {
+function getData(date = null, tcbs = false) {
     mConfig.hasChangedData = false;
     return new Promise((resolve, reject) => {
         toggleSpinner(true);
-        Promise.all([getServerData(date), getLocalData("data")])
+        Promise.all([getServerData(date, tcbs), getLocalData("data")])
             .then(arr => {
                 console.log("getData: ", arr);
                 var ids = new Set(arr[0].map(d => d.time));
-                var data = [
+                mData = [
                     ...arr[0],
                     ...arr[1].filter(d => !ids.has(d.time))
                 ].sort((a, b) => a.time.localeCompare(b.time));
-                console.log("data", data);
+                console.log("data", mData);
                 //
-                if (!mConfig.hasChangedData) {
-                    clearLocalData("data").then(() =>
-                        setLocalData("data", data)
-                    );
-                } else return getData();
+                if (!tcbs) {
+                    if (!mConfig.hasChangedData) {
+                        clearLocalData("data").then(() =>
+                            setLocalData("data", mData)
+                        );
+                    } else return getData();
+                }
                 //
-                mChart.data = data.reduce(
+                mChart.data = mData.reduce(
                     (r, item) => {
                         return createChartData(r, item);
                     },
@@ -806,9 +823,9 @@ function createChartData(r, item) {
     return r;
 }
 
-function getServerData(date = null) {
+function getServerData(date = null, tcbs = false) {
     return new Promise((resolve, reject) => {
-        var data = { action: "GET", date: date };
+        var data = { action: "GET", date: date, tcbs: tcbs };
         const url = mConfig.root + mConfig.endpoint.data;
         fetch(url, {
             method: "POST",
@@ -1151,32 +1168,26 @@ function showRunningStatus() {
 // }
 
 function orderByPrice() {
-    if (!mConfig.volumeOrderConfirm) {
-        document.getElementById("btn_cancel_all_order_condition").click();
-        createOrderLine("price");
-        document.getElementById("select_condition_order_wrapper").click();
-        document.getElementById(
-            "right_stopOrderIndex"
-        ).value = mChart.order.price.value.toFixed(1);
-        document.getElementById("right_price").value = "MTL";
-        document.getElementById("right_selStopOrderType").value = mChart.order
-            .price.type
-            ? "SOL"
-            : "SOU";
-        //
-        var btn = document.getElementById("priceCancelButton");
-        btn.style.display = "block";
-        btn.style.border = `2px solid ${
-            mChart.order.price.type ? "green" : "red"
-        }`;
-        setTimeout(() => {
-            document
-                .getElementById(
-                    `btn_${mChart.order.price.type ? "long" : "short"}`
-                )
-                .click();
-        }, 1000);
-    }
+    document.getElementById("btn_cancel_all_order_condition").click();
+    createOrderLine("price");
+    document.getElementById("select_condition_order_wrapper").click();
+    document.getElementById(
+        "right_stopOrderIndex"
+    ).value = mChart.order.price.value.toFixed(1);
+    document.getElementById("right_price").value = "MTL";
+    document.getElementById("right_selStopOrderType").value = mChart.order.price
+        .type
+        ? "SOL"
+        : "SOU";
+    //
+    var btn = document.getElementById("priceCancelButton");
+    btn.style.display = "block";
+    btn.style.border = `2px solid ${mChart.order.price.type ? "green" : "red"}`;
+    setTimeout(() => {
+        document
+            .getElementById(`btn_${mChart.order.price.type ? "long" : "short"}`)
+            .click();
+    }, 1000);
     document.getElementById("priceOrderButton").style.display = "none";
     document.getElementById("volumeOrderButton").style.display = "none";
 }
