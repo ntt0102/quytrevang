@@ -81,11 +81,15 @@ class SocketService extends CoreService
             $bid = get_global_value('bidPrice');
             $ask = get_global_value('askPrice');
             if (!!$bid && !!$ask && $data->lastVol != $data->totalVol) {
+                $side = '';
+                if ($data->lastPrice <= $bid) $side = 'SD';
+                else if ($data->lastPrice >= $ask) $side = 'BU';
+                else if (!$side) $this->vpsRepository->latest('time')->side;
                 $param = [
                     'time' => now()->format('Y-m-d ') . $data->timeServer,
                     'price' => $data->lastPrice,
                     'vol' => $data->lastVol,
-                    'side' => $data->lastPrice <= $bid ? 'SD' : 'BU',
+                    'side' => $side,
                 ];
                 activity()->withProperties($param)->log('price');
                 $this->vpsRepository->create($param);
