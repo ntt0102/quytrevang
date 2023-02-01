@@ -63,7 +63,7 @@ class VpsController extends CoreController
      */
     public function getVolumeByPrice(Request $request)
     {
-        $data = $this->vpsService->getVolumeByPrice($request);
+        $data = $this->vpsService->getVolumeByPrice();
         return $this->sendResponse($data);
     }
 
