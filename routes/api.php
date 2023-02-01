@@ -23,6 +23,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
         Route::post('report', 'VpsController@report');
         // Route::post('export', 'VpsController@export');
         Route::post('config', 'VpsController@getConfig');
+        Route::post('volume-by-price', 'VpsController@getVolumeByPrice');
         Route::post('data', 'VpsController@controlData');
         // Route::post('get-strategy', 'VpsController@getStrategy');
         // Route::post('set-strategy', 'VpsController@setStrategy');
