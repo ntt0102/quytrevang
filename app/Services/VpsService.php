@@ -372,13 +372,13 @@ class VpsService extends CoreService
         $buy = $this->vpsRepository->getVolumeByPrice('BU');
         $buy = $buy->reduce(function ($r, $item) {
             $r[0][] = $item->price;
-            $r[1][] = $item->sum;
+            $r[1][] = $item->sum + 0;
             return $r;
         }, [[], []]);
         $sell = $this->vpsRepository->getVolumeByPrice('SD');
         $sell = $sell->reduce(function ($r, $item) {
             $r[0][] = $item->price;
-            $r[1][] = $item->sum;
+            $r[1][] = -$item->sum + 0;
             return $r;
         }, [[], []]);
         return ['buy' => $buy, 'sell' => $sell];
