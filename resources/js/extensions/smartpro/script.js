@@ -554,44 +554,41 @@ function connectSocket() {
     function priceHandler(data) {
         if (data.id == 3220) {
             // console.log("price" + data.id);
-            if (
-                !!mConfig.bidPrice &&
-                !!mConfig.askPrice &&
-                data.lastVol != data.totalVol
-            ) {
-                // mData
-                var side = "";
-                if (data.lastPrice <= mConfig.bidPrice) side = "SD";
-                else if (data.lastPrice >= mConfig.askPrice) side = "BU";
-                else if (!side) side = mData.slice(-1)[0].side;
-                var param = {
-                    time: `${mConfig.currentDate} ${data.timeServer}`,
-                    price: data.lastPrice,
-                    vol: data.lastVol,
-                    side: side
-                };
-                mChart.data = createChartData(mChart.data, param);
-                var lastPrice = mChart.data.price.slice(-1)[0];
-                var lastVolume = mChart.data.volume.slice(-1)[0];
-                processVolumeOrder(lastVolume);
-                //
-                if (mConfig.timeFrame > 0) {
-                    mChart.series.price.setData(mChart.data.price);
-                    mChart.series.volume.setData(mChart.data.volume);
-                } else {
-                    mChart.series.price.update(lastPrice);
-                    mChart.series.volume.update(lastVolume);
+            if (data.lastVol < data.totalVol) {
+                if (!!mConfig.bidPrice && !!mConfig.askPrice) {
+                    var side = "";
+                    if (data.lastPrice <= mConfig.bidPrice) side = "SD";
+                    else if (data.lastPrice >= mConfig.askPrice) side = "BU";
+                    else side = mData.slice(-1)[0].side;
+                    var param = {
+                        time: `${mConfig.currentDate} ${data.timeServer}`,
+                        price: data.lastPrice,
+                        vol: data.lastVol,
+                        side: side
+                    };
+                    mChart.data = createChartData(mChart.data, param);
+                    var lastPrice = mChart.data.price.slice(-1)[0];
+                    var lastVolume = mChart.data.volume.slice(-1)[0];
+                    processVolumeOrder(lastVolume);
+                    //
+                    if (mConfig.timeFrame > 0) {
+                        mChart.series.price.setData(mChart.data.price);
+                        mChart.series.volume.setData(mChart.data.volume);
+                    } else {
+                        mChart.series.price.update(lastPrice);
+                        mChart.series.volume.update(lastVolume);
+                    }
+                    if (!mConfig.crosshair) {
+                        document.getElementById("priceLegendP").innerText =
+                            lastPrice.value;
+                        document.getElementById("volumeLegendP").innerText =
+                            lastVolume.value;
+                    }
+                    //
+                    setLocalData("data", param);
+                    mData.push(param);
+                    mConfig.hasChangedData = true;
                 }
-                if (!mConfig.crosshair) {
-                    document.getElementById("priceLegendP").innerText =
-                        lastPrice.value;
-                    document.getElementById("volumeLegendP").innerText =
-                        lastVolume.value;
-                }
-                //
-                setLocalData("data", param);
-                mData.push(param);
-                mConfig.hasChangedData = true;
             }
         }
 
