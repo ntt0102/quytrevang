@@ -2,6 +2,7 @@ var mConfig = {};
 var mData = [];
 var mChart = { object: {}, series: {}, data: {}, order: {}, line: {} };
 var mDatabase = {};
+var mHighcharts = {};
 
 getLocalConfig()
     .then(() => getServerConfig())
@@ -163,6 +164,30 @@ function createLightWeightChart() {
     div.style.height = "100vh";
     document.body.append(div);
     //
+    var highcharts = document.createElement("div");
+    highcharts.id = "highchartsChart";
+    highcharts.style.display = "none";
+    div.append(highcharts);
+    mHighcharts = new Highcharts.chart("highchartsChart", {
+        chart: { type: "bar" },
+        title: { text: "Volume by price", align: "center" },
+        xAxis: [{ labels: { enabled: false } }, { labels: { enabled: false } }],
+        yAxis: { title: { text: null } },
+        plotOptions: { series: { stacking: "normal" } },
+        series: [{ name: "Sell" }, { name: "Buy" }],
+        tooltip: {
+            formatter: function() {
+                return (
+                    "Price: " +
+                    this.point.category +
+                    "</b><br/>" +
+                    "Volume: " +
+                    Math.abs(this.point.y)
+                );
+            }
+        }
+    });
+    //
     var select = document.createElement("select");
     select.id = "timeFrameSelect";
     [
@@ -257,6 +282,19 @@ function createLightWeightChart() {
             var date = document.getElementById("dateInput").value;
             getData(date);
         }
+    });
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "highchartsButton";
+    button.innerText = "📉";
+    button.title = "Show highcharts";
+    button.addEventListener("click", () => {
+        var chart = document.getElementById("highchartsChart");
+        if (chart.style.display == "none") {
+            getVolumeByPrice();
+            chart.style.display = "block";
+        } else chart.style.display = "none";
     });
     div.append(button);
     //
@@ -1163,6 +1201,28 @@ function showRunningStatus() {
 //             .catch(error => getVn30f1m());
 //     });
 // }
+
+function getVolumeByPrice() {
+    console.log("getVolumeByPrice");
+    return new Promise((resolve, reject) => {
+        toggleSpinner(true);
+        const url = mConfig.root + mConfig.endpoint.volumeByPrice;
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        })
+            .then(response => response.json())
+            .then(json => {
+                console.log("getVolumeByPrice", json);
+                mHighcharts.xAxis[0].setCategories(json.sell[0]);
+                mHighcharts.xAxis[1].setCategories(json.buy[0]);
+                mHighcharts.series[0].setData(json.sell[1]);
+                mHighcharts.series[1].setData(json.buy[1]);
+                toggleSpinner(false);
+                resolve();
+            });
+    });
+}
 
 function orderByPrice() {
     document.getElementById("btn_cancel_all_order_condition").click();

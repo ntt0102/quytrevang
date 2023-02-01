@@ -46,6 +46,16 @@
     opacity: 0;
 }
 
+#highchartsChart {
+    position: absolute;
+    top: 30px;
+    right: 55px;
+    width: 500px;
+    height: 300px;
+    background: #e3e6e8;
+    z-index: 3;
+}
+
 .line-chart {
     overflow-y: hidden;
 }
@@ -53,6 +63,16 @@
 .line-chart #lightWeightChart {
     z-index: 1021;
     opacity: 1;
+}
+
+.line-chart #lightWeightChart > #highchartsButton {
+    position: absolute;
+    top: -0.5px;
+    right: 16px;
+    padding: 0px 8px;
+    font-size: 17px;
+    border-radius: 5px;
+    z-index: 3;
 }
 
 .line-chart #lightWeightChart > #clearButton {

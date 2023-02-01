@@ -4,6 +4,7 @@
     "endpoint": {
         "socket": "https://datafeed.vps.com.vn",
         "config": "/api/vps/config",
+        "volumeByPrice": "/api/vps/volume-by-price",
         "data": "/api/vps/data",
         "report": "/api/vps/report",
         "getStrategy": "/api/vps/get-strategy",
