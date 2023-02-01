@@ -363,4 +363,24 @@ class VpsService extends CoreService
         $unique_times = array_unique($times);
         return array_values(array_intersect_key($lines, $unique_times));
     }
+
+    /**
+     * 
+     */
+    public function getVolumeByPrice()
+    {
+        $buy = $this->vpsRepository->getVolumeByPrice('BU');
+        $buy = $buy->reduce(function ($r, $item) {
+            $r[0][] = $item->price;
+            $r[1][] = $item->sum;
+            return $r;
+        }, [[], []]);
+        $sell = $this->vpsRepository->getVolumeByPrice('SD');
+        $sell = $sell->reduce(function ($r, $item) {
+            $r[0][] = $item->price;
+            $r[1][] = $item->sum;
+            return $r;
+        }, [[], []]);
+        return ['buy' => $buy, 'sell' => $sell];
+    }
 }

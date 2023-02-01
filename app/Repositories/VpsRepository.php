@@ -38,4 +38,16 @@ class VpsRepository extends CoreRepository
     {
         return Vps::truncate();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getVolumeByPrice($side)
+    {
+        return $this->model->where('side', $side)
+            ->groupBy('price')
+            ->selectRaw('sum(vol) as sum, price')
+            ->orderBy('price', 'DESC')
+            ->get();
+    }
 }
