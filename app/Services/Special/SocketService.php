@@ -85,7 +85,7 @@ class SocketService extends CoreService
                     $side = '';
                     if ($data->lastPrice <= $bid) $side = 'SD';
                     else if ($data->lastPrice >= $ask) $side = 'BU';
-                    else $this->vpsRepository->latest('time')->side;
+                    else $side = $this->vpsRepository->latest('time')->side;
                     $param = [
                         'time' => now()->format('Y-m-d ') . $data->timeServer,
                         'price' => $data->lastPrice,
