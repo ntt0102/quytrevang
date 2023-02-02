@@ -42,7 +42,7 @@ Route::get('test', function () {
     // $n = now()->sub(date_interval_create_from_date_string('178 minutes'));
     // dd($n->format('Y-m-d H:i:s'));
     // $s = app(\App\Repositories\VpsRepository::class)->latest('time')->side;
-    // $s = app(\App\Repositories\VpsRepository::class)->getBuyVolume();
+    // $s = app(\App\Repositories\VpsRepository::class)->getVolumeByPrice('');
     // $v = number_format('123.452', 2);
     // $s = is_numeric("1000.1");
     // $s = !![1, 2];

@@ -171,7 +171,7 @@ function createLightWeightChart() {
     mHighcharts = new Highcharts.chart("highchartsChart", {
         chart: { type: "bar" },
         title: { text: "Volume by price", align: "center" },
-        xAxis: [{ labels: { enabled: false } }, { labels: { enabled: false } }],
+        xAxis: [{ labels: { enabled: false } }],
         yAxis: { title: { text: null } },
         plotOptions: { series: { stacking: "normal" } },
         series: [{ name: "Sell" }, { name: "Buy" }],
@@ -1203,7 +1203,6 @@ function showRunningStatus() {
 // }
 
 function getVolumeByPrice() {
-    console.log("getVolumeByPrice");
     return new Promise((resolve, reject) => {
         toggleSpinner(true);
         const url = mConfig.root + mConfig.endpoint.volumeByPrice;
@@ -1214,10 +1213,9 @@ function getVolumeByPrice() {
             .then(response => response.json())
             .then(json => {
                 console.log("getVolumeByPrice", json);
-                mHighcharts.xAxis[0].setCategories(json.sell[0]);
-                mHighcharts.xAxis[1].setCategories(json.buy[0]);
-                mHighcharts.series[0].setData(json.sell[1]);
-                mHighcharts.series[1].setData(json.buy[1]);
+                mHighcharts.xAxis[0].setCategories(json.price);
+                mHighcharts.series[0].setData(json.sell);
+                mHighcharts.series[1].setData(json.buy);
                 toggleSpinner(false);
                 resolve();
             });
