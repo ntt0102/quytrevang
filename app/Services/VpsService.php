@@ -369,18 +369,43 @@ class VpsService extends CoreService
      */
     public function getVolumeByPrice()
     {
-        $buy = $this->vpsRepository->getVolumeByPrice('BU');
-        $buy = $buy->reduce(function ($r, $item) {
-            $r[0][] = $item->price;
-            $r[1][] = $item->sum + 0;
-            return $r;
-        }, [[], []]);
-        $sell = $this->vpsRepository->getVolumeByPrice('SD');
-        $sell = $sell->reduce(function ($r, $item) {
-            $r[0][] = $item->price;
-            $r[1][] = -$item->sum + 0;
-            return $r;
-        }, [[], []]);
-        return ['buy' => $buy, 'sell' => $sell];
+        $data = $this->vpsRepository->getVolumeByPrice();
+        $merge = $data->reduce(function ($c, $item, $index) {
+            $isUpdate = false;
+            if (!!$index) {
+                if ($item->price == end($c)['price']) $isUpdate = true;
+            }
+            //
+            if ($isUpdate) {
+                $end = array_pop($c);
+                if ($item->side == 'BU') $end['buy'] = $item->sum + 0;
+                else $end['sell'] = $item->sum + 0;
+                $c[]  = $end;
+            } else $c[] = [
+                'price' => $item->price,
+                'buy' => $item->side == 'BU' ? $item->sum + 0 : 0,
+                'sell' => $item->side == 'SD' ? $item->sum + 0 : 0,
+            ];
+            return $c;
+        }, []);
+        return collect($merge)->reduce(function ($c, $item) {
+            $c['price'][] = $item['price'];
+            $c['buy'][] = $item['buy'];
+            $c['sell'][] = $item['sell'];
+            return $c;
+        }, ['price' => [], 'buy' => [], 'sell' => []]);
+        // $buy = $this->vpsRepository->getVolumeByPrice('BU');
+        // $buy = $buy->reduce(function ($r, $item) {
+        //     $r[0][] = $item->price;
+        //     $r[1][] = $item->sum + 0;
+        //     return $r;
+        // }, [[], []]);
+        // $sell = $this->vpsRepository->getVolumeByPrice('SD');
+        // $sell = $sell->reduce(function ($r, $item) {
+        //     $r[0][] = $item->price;
+        //     $r[1][] = -$item->sum + 0;
+        //     return $r;
+        // }, [[], []]);
+        // return ['buy' => $buy, 'sell' => $sell];
     }
 }

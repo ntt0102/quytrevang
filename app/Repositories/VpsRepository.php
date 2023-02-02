@@ -42,12 +42,17 @@ class VpsRepository extends CoreRepository
     /**
      * @inheritdoc
      */
-    public function getVolumeByPrice($side)
+    public function getVolumeByPrice()
     {
-        return $this->model->where('side', $side)
-            ->groupBy('price')
-            ->selectRaw('sum(vol) as sum, price')
-            ->orderBy('price', 'DESC')
+        return $this->model->groupBy('price', 'side')
+            ->selectRaw('sum(vol) as sum, price, side')
+            ->orderBy('price', 'ASC')
+            ->orderBy('side', 'DESC')
             ->get();
+        // return $this->model->where('side', $side)
+        //     ->groupBy('price')
+        //     ->selectRaw('sum(vol) as sum, price')
+        //     ->orderBy('price', 'DESC')
+        //     ->get();
     }
 }
