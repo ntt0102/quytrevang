@@ -1296,5 +1296,5 @@ function removePriceOrderLine() {
                 removeOrderLine("price");
             }
         }
-    }, 20000);
+    }, 60000);
 }
