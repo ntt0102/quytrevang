@@ -391,7 +391,7 @@ class VpsService extends CoreService
         return collect($merge)->reduce(function ($c, $item) {
             $c['price'][] = $item['price'];
             $c['buy'][] = $item['buy'];
-            $c['sell'][] = $item['sell'];
+            $c['sell'][] = -$item['sell'];
             return $c;
         }, ['price' => [], 'buy' => [], 'sell' => []]);
         // $buy = $this->vpsRepository->getVolumeByPrice('BU');
