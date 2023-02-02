@@ -48,10 +48,5 @@ class VpsRepository extends CoreRepository
             ->selectRaw('sum(vol) as sum, price, side')
             ->orderBy('price', 'DESC')
             ->get();
-        // return $this->model->where('side', $side)
-        //     ->groupBy('price')
-        //     ->selectRaw('sum(vol) as sum, price')
-        //     ->orderBy('price', 'DESC')
-        //     ->get();
     }
 }
