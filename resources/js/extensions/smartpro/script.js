@@ -128,10 +128,10 @@ function createButtons() {
             document.getElementById("right_order_type").innerText = "LĐK";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(1)"
-            ).innerText = "🅞";
+            ).innerText = "O";
             document.querySelector(
                 "#mainFooter .foot_tab:nth-child(2)"
-            ).innerText = "❓";
+            ).innerText = "?";
         }
     });
     document.body.append(button);
@@ -183,9 +183,8 @@ function createLightWeightChart() {
         { text: "Tick", value: 0 },
         { text: "1 min", value: 1 },
         { text: "5 min", value: 5 },
-        { text: "15 min", value: 15 },
-        { text: "1 day", value: 1440 },
-        { text: "1 week", value: 10080 }
+        { text: "30 min", value: 30 },
+        { text: "1 day", value: 1440 }
     ].forEach((item, index) => {
         var option = document.createElement("option");
         option.value = item.value;
@@ -195,7 +194,7 @@ function createLightWeightChart() {
     select.value = mConfig.timeFrame;
     select.addEventListener("change", e => {
         mConfig.timeFrame = e.target.value;
-        getData();
+        getData().then(() => mChart.object.timeScale().resetTimeScale());
     });
     div.append(select);
     //
@@ -237,7 +236,7 @@ function createLightWeightChart() {
     //
     button = document.createElement("button");
     button.id = "highchartsButton";
-    button.innerText = "📉";
+    button.innerText = "-|-";
     button.title = "Show highcharts";
     button.addEventListener("click", () => {
         var chart = document.getElementById("highchartsChart");
@@ -284,6 +283,14 @@ function createLightWeightChart() {
     button.addEventListener("click", orderByVolume);
     div.append(button);
     //
+    button = document.createElement("button");
+    button.id = "scrollButton";
+    button.innerText = "≫";
+    button.addEventListener("click", () =>
+        mChart.object.timeScale().scrollToRealTime()
+    );
+    div.append(button);
+    //
     var img = document.createElement("img");
     img.id = "spinnerImg";
     img.style.opacity = 0;
@@ -299,7 +306,7 @@ function createLightWeightChart() {
     div.append(p);
     //
     const chartOptions = {
-        localization: { locale: "vi-VN" },
+        localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
         rightPriceScale: { visible: true },
         leftPriceScale: { visible: false },
         layout: {
@@ -446,16 +453,31 @@ function registerEvent() {
 
     function zoomChart(event) {
         if (event.ctrlKey || event.metaKey) {
-            if (event.keyCode == 38) {
-                mConfig.barSpacing += 0.5;
-                mChart.object
-                    .timeScale()
-                    .applyOptions({ barSpacing: mConfig.barSpacing });
-            } else if (event.keyCode == 40) {
-                mConfig.barSpacing -= 0.5;
-                mChart.object
-                    .timeScale()
-                    .applyOptions({ barSpacing: mConfig.barSpacing });
+            if (event.shiftKey) {
+                if (event.keyCode == 39)
+                    mChart.object.timeScale().scrollToRealTime();
+            } else {
+                if (event.keyCode == 38) {
+                    const options = mChart.object.options();
+                    mChart.object.timeScale().applyOptions({
+                        barSpacing: options.timeScale.barSpacing + 0.5
+                    });
+                } else if (event.keyCode == 40) {
+                    const options = mChart.object.options();
+                    if (
+                        options.timeScale.barSpacing >
+                        options.timeScale.minBarSpacing
+                    )
+                        mChart.object.timeScale().applyOptions({
+                            barSpacing: options.timeScale.barSpacing - 0.5
+                        });
+                } else if (event.keyCode == 37) {
+                    const position = mChart.object.timeScale().scrollPosition();
+                    mChart.object.timeScale().scrollToPosition(position - 10);
+                } else if (event.keyCode == 39) {
+                    const position = mChart.object.timeScale().scrollPosition();
+                    mChart.object.timeScale().scrollToPosition(position + 10);
+                }
             }
         } else if (event.which === 27) {
             document.getElementById("priceOrderButton").style.display = "none";

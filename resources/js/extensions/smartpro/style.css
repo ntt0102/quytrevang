@@ -191,13 +191,30 @@
     font-size: 25px;
 }
 
+.line-chart #lightWeightChart > #scrollButton {
+    position: absolute;
+    bottom: 30px;
+    right: 60px;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    color: white;
+    text-align: center;
+    background: gray;
+    z-index: 3;
+    opacity: 0.5;
+}
+.line-chart #lightWeightChart > #scrollButton:hover {
+    opacity: 1;
+}
+
 .line-chart #mainFooter .foot_tab:nth-child(2) {
     position: fixed;
     top: 310px;
-    left: 36px;
+    left: 37px;
     z-index: 2001;
     font-size: 20px;
-    padding: 0px 8px !important;
+    padding: 0px 12px !important;
     border-radius: 3px !important;
     background: #f0f0f0 !important;
     color: #848484 !important;
@@ -210,7 +227,7 @@
     left: 0px;
     z-index: 2001;
     font-size: 20px;
-    padding: 0px 8px !important;
+    padding: 0px 10px !important;
     margin: unset !important;
     border-radius: 3px !important;
     background: #f0f0f0 !important;
