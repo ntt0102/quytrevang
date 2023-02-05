@@ -494,15 +494,8 @@ function connectSocket() {
         socket.emit("regs", JSON.stringify(msg));
         getData();
     });
-    socket.on("boardps", data => {
-        // console.log("boardps", data.data);
-        bidAskHandler(data.data);
-        // periodicHandler(data.data);
-    });
-    socket.on("stockps", data => {
-        // console.log("stockps", data.data);
-        priceHandler(data.data);
-    });
+    socket.on("boardps", data => bidAskHandler(data.data));
+    socket.on("stockps", data => priceHandler(data.data));
 
     function priceHandler(data) {
         if (data.id == 3220) {
@@ -816,16 +809,6 @@ function reportHandler() {
                 .innerText.replaceAll(",", ""),
             scores: +document.getElementById(`${mConfig.VN30F1M}ref`).innerText
         };
-        for (var item of document.getElementById("tbodyContent").rows) {
-            if (item.cells[0].innerText == "") break;
-            else {
-                var volume = +item.cells[6].innerText;
-                if (!isNaN(volume) && item.cells[7].innerText == "ATO") {
-                    var days = moment().day() == 1 ? 3 : 1;
-                    data.fees += days * volume * mConfig.PMF;
-                }
-            }
-        }
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -864,21 +847,6 @@ function reportHandler() {
 function toggleSpinner(status) {
     var img = document.getElementById("spinnerImg");
     img.style.opacity = status ? 1 : 0;
-}
-
-function inAtcTimeRange() {
-    return (
-        mConfig.currentTime >= mConfig.time.atc &&
-        mConfig.currentTime < mConfig.time.end
-    );
-}
-
-function inPeriodicTimeRange() {
-    var isAtoSession =
-        mConfig.currentTime > mConfig.time.start &&
-        mConfig.currentTime <= mConfig.time.ato;
-    var isAtcSession = inAtcTimeRange();
-    return isAtoSession ? "ATO" : isAtcSession ? "ATC" : "";
 }
 
 function showRunningStatus() {
