@@ -334,7 +334,7 @@ function createLightWeightChart() {
                 : null;
             const volume = e.seriesPrices.get(mChart.series.volume);
             document.getElementById("volumeLegendP").innerText = !!volume
-                ? volume
+                ? volume.toLocaleString("en-US")
                 : null;
         } else mConfig.crosshair = false;
     });
@@ -549,8 +549,9 @@ function connectSocket() {
                     if (!mConfig.crosshair) {
                         document.getElementById("priceLegendP").innerText =
                             lastPrice.value;
-                        document.getElementById("volumeLegendP").innerText =
-                            lastVolume.value;
+                        document.getElementById(
+                            "volumeLegendP"
+                        ).innerText = lastVolume.value.toLocaleString("en-US");
                     }
                     //
                     setLocalData("data", param);
