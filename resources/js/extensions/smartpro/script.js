@@ -937,7 +937,7 @@ function orderByVolume() {
     createOrderLine("volume");
     var btn = document.getElementById("volumeCancelButton");
     btn.style.display = "block";
-    btn.style.border = `5px solid ${
+    btn.style.border = `2px solid ${
         mChart.order.volume.type ? "green" : "red"
     }`;
     document.getElementById("priceOrderButton").style.display = "none";

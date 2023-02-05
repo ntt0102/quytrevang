@@ -133,45 +133,6 @@
     z-index: 2001;
 }
 
-/* .line-chart #lightWeightChart > #listButton {
-    position: absolute;
-    top: 40px;
-    right: 200px;
-    padding: 1px 5px;
-    border-radius: 5px;
-    min-width: 58px;
-    z-index: 3;
-}
-
-.line-chart #lightWeightChart > #atcInput {
-    position: absolute;
-    top: 40px;
-    right: 258px;
-    width: 47px;
-    padding: 0px;
-    text-align: center;
-    z-index: 3;
-}
-
-.line-chart #lightWeightChart > #momentumInput {
-    position: absolute;
-    top: 40px;
-    right: 305px;
-    width: 47px;
-    padding: 0px;
-    text-align: center;
-    z-index: 3;
-}
-
-.line-chart #lightWeightChart > #trendSelect {
-    position: absolute;
-    top: 40px;
-    right: 352px;
-    padding: 2.5px 0 !important;
-    text-align: center;
-    z-index: 3;
-} */
-
 .line-chart #lightWeightChart > #priceCancelButton {
     position: absolute;
     top: 30px;
@@ -229,62 +190,6 @@
     z-index: 3;
     font-size: 25px;
 }
-
-/* .line-chart #lightWeightChart > #listTable {
-    position: absolute;
-    top: 70px;
-    right: 50px;
-    background: white;
-    color: black;
-    z-index: -1;
-    opacity: 0;
-    width: 550px;
-}
-
-.line-chart #lightWeightChart > table#listTable,
-.line-chart #lightWeightChart > #listTable th,
-.line-chart #lightWeightChart > #listTable td {
-    border: 1px solid;
-}
-
-.line-chart #lightWeightChart > #listTable td {
-    padding: 5px;
-}
-
-.line-chart #lightWeightChart > #listTable td:nth-child(1) {
-    width: 40px;
-}
-
-.line-chart #lightWeightChart > #listTable td:nth-child(2) {
-    width: 100px;
-}
-
-.line-chart #lightWeightChart > #listTable tbody {
-    display: block;
-    overflow-y: auto;
-    text-align: center;
-}
-
-.line-chart #lightWeightChart > #listTable tbody::-webkit-scrollbar {
-    display: none;
-}
-
-.line-chart #lightWeightChart > #listTable thead,
-.line-chart #lightWeightChart > #listTable tbody tr {
-    display: table;
-    width: 100%;
-    table-layout: fixed;
-}
-
-.line-chart #lightWeightChart > #listTable thead {
-    text-align: center;
-    background: cornflowerblue;
-}
-
-.line-chart #lightWeightChart.list-show > #listTable {
-    z-index: 4;
-    opacity: 1;
-} */
 
 .line-chart #mainFooter .foot_tab:nth-child(2) {
     position: fixed;
