@@ -28,19 +28,6 @@ class VpsController extends CoreController
         return $this->sendResponse($data);
     }
 
-    // /**
-    //  * Upload AT Image
-    //  *
-    //  * @param \Illuminate\Http\Request $request
-    //  * 
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function export(Request $request)
-    // {
-    //     $data = $this->vpsService->export($request);
-    //     return $this->sendResponse($data);
-    // }
-
     /**
      * Check Market Open
      *
@@ -79,43 +66,4 @@ class VpsController extends CoreController
         $data = $this->vpsService->controlData($request);
         return $this->sendResponse($data);
     }
-
-    // /**
-    //  * Get strategy
-    //  *
-    //  * @param \Illuminate\Http\Request $request
-    //  * 
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function getStrategy(Request $request)
-    // {
-    //     $data = $this->vpsService->getStrategy($request);
-    //     return $this->sendResponse($data);
-    // }
-
-    // /**
-    //  * Set strategy
-    //  *
-    //  * @param \Illuminate\Http\Request $request
-    //  * 
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function setStrategy(Request $request)
-    // {
-    //     $data = $this->vpsService->setStrategy($request);
-    //     return $this->sendResponse($data);
-    // }
-
-    // /**
-    //  * Get Vn30f1m
-    //  *
-    //  * @param \Illuminate\Http\Request $request
-    //  * 
-    //  * @return \Illuminate\Http\Response
-    //  */
-    // public function getVn30f1m(Request $request)
-    // {
-    //     $data = $this->vpsService->getVn30f1m($request);
-    //     return $this->sendResponse($data);
-    // }
 }
