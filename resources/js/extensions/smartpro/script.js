@@ -444,6 +444,8 @@ function registerEvent() {
         } else if (event.which === 27) {
             document.getElementById("priceOrderButton").style.display = "none";
             document.getElementById("volumeOrderButton").style.display = "none";
+            mChart.series.price.setMarkers([]);
+            mChart.series.volume.setMarkers([]);
         }
     }
 }
