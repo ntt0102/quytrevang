@@ -35,7 +35,8 @@ Route::get('migrate', function () {
 Route::get('test', function () {
     // $s = app(\App\Services\VpsService::class)->getTcbs();
     // $s = app(\App\Services\VpsService::class)->getVps();
-    $s = app(\App\Services\VpsService::class)->getVolumeByPrice();
+    // $s = app(\App\Services\VpsService::class)->getVolumeByPrice();
+    $s = app(\App\Services\VpsService::class)->exportToCsv();
     // $s = app(\App\Services\VpsService::class)->getFromCsv('2023-01-30');
     // $s = app(\App\Repositories\StrategyRepository::class)->getStrategies(-10, -5);
     // dd($s);

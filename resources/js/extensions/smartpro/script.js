@@ -2,7 +2,6 @@ var mConfig = {};
 var mData = [];
 var mChart = { object: {}, series: {}, data: {}, order: {}, line: {} };
 var mDatabase = {};
-var mHighcharts = {};
 
 getLocalConfig()
     .then(() => getServerConfig())
@@ -152,30 +151,6 @@ function createLightWeightChart() {
     div.style.height = "100vh";
     document.body.append(div);
     //
-    var highcharts = document.createElement("div");
-    highcharts.id = "highchartsChart";
-    highcharts.style.display = "none";
-    div.append(highcharts);
-    mHighcharts = new Highcharts.chart("highchartsChart", {
-        chart: { type: "bar" },
-        title: { text: "Volume by price", align: "center" },
-        xAxis: [{ labels: { enabled: false } }],
-        yAxis: { title: { text: null } },
-        plotOptions: { series: { stacking: "normal" } },
-        series: [{ name: "Sell" }, { name: "Buy" }],
-        tooltip: {
-            formatter: function() {
-                return (
-                    "Price: " +
-                    this.point.category +
-                    "</b><br/>" +
-                    "Volume: " +
-                    Math.abs(this.point.y)
-                );
-            }
-        }
-    });
-    //
     var select = document.createElement("select");
     select.id = "timeFrameSelect";
     [
@@ -207,16 +182,9 @@ function createLightWeightChart() {
     //
     var button = document.createElement("button");
     button.id = "refreshButton";
-    button.innerText = "🔄";
+    button.innerText = "⟳";
     button.title = "Refresh chart";
     button.addEventListener("click", () => getData());
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "tcbsButton";
-    button.innerText = "🔂";
-    button.title = "TCBS chart";
-    button.addEventListener("click", () => getData(null, true));
     div.append(button);
     //
     button = document.createElement("button");
@@ -230,19 +198,6 @@ function createLightWeightChart() {
             var date = document.getElementById("dateInput").value;
             getData(date);
         }
-    });
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "highchartsButton";
-    button.innerText = "-|-";
-    button.title = "Show highcharts";
-    button.addEventListener("click", () => {
-        var chart = document.getElementById("highchartsChart");
-        if (chart.style.display == "none") {
-            getVolumeByPrice();
-            chart.style.display = "block";
-        } else chart.style.display = "none";
     });
     div.append(button);
     //
@@ -521,14 +476,15 @@ function connectSocket() {
     function priceHandler(data) {
         if (data.id == 3220) {
             // console.log("price" + data.id);
-            if (data.lastVol < data.totalVol) {
-                if (!!mConfig.bidPrice && !!mConfig.askPrice) {
-                    var side = "";
-                    if (data.lastPrice <= mConfig.bidPrice) side = "SD";
-                    else if (data.lastPrice >= mConfig.askPrice) side = "BU";
-                    else side = mData.slice(-1)[0].side;
+            if (!!mConfig.bidPrice && !!mConfig.askPrice) {
+                var side = "";
+                if (data.lastPrice <= mConfig.bidPrice) side = "SD";
+                else if (data.lastPrice >= mConfig.askPrice) side = "BU";
+                else if (mData.length > 0) side = mData.slice(-1)[0].side;
+                //
+                if (side != "") {
                     var param = {
-                        time: `${mConfig.currentDate} ${data.timeServer}`,
+                        time: `${mConfig.currentDate} ${data.time}`,
                         price: data.lastPrice,
                         vol: data.lastVol,
                         side: side
@@ -654,10 +610,10 @@ function intervalHandler() {
     //     );
 }
 
-function getData(date = null, tcbs = false) {
+function getData(date = null) {
     return new Promise((resolve, reject) => {
         toggleSpinner(true);
-        Promise.all([getServerData(date, tcbs), getLocalData("data")])
+        Promise.all([getServerData(date), getLocalData("data")])
             .then(arr => {
                 console.log("getData: ", arr);
                 var ids = new Set(arr[0].map(d => d.time));
@@ -667,11 +623,7 @@ function getData(date = null, tcbs = false) {
                 ].sort((a, b) => a.time.localeCompare(b.time));
                 console.log("data", mData);
                 //
-                if (!tcbs) {
-                    clearLocalData("data").then(() =>
-                        setLocalData("data", mData)
-                    );
-                }
+                clearLocalData("data").then(() => setLocalData("data", mData));
                 //
                 mChart.data = mData.reduce(
                     (r, item) => {
@@ -723,9 +675,9 @@ function createChartData(r, item) {
     return r;
 }
 
-function getServerData(date = null, tcbs = false) {
+function getServerData(date = null) {
     return new Promise((resolve, reject) => {
-        var data = { action: "GET", date: date, tcbs: tcbs };
+        var data = { action: "GET", date: date };
         const url = mConfig.root + mConfig.endpoint.data;
         fetch(url, {
             method: "POST",
@@ -871,26 +823,6 @@ function showRunningStatus() {
     var button = document.getElementById("lineButton");
     if (button.classList.contains("dark")) button.classList.remove("dark");
     else button.classList.add("dark");
-}
-
-function getVolumeByPrice() {
-    return new Promise((resolve, reject) => {
-        toggleSpinner(true);
-        const url = mConfig.root + mConfig.endpoint.volumeByPrice;
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" }
-        })
-            .then(response => response.json())
-            .then(json => {
-                console.log("getVolumeByPrice", json);
-                mHighcharts.xAxis[0].setCategories(json.price);
-                mHighcharts.series[0].setData(json.sell);
-                mHighcharts.series[1].setData(json.buy);
-                toggleSpinner(false);
-                resolve();
-            });
-    });
 }
 
 function orderByPrice() {

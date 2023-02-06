@@ -164,8 +164,9 @@ class VpsService extends CoreService
                     case 'GET':
                         if (!!$request->date)
                             return $this->getFromCsv($request->date);
-                        else if ($request->tcbs) return $this->getTcbs();
-                        else return $this->getVps();
+                        // else if ($request->tcbs) return $this->getTcbs();
+                        // else return $this->getVps();
+                        else return $this->getTcbs();
                         break;
                     case 'CLEAR':
                         $this->vpsRepository->clear();
@@ -187,26 +188,24 @@ class VpsService extends CoreService
         $unique_times = array_unique($times);
         return array_values(array_intersect_key($data->toArray(), $unique_times));
     }
+    /**
+     * Tcbs data
+     */
+    private function tcbsData()
+    {
+        $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
+        $client = new \GuzzleHttp\Client();
+        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size=10000";
+        $res = $client->get($url);
+        return json_decode($res->getBody())->data;
+    }
 
     /**
      * get From TCBS
      */
     public function getTcbs()
     {
-        $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
-        $client = new \GuzzleHttp\Client();
-        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size=5000";
-        $res = $client->get($url);
-        $array = json_decode($res->getBody())->data;
-        // collect($array)->map(function ($item) {
-        //     $param = [
-        //         'time' => date('Y-m-d ') . $item->t,
-        //         'price' => $item->p,
-        //         'vol' => $item->v,
-        //         'side' => $item->a
-        //     ];
-        //     $this->vpsRepository->create($param);
-        // });
+        $array = $this->tcbsData();
         $temp = collect($array)->reduce(function ($carry, $item) {
             $carry['data'][] = [
                 'time' => date('Y-m-d ') . $item->t,
@@ -227,14 +226,19 @@ class VpsService extends CoreService
     public function exportToCsv()
     {
         $filename = storage_path('app/public/vn30f1m/' . date('Y-m-d') . '.csv');
-        $list = \App\Models\Vps::all();
+        $list = $this->tcbsData();
+        // $list = \App\Models\Vps::all();
         $fp = fopen($filename, 'w');
         foreach ($list as $obj) {
             $a = [];
-            $a[] = $obj->time;
-            $a[] = $obj->price;
-            $a[] = $obj->vol;
-            $a[] = $obj->side;
+            $a[] = date('Y-m-d ') . $obj->t;
+            $a[] = $obj->p;
+            $a[] = $obj->v;
+            $a[] = $obj->a;
+            // $a[] = $obj->time;
+            // $a[] = $obj->price;
+            // $a[] = $obj->vol;
+            // $a[] = $obj->side;
             fputcsv($fp, $a);
         }
         fclose($fp);
