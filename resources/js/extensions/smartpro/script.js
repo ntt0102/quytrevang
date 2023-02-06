@@ -855,6 +855,7 @@ function orderByPrice() {
         document
             .getElementById(`btn_${mChart.order.price.type ? "long" : "short"}`)
             .click();
+        document.getElementById("select_normal_order_wrapper").click();
     }, 1000);
     document.getElementById("priceOrderButton").style.display = "none";
     document.getElementById("volumeOrderButton").style.display = "none";
