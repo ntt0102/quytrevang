@@ -182,14 +182,14 @@ function createLightWeightChart() {
     //
     var button = document.createElement("button");
     button.id = "refreshButton";
-    button.innerText = "⟳";
+    button.innerText = "R";
     button.title = "Refresh chart";
     button.addEventListener("click", () => getData());
     div.append(button);
     //
     button = document.createElement("button");
     button.id = "clearButton";
-    button.innerText = "↺";
+    button.innerText = "C";
     button.title = "Delete local data";
     button.addEventListener("click", () => {
         var choice = confirm("Delete local database?");

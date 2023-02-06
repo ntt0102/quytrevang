@@ -68,8 +68,8 @@
 .line-chart #lightWeightChart > #refreshButton {
     position: absolute;
     top: -0.5px;
-    right: 86px;
-    padding: 0px 6px;
+    right: 85px;
+    padding: 0px 8px;
     font-size: 17px;
     border-radius: 5px;
     z-index: 3;
@@ -78,7 +78,7 @@
 .line-chart #lightWeightChart > #timeFrameSelect {
     position: absolute;
     top: 0.5px;
-    right: 117.5px;
+    right: 117px;
     height: 26px;
     text-align: center;
     border-radius: 5px;
