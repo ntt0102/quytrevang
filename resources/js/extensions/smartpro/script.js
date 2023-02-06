@@ -58,7 +58,6 @@ function getServerConfig() {
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.time = { ...mConfig.time, ...json.time };
                 //
-                mConfig.hasChangedData = false;
                 mConfig.volumeOrderConfirm = false;
                 mConfig.crosshair = false;
                 //
@@ -556,7 +555,6 @@ function connectSocket() {
                     //
                     setLocalData("data", param);
                     mData.push(param);
-                    mConfig.hasChangedData = true;
                 }
             }
         }
@@ -657,7 +655,6 @@ function intervalHandler() {
 }
 
 function getData(date = null, tcbs = false) {
-    mConfig.hasChangedData = false;
     return new Promise((resolve, reject) => {
         toggleSpinner(true);
         Promise.all([getServerData(date, tcbs), getLocalData("data")])
@@ -671,11 +668,9 @@ function getData(date = null, tcbs = false) {
                 console.log("data", mData);
                 //
                 if (!tcbs) {
-                    if (!mConfig.hasChangedData) {
-                        clearLocalData("data").then(() =>
-                            setLocalData("data", mData)
-                        );
-                    } else return getData();
+                    clearLocalData("data").then(() =>
+                        setLocalData("data", mData)
+                    );
                 }
                 //
                 mChart.data = mData.reduce(
