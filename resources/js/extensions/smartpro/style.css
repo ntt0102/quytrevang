@@ -68,7 +68,7 @@
 .line-chart #lightWeightChart > #refreshButton {
     position: absolute;
     top: -0.5px;
-    right: 85px;
+    right: 86px;
     padding: 0px 8px;
     font-size: 17px;
     border-radius: 5px;
@@ -78,7 +78,7 @@
 .line-chart #lightWeightChart > #timeFrameSelect {
     position: absolute;
     top: 0.5px;
-    right: 117px;
+    right: 119px;
     height: 26px;
     text-align: center;
     border-radius: 5px;
@@ -89,7 +89,7 @@
 .line-chart #lightWeightChart > #dateInput {
     position: absolute;
     top: 0px;
-    right: 185px;
+    right: 188px;
     width: 105px;
     padding: 0px;
     line-height: 20px;
@@ -102,7 +102,7 @@
 .line-chart #lightWeightChart > #spinnerImg {
     position: absolute;
     top: 2px;
-    right: 310px;
+    right: 305px;
     width: 25px;
     z-index: 2001;
 }
