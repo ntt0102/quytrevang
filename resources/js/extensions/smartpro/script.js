@@ -309,30 +309,38 @@ function createLightWeightChart() {
         var vOrdBtn = document.getElementById("volumeOrderButton");
         if (e.time) {
             const price = e.seriesPrices.get(mChart.series.price);
-            if (!!price) {
-                pOrdBtn.style.left = +(e.point.x - 41) + "px";
-                pOrdBtn.style.top = +(e.point.y - 40) + "px";
-                pOrdBtn.style.display = "block";
-                mChart.order.price = {
-                    value: price,
-                    type: price >= mChart.data.price.slice(-1)[0].value
-                };
-                pOrdBtn.innerText = mChart.order.price.type ? "↗" : "↘";
-            }
+            pOrdBtn.style.left = +(e.point.x - 41) + "px";
+            pOrdBtn.style.top = +(e.point.y - 40) + "px";
+            pOrdBtn.style.display = "block";
+            mChart.order.price = {
+                value: price,
+                type: price >= mChart.data.price.slice(-1)[0].value
+            };
+            pOrdBtn.innerText = mChart.order.price.type ? "↗" : "↘";
+            //
             const volume = e.seriesPrices.get(mChart.series.volume);
-            if (!!volume) {
-                vOrdBtn.style.left = +(e.point.x - 41) + "px";
-                vOrdBtn.style.top = +e.point.y + "px";
-                vOrdBtn.style.display = "block";
-                mChart.order.volume = {
-                    value: volume,
-                    type: volume >= mChart.data.volume.slice(-1)[0].value
-                };
-                vOrdBtn.innerText = mChart.order.volume.type ? "↗" : "↘";
-            } else vOrdBtn.style.display = "none";
+            vOrdBtn.style.left = +(e.point.x - 41) + "px";
+            vOrdBtn.style.top = +e.point.y + "px";
+            vOrdBtn.style.display = "block";
+            mChart.order.volume = {
+                value: volume,
+                type: volume >= mChart.data.volume.slice(-1)[0].value
+            };
+            vOrdBtn.innerText = mChart.order.volume.type ? "↗" : "↘";
+            //
+            const marker = {
+                time: e.time,
+                position: "inBar",
+                color: "#FFFF00",
+                shape: "circle"
+            };
+            mChart.series.price.setMarkers([marker]);
+            mChart.series.volume.setMarkers([marker]);
         } else {
             pOrdBtn.style.display = "none";
             vOrdBtn.style.display = "none";
+            mChart.series.price.setMarkers([]);
+            mChart.series.volume.setMarkers([]);
         }
     }
 }
@@ -848,6 +856,8 @@ function orderByPrice() {
     }, 1000);
     document.getElementById("priceOrderButton").style.display = "none";
     document.getElementById("volumeOrderButton").style.display = "none";
+    mChart.series.price.setMarkers([]);
+    mChart.series.volume.setMarkers([]);
 }
 
 function orderByVolume() {
@@ -860,6 +870,8 @@ function orderByVolume() {
     }`;
     document.getElementById("priceOrderButton").style.display = "none";
     document.getElementById("volumeOrderButton").style.display = "none";
+    mChart.series.price.setMarkers([]);
+    mChart.series.volume.setMarkers([]);
 }
 
 function createOrderLine(series) {
