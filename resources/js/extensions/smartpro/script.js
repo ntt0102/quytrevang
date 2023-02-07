@@ -644,7 +644,7 @@ function getData(date = null) {
                     (r, item) => {
                         return createChartData(r, item);
                     },
-                    { original: [], price: [], volume: [] }
+                    { original: [], price: [], volume: [], pvi: [] }
                 );
                 console.log(
                     "chartData",
@@ -652,6 +652,7 @@ function getData(date = null) {
                 );
                 mChart.series.price.setData(mChart.data.price);
                 mChart.series.volume.setData(mChart.data.volume);
+                // mChart.series.volume.setData(mChart.data.pvi);
                 //
                 toggleSpinner(false);
                 resolve();
@@ -684,9 +685,19 @@ function createChartData(r, item) {
         }
         time = timeIndex * period;
     }
-    r.original.push(item);
+
     r.price.push({ time: time, value: item.price });
     r.volume.push({ time: time, value: prevVolume + volume });
+    //
+    if (!!r.original.length && item.vol > r.original.slice(-1)[0].vol) {
+        var prevPvi = !!r.pvi.length ? r.pvi.slice(-1)[0].value : 0.1;
+        var prePrice = r.original.slice(-1)[0].price;
+        r.pvi.push({
+            time: time,
+            value: prevPvi + ((item.price - prePrice) / prePrice) * prevPvi
+        });
+    }
+    r.original.push(item);
     //
     return r;
 }
