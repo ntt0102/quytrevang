@@ -1,5 +1,4 @@
 var mConfig = {};
-var mData = [];
 var mChart = { object: {}, series: {}, data: {}, order: {}, line: {} };
 var mDatabase = {};
 
@@ -505,7 +504,8 @@ function connectSocket() {
                 var side = "";
                 if (data.lastPrice <= mConfig.bidPrice) side = "SD";
                 else if (data.lastPrice >= mConfig.askPrice) side = "BU";
-                else if (mData.length > 0) side = mData.slice(-1)[0].side;
+                else if (mChart.data.original.length > 0)
+                    side = mChart.data.original.slice(-1)[0].side;
                 //
                 if (side != "") {
                     var param = {
@@ -536,7 +536,7 @@ function connectSocket() {
                     }
                     //
                     setLocalData("data", param);
-                    mData.push(param);
+                    mChart.data.original.push(param);
                 }
             }
         }
@@ -632,19 +632,19 @@ function getData(date = null) {
             .then(arr => {
                 console.log("getData: ", arr);
                 var ids = new Set(arr[0].map(d => d.time));
-                mData = [
+                var data = [
                     ...arr[0],
                     ...arr[1].filter(d => !ids.has(d.time))
                 ].sort((a, b) => a.time.localeCompare(b.time));
-                console.log("data", mData);
+                console.log("data", data);
                 //
-                clearLocalData("data").then(() => setLocalData("data", mData));
+                clearLocalData("data").then(() => setLocalData("data", data));
                 //
-                mChart.data = mData.reduce(
+                mChart.data = data.reduce(
                     (r, item) => {
                         return createChartData(r, item);
                     },
-                    { price: [], volume: [] }
+                    { original: [], price: [], volume: [] }
                 );
                 console.log(
                     "chartData",
@@ -684,6 +684,7 @@ function createChartData(r, item) {
         }
         time = timeIndex * period;
     }
+    r.original.push(item);
     r.price.push({ time: time, value: item.price });
     r.volume.push({ time: time, value: prevVolume + volume });
     //
