@@ -165,6 +165,16 @@
     font-size: 25px;
 }
 
+.line-chart #lightWeightChart > #volumeUnorderButton {
+    position: absolute;
+    padding: 0px 9px;
+    border-radius: 5px;
+    color: white;
+    background: #ff00ff;
+    z-index: 3;
+    font-size: 25px;
+}
+
 .line-chart #lightWeightChart > #scrollButton {
     position: absolute;
     bottom: 30px;

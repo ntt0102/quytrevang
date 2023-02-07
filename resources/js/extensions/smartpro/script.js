@@ -13,6 +13,7 @@ getLocalConfig()
             connectSocket();
             loadPage();
             setInterval(intervalHandler, 1000);
+            setInterval(() => getData(), 60000);
         });
     });
 
@@ -57,7 +58,8 @@ function getServerConfig() {
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.time = { ...mConfig.time, ...json.time };
                 //
-                mConfig.volumeOrderConfirm = false;
+                mConfig.hasVolumeOrder = false;
+                mConfig.hasVolumeUnorder = false;
                 mConfig.crosshair = false;
                 //
                 mConfig.bidPrice = 0;
@@ -203,7 +205,7 @@ function createLightWeightChart() {
     //
     button = document.createElement("button");
     button.id = "priceCancelButton";
-    button.innerText = "✘";
+    button.innerText = "X";
     button.style.display = "none";
     button.addEventListener("click", () => {
         document.getElementById("btn_cancel_all_order_condition").click();
@@ -214,12 +216,17 @@ function createLightWeightChart() {
     //
     button = document.createElement("button");
     button.id = "volumeCancelButton";
-    button.innerText = "✘";
+    button.innerText = "X";
     button.style.display = "none";
     button.addEventListener("click", () => {
-        mConfig.volumeOrderConfirm = false;
+        mConfig.hasVolumeOrder = false;
         document.getElementById("volumeCancelButton").style.display = "none";
         removeOrderLine("volume");
+        //
+        if (mConfig.hasVolumeUnorder) {
+            mConfig.hasVolumeUnorder = false;
+            removeUnorderLine();
+        }
     });
     div.append(button);
     //
@@ -235,6 +242,13 @@ function createLightWeightChart() {
     button.innerText = "Order?";
     button.style.display = "none";
     button.addEventListener("click", orderByVolume);
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "volumeUnorderButton";
+    button.innerText = "X";
+    button.style.display = "none";
+    button.addEventListener("click", unorderByVolume);
     div.append(button);
     //
     button = document.createElement("button");
@@ -307,6 +321,7 @@ function createLightWeightChart() {
     function chartClick(e) {
         var pOrdBtn = document.getElementById("priceOrderButton");
         var vOrdBtn = document.getElementById("volumeOrderButton");
+        var vUnordBtn = document.getElementById("volumeUnorderButton");
         if (e.time) {
             const price = e.seriesPrices.get(mChart.series.price);
             pOrdBtn.style.left = +(e.point.x - 41) + "px";
@@ -328,6 +343,12 @@ function createLightWeightChart() {
             };
             vOrdBtn.innerText = mChart.order.volume.type ? "↗" : "↘";
             //
+            if (mConfig.hasVolumeOrder) {
+                vUnordBtn.style.left = +(e.point.x - 79) + "px";
+                vUnordBtn.style.top = +e.point.y + "px";
+                vUnordBtn.style.display = "block";
+            }
+            //
             const marker = {
                 time: e.time,
                 position: "inBar",
@@ -339,6 +360,7 @@ function createLightWeightChart() {
         } else {
             pOrdBtn.style.display = "none";
             vOrdBtn.style.display = "none";
+            vUnordBtn.style.display = "none";
             mChart.series.price.setMarkers([]);
             mChart.series.volume.setMarkers([]);
         }
@@ -444,6 +466,8 @@ function registerEvent() {
         } else if (event.which === 27) {
             document.getElementById("priceOrderButton").style.display = "none";
             document.getElementById("volumeOrderButton").style.display = "none";
+            document.getElementById("volumeUnorderButton").style.display =
+                "none";
             mChart.series.price.setMarkers([]);
             mChart.series.volume.setMarkers([]);
         }
@@ -503,6 +527,7 @@ function connectSocket() {
                     var lastPrice = mChart.data.price.slice(-1)[0];
                     var lastVolume = mChart.data.volume.slice(-1)[0];
                     processVolumeOrder(lastVolume);
+                    processVolumeUnorder(lastPrice);
                     //
                     if (mConfig.timeFrame > 0) {
                         mChart.series.price.setData(mChart.data.price);
@@ -526,7 +551,7 @@ function connectSocket() {
         }
 
         function processVolumeOrder(lastVolume) {
-            if (mConfig.volumeOrderConfirm) {
+            if (mConfig.hasVolumeOrder) {
                 var isOrder = false;
                 document.getElementById("select_normal_order_wrapper").click();
                 document.getElementById("right_price").value = "MTL";
@@ -545,11 +570,36 @@ function connectSocket() {
                 }
                 //
                 if (isOrder) {
-                    mConfig.volumeOrderConfirm = false;
+                    mConfig.hasVolumeOrder = false;
                     document.getElementById(
                         "volumeCancelButton"
                     ).style.display = "none";
                     removeOrderLine("volume");
+                    //
+                    if (mConfig.hasVolumeUnorder) {
+                        mConfig.hasVolumeUnorder = false;
+                        removeUnorderLine();
+                    }
+                }
+            }
+        }
+
+        function processVolumeUnorder(lastPrice) {
+            if (mConfig.hasVolumeUnorder) {
+                if (
+                    (mChart.order.volume.type &&
+                        lastPrice.value >= mChart.order.price.value) ||
+                    (!mChart.order.volume.type &&
+                        lastPrice.value <= mChart.order.price.value)
+                ) {
+                    mConfig.hasVolumeOrder = false;
+                    document.getElementById(
+                        "volumeCancelButton"
+                    ).style.display = "none";
+                    removeOrderLine("volume");
+                    //
+                    mConfig.hasVolumeUnorder = false;
+                    removeUnorderLine();
                 }
             }
         }
@@ -590,34 +640,6 @@ function intervalHandler() {
     }
     //
     showRunningStatus();
-    //
-    // var time = moment()
-    //     .add(7, "hours")
-    //     .unix();
-    // var temp = {
-    //     time: time,
-    //     value: 1000 + 100 * (Math.random() - 0.5)
-    // };
-    // mChart.series.price.update(temp);
-    // mChart.data.price.push(temp);
-    // if (!mConfig.crosshair)
-    //     document.getElementById("priceLegendP").innerText = temp.value.toFixed(
-    //         1
-    //     );
-    // temp = {
-    //     time: time,
-    //     value:
-    //         (mChart.data.volume.length
-    //             ? mChart.data.volume.slice(-1)[0].value
-    //             : 0) +
-    //         200000 * (Math.random() - 0.5)
-    // };
-    // mChart.series.volume.update(temp);
-    // mChart.data.volume.push(temp);
-    // if (!mConfig.crosshair)
-    //     document.getElementById("volumeLegendP").innerText = temp.value.toFixed(
-    //         0
-    //     );
 }
 
 function getData(date = null) {
@@ -859,12 +881,13 @@ function orderByPrice() {
     }, 1000);
     document.getElementById("priceOrderButton").style.display = "none";
     document.getElementById("volumeOrderButton").style.display = "none";
+    document.getElementById("volumeUnorderButton").style.display = "none";
     mChart.series.price.setMarkers([]);
     mChart.series.volume.setMarkers([]);
 }
 
 function orderByVolume() {
-    mConfig.volumeOrderConfirm = true;
+    mConfig.hasVolumeOrder = true;
     createOrderLine("volume");
     var btn = document.getElementById("volumeCancelButton");
     btn.style.display = "block";
@@ -873,6 +896,17 @@ function orderByVolume() {
     }`;
     document.getElementById("priceOrderButton").style.display = "none";
     document.getElementById("volumeOrderButton").style.display = "none";
+    document.getElementById("volumeUnorderButton").style.display = "none";
+    mChart.series.price.setMarkers([]);
+    mChart.series.volume.setMarkers([]);
+}
+
+function unorderByVolume() {
+    mConfig.hasVolumeUnorder = true;
+    createUnorderLine();
+    document.getElementById("priceOrderButton").style.display = "none";
+    document.getElementById("volumeOrderButton").style.display = "none";
+    document.getElementById("volumeUnorderButton").style.display = "none";
     mChart.series.price.setMarkers([]);
     mChart.series.volume.setMarkers([]);
 }
@@ -891,5 +925,22 @@ function removeOrderLine(series) {
     if (mChart.line.hasOwnProperty(series)) {
         mChart.series[series].removePriceLine(mChart.line[series]);
         delete mChart.line[series];
+    }
+}
+
+function createUnorderLine() {
+    removeOrderLine("unorder");
+    mChart.line.unorder = mChart.series.price.createPriceLine({
+        price: mChart.order.price.value,
+        color: "#FF00FF",
+        lineWidth: 1,
+        lineStyle: LightweightCharts.LineStyle.Solid,
+        title: mChart.order.volume.type ? "CANCEL LONG" : "CANCEL SHORT"
+    });
+}
+function removeUnorderLine() {
+    if (mChart.line.hasOwnProperty("unorder")) {
+        mChart.series.price.removePriceLine(mChart.line.unorder);
+        delete mChart.line.unorder;
     }
 }
