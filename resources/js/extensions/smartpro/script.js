@@ -277,7 +277,7 @@ function createLightWeightChart() {
             vertLines: { color: "#2B2B43" },
             horzLines: { color: "#363C4E" }
         },
-        timeScale: { rightOffset: 20, timeVisible: true }
+        timeScale: { timeVisible: true, rightOffset: 20, minBarSpacing: 0.1 }
     };
     mChart.object = LightweightCharts.createChart(div, chartOptions);
     if (navigator.userAgentData.mobile)
