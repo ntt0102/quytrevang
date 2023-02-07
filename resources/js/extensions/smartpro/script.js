@@ -218,16 +218,7 @@ function createLightWeightChart() {
     button.id = "volumeCancelButton";
     button.innerText = "X";
     button.style.display = "none";
-    button.addEventListener("click", () => {
-        mConfig.hasVolumeOrder = false;
-        document.getElementById("volumeCancelButton").style.display = "none";
-        removeOrderLine("volume");
-        //
-        if (mConfig.hasVolumeUnorder) {
-            mConfig.hasVolumeUnorder = false;
-            removeUnorderLine();
-        }
-    });
+    button.addEventListener("click", cancelVolumeOrder);
     div.append(button);
     //
     button = document.createElement("button");
@@ -552,34 +543,26 @@ function connectSocket() {
 
         function processVolumeOrder(lastVolume) {
             if (mConfig.hasVolumeOrder) {
-                var isOrder = false;
-                document.getElementById("select_normal_order_wrapper").click();
-                document.getElementById("right_price").value = "MTL";
+                var orderType = "";
                 if (
                     mChart.order.volume.type &&
                     lastVolume.value >= mChart.order.volume.value
                 ) {
-                    document.getElementById("btn_long").click();
-                    isOrder = true;
+                    orderType = "long";
                 } else if (
                     !mChart.order.volume.type &&
                     lastVolume.value <= mChart.order.volume.value
                 ) {
-                    document.getElementById("btn_short").click();
-                    isOrder = true;
+                    orderType = "long";
                 }
                 //
-                if (isOrder) {
-                    mConfig.hasVolumeOrder = false;
-                    document.getElementById(
-                        "volumeCancelButton"
-                    ).style.display = "none";
-                    removeOrderLine("volume");
-                    //
-                    if (mConfig.hasVolumeUnorder) {
-                        mConfig.hasVolumeUnorder = false;
-                        removeUnorderLine();
-                    }
+                if (!!orderType) {
+                    document
+                        .getElementById("select_normal_order_wrapper")
+                        .click();
+                    document.getElementById("right_price").value = "MTL";
+                    document.getElementById(`btn_${orderType}`).click();
+                    cancelVolumeOrder();
                 }
             }
         }
@@ -591,16 +574,8 @@ function connectSocket() {
                         lastPrice.value >= mChart.order.price.value) ||
                     (!mChart.order.volume.type &&
                         lastPrice.value <= mChart.order.price.value)
-                ) {
-                    mConfig.hasVolumeOrder = false;
-                    document.getElementById(
-                        "volumeCancelButton"
-                    ).style.display = "none";
-                    removeOrderLine("volume");
-                    //
-                    mConfig.hasVolumeUnorder = false;
-                    removeUnorderLine();
-                }
+                )
+                    cancelVolumeOrder();
             }
         }
     }
@@ -877,6 +852,7 @@ function orderByPrice() {
         document
             .getElementById(`btn_${mChart.order.price.type ? "long" : "short"}`)
             .click();
+        cancelVolumeOrder();
         document.getElementById("select_normal_order_wrapper").click();
     }, 1000);
     document.getElementById("priceOrderButton").style.display = "none";
@@ -929,7 +905,7 @@ function removeOrderLine(series) {
 }
 
 function createUnorderLine() {
-    removeOrderLine("unorder");
+    removeUnorderLine();
     mChart.line.unorder = mChart.series.price.createPriceLine({
         price: mChart.order.price.value,
         color: "#FF00FF",
@@ -942,5 +918,16 @@ function removeUnorderLine() {
     if (mChart.line.hasOwnProperty("unorder")) {
         mChart.series.price.removePriceLine(mChart.line.unorder);
         delete mChart.line.unorder;
+    }
+}
+
+function cancelVolumeOrder() {
+    mConfig.hasVolumeOrder = false;
+    document.getElementById("volumeCancelButton").style.display = "none";
+    removeOrderLine("volume");
+    //
+    if (mConfig.hasVolumeUnorder) {
+        mConfig.hasVolumeUnorder = false;
+        removeUnorderLine();
     }
 }
