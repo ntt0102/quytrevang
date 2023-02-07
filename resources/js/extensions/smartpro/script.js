@@ -13,7 +13,7 @@ getLocalConfig()
             connectSocket();
             loadPage();
             setInterval(intervalHandler, 1000);
-            setInterval(() => getData(), 60000);
+            setInterval(refreshDataEveryMinute, 60000);
         });
     });
 
@@ -615,6 +615,14 @@ function intervalHandler() {
     }
     //
     showRunningStatus();
+}
+
+function refreshDataEveryMinute() {
+    if (
+        mConfig.currentTime >= mConfig.time.start &&
+        mConfig.currentTime <= mConfig.time.end
+    )
+        getData();
 }
 
 function getData(date = null) {
