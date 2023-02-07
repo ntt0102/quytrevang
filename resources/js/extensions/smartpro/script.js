@@ -338,7 +338,7 @@ function createLightWeightChart() {
                 vUnordBtn.style.left = +(e.point.x - 79) + "px";
                 vUnordBtn.style.top = +e.point.y + "px";
                 vUnordBtn.style.display = "block";
-            }
+            } else vUnordBtn.style.display = "none";
             //
             const marker = {
                 time: e.time,
