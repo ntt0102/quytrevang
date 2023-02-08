@@ -110,18 +110,18 @@
 .line-chart #lightWeightChart > #priceCancelButton {
     position: absolute;
     top: 30px;
-    right: 85px;
+    right: 55px;
     padding: 0px 7px;
     border-radius: 5px;
     color: black;
-    background: #00ffff;
+    background: #ffff00;
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #volumeCancelButton {
+.line-chart #lightWeightChart > #sharkCancelButton {
     position: absolute;
     top: 30px;
-    right: 55px;
+    right: 85px;
     padding: 0px 7px;
     border-radius: 5px;
     color: white;
@@ -129,19 +129,39 @@
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #priceLegendP {
+.line-chart #lightWeightChart > #sheepCancelButton {
     position: absolute;
-    top: 32px;
-    left: 90px;
-    color: #00ffff;
+    top: 30px;
+    right: 115px;
+    padding: 0px 7px;
+    border-radius: 5px;
+    color: black;
+    background: #00ffff;
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #volumeLegendP {
+.line-chart #lightWeightChart > #priceLegendP {
     position: absolute;
     top: 32px;
-    left: 140px;
+    left: 85px;
+    color: #ffff00;
+    z-index: 3;
+}
+
+.line-chart #lightWeightChart > #sharkLegendP {
+    position: absolute;
+    top: 32px;
+    left: 135px;
     color: #ff00ff;
+    z-index: 3;
+    cursor: pointer;
+}
+
+.line-chart #lightWeightChart > #sheepLegendP {
+    position: absolute;
+    top: 32px;
+    left: 185px;
+    color: #00ffff;
     z-index: 3;
     cursor: pointer;
 }
@@ -151,12 +171,12 @@
     padding: 0px 10px;
     border-radius: 5px;
     color: black;
-    background: #00ffff;
+    background: #ffff00;
     z-index: 3;
     font-size: 25px;
 }
 
-.line-chart #lightWeightChart > #volumeOrderButton {
+.line-chart #lightWeightChart > #sharkOrderButton {
     position: absolute;
     padding: 0px 10px;
     border-radius: 5px;
@@ -166,12 +186,22 @@
     font-size: 25px;
 }
 
-.line-chart #lightWeightChart > #volumeUnorderButton {
+.line-chart #lightWeightChart > #sheepOrderButton {
+    position: absolute;
+    padding: 0px 10px;
+    border-radius: 5px;
+    color: black;
+    background: #00ffff;
+    z-index: 3;
+    font-size: 25px;
+}
+
+.line-chart #lightWeightChart > #cancelOrderButton {
     position: absolute;
     padding: 0px 9px;
     border-radius: 5px;
-    color: white;
-    background: #ff00ff;
+    color: black;
+    background: #ffff00;
     z-index: 3;
     font-size: 25px;
 }
