@@ -572,81 +572,6 @@ function connectSocket() {
                 }
             }
         }
-
-        function processSharkOrder(lastShark) {
-            if (mConfig.hasSharkOrder) {
-                var orderType = "";
-                if (
-                    mChart.order.shark.type &&
-                    lastShark.value >= mChart.order.shark.value
-                ) {
-                    orderType = "long";
-                } else if (
-                    !mChart.order.shark.type &&
-                    lastShark.value <= mChart.order.shark.value
-                ) {
-                    orderType = "long";
-                }
-                //
-                if (!!orderType) {
-                    document
-                        .getElementById("select_normal_order_wrapper")
-                        .click();
-                    document.getElementById("right_price").value = "MTL";
-                    document.getElementById(`btn_${orderType}`).click();
-                    cancelSharkOrder();
-                }
-            }
-        }
-
-        function processSheepOrder(lastSheep) {
-            if (mConfig.hasSheepOrder) {
-                var orderType = "";
-                if (
-                    mChart.order.sheep.type &&
-                    lastSheep.value >= mChart.order.sheep.value
-                ) {
-                    orderType = "long";
-                } else if (
-                    !mChart.order.sheep.type &&
-                    lastSheep.value <= mChart.order.sheep.value
-                ) {
-                    orderType = "long";
-                }
-                //
-                if (!!orderType) {
-                    document
-                        .getElementById("select_normal_order_wrapper")
-                        .click();
-                    document.getElementById("right_price").value = "MTL";
-                    document.getElementById(`btn_${orderType}`).click();
-                    cancelSheepOrder();
-                }
-            }
-        }
-
-        function processcancelOrder(lastPrice) {
-            if (mConfig.hasCancelOrder) {
-                if (mConfig.hasSharkOrder) {
-                    if (
-                        (mChart.order.shark.type &&
-                            lastPrice.value >= mChart.order.price.value) ||
-                        (!mChart.order.shark.type &&
-                            lastPrice.value <= mChart.order.price.value)
-                    )
-                        cancelSharkOrder();
-                }
-                if (mConfig.hasSheepOrder) {
-                    if (
-                        (mChart.order.sheep.type &&
-                            lastPrice.value >= mChart.order.price.value) ||
-                        (!mChart.order.sheep.type &&
-                            lastPrice.value <= mChart.order.price.value)
-                    )
-                        cancelSheepOrder();
-                }
-            }
-        }
     }
 
     function bidAskHandler(data) {
@@ -1049,4 +974,75 @@ function removeOrderButton() {
     mChart.series.price.setMarkers([]);
     mChart.series.shark.setMarkers([]);
     mChart.series.sheep.setMarkers([]);
+}
+
+function processSharkOrder(lastShark) {
+    if (mConfig.hasSharkOrder) {
+        var orderType = "";
+        if (
+            mChart.order.shark.type &&
+            lastShark.value >= mChart.order.shark.value
+        ) {
+            orderType = "long";
+        } else if (
+            !mChart.order.shark.type &&
+            lastShark.value <= mChart.order.shark.value
+        ) {
+            orderType = "long";
+        }
+        //
+        if (!!orderType) {
+            document.getElementById("select_normal_order_wrapper").click();
+            document.getElementById("right_price").value = "MTL";
+            document.getElementById(`btn_${orderType}`).click();
+            cancelSharkOrder();
+        }
+    }
+}
+
+function processSheepOrder(lastSheep) {
+    if (mConfig.hasSheepOrder) {
+        var orderType = "";
+        if (
+            mChart.order.sheep.type &&
+            lastSheep.value >= mChart.order.sheep.value
+        ) {
+            orderType = "long";
+        } else if (
+            !mChart.order.sheep.type &&
+            lastSheep.value <= mChart.order.sheep.value
+        ) {
+            orderType = "long";
+        }
+        //
+        if (!!orderType) {
+            document.getElementById("select_normal_order_wrapper").click();
+            document.getElementById("right_price").value = "MTL";
+            document.getElementById(`btn_${orderType}`).click();
+            cancelSheepOrder();
+        }
+    }
+}
+
+function processcancelOrder(lastPrice) {
+    if (mConfig.hasCancelOrder) {
+        if (mConfig.hasSharkOrder) {
+            if (
+                (mChart.order.shark.type &&
+                    lastPrice.value >= mChart.order.price.value) ||
+                (!mChart.order.shark.type &&
+                    lastPrice.value <= mChart.order.price.value)
+            )
+                cancelSharkOrder();
+        }
+        if (mConfig.hasSheepOrder) {
+            if (
+                (mChart.order.sheep.type &&
+                    lastPrice.value >= mChart.order.price.value) ||
+                (!mChart.order.sheep.type &&
+                    lastPrice.value <= mChart.order.price.value)
+            )
+                cancelSheepOrder();
+        }
+    }
 }
