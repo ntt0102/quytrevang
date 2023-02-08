@@ -24,6 +24,7 @@ function getLocalConfig() {
             .then(json => {
                 mConfig = json;
                 mConfig.isReportedResult = false;
+                mConfig.volumeFilter = mConfig.SHARK_VOLUME;
                 mConfig.currentDate = moment().format("YYYY-MM-DD");
                 mConfig.currentTime = moment().format("HH:mm:ss");
                 setTimeout(() => {
@@ -261,6 +262,10 @@ function createLightWeightChart() {
     //
     p = document.createElement("p");
     p.id = "volumeLegendP";
+    p.addEventListener("click", () => {
+        mConfig.volumeFilter = !mConfig.volumeFilter ? mConfig.SHARK_VOLUME : 0;
+        getData();
+    });
     div.append(p);
     //
     const chartOptions = {
@@ -644,7 +649,7 @@ function getData(date = null) {
                     (r, item) => {
                         return createChartData(r, item);
                     },
-                    { original: [], price: [], volume: [], pvi: [] }
+                    { original: [], price: [], volume: [] }
                 );
                 console.log(
                     "chartData",
@@ -652,7 +657,6 @@ function getData(date = null) {
                 );
                 mChart.series.price.setData(mChart.data.price);
                 mChart.series.volume.setData(mChart.data.volume);
-                // mChart.series.volume.setData(mChart.data.pvi);
                 //
                 toggleSpinner(false);
                 resolve();
@@ -685,19 +689,12 @@ function createChartData(r, item) {
         }
         time = timeIndex * period;
     }
-
-    r.price.push({ time: time, value: item.price });
-    r.volume.push({ time: time, value: prevVolume + volume });
-    //
-    if (!!r.original.length && item.vol > r.original.slice(-1)[0].vol) {
-        var prevPvi = !!r.pvi.length ? r.pvi.slice(-1)[0].value : 0.1;
-        var prePrice = r.original.slice(-1)[0].price;
-        r.pvi.push({
-            time: time,
-            value: prevPvi + ((item.price - prePrice) / prePrice) * prevPvi
-        });
-    }
     r.original.push(item);
+    r.price.push({ time: time, value: item.price });
+    r.volume.push({
+        time: time,
+        value: prevVolume + (item.vol >= mConfig.volumeFilter ? volume : 0)
+    });
     //
     return r;
 }
