@@ -665,6 +665,7 @@ function loadPage() {
     getData();
     //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
+    document.getElementById("right_price").value = "MTL";
     // Load Order List
     // var button = document.createElement("button");
     // button.setAttribute(
