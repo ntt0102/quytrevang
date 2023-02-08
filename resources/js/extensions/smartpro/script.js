@@ -272,10 +272,22 @@ function createLightWeightChart() {
     //
     p = document.createElement("p");
     p.id = "sharkLegendP";
+    p.addEventListener("click", () => {
+        mChart.series.shark.applyOptions({
+            visible: !mChart.series.shark.options().visible
+        });
+        removeOrderButton();
+    });
     div.append(p);
     //
     p = document.createElement("p");
     p.id = "sheepLegendP";
+    p.addEventListener("click", () => {
+        mChart.series.sheep.applyOptions({
+            visible: !mChart.series.sheep.options().visible
+        });
+        removeOrderButton();
+    });
     div.append(p);
     //
     const chartOptions = {
@@ -350,25 +362,29 @@ function createLightWeightChart() {
             };
             priceBtn.innerText = mChart.order.price.type ? "↗" : "↘";
             //
-            const shark = e.seriesPrices.get(mChart.series.shark);
-            sharkBtn.style.left = +(e.point.x - 41) + "px";
-            sharkBtn.style.top = +(e.point.y - 60) + "px";
-            sharkBtn.style.display = "block";
-            mChart.order.shark = {
-                value: shark,
-                type: shark >= mChart.data.shark.slice(-1)[0].value
-            };
-            sharkBtn.innerText = mChart.order.shark.type ? "↗" : "↘";
+            if (mChart.series.shark.options().visible) {
+                const shark = e.seriesPrices.get(mChart.series.shark);
+                sharkBtn.style.left = +(e.point.x - 41) + "px";
+                sharkBtn.style.top = +(e.point.y - 60) + "px";
+                sharkBtn.style.display = "block";
+                mChart.order.shark = {
+                    value: shark,
+                    type: shark >= mChart.data.shark.slice(-1)[0].value
+                };
+                sharkBtn.innerText = mChart.order.shark.type ? "↗" : "↘";
+            }
             //
-            const sheep = e.seriesPrices.get(mChart.series.sheep);
-            sheepBtn.style.left = +(e.point.x - 41) + "px";
-            sheepBtn.style.top = +(e.point.y + 20) + "px";
-            sheepBtn.style.display = "block";
-            mChart.order.sheep = {
-                value: sheep,
-                type: sheep >= mChart.data.sheep.slice(-1)[0].value
-            };
-            sheepBtn.innerText = mChart.order.sheep.type ? "↗" : "↘";
+            if (mChart.series.sheep.options().visible) {
+                const sheep = e.seriesPrices.get(mChart.series.sheep);
+                sheepBtn.style.left = +(e.point.x - 41) + "px";
+                sheepBtn.style.top = +(e.point.y + 20) + "px";
+                sheepBtn.style.display = "block";
+                mChart.order.sheep = {
+                    value: sheep,
+                    type: sheep >= mChart.data.sheep.slice(-1)[0].value
+                };
+                sheepBtn.innerText = mChart.order.sheep.type ? "↗" : "↘";
+            }
             //
             if (mConfig.hasSharkOrder || mConfig.hasSheepOrder) {
                 cancelBtn.style.left = +(e.point.x - 79) + "px";
