@@ -194,11 +194,8 @@ function createLightWeightChart() {
     button.innerText = "C";
     button.title = "Delete local data";
     button.addEventListener("click", () => {
-        var choice = confirm("Delete local database?");
-        if (choice) {
-            clearLocalData("data");
-            getData();
-        }
+        clearLocalData("data");
+        getData();
     });
     div.append(button);
     //
@@ -728,6 +725,10 @@ function getData() {
                     "chartData",
                     JSON.parse(JSON.stringify(mChart.data))
                 );
+                processSharkOrder(mChart.data.shark.slice(-1)[0]);
+                processSheepOrder(mChart.data.sheep.slice(-1)[0]);
+                processcancelOrder(mChart.data.price.slice(-1)[0]);
+                //
                 mChart.series.price.setData(mChart.data.price);
                 mChart.series.shark.setData(mChart.data.shark);
                 mChart.series.sheep.setData(mChart.data.sheep);
