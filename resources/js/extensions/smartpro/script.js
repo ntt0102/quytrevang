@@ -241,14 +241,6 @@ function createLightWeightChart() {
     div.append(button);
     //
     button = document.createElement("button");
-    button.id = "cancelOrderButton";
-    button.classList.add("price-order-button");
-    button.innerText = "x";
-    button.style.display = "none";
-    button.addEventListener("click", cancelOrder);
-    div.append(button);
-    //
-    button = document.createElement("button");
     button.id = "sharkOrderButton";
     button.innerText = "Order?";
     button.style.display = "none";
@@ -367,7 +359,6 @@ function createLightWeightChart() {
         var priceShortBtn = document.getElementById("priceShortButton");
         var sharkBtn = document.getElementById("sharkOrderButton");
         var sheepBtn = document.getElementById("sheepOrderButton");
-        var cancelBtn = document.getElementById("cancelOrderButton");
         if (e.time) {
             if (mChart.series.price.options().visible) {
                 const price = e.seriesPrices.get(mChart.series.price);
@@ -379,12 +370,6 @@ function createLightWeightChart() {
                 priceShortBtn.style.top = +(e.point.y - 40) + "px";
                 priceShortBtn.style.display = "block";
                 mChart.order.price = { value: price };
-                //
-                if (mConfig.hasSharkOrder || mConfig.hasSheepOrder) {
-                    cancelBtn.style.left = +(e.point.x - 3) + "px";
-                    cancelBtn.style.top = +(e.point.y - 40) + "px";
-                    cancelBtn.style.display = "block";
-                } else cancelBtn.style.display = "none";
             }
             //
             if (mChart.series.shark.options().visible) {
@@ -580,7 +565,6 @@ function connectSocket() {
                     var lastSheep = mChart.data.sheep.slice(-1)[0];
                     processSharkOrder(lastShark);
                     processSheepOrder(lastSheep);
-                    processcancelOrder(lastPrice);
                     //
                     if (mConfig.timeFrame > 0) {
                         mChart.series.price.setData(mChart.data.price);
@@ -687,7 +671,6 @@ function getData() {
                 );
                 processSharkOrder(mChart.data.shark.slice(-1)[0]);
                 processSheepOrder(mChart.data.sheep.slice(-1)[0]);
-                processcancelOrder(mChart.data.price.slice(-1)[0]);
                 //
                 mChart.series.price.setData(mChart.data.price);
                 mChart.series.shark.setData(mChart.data.shark);
@@ -933,12 +916,6 @@ function orderBySheep() {
     removeOrderButton();
 }
 
-function cancelOrder() {
-    mConfig.hasCancelOrder = true;
-    createCancelLine();
-    removeOrderButton();
-}
-
 function createOrderLine(series) {
     removeOrderLine(series);
     mChart.line[series] = mChart.series[series].createPriceLine({
@@ -961,43 +938,16 @@ function removeOrderLine(series) {
     }
 }
 
-function createCancelLine() {
-    removeCancelLine();
-    mChart.line.cancel = mChart.series.price.createPriceLine({
-        price: mChart.order.price.value,
-        color: "#FFFF00",
-        lineWidth: 1,
-        lineStyle: LightweightCharts.LineStyle.Solid,
-        title: "CANCEL"
-    });
-}
-function removeCancelLine() {
-    if (mChart.line.hasOwnProperty("cancel")) {
-        mChart.series.price.removePriceLine(mChart.line.cancel);
-        delete mChart.line.cancel;
-    }
-}
-
 function cancelSharkOrder() {
     mConfig.hasSharkOrder = false;
     document.getElementById("sharkCancelButton").style.display = "none";
     removeOrderLine("shark");
-    //
-    if (mConfig.hasCancelOrder) {
-        mConfig.hasCancelOrder = false;
-        removeCancelLine();
-    }
 }
 
 function cancelSheepOrder() {
     mConfig.hasSheepOrder = false;
     document.getElementById("sheepCancelButton").style.display = "none";
     removeOrderLine("sheep");
-    //
-    if (mConfig.hasCancelOrder) {
-        mConfig.hasCancelOrder = false;
-        removeCancelLine();
-    }
 }
 
 function removeOrderButton() {
@@ -1005,7 +955,6 @@ function removeOrderButton() {
     document.getElementById("priceShortButton").style.display = "none";
     document.getElementById("sharkOrderButton").style.display = "none";
     document.getElementById("sheepOrderButton").style.display = "none";
-    document.getElementById("cancelOrderButton").style.display = "none";
     mChart.series.price.setMarkers([]);
     mChart.series.shark.setMarkers([]);
     mChart.series.sheep.setMarkers([]);
@@ -1055,29 +1004,6 @@ function processSheepOrder(lastSheep) {
             document.getElementById("right_price").value = "MTL";
             document.getElementById(`btn_${orderType}`).click();
             cancelSheepOrder();
-        }
-    }
-}
-
-function processcancelOrder(lastPrice) {
-    if (mConfig.hasCancelOrder) {
-        if (mConfig.hasSharkOrder) {
-            if (
-                (mChart.order.shark.type &&
-                    lastPrice.value >= mChart.order.price.value) ||
-                (!mChart.order.shark.type &&
-                    lastPrice.value <= mChart.order.price.value)
-            )
-                cancelSharkOrder();
-        }
-        if (mConfig.hasSheepOrder) {
-            if (
-                (mChart.order.sheep.type &&
-                    lastPrice.value >= mChart.order.price.value) ||
-                (!mChart.order.sheep.type &&
-                    lastPrice.value <= mChart.order.price.value)
-            )
-                cancelSheepOrder();
         }
     }
 }
