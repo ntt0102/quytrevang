@@ -146,6 +146,7 @@
     left: 85px;
     color: #ffff00;
     z-index: 3;
+    cursor: pointer;
 }
 
 .line-chart #lightWeightChart > #sharkLegendP {
@@ -195,16 +196,6 @@
     z-index: 3;
     font-size: 25px;
 }
-
-/* .line-chart #lightWeightChart > #cancelOrderButton {
-    position: absolute;
-    padding: 0px 9px;
-    border-radius: 5px;
-    color: black;
-    background: #ffff00;
-    z-index: 3;
-    font-size: 25px;
-} */
 
 .line-chart #lightWeightChart > #scrollButton {
     position: absolute;

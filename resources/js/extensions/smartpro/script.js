@@ -278,6 +278,12 @@ function createLightWeightChart() {
     //
     var p = document.createElement("p");
     p.id = "priceLegendP";
+    p.addEventListener("click", () => {
+        mChart.series.price.applyOptions({
+            visible: !mChart.series.price.options().visible
+        });
+        removeOrderButton();
+    });
     div.append(p);
     //
     p = document.createElement("p");
@@ -363,14 +369,23 @@ function createLightWeightChart() {
         var sheepBtn = document.getElementById("sheepOrderButton");
         var cancelBtn = document.getElementById("cancelOrderButton");
         if (e.time) {
-            const price = e.seriesPrices.get(mChart.series.price);
-            priceLongBtn.style.left = +(e.point.x - 79) + "px";
-            priceLongBtn.style.top = +(e.point.y - 40) + "px";
-            priceLongBtn.style.display = "block";
-            priceShortBtn.style.left = +(e.point.x - 41) + "px";
-            priceShortBtn.style.top = +(e.point.y - 40) + "px";
-            priceShortBtn.style.display = "block";
-            mChart.order.price = { value: price };
+            if (mChart.series.price.options().visible) {
+                const price = e.seriesPrices.get(mChart.series.price);
+                priceLongBtn.style.left = +(e.point.x - 79) + "px";
+                priceLongBtn.style.top = +(e.point.y - 40) + "px";
+                priceLongBtn.style.display = "block";
+                //
+                priceShortBtn.style.left = +(e.point.x - 41) + "px";
+                priceShortBtn.style.top = +(e.point.y - 40) + "px";
+                priceShortBtn.style.display = "block";
+                mChart.order.price = { value: price };
+                //
+                if (mConfig.hasSharkOrder || mConfig.hasSheepOrder) {
+                    cancelBtn.style.left = +(e.point.x - 3) + "px";
+                    cancelBtn.style.top = +(e.point.y - 40) + "px";
+                    cancelBtn.style.display = "block";
+                } else cancelBtn.style.display = "none";
+            }
             //
             if (mChart.series.shark.options().visible) {
                 const shark = e.seriesPrices.get(mChart.series.shark);
@@ -395,12 +410,6 @@ function createLightWeightChart() {
                 };
                 sheepBtn.innerText = mChart.order.sheep.type ? "↗" : "↘";
             }
-            //
-            if (mConfig.hasSharkOrder || mConfig.hasSheepOrder) {
-                cancelBtn.style.left = +(e.point.x - 3) + "px";
-                cancelBtn.style.top = +(e.point.y - 40) + "px";
-                cancelBtn.style.display = "block";
-            } else cancelBtn.style.display = "none";
             //
             const marker = {
                 time: e.time,
@@ -721,11 +730,11 @@ function createChartData(r, item) {
     r.price.push({ time: time, value: item.price });
     r.shark.push({
         time: time,
-        value: prevShark + (item.vol >= 50 ? volume : 0)
+        value: prevShark + (item.vol > 50 ? volume : 0)
     });
     r.sheep.push({
         time: time,
-        value: prevSheep + (item.vol < 50 ? -volume : 0)
+        value: prevSheep + (item.vol < 100 ? -volume : 0)
     });
     //
     return r;
