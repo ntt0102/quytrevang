@@ -166,7 +166,7 @@
     cursor: pointer;
 }
 
-.line-chart #lightWeightChart > #priceOrderButton {
+.line-chart #lightWeightChart > .price-order-button {
     position: absolute;
     padding: 0px 10px;
     border-radius: 5px;
@@ -196,7 +196,7 @@
     font-size: 25px;
 }
 
-.line-chart #lightWeightChart > #cancelOrderButton {
+/* .line-chart #lightWeightChart > #cancelOrderButton {
     position: absolute;
     padding: 0px 9px;
     border-radius: 5px;
@@ -204,7 +204,7 @@
     background: #ffff00;
     z-index: 3;
     font-size: 25px;
-}
+} */
 
 .line-chart #lightWeightChart > #scrollButton {
     position: absolute;

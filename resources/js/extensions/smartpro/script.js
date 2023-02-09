@@ -225,10 +225,27 @@ function createLightWeightChart() {
     div.append(button);
     //
     button = document.createElement("button");
-    button.id = "priceOrderButton";
-    button.innerText = "Order?";
+    button.id = "priceLongButton";
+    button.classList.add("price-order-button");
+    button.innerText = "↗";
     button.style.display = "none";
-    button.addEventListener("click", orderByPrice);
+    button.addEventListener("click", () => orderByPrice(true));
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "priceShortButton";
+    button.classList.add("price-order-button");
+    button.innerText = "↘";
+    button.style.display = "none";
+    button.addEventListener("click", () => orderByPrice(false));
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "cancelOrderButton";
+    button.classList.add("price-order-button");
+    button.innerText = "x";
+    button.style.display = "none";
+    button.addEventListener("click", cancelOrder);
     div.append(button);
     //
     button = document.createElement("button");
@@ -243,13 +260,6 @@ function createLightWeightChart() {
     button.innerText = "Order?";
     button.style.display = "none";
     button.addEventListener("click", orderBySheep);
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "cancelOrderButton";
-    button.innerText = "X";
-    button.style.display = "none";
-    button.addEventListener("click", cancelOrder);
     div.append(button);
     //
     button = document.createElement("button");
@@ -347,25 +357,25 @@ function createLightWeightChart() {
     mChart.object.timeScale().fitContent();
 
     function chartClick(e) {
-        var priceBtn = document.getElementById("priceOrderButton");
+        var priceLongBtn = document.getElementById("priceLongButton");
+        var priceShortBtn = document.getElementById("priceShortButton");
         var sharkBtn = document.getElementById("sharkOrderButton");
         var sheepBtn = document.getElementById("sheepOrderButton");
         var cancelBtn = document.getElementById("cancelOrderButton");
         if (e.time) {
             const price = e.seriesPrices.get(mChart.series.price);
-            priceBtn.style.left = +(e.point.x - 41) + "px";
-            priceBtn.style.top = +(e.point.y - 20) + "px";
-            priceBtn.style.display = "block";
-            mChart.order.price = {
-                value: price,
-                type: price >= mChart.data.price.slice(-1)[0].value
-            };
-            priceBtn.innerText = mChart.order.price.type ? "↗" : "↘";
+            priceLongBtn.style.left = +(e.point.x - 79) + "px";
+            priceLongBtn.style.top = +(e.point.y - 40) + "px";
+            priceLongBtn.style.display = "block";
+            priceShortBtn.style.left = +(e.point.x - 41) + "px";
+            priceShortBtn.style.top = +(e.point.y - 40) + "px";
+            priceShortBtn.style.display = "block";
+            mChart.order.price = { value: price };
             //
             if (mChart.series.shark.options().visible) {
                 const shark = e.seriesPrices.get(mChart.series.shark);
                 sharkBtn.style.left = +(e.point.x - 41) + "px";
-                sharkBtn.style.top = +(e.point.y - 60) + "px";
+                sharkBtn.style.top = +(e.point.y - 80) + "px";
                 sharkBtn.style.display = "block";
                 mChart.order.shark = {
                     value: shark,
@@ -377,7 +387,7 @@ function createLightWeightChart() {
             if (mChart.series.sheep.options().visible) {
                 const sheep = e.seriesPrices.get(mChart.series.sheep);
                 sheepBtn.style.left = +(e.point.x - 41) + "px";
-                sheepBtn.style.top = +(e.point.y + 20) + "px";
+                sheepBtn.style.top = +(e.point.y + 0) + "px";
                 sheepBtn.style.display = "block";
                 mChart.order.sheep = {
                     value: sheep,
@@ -387,8 +397,8 @@ function createLightWeightChart() {
             }
             //
             if (mConfig.hasSharkOrder || mConfig.hasSheepOrder) {
-                cancelBtn.style.left = +(e.point.x - 79) + "px";
-                cancelBtn.style.top = +(e.point.y - 20) + "px";
+                cancelBtn.style.left = +(e.point.x - 3) + "px";
+                cancelBtn.style.top = +(e.point.y - 40) + "px";
                 cancelBtn.style.display = "block";
             } else cancelBtn.style.display = "none";
             //
@@ -872,7 +882,8 @@ function showRunningStatus() {
     else button.classList.add("dark");
 }
 
-function orderByPrice() {
+function orderByPrice(type) {
+    mChart.order.price.type = type;
     document.getElementById("btn_cancel_all_order_condition").click();
     createOrderLine("price");
     document.getElementById("select_condition_order_wrapper").click();
@@ -880,18 +891,16 @@ function orderByPrice() {
         "right_stopOrderIndex"
     ).value = mChart.order.price.value.toFixed(1);
     document.getElementById("right_price").value = "MTL";
-    document.getElementById("right_selStopOrderType").value = mChart.order.price
-        .type
-        ? "SOL"
-        : "SOU";
+    document.getElementById("right_selStopOrderType").value =
+        mChart.order.price.value >= mChart.data.price.slice(-1)[0].value
+            ? "SOL"
+            : "SOU";
     //
     var btn = document.getElementById("priceCancelButton");
     btn.style.display = "block";
-    btn.style.border = `2px solid ${mChart.order.price.type ? "green" : "red"}`;
+    btn.style.border = `2px solid ${type ? "green" : "red"}`;
     setTimeout(() => {
-        document
-            .getElementById(`btn_${mChart.order.price.type ? "long" : "short"}`)
-            .click();
+        document.getElementById(`btn_${type ? "long" : "short"}`).click();
         document.getElementById("select_normal_order_wrapper").click();
     }, 1000);
     removeOrderButton();
@@ -983,7 +992,8 @@ function cancelSheepOrder() {
 }
 
 function removeOrderButton() {
-    document.getElementById("priceOrderButton").style.display = "none";
+    document.getElementById("priceLongButton").style.display = "none";
+    document.getElementById("priceShortButton").style.display = "none";
     document.getElementById("sharkOrderButton").style.display = "none";
     document.getElementById("sheepOrderButton").style.display = "none";
     document.getElementById("cancelOrderButton").style.display = "none";
