@@ -63,9 +63,6 @@ function getServerConfig() {
                 const escrow = (refPrice * 0.1 * 0.17) / 0.8;
                 mConfig.sheepLimit = parseInt(800 / escrow);
                 mConfig.sharkLimit = parseInt(2000 / escrow);
-
-                console.log("sheepLimit: ", mConfig.sheepLimit);
-                console.log("sharkLimit: ", mConfig.sharkLimit);
                 //
                 mConfig.hasSharkOrder = false;
                 mConfig.hasSheepOrder = false;
@@ -653,20 +650,6 @@ function getData() {
         toggleSpinner(true);
         Promise.all([getServerData(), getLocalData("data")])
             .then(arr => {
-                console.log(arr[0].length);
-                console.log(
-                    arr[0].filter(p => p.vol < mConfig.sheepLimit).length
-                );
-                console.log(
-                    arr[0].filter(
-                        p =>
-                            p.vol >= mConfig.sheepLimit &&
-                            p.vol <= mConfig.sharkLimit
-                    ).length
-                );
-                console.log(
-                    arr[0].filter(p => p.vol > mConfig.sharkLimit).length
-                );
                 console.log("getData: ", arr);
                 var ids = new Set(arr[0].map(d => d.time));
                 var data = [
