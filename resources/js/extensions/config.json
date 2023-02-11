@@ -8,5 +8,7 @@
         "data": "/api/vps/data",
         "report": "/api/vps/report"
     },
-    "timeFrame": 0
+    "timeFrame": 0,
+    "sheepLimit": 40,
+    "sharkLimit": 90
 }
