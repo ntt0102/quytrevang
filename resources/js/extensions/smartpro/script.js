@@ -306,7 +306,10 @@ function createLightWeightChart() {
     //
     const chartOptions = {
         localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
-        rightPriceScale: { visible: true },
+        rightPriceScale: {
+            visible: true,
+            scaleMargins: { top: 0, bottom: 0.5 }
+        },
         leftPriceScale: { visible: false },
         layout: {
             backgroundColor: "#131722",
@@ -347,7 +350,7 @@ function createLightWeightChart() {
         priceScaleId: "shark",
         color: "#FF00FF",
         priceFormat: { minMove: 1 },
-        scaleMargins: { top: 0, bottom: 0.5 }
+        scaleMargins: { top: 0.5, bottom: 0 }
     });
     mChart.series.sheep = mChart.object.addLineSeries({
         priceScaleId: "sheep",
