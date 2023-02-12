@@ -346,12 +346,14 @@ function createLightWeightChart() {
     mChart.series.shark = mChart.object.addLineSeries({
         priceScaleId: "shark",
         color: "#FF00FF",
-        priceFormat: { minMove: 1 }
+        priceFormat: { minMove: 1 },
+        scaleMargins: { top: 0, bottom: 0.5 }
     });
     mChart.series.sheep = mChart.object.addLineSeries({
         priceScaleId: "sheep",
         color: "#00FFFF",
-        priceFormat: { minMove: 1 }
+        priceFormat: { minMove: 1 },
+        scaleMargins: { top: 0.5, bottom: 0 }
     });
     mChart.series.price = mChart.object.addLineSeries({
         color: "#FFFF00",
