@@ -635,9 +635,7 @@ function intervalHandler() {
         "YYYY-MM-DD H:mm:ss"
     ).format("HH:mm:ss");
     // Report
-    if (mConfig.currentTime == mConfig.time.end) {
-        setTimeout(() => reportHandler(), 60000);
-    }
+    if (mConfig.currentTime == mConfig.time.end) reportHandler();
     //
     showRunningStatus();
 }
