@@ -57,10 +57,10 @@ function getServerConfig() {
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.time = { ...mConfig.time, ...json.time };
                 //
-                const refPrice = +document.getElementById(
-                    "tbodyPhaisinhContent"
-                ).rows[0].cells[1].innerText;
-                const escrow = (refPrice * 0.1 * 0.17) / 0.8;
+                const celPrice = +document.getElementById(
+                    `${mConfig.VN30F1M}cel`
+                ).innerText;
+                const escrow = (celPrice * 0.1 * 0.17) / 0.8;
                 mConfig.sheepLimit = parseInt(800 / escrow);
                 mConfig.sharkLimit = parseInt(2000 / escrow);
                 //
