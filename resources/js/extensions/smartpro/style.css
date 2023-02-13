@@ -538,6 +538,7 @@
         z-index: -1;
     }
 
+    .line-chart #lightWeightChart > #timeFrameSelect,
     .line-chart #lightWeightChart > #dateInput {
         height: 27px;
     }
