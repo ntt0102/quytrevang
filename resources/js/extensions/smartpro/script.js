@@ -745,7 +745,8 @@ function getServerData() {
             body: JSON.stringify(data)
         })
             .then(response => response.json())
-            .then(json => resolve(json));
+            .then(json => resolve(json))
+            .catch(() => getServerData());
     });
 }
 
