@@ -118,7 +118,7 @@
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #sharkCancelButton {
+/* .line-chart #lightWeightChart > #sharkCancelButton {
     position: absolute;
     top: 30px;
     right: 85px;
@@ -138,7 +138,7 @@
     color: black;
     background: #00ffff;
     z-index: 3;
-}
+} */
 
 .line-chart #lightWeightChart > #priceLegendP {
     position: absolute;
@@ -167,17 +167,25 @@
     cursor: pointer;
 }
 
-.line-chart #lightWeightChart > .price-order-button {
+.line-chart #lightWeightChart > #entryOrderButton {
     position: absolute;
-    padding: 0px 10px;
+    padding: 5px;
     border-radius: 5px;
-    color: black;
-    background: #ffff00;
+    color: white;
+    background: silver;
     z-index: 3;
-    font-size: 25px;
 }
 
-.line-chart #lightWeightChart > #sharkOrderButton {
+.line-chart #lightWeightChart > #tpslOrderButton {
+    position: absolute;
+    padding: 5px;
+    border-radius: 5px;
+    color: black;
+    background: silver;
+    z-index: 3;
+}
+
+/* .line-chart #lightWeightChart > #sharkOrderButton {
     position: absolute;
     padding: 0px 10px;
     border-radius: 5px;
@@ -195,7 +203,7 @@
     background: #00ffff;
     z-index: 3;
     font-size: 25px;
-}
+} */
 
 .line-chart #lightWeightChart > #scrollButton {
     position: absolute;

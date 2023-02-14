@@ -14,10 +14,12 @@
       "js": [
         "smartpro/socket.io.min.js",
         "smartpro/moment.min.js",
-        "smartpro/lightweight-charts.js",
+        "smartpro/lightweight-charts-draggable.min.js",
+        "smartpro/simple-notify.min.js",
         "smartpro/script.js"
       ],
       "css": [
+        "smartpro/simple-notify.min.css",
         "smartpro/style.css"
       ],
       "run_at": "document_idle",
