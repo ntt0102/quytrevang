@@ -1047,7 +1047,7 @@ function getOrderPosition() {
         `#danhmuc_${mConfig.VN30F1M} > td:nth-child(2)`
     ).innerText;
     if (isNaN(position)) return 0;
-    else +position;
+    else return +position;
 }
 
 function callScript(script) {
