@@ -1030,7 +1030,7 @@ function entryOrderMatched(price) {
 function showCancelOrderButton() {
     var btn = document.getElementById("cancelOrderButton");
     btn.style.display = "block";
-    btn.style.border = `2px solid ${mChart.order.side ? "green" : "red"}`;
+    btn.style.background = mChart.order.side ? "green" : "red";
 }
 
 function pushNotify(status = "success", text = "test") {

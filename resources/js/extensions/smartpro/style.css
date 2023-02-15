@@ -111,34 +111,12 @@
     position: absolute;
     top: 30px;
     right: 55px;
-    padding: 0px 7px;
-    border-radius: 5px;
-    color: black;
-    background: #ffff00;
-    z-index: 3;
-}
-
-/* .line-chart #lightWeightChart > #sharkCancelButton {
-    position: absolute;
-    top: 30px;
-    right: 85px;
-    padding: 0px 7px;
+    padding: 3px 9px;
     border-radius: 5px;
     color: white;
-    background: #ff00ff;
+    background: silver;
     z-index: 3;
 }
-
-.line-chart #lightWeightChart > #sheepCancelButton {
-    position: absolute;
-    top: 30px;
-    right: 115px;
-    padding: 0px 7px;
-    border-radius: 5px;
-    color: black;
-    background: #00ffff;
-    z-index: 3;
-} */
 
 .line-chart #lightWeightChart > #priceLegendP {
     position: absolute;
