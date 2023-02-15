@@ -69,7 +69,9 @@ function getServerConfig() {
                 ).innerText;
                 const escrow = (celPrice * 0.1 * 0.17) / 0.8;
                 mConfig.sheepLimit = parseInt(800 / escrow);
-                mConfig.sharkLimit = parseInt(2000 / escrow);
+                mConfig.sharkLimit = parseInt(2200 / escrow);
+                console.log("mConfig.sheepLimit: ", mConfig.sheepLimit);
+                console.log("mConfig.sharkLimit: ", mConfig.sharkLimit);
                 //
                 mConfig.hasSharkOrder = false;
                 mConfig.hasSheepOrder = false;
@@ -268,7 +270,6 @@ function createLightWeightChart() {
         mChart.series.price.applyOptions({
             visible: !mChart.series.price.options().visible
         });
-        removeOrderButton();
     });
     div.append(p);
     //
@@ -278,7 +279,15 @@ function createLightWeightChart() {
         mChart.series.shark.applyOptions({
             visible: !mChart.series.shark.options().visible
         });
-        removeOrderButton();
+    });
+    div.append(p);
+    //
+    p = document.createElement("p");
+    p.id = "wolfLegendP";
+    p.addEventListener("click", () => {
+        mChart.series.wolf.applyOptions({
+            visible: !mChart.series.wolf.options().visible
+        });
     });
     div.append(p);
     //
@@ -288,7 +297,6 @@ function createLightWeightChart() {
         mChart.series.sheep.applyOptions({
             visible: !mChart.series.sheep.options().visible
         });
-        removeOrderButton();
     });
     div.append(p);
     //
@@ -317,20 +325,26 @@ function createLightWeightChart() {
     mChart.object.subscribeCrosshairMove(crosshairMove);
     mChart.object.subscribeCustomPriceLineDragged(priceLineDrag);
     //
-    mChart.series.shark = mChart.object.addLineSeries({
-        priceScaleId: "shark",
-        color: "#FF00FF",
-        priceFormat: { minMove: 1 },
-        scaleMargins: { top: 0.5, bottom: 0 }
-    });
     mChart.series.sheep = mChart.object.addLineSeries({
         priceScaleId: "sheep",
         color: "#00FFFF",
         priceFormat: { minMove: 1 },
         scaleMargins: { top: 0.5, bottom: 0 }
     });
-    mChart.series.price = mChart.object.addLineSeries({
+    mChart.series.wolf = mChart.object.addLineSeries({
+        priceScaleId: "wolf",
         color: "#FFFF00",
+        priceFormat: { minMove: 1 },
+        scaleMargins: { top: 0.5, bottom: 0 }
+    });
+    mChart.series.shark = mChart.object.addLineSeries({
+        priceScaleId: "shark",
+        color: "#FF00FF",
+        priceFormat: { minMove: 1 },
+        scaleMargins: { top: 0.5, bottom: 0 }
+    });
+    mChart.series.price = mChart.object.addLineSeries({
+        color: "white",
         priceFormat: { minMove: 0.1 }
     });
 
@@ -339,21 +353,12 @@ function createLightWeightChart() {
     function crosshairMove(e) {
         if (e.time) {
             mConfig.hasCrosshair = true;
-            const price = e.seriesPrices.get(mChart.series.price);
-            if (!!price)
-                document.getElementById("priceLegendP").innerText = price;
-            //
-            const shark = e.seriesPrices.get(mChart.series.shark);
-            if (!!shark)
-                document.getElementById(
-                    "sharkLegendP"
-                ).innerText = shark.toLocaleString("en-US");
-            //
-            const sheep = e.seriesPrices.get(mChart.series.sheep);
-            if (!!sheep)
-                document.getElementById(
-                    "sheepLegendP"
-                ).innerText = sheep.toLocaleString("en-US");
+            updateLegend(
+                e.seriesPrices.get(mChart.series.price),
+                e.seriesPrices.get(mChart.series.shark),
+                e.seriesPrices.get(mChart.series.wolf),
+                e.seriesPrices.get(mChart.series.sheep)
+            );
         } else mConfig.hasCrosshair = false;
         if (e.point != undefined) {
             mChart.crosshair.x = e.point.x;
@@ -571,28 +576,27 @@ function connectSocket() {
                     mChart.data = createChartData(mChart.data, param);
                     var lastPrice = mChart.data.price.slice(-1)[0];
                     var lastShark = mChart.data.shark.slice(-1)[0];
+                    var lastWolf = mChart.data.wolf.slice(-1)[0];
                     var lastSheep = mChart.data.sheep.slice(-1)[0];
-                    //
-                    entryOrderMatched(lastPrice.value);
                     //
                     if (mConfig.timeFrame > 0) {
                         mChart.series.price.setData(mChart.data.price);
                         mChart.series.shark.setData(mChart.data.shark);
+                        mChart.series.wolf.setData(mChart.data.wolf);
                         mChart.series.sheep.setData(mChart.data.sheep);
                     } else {
                         mChart.series.price.update(lastPrice);
                         mChart.series.shark.update(lastShark);
+                        mChart.series.wolf.update(lastWolf);
                         mChart.series.sheep.update(lastSheep);
                     }
                     if (!mConfig.hasCrosshair) {
-                        document.getElementById("priceLegendP").innerText =
-                            lastPrice.value;
-                        document.getElementById(
-                            "sharkLegendP"
-                        ).innerText = lastShark.value.toLocaleString("en-US");
-                        document.getElementById(
-                            "sheepLegendP"
-                        ).innerText = lastSheep.value.toLocaleString("en-US");
+                        updateLegend(
+                            lastPrice.value,
+                            lastShark.value,
+                            lastWolf.value,
+                            lastSheep.value
+                        );
                     }
                     //
                     setLocalData("data", param);
@@ -641,6 +645,23 @@ function intervalHandler() {
         }`,
         "YYYY-MM-DD H:mm:ss"
     ).format("HH:mm:ss");
+    // Mở/đóng vị thế
+    if (
+        getOrderPosition() &&
+        mChart.order.entry.hasOwnProperty("line") &&
+        !mChart.order.tp.hasOwnProperty("line")
+    ) {
+        orderTpPrice(true);
+        orderSlPrice(true);
+        mChart.order.entry.line.applyOptions({
+            draggable: false
+        });
+        pushNotify("success", "Đã mở vị thế.");
+    } else if (mChart.order.tp.hasOwnProperty("line")) {
+        callScript("onCancelAllOrderPending('order_condition')");
+        callScript("onCancelAllOrderPending('order')");
+        pushNotify("success", "Đã đóng vị thế.");
+    }
     // Report
     if (mConfig.currentTime == mConfig.time.end) reportHandler();
     //
@@ -678,6 +699,7 @@ function getData() {
                         original: [],
                         price: [],
                         shark: [],
+                        wolf: [],
                         sheep: []
                     }
                 );
@@ -688,6 +710,7 @@ function getData() {
                 //
                 mChart.series.price.setData(mChart.data.price);
                 mChart.series.shark.setData(mChart.data.shark);
+                mChart.series.wolf.setData(mChart.data.wolf);
                 mChart.series.sheep.setData(mChart.data.sheep);
                 //
                 toggleSpinner(false);
@@ -706,6 +729,7 @@ function createChartData(r, item) {
         .add(7, "hours")
         .unix();
     var prevShark = !!r.shark.length ? r.shark.slice(-1)[0].value : 0;
+    var prevWolf = !!r.wolf.length ? r.wolf.slice(-1)[0].value : 0;
     var prevSheep = !!r.sheep.length ? r.sheep.slice(-1)[0].value : 0;
     var volume = (item.side == "BU" ? 1 : -1) * item.vol;
     if (mConfig.timeFrame > 0) {
@@ -719,6 +743,7 @@ function createChartData(r, item) {
         if (isSameTime) {
             r.price.pop();
             r.shark.pop();
+            r.wolf.pop();
             r.sheep.pop();
         }
         time = timeIndex * period;
@@ -727,11 +752,19 @@ function createChartData(r, item) {
     r.price.push({ time: time, value: item.price });
     r.shark.push({
         time: time,
-        value: prevShark + (item.vol >= mConfig.sheepLimit ? volume : 0)
+        value: prevShark + (item.vol > mConfig.sharkLimit ? volume : 0)
+    });
+    r.wolf.push({
+        time: time,
+        value:
+            prevWolf +
+            (item.vol >= mConfig.sheepLimit && item.vol <= mConfig.sharkLimit
+                ? volume
+                : 0)
     });
     r.sheep.push({
         time: time,
-        value: prevSheep + (item.vol <= mConfig.sharkLimit ? -volume : 0)
+        value: prevSheep + (item.vol < mConfig.sheepLimit ? volume : 0)
     });
     //
     return r;
@@ -1005,28 +1038,6 @@ function removeOrderButton() {
     document.getElementById("tpslOrderButton").style.display = "none";
 }
 
-function entryOrderMatched(price) {
-    if (mChart.order.entry.hasOwnProperty("line")) {
-        if (getOrderPosition()) {
-            if (
-                (mChart.order.side && price >= mChart.order.entry.price) ||
-                (!mChart.order.side && price <= mChart.order.entry.price)
-            ) {
-                if (!mChart.order.tp.hasOwnProperty("line")) {
-                    orderTpPrice(true);
-                    orderSlPrice(true);
-                    pushNotify("success", "Đã mở vị thế.");
-                }
-                if (mChart.order.entry.line.options().draggable) {
-                    mChart.order.entry.line.applyOptions({
-                        draggable: false
-                    });
-                }
-            }
-        }
-    }
-}
-
 function showCancelOrderButton() {
     var btn = document.getElementById("cancelOrderButton");
     btn.style.display = "block";
@@ -1054,4 +1065,20 @@ function callScript(script) {
     var button = document.createElement("button");
     button.setAttribute("onclick", script);
     button.click();
+}
+
+function updateLegend(price, shark, wolf, sheep) {
+    if (!!price) document.getElementById("priceLegendP").innerText = price;
+    if (!!shark)
+        document.getElementById(
+            "sharkLegendP"
+        ).innerText = shark.toLocaleString("en-US");
+    if (!!wolf)
+        document.getElementById("wolfLegendP").innerText = wolf.toLocaleString(
+            "en-US"
+        );
+    if (!!sheep)
+        document.getElementById(
+            "sheepLegendP"
+        ).innerText = sheep.toLocaleString("en-US");
 }

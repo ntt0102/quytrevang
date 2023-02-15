@@ -122,7 +122,7 @@
     position: absolute;
     top: 32px;
     left: 85px;
-    color: #ffff00;
+    color: white;
     z-index: 3;
     cursor: pointer;
 }
@@ -136,10 +136,19 @@
     cursor: pointer;
 }
 
-.line-chart #lightWeightChart > #sheepLegendP {
+.line-chart #lightWeightChart > #wolfLegendP {
     position: absolute;
     top: 32px;
     left: 185px;
+    color: #ffff00;
+    z-index: 3;
+    cursor: pointer;
+}
+
+.line-chart #lightWeightChart > #sheepLegendP {
+    position: absolute;
+    top: 32px;
+    left: 235px;
     color: #00ffff;
     z-index: 3;
     cursor: pointer;
