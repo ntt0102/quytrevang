@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+
+<head>
+    <title>WebSocket client test</title>
+    <script src="../smartpro/socket.io.min.js"></script>
+</head>
+
+<body>
+    <h1>WebSocket TCBS</h1>
+</body>
+
+<script language="javascript" type="text/javascript">
+    function testWebSocket() {
+        var wsUri = "wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream";
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function(evt) {
+            console.log("onopen", evt);
+            // var msg = { action: "join", list: "VN30F2302" };
+            // websocket.send(
+            //     "42" + JSON.stringify(["regs", JSON.stringify(msg)])
+            // );
+        };
+        websocket.onclose = function(evt) {
+            console.log("onclose", evt);
+            testWebSocket();
+        };
+        websocket.onmessage = function(evt) {
+            console.log("onmessage", evt.data);
+        };
+        websocket.onerror = function(evt) {
+            console.log("onerror", evt);
+        };
+    }
+    window.addEventListener("load", testWebSocket, false);
+</script>
