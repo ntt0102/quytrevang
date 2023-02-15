@@ -69,7 +69,7 @@ function getServerConfig() {
                 ).innerText;
                 const escrow = (celPrice * 0.1 * 0.17) / 0.8;
                 mConfig.sheepLimit = parseInt(800 / escrow);
-                mConfig.sharkLimit = parseInt(2200 / escrow);
+                mConfig.sharkLimit = parseInt(2000 / escrow);
                 console.log("mConfig.sheepLimit: ", mConfig.sheepLimit);
                 console.log("mConfig.sharkLimit: ", mConfig.sharkLimit);
                 //
