@@ -4,8 +4,7 @@ var mChart = {
     series: {},
     data: {},
     order: { entry: {}, tp: {}, sl: {} },
-    crosshair: {},
-    line: {}
+    crosshair: {}
 };
 var mDatabase = {};
 
@@ -642,7 +641,7 @@ function intervalHandler() {
         }`,
         "YYYY-MM-DD H:mm:ss"
     ).format("HH:mm:ss");
-    // Mở/đóng vị thế
+    // Auto order TP/SL and close order position
     if (getOrderPosition()) {
         if (
             mChart.order.entry.hasOwnProperty("line") &&
