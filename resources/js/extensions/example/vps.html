@@ -11,38 +11,39 @@
 
 <script language="javascript" type="text/javascript">
     function testWebSocket() {
-        var msg = { action: "join", list: "VN30F2302" };
-        var socket = io("https://datafeed.vps.com.vn");
-        socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
-        socket.on("reconnect", () => {
-            socket.emit("regs", JSON.stringify(msg));
-        });
-        socket.on("boardps", data => {
-            console.log("boardps", data);
-        });
-        socket.on("stockps", data => {
-            console.log("stockps", data);
-        });
-        // var wsUri =
-        //     "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
-        // websocket = new WebSocket(wsUri);
-        // websocket.onopen = function(evt) {
-        //     console.log("onopen", evt);
-        //     var msg = { action: "join", list: "VN30F2302" };
-        //     websocket.send(
-        //         "42" + JSON.stringify(["regs", JSON.stringify(msg)])
-        //     );
-        // };
-        // websocket.onclose = function(evt) {
-        //     console.log("onclose", evt);
-        //     testWebSocket();
-        // };
-        // websocket.onmessage = function(evt) {
-        //     console.log("onmessage", evt.data);
-        // };
-        // websocket.onerror = function(evt) {
-        //     console.log("onerror", evt);
-        // };
+        // var msg = { action: "join", list: "VN30F2302" };
+        // var socket = io("https://datafeed.vps.com.vn");
+        // socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
+        // socket.on("reconnect", () => {
+        //     socket.emit("regs", JSON.stringify(msg));
+        // });
+        // socket.on("boardps", data => {
+        //     console.log("boardps", data);
+        // });
+        // socket.on("stockps", data => {
+        //     console.log("stockps", data);
+        // });
+        var wsUri =
+            "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
+        websocket = new WebSocket(wsUri);
+        websocket.onopen = function(evt) {
+            console.log("onopen", evt);
+            var msg = { action: "join", list: "VN30F2302" };
+            websocket.send("2");
+            // websocket.send(
+            //     "42" + JSON.stringify(["regs", JSON.stringify(msg)])
+            // );
+        };
+        websocket.onclose = function(evt) {
+            console.log("onclose", evt);
+            testWebSocket();
+        };
+        websocket.onmessage = function(evt) {
+            console.log("onmessage", evt.data);
+        };
+        websocket.onerror = function(evt) {
+            console.log("onerror", evt);
+        };
     }
     window.addEventListener("load", testWebSocket, false);
 </script>

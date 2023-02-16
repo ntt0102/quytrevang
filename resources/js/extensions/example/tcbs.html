@@ -3,6 +3,8 @@
 <head>
     <title>WebSocket client test</title>
     <script src="../smartpro/socket.io.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/aes-js/3.1.2/index.min.js"></script> -->
 </head>
 
 <body>
@@ -10,6 +12,58 @@
 </body>
 
 <script language="javascript" type="text/javascript">
+    function decrypt() {
+        // var ciphertext = "79a247e48ac27ed33ca3f1919067fa64";
+        // var key = "6268890F-9B58-484C-8CDC-34F9C6A9";
+        // var iv = "6268890F-9B58-48";
+
+        // var ciphertextWA = CryptoJS.enc.Hex.parse(ciphertext);
+        // var keyWA = CryptoJS.enc.Utf8.parse(key);
+        // var ivWA = CryptoJS.enc.Utf8.parse(iv);
+        // var ciphertextCP = { ciphertext: ciphertextWA };
+
+        // var decrypted = CryptoJS.AES.decrypt(ciphertextCP, keyWA, { iv: ivWA });
+
+        // console.log(decrypted.toString(CryptoJS.enc.Utf8)); // Apple
+
+        var data = "Thọ";
+
+        // var encrypted = CryptoJS.AES.encrypt(data, _getCryptoKey()).toString();
+
+        // console.log(encrypted);
+        // => 'U2FsdGVkX18K9Ch1JYnck/Jmq+WDgM49vPmodMcLTk+/SzKtFg+o3Olc38kzacKv'
+        var Lt = "10000376255";
+        var on = "10000376255.iVLJnFPyvMdqUFXBCwip";
+        var xe = CryptoJS.enc.Utf8.parse(on);
+        var mr = (on || "").substring(0, 16);
+        var yt = CryptoJS.enc.Utf8.parse(mr);
+
+        console.log("key: ", on);
+        console.log("iv: ", mr);
+
+        var encrypted = CryptoJS.AES.encrypt("Tho", xe, {
+            // iv: yt
+            // padding: CryptoJS.pad.Pkcs7,
+            // mode: CryptoJS.mode.CBC
+            mode: CryptoJS.mode.ECB
+        }).toString();
+        console.log("enc: ", encrypted);
+        // encrypted =
+        //     "CglWTjMwRjIzMDIQwNzUw+UwGZqZmZmZUZBAITMzMzMzUZBAKZqZmZmZUZBAMTMzMzMzUZBAOAlBAAAAAAAK+0BJMzMzMzMzHUBQPFlmZmZmZlvCQGEAAAP+mAqlQmlH5shbfdV8P3EAAAAAAESQQHkAAAAAAF6QQIEBAAAAAABEkEA=";
+        var decrypted = CryptoJS.AES.decrypt(encrypted, xe, {
+            // iv: yt,
+            // padding: CryptoJS.pad.Pkcs7,
+            // mode: CryptoJS.mode.CBC
+            mode: CryptoJS.mode.ECB
+        }).toString(CryptoJS.enc.Utf8);
+
+        console.log(decrypted);
+        // => 'a JSON blob or something'
+    }
+    function _getCryptoKey() {
+        // return "10000376255.iVLJnFPyvMdqUFXBCwip";
+        return "10000376255"; //.iVLJ"; //nFPyvMdqUFXBCwip";
+    }
     function testWebSocket() {
         var wsUri = "wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream";
         websocket = new WebSocket(wsUri);
@@ -19,6 +73,10 @@
             // websocket.send(
             //     "42" + JSON.stringify(["regs", JSON.stringify(msg)])
             // );
+            websocket.send("d|ut|C001|");
+            websocket.send("d|st|C001|VN30F2302");
+            websocket.send("d|st|C001|VN30F2302");
+            websocket.send("d|s|VN30F2302");
         };
         websocket.onclose = function(evt) {
             console.log("onclose", evt);
@@ -32,4 +90,5 @@
         };
     }
     window.addEventListener("load", testWebSocket, false);
+    window.addEventListener("load", decrypt, false);
 </script>
