@@ -73,10 +73,7 @@ function getServerConfig() {
                 console.log("mConfig.sheepLimit: ", mConfig.sheepLimit);
                 console.log("mConfig.sharkLimit: ", mConfig.sharkLimit);
                 //
-                mConfig.hasSharkOrder = false;
-                mConfig.hasSheepOrder = false;
                 mConfig.hasCrosshair = false;
-                //
                 mConfig.bidPrice = 0;
                 mConfig.askPrice = 0;
                 //
@@ -658,8 +655,7 @@ function intervalHandler() {
         });
         pushNotify("success", "Đã mở vị thế.");
     } else if (mChart.order.tp.hasOwnProperty("line")) {
-        callScript("onCancelAllOrderPending('order_condition')");
-        callScript("onCancelAllOrderPending('order')");
+        cancelOrder();
         pushNotify("success", "Đã đóng vị thế.");
     }
     // Report
