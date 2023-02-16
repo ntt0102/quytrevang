@@ -643,20 +643,23 @@ function intervalHandler() {
         "YYYY-MM-DD H:mm:ss"
     ).format("HH:mm:ss");
     // Mở/đóng vị thế
-    if (
-        getOrderPosition() &&
-        mChart.order.entry.hasOwnProperty("line") &&
-        !mChart.order.tp.hasOwnProperty("line")
-    ) {
-        orderTpPrice(true);
-        orderSlPrice(true);
-        mChart.order.entry.line.applyOptions({
-            draggable: false
-        });
-        pushNotify("success", "Đã mở vị thế.");
-    } else if (mChart.order.tp.hasOwnProperty("line")) {
-        cancelOrder();
-        pushNotify("success", "Đã đóng vị thế.");
+    if (getOrderPosition()) {
+        if (
+            mChart.order.entry.hasOwnProperty("line") &&
+            !mChart.order.tp.hasOwnProperty("line")
+        ) {
+            orderTpPrice(true);
+            orderSlPrice(true);
+            mChart.order.entry.line.applyOptions({
+                draggable: false
+            });
+            pushNotify("success", "Đã mở vị thế.");
+        }
+    } else {
+        if (mChart.order.tp.hasOwnProperty("line")) {
+            cancelOrder();
+            pushNotify("success", "Đã đóng vị thế.");
+        }
     }
     // Report
     if (mConfig.currentTime == mConfig.time.end) reportHandler();
