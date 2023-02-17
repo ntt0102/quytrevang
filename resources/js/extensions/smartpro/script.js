@@ -266,6 +266,7 @@ function createLightWeightChart() {
         mChart.series.price.applyOptions({
             visible: !mChart.series.price.options().visible
         });
+        removeOrderButton();
     });
     div.append(p);
     //
