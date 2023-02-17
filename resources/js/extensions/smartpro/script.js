@@ -1053,9 +1053,11 @@ function pushNotify(status = "success", text = "test") {
 }
 
 function getOrderPosition() {
-    const position = document.querySelector(
+    const el = document.querySelector(
         `#danhmuc_${mConfig.VN30F1M} > td:nth-child(2)`
-    ).innerText;
+    );
+    if(!el) return 0;
+    const position = el.innerText;
     if (isNaN(position)) return 0;
     else return +position;
 }
