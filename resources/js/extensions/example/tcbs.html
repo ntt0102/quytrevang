@@ -41,24 +41,66 @@
         console.log("key: ", on);
         console.log("iv: ", mr);
 
-        var encrypted = CryptoJS.AES.encrypt("Tho", xe, {
-            // iv: yt
-            // padding: CryptoJS.pad.Pkcs7,
-            // mode: CryptoJS.mode.CBC
-            mode: CryptoJS.mode.ECB
-        }).toString();
-        console.log("enc: ", encrypted);
+        // var encrypted = CryptoJS.AES.encrypt("Tho", xe, {
+        //     // iv: yt
+        //     // padding: CryptoJS.pad.Pkcs7,
+        //     // mode: CryptoJS.mode.CBC
+        //     mode: CryptoJS.mode.ECB
+        // }).toString();
+        // console.log("enc: ", encrypted);
+        // encrypted = "WeJcFMQ/8+8QJ/w0hHh+0g==";
+        encrypted =
+            "CglWTjMwRjIzMDIRmpmZmZlRkEAZAAAAAAAA8D8hMzMzMzNRkEApAAAAAAAACEAxmpmZmZlRkEA5AAAAAAAAN0BA6962nwY=";
         // encrypted =
         //     "CglWTjMwRjIzMDIQwNzUw+UwGZqZmZmZUZBAITMzMzMzUZBAKZqZmZmZUZBAMTMzMzMzUZBAOAlBAAAAAAAK+0BJMzMzMzMzHUBQPFlmZmZmZlvCQGEAAAP+mAqlQmlH5shbfdV8P3EAAAAAAESQQHkAAAAAAF6QQIEBAAAAAABEkEA=";
+        console.log("encrypted: ", encrypted);
+        // encrypted = CryptoJS.enc.Base64.parse(encrypted);
+        // encrypted = atob(encrypted);
+        encrypted = b64decode(encrypted);
+        console.log("rawData: ", encrypted);
         var decrypted = CryptoJS.AES.decrypt(encrypted, xe, {
-            // iv: yt,
-            // padding: CryptoJS.pad.Pkcs7,
-            // mode: CryptoJS.mode.CBC
-            mode: CryptoJS.mode.ECB
+            iv: yt,
+            padding: CryptoJS.pad.Pkcs7,
+            mode: CryptoJS.mode.CBC
+            // mode: CryptoJS.mode.ECB
         }).toString(CryptoJS.enc.Utf8);
 
-        console.log(decrypted);
+        console.log("decrypted: ", decrypted);
         // => 'a JSON blob or something'
+    }
+    function b64decode(u) {
+        let Y = "";
+        if ((u = String(u).replace(/=+$/, "")).length % 4 == 1)
+            throw new Error(
+                "'atob' failed: The string to be decoded is not correctly encoded."
+            );
+        for (
+            let X, y, Q = 0, x = 0;
+            (y = u.charAt(x++));
+            ~y && ((X = Q % 4 ? 64 * X + y : y), Q++ % 4)
+                ? (Y += String.fromCharCode(255 & (X >> ((-2 * Q) & 6))))
+                : 0
+        )
+            y = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=".indexOf(
+                y
+            );
+        return Y;
+    }
+    function b64DecodeUnicode(u) {
+        return decodeURIComponent(
+            Array.prototype.map
+                .call(
+                    b64decode(u),
+                    Z => "%" + ("00" + Z.charCodeAt(0).toString(16)).slice(-2)
+                )
+                .join("")
+        );
+        // return Array.prototype.map
+        //     .call(
+        //         b64decode(u),
+        //         Z => "%" + ("00" + Z.charCodeAt(0).toString(16)).slice(-2)
+        //     )
+        //     .join("");
     }
     function _getCryptoKey() {
         // return "10000376255.iVLJnFPyvMdqUFXBCwip";

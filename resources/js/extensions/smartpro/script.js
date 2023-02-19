@@ -319,15 +319,16 @@ function createLightWeightChart() {
     mChart.object.subscribeCrosshairMove(crosshairMove);
     mChart.object.subscribeCustomPriceLineDragged(priceLineDrag);
     //
-    mChart.series.sheep = mChart.object.addLineSeries({
-        priceScaleId: "sheep",
-        color: "#00FFFF",
-        priceFormat: { minMove: 1 },
-        scaleMargins: { top: 0.5, bottom: 0 }
-    });
     mChart.series.wolf = mChart.object.addLineSeries({
         priceScaleId: "wolf",
         color: "#FFFF00",
+        priceFormat: { minMove: 1 },
+        scaleMargins: { top: 0.5, bottom: 0 },
+        visible: false
+    });
+    mChart.series.sheep = mChart.object.addLineSeries({
+        priceScaleId: "sheep",
+        color: "#00FFFF",
         priceFormat: { minMove: 1 },
         scaleMargins: { top: 0.5, bottom: 0 }
     });
@@ -1053,7 +1054,7 @@ function getOrderPosition() {
     const el = document.querySelector(
         `#danhmuc_${mConfig.VN30F1M} > td:nth-child(2)`
     );
-    if(!el) return 0;
+    if (!el) return 0;
     const position = el.innerText;
     if (isNaN(position)) return 0;
     else return +position;
