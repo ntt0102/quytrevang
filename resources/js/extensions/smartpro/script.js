@@ -263,9 +263,6 @@ function createLightWeightChart() {
     var p = document.createElement("p");
     p.id = "priceLegendP";
     p.addEventListener("click", () => {
-        mChart.series.price.applyOptions({
-            visible: !mChart.series.price.options().visible
-        });
         removeOrderButton();
     });
     div.append(p);
