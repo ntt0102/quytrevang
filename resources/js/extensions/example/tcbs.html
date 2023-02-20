@@ -3,6 +3,7 @@
 <head>
     <title>WebSocket client test</title>
     <script src="../smartpro/socket.io.min.js"></script>
+    <script src="../smartpro/protobuf.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
     <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/aes-js/3.1.2/index.min.js"></script> -->
 </head>
@@ -22,22 +23,23 @@
         let decoder = new TextDecoder(encoding);
         return decoder.decode(sliceWithString);
     }
-    function base64ToArrayUnit8(base64) {
-        // for (
-        //     var p = window.atob(g), r = p.length, h = new Uint8Array(r), A = 0;
-        //     A < r;
-        //     A++
-        // )
-        //     h[A] = p.charCodeAt(A);
-        // return h;
-        var raw = window.atob(base64);
-        var rawLength = raw.length;
-        var array = new Uint8Array(new ArrayBuffer(rawLength));
+    function base64ToArrayUnit8(g) {
+        for (
+            var p = window.atob(g), r = p.length, h = new Uint8Array(r), A = 0;
+            A < r;
+            A++
+        )
+            h[A] = p.charCodeAt(A);
+        return h;
+        // var raw = window.atob(g);
+        // console.log("atob: ", raw.length);
+        // var rawLength = raw.length;
+        // var array = new Uint8Array(new ArrayBuffer(rawLength));
 
-        for (i = 0; i < rawLength; i++) {
-            array[i] = raw.charCodeAt(i);
-        }
-        return array;
+        // for (i = 0; i < rawLength; i++) {
+        //     array[i] = raw.charCodeAt(i);
+        // }
+        // return array;
     }
     function deserializeBinary(l) {
         var g = new t.BinaryReader(l),
@@ -191,11 +193,48 @@
     // window.addEventListener("load", decrypt, false);
 
     window.addEventListener("load", () => {
-        var base64 =
-            "CglWTjMwRjIzMDIRmpmZmZlRkEAZAAAAAAAA8D8hMzMzMzNRkEApAAAAAAAACEAxmpmZmZlRkEA5AAAAAAAAN0BA6962nwY=";
-        console.log(base64);
-        var buffer = base64ToArrayUnit8(base64);
-        console.log(buffer);
-        console.log(binaryReader(buffer, 0, "utf-8"));
+        // var base64 =
+        //     "CglWTjMwRjIzMDIRmpmZmZlRkEAZAAAAAAAA8D8hMzMzMzNRkEApAAAAAAAACEAxmpmZmZlRkEA5AAAAAAAAN0BA6962nwY=";
+        // var base64 =
+        //     "CglWTjMwRjIzMDIQwNzUw+UwGZqZmZmZUZBAITMzMzMzUZBAKZqZmZmZUZBAMTMzMzMzUZBAOAlBAAAAAAAK+0BJMzMzMzMzHUBQPFlmZmZmZlvCQGEAAAP+mAqlQmlH5shbfdV8P3EAAAAAAESQQHkAAAAAAF6QQIEBAAAAAABEkEA=";
+        // console.log(base64);
+        // var buffer = base64ToArrayUnit8(base64);
+        // console.log(buffer);
+        // console.log(binaryReader(buffer, 0, "utf-8"));
+
+        async function encodeTestMessage(payload) {
+            const root = await protobuf.load("tcbs.proto");
+            const testMessage = root.lookupType("tcbs.testMessage");
+            const message = testMessage.create(payload);
+            return testMessage.encode(message).finish();
+        }
+
+        async function decodeTestMessage(buffer) {
+            const root = await protobuf.load("tcbs.proto");
+            const testMessage = root.lookupType("tcbs.testMessage");
+            const err = testMessage.verify(buffer);
+            if (err) {
+                throw err;
+            }
+            const message = testMessage.decode(buffer);
+            return testMessage.toObject(message);
+        }
+
+        async function testProtobuf() {
+            const payload = {
+                timestamp: Math.round(new Date().getTime() / 1000),
+                message: "A rose by any other name would smell as sweet"
+            };
+            console.log("Test message:", payload);
+            const buffer = await encodeTestMessage(payload);
+            console.log(
+                `Encoded message (${buffer.length} bytes): `,
+                buffer.toString("hex")
+            );
+            const decodedMessage = await decodeTestMessage(buffer);
+            console.log("Decoded test message:", decodedMessage);
+        }
+
+        testProtobuf();
     });
 </script>

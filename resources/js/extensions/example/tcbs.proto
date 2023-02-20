@@ -1,0 +1,29 @@
+package tcbs;
+syntax = "proto3";
+
+message InvestorHistoryTrade {
+    string symbol = 1;
+    double avgprice = 2;
+    double closevol = 3;
+    double change = 4;
+    double reference = 5;
+    double totalvalue = 6;
+    int64 timesec = 7;
+    string action = 8;
+    string type = 9;
+    int64 notrans = 10;
+    int64 unittimeframe = 11;
+}
+
+message TickerMatchedPriceDerivative {
+    string symbol = 1;
+    double high = 2;
+    double low = 3;
+    double avg = 4;
+    double open = 5;
+}
+
+message testMessage {
+    uint32 timestamp = 1;
+    string message = 2;
+}
