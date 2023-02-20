@@ -9,8 +9,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://smartpro.vps.com.vn/v1/",
-        "https://smarteasy.vps.com.vn/v1/"
+        "https://smartpro.vps.com.vn/v1/"
       ],
       "js": [
         "smartpro/socket.io.min.js",
@@ -34,8 +33,7 @@
         "spinner.gif"
       ],
       "matches": [
-        "https://smartpro.vps.com.vn/*",
-        "https://smarteasy.vps.com.vn/*"
+        "https://smartpro.vps.com.vn/*"
       ]
     }
   ]
