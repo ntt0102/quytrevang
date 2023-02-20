@@ -553,51 +553,52 @@ function connectSocket() {
 
     function priceHandler(data) {
         if (data.id == 3220) {
+            getData(3);
             // console.log("price" + data.id);
-            if (!!mConfig.bidPrice && !!mConfig.askPrice) {
-                var side = "";
-                if (data.lastPrice <= mConfig.bidPrice) side = "SD";
-                else if (data.lastPrice >= mConfig.askPrice) side = "BU";
-                else if (mChart.data.original.length > 0)
-                    side = mChart.data.original.slice(-1)[0].side;
-                //
-                if (side != "") {
-                    var param = {
-                        time: `${mConfig.currentDate} ${data.time}`,
-                        price: data.lastPrice,
-                        vol: data.lastVol,
-                        side: side
-                    };
-                    mChart.data = createChartData(mChart.data, param);
-                    var lastPrice = mChart.data.price.slice(-1)[0];
-                    var lastShark = mChart.data.shark.slice(-1)[0];
-                    var lastWolf = mChart.data.wolf.slice(-1)[0];
-                    var lastSheep = mChart.data.sheep.slice(-1)[0];
-                    //
-                    if (mConfig.timeFrame > 0) {
-                        mChart.series.price.setData(mChart.data.price);
-                        mChart.series.shark.setData(mChart.data.shark);
-                        mChart.series.wolf.setData(mChart.data.wolf);
-                        mChart.series.sheep.setData(mChart.data.sheep);
-                    } else {
-                        mChart.series.price.update(lastPrice);
-                        mChart.series.shark.update(lastShark);
-                        mChart.series.wolf.update(lastWolf);
-                        mChart.series.sheep.update(lastSheep);
-                    }
-                    if (!mConfig.hasCrosshair) {
-                        updateLegend(
-                            lastPrice.value,
-                            lastShark.value,
-                            lastWolf.value,
-                            lastSheep.value
-                        );
-                    }
-                    //
-                    setLocalData("data", param);
-                    mChart.data.original.push(param);
-                }
-            }
+            // if (!!mConfig.bidPrice && !!mConfig.askPrice) {
+            //     var side = "";
+            //     if (data.lastPrice <= mConfig.bidPrice) side = "SD";
+            //     else if (data.lastPrice >= mConfig.askPrice) side = "BU";
+            //     else if (mChart.data.original.length > 0)
+            //         side = mChart.data.original.slice(-1)[0].side;
+            //     //
+            //     if (side != "") {
+            //         var param = {
+            //             time: `${mConfig.currentDate} ${data.time}`,
+            //             price: data.lastPrice,
+            //             vol: data.lastVol,
+            //             side: side
+            //         };
+            //         mChart.data = createChartData(mChart.data, param);
+            //         var lastPrice = mChart.data.price.slice(-1)[0];
+            //         var lastShark = mChart.data.shark.slice(-1)[0];
+            //         var lastWolf = mChart.data.wolf.slice(-1)[0];
+            //         var lastSheep = mChart.data.sheep.slice(-1)[0];
+            //         //
+            //         if (mConfig.timeFrame > 0) {
+            //             mChart.series.price.setData(mChart.data.price);
+            //             mChart.series.shark.setData(mChart.data.shark);
+            //             mChart.series.wolf.setData(mChart.data.wolf);
+            //             mChart.series.sheep.setData(mChart.data.sheep);
+            //         } else {
+            //             mChart.series.price.update(lastPrice);
+            //             mChart.series.shark.update(lastShark);
+            //             mChart.series.wolf.update(lastWolf);
+            //             mChart.series.sheep.update(lastSheep);
+            //         }
+            //         if (!mConfig.hasCrosshair) {
+            //             updateLegend(
+            //                 lastPrice.value,
+            //                 lastShark.value,
+            //                 lastWolf.value,
+            //                 lastSheep.value
+            //             );
+            //         }
+            //         //
+            //         setLocalData("data", param);
+            //         mChart.data.original.push(param);
+            //     }
+            // }
         }
     }
 
@@ -673,10 +674,9 @@ function refreshDataEveryMinute() {
         getData();
 }
 
-function getData() {
+function getData(size = 10000) {
     return new Promise((resolve, reject) => {
-        toggleSpinner(true);
-        Promise.all([getServerData(), getLocalData("data")])
+        Promise.all([getServerData(size), getLocalData("data")])
             .then(arr => {
                 console.log("getData: ", arr);
                 var ids = new Set(arr[0].map(d => d.time));
@@ -710,12 +710,19 @@ function getData() {
                 mChart.series.wolf.setData(mChart.data.wolf);
                 mChart.series.sheep.setData(mChart.data.sheep);
                 //
-                toggleSpinner(false);
+                if (!mConfig.hasCrosshair) {
+                    updateLegend(
+                        mChart.data.price.slice(-1)[0].value,
+                        mChart.data.shark.slice(-1)[0].value,
+                        mChart.data.wolf.slice(-1)[0].value,
+                        mChart.data.sheep.slice(-1)[0].value
+                    );
+                }
+                //
                 resolve();
             })
             .catch(error => {
                 console.log(error);
-                toggleSpinner(false);
                 resolve();
             });
     });
@@ -767,10 +774,11 @@ function createChartData(r, item) {
     return r;
 }
 
-function getServerData() {
+function getServerData(size) {
+    if (size == 10000) toggleSpinner(true);
     return new Promise((resolve, reject) => {
         const date = document.getElementById("dateInput").value;
-        const data = { action: "GET", date: date };
+        const data = { action: "GET", date: date, size: size };
         const url = mConfig.root + mConfig.endpoint.data;
         fetch(url, {
             method: "POST",
@@ -778,8 +786,11 @@ function getServerData() {
             body: JSON.stringify(data)
         })
             .then(response => response.json())
-            .then(json => resolve(json))
-            .catch(() => getServerData());
+            .then(json => {
+                resolve(json);
+                toggleSpinner(false);
+            })
+            .catch(() => getServerData(size));
     });
 }
 

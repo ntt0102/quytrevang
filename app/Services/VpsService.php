@@ -164,9 +164,9 @@ class VpsService extends CoreService
                     case 'GET':
                         if (!!$request->date)
                             return $this->getFromCsv($request->date);
-                        // else if ($request->tcbs) return $this->getTcbs();
+                        // else if ($request->tcbs) return $this->getTcbs($request->size);
                         // else return $this->getVps();
-                        else return $this->getTcbs();
+                        else return $this->getTcbs($request->size);
                         break;
                     case 'CLEAR':
                         $this->vpsRepository->clear();
@@ -191,11 +191,11 @@ class VpsService extends CoreService
     /**
      * Tcbs data
      */
-    private function tcbsData()
+    private function tcbsData($size)
     {
         $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
         $client = new \GuzzleHttp\Client();
-        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size=10000";
+        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size={$size}";
         $res = $client->get($url);
         return json_decode($res->getBody())->data;
     }
@@ -203,9 +203,9 @@ class VpsService extends CoreService
     /**
      * get From TCBS
      */
-    public function getTcbs()
+    public function getTcbs($size)
     {
-        $array = $this->tcbsData();
+        $array = $this->tcbsData($size);
         $temp = collect($array)->reduce(function ($carry, $item) {
             $carry['data'][] = [
                 'time' => date('Y-m-d ') . $item->t,
@@ -226,7 +226,7 @@ class VpsService extends CoreService
     public function exportToCsv()
     {
         $filename = storage_path('app/public/vn30f1m/' . date('Y-m-d') . '.csv');
-        $list = $this->tcbsData();
+        $list = $this->tcbsData(10000);
         // $list = \App\Models\Vps::all();
         $fp = fopen($filename, 'w');
         foreach ($list as $obj) {

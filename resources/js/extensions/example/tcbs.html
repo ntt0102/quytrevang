@@ -12,6 +12,62 @@
 </body>
 
 <script language="javascript" type="text/javascript">
+    function binaryReader(buffer, offset, encoding = "utf-8") {
+        // create a view over first 4 bytes starting at offset
+        let view = new DataView(buffer.buffer, offset, 4);
+        // read those 4 bytes as int 32 (big endian, since your example is like that)
+        let length = view.getInt32(0);
+        // get a slice of the length we got
+        let sliceWithString = buffer.slice(offset + 4, offset + 4 + length);
+        let decoder = new TextDecoder(encoding);
+        return decoder.decode(sliceWithString);
+    }
+    function base64ToArrayUnit8(base64) {
+        // for (
+        //     var p = window.atob(g), r = p.length, h = new Uint8Array(r), A = 0;
+        //     A < r;
+        //     A++
+        // )
+        //     h[A] = p.charCodeAt(A);
+        // return h;
+        var raw = window.atob(base64);
+        var rawLength = raw.length;
+        var array = new Uint8Array(new ArrayBuffer(rawLength));
+
+        for (i = 0; i < rawLength; i++) {
+            array[i] = raw.charCodeAt(i);
+        }
+        return array;
+    }
+    function deserializeBinary(l) {
+        var g = new t.BinaryReader(l),
+            p = new proto.pb.TickerMatchedPriceDerivative();
+        return deserializeBinaryFromReader(p, g);
+    }
+    function deserializeBinaryFromReader(l, g) {
+        for (; g.nextField() && !g.isEndGroup(); )
+            switch (g.getFieldNumber()) {
+                case 1:
+                    var r = g.readString();
+                    l.setSymbol(r);
+                    break;
+                case 2:
+                    (r = g.readDouble()), l.setHigh(r);
+                    break;
+                case 3:
+                    (r = g.readDouble()), l.setLow(r);
+                    break;
+                case 4:
+                    (r = g.readDouble()), l.setAvg(r);
+                    break;
+                case 5:
+                    (r = g.readDouble()), l.setOpen(r);
+                    break;
+                default:
+                    g.skipField();
+            }
+        return l;
+    }
     function decrypt() {
         // var ciphertext = "79a247e48ac27ed33ca3f1919067fa64";
         // var key = "6268890F-9B58-484C-8CDC-34F9C6A9";
@@ -131,6 +187,15 @@
             console.log("onerror", evt);
         };
     }
-    window.addEventListener("load", testWebSocket, false);
-    window.addEventListener("load", decrypt, false);
+    // window.addEventListener("load", testWebSocket, false);
+    // window.addEventListener("load", decrypt, false);
+
+    window.addEventListener("load", () => {
+        var base64 =
+            "CglWTjMwRjIzMDIRmpmZmZlRkEAZAAAAAAAA8D8hMzMzMzNRkEApAAAAAAAACEAxmpmZmZlRkEA5AAAAAAAAN0BA6962nwY=";
+        console.log(base64);
+        var buffer = base64ToArrayUnit8(base64);
+        console.log(buffer);
+        console.log(binaryReader(buffer, 0, "utf-8"));
+    });
 </script>
