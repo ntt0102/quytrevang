@@ -548,67 +548,67 @@ function connectSocket() {
         socket.emit("regs", JSON.stringify(msg));
         getData();
     });
-    socket.on("boardps", data => bidAskHandler(data.data));
-    socket.on("stockps", data => priceHandler(data.data));
+    // socket.on("boardps", data => bidAskHandler(data.data));
+    // socket.on("stockps", data => priceHandler(data.data));
+    socket.on("stockps", data => (data.data.id == 3220 ? getData(3) : false));
 
-    function priceHandler(data) {
-        if (data.id == 3220) {
-            getData(3);
-            // console.log("price" + data.id);
-            // if (!!mConfig.bidPrice && !!mConfig.askPrice) {
-            //     var side = "";
-            //     if (data.lastPrice <= mConfig.bidPrice) side = "SD";
-            //     else if (data.lastPrice >= mConfig.askPrice) side = "BU";
-            //     else if (mChart.data.original.length > 0)
-            //         side = mChart.data.original.slice(-1)[0].side;
-            //     //
-            //     if (side != "") {
-            //         var param = {
-            //             time: `${mConfig.currentDate} ${data.time}`,
-            //             price: data.lastPrice,
-            //             vol: data.lastVol,
-            //             side: side
-            //         };
-            //         mChart.data = createChartData(mChart.data, param);
-            //         var lastPrice = mChart.data.price.slice(-1)[0];
-            //         var lastShark = mChart.data.shark.slice(-1)[0];
-            //         var lastWolf = mChart.data.wolf.slice(-1)[0];
-            //         var lastSheep = mChart.data.sheep.slice(-1)[0];
-            //         //
-            //         if (mConfig.timeFrame > 0) {
-            //             mChart.series.price.setData(mChart.data.price);
-            //             mChart.series.shark.setData(mChart.data.shark);
-            //             mChart.series.wolf.setData(mChart.data.wolf);
-            //             mChart.series.sheep.setData(mChart.data.sheep);
-            //         } else {
-            //             mChart.series.price.update(lastPrice);
-            //             mChart.series.shark.update(lastShark);
-            //             mChart.series.wolf.update(lastWolf);
-            //             mChart.series.sheep.update(lastSheep);
-            //         }
-            //         if (!mConfig.hasCrosshair) {
-            //             updateLegend(
-            //                 lastPrice.value,
-            //                 lastShark.value,
-            //                 lastWolf.value,
-            //                 lastSheep.value
-            //             );
-            //         }
-            //         //
-            //         setLocalData("data", param);
-            //         mChart.data.original.push(param);
-            //     }
-            // }
-        }
-    }
+    // function priceHandler(data) {
+    //     if (data.id == 3220) {
+    //         console.log("price" + data.id);
+    //         if (!!mConfig.bidPrice && !!mConfig.askPrice) {
+    //             var side = "";
+    //             if (data.lastPrice <= mConfig.bidPrice) side = "SD";
+    //             else if (data.lastPrice >= mConfig.askPrice) side = "BU";
+    //             else if (mChart.data.original.length > 0)
+    //                 side = mChart.data.original.slice(-1)[0].side;
+    //             //
+    //             if (side != "") {
+    //                 var param = {
+    //                     time: `${mConfig.currentDate} ${data.time}`,
+    //                     price: data.lastPrice,
+    //                     vol: data.lastVol,
+    //                     side: side
+    //                 };
+    //                 mChart.data = createChartData(mChart.data, param);
+    //                 var lastPrice = mChart.data.price.slice(-1)[0];
+    //                 var lastShark = mChart.data.shark.slice(-1)[0];
+    //                 var lastWolf = mChart.data.wolf.slice(-1)[0];
+    //                 var lastSheep = mChart.data.sheep.slice(-1)[0];
+    //                 //
+    //                 if (mConfig.timeFrame > 0) {
+    //                     mChart.series.price.setData(mChart.data.price);
+    //                     mChart.series.shark.setData(mChart.data.shark);
+    //                     mChart.series.wolf.setData(mChart.data.wolf);
+    //                     mChart.series.sheep.setData(mChart.data.sheep);
+    //                 } else {
+    //                     mChart.series.price.update(lastPrice);
+    //                     mChart.series.shark.update(lastShark);
+    //                     mChart.series.wolf.update(lastWolf);
+    //                     mChart.series.sheep.update(lastSheep);
+    //                 }
+    //                 if (!mConfig.hasCrosshair) {
+    //                     updateLegend(
+    //                         lastPrice.value,
+    //                         lastShark.value,
+    //                         lastWolf.value,
+    //                         lastSheep.value
+    //                     );
+    //                 }
+    //                 //
+    //                 setLocalData("data", param);
+    //                 mChart.data.original.push(param);
+    //             }
+    //         }
+    //     }
+    // }
 
-    function bidAskHandler(data) {
-        if (data.id == 3210) {
-            var arr = data.g1.split("|");
-            if (data.side == "B") mConfig.bidPrice = +arr[0];
-            else mConfig.askPrice = +arr[0];
-        }
-    }
+    // function bidAskHandler(data) {
+    //     if (data.id == 3210) {
+    //         var arr = data.g1.split("|");
+    //         if (data.side == "B") mConfig.bidPrice = +arr[0];
+    //         else mConfig.askPrice = +arr[0];
+    //     }
+    // }
 }
 
 function loadPage() {
