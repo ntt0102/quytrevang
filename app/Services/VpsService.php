@@ -195,7 +195,7 @@ class VpsService extends CoreService
     {
         $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
         $client = new \GuzzleHttp\Client();
-        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size={$size}";
+        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/investor/his/paging?size={$size}";
         $res = $client->get($url);
         return json_decode($res->getBody())->data;
     }
@@ -209,9 +209,10 @@ class VpsService extends CoreService
         $temp = collect($array)->reduce(function ($carry, $item) {
             $carry['data'][] = [
                 'time' => date('Y-m-d ') . $item->t,
-                'price' => $item->p,
+                'price' => $item->ap,
                 'vol' => $item->v,
-                'side' => $item->a
+                'side' => $item->a,
+                'type' => $item->type
             ];
             $carry['times'][] = $item->t;
             return $carry;
