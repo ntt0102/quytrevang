@@ -1,3 +1,5 @@
+goog.require("proto.tcbs.InvestorHistoryTrade");
+
 var mConfig = {};
 var mChart = {
     object: {},
@@ -541,6 +543,8 @@ function createIndexedDB() {
 }
 
 function connectSocket() {
+    //
+
     var msg = { action: "join", list: mConfig.VN30F1M };
     var socket = io(mConfig.endpoint.socket);
     socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
@@ -612,6 +616,12 @@ function connectSocket() {
 }
 
 function loadPage() {
+    var base64 =
+        "CglWTjMwRjIzMDMRMzMzMzMFkUAZAAAAAAAAVkAhAMzMzMzM9D8pAAAAAAAAkUAxAAAAfOLaAUI4kc/QnwZCAkJVSgRXT0xGUAE=";
+    var message = proto.tcbs.InvestorHistoryTrade.deserializeBinary(
+        base64ToArrayUnit8(base64)
+    ).toObject();
+    console.log("message: ", message);
     getData().then(() => {
         getLocalData("order").then(data =>
             data.map(item => {
@@ -1091,4 +1101,13 @@ function updateLegend(price, shark, wolf, sheep) {
         document.getElementById(
             "sheepLegendP"
         ).innerText = sheep.toLocaleString("en-US");
+}
+function base64ToArrayUnit8(g) {
+    for (
+        var p = window.atob(g), r = p.length, h = new Uint8Array(r), A = 0;
+        A < r;
+        A++
+    )
+        h[A] = p.charCodeAt(A);
+    return h;
 }

@@ -208,10 +208,10 @@ class VpsService extends CoreService
         $array = $this->tcbsData($size);
         $temp = collect($array)->reduce(function ($carry, $item) {
             $carry['data'][] = [
-                'time' => date('Y-m-d ') . $item->t,
+                'time' => strtotime(date('Y-m-d ') . $item->t),
                 'price' => $item->ap,
-                'vol' => $item->v,
-                'side' => $item->a,
+                'volume' => $item->v,
+                'action' => $item->a,
                 'type' => $item->type
             ];
             $carry['times'][] = $item->t;
@@ -228,18 +228,14 @@ class VpsService extends CoreService
     {
         $filename = storage_path('app/public/vn30f1m/' . date('Y-m-d') . '.csv');
         $list = $this->tcbsData(10000);
-        // $list = \App\Models\Vps::all();
         $fp = fopen($filename, 'w');
-        foreach ($list as $obj) {
+        foreach ($list as $item) {
             $a = [];
-            $a[] = date('Y-m-d ') . $obj->t;
-            $a[] = $obj->p;
-            $a[] = $obj->v;
-            $a[] = $obj->a;
-            // $a[] = $obj->time;
-            // $a[] = $obj->price;
-            // $a[] = $obj->vol;
-            // $a[] = $obj->side;
+            $a[] = strtotime(date('Y-m-d ') . $item->t);
+            $a[] = $item->ap;
+            $a[] = $item->v;
+            $a[] = $item->a;
+            $a[] = $item->type;
             fputcsv($fp, $a);
         }
         fclose($fp);
@@ -253,12 +249,12 @@ class VpsService extends CoreService
         $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
-        $keys = ['time', 'price', 'vol', 'side'];
+        $keys = ['time', 'price', 'volume', 'action', 'type'];
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
                 $lines[] = collect($line)->reduce(function ($carry, $item, $index) use ($keys) {
-                    $carry[$keys[$index]] = $keys[$index] == 'price' || $keys[$index] == 'vol' ? $item + 0 : $item;
+                    $carry[$keys[$index]] = in_array($keys[$index], ['time', 'price', 'volume']) ? $item + 0 : $item;
                     return $carry;
                 }, []);
             }

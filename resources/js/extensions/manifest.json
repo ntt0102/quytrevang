@@ -16,6 +16,8 @@
         "smartpro/moment.min.js",
         "smartpro/lightweight-charts.min.js",
         "smartpro/simple-notify.min.js",
+        "smartpro/google-protobuf.js",
+        "smartpro/tcbs.js",
         "smartpro/script.js"
       ],
       "css": [
@@ -30,7 +32,8 @@
     {
       "resources": [
         "config.json",
-        "spinner.gif"
+        "spinner.gif",
+        "tcbs.proto"
       ],
       "matches": [
         "https://smartpro.vps.com.vn/*"
