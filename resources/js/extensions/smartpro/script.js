@@ -2,13 +2,14 @@ goog.require("proto.tcbs.BuySellActivePojo");
 
 var mConfig = {};
 var mChart = {
-    object: {},
+    self: {},
     series: {},
     data: {},
     order: { entry: {}, tp: {}, sl: {} },
     crosshair: {}
 };
 var mDatabase = {};
+var mNotify = {};
 
 getLocalConfig()
     .then(() => getServerConfig())
@@ -25,6 +26,11 @@ getLocalConfig()
     });
 
 function getLocalConfig() {
+    mNotify = pushNotify(
+        "warning",
+        "Vui lòng đợi đến khi cài đặt xong.",
+        false
+    );
     return new Promise((resolve, reject) => {
         const file = chrome.runtime.getURL("config.json");
         fetch(file)
@@ -189,7 +195,7 @@ function createLightWeightChart() {
     select.value = mConfig.timeFrame;
     select.addEventListener("change", e => {
         mConfig.timeFrame = e.target.value;
-        getData().then(() => mChart.object.timeScale().resetTimeScale());
+        getData().then(() => mChart.self.timeScale().resetTimeScale());
     });
     div.append(select);
     //
@@ -250,7 +256,7 @@ function createLightWeightChart() {
     button.id = "scrollButton";
     button.innerText = "≫";
     button.addEventListener("click", () =>
-        mChart.object.timeScale().scrollToRealTime()
+        mChart.self.timeScale().scrollToRealTime()
     );
     div.append(button);
     //
@@ -313,37 +319,37 @@ function createLightWeightChart() {
         crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
         timeScale: { timeVisible: true, rightOffset: 20, minBarSpacing: 0.1 }
     };
-    mChart.object = LightweightCharts.createChart(div, chartOptions);
+    mChart.self = LightweightCharts.createChart(div, chartOptions);
     //
-    mChart.object.subscribeClick(removeOrderButton);
-    mChart.object.subscribeCrosshairMove(crosshairMove);
-    mChart.object.subscribeCustomPriceLineDragged(priceLineDrag);
+    mChart.self.subscribeClick(removeOrderButton);
+    mChart.self.subscribeCrosshairMove(crosshairMove);
+    mChart.self.subscribeCustomPriceLineDragged(priceLineDrag);
     //
-    mChart.series.wolf = mChart.object.addLineSeries({
+    mChart.series.wolf = mChart.self.addLineSeries({
         priceScaleId: "wolf",
         color: "#FFFF00",
         priceFormat: { minMove: 1 },
         scaleMargins: { top: 0.5, bottom: 0 },
         visible: false
     });
-    mChart.series.sheep = mChart.object.addLineSeries({
+    mChart.series.sheep = mChart.self.addLineSeries({
         priceScaleId: "sheep",
         color: "#00FFFF",
         priceFormat: { minMove: 1 },
         scaleMargins: { top: 0.5, bottom: 0 }
     });
-    mChart.series.shark = mChart.object.addLineSeries({
+    mChart.series.shark = mChart.self.addLineSeries({
         priceScaleId: "shark",
         color: "#FF00FF",
         priceFormat: { minMove: 1 },
         scaleMargins: { top: 0.5, bottom: 0 }
     });
-    mChart.series.price = mChart.object.addLineSeries({
+    mChart.series.price = mChart.self.addLineSeries({
         color: "white",
         priceFormat: { minMove: 0.1 }
     });
 
-    mChart.object.timeScale().fitContent();
+    mChart.self.timeScale().fitContent();
 
     function crosshairMove(e) {
         if (e.time) {
@@ -372,7 +378,7 @@ function createLightWeightChart() {
             }
         } else {
             if (!mChart.order.entry.hasOwnProperty("line")) {
-                const price = mChart.object
+                const price = mChart.self
                     .priceScale("right")
                     .formatPrice(
                         mChart.series.price.coordinateToPrice(
@@ -394,17 +400,11 @@ function createLightWeightChart() {
 
     function priceLineDrag(e) {
         const line = e.customPriceLine.options();
-        mChart.order[line.kind].price = mChart.object
+        mChart.order[line.kind].price = mChart.self
             .priceScale("right")
             .formatPrice(line.price);
         switch (line.kind) {
             case "entry":
-                // if (getOrderPosition()) {
-                //     mChart.order[line.kind].line.applyOptions({
-                //         price: e.fromPriceString
-                //     });
-                //     pushNotify("warning", "Không được thay đổi lệnh đã khớp.");
-                // } else
                 orderEntryPrice();
                 break;
             case "tp":
@@ -482,35 +482,35 @@ function registerEvent() {
     }
 
     function resizeChart() {
-        mChart.object.resize(window.innerWidth, window.innerHeight);
+        mChart.self.resize(window.innerWidth, window.innerHeight);
     }
 
     function zoomChart(event) {
         if (event.ctrlKey || event.metaKey) {
             if (event.shiftKey) {
                 if (event.keyCode == 39)
-                    mChart.object.timeScale().scrollToRealTime();
+                    mChart.self.timeScale().scrollToRealTime();
             } else {
                 if (event.keyCode == 38) {
-                    const options = mChart.object.options();
-                    mChart.object.timeScale().applyOptions({
+                    const options = mChart.self.options();
+                    mChart.self.timeScale().applyOptions({
                         barSpacing: options.timeScale.barSpacing + 0.1
                     });
                 } else if (event.keyCode == 40) {
-                    const options = mChart.object.options();
+                    const options = mChart.self.options();
                     if (
                         options.timeScale.barSpacing >
                         options.timeScale.minBarSpacing
                     )
-                        mChart.object.timeScale().applyOptions({
+                        mChart.self.timeScale().applyOptions({
                             barSpacing: options.timeScale.barSpacing - 0.1
                         });
                 } else if (event.keyCode == 37) {
-                    const position = mChart.object.timeScale().scrollPosition();
-                    mChart.object.timeScale().scrollToPosition(position - 10);
+                    const position = mChart.self.timeScale().scrollPosition();
+                    mChart.self.timeScale().scrollToPosition(position - 10);
                 } else if (event.keyCode == 39) {
-                    const position = mChart.object.timeScale().scrollPosition();
-                    mChart.object.timeScale().scrollToPosition(position + 10);
+                    const position = mChart.self.timeScale().scrollPosition();
+                    mChart.self.timeScale().scrollToPosition(position + 10);
                 }
             }
         } else if (event.which === 27) removeOrderButton();
@@ -601,78 +601,11 @@ function connectSocket() {
     ws.onerror = function(e) {
         console.log("ws-error", e);
     };
-    //
-    // var msg = { action: "join", list: mConfig.VN30F1M };
-    // var socket = io(mConfig.endpoint.socket);
-    // socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
-    // socket.on("reconnect", () => {
-    //     socket.emit("regs", JSON.stringify(msg));
-    //     getData();
-    // });
-    // // socket.on("boardps", data => bidAskHandler(data.data));
-    // // socket.on("stockps", data => priceHandler(data.data));
-    // socket.on("stockps", data => (data.data.id == 3220 ? getData(3) : false));
-    // function priceHandler(data) {
-    //     if (data.id == 3220) {
-    //         console.log("price" + data.id);
-    //         if (!!mConfig.bidPrice && !!mConfig.askPrice) {
-    //             var side = "";
-    //             if (data.lastPrice <= mConfig.bidPrice) side = "SD";
-    //             else if (data.lastPrice >= mConfig.askPrice) side = "BU";
-    //             else if (mChart.data.original.length > 0)
-    //                 side = mChart.data.original.slice(-1)[0].side;
-    //             //
-    //             if (side != "") {
-    //                 var param = {
-    //                     time: `${mConfig.currentDate} ${data.time}`,
-    //                     price: data.lastPrice,
-    //                     vol: data.lastVol,
-    //                     side: side
-    //                 };
-    //                 mChart.data = createChartData(mChart.data, param);
-    //                 var lastPrice = mChart.data.price.slice(-1)[0];
-    //                 var lastShark = mChart.data.shark.slice(-1)[0];
-    //                 var lastWolf = mChart.data.wolf.slice(-1)[0];
-    //                 var lastSheep = mChart.data.sheep.slice(-1)[0];
-    //                 //
-    //                 if (mConfig.timeFrame > 0) {
-    //                     mChart.series.price.setData(mChart.data.price);
-    //                     mChart.series.shark.setData(mChart.data.shark);
-    //                     mChart.series.wolf.setData(mChart.data.wolf);
-    //                     mChart.series.sheep.setData(mChart.data.sheep);
-    //                 } else {
-    //                     mChart.series.price.update(lastPrice);
-    //                     mChart.series.shark.update(lastShark);
-    //                     mChart.series.wolf.update(lastWolf);
-    //                     mChart.series.sheep.update(lastSheep);
-    //                 }
-    //                 if (!mConfig.hasCrosshair) {
-    //                     updateLegend(
-    //                         lastPrice.value,
-    //                         lastShark.value,
-    //                         lastWolf.value,
-    //                         lastSheep.value
-    //                     );
-    //                 }
-    //                 //
-    //                 setLocalData("data", param);
-    //                 mChart.data.original.push(param);
-    //             }
-    //         }
-    //     }
-    // }
-    // function bidAskHandler(data) {
-    //     if (data.id == 3210) {
-    //         var arr = data.g1.split("|");
-    //         if (data.side == "B") mConfig.bidPrice = +arr[0];
-    //         else mConfig.askPrice = +arr[0];
-    //     }
-    // }
 }
 
 function loadPage() {
     getData().then(() => {
-        getLocalData("order").then(data =>
+        getLocalData("order").then(data => {
             data.map(item => {
                 mChart.order.side = item.side;
                 mChart.order[item.kind].price = item.price;
@@ -685,8 +618,9 @@ function loadPage() {
                     }
                     showCancelOrderButton();
                 }
-            })
-        );
+            });
+            mNotify.close();
+        });
     });
     //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
@@ -694,12 +628,8 @@ function loadPage() {
 }
 
 function intervalHandler() {
-    mConfig.currentTime = moment(
-        `${mConfig.currentDate} ${
-            document.querySelector(".timeStamp").innerText
-        }`,
-        "YYYY-MM-DD H:mm:ss"
-    ).format("HH:mm:ss");
+    mConfig.currentTime = moment().unix();
+    //
     // Auto order TP/SL and close order position
     if (getOrderPosition()) {
         if (
@@ -748,9 +678,7 @@ function getData(size = 10000) {
                 clearLocalData("data").then(() => setLocalData("data", data));
                 //
                 mChart.data = data.reduce(
-                    (r, item) => {
-                        return createChartData(r, item);
-                    },
+                    (r, item) => createChartData(r, item),
                     {
                         original: [],
                         price: [],
@@ -1109,11 +1037,11 @@ function showCancelOrderButton() {
     btn.style.background = mChart.order.side ? "green" : "red";
 }
 
-function pushNotify(status = "success", text = "test") {
-    new Notify({
+function pushNotify(status = "success", text = "test", autoclose = true) {
+    return new Notify({
         status: status,
         text: text,
-        autoclose: true,
+        autoclose: autoclose,
         position: "right bottom"
     });
 }
