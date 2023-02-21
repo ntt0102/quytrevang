@@ -3,19 +3,14 @@
 namespace App\Services\Special;
 
 use App\Services\CoreService;
-use App\Repositories\ParameterRepository;
 use App\Repositories\VpsRepository;
 
 class SocketService extends CoreService
 {
-    private $parameterRepository;
     private $vpsRepository;
 
-    public function __construct(
-        ParameterRepository $parameterRepository,
-        VpsRepository $vpsRepository
-    ) {
-        $this->parameterRepository = $parameterRepository;
+    public function __construct(VpsRepository $vpsRepository)
+    {
         $this->vpsRepository = $vpsRepository;
     }
 
@@ -37,8 +32,8 @@ class SocketService extends CoreService
                             $second = substr($msg, 1, 1);
                             if ($second == 0) {
                                 activity()->log("Socket opened.");
-                                $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
-                                $data = ['action' => 'join', 'list' => $VN30F1M];
+                                $symbol = app(\App\Services\VpsService::class)->getPsSymbol();
+                                $data = ['action' => 'join', 'list' => $symbol];
                                 $conn->send('42' . json_encode(["regs", json_encode($data)]));
                             } else if ($second == 2) {
                                 $json = json_decode(substr($msg, 2));

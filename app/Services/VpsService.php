@@ -10,7 +10,6 @@ use App\Repositories\UserRepository;
 use App\Repositories\TradeRepository;
 use App\Repositories\VpsRepository;
 use App\Repositories\StrategyRepository;
-use Illuminate\Support\Facades\Storage;
 use App\Events\UpdateTradeEvent;
 
 class VpsService extends CoreService
@@ -96,21 +95,19 @@ class VpsService extends CoreService
      */
     public function getConfig($request)
     {
-        $this->parameterRepository->setValue('VN30F1M', $request->VN30F1M);
-        //
         $isOpeningMarket = $this->checkOpeningMarket();
         $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
-        return [
+        $configs = [
             'isOpeningMarket' => $isOpeningMarket,
             'contractNumber' => $tradeContracts,
             'time' => [
                 'start' => strtotime(date('Y-m-d ') . $startTime),
                 'end' => strtotime(date('Y-m-d ') . $endTime)
-            ],
-            'strategy' => $this->strategyRepository->getLast()
+            ]
         ];
+        return array_merge($configs, $this->getOtherConfigs());
     }
 
     /**
@@ -191,11 +188,40 @@ class VpsService extends CoreService
     /**
      * Tcbs data
      */
+    public function getPsSymbol()
+    {
+        $client = new \GuzzleHttp\Client();
+        $url = "https://spwapidatafeed.vps.com.vn/pslistdata";
+        $res = $client->get($url);
+        return json_decode($res->getBody())[0];
+    }
+
+    /**
+     * Tcbs data
+     */
+    private function getOtherConfigs()
+    {
+        $symbol = $this->getPsSymbol();
+        $client = new \GuzzleHttp\Client();
+        $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
+        $res = $client->get($url);
+        $c = json_decode($res->getBody())[0]->c;
+        $escrow = ($c * 0.1 * 0.17) / 0.8;
+        return [
+            'symbol' => $symbol,
+            'sheepLimit' => intval(800 / $escrow),
+            'sharkLimit' => intval(2000 / $escrow)
+        ];
+    }
+
+    /**
+     * Tcbs data
+     */
     private function tcbsData($size)
     {
-        $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
+        $symbol = $this->getPsSymbol();
         $client = new \GuzzleHttp\Client();
-        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size={$size}";
+        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$symbol}/his/paging?size={$size}";
         $res = $client->get($url);
         return json_decode($res->getBody())->data;
     }

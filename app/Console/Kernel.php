@@ -32,21 +32,21 @@ class Kernel extends ConsoleKernel
             $openingMarketFlag = app(\App\Services\VpsService::class)->checkOpeningMarket();
             set_global_value('openingMarketFlag', $openingMarketFlag ? '1' : '0');
             if ($openingMarketFlag) {
-                set_global_value('bidPrice', '0');
-                set_global_value('askPrice', '0');
+                // set_global_value('bidPrice', '0');
+                // set_global_value('askPrice', '0');
+                // app(\App\Repositories\VpsRepository::class)->clear();
                 set_global_value('reportedTradingFlag', '0');
-                app(\App\Repositories\VpsRepository::class)->clear();
             }
         })->dailyAt('08:55');
         //
-        $schedule->call(function () {
-            if (get_global_value('openingMarketFlag') == '1') {
-                set_global_value('startSocketTime', now()->format('H:i:s'));
-                app(\App\Services\Special\SocketService::class)->connectVps();
-            }
-        })->everyMinute()
-            ->between(trading_time('startTradingTime', true), trading_time('endTradingTime', true))
-            ->unlessBetween(trading_time('startBreakTime', true), trading_time('endBreakTime', true));
+        // $schedule->call(function () {
+        //     if (get_global_value('openingMarketFlag') == '1') {
+        //         set_global_value('startSocketTime', now()->format('H:i:s'));
+        //         app(\App\Services\Special\SocketService::class)->connectVps();
+        //     }
+        // })->everyMinute()
+        //     ->between(trading_time('startTradingTime', true), trading_time('endTradingTime', true))
+        //     ->unlessBetween(trading_time('startBreakTime', true), trading_time('endBreakTime', true));
         //
         $schedule->call(function () {
             if (get_global_value('openingMarketFlag') == '1')
