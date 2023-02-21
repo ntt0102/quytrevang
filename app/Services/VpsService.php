@@ -106,8 +106,8 @@ class VpsService extends CoreService
             'isOpeningMarket' => $isOpeningMarket,
             'contractNumber' => $tradeContracts,
             'time' => [
-                'start' => $startTime,
-                'end' => $endTime
+                'start' => strtotime(date('Y-m-d ') . $startTime),
+                'end' => strtotime(date('Y-m-d ') . $endTime)
             ],
             'strategy' => $this->strategyRepository->getLast()
         ];
