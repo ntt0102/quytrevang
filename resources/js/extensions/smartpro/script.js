@@ -630,6 +630,7 @@ function loadPage() {
                 }
             });
             mNotify.close();
+            document.getElementById("lineButton").click();
         });
     });
     //
