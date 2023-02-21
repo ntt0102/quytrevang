@@ -38,19 +38,11 @@ function getLocalConfig() {
             .then(json => {
                 // console.log("localConfig", json);
                 mConfig = json;
-                mConfig.isReportedResult = false;
-                mConfig.currentDate = moment().format("YYYY-MM-DD");
-                mConfig.currentTime = moment().format("HH:mm:ss");
-                setTimeout(() => {
-                    mConfig.VN30F1M = document.getElementById(
-                        "tbodyPhaisinhContent"
-                    ).rows[0].cells[0].innerText;
-                    resolve();
-                }, 1000);
+                resolve();
             })
             .catch(() => {
                 console.log(err);
-                var choice = confirm("Get config error. Refresh now?");
+                var choice = confirm("Get local config error. Refresh now?");
                 if (choice) location.reload();
             });
     });
@@ -62,31 +54,26 @@ function getServerConfig() {
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ VN30F1M: mConfig.VN30F1M })
+            body: JSON.stringify({})
         })
             .then(response => response.json())
             .then(json => {
                 // console.log("serverConfig", json);
                 mConfig.isOpeningMarket = json.isOpeningMarket;
                 mConfig.contractNumber = json.contractNumber;
+                mConfig.isReportedResult = json.isReportedResult;
+                mConfig.symbol = json.symbol;
+                mConfig.sheepLimit = json.sheepLimit;
+                mConfig.sharkLimit = json.sharkLimit;
                 mConfig.time = { ...mConfig.time, ...json.time };
-                //
-                const celPrice = +document.getElementById(
-                    `${mConfig.VN30F1M}cel`
-                ).innerText;
-                const escrow = (celPrice * 0.1 * 0.17) / 0.8;
-                mConfig.sheepLimit = parseInt(800 / escrow);
-                mConfig.sharkLimit = parseInt(2000 / escrow);
-                //
                 mConfig.hasCrosshair = false;
-                mConfig.bidPrice = 0;
-                mConfig.askPrice = 0;
+                mConfig.currentTime = moment().unix();
                 //
                 resolve();
             })
             .catch(err => {
                 console.log(err);
-                var choice = confirm("Get config error. Refresh now?");
+                var choice = confirm("Get server config error. Refresh now?");
                 if (choice) location.reload();
             });
     });
@@ -203,7 +190,7 @@ function createLightWeightChart() {
     input.id = "dateInput";
     input.type = "date";
     input.addEventListener("change", e => {
-        if (!!e.target.value) getData(e.target.value);
+        if (!!e.target.value) getData();
     });
     div.append(input);
     //
@@ -465,7 +452,7 @@ function registerEvent() {
         var stopOperation = document.getElementById("right_selStopOrderType")
             .value;
         var stopPrice = document.getElementById("right_stopOrderIndex").value;
-        var currentPrice = document.getElementById(`${mConfig.VN30F1M}pri`)
+        var currentPrice = document.getElementById(`${mConfig.symbol}pri`)
             .innerText;
         if (Math.abs(currentPrice - stopPrice) < 20) {
             if (stopOperation == "SOL" && currentPrice >= stopPrice)
@@ -545,9 +532,9 @@ function connectSocket() {
     var ws = new WebSocket(wsUri);
     ws.onopen = function(e) {
         ws.send("d|ut|C001|");
-        ws.send(`d|st|C001|${mConfig.VN30F1M}`);
-        ws.send(`d|st|C001|${mConfig.VN30F1M}`);
-        ws.send(`d|s|${mConfig.VN30F1M}`);
+        ws.send(`d|st|C001|${mConfig.symbol}`);
+        ws.send(`d|st|C001|${mConfig.symbol}`);
+        ws.send(`d|s|${mConfig.symbol}`);
     };
     ws.onclose = function(e) {
         console.log("ws-close", e);
@@ -718,7 +705,7 @@ function getData(size = 10000) {
 }
 
 function createChartData(r, item) {
-    const time = item.time + 7 * 60 * 60;
+    var time = item.time + 7 * 60 * 60;
     const prevShark = !!r.shark.length ? r.shark.slice(-1)[0].value : 0;
     const prevWolf = !!r.wolf.length ? r.wolf.slice(-1)[0].value : 0;
     const prevSheep = !!r.sheep.length ? r.sheep.slice(-1)[0].value : 0;
@@ -869,7 +856,7 @@ function reportHandler() {
             fees: +document
                 .getElementById("othersAccInfo")
                 .innerText.replaceAll(",", ""),
-            scores: +document.getElementById(`${mConfig.VN30F1M}ref`).innerText
+            scores: +document.getElementById(`${mConfig.symbol}ref`).innerText
         };
         fetch(url, {
             method: "POST",
@@ -1050,7 +1037,7 @@ function pushNotify(status = "success", text = "test", autoclose = true) {
 
 function getOrderPosition() {
     const el = document.querySelector(
-        `#danhmuc_${mConfig.VN30F1M} > td:nth-child(2)`
+        `#danhmuc_${mConfig.symbol} > td:nth-child(2)`
     );
     if (!el) return 0;
     const position = el.innerText;
