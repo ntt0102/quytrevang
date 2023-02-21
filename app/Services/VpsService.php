@@ -266,6 +266,36 @@ class VpsService extends CoreService
         return array_values(array_intersect_key($lines, $unique_times));
     }
 
+    // function exedata()
+    // {
+    //     $dates = [
+    //         '2023-02-06', '2023-02-07', '2023-02-08',
+    //         '2023-02-09', '2023-02-10', '2023-02-13',
+    //         '2023-02-14', '2023-02-15', '2023-02-16',
+    //         '2023-02-17', '2023-02-20'
+    //     ];
+    //     foreach ($dates as $date) {
+    //         $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
+    //         $filename_ = storage_path('app/public/vn30f1m/' . $date . '_.csv');
+    //         $fp = fopen($filename, 'r');
+    //         $fp_ = fopen($filename_, 'w');
+    //         while (!feof($fp)) {
+    //             $line = fgetcsv($fp);
+    //             if (!!$line) {
+    //                 $a = [
+    //                     strtotime($line[0]),
+    //                     $line[1] + 0,
+    //                     $line[2] + 0,
+    //                     $line[3]
+    //                 ];
+    //                 fputcsv($fp_, $a);
+    //             }
+    //         }
+    //         fclose($fp_);
+    //         fclose($fp);
+    //     }
+    // }
+
     /**
      * 
      */
