@@ -30,6 +30,7 @@ function getLocalConfig() {
         fetch(file)
             .then(response => response.json())
             .then(json => {
+                // console.log("localConfig", json);
                 mConfig = json;
                 mConfig.isReportedResult = false;
                 mConfig.currentDate = moment().format("YYYY-MM-DD");
@@ -40,7 +41,6 @@ function getLocalConfig() {
                     ).rows[0].cells[0].innerText;
                     resolve();
                 }, 1000);
-                console.log("mConfig", mConfig);
             })
             .catch(() => {
                 console.log(err);
@@ -60,7 +60,7 @@ function getServerConfig() {
         })
             .then(response => response.json())
             .then(json => {
-                console.log("getServerConfig", json);
+                // console.log("serverConfig", json);
                 mConfig.isOpeningMarket = json.isOpeningMarket;
                 mConfig.contractNumber = json.contractNumber;
                 mConfig.time = { ...mConfig.time, ...json.time };
@@ -71,8 +71,6 @@ function getServerConfig() {
                 const escrow = (celPrice * 0.1 * 0.17) / 0.8;
                 mConfig.sheepLimit = parseInt(800 / escrow);
                 mConfig.sharkLimit = parseInt(2000 / escrow);
-                console.log("mConfig.sheepLimit: ", mConfig.sheepLimit);
-                console.log("mConfig.sharkLimit: ", mConfig.sharkLimit);
                 //
                 mConfig.hasCrosshair = false;
                 mConfig.bidPrice = 0;
@@ -739,13 +737,13 @@ function getData(size = 10000) {
     return new Promise((resolve, reject) => {
         Promise.all([getServerData(size), getLocalData("data")])
             .then(arr => {
-                console.log("getData: ", arr);
-                var ids = new Set(arr[0].map(d => d.time));
-                var data = [
+                // console.log("getData: ", arr);
+                const ids = new Set(arr[0].map(d => d.time));
+                const data = [
                     ...arr[0],
                     ...arr[1].filter(d => !ids.has(d.time))
                 ].sort((a, b) => a.time - b.time);
-                console.log("data", data);
+                // console.log("data", data);
                 //
                 clearLocalData("data").then(() => setLocalData("data", data));
                 //
@@ -761,10 +759,10 @@ function getData(size = 10000) {
                         sheep: []
                     }
                 );
-                console.log(
-                    "chartData",
-                    JSON.parse(JSON.stringify(mChart.data))
-                );
+                // console.log(
+                //     "chartData",
+                //     JSON.parse(JSON.stringify(mChart.data))
+                // );
                 //
                 mChart.series.price.setData(mChart.data.price);
                 mChart.series.shark.setData(mChart.data.shark);
@@ -790,20 +788,17 @@ function getData(size = 10000) {
 }
 
 function createChartData(r, item) {
-    var time = moment
-        .utc(item.time * 1000)
-        .add(7, "hours")
-        .unix();
-    var prevShark = !!r.shark.length ? r.shark.slice(-1)[0].value : 0;
-    var prevWolf = !!r.wolf.length ? r.wolf.slice(-1)[0].value : 0;
-    var prevSheep = !!r.sheep.length ? r.sheep.slice(-1)[0].value : 0;
-    var volume = (item.action == "BU" ? 1 : -1) * item.volume;
+    const time = item.time + 7 * 60 * 60;
+    const prevShark = !!r.shark.length ? r.shark.slice(-1)[0].value : 0;
+    const prevWolf = !!r.wolf.length ? r.wolf.slice(-1)[0].value : 0;
+    const prevSheep = !!r.sheep.length ? r.sheep.slice(-1)[0].value : 0;
+    const volume = (item.action == "BU" ? 1 : -1) * item.volume;
     if (mConfig.timeFrame > 0) {
-        var period = 60 * mConfig.timeFrame;
-        var timeIndex = Math.floor(time / period);
+        const period = 60 * mConfig.timeFrame;
+        const timeIndex = Math.floor(time / period);
         var isSameTime = false;
         if (!!r.price.length) {
-            var prevTime = r.price.slice(-1)[0].time;
+            const prevTime = r.price.slice(-1)[0].time;
             if (timeIndex == Math.floor(prevTime / period)) isSameTime = true;
         }
         if (isSameTime) {
@@ -818,12 +813,10 @@ function createChartData(r, item) {
     r.price.push({ time: time, value: item.price });
     r.shark.push({
         time: time,
-        // value: prevShark + (item.type == "SHARK" ? volume : 0)
         value: prevShark + (item.volume > mConfig.sharkLimit ? volume : 0)
     });
     r.wolf.push({
         time: time,
-        // value: prevWolf + (item.type == "WOLF" ? volume : 0)
         value:
             prevWolf +
             (item.volume >= mConfig.sheepLimit &&
@@ -833,7 +826,6 @@ function createChartData(r, item) {
     });
     r.sheep.push({
         time: time,
-        // value: prevSheep + (item.type == "SHEEP" ? volume : 0)
         value: prevSheep + (item.volume < mConfig.sheepLimit ? volume : 0)
     });
     //
@@ -925,7 +917,6 @@ function clearLocalData(table) {
             .clear();
 
         request.onsuccess = () => {
-            console.log(`Object Store "${table}" emptied`);
             resolve();
         };
 
