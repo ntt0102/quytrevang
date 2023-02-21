@@ -211,8 +211,7 @@ class VpsService extends CoreService
                 'time' => strtotime(date('Y-m-d ') . $item->t),
                 'price' => $item->p,
                 'volume' => $item->v,
-                'action' => $item->a,
-                // 'type' => $item->type
+                'action' => $item->a
             ];
             $carry['times'][] = $item->t;
             return $carry;
@@ -232,10 +231,9 @@ class VpsService extends CoreService
         foreach ($list as $item) {
             $a = [];
             $a[] = strtotime(date('Y-m-d ') . $item->t);
-            $a[] = $item->ap;
+            $a[] = $item->p;
             $a[] = $item->v;
             $a[] = $item->a;
-            // $a[] = $item->type;
             fputcsv($fp, $a);
         }
         fclose($fp);

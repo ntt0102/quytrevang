@@ -174,9 +174,9 @@
             //     "42" + JSON.stringify(["regs", JSON.stringify(msg)])
             // );
             websocket.send("d|ut|C001|");
-            websocket.send("d|st|C001|VN30F2302");
-            websocket.send("d|st|C001|VN30F2302");
-            websocket.send("d|s|VN30F2302");
+            websocket.send("d|st|C001|VN30F2303");
+            websocket.send("d|st|C001|VN30F2303");
+            websocket.send("d|s|VN30F2303");
         };
         websocket.onclose = function(evt) {
             console.log("onclose", evt);
@@ -189,52 +189,52 @@
             console.log("onerror", evt);
         };
     }
-    // window.addEventListener("load", testWebSocket, false);
+    window.addEventListener("load", testWebSocket, false);
     // window.addEventListener("load", decrypt, false);
 
-    window.addEventListener("load", () => {
-        // var base64 =
-        //     "CglWTjMwRjIzMDIRmpmZmZlRkEAZAAAAAAAA8D8hMzMzMzNRkEApAAAAAAAACEAxmpmZmZlRkEA5AAAAAAAAN0BA6962nwY=";
-        // var base64 =
-        //     "CglWTjMwRjIzMDIQwNzUw+UwGZqZmZmZUZBAITMzMzMzUZBAKZqZmZmZUZBAMTMzMzMzUZBAOAlBAAAAAAAK+0BJMzMzMzMzHUBQPFlmZmZmZlvCQGEAAAP+mAqlQmlH5shbfdV8P3EAAAAAAESQQHkAAAAAAF6QQIEBAAAAAABEkEA=";
-        // console.log(base64);
-        // var buffer = base64ToArrayUnit8(base64);
-        // console.log(buffer);
-        // console.log(binaryReader(buffer, 0, "utf-8"));
+    // window.addEventListener("load", () => {
+    //     // var base64 =
+    //     //     "CglWTjMwRjIzMDIRmpmZmZlRkEAZAAAAAAAA8D8hMzMzMzNRkEApAAAAAAAACEAxmpmZmZlRkEA5AAAAAAAAN0BA6962nwY=";
+    //     // var base64 =
+    //     //     "CglWTjMwRjIzMDIQwNzUw+UwGZqZmZmZUZBAITMzMzMzUZBAKZqZmZmZUZBAMTMzMzMzUZBAOAlBAAAAAAAK+0BJMzMzMzMzHUBQPFlmZmZmZlvCQGEAAAP+mAqlQmlH5shbfdV8P3EAAAAAAESQQHkAAAAAAF6QQIEBAAAAAABEkEA=";
+    //     // console.log(base64);
+    //     // var buffer = base64ToArrayUnit8(base64);
+    //     // console.log(buffer);
+    //     // console.log(binaryReader(buffer, 0, "utf-8"));
 
-        async function encodeTestMessage(payload) {
-            const root = await protobuf.load("tcbs.proto");
-            const testMessage = root.lookupType("tcbs.testMessage");
-            const message = testMessage.create(payload);
-            return testMessage.encode(message).finish();
-        }
+    //     async function encodeTestMessage(payload) {
+    //         const root = await protobuf.load("tcbs.proto");
+    //         const testMessage = root.lookupType("tcbs.testMessage");
+    //         const message = testMessage.create(payload);
+    //         return testMessage.encode(message).finish();
+    //     }
 
-        async function decodeTestMessage(buffer) {
-            const root = await protobuf.load("tcbs.proto");
-            const testMessage = root.lookupType("tcbs.testMessage");
-            const err = testMessage.verify(buffer);
-            if (err) {
-                throw err;
-            }
-            const message = testMessage.decode(buffer);
-            return testMessage.toObject(message);
-        }
+    //     async function decodeTestMessage(buffer) {
+    //         const root = await protobuf.load("tcbs.proto");
+    //         const testMessage = root.lookupType("tcbs.testMessage");
+    //         const err = testMessage.verify(buffer);
+    //         if (err) {
+    //             throw err;
+    //         }
+    //         const message = testMessage.decode(buffer);
+    //         return testMessage.toObject(message);
+    //     }
 
-        async function testProtobuf() {
-            const payload = {
-                timestamp: Math.round(new Date().getTime() / 1000),
-                message: "A rose by any other name would smell as sweet"
-            };
-            console.log("Test message:", payload);
-            const buffer = await encodeTestMessage(payload);
-            console.log(
-                `Encoded message (${buffer.length} bytes): `,
-                buffer.toString("hex")
-            );
-            const decodedMessage = await decodeTestMessage(buffer);
-            console.log("Decoded test message:", decodedMessage);
-        }
+    //     async function testProtobuf() {
+    //         const payload = {
+    //             timestamp: Math.round(new Date().getTime() / 1000),
+    //             message: "A rose by any other name would smell as sweet"
+    //         };
+    //         console.log("Test message:", payload);
+    //         const buffer = await encodeTestMessage(payload);
+    //         console.log(
+    //             `Encoded message (${buffer.length} bytes): `,
+    //             buffer.toString("hex")
+    //         );
+    //         const decodedMessage = await decodeTestMessage(buffer);
+    //         console.log("Decoded test message:", decodedMessage);
+    //     }
 
-        testProtobuf();
-    });
+    //     testProtobuf();
+    // });
 </script>

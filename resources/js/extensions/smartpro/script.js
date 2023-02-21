@@ -1,4 +1,4 @@
-goog.require("proto.tcbs.InvestorHistoryTrade");
+goog.require("proto.tcbs.BuySellActivePojo");
 
 var mConfig = {};
 var mChart = {
@@ -543,19 +543,77 @@ function createIndexedDB() {
 }
 
 function connectSocket() {
-    //
-
-    var msg = { action: "join", list: mConfig.VN30F1M };
-    var socket = io(mConfig.endpoint.socket);
-    socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
-    socket.on("reconnect", () => {
-        socket.emit("regs", JSON.stringify(msg));
+    var wsUri = "wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream";
+    var ws = new WebSocket(wsUri);
+    ws.onopen = function(e) {
+        ws.send("d|ut|C001|");
+        ws.send(`d|st|C001|${mConfig.VN30F1M}`);
+        ws.send(`d|st|C001|${mConfig.VN30F1M}`);
+        ws.send(`d|s|${mConfig.VN30F1M}`);
+    };
+    ws.onclose = function(e) {
+        console.log("ws-close", e);
+        connectSocket();
         getData();
-    });
-    // socket.on("boardps", data => bidAskHandler(data.data));
-    // socket.on("stockps", data => priceHandler(data.data));
-    socket.on("stockps", data => (data.data.id == 3220 ? getData(3) : false));
-
+    };
+    ws.onmessage = function(e) {
+        const t = e.data.split("|");
+        if (t[0] == "C001") {
+            // console.log("ws-message", e.data);
+            const message = proto.tcbs.BuySellActivePojo.deserializeBinary(
+                base64ToArrayUnit8(t[2])
+            ).toObject();
+            console.log("message: ", message);
+            const param = {
+                time: message.timesec,
+                price: message.closeprice,
+                volume: message.closevol,
+                action: message.action
+            };
+            mChart.data = createChartData(mChart.data, param);
+            const lastPrice = mChart.data.price.slice(-1)[0];
+            const lastShark = mChart.data.shark.slice(-1)[0];
+            const lastWolf = mChart.data.wolf.slice(-1)[0];
+            const lastSheep = mChart.data.sheep.slice(-1)[0];
+            //
+            if (mConfig.timeFrame > 0) {
+                mChart.series.price.setData(mChart.data.price);
+                mChart.series.shark.setData(mChart.data.shark);
+                mChart.series.wolf.setData(mChart.data.wolf);
+                mChart.series.sheep.setData(mChart.data.sheep);
+            } else {
+                mChart.series.price.update(lastPrice);
+                mChart.series.shark.update(lastShark);
+                mChart.series.wolf.update(lastWolf);
+                mChart.series.sheep.update(lastSheep);
+            }
+            if (!mConfig.hasCrosshair) {
+                updateLegend(
+                    lastPrice.value,
+                    lastShark.value,
+                    lastWolf.value,
+                    lastSheep.value
+                );
+            }
+            //
+            setLocalData("data", param);
+            mChart.data.original.push(param);
+        }
+    };
+    ws.onerror = function(e) {
+        console.log("ws-error", e);
+    };
+    //
+    // var msg = { action: "join", list: mConfig.VN30F1M };
+    // var socket = io(mConfig.endpoint.socket);
+    // socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
+    // socket.on("reconnect", () => {
+    //     socket.emit("regs", JSON.stringify(msg));
+    //     getData();
+    // });
+    // // socket.on("boardps", data => bidAskHandler(data.data));
+    // // socket.on("stockps", data => priceHandler(data.data));
+    // socket.on("stockps", data => (data.data.id == 3220 ? getData(3) : false));
     // function priceHandler(data) {
     //     if (data.id == 3220) {
     //         console.log("price" + data.id);
@@ -605,7 +663,6 @@ function connectSocket() {
     //         }
     //     }
     // }
-
     // function bidAskHandler(data) {
     //     if (data.id == 3210) {
     //         var arr = data.g1.split("|");
@@ -616,12 +673,6 @@ function connectSocket() {
 }
 
 function loadPage() {
-    var base64 =
-        "CglWTjMwRjIzMDMRMzMzMzMFkUAZAAAAAAAAVkAhAMzMzMzM9D8pAAAAAAAAkUAxAAAAfOLaAUI4kc/QnwZCAkJVSgRXT0xGUAE=";
-    var message = proto.tcbs.InvestorHistoryTrade.deserializeBinary(
-        base64ToArrayUnit8(base64)
-    ).toObject();
-    console.log("message: ", message);
     getData().then(() => {
         getLocalData("order").then(data =>
             data.map(item => {
@@ -693,7 +744,7 @@ function getData(size = 10000) {
                 var data = [
                     ...arr[0],
                     ...arr[1].filter(d => !ids.has(d.time))
-                ].sort((a, b) => a.time.localeCompare(b.time));
+                ].sort((a, b) => a.time - b.time);
                 console.log("data", data);
                 //
                 clearLocalData("data").then(() => setLocalData("data", data));
@@ -739,13 +790,14 @@ function getData(size = 10000) {
 }
 
 function createChartData(r, item) {
-    var time = moment(item.time)
+    var time = moment
+        .utc(item.time * 1000)
         .add(7, "hours")
         .unix();
     var prevShark = !!r.shark.length ? r.shark.slice(-1)[0].value : 0;
     var prevWolf = !!r.wolf.length ? r.wolf.slice(-1)[0].value : 0;
     var prevSheep = !!r.sheep.length ? r.sheep.slice(-1)[0].value : 0;
-    var volume = (item.side == "BU" ? 1 : -1) * item.vol;
+    var volume = (item.action == "BU" ? 1 : -1) * item.volume;
     if (mConfig.timeFrame > 0) {
         var period = 60 * mConfig.timeFrame;
         var timeIndex = Math.floor(time / period);
@@ -766,19 +818,23 @@ function createChartData(r, item) {
     r.price.push({ time: time, value: item.price });
     r.shark.push({
         time: time,
-        value: prevShark + (item.vol > mConfig.sharkLimit ? volume : 0)
+        // value: prevShark + (item.type == "SHARK" ? volume : 0)
+        value: prevShark + (item.volume > mConfig.sharkLimit ? volume : 0)
     });
     r.wolf.push({
         time: time,
+        // value: prevWolf + (item.type == "WOLF" ? volume : 0)
         value:
             prevWolf +
-            (item.vol >= mConfig.sheepLimit && item.vol <= mConfig.sharkLimit
+            (item.volume >= mConfig.sheepLimit &&
+            item.volume <= mConfig.sharkLimit
                 ? volume
                 : 0)
     });
     r.sheep.push({
         time: time,
-        value: prevSheep + (item.vol < mConfig.sheepLimit ? volume : 0)
+        // value: prevSheep + (item.type == "SHEEP" ? volume : 0)
+        value: prevSheep + (item.volume < mConfig.sheepLimit ? volume : 0)
     });
     //
     return r;
