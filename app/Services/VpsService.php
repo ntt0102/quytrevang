@@ -195,7 +195,7 @@ class VpsService extends CoreService
     {
         $VN30F1M = $this->parameterRepository->getValue('VN30F1M');
         $client = new \GuzzleHttp\Client();
-        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/investor/his/paging?size={$size}";
+        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$VN30F1M}/his/paging?size={$size}";
         $res = $client->get($url);
         return json_decode($res->getBody())->data;
     }
@@ -209,10 +209,10 @@ class VpsService extends CoreService
         $temp = collect($array)->reduce(function ($carry, $item) {
             $carry['data'][] = [
                 'time' => strtotime(date('Y-m-d ') . $item->t),
-                'price' => $item->ap,
+                'price' => $item->p,
                 'volume' => $item->v,
                 'action' => $item->a,
-                'type' => $item->type
+                // 'type' => $item->type
             ];
             $carry['times'][] = $item->t;
             return $carry;
@@ -235,7 +235,7 @@ class VpsService extends CoreService
             $a[] = $item->ap;
             $a[] = $item->v;
             $a[] = $item->a;
-            $a[] = $item->type;
+            // $a[] = $item->type;
             fputcsv($fp, $a);
         }
         fclose($fp);
@@ -249,7 +249,7 @@ class VpsService extends CoreService
         $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
-        $keys = ['time', 'price', 'volume', 'action', 'type'];
+        $keys = ['time', 'price', 'volume', 'action'];
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
