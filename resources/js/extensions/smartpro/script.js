@@ -21,7 +21,7 @@ getLocalConfig()
             connectSocket();
             loadPage();
             setInterval(intervalHandler, 1000);
-            setInterval(refreshDataEveryMinute, 60000);
+            setInterval(refreshDataInSession, 60000);
         });
     });
 
@@ -551,8 +551,7 @@ function connectSocket() {
     };
     ws.onclose = function(e) {
         console.log("ws-close", e);
-        connectSocket();
-        getData();
+        if (refreshDataInSession()) connectSocket();
     };
     ws.onmessage = function(e) {
         const t = e.data.split("|");
@@ -664,14 +663,6 @@ function intervalHandler() {
     if (mConfig.currentTime == mConfig.time.end) reportHandler();
     //
     showRunningStatus();
-}
-
-function refreshDataEveryMinute() {
-    if (
-        mConfig.currentTime >= mConfig.time.start &&
-        mConfig.currentTime <= mConfig.time.end
-    )
-        getData();
 }
 
 function getData(size = 10000) {
@@ -1087,4 +1078,15 @@ function updateLegend(price, shark, wolf, sheep) {
         document.getElementById(
             "sheepLegendP"
         ).innerText = sheep.toLocaleString("en-US");
+}
+
+function refreshDataInSession() {
+    if (
+        mConfig.currentTime >= mConfig.time.start &&
+        mConfig.currentTime <= mConfig.time.end
+    ) {
+        getData();
+        return true;
+    }
+    return false;
 }
