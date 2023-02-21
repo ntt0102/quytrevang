@@ -102,6 +102,7 @@ class VpsService extends CoreService
         $configs = [
             'isOpeningMarket' => $isOpeningMarket,
             'contractNumber' => $tradeContracts,
+            'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
             'time' => [
                 'start' => strtotime(date('Y-m-d ') . $startTime),
                 'end' => strtotime(date('Y-m-d ') . $endTime)
