@@ -601,6 +601,16 @@ function connectSocket() {
     ws.onerror = function(e) {
         console.log("ws-error", e);
     };
+
+    function base64ToArrayUnit8(g) {
+        for (
+            var p = window.atob(g), r = p.length, h = new Uint8Array(r), A = 0;
+            A < r;
+            A++
+        )
+            h[A] = p.charCodeAt(A);
+        return h;
+    }
 }
 
 function loadPage() {
@@ -1076,13 +1086,4 @@ function updateLegend(price, shark, wolf, sheep) {
         document.getElementById(
             "sheepLegendP"
         ).innerText = sheep.toLocaleString("en-US");
-}
-function base64ToArrayUnit8(g) {
-    for (
-        var p = window.atob(g), r = p.length, h = new Uint8Array(r), A = 0;
-        A < r;
-        A++
-    )
-        h[A] = p.charCodeAt(A);
-    return h;
 }
