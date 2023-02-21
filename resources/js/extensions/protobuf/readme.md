@@ -5,8 +5,6 @@
    npm install
 
 3. command:
-   protoc --js_out=library=tcbs,binary:. tcbs.proto
 
-4. Ouput files:
-   1. tcbs.js
-   2. node_modules/google-protobuf/google-protobuf.js
+    1. protoc --js_out=library=../smartpro/tcbs,binary:. tcbs.proto
+    2. copy node_modules\google-protobuf\google-protobuf.js ..\smartpro\google-protobuf.js
