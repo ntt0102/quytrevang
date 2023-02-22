@@ -290,8 +290,8 @@ function createLightWeightChart() {
     const chartOptions = {
         localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
         rightPriceScale: {
-            visible: true,
-            scaleMargins: { top: 0, bottom: 0.5 }
+            visible: true
+            // scaleMargins: { top: 0, bottom: 0.5 }
         },
         leftPriceScale: { visible: false },
         layout: {
@@ -323,13 +323,14 @@ function createLightWeightChart() {
         priceScaleId: "sheep",
         color: "#00FFFF",
         priceFormat: { minMove: 1 },
-        scaleMargins: { top: 0.5, bottom: 0 }
+        scaleMargins: { top: 0.5, bottom: 0 },
+        visible: false
     });
     mChart.series.shark = mChart.self.addLineSeries({
         priceScaleId: "shark",
         color: "#FF00FF",
-        priceFormat: { minMove: 1 },
-        scaleMargins: { top: 0.5, bottom: 0 }
+        priceFormat: { minMove: 1 }
+        // scaleMargins: { top: 0.5, bottom: 0 }
     });
     mChart.series.price = mChart.self.addLineSeries({
         color: "white",
