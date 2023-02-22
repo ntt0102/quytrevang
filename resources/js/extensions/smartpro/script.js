@@ -534,7 +534,7 @@ function connectSocket() {
         ws.send(`d|st|C001|${mConfig.symbol}`);
     };
     ws.onclose = function(e) {
-        console.log("ws-close", e);
+        // console.log("ws-close", e);
         if (refreshDataInSession()) connectSocket();
     };
     ws.onmessage = function(e) {
@@ -544,7 +544,7 @@ function connectSocket() {
             const message = proto.tcbs.BuySellActivePojo.deserializeBinary(
                 base64ToArrayUnit8(t[2])
             ).toObject();
-            console.log("message: ", message);
+            // console.log("message: ", message);
             const param = {
                 time: message.timesec,
                 price: message.closeprice,
