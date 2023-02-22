@@ -646,6 +646,8 @@ function intervalHandler() {
             pushNotify("success", "Đã đóng vị thế.");
         }
     }
+    // Begin Socket
+    if (mConfig.currentTime == mConfig.time.start) connectSocket();
     // Report
     if (mConfig.currentTime == mConfig.time.end) reportHandler();
     //
@@ -1068,7 +1070,10 @@ function updateLegend(price, shark, wolf, sheep) {
 }
 
 function refreshDataInSession() {
-    if (mConfig.currentTime <= mConfig.time.end) {
+    if (
+        mConfig.currentTime >= mConfig.time.start &&
+        mConfig.currentTime <= mConfig.time.end
+    ) {
         getData();
         return true;
     }
