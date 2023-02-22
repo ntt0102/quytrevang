@@ -1068,10 +1068,7 @@ function updateLegend(price, shark, wolf, sheep) {
 }
 
 function refreshDataInSession() {
-    if (
-        mConfig.currentTime >= mConfig.time.start &&
-        mConfig.currentTime <= mConfig.time.end
-    ) {
+    if (mConfig.currentTime <= mConfig.time.end) {
         getData();
         return true;
     }
