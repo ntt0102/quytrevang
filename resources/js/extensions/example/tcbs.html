@@ -173,9 +173,9 @@
             // websocket.send(
             //     "42" + JSON.stringify(["regs", JSON.stringify(msg)])
             // );
-            websocket.send("d|ut|C001|");
-            websocket.send("d|st|C001|VN30F2303");
-            websocket.send("d|st|C001|VN30F2303");
+            // websocket.send("d|ut|C001|");
+            // websocket.send("d|st|C001|VN30F2303");
+            // websocket.send("d|st|C001|VN30F2303");
             websocket.send("d|s|VN30F2303");
         };
         websocket.onclose = function(evt) {
@@ -183,7 +183,7 @@
             testWebSocket();
         };
         websocket.onmessage = function(evt) {
-            console.log("onmessage", evt.data);
+            console.log(new Date(), evt.data);
         };
         websocket.onerror = function(evt) {
             console.log("onerror", evt);

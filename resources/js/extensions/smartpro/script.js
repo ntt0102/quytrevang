@@ -531,10 +531,7 @@ function connectSocket() {
     var wsUri = "wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream";
     var ws = new WebSocket(wsUri);
     ws.onopen = function(e) {
-        ws.send("d|ut|C001|");
         ws.send(`d|st|C001|${mConfig.symbol}`);
-        ws.send(`d|st|C001|${mConfig.symbol}`);
-        ws.send(`d|s|${mConfig.symbol}`);
     };
     ws.onclose = function(e) {
         console.log("ws-close", e);
