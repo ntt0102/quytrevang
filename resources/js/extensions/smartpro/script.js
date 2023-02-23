@@ -59,13 +59,7 @@ function getServerConfig() {
             .then(response => response.json())
             .then(json => {
                 // console.log("serverConfig", json);
-                mConfig.isOpeningMarket = json.isOpeningMarket;
-                mConfig.contractNumber = json.contractNumber;
-                mConfig.isReportedResult = json.isReportedResult;
-                mConfig.symbol = json.symbol;
-                mConfig.sheepLimit = json.sheepLimit;
-                mConfig.sharkLimit = json.sharkLimit;
-                mConfig.time = { ...mConfig.time, ...json.time };
+                mConfig = { ...mConfig, ...json };
                 mConfig.hasCrosshair = false;
                 mConfig.hasNewData = false;
                 mConfig.currentTime = moment().unix();
