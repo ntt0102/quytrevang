@@ -374,7 +374,8 @@ function createLightWeightChart() {
                             mChart.crosshair.y
                         )
                     );
-                const side = price >= mChart.data.price.slice(-1)[0].value;
+                const side =
+                    price >= mChart.data.price.slice(-1)[0].value ? 1 : -1;
                 var btn = document.getElementById("entryOrderButton");
                 mChart.order.entry.price = price;
                 mChart.order.side = side;
@@ -394,13 +395,26 @@ function createLightWeightChart() {
             .formatPrice(line.price);
         switch (line.kind) {
             case "entry":
-                orderEntryPrice();
+                if (!getOrderPosition()) orderEntryPrice();
                 break;
             case "tp":
-                orderTpPrice();
-                break;
+                if (mChart.order.side * getOrderPosition() > 0) orderTpPrice();
+                else {
+                    mChart.order.tp.line.applyOptions({
+                        price: e.fromPriceString
+                    });
+                    pushNotify("warning", "Không được thay đổi Take Profit.");
+                    break;
+                }
             case "sl":
-                orderSlPrice();
+                if (mChart.order.side * getOrderPosition() > 0) orderSlPrice();
+                else {
+                    mChart.order.sl.line.applyOptions({
+                        price: e.fromPriceString
+                    });
+                    pushNotify("warning", "Không được thay đổi Stop Loss.");
+                    break;
+                }
                 break;
         }
     }
@@ -860,8 +874,7 @@ function reportHandler() {
                 .innerText.replaceAll(",", ""),
             fees: +document
                 .getElementById("othersAccInfo")
-                .innerText.replaceAll(",", ""),
-            scores: +document.getElementById(`${mConfig.symbol}ref`).innerText
+                .innerText.replaceAll(",", "")
         };
         fetch(url, {
             method: "POST",
@@ -916,14 +929,13 @@ function orderEntryPrice() {
     document.getElementById("right_stopOrderIndex").value =
         mChart.order.entry.price;
     document.getElementById("right_price").value = "MTL";
-    document.getElementById("right_selStopOrderType").value = mChart.order.side
-        ? "SOL"
-        : "SOU";
+    document.getElementById("right_selStopOrderType").value =
+        mChart.order.side > 0 ? "SOL" : "SOU";
     //
     showCancelOrderButton();
     setTimeout(() => {
         document
-            .getElementById(`btn_${mChart.order.side ? "long" : "short"}`)
+            .getElementById(`btn_${mChart.order.side > 0 ? "long" : "short"}`)
             .click();
     }, 1000);
 }
@@ -932,13 +944,13 @@ function orderTpPrice(isInit = false) {
     callScript("onCancelAllOrderPending('order')");
     if (isInit)
         mChart.order.tp.price =
-            +mChart.order.entry.price + (mChart.order.side ? 1 : -1) * 3;
+            +mChart.order.entry.price + mChart.order.side * 3;
     drawOrderLine("tp");
     setTimeout(() => {
         document.getElementById("select_normal_order_wrapper").click();
         document.getElementById("right_price").value = mChart.order.tp.price;
         document
-            .getElementById(`btn_${!mChart.order.side ? "long" : "short"}`)
+            .getElementById(`btn_${mChart.order.side < 0 ? "long" : "short"}`)
             .click();
     }, 1000);
 }
@@ -947,19 +959,17 @@ function orderSlPrice(isInit = false) {
     callScript("onCancelAllOrderPending('order_condition')");
     if (isInit)
         mChart.order.sl.price =
-            +mChart.order.entry.price + (mChart.order.side ? -1 : 1) * 2;
+            +mChart.order.entry.price - mChart.order.side * 2;
     drawOrderLine("sl");
     setTimeout(() => {
         document.getElementById("select_condition_order_wrapper").click();
         document.getElementById("right_stopOrderIndex").value =
             mChart.order.sl.price;
         document.getElementById("right_price").value = "MTL";
-        document.getElementById("right_selStopOrderType").value = !mChart.order
-            .side
-            ? "SOL"
-            : "SOU";
+        document.getElementById("right_selStopOrderType").value =
+            mChart.order.side < 0 ? "SOL" : "SOU";
         document
-            .getElementById(`btn_${!mChart.order.side ? "long" : "short"}`)
+            .getElementById(`btn_${mChart.order.side < 0 ? "long" : "short"}`)
             .click();
     }, 1000);
 }
@@ -986,7 +996,7 @@ function drawOrderLine(kind) {
         switch (kind) {
             case "entry":
                 color = "silver";
-                title = `${mChart.order.side ? "Long" : "Short"} Entry`;
+                title = `${mChart.order.side > 0 ? "Long" : "Short"} Entry`;
                 break;
             case "tp":
                 color = "lime";
@@ -1028,7 +1038,7 @@ function removeOrderButton() {
 function showCancelOrderButton() {
     var btn = document.getElementById("cancelOrderButton");
     btn.style.display = "block";
-    btn.style.background = mChart.order.side ? "green" : "red";
+    btn.style.background = mChart.order.side > 0 ? "green" : "red";
 }
 
 function pushNotify(status = "success", text = "test", autoclose = true) {
