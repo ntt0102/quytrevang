@@ -753,20 +753,24 @@ function createChartData(r, item) {
 }
 
 function getServerData() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
         const date = document.getElementById("dateInput").value;
         const data = { action: "GET", date: date };
         const url = mConfig.root + mConfig.endpoint.data;
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
-        })
-            .then(response => response.json())
-            .then(json => {
+        start: while (true) {
+            try {
+                var response = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                var json = await response.json();
                 resolve(json);
-            })
-            .catch(() => getServerData());
+                break;
+            } catch (e) {
+                continue start;
+            }
+        }
     });
 }
 
