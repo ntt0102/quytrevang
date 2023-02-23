@@ -51,13 +51,12 @@ class VpsService extends CoreService
                 $lastTrade = $this->tradeRepository->latest('monday');
                 if ($currentDate->format('W') != date_create($lastTrade->monday)->format('W')) {
                     $amount = (int) $this->parameterRepository->getValue('tradeContracts');
-                    $pmFee = (int) $this->parameterRepository->getValue('positionManagementFee');
                     $trade = $this->tradeRepository->create([
                         "amount" => $amount,
-                        "scores" => $request->scores,
+                        "scores" => $this->getInfo($this->getSymbol())->r,
                         "revenue" => $revenue,
                         "loss" => $loss,
-                        "fees" => $request->fees + ($request->pmNight * $amount * $pmFee),
+                        "fees" => $request->fees,
                         "monday" => $currentDate->sub(date_interval_create_from_date_string(($currentDate->format('w') - 1) . ' days'))->format('Y-m-d'),
                     ]);
                     $isOk = !!$trade;
@@ -99,16 +98,20 @@ class VpsService extends CoreService
         $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
-        $configs = [
+        $symbol = $this->getSymbol();
+        $escrow = ($this->getInfo($symbol)->c * 0.1 * 0.17) / 0.8;
+        return [
             'isOpeningMarket' => $isOpeningMarket,
             'contractNumber' => $tradeContracts,
             'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
             'time' => [
                 'start' => strtotime(date('Y-m-d ') . $startTime),
                 'end' => strtotime(date('Y-m-d ') . $endTime)
-            ]
+            ],
+            'symbol' => $symbol,
+            'sheepLimit' => intval(800 / $escrow),
+            'sharkLimit' => intval(2000 / $escrow)
         ];
-        return array_merge($configs, $this->getOtherConfigs());
     }
 
     /**
@@ -187,12 +190,23 @@ class VpsService extends CoreService
         return array_values(array_intersect_key($data->toArray(), $unique_times));
     }
     /**
-     * Tcbs data
+     * Get Symbol
      */
-    public function getPsSymbol()
+    public function getSymbol()
     {
         $client = new \GuzzleHttp\Client();
         $url = "https://spwapidatafeed.vps.com.vn/pslistdata";
+        $res = $client->get($url);
+        return json_decode($res->getBody())[0];
+    }
+
+    /**
+     * Get Info
+     */
+    public function getInfo($symbol)
+    {
+        $client = new \GuzzleHttp\Client();
+        $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
         $res = $client->get($url);
         return json_decode($res->getBody())[0];
     }
@@ -202,11 +216,8 @@ class VpsService extends CoreService
      */
     private function getOtherConfigs()
     {
-        $symbol = $this->getPsSymbol();
-        $client = new \GuzzleHttp\Client();
-        $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
-        $res = $client->get($url);
-        $c = json_decode($res->getBody())[0]->c;
+        $symbol = $this->getSymbol();
+        $c =  $this->getInfo($symbol)->c;
         $escrow = ($c * 0.1 * 0.17) / 0.8;
         return [
             'symbol' => $symbol,
@@ -220,7 +231,7 @@ class VpsService extends CoreService
      */
     private function tcbsData($size)
     {
-        $symbol = $this->getPsSymbol();
+        $symbol = $this->getSymbol();
         $client = new \GuzzleHttp\Client();
         $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$symbol}/his/paging?size={$size}";
         $res = $client->get($url);
