@@ -6,6 +6,7 @@ var mChart = {
     series: {},
     data: {},
     order: { entry: {}, tp: {}, sl: {} },
+    markers: [],
     crosshair: {}
 };
 var mDatabase = {};
@@ -158,6 +159,7 @@ function createLightWeightChart() {
         e.preventDefault();
         showOrderButton();
     });
+    div.addEventListener("dblclick", drawMarker);
     document.body.append(div);
     //
     var select = document.createElement("select");
@@ -250,8 +252,10 @@ function createLightWeightChart() {
     //
     var p = document.createElement("p");
     p.id = "priceLegendP";
-    p.addEventListener("click", () => {
-        removeOrderButton();
+    p.addEventListener("click", removeOrderButton);
+    p.addEventListener("dblclick", e => {
+        e.stopPropagation();
+        removeMarkers();
     });
     div.append(p);
     //
@@ -285,8 +289,8 @@ function createLightWeightChart() {
     const chartOptions = {
         localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
         rightPriceScale: {
-            visible: true
-            // scaleMargins: { top: 0, bottom: 0.5 }
+            visible: true,
+            scaleMargins: { top: 0, bottom: 0.5 }
         },
         leftPriceScale: { visible: false },
         layout: {
@@ -324,8 +328,8 @@ function createLightWeightChart() {
     mChart.series.shark = mChart.self.addLineSeries({
         priceScaleId: "shark",
         color: "#FF00FF",
-        priceFormat: { minMove: 1 }
-        // scaleMargins: { top: 0.5, bottom: 0 }
+        priceFormat: { minMove: 1 },
+        scaleMargins: { top: 0.5, bottom: 0 }
     });
     mChart.series.price = mChart.self.addLineSeries({
         color: "white",
@@ -336,14 +340,20 @@ function createLightWeightChart() {
 
     function crosshairMove(e) {
         if (e.time) {
-            mConfig.hasCrosshair = true;
             updateLegend(
                 e.seriesPrices.get(mChart.series.price),
                 e.seriesPrices.get(mChart.series.shark),
                 e.seriesPrices.get(mChart.series.wolf),
                 e.seriesPrices.get(mChart.series.sheep)
             );
-        } else mConfig.hasCrosshair = false;
+            mConfig.hasCrosshair = true;
+            mChart.crosshair.time = e.time;
+            mChart.crosshair.price = e.seriesPrices.get(mChart.series.price);
+        } else {
+            mConfig.hasCrosshair = false;
+            mChart.crosshair.time = null;
+            mChart.crosshair.price = null;
+        }
         if (e.point != undefined) {
             mChart.crosshair.x = e.point.x;
             mChart.crosshair.y = e.point.y;
@@ -380,6 +390,37 @@ function createLightWeightChart() {
                 btn.style.display = "block";
             }
         }
+    }
+
+    function drawMarker() {
+        if (mChart.crosshair.time) {
+            const markers = mChart.markers.filter(
+                item => item.time != mChart.crosshair.time
+            );
+            if (markers.length == mChart.markers.length) {
+                const dir =
+                    mChart.crosshair.y >=
+                    mChart.series.price.priceToCoordinate(
+                        mChart.crosshair.price
+                    );
+                mChart.markers.push({
+                    time: mChart.crosshair.time,
+                    position: dir ? "belowBar" : "aboveBar",
+                    color: dir ? "lime" : "red",
+                    shape: dir ? "arrowUp" : "arrowDown"
+                });
+            } else mChart.markers = markers;
+            mChart.series.price.setMarkers(mChart.markers);
+            clearLocalData("marker").then(() =>
+                setLocalData("marker", mChart.markers)
+            );
+        } else removeMarkers();
+    }
+
+    function removeMarkers() {
+        mChart.markers = [];
+        mChart.series.price.setMarkers([]);
+        clearLocalData("marker");
     }
 
     function priceLineDrag(e) {
@@ -523,6 +564,7 @@ function createIndexedDB() {
             mDatabase = e.target.result;
             mDatabase.createObjectStore("data", { keyPath: "time" });
             mDatabase.createObjectStore("order", { keyPath: "kind" });
+            mDatabase.createObjectStore("marker", { keyPath: "time" });
             resolve();
         };
         request.onsuccess = e => {
@@ -610,24 +652,25 @@ function connectSocket() {
 }
 
 function loadPage() {
-    getData().then(() => {
-        getLocalData("order").then(data => {
-            data.map(item => {
-                mChart.order.side = item.side;
-                mChart.order[item.kind].price = item.price;
-                drawOrderLine(item.kind);
-                if (item.kind == "entry") {
-                    if (getOrderPosition()) {
-                        mChart.order.entry.line.applyOptions({
-                            draggable: false
-                        });
-                    }
-                    showCancelOrderButton();
+    getData().then(async () => {
+        const order = await getLocalData("order");
+        order.map(item => {
+            mChart.order.side = item.side;
+            mChart.order[item.kind].price = item.price;
+            drawOrderLine(item.kind);
+            if (item.kind == "entry") {
+                if (getOrderPosition()) {
+                    mChart.order.entry.line.applyOptions({
+                        draggable: false
+                    });
                 }
-            });
-            mNotify.close();
-            document.getElementById("lineButton").click();
+                showCancelOrderButton();
+            }
         });
+        mChart.markers = await getLocalData("marker");
+        mChart.series.price.setMarkers(mChart.markers);
+        mNotify.close();
+        document.getElementById("lineButton").click();
     });
     //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
