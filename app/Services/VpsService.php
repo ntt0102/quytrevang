@@ -162,9 +162,9 @@ class VpsService extends CoreService
                     case 'GET':
                         if (!!$request->date)
                             return $this->getFromCsv($request->date);
-                        // else if ($request->tcbs) return $this->getTcbs($request->size);
+                        // else if ($request->tcbs) return $this->getTcbs();
                         // else return $this->getVps();
-                        else return $this->getTcbs($request->size);
+                        else return $this->getTcbs();
                         break;
                     case 'CLEAR':
                         $this->vpsRepository->clear();
@@ -230,9 +230,9 @@ class VpsService extends CoreService
     /**
      * get From TCBS
      */
-    public function getTcbs($size)
+    public function getTcbs()
     {
-        $array = $this->tcbsData($size);
+        $array = $this->tcbsData(10000);
         $temp = collect($array)->reduce(function ($carry, $item) {
             $carry['data'][] = [
                 'time' => strtotime(date('Y-m-d ') . $item->t),
