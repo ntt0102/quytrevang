@@ -381,8 +381,8 @@ function createLightWeightChart() {
                 mChart.order.side = side;
                 btn.style.left = +(mChart.crosshair.x + 10) + "px";
                 btn.style.top = +(mChart.crosshair.y + 10) + "px";
-                btn.style.background = side ? "green" : "red";
-                btn.innerText = `Entry ${price}`;
+                btn.style.background = side > 0 ? "green" : "red";
+                btn.innerText = `${side > 0 ? "Long" : "Short"} ${price}`;
                 btn.style.display = "block";
             }
         }
@@ -390,32 +390,33 @@ function createLightWeightChart() {
 
     function priceLineDrag(e) {
         const line = e.customPriceLine.options();
-        mChart.order[line.kind].price = mChart.self
+        const formatedPrice = mChart.self
             .priceScale("right")
             .formatPrice(line.price);
-        switch (line.kind) {
-            case "entry":
-                if (!getOrderPosition()) orderEntryPrice();
-                break;
-            case "tp":
-                if (mChart.order.side * getOrderPosition() > 0) orderTpPrice();
-                else {
-                    mChart.order.tp.line.applyOptions({
-                        price: e.fromPriceString
-                    });
-                    pushNotify("warning", "Không được thay đổi Take Profit.");
-                    break;
+        if (formatedPrice != +e.fromPriceString) {
+            var isChanged = false;
+            const position = getOrderPosition();
+            if (line.kind == "entry") {
+                if (!position) {
+                    isChanged = true;
+                    mChart.order[line.kind].price = formatedPrice;
+                    orderEntryPrice();
                 }
-            case "sl":
-                if (mChart.order.side * getOrderPosition() > 0) orderSlPrice();
-                else {
-                    mChart.order.sl.line.applyOptions({
-                        price: e.fromPriceString
-                    });
-                    pushNotify("warning", "Không được thay đổi Stop Loss.");
-                    break;
+            } else {
+                if (mChart.order.side * position > 0) {
+                    isChanged = true;
+                    mChart.order[line.kind].price = formatedPrice;
+                    if (line.kind == "tp") orderTpPrice();
+                    else orderSlPrice();
                 }
-                break;
+            }
+            //
+            if (!isChanged) {
+                mChart.order[line.kind].line.applyOptions({
+                    price: e.fromPriceString
+                });
+                pushNotify("warning", "Không được thay đổi.");
+            }
         }
     }
 }
@@ -544,8 +545,7 @@ function createIndexedDB() {
 }
 
 function connectSocket() {
-    var wsUri = "wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream";
-    var ws = new WebSocket(wsUri);
+    var ws = new WebSocket(mConfig.endpoint.socket);
     ws.onopen = function(e) {
         ws.send(`d|st|C001|${mConfig.symbol}`);
     };
