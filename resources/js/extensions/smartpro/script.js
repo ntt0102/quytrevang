@@ -67,6 +67,7 @@ function getServerConfig() {
                 mConfig.sharkLimit = json.sharkLimit;
                 mConfig.time = { ...mConfig.time, ...json.time };
                 mConfig.hasCrosshair = false;
+                mConfig.hasNewData = false;
                 mConfig.currentTime = moment().unix();
                 //
                 resolve();
@@ -541,45 +542,48 @@ function connectSocket() {
     ws.onmessage = function(e) {
         const t = e.data.split("|");
         if (t[0] == "C001") {
-            // console.log("ws-message", e.data);
-            const message = proto.tcbs.BuySellActivePojo.deserializeBinary(
-                base64ToArrayUnit8(t[2])
-            ).toObject();
-            // console.log("message: ", message);
-            const param = {
-                time: message.timesec,
-                price: message.closeprice,
-                volume: message.closevol,
-                action: message.action
-            };
-            mChart.data = createChartData(mChart.data, param);
-            const lastPrice = mChart.data.price.slice(-1)[0];
-            const lastShark = mChart.data.shark.slice(-1)[0];
-            const lastWolf = mChart.data.wolf.slice(-1)[0];
-            const lastSheep = mChart.data.sheep.slice(-1)[0];
-            //
-            if (mConfig.timeFrame > 0) {
-                mChart.series.price.setData(mChart.data.price);
-                mChart.series.shark.setData(mChart.data.shark);
-                mChart.series.wolf.setData(mChart.data.wolf);
-                mChart.series.sheep.setData(mChart.data.sheep);
-            } else {
-                mChart.series.price.update(lastPrice);
-                mChart.series.shark.update(lastShark);
-                mChart.series.wolf.update(lastWolf);
-                mChart.series.sheep.update(lastSheep);
+            if (mChart.data.hasOwnProperty("original")) {
+                mConfig.hasNewData = true;
+                // console.log("ws-message", e.data);
+                const message = proto.tcbs.BuySellActivePojo.deserializeBinary(
+                    base64ToArrayUnit8(t[2])
+                ).toObject();
+                // console.log("message: ", message);
+                const param = {
+                    time: message.timesec,
+                    price: message.closeprice,
+                    volume: message.closevol,
+                    action: message.action
+                };
+                mChart.data = createChartData(mChart.data, param);
+                const lastPrice = mChart.data.price.slice(-1)[0];
+                const lastShark = mChart.data.shark.slice(-1)[0];
+                const lastWolf = mChart.data.wolf.slice(-1)[0];
+                const lastSheep = mChart.data.sheep.slice(-1)[0];
+                //
+                if (mConfig.timeFrame > 0) {
+                    mChart.series.price.setData(mChart.data.price);
+                    mChart.series.shark.setData(mChart.data.shark);
+                    mChart.series.wolf.setData(mChart.data.wolf);
+                    mChart.series.sheep.setData(mChart.data.sheep);
+                } else {
+                    mChart.series.price.update(lastPrice);
+                    mChart.series.shark.update(lastShark);
+                    mChart.series.wolf.update(lastWolf);
+                    mChart.series.sheep.update(lastSheep);
+                }
+                if (!mConfig.hasCrosshair) {
+                    updateLegend(
+                        lastPrice.value,
+                        lastShark.value,
+                        lastWolf.value,
+                        lastSheep.value
+                    );
+                }
+                //
+                setLocalData("data", param);
+                mChart.data.original.push(param);
             }
-            if (!mConfig.hasCrosshair) {
-                updateLegend(
-                    lastPrice.value,
-                    lastShark.value,
-                    lastWolf.value,
-                    lastSheep.value
-                );
-            }
-            //
-            setLocalData("data", param);
-            mChart.data.original.push(param);
         }
     };
     ws.onerror = function(e) {
@@ -652,55 +656,54 @@ function intervalHandler() {
     showRunningStatus();
 }
 
-function getData(size = 10000) {
-    return new Promise((resolve, reject) => {
-        Promise.all([getServerData(size), getLocalData("data")])
-            .then(arr => {
-                // console.log("getData: ", arr);
-                const ids = new Set(arr[0].map(d => d.time));
-                const data = [
-                    ...arr[0],
-                    ...arr[1].filter(d => !ids.has(d.time))
-                ].sort((a, b) => a.time - b.time);
-                // console.log("data", data);
-                //
-                clearLocalData("data").then(() => setLocalData("data", data));
-                //
-                mChart.data = data.reduce(
-                    (r, item) => createChartData(r, item),
-                    {
-                        original: [],
-                        price: [],
-                        shark: [],
-                        wolf: [],
-                        sheep: []
-                    }
-                );
-                // console.log(
-                //     "chartData",
-                //     JSON.parse(JSON.stringify(mChart.data))
-                // );
-                //
-                mChart.series.price.setData(mChart.data.price);
-                mChart.series.shark.setData(mChart.data.shark);
-                mChart.series.wolf.setData(mChart.data.wolf);
-                mChart.series.sheep.setData(mChart.data.sheep);
-                //
-                if (!mConfig.hasCrosshair) {
-                    updateLegend(
-                        mChart.data.price.slice(-1)[0].value,
-                        mChart.data.shark.slice(-1)[0].value,
-                        mChart.data.wolf.slice(-1)[0].value,
-                        mChart.data.sheep.slice(-1)[0].value
-                    );
-                }
-                //
-                resolve();
-            })
-            .catch(error => {
-                console.log(error);
-                resolve();
+function getData() {
+    return new Promise(async (resolve, reject) => {
+        toggleSpinner(true);
+        const svData = await getServerData();
+        // console.log("svData: ", svData);
+        start: while (true) {
+            mConfig.hasNewData = false;
+            const lcData = await getLocalData("data");
+            // console.log("lcData: ", lcData);
+            const ids = new Set(svData.map(d => d.time));
+            const data = [
+                ...svData,
+                ...lcData.filter(d => !ids.has(d.time))
+            ].sort((a, b) => a.time - b.time);
+            // console.log("data", data);
+            if (mConfig.hasNewData) continue start;
+            clearLocalData("data").then(() => setLocalData("data", data));
+            //
+            mChart.data = data.reduce((r, item) => createChartData(r, item), {
+                original: [],
+                price: [],
+                shark: [],
+                wolf: [],
+                sheep: []
             });
+            // console.log(
+            //     "chartData",
+            //     JSON.parse(JSON.stringify(mChart.data))
+            // );
+            //
+            mChart.series.price.setData(mChart.data.price);
+            mChart.series.shark.setData(mChart.data.shark);
+            mChart.series.wolf.setData(mChart.data.wolf);
+            mChart.series.sheep.setData(mChart.data.sheep);
+            //
+            if (!mConfig.hasCrosshair) {
+                updateLegend(
+                    mChart.data.price.slice(-1)[0].value,
+                    mChart.data.shark.slice(-1)[0].value,
+                    mChart.data.wolf.slice(-1)[0].value,
+                    mChart.data.sheep.slice(-1)[0].value
+                );
+            }
+            //
+            toggleSpinner(false);
+            resolve();
+            break;
+        }
     });
 }
 
@@ -749,11 +752,10 @@ function createChartData(r, item) {
     return r;
 }
 
-function getServerData(size) {
-    if (size == 10000) toggleSpinner(true);
+function getServerData() {
     return new Promise((resolve, reject) => {
         const date = document.getElementById("dateInput").value;
-        const data = { action: "GET", date: date, size: size };
+        const data = { action: "GET", date: date };
         const url = mConfig.root + mConfig.endpoint.data;
         fetch(url, {
             method: "POST",
@@ -763,9 +765,8 @@ function getServerData(size) {
             .then(response => response.json())
             .then(json => {
                 resolve(json);
-                toggleSpinner(false);
             })
-            .catch(() => getServerData(size));
+            .catch(() => getServerData());
     });
 }
 
