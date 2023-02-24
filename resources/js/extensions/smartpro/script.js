@@ -159,7 +159,9 @@ function createLightWeightChart() {
         e.preventDefault();
         showOrderButton();
     });
+    div.addEventListener("click", removeOrderButton);
     div.addEventListener("dblclick", drawMarker);
+    div.addEventListener("touchstart", chartTouchstart);
     document.body.append(div);
     //
     var select = document.createElement("select");
@@ -307,7 +309,6 @@ function createLightWeightChart() {
     };
     mChart.self = LightweightCharts.createChart(div, chartOptions);
     //
-    mChart.self.subscribeClick(removeOrderButton);
     mChart.self.subscribeCrosshairMove(crosshairMove);
     mChart.self.subscribeCustomPriceLineDragged(priceLineDrag);
     //
@@ -349,11 +350,7 @@ function createLightWeightChart() {
             mConfig.hasCrosshair = true;
             mChart.crosshair.time = e.time;
             mChart.crosshair.price = e.seriesPrices.get(mChart.series.price);
-        } else {
-            mConfig.hasCrosshair = false;
-            mChart.crosshair.time = null;
-            mChart.crosshair.price = null;
-        }
+        } else mConfig.hasCrosshair = false;
         if (e.point != undefined) {
             mChart.crosshair.x = e.point.x;
             mChart.crosshair.y = e.point.y;
@@ -421,6 +418,22 @@ function createLightWeightChart() {
         mChart.markers = [];
         mChart.series.price.setMarkers([]);
         clearLocalData("marker");
+    }
+
+    function chartTouchstart(e) {
+        if (!mChart.crosshair.tapped) {
+            mChart.crosshair.tapped = setTimeout(() => {
+                mChart.crosshair.tapped = null;
+                console.log("single", mChart.crosshair);
+                removeOrderButton();
+            }, 300);
+        } else {
+            clearTimeout(mChart.crosshair.tapped);
+            mChart.crosshair.tapped = null;
+            console.log("double", mChart.crosshair);
+            drawMarker();
+        }
+        e.preventDefault();
     }
 
     function priceLineDrag(e) {
