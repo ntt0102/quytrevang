@@ -213,7 +213,10 @@ function createLightWeightChart() {
     button.id = "cancelOrderButton";
     button.innerText = "X";
     button.style.display = "none";
-    button.addEventListener("click", cancelOrder);
+    button.addEventListener("click", () => {
+        closePosition();
+        cancelOrder();
+    });
     div.append(button);
     //
     button = document.createElement("button");
@@ -1012,15 +1015,25 @@ function orderSlPrice(isInit = false) {
 }
 
 function cancelOrder() {
-    if (!getOrderPosition()) {
-        callScript("onCancelAllOrderPending('order_condition')");
-        callScript("onCancelAllOrderPending('order')");
-        document.getElementById("cancelOrderButton").style.display = "none";
-        removeOrderLine("entry");
-        removeOrderLine("tp");
-        removeOrderLine("sl");
-        clearLocalData("order");
-    } else pushNotify("warning", "Không thể huỷ lệnh đang mở.");
+    document.getElementById("cancelOrderButton").style.display = "none";
+    callScript("onCancelAllOrderPending('order_condition')");
+    callScript("onCancelAllOrderPending('order')");
+    removeOrderLine("entry");
+    removeOrderLine("tp");
+    removeOrderLine("sl");
+    clearLocalData("order");
+}
+
+function closePosition() {
+    const position = getOrderPosition();
+    if (position) {
+        document.getElementById("select_normal_order_wrapper").click();
+        document.getElementById("right_price").value = "MTL";
+        document.getElementById("sohopdong").value = Math.abs(position);
+        document
+            .getElementById(`btn_${position > 0 ? "short" : "long"}`)
+            .click();
+    }
 }
 
 function drawOrderLine(kind) {
