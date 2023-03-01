@@ -172,25 +172,33 @@
     z-index: 3;
 }
 
-/* .line-chart #lightWeightChart > #sharkOrderButton {
+.line-chart #lightWeightChart > #drawLineButton {
     position: absolute;
-    padding: 0px 10px;
+    top: 55px;
+    left: 85px;
     border-radius: 5px;
+    width: 30px;
+    height: 30px;
     color: white;
-    background: #ff00ff;
+    text-align: center;
+    background: gray;
     z-index: 3;
-    font-size: 25px;
+    opacity: 0.5;
 }
 
-.line-chart #lightWeightChart > #sheepOrderButton {
+.line-chart #lightWeightChart > #drawMarkerButton {
     position: absolute;
-    padding: 0px 10px;
+    top: 85px;
+    left: 85px;
     border-radius: 5px;
-    color: black;
-    background: #00ffff;
+    width: 30px;
+    height: 30px;
+    color: white;
+    text-align: center;
+    background: gray;
     z-index: 3;
-    font-size: 25px;
-} */
+    opacity: 0.5;
+}
 
 .line-chart #lightWeightChart > #scrollButton {
     position: absolute;
@@ -205,8 +213,13 @@
     z-index: 3;
     opacity: 0.5;
 }
-.line-chart #lightWeightChart > #scrollButton:hover {
-    opacity: 1;
+
+.line-chart #lightWeightChart .selected {
+    background: #1e53e5 !important;
+}
+
+.line-chart #lightWeightChart .hover-light:hover {
+    opacity: 1 !important;
 }
 
 .line-chart #mainFooter .foot_tab:nth-child(2) {

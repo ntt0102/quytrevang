@@ -6,6 +6,7 @@ var mChart = {
     series: {},
     data: {},
     order: { entry: {}, tp: {}, sl: {} },
+    lines: [],
     markers: [],
     crosshair: {}
 };
@@ -27,11 +28,7 @@ getLocalConfig()
     });
 
 function getLocalConfig() {
-    mNotify = pushNotify(
-        "warning",
-        "Vui lòng đợi đến khi cài đặt xong.",
-        false
-    );
+    mNotify = pushNotify("warning", "Đang cài đặt biểu đồ", false);
     return new Promise((resolve, reject) => {
         const file = chrome.runtime.getURL("config.json");
         fetch(file)
@@ -159,8 +156,7 @@ function createLightWeightChart() {
         showOrderButton();
         e.preventDefault();
     });
-    div.addEventListener("click", removeOrderButton);
-    div.addEventListener("dblclick", drawMarker);
+    div.addEventListener("click", chartClick);
     document.body.append(div);
     //
     var select = document.createElement("select");
@@ -241,8 +237,49 @@ function createLightWeightChart() {
     div.append(button);
     //
     button = document.createElement("button");
+    button.id = "drawLineButton";
+    button.innerText = "➖";
+    button.className = "tool hover-light";
+    button.addEventListener("click", e => {
+        const selected = e.target.classList.contains("selected");
+        document
+            .querySelectorAll(".tool")
+            .forEach(el => el.classList.remove("selected"));
+        if (!selected) e.target.classList.add("selected");
+        e.stopPropagation();
+    });
+    button.addEventListener("contextmenu", e => {
+        removeToolLines();
+        e.target.classList.remove("selected");
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    div.append(button);
+    //
+    button = document.createElement("button");
+    button.id = "drawMarkerButton";
+    button.innerText = "⇅";
+    button.className = "tool hover-light";
+    button.addEventListener("click", e => {
+        const selected = e.target.classList.contains("selected");
+        document
+            .querySelectorAll(".tool")
+            .forEach(el => el.classList.remove("selected"));
+        if (!selected) e.target.classList.add("selected");
+        e.stopPropagation();
+    });
+    button.addEventListener("contextmenu", e => {
+        removeMarkers();
+        e.target.classList.remove("selected");
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    div.append(button);
+    //
+    button = document.createElement("button");
     button.id = "scrollButton";
     button.innerText = "≫";
+    button.classList.add("hover-light");
     button.addEventListener("click", () =>
         mChart.self.timeScale().scrollToRealTime()
     );
@@ -257,10 +294,6 @@ function createLightWeightChart() {
     var p = document.createElement("p");
     p.id = "priceLegendP";
     p.addEventListener("click", removeOrderButton);
-    p.addEventListener("dblclick", e => {
-        e.stopPropagation();
-        removeMarkers();
-    });
     div.append(p);
     //
     p = document.createElement("p");
@@ -274,6 +307,7 @@ function createLightWeightChart() {
     //
     p = document.createElement("p");
     p.id = "wolfLegendP";
+    p.style.display = "none";
     p.addEventListener("click", () => {
         mChart.series.wolf.applyOptions({
             visible: !mChart.series.wolf.options().visible
@@ -283,6 +317,7 @@ function createLightWeightChart() {
     //
     p = document.createElement("p");
     p.id = "sheepLegendP";
+    p.style.display = "none";
     p.addEventListener("click", () => {
         mChart.series.sheep.applyOptions({
             visible: !mChart.series.sheep.options().visible
@@ -363,6 +398,58 @@ function createLightWeightChart() {
         }
     }
 
+    function chartClick() {
+        removeOrderButton();
+        if (
+            document
+                .getElementById("drawLineButton")
+                .classList.contains("selected")
+        )
+            drawToolLine(coordinateToPrice(mChart.crosshair.y));
+        else if (
+            document
+                .getElementById("drawMarkerButton")
+                .classList.contains("selected")
+        )
+            drawMarker();
+    }
+
+    function drawToolLine(price) {
+        const TYPE = "tool";
+        const existIndex = mChart.lines.findIndex(line => {
+            const ops = line.options();
+            return (ops.type = TYPE && +ops.price == price);
+        });
+        if (existIndex != -1) {
+            const removeLine = mChart.lines.splice(existIndex, 1);
+            mChart.series.price.removePriceLine(removeLine[0]);
+        } else
+            mChart.lines.push(
+                mChart.series.price.createPriceLine({
+                    type: TYPE,
+                    price: price,
+                    color: "aqua",
+                    lineWidth: 1,
+                    lineStyle: LightweightCharts.LineStyle.Solid,
+                    draggable: true
+                })
+            );
+        //
+        clearLocalData("line").then(() =>
+            setLocalData(
+                "line",
+                mChart.lines.map(line => line.options())
+            )
+        );
+        document.getElementById("drawLineButton").classList.remove("selected");
+    }
+
+    function removeToolLines() {
+        mChart.lines.forEach(line => mChart.series.price.removePriceLine(line));
+        mChart.lines = [];
+        clearLocalData("line");
+    }
+
     function showOrderButton() {
         if (getOrderPosition()) {
             // if (mChart.order.entry.hasOwnProperty("line")) {
@@ -374,13 +461,7 @@ function createLightWeightChart() {
             }
         } else {
             if (!mChart.order.entry.hasOwnProperty("line")) {
-                const price = mChart.self
-                    .priceScale("right")
-                    .formatPrice(
-                        mChart.series.price.coordinateToPrice(
-                            mChart.crosshair.y
-                        )
-                    );
+                const price = coordinateToPrice(mChart.crosshair.y);
                 const side =
                     price >= mChart.data.price.slice(-1)[0].value ? 1 : -1;
                 var btn = document.getElementById("entryOrderButton");
@@ -417,7 +498,11 @@ function createLightWeightChart() {
             clearLocalData("marker").then(() =>
                 setLocalData("marker", mChart.markers)
             );
-        } else removeMarkers();
+            //
+            document
+                .getElementById("drawMarkerButton")
+                .classList.remove("selected");
+        }
     }
 
     function removeMarkers() {
@@ -428,33 +513,44 @@ function createLightWeightChart() {
 
     function priceLineDrag(e) {
         const line = e.customPriceLine.options();
-        const formatedPrice = mChart.self
-            .priceScale("right")
-            .formatPrice(line.price);
-        if (formatedPrice != +e.fromPriceString) {
-            var isChanged = false;
-            const position = getOrderPosition();
-            if (line.kind == "entry") {
-                if (!position) {
-                    isChanged = true;
-                    mChart.order[line.kind].price = formatedPrice;
-                    orderEntryPrice();
+        if (line.type == "order") {
+            const oldPrice = +e.fromPriceString;
+            const newPrice = formatPrice(line.price);
+            if (newPrice != oldPrice) {
+                var isChanged = false;
+                const position = getOrderPosition();
+                if (line.kind == "entry") {
+                    if (!position) {
+                        isChanged = true;
+                        mChart.order[line.kind].price = newPrice;
+                        orderEntryPrice();
+                    }
+                } else {
+                    if (mChart.order.side * position > 0) {
+                        isChanged = true;
+                        mChart.order[line.kind].price = newPrice;
+                        if (line.kind == "tp") orderTpPrice();
+                        else orderSlPrice();
+                    }
                 }
-            } else {
-                if (mChart.order.side * position > 0) {
-                    isChanged = true;
-                    mChart.order[line.kind].price = formatedPrice;
-                    if (line.kind == "tp") orderTpPrice();
-                    else orderSlPrice();
+                //
+                if (!isChanged) {
+                    mChart.order[line.kind].line.applyOptions({
+                        price: e.fromPriceString
+                    });
+                    pushNotify("warning", "Không được thay đổi.");
                 }
             }
-            //
-            if (!isChanged) {
-                mChart.order[line.kind].line.applyOptions({
-                    price: e.fromPriceString
-                });
-                pushNotify("warning", "Không được thay đổi.");
-            }
+        } else {
+            clearLocalData("line").then(() =>
+                setLocalData(
+                    "line",
+                    mChart.lines.map(line => line.options())
+                )
+            );
+            document
+                .getElementById("drawLineButton")
+                .classList.remove("selected");
         }
     }
 }
@@ -568,6 +664,7 @@ function createIndexedDB() {
             mDatabase.createObjectStore("data", { keyPath: "time" });
             mDatabase.createObjectStore("order", { keyPath: "kind" });
             mDatabase.createObjectStore("marker", { keyPath: "time" });
+            mDatabase.createObjectStore("line", { keyPath: "price" });
             resolve();
         };
         request.onsuccess = e => {
@@ -670,6 +767,13 @@ function loadPage() {
                 showCancelOrderButton();
             }
         });
+        //
+        const lines = await getLocalData("line");
+        lines.forEach(line => {
+            line.price = +line.price;
+            mChart.lines.push(mChart.series.price.createPriceLine(line));
+        });
+        //
         mChart.markers = await getLocalData("marker");
         mChart.series.price.setMarkers(mChart.markers);
         mNotify.close();
@@ -1058,6 +1162,7 @@ function drawOrderLine(kind) {
                 break;
         }
         mChart.order[kind].line = mChart.series.price.createPriceLine({
+            type: "order",
             kind: kind,
             price: mChart.order[kind].price,
             color: color,
@@ -1141,4 +1246,12 @@ function refreshDataInSession() {
         return true;
     }
     return false;
+}
+
+function coordinateToPrice(y) {
+    return formatPrice(mChart.series.price.coordinateToPrice(y));
+}
+
+function formatPrice(price) {
+    return mChart.self.priceScale("right").formatPrice(+price);
 }
