@@ -58,6 +58,7 @@ function getServerConfig() {
             .then(json => {
                 // console.log("serverConfig", json);
                 mConfig = { ...mConfig, ...json };
+                mConfig.isMobile = navigator.userAgentData.mobile;
                 mConfig.hasCrosshair = false;
                 mConfig.hasNewData = false;
                 mConfig.currentTime = moment().unix();
@@ -429,8 +430,10 @@ function createChartContainer() {
             mChart.crosshair.price = e.seriesPrices.get(mChart.series.price);
         } else {
             mConfig.hasCrosshair = false;
-            mChart.crosshair.time = null;
-            mChart.crosshair.price = null;
+            if (!mConfig.isMobile) {
+                mChart.crosshair.time = null;
+                mChart.crosshair.price = null;
+            }
         }
         if (e.point != undefined) {
             mChart.crosshair.x = e.point.x;
@@ -517,6 +520,7 @@ function createChartContainer() {
     }
 
     function drawMarker() {
+        console.log("mChart.crosshair.time: ", mChart.crosshair.time);
         if (mChart.crosshair.time) {
             const markers = mChart.markers.filter(
                 item => item.time != mChart.crosshair.time
