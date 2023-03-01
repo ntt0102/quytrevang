@@ -852,11 +852,9 @@ function getData() {
     return new Promise(async (resolve, reject) => {
         toggleSpinner(true);
         const svData = await getServerData();
-        // console.log("svData: ", svData);
         start: while (true) {
             mConfig.hasNewData = false;
             const lcData = await getLocalData("data");
-            // console.log("lcData: ", lcData);
             const ids = new Set(svData.map(d => d.time));
             const data = [
                 ...svData,
@@ -871,15 +869,11 @@ function getData() {
                 price: [],
                 shark: []
             });
-            // console.log(
-            //     "chartData",
-            //     JSON.parse(JSON.stringify(mChart.data))
-            // );
             //
             mChart.series.price.setData(mChart.data.price);
             mChart.series.shark.setData(mChart.data.shark);
             //
-            if (!mConfig.hasCrosshair) {
+            if (!mConfig.hasCrosshair && !!mChart.data.original.length) {
                 updateLegend(
                     mChart.data.price.slice(-1)[0].value,
                     mChart.data.shark.slice(-1)[0].value
