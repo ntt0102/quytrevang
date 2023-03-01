@@ -207,6 +207,7 @@ function createChartContainer() {
             var input = document.createElement("input");
             input.id = "dateInput";
             input.type = "date";
+            input.value = moment().format("YYYY-MM-DD");
             input.className = "command";
             input.addEventListener("change", e => {
                 if (!!e.target.value) getData();

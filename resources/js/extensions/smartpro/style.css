@@ -94,7 +94,7 @@
 
 .line-chart #lightWeightChart > #dataAreaDiv {
     top: 0px;
-    right: 50px;
+    right: 60px;
 }
 
 .line-chart #lightWeightChart > #dataAreaDiv > #timeFrameSelect {
@@ -493,10 +493,6 @@
 @media (max-width: 991.98px) {
     .line-chart #reportButton {
         z-index: -1;
-    }
-
-    .line-chart #lightWeightChart > #dataAreaDiv {
-        right: 50px;
     }
 
     .line-chart #footerPanel {
