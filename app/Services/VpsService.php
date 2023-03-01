@@ -163,11 +163,9 @@ class VpsService extends CoreService
                         $this->vpsRepository->create($request->all());
                         break;
                     case 'GET':
-                        if (!!$request->date)
-                            return $this->getFromCsv($request->date);
-                        // else if ($request->tcbs) return $this->getTcbs();
-                        // else return $this->getVps();
-                        else return $this->getTcbs();
+                        if ($request->date == date('Y-m-d'))
+                            return $this->getTcbs();
+                        else return $this->getFromCsv($request->date);
                         break;
                     case 'CLEAR':
                         $this->vpsRepository->clear();
