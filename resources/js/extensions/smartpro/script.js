@@ -17,7 +17,7 @@ getLocalConfig()
     .then(() => getServerConfig())
     .then(() => {
         createButtons();
-        createLightWeightChart();
+        createChartContainer();
         registerEvent();
         createIndexedDB().then(() => {
             connectSocket();
@@ -147,7 +147,7 @@ function createButtons() {
     document.body.append(button);
 }
 
-function createLightWeightChart() {
+function createChartContainer() {
     var div = document.createElement("div");
     div.id = "lightWeightChart";
     div.style.width = "100vw";
@@ -159,230 +159,270 @@ function createLightWeightChart() {
     div.addEventListener("click", chartClick);
     document.body.append(div);
     //
-    var select = document.createElement("select");
-    select.id = "timeFrameSelect";
-    [
-        { text: "Tick", value: 0 },
-        { text: "1 min", value: 1 },
-        { text: "5 min", value: 5 },
-        { text: "30 min", value: 30 },
-        { text: "1 day", value: 1440 }
-    ].forEach((item, index) => {
-        var option = document.createElement("option");
-        option.value = item.value;
-        option.text = item.text;
-        select.appendChild(option);
-    });
-    select.value = mConfig.timeFrame;
-    select.addEventListener("change", e => {
-        mConfig.timeFrame = e.target.value;
-        getData().then(() => mChart.self.timeScale().resetTimeScale());
-    });
-    div.append(select);
+    createDataArea(div);
+    createToolArea(div);
+    createLegendArea(div);
+    createFreeElement(div);
+    createLightWeightChart(div);
     //
-    var input = document.createElement("input");
-    input.id = "dateInput";
-    input.type = "date";
-    input.addEventListener("change", e => {
-        if (!!e.target.value) getData();
-    });
-    div.append(input);
-    //
-    var button = document.createElement("button");
-    button.id = "refreshButton";
-    button.innerText = "R";
-    button.title = "Refresh chart";
-    button.addEventListener("click", () => getData());
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "clearButton";
-    button.innerText = "C";
-    button.title = "Delete local data";
-    button.addEventListener("click", () => {
-        clearLocalData("data");
-        getData();
-    });
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "cancelOrderButton";
-    button.innerText = "X";
-    button.style.display = "none";
-    button.addEventListener("click", () => {
-        closePosition();
-        cancelOrder();
-    });
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "entryOrderButton";
-    button.innerText = "Entry";
-    button.style.display = "none";
-    button.addEventListener("click", () => {
-        orderEntryPrice();
-        removeOrderButton();
-    });
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "tpslOrderButton";
-    button.innerText = "TP/SL";
-    button.style.display = "none";
-    button.addEventListener("click", () => {
-        orderTpPrice(true);
-        orderSlPrice(true);
-        removeOrderButton();
-    });
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "drawLineButton";
-    button.innerText = "➖";
-    button.className = "tool hover-light";
-    button.addEventListener("click", e => {
-        const selected = e.target.classList.contains("selected");
-        document
-            .querySelectorAll(".tool")
-            .forEach(el => el.classList.remove("selected"));
-        if (!selected) e.target.classList.add("selected");
-        e.stopPropagation();
-    });
-    button.addEventListener("contextmenu", e => {
-        removeToolLines();
-        e.target.classList.remove("selected");
-        e.preventDefault();
-        e.stopPropagation();
-    });
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "drawMarkerButton";
-    button.innerText = "⇅";
-    button.className = "tool hover-light";
-    button.addEventListener("click", e => {
-        const selected = e.target.classList.contains("selected");
-        document
-            .querySelectorAll(".tool")
-            .forEach(el => el.classList.remove("selected"));
-        if (!selected) e.target.classList.add("selected");
-        e.stopPropagation();
-    });
-    button.addEventListener("contextmenu", e => {
-        removeMarkers();
-        e.target.classList.remove("selected");
-        e.preventDefault();
-        e.stopPropagation();
-    });
-    div.append(button);
-    //
-    button = document.createElement("button");
-    button.id = "scrollButton";
-    button.innerText = "≫";
-    button.classList.add("hover-light");
-    button.addEventListener("click", () =>
-        mChart.self.timeScale().scrollToRealTime()
-    );
-    div.append(button);
-    //
-    var img = document.createElement("img");
-    img.id = "spinnerImg";
-    img.style.opacity = 0;
-    img.src = chrome.runtime.getURL("spinner.gif");
-    div.append(img);
-    //
-    var p = document.createElement("p");
-    p.id = "priceLegendP";
-    p.addEventListener("click", removeOrderButton);
-    div.append(p);
-    //
-    p = document.createElement("p");
-    p.id = "sharkLegendP";
-    p.addEventListener("click", () => {
-        mChart.series.shark.applyOptions({
-            visible: !mChart.series.shark.options().visible
-        });
-    });
-    div.append(p);
-    //
-    p = document.createElement("p");
-    p.id = "wolfLegendP";
-    p.style.display = "none";
-    p.addEventListener("click", () => {
-        mChart.series.wolf.applyOptions({
-            visible: !mChart.series.wolf.options().visible
-        });
-    });
-    div.append(p);
-    //
-    p = document.createElement("p");
-    p.id = "sheepLegendP";
-    p.style.display = "none";
-    p.addEventListener("click", () => {
-        mChart.series.sheep.applyOptions({
-            visible: !mChart.series.sheep.options().visible
-        });
-    });
-    div.append(p);
-    //
-    const chartOptions = {
-        localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
-        rightPriceScale: {
-            visible: true,
-            scaleMargins: { top: 0.1, bottom: 0.4 }
-        },
-        leftPriceScale: { visible: false },
-        layout: {
-            backgroundColor: "#131722",
-            textColor: "#d1d4dc",
-            lineColor: "#2B2B43"
-        },
-        grid: {
-            vertLines: { color: "#2B2B43" },
-            horzLines: { color: "#363C4E" }
-        },
-        crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-        timeScale: { timeVisible: true, rightOffset: 20, minBarSpacing: 0.1 }
-    };
-    mChart.self = LightweightCharts.createChart(div, chartOptions);
-    //
-    mChart.self.subscribeCrosshairMove(crosshairMove);
-    mChart.self.subscribeCustomPriceLineDragged(priceLineDrag);
-    //
-    mChart.series.wolf = mChart.self.addLineSeries({
-        priceScaleId: "wolf",
-        color: "#FFFF00",
-        priceFormat: { minMove: 1 },
-        scaleMargins: { top: 0.6, bottom: 0 },
-        visible: false
-    });
-    mChart.series.sheep = mChart.self.addLineSeries({
-        priceScaleId: "sheep",
-        color: "#00FFFF",
-        priceFormat: { minMove: 1 },
-        scaleMargins: { top: 0.6, bottom: 0 },
-        visible: false
-    });
-    mChart.series.shark = mChart.self.addLineSeries({
-        priceScaleId: "shark",
-        color: "#FF00FF",
-        priceFormat: { minMove: 1 },
-        scaleMargins: { top: 0.6, bottom: 0 }
-    });
-    mChart.series.price = mChart.self.addLineSeries({
-        color: "white",
-        priceFormat: { minMove: 0.1 }
-    });
 
-    mChart.self.timeScale().fitContent();
+    function createDataArea(container) {
+        var div = document.createElement("div");
+        div.id = "dataAreaDiv";
+        div.className = "area";
+        container.append(div);
+        //
+        createSpinnerImg(div);
+        createDateInput(div);
+        createTimeFrameSelect(div);
+        createRefreshButton(div);
+        createClearButton(div);
+
+        function createTimeFrameSelect(container) {
+            var select = document.createElement("select");
+            select.id = "timeFrameSelect";
+            select.className = "command";
+            [
+                { text: "Tick", value: 0 },
+                { text: "1 min", value: 1 },
+                { text: "5 min", value: 5 },
+                { text: "30 min", value: 30 },
+                { text: "1 day", value: 1440 }
+            ].forEach((item, index) => {
+                var option = document.createElement("option");
+                option.value = item.value;
+                option.text = item.text;
+                select.appendChild(option);
+            });
+            select.value = mConfig.timeFrame;
+            select.addEventListener("change", e => {
+                mConfig.timeFrame = e.target.value;
+                getData().then(() => mChart.self.timeScale().resetTimeScale());
+            });
+            container.append(select);
+        }
+
+        function createDateInput(container) {
+            var input = document.createElement("input");
+            input.id = "dateInput";
+            input.type = "date";
+            input.className = "command";
+            input.addEventListener("change", e => {
+                if (!!e.target.value) getData();
+            });
+            container.append(input);
+        }
+
+        function createRefreshButton(container) {
+            var button = document.createElement("div");
+            button.id = "refreshButton";
+            button.innerText = "R";
+            button.className = "command";
+            button.title = "Refresh chart";
+            button.addEventListener("click", () => getData());
+            container.append(button);
+        }
+
+        function createClearButton(container) {
+            var button = document.createElement("div");
+            button.id = "clearButton";
+            button.innerText = "C";
+            button.className = "command";
+            button.title = "Delete local data";
+            button.addEventListener("click", () => {
+                clearLocalData("data");
+                getData();
+            });
+            container.append(button);
+        }
+
+        function createSpinnerImg(container) {
+            var img = document.createElement("img");
+            img.id = "spinnerImg";
+            img.style.opacity = 0;
+            img.src = chrome.runtime.getURL("spinner.gif");
+            container.append(img);
+        }
+    }
+
+    function createToolArea(container) {
+        var div = document.createElement("div");
+        div.id = "toolAreaDiv";
+        div.className = "area";
+        container.append(div);
+        //
+        createDrawLineButton(div);
+        createDrawMarkerButton(div);
+
+        function createDrawLineButton(container) {
+            var button = document.createElement("div");
+            button.id = "drawLineButton";
+            button.innerText = "L";
+            button.className = "command tool";
+            button.addEventListener("click", e => {
+                const selected = e.target.classList.contains("selected");
+                document
+                    .querySelectorAll(".tool")
+                    .forEach(el => el.classList.remove("selected"));
+                if (!selected) e.target.classList.add("selected");
+                e.stopPropagation();
+            });
+            button.addEventListener("contextmenu", e => {
+                removeToolLines();
+                e.target.classList.remove("selected");
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            container.append(button);
+        }
+
+        function createDrawMarkerButton(container) {
+            button = document.createElement("div");
+            button.id = "drawMarkerButton";
+            button.innerText = "M";
+            button.className = "command tool";
+            button.addEventListener("click", e => {
+                const selected = e.target.classList.contains("selected");
+                document
+                    .querySelectorAll(".tool")
+                    .forEach(el => el.classList.remove("selected"));
+                if (!selected) e.target.classList.add("selected");
+                e.stopPropagation();
+            });
+            button.addEventListener("contextmenu", e => {
+                removeMarkers();
+                e.target.classList.remove("selected");
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            container.append(button);
+        }
+    }
+
+    function createLegendArea(container) {
+        var div = document.createElement("div");
+        div.id = "legendAreaDiv";
+        container.append(div);
+        //
+        createPriceLegendP(div);
+        createSharkLegendP(div);
+
+        function createPriceLegendP(container) {
+            var p = document.createElement("p");
+            p.id = "priceLegendP";
+            container.append(p);
+        }
+
+        function createSharkLegendP(container) {
+            //
+            var p = document.createElement("p");
+            p.id = "sharkLegendP";
+            container.append(p);
+        }
+    }
+
+    function createFreeElement(container) {
+        createCancelOrderButton(container);
+        createEntryOrderButton(container);
+        createTpslOrderButton(container);
+        createScrollButton(container);
+
+        function createCancelOrderButton(container) {
+            var button = document.createElement("button");
+            button.id = "cancelOrderButton";
+            button.innerText = "X";
+            button.style.display = "none";
+            button.addEventListener("click", () => {
+                closePosition();
+                cancelOrder();
+            });
+            container.append(button);
+        }
+        function createEntryOrderButton(container) {
+            button = document.createElement("button");
+            button.id = "entryOrderButton";
+            button.innerText = "Entry";
+            button.style.display = "none";
+            button.addEventListener("click", () => {
+                orderEntryPrice();
+                removeOrderButton();
+            });
+            container.append(button);
+        }
+        function createTpslOrderButton(container) {
+            //
+            button = document.createElement("button");
+            button.id = "tpslOrderButton";
+            button.innerText = "TP/SL";
+            button.style.display = "none";
+            button.addEventListener("click", () => {
+                orderTpPrice(true);
+                orderSlPrice(true);
+                removeOrderButton();
+            });
+            container.append(button);
+        }
+        function createScrollButton(container) {
+            //
+            button = document.createElement("div");
+            button.id = "scrollButton";
+            button.className = "command";
+            button.innerText = "≫";
+            button.addEventListener("click", () =>
+                mChart.self.timeScale().scrollToRealTime()
+            );
+            container.append(button);
+        }
+    }
+
+    function createLightWeightChart(container) {
+        const chartOptions = {
+            localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
+            rightPriceScale: {
+                visible: true,
+                scaleMargins: { top: 0.1, bottom: 0.4 }
+            },
+            leftPriceScale: { visible: false },
+            layout: {
+                backgroundColor: "#181C27",
+                textColor: "#A2A6AE",
+                lineColor: "#2B2B43"
+            },
+            grid: {
+                vertLines: { color: "#30333F" },
+                horzLines: { color: "#30333F" }
+            },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+            timeScale: {
+                timeVisible: true,
+                rightOffset: 20,
+                minBarSpacing: 0.1
+            }
+        };
+        mChart.self = LightweightCharts.createChart(container, chartOptions);
+        //
+        mChart.self.subscribeCrosshairMove(crosshairMove);
+        mChart.self.subscribeCustomPriceLineDragged(priceLineDrag);
+        //
+        mChart.series.shark = mChart.self.addLineSeries({
+            priceScaleId: "shark",
+            color: "#FF00FF",
+            priceFormat: { minMove: 1 },
+            scaleMargins: { top: 0.6, bottom: 0 }
+        });
+        mChart.series.price = mChart.self.addLineSeries({
+            color: "white",
+            priceFormat: { minMove: 0.1 }
+        });
+
+        mChart.self.timeScale().fitContent();
+    }
 
     function crosshairMove(e) {
         if (e.time) {
             updateLegend(
                 e.seriesPrices.get(mChart.series.price),
-                e.seriesPrices.get(mChart.series.shark),
-                e.seriesPrices.get(mChart.series.wolf),
-                e.seriesPrices.get(mChart.series.sheep)
+                e.seriesPrices.get(mChart.series.shark)
             );
             mConfig.hasCrosshair = true;
             mChart.crosshair.time = e.time;
@@ -708,27 +748,16 @@ function connectSocket() {
                 mChart.data = createChartData(mChart.data, param);
                 const lastPrice = mChart.data.price.slice(-1)[0];
                 const lastShark = mChart.data.shark.slice(-1)[0];
-                const lastWolf = mChart.data.wolf.slice(-1)[0];
-                const lastSheep = mChart.data.sheep.slice(-1)[0];
                 //
                 if (mConfig.timeFrame > 0) {
                     mChart.series.price.setData(mChart.data.price);
                     mChart.series.shark.setData(mChart.data.shark);
-                    mChart.series.wolf.setData(mChart.data.wolf);
-                    mChart.series.sheep.setData(mChart.data.sheep);
                 } else {
                     mChart.series.price.update(lastPrice);
                     mChart.series.shark.update(lastShark);
-                    mChart.series.wolf.update(lastWolf);
-                    mChart.series.sheep.update(lastSheep);
                 }
                 if (!mConfig.hasCrosshair) {
-                    updateLegend(
-                        lastPrice.value,
-                        lastShark.value,
-                        lastWolf.value,
-                        lastSheep.value
-                    );
+                    updateLegend(lastPrice.value, lastShark.value);
                 }
                 //
                 setLocalData("data", param);
@@ -835,9 +864,7 @@ function getData() {
             mChart.data = data.reduce((r, item) => createChartData(r, item), {
                 original: [],
                 price: [],
-                shark: [],
-                wolf: [],
-                sheep: []
+                shark: []
             });
             // console.log(
             //     "chartData",
@@ -846,15 +873,11 @@ function getData() {
             //
             mChart.series.price.setData(mChart.data.price);
             mChart.series.shark.setData(mChart.data.shark);
-            mChart.series.wolf.setData(mChart.data.wolf);
-            mChart.series.sheep.setData(mChart.data.sheep);
             //
             if (!mConfig.hasCrosshair) {
                 updateLegend(
                     mChart.data.price.slice(-1)[0].value,
-                    mChart.data.shark.slice(-1)[0].value,
-                    mChart.data.wolf.slice(-1)[0].value,
-                    mChart.data.sheep.slice(-1)[0].value
+                    mChart.data.shark.slice(-1)[0].value
                 );
             }
             //
@@ -868,8 +891,6 @@ function getData() {
 function createChartData(r, item) {
     var time = item.time + 7 * 60 * 60;
     const prevShark = !!r.shark.length ? r.shark.slice(-1)[0].value : 0;
-    const prevWolf = !!r.wolf.length ? r.wolf.slice(-1)[0].value : 0;
-    const prevSheep = !!r.sheep.length ? r.sheep.slice(-1)[0].value : 0;
     const volume = (item.action == "BU" ? 1 : -1) * item.volume;
     if (mConfig.timeFrame > 0) {
         const period = 60 * mConfig.timeFrame;
@@ -882,8 +903,6 @@ function createChartData(r, item) {
         if (isSameTime) {
             r.price.pop();
             r.shark.pop();
-            r.wolf.pop();
-            r.sheep.pop();
         }
         time = timeIndex * period;
     }
@@ -892,19 +911,6 @@ function createChartData(r, item) {
     r.shark.push({
         time: time,
         value: prevShark + (item.volume > mConfig.sharkLimit ? volume : 0)
-    });
-    r.wolf.push({
-        time: time,
-        value:
-            prevWolf +
-            (item.volume >= mConfig.sheepLimit &&
-            item.volume <= mConfig.sharkLimit
-                ? volume
-                : 0)
-    });
-    r.sheep.push({
-        time: time,
-        value: prevSheep + (item.volume < mConfig.sheepLimit ? volume : 0)
     });
     //
     return r;
@@ -1221,20 +1227,12 @@ function callScript(script) {
     button.click();
 }
 
-function updateLegend(price, shark, wolf, sheep) {
+function updateLegend(price, shark) {
     if (!!price) document.getElementById("priceLegendP").innerText = price;
     if (!!shark)
         document.getElementById(
             "sharkLegendP"
         ).innerText = shark.toLocaleString("en-US");
-    if (!!wolf)
-        document.getElementById("wolfLegendP").innerText = wolf.toLocaleString(
-            "en-US"
-        );
-    if (!!sheep)
-        document.getElementById(
-            "sheepLegendP"
-        ).innerText = sheep.toLocaleString("en-US");
 }
 
 function refreshDataInSession() {

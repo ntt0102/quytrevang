@@ -55,103 +55,93 @@
     opacity: 1;
 }
 
-.line-chart #lightWeightChart > #clearButton {
+.line-chart #lightWeightChart .area {
     position: absolute;
-    top: -0.5px;
-    right: 55px;
-    padding: 0px 8px;
+    display: flex;
+    gap: 5px;
+    padding: 1px;
     font-size: 17px;
+    background: #131722;
+    border: solid 3px #2a2e39;
     border-radius: 5px;
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #refreshButton {
-    position: absolute;
-    top: -0.5px;
-    right: 86px;
-    padding: 0px 8px;
-    font-size: 17px;
-    border-radius: 5px;
-    z-index: 3;
-}
-
-.line-chart #lightWeightChart > #timeFrameSelect {
-    position: absolute;
-    top: 0.5px;
-    right: 119px;
-    height: 26px;
+.line-chart #lightWeightChart .command {
+    border-radius: 3px;
     text-align: center;
-    border-radius: 5px;
-    padding: 2px 0 !important;
+    color: #d1d4dc;
+    background: transparent !important;
+    line-height: 30px;
+    width: 30px;
+    height: 30px;
+    border: none;
+    cursor: pointer;
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #dateInput {
-    position: absolute;
+.line-chart #lightWeightChart .command:hover {
+    background: #2a2e39 !important;
+}
+
+.line-chart #lightWeightChart .selected {
+    color: #1f62ff !important;
+}
+
+.line-chart #lightWeightChart .hover-light:hover {
+    opacity: 1 !important;
+}
+
+.line-chart #lightWeightChart > #dataAreaDiv {
     top: 0px;
-    right: 188px;
-    width: 105px;
-    padding: 0px;
-    line-height: 20px;
-    margin-top: 1px;
-    text-align: center;
-    border-radius: 5px;
+    right: 50px;
+}
+
+.line-chart #lightWeightChart > #dataAreaDiv > #timeFrameSelect {
+    width: 65px;
+}
+
+.line-chart #lightWeightChart > #dataAreaDiv > #dateInput {
+    width: 120px;
+}
+
+.line-chart #lightWeightChart > #dataAreaDiv > #spinnerImg {
+    width: 30px;
+    height: 30px;
+}
+
+.line-chart #lightWeightChart > #toolAreaDiv {
+    top: 55px;
+    left: 85px;
+    flex-direction: column;
+}
+
+.line-chart #lightWeightChart > #legendAreaDiv {
+    position: absolute;
+    top: 32px;
+    left: 85px;
+    display: flex;
+    gap: 5px;
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #spinnerImg {
-    position: absolute;
-    top: 2px;
-    right: 305px;
-    width: 25px;
-    z-index: 2001;
+.line-chart #lightWeightChart > #legendAreaDiv > #priceLegendP {
+    color: white;
+}
+
+.line-chart #lightWeightChart > #legendAreaDiv > #sharkLegendP {
+    color: #ff00ff;
 }
 
 .line-chart #lightWeightChart > #cancelOrderButton {
     position: absolute;
-    top: 30px;
-    right: 55px;
+    top: 135px;
+    left: 88px;
     padding: 3px 9px;
     border-radius: 5px;
     color: white;
     background: silver;
     z-index: 3;
-}
-
-.line-chart #lightWeightChart > #priceLegendP {
-    position: absolute;
-    top: 32px;
-    left: 85px;
-    color: white;
-    z-index: 3;
-    cursor: pointer;
-}
-
-.line-chart #lightWeightChart > #sharkLegendP {
-    position: absolute;
-    top: 32px;
-    left: 135px;
-    color: #ff00ff;
-    z-index: 3;
-    cursor: pointer;
-}
-
-.line-chart #lightWeightChart > #wolfLegendP {
-    position: absolute;
-    top: 32px;
-    left: 185px;
-    color: #ffff00;
-    z-index: 3;
-    cursor: pointer;
-}
-
-.line-chart #lightWeightChart > #sheepLegendP {
-    position: absolute;
-    top: 32px;
-    left: 235px;
-    color: #00ffff;
-    z-index: 3;
-    cursor: pointer;
 }
 
 .line-chart #lightWeightChart > #entryOrderButton {
@@ -172,54 +162,13 @@
     z-index: 3;
 }
 
-.line-chart #lightWeightChart > #drawLineButton {
-    position: absolute;
-    top: 55px;
-    left: 85px;
-    border-radius: 5px;
-    width: 30px;
-    height: 30px;
-    color: white;
-    text-align: center;
-    background: gray;
-    z-index: 3;
-    opacity: 0.5;
-}
-
-.line-chart #lightWeightChart > #drawMarkerButton {
-    position: absolute;
-    top: 85px;
-    left: 85px;
-    border-radius: 5px;
-    width: 30px;
-    height: 30px;
-    color: white;
-    text-align: center;
-    background: gray;
-    z-index: 3;
-    opacity: 0.5;
-}
-
 .line-chart #lightWeightChart > #scrollButton {
     position: absolute;
     bottom: 30px;
     right: 60px;
     border-radius: 50%;
-    width: 30px;
-    height: 30px;
-    color: white;
-    text-align: center;
-    background: gray;
-    z-index: 3;
-    opacity: 0.5;
-}
-
-.line-chart #lightWeightChart .selected {
-    background: #1e53e5 !important;
-}
-
-.line-chart #lightWeightChart .hover-light:hover {
-    opacity: 1 !important;
+    border: 1px solid gray;
+    line-height: 26px !important;
 }
 
 .line-chart #mainFooter .foot_tab:nth-child(2) {
