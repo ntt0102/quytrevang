@@ -260,11 +260,11 @@ function createChartContainer() {
             var button = document.createElement("div");
             button.id = "drawLineButton";
             button.innerText = "L";
-            button.className = "command tool";
+            button.className = "command";
             button.addEventListener("click", e => {
                 const selected = e.target.classList.contains("selected");
                 document
-                    .querySelectorAll(".tool")
+                    .querySelectorAll("#toolAreaDiv > .command")
                     .forEach(el => el.classList.remove("selected"));
                 if (!selected) e.target.classList.add("selected");
                 e.stopPropagation();
@@ -286,7 +286,7 @@ function createChartContainer() {
             button.addEventListener("click", e => {
                 const selected = e.target.classList.contains("selected");
                 document
-                    .querySelectorAll(".tool")
+                    .querySelectorAll("#toolAreaDiv > .command")
                     .forEach(el => el.classList.remove("selected"));
                 if (!selected) e.target.classList.add("selected");
                 e.stopPropagation();
@@ -387,8 +387,7 @@ function createChartContainer() {
             leftPriceScale: { visible: false },
             layout: {
                 backgroundColor: "#181C27",
-                textColor: "#A2A6AE",
-                lineColor: "#2B2B43"
+                textColor: "#A2A6AE"
             },
             grid: {
                 vertLines: { color: "#30333F" },
@@ -1250,5 +1249,6 @@ function coordinateToPrice(y) {
 }
 
 function formatPrice(price) {
-    return mChart.self.priceScale("right").formatPrice(+price);
+    // return mChart.self.priceScale("right").formatPrice(+price);
+    return +(+price.toFixed(1));
 }

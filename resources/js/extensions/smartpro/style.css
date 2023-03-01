@@ -58,8 +58,7 @@
 .line-chart #lightWeightChart .area {
     position: absolute;
     display: flex;
-    gap: 5px;
-    padding: 1px;
+    justify-content: space-between;
     font-size: 17px;
     background: #131722;
     border: solid 2px #2a2e39;
@@ -68,7 +67,7 @@
 }
 
 .line-chart #lightWeightChart .command {
-    border-radius: 3px;
+    flex: 1 1 auto;
     text-align: center;
     color: #d1d4dc;
     background: transparent !important;
@@ -78,6 +77,14 @@
     border: none;
     cursor: pointer;
     z-index: 3;
+}
+
+.line-chart #lightWeightChart > #dataAreaDiv .command:not(:first-child) {
+    border-left: solid 2px #2a2e39 !important;
+}
+
+.line-chart #lightWeightChart > #toolAreaDiv .command:not(:first-child) {
+    border-top: solid 2px #2a2e39 !important;
 }
 
 .line-chart #lightWeightChart .command:hover {
