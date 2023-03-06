@@ -520,7 +520,6 @@ function createChartContainer() {
     }
 
     function drawMarker() {
-        console.log("mChart.crosshair.time: ", mChart.crosshair.time);
         if (mChart.crosshair.time) {
             const markers = mChart.markers.filter(
                 item => item.time != mChart.crosshair.time
@@ -619,7 +618,7 @@ function registerEvent() {
         .querySelector(".timeStamp")
         .addEventListener("dblclick", toggleFullScreen);
     window.addEventListener("resize", resizeChart);
-    window.addEventListener("keydown", zoomChart);
+    window.addEventListener("keydown", keyEvent);
 
     function conditionOrderSelect() {
         document.getElementById("right_price").value = "MTL";
@@ -667,7 +666,7 @@ function registerEvent() {
         mChart.self.resize(window.innerWidth, window.innerHeight);
     }
 
-    function zoomChart(event) {
+    function keyEvent(event) {
         if (event.ctrlKey || event.metaKey) {
             if (event.shiftKey) {
                 if (event.keyCode == 39)
@@ -693,7 +692,10 @@ function registerEvent() {
                 } else if (event.keyCode == 39) {
                     const position = mChart.self.timeScale().scrollPosition();
                     mChart.self.timeScale().scrollToPosition(position + 10);
-                }
+                } else if (event.keyCode == 76)
+                    document.getElementById("drawLineButton").click();
+                else if (event.keyCode == 77)
+                    document.getElementById("drawMarkerButton").click();
             }
         } else if (event.which === 27) removeOrderButton();
     }
