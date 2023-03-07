@@ -579,7 +579,7 @@ function createChartContainer() {
                 //
                 if (!isChanged) {
                     mChart.order[line.kind].line.applyOptions({
-                        price: e.fromPriceString
+                        price: oldPrice
                     });
                     pushNotify("warning", "Không được thay đổi.");
                 }
