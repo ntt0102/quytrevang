@@ -8,6 +8,7 @@ var mChart = {
     order: { entry: {}, tp: {}, sl: {} },
     lines: [],
     markers: [],
+    ruler: { start: {}, end: {}, point: 0 },
     crosshair: {}
 };
 var mDatabase = {};
@@ -255,12 +256,12 @@ function createChartContainer() {
         //
         createDrawLineButton(div);
         createDrawMarkerButton(div);
+        createDrawRulerButton(div);
 
         function createDrawLineButton(container) {
             var button = document.createElement("div");
             button.id = "drawLineButton";
-            button.innerText = "L";
-            button.className = "command";
+            button.className = "command fa fa-minus";
             button.addEventListener("click", e => {
                 const selected = e.target.classList.contains("selected");
                 document
@@ -281,8 +282,7 @@ function createChartContainer() {
         function createDrawMarkerButton(container) {
             button = document.createElement("div");
             button.id = "drawMarkerButton";
-            button.innerText = "M";
-            button.className = "command tool";
+            button.className = "command fa fa-map-marker";
             button.addEventListener("click", e => {
                 const selected = e.target.classList.contains("selected");
                 document
@@ -293,6 +293,30 @@ function createChartContainer() {
             });
             button.addEventListener("contextmenu", e => {
                 removeMarkers();
+                e.target.classList.remove("selected");
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            container.append(button);
+        }
+
+        function createDrawRulerButton(container) {
+            button = document.createElement("div");
+            button.id = "drawRulerButton";
+            button.className = "command fa fa-arrows-v";
+            button.addEventListener("click", e => {
+                const selected = e.target.classList.contains("selected");
+                document
+                    .querySelectorAll("#toolAreaDiv > .command")
+                    .forEach(el => el.classList.remove("selected"));
+                if (!selected) {
+                    e.target.classList.add("selected");
+                    removeRuler();
+                }
+                e.stopPropagation();
+            });
+            button.addEventListener("contextmenu", e => {
+                removeRuler();
                 e.target.classList.remove("selected");
                 e.preventDefault();
                 e.stopPropagation();
@@ -455,10 +479,16 @@ function createChartContainer() {
                 .classList.contains("selected")
         )
             drawMarker();
+        else if (
+            document
+                .getElementById("drawRulerButton")
+                .classList.contains("selected")
+        )
+            drawRuler();
     }
 
     function drawToolLine(price) {
-        const TYPE = "tool";
+        const TYPE = "line";
         const existIndex = mChart.lines.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
@@ -554,46 +584,101 @@ function createChartContainer() {
         clearLocalData("marker");
     }
 
+    function drawRuler() {
+        const price = coordinateToPrice(mChart.crosshair.y);
+        var options = {
+            type: "ruler",
+            price: price,
+            color: "yellow",
+            lineWidth: 1,
+            lineStyle: LightweightCharts.LineStyle.Solid,
+            draggable: true
+        };
+        if (mChart.ruler.point == 0) {
+            options.point = 1;
+            options.title = "0";
+            mChart.ruler.start = mChart.series.price.createPriceLine(options);
+            mChart.ruler.point = 1;
+        } else if (mChart.ruler.point == 1) {
+            const startPrice = +mChart.ruler.start.options().price;
+            options.point = 2;
+            options.title = (price - startPrice).toFixed(1);
+            mChart.ruler.end = mChart.series.price.createPriceLine(options);
+            mChart.ruler.point = 2;
+            document
+                .getElementById("drawRulerButton")
+                .classList.remove("selected");
+        }
+    }
+
+    function removeRuler() {
+        if (mChart.ruler.point > 0) {
+            mChart.series.price.removePriceLine(mChart.ruler.start);
+            if (mChart.ruler.point > 1)
+                mChart.series.price.removePriceLine(mChart.ruler.end);
+            //
+            mChart.ruler = { start: {}, end: {}, point: 0 };
+        }
+    }
+
     function priceLineDrag(e) {
         const line = e.customPriceLine.options();
-        if (line.type == "order") {
-            const oldPrice = +e.fromPriceString;
-            const newPrice = formatPrice(line.price);
-            if (newPrice != oldPrice) {
-                var isChanged = false;
-                const position = getOrderPosition();
-                if (line.kind == "entry") {
-                    if (!position) {
-                        isChanged = true;
-                        mChart.order[line.kind].price = newPrice;
-                        orderEntryPrice();
+        const oldPrice = +e.fromPriceString;
+        const newPrice = formatPrice(line.price);
+        switch (line.type) {
+            case "order":
+                if (newPrice != oldPrice) {
+                    var isChanged = false;
+                    const position = getOrderPosition();
+                    if (line.kind == "entry") {
+                        if (!position) {
+                            isChanged = true;
+                            mChart.order[line.kind].price = newPrice;
+                            orderEntryPrice();
+                        }
+                    } else {
+                        if (mChart.order.side * position > 0) {
+                            isChanged = true;
+                            mChart.order[line.kind].price = newPrice;
+                            if (line.kind == "tp") orderTpPrice();
+                            else orderSlPrice();
+                        }
+                    }
+                    //
+                    if (!isChanged) {
+                        mChart.order[line.kind].line.applyOptions({
+                            price: oldPrice
+                        });
+                        pushNotify("warning", "Không được thay đổi.");
+                    }
+                }
+                break;
+            case "line":
+                clearLocalData("line").then(() =>
+                    setLocalData(
+                        "line",
+                        mChart.lines.map(line => line.options())
+                    )
+                );
+                document
+                    .getElementById("drawLineButton")
+                    .classList.remove("selected");
+                break;
+            case "ruler":
+                if (line.point == 1) {
+                    if (mChart.ruler.point == 2) {
+                        const distance = +mChart.ruler.end.options().title;
+                        mChart.ruler.end.applyOptions({
+                            price: +(newPrice + distance).toFixed(1)
+                        });
                     }
                 } else {
-                    if (mChart.order.side * position > 0) {
-                        isChanged = true;
-                        mChart.order[line.kind].price = newPrice;
-                        if (line.kind == "tp") orderTpPrice();
-                        else orderSlPrice();
-                    }
-                }
-                //
-                if (!isChanged) {
-                    mChart.order[line.kind].line.applyOptions({
-                        price: oldPrice
+                    const startPrice = +mChart.ruler.start.options().price;
+                    mChart.ruler.end.applyOptions({
+                        title: (newPrice - startPrice).toFixed(1)
                     });
-                    pushNotify("warning", "Không được thay đổi.");
                 }
-            }
-        } else {
-            clearLocalData("line").then(() =>
-                setLocalData(
-                    "line",
-                    mChart.lines.map(line => line.options())
-                )
-            );
-            document
-                .getElementById("drawLineButton")
-                .classList.remove("selected");
+                break;
         }
     }
 }
@@ -1184,6 +1269,7 @@ function drawOrderLine(kind) {
         side: mChart.order.side
     });
 }
+
 function removeOrderLine(kind) {
     if (mChart.order[kind].hasOwnProperty("line")) {
         mChart.series.price.removePriceLine(mChart.order[kind].line);
