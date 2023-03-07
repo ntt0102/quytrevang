@@ -12,16 +12,17 @@
         "https://smartpro.vps.com.vn/v1/"
       ],
       "js": [
-        "smartpro/moment.min.js",
-        "smartpro/lightweight-charts.min.js",
-        "smartpro/simple-notify.min.js",
-        "smartpro/google-protobuf.js",
-        "smartpro/tcbs.js",
-        "smartpro/script.js"
+        "js/moment.min.js",
+        "js/lightweight-charts.min.js",
+        "js/simple-notify.min.js",
+        "js/google-protobuf.js",
+        "js/tcbs.js",
+        "js/main.js"
       ],
       "css": [
-        "smartpro/simple-notify.min.css",
-        "smartpro/style.css"
+        "css/simple-notify.min.css",
+        "css/fa.css",
+        "css/main.css"
       ],
       "run_at": "document_idle",
       "all_frames": false
@@ -31,8 +32,7 @@
     {
       "resources": [
         "config.json",
-        "spinner.gif",
-        "tcbs.proto"
+        "spinner.gif"
       ],
       "matches": [
         "https://smartpro.vps.com.vn/*"
