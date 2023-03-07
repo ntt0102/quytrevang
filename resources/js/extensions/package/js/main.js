@@ -1179,7 +1179,7 @@ function orderTpPrice(isInit = false) {
     callScript("onCancelAllOrderPending('order')");
     if (isInit)
         mChart.order.tp.price =
-            +mChart.order.entry.price + mChart.order.side * 3;
+            +mChart.order.entry.price + mChart.order.side * mConfig.order.TP;
     drawOrderLine("tp");
     setTimeout(() => {
         document.getElementById("select_normal_order_wrapper").click();
@@ -1194,7 +1194,7 @@ function orderSlPrice(isInit = false) {
     callScript("onCancelAllOrderPending('order_condition')");
     if (isInit)
         mChart.order.sl.price =
-            +mChart.order.entry.price - mChart.order.side * 2;
+            +mChart.order.entry.price - mChart.order.side * mConfig.order.SL;
     drawOrderLine("sl");
     setTimeout(() => {
         document.getElementById("select_condition_order_wrapper").click();
@@ -1232,26 +1232,31 @@ function closePosition() {
 }
 
 function drawOrderLine(kind) {
+    var color, title;
+    switch (kind) {
+        case "entry":
+            color = "silver";
+            title = mChart.order.side > 0 ? "Long" : "Short";
+            break;
+        case "tp":
+            color = "lime";
+            title = Math.abs(
+                mChart.order.tp.price - mChart.order.entry.price
+            ).toFixed(1);
+            break;
+        case "sl":
+            color = "red";
+            title = Math.abs(
+                mChart.order.sl.price - mChart.order.entry.price
+            ).toFixed(1);
+            break;
+    }
     if (mChart.order[kind].hasOwnProperty("line")) {
         mChart.order[kind].line.applyOptions({
-            price: mChart.order[kind].price
+            price: mChart.order[kind].price,
+            title: title
         });
     } else {
-        var color, title;
-        switch (kind) {
-            case "entry":
-                color = "silver";
-                title = `${mChart.order.side > 0 ? "Long" : "Short"} Entry`;
-                break;
-            case "tp":
-                color = "lime";
-                title = "Take Profit";
-                break;
-            case "sl":
-                color = "red";
-                title = "Stop Loss";
-                break;
-        }
         mChart.order[kind].line = mChart.series.price.createPriceLine({
             type: "order",
             kind: kind,

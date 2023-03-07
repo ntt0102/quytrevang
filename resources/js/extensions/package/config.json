@@ -7,5 +7,9 @@
         "data": "/api/vps/data",
         "report": "/api/vps/report"
     },
-    "timeFrame": 0
+    "timeFrame": 0,
+    "order": {
+        "TP": 3,
+        "SL": 2
+    }
 }
