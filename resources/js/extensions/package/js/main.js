@@ -77,7 +77,7 @@ function getServerConfig() {
 function createButtons() {
     var button = document.createElement("button");
     button.id = "candleButton";
-    button.innerText = "📊";
+    button.classList = "fa fa-bar-chart";
     button.title = "Candle chart";
     button.addEventListener("click", () => {
         if (document.body.classList.contains("candle-chart")) {
@@ -109,39 +109,43 @@ function createButtons() {
     //
     button = document.createElement("button");
     button.id = "lineButton";
-    button.innerText = "💹";
+    button.classList = "fa fa-line-chart";
     button.title = "Line chart";
     button.addEventListener("click", () => {
+        var leftEl = document.getElementById("left_order_type");
+        var rightEl = document.getElementById("right_order_type");
+        var orderEl = document.querySelector(
+            "#mainFooter .foot_tab:nth-child(1)"
+        );
+        var condOrderEl = document.querySelector(
+            "#mainFooter .foot_tab:nth-child(2)"
+        );
         if (document.body.classList.contains("line-chart")) {
             document.body.classList.remove("line-chart");
-            document.getElementById("left_order_type").innerText =
-                "Lệnh thường";
-            document.getElementById("right_order_type").innerText =
-                "Lệnh điều kiện";
-            document.querySelector(
-                "#mainFooter .foot_tab:nth-child(1)"
-            ).innerText = "DANH SÁCH LỆNH";
-            document.querySelector(
-                "#mainFooter .foot_tab:nth-child(2)"
-            ).innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            leftEl.innerText = "Lệnh thường";
+            rightEl.innerText = "Lệnh điều kiện";
+            //
+            orderEl.classList.remove("fa", "fa-check-circle");
+            orderEl.innerText = "DANH SÁCH LỆNH";
+            condOrderEl.classList.remove("fa", "fa-question-circle");
+            condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
             document.body.classList.add("line-chart");
             document.body.classList.remove("candle-chart");
-            document.getElementById("left_order_type").innerText = "LT";
-            document.getElementById("right_order_type").innerText = "LĐK";
-            document.querySelector(
-                "#mainFooter .foot_tab:nth-child(1)"
-            ).innerText = "O";
-            document.querySelector(
-                "#mainFooter .foot_tab:nth-child(2)"
-            ).innerText = "?";
+            leftEl.innerText = "LT";
+            rightEl.innerText = "LĐK";
+            //
+            orderEl.classList.add("fa", "fa-check-circle");
+            orderEl.innerText = "";
+            condOrderEl.classList.add("fa", "fa-question-circle");
+            condOrderEl.innerText = "";
         }
     });
     document.body.append(button);
     //
     button = document.createElement("button");
     button.id = "reportButton";
-    button.innerText = "📔";
+    button.classList = "fa fa-flag-checkered";
     button.title = "Report";
     button.addEventListener("click", () => {
         if (mConfig.currentTime > mConfig.time.end) reportHandler();
@@ -219,8 +223,7 @@ function createChartContainer() {
         function createRefreshButton(container) {
             var button = document.createElement("div");
             button.id = "refreshButton";
-            button.innerText = "R";
-            button.className = "command";
+            button.className = "command fa fa-refresh";
             button.title = "Refresh chart";
             button.addEventListener("click", () => getData());
             container.append(button);
@@ -229,8 +232,7 @@ function createChartContainer() {
         function createClearButton(container) {
             var button = document.createElement("div");
             button.id = "clearButton";
-            button.innerText = "C";
-            button.className = "command";
+            button.className = "command fa fa-trash";
             button.title = "Delete local data";
             button.addEventListener("click", () => {
                 clearLocalData("data");
@@ -392,8 +394,7 @@ function createChartContainer() {
             //
             button = document.createElement("div");
             button.id = "scrollButton";
-            button.className = "command";
-            button.innerText = "≫";
+            button.className = "command fa fa-angle-double-right";
             button.addEventListener("click", () =>
                 mChart.self.timeScale().scrollToRealTime()
             );

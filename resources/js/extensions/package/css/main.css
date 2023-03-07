@@ -2,9 +2,11 @@
     position: fixed;
     bottom: 0px;
     left: 0px;
-    background: #848484;
-    border-radius: 20px;
-    padding: 0px 5px;
+    background: #3f433f;
+    color: #d1d4dc;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     font-size: 20px;
     z-index: 2001;
 }
@@ -12,28 +14,31 @@
 #lineButton {
     position: fixed;
     bottom: 0px;
-    left: 40px;
+    left: 42px;
     background: #3f433f;
-    border-radius: 20px;
-    padding: 2px 6px;
+    color: #d1d4dc;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     font-size: 16px;
     z-index: 2001;
 }
 
 #lineButton.dark {
-    border-color: lime;
+    border-color: white;
     border-width: 6px;
-    bottom: -3.5px;
-    left: 36.3px;
+    left: 41px;
 }
 
 #reportButton {
     position: fixed;
     bottom: 0px;
-    left: 78px;
-    background: black;
-    border-radius: 20px;
-    padding: 2px 6px;
+    left: 84px;
+    background: #3f433f;
+    color: #d1d4dc;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
     font-size: 16px;
 }
 
@@ -175,16 +180,18 @@
     right: 60px;
     border-radius: 50%;
     border: 1px solid gray;
-    line-height: 28px !important;
+    padding-left: 2px;
+    line-height: 26px !important;
+    font-size: 22px;
 }
 
 .line-chart #mainFooter .foot_tab:nth-child(2) {
     position: fixed;
     top: 310px;
-    left: 37px;
+    left: 37.5px;
     z-index: 2001;
     font-size: 20px;
-    padding: 0px 12px !important;
+    padding: 5px 9px !important;
     border-radius: 3px !important;
     background: #f0f0f0 !important;
     color: #848484 !important;
@@ -197,7 +204,7 @@
     left: 0px;
     z-index: 2001;
     font-size: 20px;
-    padding: 0px 10px !important;
+    padding: 5px 9px !important;
     margin: unset !important;
     border-radius: 3px !important;
     background: #f0f0f0 !important;
@@ -220,6 +227,7 @@
 }
 .line-chart .aside-menu .tab-content {
     height: unset !important;
+    border-radius: 5px;
 }
 
 .line-chart .aside-menu > .nav,
@@ -360,6 +368,7 @@
     position: fixed !important;
     top: -12px !important;
     left: -10px !important;
+    color: #d1d4dc;
     z-index: 1022;
 }
 
