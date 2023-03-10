@@ -3,12 +3,10 @@
     "root1": "http://localhost",
     "endpoint": {
         "socket": "wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream",
-        "voicerss": "https://api.voicerss.org/?hl=vi-vn",
         "config": "/api/vps/config",
         "data": "/api/vps/data",
         "report": "/api/vps/report"
     },
-    "voicerssKey": "bd4aed0104b049429786e1ea43ce7a43",
     "timeFrame": 0,
     "order": {
         "TP": 3,
