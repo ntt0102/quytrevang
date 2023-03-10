@@ -64,7 +64,7 @@ function getServerConfig() {
                 mConfig.hasCrosshair = false;
                 mConfig.hasNewData = false;
                 mConfig.currentTime = moment().unix();
-                mConfig.audio = null;
+                mConfig.audio = new Audio(chrome.runtime.getURL("alert.wav"));
                 //
                 resolve();
             })
@@ -931,28 +931,20 @@ function connectSocket() {
                 setLocalData("data", param);
                 mChart.data.original.push(param);
                 //
-                mChart.alerts.forEach(alert => {
-                    const ops = alert.options();
-                    if (!ops.removed) {
-                        if (
-                            ops.title == ">" &&
-                            message.closeprice >= ops.price
-                        ) {
-                            mConfig.audio = new Audio(
-                                chrome.runtime.getURL("alert.wav")
-                            );
-                            if (mConfig.audio.paused) mConfig.audio.play();
-                        } else if (
-                            ops.title == "<" &&
-                            message.closeprice <= ops.price
-                        ) {
-                            mConfig.audio = new Audio(
-                                chrome.runtime.getURL("alert.wav")
-                            );
-                            if (mConfig.audio.paused) mConfig.audio.play();
+                if (mConfig.audio.paused) {
+                    mChart.alerts.forEach(alert => {
+                        const ops = alert.options();
+                        if (!ops.removed) {
+                            if (
+                                (ops.title == ">" &&
+                                    message.closeprice >= ops.price) ||
+                                (ops.title == "<" &&
+                                    message.closeprice <= ops.price)
+                            )
+                                mConfig.audio.play();
                         }
-                    }
-                });
+                    });
+                }
             }
         }
     };
