@@ -9,6 +9,7 @@ var mChart = {
     lines: [],
     markers: [],
     ruler: { start: {}, end: {}, point: 0 },
+    notifies: [],
     crosshair: {}
 };
 var mDatabase = {};
@@ -259,6 +260,7 @@ function createChartContainer() {
         createDrawLineButton(div);
         createDrawMarkerButton(div);
         createDrawRulerButton(div);
+        createDrawNotifyButton(div);
 
         function createDrawLineButton(container) {
             var button = document.createElement("div");
@@ -319,6 +321,27 @@ function createChartContainer() {
             });
             button.addEventListener("contextmenu", e => {
                 removeRuler();
+                e.target.classList.remove("selected");
+                e.preventDefault();
+                e.stopPropagation();
+            });
+            container.append(button);
+        }
+
+        function createDrawNotifyButton(container) {
+            button = document.createElement("div");
+            button.id = "drawNotifyButton";
+            button.className = "command fa fa-bell-o";
+            button.addEventListener("click", e => {
+                const selected = e.target.classList.contains("selected");
+                document
+                    .querySelectorAll("#toolAreaDiv > .command")
+                    .forEach(el => el.classList.remove("selected"));
+                if (!selected) e.target.classList.add("selected");
+                e.stopPropagation();
+            });
+            button.addEventListener("contextmenu", e => {
+                removeNotifies();
                 e.target.classList.remove("selected");
                 e.preventDefault();
                 e.stopPropagation();
@@ -486,6 +509,12 @@ function createChartContainer() {
                 .classList.contains("selected")
         )
             drawRuler();
+        else if (
+            document
+                .getElementById("drawNotifyButton")
+                .classList.contains("selected")
+        )
+            drawNotify(coordinateToPrice(mChart.crosshair.y));
     }
 
     function drawToolLine(price) {
@@ -497,24 +526,19 @@ function createChartContainer() {
         if (existIndex != -1) {
             const removeLine = mChart.lines.splice(existIndex, 1);
             mChart.series.price.removePriceLine(removeLine[0]);
-        } else
-            mChart.lines.push(
-                mChart.series.price.createPriceLine({
-                    type: TYPE,
-                    price: price,
-                    color: "aqua",
-                    lineWidth: 1,
-                    lineStyle: LightweightCharts.LineStyle.Solid,
-                    draggable: true
-                })
-            );
-        //
-        clearLocalData("line").then(() =>
-            setLocalData(
-                "line",
-                mChart.lines.map(line => line.options())
-            )
-        );
+            setLocalData("line", { price: price, removed: true });
+        } else {
+            const options = {
+                type: TYPE,
+                price: price,
+                color: "aqua",
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Solid,
+                draggable: true
+            };
+            mChart.lines.push(mChart.series.price.createPriceLine(options));
+            setLocalData("line", options);
+        }
         document.getElementById("drawLineButton").classList.remove("selected");
     }
 
@@ -522,32 +546,6 @@ function createChartContainer() {
         mChart.lines.forEach(line => mChart.series.price.removePriceLine(line));
         mChart.lines = [];
         clearLocalData("line");
-    }
-
-    function showOrderButton() {
-        if (getOrderPosition()) {
-            // if (mChart.order.entry.hasOwnProperty("line")) {
-            if (!mChart.order.tp.hasOwnProperty("line")) {
-                var btn = document.getElementById("tpslOrderButton");
-                btn.style.left = +(mChart.crosshair.x + 10) + "px";
-                btn.style.top = +(mChart.crosshair.y + 10) + "px";
-                btn.style.display = "block";
-            }
-        } else {
-            if (!mChart.order.entry.hasOwnProperty("line")) {
-                const price = coordinateToPrice(mChart.crosshair.y);
-                const side =
-                    price >= mChart.data.price.slice(-1)[0].value ? 1 : -1;
-                var btn = document.getElementById("entryOrderButton");
-                mChart.order.entry.price = price;
-                mChart.order.side = side;
-                btn.style.left = +(mChart.crosshair.x + 10) + "px";
-                btn.style.top = +(mChart.crosshair.y + 10) + "px";
-                btn.style.background = side > 0 ? "green" : "red";
-                btn.innerText = `${side > 0 ? "Long" : "Short"} ${price}`;
-                btn.style.display = "block";
-            }
-        }
     }
 
     function drawMarker() {
@@ -627,6 +625,67 @@ function createChartContainer() {
         }
     }
 
+    function drawNotify(price) {
+        const TYPE = "notify";
+        const existIndex = mChart.notifies.findIndex(line => {
+            const ops = line.options();
+            return (ops.type = TYPE && +ops.price == price);
+        });
+        if (existIndex != -1) {
+            const removeLine = mChart.notifies.splice(existIndex, 1);
+            mChart.series.price.removePriceLine(removeLine[0]);
+            setLocalData("notify", { price: price, removed: true });
+        } else {
+            const options = {
+                type: TYPE,
+                price: price,
+                color: "#FF00FF",
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Solid,
+                draggable: true
+            };
+            mChart.notifies.push(mChart.series.price.createPriceLine(options));
+            setLocalData("notify", options);
+        }
+        document
+            .getElementById("drawNotifyButton")
+            .classList.remove("selected");
+    }
+
+    function removeNotifies() {
+        mChart.notifies.forEach(line =>
+            mChart.series.price.removePriceLine(line)
+        );
+        mChart.notifies = [];
+        clearLocalData("notify");
+    }
+
+    function showOrderButton() {
+        if (getOrderPosition()) {
+            // if (mChart.order.entry.hasOwnProperty("line")) {
+            if (!mChart.order.tp.hasOwnProperty("line")) {
+                var btn = document.getElementById("tpslOrderButton");
+                btn.style.left = +(mChart.crosshair.x + 10) + "px";
+                btn.style.top = +(mChart.crosshair.y + 10) + "px";
+                btn.style.display = "block";
+            }
+        } else {
+            if (!mChart.order.entry.hasOwnProperty("line")) {
+                const price = coordinateToPrice(mChart.crosshair.y);
+                const side =
+                    price >= mChart.data.price.slice(-1)[0].value ? 1 : -1;
+                var btn = document.getElementById("entryOrderButton");
+                mChart.order.entry.price = price;
+                mChart.order.side = side;
+                btn.style.left = +(mChart.crosshair.x + 10) + "px";
+                btn.style.top = +(mChart.crosshair.y + 10) + "px";
+                btn.style.background = side > 0 ? "green" : "red";
+                btn.innerText = `${side > 0 ? "Long" : "Short"} ${price}`;
+                btn.style.display = "block";
+            }
+        }
+    }
+
     function priceLineDrag(e) {
         const line = e.customPriceLine.options();
         const oldPrice = +e.fromPriceString;
@@ -660,12 +719,8 @@ function createChartContainer() {
                 }
                 break;
             case "line":
-                clearLocalData("line").then(() =>
-                    setLocalData(
-                        "line",
-                        mChart.lines.map(line => line.options())
-                    )
-                );
+                setLocalData("line", { price: oldPrice, removed: true });
+                setLocalData("line", line);
                 document
                     .getElementById("drawLineButton")
                     .classList.remove("selected");
@@ -688,6 +743,13 @@ function createChartContainer() {
                         title: (newPrice - startPrice).toFixed(1)
                     });
                 }
+                break;
+            case "notify":
+                setLocalData("notify", { price: oldPrice, removed: true });
+                setLocalData("notify", line);
+                document
+                    .getElementById("drawNotifyButton")
+                    .classList.remove("selected");
                 break;
         }
     }
@@ -807,6 +869,7 @@ function createIndexedDB() {
             mDatabase.createObjectStore("marker", { keyPath: "time" });
             mDatabase.createObjectStore("line", { keyPath: "price" });
             mDatabase.createObjectStore("ruler", { keyPath: "point" });
+            mDatabase.createObjectStore("notify", { keyPath: "price" });
             resolve();
         };
         request.onsuccess = e => {
@@ -900,9 +963,10 @@ function loadPage() {
         });
         //
         const lines = await getLocalData("line");
-        lines.forEach(line =>
-            mChart.lines.push(mChart.series.price.createPriceLine(line))
-        );
+        lines.forEach(line => {
+            if (!line.removed)
+                mChart.lines.push(mChart.series.price.createPriceLine(line));
+        });
         //
         mChart.markers = await getLocalData("marker");
         mChart.series.price.setMarkers(mChart.markers);
@@ -921,6 +985,12 @@ function loadPage() {
                     );
             });
         }
+        //
+        const notifyLines = await getLocalData("notify");
+        notifyLines.forEach(line => {
+            if (!line.removed)
+                mChart.notifies.push(mChart.series.price.createPriceLine(line));
+        });
         //
         mNotify.close();
         document.getElementById("lineButton").click();
