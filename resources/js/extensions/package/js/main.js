@@ -596,16 +596,20 @@ function createChartContainer() {
             draggable: true
         };
         if (mChart.ruler.point == 0) {
-            options.point = 1;
+            const point = 1;
+            options.point = point;
             options.title = "0";
             mChart.ruler.start = mChart.series.price.createPriceLine(options);
-            mChart.ruler.point = 1;
+            mChart.ruler.point = point;
+            setLocalData("ruler", options);
         } else if (mChart.ruler.point == 1) {
             const startPrice = +mChart.ruler.start.options().price;
-            options.point = 2;
+            const point = 2;
+            options.point = point;
             options.title = (price - startPrice).toFixed(1);
             mChart.ruler.end = mChart.series.price.createPriceLine(options);
-            mChart.ruler.point = 2;
+            mChart.ruler.point = point;
+            setLocalData("ruler", options);
             document
                 .getElementById("drawRulerButton")
                 .classList.remove("selected");
@@ -619,6 +623,7 @@ function createChartContainer() {
                 mChart.series.price.removePriceLine(mChart.ruler.end);
             //
             mChart.ruler = { start: {}, end: {}, point: 0 };
+            clearLocalData("ruler");
         }
     }
 
@@ -667,13 +672,17 @@ function createChartContainer() {
                 break;
             case "ruler":
                 if (line.point == 1) {
+                    setLocalData("ruler", line);
                     if (mChart.ruler.point == 2) {
                         const distance = +mChart.ruler.end.options().title;
+                        const endPrice = +(newPrice + distance).toFixed(1);
                         mChart.ruler.end.applyOptions({
-                            price: +(newPrice + distance).toFixed(1)
+                            price: endPrice
                         });
+                        setLocalData("ruler", mChart.ruler.end.options());
                     }
                 } else {
+                    setLocalData("ruler", line);
                     const startPrice = +mChart.ruler.start.options().price;
                     mChart.ruler.end.applyOptions({
                         title: (newPrice - startPrice).toFixed(1)
@@ -797,6 +806,7 @@ function createIndexedDB() {
             mDatabase.createObjectStore("order", { keyPath: "kind" });
             mDatabase.createObjectStore("marker", { keyPath: "time" });
             mDatabase.createObjectStore("line", { keyPath: "price" });
+            mDatabase.createObjectStore("ruler", { keyPath: "point" });
             resolve();
         };
         request.onsuccess = e => {
@@ -890,13 +900,28 @@ function loadPage() {
         });
         //
         const lines = await getLocalData("line");
-        lines.forEach(line => {
-            line.price = +line.price;
-            mChart.lines.push(mChart.series.price.createPriceLine(line));
-        });
+        lines.forEach(line =>
+            mChart.lines.push(mChart.series.price.createPriceLine(line))
+        );
         //
         mChart.markers = await getLocalData("marker");
         mChart.series.price.setMarkers(mChart.markers);
+        //
+        const rulerLines = await getLocalData("ruler");
+        if (rulerLines.length == 2) {
+            rulerLines.forEach(line => {
+                mChart.ruler.point = 2;
+                if (line.point == 1)
+                    mChart.ruler.start = mChart.series.price.createPriceLine(
+                        line
+                    );
+                else
+                    mChart.ruler.end = mChart.series.price.createPriceLine(
+                        line
+                    );
+            });
+        }
+        //
         mNotify.close();
         document.getElementById("lineButton").click();
     });
