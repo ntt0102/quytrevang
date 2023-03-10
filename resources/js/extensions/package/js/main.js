@@ -9,7 +9,7 @@ var mChart = {
     lines: [],
     markers: [],
     ruler: { start: {}, end: {}, point: 0 },
-    notifies: [],
+    alerts: [],
     crosshair: {}
 };
 var mDatabase = {};
@@ -64,6 +64,7 @@ function getServerConfig() {
                 mConfig.hasCrosshair = false;
                 mConfig.hasNewData = false;
                 mConfig.currentTime = moment().unix();
+                mConfig.audio = null;
                 //
                 resolve();
             })
@@ -260,7 +261,7 @@ function createChartContainer() {
         createDrawLineButton(div);
         createDrawMarkerButton(div);
         createDrawRulerButton(div);
-        createDrawNotifyButton(div);
+        createDrawAlertButton(div);
 
         function createDrawLineButton(container) {
             var button = document.createElement("div");
@@ -328,9 +329,9 @@ function createChartContainer() {
             container.append(button);
         }
 
-        function createDrawNotifyButton(container) {
+        function createDrawAlertButton(container) {
             button = document.createElement("div");
-            button.id = "drawNotifyButton";
+            button.id = "drawAlertButton";
             button.className = "command fa fa-bell-o";
             button.addEventListener("click", e => {
                 const selected = e.target.classList.contains("selected");
@@ -341,7 +342,7 @@ function createChartContainer() {
                 e.stopPropagation();
             });
             button.addEventListener("contextmenu", e => {
-                removeNotifies();
+                removeAlerts();
                 e.target.classList.remove("selected");
                 e.preventDefault();
                 e.stopPropagation();
@@ -511,10 +512,10 @@ function createChartContainer() {
             drawRuler();
         else if (
             document
-                .getElementById("drawNotifyButton")
+                .getElementById("drawAlertButton")
                 .classList.contains("selected")
         )
-            drawNotify(coordinateToPrice(mChart.crosshair.y));
+            drawAlert(coordinateToPrice(mChart.crosshair.y));
     }
 
     function drawToolLine(price) {
@@ -625,39 +626,41 @@ function createChartContainer() {
         }
     }
 
-    function drawNotify(price) {
-        const TYPE = "notify";
-        const existIndex = mChart.notifies.findIndex(line => {
+    function drawAlert(price) {
+        const TYPE = "alert";
+        const existIndex = mChart.alerts.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
         });
         if (existIndex != -1) {
-            const removeLine = mChart.notifies.splice(existIndex, 1);
+            const removeLine = mChart.alerts.splice(existIndex, 1);
             mChart.series.price.removePriceLine(removeLine[0]);
-            setLocalData("notify", { price: price, removed: true });
+            setLocalData("alert", { price: price, removed: true });
         } else {
             const options = {
                 type: TYPE,
                 price: price,
+                title:
+                    price >= mChart.data.original.slice(-1)[0].value
+                        ? ">"
+                        : "<",
                 color: "#FF00FF",
                 lineWidth: 1,
                 lineStyle: LightweightCharts.LineStyle.Solid,
                 draggable: true
             };
-            mChart.notifies.push(mChart.series.price.createPriceLine(options));
-            setLocalData("notify", options);
+            mChart.alerts.push(mChart.series.price.createPriceLine(options));
+            setLocalData("alert", options);
         }
-        document
-            .getElementById("drawNotifyButton")
-            .classList.remove("selected");
+        document.getElementById("drawAlertButton").classList.remove("selected");
     }
 
-    function removeNotifies() {
-        mChart.notifies.forEach(line =>
+    function removeAlerts() {
+        mChart.alerts.forEach(line =>
             mChart.series.price.removePriceLine(line)
         );
-        mChart.notifies = [];
-        clearLocalData("notify");
+        mChart.alerts = [];
+        clearLocalData("alert");
     }
 
     function showOrderButton() {
@@ -744,11 +747,11 @@ function createChartContainer() {
                     });
                 }
                 break;
-            case "notify":
-                setLocalData("notify", { price: oldPrice, removed: true });
-                setLocalData("notify", line);
+            case "alert":
+                setLocalData("alert", { price: oldPrice, removed: true });
+                setLocalData("alert", line);
                 document
-                    .getElementById("drawNotifyButton")
+                    .getElementById("drawAlertButton")
                     .classList.remove("selected");
                 break;
         }
@@ -869,7 +872,7 @@ function createIndexedDB() {
             mDatabase.createObjectStore("marker", { keyPath: "time" });
             mDatabase.createObjectStore("line", { keyPath: "price" });
             mDatabase.createObjectStore("ruler", { keyPath: "point" });
-            mDatabase.createObjectStore("notify", { keyPath: "price" });
+            mDatabase.createObjectStore("alert", { keyPath: "price" });
             resolve();
         };
         request.onsuccess = e => {
@@ -927,6 +930,29 @@ function connectSocket() {
                 //
                 setLocalData("data", param);
                 mChart.data.original.push(param);
+                //
+                mChart.alerts.forEach(alert => {
+                    const ops = alert.options();
+                    if (!ops.removed) {
+                        if (
+                            ops.title == ">" &&
+                            message.closeprice >= ops.price
+                        ) {
+                            mConfig.audio = new Audio(
+                                chrome.runtime.getURL("alert.wav")
+                            );
+                            if (mConfig.audio.paused) mConfig.audio.play();
+                        } else if (
+                            ops.title == "<" &&
+                            message.closeprice <= ops.price
+                        ) {
+                            mConfig.audio = new Audio(
+                                chrome.runtime.getURL("alert.wav")
+                            );
+                            if (mConfig.audio.paused) mConfig.audio.play();
+                        }
+                    }
+                });
             }
         }
     };
@@ -986,10 +1012,10 @@ function loadPage() {
             });
         }
         //
-        const notifyLines = await getLocalData("notify");
-        notifyLines.forEach(line => {
+        const alertLines = await getLocalData("alert");
+        alertLines.forEach(line => {
             if (!line.removed)
-                mChart.notifies.push(mChart.series.price.createPriceLine(line));
+                mChart.alerts.push(mChart.series.price.createPriceLine(line));
         });
         //
         mNotify.close();
