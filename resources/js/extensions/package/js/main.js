@@ -497,7 +497,7 @@ function createChartContainer() {
                 .getElementById("drawLineButton")
                 .classList.contains("selected")
         )
-            drawToolLine(coordinateToPrice(mChart.crosshair.y));
+            drawToolLine();
         else if (
             document
                 .getElementById("drawMarkerButton")
@@ -515,11 +515,12 @@ function createChartContainer() {
                 .getElementById("drawAlertButton")
                 .classList.contains("selected")
         )
-            drawAlert(coordinateToPrice(mChart.crosshair.y));
+            drawAlert();
     }
 
-    function drawToolLine(price) {
+    function drawToolLine() {
         const TYPE = "line";
+        const price = formatPrice(coordinateToPrice(mChart.crosshair.y));
         const existIndex = mChart.lines.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
@@ -626,8 +627,9 @@ function createChartContainer() {
         }
     }
 
-    function drawAlert(price) {
+    function drawAlert() {
         const TYPE = "alert";
+        const price = formatPrice(coordinateToPrice(mChart.crosshair.y));
         const existIndex = mChart.alerts.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
@@ -641,7 +643,7 @@ function createChartContainer() {
                 type: TYPE,
                 price: price,
                 title:
-                    price >= mChart.data.original.slice(-1)[0].value
+                    price >= mChart.data.original.slice(-1)[0].price
                         ? ">"
                         : "<",
                 color: "#FF00FF",
@@ -651,6 +653,7 @@ function createChartContainer() {
             };
             mChart.alerts.push(mChart.series.price.createPriceLine(options));
             setLocalData("alert", options);
+            mConfig.audio.pause();
         }
         document.getElementById("drawAlertButton").classList.remove("selected");
     }
@@ -661,6 +664,7 @@ function createChartContainer() {
         );
         mChart.alerts = [];
         clearLocalData("alert");
+        mConfig.audio.pause();
     }
 
     function showOrderButton() {
@@ -690,9 +694,10 @@ function createChartContainer() {
     }
 
     function priceLineDrag(e) {
-        const line = e.customPriceLine.options();
+        var line = e.customPriceLine.options();
+        line.price = formatPrice(line.price);
         const oldPrice = +e.fromPriceString;
-        const newPrice = formatPrice(line.price);
+        const newPrice = line.price;
         switch (line.type) {
             case "order":
                 if (newPrice != oldPrice) {
@@ -748,6 +753,7 @@ function createChartContainer() {
                 }
                 break;
             case "alert":
+                mConfig.audio.pause();
                 setLocalData("alert", { price: oldPrice, removed: true });
                 setLocalData("alert", line);
                 document
@@ -852,10 +858,14 @@ function registerEvent() {
                 } else if (event.keyCode == 39) {
                     const position = mChart.self.timeScale().scrollPosition();
                     mChart.self.timeScale().scrollToPosition(position + 10);
-                } else if (event.keyCode == 76)
+                } else if (event.keyCode == 97)
                     document.getElementById("drawLineButton").click();
-                else if (event.keyCode == 77)
+                else if (event.keyCode == 98)
                     document.getElementById("drawMarkerButton").click();
+                else if (event.keyCode == 99)
+                    document.getElementById("drawRulerButton").click();
+                else if (event.keyCode == 100)
+                    document.getElementById("drawAlertButton").click();
             }
         } else if (event.which === 27) removeOrderButton();
     }
@@ -930,21 +940,6 @@ function connectSocket() {
                 //
                 setLocalData("data", param);
                 mChart.data.original.push(param);
-                //
-                if (mConfig.audio.paused) {
-                    mChart.alerts.forEach(alert => {
-                        const ops = alert.options();
-                        if (!ops.removed) {
-                            if (
-                                (ops.title == ">" &&
-                                    message.closeprice >= ops.price) ||
-                                (ops.title == "<" &&
-                                    message.closeprice <= ops.price)
-                            )
-                                mConfig.audio.play();
-                        }
-                    });
-                }
             }
         }
     };
@@ -1016,6 +1011,8 @@ function loadPage() {
     //
     document.getElementById("sohopdong").value = mConfig.contractNumber;
     document.getElementById("right_price").value = "MTL";
+    //
+    mConfig.audio.loop = true;
 }
 
 function intervalHandler() {
@@ -1039,6 +1036,20 @@ function intervalHandler() {
             cancelOrder();
             pushNotify("success", "Đã đóng vị thế.");
         }
+    }
+    //
+    if (mConfig.audio.paused) {
+        mChart.alerts.forEach(alert => {
+            const ops = alert.options();
+            if (!ops.removed) {
+                const currentPrice = mChart.data.original.slice(-1)[0].price;
+                if (
+                    (ops.title == ">" && currentPrice >= ops.price) ||
+                    (ops.title == "<" && currentPrice <= ops.price)
+                )
+                    mConfig.audio.play();
+            }
+        });
     }
     // Begin Socket
     if (mConfig.currentTime == mConfig.time.start) connectSocket();
