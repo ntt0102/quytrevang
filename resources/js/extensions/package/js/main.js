@@ -653,9 +653,9 @@ function createChartContainer() {
             };
             mChart.alerts.push(mChart.series.price.createPriceLine(options));
             setLocalData("alert", options);
-            mConfig.audio.pause();
         }
         document.getElementById("drawAlertButton").classList.remove("selected");
+        mConfig.audio.pause();
     }
 
     function removeAlerts() {
