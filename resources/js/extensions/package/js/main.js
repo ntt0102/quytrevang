@@ -531,7 +531,7 @@ function createChartContainer() {
             setLocalData("line", { price: price, removed: true });
         } else {
             const options = {
-                type: TYPE,
+                lineType: TYPE,
                 price: price,
                 color: "aqua",
                 lineWidth: 1,
@@ -588,7 +588,7 @@ function createChartContainer() {
     function drawRuler() {
         const price = coordinateToPrice(mChart.crosshair.y);
         var options = {
-            type: "ruler",
+            lineType: "ruler",
             price: price,
             color: "yellow",
             lineWidth: 1,
@@ -640,7 +640,7 @@ function createChartContainer() {
             setLocalData("alert", { price: price, removed: true });
         } else {
             const options = {
-                type: TYPE,
+                lineType: TYPE,
                 price: price,
                 title:
                     price >= mChart.data.original.slice(-1)[0].price
@@ -696,9 +696,10 @@ function createChartContainer() {
     function priceLineDrag(e) {
         var line = e.customPriceLine.options();
         line.price = formatPrice(line.price);
+        console.log("drag-line:", line);
         const oldPrice = +e.fromPriceString;
         const newPrice = line.price;
-        switch (line.type) {
+        switch (line.lineType) {
             case "order":
                 if (newPrice != oldPrice) {
                     var isChanged = false;
@@ -1039,6 +1040,7 @@ function intervalHandler() {
     }
     //
     if (mConfig.audio.paused) {
+        console.log("paused");
         mChart.alerts.forEach(alert => {
             const ops = alert.options();
             if (!ops.removed && !!mChart.data.original.length) {
@@ -1046,8 +1048,10 @@ function intervalHandler() {
                 if (
                     (ops.title == ">" && currentPrice >= ops.price) ||
                     (ops.title == "<" && currentPrice <= ops.price)
-                )
+                ) {
                     mConfig.audio.play();
+                    console.log("ops: ", ops);
+                }
             }
         });
     }
@@ -1383,7 +1387,7 @@ function drawOrderLine(kind) {
         });
     } else {
         mChart.order[kind].line = mChart.series.price.createPriceLine({
-            type: "order",
+            lineType: "order",
             kind: kind,
             price: mChart.order[kind].price,
             color: color,
