@@ -1041,7 +1041,7 @@ function intervalHandler() {
     if (mConfig.audio.paused) {
         mChart.alerts.forEach(alert => {
             const ops = alert.options();
-            if (!ops.removed) {
+            if (!ops.removed && !!mChart.data.original.length) {
                 const currentPrice = mChart.data.original.slice(-1)[0].price;
                 if (
                     (ops.title == ">" && currentPrice >= ops.price) ||
