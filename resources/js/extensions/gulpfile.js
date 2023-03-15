@@ -8,7 +8,7 @@ const bundleJs = () => {
     return src("./src/js/**/*.js")
         .pipe(sourceMap.init())
         .pipe(minifyJs())
-        .pipe(concat("main.js"))
+        .pipe(concat("main.min.js"))
         .pipe(sourceMap.write())
         .pipe(dest("./dist/js"));
 };
@@ -16,7 +16,7 @@ const bundleCss = () => {
     return src("./src/css/**/*.css")
         .pipe(sourceMap.init())
         .pipe(minifyCss())
-        .pipe(concat("main.css"))
+        .pipe(concat("main.min.css"))
         .pipe(sourceMap.write())
         .pipe(dest("./dist/css"));
 };
