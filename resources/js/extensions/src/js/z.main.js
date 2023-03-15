@@ -1,4 +1,5 @@
 class SmartOrder {
+    //
     // Các thuộc tính
     notifier = new Notifier();
     localDB = new LocalDatabase();

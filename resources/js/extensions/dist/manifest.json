@@ -12,21 +12,14 @@
         "https://smartpro.vps.com.vn/v1/"
       ],
       "js": [
-        "js/vendor/moment.min.js",
-        "js/vendor/lightweight-charts.min.js",
-        "js/vendor/simple-notify.min.js",
-        "js/vendor/google-protobuf.min.js",
-        "js/tcbs.js",
-        "js/notification.js",
-        "js/localDatabase.js",
-        "js/lightWeight.js",
-        "js/optionView.js",
+        "js/moment.min.js",
+        "js/lightweight-charts.min.js",
+        "js/simple-notify.min.js",
+        "js/google-protobuf.min.js",
         "js/main.js"
       ],
       "css": [
-        "css/vendor/simple-notify.min.css",
-        "css/lightWeight.css",
-        "css/optionView.css",
+        "css/simple-notify.min.css",
         "css/main.css"
       ],
       "run_at": "document_idle",
