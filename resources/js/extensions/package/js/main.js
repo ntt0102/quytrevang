@@ -5,6 +5,7 @@ class SmartOrder {
     audio = new Audio(chrome.runtime.getURL("alert.wav"));
     isMobile = navigator.userAgentData.mobile;
     currentTime = moment().unix();
+    optionView = new OptionView();
 
     // Hàm khởi tạo
     constructor() {
@@ -34,6 +35,7 @@ class SmartOrder {
             cancelOrder: this.cancelOrder
         });
         this.lw.init();
+        this.optionView.init();
         await this.localDB.init();
         await this.lw.loadChartData();
         await this.lw.getHelperData();
@@ -45,7 +47,7 @@ class SmartOrder {
         setInterval(() => this.refreshDataInSession(this), 60000);
         //
         this.notifier.hide();
-        this.lineButton.click();
+        this.lightWeightButton.click();
     };
     getLocalConfig = () => {
         return new Promise((resolve, reject) => {
@@ -99,10 +101,20 @@ class SmartOrder {
         });
     };
     createButtons = () => {
+        var container = document.createElement("div");
+        container.id = "directionCommandDiv";
+        document.body.append(container);
+        //
+        this.createTradingViewButton(container);
+        this.createLightWeightButton(container);
+        this.createOptionButton(container);
+        this.createReportButton(container);
+    };
+    createTradingViewButton = container => {
         var button = document.createElement("button");
-        button.id = "candleButton";
+        button.id = "tradingViewButton";
         button.classList = "fa fa-bar-chart";
-        button.title = "Candle chart";
+        button.title = "TradingView Chart";
         button.addEventListener("click", () => {
             var leftEl = document.getElementById("left_order_type");
             var rightEl = document.getElementById("right_order_type");
@@ -131,13 +143,14 @@ class SmartOrder {
                 condOrderEl.innerText = "L. ĐIỀU KIỆN";
             }
         });
-        document.body.append(button);
-        this.candleButton = button;
-        //
-        button = document.createElement("button");
-        button.id = "lineButton";
+        container.append(button);
+        this.tradingViewButton = button;
+    };
+    createLightWeightButton = container => {
+        var button = document.createElement("button");
+        button.id = "lightWeightButton";
         button.classList = "fa fa-line-chart";
-        button.title = "Line chart";
+        button.title = "LightWeight Chart";
         button.addEventListener("click", () => {
             var leftEl = document.getElementById("left_order_type");
             var rightEl = document.getElementById("right_order_type");
@@ -170,20 +183,32 @@ class SmartOrder {
                 condOrderEl.innerText = "";
             }
         });
-        document.body.append(button);
-        this.lineButton = button;
-        //
-        button = document.createElement("button");
+        container.append(button);
+        this.lightWeightButton = button;
+    };
+    createOptionButton = container => {
+        var button = document.createElement("button");
+        button.id = "optionButton";
+        button.classList = "fa fa-cog";
+        button.title = "Option";
+        button.addEventListener("click", () => this.optionButtonClick(this));
+        container.append(button);
+        this.optionButton = button;
+    };
+    optionButtonClick = self => {
+        self.optionView.toggle();
+    };
+    createReportButton = container => {
+        var button = document.createElement("button");
         button.id = "reportButton";
         button.classList = "fa fa-flag-checkered";
         button.title = "Report";
-        button.addEventListener("click", () => reportButtonClick(this));
-        document.body.append(button);
+        button.addEventListener("click", () => this.reportButtonClick(this));
+        container.append(button);
         this.reportButton = button;
-
-        function reportButtonClick(self) {
-            if (self.currentTime > self.config.time.end) self.reportHandler();
-        }
+    };
+    reportButtonClick = self => {
+        if (self.currentTime > self.config.time.end) self.reportHandler();
     };
     registerEvent = () => {
         document
@@ -360,9 +385,9 @@ class SmartOrder {
         }
     };
     showRunningStatus = () => {
-        if (this.lineButton.classList.contains("dark"))
-            this.lineButton.classList.remove("dark");
-        else this.lineButton.classList.add("dark");
+        if (this.lightWeightButton.classList.contains("dark"))
+            this.lightWeightButton.classList.remove("dark");
+        else this.lightWeightButton.classList.add("dark");
     };
     refreshDataInSession = self => {
         if (

@@ -1,45 +1,31 @@
-#candleButton {
+#directionCommandDiv {
     position: fixed;
     bottom: 0px;
     left: 0px;
+    display: flex;
+    gap: 2px;
+    justify-content: space-between;
+    background: transparent;
+    z-index: 2001;
+}
+
+#directionCommandDiv > button {
     background: #3f433f;
     color: #d1d4dc;
     width: 40px;
     height: 40px;
     border-radius: 50%;
     font-size: 20px;
-    z-index: 2001;
 }
 
-#lineButton {
-    position: fixed;
-    bottom: 0px;
-    left: 42px;
-    background: #3f433f;
-    color: #d1d4dc;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 16px;
-    z-index: 2001;
+#lightWeightButton.dark {
+    background: #d1d4dc;
+    color: #3f433f;
 }
 
-#lineButton.dark {
-    border-color: white;
-    border-width: 6px;
-    left: 41px;
-}
-
-#reportButton {
-    position: fixed;
-    bottom: 0px;
-    left: 84px;
-    background: #3f433f;
-    color: #d1d4dc;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    font-size: 16px;
+.full-chart #optionButton,
+.full-chart #reportButton {
+    display: none;
 }
 
 .full-chart .aside-menu {

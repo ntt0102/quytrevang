@@ -19,12 +19,14 @@
         "js/tcbs.js",
         "js/notification.js",
         "js/localDatabase.js",
-        "js/lightweight.js",
+        "js/lightWeight.js",
+        "js/optionView.js",
         "js/main.js"
       ],
       "css": [
         "css/vendor/simple-notify.min.css",
-        "css/lightweight.css",
+        "css/lightWeight.css",
+        "css/optionView.css",
         "css/main.css"
       ],
       "run_at": "document_idle",

@@ -1,0 +1,16 @@
+#optionViewContainer {
+    position: fixed;
+    bottom: 40px;
+    left: 85px;
+    width: 300px;
+    height: 500px;
+    display: flex;
+    gap: 2px;
+    justify-content: space-between;
+    background: red;
+    z-index: -1;
+}
+
+#optionViewContainer.show {
+    z-index: 2001 !important;
+}
