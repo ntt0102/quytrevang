@@ -1,8 +1,9 @@
 class LocalDatabase {
     // Hàm khởi tạo
     constructor() {}
+
     // Các phương thức
-    init() {
+    init = () => {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open("vpsDB", 1);
             request.onupgradeneeded = e => {
@@ -27,8 +28,8 @@ class LocalDatabase {
                 reject();
             };
         });
-    }
-    get(tables) {
+    };
+    get = tables => {
         var database = this.database;
         return new Promise(function(resolve, reject) {
             var tx = database.transaction(tables, "readonly");
@@ -49,16 +50,16 @@ class LocalDatabase {
                 request.onerror = () => reject();
             });
         }
-    }
-    set(table, data) {
+    };
+    set = (table, data) => {
         const store = this.database
             .transaction(table, "readwrite")
             .objectStore(table);
         if (Array.isArray(data)) {
             if (data.length > 0) data.forEach(item => store.put(item));
         } else store.put(data);
-    }
-    clear(table) {
+    };
+    clear = table => {
         var database = this.database;
         return new Promise(function(resolve, reject) {
             const request = database
@@ -75,5 +76,5 @@ class LocalDatabase {
                 reject();
             };
         });
-    }
+    };
 }

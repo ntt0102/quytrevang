@@ -11,6 +11,7 @@ class Lightweight {
     crosshair = {};
     hasCrosshair = false;
     hasNewData = false;
+
     // Hàm khởi tạo
     constructor(options) {
         this.dataEndpoint = options.dataEndpoint;
@@ -26,10 +27,10 @@ class Lightweight {
         this.orderTpPrice = options.orderTpPrice;
         this.orderSlPrice = options.orderSlPrice;
         this.cancelOrder = options.cancelOrder;
-        console.log("options: ", this.getOrderPosition());
     }
+
     // Các phương thức
-    init() {
+    init = () => {
         this.createLightWeightChart();
         this.createDataArea();
         this.createToolArea();
@@ -38,8 +39,8 @@ class Lightweight {
         setInterval(() => this.intervalHandler(this), 1000);
         window.addEventListener("resize", () => this.resize(this.chart));
         window.addEventListener("keydown", e => this.keyEvent(e, this));
-    }
-    createLightWeightChart() {
+    };
+    createLightWeightChart = () => {
         const chartOptions = {
             localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
             rightPriceScale: {
@@ -73,7 +74,9 @@ class Lightweight {
         chartElement.addEventListener("click", e => this.chartClick(e, this));
         this.chart = LightweightCharts.createChart(chartElement, chartOptions);
         this.chart.subscribeCrosshairMove(e => this.crosshairMove(e, this));
-        this.chart.subscribeCustomPriceLineDragged(this.priceLineDrag);
+        this.chart.subscribeCustomPriceLineDragged(e =>
+            this.priceLineDrag(e, this)
+        );
         //
         this.series.shark = this.chart.addLineSeries({
             priceScaleId: "shark",
@@ -87,8 +90,8 @@ class Lightweight {
         });
         this.chart.timeScale().fitContent();
         this.chartElement = chartElement;
-    }
-    createDataArea() {
+    };
+    createDataArea = () => {
         var div = document.createElement("div");
         div.id = "dataAreaDiv";
         div.className = "area";
@@ -99,8 +102,8 @@ class Lightweight {
         this.createTimeFrameSelect(div);
         this.createRefreshButton(div);
         this.createClearButton(div);
-    }
-    createClearButton(container) {
+    };
+    createClearButton = container => {
         var button = document.createElement("div");
         button.id = "clearButton";
         button.className = "command fa fa-trash";
@@ -110,16 +113,16 @@ class Lightweight {
             this.loadChartData();
         });
         container.append(button);
-    }
-    createRefreshButton(container) {
+    };
+    createRefreshButton = container => {
         var button = document.createElement("div");
         button.id = "refreshButton";
         button.className = "command fa fa-refresh";
         button.title = "Refresh chart";
         button.addEventListener("click", () => this.loadChartData());
         container.append(button);
-    }
-    createTimeFrameSelect(container) {
+    };
+    createTimeFrameSelect = container => {
         var select = document.createElement("select");
         select.id = "timeFrameSelect";
         select.className = "command";
@@ -143,8 +146,8 @@ class Lightweight {
             );
         });
         container.append(select);
-    }
-    createDateInput(container) {
+    };
+    createDateInput = container => {
         var input = document.createElement("input");
         input.id = "dateInput";
         input.type = "date";
@@ -155,16 +158,16 @@ class Lightweight {
         });
         container.append(input);
         this.dateInput = input;
-    }
-    createSpinnerImg(container) {
+    };
+    createSpinnerImg = container => {
         var img = document.createElement("img");
         img.id = "spinnerImg";
         img.style.opacity = 0;
         img.src = chrome.runtime.getURL("spinner.gif");
         container.append(img);
         this.spinnerImg = img;
-    }
-    createToolArea() {
+    };
+    createToolArea = () => {
         var div = document.createElement("div");
         div.id = "toolAreaDiv";
         div.className = "area";
@@ -174,8 +177,8 @@ class Lightweight {
         this.createDrawMarkerButton(div);
         this.createDrawRulerButton(div);
         this.createDrawAlertButton(div);
-    }
-    createDrawLineButton(container) {
+    };
+    createDrawLineButton = container => {
         var button = document.createElement("div");
         button.id = "drawLineButton";
         button.className = "command fa fa-minus";
@@ -195,8 +198,8 @@ class Lightweight {
         });
         container.append(button);
         this.drawLineButton = button;
-    }
-    createDrawMarkerButton(container) {
+    };
+    createDrawMarkerButton = container => {
         var button = document.createElement("div");
         button.id = "drawMarkerButton";
         button.className = "command fa fa-map-marker";
@@ -216,8 +219,8 @@ class Lightweight {
         });
         container.append(button);
         this.drawMarkerButton = button;
-    }
-    createDrawRulerButton(container) {
+    };
+    createDrawRulerButton = container => {
         var button = document.createElement("div");
         button.id = "drawRulerButton";
         button.className = "command fa fa-arrows-v";
@@ -240,8 +243,8 @@ class Lightweight {
         });
         container.append(button);
         this.drawRulerButton = button;
-    }
-    createDrawAlertButton(container) {
+    };
+    createDrawAlertButton = container => {
         var button = document.createElement("div");
         button.id = "drawAlertButton";
         button.className = "command fa fa-bell-o";
@@ -261,36 +264,36 @@ class Lightweight {
         });
         container.append(button);
         this.drawAlertButton = button;
-    }
-    createLegendArea() {
+    };
+    createLegendArea = () => {
         var div = document.createElement("div");
         div.id = "legendAreaDiv";
         this.chartElement.append(div);
         //
         this.createPriceLegendP(div);
         this.createSharkLegendP(div);
-    }
-    createPriceLegendP(container) {
+    };
+    createPriceLegendP = container => {
         var p = document.createElement("p");
         p.id = "priceLegendP";
         container.append(p);
         this.priceLegendP = p;
-    }
-    createSharkLegendP(container) {
+    };
+    createSharkLegendP = container => {
         //
         var p = document.createElement("p");
         p.id = "sharkLegendP";
         container.append(p);
         this.sharkLegendP = p;
-    }
-    createFreeArea() {
+    };
+    createFreeArea = () => {
         var container = this.chartElement;
         this.createCancelOrderButton(container);
         this.createEntryOrderButton(container);
         this.createTpslOrderButton(container);
         this.createScrollButton(container);
-    }
-    createCancelOrderButton(container) {
+    };
+    createCancelOrderButton = container => {
         var button = document.createElement("button");
         button.id = "cancelOrderButton";
         button.innerText = "X";
@@ -306,8 +309,8 @@ class Lightweight {
         });
         container.append(button);
         this.cancelOrderButton = button;
-    }
-    createEntryOrderButton(container) {
+    };
+    createEntryOrderButton = container => {
         var button = document.createElement("button");
         button.id = "entryOrderButton";
         button.innerText = "Entry";
@@ -320,8 +323,8 @@ class Lightweight {
         });
         container.append(button);
         this.entryOrderButton = button;
-    }
-    createTpslOrderButton(container) {
+    };
+    createTpslOrderButton = container => {
         var button = document.createElement("button");
         button.id = "tpslOrderButton";
         button.innerText = "TP/SL";
@@ -335,8 +338,8 @@ class Lightweight {
         });
         container.append(button);
         this.tpslOrderButton = button;
-    }
-    createScrollButton(container) {
+    };
+    createScrollButton = container => {
         var button = document.createElement("div");
         button.id = "scrollButton";
         button.className = "command fa fa-angle-double-right";
@@ -344,12 +347,12 @@ class Lightweight {
             this.chart.timeScale().scrollToRealTime()
         );
         container.append(button);
-    }
-    chartContextmenu(e, self) {
+    };
+    chartContextmenu = (e, self) => {
         self.showOrderButton();
         e.preventDefault();
-    }
-    chartClick(e, self) {
+    };
+    chartClick = (e, self) => {
         self.hideOrderButton();
         if (self.drawLineButton.classList.contains("selected"))
             self.drawToolLine();
@@ -359,8 +362,8 @@ class Lightweight {
             self.drawRuler();
         else if (self.drawAlertButton.classList.contains("selected"))
             self.drawAlert();
-    }
-    crosshairMove(e, self) {
+    };
+    crosshairMove = (e, self) => {
         if (e.time) {
             self.updateLegend(
                 e.seriesPrices.get(self.series.price),
@@ -380,77 +383,77 @@ class Lightweight {
             self.crosshair.x = e.point.x;
             self.crosshair.y = e.point.y;
         }
-    }
-    priceLineDrag(e) {
+    };
+    priceLineDrag = (e, self) => {
         var line = e.customPriceLine.options();
-        line.price = this.formatPrice(line.price);
+        line.price = self.formatPrice(line.price);
         const oldPrice = +e.fromPriceString;
         const newPrice = line.price;
         switch (line.lineType) {
             case "order":
                 if (newPrice != oldPrice) {
                     var isChanged = false;
-                    const position = this.getOrderPosition();
+                    const position = self.getOrderPosition();
                     if (line.kind == "entry") {
                         if (!position) {
                             isChanged = true;
-                            this.order[line.kind].price = newPrice;
-                            this.orderEntryPrice(this.order);
-                            this.drawOrderLine(line.kind);
+                            self.order[line.kind].price = newPrice;
+                            self.orderEntryPrice(self.order);
+                            self.drawOrderLine(line.kind);
                         }
                     } else {
-                        if (this.order.side * position > 0) {
+                        if (self.order.side * position > 0) {
                             isChanged = true;
-                            this.order[line.kind].price = newPrice;
+                            self.order[line.kind].price = newPrice;
                             if (line.kind == "tp")
-                                this.orderTpPrice(this.order);
-                            else this.orderSlPrice(this.order);
+                                self.orderTpPrice(self.order);
+                            else self.orderSlPrice(self.order);
                             drawOrderLine(line.kind);
                         }
                     }
                     //
                     if (!isChanged) {
-                        this.order[line.kind].line.applyOptions({
+                        self.order[line.kind].line.applyOptions({
                             price: oldPrice
                         });
-                        this.notifier.show("warning", "Không được thay đổi.");
+                        self.notifier.show("warning", "Không được thay đổi.");
                     }
                 }
                 break;
             case "line":
-                this.localDB.set("line", { price: oldPrice, removed: true });
-                this.localDB.set("line", line);
-                this.drawLineButton.classList.remove("selected");
+                self.localDB.set("line", { price: oldPrice, removed: true });
+                self.localDB.set("line", line);
+                self.drawLineButton.classList.remove("selected");
                 break;
             case "ruler":
                 if (line.point == 1) {
-                    this.localDB.set("ruler", line);
-                    if (this.ruler.point == 2) {
-                        const distance = +this.ruler.end.options().title;
+                    self.localDB.set("ruler", line);
+                    if (self.ruler.point == 2) {
+                        const distance = +self.ruler.end.options().title;
                         const endPrice = +(newPrice + distance).toFixed(1);
-                        this.ruler.end.applyOptions({
+                        self.ruler.end.applyOptions({
                             price: endPrice
                         });
-                        this.localDB.set("ruler", this.ruler.end.options());
+                        self.localDB.set("ruler", self.ruler.end.options());
                     }
                 } else {
-                    this.localDB.set("ruler", line);
-                    const startPrice = +this.ruler.start.options().price;
-                    this.ruler.end.applyOptions({
+                    self.localDB.set("ruler", line);
+                    const startPrice = +self.ruler.start.options().price;
+                    self.ruler.end.applyOptions({
                         title: (newPrice - startPrice).toFixed(1)
                     });
                 }
                 break;
             case "alert":
-                this.audio.pause();
-                this.localDB.set("alert", { price: oldPrice, removed: true });
-                this.localDB.set("alert", line);
-                this.drawAlertButton.classList.remove("selected");
+                self.audio.pause();
+                self.localDB.set("alert", { price: oldPrice, removed: true });
+                self.localDB.set("alert", line);
+                self.drawAlertButton.classList.remove("selected");
                 break;
         }
-    }
+    };
     //
-    showOrderButton() {
+    showOrderButton = () => {
         if (this.getOrderPosition()) {
             // if (this.order.entry.hasOwnProperty("line")) {
             if (!this.order.tp.hasOwnProperty("line")) {
@@ -479,13 +482,13 @@ class Lightweight {
                 this.entryOrderButton.style.display = "block";
             }
         }
-    }
-    hideOrderButton() {
+    };
+    hideOrderButton = () => {
         this.entryOrderButton.style.display = "none";
         this.tpslOrderButton.style.display = "none";
-    }
+    };
     //
-    drawOrderLine(kind) {
+    drawOrderLine = kind => {
         var color, title;
         switch (kind) {
             case "entry":
@@ -527,15 +530,15 @@ class Lightweight {
             price: +this.order[kind].price,
             side: this.order.side
         });
-    }
-    removeOrderLine(kind) {
+    };
+    removeOrderLine = kind => {
         if (this.order[kind].hasOwnProperty("line")) {
             this.series.price.removePriceLine(this.order[kind].line);
             delete this.order[kind].line;
         }
-    }
+    };
     //
-    drawToolLine() {
+    drawToolLine = () => {
         const TYPE = "line";
         const price = this.formatPrice(
             this.coordinateToPrice(this.crosshair.y)
@@ -561,14 +564,14 @@ class Lightweight {
             this.localDB.set("line", options);
         }
         this.drawLineButton.classList.remove("selected");
-    }
-    removeToolLines() {
+    };
+    removeToolLines = () => {
         this.lines.forEach(line => this.series.price.removePriceLine(line));
         this.lines = [];
         this.localDB.clear("line");
-    }
+    };
     //
-    drawMarker() {
+    drawMarker = () => {
         if (this.crosshair.time) {
             const markers = this.markers.filter(
                 item => item.time != this.crosshair.time
@@ -591,14 +594,14 @@ class Lightweight {
             //
             this.drawMarkerButton.classList.remove("selected");
         }
-    }
-    removeMarkers() {
+    };
+    removeMarkers = () => {
         this.markers = [];
         this.series.price.setMarkers([]);
         this.localDB.clear("marker");
-    }
+    };
     //
-    drawRuler() {
+    drawRuler = () => {
         const price = this.coordinateToPrice(this.crosshair.y);
         var options = {
             lineType: "ruler",
@@ -625,8 +628,8 @@ class Lightweight {
             this.localDB.set("ruler", options);
             this.drawRulerButton.classList.remove("selected");
         }
-    }
-    removeRuler() {
+    };
+    removeRuler = () => {
         if (this.ruler.point > 0) {
             this.series.price.removePriceLine(this.ruler.start);
             if (this.ruler.point > 1)
@@ -635,9 +638,9 @@ class Lightweight {
             this.ruler = { start: {}, end: {}, point: 0 };
             this.localDB.clear("ruler");
         }
-    }
+    };
     //
-    drawAlert() {
+    drawAlert = () => {
         const TYPE = "alert";
         const price = this.formatPrice(
             this.coordinateToPrice(this.crosshair.y)
@@ -666,35 +669,35 @@ class Lightweight {
         }
         this.drawAlertButton.classList.remove("selected");
         this.audio.pause();
-    }
-    removeAlerts() {
+    };
+    removeAlerts = () => {
         this.alerts.forEach(line => this.series.price.removePriceLine(line));
         this.alerts = [];
         this.localDB.clear("alert");
         this.audio.pause();
-    }
+    };
     //
-    toggleCancelOrderButton(visible) {
+    toggleCancelOrderButton = visible => {
         if (visible) {
             this.cancelOrderButton.style.display = "block";
             this.cancelOrderButton.style.background =
                 this.order.side > 0 ? "green" : "red";
         } else this.cancelOrderButton.style.display = "none";
-    }
+    };
     //
-    updateLegend(price, shark) {
+    updateLegend = (price, shark) => {
         if (!!price) this.priceLegendP.innerText = price;
         if (!!shark)
             this.sharkLegendP.innerText = shark.toLocaleString("en-US");
-    }
-    coordinateToPrice(y) {
+    };
+    coordinateToPrice = y => {
         return this.formatPrice(this.series.price.coordinateToPrice(y));
-    }
-    formatPrice(price) {
+    };
+    formatPrice = price => {
         return +(+price.toFixed(1));
-    }
+    };
     //
-    loadChartData() {
+    loadChartData = () => {
         return new Promise(async (resolve, reject) => {
             this.toggleSpinner(true);
             const svData = await this.getServerData();
@@ -736,8 +739,8 @@ class Lightweight {
                 break;
             }
         });
-    }
-    updateChartData(data) {
+    };
+    updateChartData = data => {
         this.hasNewData = true;
         const param = {
             time: data.timesec,
@@ -762,8 +765,8 @@ class Lightweight {
         //
         this.localDB.set("data", param);
         this.data.original.push(param);
-    }
-    getServerData() {
+    };
+    getServerData = () => {
         return new Promise(async (resolve, reject) => {
             const date = this.dateInput.value;
             const data = { action: "GET", date: date };
@@ -783,8 +786,8 @@ class Lightweight {
                 }
             }
         });
-    }
-    createChartData(r, item) {
+    };
+    createChartData = (r, item) => {
         var time = item.time + 7 * 60 * 60;
         const prevShark = !!r.shark.length ? r.shark.slice(-1)[0].value : 0;
         const volume = (item.action == "BU" ? 1 : -1) * item.volume;
@@ -811,8 +814,8 @@ class Lightweight {
         });
         //
         return r;
-    }
-    getHelperData() {
+    };
+    getHelperData = () => {
         return new Promise(async (resolve, reject) => {
             const order = await this.localDB.get("order");
             order.map(item => {
@@ -861,9 +864,9 @@ class Lightweight {
             //
             resolve();
         });
-    }
+    };
     //
-    intervalHandler(self) {
+    intervalHandler = self => {
         if (self.getOrderPosition()) {
             if (
                 self.order.entry.hasOwnProperty("line") &&
@@ -903,15 +906,15 @@ class Lightweight {
                 }
             });
         }
-    }
+    };
     //
-    toggleSpinner(visible) {
+    toggleSpinner = visible => {
         this.spinnerImg.style.opacity = visible ? 1 : 0;
-    }
-    resize(chart) {
+    };
+    resize = chart => {
         chart.resize(window.innerWidth, window.innerHeight);
-    }
-    keyEvent(e, self) {
+    };
+    keyEvent = (e, self) => {
         if (e.ctrlKey || e.metaKey) {
             if (e.shiftKey) {
                 if (e.keyCode == 39) self.chart.timeScale().scrollToRealTime();
@@ -942,5 +945,5 @@ class Lightweight {
                 else if (e.keyCode == 100) self.drawAlertButton.click();
             }
         } else if (e.which === 27) self.removeOrderButton();
-    }
+    };
 }

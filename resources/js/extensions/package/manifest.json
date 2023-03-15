@@ -1,6 +1,6 @@
 {
   "name": "VPS Extention",
-  "version": "1.0",
+  "version": "2.0.0",
   "manifest_version": 3,
   "description": "Google extension for VPS. By Tho.",
   "icons": {
@@ -24,6 +24,7 @@
       ],
       "css": [
         "css/vendor/simple-notify.min.css",
+        "css/lightweight.css",
         "css/main.css"
       ],
       "run_at": "document_idle",

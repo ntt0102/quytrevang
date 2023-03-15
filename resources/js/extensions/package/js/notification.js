@@ -6,7 +6,7 @@ class Notifier {
     // Hàm khởi tạo
     constructor() {}
     // Các phương thức
-    show(status, text, autoclose) {
+    show = (status, text, autoclose) => {
         this.status = status || this.status;
         this.text = text || this.text;
         this.autoclose = autoclose && this.autoclose;
@@ -16,8 +16,8 @@ class Notifier {
             autoclose: this.autoclose,
             position: "right bottom"
         });
-    }
-    hide() {
+    };
+    hide = () => {
         this.notify.close();
-    }
+    };
 }
