@@ -1,26 +1,24 @@
 class LocalDatabase {
     // Hàm khởi tạo
-    constructor() {
-        this.init();
-    }
+    constructor() {}
     // Các phương thức
     init() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open("vpsDB", 1);
             request.onupgradeneeded = e => {
                 console.log("onupgradeneeded");
-                mDatabase = e.target.result;
-                mDatabase.createObjectStore("data", { keyPath: "time" });
-                mDatabase.createObjectStore("order", { keyPath: "kind" });
-                mDatabase.createObjectStore("marker", { keyPath: "time" });
-                mDatabase.createObjectStore("line", { keyPath: "price" });
-                mDatabase.createObjectStore("ruler", { keyPath: "point" });
-                mDatabase.createObjectStore("alert", { keyPath: "price" });
+                this.database = e.target.result;
+                this.database.createObjectStore("data", { keyPath: "time" });
+                this.database.createObjectStore("order", { keyPath: "kind" });
+                this.database.createObjectStore("marker", { keyPath: "time" });
+                this.database.createObjectStore("line", { keyPath: "price" });
+                this.database.createObjectStore("ruler", { keyPath: "point" });
+                this.database.createObjectStore("alert", { keyPath: "price" });
                 resolve();
             };
             request.onsuccess = e => {
                 console.log("onsuccess");
-                mDatabase = e.target.result;
+                this.database = e.target.result;
                 resolve();
             };
             request.onerror = () => {
@@ -31,8 +29,9 @@ class LocalDatabase {
         });
     }
     get(tables) {
+        var database = this.database;
         return new Promise(function(resolve, reject) {
-            var tx = mDatabase.transaction(tables, "readonly");
+            var tx = database.transaction(tables, "readonly");
             if (Array.isArray(tables)) {
                 var stores = tables.map(table => tx.objectStore(table));
                 var promises = stores.map(loadStore);
@@ -52,7 +51,7 @@ class LocalDatabase {
         }
     }
     set(table, data) {
-        const store = mDatabase
+        const store = this.database
             .transaction(table, "readwrite")
             .objectStore(table);
         if (Array.isArray(data)) {
@@ -60,8 +59,9 @@ class LocalDatabase {
         } else store.put(data);
     }
     clear(table) {
+        var database = this.database;
         return new Promise(function(resolve, reject) {
-            const request = mDatabase
+            const request = database
                 .transaction(table, "readwrite")
                 .objectStore(table)
                 .clear();

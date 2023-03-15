@@ -1,4 +1,4 @@
-class Notification {
+class Notifier {
     // Các thuộc tính
     status = "success";
     text = "test";
@@ -9,7 +9,7 @@ class Notification {
     show(status, text, autoclose) {
         this.status = status || this.status;
         this.text = text || this.text;
-        this.autoclose = autoclose || this.autoclose;
+        this.autoclose = autoclose && this.autoclose;
         this.notify = new Notify({
             status: this.status,
             text: this.text,
