@@ -44,8 +44,8 @@ class Lightweight {
         const chartOptions = {
             localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
             rightPriceScale: {
-                visible: true,
-                scaleMargins: { top: 0.1, bottom: 0.4 }
+                visible: true
+                // scaleMargins: { top: 0.1, bottom: 0.4 }
             },
             leftPriceScale: { visible: false },
             layout: {
@@ -82,7 +82,8 @@ class Lightweight {
             priceScaleId: "shark",
             color: "#FF00FF",
             priceFormat: { minMove: 1 },
-            scaleMargins: { top: 0.6, bottom: 0 }
+            scaleMargins: { top: 0.6, bottom: 0 },
+            visible: false
         });
         this.series.price = this.chart.addLineSeries({
             color: "white",

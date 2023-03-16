@@ -11,21 +11,30 @@
     background: red;
     border-radius: 5px;
     z-index: -1;
+    opacity: 0;
 }
 
 #optionViewContainer.show {
     z-index: 2001 !important;
+    opacity: 1 !important;
 }
 
-#optionViewContainer > .title {
-    font-size: 17px;
-    font-weight: bold;
+#optionViewContainer > #hearderContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#optionViewContainer > #hearderContainer > p {
     margin-bottom: 0;
 }
-#optionViewContainer > .subtitle {
+#optionViewContainer > #hearderContainer > .title {
+    font-size: 17px;
+    font-weight: bold;
+}
+#optionViewContainer > #hearderContainer > .subtitle,
+#optionViewContainer > #hearderContainer > .homepage {
     font-size: 12px;
     margin-top: -5px;
-    margin-bottom: 0;
 }
 .full-chart #optionViewContainer {
     z-index: -1 !important;
@@ -36,12 +45,16 @@
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-#optionViewContainer > .section > div {
+#optionViewContainer > .section > .wrapper {
     padding: 30px;
     display: flex !important;
     flex-direction: column;
     align-items: center;
     gap: 5px;
+}
+
+#optionViewContainer .invalid {
+    color: red;
 }
 
 #optionViewContainer .link {

@@ -1,11 +1,12 @@
 {
-    "root": "https://quytrevang.nguyenvanxuanphu.com",
-    "root1": "http://localhost",
+    "root1": "https://quytrevang.nguyenvanxuanphu.com",
+    "root": "http://localhost",
     "endpoint": {
         "socket": "wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream",
         "config": "/api/vps/config",
         "data": "/api/vps/data",
-        "report": "/api/vps/report"
+        "report": "/api/vps/report",
+        "register": "/api/auth/create-account"
     },
     "timeFrame": 0,
     "order": {

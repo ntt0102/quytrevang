@@ -6,7 +6,6 @@ class SmartOrder {
     audio = new Audio(chrome.runtime.getURL("alert.wav"));
     isMobile = navigator.userAgentData.mobile;
     currentTime = moment().unix();
-    optionView = new OptionView();
 
     // Hàm khởi tạo
     constructor() {
@@ -36,6 +35,9 @@ class SmartOrder {
             cancelOrder: this.cancelOrder
         });
         this.lw.init();
+        this.optionView = new OptionView({
+            registerEnpoint: this.config.root + this.config.endpoint.register
+        });
         this.optionView.init();
         await this.localDB.init();
         await this.lw.loadChartData();
@@ -322,7 +324,6 @@ class SmartOrder {
     };
     intervalHandler = self => {
         self.currentTime = moment().unix();
-        console.log("currentTime: ", self.currentTime);
         // Begin Socket
         if (self.currentTime == self.config.time.start) self.lw.connectSocket();
         // Report
