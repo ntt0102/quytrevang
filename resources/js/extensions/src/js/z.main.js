@@ -7,6 +7,8 @@ class SmartOrder {
     audio = new Audio(chrome.runtime.getURL("alert.wav"));
     isMobile = navigator.userAgentData.mobile;
     currentTime = moment().unix();
+    lightweight = new Lightweight();
+    optionView = new OptionView();
 
     // Hàm khởi tạo
     constructor() {
@@ -16,51 +18,63 @@ class SmartOrder {
     // Các phương thức
     init = async () => {
         await this.getLocalConfig();
-        this.optionView = new OptionView({
+        await this.optionView.getUser(
+            this.config.root + this.config.endpoint.getUser
+        );
+        this.createButtons();
+        this.registerEvent();
+        this.optionView.setOptions({
             APP_NAME: this.APP_NAME,
             notifier: this.notifier,
+            lightweight: this.lightweight,
             registerEndpoint: this.config.root + this.config.endpoint.register,
             loginEndpoint: this.config.root + this.config.endpoint.login,
             logoutEndpoint: this.config.root + this.config.endpoint.logout,
-            getUserEndpoint: this.config.root + this.config.endpoint.getUser
+            menuButtonCallback: this.toggleButton
+            // getUserEndpoint: this.config.root + this.config.endpoint.getUser
         });
-        this.optionView.getUser();
-        //
-        this.notifier.show("warning", "Đang cài đặt biểu đồ ...", false);
-        this.createButtons();
-        this.registerEvent();
-        await this.getServerConfig();
-        this.lw = new Lightweight({
-            dataEndpoint: this.config.root + this.config.endpoint.data,
-            localDB: this.localDB,
-            notifier: this.notifier,
-            audio: this.audio,
-            isMobile: this.isMobile,
-            timeFrame: this.config.timeFrame,
-            sharkLimit: this.config.sharkLimit,
-            getOrderPosition: this.getOrderPosition,
-            closePosition: this.closePosition,
-            orderEntryPrice: this.orderEntryPrice,
-            orderTpPrice: this.orderTpPrice,
-            orderSlPrice: this.orderSlPrice,
-            cancelOrder: this.cancelOrder
-        });
-        this.lw.init();
-
         this.optionView.init();
-        await this.localDB.init();
-        await this.lw.loadChartData();
-        await this.lw.getHelperData();
-        this.connectSocket();
-        document.getElementById("sohopdong").value = this.config.contractNumber;
-        document.getElementById("right_price").value = "MTL";
-        this.audio.loop = true;
-        //
-        setInterval(() => this.intervalHandler(this), 1000);
-        setInterval(() => this.refreshDataInSession(this), 60000);
-        //
-        this.notifier.hide();
-        this.lightWeightButton.click();
+        if (this.optionView.isLogedin) {
+            this.notifier.show("warning", "Đang cài đặt biểu đồ ...", false);
+            // this.createButtons();
+            // this.registerEvent();
+            this.toggleButton(true);
+            await this.getServerConfig();
+            this.lightweight.setOptions({
+                dataEndpoint: this.config.root + this.config.endpoint.data,
+                localDB: this.localDB,
+                notifier: this.notifier,
+                audio: this.audio,
+                isMobile: this.isMobile,
+                timeFrame: this.config.timeFrame,
+                sharkLimit: this.config.sharkLimit,
+                getOrderPosition: this.getOrderPosition,
+                closePosition: this.closePosition,
+                orderEntryPrice: this.orderEntryPrice,
+                orderTpPrice: this.orderTpPrice,
+                orderSlPrice: this.orderSlPrice,
+                cancelOrder: this.cancelOrder
+            });
+            this.lightweight.init();
+
+            await this.localDB.init();
+            await this.lightweight.loadChartData();
+            await this.lightweight.getHelperData();
+            this.connectSocket();
+            document.getElementById(
+                "sohopdong"
+            ).value = this.config.contractNumber;
+            document.getElementById("right_price").value = "MTL";
+            this.audio.loop = true;
+            //
+            setInterval(() => this.intervalHandler(this), 1000);
+            setInterval(() => this.refreshDataInSession(this), 60000);
+            //
+            this.notifier.hide();
+            this.lightWeightButton.click();
+        } else {
+            this.optionButton.click();
+        }
     };
     getLocalConfig = () => {
         return new Promise((resolve, reject) => {
@@ -120,6 +134,7 @@ class SmartOrder {
         button.id = "tradingViewButton";
         button.classList = "fa fa-bar-chart";
         button.title = "TradingView Chart";
+        button.style.display = "none";
         button.addEventListener("click", () => {
             var leftEl = document.getElementById("left_order_type");
             var rightEl = document.getElementById("right_order_type");
@@ -156,6 +171,7 @@ class SmartOrder {
         button.id = "lightWeightButton";
         button.classList = "fa fa-line-chart";
         button.title = "LightWeight Chart";
+        button.style.display = "none";
         button.addEventListener("click", () => {
             var leftEl = document.getElementById("left_order_type");
             var rightEl = document.getElementById("right_order_type");
@@ -208,6 +224,7 @@ class SmartOrder {
         button.id = "reportButton";
         button.classList = "fa fa-flag-checkered";
         button.title = "Report";
+        button.style.display = "none";
         button.addEventListener("click", () => this.reportButtonClick(this));
         container.append(button);
         this.reportButton = button;
@@ -311,7 +328,7 @@ class SmartOrder {
                     base64ToArrayUnit8(t[2])
                 ).toObject();
                 // console.log("message: ", message);
-                self.lw.updateChartData(message);
+                self.lightweight.updateChartData(message);
             }
         };
         ws.onerror = function(e) {
@@ -334,7 +351,8 @@ class SmartOrder {
     intervalHandler = self => {
         self.currentTime = moment().unix();
         // Begin Socket
-        if (self.currentTime == self.config.time.start) self.lw.connectSocket();
+        if (self.currentTime == self.config.time.start)
+            self.lightweight.connectSocket();
         // Report
         if (self.currentTime == self.config.time.end) self.reportHandler();
         //
@@ -343,7 +361,7 @@ class SmartOrder {
     reportHandler = () => {
         if (this.config.isOpeningMarket && !this.config.isReportedResult) {
             this.config.isReportedResult = true;
-            this.lw.toggleSpinner(true);
+            this.lightweight.toggleSpinner(true);
             const url = this.config.root + this.config.endpoint.report;
             const data = {
                 revenue: +document
@@ -373,12 +391,12 @@ class SmartOrder {
                         else this.notifier.show("warning", "Đã gửi báo cáo");
                     }
                     //
-                    this.lw.toggleSpinner(false);
+                    this.lightweight.toggleSpinner(false);
                 })
                 .catch(error => {
                     this.config.isReportedResult = false;
                     this.notifier.show("error", "Gửi báo cáo thất bại");
-                    this.lw.toggleSpinner(false);
+                    this.lightweight.toggleSpinner(false);
                 });
         }
     };
@@ -392,7 +410,7 @@ class SmartOrder {
             self.currentTime >= self.config.time.start &&
             self.currentTime <= self.config.time.end
         ) {
-            self.lw.loadChartData();
+            self.lightweight.loadChartData();
             return true;
         }
         return false;
@@ -401,6 +419,12 @@ class SmartOrder {
         var button = document.createElement("button");
         button.setAttribute("onclick", script);
         button.click();
+    };
+    toggleButton = visible => {
+        const display = visible ? "block" : "none";
+        this.tradingViewButton.style.display = display;
+        this.lightWeightButton.style.display = display;
+        this.reportButton.style.display = display;
     };
 }
 

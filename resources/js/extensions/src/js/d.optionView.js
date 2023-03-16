@@ -1,17 +1,22 @@
 class OptionView {
     // Các thuộc tính
     TOKEN_KEY = "SOAT";
+    isLogedin = false;
+
     // Hàm khởi tạo
-    constructor(options) {
+    constructor() {}
+
+    // Các phương thức
+    setOptions = options => {
         this.APP_NAME = options.APP_NAME;
         this.registerEndpoint = options.registerEndpoint;
         this.loginEndpoint = options.loginEndpoint;
         this.logoutEndpoint = options.logoutEndpoint;
-        this.getUserEndpoint = options.getUserEndpoint;
+        this.menuButtonCallback = options.menuButtonCallback;
+        // this.getUserEndpoint = options.getUserEndpoint;
         this.notifier = options.notifier;
-    }
-
-    // Các phương thức
+        this.lightweight = options.lightweight;
+    };
     init = () => {
         this.createContainer();
     };
@@ -24,6 +29,7 @@ class OptionView {
         this.createHearderContainer(container);
         this.createLoginContainer(container);
         this.createRegisterContainer(container);
+        this.createInfoContainer(container);
         this.createOptionContainer(container);
     };
     createHearderContainer = container => {
@@ -31,7 +37,6 @@ class OptionView {
         div.id = "hearderContainer";
         container.append(div);
         this.hearderContainer = div;
-        //
         //
         var p = document.createElement("p");
         div.append(p);
@@ -55,7 +60,7 @@ class OptionView {
         var div = document.createElement("div");
         div.id = "loginContainer";
         div.className = "section";
-        div.style.display = "block";
+        div.style.display = this.isLogedin ? "none" : "block";
         container.append(div);
         this.loginContainer = div;
         //
@@ -77,6 +82,7 @@ class OptionView {
         input.placeholder = "Email hoặc Số điện thoại";
         input.required = true;
         this.loginUsername = input;
+        if (!this.isLogedin) this.loginUsername.focus();
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -103,7 +109,6 @@ class OptionView {
         button.id = "loginSubmit";
         button.innerText = "ĐĂNG NHẬP";
         button.type = "submit";
-        // button.setAttribute("form", "loginForm");
         this.loginSubmit = button;
         //
         var p = document.createElement("p");
@@ -113,6 +118,7 @@ class OptionView {
         p.addEventListener("click", e => {
             this.loginContainer.style.display = "none";
             this.registerContainer.style.display = "block";
+            this.registerName.focus();
         });
     };
     createRegisterContainer = container => {
@@ -181,7 +187,6 @@ class OptionView {
         button.id = "registerSubmit";
         button.innerText = "ĐĂNG KÝ";
         button.type = "submit";
-        // button.setAttribute("form", "registerForm");
         this.registerSubmit = button;
         //
         var p = document.createElement("p");
@@ -191,6 +196,33 @@ class OptionView {
         p.addEventListener("click", e => {
             this.registerContainer.style.display = "none";
             this.loginContainer.style.display = "block";
+            this.loginUsername.focus();
+        });
+    };
+    createInfoContainer = container => {
+        var div = document.createElement("div");
+        div.id = "infoContainer";
+        div.className = "section";
+        div.style.display = this.isLogedin ? "block" : "none";
+        container.append(div);
+        this.infoContainer = div;
+        //
+        var wrapper = document.createElement("div");
+        wrapper.className = "wrapper";
+        div.append(wrapper);
+        //
+        var button = document.createElement("button");
+        wrapper.append(button);
+        button.innerText = "ĐĂNG XUẤT";
+        button.addEventListener("click", e => this.logout(e, this));
+        //
+        var p = document.createElement("p");
+        wrapper.append(p);
+        p.className = "link";
+        p.innerText = "Cài đặt";
+        p.addEventListener("click", e => {
+            this.infoContainer.style.display = "none";
+            this.optionContainer.style.display = "block";
         });
     };
     createOptionContainer = container => {
@@ -207,10 +239,11 @@ class OptionView {
         //
         var p = document.createElement("p");
         wrapper.append(p);
-        p.innerText = "Đăng xuất";
+        p.className = "link";
+        p.innerText = "Trở về";
         p.addEventListener("click", e => {
             this.optionContainer.style.display = "none";
-            this.loginContainer.style.display = "block";
+            this.infoContainer.style.display = "block";
         });
     };
     register = (e, self) => {
@@ -240,13 +273,13 @@ class OptionView {
                 })
                 .then(jsondata => {
                     // console.log("register: ", jsondata);
+                    self.registerSubmit.innerText = "ĐĂNG KÝ";
+                    self.registerSubmit.disabled = false;
                     if (jsondata.isOk) {
                         self.setToken(jsondata.token);
                         self.user = jsondata.user;
                         self.notifier.show("success", "Đăng ký thành công");
                     } else {
-                        self.registerSubmit.innerText = "ĐĂNG KÝ";
-                        self.registerSubmit.disabled = false;
                         if (jsondata.message == "emailExist")
                             self.registerMessage.innerText =
                                 "Emai này đã đăng ký";
@@ -285,21 +318,25 @@ class OptionView {
                 })
                 .then(jsondata => {
                     console.log("login: ", jsondata);
+                    self.loginSubmit.innerText = "ĐĂNG NHẬP";
+                    self.loginSubmit.disabled = false;
                     if (jsondata.isOk) {
                         self.setToken(jsondata.token);
                         self.user = jsondata.user;
-                    } else {
-                        self.loginSubmit.innerText = "ĐĂNG NHẬP";
-                        self.loginSubmit.disabled = false;
+                        self.loginUsername.value = "";
+                        self.loginPassword.value = "";
+                        self.loginContainer.style.display = "none";
+                        self.infoContainer.style.display = "block";
+                        self.menuButtonCallback(true);
+                    } else
                         self.loginMessage.innerText = "Sai thông tin đăng nhập";
-                    }
+                    //
                     resolve();
                 })
                 .catch(error => resolve(false));
         });
     };
-    logout = () => {
-        var self = this;
+    logout = (e, self) => {
         return new Promise(resolve => {
             const accessToken = self.getToken();
             fetch(self.logoutEndpoint, {
@@ -310,17 +347,22 @@ class OptionView {
                 }
             }).then(() => {
                 self.removeToken();
+                self.lightweight.removeLightWeightChart();
+                self.infoContainer.style.display = "none";
+                self.loginContainer.style.display = "block";
+                self.menuButtonCallback(false);
+                self.loginUsername.focus();
                 resolve();
             });
         });
     };
-    getUser = () => {
+    getUser = url => {
         var self = this;
         return new Promise(resolve => {
             const accessToken = self.getToken();
             if (!accessToken) resolve(false);
             else {
-                fetch(self.getUserEndpoint, {
+                fetch(url, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -334,7 +376,8 @@ class OptionView {
                     .then(jsondata => {
                         console.log("getUser: ", jsondata);
                         self.user = jsondata;
-                        resolve(!!jsondata.code);
+                        self.isLogedin = !!jsondata.code;
+                        resolve(self.isLogedin);
                     })
                     .catch(error => resolve(false));
             }
@@ -345,7 +388,8 @@ class OptionView {
     removeToken = () => localStorage.removeItem(this.TOKEN_KEY);
     getToken = () => {
         const token = JSON.parse(localStorage.getItem(this.TOKEN_KEY));
-        if (moment().isBefore(token.expires_at)) return token.access_token;
+        if (!!token && moment().isBefore(token.expires_at))
+            return token.access_token;
         else return false;
     };
     toggle = () => {

@@ -1,7 +1,7 @@
 #optionViewContainer {
     position: fixed;
-    bottom: 40px;
-    left: 85px;
+    bottom: 45px;
+    left: 5px;
     width: 300px;
     height: 400px;
     display: flex;
@@ -70,6 +70,9 @@
 }
 #registerContainer {
     background-color: blueviolet;
+}
+#infoContainer {
+    background-color: chocolate;
 }
 #optionContainer {
     background-color: yellowgreen;

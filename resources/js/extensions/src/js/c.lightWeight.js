@@ -13,7 +13,10 @@ class Lightweight {
     hasNewData = false;
 
     // Hàm khởi tạo
-    constructor(options) {
+    constructor() {}
+
+    // Các phương thức
+    setOptions = options => {
         this.dataEndpoint = options.dataEndpoint;
         this.localDB = options.localDB;
         this.audio = options.audio;
@@ -27,9 +30,7 @@ class Lightweight {
         this.orderTpPrice = options.orderTpPrice;
         this.orderSlPrice = options.orderSlPrice;
         this.cancelOrder = options.cancelOrder;
-    }
-
-    // Các phương thức
+    };
     init = () => {
         this.createLightWeightChart();
         this.createDataArea();
@@ -91,6 +92,9 @@ class Lightweight {
         });
         this.chart.timeScale().fitContent();
         this.chartElement = chartElement;
+    };
+    removeLightWeightChart = () => {
+        this.chartElement.remove();
     };
     createDataArea = () => {
         var div = document.createElement("div");
