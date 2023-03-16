@@ -26,10 +26,15 @@ class RegisterService extends CoreService
     public function createAccount($request)
     {
         return $this->transaction(function () use ($request) {
+            if (count($this->userRepository->where([['email', $request->email]])) != 0)
+                return ['isOk' => false, 'msg' => 'emailExist'];
+            if (count($this->userRepository->where([['phone', $request->phone]])) != 0)
+                return ['isOk' => false, 'msg' => 'phoneExist'];
             $data = [
                 'code' => $this->userRepository->generateUniqueCode(),
                 'name' => $request->name,
                 'email' => $request->email,
+                'phone' => $request->phone,
                 'password' => bcrypt($request->password),
             ];
             $user = $this->userRepository->create($data);
