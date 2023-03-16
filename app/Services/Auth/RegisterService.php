@@ -27,9 +27,9 @@ class RegisterService extends CoreService
     {
         return $this->transaction(function () use ($request) {
             if (count($this->userRepository->where([['email', $request->email]])) != 0)
-                return ['isOk' => false, 'msg' => 'emailExist'];
+                return ['isOk' => false, 'message' => 'emailExist'];
             if (count($this->userRepository->where([['phone', $request->phone]])) != 0)
-                return ['isOk' => false, 'msg' => 'phoneExist'];
+                return ['isOk' => false, 'message' => 'phoneExist'];
             $data = [
                 'code' => $this->userRepository->generateUniqueCode(),
                 'name' => $request->name,
