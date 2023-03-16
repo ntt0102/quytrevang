@@ -40,6 +40,7 @@ class SmartOrder {
         await this.localDB.init();
         await this.lw.loadChartData();
         await this.lw.getHelperData();
+        this.connectSocket();
         document.getElementById("sohopdong").value = this.config.contractNumber;
         document.getElementById("right_price").value = "MTL";
         this.audio.loop = true;
@@ -58,14 +59,6 @@ class SmartOrder {
                 .then(json => {
                     // console.log("localConfig", json);
                     this.config = json;
-                    // this = { ...this, ...json };
-                    // console.log("this: ", this);
-                    // this.config.isMobile = navigator.userAgentData.mobile;
-                    // this.config.hasNewData = false;
-                    // this.config.currentTime = moment().unix();
-                    // this.config.audio = new Audio(
-                    //     chrome.runtime.getURL("alert.wav")
-                    // );
                     resolve();
                 })
                 .catch(() => {
@@ -291,12 +284,13 @@ class SmartOrder {
     };
     connectSocket = () => {
         var ws = new WebSocket(this.config.endpoint.socket);
+        var self = this;
         ws.onopen = function(e) {
-            ws.send(`d|st|C001|${this.config.symbol}`);
+            ws.send(`d|st|C001|${self.config.symbol}`);
         };
         ws.onclose = function(e) {
             // console.log("ws-close", e);
-            if (this.refreshDataInSession()) this.connectSocket();
+            if (self.refreshDataInSession(self)) self.connectSocket();
         };
         ws.onmessage = function(e) {
             const t = e.data.split("|");
@@ -306,7 +300,7 @@ class SmartOrder {
                     base64ToArrayUnit8(t[2])
                 ).toObject();
                 // console.log("message: ", message);
-                this.lw.updateChartData(message);
+                self.lw.updateChartData(message);
             }
         };
         ws.onerror = function(e) {
@@ -328,6 +322,7 @@ class SmartOrder {
     };
     intervalHandler = self => {
         self.currentTime = moment().unix();
+        console.log("currentTime: ", self.currentTime);
         // Begin Socket
         if (self.currentTime == self.config.time.start) self.lw.connectSocket();
         // Report
