@@ -39,7 +39,7 @@ class LoginService
         $credentials = request([$fieldName, 'password']);
         if (!Auth::attempt($credentials)) return ['isOk' => false, 'message' => 'unauthorized'];
         //
-        return $this->createToken($request->user(), $request->remember_me);
+        return $this->createToken($request->user(), $request->rememberMe);
     }
 
     /**

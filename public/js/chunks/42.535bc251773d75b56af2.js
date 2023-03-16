@@ -147,6 +147,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
 
 
 
@@ -535,7 +540,7 @@ var render = function() {
                 _vm._v(" "),
                 _c("DxItem", {
                   attrs: {
-                    "data-field": "remember_me",
+                    "data-field": "rememberMe",
                     "editor-type": "dxCheckBox",
                     "editor-options": {
                       text: _vm.$t("auth.login.rememberMe"),

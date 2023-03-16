@@ -1,6 +1,7 @@
 class SmartOrder {
     //
     // Các thuộc tính
+    APP_NAME = "SmartOrder";
     notifier = new Notifier();
     localDB = new LocalDatabase();
     audio = new Audio(chrome.runtime.getURL("alert.wav"));
@@ -14,10 +15,20 @@ class SmartOrder {
 
     // Các phương thức
     init = async () => {
+        await this.getLocalConfig();
+        this.optionView = new OptionView({
+            APP_NAME: this.APP_NAME,
+            notifier: this.notifier,
+            registerEndpoint: this.config.root + this.config.endpoint.register,
+            loginEndpoint: this.config.root + this.config.endpoint.login,
+            logoutEndpoint: this.config.root + this.config.endpoint.logout,
+            getUserEndpoint: this.config.root + this.config.endpoint.getUser
+        });
+        this.optionView.getUser();
+        //
         this.notifier.show("warning", "Đang cài đặt biểu đồ ...", false);
         this.createButtons();
         this.registerEvent();
-        await this.getLocalConfig();
         await this.getServerConfig();
         this.lw = new Lightweight({
             dataEndpoint: this.config.root + this.config.endpoint.data,
@@ -35,9 +46,7 @@ class SmartOrder {
             cancelOrder: this.cancelOrder
         });
         this.lw.init();
-        this.optionView = new OptionView({
-            registerEnpoint: this.config.root + this.config.endpoint.register
-        });
+
         this.optionView.init();
         await this.localDB.init();
         await this.lw.loadChartData();
@@ -350,15 +359,10 @@ class SmartOrder {
                 body: JSON.stringify(data)
             })
                 .then(response => {
-                    if (response.ok) {
-                        return response.json();
-                    }
+                    if (response.ok) return response.json();
                     throw new Error(response.statusText);
                 })
                 .then(jsondata => {
-                    console.log("Report-Start ##############################");
-                    console.log(jsondata);
-                    console.log("Report-End ##############################");
                     this.config.isReportedResult = jsondata.isOk;
                     if (jsondata.isOk) {
                         if (jsondata.isExecuted)
@@ -373,9 +377,6 @@ class SmartOrder {
                 })
                 .catch(error => {
                     this.config.isReportedResult = false;
-                    console.log("Report-Start ##############################");
-                    console.log(error);
-                    console.log("Report-End ##############################");
                     this.notifier.show("error", "Gửi báo cáo thất bại");
                     this.lw.toggleSpinner(false);
                 });
