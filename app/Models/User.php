@@ -184,6 +184,14 @@ class User extends Authenticatable implements MustVerifyEmail, WebAuthnAuthentic
     }
 
     /**
+     * Get the phone smartOrder associated with the user.
+     */
+    public function smartOrder()
+    {
+        return $this->hasOne(SmartOrder::class, 'user_code', 'code');
+    }
+
+    /**
      * The channels the user receives notification broadcasts on.
      *
      * @return string

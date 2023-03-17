@@ -9,6 +9,7 @@ class OptionView {
     // Các phương thức
     setOptions = options => {
         this.APP_NAME = options.APP_NAME;
+        this.deviceId = options.deviceId;
         this.registerEndpoint = options.registerEndpoint;
         this.loginEndpoint = options.loginEndpoint;
         this.logoutEndpoint = options.logoutEndpoint;
@@ -260,6 +261,7 @@ class OptionView {
                 email: self.registerEmail.value,
                 phone: self.registerPhone.value,
                 password: self.registerPassword.value,
+                deviceId: self.deviceId,
                 chanel: self.APP_NAME
             };
             fetch(self.registerEndpoint, {
@@ -304,7 +306,9 @@ class OptionView {
             const data = {
                 username: self.loginUsername.value,
                 password: self.loginPassword.value,
-                rememberMe: self.loginRememberMe.value
+                rememberMe: self.loginRememberMe.value,
+                deviceId: self.deviceId,
+                chanel: self.APP_NAME
             };
             console.log("login-data: ", data);
             fetch(self.loginEndpoint, {
@@ -328,8 +332,20 @@ class OptionView {
                         self.loginContainer.style.display = "none";
                         self.infoContainer.style.display = "block";
                         self.menuButtonCallback(true);
-                    } else
-                        self.loginMessage.innerText = "Sai thông tin đăng nhập";
+                    } else {
+                        if (jsondata.message == "unauthorized")
+                            self.loginMessage.innerText =
+                                "Sai thông tin đăng nhập";
+                        else if (jsondata.message == "unsetup")
+                            self.loginMessage.innerText =
+                                "Lỗi khởi tạo tài khoản";
+                        else if (jsondata.message == "expired")
+                            self.loginMessage.innerText =
+                                "Quá hạn sử dụng dịch vụ";
+                        else if (jsondata.message == "deviceLimit")
+                            self.loginMessage.innerText =
+                                "Quá giới hạn thiết bị";
+                    }
                     //
                     resolve();
                 })

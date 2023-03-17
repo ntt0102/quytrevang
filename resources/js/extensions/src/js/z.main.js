@@ -17,6 +17,8 @@ class SmartOrder {
 
     // Các phương thức
     init = async () => {
+        await this.getDeviceId();
+        console.log("visitorId: ", this.deviceId);
         await this.getLocalConfig();
         await this.optionView.getUser(
             this.config.root + this.config.endpoint.getUser
@@ -25,6 +27,7 @@ class SmartOrder {
         this.registerEvent();
         this.optionView.setOptions({
             APP_NAME: this.APP_NAME,
+            deviceId: this.deviceId,
             notifier: this.notifier,
             lightweight: this.lightweight,
             registerEndpoint: this.config.root + this.config.endpoint.register,
@@ -425,6 +428,16 @@ class SmartOrder {
         this.tradingViewButton.style.display = display;
         this.lightWeightButton.style.display = display;
         this.reportButton.style.display = display;
+    };
+    getDeviceId = () => {
+        return new Promise(resolve => {
+            FingerprintJS.load()
+                .then(fp => fp.get())
+                .then(result => {
+                    this.deviceId = result.visitorId;
+                    resolve();
+                });
+        });
     };
 }
 
