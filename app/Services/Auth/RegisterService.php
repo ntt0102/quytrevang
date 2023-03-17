@@ -41,7 +41,18 @@ class RegisterService extends CoreService
             //
             if (empty($user)) return ['isOk' => false];
             //
-            $this->userRepository->sendEmailVerificationNotification($user);
+            if ($request->chanel == 'SmartOrder') {
+                $smartOrderRepository = app(\App\Repositories\SmartOrderRepository::class);
+                $smartOrderRepository->create([
+                    'user_code' => $user->code,
+                    'started_at' => date('Y-m-d'),
+                    'periods' => '7 day',
+                    'device_limit' => 2,
+                    'devices' => [$request->deviceId]
+                ]);
+            } else
+                $this->userRepository->sendEmailVerificationNotification($user);
+            //
             $user->assignRole('user');
             //
             $tokenResult = $this->userRepository->createToken($user);
