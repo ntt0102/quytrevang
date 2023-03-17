@@ -42,6 +42,7 @@ class SmartOrderService extends CoreService
         $isOpeningMarket = $this->checkOpeningMarket();
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
+        $contact = app(\App\Services\AppService::class)->getContact();
         return [
             'isOpeningMarket' => $isOpeningMarket,
             'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
@@ -56,8 +57,11 @@ class SmartOrderService extends CoreService
             'deviceLimit' => $so->device_limit,
             'contractNumber' => $so->contracts,
             'isVolume' => $so->volume,
+            'isViewChart' => $so->view_chart,
+            'isFullscreen' => $so->fullscreen,
             'timeFrame' => $so->time_frame,
-            'chartType' => $so->chart_type
+            'chartType' => $so->chart_type,
+            'contact' => $contact
         ];
     }
 
@@ -72,10 +76,12 @@ class SmartOrderService extends CoreService
         return $this->transaction(
             function () use ($request) {
                 $isOk = $this->smartOrderRepository->update($request->user()->smartOrder, [
+                    'time_frame' => $request->timeFrame,
+                    'chart_type' => $request->chartType,
                     'contracts' => $request->contractNumber,
                     'volume' => $request->isVolume,
-                    'time_frame' => $request->timeFrame,
-                    'chart_type' => $request->chartType
+                    'view_chart' => $request->isViewChart,
+                    'fullscreen' => $request->isFullscreen
                 ]);
                 return ['isOk' => $isOk];
             }
