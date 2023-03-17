@@ -27,7 +27,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     });
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
-        Route::post('login', 'LoginController@login');
+        Route::post('login', 'LoginController@login')->name('login');
         Route::post('login-webauthn', 'LoginController@loginWebAuthn');
         Route::post('validate-duplicate-email', 'RegisterController@validateDuplicateEmail');
         Route::post('create-account', 'RegisterController@createAccount');
