@@ -63,6 +63,12 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::post('/', 'PushSubscriptionController@update');
                 Route::post('destroy', 'PushSubscriptionController@destroy');
             });
+            Route::group(['prefix' => 'smart-order', 'middleware' => 'cors'], function () {
+                Route::post('report', 'SmartOrderController@report');
+                Route::post('config', 'SmartOrderController@getConfig');
+                Route::post('option', 'SmartOrderController@setOption');
+                Route::post('data', 'SmartOrderController@getChartData');
+            });
         });
 
         Route::group(['middleware' => 'verified'], function () {

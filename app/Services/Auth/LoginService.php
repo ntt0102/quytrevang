@@ -44,10 +44,7 @@ class LoginService
         if ($request->chanel == 'SmartOrder') {
             $so = $user->smartOrder;
             if (!$so) return ['isOk' => false, 'message' => 'unsetup'];
-            $expires_at = date_add(
-                date_create($so->started_at),
-                date_interval_create_from_date_string($so->periods)
-            );
+            $expires_at = date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods));
             if (date_create() > $expires_at)
                 return ['isOk' => false, 'message' => 'expired'];
             if ($so->device_limit == count($so->devices)) {

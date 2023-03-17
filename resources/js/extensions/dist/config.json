@@ -3,13 +3,14 @@
     "root1": "http://localhost",
     "endpoint": {
         "socket": "wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream",
-        "config": "/api/vps/config",
-        "data": "/api/vps/data",
-        "report": "/api/vps/report",
+        "config": "/api/smart-order/config",
+        "option": "/api/smart-order/option",
+        "data": "/api/smart-order/data",
+        "report": "/api/smart-order/report",
         "register": "/api/auth/create-account",
         "login": "/api/auth/login",
         "logout": "/api/auth/logout",
-        "getUser": "/api/auth/user"
+        "user": "/api/auth/user"
     },
     "timeFrame": 0,
     "order": {

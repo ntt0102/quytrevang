@@ -21,7 +21,7 @@ class SmartOrder {
         console.log("visitorId: ", this.deviceId);
         await this.getLocalConfig();
         await this.optionView.getUser(
-            this.config.root + this.config.endpoint.getUser
+            this.config.root + this.config.endpoint.user
         );
         this.createButtons();
         this.registerEvent();
@@ -34,7 +34,6 @@ class SmartOrder {
             loginEndpoint: this.config.root + this.config.endpoint.login,
             logoutEndpoint: this.config.root + this.config.endpoint.logout,
             menuButtonCallback: this.toggleButton
-            // getUserEndpoint: this.config.root + this.config.endpoint.getUser
         });
         this.optionView.init();
         if (this.optionView.isLogedin) {

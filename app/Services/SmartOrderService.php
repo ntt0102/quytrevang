@@ -9,7 +9,6 @@ use App\Repositories\ParameterRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\TradeRepository;
 use App\Repositories\VpsRepository;
-use App\Repositories\StrategyRepository;
 use App\Events\UpdateTradeEvent;
 
 class SmartOrderService extends CoreService
@@ -18,20 +17,17 @@ class SmartOrderService extends CoreService
     private $userRepository;
     private $tradeRepository;
     private $vpsRepository;
-    private $strategyRepository;
 
     public function __construct(
         ParameterRepository $parameterRepository,
         UserRepository $userRepository,
         TradeRepository $tradeRepository,
-        VpsRepository $vpsRepository,
-        StrategyRepository $strategyRepository
+        VpsRepository $vpsRepository
     ) {
         $this->parameterRepository = $parameterRepository;
         $this->userRepository = $userRepository;
         $this->tradeRepository = $tradeRepository;
         $this->vpsRepository = $vpsRepository;
-        $this->strategyRepository = $strategyRepository;
     }
 
     /**
@@ -99,7 +95,6 @@ class SmartOrderService extends CoreService
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
         $symbol = $this->getSymbol();
-        $escrow = ($this->getInfo($symbol)->c * 0.1 * 0.17) / 0.8;
         return [
             'isOpeningMarket' => $isOpeningMarket,
             'contractNumber' => $tradeContracts,
@@ -108,9 +103,7 @@ class SmartOrderService extends CoreService
                 'start' => strtotime(date('Y-m-d ') . $startTime),
                 'end' => strtotime(date('Y-m-d ') . $endTime)
             ],
-            'symbol' => $symbol,
-            'sheepLimit' => intval(800 / $escrow),
-            'sharkLimit' => intval(2000 / $escrow)
+            'symbol' => $symbol
         ];
     }
 
@@ -153,26 +146,11 @@ class SmartOrderService extends CoreService
      * @param $request
      * 
      */
-    public function controlData($request)
+    public function getChartData($request)
     {
-        return $this->transaction(
-            function () use ($request) {
-                $action = $request->action;
-                switch ($action) {
-                    case 'SET':
-                        $this->vpsRepository->create($request->all());
-                        break;
-                    case 'GET':
-                        if ($request->date == date('Y-m-d'))
-                            return $this->getTcbs();
-                        else return $this->getFromCsv($request->date);
-                        break;
-                    case 'CLEAR':
-                        $this->vpsRepository->clear();
-                        break;
-                }
-            }
-        );
+        if ($request->date == date('Y-m-d'))
+            return $this->getTcbs();
+        else return $this->getFromCsv($request->date);
     }
     /**
      * 
@@ -207,21 +185,6 @@ class SmartOrderService extends CoreService
         $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
         $res = $client->get($url);
         return json_decode($res->getBody())[0];
-    }
-
-    /**
-     * Tcbs data
-     */
-    private function getOtherConfigs()
-    {
-        $symbol = $this->getSymbol();
-        $c =  $this->getInfo($symbol)->c;
-        $escrow = ($c * 0.1 * 0.17) / 0.8;
-        return [
-            'symbol' => $symbol,
-            'sheepLimit' => intval(800 / $escrow),
-            'sharkLimit' => intval(2000 / $escrow)
-        ];
     }
 
     /**
