@@ -40,9 +40,9 @@ class ParametersTableSeeder extends Seeder
             'description' => "Tỷ lệ ký quỹ",
         ]);
         Parameter::create([
-            'slug' => "tradeContracts",
-            'value' => "2",
-            'description' => "Số hợp đồng phái sinh",
+            'slug' => "smartOrderVersion",
+            'value' => "2.0.0",
+            'description' => "Phiên bản SmartOrder mới nhất",
         ]);
         Parameter::create([
             'slug' => "VN30F1M",

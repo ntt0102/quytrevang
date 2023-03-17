@@ -22,8 +22,8 @@ class CreateSmartOrdersTable extends Migration
             $table->json('devices');
             $table->integer('time_frame')->default(0);
             $table->boolean('volume')->default(0);
-            $table->boolean('view_chart')->default(0);
-            $table->boolean('fullscreen')->default(0);
+            $table->boolean('view_chart')->default(1);
+            $table->boolean('fullscreen')->default(1);
             $table->integer('chart_type')->default(0);
             $table->integer('contracts')->default(1);
             $table->timestamps();

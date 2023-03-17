@@ -42,6 +42,7 @@ class SmartOrderService extends CoreService
         $isOpeningMarket = $this->checkOpeningMarket();
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
+        $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
         $contact = app(\App\Services\AppService::class)->getContact();
         return [
             'isOpeningMarket' => $isOpeningMarket,
@@ -61,7 +62,8 @@ class SmartOrderService extends CoreService
             'isFullscreen' => $so->fullscreen,
             'timeFrame' => $so->time_frame,
             'chartType' => $so->chart_type,
-            'contact' => $contact
+            'contact' => $contact,
+            'latestVersion' => $latestVersion,
         ];
     }
 
