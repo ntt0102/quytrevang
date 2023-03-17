@@ -23,6 +23,7 @@ class CreateSmartOrdersTable extends Migration
             $table->integer('time_frame');
             $table->boolean('volume');
             $table->integer('chart_type');
+            $table->integer('contracts');
             $table->timestamps();
         });
     }
