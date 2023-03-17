@@ -23,7 +23,8 @@ class SmartOrder {
         await this.optionView.getUser(
             this.config.root + this.config.endpoint.user
         );
-        this.createButtons();
+        console.log("user: ", this.optionView.user);
+        this.createMenuButtons();
         this.registerEvent();
         this.optionView.setOptions({
             APP_NAME: this.APP_NAME,
@@ -38,12 +39,13 @@ class SmartOrder {
         this.optionView.init();
         if (this.optionView.isLogedin) {
             this.notifier.show("warning", "Đang cài đặt biểu đồ ...", false);
-            // this.createButtons();
+            // this.createMenuButtons();
             // this.registerEvent();
             this.toggleButton(true);
             await this.getServerConfig();
             this.lightweight.setOptions({
                 dataEndpoint: this.config.root + this.config.endpoint.data,
+                accessToken: this.optionView.accessToken,
                 localDB: this.localDB,
                 notifier: this.notifier,
                 audio: this.audio,
@@ -102,12 +104,15 @@ class SmartOrder {
             const url = this.config.root + this.config.endpoint.config;
             fetch(url, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${this.optionView.accessToken}`
+                },
                 body: JSON.stringify({})
             })
                 .then(response => response.json())
                 .then(json => {
-                    // console.log("serverConfig", json);
+                    console.log("serverConfig", json);
                     this.config = { ...this.config, ...json };
                     //
                     resolve();
@@ -121,7 +126,7 @@ class SmartOrder {
                 });
         });
     };
-    createButtons = () => {
+    createMenuButtons = () => {
         var container = document.createElement("div");
         container.id = "directionCommandDiv";
         document.body.append(container);

@@ -18,6 +18,7 @@ class Lightweight {
     // Các phương thức
     setOptions = options => {
         this.dataEndpoint = options.dataEndpoint;
+        this.accessToken = options.accessToken;
         this.localDB = options.localDB;
         this.audio = options.audio;
         this.notifier = options.notifier;
@@ -780,7 +781,10 @@ class Lightweight {
                 try {
                     var response = await fetch(url, {
                         method: "POST",
-                        headers: { "Content-Type": "application/json" },
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${this.accessToken}`
+                        },
                         body: JSON.stringify(data)
                     });
                     var json = await response.json();

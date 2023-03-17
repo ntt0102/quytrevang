@@ -14,7 +14,6 @@ class OptionView {
         this.loginEndpoint = options.loginEndpoint;
         this.logoutEndpoint = options.logoutEndpoint;
         this.menuButtonCallback = options.menuButtonCallback;
-        // this.getUserEndpoint = options.getUserEndpoint;
         this.notifier = options.notifier;
         this.lightweight = options.lightweight;
     };
@@ -375,14 +374,14 @@ class OptionView {
     getUser = url => {
         var self = this;
         return new Promise(resolve => {
-            const accessToken = self.getToken();
-            if (!accessToken) resolve(false);
+            self.accessToken = self.getToken();
+            if (!self.accessToken) resolve(false);
             else {
                 fetch(url, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${accessToken}`
+                        Authorization: `Bearer ${self.accessToken}`
                     }
                 })
                     .then(response => {
