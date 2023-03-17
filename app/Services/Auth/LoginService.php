@@ -56,7 +56,7 @@ class LoginService
             } else {
                 $devices = $so->devices;
                 $devices[] = $request->deviceId;
-                app(\App\Repositories\SmartOrderRepository::class)->update(['devices' => $devices]);
+                app(\App\Repositories\SmartOrderRepository::class)->update($so, ['devices' => $devices]);
             }
         }
         //
