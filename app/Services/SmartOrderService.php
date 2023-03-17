@@ -50,7 +50,7 @@ class SmartOrderService extends CoreService
                 'end' => strtotime(date('Y-m-d ') . $endTime)
             ],
             'symbol' => $this->getSymbol(),
-            'registerDate' => $so->created_at,
+            'registerDate' => date_create($so->created_at)->format('Y-m-d'),
             'startDate' => $so->started_at,
             'expiresDate' => date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods))->format('Y-m-d'),
             'deviceLimit' => $so->device_limit,
