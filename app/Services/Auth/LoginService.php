@@ -41,18 +41,23 @@ class LoginService
             return ['isOk' => false, 'message' => 'unauthorized'];
         //
         $user = $request->user();
-        if ($request->chanel == 'SmartOrder' && !!$user->smartOrder) {
+        if ($request->chanel == 'SmartOrder') {
             $so = $user->smartOrder;
+            if (!$so) return ['isOk' => false, 'message' => 'unsetup'];
             $expires_at = date_add(
                 date_create($so->started_at),
                 date_interval_create_from_date_string($so->periods)
             );
             if (date_create() > $expires_at)
                 return ['isOk' => false, 'message' => 'expired'];
-            if (
-                $so->device_limit == count($so->devices)
-                && !in_array($request->deviceId, $so->devices)
-            ) return ['isOk' => false, 'message' => 'deviceLimit'];
+            if ($so->device_limit == count($so->devices)) {
+                if (!in_array($request->deviceId, $so->devices))
+                    return ['isOk' => false, 'message' => 'deviceLimit'];
+            } else {
+                $devices = $so->devices;
+                $devices[] = $request->deviceId;
+                app(\App\Repositories\SmartOrderRepository::class)->update(['devices' => $devices]);
+            }
         }
         //
         return $this->createToken($user, $request->rememberMe);
