@@ -20,10 +20,10 @@ class CreateSmartOrdersTable extends Migration
             $table->string('periods');
             $table->integer('device_limit');
             $table->json('devices');
-            $table->integer('time_frame');
-            $table->boolean('volume');
-            $table->integer('chart_type');
-            $table->integer('contracts');
+            $table->integer('time_frame')->default(0);
+            $table->boolean('volume')->default(0);
+            $table->integer('chart_type')->default(0);
+            $table->integer('contracts')->default(1);
             $table->timestamps();
         });
     }
