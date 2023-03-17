@@ -29,7 +29,7 @@ class SmartOrderController extends CoreController
     }
 
     /**
-     * Check Market Open
+     * Get config
      *
      * @param \Illuminate\Http\Request $request
      * 
@@ -38,6 +38,19 @@ class SmartOrderController extends CoreController
     public function getconfig(Request $request)
     {
         $data = $this->smartOrderService->getconfig($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Set option
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function setOption(Request $request)
+    {
+        $data = $this->smartOrderService->setOption($request);
         return $this->sendResponse($data);
     }
 

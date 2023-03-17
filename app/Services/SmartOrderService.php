@@ -8,7 +8,7 @@ use App\Notifications\UpdatedTradesNotification;
 use App\Repositories\ParameterRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\TradeRepository;
-use App\Repositories\VpsRepository;
+use App\Repositories\SmartOrderRepository;
 use App\Events\UpdateTradeEvent;
 
 class SmartOrderService extends CoreService
@@ -16,20 +16,79 @@ class SmartOrderService extends CoreService
     private $parameterRepository;
     private $userRepository;
     private $tradeRepository;
-    private $vpsRepository;
+    private $smartOrderRepository;
 
     public function __construct(
         ParameterRepository $parameterRepository,
         UserRepository $userRepository,
         TradeRepository $tradeRepository,
-        VpsRepository $vpsRepository
+        SmartOrderRepository $smartOrderRepository
     ) {
         $this->parameterRepository = $parameterRepository;
         $this->userRepository = $userRepository;
         $this->tradeRepository = $tradeRepository;
-        $this->vpsRepository = $vpsRepository;
+        $this->smartOrderRepository = $smartOrderRepository;
     }
 
+    /**
+     * Get Config
+     *
+     * @param $request
+     * 
+     */
+    public function getConfig($request)
+    {
+        $so = $request->user()->smartOrder;
+        $isOpeningMarket = $this->checkOpeningMarket();
+        $startTime = $this->parameterRepository->getValue('startTradingTime');
+        $endTime = $this->parameterRepository->getValue('endTradingTime');
+        return [
+            'isOpeningMarket' => $isOpeningMarket,
+            'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
+            'time' => [
+                'start' => strtotime(date('Y-m-d ') . $startTime),
+                'end' => strtotime(date('Y-m-d ') . $endTime)
+            ],
+            'symbol' => $this->getSymbol(),
+            'contractNumber' => $so->contracts,
+            'isVolume' => $so->volume,
+            'timeFrame' => $so->time_frame,
+            'chartType' => $so->chart_type
+        ];
+    }
+
+    /**
+     * Set option
+     *
+     * @param $request
+     * 
+     */
+    public function setOption($request)
+    {
+        return $this->transaction(
+            function () use ($request) {
+                $isOk = $this->smartOrderRepository->update($request->user()->smartOrder, [
+                    'contracts' => $request->contractNumber,
+                    'volume' => $request->isVolume,
+                    'time_frame' => $request->timeFrame,
+                    'chart_type' => $request->chartType
+                ]);
+                return ['isOk' => $isOk];
+            }
+        );
+    }
+    /**
+     * Get chart data
+     *
+     * @param $request
+     * 
+     */
+    public function getChartData($request)
+    {
+        if ($request->date == date('Y-m-d'))
+            return $this->getTcbs();
+        else return $this->getFromCsv($request->date);
+    }
     /**
      * Report
      *
@@ -46,7 +105,7 @@ class SmartOrderService extends CoreService
                 $currentDate = date_create();
                 $lastTrade = $this->tradeRepository->latest('monday');
                 if ($currentDate->format('W') != date_create($lastTrade->monday)->format('W')) {
-                    $amount = (int) $this->parameterRepository->getValue('tradeContracts');
+                    $amount = $request->user()->smartOrder->contracts;
                     $trade = $this->tradeRepository->create([
                         "amount" => $amount,
                         "scores" => $this->getInfo($this->getSymbol())->r,
@@ -81,32 +140,6 @@ class SmartOrderService extends CoreService
             }
         );
     }
-
-    /**
-     * Get Config
-     *
-     * @param $request
-     * 
-     */
-    public function getConfig($request)
-    {
-        $isOpeningMarket = $this->checkOpeningMarket();
-        $tradeContracts = (int) $this->parameterRepository->getValue('tradeContracts');
-        $startTime = $this->parameterRepository->getValue('startTradingTime');
-        $endTime = $this->parameterRepository->getValue('endTradingTime');
-        $symbol = $this->getSymbol();
-        return [
-            'isOpeningMarket' => $isOpeningMarket,
-            'contractNumber' => $tradeContracts,
-            'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
-            'time' => [
-                'start' => strtotime(date('Y-m-d ') . $startTime),
-                'end' => strtotime(date('Y-m-d ') . $endTime)
-            ],
-            'symbol' => $symbol
-        ];
-    }
-
     /**
      * Check Opening Market
      * @return boolean
@@ -141,29 +174,23 @@ class SmartOrderService extends CoreService
     }
 
     /**
-     * Get, set and Clear Data
-     *
-     * @param $request
-     * 
+     * get From TCBS
      */
-    public function getChartData($request)
+    public function getTcbs()
     {
-        if ($request->date == date('Y-m-d'))
-            return $this->getTcbs();
-        else return $this->getFromCsv($request->date);
-    }
-    /**
-     * 
-     */
-    public function getVps()
-    {
-        $data = $this->vpsRepository->getVps();
-        $times = $data->reduce(function ($ts, $item) {
-            $ts[] = $item->time;
-            return $ts;
-        }, []);
-        $unique_times = array_unique($times);
-        return array_values(array_intersect_key($data->toArray(), $unique_times));
+        $array = $this->tcbsData(10000);
+        $temp = collect($array)->reduce(function ($carry, $item) {
+            $carry['data'][] = [
+                'time' => strtotime(date('Y-m-d ') . $item->t),
+                'price' => $item->p,
+                'volume' => $item->v,
+                'action' => $item->a
+            ];
+            $carry['times'][] = $item->t;
+            return $carry;
+        }, ['data' => [], 'times' => []]);
+        $unique_times = array_unique($temp['times']);
+        return array_values(array_intersect_key($temp['data'], $unique_times));
     }
     /**
      * Get Symbol
@@ -199,25 +226,7 @@ class SmartOrderService extends CoreService
         return json_decode($res->getBody())->data;
     }
 
-    /**
-     * get From TCBS
-     */
-    public function getTcbs()
-    {
-        $array = $this->tcbsData(10000);
-        $temp = collect($array)->reduce(function ($carry, $item) {
-            $carry['data'][] = [
-                'time' => strtotime(date('Y-m-d ') . $item->t),
-                'price' => $item->p,
-                'volume' => $item->v,
-                'action' => $item->a
-            ];
-            $carry['times'][] = $item->t;
-            return $carry;
-        }, ['data' => [], 'times' => []]);
-        $unique_times = array_unique($temp['times']);
-        return array_values(array_intersect_key($temp['data'], $unique_times));
-    }
+
 
     /**
      * 
@@ -263,67 +272,5 @@ class SmartOrderService extends CoreService
         }, []);
         $unique_times = array_unique($times);
         return array_values(array_intersect_key($lines, $unique_times));
-    }
-
-    // function exedata()
-    // {
-    //     $dates = [
-    //         '2023-02-06', '2023-02-07', '2023-02-08',
-    //         '2023-02-09', '2023-02-10', '2023-02-13',
-    //         '2023-02-14', '2023-02-15', '2023-02-16',
-    //         '2023-02-17', '2023-02-20'
-    //     ];
-    //     foreach ($dates as $date) {
-    //         $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
-    //         $filename_ = storage_path('app/public/vn30f1m/' . $date . '_.csv');
-    //         $fp = fopen($filename, 'r');
-    //         $fp_ = fopen($filename_, 'w');
-    //         while (!feof($fp)) {
-    //             $line = fgetcsv($fp);
-    //             if (!!$line) {
-    //                 $a = [
-    //                     strtotime($line[0]),
-    //                     $line[1] + 0,
-    //                     $line[2] + 0,
-    //                     $line[3]
-    //                 ];
-    //                 fputcsv($fp_, $a);
-    //             }
-    //         }
-    //         fclose($fp_);
-    //         fclose($fp);
-    //     }
-    // }
-
-    /**
-     * 
-     */
-    public function getVolumeByPrice()
-    {
-        $data = $this->vpsRepository->getVolumeByPrice();
-        $merge = $data->reduce(function ($c, $item, $index) {
-            $isUpdate = false;
-            if (!!$index) {
-                if ($item->price == end($c)['price']) $isUpdate = true;
-            }
-            //
-            if ($isUpdate) {
-                $end = array_pop($c);
-                if ($item->side == 'BU') $end['buy'] = $item->sum + 0;
-                else $end['sell'] = $item->sum + 0;
-                $c[]  = $end;
-            } else $c[] = [
-                'price' => $item->price,
-                'buy' => $item->side == 'BU' ? $item->sum + 0 : 0,
-                'sell' => $item->side == 'SD' ? $item->sum + 0 : 0,
-            ];
-            return $c;
-        }, []);
-        return collect($merge)->reduce(function ($c, $item) {
-            $c['price'][] = $item['price'];
-            $c['buy'][] = $item['buy'];
-            $c['sell'][] = -$item['sell'];
-            return $c;
-        }, ['price' => [], 'buy' => [], 'sell' => []]);
     }
 }
