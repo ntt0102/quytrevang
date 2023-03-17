@@ -19,12 +19,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('send-comment', 'AppController@sendComment');
     Route::get('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
-    Route::group(['prefix' => 'vps', 'middleware' => 'cors'], function () {
-        Route::post('report', 'VpsController@report');
-        Route::post('config', 'VpsController@getConfig');
-        Route::post('volume-by-price', 'VpsController@getVolumeByPrice');
-        Route::post('data', 'VpsController@controlData');
-    });
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login')->name('login');
