@@ -37,9 +37,25 @@ class LoginService
         $fieldName = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
         request()->merge([$fieldName => $username]);
         $credentials = request([$fieldName, 'password']);
-        if (!Auth::attempt($credentials)) return ['isOk' => false, 'message' => 'unauthorized'];
+        if (!Auth::attempt($credentials))
+            return ['isOk' => false, 'message' => 'unauthorized'];
         //
-        return $this->createToken($request->user(), $request->rememberMe);
+        $user = $request->user();
+        if ($request->chanel == 'SmartOrder' && !!$user->smartOrder) {
+            $so = $user->smartOrder;
+            $expires_at = date_add(
+                date_create($so->started_at),
+                date_interval_create_from_date_string($so->periods)
+            );
+            if (date_create() > $expires_at)
+                return ['isOk' => false, 'message' => 'expired'];
+            if (
+                $so->device_limit == count($so->devices)
+                && !in_array($request->deviceId, $so->devices)
+            ) return ['isOk' => false, 'message' => 'deviceLimit'];
+        }
+        //
+        return $this->createToken($user, $request->rememberMe);
     }
 
     /**

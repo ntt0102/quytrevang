@@ -46,7 +46,7 @@ class RegisterService extends CoreService
                 $smartOrderRepository->create([
                     'user_code' => $user->code,
                     'started_at' => date('Y-m-d'),
-                    'periods' => '7 day',
+                    'periods' => '7-d',
                     'device_limit' => 2,
                     'devices' => [$request->deviceId]
                 ]);
