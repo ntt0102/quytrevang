@@ -1,15 +1,20 @@
 class OptionView {
     // Các thuộc tính
     TOKEN_KEY = "SOAT";
-    isLogedin = false;
+    isLoggedin = false;
 
     // Hàm khởi tạo
-    constructor() {}
+    constructor(global) {
+        this.global = global;
+        this.createContainerElement();
+        this.createHearderContainer();
+        this.createLoginContainer();
+        this.createRegisterContainer();
+    }
 
     // Các phương thức
     setOptions = options => {
-        this.APP_NAME = options.APP_NAME;
-        this.deviceId = options.deviceId;
+        this.global = options.config;
         this.registerEndpoint = options.registerEndpoint;
         this.loginEndpoint = options.loginEndpoint;
         this.logoutEndpoint = options.logoutEndpoint;
@@ -18,50 +23,32 @@ class OptionView {
         this.lightweight = options.lightweight;
     };
     init = () => {
+        this.getDeviceId();
         this.createContainer();
     };
-    createContainer = () => {
+    createContainerElement = () => {
         var container = document.createElement("div");
         container.id = "optionViewContainer";
         document.body.append(container);
-        this.container = container;
-        //
-        this.createHearderContainer(container);
-        this.createLoginContainer(container);
-        this.createRegisterContainer(container);
-        this.createInfoContainer(container);
-        this.createOptionContainer(container);
+        this.containerElement = container;
     };
-    createHearderContainer = container => {
+    createHearderContainer = () => {
         var div = document.createElement("div");
         div.id = "hearderContainer";
-        container.append(div);
+        this.containerElement.append(div);
         this.hearderContainer = div;
         //
-        var p = document.createElement("p");
+        var p = document.createElement("label");
         div.append(p);
         p.className = "title";
-        p.innerText = "SmartOrder cho VPS";
-        //
-        p = document.createElement("p");
-        div.append(p);
-        p.className = "subtitle";
-        p.innerText = "Phát triển bởi Tho PS";
-        //
-        p = document.createElement("p");
-        div.append(p);
-        p.className = "homepage link";
-        p.innerText = "Trang chủ";
-        p.addEventListener("click", () =>
-            window.open("https://www.w3schools.com")
-        );
+        p.innerText = this.global.appName;
     };
-    createLoginContainer = container => {
+    createLoginContainer = () => {
         var div = document.createElement("div");
         div.id = "loginContainer";
         div.className = "section";
-        div.style.display = this.isLogedin ? "none" : "block";
-        container.append(div);
+        div.style.display = this.isLoggedin ? "none" : "block";
+        this.containerElement.append(div);
         this.loginContainer = div;
         //
         var wrapper = document.createElement("form");
@@ -70,7 +57,7 @@ class OptionView {
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e => this.login(e, this));
         //
-        var p = document.createElement("p");
+        var p = document.createElement("label");
         wrapper.append(p);
         p.className = "invalid";
         this.loginMessage = p;
@@ -82,7 +69,7 @@ class OptionView {
         input.placeholder = "Email hoặc Số điện thoại";
         input.required = true;
         this.loginUsername = input;
-        if (!this.isLogedin) this.loginUsername.focus();
+        if (!this.isLoggedin) this.loginUsername.focus();
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -111,22 +98,32 @@ class OptionView {
         button.type = "submit";
         this.loginSubmit = button;
         //
-        var p = document.createElement("p");
-        wrapper.append(p);
-        p.className = "link";
-        p.innerText = "Đăng ký";
-        p.addEventListener("click", e => {
+        var routeWrapper = document.createElement("div");
+        routeWrapper.className = "link-group";
+        wrapper.append(routeWrapper);
+        var route = document.createElement("label");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Đăng ký";
+        route.addEventListener("click", e => {
             this.loginContainer.style.display = "none";
             this.registerContainer.style.display = "block";
             this.registerName.focus();
         });
+        var route = document.createElement("label");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Trang chủ";
+        route.addEventListener("click", () =>
+            window.open("https://www.w3schools.com")
+        );
     };
-    createRegisterContainer = container => {
+    createRegisterContainer = () => {
         var div = document.createElement("div");
         div.id = "registerContainer";
         div.className = "section";
         div.style.display = "none";
-        container.append(div);
+        this.containerElement.append(div);
         this.registerContainer = div;
         //
         var wrapper = document.createElement("form");
@@ -135,7 +132,7 @@ class OptionView {
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e => this.register(e, this));
         //
-        var p = document.createElement("p");
+        var p = document.createElement("label");
         wrapper.append(p);
         p.className = "invalid";
         this.registerMessage = p;
@@ -189,62 +186,371 @@ class OptionView {
         button.type = "submit";
         this.registerSubmit = button;
         //
-        var p = document.createElement("p");
-        wrapper.append(p);
-        p.className = "link";
-        p.innerText = "Đăng nhập";
-        p.addEventListener("click", e => {
+        var routeWrapper = document.createElement("div");
+        routeWrapper.className = "link-group";
+        wrapper.append(routeWrapper);
+        var route = document.createElement("label");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Đăng nhập";
+        route.addEventListener("click", e => {
             this.registerContainer.style.display = "none";
             this.loginContainer.style.display = "block";
             this.loginUsername.focus();
         });
+        var route = document.createElement("label");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Trang chủ";
+        route.addEventListener("click", () =>
+            window.open("https://www.w3schools.com")
+        );
     };
-    createInfoContainer = container => {
+    createLoggedinElement = () => {
+        this.createInfoContainer();
+        this.createOptionContainer();
+        this.createAboutContainer();
+    };
+    createInfoContainer = () => {
         var div = document.createElement("div");
         div.id = "infoContainer";
         div.className = "section";
-        div.style.display = this.isLogedin ? "block" : "none";
-        container.append(div);
+        div.style.display = this.isLoggedin ? "block" : "none";
+        this.containerElement.append(div);
         this.infoContainer = div;
         //
         var wrapper = document.createElement("div");
         wrapper.className = "wrapper";
         div.append(wrapper);
         //
+        var list = document.createElement("div");
+        list.className = "list";
+        wrapper.append(list);
+        var title = document.createElement("label");
+        list.append(title);
+        title.className = "title";
+        title.innerText = "Thông tin tài khoản:";
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Tên:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.user.name;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Email:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.user.email;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Điện thoại:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.user.phone;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Ngày đăng ký:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = moment(this.global.registerDate).format("DD/MM/YYYY");
+        item.append(value);
+        //
+        var list = document.createElement("div");
+        list.className = "list";
+        wrapper.append(list);
+        var title = document.createElement("label");
+        list.append(title);
+        title.className = "title";
+        title.innerText = "Thông tin gói dịch vụ:";
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Ngày bắt đầu:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = moment(this.global.startDate).format("DD/MM/YYYY");
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Ngày hết hạn:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = moment(this.global.expiresDate).format("DD/MM/YYYY");
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Số lượng thiết bị:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.global.deviceLimit;
+        item.append(value);
+        //
         var button = document.createElement("button");
         wrapper.append(button);
         button.innerText = "ĐĂNG XUẤT";
         button.addEventListener("click", e => this.logout(e, this));
         //
-        var p = document.createElement("p");
-        wrapper.append(p);
-        p.className = "link";
-        p.innerText = "Cài đặt";
-        p.addEventListener("click", e => {
+        var routeWrapper = document.createElement("div");
+        routeWrapper.className = "link-group";
+        wrapper.append(routeWrapper);
+        var route = document.createElement("label");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Cài đặt";
+        route.addEventListener("click", e => {
             this.infoContainer.style.display = "none";
             this.optionContainer.style.display = "block";
         });
+        var route = document.createElement("label");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Cập nhật";
+        route.addEventListener("click", e => {
+            this.infoContainer.style.display = "none";
+            this.aboutContainer.style.display = "block";
+        });
     };
-    createOptionContainer = container => {
+    createOptionContainer = () => {
         var div = document.createElement("div");
         div.id = "optionContainer";
         div.className = "section";
         div.style.display = "none";
-        container.append(div);
+        this.containerElement.append(div);
         this.optionContainer = div;
         //
         var wrapper = document.createElement("div");
         wrapper.className = "wrapper";
         div.append(wrapper);
         //
-        var p = document.createElement("p");
-        wrapper.append(p);
-        p.className = "link";
-        p.innerText = "Trở về";
-        p.addEventListener("click", e => {
+        var list = document.createElement("div");
+        list.className = "list";
+        wrapper.append(list);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Khung thời gian:";
+        item.append(label);
+        var select = document.createElement("select");
+        select.style.width = "69px";
+        [
+            { text: "Tick", value: 0 },
+            { text: "1 min", value: 1 },
+            { text: "5 min", value: 5 },
+            { text: "30 min", value: 30 },
+            { text: "1 day", value: 1440 }
+        ].forEach((item, index) => {
+            var option = document.createElement("option");
+            option.value = item.value;
+            option.text = item.text;
+            select.appendChild(option);
+        });
+        select.value = this.global.timeFrame;
+        this.timeFrameSelect = select;
+        item.append(select);
+        //
+        item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        label = document.createElement("span");
+        label.innerText = "Loại biểu đồ:";
+        item.append(label);
+        select = document.createElement("select");
+        [
+            { text: "Đường", value: 0 },
+            { text: "Nến", value: 1 },
+            { text: "Thanh", value: 2 }
+        ].forEach((item, index) => {
+            var option = document.createElement("option");
+            option.value = item.value;
+            option.text = item.text;
+            select.appendChild(option);
+        });
+        select.value = this.global.chartType;
+        this.chartTypeSelect = select;
+        item.append(select);
+        //
+        item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        label = document.createElement("span");
+        label.innerText = "Số hợp đồng:";
+        item.append(label);
+        var input = document.createElement("input");
+        input.type = "number";
+        input.style.width = "69px";
+        input.style.height = "21px";
+        input.value = this.global.contractNumber;
+        this.contractNumberInput = input;
+        item.append(input);
+        //
+        item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        label = document.createElement("span");
+        label.innerText = "Hiển thị biểu đồ khối lượng:";
+        item.append(label);
+        input = document.createElement("input");
+        input.type = "checkbox";
+        input.style.width = "17px";
+        input.value = !!this.global.isVolume;
+        this.isVolumeCheckbox = input;
+        item.append(input);
+        //
+        item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        label = document.createElement("span");
+        label.innerText = "Mở biểu đồ khi khởi động:";
+        item.append(label);
+        input = document.createElement("input");
+        input.type = "checkbox";
+        input.style.width = "17px";
+        input.value = !!this.global.isViewChart;
+        this.isViewChartCheckbox = input;
+        item.append(input);
+        //
+        item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        label = document.createElement("span");
+        label.innerText = "Bật chế độ toàn màn hình:";
+        item.append(label);
+        input = document.createElement("input");
+        input.type = "checkbox";
+        input.style.width = "17px";
+        input.value = !!this.global.isFullscreen;
+        this.isFullscreenCheckbox = input;
+        item.append(input);
+        //
+        var route = document.createElement("label");
+        wrapper.append(route);
+        route.className = "link";
+        route.innerText = "Trở về";
+        route.addEventListener("click", e => {
             this.optionContainer.style.display = "none";
             this.infoContainer.style.display = "block";
         });
+    };
+    createAboutContainer = () => {
+        var div = document.createElement("div");
+        div.id = "aboutContainer";
+        div.className = "section";
+        div.style.display = "none";
+        this.containerElement.append(div);
+        this.aboutContainer = div;
+        //
+        var wrapper = document.createElement("div");
+        wrapper.className = "wrapper";
+        div.append(wrapper);
+        //
+        var list = document.createElement("div");
+        list.className = "list";
+        wrapper.append(list);
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Phiên bản:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.global.version;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Ngày xuất bản:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.global.publishDate;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Nhà phát triển:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.global.developer;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Số điện thoại:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.global.contact.phone;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Email:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.global.contact.email;
+        item.append(value);
+        //
+        if (this.global.version != this.global.latestVersion) {
+            var download = document.createElement("div");
+            download.className = "download";
+            wrapper.append(download);
+            var label = document.createElement("label");
+            download.append(label);
+            label.innerHTML = "Đã có phiên bản cập nhật mới.";
+            var button = document.createElement("button");
+            download.append(button);
+            button.innerText = "TẢI XUỐNG";
+            button.addEventListener("click", e => this.logout(e, this));
+        }
+        //
+        var routeWrapper = document.createElement("div");
+        routeWrapper.className = "link-group";
+        wrapper.append(routeWrapper);
+        var route = document.createElement("label");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Trở về";
+        route.addEventListener("click", e => {
+            this.aboutContainer.style.display = "none";
+            this.infoContainer.style.display = "block";
+        });
+        var route = document.createElement("label");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Trang chủ";
+        route.addEventListener("click", () =>
+            window.open("https://www.w3schools.com")
+        );
     };
     register = (e, self) => {
         e.preventDefault();
@@ -261,7 +567,7 @@ class OptionView {
                 phone: self.registerPhone.value,
                 password: self.registerPassword.value,
                 deviceId: self.deviceId,
-                chanel: self.APP_NAME
+                chanel: self.global.appName
             };
             fetch(self.registerEndpoint, {
                 method: "POST",
@@ -307,7 +613,7 @@ class OptionView {
                 password: self.loginPassword.value,
                 rememberMe: self.loginRememberMe.value,
                 deviceId: self.deviceId,
-                chanel: self.APP_NAME
+                chanel: self.global.appName
             };
             console.log("login-data: ", data);
             fetch(self.loginEndpoint, {
@@ -371,31 +677,58 @@ class OptionView {
             });
         });
     };
-    getUser = url => {
-        var self = this;
+    getUser = () => {
         return new Promise(resolve => {
-            self.accessToken = self.getToken();
-            if (!self.accessToken) resolve(false);
+            this.global.accessToken = this.getToken();
+            if (!this.global.accessToken) resolve();
             else {
+                const url = this.global.domain + this.global.endpoint.user;
                 fetch(url, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${self.accessToken}`
+                        Authorization: `Bearer ${this.global.accessToken}`
                     }
                 })
                     .then(response => {
                         if (response.ok) return response.json();
                         throw new Error(response.statusText);
                     })
-                    .then(jsondata => {
-                        console.log("getUser: ", jsondata);
-                        self.user = jsondata;
-                        self.isLogedin = !!jsondata.code;
-                        resolve(self.isLogedin);
+                    .then(json => {
+                        console.log("getUser: ", json);
+                        this.global.user = json;
+                        this.global.isLoggedin = !!json.code;
+                        resolve();
                     })
-                    .catch(error => resolve(false));
+                    .catch(error => resolve());
             }
+        });
+    };
+    getServerConfig = () => {
+        return new Promise((resolve, reject) => {
+            const url = this.global.domain + this.global.endpoint.config;
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${this.global.accessToken}`
+                },
+                body: JSON.stringify({})
+            })
+                .then(response => response.json())
+                .then(json => {
+                    console.log("serverConfig", json);
+                    this.global = { ...this.global, ...json };
+                    //
+                    resolve();
+                });
+            // .catch(err => {
+            //     console.log(err);
+            //     var choice = confirm(
+            //         "Get server config error. Refresh now?"
+            //     );
+            //     if (choice) location.reload();
+            // });
         });
     };
     setToken = token =>
@@ -407,9 +740,19 @@ class OptionView {
             return token.access_token;
         else return false;
     };
+    getDeviceId = () => {
+        return new Promise(resolve => {
+            FingerprintJS.load()
+                .then(fp => fp.get())
+                .then(result => {
+                    this.deviceId = result.visitorId;
+                    resolve();
+                });
+        });
+    };
     toggle = () => {
-        if (this.container.classList.contains("show"))
-            this.container.classList.remove("show");
-        else this.container.classList.add("show");
+        if (this.containerElement.classList.contains("show"))
+            this.containerElement.classList.remove("show");
+        else this.containerElement.classList.add("show");
     };
 }

@@ -1,83 +1,83 @@
 class SmartOrder {
-    //
     // Các thuộc tính
-    APP_NAME = "SmartOrder";
-    notifier = new Notifier();
-    localDB = new LocalDatabase();
     audio = new Audio(chrome.runtime.getURL("alert.wav"));
     isMobile = navigator.userAgentData.mobile;
     currentTime = moment().unix();
-    lightweight = new Lightweight();
-    optionView = new OptionView();
 
     // Hàm khởi tạo
     constructor() {
         goog.require("proto.tcbs.BuySellActivePojo");
+        this.notifier = new Notifier();
+        this.localDB = new LocalDatabase();
     }
 
     // Các phương thức
     init = async () => {
-        await this.getDeviceId();
-        console.log("visitorId: ", this.deviceId);
         await this.getLocalConfig();
-        await this.optionView.getUser(
-            this.config.root + this.config.endpoint.user
-        );
-        console.log("user: ", this.optionView.user);
-        this.createMenuButtons();
-        this.registerEvent();
-        this.optionView.setOptions({
-            APP_NAME: this.APP_NAME,
-            deviceId: this.deviceId,
-            notifier: this.notifier,
-            lightweight: this.lightweight,
-            registerEndpoint: this.config.root + this.config.endpoint.register,
-            loginEndpoint: this.config.root + this.config.endpoint.login,
-            logoutEndpoint: this.config.root + this.config.endpoint.logout,
-            menuButtonCallback: this.toggleButton
+        this.lightweight = new Lightweight(this.global);
+        this.optionView = new OptionView(this.global);
+        this.menu = new Menu(this.global, {
+            toggleTradingViewChart: this.toggleTradingViewCallback,
+            toggleLightWeightChart: this.toggleLightWeightCallback,
+            togglePopup: this.optionView.toggle,
+            report: this.manualReportCallback
         });
-        this.optionView.init();
-        if (this.optionView.isLogedin) {
+        await this.optionView.getUser();
+        // this.createMenuButtons();
+        // this.registerEvent();
+        // this.optionView.setOptions({
+        //     notifier: this.notifier,
+        //     lightweight: this.lightweight,
+        //     config: this.global,
+        //     registerEndpoint:
+        //         this.global.domain + this.global.endpoint.register,
+        //     loginEndpoint: this.global.domain + this.global.endpoint.login,
+        //     logoutEndpoint: this.global.domain + this.global.endpoint.logout,
+        //     menuButtonCallback: this.toggleButton
+        // });
+        // this.optionView.init();
+        if (this.global.isLoggedin) {
             this.notifier.show("warning", "Đang cài đặt biểu đồ ...", false);
-            // this.createMenuButtons();
-            // this.registerEvent();
-            this.toggleButton(true);
-            await this.getServerConfig();
-            this.lightweight.setOptions({
-                dataEndpoint: this.config.root + this.config.endpoint.data,
-                accessToken: this.optionView.accessToken,
-                localDB: this.localDB,
-                notifier: this.notifier,
-                audio: this.audio,
-                isMobile: this.isMobile,
-                timeFrame: this.config.timeFrame,
-                sharkLimit: this.config.sharkLimit,
-                getOrderPosition: this.getOrderPosition,
-                closePosition: this.closePosition,
-                orderEntryPrice: this.orderEntryPrice,
-                orderTpPrice: this.orderTpPrice,
-                orderSlPrice: this.orderSlPrice,
-                cancelOrder: this.cancelOrder
-            });
-            this.lightweight.init();
+            this.menu.createLoggedinElement();
+            this.optionView.createLoggedinElement();
 
-            await this.localDB.init();
-            await this.lightweight.loadChartData();
-            await this.lightweight.getHelperData();
-            this.connectSocket();
-            document.getElementById(
-                "sohopdong"
-            ).value = this.config.contractNumber;
-            document.getElementById("right_price").value = "MTL";
-            this.audio.loop = true;
-            //
-            setInterval(() => this.intervalHandler(this), 1000);
-            setInterval(() => this.refreshDataInSession(this), 60000);
-            //
-            this.notifier.hide();
-            this.lightWeightButton.click();
+            // await this.optionView.getServerConfig();
+            // this.toggleButton(true);
+            // this.lightweight.setOptions({
+            //     dataEndpoint: this.global.domain + this.global.endpoint.data,
+            //     accessToken: this.global.accessToken,
+            //     localDB: this.localDB,
+            //     notifier: this.notifier,
+            //     audio: this.audio,
+            //     isMobile: this.isMobile,
+            //     timeFrame: this.global.timeFrame,
+            //     sharkLimit: this.global.sharkLimit,
+            //     getOrderPosition: this.getOrderPosition,
+            //     closePosition: this.closePosition,
+            //     orderEntryPrice: this.orderEntryPrice,
+            //     orderTpPrice: this.orderTpPrice,
+            //     orderSlPrice: this.orderSlPrice,
+            //     cancelOrder: this.cancelOrder
+            // });
+            // this.lightweight.init();
+
+            // await this.localDB.init();
+            // await this.lightweight.loadChartData();
+            // await this.lightweight.getHelperData();
+            // this.connectSocket();
+            // document.getElementById(
+            //     "sohopdong"
+            // ).value = this.global.contractNumber;
+            // document.getElementById("right_price").value = "MTL";
+            // this.audio.loop = true;
+            // //
+            // setInterval(() => this.intervalHandler(this), 1000);
+            // setInterval(() => this.refreshDataInSession(this), 60000);
+            // //
+            // this.notifier.hide();
+            // this.lightWeightButton.click();
         } else {
-            this.optionButton.click();
+            // this.settingButton.click();
         }
     };
     getLocalConfig = () => {
@@ -86,8 +86,8 @@ class SmartOrder {
             fetch(file)
                 .then(response => response.json())
                 .then(json => {
-                    // console.log("localConfig", json);
-                    this.config = json;
+                    console.log("localConfig", json);
+                    this.global = { ...this.global, ...json };
                     resolve();
                 })
                 .catch(() => {
@@ -99,145 +99,68 @@ class SmartOrder {
                 });
         });
     };
-    getServerConfig = () => {
-        return new Promise((resolve, reject) => {
-            const url = this.config.root + this.config.endpoint.config;
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${this.optionView.accessToken}`
-                },
-                body: JSON.stringify({})
-            })
-                .then(response => response.json())
-                .then(json => {
-                    console.log("serverConfig", json);
-                    this.config = { ...this.config, ...json };
-                    //
-                    resolve();
-                })
-                .catch(err => {
-                    console.log(err);
-                    var choice = confirm(
-                        "Get server config error. Refresh now?"
-                    );
-                    if (choice) location.reload();
-                });
-        });
+    toggleTradingViewCallback = () => {
+        var leftEl = document.getElementById("left_order_type");
+        var rightEl = document.getElementById("right_order_type");
+        var orderEl = document.querySelector(
+            "#mainFooter .foot_tab:nth-child(1)"
+        );
+        var condOrderEl = document.querySelector(
+            "#mainFooter .foot_tab:nth-child(2)"
+        );
+        orderEl.classList.remove("fa", "fa-check-circle");
+        condOrderEl.classList.remove("fa", "fa-question-circle");
+        if (document.body.classList.contains("tradingview-chart")) {
+            document.body.classList.remove("tradingview-chart");
+            document.body.classList.remove("full-chart");
+            leftEl.innerText = "Lệnh thường";
+            rightEl.innerText = "Lệnh điều kiện";
+            orderEl.innerText = "DANH SÁCH LỆNH";
+            condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+        } else {
+            document.body.classList.add("tradingview-chart");
+            document.body.classList.add("full-chart");
+            document.body.classList.remove("lightweight-chart");
+            leftEl.innerText = "LT";
+            rightEl.innerText = "LĐK";
+            orderEl.innerText = "LỆNH THƯỜNG";
+            condOrderEl.innerText = "L. ĐIỀU KIỆN";
+        }
     };
-    createMenuButtons = () => {
-        var container = document.createElement("div");
-        container.id = "directionCommandDiv";
-        document.body.append(container);
-        //
-        this.createTradingViewButton(container);
-        this.createLightWeightButton(container);
-        this.createOptionButton(container);
-        this.createReportButton(container);
-    };
-    createTradingViewButton = container => {
-        var button = document.createElement("button");
-        button.id = "tradingViewButton";
-        button.classList = "fa fa-bar-chart";
-        button.title = "TradingView Chart";
-        button.style.display = "none";
-        button.addEventListener("click", () => {
-            var leftEl = document.getElementById("left_order_type");
-            var rightEl = document.getElementById("right_order_type");
-            var orderEl = document.querySelector(
-                "#mainFooter .foot_tab:nth-child(1)"
-            );
-            var condOrderEl = document.querySelector(
-                "#mainFooter .foot_tab:nth-child(2)"
-            );
+    toggleLightWeightCallback = () => {
+        var leftEl = document.getElementById("left_order_type");
+        var rightEl = document.getElementById("right_order_type");
+        var orderEl = document.querySelector(
+            "#mainFooter .foot_tab:nth-child(1)"
+        );
+        var condOrderEl = document.querySelector(
+            "#mainFooter .foot_tab:nth-child(2)"
+        );
+        if (document.body.classList.contains("lightweight-chart")) {
+            document.body.classList.remove("lightweight-chart");
+            document.body.classList.remove("full-chart");
+            leftEl.innerText = "Lệnh thường";
+            rightEl.innerText = "Lệnh điều kiện";
+            //
             orderEl.classList.remove("fa", "fa-check-circle");
+            orderEl.innerText = "DANH SÁCH LỆNH";
             condOrderEl.classList.remove("fa", "fa-question-circle");
-            if (document.body.classList.contains("tradingview-chart")) {
-                document.body.classList.remove("tradingview-chart");
-                document.body.classList.remove("full-chart");
-                leftEl.innerText = "Lệnh thường";
-                rightEl.innerText = "Lệnh điều kiện";
-                orderEl.innerText = "DANH SÁCH LỆNH";
-                condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
-            } else {
-                document.body.classList.add("tradingview-chart");
-                document.body.classList.add("full-chart");
-                document.body.classList.remove("lightweight-chart");
-                leftEl.innerText = "LT";
-                rightEl.innerText = "LĐK";
-                orderEl.innerText = "LỆNH THƯỜNG";
-                condOrderEl.innerText = "L. ĐIỀU KIỆN";
-            }
-        });
-        container.append(button);
-        this.tradingViewButton = button;
+            condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+        } else {
+            document.body.classList.add("lightweight-chart");
+            document.body.classList.add("full-chart");
+            document.body.classList.remove("tradingview-chart");
+            leftEl.innerText = "LT";
+            rightEl.innerText = "LĐK";
+            //
+            orderEl.classList.add("fa", "fa-check-circle");
+            orderEl.innerText = "";
+            condOrderEl.classList.add("fa", "fa-question-circle");
+            condOrderEl.innerText = "";
+        }
     };
-    createLightWeightButton = container => {
-        var button = document.createElement("button");
-        button.id = "lightWeightButton";
-        button.classList = "fa fa-line-chart";
-        button.title = "LightWeight Chart";
-        button.style.display = "none";
-        button.addEventListener("click", () => {
-            var leftEl = document.getElementById("left_order_type");
-            var rightEl = document.getElementById("right_order_type");
-            var orderEl = document.querySelector(
-                "#mainFooter .foot_tab:nth-child(1)"
-            );
-            var condOrderEl = document.querySelector(
-                "#mainFooter .foot_tab:nth-child(2)"
-            );
-            if (document.body.classList.contains("lightweight-chart")) {
-                document.body.classList.remove("lightweight-chart");
-                document.body.classList.remove("full-chart");
-                leftEl.innerText = "Lệnh thường";
-                rightEl.innerText = "Lệnh điều kiện";
-                //
-                orderEl.classList.remove("fa", "fa-check-circle");
-                orderEl.innerText = "DANH SÁCH LỆNH";
-                condOrderEl.classList.remove("fa", "fa-question-circle");
-                condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
-            } else {
-                document.body.classList.add("lightweight-chart");
-                document.body.classList.add("full-chart");
-                document.body.classList.remove("tradingview-chart");
-                leftEl.innerText = "LT";
-                rightEl.innerText = "LĐK";
-                //
-                orderEl.classList.add("fa", "fa-check-circle");
-                orderEl.innerText = "";
-                condOrderEl.classList.add("fa", "fa-question-circle");
-                condOrderEl.innerText = "";
-            }
-        });
-        container.append(button);
-        this.lightWeightButton = button;
-    };
-    createOptionButton = container => {
-        var button = document.createElement("button");
-        button.id = "optionButton";
-        button.classList = "fa fa-cog";
-        button.title = "Option";
-        button.addEventListener("click", () => this.optionButtonClick(this));
-        container.append(button);
-        this.optionButton = button;
-    };
-    optionButtonClick = self => {
-        self.optionView.toggle();
-    };
-    createReportButton = container => {
-        var button = document.createElement("button");
-        button.id = "reportButton";
-        button.classList = "fa fa-flag-checkered";
-        button.title = "Report";
-        button.style.display = "none";
-        button.addEventListener("click", () => this.reportButtonClick(this));
-        container.append(button);
-        this.reportButton = button;
-    };
-    reportButtonClick = self => {
-        if (self.currentTime > self.config.time.end) self.reportHandler();
+    manualReportCallback = () => {
+        if (this.currentTime > this.global.time.end) this.reportHandler();
     };
     registerEvent = () => {
         document
@@ -250,7 +173,7 @@ class SmartOrder {
     //
     getOrderPosition = () => {
         const el = document.querySelector(
-            `#danhmuc_${this.config.symbol} > td:nth-child(2)`
+            `#danhmuc_${this.global.symbol} > td:nth-child(2)`
         );
         if (!el) return 0;
         const position = el.innerText;
@@ -287,7 +210,7 @@ class SmartOrder {
         this.callScript("onCancelAllOrderPending('order')");
         if (isInit)
             order.tp.price =
-                +order.entry.price + order.side * this.config.order.TP;
+                +order.entry.price + order.side * this.global.order.TP;
         setTimeout(() => {
             document.getElementById("select_normal_order_wrapper").click();
             document.getElementById("right_price").value = order.tp.price;
@@ -300,7 +223,7 @@ class SmartOrder {
         this.callScript("onCancelAllOrderPending('order_condition')");
         if (isInit)
             order.sl.price =
-                +order.entry.price - order.side * this.config.order.SL;
+                +order.entry.price - order.side * this.global.order.SL;
         setTimeout(() => {
             document.getElementById("select_condition_order_wrapper").click();
             document.getElementById("right_stopOrderIndex").value =
@@ -318,10 +241,10 @@ class SmartOrder {
         this.callScript("onCancelAllOrderPending('order')");
     };
     connectSocket = () => {
-        var ws = new WebSocket(this.config.endpoint.socket);
+        var ws = new WebSocket(this.global.endpoint.socket);
         var self = this;
         ws.onopen = function(e) {
-            ws.send(`d|st|C001|${self.config.symbol}`);
+            ws.send(`d|st|C001|${self.global.symbol}`);
         };
         ws.onclose = function(e) {
             // console.log("ws-close", e);
@@ -358,18 +281,18 @@ class SmartOrder {
     intervalHandler = self => {
         self.currentTime = moment().unix();
         // Begin Socket
-        if (self.currentTime == self.config.time.start)
+        if (self.currentTime == self.global.time.start)
             self.lightweight.connectSocket();
         // Report
-        if (self.currentTime == self.config.time.end) self.reportHandler();
+        if (self.currentTime == self.global.time.end) self.reportHandler();
         //
         self.showRunningStatus();
     };
     reportHandler = () => {
-        if (this.config.isOpeningMarket && !this.config.isReportedResult) {
-            this.config.isReportedResult = true;
+        if (this.global.isOpeningMarket && !this.global.isReportedResult) {
+            this.global.isReportedResult = true;
             this.lightweight.toggleSpinner(true);
-            const url = this.config.root + this.config.endpoint.report;
+            const url = this.global.domain + this.global.endpoint.report;
             const data = {
                 revenue: +document
                     .getElementById("vmAccInfo")
@@ -388,7 +311,7 @@ class SmartOrder {
                     throw new Error(response.statusText);
                 })
                 .then(jsondata => {
-                    this.config.isReportedResult = jsondata.isOk;
+                    this.global.isReportedResult = jsondata.isOk;
                     if (jsondata.isOk) {
                         if (jsondata.isExecuted)
                             this.notifier.show(
@@ -401,7 +324,7 @@ class SmartOrder {
                     this.lightweight.toggleSpinner(false);
                 })
                 .catch(error => {
-                    this.config.isReportedResult = false;
+                    this.global.isReportedResult = false;
                     this.notifier.show("error", "Gửi báo cáo thất bại");
                     this.lightweight.toggleSpinner(false);
                 });
@@ -414,8 +337,8 @@ class SmartOrder {
     };
     refreshDataInSession = self => {
         if (
-            self.currentTime >= self.config.time.start &&
-            self.currentTime <= self.config.time.end
+            self.currentTime >= self.global.time.start &&
+            self.currentTime <= self.global.time.end
         ) {
             self.lightweight.loadChartData();
             return true;
@@ -432,16 +355,6 @@ class SmartOrder {
         this.tradingViewButton.style.display = display;
         this.lightWeightButton.style.display = display;
         this.reportButton.style.display = display;
-    };
-    getDeviceId = () => {
-        return new Promise(resolve => {
-            FingerprintJS.load()
-                .then(fp => fp.get())
-                .then(result => {
-                    this.deviceId = result.visitorId;
-                    resolve();
-                });
-        });
     };
 }
 

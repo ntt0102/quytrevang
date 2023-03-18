@@ -2,8 +2,8 @@
     position: fixed;
     bottom: 45px;
     left: 5px;
-    width: 300px;
-    height: 400px;
+    width: 250px;
+    height: 300px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -25,12 +25,11 @@
     flex-direction: column;
     align-items: center;
 }
-#optionViewContainer > #hearderContainer > p {
-    margin-bottom: 0;
-}
 #optionViewContainer > #hearderContainer > .title {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: bold;
+    margin-top: 3px;
+    margin-bottom: 0;
 }
 #optionViewContainer > #hearderContainer > .subtitle,
 #optionViewContainer > #hearderContainer > .homepage {
@@ -42,25 +41,58 @@
 }
 #optionViewContainer > .section {
     width: 100%;
-    height: calc(100% - 50px);
+    height: calc(100% - 30px);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     background-color: #2e2e2e;
 }
 #optionViewContainer > .section > .wrapper {
-    padding: 20px;
+    padding: 5px 10px;
     display: flex !important;
     flex-direction: column;
     align-items: center;
     gap: 5px;
 }
-
+#optionViewContainer > .section > .wrapper .title {
+    font-weight: bold;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+#optionViewContainer > .section > .wrapper > .list {
+    width: 100%;
+}
+#optionViewContainer > .section > .wrapper > .list > .item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+#optionViewContainer > #optionContainer .item {
+    margin-bottom: 10px;
+}
+#optionViewContainer > .section button {
+    border-radius: 20px;
+    font-weight: bold;
+}
 #optionViewContainer .invalid {
     color: red;
 }
 
+#optionViewContainer .link-group {
+    display: flex;
+    gap: 10px;
+}
+
 #optionViewContainer .link {
     cursor: pointer;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+#optionViewContainer .download {
+    display: flex;
+    flex-direction: column;
+    /* justify-content: space-between; */
+    text-align: center;
 }
 
 #optionViewContainer .link:hover {

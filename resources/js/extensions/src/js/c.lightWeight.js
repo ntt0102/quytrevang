@@ -13,7 +13,9 @@ class Lightweight {
     hasNewData = false;
 
     // Hàm khởi tạo
-    constructor() {}
+    constructor(config) {
+        this.global = config;
+    }
 
     // Các phương thức
     setOptions = options => {

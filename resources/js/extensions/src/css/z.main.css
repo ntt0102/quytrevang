@@ -1,4 +1,4 @@
-#directionCommandDiv {
+#menuContainer {
     position: fixed;
     bottom: 0px;
     left: 0px;
@@ -9,7 +9,7 @@
     z-index: 2001;
 }
 
-#directionCommandDiv > button {
+#menuContainer > button {
     background: #3f433f;
     color: #d1d4dc;
     width: 40px;
@@ -23,7 +23,7 @@
     color: #3f433f;
 }
 
-.full-chart #optionButton,
+.full-chart #settingButton,
 .full-chart #reportButton {
     display: none;
 }
