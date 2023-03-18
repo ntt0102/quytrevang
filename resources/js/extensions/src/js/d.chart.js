@@ -748,7 +748,7 @@ class Chart {
         return new Promise(async (resolve, reject) => {
             const date = this.dateInput.value;
             const data = { date: date };
-            const url = this.global.domain + this.global.endpoint.data;
+            const url = this.global.domain + this.global.endpoint.getChart;
             start: while (true) {
                 try {
                     var response = await fetch(url, {

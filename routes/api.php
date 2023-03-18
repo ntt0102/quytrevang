@@ -59,9 +59,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             });
             Route::group(['prefix' => 'smart-order', 'middleware' => 'cors'], function () {
                 Route::post('report', 'SmartOrderController@report');
-                Route::post('config', 'SmartOrderController@getConfig');
-                Route::post('option', 'SmartOrderController@setOption');
-                Route::post('data', 'SmartOrderController@getChartData');
+                Route::post('get-config', 'SmartOrderController@getConfig');
+                Route::post('set-config', 'SmartOrderController@setConfig');
+                Route::post('get-chart', 'SmartOrderController@getChartData');
             });
         });
 

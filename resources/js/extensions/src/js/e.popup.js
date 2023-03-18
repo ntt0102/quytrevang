@@ -719,14 +719,14 @@ class Popup {
     };
     getServerConfig = () => {
         return new Promise((resolve, reject) => {
-            const url = this.global.domain + this.global.endpoint.config;
+            const url = this.global.domain + this.global.endpoint.setConfig;
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${this.global.accessToken}`
                 },
-                body: JSON.stringify({})
+                body: JSON.stringify({ securities: this.global.securities })
             })
                 .then(response => response.json())
                 .then(json => {

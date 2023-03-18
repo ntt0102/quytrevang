@@ -40,9 +40,9 @@ class ParametersTableSeeder extends Seeder
             'description' => "Tỷ lệ ký quỹ",
         ]);
         Parameter::create([
-            'slug' => "smartOrderVersion",
+            'slug' => "vpsSmartOrderVer",
             'value' => "2.0.0",
-            'description' => "Phiên bản SmartOrder mới nhất",
+            'description' => "Phiên bản SmartOrder VPS",
         ]);
         Parameter::create([
             'slug' => "VN30F1M",

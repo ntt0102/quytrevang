@@ -48,9 +48,9 @@ class SmartOrderController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function setOption(Request $request)
+    public function setConfig(Request $request)
     {
-        $data = $this->smartOrderService->setOption($request);
+        $data = $this->smartOrderService->setConfig($request);
         return $this->sendResponse($data);
     }
 

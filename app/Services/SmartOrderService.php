@@ -42,7 +42,7 @@ class SmartOrderService extends CoreService
         $isOpeningMarket = $this->checkOpeningMarket();
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
-        $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
+        $latestVersion = $this->parameterRepository->getValue($request->securities . 'SmartOrderVer');
         $contact = app(\App\Services\AppService::class)->getContact();
         return [
             'endpoint' => ['socket' => 'https://datafeed.vps.com.vn'],
@@ -76,7 +76,7 @@ class SmartOrderService extends CoreService
      * @param $request
      * 
      */
-    public function setOption($request)
+    public function setConfig($request)
     {
         return $this->transaction(
             function () use ($request) {

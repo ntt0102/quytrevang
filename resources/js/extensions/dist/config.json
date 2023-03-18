@@ -3,21 +3,19 @@
     "version": "2.0.1",
     "publishDate": "17/03/2023",
     "developer": "Tho PS",
-    "securities": "VPS",
+    "securities": "vps",
     "domain": "https://quytrevang.nguyenvanxuanphu.com",
     "domain1": "http://localhost",
     "endpoint": {
-        "socket": "wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream",
-        "config": "/api/smart-order/config",
-        "option": "/api/smart-order/option",
-        "data": "/api/smart-order/data",
+        "setConfig": "/api/smart-order/get-config",
+        "getConfig": "/api/smart-order/set-config",
+        "getChart": "/api/smart-order/get-chart",
         "report": "/api/smart-order/report",
         "register": "/api/auth/create-account",
         "login": "/api/auth/login",
         "logout": "/api/auth/logout",
         "user": "/api/auth/user"
     },
-    "timeFrame": 0,
     "order": {
         "TP": 3,
         "SL": 2

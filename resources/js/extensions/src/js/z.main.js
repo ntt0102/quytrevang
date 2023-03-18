@@ -167,7 +167,7 @@ class SmartOrder {
         this.callScript("onCancelAllOrderPending('order')");
         if (isInit)
             order.tp.price =
-                +order.entry.price + order.side * this.global.order.TP;
+                +order.entry.price + order.side * this.global.takeProfit;
         setTimeout(() => {
             document.getElementById("select_normal_order_wrapper").click();
             document.getElementById("right_price").value = order.tp.price;
@@ -180,7 +180,7 @@ class SmartOrder {
         this.callScript("onCancelAllOrderPending('order_condition')");
         if (isInit)
             order.sl.price =
-                +order.entry.price - order.side * this.global.order.SL;
+                +order.entry.price - order.side * this.global.stopLoss;
         setTimeout(() => {
             document.getElementById("select_condition_order_wrapper").click();
             document.getElementById("right_stopOrderIndex").value =
