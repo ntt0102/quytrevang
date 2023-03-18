@@ -18,7 +18,15 @@ class SmartOrder extends CoreModel
         'started_at',
         'periods',
         'device_limit',
-        'devices'
+        'devices',
+        'time_frame',
+        'chart_type',
+        'contracts',
+        'take_profit',
+        'stop_loss',
+        'volume',
+        'view_chart',
+        'fullscreen'
     ];
     protected static $recordEvents = [];
     protected $casts = ['devices' => 'array'];
