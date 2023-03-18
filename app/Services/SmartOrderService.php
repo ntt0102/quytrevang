@@ -45,6 +45,8 @@ class SmartOrderService extends CoreService
         $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
         $contact = app(\App\Services\AppService::class)->getContact();
         return [
+            'domain' => $request->server->get('SERVER_NAME'),
+            'endpoint' => ['socket' => 'wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream'],
             'isOpeningMarket' => $isOpeningMarket,
             'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
             'time' => [
@@ -57,6 +59,8 @@ class SmartOrderService extends CoreService
             'expiresDate' => date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods))->format('Y-m-d'),
             'deviceLimit' => $so->device_limit,
             'contractNumber' => $so->contracts,
+            'takeProfit' => $so->take_profit,
+            'stopLoss' => $so->stop_loss,
             'isVolume' => $so->volume,
             'isViewChart' => $so->view_chart,
             'isFullscreen' => $so->fullscreen,
@@ -81,6 +85,8 @@ class SmartOrderService extends CoreService
                     'time_frame' => $request->timeFrame,
                     'chart_type' => $request->chartType,
                     'contracts' => $request->contractNumber,
+                    'take_profit' => $request->takeProfit,
+                    'stop_loss' => $request->stopLoss,
                     'volume' => $request->isVolume,
                     'view_chart' => $request->isViewChart,
                     'fullscreen' => $request->isFullscreen
