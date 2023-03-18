@@ -1,4 +1,4 @@
-#lightWeightChart {
+#lightWeightChartContainer {
     position: fixed;
     top: 0px;
     left: 0px;
@@ -11,12 +11,12 @@
     overflow-y: hidden;
 }
 
-.lightweight-chart #lightWeightChart {
+.lightweight-chart #lightWeightChartContainer {
     z-index: 1021;
     opacity: 1;
 }
 
-.lightweight-chart #lightWeightChart .area {
+.lightweight-chart #lightWeightChartContainer .area {
     position: absolute;
     display: flex;
     justify-content: space-between;
@@ -27,7 +27,7 @@
     z-index: 3;
 }
 
-.lightweight-chart #lightWeightChart .command {
+.lightweight-chart #lightWeightChartContainer .command {
     flex: 1 1 auto;
     text-align: center;
     color: #d1d4dc;
@@ -40,51 +40,60 @@
     z-index: 3;
 }
 
-.lightweight-chart #lightWeightChart > #dataAreaDiv .command:not(:first-child) {
+.lightweight-chart
+    #lightWeightChartContainer
+    > #dataAreaDiv
+    .command:not(:first-child) {
     border-left: solid 2px #2a2e39 !important;
 }
 
-.lightweight-chart #lightWeightChart > #toolAreaDiv .command:not(:first-child) {
+.lightweight-chart
+    #lightWeightChartContainer
+    > #toolAreaDiv
+    .command:not(:first-child) {
     border-top: solid 2px #2a2e39 !important;
 }
 
-.lightweight-chart #lightWeightChart .command:hover {
+.lightweight-chart #lightWeightChartContainer .command:hover {
     background: #2a2e39 !important;
 }
 
-.lightweight-chart #lightWeightChart .selected {
+.lightweight-chart #lightWeightChartContainer .selected {
     color: #1f62ff !important;
 }
 
-.lightweight-chart #lightWeightChart .hover-light:hover {
+.lightweight-chart #lightWeightChartContainer .hover-light:hover {
     opacity: 1 !important;
 }
 
-.lightweight-chart #lightWeightChart > #dataAreaDiv {
+.lightweight-chart #lightWeightChartContainer > #dataAreaDiv {
     top: 0px;
     right: 60px;
 }
 
-.lightweight-chart #lightWeightChart > #dataAreaDiv > #timeFrameSelect {
+.lightweight-chart
+    #lightWeightChartContainer
+    > #dataAreaDiv
+    > #timeFrameSelect {
     width: 65px;
 }
 
-.lightweight-chart #lightWeightChart > #dataAreaDiv > #dateInput {
+.lightweight-chart #lightWeightChartContainer > #dataAreaDiv > #dateInput {
     width: 125px;
 }
 
-.lightweight-chart #lightWeightChart > #dataAreaDiv > #spinnerImg {
+.lightweight-chart #lightWeightChartContainer > #dataAreaDiv > #spinnerImg {
     width: 30px;
     height: 30px;
 }
 
-.lightweight-chart #lightWeightChart > #toolAreaDiv {
+.lightweight-chart #lightWeightChartContainer > #toolAreaDiv {
     top: 55px;
     left: 85px;
     flex-direction: column;
 }
 
-.lightweight-chart #lightWeightChart > #legendAreaDiv {
+.lightweight-chart #lightWeightChartContainer > #legendAreaDiv {
     position: absolute;
     top: 32px;
     left: 85px;
@@ -93,15 +102,15 @@
     z-index: 3;
 }
 
-.lightweight-chart #lightWeightChart > #legendAreaDiv > #priceLegendP {
+.lightweight-chart #lightWeightChartContainer > #legendAreaDiv > #priceLegendP {
     color: white;
 }
 
-.lightweight-chart #lightWeightChart > #legendAreaDiv > #sharkLegendP {
+.lightweight-chart #lightWeightChartContainer > #legendAreaDiv > #sharkLegendP {
     color: #ff00ff;
 }
 
-.lightweight-chart #lightWeightChart > #cancelOrderButton {
+.lightweight-chart #lightWeightChartContainer > #cancelOrderButton {
     position: absolute;
     top: 57px;
     left: 125px;
@@ -112,7 +121,7 @@
     z-index: 3;
 }
 
-.lightweight-chart #lightWeightChart > #entryOrderButton {
+.lightweight-chart #lightWeightChartContainer > #entryOrderButton {
     position: absolute;
     padding: 5px;
     border-radius: 5px;
@@ -121,7 +130,7 @@
     z-index: 3;
 }
 
-.lightweight-chart #lightWeightChart > #tpslOrderButton {
+.lightweight-chart #lightWeightChartContainer > #tpslOrderButton {
     position: absolute;
     padding: 5px;
     border-radius: 5px;
@@ -130,7 +139,7 @@
     z-index: 3;
 }
 
-.lightweight-chart #lightWeightChart > #scrollButton {
+.lightweight-chart #lightWeightChartContainer > #scrollButton {
     position: absolute;
     bottom: 30px;
     right: 60px;

@@ -1,31 +1,19 @@
-class OptionView {
+class Popup {
     // Các thuộc tính
     TOKEN_KEY = "SOAT";
-    isLoggedin = false;
 
     // Hàm khởi tạo
-    constructor(global) {
+    constructor(global, callback) {
         this.global = global;
+        this.callback = callback;
         this.createContainerElement();
         this.createHearderContainer();
         this.createLoginContainer();
         this.createRegisterContainer();
+        this.getDeviceId();
     }
 
     // Các phương thức
-    setOptions = options => {
-        this.global = options.config;
-        this.registerEndpoint = options.registerEndpoint;
-        this.loginEndpoint = options.loginEndpoint;
-        this.logoutEndpoint = options.logoutEndpoint;
-        this.menuButtonCallback = options.menuButtonCallback;
-        this.notifier = options.notifier;
-        this.lightweight = options.lightweight;
-    };
-    init = () => {
-        this.getDeviceId();
-        this.createContainer();
-    };
     createContainerElement = () => {
         var container = document.createElement("div");
         container.id = "optionViewContainer";
@@ -47,7 +35,7 @@ class OptionView {
         var div = document.createElement("div");
         div.id = "loginContainer";
         div.className = "section";
-        div.style.display = this.isLoggedin ? "none" : "block";
+        div.style.display = this.global.isLoggedin ? "none" : "block";
         this.containerElement.append(div);
         this.loginContainer = div;
         //
@@ -69,7 +57,7 @@ class OptionView {
         input.placeholder = "Email hoặc Số điện thoại";
         input.required = true;
         this.loginUsername = input;
-        if (!this.isLoggedin) this.loginUsername.focus();
+        if (!this.global.isLoggedin) this.loginUsername.focus();
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -215,7 +203,7 @@ class OptionView {
         var div = document.createElement("div");
         div.id = "infoContainer";
         div.className = "section";
-        div.style.display = this.isLoggedin ? "block" : "none";
+        div.style.display = this.global.isLoggedin ? "block" : "none";
         this.containerElement.append(div);
         this.infoContainer = div;
         //
@@ -310,7 +298,7 @@ class OptionView {
         var button = document.createElement("button");
         wrapper.append(button);
         button.innerText = "ĐĂNG XUẤT";
-        button.addEventListener("click", e => this.logout(e, this));
+        button.addEventListener("click", () => this.logout(this));
         //
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
@@ -552,6 +540,11 @@ class OptionView {
             window.open("https://www.w3schools.com")
         );
     };
+    removeLoggedinElement = () => {
+        this.infoContainer.remove();
+        this.optionContainer.remove();
+        this.aboutContainer.remove();
+    };
     register = (e, self) => {
         e.preventDefault();
         if (self.registerConfirmPassword.value != self.registerPassword.value) {
@@ -566,10 +559,11 @@ class OptionView {
                 email: self.registerEmail.value,
                 phone: self.registerPhone.value,
                 password: self.registerPassword.value,
-                deviceId: self.deviceId,
+                deviceId: self.global.deviceId,
                 chanel: self.global.appName
             };
-            fetch(self.registerEndpoint, {
+            const url = this.global.domain + this.global.endpoint.register;
+            fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
@@ -585,7 +579,7 @@ class OptionView {
                     if (jsondata.isOk) {
                         self.setToken(jsondata.token);
                         self.user = jsondata.user;
-                        self.notifier.show("success", "Đăng ký thành công");
+                        self.global.alert.show("success", "Đăng ký thành công");
                     } else {
                         if (jsondata.message == "emailExist")
                             self.registerMessage.innerText =
@@ -596,7 +590,7 @@ class OptionView {
                     }
                 })
                 .catch(error => {
-                    self.notifier.show("error", "Đăng ký thất bại");
+                    self.global.alert.show("error", "Đăng ký thất bại");
                     self.registerSubmit.innerText = "ĐĂNG KÝ";
                     self.registerSubmit.disabled = false;
                 });
@@ -612,11 +606,11 @@ class OptionView {
                 username: self.loginUsername.value,
                 password: self.loginPassword.value,
                 rememberMe: self.loginRememberMe.value,
-                deviceId: self.deviceId,
+                deviceId: self.global.deviceId,
                 chanel: self.global.appName
             };
-            console.log("login-data: ", data);
-            fetch(self.loginEndpoint, {
+            const url = this.global.domain + this.global.endpoint.login;
+            fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data)
@@ -625,7 +619,7 @@ class OptionView {
                     if (response.ok) return response.json();
                     throw new Error(response.statusText);
                 })
-                .then(jsondata => {
+                .then(async jsondata => {
                     console.log("login: ", jsondata);
                     self.loginSubmit.innerText = "ĐĂNG NHẬP";
                     self.loginSubmit.disabled = false;
@@ -636,7 +630,7 @@ class OptionView {
                         self.loginPassword.value = "";
                         self.loginContainer.style.display = "none";
                         self.infoContainer.style.display = "block";
-                        self.menuButtonCallback(true);
+                        await self.callback.loggedin();
                     } else {
                         if (jsondata.message == "unauthorized")
                             self.loginMessage.innerText =
@@ -657,10 +651,11 @@ class OptionView {
                 .catch(error => resolve(false));
         });
     };
-    logout = (e, self) => {
+    logout = self => {
         return new Promise(resolve => {
             const accessToken = self.getToken();
-            fetch(self.logoutEndpoint, {
+            const url = this.global.domain + this.global.endpoint.logout;
+            fetch(url, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -668,10 +663,9 @@ class OptionView {
                 }
             }).then(() => {
                 self.removeToken();
-                self.lightweight.removeLightWeightChart();
                 self.infoContainer.style.display = "none";
                 self.loginContainer.style.display = "block";
-                self.menuButtonCallback(false);
+                self.callback.loggedout();
                 self.loginUsername.focus();
                 resolve();
             });
@@ -702,6 +696,25 @@ class OptionView {
                     })
                     .catch(error => resolve());
             }
+        });
+    };
+    getLocalConfig = () => {
+        return new Promise((resolve, reject) => {
+            const file = chrome.runtime.getURL("config.json");
+            fetch(file)
+                .then(response => response.json())
+                .then(json => {
+                    console.log("localConfig", json);
+                    this.global = { ...this.global, ...json };
+                    resolve();
+                })
+                .catch(() => {
+                    console.log(err);
+                    var choice = confirm(
+                        "Get local config error. Refresh now?"
+                    );
+                    if (choice) location.reload();
+                });
         });
     };
     getServerConfig = () => {
@@ -745,7 +758,7 @@ class OptionView {
             FingerprintJS.load()
                 .then(fp => fp.get())
                 .then(result => {
-                    this.deviceId = result.visitorId;
+                    this.global.deviceId = result.visitorId;
                     resolve();
                 });
         });

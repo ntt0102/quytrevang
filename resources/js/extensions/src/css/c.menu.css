@@ -1,0 +1,35 @@
+#menuContainer {
+    position: fixed;
+    bottom: 0px;
+    left: 0px;
+    display: flex;
+    gap: 2px;
+    justify-content: space-between;
+    background: transparent;
+    z-index: 2001;
+}
+
+#menuContainer > button {
+    background: #3f433f;
+    color: #d1d4dc;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 20px;
+}
+
+#menuContainer > #lightWeightButton.dark {
+    background: #d1d4dc;
+    color: #3f433f;
+}
+
+.full-chart #menuContainer > #settingButton,
+.full-chart #menuContainer > #reportButton {
+    display: none;
+}
+
+@media (max-width: 991.98px) {
+    .lightweight-chart #menuContainer > #reportButton {
+        z-index: -1;
+    }
+}
