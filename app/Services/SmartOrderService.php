@@ -45,7 +45,6 @@ class SmartOrderService extends CoreService
         $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
         $contact = app(\App\Services\AppService::class)->getContact();
         return [
-            'domain' => $request->server->get('SERVER_NAME'),
             'endpoint' => ['socket' => 'wss://futures-wscenter.tcbs.com.vn/wscenter/v1/stream'],
             'isOpeningMarket' => $isOpeningMarket,
             'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
