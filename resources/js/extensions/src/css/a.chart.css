@@ -106,7 +106,10 @@
     color: white;
 }
 
-.lightweight-chart #lightWeightChartContainer > #legendAreaDiv > #sharkLegendP {
+.lightweight-chart
+    #lightWeightChartContainer
+    > #legendAreaDiv
+    > #volumeLegendP {
     color: #ff00ff;
 }
 

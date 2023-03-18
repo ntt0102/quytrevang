@@ -83,8 +83,8 @@ class Chart {
             this.priceLineDrag(e, this)
         );
         //
-        this.series.shark = this.chart.addLineSeries({
-            priceScaleId: "shark",
+        this.series.volume = this.chart.addLineSeries({
+            priceScaleId: "volume",
             color: "#FF00FF",
             priceFormat: { minMove: 1 },
             scaleMargins: { top: 0.6, bottom: 0 },
@@ -262,9 +262,9 @@ class Chart {
         this.priceLegendP = p;
         //
         var p = document.createElement("p");
-        p.id = "sharkLegendP";
+        p.id = "volumeLegendP";
         container.append(p);
-        this.sharkLegendP = p;
+        this.volumeLegendP = p;
     };
     createFreeArea = () => {
         var container = this.containerElement;
@@ -339,7 +339,7 @@ class Chart {
         if (e.time) {
             self.updateLegend(
                 e.seriesPrices.get(self.series.price),
-                e.seriesPrices.get(self.series.shark)
+                e.seriesPrices.get(self.series.volume)
             );
             self.hasCrosshair = true;
             self.crosshair.time = e.time;
@@ -669,10 +669,10 @@ class Chart {
         } else this.cancelOrderButton.style.display = "none";
     };
     //
-    updateLegend = (price, shark) => {
+    updateLegend = (price, volume) => {
         if (!!price) this.priceLegendP.innerText = price;
-        if (!!shark)
-            this.sharkLegendP.innerText = shark.toLocaleString("en-US");
+        if (!!volume)
+            this.volumeLegendP.innerText = volume.toLocaleString("en-US");
     };
     coordinateToPrice = y => {
         return this.formatPrice(this.series.price.coordinateToPrice(y));
@@ -700,21 +700,21 @@ class Chart {
                     .then(() => this.global.store.set("data", data));
                 //
                 this.data = data.reduce(
-                    (r, item) => this.createChartData(r, item),
+                    (r, item) => this.generateChartData(r, item),
                     {
                         original: [],
                         price: [],
-                        shark: []
+                        volume: []
                     }
                 );
                 //
                 this.series.price.setData(this.data.price);
-                this.series.shark.setData(this.data.shark);
+                this.series.volume.setData(this.data.volume);
                 //
                 if (!this.hasCrosshair && !!this.data.original.length) {
                     this.updateLegend(
                         this.data.price.slice(-1)[0].value,
-                        this.data.shark.slice(-1)[0].value
+                        this.data.volume.slice(-1)[0].value
                     );
                 }
                 //
@@ -724,27 +724,21 @@ class Chart {
             }
         });
     };
-    updateChartData = data => {
+    updateChartData = param => {
         this.hasNewData = true;
-        const param = {
-            time: data.timesec,
-            price: data.closeprice,
-            volume: data.closevol,
-            action: data.action
-        };
-        this.data = this.createChartData(this.data, param);
+        this.data = this.generateChartData(this.data, param);
         const lastPrice = this.data.price.slice(-1)[0];
-        const lastShark = this.data.shark.slice(-1)[0];
+        const lastVolume = this.data.volume.slice(-1)[0];
         //
         if (this.timeFrame > 0) {
             this.series.price.setData(this.data.price);
-            this.series.shark.setData(this.data.shark);
+            this.series.volume.setData(this.data.volume);
         } else {
             this.series.price.update(lastPrice);
-            this.series.shark.update(lastShark);
+            this.series.volume.update(lastVolume);
         }
         if (!this.hasCrosshair) {
-            this.updateLegend(lastPrice.value, lastShark.value);
+            this.updateLegend(lastPrice.value, lastVolume.value);
         }
         //
         this.global.store.set("data", param);
@@ -774,10 +768,9 @@ class Chart {
             }
         });
     };
-    createChartData = (r, item) => {
+    generateChartData = (r, item) => {
         var time = item.time + 7 * 60 * 60;
-        const prevShark = !!r.shark.length ? r.shark.slice(-1)[0].value : 0;
-        const volume = (item.action == "BU" ? 1 : -1) * item.volume;
+        var volume = item.volume;
         if (this.timeFrame > 0) {
             const period = 60 * this.timeFrame;
             const timeIndex = Math.floor(time / period);
@@ -789,16 +782,14 @@ class Chart {
             }
             if (isSameTime) {
                 r.price.pop();
-                r.shark.pop();
+                const prevVolume = r.volume.pop();
+                volume += prevVolume.value;
             }
             time = timeIndex * period;
         }
         r.original.push(item);
         r.price.push({ time: time, value: item.price });
-        r.shark.push({
-            time: time,
-            value: prevShark + (item.volume > this.sharkLimit ? volume : 0)
-        });
+        r.volume.push({ time: time, value: volume });
         //
         return r;
     };
@@ -852,30 +843,58 @@ class Chart {
             resolve();
         });
     };
+    // connectSocket = () => {
+    //     var self = this;
+    //     var ws = new WebSocket(self.global.endpoint.socket);
+    //     ws.onopen = function(e) {
+    //         ws.send(`d|st|C001|${self.global.symbol}`);
+    //     };
+    //     ws.onclose = function(e) {
+    //         // console.log("ws-close", e);
+    //         if (self.refreshDataInSession(self)) self.connectSocket();
+    //     };
+    //     ws.onmessage = function(e) {
+    //         const t = e.data.split("|");
+    //         if (t[0] == "C001") {
+    //             // console.log("ws-message", e.data);
+    //             const message = proto.tcbs.BuySellActivePojo.deserializeBinary(
+    //                 self.base64ToArrayUnit8(t[2])
+    //             ).toObject();
+    //             // console.log("message: ", message);
+    //             const param = {
+    //                 time: message.timesec,
+    //                 price: message.closeprice,
+    //                 volume: message.closevol,
+    //                 action: message.action
+    //             };
+    //             self.updateChartData(param);
+    //         }
+    //     };
+    //     ws.onerror = function(e) {
+    //         console.log("ws-error", e);
+    //     };
+    // };
     connectSocket = () => {
         var self = this;
-        var ws = new WebSocket(self.global.endpoint.socket);
-        ws.onopen = function(e) {
-            ws.send(`d|st|C001|${self.global.symbol}`);
-        };
-        ws.onclose = function(e) {
-            // console.log("ws-close", e);
-            if (self.refreshDataInSession(self)) self.connectSocket();
-        };
-        ws.onmessage = function(e) {
-            const t = e.data.split("|");
-            if (t[0] == "C001") {
-                // console.log("ws-message", e.data);
-                const message = proto.tcbs.BuySellActivePojo.deserializeBinary(
-                    self.base64ToArrayUnit8(t[2])
-                ).toObject();
-                // console.log("message: ", message);
-                self.updateChartData(message);
+        var msg = { action: "join", list: self.global.symbol };
+        var socket = io(self.global.endpoint.socket);
+        socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
+        socket.on("reconnect", () => {
+            if (self.refreshDataInSession(self))
+                socket.emit("regs", JSON.stringify(msg));
+        });
+        socket.on("stockps", data => {
+            if (data.id == 3220) {
+                const param = {
+                    time: moment(
+                        `${moment().format("YYYY-MM-DD")} ${data.time}`
+                    ).unix(),
+                    price: data.lastPrice,
+                    volume: data.lastVol
+                };
+                self.updateChartData(param);
             }
-        };
-        ws.onerror = function(e) {
-            console.log("ws-error", e);
-        };
+        });
     };
     //
     intervalHandler = self => {
