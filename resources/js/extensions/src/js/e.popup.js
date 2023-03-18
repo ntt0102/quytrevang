@@ -7,9 +7,6 @@ class Popup {
         this.global = global;
         this.callback = callback;
         this.createContainerElement();
-        this.createHearderContainer();
-        this.createLoginContainer();
-        this.createRegisterContainer();
         this.getDeviceId();
     }
 
@@ -19,6 +16,11 @@ class Popup {
         container.id = "optionViewContainer";
         document.body.append(container);
         this.containerElement = container;
+    };
+    createNoLoginElement = () => {
+        this.createHearderContainer();
+        this.createLoginContainer();
+        this.createRegisterContainer();
     };
     createHearderContainer = () => {
         var div = document.createElement("div");
@@ -198,6 +200,10 @@ class Popup {
         this.createInfoContainer();
         this.createOptionContainer();
         this.createAboutContainer();
+        //
+        this.loginContainer.style.display = "none";
+        this.registerContainer.style.display = "none";
+        this.infoContainer.style.display = "block";
     };
     createInfoContainer = () => {
         var div = document.createElement("div");
@@ -225,7 +231,7 @@ class Popup {
         label.innerText = "Tên:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.user.name;
+        value.innerText = this.global.user.name;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -235,7 +241,7 @@ class Popup {
         label.innerText = "Email:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.user.email;
+        value.innerText = this.global.user.email;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -245,7 +251,7 @@ class Popup {
         label.innerText = "Điện thoại:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.user.phone;
+        value.innerText = this.global.user.phone;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -328,9 +334,17 @@ class Popup {
         this.containerElement.append(div);
         this.optionContainer = div;
         //
-        var wrapper = document.createElement("div");
-        wrapper.className = "wrapper";
+        var wrapper = document.createElement("form");
         div.append(wrapper);
+        wrapper.id = "optionForm";
+        wrapper.className = "wrapper";
+        wrapper.addEventListener("submit", e =>
+            this.setServerConfig(e, this).then(isOk => {
+                if (isOk)
+                    this.global.alert.show("success", "Lưu cài đặt thành công");
+                else this.global.alert.show("error", "Lưu cài đặt thất bại");
+            })
+        );
         //
         var list = document.createElement("div");
         list.className = "list";
@@ -399,6 +413,34 @@ class Popup {
         item.className = "item";
         list.append(item);
         label = document.createElement("span");
+        label.innerText = "Điểm chốt lời:";
+        item.append(label);
+        var input = document.createElement("input");
+        input.type = "number";
+        input.style.width = "69px";
+        input.style.height = "21px";
+        input.value = this.global.takeProfit;
+        this.takeProfitInput = input;
+        item.append(input);
+        //
+        item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        label = document.createElement("span");
+        label.innerText = "Điểm cắt lỗ:";
+        item.append(label);
+        var input = document.createElement("input");
+        input.type = "number";
+        input.style.width = "69px";
+        input.style.height = "21px";
+        input.value = this.global.stopLoss;
+        this.stopLossInput = input;
+        item.append(input);
+        //
+        item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        label = document.createElement("span");
         label.innerText = "Hiển thị biểu đồ khối lượng:";
         item.append(label);
         input = document.createElement("input");
@@ -433,6 +475,13 @@ class Popup {
         input.value = !!this.global.isFullscreen;
         this.isFullscreenCheckbox = input;
         item.append(input);
+        //
+        var button = document.createElement("button");
+        wrapper.append(button);
+        button.id = "optionSubmit";
+        button.innerText = "LƯU CÀI ĐẶT";
+        button.type = "submit";
+        this.optionSubmit = button;
         //
         var route = document.createElement("label");
         wrapper.append(route);
@@ -572,25 +621,32 @@ class Popup {
                     if (response.ok) return response.json();
                     throw new Error(response.statusText);
                 })
-                .then(jsondata => {
-                    // console.log("register: ", jsondata);
+                .then(async json => {
+                    // console.log("register: ", json);
                     self.registerSubmit.innerText = "ĐĂNG KÝ";
                     self.registerSubmit.disabled = false;
-                    if (jsondata.isOk) {
-                        self.setToken(jsondata.token);
-                        self.user = jsondata.user;
+                    if (json.isOk) {
+                        self.setToken(json.token);
+                        self.global.accessToken = json.token.access_token;
+                        self.global.user = json.user;
+                        await self.callback.loggedin();
                         self.global.alert.show("success", "Đăng ký thành công");
+                        self.registerName.value = "";
+                        self.registerEmail.value = "";
+                        self.registerPhone.value = "";
+                        self.registerPassword.value = "";
+                        self.registerConfirmPassword.value = "";
                     } else {
-                        if (jsondata.message == "emailExist")
+                        if (json.message == "emailExist")
                             self.registerMessage.innerText =
                                 "Emai này đã đăng ký";
-                        else if (jsondata.message == "phoneExist")
+                        else if (json.message == "phoneExist")
                             self.registerMessage.innerText =
                                 "Số điện thoại này đã đăng ký";
                     }
                 })
                 .catch(error => {
-                    self.global.alert.show("error", "Đăng ký thất bại");
+                    self.global.alert.show("error", "Đăng ký lỗi");
                     self.registerSubmit.innerText = "ĐĂNG KÝ";
                     self.registerSubmit.disabled = false;
                 });
@@ -598,77 +654,68 @@ class Popup {
     };
     login = (e, self) => {
         e.preventDefault();
-        return new Promise(resolve => {
-            self.loginSubmit.innerText = "Đang đăng nhập...";
-            self.loginSubmit.disabled = true;
-            self.loginMessage.innerText = "";
-            const data = {
-                username: self.loginUsername.value,
-                password: self.loginPassword.value,
-                rememberMe: self.loginRememberMe.value,
-                deviceId: self.global.deviceId,
-                chanel: self.global.appName
-            };
-            const url = this.global.domain + this.global.endpoint.login;
-            fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
+        self.loginSubmit.innerText = "Đang đăng nhập...";
+        self.loginSubmit.disabled = true;
+        self.loginMessage.innerText = "";
+        const data = {
+            username: self.loginUsername.value,
+            password: self.loginPassword.value,
+            rememberMe: self.loginRememberMe.value,
+            deviceId: self.global.deviceId,
+            chanel: self.global.appName
+        };
+        const url = this.global.domain + this.global.endpoint.login;
+        fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        })
+            .then(response => {
+                if (response.ok) return response.json();
+                throw new Error(response.statusText);
             })
-                .then(response => {
-                    if (response.ok) return response.json();
-                    throw new Error(response.statusText);
-                })
-                .then(async jsondata => {
-                    console.log("login: ", jsondata);
-                    self.loginSubmit.innerText = "ĐĂNG NHẬP";
-                    self.loginSubmit.disabled = false;
-                    if (jsondata.isOk) {
-                        self.setToken(jsondata.token);
-                        self.user = jsondata.user;
-                        self.loginUsername.value = "";
-                        self.loginPassword.value = "";
-                        self.loginContainer.style.display = "none";
-                        self.infoContainer.style.display = "block";
-                        await self.callback.loggedin();
-                    } else {
-                        if (jsondata.message == "unauthorized")
-                            self.loginMessage.innerText =
-                                "Sai thông tin đăng nhập";
-                        else if (jsondata.message == "unsetup")
-                            self.loginMessage.innerText =
-                                "Lỗi khởi tạo tài khoản";
-                        else if (jsondata.message == "expired")
-                            self.loginMessage.innerText =
-                                "Quá hạn sử dụng dịch vụ";
-                        else if (jsondata.message == "deviceLimit")
-                            self.loginMessage.innerText =
-                                "Quá giới hạn thiết bị";
-                    }
-                    //
-                    resolve();
-                })
-                .catch(error => resolve(false));
-        });
+            .then(async json => {
+                // console.log("login: ", json);
+                self.loginSubmit.innerText = "ĐĂNG NHẬP";
+                self.loginSubmit.disabled = false;
+                if (json.isOk) {
+                    self.setToken(json.token);
+                    self.global.accessToken = json.token.access_token;
+                    self.global.user = json.user;
+                    self.loginUsername.value = "";
+                    self.loginPassword.value = "";
+                    await self.callback.loggedin();
+                } else {
+                    if (json.message == "unauthorized")
+                        self.loginMessage.innerText = "Sai thông tin đăng nhập";
+                    else if (json.message == "unsetup")
+                        self.loginMessage.innerText = "Lỗi khởi tạo tài khoản";
+                    else if (json.message == "expired")
+                        self.loginMessage.innerText = "Quá hạn sử dụng dịch vụ";
+                    else if (json.message == "deviceLimit")
+                        self.loginMessage.innerText = "Quá giới hạn thiết bị";
+                }
+            })
+            .catch(error => {
+                self.global.alert.show("error", "Đăng nhập lỗi");
+                self.loginSubmit.innerText = "ĐĂNG NHẬP";
+                self.loginSubmit.disabled = false;
+            });
     };
     logout = self => {
-        return new Promise(resolve => {
-            const accessToken = self.getToken();
-            const url = this.global.domain + this.global.endpoint.logout;
-            fetch(url, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }).then(() => {
-                self.removeToken();
-                self.infoContainer.style.display = "none";
-                self.loginContainer.style.display = "block";
-                self.callback.loggedout();
-                self.loginUsername.focus();
-                resolve();
-            });
+        const url = this.global.domain + this.global.endpoint.logout;
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${self.global.accessToken}`
+            }
+        }).then(() => {
+            self.removeToken();
+            self.infoContainer.style.display = "none";
+            self.loginContainer.style.display = "block";
+            self.callback.loggedout();
+            self.loginUsername.focus();
         });
     };
     getUser = () => {
@@ -704,8 +751,9 @@ class Popup {
             fetch(file)
                 .then(response => response.json())
                 .then(json => {
-                    console.log("localConfig", json);
-                    this.global = { ...this.global, ...json };
+                    // console.log("localConfig", json);
+                    for (const key in json) this.global[key] = json[key];
+
                     resolve();
                 })
                 .catch(() => {
@@ -719,7 +767,7 @@ class Popup {
     };
     getServerConfig = () => {
         return new Promise((resolve, reject) => {
-            const url = this.global.domain + this.global.endpoint.setConfig;
+            const url = this.global.domain + this.global.endpoint.getConfig;
             fetch(url, {
                 method: "POST",
                 headers: {
@@ -731,17 +779,58 @@ class Popup {
                 .then(response => response.json())
                 .then(json => {
                     console.log("serverConfig", json);
-                    this.global = { ...this.global, ...json };
+                    for (const key in json) {
+                        if (key == "endpoint")
+                            this.global.endpoint.socket = json.endpoint.socket;
+                        else this.global[key] = json[key];
+                    }
                     //
                     resolve();
+                })
+                .catch(err => {
+                    console.log(err);
+                    var choice = confirm(
+                        "Get server config error. Refresh now?"
+                    );
+                    if (choice) location.reload();
                 });
-            // .catch(err => {
-            //     console.log(err);
-            //     var choice = confirm(
-            //         "Get server config error. Refresh now?"
-            //     );
-            //     if (choice) location.reload();
-            // });
+        });
+    };
+    setServerConfig = (e, self) => {
+        e.preventDefault();
+        return new Promise(resolve => {
+            self.optionSubmit.innerText = "Đang lưu cài đặt...";
+            self.optionSubmit.disabled = true;
+            const data = {
+                timeFrame: self.timeFrameSelect.value,
+                chartType: self.chartTypeSelect.value,
+                contractNumber: self.contractNumberInput.value,
+                takeProfit: self.takeProfitInput.deviceId,
+                stopLoss: self.stopLossInput.appName,
+                isVolume: self.isVolumeCheckbox.appName,
+                isViewChart: self.isViewChartCheckbox.appName,
+                isFullscreen: self.isFullscreenCheckbox.appName
+            };
+            const url = this.global.domain + this.global.endpoint.setConfig;
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${self.global.accessToken}`
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) return response.json();
+                    throw new Error(response.statusText);
+                })
+                .then(async json => {
+                    console.log("setConfig: ", json);
+                    self.loginSubmit.innerText = "LƯU CÀI ĐẶT";
+                    self.loginSubmit.disabled = false;
+                    resolve(json.isOk);
+                });
+            // .catch(error => resolve(false));
         });
     };
     setToken = token =>

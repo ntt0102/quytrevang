@@ -365,7 +365,7 @@ class Chart {
             case "order":
                 if (newPrice != oldPrice) {
                     var isChanged = false;
-                    const position = self.getOrderPosition();
+                    const position = self.callback.getOrderPosition();
                     if (line.kind == "entry") {
                         if (!position) {
                             isChanged = true;
@@ -438,7 +438,7 @@ class Chart {
     };
     //
     showOrderButton = () => {
-        if (this.getOrderPosition()) {
+        if (this.callback.getOrderPosition()) {
             // if (this.order.entry.hasOwnProperty("line")) {
             if (!this.order.tp.hasOwnProperty("line")) {
                 this.tpslOrderButton.style.left =
@@ -801,7 +801,7 @@ class Chart {
                 this.order[item.kind].price = item.price;
                 this.drawOrderLine(item.kind);
                 if (item.kind == "entry") {
-                    if (this.getOrderPosition()) {
+                    if (this.callback.getOrderPosition()) {
                         this.order.entry.line.applyOptions({
                             draggable: false
                         });
@@ -898,7 +898,7 @@ class Chart {
     };
     //
     intervalHandler = self => {
-        if (self.getOrderPosition()) {
+        if (self.callback.getOrderPosition()) {
             if (
                 self.order.entry.hasOwnProperty("line") &&
                 !self.order.tp.hasOwnProperty("line")
@@ -938,13 +938,12 @@ class Chart {
             });
         }
         //
-        if (self.moment().unix() == self.global.time.start)
-            self.connectSocket();
+        if (moment().unix() == self.global.time.start) self.connectSocket();
     };
     refreshDataInSession = self => {
         if (
-            self.moment().unix() >= self.global.time.start &&
-            self.moment().unix() <= self.global.time.end
+            moment().unix() >= self.global.time.start &&
+            moment().unix() <= self.global.time.end
         ) {
             self.loadChartData();
             return true;

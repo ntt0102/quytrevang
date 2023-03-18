@@ -18,20 +18,20 @@ class Menu {
     };
     createLoggedinElement = () => {
         var button = document.createElement("button");
-        button.id = "tradingViewButton";
-        button.classList = "fa fa-bar-chart";
-        button.title = "TradingView Chart";
-        button.addEventListener("click", this.callback.toggleTradingViewChart);
-        this.containerElement.append(button);
-        this.tradingViewButton = button;
-        //
-        var button = document.createElement("button");
         button.id = "lightWeightButton";
         button.classList = "fa fa-line-chart";
         button.title = "LightWeight Chart";
         button.addEventListener("click", this.callback.toggleLightWeightChart);
-        this.containerElement.append(button);
+        this.containerElement.prepend(button);
         this.lightWeightButton = button;
+        //
+        var button = document.createElement("button");
+        button.id = "tradingViewButton";
+        button.classList = "fa fa-bar-chart";
+        button.title = "TradingView Chart";
+        button.addEventListener("click", this.callback.toggleTradingViewChart);
+        this.containerElement.prepend(button);
+        this.tradingViewButton = button;
         //
         var button = document.createElement("button");
         button.id = "reportButton";
@@ -43,7 +43,7 @@ class Menu {
         //
         this.interval = setInterval(() => {
             this.blinkLightWeightButton(this);
-            if (this.moment().unix() == this.global.time.end)
+            if (moment().unix() == this.global.time.end)
                 this.reportTradingResult(this);
         }, 1000);
     };

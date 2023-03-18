@@ -7,17 +7,13 @@
     "domain": "https://quytrevang.nguyenvanxuanphu.com",
     "domain1": "http://localhost",
     "endpoint": {
-        "setConfig": "/api/smart-order/get-config",
-        "getConfig": "/api/smart-order/set-config",
+        "getConfig": "/api/smart-order/get-config",
+        "setConfig": "/api/smart-order/set-config",
         "getChart": "/api/smart-order/get-chart",
         "report": "/api/smart-order/report",
         "register": "/api/auth/create-account",
         "login": "/api/auth/login",
         "logout": "/api/auth/logout",
         "user": "/api/auth/user"
-    },
-    "order": {
-        "TP": 3,
-        "SL": 2
     }
 }

@@ -9,14 +9,14 @@
   "content_scripts": [
     {
       "matches": [
-        "https://smartpro.vps.com.vn/v1/"
+        "https://smarteasy.vps.com.vn/v1/"
       ],
       "js": [
         "js/moment.min.js",
         "js/fingerprintjs.min.js",
         "js/lightweight-charts.min.js",
         "js/simple-notify.min.js",
-        "js/google-protobuf.min.js",
+        "js/socket.io.min.js",
         "js/main.min.js"
       ],
       "css": [
@@ -35,7 +35,7 @@
         "alert.wav"
       ],
       "matches": [
-        "https://smartpro.vps.com.vn/*"
+        "https://smarteasy.vps.com.vn/*"
       ]
     }
   ]

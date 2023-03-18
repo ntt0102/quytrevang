@@ -1,7 +1,6 @@
 class SmartOrder {
     // Hàm khởi tạo
     constructor() {
-        goog.require("proto.tcbs.BuySellActivePojo");
         this.global = new Object();
         this.global.alert = new Alert();
         this.global.store = new Store();
@@ -31,11 +30,16 @@ class SmartOrder {
     init = async () => {
         this.global.alert.show(
             "warning",
-            "Đang khởi tạo SmartOrder, vui lòng đợi...",
+            "Đang khởi tạo SmartOrder ...",
             false
         );
+        await this.popup.getLocalConfig();
+        console.log("global-local: ", this.global);
+        this.popup.createNoLoginElement();
         await this.popup.getUser();
         if (this.global.isLoggedin) {
+            await this.popup.getServerConfig();
+            console.log("global-server: ", this.global);
             await this.loggedinCallback();
             document.getElementById(
                 "sohopdong"
@@ -72,18 +76,18 @@ class SmartOrder {
         if (document.body.classList.contains("tradingview-chart")) {
             document.body.classList.remove("tradingview-chart");
             document.body.classList.remove("full-chart");
-            leftEl.innerText = "Lệnh thường";
-            rightEl.innerText = "Lệnh điều kiện";
-            orderEl.innerText = "DANH SÁCH LỆNH";
-            condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            // leftEl.innerText = "Lệnh thường";
+            // rightEl.innerText = "Lệnh điều kiện";
+            // orderEl.innerText = "DANH SÁCH LỆNH";
+            // condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
             document.body.classList.add("tradingview-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("lightweight-chart");
-            leftEl.innerText = "LT";
-            rightEl.innerText = "LĐK";
-            orderEl.innerText = "LỆNH THƯỜNG";
-            condOrderEl.innerText = "L. ĐIỀU KIỆN";
+            // leftEl.innerText = "LT";
+            // rightEl.innerText = "LĐK";
+            // orderEl.innerText = "LỆNH THƯỜNG";
+            // condOrderEl.innerText = "L. ĐIỀU KIỆN";
         }
     };
     toggleLightWeightCallback = () => {
@@ -98,24 +102,24 @@ class SmartOrder {
         if (document.body.classList.contains("lightweight-chart")) {
             document.body.classList.remove("lightweight-chart");
             document.body.classList.remove("full-chart");
-            leftEl.innerText = "Lệnh thường";
-            rightEl.innerText = "Lệnh điều kiện";
-            //
-            orderEl.classList.remove("fa", "fa-check-circle");
-            orderEl.innerText = "DANH SÁCH LỆNH";
-            condOrderEl.classList.remove("fa", "fa-question-circle");
-            condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            // leftEl.innerText = "Lệnh thường";
+            // rightEl.innerText = "Lệnh điều kiện";
+            // //
+            // orderEl.classList.remove("fa", "fa-check-circle");
+            // orderEl.innerText = "DANH SÁCH LỆNH";
+            // condOrderEl.classList.remove("fa", "fa-question-circle");
+            // condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
             document.body.classList.add("lightweight-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("tradingview-chart");
-            leftEl.innerText = "LT";
-            rightEl.innerText = "LĐK";
-            //
-            orderEl.classList.add("fa", "fa-check-circle");
-            orderEl.innerText = "";
-            condOrderEl.classList.add("fa", "fa-question-circle");
-            condOrderEl.innerText = "";
+            // leftEl.innerText = "LT";
+            // rightEl.innerText = "LĐK";
+            // //
+            // orderEl.classList.add("fa", "fa-check-circle");
+            // orderEl.innerText = "";
+            // condOrderEl.classList.add("fa", "fa-question-circle");
+            // condOrderEl.innerText = "";
         }
     };
     getReportDataCallback = () => {
