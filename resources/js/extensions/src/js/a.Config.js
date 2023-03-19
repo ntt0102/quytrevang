@@ -17,7 +17,7 @@ class Co {
         logout: "/api/auth/logout",
         user: "/api/auth/user"
     };
-    timeFrames = [
+    timFrs = [
         { text: "Tick", value: 0 },
         { text: "1 min", value: 1 },
         { text: "2 min", value: 2 },
@@ -29,7 +29,7 @@ class Co {
         { text: "30 min", value: 30 },
         { text: "1 day", value: 1440 }
     ];
-    chartTypes = [
+    chaTys = [
         { text: "Nến", value: "candlestick" },
         { text: "Đường", value: "line" },
         { text: "Thanh", value: "bar" }

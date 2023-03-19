@@ -26,7 +26,6 @@ class Me {
         this.ligWeBu = button;
         //
         var button = document.createElement("button");
-        button.id = "tradingViewButton";
         button.classList = "fa fa-bar-chart";
         button.title = "TradingView Chart";
         button.addEventListener("click", this.cb.tTrViCh);

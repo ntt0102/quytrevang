@@ -25,9 +25,9 @@ class Ch {
 
     // Các phương thức
     c = () => {
-        this.timeFrame = this.g.timeFrame;
-        this.chartType = this.g.chartType;
-        console.log("this.chartType: ", this.chartType);
+        this.timFr = this.g.timeFrame;
+        this.chaTy = this.g.chartType;
+        console.log("this.chaTy: ", this.chaTy);
         this.cCoEl();
         this.cCh();
         this.cDaAr();
@@ -107,7 +107,7 @@ class Ch {
         this.ch.timeScale().fitContent();
     };
     cPrSe = () => {
-        switch (this.chartType) {
+        switch (this.chaTy) {
             case "candlestick":
                 this.se.price = this.ch.addCandlestickSeries({
                     priceFormat: { minMove: 0.1 }
@@ -156,15 +156,15 @@ class Ch {
         select.id = "chartTypeSelect";
         select.className = "command";
         select.title = "Loại biểu đồ giá";
-        this.g.chartTypes.forEach((item, index) => {
+        this.g.chaTys.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
             select.appendChild(option);
         });
-        select.value = this.chartType;
+        select.value = this.chaTy;
         select.addEventListener("change", e => {
-            this.chartType = e.target.value;
+            this.chaTy = e.target.value;
             this.ch.remove();
             this.cCh();
             this.se.price.setData(this.da.price);
@@ -178,22 +178,21 @@ class Ch {
         select.id = "timeFrameSelect";
         select.className = "command";
         select.title = "Khung thời gian [Ctrl+0]";
-        this.g.timeFrames.forEach((item, index) => {
+        this.g.timFrs.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
             select.appendChild(option);
         });
-        select.value = this.timeFrame;
+        select.value = this.timFr;
         select.addEventListener("change", e => {
-            this.timeFrame = e.target.value;
+            this.timFr = e.target.value;
             this.lChDa().then(() => this.ch.timeScale().resetTimeScale());
         });
         container.append(select);
         this.timFrSe = select;
         //
         var button = document.createElement("div");
-        button.id = "refreshButton";
         button.className = "command fa fa-refresh";
         button.title = "Làm mới [Ctrl+M]";
         button.addEventListener("click", () => this.lChDa());
@@ -201,7 +200,6 @@ class Ch {
         this.refBu = button;
         //
         var button = document.createElement("div");
-        button.id = "clearButton";
         button.className = "command fa fa-trash";
         button.title = "Xoá ngày khác [Ctrl+,]";
         button.addEventListener("click", () => {
@@ -218,7 +216,6 @@ class Ch {
         this.conEl.append(container);
         //
         var button = document.createElement("div");
-        button.id = "drawLineButton";
         button.className = "command fa fa-minus";
         button.title = "Vẽ đường ngang [Ctrl+K][Ctrl+Shift+K]";
         button.addEventListener("click", e => {
@@ -239,7 +236,6 @@ class Ch {
         this.draLiBu = button;
         //
         var button = document.createElement("div");
-        button.id = "draMaBu";
         button.className = "command fa fa-map-marker";
         button.title = "Vẽ đánh dấu [Ctrl+L][Ctrl+Shift+L]";
         button.addEventListener("click", e => {
@@ -260,7 +256,6 @@ class Ch {
         this.draMaBu = button;
         //
         var button = document.createElement("div");
-        button.id = "draRuBu";
         button.className = "command fa fa-arrows-v";
         button.title = "Thước đo giá [Ctrl+;][Ctrl+Shift+;]";
         button.addEventListener("click", e => {
@@ -284,7 +279,6 @@ class Ch {
         this.draRuBu = button;
         //
         var button = document.createElement("div");
-        button.id = "draAlBu";
         button.className = "command fa fa-bell-o";
         button.title = "Đặt cảnh báo [Ctrl+'][Ctrl+Shift+']";
         button.addEventListener("click", e => {
@@ -310,12 +304,10 @@ class Ch {
         this.conEl.append(container);
         //
         var p = document.createElement("p");
-        p.id = "priceLegendP";
         container.append(p);
         this.priLeP = p;
         //
         var p = document.createElement("p");
-        p.id = "volumeLegendP";
         p.style.display = this.g.isVolume ? "block" : "none";
         container.append(p);
         this.volLeP = p;
@@ -748,7 +740,7 @@ class Ch {
         const lastPrice = this.da.price.slice(-1)[0];
         const lastVolume = this.da.volume.slice(-1)[0];
         //
-        if (this.timeFrame > 0) {
+        if (this.timFr > 0) {
             this.se.price.setData(this.da.price);
             this.se.volume.setData(this.da.volume);
         } else {
@@ -793,8 +785,8 @@ class Ch {
             openPrice = 0,
             highPrice = 0,
             lowPrice = 0;
-        if (this.timeFrame > 0) {
-            const period = 60 * this.timeFrame;
+        if (this.timFr > 0) {
+            const period = 60 * this.timFr;
             const timeIndex = Math.floor(time / period);
             var isSameTime = false;
             if (!!r.price.length) {
@@ -1025,43 +1017,43 @@ class Ch {
                             self.draAlBu.click();
                             break;
                         case 96:
-                            self.timFrSe.value = self.g.timeFrames[0].value;
+                            self.timFrSe.value = self.g.timFrs[0].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 97:
-                            self.timFrSe.value = self.g.timeFrames[1].value;
+                            self.timFrSe.value = self.g.timFrs[1].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 98:
-                            self.timFrSe.value = self.g.timeFrames[2].value;
+                            self.timFrSe.value = self.g.timFrs[2].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 99:
-                            self.timFrSe.value = self.g.timeFrames[3].value;
+                            self.timFrSe.value = self.g.timFrs[3].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 100:
-                            self.timFrSe.value = self.g.timeFrames[4].value;
+                            self.timFrSe.value = self.g.timFrs[4].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 101:
-                            self.timFrSe.value = self.g.timeFrames[5].value;
+                            self.timFrSe.value = self.g.timFrs[5].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 102:
-                            self.timFrSe.value = self.g.timeFrames[6].value;
+                            self.timFrSe.value = self.g.timFrs[6].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 103:
-                            self.timFrSe.value = self.g.timeFrames[7].value;
+                            self.timFrSe.value = self.g.timFrs[7].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 104:
-                            self.timFrSe.value = self.g.timeFrames[8].value;
+                            self.timFrSe.value = self.g.timFrs[8].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 105:
-                            self.timFrSe.value = self.g.timeFrames[9].value;
+                            self.timFrSe.value = self.g.timFrs[9].value;
                             self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 77:

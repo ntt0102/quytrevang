@@ -35,7 +35,6 @@ class Po {
     };
     cLoCo = () => {
         var div = document.createElement("div");
-        div.id = "loginContainer";
         div.className = "section";
         div.style.display = this.g.isLi ? "none" : "block";
         this.conEl.append(div);
@@ -43,7 +42,6 @@ class Po {
         //
         var wrapper = document.createElement("form");
         div.append(wrapper);
-        wrapper.id = "loginForm";
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e => this.lIn(e, this));
         //
@@ -54,7 +52,6 @@ class Po {
         //
         var input = document.createElement("input");
         wrapper.append(input);
-        input.id = "loginUsername";
         input.type = "text";
         input.placeholder = "Email hoặc Số điện thoại";
         input.required = true;
@@ -63,7 +60,6 @@ class Po {
         //
         input = document.createElement("input");
         wrapper.append(input);
-        input.id = "loginPassword";
         input.type = "password";
         input.placeholder = "Mật khẩu";
         input.required = true;
@@ -83,7 +79,6 @@ class Po {
         //
         var button = document.createElement("button");
         wrapper.append(button);
-        button.id = "loginSubmit";
         button.innerText = "ĐĂNG NHẬP";
         button.type = "submit";
         this.logSu = button;
@@ -110,7 +105,6 @@ class Po {
     };
     cReCo = () => {
         var div = document.createElement("div");
-        div.id = "registerContainer";
         div.className = "section";
         div.style.display = "none";
         this.conEl.append(div);
@@ -118,7 +112,6 @@ class Po {
         //
         var wrapper = document.createElement("form");
         div.append(wrapper);
-        wrapper.id = "registerForm";
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e => this.rAc(e, this));
         //
@@ -129,7 +122,6 @@ class Po {
         //
         var input = document.createElement("input");
         wrapper.append(input);
-        input.id = "registerName";
         input.type = "text";
         input.placeholder = "Tên";
         input.required = true;
@@ -137,7 +129,6 @@ class Po {
         //
         input = document.createElement("input");
         wrapper.append(input);
-        input.id = "registerEmail";
         input.type = "email";
         input.placeholder = "Email";
         input.required = true;
@@ -145,7 +136,6 @@ class Po {
         //
         input = document.createElement("input");
         wrapper.append(input);
-        input.id = "registerPhone";
         input.type = "text";
         input.placeholder = "Số điện thoại";
         input.required = true;
@@ -155,7 +145,6 @@ class Po {
         //
         input = document.createElement("input");
         wrapper.append(input);
-        input.id = "registerPassword";
         input.type = "password";
         input.placeholder = "Mật khẩu";
         input.required = true;
@@ -163,7 +152,6 @@ class Po {
         //
         input = document.createElement("input");
         wrapper.append(input);
-        input.id = "registerConfirmPassword";
         input.type = "password";
         input.placeholder = "Xác nhận mật khẩu";
         input.required = true;
@@ -171,7 +159,6 @@ class Po {
         //
         var button = document.createElement("button");
         wrapper.append(button);
-        button.id = "registerSubmit";
         button.innerText = "ĐĂNG KÝ";
         button.type = "submit";
         this.regSu = button;
@@ -207,7 +194,6 @@ class Po {
     };
     cInCo = () => {
         var div = document.createElement("div");
-        div.id = "infoContainer";
         div.className = "section";
         div.style.display = this.g.isLi ? "block" : "none";
         this.conEl.append(div);
@@ -336,7 +322,6 @@ class Po {
         //
         var wrapper = document.createElement("form");
         div.append(wrapper);
-        wrapper.id = "optionForm";
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e =>
             this.sSeCo(e, this).then(isOk => {
@@ -361,7 +346,7 @@ class Po {
         item.append(label);
         var select = document.createElement("select");
         select.style.width = "69px";
-        this.g.timeFrames.forEach((item, index) => {
+        this.g.timFrs.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
@@ -378,7 +363,7 @@ class Po {
         label.innerText = "Loại biểu đồ:";
         item.append(label);
         select = document.createElement("select");
-        this.g.chartTypes.forEach((item, index) => {
+        this.g.chaTys.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
@@ -458,7 +443,6 @@ class Po {
         //
         var button = document.createElement("button");
         wrapper.append(button);
-        button.id = "optionSubmit";
         button.innerText = "LƯU CÀI ĐẶT";
         button.type = "submit";
         this.optSu = button;
@@ -474,7 +458,6 @@ class Po {
     };
     cAbCo = () => {
         var div = document.createElement("div");
-        div.id = "aboutContainer";
         div.className = "section";
         div.style.display = "none";
         this.conEl.append(div);

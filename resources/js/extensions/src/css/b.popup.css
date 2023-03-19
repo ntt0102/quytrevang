@@ -91,23 +91,9 @@
 #optionViewContainer .download {
     display: flex;
     flex-direction: column;
-    /* justify-content: space-between; */
     text-align: center;
 }
 
 #optionViewContainer .link:hover {
     text-decoration: underline;
 }
-
-/* #loginContainer {
-    background-color: aquamarine;
-}
-#registerContainer {
-    background-color: blueviolet;
-}
-#infoContainer {
-    background-color: chocolate;
-}
-#optionContainer {
-    background-color: yellowgreen;
-} */
