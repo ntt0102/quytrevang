@@ -360,13 +360,7 @@ class Popup {
         item.append(label);
         var select = document.createElement("select");
         select.style.width = "69px";
-        [
-            { text: "Tick", value: 0 },
-            { text: "1 min", value: 1 },
-            { text: "5 min", value: 5 },
-            { text: "30 min", value: 30 },
-            { text: "1 day", value: 1440 }
-        ].forEach((item, index) => {
+        this.global.timeFrames.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
@@ -383,11 +377,7 @@ class Popup {
         label.innerText = "Loại biểu đồ:";
         item.append(label);
         select = document.createElement("select");
-        [
-            { text: "Đường", value: 0 },
-            { text: "Nến", value: 1 },
-            { text: "Thanh", value: 2 }
-        ].forEach((item, index) => {
+        this.global.chartTypes.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;

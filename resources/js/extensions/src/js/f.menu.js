@@ -33,13 +33,17 @@ class Menu {
         this.containerElement.prepend(button);
         this.tradingViewButton = button;
         //
-        var button = document.createElement("button");
-        button.id = "reportButton";
-        button.classList = "fa fa-flag-checkered";
-        button.title = "Report";
-        button.addEventListener("click", () => this.reportTradingResult(this));
-        this.containerElement.append(button);
-        this.reportButton = button;
+        if (this.global.isOpeningMarket) {
+            var button = document.createElement("button");
+            button.id = "reportButton";
+            button.classList = "fa fa-flag-checkered";
+            button.title = "Report";
+            button.addEventListener("click", () =>
+                this.reportTradingResult(this)
+            );
+            this.containerElement.append(button);
+            this.reportButton = button;
+        }
         //
         this.interval = setInterval(() => {
             this.blinkLightWeightButton(this);

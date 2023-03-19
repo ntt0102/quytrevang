@@ -17,23 +17,29 @@ class Chart {
     constructor(global, callback) {
         this.global = global;
         this.callback = callback;
-        this.timeFrame = global.timeFrame;
         this.global.toggleSpinner = this.toggleSpinner;
         this.alertAudio.loop = true;
     }
 
     // Các phương thức
     createChart = () => {
+        this.timeFrame = this.global.timeFrame;
         this.createLightWeightChart();
         this.createDataArea();
         this.createToolArea();
         this.createLegendArea();
         this.createFreeArea();
-        this.secInterval = setInterval(() => this.intervalHandler(this), 1000);
-        this.minInterval = setInterval(
-            () => this.refreshDataInSession(this),
-            60000
-        );
+        if (this.global.isOpeningMarket) {
+            this.secInterval = setInterval(
+                () => this.secIntervalHandler(this),
+                1000
+            );
+            this.minInterval = setInterval(
+                () => this.minIntervalHandler(this),
+                60000
+            );
+            this.connectSocket();
+        }
         window.addEventListener("resize", () => this.resize(this));
         window.addEventListener("keydown", e => this.keyEvent(e, this));
     };
@@ -115,6 +121,7 @@ class Chart {
         input.type = "date";
         input.value = moment().format("YYYY-MM-DD");
         input.className = "command";
+        input.title = "Dữ liệu của ngày";
         input.addEventListener("change", e => {
             if (!!e.target.value) this.loadChartData();
         });
@@ -124,13 +131,8 @@ class Chart {
         var select = document.createElement("select");
         select.id = "timeFrameSelect";
         select.className = "command";
-        [
-            { text: "Tick", value: 0 },
-            { text: "1 min", value: 1 },
-            { text: "5 min", value: 5 },
-            { text: "30 min", value: 30 },
-            { text: "1 day", value: 1440 }
-        ].forEach((item, index) => {
+        select.title = "Khung thời gian [Ctrl+0]";
+        this.global.timeFrames.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
@@ -144,23 +146,26 @@ class Chart {
             );
         });
         container.append(select);
+        this.timeFrameSelect = select;
         //
         var button = document.createElement("div");
         button.id = "refreshButton";
         button.className = "command fa fa-refresh";
-        button.title = "Refresh chart";
+        button.title = "Làm mới [Ctrl+M]";
         button.addEventListener("click", () => this.loadChartData());
         container.append(button);
+        this.refreshButton = button;
         //
         var button = document.createElement("div");
         button.id = "clearButton";
         button.className = "command fa fa-trash";
-        button.title = "Delete local data";
+        button.title = "Xoá ngày khác [Ctrl+,]";
         button.addEventListener("click", () => {
             this.global.store.clear("data");
             this.loadChartData();
         });
         container.append(button);
+        this.clearButton = button;
     };
     createToolArea = () => {
         var container = document.createElement("div");
@@ -171,6 +176,7 @@ class Chart {
         var button = document.createElement("div");
         button.id = "drawLineButton";
         button.className = "command fa fa-minus";
+        button.title = "Vẽ đường ngang [Ctrl+K][Ctrl+Shift+K]";
         button.addEventListener("click", e => {
             const selected = e.target.classList.contains("selected");
             document
@@ -191,6 +197,7 @@ class Chart {
         var button = document.createElement("div");
         button.id = "drawMarkerButton";
         button.className = "command fa fa-map-marker";
+        button.title = "Vẽ đánh dấu [Ctrl+L][Ctrl+Shift+L]";
         button.addEventListener("click", e => {
             const selected = e.target.classList.contains("selected");
             document
@@ -211,6 +218,7 @@ class Chart {
         var button = document.createElement("div");
         button.id = "drawRulerButton";
         button.className = "command fa fa-arrows-v";
+        button.title = "Thước đo giá [Ctrl+;][Ctrl+Shift+;]";
         button.addEventListener("click", e => {
             const selected = e.target.classList.contains("selected");
             document
@@ -234,6 +242,7 @@ class Chart {
         var button = document.createElement("div");
         button.id = "drawAlertButton";
         button.className = "command fa fa-bell-o";
+        button.title = "Đặt cảnh báo [Ctrl+'][Ctrl+Shift+']";
         button.addEventListener("click", e => {
             const selected = e.target.classList.contains("selected");
             document
@@ -274,8 +283,8 @@ class Chart {
         button.innerText = "X";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.closePosition();
-            this.cancelOrder();
+            this.callback.closePosition();
+            this.callback.cancelOrder();
             this.toggleCancelOrderButton(false);
             this.removeOrderLine("entry");
             this.removeOrderLine("tp");
@@ -290,7 +299,7 @@ class Chart {
         button.innerText = "Entry";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.orderEntryPrice(this.order);
+            this.callback.orderEntryPrice(this.order);
             this.drawOrderLine("entry");
             this.toggleCancelOrderButton(true);
             this.hideOrderButton();
@@ -303,9 +312,9 @@ class Chart {
         button.innerText = "TP/SL";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.orderTpPrice(this.order, true);
+            this.callback.orderTpPrice(this.order, true);
             this.drawOrderLine("tp");
-            this.orderSlPrice(this.order, true);
+            this.callback.orderSlPrice(this.order, true);
             this.drawOrderLine("sl");
             this.hideOrderButton();
         });
@@ -357,37 +366,36 @@ class Chart {
         }
     };
     priceLineDrag = (e, self) => {
-        var line = e.customPriceLine.options();
-        line.price = self.formatPrice(line.price);
+        var line = e.customPriceLine;
+        var lineOptions = line.options();
+        lineOptions.price = self.formatPrice(lineOptions.price);
         const oldPrice = +e.fromPriceString;
-        const newPrice = line.price;
-        switch (line.lineType) {
+        const newPrice = lineOptions.price;
+        switch (lineOptions.lineType) {
             case "order":
                 if (newPrice != oldPrice) {
                     var isChanged = false;
                     const position = self.callback.getOrderPosition();
-                    if (line.kind == "entry") {
+                    if (lineOptions.kind == "entry") {
                         if (!position) {
                             isChanged = true;
-                            self.order[line.kind].price = newPrice;
-                            self.orderEntryPrice(self.order);
-                            self.drawOrderLine(line.kind);
+                            self.order[lineOptions.kind].price = newPrice;
+                            self.callback.orderEntryPrice(self.order);
+                            self.drawOrderLine(lineOptions.kind);
                         }
                     } else {
                         if (self.order.side * position > 0) {
                             isChanged = true;
-                            self.order[line.kind].price = newPrice;
-                            if (line.kind == "tp")
-                                self.orderTpPrice(self.order);
-                            else self.orderSlPrice(self.order);
-                            drawOrderLine(line.kind);
+                            self.order[lineOptions.kind].price = newPrice;
+                            if (lineOptions.kind == "tp")
+                                self.callback.orderTpPrice(self.order);
+                            else self.callback.orderSlPrice(self.order);
+                            drawOrderLine(lineOptions.kind);
                         }
                     }
                     //
                     if (!isChanged) {
-                        self.order[line.kind].line.applyOptions({
-                            price: oldPrice
-                        });
+                        line.applyOptions({ price: oldPrice });
                         self.global.alert.show(
                             "warning",
                             "Không được thay đổi."
@@ -400,29 +408,26 @@ class Chart {
                     price: oldPrice,
                     removed: true
                 });
-                self.global.store.set("line", line);
+                self.global.store.set("line", lineOptions);
                 self.drawLineButton.classList.remove("selected");
                 break;
             case "ruler":
-                if (line.point == 1) {
-                    self.global.store.set("ruler", line);
+                if (lineOptions.point == 1) {
+                    self.global.store.set("ruler", lineOptions);
                     if (self.ruler.point == 2) {
                         const distance = +self.ruler.end.options().title;
                         const endPrice = +(newPrice + distance).toFixed(1);
-                        self.ruler.end.applyOptions({
-                            price: endPrice
-                        });
+                        self.ruler.end.applyOptions({ price: endPrice });
                         self.global.store.set(
                             "ruler",
                             self.ruler.end.options()
                         );
                     }
                 } else {
-                    self.global.store.set("ruler", line);
                     const startPrice = +self.ruler.start.options().price;
-                    self.ruler.end.applyOptions({
-                        title: (newPrice - startPrice).toFixed(1)
-                    });
+                    const distance = (newPrice - startPrice).toFixed(1);
+                    line.applyOptions({ title: distance });
+                    self.global.store.set("ruler", line.options());
                 }
                 break;
             case "alert":
@@ -431,7 +436,10 @@ class Chart {
                     price: oldPrice,
                     removed: true
                 });
-                self.global.store.set("alert", line);
+                const currentPrice = self.data.price.slice(-1)[0].value;
+                var title = newPrice >= currentPrice ? ">" : "<";
+                line.applyOptions({ title: title });
+                self.global.store.set("alert", line.options());
                 self.drawAlertButton.classList.remove("selected");
                 break;
         }
@@ -843,45 +851,14 @@ class Chart {
             resolve();
         });
     };
-    // connectSocket = () => {
-    //     var self = this;
-    //     var ws = new WebSocket(self.global.endpoint.socket);
-    //     ws.onopen = function(e) {
-    //         ws.send(`d|st|C001|${self.global.symbol}`);
-    //     };
-    //     ws.onclose = function(e) {
-    //         // console.log("ws-close", e);
-    //         if (self.refreshDataInSession(self)) self.connectSocket();
-    //     };
-    //     ws.onmessage = function(e) {
-    //         const t = e.data.split("|");
-    //         if (t[0] == "C001") {
-    //             // console.log("ws-message", e.data);
-    //             const message = proto.tcbs.BuySellActivePojo.deserializeBinary(
-    //                 self.base64ToArrayUnit8(t[2])
-    //             ).toObject();
-    //             // console.log("message: ", message);
-    //             const param = {
-    //                 time: message.timesec,
-    //                 price: message.closeprice,
-    //                 volume: message.closevol,
-    //                 action: message.action
-    //             };
-    //             self.updateChartData(param);
-    //         }
-    //     };
-    //     ws.onerror = function(e) {
-    //         console.log("ws-error", e);
-    //     };
-    // };
     connectSocket = () => {
         var self = this;
         var msg = { action: "join", list: self.global.symbol };
         var socket = io(self.global.endpoint.socket);
         socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
         socket.on("reconnect", () => {
-            if (self.refreshDataInSession(self))
-                socket.emit("regs", JSON.stringify(msg));
+            self.loadChartData();
+            if (self.inSession()) socket.emit("regs", JSON.stringify(msg));
         });
         socket.on("stockps", data => {
             if (data.id == 3220) {
@@ -897,15 +874,15 @@ class Chart {
         });
     };
     //
-    intervalHandler = self => {
+    secIntervalHandler = self => {
         if (self.callback.getOrderPosition()) {
             if (
                 self.order.entry.hasOwnProperty("line") &&
                 !self.order.tp.hasOwnProperty("line")
             ) {
-                self.orderTpPrice(self.order, true);
+                self.callback.orderTpPrice(self.order, true);
                 self.drawOrderLine("tp");
-                self.orderSlPrice(self.order, true);
+                self.callback.orderSlPrice(self.order, true);
                 self.drawOrderLine("sl");
                 self.order.entry.line.applyOptions({
                     draggable: false
@@ -914,7 +891,7 @@ class Chart {
             }
         } else {
             if (self.order.tp.hasOwnProperty("line")) {
-                self.cancelOrder();
+                self.callback.cancelOrder();
                 self.toggleCancelOrderButton(false);
                 self.removeOrderLine("entry");
                 self.removeOrderLine("tp");
@@ -923,7 +900,6 @@ class Chart {
                 self.global.alert.show("success", "Đã đóng vị thế.");
             }
         }
-        //
         if (self.alertAudio.paused) {
             self.alerts.forEach(alert => {
                 const ops = alert.options();
@@ -937,18 +913,16 @@ class Chart {
                 }
             });
         }
-        //
         if (moment().unix() == self.global.time.start) self.connectSocket();
     };
-    refreshDataInSession = self => {
-        if (
+    minIntervalHandler = self => {
+        if (self.inSession()) self.loadChartData();
+    };
+    inSession = () => {
+        return (
             moment().unix() >= self.global.time.start &&
             moment().unix() <= self.global.time.end
-        ) {
-            self.loadChartData();
-            return true;
-        }
-        return false;
+        );
     };
     //
     toggleSpinner = visible => {
@@ -958,44 +932,139 @@ class Chart {
         self.chart.resize(window.innerWidth, window.innerHeight);
     };
     keyEvent = (e, self) => {
-        if (e.ctrlKey || e.metaKey) {
-            if (e.shiftKey) {
-                if (e.keyCode == 39) self.chart.timeScale().scrollToRealTime();
-            } else {
-                if (e.keyCode == 38) {
-                    const options = self.chart.options();
-                    self.chart.timeScale().applyOptions({
-                        barSpacing: options.timeScale.barSpacing + 0.1
-                    });
-                } else if (e.keyCode == 40) {
-                    const options = self.chart.options();
-                    if (
-                        options.timeScale.barSpacing >
-                        options.timeScale.minBarSpacing
-                    )
-                        self.chart.timeScale().applyOptions({
-                            barSpacing: options.timeScale.barSpacing - 0.1
-                        });
-                } else if (e.keyCode == 37) {
-                    const position = self.chart.timeScale().scrollPosition();
-                    self.chart.timeScale().scrollToPosition(position - 10);
-                } else if (e.keyCode == 39) {
-                    const position = self.chart.timeScale().scrollPosition();
-                    self.chart.timeScale().scrollToPosition(position + 10);
-                } else if (e.keyCode == 97) self.drawLineButton.click();
-                else if (e.keyCode == 98) self.drawMarkerButton.click();
-                else if (e.keyCode == 99) self.drawRulerButton.click();
-                else if (e.keyCode == 100) self.drawAlertButton.click();
+        try {
+            if (e.ctrlKey || e.metaKey) {
+                if (e.shiftKey) {
+                    if (e.keyCode == 39)
+                        self.chart.timeScale().scrollToRealTime();
+                } else {
+                    switch (e.keyCode) {
+                        case 38:
+                            self.chart.timeScale().applyOptions({
+                                barSpacing:
+                                    self.chart.options().timeScale.barSpacing +
+                                    0.1
+                            });
+                            break;
+                        case 40:
+                            if (
+                                options.timeScale.barSpacing >
+                                options.timeScale.minBarSpacing
+                            )
+                                self.chart.timeScale().applyOptions({
+                                    barSpacing:
+                                        self.chart.options().timeScale
+                                            .barSpacing - 0.1
+                                });
+                            break;
+                        case 37:
+                            self.chart
+                                .timeScale()
+                                .scrollToPosition(
+                                    self.chart.timeScale().scrollPosition() - 10
+                                );
+                            break;
+                        case 39:
+                            self.chart
+                                .timeScale()
+                                .scrollToPosition(
+                                    self.chart.timeScale().scrollPosition() + 10
+                                );
+                            break;
+                        case 75:
+                            self.drawLineButton.click();
+                            break;
+                        case 76:
+                            self.drawMarkerButton.click();
+                            break;
+                        case 186:
+                            self.drawRulerButton.click();
+                            break;
+                        case 222:
+                            self.drawAlertButton.click();
+                            break;
+                        case 96:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[0].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 97:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[1].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 98:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[2].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 99:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[3].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 100:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[4].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 101:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[5].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 102:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[6].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 103:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[7].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 104:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[8].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 105:
+                            self.timeFrameSelect.value =
+                                self.global.timeFrames[9].value;
+                            self.timeFrameSelect.dispatchEvent(
+                                new Event("change")
+                            );
+                            break;
+                        case 77:
+                            self.refreshButton.click();
+                            break;
+                        case 188:
+                            self.clearButton.click();
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
             }
-        } else if (e.which === 27) self.removeOrderButton();
-    };
-    base64ToArrayUnit8 = g => {
-        for (
-            var p = window.atob(g), r = p.length, h = new Uint8Array(r), A = 0;
-            A < r;
-            A++
-        )
-            h[A] = p.charCodeAt(A);
-        return h;
+        } catch (error) {}
     };
 }

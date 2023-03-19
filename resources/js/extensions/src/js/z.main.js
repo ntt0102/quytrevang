@@ -5,6 +5,23 @@ class SmartOrder {
         this.global.alert = new Alert();
         this.global.store = new Store();
         this.global.isMobile = navigator.userAgentData.mobile;
+        this.global.timeFrames = [
+            { text: "Tick", value: 0 },
+            { text: "1 min", value: 1 },
+            { text: "2 min", value: 2 },
+            { text: "3 min", value: 3 },
+            { text: "5 min", value: 5 },
+            { text: "7 min", value: 7 },
+            { text: "10 min", value: 10 },
+            { text: "15 min", value: 15 },
+            { text: "30 min", value: 30 },
+            { text: "1 day", value: 1440 }
+        ];
+        this.global.chartTypes = [
+            { text: "Nến", value: 0 },
+            { text: "Đường", value: 1 },
+            { text: "Thanh", value: 2 }
+        ];
         this.chart = new Chart(this.global, {
             getOrderPosition: this.getOrderPositionCallback,
             closePosition: this.closePositionCallback,
@@ -34,7 +51,6 @@ class SmartOrder {
             false
         );
         await this.popup.getLocalConfig();
-        console.log("global-local: ", this.global);
         this.popup.createNoLoginElement();
         await this.popup.getUser();
         if (this.global.isLoggedin) {
@@ -50,11 +66,11 @@ class SmartOrder {
         this.global.alert.hide();
     };
     loggedinCallback = async () => {
-        this.menu.createLoggedinElement();
-        this.popup.createLoggedinElement();
         this.chart.createChart();
         await this.chart.loadChartData();
         await this.chart.getToolsData();
+        this.popup.createLoggedinElement();
+        this.menu.createLoggedinElement();
         this.chart.connectSocket();
     };
     loggedoutCallback = () => {
@@ -142,7 +158,7 @@ class SmartOrder {
         else return +position;
     };
     closePositionCallback = () => {
-        const position = this.getOrderPosition();
+        const position = this.getOrderPositionCallback();
         if (position) {
             document.getElementById("select_normal_order_wrapper").click();
             document.getElementById("right_price").value = "MTL";
