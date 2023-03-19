@@ -23,7 +23,7 @@ class Me {
         button.title = "LightWeight Chart";
         button.addEventListener("click", this.cb.toggleLightWeightChart);
         this.conEl.prepend(button);
-        this.lightWeightButton = button;
+        this.ligWeBu = button;
         //
         var button = document.createElement("button");
         button.id = "tradingViewButton";
@@ -31,7 +31,7 @@ class Me {
         button.title = "TradingView Chart";
         button.addEventListener("click", this.cb.toggleTradingViewChart);
         this.conEl.prepend(button);
-        this.tradingViewButton = button;
+        this.traViBu = button;
         //
         if (this.g.isOpeningMarket) {
             var button = document.createElement("button");
@@ -40,7 +40,7 @@ class Me {
             button.title = "Report";
             button.addEventListener("click", () => this.rTrRe(this));
             this.conEl.append(button);
-            this.reportButton = button;
+            this.repBu = button;
         }
         //
         this.interval = setInterval(() => {
@@ -49,9 +49,9 @@ class Me {
         }, 1000);
     };
     rLoEl = () => {
-        this.tradingViewButton.remove();
-        this.lightWeightButton.remove();
-        this.reportButton.remove();
+        this.traViBu.remove();
+        this.ligWeBu.remove();
+        this.repBu.remove();
         //
         clearInterval(this.interval);
     };
@@ -62,12 +62,12 @@ class Me {
         button.title = "Cài đặt";
         button.addEventListener("click", this.cb.togglePopup);
         this.conEl.append(button);
-        this.settingButton = button;
+        this.setBu = button;
     };
     bLiWeBu = self => {
-        if (self.lightWeightButton.classList.contains("dark"))
-            self.lightWeightButton.classList.remove("dark");
-        else self.lightWeightButton.classList.add("dark");
+        if (self.ligWeBu.classList.contains("dark"))
+            self.ligWeBu.classList.remove("dark");
+        else self.ligWeBu.classList.add("dark");
     };
     rTrRe = self => {
         if (self.g.isOpeningMarket && !self.g.isReportedResult) {
@@ -103,7 +103,7 @@ class Me {
     };
     dDe = () => {
         if (this.g.isLi) {
-            if (!!this.g.isViewChart) this.lightWeightButton.click();
-        } else this.settingButton.click();
+            if (!!this.g.isViewChart) this.ligWeBu.click();
+        } else this.setBu.click();
     };
 }
