@@ -1,6 +1,6 @@
 class Po {
     // Các thuộc tính
-    TOKEN_KEY = "SOAT";
+    T_K = "SOAT";
 
     // Hàm khởi tạo
     constructor(g, c) {
@@ -15,7 +15,7 @@ class Po {
         var container = document.createElement("div");
         container.id = "optionViewContainer";
         document.body.append(container);
-        this.containerElement = container;
+        this.conEl = container;
     };
     cNoLoEl = () => {
         this.cHeCo();
@@ -25,8 +25,8 @@ class Po {
     cHeCo = () => {
         var div = document.createElement("div");
         div.id = "hearderContainer";
-        this.containerElement.append(div);
-        this.hearderContainer = div;
+        this.conEl.append(div);
+        this.heaCo = div;
         //
         var p = document.createElement("label");
         div.append(p);
@@ -38,8 +38,8 @@ class Po {
         div.id = "loginContainer";
         div.className = "section";
         div.style.display = this.g.isLi ? "none" : "block";
-        this.containerElement.append(div);
-        this.loginContainer = div;
+        this.conEl.append(div);
+        this.logCo = div;
         //
         var wrapper = document.createElement("form");
         div.append(wrapper);
@@ -50,7 +50,7 @@ class Po {
         var p = document.createElement("label");
         wrapper.append(p);
         p.className = "invalid";
-        this.loginMessage = p;
+        this.logMe = p;
         //
         var input = document.createElement("input");
         wrapper.append(input);
@@ -58,8 +58,8 @@ class Po {
         input.type = "text";
         input.placeholder = "Email hoặc Số điện thoại";
         input.required = true;
-        this.loginUsername = input;
-        if (!this.g.isLi) this.loginUsername.focus();
+        this.logUs = input;
+        if (!this.g.isLi) this.logUs.focus();
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -67,7 +67,7 @@ class Po {
         input.type = "password";
         input.placeholder = "Mật khẩu";
         input.required = true;
-        this.loginPassword = input;
+        this.logPa = input;
         //
         var checkboxWrapper = document.createElement("div");
         wrapper.append(checkboxWrapper);
@@ -75,7 +75,7 @@ class Po {
         checkboxWrapper.append(input);
         input.id = "loginRememberMe";
         input.type = "checkbox";
-        this.loginRememberMe = input;
+        this.logReMe = input;
         var label = document.createElement("label");
         checkboxWrapper.append(label);
         label.setAttribute("for", "loginRememberMe");
@@ -86,7 +86,7 @@ class Po {
         button.id = "loginSubmit";
         button.innerText = "ĐĂNG NHẬP";
         button.type = "submit";
-        this.loginSubmit = button;
+        this.logSu = button;
         //
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
@@ -96,9 +96,9 @@ class Po {
         route.className = "link";
         route.innerText = "Đăng ký";
         route.addEventListener("click", e => {
-            this.loginContainer.style.display = "none";
-            this.registerContainer.style.display = "block";
-            this.registerName.focus();
+            this.logCo.style.display = "none";
+            this.regCo.style.display = "block";
+            this.regNa.focus();
         });
         var route = document.createElement("label");
         routeWrapper.append(route);
@@ -113,8 +113,8 @@ class Po {
         div.id = "registerContainer";
         div.className = "section";
         div.style.display = "none";
-        this.containerElement.append(div);
-        this.registerContainer = div;
+        this.conEl.append(div);
+        this.regCo = div;
         //
         var wrapper = document.createElement("form");
         div.append(wrapper);
@@ -125,7 +125,7 @@ class Po {
         var p = document.createElement("label");
         wrapper.append(p);
         p.className = "invalid";
-        this.registerMessage = p;
+        this.regMe = p;
         //
         var input = document.createElement("input");
         wrapper.append(input);
@@ -133,7 +133,7 @@ class Po {
         input.type = "text";
         input.placeholder = "Tên";
         input.required = true;
-        this.registerName = input;
+        this.regNa = input;
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -141,7 +141,7 @@ class Po {
         input.type = "email";
         input.placeholder = "Email";
         input.required = true;
-        this.registerEmail = input;
+        this.regEm = input;
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -151,7 +151,7 @@ class Po {
         input.required = true;
         input.setAttribute("maxlength", 10);
         input.setAttribute("pattern", "[0-9]+");
-        this.registerPhone = input;
+        this.regPh = input;
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -159,7 +159,7 @@ class Po {
         input.type = "password";
         input.placeholder = "Mật khẩu";
         input.required = true;
-        this.registerPassword = input;
+        this.regPa = input;
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -167,14 +167,14 @@ class Po {
         input.type = "password";
         input.placeholder = "Xác nhận mật khẩu";
         input.required = true;
-        this.registerConfirmPassword = input;
+        this.regCoPa = input;
         //
         var button = document.createElement("button");
         wrapper.append(button);
         button.id = "registerSubmit";
         button.innerText = "ĐĂNG KÝ";
         button.type = "submit";
-        this.registerSubmit = button;
+        this.regSu = button;
         //
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
@@ -184,9 +184,9 @@ class Po {
         route.className = "link";
         route.innerText = "Đăng nhập";
         route.addEventListener("click", e => {
-            this.registerContainer.style.display = "none";
-            this.loginContainer.style.display = "block";
-            this.loginUsername.focus();
+            this.regCo.style.display = "none";
+            this.logCo.style.display = "block";
+            this.logUs.focus();
         });
         var route = document.createElement("label");
         routeWrapper.append(route);
@@ -201,17 +201,17 @@ class Po {
         this.cOpCo();
         this.cAbCo();
         //
-        this.loginContainer.style.display = "none";
-        this.registerContainer.style.display = "none";
-        this.infoContainer.style.display = "block";
+        this.logCo.style.display = "none";
+        this.regCo.style.display = "none";
+        this.infCo.style.display = "block";
     };
     cInCo = () => {
         var div = document.createElement("div");
         div.id = "infoContainer";
         div.className = "section";
         div.style.display = this.g.isLi ? "block" : "none";
-        this.containerElement.append(div);
-        this.infoContainer = div;
+        this.conEl.append(div);
+        this.infCo = div;
         //
         var wrapper = document.createElement("div");
         wrapper.className = "wrapper";
@@ -314,16 +314,16 @@ class Po {
         route.className = "link";
         route.innerText = "Cài đặt";
         route.addEventListener("click", e => {
-            this.infoContainer.style.display = "none";
-            this.optionContainer.style.display = "block";
+            this.infCo.style.display = "none";
+            this.optCo.style.display = "block";
         });
         var route = document.createElement("label");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Cập nhật";
         route.addEventListener("click", e => {
-            this.infoContainer.style.display = "none";
-            this.aboutContainer.style.display = "block";
+            this.infCo.style.display = "none";
+            this.aboCo.style.display = "block";
         });
     };
     cOpCo = () => {
@@ -331,8 +331,8 @@ class Po {
         div.id = "optionContainer";
         div.className = "section";
         div.style.display = "none";
-        this.containerElement.append(div);
-        this.optionContainer = div;
+        this.conEl.append(div);
+        this.optCo = div;
         //
         var wrapper = document.createElement("form");
         div.append(wrapper);
@@ -340,12 +340,12 @@ class Po {
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e =>
             this.sSeCo(e, this).then(isOk => {
-                this.optionSubmit.innerText = "LƯU CÀI ĐẶT";
-                this.optionSubmit.disabled = false;
+                this.optSu.innerText = "LƯU CÀI ĐẶT";
+                this.optSu.disabled = false;
                 if (isOk) this.g.a.s("success", "Lưu cài đặt thành công");
                 else this.g.a.s("error", "Lưu cài đặt thất bại");
                 //
-                this.cb.tVo(this.isVolumeCheckbox.checked);
+                this.cb.tVo(this.isVolCh.checked);
             })
         );
         //
@@ -368,7 +368,7 @@ class Po {
             select.appendChild(option);
         });
         select.value = this.g.timeFrame;
-        this.timeFrameSelect = select;
+        this.timFrSe = select;
         item.append(select);
         //
         item = document.createElement("div");
@@ -385,7 +385,7 @@ class Po {
             select.appendChild(option);
         });
         select.value = this.g.chartType;
-        this.chartTypeSelect = select;
+        this.chaTySe = select;
         item.append(select);
         //
         item = document.createElement("div");
@@ -399,7 +399,7 @@ class Po {
         input.style.width = "69px";
         input.style.height = "21px";
         input.value = this.g.contractNumber;
-        this.contractNumberInput = input;
+        this.conNuIn = input;
         item.append(input);
         //
         item = document.createElement("div");
@@ -413,7 +413,7 @@ class Po {
         input.style.width = "69px";
         input.style.height = "21px";
         input.value = this.g.takeProfit;
-        this.takeProfitInput = input;
+        this.takPrIn = input;
         item.append(input);
         //
         item = document.createElement("div");
@@ -427,7 +427,7 @@ class Po {
         input.style.width = "69px";
         input.style.height = "21px";
         input.value = this.g.stopLoss;
-        this.stopLossInput = input;
+        this.stoLoIn = input;
         item.append(input);
         //
         item = document.createElement("div");
@@ -440,7 +440,7 @@ class Po {
         input.type = "checkbox";
         input.style.width = "17px";
         input.checked = !!this.g.isVolume;
-        this.isVolumeCheckbox = input;
+        this.isVolCh = input;
         item.append(input);
         //
         item = document.createElement("div");
@@ -453,7 +453,7 @@ class Po {
         input.type = "checkbox";
         input.style.width = "17px";
         input.checked = !!this.g.isViewChart;
-        this.isViewChartCheckbox = input;
+        this.isVieChCh = input;
         item.append(input);
         //
         var button = document.createElement("button");
@@ -461,15 +461,15 @@ class Po {
         button.id = "optionSubmit";
         button.innerText = "LƯU CÀI ĐẶT";
         button.type = "submit";
-        this.optionSubmit = button;
+        this.optSu = button;
         //
         var route = document.createElement("label");
         wrapper.append(route);
         route.className = "link";
         route.innerText = "Trở về";
         route.addEventListener("click", e => {
-            this.optionContainer.style.display = "none";
-            this.infoContainer.style.display = "block";
+            this.optCo.style.display = "none";
+            this.infCo.style.display = "block";
         });
     };
     cAbCo = () => {
@@ -477,8 +477,8 @@ class Po {
         div.id = "aboutContainer";
         div.className = "section";
         div.style.display = "none";
-        this.containerElement.append(div);
-        this.aboutContainer = div;
+        this.conEl.append(div);
+        this.aboCo = div;
         //
         var wrapper = document.createElement("div");
         wrapper.className = "wrapper";
@@ -558,8 +558,8 @@ class Po {
         route.className = "link";
         route.innerText = "Trở về";
         route.addEventListener("click", e => {
-            this.aboutContainer.style.display = "none";
-            this.infoContainer.style.display = "block";
+            this.aboCo.style.display = "none";
+            this.infCo.style.display = "block";
         });
         var route = document.createElement("label");
         routeWrapper.append(route);
@@ -570,24 +570,24 @@ class Po {
         );
     };
     rLoEl = () => {
-        this.infoContainer.remove();
-        this.optionContainer.remove();
-        this.aboutContainer.remove();
+        this.infCo.remove();
+        this.optCo.remove();
+        this.aboCo.remove();
     };
     rAc = (e, self) => {
         e.preventDefault();
-        if (self.registerConfirmPassword.value != self.registerPassword.value) {
-            self.registerMessage.innerText = "Mật khẩu không khớp";
+        if (self.regCoPa.value != self.regPa.value) {
+            self.regMe.innerText = "Mật khẩu không khớp";
             return false;
         } else {
-            self.registerSubmit.innerText = "Đang đăng ký...";
-            self.registerSubmit.disabled = true;
-            self.registerMessage.innerText = "";
+            self.regSu.innerText = "Đang đăng ký...";
+            self.regSu.disabled = true;
+            self.regMe.innerText = "";
             const data = {
-                name: self.registerName.value,
-                email: self.registerEmail.value,
-                phone: self.registerPhone.value,
-                password: self.registerPassword.value,
+                name: self.regNa.value,
+                email: self.regEm.value,
+                phone: self.regPh.value,
+                password: self.regPa.value,
                 deviceId: self.g.deviceId,
                 chanel: self.g.appName
             };
@@ -603,45 +603,44 @@ class Po {
                 })
                 .then(async json => {
                     // console.log("register: ", json);
-                    self.registerSubmit.innerText = "ĐĂNG KÝ";
-                    self.registerSubmit.disabled = false;
+                    self.regSu.innerText = "ĐĂNG KÝ";
+                    self.regSu.disabled = false;
                     if (json.isOk) {
                         self.sTo(json.token);
                         self.g.accessToken = json.token.access_token;
                         self.g.user = json.user;
                         await self.cb.loggedin();
                         self.g.a.s("success", "Đăng ký thành công");
-                        self.registerName.value = "";
-                        self.registerEmail.value = "";
-                        self.registerPhone.value = "";
-                        self.registerPassword.value = "";
-                        self.registerConfirmPassword.value = "";
+                        self.regNa.value = "";
+                        self.regEm.value = "";
+                        self.regPh.value = "";
+                        self.regPa.value = "";
+                        self.regCoPa.value = "";
                     } else {
                         if (json.message == "emailExist")
-                            self.registerMessage.innerText =
-                                "Emai này đã đăng ký";
+                            self.regMe.innerText = "Emai này đã đăng ký";
                         else if (json.message == "phoneExist")
-                            self.registerMessage.innerText =
+                            self.regMe.innerText =
                                 "Số điện thoại này đã đăng ký";
                     }
                 })
                 .catch(error => {
                     console.log(error);
                     self.g.a.s("error", "Đăng ký lỗi");
-                    self.registerSubmit.innerText = "ĐĂNG KÝ";
-                    self.registerSubmit.disabled = false;
+                    self.regSu.innerText = "ĐĂNG KÝ";
+                    self.regSu.disabled = false;
                 });
         }
     };
     lIn = (e, self) => {
         e.preventDefault();
-        self.loginSubmit.innerText = "Đang đăng nhập...";
-        self.loginSubmit.disabled = true;
-        self.loginMessage.innerText = "";
+        self.logSu.innerText = "Đang đăng nhập...";
+        self.logSu.disabled = true;
+        self.logMe.innerText = "";
         const data = {
-            username: self.loginUsername.value,
-            password: self.loginPassword.value,
-            rememberMe: self.loginRememberMe.value,
+            username: self.logUs.value,
+            password: self.logPa.value,
+            rememberMe: self.logReMe.value,
             deviceId: self.g.deviceId,
             chanel: self.g.appName
         };
@@ -657,30 +656,30 @@ class Po {
             })
             .then(async json => {
                 // console.log("login: ", json);
-                self.loginSubmit.innerText = "ĐĂNG NHẬP";
-                self.loginSubmit.disabled = false;
+                self.logSu.innerText = "ĐĂNG NHẬP";
+                self.logSu.disabled = false;
                 if (json.isOk) {
                     self.sTo(json.token);
                     self.g.accessToken = json.token.access_token;
                     self.g.user = json.user;
-                    self.loginUsername.value = "";
-                    self.loginPassword.value = "";
+                    self.logUs.value = "";
+                    self.logPa.value = "";
                     await self.cb.loggedin();
                 } else {
                     if (json.message == "unauthorized")
-                        self.loginMessage.innerText = "Sai thông tin đăng nhập";
+                        self.logMe.innerText = "Sai thông tin đăng nhập";
                     else if (json.message == "unsetup")
-                        self.loginMessage.innerText = "Lỗi khởi tạo tài khoản";
+                        self.logMe.innerText = "Lỗi khởi tạo tài khoản";
                     else if (json.message == "expired")
-                        self.loginMessage.innerText = "Quá hạn sử dụng dịch vụ";
+                        self.logMe.innerText = "Quá hạn sử dụng dịch vụ";
                     else if (json.message == "deviceLimit")
-                        self.loginMessage.innerText = "Quá giới hạn thiết bị";
+                        self.logMe.innerText = "Quá giới hạn thiết bị";
                 }
             })
             .catch(error => {
                 self.g.a.s("error", "Đăng nhập lỗi");
-                self.loginSubmit.innerText = "ĐĂNG NHẬP";
-                self.loginSubmit.disabled = false;
+                self.logSu.innerText = "ĐĂNG NHẬP";
+                self.logSu.disabled = false;
             });
     };
     lOu = self => {
@@ -693,10 +692,10 @@ class Po {
             }
         }).then(() => {
             self.rTo();
-            self.infoContainer.style.display = "none";
-            self.loginContainer.style.display = "block";
+            self.infCo.style.display = "none";
+            self.logCo.style.display = "block";
             self.cb.loggedout();
-            self.loginUsername.focus();
+            self.logUs.focus();
         });
     };
     gU = () => {
@@ -756,16 +755,16 @@ class Po {
     sSeCo = (e, self) => {
         e.preventDefault();
         return new Promise(resolve => {
-            self.optionSubmit.innerText = "Đang lưu cài đặt...";
-            self.optionSubmit.disabled = true;
+            self.optSu.innerText = "Đang lưu cài đặt...";
+            self.optSu.disabled = true;
             const data = {
-                timeFrame: +self.timeFrameSelect.value,
-                chartType: self.chartTypeSelect.value,
-                contractNumber: +self.contractNumberInput.value,
-                takeProfit: +self.takeProfitInput.value,
-                stopLoss: +self.stopLossInput.value,
-                isVolume: self.isVolumeCheckbox.checked,
-                isViewChart: self.isViewChartCheckbox.checked
+                timeFrame: +self.timFrSe.value,
+                chartType: self.chaTySe.value,
+                contractNumber: +self.conNuIn.value,
+                takeProfit: +self.takPrIn.value,
+                stopLoss: +self.stoLoIn.value,
+                isVolume: self.isVolCh.checked,
+                isViewChart: self.isVieChCh.checked
             };
             console.log("data:", data);
             const url = this.g.domain + this.g.endpoint.setConfig;
@@ -788,10 +787,10 @@ class Po {
                 .catch(error => resolve(false));
         });
     };
-    sTo = token => localStorage.setItem(this.TOKEN_KEY, JSON.stringify(token));
-    rTo = () => localStorage.removeItem(this.TOKEN_KEY);
+    sTo = token => localStorage.setItem(this.T_K, JSON.stringify(token));
+    rTo = () => localStorage.removeItem(this.T_K);
     gTo = () => {
-        const token = JSON.parse(localStorage.getItem(this.TOKEN_KEY));
+        const token = JSON.parse(localStorage.getItem(this.T_K));
         if (!!token && moment().isBefore(token.expires_at))
             return token.access_token;
         else return false;
@@ -807,8 +806,8 @@ class Po {
         });
     };
     t = () => {
-        if (this.containerElement.classList.contains("show"))
-            this.containerElement.classList.remove("show");
-        else this.containerElement.classList.add("show");
+        if (this.conEl.classList.contains("show"))
+            this.conEl.classList.remove("show");
+        else this.conEl.classList.add("show");
     };
 }

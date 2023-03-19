@@ -35,8 +35,8 @@ class Ch {
         this.cLeAr();
         this.cFrAr();
         if (this.g.isOpeningMarket) {
-            this.secInterval = setInterval(() => this.inSec(this), 1000);
-            this.minInterval = setInterval(() => this.inMin(this), 60000);
+            this.secIn = setInterval(() => this.inSec(this), 1000);
+            this.minIn = setInterval(() => this.inMin(this), 60000);
             this.cnSk();
         }
         window.addEventListener("resize", () => this.eChRe(this));
@@ -45,10 +45,10 @@ class Ch {
     r = () => {
         window.removeEventListener("resize", () => this.eChRe(this));
         window.removeEventListener("keydown", e => this.eKePr(e, this));
-        clearInterval(this.secInterval);
-        clearInterval(this.minInterval);
+        clearInterval(this.secIn);
+        clearInterval(this.minIn);
         //
-        this.containerElement.remove();
+        this.conEl.remove();
     };
     cCoEl = () => {
         var container = document.createElement("div");
@@ -58,7 +58,7 @@ class Ch {
         container.style.height = "100vh";
         container.addEventListener("contextmenu", e => this.eChCoMe(e, this));
         container.addEventListener("click", e => this.eChCl(e, this));
-        this.containerElement = container;
+        this.conEl = container;
     };
     cCh = () => {
         const chartOptions = {
@@ -91,10 +91,7 @@ class Ch {
                 minBarSpacing: 0.1
             }
         };
-        this.ch = LightweightCharts.createChart(
-            this.containerElement,
-            chartOptions
-        );
+        this.ch = LightweightCharts.createChart(this.conEl, chartOptions);
         this.ch.subscribeCrosshairMove(e => this.eChCrMo(e, this));
         this.ch.subscribeCustomPriceLineDragged(e => this.ePrLiDr(e, this));
         //
@@ -134,14 +131,14 @@ class Ch {
         var container = document.createElement("div");
         container.id = "dataAreaDiv";
         container.className = "area";
-        this.containerElement.append(container);
+        this.conEl.append(container);
         //
         var img = document.createElement("img");
         img.id = "spinnerImg";
         img.style.opacity = 0;
         img.src = chrome.runtime.getURL("spinner.gif");
         container.append(img);
-        this.spinnerImg = img;
+        this.spiIm = img;
         //
         var input = document.createElement("input");
         input.id = "dateInput";
@@ -153,7 +150,7 @@ class Ch {
             if (!!e.target.value) this.lChDa();
         });
         container.append(input);
-        this.dateInput = input;
+        this.datIn = input;
         //
         var select = document.createElement("select");
         select.id = "chartTypeSelect";
@@ -175,7 +172,7 @@ class Ch {
             this.gToDa();
         });
         container.append(select);
-        this.chartTypeSelect = select;
+        this.chaTySe = select;
         //
         var select = document.createElement("select");
         select.id = "timeFrameSelect";
@@ -193,7 +190,7 @@ class Ch {
             this.lChDa().then(() => this.ch.timeScale().resetTimeScale());
         });
         container.append(select);
-        this.timeFrameSelect = select;
+        this.timFrSe = select;
         //
         var button = document.createElement("div");
         button.id = "refreshButton";
@@ -201,7 +198,7 @@ class Ch {
         button.title = "Làm mới [Ctrl+M]";
         button.addEventListener("click", () => this.lChDa());
         container.append(button);
-        this.refreshButton = button;
+        this.refBu = button;
         //
         var button = document.createElement("div");
         button.id = "clearButton";
@@ -212,13 +209,13 @@ class Ch {
             this.lChDa();
         });
         container.append(button);
-        this.clearButton = button;
+        this.cleBu = button;
     };
     cToAr = () => {
         var container = document.createElement("div");
         container.id = "toolAreaDiv";
         container.className = "area";
-        this.containerElement.append(container);
+        this.conEl.append(container);
         //
         var button = document.createElement("div");
         button.id = "drawLineButton";
@@ -239,10 +236,10 @@ class Ch {
             e.stopPropagation();
         });
         container.append(button);
-        this.drawLineButton = button;
+        this.draLiBu = button;
         //
         var button = document.createElement("div");
-        button.id = "dMaButton";
+        button.id = "draMaBu";
         button.className = "command fa fa-map-marker";
         button.title = "Vẽ đánh dấu [Ctrl+L][Ctrl+Shift+L]";
         button.addEventListener("click", e => {
@@ -260,10 +257,10 @@ class Ch {
             e.stopPropagation();
         });
         container.append(button);
-        this.dMaButton = button;
+        this.draMaBu = button;
         //
         var button = document.createElement("div");
-        button.id = "dRuButton";
+        button.id = "draRuBu";
         button.className = "command fa fa-arrows-v";
         button.title = "Thước đo giá [Ctrl+;][Ctrl+Shift+;]";
         button.addEventListener("click", e => {
@@ -284,10 +281,10 @@ class Ch {
             e.stopPropagation();
         });
         container.append(button);
-        this.dRuButton = button;
+        this.draRuBu = button;
         //
         var button = document.createElement("div");
-        button.id = "dAlButton";
+        button.id = "draAlBu";
         button.className = "command fa fa-bell-o";
         button.title = "Đặt cảnh báo [Ctrl+'][Ctrl+Shift+']";
         button.addEventListener("click", e => {
@@ -305,26 +302,26 @@ class Ch {
             e.stopPropagation();
         });
         container.append(button);
-        this.dAlButton = button;
+        this.draAlBu = button;
     };
     cLeAr = () => {
         var container = document.createElement("div");
         container.id = "legendAreaDiv";
-        this.containerElement.append(container);
+        this.conEl.append(container);
         //
         var p = document.createElement("p");
         p.id = "priceLegendP";
         container.append(p);
-        this.priceLegendP = p;
+        this.priLeP = p;
         //
         var p = document.createElement("p");
         p.id = "volumeLegendP";
         p.style.display = this.g.isVolume ? "block" : "none";
         container.append(p);
-        this.volumeLegendP = p;
+        this.volLeP = p;
     };
     cFrAr = () => {
-        var container = this.containerElement;
+        var container = this.conEl;
         //
         var button = document.createElement("button");
         button.id = "cancelOrderButton";
@@ -340,7 +337,7 @@ class Ch {
             this.g.s.c("order");
         });
         container.append(button);
-        this.cancelOrderButton = button;
+        this.canOrBu = button;
         //
         var button = document.createElement("button");
         button.id = "entryOrderButton";
@@ -353,7 +350,7 @@ class Ch {
             this.hOrBu();
         });
         container.append(button);
-        this.entryOrderButton = button;
+        this.entOrBu = button;
         //
         var button = document.createElement("button");
         button.id = "tpslOrderButton";
@@ -367,7 +364,7 @@ class Ch {
             this.hOrBu();
         });
         container.append(button);
-        this.tpslOrderButton = button;
+        this.tpsOrBu = button;
         //
         var button = document.createElement("div");
         button.id = "scrollButton";
@@ -383,10 +380,10 @@ class Ch {
     };
     eChCl = (e, self) => {
         self.hOrBu();
-        if (self.drawLineButton.classList.contains("selected")) self.dToLi();
-        else if (self.dMaButton.classList.contains("selected")) self.dMa();
-        else if (self.dRuButton.classList.contains("selected")) self.dRu();
-        else if (self.dAlButton.classList.contains("selected")) self.dAl();
+        if (self.draLiBu.classList.contains("selected")) self.dToLi();
+        else if (self.draMaBu.classList.contains("selected")) self.dMa();
+        else if (self.draRuBu.classList.contains("selected")) self.dRu();
+        else if (self.draAlBu.classList.contains("selected")) self.dAl();
     };
     eChCrMo = (e, self) => {
         if (e.time) {
@@ -450,7 +447,7 @@ class Ch {
                     removed: true
                 });
                 self.g.s.s("line", lineOptions);
-                self.drawLineButton.classList.remove("selected");
+                self.draLiBu.classList.remove("selected");
                 break;
             case "ruler":
                 if (lineOptions.point == 1) {
@@ -478,18 +475,17 @@ class Ch {
                 var title = newPrice >= currentPrice ? ">" : "<";
                 line.applyOptions({ title: title });
                 self.g.s.s("alert", line.options());
-                self.dAlButton.classList.remove("selected");
+                self.draAlBu.classList.remove("selected");
                 break;
         }
     };
     //
     sOrBu = () => {
         if (this.cb.gOrPo()) {
-            // if (this.or.entry.hasOwnProperty("line")) {
             if (!this.or.tp.hasOwnProperty("line")) {
-                this.tpslOrderButton.style.left = +(this.cr.x + 10) + "px";
-                this.tpslOrderButton.style.top = +(this.cr.y + 10) + "px";
-                this.tpslOrderButton.style.display = "block";
+                this.tpsOrBu.style.left = +(this.cr.x + 10) + "px";
+                this.tpsOrBu.style.top = +(this.cr.y + 10) + "px";
+                this.tpsOrBu.style.display = "block";
             }
         } else {
             if (!this.or.entry.hasOwnProperty("line")) {
@@ -497,20 +493,19 @@ class Ch {
                 const side = price >= this.da.price.slice(-1)[0].value ? 1 : -1;
                 this.or.entry.price = price;
                 this.or.side = side;
-                this.entryOrderButton.style.left = +(this.cr.x + 10) + "px";
-                this.entryOrderButton.style.top = +(this.cr.y + 10) + "px";
-                this.entryOrderButton.style.background =
-                    side > 0 ? "green" : "red";
-                this.entryOrderButton.innerText = `${
+                this.entOrBu.style.left = +(this.cr.x + 10) + "px";
+                this.entOrBu.style.top = +(this.cr.y + 10) + "px";
+                this.entOrBu.style.background = side > 0 ? "green" : "red";
+                this.entOrBu.innerText = `${
                     side > 0 ? "Long" : "Short"
                 } ${price}`;
-                this.entryOrderButton.style.display = "block";
+                this.entOrBu.style.display = "block";
             }
         }
     };
     hOrBu = () => {
-        this.entryOrderButton.style.display = "none";
-        this.tpslOrderButton.style.display = "none";
+        this.entOrBu.style.display = "none";
+        this.tpsOrBu.style.display = "none";
     };
     //
     dOrLi = kind => {
@@ -586,7 +581,7 @@ class Ch {
             this.li.push(this.se.price.createPriceLine(options));
             this.g.s.s("line", options);
         }
-        this.drawLineButton.classList.remove("selected");
+        this.draLiBu.classList.remove("selected");
     };
     rToLi = () => {
         this.li.forEach(line => this.se.price.removePriceLine(line));
@@ -610,7 +605,7 @@ class Ch {
             this.se.price.setMarkers(this.ma);
             this.g.s.clear("marker").then(() => this.g.s.s("marker", this.ma));
             //
-            this.dMaButton.classList.remove("selected");
+            this.draMaBu.classList.remove("selected");
         }
     };
     rMa = () => {
@@ -644,7 +639,7 @@ class Ch {
             this.ru.end = this.se.price.createPriceLine(options);
             this.ru.point = point;
             this.g.s.s("ruler", options);
-            this.dRuButton.classList.remove("selected");
+            this.draRuBu.classList.remove("selected");
         }
     };
     rRu = () => {
@@ -681,7 +676,7 @@ class Ch {
             this.al.push(this.se.price.createPriceLine(options));
             this.g.s.s("alert", options);
         }
-        this.dAlButton.classList.remove("selected");
+        this.draAlBu.classList.remove("selected");
         this.auAl.pause();
     };
     rAl = () => {
@@ -693,16 +688,14 @@ class Ch {
     //
     tCaOrBu = visible => {
         if (visible) {
-            this.cancelOrderButton.style.display = "block";
-            this.cancelOrderButton.style.background =
-                this.or.side > 0 ? "green" : "red";
-        } else this.cancelOrderButton.style.display = "none";
+            this.canOrBu.style.display = "block";
+            this.canOrBu.style.background = this.or.side > 0 ? "green" : "red";
+        } else this.canOrBu.style.display = "none";
     };
     //
     uLe = (price, volume) => {
-        if (!!price) this.priceLegendP.innerText = price;
-        if (!!volume)
-            this.volumeLegendP.innerText = volume.toLocaleString("en-US");
+        if (!!price) this.priLeP.innerText = price;
+        if (!!volume) this.volLeP.innerText = volume.toLocaleString("en-US");
     };
     cCo2Pr = y => {
         return this.fPr(this.se.price.cCo2Pr(y));
@@ -771,7 +764,7 @@ class Ch {
     };
     gSeDa = () => {
         return new Promise(async (resolve, reject) => {
-            const date = this.dateInput.value;
+            const date = this.datIn.value;
             const data = { date: date };
             const url = this.g.domain + this.g.endpoint.getChart;
             start: while (true) {
@@ -965,7 +958,7 @@ class Ch {
     //
     tVo = visible => {
         this.se.volume.applyOptions({ visible: visible });
-        this.volumeLegendP.style.display = visible ? "block" : "none";
+        this.volLeP.style.display = visible ? "block" : "none";
         this.ch.applyOptions({
             rightPriceScale: {
                 scaleMargins: visible
@@ -976,7 +969,7 @@ class Ch {
     };
     //
     tSp = visible => {
-        this.spinnerImg.style.opacity = visible ? 1 : 0;
+        this.spiIm.style.opacity = visible ? 1 : 0;
     };
     eChRe = self => {
         self.ch.resize(window.innerWidth, window.innerHeight);
@@ -1020,92 +1013,62 @@ class Ch {
                                 );
                             break;
                         case 75:
-                            self.drawLineButton.click();
+                            self.draLiBu.click();
                             break;
                         case 76:
-                            self.dMaButton.click();
+                            self.draMaBu.click();
                             break;
                         case 186:
-                            self.dRuButton.click();
+                            self.draRuBu.click();
                             break;
                         case 222:
-                            self.dAlButton.click();
+                            self.draAlBu.click();
                             break;
                         case 96:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[0].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[0].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 97:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[1].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[1].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 98:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[2].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[2].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 99:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[3].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[3].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 100:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[4].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[4].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 101:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[5].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[5].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 102:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[6].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[6].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 103:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[7].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[7].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 104:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[8].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[8].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 105:
-                            self.timeFrameSelect.value =
-                                self.g.timeFrames[9].value;
-                            self.timeFrameSelect.dispatchEvent(
-                                new Event("change")
-                            );
+                            self.timFrSe.value = self.g.timeFrames[9].value;
+                            self.timFrSe.dispatchEvent(new Event("change"));
                             break;
                         case 77:
-                            self.refreshButton.click();
+                            self.refBu.click();
                             break;
                         case 188:
-                            self.clearButton.click();
+                            self.cleBu.click();
                             break;
 
                         default:

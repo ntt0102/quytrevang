@@ -14,7 +14,7 @@ class Me {
         var container = document.createElement("div");
         container.id = "menuContainer";
         document.body.append(container);
-        this.containerElement = container;
+        this.conEl = container;
     };
     cLoEl = () => {
         var button = document.createElement("button");
@@ -22,7 +22,7 @@ class Me {
         button.classList = "fa fa-line-chart";
         button.title = "LightWeight Chart";
         button.addEventListener("click", this.cb.toggleLightWeightChart);
-        this.containerElement.prepend(button);
+        this.conEl.prepend(button);
         this.lightWeightButton = button;
         //
         var button = document.createElement("button");
@@ -30,7 +30,7 @@ class Me {
         button.classList = "fa fa-bar-chart";
         button.title = "TradingView Chart";
         button.addEventListener("click", this.cb.toggleTradingViewChart);
-        this.containerElement.prepend(button);
+        this.conEl.prepend(button);
         this.tradingViewButton = button;
         //
         if (this.g.isOpeningMarket) {
@@ -39,7 +39,7 @@ class Me {
             button.classList = "fa fa-flag-checkered";
             button.title = "Report";
             button.addEventListener("click", () => this.rTrRe(this));
-            this.containerElement.append(button);
+            this.conEl.append(button);
             this.reportButton = button;
         }
         //
@@ -61,7 +61,7 @@ class Me {
         button.classList = "fa fa-cog";
         button.title = "Cài đặt";
         button.addEventListener("click", this.cb.togglePopup);
-        this.containerElement.append(button);
+        this.conEl.append(button);
         this.settingButton = button;
     };
     bLiWeBu = self => {
