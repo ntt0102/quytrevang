@@ -9,7 +9,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://smarteasy.vps.com.vn/v1/"
+        "https://smartpro.vps.com.vn/v1/"
       ],
       "js": [
         "js/moment.min.js",
@@ -35,7 +35,7 @@
         "alert.wav"
       ],
       "matches": [
-        "https://smarteasy.vps.com.vn/*"
+        "https://smartpro.vps.com.vn/*"
       ]
     }
   ]

@@ -30,7 +30,7 @@ class SmartOrder {
     init = async () => {
         this.global.alert.show(
             "warning",
-            "Đang khởi tạo SmartOrder ...",
+            "Đang khởi tạo SmartOrder . . .",
             false
         );
         await this.popup.getLocalConfig();
@@ -76,18 +76,18 @@ class SmartOrder {
         if (document.body.classList.contains("tradingview-chart")) {
             document.body.classList.remove("tradingview-chart");
             document.body.classList.remove("full-chart");
-            // leftEl.innerText = "Lệnh thường";
-            // rightEl.innerText = "Lệnh điều kiện";
-            // orderEl.innerText = "DANH SÁCH LỆNH";
-            // condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            leftEl.innerText = "Lệnh thường";
+            rightEl.innerText = "Lệnh điều kiện";
+            orderEl.innerText = "DANH SÁCH LỆNH";
+            condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
             document.body.classList.add("tradingview-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("lightweight-chart");
-            // leftEl.innerText = "LT";
-            // rightEl.innerText = "LĐK";
-            // orderEl.innerText = "LỆNH THƯỜNG";
-            // condOrderEl.innerText = "L. ĐIỀU KIỆN";
+            leftEl.innerText = "LT";
+            rightEl.innerText = "LĐK";
+            orderEl.innerText = "LỆNH THƯỜNG";
+            condOrderEl.innerText = "L. ĐIỀU KIỆN";
         }
     };
     toggleLightWeightCallback = () => {
@@ -102,24 +102,24 @@ class SmartOrder {
         if (document.body.classList.contains("lightweight-chart")) {
             document.body.classList.remove("lightweight-chart");
             document.body.classList.remove("full-chart");
-            // leftEl.innerText = "Lệnh thường";
-            // rightEl.innerText = "Lệnh điều kiện";
-            // //
-            // orderEl.classList.remove("fa", "fa-check-circle");
-            // orderEl.innerText = "DANH SÁCH LỆNH";
-            // condOrderEl.classList.remove("fa", "fa-question-circle");
-            // condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            leftEl.innerText = "Lệnh thường";
+            rightEl.innerText = "Lệnh điều kiện";
+            //
+            orderEl.classList.remove("fa", "fa-check-circle");
+            orderEl.innerText = "DANH SÁCH LỆNH";
+            condOrderEl.classList.remove("fa", "fa-question-circle");
+            condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
             document.body.classList.add("lightweight-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("tradingview-chart");
-            // leftEl.innerText = "LT";
-            // rightEl.innerText = "LĐK";
-            // //
-            // orderEl.classList.add("fa", "fa-check-circle");
-            // orderEl.innerText = "";
-            // condOrderEl.classList.add("fa", "fa-question-circle");
-            // condOrderEl.innerText = "";
+            leftEl.innerText = "LT";
+            rightEl.innerText = "LĐK";
+            //
+            orderEl.classList.add("fa", "fa-check-circle");
+            orderEl.innerText = "";
+            condOrderEl.classList.add("fa", "fa-question-circle");
+            condOrderEl.innerText = "";
         }
     };
     getReportDataCallback = () => {

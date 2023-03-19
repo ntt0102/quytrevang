@@ -340,6 +340,8 @@ class Popup {
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e =>
             this.setServerConfig(e, this).then(isOk => {
+                this.optionSubmit.innerText = "LƯU CÀI ĐẶT";
+                this.optionSubmit.disabled = false;
                 if (isOk)
                     this.global.alert.show("success", "Lưu cài đặt thành công");
                 else this.global.alert.show("error", "Lưu cài đặt thất bại");
@@ -446,7 +448,7 @@ class Popup {
         input = document.createElement("input");
         input.type = "checkbox";
         input.style.width = "17px";
-        input.value = !!this.global.isVolume;
+        input.checked = !!this.global.isVolume;
         this.isVolumeCheckbox = input;
         item.append(input);
         //
@@ -459,21 +461,8 @@ class Popup {
         input = document.createElement("input");
         input.type = "checkbox";
         input.style.width = "17px";
-        input.value = !!this.global.isViewChart;
+        input.checked = !!this.global.isViewChart;
         this.isViewChartCheckbox = input;
-        item.append(input);
-        //
-        item = document.createElement("div");
-        item.className = "item";
-        list.append(item);
-        label = document.createElement("span");
-        label.innerText = "Bật chế độ toàn màn hình:";
-        item.append(label);
-        input = document.createElement("input");
-        input.type = "checkbox";
-        input.style.width = "17px";
-        input.value = !!this.global.isFullscreen;
-        this.isFullscreenCheckbox = input;
         item.append(input);
         //
         var button = document.createElement("button");
@@ -646,6 +635,7 @@ class Popup {
                     }
                 })
                 .catch(error => {
+                    console.log(error);
                     self.global.alert.show("error", "Đăng ký lỗi");
                     self.registerSubmit.innerText = "ĐĂNG KÝ";
                     self.registerSubmit.disabled = false;
@@ -802,15 +792,15 @@ class Popup {
             self.optionSubmit.innerText = "Đang lưu cài đặt...";
             self.optionSubmit.disabled = true;
             const data = {
-                timeFrame: self.timeFrameSelect.value,
-                chartType: self.chartTypeSelect.value,
-                contractNumber: self.contractNumberInput.value,
-                takeProfit: self.takeProfitInput.deviceId,
-                stopLoss: self.stopLossInput.appName,
-                isVolume: self.isVolumeCheckbox.appName,
-                isViewChart: self.isViewChartCheckbox.appName,
-                isFullscreen: self.isFullscreenCheckbox.appName
+                timeFrame: +self.timeFrameSelect.value,
+                chartType: +self.chartTypeSelect.value,
+                contractNumber: +self.contractNumberInput.value,
+                takeProfit: +self.takeProfitInput.value,
+                stopLoss: +self.stopLossInput.value,
+                isVolume: self.isVolumeCheckbox.checked,
+                isViewChart: self.isViewChartCheckbox.checked
             };
+            console.log("data:", data);
             const url = this.global.domain + this.global.endpoint.setConfig;
             fetch(url, {
                 method: "POST",
@@ -826,11 +816,9 @@ class Popup {
                 })
                 .then(async json => {
                     console.log("setConfig: ", json);
-                    self.loginSubmit.innerText = "LƯU CÀI ĐẶT";
-                    self.loginSubmit.disabled = false;
                     resolve(json.isOk);
-                });
-            // .catch(error => resolve(false));
+                })
+                .catch(error => resolve(false));
         });
     };
     setToken = token =>

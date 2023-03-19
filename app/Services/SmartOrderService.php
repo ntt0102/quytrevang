@@ -62,7 +62,6 @@ class SmartOrderService extends CoreService
             'stopLoss' => $so->stop_loss,
             'isVolume' => $so->volume,
             'isViewChart' => $so->view_chart,
-            'isFullscreen' => $so->fullscreen,
             'timeFrame' => $so->time_frame,
             'chartType' => $so->chart_type,
             'contact' => $contact,
@@ -88,7 +87,6 @@ class SmartOrderService extends CoreService
                     'stop_loss' => $request->stopLoss,
                     'volume' => $request->isVolume,
                     'view_chart' => $request->isViewChart,
-                    'fullscreen' => $request->isFullscreen
                 ]);
                 return ['isOk' => $isOk];
             }
