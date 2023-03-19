@@ -12,6 +12,8 @@ class Chart {
     hasCrosshair = false;
     hasNewData = false;
     alertAudio = new Audio(chrome.runtime.getURL("alert.wav"));
+    UP_COLOR = "rgb(38,166,154)";
+    DOWN_COLOR = "rgb(239,83,80)";
 
     // Hàm khởi tạo
     constructor(global, callback) {
@@ -22,9 +24,12 @@ class Chart {
     }
 
     // Các phương thức
-    createChart = () => {
+    create = () => {
         this.timeFrame = this.global.timeFrame;
-        this.createLightWeightChart();
+        this.chartType = this.global.chartType;
+        console.log("this.chartType: ", this.chartType);
+        this.createContainerElement();
+        this.createChart();
         this.createDataArea();
         this.createToolArea();
         this.createLegendArea();
@@ -43,7 +48,7 @@ class Chart {
         window.addEventListener("resize", () => this.resize(this));
         window.addEventListener("keydown", e => this.keyEvent(e, this));
     };
-    removeChart = () => {
+    remove = () => {
         window.removeEventListener("resize", () => this.resize(this));
         window.removeEventListener("keydown", e => this.keyEvent(e, this));
         clearInterval(this.secInterval);
@@ -51,29 +56,7 @@ class Chart {
         //
         this.containerElement.remove();
     };
-    createLightWeightChart = () => {
-        const chartOptions = {
-            localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
-            rightPriceScale: {
-                visible: true
-                // scaleMargins: { top: 0.1, bottom: 0.4 }
-            },
-            leftPriceScale: { visible: false },
-            layout: {
-                backgroundColor: "#181C27",
-                textColor: "#A2A6AE"
-            },
-            grid: {
-                vertLines: { color: "#30333F" },
-                horzLines: { color: "#30333F" }
-            },
-            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
-            timeScale: {
-                timeVisible: true,
-                rightOffset: 20,
-                minBarSpacing: 0.1
-            }
-        };
+    createContainerElement = () => {
         var container = document.createElement("div");
         document.body.append(container);
         container.id = "lightWeightChartContainer";
@@ -83,25 +66,79 @@ class Chart {
             this.chartContextmenu(e, this)
         );
         container.addEventListener("click", e => this.chartClick(e, this));
-        this.chart = LightweightCharts.createChart(container, chartOptions);
+        this.containerElement = container;
+    };
+    createChart = () => {
+        const chartOptions = {
+            localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
+            rightPriceScale: {
+                visible: true,
+                scaleMargins: this.global.isVolume
+                    ? { top: 0.1, bottom: 0.21 }
+                    : { top: 0.2, bottom: 0.1 }
+            },
+            leftPriceScale: { visible: false },
+            layout: {
+                backgroundColor: "#000000",
+                textColor: "#CCCCCC"
+            },
+            grid: {
+                vertLines: {
+                    color: "#1B1E27",
+                    style: LightweightCharts.LineStyle.Dashed
+                },
+                horzLines: {
+                    color: "#1B1E27",
+                    style: LightweightCharts.LineStyle.Dashed
+                }
+            },
+            crosshair: { mode: LightweightCharts.CrosshairMode.Normal },
+            timeScale: {
+                timeVisible: true,
+                rightOffset: 20,
+                minBarSpacing: 0.1
+            }
+        };
+        this.chart = LightweightCharts.createChart(
+            this.containerElement,
+            chartOptions
+        );
         this.chart.subscribeCrosshairMove(e => this.crosshairMove(e, this));
         this.chart.subscribeCustomPriceLineDragged(e =>
             this.priceLineDrag(e, this)
         );
         //
-        this.series.volume = this.chart.addLineSeries({
+        this.series.volume = this.chart.addHistogramSeries({
             priceScaleId: "volume",
             color: "#FF00FF",
-            priceFormat: { minMove: 1 },
-            scaleMargins: { top: 0.6, bottom: 0 },
-            visible: false
+            priceFormat: { type: "volume" },
+            scaleMargins: { top: 0.8, bottom: 0 },
+            visible: this.global.isVolume
         });
-        this.series.price = this.chart.addLineSeries({
-            color: "white",
-            priceFormat: { minMove: 0.1 }
-        });
+        //
+        this.createPriceSeries();
         this.chart.timeScale().fitContent();
-        this.containerElement = container;
+    };
+    createPriceSeries = () => {
+        switch (this.chartType) {
+            case "candlestick":
+                this.series.price = this.chart.addCandlestickSeries({
+                    priceFormat: { minMove: 0.1 }
+                });
+                break;
+            case "line":
+                this.series.price = this.chart.addLineSeries({
+                    color: "white",
+                    priceFormat: { minMove: 0.1 }
+                });
+                break;
+            case "bar":
+                this.series.price = this.chart.addBarSeries({
+                    thinBars: false,
+                    priceFormat: { minMove: 0.1 }
+                });
+                break;
+        }
     };
     createDataArea = () => {
         var container = document.createElement("div");
@@ -127,6 +164,28 @@ class Chart {
         });
         container.append(input);
         this.dateInput = input;
+        //
+        var select = document.createElement("select");
+        select.id = "chartTypeSelect";
+        select.className = "command";
+        select.title = "Loại biểu đồ giá";
+        this.global.chartTypes.forEach((item, index) => {
+            var option = document.createElement("option");
+            option.value = item.value;
+            option.text = item.text;
+            select.appendChild(option);
+        });
+        select.value = this.chartType;
+        select.addEventListener("change", e => {
+            this.chartType = e.target.value;
+            this.chart.remove();
+            this.createChart();
+            this.series.price.setData(this.data.price);
+            this.series.volume.setData(this.data.volume);
+            this.getToolsData();
+        });
+        container.append(select);
+        this.chartTypeSelect = select;
         //
         var select = document.createElement("select");
         select.id = "timeFrameSelect";
@@ -272,6 +331,7 @@ class Chart {
         //
         var p = document.createElement("p");
         p.id = "volumeLegendP";
+        p.style.display = this.global.isVolume ? "block" : "none";
         container.append(p);
         this.volumeLegendP = p;
     };
@@ -346,13 +406,13 @@ class Chart {
     };
     crosshairMove = (e, self) => {
         if (e.time) {
-            self.updateLegend(
-                e.seriesPrices.get(self.series.price),
-                e.seriesPrices.get(self.series.volume)
-            );
+            var price = e.seriesPrices.get(self.series.price);
+            var volume = e.seriesPrices.get(self.series.volume);
+            if (self.chartType != "line") price = price.close;
+            self.updateLegend(price, volume);
             self.hasCrosshair = true;
             self.crosshair.time = e.time;
-            self.crosshair.price = e.seriesPrices.get(self.series.price);
+            self.crosshair.price = price;
         } else {
             self.hasCrosshair = false;
             if (!self.global.isMobile) {
@@ -549,7 +609,7 @@ class Chart {
                 price: price,
                 color: "aqua",
                 lineWidth: 1,
-                lineStyle: LightweightCharts.LineStyle.Solid,
+                lineStyle: LightweightCharts.LineStyle.Dotted,
                 draggable: true
             };
             this.lines.push(this.series.price.createPriceLine(options));
@@ -600,7 +660,7 @@ class Chart {
             price: price,
             color: "yellow",
             lineWidth: 1,
-            lineStyle: LightweightCharts.LineStyle.Solid,
+            lineStyle: LightweightCharts.LineStyle.Dotted,
             draggable: true
         };
         if (this.ruler.point == 0) {
@@ -653,7 +713,7 @@ class Chart {
                     price >= this.data.original.slice(-1)[0].price ? ">" : "<",
                 color: "#FF00FF",
                 lineWidth: 1,
-                lineStyle: LightweightCharts.LineStyle.Solid,
+                lineStyle: LightweightCharts.LineStyle.Dotted,
                 draggable: true
             };
             this.alerts.push(this.series.price.createPriceLine(options));
@@ -701,7 +761,6 @@ class Chart {
                     ...svData,
                     ...lcData.filter(d => !ids.has(d.time))
                 ].sort((a, b) => a.time - b.time);
-                // console.log("data", data);
                 if (this.hasNewData) continue start;
                 this.global.store
                     .clear("data")
@@ -715,6 +774,7 @@ class Chart {
                         volume: []
                     }
                 );
+                console.log("data", this.data);
                 //
                 this.series.price.setData(this.data.price);
                 this.series.volume.setData(this.data.volume);
@@ -778,7 +838,11 @@ class Chart {
     };
     generateChartData = (r, item) => {
         var time = item.time + 7 * 60 * 60;
-        var volume = item.volume;
+        var volumeColor = this.UP_COLOR;
+        var volume = item.volume,
+            openPrice = 0,
+            highPrice = 0,
+            lowPrice = 0;
         if (this.timeFrame > 0) {
             const period = 60 * this.timeFrame;
             const timeIndex = Math.floor(time / period);
@@ -789,15 +853,38 @@ class Chart {
                     isSameTime = true;
             }
             if (isSameTime) {
-                r.price.pop();
+                const prevPrice = r.price.pop();
+                openPrice = prevPrice.open;
+                highPrice = prevPrice.high;
+                lowPrice = prevPrice.low;
+                if (item.price < lowPrice) lowPrice = item.price;
+                if (item.price > highPrice) highPrice = item.price;
+                //
                 const prevVolume = r.volume.pop();
                 volume += prevVolume.value;
+                volumeColor =
+                    item.price >= openPrice ? this.UP_COLOR : this.DOWN_COLOR;
+            } else {
+                openPrice = item.price;
+                highPrice = item.price;
+                lowPrice = item.price;
             }
             time = timeIndex * period;
         }
         r.original.push(item);
-        r.price.push({ time: time, value: item.price });
-        r.volume.push({ time: time, value: volume });
+        r.price.push({
+            time: time,
+            value: item.price,
+            open: openPrice,
+            high: highPrice,
+            low: lowPrice,
+            close: item.price
+        });
+        r.volume.push({
+            time: time,
+            value: volume,
+            color: volumeColor
+        });
         //
         return r;
     };
@@ -923,6 +1010,18 @@ class Chart {
             moment().unix() >= self.global.time.start &&
             moment().unix() <= self.global.time.end
         );
+    };
+    //
+    toggleVolume = visible => {
+        this.series.volume.applyOptions({ visible: visible });
+        this.volumeLegendP.style.display = visible ? "block" : "none";
+        this.chart.applyOptions({
+            rightPriceScale: {
+                scaleMargins: visible
+                    ? { top: 0.1, bottom: 0.21 }
+                    : { top: 0.2, bottom: 0.1 }
+            }
+        });
     };
     //
     toggleSpinner = visible => {

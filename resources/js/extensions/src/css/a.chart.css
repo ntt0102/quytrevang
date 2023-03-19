@@ -30,7 +30,7 @@
 .lightweight-chart #lightWeightChartContainer .command {
     flex: 1 1 auto;
     text-align: center;
-    color: #d1d4dc;
+    color: #787b86;
     background: transparent !important;
     line-height: 30px;
     width: 30px;
@@ -78,6 +78,13 @@
     width: 75px;
 }
 
+.lightweight-chart
+    #lightWeightChartContainer
+    > #dataAreaDiv
+    > #chartTypeSelect {
+    width: 77px;
+}
+
 .lightweight-chart #lightWeightChartContainer > #dataAreaDiv > #dateInput {
     width: 125px;
 }
@@ -102,16 +109,16 @@
     z-index: 3;
 }
 
-.lightweight-chart #lightWeightChartContainer > #legendAreaDiv > #priceLegendP {
-    color: white;
+.lightweight-chart #lightWeightChartContainer > #legendAreaDiv {
+    color: #787b86;
 }
 
-.lightweight-chart
+/* .lightweight-chart
     #lightWeightChartContainer
     > #legendAreaDiv
     > #volumeLegendP {
-    color: #ff00ff;
-}
+    color: #787b86;
+} */
 
 .lightweight-chart #lightWeightChartContainer > #cancelOrderButton {
     position: absolute;

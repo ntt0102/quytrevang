@@ -345,6 +345,8 @@ class Popup {
                 if (isOk)
                     this.global.alert.show("success", "Lưu cài đặt thành công");
                 else this.global.alert.show("error", "Lưu cài đặt thất bại");
+                //
+                this.callback.toggleVolume(this.isVolumeCheckbox.checked);
             })
         );
         //
@@ -783,7 +785,7 @@ class Popup {
             self.optionSubmit.disabled = true;
             const data = {
                 timeFrame: +self.timeFrameSelect.value,
-                chartType: +self.chartTypeSelect.value,
+                chartType: self.chartTypeSelect.value,
                 contractNumber: +self.contractNumberInput.value,
                 takeProfit: +self.takeProfitInput.value,
                 stopLoss: +self.stopLossInput.value,

@@ -18,9 +18,9 @@ class SmartOrder {
             { text: "1 day", value: 1440 }
         ];
         this.global.chartTypes = [
-            { text: "Nến", value: 0 },
-            { text: "Đường", value: 1 },
-            { text: "Thanh", value: 2 }
+            { text: "Nến", value: "candlestick" },
+            { text: "Đường", value: "line" },
+            { text: "Thanh", value: "bar" }
         ];
         this.chart = new Chart(this.global, {
             getOrderPosition: this.getOrderPositionCallback,
@@ -32,7 +32,8 @@ class SmartOrder {
         });
         this.popup = new Popup(this.global, {
             loggedin: this.loggedinCallback,
-            loggedout: this.loggedoutCallback
+            loggedout: this.loggedoutCallback,
+            toggleVolume: this.chart.toggleVolume
         });
         this.menu = new Menu(this.global, {
             toggleTradingViewChart: this.toggleTradingViewCallback,
@@ -66,7 +67,7 @@ class SmartOrder {
         this.global.alert.hide();
     };
     loggedinCallback = async () => {
-        this.chart.createChart();
+        this.chart.create();
         await this.chart.loadChartData();
         await this.chart.getToolsData();
         this.popup.createLoggedinElement();
@@ -76,7 +77,7 @@ class SmartOrder {
     loggedoutCallback = () => {
         this.menu.removeLoggedinElement();
         this.popup.removeLoggedinElement();
-        this.chart.removeChart();
+        this.chart.remove();
     };
     toggleTradingViewCallback = () => {
         var leftEl = document.getElementById("left_order_type");
