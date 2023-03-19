@@ -16,21 +16,21 @@ class So {
             cOr: this.cOrCb
         });
         this.p = new Po(this.g, {
-            loggedin: this.liCb,
-            loggedout: this.loCb,
+            lin: this.liCb,
+            lou: this.loCb,
             tVo: this.c.tVo
         });
         this.m = new Me(this.g, {
-            toggleTradingViewChart: this.tTrViCb,
-            toggleLightWeightChart: this.tLiWeCb,
-            togglePopup: this.p.t,
-            getReportData: this.gReDaCb
+            tTrViCh: this.tTrViCb,
+            tLiWeCh: this.tLiWeCb,
+            tPo: this.p.t,
+            gReDa: this.gReDaCb
         });
         this.rFuEv();
     }
 
     // Các phương thức
-    init = async () => {
+    i = async () => {
         this.g.a.s("warning", "Đang khởi tạo SmartOrder . . .", false);
         this.p.cNoLoEl();
         await this.p.gU();
@@ -211,4 +211,4 @@ class So {
 }
 
 var so = new So();
-so.init();
+so.i();

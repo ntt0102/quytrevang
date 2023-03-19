@@ -609,7 +609,7 @@ class Po {
                         self.sTo(json.token);
                         self.g.accessToken = json.token.access_token;
                         self.g.user = json.user;
-                        await self.cb.loggedin();
+                        await self.cb.lin();
                         self.g.a.s("success", "Đăng ký thành công");
                         self.regNa.value = "";
                         self.regEm.value = "";
@@ -664,7 +664,7 @@ class Po {
                     self.g.user = json.user;
                     self.logUs.value = "";
                     self.logPa.value = "";
-                    await self.cb.loggedin();
+                    await self.cb.lin();
                 } else {
                     if (json.message == "unauthorized")
                         self.logMe.innerText = "Sai thông tin đăng nhập";
@@ -694,7 +694,7 @@ class Po {
             self.rTo();
             self.infCo.style.display = "none";
             self.logCo.style.display = "block";
-            self.cb.loggedout();
+            self.cb.lou();
             self.logUs.focus();
         });
     };

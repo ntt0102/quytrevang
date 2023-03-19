@@ -21,7 +21,7 @@ class Me {
         button.id = "lightWeightButton";
         button.classList = "fa fa-line-chart";
         button.title = "LightWeight Chart";
-        button.addEventListener("click", this.cb.toggleLightWeightChart);
+        button.addEventListener("click", this.cb.tLiWeCh);
         this.conEl.prepend(button);
         this.ligWeBu = button;
         //
@@ -29,7 +29,7 @@ class Me {
         button.id = "tradingViewButton";
         button.classList = "fa fa-bar-chart";
         button.title = "TradingView Chart";
-        button.addEventListener("click", this.cb.toggleTradingViewChart);
+        button.addEventListener("click", this.cb.tTrViCh);
         this.conEl.prepend(button);
         this.traViBu = button;
         //
@@ -60,7 +60,7 @@ class Me {
         button.id = "settingButton";
         button.classList = "fa fa-cog";
         button.title = "Cài đặt";
-        button.addEventListener("click", this.cb.togglePopup);
+        button.addEventListener("click", this.cb.tPo);
         this.conEl.append(button);
         this.setBu = button;
     };
@@ -74,7 +74,7 @@ class Me {
             self.g.isReportedResult = true;
             self.g.tSp(true);
             const url = self.g.domain + self.g.endpoint.report;
-            const data = self.cb.getReportData();
+            const data = self.cb.gReDa();
             fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
