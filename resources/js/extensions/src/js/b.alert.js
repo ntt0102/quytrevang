@@ -1,8 +1,8 @@
-class Alert {
+class Al {
     // Hàm khởi tạo
     constructor() {}
     // Các phương thức
-    show = (status = "success", text = "message", autoclose = true) => {
+    s = (status = "success", text = "message", autoclose = true) => {
         this.notify = new Notify({
             status: status,
             text: text,
@@ -10,5 +10,5 @@ class Alert {
             position: "right bottom"
         });
     };
-    hide = () => this.notify.close();
+    h = () => this.notify.close();
 }

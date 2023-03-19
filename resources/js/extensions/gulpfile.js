@@ -1,4 +1,5 @@
 const { src, dest, watch } = require("gulp");
+const javascriptObfuscator = require("gulp-javascript-obfuscator");
 const minifyJs = require("gulp-uglify");
 const minifyCss = require("gulp-clean-css");
 const sourceMap = require("gulp-sourcemaps");
@@ -15,6 +16,7 @@ const bundleJs = () => {
 const bundleCss = () => {
     return src("./src/css/**/*.css")
         .pipe(sourceMap.init())
+        .pipe(javascriptObfuscator({ compact: true }))
         .pipe(minifyCss())
         .pipe(concat("main.min.css"))
         .pipe(sourceMap.write())

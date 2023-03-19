@@ -1,85 +1,63 @@
-class SmartOrder {
+class So {
+    //
     // Hàm khởi tạo
     constructor() {
-        this.global = new Object();
-        this.global.alert = new Alert();
-        this.global.store = new Store();
-        this.global.isMobile = navigator.userAgentData.mobile;
-        this.global.timeFrames = [
-            { text: "Tick", value: 0 },
-            { text: "1 min", value: 1 },
-            { text: "2 min", value: 2 },
-            { text: "3 min", value: 3 },
-            { text: "5 min", value: 5 },
-            { text: "7 min", value: 7 },
-            { text: "10 min", value: 10 },
-            { text: "15 min", value: 15 },
-            { text: "30 min", value: 30 },
-            { text: "1 day", value: 1440 }
-        ];
-        this.global.chartTypes = [
-            { text: "Nến", value: "candlestick" },
-            { text: "Đường", value: "line" },
-            { text: "Thanh", value: "bar" }
-        ];
-        this.chart = new Chart(this.global, {
-            getOrderPosition: this.getOrderPositionCallback,
-            closePosition: this.closePositionCallback,
-            orderEntryPrice: this.orderEntryPriceCallback,
-            orderTpPrice: this.orderTpPriceCallback,
-            orderSlPrice: this.orderSlPriceCallback,
-            cancelOrder: this.cancelOrderCallback
+        this.g = new Co();
+        console.log("ggggggggg: ", this.g);
+        this.g.a = new Al();
+        this.g.s = new St();
+        this.g.isM = navigator.userAgentData.mobile;
+        this.c = new Ch(this.g, {
+            gOrPo: this.gOrPoCb,
+            cPo: this.cPoCb,
+            oEnPr: this.oEnPrCb,
+            oTpPr: this.oTpPrCb,
+            oSlPr: this.oSlPrCb,
+            cOr: this.cOrCb
         });
-        this.popup = new Popup(this.global, {
-            loggedin: this.loggedinCallback,
-            loggedout: this.loggedoutCallback,
-            toggleVolume: this.chart.toggleVolume
+        this.p = new Po(this.g, {
+            loggedin: this.liCb,
+            loggedout: this.loCb,
+            tVo: this.c.tVo
         });
-        this.menu = new Menu(this.global, {
-            toggleTradingViewChart: this.toggleTradingViewCallback,
-            toggleLightWeightChart: this.toggleLightWeightCallback,
-            togglePopup: this.popup.toggle,
-            getReportData: this.getReportDataCallback
+        this.m = new Me(this.g, {
+            toggleTradingViewChart: this.tTrViCb,
+            toggleLightWeightChart: this.tLiWeCb,
+            togglePopup: this.p.t,
+            getReportData: this.gReDaCb
         });
-        this.registerFullscreenEvent();
+        this.rFuEv();
     }
 
     // Các phương thức
     init = async () => {
-        this.global.alert.show(
-            "warning",
-            "Đang khởi tạo SmartOrder . . .",
-            false
-        );
-        await this.popup.getLocalConfig();
-        this.popup.createNoLoginElement();
-        await this.popup.getUser();
-        if (this.global.isLoggedin) {
-            await this.popup.getServerConfig();
-            console.log("global-server: ", this.global);
-            await this.loggedinCallback();
-            document.getElementById(
-                "sohopdong"
-            ).value = this.global.contractNumber;
+        this.g.a.s("warning", "Đang khởi tạo SmartOrder . . .", false);
+        this.p.cNoLoEl();
+        await this.p.gU();
+        if (this.g.isLi) {
+            await this.p.gSeCo();
+            console.log("g-server: ", this.g);
+            await this.liCb();
+            document.getElementById("sohopdong").value = this.g.contractNumber;
             document.getElementById("right_price").value = "MTL";
         }
-        this.menu.displayDefault();
-        this.global.alert.hide();
+        this.m.dDe();
+        this.g.a.h();
     };
-    loggedinCallback = async () => {
-        this.chart.create();
-        await this.chart.loadChartData();
-        await this.chart.getToolsData();
-        this.popup.createLoggedinElement();
-        this.menu.createLoggedinElement();
-        this.chart.connectSocket();
+    liCb = async () => {
+        this.c.c();
+        await this.c.lChDa();
+        await this.c.gToDa();
+        this.p.cLoEl();
+        this.m.cLoEl();
+        this.c.cnSk();
     };
-    loggedoutCallback = () => {
-        this.menu.removeLoggedinElement();
-        this.popup.removeLoggedinElement();
-        this.chart.remove();
+    loCb = () => {
+        this.m.rLoEl();
+        this.p.rLoEl();
+        this.c.r();
     };
-    toggleTradingViewCallback = () => {
+    tTrViCb = () => {
         var leftEl = document.getElementById("left_order_type");
         var rightEl = document.getElementById("right_order_type");
         var orderEl = document.querySelector(
@@ -107,7 +85,7 @@ class SmartOrder {
             condOrderEl.innerText = "L. ĐIỀU KIỆN";
         }
     };
-    toggleLightWeightCallback = () => {
+    tLiWeCb = () => {
         var leftEl = document.getElementById("left_order_type");
         var rightEl = document.getElementById("right_order_type");
         var orderEl = document.querySelector(
@@ -139,7 +117,7 @@ class SmartOrder {
             condOrderEl.innerText = "";
         }
     };
-    getReportDataCallback = () => {
+    gReDaCb = () => {
         return {
             revenue: +document
                 .getElementById("vmAccInfo")
@@ -149,17 +127,17 @@ class SmartOrder {
                 .innerText.replaceAll(",", "")
         };
     };
-    getOrderPositionCallback = () => {
+    gOrPoCb = () => {
         const el = document.querySelector(
-            `#danhmuc_${this.global.symbol} > td:nth-child(2)`
+            `#danhmuc_${this.g.symbol} > td:nth-child(2)`
         );
         if (!el) return 0;
         const position = el.innerText;
         if (isNaN(position)) return 0;
         else return +position;
     };
-    closePositionCallback = () => {
-        const position = this.getOrderPositionCallback();
+    cPoCb = () => {
+        const position = this.gOrPoCb();
         if (position) {
             document.getElementById("select_normal_order_wrapper").click();
             document.getElementById("right_price").value = "MTL";
@@ -169,8 +147,8 @@ class SmartOrder {
                 .click();
         }
     };
-    orderEntryPriceCallback = order => {
-        this.callScript("onCancelAllOrderPending('order_condition')");
+    oEnPrCb = order => {
+        this.cSc("onCancelAllOrderPending('order_condition')");
         document.getElementById("select_condition_order_wrapper").click();
         document.getElementById("right_stopOrderIndex").value =
             order.entry.price;
@@ -184,11 +162,11 @@ class SmartOrder {
                 .click();
         }, 1000);
     };
-    orderTpPriceCallback = (order, isInit = false) => {
-        this.callScript("onCancelAllOrderPending('order')");
+    oTpPrCb = (order, isInit = false) => {
+        this.cSc("onCancelAllOrderPending('order')");
         if (isInit)
             order.tp.price =
-                +order.entry.price + order.side * this.global.takeProfit;
+                +order.entry.price + order.side * this.g.takeProfit;
         setTimeout(() => {
             document.getElementById("select_normal_order_wrapper").click();
             document.getElementById("right_price").value = order.tp.price;
@@ -197,11 +175,10 @@ class SmartOrder {
                 .click();
         }, 1000);
     };
-    orderSlPriceCallback = (order, isInit = false) => {
-        this.callScript("onCancelAllOrderPending('order_condition')");
+    oSlPrCb = (order, isInit = false) => {
+        this.cSc("onCancelAllOrderPending('order_condition')");
         if (isInit)
-            order.sl.price =
-                +order.entry.price - order.side * this.global.stopLoss;
+            order.sl.price = +order.entry.price - order.side * this.g.stopLoss;
         setTimeout(() => {
             document.getElementById("select_condition_order_wrapper").click();
             document.getElementById("right_stopOrderIndex").value =
@@ -214,16 +191,16 @@ class SmartOrder {
                 .click();
         }, 1000);
     };
-    cancelOrderCallback = () => {
-        this.callScript("onCancelAllOrderPending('order_condition')");
-        this.callScript("onCancelAllOrderPending('order')");
+    cOrCb = () => {
+        this.cSc("onCancelAllOrderPending('order_condition')");
+        this.cSc("onCancelAllOrderPending('order')");
     };
-    callScript = script => {
+    cSc = script => {
         var button = document.createElement("button");
         button.setAttribute("onclick", script);
         button.click();
     };
-    registerFullscreenEvent = () => {
+    rFuEv = () => {
         document
             .querySelector(".timeStamp")
             .addEventListener("dblclick", () => {
@@ -233,5 +210,5 @@ class SmartOrder {
     };
 }
 
-var so = new SmartOrder();
+var so = new So();
 so.init();

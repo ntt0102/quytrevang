@@ -1,28 +1,28 @@
-class Popup {
+class Po {
     // Các thuộc tính
     TOKEN_KEY = "SOAT";
 
     // Hàm khởi tạo
-    constructor(global, callback) {
-        this.global = global;
-        this.callback = callback;
-        this.createContainerElement();
-        this.getDeviceId();
+    constructor(g, c) {
+        this.g = g;
+        this.cb = c;
+        this.cCoEl();
+        this.gDeId();
     }
 
     // Các phương thức
-    createContainerElement = () => {
+    cCoEl = () => {
         var container = document.createElement("div");
         container.id = "optionViewContainer";
         document.body.append(container);
         this.containerElement = container;
     };
-    createNoLoginElement = () => {
-        this.createHearderContainer();
-        this.createLoginContainer();
-        this.createRegisterContainer();
+    cNoLoEl = () => {
+        this.cHeCo();
+        this.cLoCo();
+        this.cReCo();
     };
-    createHearderContainer = () => {
+    cHeCo = () => {
         var div = document.createElement("div");
         div.id = "hearderContainer";
         this.containerElement.append(div);
@@ -31,13 +31,13 @@ class Popup {
         var p = document.createElement("label");
         div.append(p);
         p.className = "title";
-        p.innerText = this.global.appName;
+        p.innerText = this.g.appName;
     };
-    createLoginContainer = () => {
+    cLoCo = () => {
         var div = document.createElement("div");
         div.id = "loginContainer";
         div.className = "section";
-        div.style.display = this.global.isLoggedin ? "none" : "block";
+        div.style.display = this.g.isLi ? "none" : "block";
         this.containerElement.append(div);
         this.loginContainer = div;
         //
@@ -45,7 +45,7 @@ class Popup {
         div.append(wrapper);
         wrapper.id = "loginForm";
         wrapper.className = "wrapper";
-        wrapper.addEventListener("submit", e => this.login(e, this));
+        wrapper.addEventListener("submit", e => this.lIn(e, this));
         //
         var p = document.createElement("label");
         wrapper.append(p);
@@ -59,7 +59,7 @@ class Popup {
         input.placeholder = "Email hoặc Số điện thoại";
         input.required = true;
         this.loginUsername = input;
-        if (!this.global.isLoggedin) this.loginUsername.focus();
+        if (!this.g.isLi) this.loginUsername.focus();
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -108,7 +108,7 @@ class Popup {
             window.open("https://www.w3schools.com")
         );
     };
-    createRegisterContainer = () => {
+    cReCo = () => {
         var div = document.createElement("div");
         div.id = "registerContainer";
         div.className = "section";
@@ -120,7 +120,7 @@ class Popup {
         div.append(wrapper);
         wrapper.id = "registerForm";
         wrapper.className = "wrapper";
-        wrapper.addEventListener("submit", e => this.register(e, this));
+        wrapper.addEventListener("submit", e => this.rAc(e, this));
         //
         var p = document.createElement("label");
         wrapper.append(p);
@@ -196,20 +196,20 @@ class Popup {
             window.open("https://www.w3schools.com")
         );
     };
-    createLoggedinElement = () => {
-        this.createInfoContainer();
-        this.createOptionContainer();
-        this.createAboutContainer();
+    cLoEl = () => {
+        this.cInCo();
+        this.cOpCo();
+        this.cAbCo();
         //
         this.loginContainer.style.display = "none";
         this.registerContainer.style.display = "none";
         this.infoContainer.style.display = "block";
     };
-    createInfoContainer = () => {
+    cInCo = () => {
         var div = document.createElement("div");
         div.id = "infoContainer";
         div.className = "section";
-        div.style.display = this.global.isLoggedin ? "block" : "none";
+        div.style.display = this.g.isLi ? "block" : "none";
         this.containerElement.append(div);
         this.infoContainer = div;
         //
@@ -231,7 +231,7 @@ class Popup {
         label.innerText = "Tên:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.global.user.name;
+        value.innerText = this.g.user.name;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -241,7 +241,7 @@ class Popup {
         label.innerText = "Email:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.global.user.email;
+        value.innerText = this.g.user.email;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -251,7 +251,7 @@ class Popup {
         label.innerText = "Điện thoại:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.global.user.phone;
+        value.innerText = this.g.user.phone;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -261,7 +261,7 @@ class Popup {
         label.innerText = "Ngày đăng ký:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = moment(this.global.registerDate).format("DD/MM/YYYY");
+        value.innerText = moment(this.g.registerDate).format("DD/MM/YYYY");
         item.append(value);
         //
         var list = document.createElement("div");
@@ -278,7 +278,7 @@ class Popup {
         label.innerText = "Ngày bắt đầu:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = moment(this.global.startDate).format("DD/MM/YYYY");
+        value.innerText = moment(this.g.startDate).format("DD/MM/YYYY");
         item.append(value);
         //
         var item = document.createElement("div");
@@ -288,7 +288,7 @@ class Popup {
         label.innerText = "Ngày hết hạn:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = moment(this.global.expiresDate).format("DD/MM/YYYY");
+        value.innerText = moment(this.g.expiresDate).format("DD/MM/YYYY");
         item.append(value);
         //
         var item = document.createElement("div");
@@ -298,13 +298,13 @@ class Popup {
         label.innerText = "Số lượng thiết bị:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.global.deviceLimit;
+        value.innerText = this.g.deviceLimit;
         item.append(value);
         //
         var button = document.createElement("button");
         wrapper.append(button);
         button.innerText = "ĐĂNG XUẤT";
-        button.addEventListener("click", () => this.logout(this));
+        button.addEventListener("click", () => this.lOu(this));
         //
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
@@ -326,7 +326,7 @@ class Popup {
             this.aboutContainer.style.display = "block";
         });
     };
-    createOptionContainer = () => {
+    cOpCo = () => {
         var div = document.createElement("div");
         div.id = "optionContainer";
         div.className = "section";
@@ -339,14 +339,13 @@ class Popup {
         wrapper.id = "optionForm";
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e =>
-            this.setServerConfig(e, this).then(isOk => {
+            this.sSeCo(e, this).then(isOk => {
                 this.optionSubmit.innerText = "LƯU CÀI ĐẶT";
                 this.optionSubmit.disabled = false;
-                if (isOk)
-                    this.global.alert.show("success", "Lưu cài đặt thành công");
-                else this.global.alert.show("error", "Lưu cài đặt thất bại");
+                if (isOk) this.g.a.s("success", "Lưu cài đặt thành công");
+                else this.g.a.s("error", "Lưu cài đặt thất bại");
                 //
-                this.callback.toggleVolume(this.isVolumeCheckbox.checked);
+                this.cb.tVo(this.isVolumeCheckbox.checked);
             })
         );
         //
@@ -362,13 +361,13 @@ class Popup {
         item.append(label);
         var select = document.createElement("select");
         select.style.width = "69px";
-        this.global.timeFrames.forEach((item, index) => {
+        this.g.timeFrames.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
             select.appendChild(option);
         });
-        select.value = this.global.timeFrame;
+        select.value = this.g.timeFrame;
         this.timeFrameSelect = select;
         item.append(select);
         //
@@ -379,13 +378,13 @@ class Popup {
         label.innerText = "Loại biểu đồ:";
         item.append(label);
         select = document.createElement("select");
-        this.global.chartTypes.forEach((item, index) => {
+        this.g.chartTypes.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
             select.appendChild(option);
         });
-        select.value = this.global.chartType;
+        select.value = this.g.chartType;
         this.chartTypeSelect = select;
         item.append(select);
         //
@@ -399,7 +398,7 @@ class Popup {
         input.type = "number";
         input.style.width = "69px";
         input.style.height = "21px";
-        input.value = this.global.contractNumber;
+        input.value = this.g.contractNumber;
         this.contractNumberInput = input;
         item.append(input);
         //
@@ -413,7 +412,7 @@ class Popup {
         input.type = "number";
         input.style.width = "69px";
         input.style.height = "21px";
-        input.value = this.global.takeProfit;
+        input.value = this.g.takeProfit;
         this.takeProfitInput = input;
         item.append(input);
         //
@@ -427,7 +426,7 @@ class Popup {
         input.type = "number";
         input.style.width = "69px";
         input.style.height = "21px";
-        input.value = this.global.stopLoss;
+        input.value = this.g.stopLoss;
         this.stopLossInput = input;
         item.append(input);
         //
@@ -440,7 +439,7 @@ class Popup {
         input = document.createElement("input");
         input.type = "checkbox";
         input.style.width = "17px";
-        input.checked = !!this.global.isVolume;
+        input.checked = !!this.g.isVolume;
         this.isVolumeCheckbox = input;
         item.append(input);
         //
@@ -453,7 +452,7 @@ class Popup {
         input = document.createElement("input");
         input.type = "checkbox";
         input.style.width = "17px";
-        input.checked = !!this.global.isViewChart;
+        input.checked = !!this.g.isViewChart;
         this.isViewChartCheckbox = input;
         item.append(input);
         //
@@ -473,7 +472,7 @@ class Popup {
             this.infoContainer.style.display = "block";
         });
     };
-    createAboutContainer = () => {
+    cAbCo = () => {
         var div = document.createElement("div");
         div.id = "aboutContainer";
         div.className = "section";
@@ -495,7 +494,7 @@ class Popup {
         label.innerText = "Phiên bản:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.global.version;
+        value.innerText = this.g.version;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -505,7 +504,7 @@ class Popup {
         label.innerText = "Ngày xuất bản:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.global.publishDate;
+        value.innerText = this.g.publishDate;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -515,7 +514,7 @@ class Popup {
         label.innerText = "Nhà phát triển:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.global.developer;
+        value.innerText = this.g.developer;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -525,7 +524,7 @@ class Popup {
         label.innerText = "Số điện thoại:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.global.contact.phone;
+        value.innerText = this.g.contact.phone;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -535,10 +534,10 @@ class Popup {
         label.innerText = "Email:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.global.contact.email;
+        value.innerText = this.g.contact.email;
         item.append(value);
         //
-        if (this.global.version != this.global.latestVersion) {
+        if (this.g.version != this.g.latestVersion) {
             var download = document.createElement("div");
             download.className = "download";
             wrapper.append(download);
@@ -548,7 +547,7 @@ class Popup {
             var button = document.createElement("button");
             download.append(button);
             button.innerText = "TẢI XUỐNG";
-            button.addEventListener("click", e => this.logout(e, this));
+            button.addEventListener("click", e => this.lOu(e, this));
         }
         //
         var routeWrapper = document.createElement("div");
@@ -570,12 +569,12 @@ class Popup {
             window.open("https://www.w3schools.com")
         );
     };
-    removeLoggedinElement = () => {
+    rLoEl = () => {
         this.infoContainer.remove();
         this.optionContainer.remove();
         this.aboutContainer.remove();
     };
-    register = (e, self) => {
+    rAc = (e, self) => {
         e.preventDefault();
         if (self.registerConfirmPassword.value != self.registerPassword.value) {
             self.registerMessage.innerText = "Mật khẩu không khớp";
@@ -589,10 +588,10 @@ class Popup {
                 email: self.registerEmail.value,
                 phone: self.registerPhone.value,
                 password: self.registerPassword.value,
-                deviceId: self.global.deviceId,
-                chanel: self.global.appName
+                deviceId: self.g.deviceId,
+                chanel: self.g.appName
             };
-            const url = this.global.domain + this.global.endpoint.register;
+            const url = this.g.domain + this.g.endpoint.register;
             fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -607,11 +606,11 @@ class Popup {
                     self.registerSubmit.innerText = "ĐĂNG KÝ";
                     self.registerSubmit.disabled = false;
                     if (json.isOk) {
-                        self.setToken(json.token);
-                        self.global.accessToken = json.token.access_token;
-                        self.global.user = json.user;
-                        await self.callback.loggedin();
-                        self.global.alert.show("success", "Đăng ký thành công");
+                        self.sTo(json.token);
+                        self.g.accessToken = json.token.access_token;
+                        self.g.user = json.user;
+                        await self.cb.loggedin();
+                        self.g.a.s("success", "Đăng ký thành công");
                         self.registerName.value = "";
                         self.registerEmail.value = "";
                         self.registerPhone.value = "";
@@ -628,13 +627,13 @@ class Popup {
                 })
                 .catch(error => {
                     console.log(error);
-                    self.global.alert.show("error", "Đăng ký lỗi");
+                    self.g.a.s("error", "Đăng ký lỗi");
                     self.registerSubmit.innerText = "ĐĂNG KÝ";
                     self.registerSubmit.disabled = false;
                 });
         }
     };
-    login = (e, self) => {
+    lIn = (e, self) => {
         e.preventDefault();
         self.loginSubmit.innerText = "Đang đăng nhập...";
         self.loginSubmit.disabled = true;
@@ -643,10 +642,10 @@ class Popup {
             username: self.loginUsername.value,
             password: self.loginPassword.value,
             rememberMe: self.loginRememberMe.value,
-            deviceId: self.global.deviceId,
-            chanel: self.global.appName
+            deviceId: self.g.deviceId,
+            chanel: self.g.appName
         };
-        const url = this.global.domain + this.global.endpoint.login;
+        const url = this.g.domain + this.g.endpoint.login;
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -661,12 +660,12 @@ class Popup {
                 self.loginSubmit.innerText = "ĐĂNG NHẬP";
                 self.loginSubmit.disabled = false;
                 if (json.isOk) {
-                    self.setToken(json.token);
-                    self.global.accessToken = json.token.access_token;
-                    self.global.user = json.user;
+                    self.sTo(json.token);
+                    self.g.accessToken = json.token.access_token;
+                    self.g.user = json.user;
                     self.loginUsername.value = "";
                     self.loginPassword.value = "";
-                    await self.callback.loggedin();
+                    await self.cb.loggedin();
                 } else {
                     if (json.message == "unauthorized")
                         self.loginMessage.innerText = "Sai thông tin đăng nhập";
@@ -679,38 +678,38 @@ class Popup {
                 }
             })
             .catch(error => {
-                self.global.alert.show("error", "Đăng nhập lỗi");
+                self.g.a.s("error", "Đăng nhập lỗi");
                 self.loginSubmit.innerText = "ĐĂNG NHẬP";
                 self.loginSubmit.disabled = false;
             });
     };
-    logout = self => {
-        const url = this.global.domain + this.global.endpoint.logout;
+    lOu = self => {
+        const url = this.g.domain + this.g.endpoint.logout;
         fetch(url, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${self.global.accessToken}`
+                Authorization: `Bearer ${self.g.accessToken}`
             }
         }).then(() => {
-            self.removeToken();
+            self.rTo();
             self.infoContainer.style.display = "none";
             self.loginContainer.style.display = "block";
-            self.callback.loggedout();
+            self.cb.loggedout();
             self.loginUsername.focus();
         });
     };
-    getUser = () => {
+    gU = () => {
         return new Promise(resolve => {
-            this.global.accessToken = this.getToken();
-            if (!this.global.accessToken) resolve();
+            this.g.accessToken = this.gTo();
+            if (!this.g.accessToken) resolve();
             else {
-                const url = this.global.domain + this.global.endpoint.user;
+                const url = this.g.domain + this.g.endpoint.user;
                 fetch(url, {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${this.global.accessToken}`
+                        Authorization: `Bearer ${this.g.accessToken}`
                     }
                 })
                     .then(response => {
@@ -718,54 +717,30 @@ class Popup {
                         throw new Error(response.statusText);
                     })
                     .then(json => {
-                        console.log("getUser: ", json);
-                        this.global.user = json;
-                        this.global.isLoggedin = !!json.code;
+                        console.log("gU: ", json);
+                        this.g.user = json;
+                        this.g.isLi = !!json.code;
                         resolve();
                     })
                     .catch(error => resolve());
             }
         });
     };
-    getLocalConfig = () => {
+    gSeCo = () => {
         return new Promise((resolve, reject) => {
-            const file = chrome.runtime.getURL("config.json");
-            fetch(file)
-                .then(response => response.json())
-                .then(json => {
-                    // console.log("localConfig", json);
-                    for (const key in json) this.global[key] = json[key];
-
-                    resolve();
-                })
-                .catch(() => {
-                    console.log(err);
-                    var choice = confirm(
-                        "Get local config error. Refresh now?"
-                    );
-                    if (choice) location.reload();
-                });
-        });
-    };
-    getServerConfig = () => {
-        return new Promise((resolve, reject) => {
-            const url = this.global.domain + this.global.endpoint.getConfig;
+            const url = this.g.domain + this.g.endpoint.getConfig;
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${this.global.accessToken}`
+                    Authorization: `Bearer ${this.g.accessToken}`
                 },
-                body: JSON.stringify({ securities: this.global.securities })
+                body: JSON.stringify({ securities: this.g.securities })
             })
                 .then(response => response.json())
                 .then(json => {
                     console.log("serverConfig", json);
-                    for (const key in json) {
-                        if (key == "endpoint")
-                            this.global.endpoint.socket = json.endpoint.socket;
-                        else this.global[key] = json[key];
-                    }
+                    for (const key in json) this.g[key] = json[key];
                     //
                     resolve();
                 })
@@ -778,7 +753,7 @@ class Popup {
                 });
         });
     };
-    setServerConfig = (e, self) => {
+    sSeCo = (e, self) => {
         e.preventDefault();
         return new Promise(resolve => {
             self.optionSubmit.innerText = "Đang lưu cài đặt...";
@@ -793,12 +768,12 @@ class Popup {
                 isViewChart: self.isViewChartCheckbox.checked
             };
             console.log("data:", data);
-            const url = this.global.domain + this.global.endpoint.setConfig;
+            const url = this.g.domain + this.g.endpoint.setConfig;
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${self.global.accessToken}`
+                    Authorization: `Bearer ${self.g.accessToken}`
                 },
                 body: JSON.stringify(data)
             })
@@ -813,26 +788,25 @@ class Popup {
                 .catch(error => resolve(false));
         });
     };
-    setToken = token =>
-        localStorage.setItem(this.TOKEN_KEY, JSON.stringify(token));
-    removeToken = () => localStorage.removeItem(this.TOKEN_KEY);
-    getToken = () => {
+    sTo = token => localStorage.setItem(this.TOKEN_KEY, JSON.stringify(token));
+    rTo = () => localStorage.removeItem(this.TOKEN_KEY);
+    gTo = () => {
         const token = JSON.parse(localStorage.getItem(this.TOKEN_KEY));
         if (!!token && moment().isBefore(token.expires_at))
             return token.access_token;
         else return false;
     };
-    getDeviceId = () => {
+    gDeId = () => {
         return new Promise(resolve => {
             FingerprintJS.load()
                 .then(fp => fp.get())
                 .then(result => {
-                    this.global.deviceId = result.visitorId;
+                    this.g.deviceId = result.visitorId;
                     resolve();
                 });
         });
     };
-    toggle = () => {
+    t = () => {
         if (this.containerElement.classList.contains("show"))
             this.containerElement.classList.remove("show");
         else this.containerElement.classList.add("show");

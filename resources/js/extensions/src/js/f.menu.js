@@ -1,27 +1,27 @@
-class Menu {
+class Me {
     // Các thuộc tính
 
     // Hàm khởi tạo
-    constructor(global, callback) {
-        this.global = global;
-        this.callback = callback;
-        this.createContainerElement();
-        this.createNoLoginElement();
+    constructor(g, c) {
+        this.g = g;
+        this.cb = c;
+        this.cCoEl();
+        this.cNoLoEl();
     }
 
     // Các phương thức
-    createContainerElement = () => {
+    cCoEl = () => {
         var container = document.createElement("div");
         container.id = "menuContainer";
         document.body.append(container);
         this.containerElement = container;
     };
-    createLoggedinElement = () => {
+    cLoEl = () => {
         var button = document.createElement("button");
         button.id = "lightWeightButton";
         button.classList = "fa fa-line-chart";
         button.title = "LightWeight Chart";
-        button.addEventListener("click", this.callback.toggleLightWeightChart);
+        button.addEventListener("click", this.cb.toggleLightWeightChart);
         this.containerElement.prepend(button);
         this.lightWeightButton = button;
         //
@@ -29,55 +29,52 @@ class Menu {
         button.id = "tradingViewButton";
         button.classList = "fa fa-bar-chart";
         button.title = "TradingView Chart";
-        button.addEventListener("click", this.callback.toggleTradingViewChart);
+        button.addEventListener("click", this.cb.toggleTradingViewChart);
         this.containerElement.prepend(button);
         this.tradingViewButton = button;
         //
-        if (this.global.isOpeningMarket) {
+        if (this.g.isOpeningMarket) {
             var button = document.createElement("button");
             button.id = "reportButton";
             button.classList = "fa fa-flag-checkered";
             button.title = "Report";
-            button.addEventListener("click", () =>
-                this.reportTradingResult(this)
-            );
+            button.addEventListener("click", () => this.rTrRe(this));
             this.containerElement.append(button);
             this.reportButton = button;
         }
         //
         this.interval = setInterval(() => {
-            this.blinkLightWeightButton(this);
-            if (moment().unix() == this.global.time.end)
-                this.reportTradingResult(this);
+            this.bLiWeBu(this);
+            if (moment().unix() == this.g.time.end) this.rTrRe(this);
         }, 1000);
     };
-    removeLoggedinElement = () => {
+    rLoEl = () => {
         this.tradingViewButton.remove();
         this.lightWeightButton.remove();
         this.reportButton.remove();
         //
         clearInterval(this.interval);
     };
-    createNoLoginElement = () => {
+    cNoLoEl = () => {
         var button = document.createElement("button");
         button.id = "settingButton";
         button.classList = "fa fa-cog";
         button.title = "Cài đặt";
-        button.addEventListener("click", this.callback.togglePopup);
+        button.addEventListener("click", this.cb.togglePopup);
         this.containerElement.append(button);
         this.settingButton = button;
     };
-    blinkLightWeightButton = self => {
+    bLiWeBu = self => {
         if (self.lightWeightButton.classList.contains("dark"))
             self.lightWeightButton.classList.remove("dark");
         else self.lightWeightButton.classList.add("dark");
     };
-    reportTradingResult = self => {
-        if (self.global.isOpeningMarket && !self.global.isReportedResult) {
-            self.global.isReportedResult = true;
-            self.global.toggleSpinner(true);
-            const url = self.global.domain + self.global.endpoint.report;
-            const data = self.callback.getReportData();
+    rTrRe = self => {
+        if (self.g.isOpeningMarket && !self.g.isReportedResult) {
+            self.g.isReportedResult = true;
+            self.g.tSp(true);
+            const url = self.g.domain + self.g.endpoint.report;
+            const data = self.cb.getReportData();
             fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -88,29 +85,25 @@ class Menu {
                     throw new Error(response.statusText);
                 })
                 .then(jsondata => {
-                    self.global.isReportedResult = jsondata.isOk;
+                    self.g.isReportedResult = jsondata.isOk;
                     if (jsondata.isOk) {
                         if (jsondata.isExecuted)
-                            self.global.alert.show(
-                                "success",
-                                "Báo cáo đã gửi thành công."
-                            );
-                        else
-                            self.global.alert.show("warning", "Đã gửi báo cáo");
+                            self.g.a.s("success", "Báo cáo đã gửi thành công.");
+                        else self.g.a.s("warning", "Đã gửi báo cáo");
                     }
                     //
-                    self.global.toggleSpinner(false);
+                    self.g.tSp(false);
                 })
                 .catch(error => {
-                    self.global.isReportedResult = false;
-                    self.global.alert.show("error", "Gửi báo cáo thất bại");
-                    self.global.toggleSpinner(false);
+                    self.g.isReportedResult = false;
+                    self.g.a.s("error", "Gửi báo cáo thất bại");
+                    self.g.tSp(false);
                 });
         }
     };
-    displayDefault = () => {
-        if (this.global.isLoggedin) {
-            if (!!this.global.isViewChart) this.lightWeightButton.click();
+    dDe = () => {
+        if (this.g.isLi) {
+            if (!!this.g.isViewChart) this.lightWeightButton.click();
         } else this.settingButton.click();
     };
 }

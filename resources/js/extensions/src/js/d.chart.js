@@ -1,8 +1,8 @@
-class Chart {
+class Ch {
     // Các thuộc tính
-    chart = {};
-    series = {};
-    data = {};
+    ch = {};
+    se = {};
+    da = {};
     order = { entry: {}, tp: {}, sl: {} };
     lines = [];
     markers = [];
@@ -16,64 +16,56 @@ class Chart {
     DOWN_COLOR = "rgb(239,83,80)";
 
     // Hàm khởi tạo
-    constructor(global, callback) {
-        this.global = global;
-        this.callback = callback;
-        this.global.toggleSpinner = this.toggleSpinner;
+    constructor(g, c) {
+        this.g = g;
+        this.cb = c;
+        this.g.tSp = this.tSp;
         this.alertAudio.loop = true;
     }
 
     // Các phương thức
-    create = () => {
-        this.timeFrame = this.global.timeFrame;
-        this.chartType = this.global.chartType;
+    c = () => {
+        this.timeFrame = this.g.timeFrame;
+        this.chartType = this.g.chartType;
         console.log("this.chartType: ", this.chartType);
-        this.createContainerElement();
-        this.createChart();
-        this.createDataArea();
-        this.createToolArea();
-        this.createLegendArea();
-        this.createFreeArea();
-        if (this.global.isOpeningMarket) {
-            this.secInterval = setInterval(
-                () => this.secIntervalHandler(this),
-                1000
-            );
-            this.minInterval = setInterval(
-                () => this.minIntervalHandler(this),
-                60000
-            );
-            this.connectSocket();
+        this.cCoEl();
+        this.cCh();
+        this.cDaAr();
+        this.cToAr();
+        this.cLeAr();
+        this.cFrAr();
+        if (this.g.isOpeningMarket) {
+            this.secInterval = setInterval(() => this.inSec(this), 1000);
+            this.minInterval = setInterval(() => this.inMin(this), 60000);
+            this.cnSk();
         }
-        window.addEventListener("resize", () => this.resize(this));
-        window.addEventListener("keydown", e => this.keyEvent(e, this));
+        window.addEventListener("resize", () => this.eChRe(this));
+        window.addEventListener("keydown", e => this.eKePr(e, this));
     };
-    remove = () => {
-        window.removeEventListener("resize", () => this.resize(this));
-        window.removeEventListener("keydown", e => this.keyEvent(e, this));
+    r = () => {
+        window.removeEventListener("resize", () => this.eChRe(this));
+        window.removeEventListener("keydown", e => this.eKePr(e, this));
         clearInterval(this.secInterval);
         clearInterval(this.minInterval);
         //
         this.containerElement.remove();
     };
-    createContainerElement = () => {
+    cCoEl = () => {
         var container = document.createElement("div");
         document.body.append(container);
         container.id = "lightWeightChartContainer";
         container.style.width = "100vw";
         container.style.height = "100vh";
-        container.addEventListener("contextmenu", e =>
-            this.chartContextmenu(e, this)
-        );
-        container.addEventListener("click", e => this.chartClick(e, this));
+        container.addEventListener("contextmenu", e => this.eChCoMe(e, this));
+        container.addEventListener("click", e => this.eChCl(e, this));
         this.containerElement = container;
     };
-    createChart = () => {
+    cCh = () => {
         const chartOptions = {
             localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
             rightPriceScale: {
                 visible: true,
-                scaleMargins: this.global.isVolume
+                scaleMargins: this.g.isVolume
                     ? { top: 0.1, bottom: 0.21 }
                     : { top: 0.2, bottom: 0.1 }
             },
@@ -99,48 +91,46 @@ class Chart {
                 minBarSpacing: 0.1
             }
         };
-        this.chart = LightweightCharts.createChart(
+        this.ch = LightweightCharts.createChart(
             this.containerElement,
             chartOptions
         );
-        this.chart.subscribeCrosshairMove(e => this.crosshairMove(e, this));
-        this.chart.subscribeCustomPriceLineDragged(e =>
-            this.priceLineDrag(e, this)
-        );
+        this.ch.subscribeCrosshairMove(e => this.eChCrMo(e, this));
+        this.ch.subscribeCustomPriceLineDragged(e => this.ePrLiDr(e, this));
         //
-        this.series.volume = this.chart.addHistogramSeries({
+        this.se.volume = this.ch.addHistogramSeries({
             priceScaleId: "volume",
             color: "#FF00FF",
             priceFormat: { type: "volume" },
             scaleMargins: { top: 0.8, bottom: 0 },
-            visible: this.global.isVolume
+            visible: this.g.isVolume
         });
         //
-        this.createPriceSeries();
-        this.chart.timeScale().fitContent();
+        this.cPrSe();
+        this.ch.timeScale().fitContent();
     };
-    createPriceSeries = () => {
+    cPrSe = () => {
         switch (this.chartType) {
             case "candlestick":
-                this.series.price = this.chart.addCandlestickSeries({
+                this.se.price = this.ch.addCandlestickSeries({
                     priceFormat: { minMove: 0.1 }
                 });
                 break;
             case "line":
-                this.series.price = this.chart.addLineSeries({
+                this.se.price = this.ch.addLineSeries({
                     color: "white",
                     priceFormat: { minMove: 0.1 }
                 });
                 break;
             case "bar":
-                this.series.price = this.chart.addBarSeries({
+                this.se.price = this.ch.addBarSeries({
                     thinBars: false,
                     priceFormat: { minMove: 0.1 }
                 });
                 break;
         }
     };
-    createDataArea = () => {
+    cDaAr = () => {
         var container = document.createElement("div");
         container.id = "dataAreaDiv";
         container.className = "area";
@@ -160,7 +150,7 @@ class Chart {
         input.className = "command";
         input.title = "Dữ liệu của ngày";
         input.addEventListener("change", e => {
-            if (!!e.target.value) this.loadChartData();
+            if (!!e.target.value) this.lChDa();
         });
         container.append(input);
         this.dateInput = input;
@@ -169,7 +159,7 @@ class Chart {
         select.id = "chartTypeSelect";
         select.className = "command";
         select.title = "Loại biểu đồ giá";
-        this.global.chartTypes.forEach((item, index) => {
+        this.g.chartTypes.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
@@ -178,11 +168,11 @@ class Chart {
         select.value = this.chartType;
         select.addEventListener("change", e => {
             this.chartType = e.target.value;
-            this.chart.remove();
-            this.createChart();
-            this.series.price.setData(this.data.price);
-            this.series.volume.setData(this.data.volume);
-            this.getToolsData();
+            this.ch.remove();
+            this.cCh();
+            this.se.price.setData(this.da.price);
+            this.se.volume.setData(this.da.volume);
+            this.gToDa();
         });
         container.append(select);
         this.chartTypeSelect = select;
@@ -191,7 +181,7 @@ class Chart {
         select.id = "timeFrameSelect";
         select.className = "command";
         select.title = "Khung thời gian [Ctrl+0]";
-        this.global.timeFrames.forEach((item, index) => {
+        this.g.timeFrames.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
@@ -200,9 +190,7 @@ class Chart {
         select.value = this.timeFrame;
         select.addEventListener("change", e => {
             this.timeFrame = e.target.value;
-            this.loadChartData().then(() =>
-                this.chart.timeScale().resetTimeScale()
-            );
+            this.lChDa().then(() => this.ch.timeScale().resetTimeScale());
         });
         container.append(select);
         this.timeFrameSelect = select;
@@ -211,7 +199,7 @@ class Chart {
         button.id = "refreshButton";
         button.className = "command fa fa-refresh";
         button.title = "Làm mới [Ctrl+M]";
-        button.addEventListener("click", () => this.loadChartData());
+        button.addEventListener("click", () => this.lChDa());
         container.append(button);
         this.refreshButton = button;
         //
@@ -220,13 +208,13 @@ class Chart {
         button.className = "command fa fa-trash";
         button.title = "Xoá ngày khác [Ctrl+,]";
         button.addEventListener("click", () => {
-            this.global.store.clear("data");
-            this.loadChartData();
+            this.g.s.c("data");
+            this.lChDa();
         });
         container.append(button);
         this.clearButton = button;
     };
-    createToolArea = () => {
+    cToAr = () => {
         var container = document.createElement("div");
         container.id = "toolAreaDiv";
         container.className = "area";
@@ -245,7 +233,7 @@ class Chart {
             e.stopPropagation();
         });
         button.addEventListener("contextmenu", e => {
-            this.removeToolLines();
+            this.rToLi();
             e.target.classList.remove("selected");
             e.preventDefault();
             e.stopPropagation();
@@ -254,7 +242,7 @@ class Chart {
         this.drawLineButton = button;
         //
         var button = document.createElement("div");
-        button.id = "drawMarkerButton";
+        button.id = "dMaButton";
         button.className = "command fa fa-map-marker";
         button.title = "Vẽ đánh dấu [Ctrl+L][Ctrl+Shift+L]";
         button.addEventListener("click", e => {
@@ -266,16 +254,16 @@ class Chart {
             e.stopPropagation();
         });
         button.addEventListener("contextmenu", e => {
-            this.removeMarkers();
+            this.rMa();
             e.target.classList.remove("selected");
             e.preventDefault();
             e.stopPropagation();
         });
         container.append(button);
-        this.drawMarkerButton = button;
+        this.dMaButton = button;
         //
         var button = document.createElement("div");
-        button.id = "drawRulerButton";
+        button.id = "dRuButton";
         button.className = "command fa fa-arrows-v";
         button.title = "Thước đo giá [Ctrl+;][Ctrl+Shift+;]";
         button.addEventListener("click", e => {
@@ -285,21 +273,21 @@ class Chart {
                 .forEach(el => el.classList.remove("selected"));
             if (!selected) {
                 e.target.classList.add("selected");
-                this.removeRuler();
+                this.rRu();
             }
             e.stopPropagation();
         });
         button.addEventListener("contextmenu", e => {
-            this.removeRuler();
+            this.rRu();
             e.target.classList.remove("selected");
             e.preventDefault();
             e.stopPropagation();
         });
         container.append(button);
-        this.drawRulerButton = button;
+        this.dRuButton = button;
         //
         var button = document.createElement("div");
-        button.id = "drawAlertButton";
+        button.id = "dAlButton";
         button.className = "command fa fa-bell-o";
         button.title = "Đặt cảnh báo [Ctrl+'][Ctrl+Shift+']";
         button.addEventListener("click", e => {
@@ -311,15 +299,15 @@ class Chart {
             e.stopPropagation();
         });
         button.addEventListener("contextmenu", e => {
-            this.removeAlerts();
+            this.rAl();
             e.target.classList.remove("selected");
             e.preventDefault();
             e.stopPropagation();
         });
         container.append(button);
-        this.drawAlertButton = button;
+        this.dAlButton = button;
     };
-    createLegendArea = () => {
+    cLeAr = () => {
         var container = document.createElement("div");
         container.id = "legendAreaDiv";
         this.containerElement.append(container);
@@ -331,11 +319,11 @@ class Chart {
         //
         var p = document.createElement("p");
         p.id = "volumeLegendP";
-        p.style.display = this.global.isVolume ? "block" : "none";
+        p.style.display = this.g.isVolume ? "block" : "none";
         container.append(p);
         this.volumeLegendP = p;
     };
-    createFreeArea = () => {
+    cFrAr = () => {
         var container = this.containerElement;
         //
         var button = document.createElement("button");
@@ -343,13 +331,13 @@ class Chart {
         button.innerText = "X";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.callback.closePosition();
-            this.callback.cancelOrder();
-            this.toggleCancelOrderButton(false);
-            this.removeOrderLine("entry");
-            this.removeOrderLine("tp");
-            this.removeOrderLine("sl");
-            this.global.store.clear("order");
+            this.cb.cPo();
+            this.cb.cOr();
+            this.tCaOrBu(false);
+            this.rOrLi("entry");
+            this.rOrLi("tp");
+            this.rOrLi("sl");
+            this.g.s.c("order");
         });
         container.append(button);
         this.cancelOrderButton = button;
@@ -359,10 +347,10 @@ class Chart {
         button.innerText = "Entry";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.callback.orderEntryPrice(this.order);
-            this.drawOrderLine("entry");
-            this.toggleCancelOrderButton(true);
-            this.hideOrderButton();
+            this.cb.oEnPr(this.or);
+            this.dOrLi("entry");
+            this.tCaOrBu(true);
+            this.hOrBu();
         });
         container.append(button);
         this.entryOrderButton = button;
@@ -372,11 +360,11 @@ class Chart {
         button.innerText = "TP/SL";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.callback.orderTpPrice(this.order, true);
-            this.drawOrderLine("tp");
-            this.callback.orderSlPrice(this.order, true);
-            this.drawOrderLine("sl");
-            this.hideOrderButton();
+            this.cb.oTpPr(this.or, true);
+            this.dOrLi("tp");
+            this.cb.oSlPr(this.or, true);
+            this.dOrLi("sl");
+            this.hOrBu();
         });
         container.append(button);
         this.tpslOrderButton = button;
@@ -385,37 +373,33 @@ class Chart {
         button.id = "scrollButton";
         button.className = "command fa fa-angle-double-right";
         button.addEventListener("click", () =>
-            this.chart.timeScale().scrollToRealTime()
+            this.ch.timeScale().scrollToRealTime()
         );
         container.append(button);
     };
-    chartContextmenu = (e, self) => {
-        self.showOrderButton();
+    eChCoMe = (e, self) => {
+        self.sOrBu();
         e.preventDefault();
     };
-    chartClick = (e, self) => {
-        self.hideOrderButton();
-        if (self.drawLineButton.classList.contains("selected"))
-            self.drawToolLine();
-        else if (self.drawMarkerButton.classList.contains("selected"))
-            self.drawMarker();
-        else if (self.drawRulerButton.classList.contains("selected"))
-            self.drawRuler();
-        else if (self.drawAlertButton.classList.contains("selected"))
-            self.drawAlert();
+    eChCl = (e, self) => {
+        self.hOrBu();
+        if (self.drawLineButton.classList.contains("selected")) self.dToLi();
+        else if (self.dMaButton.classList.contains("selected")) self.dMa();
+        else if (self.dRuButton.classList.contains("selected")) self.dRu();
+        else if (self.dAlButton.classList.contains("selected")) self.dAl();
     };
-    crosshairMove = (e, self) => {
+    eChCrMo = (e, self) => {
         if (e.time) {
-            var price = e.seriesPrices.get(self.series.price);
-            var volume = e.seriesPrices.get(self.series.volume);
-            if (self.chartType != "line") price = price.close;
-            self.updateLegend(price, volume);
+            var price = e.seriesPrices.get(self.se.price);
+            var volume = e.seriesPrices.get(self.se.volume);
+            if (self.chType != "line") price = price.close;
+            self.uLe(price, volume);
             self.hasCrosshair = true;
             self.crosshair.time = e.time;
             self.crosshair.price = price;
         } else {
             self.hasCrosshair = false;
-            if (!self.global.isMobile) {
+            if (!self.g.isM) {
                 self.crosshair.time = null;
                 self.crosshair.price = null;
             }
@@ -425,90 +409,84 @@ class Chart {
             self.crosshair.y = e.point.y;
         }
     };
-    priceLineDrag = (e, self) => {
+    ePrLiDr = (e, self) => {
         var line = e.customPriceLine;
         var lineOptions = line.options();
-        lineOptions.price = self.formatPrice(lineOptions.price);
+        lineOptions.price = self.fPr(lineOptions.price);
         const oldPrice = +e.fromPriceString;
         const newPrice = lineOptions.price;
         switch (lineOptions.lineType) {
             case "order":
                 if (newPrice != oldPrice) {
                     var isChanged = false;
-                    const position = self.callback.getOrderPosition();
+                    const position = self.cb.gOrPo();
                     if (lineOptions.kind == "entry") {
                         if (!position) {
                             isChanged = true;
-                            self.order[lineOptions.kind].price = newPrice;
-                            self.callback.orderEntryPrice(self.order);
-                            self.drawOrderLine(lineOptions.kind);
+                            self.or[lineOptions.kind].price = newPrice;
+                            self.cb.oEnPr(self.or);
+                            self.dOrLi(lineOptions.kind);
                         }
                     } else {
-                        if (self.order.side * position > 0) {
+                        if (self.or.side * position > 0) {
                             isChanged = true;
-                            self.order[lineOptions.kind].price = newPrice;
+                            self.or[lineOptions.kind].price = newPrice;
                             if (lineOptions.kind == "tp")
-                                self.callback.orderTpPrice(self.order);
-                            else self.callback.orderSlPrice(self.order);
-                            drawOrderLine(lineOptions.kind);
+                                self.cb.oTpPr(self.or);
+                            else self.cb.oSlPr(self.or);
+                            dOrLi(lineOptions.kind);
                         }
                     }
                     //
                     if (!isChanged) {
                         line.applyOptions({ price: oldPrice });
-                        self.global.alert.show(
-                            "warning",
-                            "Không được thay đổi."
-                        );
+                        self.g.a.s("warning", "Không được thay đổi.");
                     }
                 }
                 break;
             case "line":
-                self.global.store.set("line", {
+                self.g.s.s("line", {
                     price: oldPrice,
                     removed: true
                 });
-                self.global.store.set("line", lineOptions);
+                self.g.s.s("line", lineOptions);
                 self.drawLineButton.classList.remove("selected");
                 break;
             case "ruler":
                 if (lineOptions.point == 1) {
-                    self.global.store.set("ruler", lineOptions);
+                    self.g.s.s("ruler", lineOptions);
                     if (self.ruler.point == 2) {
                         const distance = +self.ruler.end.options().title;
                         const endPrice = +(newPrice + distance).toFixed(1);
                         self.ruler.end.applyOptions({ price: endPrice });
-                        self.global.store.set(
-                            "ruler",
-                            self.ruler.end.options()
-                        );
+                        self.g.s.s("ruler", self.ruler.end.options());
                     }
                 } else {
                     const startPrice = +self.ruler.start.options().price;
                     const distance = (newPrice - startPrice).toFixed(1);
                     line.applyOptions({ title: distance });
-                    self.global.store.set("ruler", line.options());
+                    self.g.s.s("ruler", line.options());
                 }
                 break;
             case "alert":
                 self.alertAudio.pause();
-                self.global.store.set("alert", {
+                self.g.s.s("alert", {
                     price: oldPrice,
                     removed: true
                 });
-                const currentPrice = self.data.price.slice(-1)[0].value;
+                const currentPrice = self.da.price.slice(-1)[0].value;
                 var title = newPrice >= currentPrice ? ">" : "<";
                 line.applyOptions({ title: title });
-                self.global.store.set("alert", line.options());
-                self.drawAlertButton.classList.remove("selected");
+                self.g.s.s("alert", line.options());
+                self.dAlButton.classList.remove("selected");
                 break;
         }
     };
     //
-    showOrderButton = () => {
-        if (this.callback.getOrderPosition()) {
-            // if (this.order.entry.hasOwnProperty("line")) {
-            if (!this.order.tp.hasOwnProperty("line")) {
+    sOrBu = () => {
+        if (this.cb.gOrPo()) {
+            // if (this.or.entry.hasOwnProperty("line")) {
+            if (!this.or.tp.hasOwnProperty("line")) {
                 this.tpslOrderButton.style.left =
                     +(this.crosshair.x + 10) + "px";
                 this.tpslOrderButton.style.top =
@@ -516,12 +494,11 @@ class Chart {
                 this.tpslOrderButton.style.display = "block";
             }
         } else {
-            if (!this.order.entry.hasOwnProperty("line")) {
-                const price = this.coordinateToPrice(this.crosshair.y);
-                const side =
-                    price >= this.data.price.slice(-1)[0].value ? 1 : -1;
-                this.order.entry.price = price;
-                this.order.side = side;
+            if (!this.or.entry.hasOwnProperty("line")) {
+                const price = this.cCo2Pr(this.crosshair.y);
+                const side = price >= this.da.price.slice(-1)[0].value ? 1 : -1;
+                this.or.entry.price = price;
+                this.or.side = side;
                 this.entryOrderButton.style.left =
                     +(this.crosshair.x + 10) + "px";
                 this.entryOrderButton.style.top =
@@ -535,41 +512,41 @@ class Chart {
             }
         }
     };
-    hideOrderButton = () => {
+    hOrBu = () => {
         this.entryOrderButton.style.display = "none";
         this.tpslOrderButton.style.display = "none";
     };
     //
-    drawOrderLine = kind => {
+    dOrLi = kind => {
         var color, title;
         switch (kind) {
             case "entry":
                 color = "silver";
-                title = this.order.side > 0 ? "Long" : "Short";
+                title = this.or.side > 0 ? "Long" : "Short";
                 break;
             case "tp":
                 color = "lime";
                 title = Math.abs(
-                    this.order.tp.price - this.order.entry.price
+                    this.or.tp.price - this.or.entry.price
                 ).toFixed(1);
                 break;
             case "sl":
                 color = "red";
                 title = Math.abs(
-                    this.order.sl.price - this.order.entry.price
+                    this.or.sl.price - this.or.entry.price
                 ).toFixed(1);
                 break;
         }
-        if (this.order[kind].hasOwnProperty("line")) {
-            this.order[kind].line.applyOptions({
-                price: this.order[kind].price,
+        if (this.or[kind].hasOwnProperty("line")) {
+            this.or[kind].line.applyOptions({
+                price: this.or[kind].price,
                 title: title
             });
         } else {
-            this.order[kind].line = this.series.price.createPriceLine({
+            this.or[kind].line = this.se.price.createPriceLine({
                 lineType: "order",
                 kind: kind,
-                price: this.order[kind].price,
+                price: this.or[kind].price,
                 color: color,
                 lineWidth: 1,
                 lineStyle: LightweightCharts.LineStyle.Solid,
@@ -577,32 +554,30 @@ class Chart {
                 draggable: true
             });
         }
-        this.global.store.set("order", {
+        this.g.s.s("order", {
             kind: kind,
-            price: +this.order[kind].price,
-            side: this.order.side
+            price: +this.or[kind].price,
+            side: this.or.side
         });
     };
-    removeOrderLine = kind => {
-        if (this.order[kind].hasOwnProperty("line")) {
-            this.series.price.removePriceLine(this.order[kind].line);
-            delete this.order[kind].line;
+    rOrLi = kind => {
+        if (this.or[kind].hasOwnProperty("line")) {
+            this.se.price.removePriceLine(this.or[kind].line);
+            delete this.or[kind].line;
         }
     };
     //
-    drawToolLine = () => {
+    dToLi = () => {
         const TYPE = "line";
-        const price = this.formatPrice(
-            this.coordinateToPrice(this.crosshair.y)
-        );
+        const price = this.fPr(this.cCo2Pr(this.crosshair.y));
         const existIndex = this.lines.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
         });
         if (existIndex != -1) {
             const removeLine = this.lines.splice(existIndex, 1);
-            this.series.price.removePriceLine(removeLine[0]);
-            this.global.store.set("line", { price: price, removed: true });
+            this.se.price.removePriceLine(removeLine[0]);
+            this.g.s.s("line", { price: price, removed: true });
         } else {
             const options = {
                 lineType: TYPE,
@@ -612,18 +587,18 @@ class Chart {
                 lineStyle: LightweightCharts.LineStyle.Dotted,
                 draggable: true
             };
-            this.lines.push(this.series.price.createPriceLine(options));
-            this.global.store.set("line", options);
+            this.lines.push(this.se.price.createPriceLine(options));
+            this.g.s.s("line", options);
         }
         this.drawLineButton.classList.remove("selected");
     };
-    removeToolLines = () => {
-        this.lines.forEach(line => this.series.price.removePriceLine(line));
+    rToLi = () => {
+        this.lines.forEach(line => this.se.price.removePriceLine(line));
         this.lines = [];
-        this.global.store.clear("line");
+        this.g.s.c("line");
     };
     //
-    drawMarker = () => {
+    dMa = () => {
         if (this.crosshair.time) {
             const markers = this.markers.filter(
                 item => item.time != this.crosshair.time
@@ -631,7 +606,7 @@ class Chart {
             if (markers.length == this.markers.length) {
                 const dir =
                     this.crosshair.y >=
-                    this.series.price.priceToCoordinate(this.crosshair.price);
+                    this.se.price.priceToCoordinate(this.crosshair.price);
                 this.markers.push({
                     time: this.crosshair.time,
                     position: dir ? "belowBar" : "aboveBar",
@@ -639,22 +614,22 @@ class Chart {
                     shape: dir ? "arrowUp" : "arrowDown"
                 });
             } else this.markers = markers;
-            this.series.price.setMarkers(this.markers);
-            this.global.store
+            this.se.price.setMarkers(this.markers);
+            this.g.s
                 .clear("marker")
-                .then(() => this.global.store.set("marker", this.markers));
+                .then(() => this.g.s.s("marker", this.markers));
             //
-            this.drawMarkerButton.classList.remove("selected");
+            this.dMaButton.classList.remove("selected");
         }
     };
-    removeMarkers = () => {
+    rMa = () => {
         this.markers = [];
-        this.series.price.setMarkers([]);
-        this.global.store.clear("marker");
+        this.se.price.setMarkers([]);
+        this.g.s.c("marker");
     };
     //
-    drawRuler = () => {
-        const price = this.coordinateToPrice(this.crosshair.y);
+    dRu = () => {
+        const price = this.cCo2Pr(this.crosshair.y);
         var options = {
             lineType: "ruler",
             price: price,
@@ -667,163 +642,155 @@ class Chart {
             const point = 1;
             options.point = point;
             options.title = "0";
-            this.ruler.start = this.series.price.createPriceLine(options);
+            this.ruler.start = this.se.price.createPriceLine(options);
             this.ruler.point = point;
-            this.global.store.set("ruler", options);
+            this.g.s.s("ruler", options);
         } else if (this.ruler.point == 1) {
             const startPrice = +this.ruler.start.options().price;
             const point = 2;
             options.point = point;
             options.title = (price - startPrice).toFixed(1);
-            this.ruler.end = this.series.price.createPriceLine(options);
+            this.ruler.end = this.se.price.createPriceLine(options);
             this.ruler.point = point;
-            this.global.store.set("ruler", options);
-            this.drawRulerButton.classList.remove("selected");
+            this.g.s.s("ruler", options);
+            this.dRuButton.classList.remove("selected");
         }
     };
-    removeRuler = () => {
+    rRu = () => {
         if (this.ruler.point > 0) {
-            this.series.price.removePriceLine(this.ruler.start);
+            this.se.price.removePriceLine(this.ruler.start);
             if (this.ruler.point > 1)
-                this.series.price.removePriceLine(this.ruler.end);
+                this.se.price.removePriceLine(this.ruler.end);
             //
             this.ruler = { start: {}, end: {}, point: 0 };
-            this.global.store.clear("ruler");
+            this.g.s.c("ruler");
         }
     };
     //
-    drawAlert = () => {
+    dAl = () => {
         const TYPE = "alert";
-        const price = this.formatPrice(
-            this.coordinateToPrice(this.crosshair.y)
-        );
+        const price = this.fPr(this.cCo2Pr(this.crosshair.y));
         const existIndex = this.alerts.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
         });
         if (existIndex != -1) {
             const removeLine = this.alerts.splice(existIndex, 1);
-            this.series.price.removePriceLine(removeLine[0]);
-            this.global.store.set("alert", { price: price, removed: true });
+            this.se.price.removePriceLine(removeLine[0]);
+            this.g.s.s("alert", { price: price, removed: true });
         } else {
             const options = {
                 lineType: TYPE,
                 price: price,
-                title:
-                    price >= this.data.original.slice(-1)[0].price ? ">" : "<",
+                title: price >= this.da.original.slice(-1)[0].price ? ">" : "<",
                 color: "#FF00FF",
                 lineWidth: 1,
                 lineStyle: LightweightCharts.LineStyle.Dotted,
                 draggable: true
             };
-            this.alerts.push(this.series.price.createPriceLine(options));
-            this.global.store.set("alert", options);
+            this.alerts.push(this.se.price.createPriceLine(options));
+            this.g.s.s("alert", options);
         }
-        this.drawAlertButton.classList.remove("selected");
+        this.dAlButton.classList.remove("selected");
         this.alertAudio.pause();
     };
-    removeAlerts = () => {
-        this.alerts.forEach(line => this.series.price.removePriceLine(line));
+    rAl = () => {
+        this.alerts.forEach(line => this.se.price.removePriceLine(line));
         this.alerts = [];
-        this.global.store.clear("alert");
+        this.g.s.c("alert");
         this.alertAudio.pause();
     };
     //
-    toggleCancelOrderButton = visible => {
+    tCaOrBu = visible => {
         if (visible) {
             this.cancelOrderButton.style.display = "block";
             this.cancelOrderButton.style.background =
-                this.order.side > 0 ? "green" : "red";
+                this.or.side > 0 ? "green" : "red";
         } else this.cancelOrderButton.style.display = "none";
     };
     //
-    updateLegend = (price, volume) => {
+    uLe = (price, volume) => {
         if (!!price) this.priceLegendP.innerText = price;
         if (!!volume)
             this.volumeLegendP.innerText = volume.toLocaleString("en-US");
     };
-    coordinateToPrice = y => {
-        return this.formatPrice(this.series.price.coordinateToPrice(y));
+    cCo2Pr = y => {
+        return this.fPr(this.se.price.cCo2Pr(y));
     };
-    formatPrice = price => {
+    fPr = price => {
         return +(+price.toFixed(1));
     };
     //
-    loadChartData = () => {
+    lChDa = () => {
         return new Promise(async (resolve, reject) => {
-            this.toggleSpinner(true);
-            const svData = await this.getServerData();
+            this.tSp(true);
+            const svData = await this.gSeDa();
             start: while (true) {
                 this.hasNewData = false;
-                const lcData = await this.global.store.get("data");
+                const lcData = await this.g.s.g("data");
                 const ids = new Set(svData.map(d => d.time));
                 const data = [
                     ...svData,
                     ...lcData.filter(d => !ids.has(d.time))
                 ].sort((a, b) => a.time - b.time);
                 if (this.hasNewData) continue start;
-                this.global.store
-                    .clear("data")
-                    .then(() => this.global.store.set("data", data));
+                this.g.s.c("data").then(() => this.g.s.s("data", data));
                 //
-                this.data = data.reduce(
-                    (r, item) => this.generateChartData(r, item),
-                    {
-                        original: [],
-                        price: [],
-                        volume: []
-                    }
-                );
-                console.log("data", this.data);
+                this.da = data.reduce((r, item) => this.cChDa(r, item), {
+                    original: [],
+                    price: [],
+                    volume: []
+                });
+                console.log("data", this.da);
                 //
-                this.series.price.setData(this.data.price);
-                this.series.volume.setData(this.data.volume);
+                this.se.price.setData(this.da.price);
+                this.se.volume.setData(this.da.volume);
                 //
-                if (!this.hasCrosshair && !!this.data.original.length) {
-                    this.updateLegend(
-                        this.data.price.slice(-1)[0].value,
-                        this.data.volume.slice(-1)[0].value
+                if (!this.hasCrosshair && !!this.da.original.length) {
+                    this.uLe(
+                        this.da.price.slice(-1)[0].value,
+                        this.da.volume.slice(-1)[0].value
                     );
                 }
                 //
-                this.toggleSpinner(false);
+                this.tSp(false);
                 resolve();
                 break;
             }
         });
     };
-    updateChartData = param => {
+    uChDa = param => {
         this.hasNewData = true;
-        this.data = this.generateChartData(this.data, param);
-        const lastPrice = this.data.price.slice(-1)[0];
-        const lastVolume = this.data.volume.slice(-1)[0];
+        this.da = this.cChDa(this.da, param);
+        const lastPrice = this.da.price.slice(-1)[0];
+        const lastVolume = this.da.volume.slice(-1)[0];
         //
         if (this.timeFrame > 0) {
-            this.series.price.setData(this.data.price);
-            this.series.volume.setData(this.data.volume);
+            this.se.price.setData(this.da.price);
+            this.se.volume.setData(this.da.volume);
         } else {
-            this.series.price.update(lastPrice);
-            this.series.volume.update(lastVolume);
+            this.se.price.update(lastPrice);
+            this.se.volume.update(lastVolume);
         }
         if (!this.hasCrosshair) {
-            this.updateLegend(lastPrice.value, lastVolume.value);
+            this.uLe(lastPrice.value, lastVolume.value);
         }
         //
-        this.global.store.set("data", param);
-        this.data.original.push(param);
+        this.g.s.s("data", param);
+        this.da.original.push(param);
     };
-    getServerData = () => {
+    gSeDa = () => {
         return new Promise(async (resolve, reject) => {
             const date = this.dateInput.value;
             const data = { date: date };
-            const url = this.global.domain + this.global.endpoint.getChart;
+            const url = this.g.domain + this.g.endpoint.getChart;
             start: while (true) {
                 try {
                     var response = await fetch(url, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${this.global.accessToken}`
+                            Authorization: `Bearer ${this.g.accessToken}`
                         },
                         body: JSON.stringify(data)
                     });
@@ -836,7 +803,7 @@ class Chart {
             }
         });
     };
-    generateChartData = (r, item) => {
+    cChDa = (r, item) => {
         var time = item.time + 7 * 60 * 60;
         var volumeColor = this.UP_COLOR;
         var volume = item.volume,
@@ -888,64 +855,59 @@ class Chart {
         //
         return r;
     };
-    getToolsData = () => {
+    gToDa = () => {
         return new Promise(async (resolve, reject) => {
-            const order = await this.global.store.get("order");
+            const order = await this.g.s.g("order");
             order.map(item => {
-                this.order.side = item.side;
-                this.order[item.kind].price = item.price;
-                this.drawOrderLine(item.kind);
+                this.or.side = item.side;
+                this.or[item.kind].price = item.price;
+                this.dOrLi(item.kind);
                 if (item.kind == "entry") {
-                    if (this.callback.getOrderPosition()) {
-                        this.order.entry.line.applyOptions({
+                    if (this.cb.gOrPo()) {
+                        this.or.entry.line.applyOptions({
                             draggable: false
                         });
                     }
-                    this.toggleCancelOrderButton(true);
+                    this.tCaOrBu(true);
                 }
             });
             //
-            const lines = await this.global.store.get("line");
+            const lines = await this.g.s.g("line");
             lines.forEach(line => {
                 if (!line.removed)
-                    this.lines.push(this.series.price.createPriceLine(line));
+                    this.lines.push(this.se.price.createPriceLine(line));
             });
             //
-            this.markers = await this.global.store.get("marker");
-            this.series.price.setMarkers(this.markers);
+            this.markers = await this.g.s.g("marker");
+            this.se.price.setMarkers(this.markers);
             //
-            const rulerLines = await this.global.store.get("ruler");
+            const rulerLines = await this.g.s.g("ruler");
             if (rulerLines.length == 2) {
                 rulerLines.forEach(line => {
                     this.ruler.point = 2;
                     if (line.point == 1)
-                        this.ruler.start = this.series.price.createPriceLine(
-                            line
-                        );
-                    else
-                        this.ruler.end = this.series.price.createPriceLine(
-                            line
-                        );
+                        this.ruler.start = this.se.price.createPriceLine(line);
+                    else this.ruler.end = this.se.price.createPriceLine(line);
                 });
             }
             //
-            const alertLines = await this.global.store.get("alert");
+            const alertLines = await this.g.s.g("alert");
             alertLines.forEach(line => {
                 if (!line.removed)
-                    this.alerts.push(this.series.price.createPriceLine(line));
+                    this.alerts.push(this.se.price.createPriceLine(line));
             });
             //
             resolve();
         });
     };
-    connectSocket = () => {
+    cnSk = () => {
         var self = this;
-        var msg = { action: "join", list: self.global.symbol };
-        var socket = io(self.global.endpoint.socket);
+        var msg = { action: "join", list: self.g.symbol };
+        var socket = io(self.g.endpoint.socket);
         socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
         socket.on("reconnect", () => {
-            self.loadChartData();
-            if (self.inSession()) socket.emit("regs", JSON.stringify(msg));
+            self.lChDa();
+            if (self.isInSe()) socket.emit("regs", JSON.stringify(msg));
         });
         socket.on("stockps", data => {
             if (data.id == 3220) {
@@ -956,42 +918,42 @@ class Chart {
                     price: data.lastPrice,
                     volume: data.lastVol
                 };
-                self.updateChartData(param);
+                self.uChDa(param);
             }
         });
     };
     //
-    secIntervalHandler = self => {
-        if (self.callback.getOrderPosition()) {
+    inSec = self => {
+        if (self.cb.gOrPo()) {
             if (
-                self.order.entry.hasOwnProperty("line") &&
-                !self.order.tp.hasOwnProperty("line")
+                self.or.entry.hasOwnProperty("line") &&
+                !self.or.tp.hasOwnProperty("line")
             ) {
-                self.callback.orderTpPrice(self.order, true);
-                self.drawOrderLine("tp");
-                self.callback.orderSlPrice(self.order, true);
-                self.drawOrderLine("sl");
-                self.order.entry.line.applyOptions({
+                self.cb.oTpPr(self.or, true);
+                self.dOrLi("tp");
+                self.cb.oSlPr(self.or, true);
+                self.dOrLi("sl");
+                self.or.entry.line.applyOptions({
                     draggable: false
                 });
-                self.global.alert.show("success", "Đã mở vị thế.");
+                self.g.a.s("success", "Đã mở vị thế.");
             }
         } else {
-            if (self.order.tp.hasOwnProperty("line")) {
-                self.callback.cancelOrder();
-                self.toggleCancelOrderButton(false);
-                self.removeOrderLine("entry");
-                self.removeOrderLine("tp");
-                self.removeOrderLine("sl");
-                self.global.store.clear("order");
-                self.global.alert.show("success", "Đã đóng vị thế.");
+            if (self.or.tp.hasOwnProperty("line")) {
+                self.cb.cOr();
+                self.tCaOrBu(false);
+                self.rOrLi("entry");
+                self.rOrLi("tp");
+                self.rOrLi("sl");
+                self.g.s.c("order");
+                self.g.a.s("success", "Đã đóng vị thế.");
             }
         }
         if (self.alertAudio.paused) {
             self.alerts.forEach(alert => {
                 const ops = alert.options();
-                if (!ops.removed && !!self.data.original.length) {
-                    const currentPrice = self.data.original.slice(-1)[0].price;
+                if (!ops.removed && !!self.da.original.length) {
+                    const currentPrice = self.da.original.slice(-1)[0].price;
                     if (
                         (ops.title == ">" && currentPrice >= ops.price) ||
                         (ops.title == "<" && currentPrice <= ops.price)
@@ -1000,22 +962,22 @@ class Chart {
                 }
             });
         }
-        if (moment().unix() == self.global.time.start) self.connectSocket();
+        if (moment().unix() == self.g.time.start) self.cnSk();
     };
-    minIntervalHandler = self => {
-        if (self.inSession()) self.loadChartData();
+    inMin = self => {
+        if (self.isInSe()) self.lChDa();
     };
-    inSession = () => {
+    isInSe = () => {
         return (
-            moment().unix() >= self.global.time.start &&
-            moment().unix() <= self.global.time.end
+            moment().unix() >= self.g.time.start &&
+            moment().unix() <= self.g.time.end
         );
     };
     //
-    toggleVolume = visible => {
-        this.series.volume.applyOptions({ visible: visible });
+    tVo = visible => {
+        this.se.volume.applyOptions({ visible: visible });
         this.volumeLegendP.style.display = visible ? "block" : "none";
-        this.chart.applyOptions({
+        this.ch.applyOptions({
             rightPriceScale: {
                 scaleMargins: visible
                     ? { top: 0.1, bottom: 0.21 }
@@ -1024,25 +986,23 @@ class Chart {
         });
     };
     //
-    toggleSpinner = visible => {
+    tSp = visible => {
         this.spinnerImg.style.opacity = visible ? 1 : 0;
     };
-    resize = self => {
-        self.chart.resize(window.innerWidth, window.innerHeight);
+    eChRe = self => {
+        self.ch.resize(window.innerWidth, window.innerHeight);
     };
-    keyEvent = (e, self) => {
+    eKePr = (e, self) => {
         try {
             if (e.ctrlKey || e.metaKey) {
                 if (e.shiftKey) {
-                    if (e.keyCode == 39)
-                        self.chart.timeScale().scrollToRealTime();
+                    if (e.keyCode == 39) self.ch.timeScale().scrollToRealTime();
                 } else {
                     switch (e.keyCode) {
                         case 38:
-                            self.chart.timeScale().applyOptions({
+                            self.ch.timeScale().applyOptions({
                                 barSpacing:
-                                    self.chart.options().timeScale.barSpacing +
-                                    0.1
+                                    self.ch.options().timeScale.barSpacing + 0.1
                             });
                             break;
                         case 40:
@@ -1050,104 +1010,104 @@ class Chart {
                                 options.timeScale.barSpacing >
                                 options.timeScale.minBarSpacing
                             )
-                                self.chart.timeScale().applyOptions({
+                                self.ch.timeScale().applyOptions({
                                     barSpacing:
-                                        self.chart.options().timeScale
-                                            .barSpacing - 0.1
+                                        self.ch.options().timeScale.barSpacing -
+                                        0.1
                                 });
                             break;
                         case 37:
-                            self.chart
+                            self.ch
                                 .timeScale()
                                 .scrollToPosition(
-                                    self.chart.timeScale().scrollPosition() - 10
+                                    self.ch.timeScale().scrollPosition() - 10
                                 );
                             break;
                         case 39:
-                            self.chart
+                            self.ch
                                 .timeScale()
                                 .scrollToPosition(
-                                    self.chart.timeScale().scrollPosition() + 10
+                                    self.ch.timeScale().scrollPosition() + 10
                                 );
                             break;
                         case 75:
                             self.drawLineButton.click();
                             break;
                         case 76:
-                            self.drawMarkerButton.click();
+                            self.dMaButton.click();
                             break;
                         case 186:
-                            self.drawRulerButton.click();
+                            self.dRuButton.click();
                             break;
                         case 222:
-                            self.drawAlertButton.click();
+                            self.dAlButton.click();
                             break;
                         case 96:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[0].value;
+                                self.g.timeFrames[0].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
                             break;
                         case 97:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[1].value;
+                                self.g.timeFrames[1].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
                             break;
                         case 98:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[2].value;
+                                self.g.timeFrames[2].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
                             break;
                         case 99:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[3].value;
+                                self.g.timeFrames[3].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
                             break;
                         case 100:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[4].value;
+                                self.g.timeFrames[4].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
                             break;
                         case 101:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[5].value;
+                                self.g.timeFrames[5].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
                             break;
                         case 102:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[6].value;
+                                self.g.timeFrames[6].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
                             break;
                         case 103:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[7].value;
+                                self.g.timeFrames[7].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
                             break;
                         case 104:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[8].value;
+                                self.g.timeFrames[8].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
                             break;
                         case 105:
                             self.timeFrameSelect.value =
-                                self.global.timeFrames[9].value;
+                                self.g.timeFrames[9].value;
                             self.timeFrameSelect.dispatchEvent(
                                 new Event("change")
                             );
