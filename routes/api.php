@@ -21,10 +21,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
-        Route::post('login', 'LoginController@login')->name('login');
+        Route::post('login', 'LoginController@login')->name('login')->middleware('cors');
         Route::post('login-webauthn', 'LoginController@loginWebAuthn');
         Route::post('validate-duplicate-email', 'RegisterController@validateDuplicateEmail');
-        Route::post('create-account', 'RegisterController@createAccount');
+        Route::post('create-account', 'RegisterController@createAccount')->middleware('cors');
         Route::group(['prefix' => 'password'], function () {
             Route::post('reset', 'ResetPasswordController@resetPassword');
             Route::post('change', 'ResetPasswordController@changePassword')->name('password.reset');
@@ -36,7 +36,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::get('verify/{id}', 'VerificationController@verify')->name('verification.verify');
             });
             Route::get('logout', 'LoginController@logout');
-            Route::get('user', 'LoginController@user');
+            Route::get('user', 'LoginController@user')->middleware('cors');
             Route::post('register-webauthn', 'LoginController@registerWebAuthn');
             Route::post('confirm-webauthn', 'LoginController@confirmWebAuthn');
             Route::post('check-pin', 'LoginController@checkPin');
