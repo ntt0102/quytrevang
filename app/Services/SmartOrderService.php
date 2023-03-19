@@ -45,7 +45,6 @@ class SmartOrderService extends CoreService
         $latestVersion = $this->parameterRepository->getValue($request->securities . 'SmartOrderVer');
         $contact = app(\App\Services\AppService::class)->getContact();
         return [
-            'endpoint' => ['socket' => 'https://datafeed.vps.com.vn'],
             'isOpeningMarket' => $isOpeningMarket,
             'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
             'time' => [
