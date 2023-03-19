@@ -3,24 +3,24 @@ class Ch {
     ch = {};
     se = {};
     da = {};
-    order = { entry: {}, tp: {}, sl: {} };
-    lines = [];
-    markers = [];
-    ruler = { start: {}, end: {}, point: 0 };
-    alerts = [];
-    crosshair = {};
-    hasCrosshair = false;
-    hasNewData = false;
-    alertAudio = new Audio(chrome.runtime.getURL("alert.wav"));
-    UP_COLOR = "rgb(38,166,154)";
-    DOWN_COLOR = "rgb(239,83,80)";
+    or = { entry: {}, tp: {}, sl: {} };
+    li = [];
+    ma = [];
+    ru = { start: {}, end: {}, point: 0 };
+    al = [];
+    cr = {};
+    hsCr = false;
+    hsNeDa = false;
+    auAl = new Audio(chrome.runtime.getURL("alert.wav"));
+    U_C = "rgb(38,166,154)";
+    D_C = "rgb(239,83,80)";
 
     // Hàm khởi tạo
     constructor(g, c) {
         this.g = g;
         this.cb = c;
         this.g.tSp = this.tSp;
-        this.alertAudio.loop = true;
+        this.auAl.loop = true;
     }
 
     // Các phương thức
@@ -394,19 +394,19 @@ class Ch {
             var volume = e.seriesPrices.get(self.se.volume);
             if (self.chType != "line") price = price.close;
             self.uLe(price, volume);
-            self.hasCrosshair = true;
-            self.crosshair.time = e.time;
-            self.crosshair.price = price;
+            self.hsCr = true;
+            self.cr.time = e.time;
+            self.cr.price = price;
         } else {
-            self.hasCrosshair = false;
+            self.hsCr = false;
             if (!self.g.isM) {
-                self.crosshair.time = null;
-                self.crosshair.price = null;
+                self.cr.time = null;
+                self.cr.price = null;
             }
         }
         if (e.point != undefined) {
-            self.crosshair.x = e.point.x;
-            self.crosshair.y = e.point.y;
+            self.cr.x = e.point.x;
+            self.cr.y = e.point.y;
         }
     };
     ePrLiDr = (e, self) => {
@@ -455,21 +455,21 @@ class Ch {
             case "ruler":
                 if (lineOptions.point == 1) {
                     self.g.s.s("ruler", lineOptions);
-                    if (self.ruler.point == 2) {
-                        const distance = +self.ruler.end.options().title;
+                    if (self.ru.point == 2) {
+                        const distance = +self.ru.end.options().title;
                         const endPrice = +(newPrice + distance).toFixed(1);
-                        self.ruler.end.applyOptions({ price: endPrice });
-                        self.g.s.s("ruler", self.ruler.end.options());
+                        self.ru.end.applyOptions({ price: endPrice });
+                        self.g.s.s("ruler", self.ru.end.options());
                     }
                 } else {
-                    const startPrice = +self.ruler.start.options().price;
+                    const startPrice = +self.ru.start.options().price;
                     const distance = (newPrice - startPrice).toFixed(1);
                     line.applyOptions({ title: distance });
                     self.g.s.s("ruler", line.options());
                 }
                 break;
             case "alert":
-                self.alertAudio.pause();
+                self.auAl.pause();
                 self.g.s.s("alert", {
                     price: oldPrice,
                     removed: true
@@ -487,22 +487,18 @@ class Ch {
         if (this.cb.gOrPo()) {
             // if (this.or.entry.hasOwnProperty("line")) {
             if (!this.or.tp.hasOwnProperty("line")) {
-                this.tpslOrderButton.style.left =
-                    +(this.crosshair.x + 10) + "px";
-                this.tpslOrderButton.style.top =
-                    +(this.crosshair.y + 10) + "px";
+                this.tpslOrderButton.style.left = +(this.cr.x + 10) + "px";
+                this.tpslOrderButton.style.top = +(this.cr.y + 10) + "px";
                 this.tpslOrderButton.style.display = "block";
             }
         } else {
             if (!this.or.entry.hasOwnProperty("line")) {
-                const price = this.cCo2Pr(this.crosshair.y);
+                const price = this.cCo2Pr(this.cr.y);
                 const side = price >= this.da.price.slice(-1)[0].value ? 1 : -1;
                 this.or.entry.price = price;
                 this.or.side = side;
-                this.entryOrderButton.style.left =
-                    +(this.crosshair.x + 10) + "px";
-                this.entryOrderButton.style.top =
-                    +(this.crosshair.y + 10) + "px";
+                this.entryOrderButton.style.left = +(this.cr.x + 10) + "px";
+                this.entryOrderButton.style.top = +(this.cr.y + 10) + "px";
                 this.entryOrderButton.style.background =
                     side > 0 ? "green" : "red";
                 this.entryOrderButton.innerText = `${
@@ -569,13 +565,13 @@ class Ch {
     //
     dToLi = () => {
         const TYPE = "line";
-        const price = this.fPr(this.cCo2Pr(this.crosshair.y));
-        const existIndex = this.lines.findIndex(line => {
+        const price = this.fPr(this.cCo2Pr(this.cr.y));
+        const existIndex = this.li.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
         });
         if (existIndex != -1) {
-            const removeLine = this.lines.splice(existIndex, 1);
+            const removeLine = this.li.splice(existIndex, 1);
             this.se.price.removePriceLine(removeLine[0]);
             this.g.s.s("line", { price: price, removed: true });
         } else {
@@ -587,49 +583,44 @@ class Ch {
                 lineStyle: LightweightCharts.LineStyle.Dotted,
                 draggable: true
             };
-            this.lines.push(this.se.price.createPriceLine(options));
+            this.li.push(this.se.price.createPriceLine(options));
             this.g.s.s("line", options);
         }
         this.drawLineButton.classList.remove("selected");
     };
     rToLi = () => {
-        this.lines.forEach(line => this.se.price.removePriceLine(line));
-        this.lines = [];
+        this.li.forEach(line => this.se.price.removePriceLine(line));
+        this.li = [];
         this.g.s.c("line");
     };
     //
     dMa = () => {
-        if (this.crosshair.time) {
-            const markers = this.markers.filter(
-                item => item.time != this.crosshair.time
-            );
-            if (markers.length == this.markers.length) {
+        if (this.cr.time) {
+            const markers = this.ma.filter(item => item.time != this.cr.time);
+            if (markers.length == this.ma.length) {
                 const dir =
-                    this.crosshair.y >=
-                    this.se.price.priceToCoordinate(this.crosshair.price);
-                this.markers.push({
-                    time: this.crosshair.time,
+                    this.cr.y >= this.se.price.priceToCoordinate(this.cr.price);
+                this.ma.push({
+                    time: this.cr.time,
                     position: dir ? "belowBar" : "aboveBar",
                     color: dir ? "lime" : "red",
                     shape: dir ? "arrowUp" : "arrowDown"
                 });
-            } else this.markers = markers;
-            this.se.price.setMarkers(this.markers);
-            this.g.s
-                .clear("marker")
-                .then(() => this.g.s.s("marker", this.markers));
+            } else this.ma = markers;
+            this.se.price.setMarkers(this.ma);
+            this.g.s.clear("marker").then(() => this.g.s.s("marker", this.ma));
             //
             this.dMaButton.classList.remove("selected");
         }
     };
     rMa = () => {
-        this.markers = [];
+        this.ma = [];
         this.se.price.setMarkers([]);
         this.g.s.c("marker");
     };
     //
     dRu = () => {
-        const price = this.cCo2Pr(this.crosshair.y);
+        const price = this.cCo2Pr(this.cr.y);
         var options = {
             lineType: "ruler",
             price: price,
@@ -638,44 +629,43 @@ class Ch {
             lineStyle: LightweightCharts.LineStyle.Dotted,
             draggable: true
         };
-        if (this.ruler.point == 0) {
+        if (this.ru.point == 0) {
             const point = 1;
             options.point = point;
             options.title = "0";
-            this.ruler.start = this.se.price.createPriceLine(options);
-            this.ruler.point = point;
+            this.ru.start = this.se.price.createPriceLine(options);
+            this.ru.point = point;
             this.g.s.s("ruler", options);
-        } else if (this.ruler.point == 1) {
-            const startPrice = +this.ruler.start.options().price;
+        } else if (this.ru.point == 1) {
+            const startPrice = +this.ru.start.options().price;
             const point = 2;
             options.point = point;
             options.title = (price - startPrice).toFixed(1);
-            this.ruler.end = this.se.price.createPriceLine(options);
-            this.ruler.point = point;
+            this.ru.end = this.se.price.createPriceLine(options);
+            this.ru.point = point;
             this.g.s.s("ruler", options);
             this.dRuButton.classList.remove("selected");
         }
     };
     rRu = () => {
-        if (this.ruler.point > 0) {
-            this.se.price.removePriceLine(this.ruler.start);
-            if (this.ruler.point > 1)
-                this.se.price.removePriceLine(this.ruler.end);
+        if (this.ru.point > 0) {
+            this.se.price.removePriceLine(this.ru.start);
+            if (this.ru.point > 1) this.se.price.removePriceLine(this.ru.end);
             //
-            this.ruler = { start: {}, end: {}, point: 0 };
+            this.ru = { start: {}, end: {}, point: 0 };
             this.g.s.c("ruler");
         }
     };
     //
     dAl = () => {
         const TYPE = "alert";
-        const price = this.fPr(this.cCo2Pr(this.crosshair.y));
-        const existIndex = this.alerts.findIndex(line => {
+        const price = this.fPr(this.cCo2Pr(this.cr.y));
+        const existIndex = this.al.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
         });
         if (existIndex != -1) {
-            const removeLine = this.alerts.splice(existIndex, 1);
+            const removeLine = this.al.splice(existIndex, 1);
             this.se.price.removePriceLine(removeLine[0]);
             this.g.s.s("alert", { price: price, removed: true });
         } else {
@@ -688,17 +678,17 @@ class Ch {
                 lineStyle: LightweightCharts.LineStyle.Dotted,
                 draggable: true
             };
-            this.alerts.push(this.se.price.createPriceLine(options));
+            this.al.push(this.se.price.createPriceLine(options));
             this.g.s.s("alert", options);
         }
         this.dAlButton.classList.remove("selected");
-        this.alertAudio.pause();
+        this.auAl.pause();
     };
     rAl = () => {
-        this.alerts.forEach(line => this.se.price.removePriceLine(line));
-        this.alerts = [];
+        this.al.forEach(line => this.se.price.removePriceLine(line));
+        this.al = [];
         this.g.s.c("alert");
-        this.alertAudio.pause();
+        this.auAl.pause();
     };
     //
     tCaOrBu = visible => {
@@ -726,14 +716,14 @@ class Ch {
             this.tSp(true);
             const svData = await this.gSeDa();
             start: while (true) {
-                this.hasNewData = false;
+                this.hsNeDa = false;
                 const lcData = await this.g.s.g("data");
                 const ids = new Set(svData.map(d => d.time));
                 const data = [
                     ...svData,
                     ...lcData.filter(d => !ids.has(d.time))
                 ].sort((a, b) => a.time - b.time);
-                if (this.hasNewData) continue start;
+                if (this.hsNeDa) continue start;
                 this.g.s.c("data").then(() => this.g.s.s("data", data));
                 //
                 this.da = data.reduce((r, item) => this.cChDa(r, item), {
@@ -746,7 +736,7 @@ class Ch {
                 this.se.price.setData(this.da.price);
                 this.se.volume.setData(this.da.volume);
                 //
-                if (!this.hasCrosshair && !!this.da.original.length) {
+                if (!this.hsCr && !!this.da.original.length) {
                     this.uLe(
                         this.da.price.slice(-1)[0].value,
                         this.da.volume.slice(-1)[0].value
@@ -760,7 +750,7 @@ class Ch {
         });
     };
     uChDa = param => {
-        this.hasNewData = true;
+        this.hsNeDa = true;
         this.da = this.cChDa(this.da, param);
         const lastPrice = this.da.price.slice(-1)[0];
         const lastVolume = this.da.volume.slice(-1)[0];
@@ -772,7 +762,7 @@ class Ch {
             this.se.price.update(lastPrice);
             this.se.volume.update(lastVolume);
         }
-        if (!this.hasCrosshair) {
+        if (!this.hsCr) {
             this.uLe(lastPrice.value, lastVolume.value);
         }
         //
@@ -805,7 +795,7 @@ class Ch {
     };
     cChDa = (r, item) => {
         var time = item.time + 7 * 60 * 60;
-        var volumeColor = this.UP_COLOR;
+        var volumeColor = this.U_C;
         var volume = item.volume,
             openPrice = 0,
             highPrice = 0,
@@ -829,8 +819,7 @@ class Ch {
                 //
                 const prevVolume = r.volume.pop();
                 volume += prevVolume.value;
-                volumeColor =
-                    item.price >= openPrice ? this.UP_COLOR : this.DOWN_COLOR;
+                volumeColor = item.price >= openPrice ? this.U_C : this.D_C;
             } else {
                 openPrice = item.price;
                 highPrice = item.price;
@@ -875,26 +864,26 @@ class Ch {
             const lines = await this.g.s.g("line");
             lines.forEach(line => {
                 if (!line.removed)
-                    this.lines.push(this.se.price.createPriceLine(line));
+                    this.li.push(this.se.price.createPriceLine(line));
             });
             //
-            this.markers = await this.g.s.g("marker");
-            this.se.price.setMarkers(this.markers);
+            this.ma = await this.g.s.g("marker");
+            this.se.price.setMarkers(this.ma);
             //
             const rulerLines = await this.g.s.g("ruler");
             if (rulerLines.length == 2) {
                 rulerLines.forEach(line => {
-                    this.ruler.point = 2;
+                    this.ru.point = 2;
                     if (line.point == 1)
-                        this.ruler.start = this.se.price.createPriceLine(line);
-                    else this.ruler.end = this.se.price.createPriceLine(line);
+                        this.ru.start = this.se.price.createPriceLine(line);
+                    else this.ru.end = this.se.price.createPriceLine(line);
                 });
             }
             //
             const alertLines = await this.g.s.g("alert");
             alertLines.forEach(line => {
                 if (!line.removed)
-                    this.alerts.push(this.se.price.createPriceLine(line));
+                    this.al.push(this.se.price.createPriceLine(line));
             });
             //
             resolve();
@@ -949,8 +938,8 @@ class Ch {
                 self.g.a.s("success", "Đã đóng vị thế.");
             }
         }
-        if (self.alertAudio.paused) {
-            self.alerts.forEach(alert => {
+        if (self.auAl.paused) {
+            self.al.forEach(alert => {
                 const ops = alert.options();
                 if (!ops.removed && !!self.da.original.length) {
                     const currentPrice = self.da.original.slice(-1)[0].price;
@@ -958,7 +947,7 @@ class Ch {
                         (ops.title == ">" && currentPrice >= ops.price) ||
                         (ops.title == "<" && currentPrice <= ops.price)
                     )
-                        self.alertAudio.play();
+                        self.auAl.play();
                 }
             });
         }
