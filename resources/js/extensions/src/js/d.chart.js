@@ -164,6 +164,14 @@ class Ch {
         });
         select.value = this.chaTy;
         select.addEventListener("change", e => {
+            if (this.timFr == 0 && e.target.value != "line") {
+                this.chaTySe.value = "line";
+                this.g.a.s(
+                    "warning",
+                    "Chỉ có thể mở biểu đồ Đường trong khung thời gian Tick."
+                );
+                return false;
+            }
             this.chaTy = e.target.value;
             this.ch.remove();
             this.cCh();
@@ -381,7 +389,7 @@ class Ch {
         if (e.time) {
             var price = e.seriesPrices.get(self.se.price);
             var volume = e.seriesPrices.get(self.se.volume);
-            if (self.chType != "line") price = price.close;
+            if (!!price && self.chaTy != "line") price = price.close;
             self.uLe(price, volume);
             self.hsCr = true;
             self.cr.time = e.time;
@@ -595,7 +603,7 @@ class Ch {
                 });
             } else this.ma = markers;
             this.se.price.setMarkers(this.ma);
-            this.g.s.clear("marker").then(() => this.g.s.s("marker", this.ma));
+            this.g.s.c("marker").then(() => this.g.s.s("marker", this.ma));
             //
             this.draMaBu.classList.remove("selected");
         }
@@ -690,7 +698,7 @@ class Ch {
         if (!!volume) this.volLeP.innerText = volume.toLocaleString("en-US");
     };
     cCo2Pr = y => {
-        return this.fPr(this.se.price.cCo2Pr(y));
+        return this.fPr(this.se.price.coordinateToPrice(y));
     };
     fPr = price => {
         return +(+price.toFixed(1));
@@ -716,7 +724,7 @@ class Ch {
                     price: [],
                     volume: []
                 });
-                console.log("data", this.da);
+                console.log("data-----------", this.da);
                 //
                 this.se.price.setData(this.da.price);
                 this.se.volume.setData(this.da.volume);
@@ -943,8 +951,8 @@ class Ch {
     };
     isInSe = () => {
         return (
-            moment().unix() >= self.g.time.start &&
-            moment().unix() <= self.g.time.end
+            moment().unix() >= this.g.time.start &&
+            moment().unix() <= this.g.time.end
         );
     };
     //
