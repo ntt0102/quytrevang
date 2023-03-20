@@ -34,7 +34,7 @@ Route::get('migrate', function () {
 
 Route::get('test', function () {
     // $s = app(\App\Services\VpsService::class)->checkOpeningMarket();
-    $s = app(\App\Services\SmartOrderService::class)->getVpsData();
+    $s = app(\App\Services\SmartOrderService::class)->getInfo('vn30f2304')->r;
     // $s = app(\App\Services\VpsService::class)->getVolumeByPrice();
     // $s = app(\App\Services\VpsService::class)->exportToCsv();
     // $s = app(\App\Services\VpsService::class);

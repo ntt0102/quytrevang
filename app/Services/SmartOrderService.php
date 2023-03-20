@@ -225,7 +225,7 @@ class SmartOrderService extends CoreService
         $client = new \GuzzleHttp\Client();
         $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
         $res = $client->get($url);
-        return json_decode($res->getBody());
+        return json_decode($res->getBody())[0];
     }
 
     /**

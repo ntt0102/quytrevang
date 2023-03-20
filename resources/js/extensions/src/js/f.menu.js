@@ -80,7 +80,10 @@ class Me {
             const data = self.cb.gReDa();
             fetch(url, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${self.g.accessToken}`
+                },
                 body: JSON.stringify(data)
             })
                 .then(response => {
