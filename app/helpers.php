@@ -42,63 +42,6 @@ if (!function_exists('trading_time')) {
     }
 }
 
-if (!function_exists('text2code')) {
-    /**
-     * Convert text to code
-     *
-     * @param string $str
-     * @return string
-     */
-    function text2code($str)
-    {
-        $unicode = array(
-            'a' => 'á|à|ả|ã|ạ|ă|ắ|ặ|ằ|ẳ|ẵ|â|ấ|ầ|ẩ|ẫ|ậ',
-            'd' => 'đ',
-            'e' => 'é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ',
-            'i' => 'í|ì|ỉ|ĩ|ị',
-            'o' => 'ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ',
-            'u' => 'ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự',
-            'y' => 'ý|ỳ|ỷ|ỹ|ỵ',
-            'A' => 'Á|À|Ả|Ã|Ạ|Ă|Ắ|Ặ|Ằ|Ẳ|Ẵ|Â|Ấ|Ầ|Ẩ|Ẫ|Ậ',
-            'D' => 'Đ',
-            'E' => 'É|È|Ẻ|Ẽ|Ẹ|Ê|Ế|Ề|Ể|Ễ|Ệ',
-            'I' => 'Í|Ì|Ỉ|Ĩ|Ị',
-            'O' => 'Ó|Ò|Ỏ|Õ|Ọ|Ô|Ố|Ồ|Ổ|Ỗ|Ộ|Ơ|Ớ|Ờ|Ở|Ỡ|Ợ',
-            'U' => 'Ú|Ù|Ủ|Ũ|Ụ|Ư|Ứ|Ừ|Ử|Ữ|Ự',
-            'Y' => 'Ý|Ỳ|Ỷ|Ỹ|Ỵ',
-
-        );
-        foreach ($unicode as $nonUnicode => $uni) {
-            $str = preg_replace("/($uni)/i", $nonUnicode, $str);
-        }
-        return str_replace(' ', '_', $str);
-    }
-}
-
-if (!function_exists('formatBytes')) {
-    /**
-     * Format bytes
-     *
-     * @param int $bytes
-     * @param int $precision
-     * @return int
-     */
-    function formatBytes($bytes, $precision = 2)
-    {
-        $units = array('B', 'KB', 'MB', 'GB', 'TB');
-
-        $bytes = max($bytes, 0);
-        $pow = floor(($bytes ? log($bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
-
-        // Uncomment one of the following alternatives
-        // $bytes /= pow(1024, $pow);
-        // $bytes /= (1 << (10 * $pow)); 
-
-        return round($bytes, $precision) . ' ' . $units[$pow];
-    }
-}
-
 if (!function_exists('get_url_image')) {
     /**
      * Get url image
@@ -157,5 +100,58 @@ if (!function_exists('create_contract_image')) {
             $font->size(28);
         });
         return $img;
+    }
+
+    if (!function_exists('aes_encrypt')) {
+        /**
+         * Encrypt value to a cryptojs compatiable json encoding string
+         *
+         * @param mixed $passphrase
+         * @param mixed $value
+         * @return string
+         */
+        function aes_encrypt($value, $passphrase)
+        {
+            $salt = openssl_random_pseudo_bytes(8);
+            $salted = '';
+            $dx = '';
+            while (strlen($salted) < 48) {
+                $dx = md5($dx . $passphrase . $salt, true);
+                $salted .= $dx;
+            }
+            $key = substr($salted, 0, 32);
+            $iv  = substr($salted, 32, 16);
+            $encrypted_data = openssl_encrypt(json_encode($value), 'aes-256-cbc', $key, true, $iv);
+            $data = array("ct" => base64_encode($encrypted_data), "iv" => bin2hex($iv), "s" => bin2hex($salt));
+            return json_encode($data);
+        }
+    }
+
+    if (!function_exists('aes_decrypt')) {
+        /**
+         * Decrypt data from a CryptoJS json encoding string
+         *
+         * @param mixed $passphrase
+         * @param mixed $jsonString
+         * @return mixed
+         */
+        function aes_decrypt($jsonString, $passphrase)
+        {
+            $jsondata = json_decode($jsonString, true);
+            $salt = hex2bin($jsondata["s"]);
+            $ct = base64_decode($jsondata["ct"]);
+            $iv  = hex2bin($jsondata["iv"]);
+            $concatedPassphrase = $passphrase . $salt;
+            $md5 = array();
+            $md5[0] = md5($concatedPassphrase, true);
+            $result = $md5[0];
+            for ($i = 1; $i < 3; $i++) {
+                $md5[$i] = md5($md5[$i - 1] . $concatedPassphrase, true);
+                $result .= $md5[$i];
+            }
+            $key = substr($result, 0, 32);
+            $data = openssl_decrypt($ct, 'aes-256-cbc', $key, true, $iv);
+            return json_decode($data, true);
+        }
     }
 }

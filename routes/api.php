@@ -21,10 +21,15 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
-        Route::post('login', 'LoginController@login')->name('login')->middleware('cors');
+        Route::post('login', 'LoginController@login')->name('login');
         Route::post('login-webauthn', 'LoginController@loginWebAuthn');
         Route::post('validate-duplicate-email', 'RegisterController@validateDuplicateEmail');
-        Route::post('create-account', 'RegisterController@createAccount')->middleware('cors');
+        Route::post('create-account', 'RegisterController@createAccount');
+
+        Route::group(['prefix' => 'smartorder'], function () {
+            Route::post('login', 'LoginController@smartOrderLogin')->middleware('cors');
+            Route::post('register', 'RegisterController@smartOrderRegister')->middleware('cors');
+        });
         Route::group(['prefix' => 'password'], function () {
             Route::post('reset', 'ResetPasswordController@resetPassword');
             Route::post('change', 'ResetPasswordController@changePassword')->name('password.reset');
@@ -35,8 +40,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::post('resend', 'VerificationController@resend');
                 Route::get('verify/{id}', 'VerificationController@verify')->name('verification.verify');
             });
-            Route::get('logout', 'LoginController@logout');
-            Route::get('user', 'LoginController@user')->middleware('cors');
+            Route::get('logout', 'LoginController@logout')->middleware('cors');
+            Route::get('user', 'LoginController@user');
+            Route::get('smartorder/user', 'LoginController@smartOrderUser')->middleware('cors');
             Route::post('register-webauthn', 'LoginController@registerWebAuthn');
             Route::post('confirm-webauthn', 'LoginController@confirmWebAuthn');
             Route::post('check-pin', 'LoginController@checkPin');

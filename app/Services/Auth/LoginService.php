@@ -61,16 +61,39 @@ class LoginService
     }
 
     /**
-     * Login via WebAuthn
+     * Login.
      * 
-     * @param $credentialId
+     * @param $request
      *
      * @return array
      */
-    public function webAuthnLogin1($credentialId)
+    public function smartOrderLogin($request)
     {
-        $user = $this->userRepository->getFromCredentialId($credentialId);
-        return $this->createToken($user);
+        $username  = request()->username;
+        $fieldName = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        request()->merge([$fieldName => $username]);
+        $credentials = request([$fieldName, 'password']);
+        if (!Auth::attempt($credentials))
+            return ['isOk' => false, 'message' => 'unauthorized'];
+        //
+        $user = $request->user();
+        if ($request->chanel == 'SmartOrder') {
+            $so = $user->smartOrder;
+            if (!$so) return ['isOk' => false, 'message' => 'unsetup'];
+            $expires_at = date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods));
+            if (date_create() > $expires_at)
+                return ['isOk' => false, 'message' => 'expired'];
+            if (!in_array($request->deviceId, $so->devices)) {
+                if (count($so->devices) >= $so->device_limit)
+                    return ['isOk' => false, 'message' => 'deviceLimit'];
+                //
+                $devices = $so->devices;
+                $devices[] = $request->deviceId;
+                app(\App\Repositories\SmartOrderRepository::class)->update($so, ['devices' => $devices]);
+            }
+        }
+        //
+        return $this->createToken($user, $request->rememberMe);
     }
 
     /**
@@ -191,6 +214,16 @@ class LoginService
      * @return object $user
      */
     public function user($request)
+    {
+        return $this->userRepository->getAuthUser($request->user());
+    }
+
+    /**
+     * Get the authenticated user
+     * 
+     * @return object $user
+     */
+    public function smartOrderUser($request)
     {
         return $this->userRepository->getAuthUser($request->user());
     }

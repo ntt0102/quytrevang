@@ -29,6 +29,19 @@ class RegisterController extends CoreController
     }
 
     /**
+     * Create user
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function smartOrderRegister(Request $request)
+    {
+        $data = $this->registerService->smartOrderRegister($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Validate Duplicate Email
      *
      * @param \Illuminate\Http\Request $request

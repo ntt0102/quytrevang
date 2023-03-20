@@ -580,26 +580,30 @@ class Po {
             self.regSu.innerText = "Đang đăng ký...";
             self.regSu.disabled = true;
             self.regMe.innerText = "";
-            const data = {
+            var data = {
                 name: self.regNa.value,
                 email: self.regEm.value,
                 phone: self.regPh.value,
                 password: self.regPa.value,
-                deviceId: self.g.deviceId,
-                chanel: self.g.appName
+                deviceId: self.g.deviceId
             };
+            // JSON.stringify(data);
+            data = self.g.c.e(data, self.g.appName);
+            // var data1 = self.g.c.d(data, self.g.appName);
+            // console.log("data: ", JSON.parse(data));
             const url = this.g.domain + this.g.endpoint.register;
+            console.log("url", url);
             fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data)
+                body: data
             })
                 .then(response => {
                     if (response.ok) return response.json();
                     throw new Error(response.statusText);
                 })
                 .then(async json => {
-                    // console.log("register: ", json);
+                    console.log("register: ", json);
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
                     if (json.isOk) {
@@ -621,7 +625,7 @@ class Po {
                                 "Số điện thoại này đã đăng ký";
                         else if (json.message == "deviceExist")
                             self.regMe.innerText =
-                                "Thiết bị này đang sử dụng dịch vụ";
+                                "Tài khoản khác đang dùng thiết bị này";
                     }
                 })
                 .catch(error => {

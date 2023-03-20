@@ -4,18 +4,18 @@ class Co {
     publishDate = "17/03/2023";
     developer = "Tho PS";
     securities = "vps";
-    domain = "https://quytrevang.nguyenvanxuanphu.com";
-    domain1 = "http://localhost";
+    domain1 = "https://quytrevang.nguyenvanxuanphu.com";
+    domain = "http://localhost";
     endpoint = {
         socket: "https://datafeed.vps.com.vn",
         getConfig: "/api/smart-order/get-config",
         setConfig: "/api/smart-order/set-config",
         getChart: "/api/smart-order/get-chart",
         report: "/api/smart-order/report",
-        register: "/api/auth/create-account",
-        login: "/api/auth/login",
+        register: "/api/auth/smartorder/register",
+        login: "/api/auth/smartorder/login",
         logout: "/api/auth/logout",
-        user: "/api/auth/user"
+        user: "/api/auth/smartorder/user"
     };
     timFrs = [
         { text: "Tick", value: 0 },
