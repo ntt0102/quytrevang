@@ -21,4 +21,12 @@ class SmartOrderRepository extends CoreRepository
     {
         parent::__construct($model);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasDevice($deviceId)
+    {
+        return count($this->model->whereJsonContains('devices', $deviceId)->get()) > 0;
+    }
 }

@@ -6,14 +6,19 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\RegisteredUserNotification;
 use App\Services\CoreService;
 use App\Repositories\UserRepository;
+use App\Repositories\SmartOrderRepository;
 
 class RegisterService extends CoreService
 {
     private $userRepository;
+    private $smartOrderRepository;
 
-    public function __construct(UserRepository $userRepository)
-    {
+    public function __construct(
+        UserRepository $userRepository,
+        SmartOrderRepository $smartOrderRepository
+    ) {
         $this->userRepository = $userRepository;
+        $this->smartOrderRepository = $smartOrderRepository;
     }
 
     /**
@@ -30,6 +35,11 @@ class RegisterService extends CoreService
                 return ['isOk' => false, 'message' => 'emailExist'];
             if (count($this->userRepository->where([['phone', $request->phone]])) != 0)
                 return ['isOk' => false, 'message' => 'phoneExist'];
+            if ($request->chanel == 'SmartOrder') {
+                if ($this->smartOrderRepository->hasDevice($request->deviceId))
+                    return ['isOk' => false, 'message' => 'deviceExist'];
+            }
+            //
             $data = [
                 'code' => $this->userRepository->generateUniqueCode(),
                 'name' => $request->name,
@@ -42,11 +52,10 @@ class RegisterService extends CoreService
             if (empty($user)) return ['isOk' => false];
             //
             if ($request->chanel == 'SmartOrder') {
-                $smartOrderRepository = app(\App\Repositories\SmartOrderRepository::class);
-                $smartOrderRepository->create([
+                $this->smartOrderRepository->create([
                     'user_code' => $user->code,
                     'started_at' => date('Y-m-d'),
-                    'periods' => '7-d',
+                    'periods' => '7 days',
                     'device_limit' => 2,
                     'devices' => [$request->deviceId]
                 ]);
