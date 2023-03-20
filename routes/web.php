@@ -33,8 +33,9 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
+    $s = \Request::getClientIp(true);
     // $s = app(\App\Services\VpsService::class)->checkOpeningMarket();
-    $s = app(\App\Services\SmartOrderService::class)->getInfo('vn30f2304')->r;
+    // $s = app(\App\Services\SmartOrderService::class)->getInfo('vn30f2304')->r;
     // $s = app(\App\Services\VpsService::class)->getVolumeByPrice();
     // $s = app(\App\Services\VpsService::class)->exportToCsv();
     // $s = app(\App\Services\VpsService::class);
@@ -44,7 +45,7 @@ Route::get('test', function () {
     // dd($s);
     // $n = now()->sub(date_interval_create_from_date_string('178 minutes'));
     // dd($n->format('Y-m-d H:i:s'));
-    // $s = app(\App\Repositories\VpsRepository::class)->latest('time')->side;
+    // $s = app(\App\Repositories\SmartOrderRepository::class)->hasDevice('24efbc2f1f3b09283ee0d2b246a665a0');
     // $s = app(\App\Repositories\VpsRepository::class)->getVolumeByPrice('');
     // $v = number_format('123.452', 2);
     // $s = is_numeric("1000.1");

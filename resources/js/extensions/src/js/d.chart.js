@@ -108,7 +108,6 @@ class Ch {
             visible: this.g.isVolume
         });
         //
-        console.log("this.chaTy: ", this.chaTy);
         this.cPrSe();
         this.ch.timeScale().fitContent();
     };

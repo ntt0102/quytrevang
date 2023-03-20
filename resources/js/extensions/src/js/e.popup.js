@@ -32,6 +32,13 @@ class Po {
         div.append(p);
         p.className = "title";
         p.innerText = this.g.appName;
+        //
+        var p = document.createElement("label");
+        div.append(p);
+        p.className = "logout fa fa-sign-out";
+        p.title = "Đăng xuất";
+        p.style.display = "none";
+        this.louBu = p;
     };
     cLoCo = () => {
         var div = document.createElement("div");
@@ -66,16 +73,16 @@ class Po {
         this.logPa = input;
         //
         var checkboxWrapper = document.createElement("div");
+        checkboxWrapper.style.display = "flex";
         wrapper.append(checkboxWrapper);
         input = document.createElement("input");
         checkboxWrapper.append(input);
-        input.id = "loginRememberMe";
         input.type = "checkbox";
+        input.style.width = "17px";
         this.logReMe = input;
-        var label = document.createElement("label");
-        checkboxWrapper.append(label);
-        label.setAttribute("for", "loginRememberMe");
-        label.innerHTML = "&ensp;Lưu đăng nhập";
+        var span = document.createElement("span");
+        checkboxWrapper.append(span);
+        span.innerHTML = "&ensp;Lưu đăng nhập";
         //
         var button = document.createElement("button");
         wrapper.append(button);
@@ -115,10 +122,9 @@ class Po {
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e => this.rAc(e, this));
         //
-        var p = document.createElement("label");
-        wrapper.append(p);
-        p.className = "invalid";
-        this.regMe = p;
+        var span = document.createElement("span");
+        span.innerText = "Được 7 ngày dùng thử khi đăng ký.";
+        wrapper.append(span);
         //
         var input = document.createElement("input");
         wrapper.append(input);
@@ -157,6 +163,11 @@ class Po {
         input.required = true;
         this.regCoPa = input;
         //
+        var span = document.createElement("span");
+        wrapper.append(span);
+        span.className = "invalid";
+        this.regMe = span;
+        //
         var button = document.createElement("button");
         wrapper.append(button);
         button.innerText = "ĐĂNG KÝ";
@@ -191,6 +202,7 @@ class Po {
         this.logCo.style.display = "none";
         this.regCo.style.display = "none";
         this.infCo.style.display = "block";
+        this.louBu.style.display = "block";
     };
     cInCo = () => {
         var div = document.createElement("div");
@@ -556,6 +568,8 @@ class Po {
         this.infCo.remove();
         this.optCo.remove();
         this.aboCo.remove();
+        //
+        this.louBu.style.display = "none";
     };
     rAc = (e, self) => {
         e.preventDefault();
@@ -605,6 +619,9 @@ class Po {
                         else if (json.message == "phoneExist")
                             self.regMe.innerText =
                                 "Số điện thoại này đã đăng ký";
+                        else if (json.message == "deviceExist")
+                            self.regMe.innerText =
+                                "Thiết bị này đang sử dụng dịch vụ";
                     }
                 })
                 .catch(error => {

@@ -18,6 +18,11 @@
     font-size: 20px;
 }
 
+#menuContainer > button:hover {
+    background: #000;
+    border-color: #d1d4dc;
+}
+
 #menuContainer > #lightWeightButton.dark {
     background: #d1d4dc;
     color: #3f433f;

@@ -10,5 +10,9 @@ class Al {
             position: "right bottom"
         });
     };
-    h = () => this.notify.close();
+    h = () =>
+        new Promise(resolve => {
+            this.notify.close();
+            setTimeout(() => resolve(), 500);
+        });
 }

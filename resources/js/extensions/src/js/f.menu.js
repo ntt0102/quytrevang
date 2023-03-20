@@ -20,23 +20,27 @@ class Me {
         var button = document.createElement("button");
         button.id = "lightWeightButton";
         button.classList = "fa fa-line-chart";
-        button.title = "LightWeight Chart";
+        button.title = "Biểu đồ đặt lệnh";
         button.addEventListener("click", this.cb.tLiWeCh);
         this.conEl.prepend(button);
         this.ligWeBu = button;
         //
         var button = document.createElement("button");
         button.classList = "fa fa-bar-chart";
-        button.title = "TradingView Chart";
+        button.title = "Biểu đồ phân tích";
         button.addEventListener("click", this.cb.tTrViCh);
         this.conEl.prepend(button);
         this.traViBu = button;
         //
-        if (this.g.isOpeningMarket) {
+        if (
+            !!this.g.isReport &&
+            this.g.isOpeningMarket &&
+            !this.g.isReportedResult
+        ) {
             var button = document.createElement("button");
             button.id = "reportButton";
             button.classList = "fa fa-flag-checkered";
-            button.title = "Report";
+            button.title = "Báo cáo kết quả";
             button.addEventListener("click", () => this.rTrRe(this));
             this.conEl.append(button);
             this.repBu = button;
@@ -52,7 +56,12 @@ class Me {
     rLoEl = () => {
         this.traViBu.remove();
         this.ligWeBu.remove();
-        this.repBu.remove();
+        if (
+            !!this.g.isReport &&
+            this.g.isOpeningMarket &&
+            !this.g.isReportedResult
+        )
+            this.repBu.remove();
         //
         this.setBu.classList.replace("fa-cog", "fa-sign-in");
         //
@@ -73,6 +82,7 @@ class Me {
         else self.ligWeBu.classList.add("dark");
     };
     rTrRe = self => {
+        self.g.a.s("warning", "Đang gửi báo cáo . . .", false);
         if (self.g.isOpeningMarket && !self.g.isReportedResult) {
             self.g.isReportedResult = true;
             self.g.tSp(true);
@@ -93,16 +103,26 @@ class Me {
                 .then(jsondata => {
                     self.g.isReportedResult = jsondata.isOk;
                     if (jsondata.isOk) {
-                        if (jsondata.isExecuted)
-                            self.g.a.s("success", "Báo cáo đã gửi thành công.");
-                        else self.g.a.s("warning", "Đã gửi báo cáo");
+                        self.g.a.h().then(() => {
+                            if (jsondata.isExecuted)
+                                self.g.a.s(
+                                    "success",
+                                    "Báo cáo đã gửi thành công."
+                                );
+                            else self.g.a.s("warning", "Đã gửi báo cáo");
+                        });
+                        self.repBu.remove();
                     }
                     //
                     self.g.tSp(false);
                 })
                 .catch(error => {
                     self.g.isReportedResult = false;
-                    self.g.a.s("error", "Gửi báo cáo thất bại");
+                    self.g.a
+                        .h()
+                        .then(() =>
+                            self.g.a.s("error", "Gửi báo cáo thất bại")
+                        );
                     self.g.tSp(false);
                 });
         }
