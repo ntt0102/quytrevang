@@ -623,7 +623,7 @@ class Po {
         const data = {
             username: self.logUs.value,
             password: self.logPa.value,
-            rememberMe: self.logReMe.value,
+            rememberMe: self.logReMe.checked,
             deviceId: self.g.deviceId,
             chanel: self.g.appName
         };
@@ -639,15 +639,13 @@ class Po {
             })
             .then(async json => {
                 // console.log("login: ", json);
-                self.logSu.innerText = "ĐĂNG NHẬP";
-                self.logSu.disabled = false;
                 if (json.isOk) {
                     self.sTo(json.token);
                     self.g.accessToken = json.token.access_token;
                     self.g.user = json.user;
+                    await self.cb.lin();
                     self.logUs.value = "";
                     self.logPa.value = "";
-                    await self.cb.lin();
                 } else {
                     if (json.message == "unauthorized")
                         self.logMe.innerText = "Sai thông tin đăng nhập";
@@ -658,6 +656,8 @@ class Po {
                     else if (json.message == "deviceLimit")
                         self.logMe.innerText = "Quá giới hạn thiết bị";
                 }
+                self.logSu.innerText = "ĐĂNG NHẬP";
+                self.logSu.disabled = false;
             })
             .catch(error => {
                 self.g.a.s("error", "Đăng nhập lỗi");
@@ -699,7 +699,7 @@ class Po {
                         throw new Error(response.statusText);
                     })
                     .then(json => {
-                        console.log("gU: ", json);
+                        // console.log("gU: ", json);
                         this.g.user = json;
                         this.g.isLi = !!json.code;
                         resolve();
@@ -721,7 +721,7 @@ class Po {
             })
                 .then(response => response.json())
                 .then(json => {
-                    console.log("serverConfig", json);
+                    // console.log("serverConfig", json);
                     for (const key in json) this.g[key] = json[key];
                     //
                     resolve();

@@ -42,6 +42,8 @@ class Me {
             this.repBu = button;
         }
         //
+        this.setBu.classList.replace("fa-sign-in", "fa-cog");
+        //
         this.interval = setInterval(() => {
             this.bLiWeBu(this);
             if (moment().unix() == this.g.time.end) this.rTrRe(this);
@@ -52,12 +54,14 @@ class Me {
         this.ligWeBu.remove();
         this.repBu.remove();
         //
+        this.setBu.classList.replace("fa-cog", "fa-sign-in");
+        //
         clearInterval(this.interval);
     };
     cNoLoEl = () => {
         var button = document.createElement("button");
         button.id = "settingButton";
-        button.classList = "fa fa-cog";
+        button.classList = "fa fa-sign-in";
         button.title = "Cài đặt";
         button.addEventListener("click", this.cb.tPo);
         this.conEl.append(button);
@@ -99,10 +103,5 @@ class Me {
                     self.g.tSp(false);
                 });
         }
-    };
-    dDe = () => {
-        if (this.g.isLi) {
-            if (!!this.g.isViewChart) this.ligWeBu.click();
-        } else this.setBu.click();
     };
 }

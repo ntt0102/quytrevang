@@ -14,13 +14,15 @@ const bundleJs = () => {
         .pipe(dest("./dist/js"));
 };
 const bundleCss = () => {
-    return src("./src/css/**/*.css")
-        .pipe(sourceMap.init())
-        .pipe(javascriptObfuscator({ compact: true }))
-        .pipe(minifyCss())
-        .pipe(concat("main.min.css"))
-        .pipe(sourceMap.write())
-        .pipe(dest("./dist/css"));
+    return (
+        src("./src/css/**/*.css")
+            .pipe(sourceMap.init())
+            // .pipe(javascriptObfuscator({ compact: true }))
+            .pipe(minifyCss())
+            .pipe(concat("main.min.css"))
+            .pipe(sourceMap.write())
+            .pipe(dest("./dist/css"))
+    );
 };
 
 const devWatch = () => {

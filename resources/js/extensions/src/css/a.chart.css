@@ -31,7 +31,7 @@
 .lightweight-chart #lightWeightChartContainer .command {
     flex: 1 1 auto;
     text-align: center;
-    color: #787b86;
+    color: #bbbbbb;
     background: transparent !important;
     line-height: 30px;
     width: 30px;
@@ -111,7 +111,7 @@
 }
 
 .lightweight-chart #lightWeightChartContainer > #legendAreaDiv {
-    color: #787b86;
+    color: #aaaaaa;
 }
 
 .lightweight-chart #lightWeightChartContainer > #cancelOrderButton {

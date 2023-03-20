@@ -2,7 +2,7 @@ class Ch {
     // Các thuộc tính
     ch = {};
     se = {};
-    da = {};
+    da = { original: [], price: [], volume: [] };
     or = { entry: {}, tp: {}, sl: {} };
     li = [];
     ma = [];
@@ -36,7 +36,6 @@ class Ch {
         if (this.g.isOpeningMarket) {
             this.secIn = setInterval(() => this.inSec(this), 1000);
             this.minIn = setInterval(() => this.inMin(this), 60000);
-            this.cnSk();
         }
         window.addEventListener("resize", () => this.eChRe(this));
         window.addEventListener("keydown", e => this.eKePr(e, this));
@@ -55,9 +54,17 @@ class Ch {
         container.id = "lightWeightChartContainer";
         container.style.width = "100vw";
         container.style.height = "100vh";
-        container.addEventListener("contextmenu", e => this.eChCoMe(e, this));
-        container.addEventListener("click", e => this.eChCl(e, this));
+        //
+        var chartContainer = document.createElement("div");
+        container.prepend(chartContainer);
+        chartContainer.style.width = "100%";
+        chartContainer.style.height = "100%";
+        chartContainer.addEventListener("contextmenu", e =>
+            this.eChCoMe(e, this)
+        );
+        chartContainer.addEventListener("click", e => this.eChCl(e, this));
         this.conEl = container;
+        this.chaCoEl = chartContainer;
     };
     cCh = () => {
         const chartOptions = {
@@ -90,18 +97,18 @@ class Ch {
                 minBarSpacing: 0.1
             }
         };
-        this.ch = LightweightCharts.createChart(this.conEl, chartOptions);
+        this.ch = LightweightCharts.createChart(this.chaCoEl, chartOptions);
         this.ch.subscribeCrosshairMove(e => this.eChCrMo(e, this));
         this.ch.subscribeCustomPriceLineDragged(e => this.ePrLiDr(e, this));
         //
         this.se.volume = this.ch.addHistogramSeries({
             priceScaleId: "volume",
-            color: "#FF00FF",
             priceFormat: { type: "volume" },
             scaleMargins: { top: 0.8, bottom: 0 },
             visible: this.g.isVolume
         });
         //
+        console.log("this.chaTy: ", this.chaTy);
         this.cPrSe();
         this.ch.timeScale().fitContent();
     };
@@ -114,7 +121,7 @@ class Ch {
                 break;
             case "line":
                 this.se.price = this.ch.addLineSeries({
-                    color: "white",
+                    color: "#CCCCCC",
                     priceFormat: { minMove: 0.1 }
                 });
                 break;
@@ -723,7 +730,7 @@ class Ch {
                     price: [],
                     volume: []
                 });
-                console.log("data-----------", this.da);
+                // console.log("data: ", this.da);
                 //
                 this.se.price.setData(this.da.price);
                 this.se.volume.setData(this.da.volume);

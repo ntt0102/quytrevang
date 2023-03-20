@@ -34,21 +34,20 @@ class So {
         this.p.cNoLoEl();
         await this.p.gU();
         if (this.g.isLi) {
-            await this.p.gSeCo();
-            console.log("g-server: ", this.g);
             await this.liCb();
             document.getElementById("sohopdong").value = this.g.contractNumber;
             document.getElementById("right_price").value = "MTL";
-        }
-        this.m.dDe();
+        } else this.m.setBu.click();
         this.g.a.h();
     };
     liCb = async () => {
+        await this.p.gSeCo();
         this.c.c();
         await this.c.lChDa();
         await this.c.gToDa();
         this.p.cLoEl();
         this.m.cLoEl();
+        if (!!this.g.isViewChart) this.m.ligWeBu.click();
         this.c.cnSk();
     };
     loCb = () => {
