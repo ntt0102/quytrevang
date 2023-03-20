@@ -25,7 +25,8 @@ class SmartOrder extends CoreModel
         'take_profit',
         'stop_loss',
         'volume',
-        'view_chart'
+        'view_chart',
+        'report'
     ];
     protected static $recordEvents = [];
     protected $casts = ['devices' => 'array'];

@@ -43,7 +43,8 @@ class SmartOrderService extends CoreService
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
         $latestVersion = $this->parameterRepository->getValue($request->securities . 'SmartOrderVer');
-        $contact = app(\App\Services\AppService::class)->getContact();
+        $pCode = (int) $this->parameterRepository->getValue('representUser');
+        $contactUser = $this->userRepository->findByCode($pCode);
         return [
             'isOpeningMarket' => $isOpeningMarket,
             'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
@@ -57,14 +58,19 @@ class SmartOrderService extends CoreService
             'expiresDate' => date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods))->format('Y-m-d'),
             'deviceLimit' => $so->device_limit,
             'contractNumber' => $so->contracts,
+            'timeFrame' => $so->time_frame,
+            'chartType' => $so->chart_type,
             'takeProfit' => $so->take_profit,
             'stopLoss' => $so->stop_loss,
             'isVolume' => $so->volume,
             'isViewChart' => $so->view_chart,
-            'timeFrame' => $so->time_frame,
-            'chartType' => $so->chart_type,
-            'contact' => $contact,
+            'isReport' => $so->report,
             'latestVersion' => $latestVersion,
+            'contact' => [
+                'email' => $contactUser->email,
+                'phone' => $contactUser->phone,
+                'bankAccount' => $contactUser->bank_account
+            ],
         ];
     }
 
