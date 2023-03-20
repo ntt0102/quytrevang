@@ -441,7 +441,7 @@ class Ch {
                             if (lineOptions.kind == "tp")
                                 self.cb.oTpPr(self.or);
                             else self.cb.oSlPr(self.or);
-                            dOrLi(lineOptions.kind);
+                            self.dOrLi(lineOptions.kind);
                         }
                     }
                     //
