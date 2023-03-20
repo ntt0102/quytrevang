@@ -100,7 +100,7 @@ class SmartOrderService extends CoreService
     public function getChartData($request)
     {
         if ($request->date == date('Y-m-d'))
-            return $this->getTcbs();
+            return $this->getVpsData();
         else return $this->getFromCsv($request->date);
     }
     /**
@@ -188,19 +188,19 @@ class SmartOrderService extends CoreService
     }
 
     /**
-     * get From TCBS
+     * Get data from VPS website
      */
-    public function getTcbs()
+    public function getVpsData()
     {
-        $array = $this->tcbsData(10000);
+        $array = $this->vpsData();
         $temp = collect($array)->reduce(function ($carry, $item) {
+            $time = strtotime(date('Y-m-d ') . $item->time);
             $carry['data'][] = [
-                'time' => strtotime(date('Y-m-d ') . $item->t),
-                'price' => $item->p,
-                'volume' => $item->v,
-                'action' => $item->a
+                'time' => $time,
+                'price' => $item->lastPrice,
+                'volume' => $item->lastVol
             ];
-            $carry['times'][] = $item->t;
+            $carry['times'][] = $time;
             return $carry;
         }, ['data' => [], 'times' => []]);
         $unique_times = array_unique($temp['times']);
@@ -225,22 +225,19 @@ class SmartOrderService extends CoreService
         $client = new \GuzzleHttp\Client();
         $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
         $res = $client->get($url);
-        return json_decode($res->getBody())[0];
+        return json_decode($res->getBody());
     }
 
     /**
-     * Tcbs data
+     * Vps data
      */
-    private function tcbsData($size)
+    private function vpsData()
     {
-        $symbol = $this->getSymbol();
         $client = new \GuzzleHttp\Client();
-        $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$symbol}/his/paging?size={$size}";
+        $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
         $res = $client->get($url);
-        return json_decode($res->getBody())->data;
+        return json_decode($res->getBody());
     }
-
-
 
     /**
      * 
@@ -248,14 +245,13 @@ class SmartOrderService extends CoreService
     public function exportToCsv()
     {
         $filename = storage_path('app/public/vn30f1m/' . date('Y-m-d') . '.csv');
-        $list = $this->tcbsData(10000);
+        $list = $this->vpsData();
         $fp = fopen($filename, 'w');
         foreach ($list as $item) {
             $a = [];
-            $a[] = strtotime(date('Y-m-d ') . $item->t);
-            $a[] = $item->p;
-            $a[] = $item->v;
-            $a[] = $item->a;
+            $a[] = strtotime(date('Y-m-d ') . $item->time);
+            $a[] = $item->lastPrice;
+            $a[] = $item->lastVol;
             fputcsv($fp, $a);
         }
         fclose($fp);

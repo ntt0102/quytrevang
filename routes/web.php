@@ -34,7 +34,7 @@ Route::get('migrate', function () {
 
 Route::get('test', function () {
     // $s = app(\App\Services\VpsService::class)->checkOpeningMarket();
-    // $s = app(\App\Services\VpsService::class)->getVps();
+    $s = app(\App\Services\SmartOrderService::class)->getVpsData();
     // $s = app(\App\Services\VpsService::class)->getVolumeByPrice();
     // $s = app(\App\Services\VpsService::class)->exportToCsv();
     // $s = app(\App\Services\VpsService::class);
@@ -49,8 +49,8 @@ Route::get('test', function () {
     // $v = number_format('123.452', 2);
     // $s = is_numeric("1000.1");
     // $s = !![1, 2];
-    $s = \App\Models\User::find(1);
-    $s = $s->smartOrder->periods;
+    // $s = \App\Models\User::find(1);
+    // $s = $s->smartOrder->periods;
     // $s = date_create() < date_add(date_create($s->smartOrder->started_at), date_interval_create_from_date_string("7 days"));
     dd($s);
 })->middleware('cors');
