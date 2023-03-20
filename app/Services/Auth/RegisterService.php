@@ -31,14 +31,15 @@ class RegisterService extends CoreService
     public function createAccount($request)
     {
         return $this->transaction(function () use ($request) {
+            $clientIp = $request->ip();
+            if ($request->chanel == 'SmartOrder') {
+                if ($this->smartOrderRepository->hasDevice($clientIp))
+                    return ['isOk' => false, 'message' => 'deviceExist'];
+            }
             if (count($this->userRepository->where([['email', $request->email]])) != 0)
                 return ['isOk' => false, 'message' => 'emailExist'];
             if (count($this->userRepository->where([['phone', $request->phone]])) != 0)
                 return ['isOk' => false, 'message' => 'phoneExist'];
-            if ($request->chanel == 'SmartOrder') {
-                if ($this->smartOrderRepository->hasDevice($request->deviceId))
-                    return ['isOk' => false, 'message' => 'deviceExist'];
-            }
             //
             $data = [
                 'code' => $this->userRepository->generateUniqueCode(),
@@ -57,7 +58,7 @@ class RegisterService extends CoreService
                     'started_at' => date('Y-m-d'),
                     'periods' => '7 days',
                     'device_limit' => 2,
-                    'devices' => [$request->deviceId]
+                    'devices' => [$clientIp]
                 ]);
             } else
                 $this->userRepository->sendEmailVerificationNotification($user);
