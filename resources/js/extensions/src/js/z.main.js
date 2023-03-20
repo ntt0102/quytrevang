@@ -30,7 +30,7 @@ class So {
 
     // Các phương thức
     i = async () => {
-        this.g.a.s("warning", "Đang khởi tạo SmartOrder . . .", false);
+        this.g.a.s("warning", "Đang khởi động SmartOrder . . .", false);
         this.p.cNoLoEl();
         await this.p.gU();
         if (this.g.isLi) {

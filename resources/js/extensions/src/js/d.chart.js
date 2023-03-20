@@ -27,7 +27,6 @@ class Ch {
     c = () => {
         this.timFr = this.g.timeFrame;
         this.chaTy = this.g.chartType;
-        console.log("this.chaTy: ", this.chaTy);
         this.cCoEl();
         this.cCh();
         this.cDaAr();
@@ -892,13 +891,13 @@ class Ch {
             if (self.isInSe()) socket.emit("regs", JSON.stringify(msg));
         });
         socket.on("stockps", data => {
-            if (data.id == 3220) {
+            if (data.data.id == 3220) {
                 const param = {
                     time: moment(
-                        `${moment().format("YYYY-MM-DD")} ${data.time}`
+                        `${moment().format("YYYY-MM-DD")} ${data.data.time}`
                     ).unix(),
-                    price: data.lastPrice,
-                    volume: data.lastVol
+                    price: data.data.lastPrice,
+                    volume: data.data.lastVol
                 };
                 self.uChDa(param);
             }
