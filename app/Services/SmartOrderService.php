@@ -62,9 +62,9 @@ class SmartOrderService extends CoreService
             'chartType' => $so->chart_type,
             'takeProfit' => $so->take_profit,
             'stopLoss' => $so->stop_loss,
-            'isVolume' => $so->volume,
-            'isViewChart' => $so->view_chart,
-            'isReport' => $so->report,
+            'isVolume' => !!$so->volume,
+            'isViewChart' => !!$so->view_chart,
+            'isReport' => !!$so->report,
             'latestVersion' => $latestVersion,
             'contact' => [
                 'email' => $contactUser->email,
