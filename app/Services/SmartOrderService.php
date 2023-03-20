@@ -69,8 +69,8 @@ class SmartOrderService extends CoreService
             'contact' => [
                 'email' => $contactUser->email,
                 'phone' => $contactUser->phone,
-                'bankAccount' => $contactUser->bank_account
             ],
+            'bankAccount' => $contactUser->bank_account
         ];
     }
 
