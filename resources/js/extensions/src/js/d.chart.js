@@ -201,7 +201,11 @@ class Ch {
         select.value = this.timFr;
         select.addEventListener("change", e => {
             this.timFr = e.target.value;
-            this.lChDa().then(() => this.ch.timeScale().resetTimeScale());
+            if (this.timFr == 0) {
+                this.chaTySe.value = "line";
+                this.chaTySe.dispatchEvent(new Event("change"));
+            } else
+                this.lChDa().then(() => this.ch.timeScale().resetTimeScale());
         });
         container.append(select);
         this.timFrSe = select;
