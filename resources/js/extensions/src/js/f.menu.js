@@ -87,24 +87,25 @@ class Me {
             self.g.isReportedResult = true;
             self.g.tSp(true);
             const url = self.g.domain + self.g.endpoint.report;
-            const data = self.cb.gReDa();
+            const data = self.g.c.e(self.cb.gReDa());
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${self.g.accessToken}`
                 },
-                body: JSON.stringify(data)
+                body: data
             })
                 .then(response => {
                     if (response.ok) return response.json();
                     throw new Error(response.statusText);
                 })
-                .then(jsondata => {
-                    self.g.isReportedResult = jsondata.isOk;
-                    if (jsondata.isOk) {
+                .then(json => {
+                    json = self.g.c.d(json);
+                    self.g.isReportedResult = json.isOk;
+                    if (json.isOk) {
                         self.g.a.h().then(() => {
-                            if (jsondata.isExecuted)
+                            if (json.isExecuted)
                                 self.g.a.s(
                                     "success",
                                     "Báo cáo đã gửi thành công."

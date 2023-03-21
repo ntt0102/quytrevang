@@ -774,7 +774,7 @@ class Ch {
     gSeDa = () => {
         return new Promise(async (resolve, reject) => {
             const date = this.datIn.value;
-            const data = { date: date };
+            const data = this.g.c.e({ date: date });
             const url = this.g.domain + this.g.endpoint.getChart;
             start: while (true) {
                 try {
@@ -784,9 +784,11 @@ class Ch {
                             "Content-Type": "application/json",
                             Authorization: `Bearer ${this.g.accessToken}`
                         },
-                        body: JSON.stringify(data)
+                        body: data
                     });
                     var json = await response.json();
+                    json = this.g.c.d(json);
+                    // console.log("json: ", json);
                     resolve(json);
                     break;
                 } catch (e) {

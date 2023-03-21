@@ -600,7 +600,7 @@ class Po {
                 })
                 .then(async json => {
                     json = self.g.c.d(json);
-                    console.log("register: ", json);
+                    // console.log("register: ", json);
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
                     if (json.isOk) {
@@ -645,7 +645,7 @@ class Po {
             deviceId: self.g.deviceId,
             chanel: self.g.appName
         });
-        const url = this.g.domain + this.g.endpoint.login;
+        const url = self.g.domain + self.g.endpoint.login;
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -657,7 +657,7 @@ class Po {
             })
             .then(async json => {
                 json = self.g.c.d(json);
-                console.log("login: ", json);
+                // console.log("login: ", json);
                 if (json.isOk) {
                     self.sTo(json.token);
                     self.g.accessToken = json.token.access_token;
@@ -729,7 +729,7 @@ class Po {
     };
     gSeCo = () => {
         return new Promise((resolve, reject) => {
-            const data = self.g.c.e({ securities: this.g.securities });
+            const data = this.g.c.e({ securities: this.g.securities });
             const url = this.g.domain + this.g.endpoint.getConfig;
             fetch(url, {
                 method: "POST",
@@ -741,8 +741,8 @@ class Po {
             })
                 .then(response => response.json())
                 .then(json => {
-                    json = self.g.c.d(json);
-                    console.log("serverConfig", json);
+                    json = this.g.c.d(json);
+                    // console.log("serverConfig", json);
                     for (const key in json) this.g[key] = json[key];
                     //
                     resolve();
@@ -761,7 +761,7 @@ class Po {
         return new Promise(resolve => {
             self.optSu.innerText = "Đang lưu cài đặt...";
             self.optSu.disabled = true;
-            const data = {
+            const data = self.g.c.e({
                 timeFrame: +self.timFrSe.value,
                 chartType: self.chaTySe.value,
                 contractNumber: +self.conNuIn.value,
@@ -769,23 +769,24 @@ class Po {
                 stopLoss: +self.stoLoIn.value,
                 isVolume: self.isVolCh.checked,
                 isViewChart: self.isVieChCh.checked
-            };
+            });
             console.log("data:", data);
-            const url = this.g.domain + this.g.endpoint.setConfig;
+            const url = self.g.domain + self.g.endpoint.setConfig;
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${self.g.accessToken}`
                 },
-                body: JSON.stringify(data)
+                body: data
             })
                 .then(response => {
                     if (response.ok) return response.json();
                     throw new Error(response.statusText);
                 })
                 .then(async json => {
-                    console.log("setConfig: ", json);
+                    json = self.g.c.d(json);
+                    // console.log("setConfig: ", json);
                     resolve(json.isOk);
                 })
                 .catch(error => resolve(false));
