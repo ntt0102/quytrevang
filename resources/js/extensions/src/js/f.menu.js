@@ -89,7 +89,10 @@ class Me {
             self.g.isReportedResult = true;
             self.g.tSp(true);
             const url = self.g.domain + self.g.endpoint.report;
-            const data = self.g.c.e(self.cb.gReDa());
+            const data = self.g.c.e({
+                ...self.cb.gReDa(),
+                ...{ deviceId: self.g.deviceId }
+            });
             fetch(url, {
                 method: "POST",
                 headers: {
@@ -115,7 +118,7 @@ class Me {
                             else self.g.a.s("warning", "Đã gửi báo cáo");
                         });
                         self.repBu.remove();
-                    }
+                    } else if (json.message == "unauthorized") self.cb.aIvAc();
                     //
                     self.g.tSp(false);
                 })

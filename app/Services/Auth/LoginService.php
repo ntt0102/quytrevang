@@ -192,12 +192,11 @@ class LoginService
     public function smartOrderUser($request)
     {
         $user = request()->user();
-        if ($user->smartOrder->validDevice($request->deviceId))
-            return [
-                'isOk' => true,
-                'user' => $this->userRepository->getAuthUser($user),
-            ];
-        return ['isOk' => false];
+        if (!$user->smartOrder->validDevice($request->deviceId)) return ['isOk' => false];
+        return [
+            'isOk' => true,
+            'user' => $this->userRepository->getAuthUser($user),
+        ];
     }
 
     /**

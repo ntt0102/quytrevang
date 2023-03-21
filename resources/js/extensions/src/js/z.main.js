@@ -13,7 +13,8 @@ class So {
             oEnPr: this.oEnPrCb,
             oTpPr: this.oTpPrCb,
             oSlPr: this.oSlPrCb,
-            cOr: this.cOrCb
+            cOr: this.cOrCb,
+            aIvAc: this.p.aIvAc
         });
         this.p = new Po(this.g, {
             lin: this.liCb,
@@ -24,7 +25,8 @@ class So {
             tTrViCh: this.tTrViCb,
             tLiWeCh: this.tLiWeCb,
             tPo: this.p.t,
-            gReDa: this.gReDaCb
+            gReDa: this.gReDaCb,
+            aIvAc: this.p.aIvAc
         });
         this.rFuEv();
     }
@@ -33,6 +35,7 @@ class So {
     i = async () => {
         this.g.a.s("warning", "Đang khởi động SmartOrder . . .", false);
         this.p.cNoLoEl();
+        await this.p.gDeId();
         await this.p.gU();
         if (this.g.isLi) {
             await this.liCb();

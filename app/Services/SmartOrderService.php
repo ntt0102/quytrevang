@@ -39,13 +39,15 @@ class SmartOrderService extends CoreService
     public function getConfig($request)
     {
         $so = request()->user()->smartOrder;
+        if (!$so->validDevice($request->deviceId)) return ['isOk' => false];
+        //
         $isOpeningMarket = $this->checkOpeningMarket();
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
         $latestVersion = $this->parameterRepository->getValue($request->securities . 'SmartOrderVer');
         $pCode = (int) $this->parameterRepository->getValue('representUser');
         $contactUser = $this->userRepository->findByCode($pCode);
-        return [
+        $config = [
             'isOpeningMarket' => $isOpeningMarket,
             'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
             'time' => [
@@ -72,6 +74,10 @@ class SmartOrderService extends CoreService
             ],
             'bankAccount' => $contactUser->bank_account
         ];
+        return [
+            'isOk' => true,
+            'config' => $config
+        ];
     }
 
     /**
@@ -84,7 +90,11 @@ class SmartOrderService extends CoreService
     {
         return $this->transaction(
             function () use ($request) {
-                $isOk = $this->smartOrderRepository->update(request()->user()->smartOrder, [
+                $so = request()->user()->smartOrder;
+                if (!$so->validDevice($request->deviceId))
+                    return ['isOk' => false, 'message' => 'unauthorized'];
+                //
+                $isOk = $this->smartOrderRepository->update($so, [
                     'time_frame' => $request->timeFrame,
                     'chart_type' => $request->chartType,
                     'contracts' => $request->contractNumber,
@@ -105,9 +115,13 @@ class SmartOrderService extends CoreService
      */
     public function getChartData($request)
     {
-        if ($request->date == date('Y-m-d'))
-            return $this->getVpsData();
-        else return $this->getFromCsv($request->date);
+        $so = request()->user()->smartOrder;
+        if (!$so->validDevice($request->deviceId)) return ['isOk' => false, 'data' => []];
+        //
+        return [
+            'isOk' => true,
+            'data' => $request->date == date('Y-m-d') ? $this->getVpsData() : $this->getFromCsv($request->date)
+        ];
     }
     /**
      * Report
@@ -119,7 +133,13 @@ class SmartOrderService extends CoreService
     {
         return $this->transaction(
             function () use ($request) {
-                if (get_global_value('reportedTradingFlag') == '1') return ['isOk' => true, 'isExecuted' => false];
+                $so = request()->user()->smartOrder;
+                if (!$so->validDevice($request->deviceId))
+                    return ['isOk' => false, 'message' => 'unauthorized'];
+                //
+                if (get_global_value('reportedTradingFlag') == '1')
+                    return ['isOk' => true, 'isExecuted' => false];
+                //
                 $revenue = $request->revenue > 0 ? $request->revenue : 0;
                 $loss = $request->revenue < 0 ? -$request->revenue : 0;
                 $currentDate = date_create();

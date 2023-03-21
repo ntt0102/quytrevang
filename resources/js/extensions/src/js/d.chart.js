@@ -775,7 +775,7 @@ class Ch {
     gSeDa = () => {
         return new Promise(async (resolve, reject) => {
             const date = this.datIn.value;
-            const data = this.g.c.e({ date: date });
+            const data = this.g.c.e({ date: date, deviceId: this.g.deviceId });
             const url = this.g.domain + this.g.endpoint.getChart;
             start: while (true) {
                 try {
@@ -790,7 +790,8 @@ class Ch {
                     var json = await response.json();
                     json = this.g.c.d(json);
                     // console.log("json: ", json);
-                    resolve(json);
+                    if (!json.isOk) this.cb.aIvAc();
+                    resolve(json.data);
                     break;
                 } catch (e) {
                     continue start;

@@ -7,7 +7,6 @@ class Po {
         this.g = g;
         this.cb = c;
         this.cCoEl();
-        this.gDeId();
     }
 
     // Các phương thức
@@ -209,16 +208,7 @@ class Po {
         var wrapper = document.createElement("form");
         div.append(wrapper);
         wrapper.className = "wrapper";
-        wrapper.addEventListener("submit", e =>
-            this.sSeCo(e, this).then(isOk => {
-                this.optSu.innerText = "LƯU CÀI ĐẶT";
-                this.optSu.disabled = false;
-                if (isOk) this.g.a.s("success", "Lưu cài đặt thành công");
-                else this.g.a.s("error", "Lưu cài đặt thất bại");
-                //
-                this.cb.tVo(this.isVolCh.checked);
-            })
-        );
+        wrapper.addEventListener("submit", e => this.sSeCo(e, this));
         //
         var list = document.createElement("div");
         list.className = "list";
@@ -682,7 +672,7 @@ class Po {
             this.g.accessToken = this.gTo();
             if (!this.g.accessToken) resolve();
             else {
-                const data = this.g.c.e({ deviceId: self.g.deviceId });
+                const data = this.g.c.e({ deviceId: this.g.deviceId });
                 const url = this.g.domain + this.g.endpoint.user;
                 fetch(url, {
                     method: "POST",
@@ -698,18 +688,10 @@ class Po {
                     })
                     .then(json => {
                         json = this.g.c.d(json);
-                        console.log("gU: ", json);
+                        // console.log("gU: ", json);
                         this.g.isLi = json.isOk;
                         if (json.isOk) this.g.user = json.user;
-                        else {
-                            this.rTo();
-                            // this.sPa(this.logCo);
-                            // this.logUs.focus();
-                            this.g.a.s(
-                                "error",
-                                "Tài khoản không đăng nhập đúng cách"
-                            );
-                        }
+                        else this.aIvAc(true);
                         resolve();
                     })
                     .catch(error => resolve());
@@ -718,7 +700,10 @@ class Po {
     };
     gSeCo = () => {
         return new Promise((resolve, reject) => {
-            const data = this.g.c.e({ securities: this.g.securities });
+            const data = this.g.c.e({
+                securities: this.g.securities,
+                deviceId: this.g.deviceId
+            });
             const url = this.g.domain + this.g.endpoint.getConfig;
             fetch(url, {
                 method: "POST",
@@ -732,8 +717,9 @@ class Po {
                 .then(json => {
                     json = this.g.c.d(json);
                     // console.log("serverConfig", json);
-                    for (const key in json) this.g[key] = json[key];
-                    //
+                    if (json.isOk)
+                        for (const key in json) this.g[key] = json.config[key];
+                    else this.aIvAc();
                     resolve();
                 })
                 .catch(err => {
@@ -757,7 +743,8 @@ class Po {
                 takeProfit: +self.takPrIn.value,
                 stopLoss: +self.stoLoIn.value,
                 isVolume: self.isVolCh.checked,
-                isViewChart: self.isVieChCh.checked
+                isViewChart: self.isVieChCh.checked,
+                deviceId: self.g.deviceId
             });
             const url = self.g.domain + self.g.endpoint.setConfig;
             fetch(url, {
@@ -775,9 +762,16 @@ class Po {
                 .then(async json => {
                     json = self.g.c.d(json);
                     // console.log("setConfig: ", json);
-                    resolve(json.isOk);
-                })
-                .catch(error => resolve(false));
+                    self.optSu.innerText = "LƯU CÀI ĐẶT";
+                    self.optSu.disabled = false;
+                    if (isOk) self.g.a.s("success", "Lưu cài đặt thành công");
+                    else {
+                        if (json.message == "unauthorized") self.aIvAc();
+                        else self.g.a.s("error", "Lưu cài đặt thất bại");
+                    }
+                    self.cb.tVo(self.isVolCh.checked);
+                    resolve();
+                });
         });
     };
     sTo = token => localStorage.setItem(this.TK, JSON.stringify(token));
@@ -795,6 +789,7 @@ class Po {
                 .then(fp => fp.get())
                 .then(result => {
                     this.g.deviceId = result.visitorId;
+                    console.log("result.visitorId: ", this.g.deviceId);
                     resolve();
                 });
         });
@@ -816,5 +811,11 @@ class Po {
         );
         if (activeEl) activeEl.classList.remove("active");
         el.classList.add("active");
+    };
+    aIvAc = (h = false) => {
+        this.lOu(this);
+        const msg = "Tài khoản đăng nhập sai cách";
+        if (h) this.g.a.h().then(() => this.g.a.s("error", msg, true, true));
+        else this.g.a.s("error", msg);
     };
 }
