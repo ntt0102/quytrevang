@@ -37,7 +37,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             });
             Route::get('logout', 'LoginController@logout')->middleware('cors');
             Route::get('user', 'LoginController@user');
-            Route::get('so/user', 'LoginController@smartOrderUser')->middleware('cors');
+            Route::post('so/user', 'LoginController@smartOrderUser')->middleware('cors');
             Route::post('register-webauthn', 'LoginController@registerWebAuthn');
             Route::post('confirm-webauthn', 'LoginController@confirmWebAuthn');
             Route::post('check-pin', 'LoginController@checkPin');
