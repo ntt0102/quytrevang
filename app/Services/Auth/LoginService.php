@@ -85,17 +85,17 @@ class LoginService
         $expires_at = date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods));
         if (date_create() > $expires_at)
             return ['isOk' => false, 'message' => 'expired'];
-        if (!in_array($request->deviceId, $so->devices)) {
+        if (!in_array($payload['deviceId'], $so->devices)) {
             if (count($so->devices) >= $so->device_limit)
                 return ['isOk' => false, 'message' => 'deviceLimit'];
             //
             $devices = $so->devices;
-            $devices[] = $request->deviceId;
+            $devices[] = $payload['deviceId'];
             app(\App\Repositories\SmartOrderRepository::class)->update($so, ['devices' => $devices]);
         }
 
         //
-        return $this->createToken($user, $request->rememberMe);
+        return $this->createToken($user, $payload['rememberMe']);
     }
 
     /**
