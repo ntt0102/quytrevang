@@ -110,7 +110,7 @@ if (!function_exists('create_contract_image')) {
          * @param mixed $value
          * @return string
          */
-        function aes_encrypt($value, $passphrase)
+        function aes_encrypt($value, $passphrase = '19AqVgG36ekVzc1HyEmE9vfA7PH78DFCwhdwUxJ7dns=')
         {
             $salt = openssl_random_pseudo_bytes(8);
             $salted = '';
@@ -135,7 +135,7 @@ if (!function_exists('create_contract_image')) {
          * @param mixed $jsonString
          * @return mixed
          */
-        function aes_decrypt($jsonString, $passphrase)
+        function aes_decrypt($jsonString, $passphrase = '19AqVgG36ekVzc1HyEmE9vfA7PH78DFCwhdwUxJ7dns=')
         {
             $jsondata = json_decode($jsonString, true);
             $salt = hex2bin($jsondata["s"]);

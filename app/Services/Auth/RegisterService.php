@@ -56,7 +56,7 @@ class RegisterService extends CoreService
     public function smartOrderRegister($request)
     {
         return $this->transaction(function () use ($request) {
-            $payload = aes_decrypt(json_encode($request->all()), 'SmartOrder');
+            $payload = aes_decrypt(json_encode($request->all()));
             if ($this->smartOrderRepository->hasDevice($payload['deviceId']))
                 return ['isOk' => false, 'message' => 'deviceExist'];
             if (count($this->userRepository->where([['email', $payload['email']]])) != 0)
@@ -73,7 +73,7 @@ class RegisterService extends CoreService
             ];
             $user = $this->userRepository->create($data);
             //
-            if (empty($user)) return ['isOk' => false];
+            if (empty($user)) return ['isOk' => false, 'message' => 'unknow'];
             //
             $this->smartOrderRepository->create([
                 'user_code' => $user->code,
