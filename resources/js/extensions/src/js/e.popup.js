@@ -120,7 +120,7 @@ class Po {
         wrapper.addEventListener("submit", e => this.rAc(e, this));
         //
         var span = document.createElement("span");
-        span.innerText = "Được 7 ngày dùng thử khi đăng ký.";
+        span.innerText = "Được 7 ngày dùng thử với 2 thiết bị.";
         wrapper.append(span);
         //
         var input = document.createElement("input");
@@ -533,11 +533,13 @@ class Po {
         );
     };
     rLoEl = () => {
-        this.infCo.remove();
-        this.optCo.remove();
-        this.aboCo.remove();
+        if (!!this.infCo) this.infCo.remove();
+        if (!!this.optCo) this.optCo.remove();
+        if (!!this.aboCo) this.aboCo.remove();
         //
         this.louBu.style.display = "none";
+        this.sPa(this.logCo);
+        this.logUs.focus();
     };
     rAc = (e, self) => {
         e.preventDefault();
@@ -625,7 +627,7 @@ class Po {
             })
             .then(async json => {
                 json = self.g.c.d(json);
-                // console.log("login: ", json);
+                console.log("login: ", json);
                 if (json.isOk) {
                     self.sTo(json.token);
                     self.g.accessToken = json.token.access_token;
@@ -653,7 +655,7 @@ class Po {
             });
     };
     lOu = self => {
-        const url = this.g.domain + this.g.endpoint.logout;
+        const url = self.g.domain + self.g.endpoint.logout;
         fetch(url, {
             method: "GET",
             headers: {
@@ -662,9 +664,7 @@ class Po {
             }
         }).then(() => {
             self.rTo();
-            self.sPa(self.logCo);
             self.cb.lou();
-            self.logUs.focus();
         });
     };
     gU = () => {
@@ -688,7 +688,7 @@ class Po {
                     })
                     .then(json => {
                         json = this.g.c.d(json);
-                        // console.log("gU: ", json);
+                        console.log("gU: ", json);
                         this.g.isLi = json.isOk;
                         if (json.isOk) this.g.user = json.user;
                         else this.aIvAc(true);
@@ -716,9 +716,10 @@ class Po {
                 .then(response => response.json())
                 .then(json => {
                     json = this.g.c.d(json);
-                    // console.log("serverConfig", json);
+                    console.log("serverConfig", json);
                     if (json.isOk)
-                        for (const key in json) this.g[key] = json.config[key];
+                        for (const key in json.config)
+                            this.g[key] = json.config[key];
                     else this.aIvAc();
                     resolve();
                 })
@@ -764,7 +765,8 @@ class Po {
                     // console.log("setConfig: ", json);
                     self.optSu.innerText = "LƯU CÀI ĐẶT";
                     self.optSu.disabled = false;
-                    if (isOk) self.g.a.s("success", "Lưu cài đặt thành công");
+                    if (json.isOk)
+                        self.g.a.s("success", "Lưu cài đặt thành công");
                     else {
                         if (json.message == "unauthorized") self.aIvAc();
                         else self.g.a.s("error", "Lưu cài đặt thất bại");
@@ -789,7 +791,6 @@ class Po {
                 .then(fp => fp.get())
                 .then(result => {
                     this.g.deviceId = result.visitorId;
-                    console.log("result.visitorId: ", this.g.deviceId);
                     resolve();
                 });
         });

@@ -21,14 +21,14 @@ class Me {
         button.id = "lightWeightButton";
         button.classList = "fa fa-line-chart";
         button.title = "Biểu đồ đặt lệnh";
-        button.addEventListener("click", this.cb.tLiWeCh);
+        button.addEventListener("click", () => this.cb.tLiWeCh());
         this.conEl.prepend(button);
         this.ligWeBu = button;
         //
         var button = document.createElement("button");
         button.classList = "fa fa-bar-chart";
         button.title = "Biểu đồ phân tích";
-        button.addEventListener("click", this.cb.tTrViCh);
+        button.addEventListener("click", () => this.cb.tTrViCh());
         this.conEl.prepend(button);
         this.traViBu = button;
         //
@@ -54,14 +54,14 @@ class Me {
         }, 1000);
     };
     rLoEl = () => {
-        this.traViBu.remove();
-        this.ligWeBu.remove();
+        if (!!this.traViBu) this.traViBu.remove();
+        if (!!this.ligWeBu) this.ligWeBu.remove();
         if (
             !!this.g.isReport &&
             this.g.isOpeningMarket &&
             !this.g.isReportedResult
         )
-            this.repBu.remove();
+            if (!!this.repBu) this.repBu.remove();
         //
         this.setBu.classList.replace("fa-cog", "fa-sign-in");
         //

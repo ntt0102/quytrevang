@@ -14,23 +14,22 @@ class So {
             oTpPr: this.oTpPrCb,
             oSlPr: this.oSlPrCb,
             cOr: this.cOrCb,
-            aIvAc: this.p.aIvAc
+            aIvAc: this.aIvAcCb
         });
         this.p = new Po(this.g, {
             lin: this.liCb,
             lou: this.loCb,
-            tVo: this.c.tVo
+            tVo: this.tVoCb
         });
         this.m = new Me(this.g, {
             tTrViCh: this.tTrViCb,
             tLiWeCh: this.tLiWeCb,
-            tPo: this.p.t,
+            tPo: this.tPoCb,
             gReDa: this.gReDaCb,
-            aIvAc: this.p.aIvAc
+            aIvAc: this.aIvAcCb
         });
         this.rFuEv();
     }
-
     // Các phương thức
     i = async () => {
         this.g.a.s("warning", "Đang khởi động SmartOrder . . .", false);
@@ -47,6 +46,7 @@ class So {
     liCb = async () => {
         await this.p.gSeCo();
         this.c.c();
+        console.log("global: ", this.g);
         await this.c.lChDa();
         await this.c.gToDa();
         this.p.cLoEl();
@@ -58,8 +58,10 @@ class So {
         this.m.rLoEl();
         this.p.rLoEl();
         this.c.r();
+        this.tTrViCb(true);
+        this.tLiWeCb(true);
     };
-    tTrViCb = () => {
+    tTrViCb = (hide = false) => {
         var leftEl = document.getElementById("left_order_type");
         var rightEl = document.getElementById("right_order_type");
         var orderEl = document.querySelector(
@@ -70,7 +72,7 @@ class So {
         );
         orderEl.classList.remove("fa", "fa-check-circle");
         condOrderEl.classList.remove("fa", "fa-question-circle");
-        if (document.body.classList.contains("tradingview-chart")) {
+        if (hide || document.body.classList.contains("tradingview-chart")) {
             document.body.classList.remove("tradingview-chart");
             document.body.classList.remove("full-chart");
             leftEl.innerText = "Lệnh thường";
@@ -87,7 +89,7 @@ class So {
             condOrderEl.innerText = "L. ĐIỀU KIỆN";
         }
     };
-    tLiWeCb = () => {
+    tLiWeCb = (hide = false) => {
         var leftEl = document.getElementById("left_order_type");
         var rightEl = document.getElementById("right_order_type");
         var orderEl = document.querySelector(
@@ -96,7 +98,7 @@ class So {
         var condOrderEl = document.querySelector(
             "#mainFooter .foot_tab:nth-child(2)"
         );
-        if (document.body.classList.contains("lightweight-chart")) {
+        if (hide || document.body.classList.contains("lightweight-chart")) {
             document.body.classList.remove("lightweight-chart");
             document.body.classList.remove("full-chart");
             leftEl.innerText = "Lệnh thường";
@@ -197,6 +199,9 @@ class So {
         this.cSc("onCancelAllOrderPending('order_condition')");
         this.cSc("onCancelAllOrderPending('order')");
     };
+    tVoCb = () => this.c.tVo();
+    tPoCb = () => this.p.t();
+    aIvAcCb = () => this.p.aIvAc();
     cSc = script => {
         var button = document.createElement("button");
         button.setAttribute("onclick", script);
