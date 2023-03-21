@@ -10,8 +10,9 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 class CoreController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+    protected $passphrase = '19AqVgG36ekVzc1HyEmE9vfA7PH78DFCwhdwUxJ7dns=';
 
-    public function __construct($permission)
+    public function __construct()
     {
         set_time_limit(30);
     }
@@ -55,5 +56,54 @@ class CoreController extends Controller
     protected function sendError($message = null, $code = 404)
     {
         return response()->json(['message' => $message], $code);
+    }
+
+    /**
+     * Encrypt value to a cryptojs compatiable json encoding string
+     *
+     * @param mixed $value
+     * @return string
+     */
+    function encrypt($value)
+    {
+        $salt = openssl_random_pseudo_bytes(8);
+        $salted = '';
+        $dx = '';
+        while (strlen($salted) < 48) {
+            $dx = md5($dx . $this->passphrase . $salt, true);
+            $salted .= $dx;
+        }
+        $key = substr($salted, 0, 32);
+        $iv  = substr($salted, 32, 16);
+        $encrypted_data = openssl_encrypt(json_encode($value), 'aes-256-cbc', $key, true, $iv);
+        return [
+            "ct" => base64_encode($encrypted_data),
+            "iv" => bin2hex($iv),
+            "s" => bin2hex($salt)
+        ];
+    }
+
+    /**
+     * Decrypt data from a CryptoJS json encoding string
+     *
+     * @param mixed $jsonString
+     * @return mixed
+     */
+    function decrypt($input)
+    {
+        $salt = hex2bin($input->s);
+        $ct = base64_decode($input->ct);
+        $iv  = hex2bin($input->iv);
+        $concatedPassphrase = $this->passphrase . $salt;
+        $md5 = array();
+        $md5[0] = md5($concatedPassphrase, true);
+        $result = $md5[0];
+        for ($i = 1; $i < 3; $i++) {
+            $md5[$i] = md5($md5[$i - 1] . $concatedPassphrase, true);
+            $result .= $md5[$i];
+        }
+        $key = substr($result, 0, 32);
+        $data = openssl_decrypt($ct, 'aes-256-cbc', $key, true, $iv);
+        return json_decode($data, false);
     }
 }

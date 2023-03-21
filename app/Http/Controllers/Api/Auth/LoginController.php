@@ -24,20 +24,10 @@ class LoginController extends CoreController
      */
     public function login(Request $request)
     {
-        $data = $this->loginService->login($request);
-        return $this->sendResponse($data);
-    }
-
-    /**
-     * Login user and create token
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function smartOrderLogin(Request $request)
-    {
-        $data = $this->loginService->smartOrderLogin($request);
+        $payload = $this->decrypt($request);
+        $data = $this->loginService->login($payload);
+        if ($payload->chanel == 'SmartOrder')
+            return $this->sendResponse($this->encrypt($data));
         return $this->sendResponse($data);
     }
 
@@ -102,21 +92,8 @@ class LoginController extends CoreController
      */
     public function user(Request $request)
     {
-        $user = $this->loginService->user($request);
-        return $this->sendResponse($user);
-    }
-
-    /**
-     * Get the authenticated User
-     * 
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function smartOrderUser(Request $request)
-    {
-        $user = $this->loginService->smartOrderUser($request);
-        return $this->sendResponse($user);
+        $data = $this->loginService->user();
+        return $this->sendResponse($data);
     }
 
     /**

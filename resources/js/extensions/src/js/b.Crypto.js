@@ -1,6 +1,7 @@
 class Cr {
+    k = "19AqVgG36ekVzc1HyEmE9vfA7PH78DFCwhdwUxJ7dns=";
     // Hàm khởi tạo
-    constructor() {
+    constructor(g) {
         this.fo = this.f();
     }
     // Các phương thức
@@ -25,14 +26,14 @@ class Cr {
             }
         };
     };
-    e = (text, key) => {
-        return CryptoJS.AES.encrypt(JSON.stringify(text), key, {
+    e = text => {
+        return CryptoJS.AES.encrypt(JSON.stringify(text), this.k, {
             format: this.fo
         }).toString();
     };
-    d = (encrypted, key) => {
+    d = encrypted => {
         return JSON.parse(
-            CryptoJS.AES.decrypt(encrypted, key, {
+            CryptoJS.AES.decrypt(JSON.stringify(encrypted), this.k, {
                 format: this.fo
             }).toString(CryptoJS.enc.Utf8)
         );

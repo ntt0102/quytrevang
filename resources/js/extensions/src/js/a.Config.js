@@ -12,10 +12,10 @@ class Co {
         setConfig: "/api/smart-order/set-config",
         getChart: "/api/smart-order/get-chart",
         report: "/api/smart-order/report",
-        register: "/api/auth/smartorder/register",
-        login: "/api/auth/smartorder/login",
+        register: "/api/auth/register",
+        login: "/api/auth/login",
         logout: "/api/auth/logout",
-        user: "/api/auth/smartorder/user"
+        user: "/api/auth/user"
     };
     timFrs = [
         { text: "Tick", value: 0 },

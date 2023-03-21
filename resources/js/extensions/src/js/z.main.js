@@ -3,9 +3,9 @@ class So {
     // Hàm khởi tạo
     constructor() {
         this.g = new Co();
-        this.g.c = new Cr();
         this.g.a = new Al();
         this.g.s = new St();
+        this.g.c = new Cr(this.g);
         this.g.isM = navigator.userAgentData.mobile;
         this.c = new Ch(this.g, {
             gOrPo: this.gOrPoCb,

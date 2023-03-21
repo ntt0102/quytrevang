@@ -33,14 +33,16 @@ class LoginService
      */
     public function login($request)
     {
-        $username  = request()->username;
+        $username  = $request->username;
         $fieldName = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
-        request()->merge([$fieldName => $username]);
-        $credentials = request([$fieldName, 'password']);
+        $credentials = [
+            $fieldName => $username,
+            'password' => $request->password
+        ];
         if (!Auth::attempt($credentials))
             return ['isOk' => false, 'message' => 'unauthorized'];
         //
-        $user = $request->user();
+        $user = request()->user();
         if ($request->chanel == 'SmartOrder') {
             $so = $user->smartOrder;
             if (!$so) return ['isOk' => false, 'message' => 'unsetup'];
@@ -58,44 +60,6 @@ class LoginService
         }
         //
         return $this->createToken($user, $request->rememberMe);
-    }
-
-    /**
-     * Login.
-     * 
-     * @param $request
-     *
-     * @return array
-     */
-    public function smartOrderLogin($request)
-    {
-        $payload = aes_decrypt(json_encode($request->all()));
-        $username  = $payload['username'];
-        $fieldName = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
-        $credentials = [
-            $fieldName => $username,
-            'password' => $payload['password']
-        ];
-        if (!Auth::attempt($credentials))
-            return ['isOk' => false, 'message' => 'unauthorized'];
-        //
-        $user = $request->user();
-        $so = $user->smartOrder;
-        if (!$so) return ['isOk' => false, 'message' => 'unsetup'];
-        $expires_at = date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods));
-        if (date_create() > $expires_at)
-            return ['isOk' => false, 'message' => 'expired'];
-        if (!in_array($payload['deviceId'], $so->devices)) {
-            if (count($so->devices) >= $so->device_limit)
-                return ['isOk' => false, 'message' => 'deviceLimit'];
-            //
-            $devices = $so->devices;
-            $devices[] = $payload['deviceId'];
-            app(\App\Repositories\SmartOrderRepository::class)->update($so, ['devices' => $devices]);
-        }
-
-        //
-        return $this->createToken($user, $payload['rememberMe']);
     }
 
     /**
@@ -215,19 +179,9 @@ class LoginService
      * 
      * @return object $user
      */
-    public function user($request)
+    public function user()
     {
-        return $this->userRepository->getAuthUser($request->user());
-    }
-
-    /**
-     * Get the authenticated user
-     * 
-     * @return object $user
-     */
-    public function smartOrderUser($request)
-    {
-        return $this->userRepository->getAuthUser($request->user());
+        return $this->userRepository->getAuthUser(request()->user());
     }
 
     /**

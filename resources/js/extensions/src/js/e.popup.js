@@ -580,19 +580,15 @@ class Po {
             self.regSu.innerText = "Đang đăng ký...";
             self.regSu.disabled = true;
             self.regMe.innerText = "";
-            var data = {
+            const data = self.g.c.e({
                 name: self.regNa.value,
                 email: self.regEm.value,
                 phone: self.regPh.value,
                 password: self.regPa.value,
-                deviceId: self.g.deviceId
-            };
-            // JSON.stringify(data);
-            data = self.g.c.e(data, self.g.appName);
-            // var data1 = self.g.c.d(data, self.g.appName);
-            // console.log("data: ", JSON.parse(data));
+                deviceId: self.g.deviceId,
+                chanel: self.g.appName
+            });
             const url = this.g.domain + this.g.endpoint.register;
-            console.log("url", url);
             fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -603,6 +599,7 @@ class Po {
                     throw new Error(response.statusText);
                 })
                 .then(async json => {
+                    json = self.g.c.d(json);
                     console.log("register: ", json);
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
@@ -641,25 +638,26 @@ class Po {
         self.logSu.innerText = "Đang đăng nhập...";
         self.logSu.disabled = true;
         self.logMe.innerText = "";
-        const data = {
+        const data = self.g.c.e({
             username: self.logUs.value,
             password: self.logPa.value,
             rememberMe: self.logReMe.checked,
             deviceId: self.g.deviceId,
             chanel: self.g.appName
-        };
+        });
         const url = this.g.domain + this.g.endpoint.login;
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data)
+            body: data
         })
             .then(response => {
                 if (response.ok) return response.json();
                 throw new Error(response.statusText);
             })
             .then(async json => {
-                // console.log("login: ", json);
+                json = self.g.c.d(json);
+                console.log("login: ", json);
                 if (json.isOk) {
                     self.sTo(json.token);
                     self.g.accessToken = json.token.access_token;

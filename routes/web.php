@@ -33,22 +33,22 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    $text = 'tho';
-    $key = 'key';
-    // $encrypted = app(\App\Services\SmartOrderService::class)->cryptoJsAesEncrypt($key, $text);
-    $encrypted = '{"ct":"tVh03CaS6JTXe690C/030Gjo24nPTDTiQozJrh3emoQ=","iv":"5b26bd6d9c67982e8dd5b8405ec91e16","s":"88e9e8aea4062416"}';
-    $s = $encrypted;
-    $decrypted = app(\App\Services\SmartOrderService::class)->cryptoJsAesDecrypt($key, $encrypted);
-    $s = $decrypted;
+    // $text = 'tho';
+    // $key = 'key';
+    // // $encrypted = app(\App\Services\SmartOrderService::class)->cryptoJsAesEncrypt($key, $text);
+    // $encrypted = '{"ct":"tVh03CaS6JTXe690C/030Gjo24nPTDTiQozJrh3emoQ=","iv":"5b26bd6d9c67982e8dd5b8405ec91e16","s":"88e9e8aea4062416"}';
+    // $s = $encrypted;
+    // $decrypted = app(\App\Services\SmartOrderService::class)->cryptoJsAesDecrypt($key, $encrypted);
+    // $s = $decrypted;
     // $vWord = 'NguyenTruongTho';
-    // // $customKey = \Illuminate\Encryption\Encrypter::generateKey(config('app.cipher'));
-    // // dd(base64_encode($customKey));
+    // $customKey = \Illuminate\Encryption\Encrypter::generateKey(config('app.cipher'));
+    // dd(base64_encode($customKey));
     // $customKey = '7Ko5X9IgJuKbsWe8IlSMDSPcxpudWvXxKQ9EIPQjnDg=';
     // $customKey = base64_decode($customKey);
     // $newEncrypter = new \Illuminate\Encryption\Encrypter($customKey, config('app.cipher'));
     // $s = $newEncrypter->encrypt($vWord);
     // dd($s);
-    // $s = 'eyJpdiI6IkRoSE5SNkloNHdxMCt1YlJkL3QwZnc9PSIsInZhbHVlIjoiMlJmelRFSnFGbFVGQitwcXRVVHAzdz09IiwibWFjIjoiM2RiMTVjODZjODg4OTRmOWMyZWQ5Nzg5NTU3ZGYwZGFkZDVhMDJiMzhjMzdhYTVkYzk1ZWIyZjg4MzExZmM4NCJ9';
+    $s = 'eyJpdiI6IkRoSE5SNkloNHdxMCt1YlJkL3QwZnc9PSIsInZhbHVlIjoiMlJmelRFSnFGbFVGQitwcXRVVHAzdz09IiwibWFjIjoiM2RiMTVjODZjODg4OTRmOWMyZWQ5Nzg5NTU3ZGYwZGFkZDVhMDJiMzhjMzdhYTVkYzk1ZWIyZjg4MzExZmM4NCJ9';
     // $s = $newEncrypter->decrypt($s);
     // $s = Illuminate\Support\Facades\Crypt::encrypt('tho');
     // $s = 'eyJpdiI6IjQrTGowYnN1RVJtRWROTTJaOWIyd1E9PSIsInZhbHVlIjoibkI2anNBN01jQXBqVmdodit6MURxZz09IiwibWFjIjoiMTgzMjJjZTM1ZDc3YTU0MjNjYTQ1OTczODg5ZTQ2MTlhMzdjZTlhY2I2MjZhMWI5MTVhZjZmNzYzODE1NWYyZCJ9';
