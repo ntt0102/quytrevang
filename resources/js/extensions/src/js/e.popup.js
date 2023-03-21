@@ -622,7 +622,7 @@ class Po {
                                 "Số điện thoại này đã đăng ký";
                         else if (json.message == "deviceExist")
                             self.regMe.innerText =
-                                "Tài khoản khác đang dùng thiết bị này";
+                                "Tài khoản khác đã dùng thiết bị này";
                     }
                 })
                 .catch(error => {
@@ -729,6 +729,7 @@ class Po {
     };
     gSeCo = () => {
         return new Promise((resolve, reject) => {
+            const data = self.g.c.e({ securities: this.g.securities });
             const url = this.g.domain + this.g.endpoint.getConfig;
             fetch(url, {
                 method: "POST",
@@ -736,11 +737,12 @@ class Po {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${this.g.accessToken}`
                 },
-                body: JSON.stringify({ securities: this.g.securities })
+                body: data
             })
                 .then(response => response.json())
                 .then(json => {
-                    // console.log("serverConfig", json);
+                    json = self.g.c.d(json);
+                    console.log("serverConfig", json);
                     for (const key in json) this.g[key] = json[key];
                     //
                     resolve();

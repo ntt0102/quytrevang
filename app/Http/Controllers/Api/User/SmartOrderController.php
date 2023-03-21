@@ -16,19 +16,6 @@ class SmartOrderController extends CoreController
     }
 
     /**
-     * Update Trades
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function report(Request $request)
-    {
-        $data = $this->smartOrderService->report($request);
-        return $this->sendResponse($data);
-    }
-
-    /**
      * Get config
      *
      * @param \Illuminate\Http\Request $request
@@ -37,8 +24,8 @@ class SmartOrderController extends CoreController
      */
     public function getconfig(Request $request)
     {
-        $data = $this->smartOrderService->getconfig($request);
-        return $this->sendResponse($data);
+        $data = $this->smartOrderService->getconfig($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
     }
 
     /**
@@ -50,8 +37,8 @@ class SmartOrderController extends CoreController
      */
     public function setConfig(Request $request)
     {
-        $data = $this->smartOrderService->setConfig($request);
-        return $this->sendResponse($data);
+        $data = $this->smartOrderService->setConfig($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
     }
 
     /**
@@ -63,7 +50,20 @@ class SmartOrderController extends CoreController
      */
     public function getChartData(Request $request)
     {
-        $data = $this->smartOrderService->getChartData($request);
-        return $this->sendResponse($data);
+        $data = $this->smartOrderService->getChartData($this->decrypt($request));
+        return $this->sendResponse($this->decrypt($request));
+    }
+
+    /**
+     * Update Trades
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function report(Request $request)
+    {
+        $data = $this->smartOrderService->report($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
     }
 }
