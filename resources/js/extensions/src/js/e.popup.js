@@ -28,22 +28,22 @@ class Po {
         this.conEl.append(div);
         this.heaCo = div;
         //
-        var p = document.createElement("label");
+        var p = document.createElement("span");
         div.append(p);
         p.className = "title";
         p.innerText = this.g.appName;
         //
-        var p = document.createElement("label");
-        div.append(p);
-        p.className = "logout fa fa-sign-out";
-        p.title = "Đăng xuất";
-        p.style.display = "none";
-        this.louBu = p;
+        var logout = document.createElement("span");
+        div.append(logout);
+        logout.className = "logout fa fa-sign-out";
+        logout.title = "Đăng xuất";
+        logout.style.display = "none";
+        logout.addEventListener("click", () => this.lOu(this));
+        this.louBu = logout;
     };
     cLoCo = () => {
         var div = document.createElement("div");
         div.className = "section";
-        div.style.display = this.g.isLi ? "none" : "block";
         this.conEl.append(div);
         this.logCo = div;
         //
@@ -97,9 +97,8 @@ class Po {
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Đăng ký";
-        route.addEventListener("click", e => {
-            this.logCo.style.display = "none";
-            this.regCo.style.display = "block";
+        route.addEventListener("click", () => {
+            this.sPa(this.regCo);
             this.regNa.focus();
         });
         var route = document.createElement("label");
@@ -113,7 +112,6 @@ class Po {
     cReCo = () => {
         var div = document.createElement("div");
         div.className = "section";
-        div.style.display = "none";
         this.conEl.append(div);
         this.regCo = div;
         //
@@ -181,9 +179,8 @@ class Po {
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Đăng nhập";
-        route.addEventListener("click", e => {
-            this.regCo.style.display = "none";
-            this.logCo.style.display = "block";
+        route.addEventListener("click", () => {
+            this.sPa(this.logCo);
             this.logUs.focus();
         });
         var route = document.createElement("label");
@@ -195,140 +192,17 @@ class Po {
         );
     };
     cLoEl = () => {
-        this.cInCo();
         this.cOpCo();
+        this.cInCo();
         this.cAbCo();
         //
-        this.logCo.style.display = "none";
-        this.regCo.style.display = "none";
-        this.infCo.style.display = "block";
-        this.louBu.style.display = "block";
-    };
-    cInCo = () => {
-        var div = document.createElement("div");
-        div.className = "section";
-        div.style.display = this.g.isLi ? "block" : "none";
-        this.conEl.append(div);
-        this.infCo = div;
-        //
-        var wrapper = document.createElement("div");
-        wrapper.className = "wrapper";
-        div.append(wrapper);
-        //
-        var list = document.createElement("div");
-        list.className = "list";
-        wrapper.append(list);
-        var title = document.createElement("label");
-        list.append(title);
-        title.className = "title";
-        title.innerText = "Thông tin tài khoản:";
-        var item = document.createElement("div");
-        item.className = "item";
-        list.append(item);
-        var label = document.createElement("span");
-        label.innerText = "Tên:";
-        item.append(label);
-        var value = document.createElement("span");
-        value.innerText = this.g.user.name;
-        item.append(value);
-        //
-        var item = document.createElement("div");
-        item.className = "item";
-        list.append(item);
-        var label = document.createElement("span");
-        label.innerText = "Email:";
-        item.append(label);
-        var value = document.createElement("span");
-        value.innerText = this.g.user.email;
-        item.append(value);
-        //
-        var item = document.createElement("div");
-        item.className = "item";
-        list.append(item);
-        var label = document.createElement("span");
-        label.innerText = "Điện thoại:";
-        item.append(label);
-        var value = document.createElement("span");
-        value.innerText = this.g.user.phone;
-        item.append(value);
-        //
-        var item = document.createElement("div");
-        item.className = "item";
-        list.append(item);
-        var label = document.createElement("span");
-        label.innerText = "Ngày đăng ký:";
-        item.append(label);
-        var value = document.createElement("span");
-        value.innerText = moment(this.g.registerDate).format("DD/MM/YYYY");
-        item.append(value);
-        //
-        var list = document.createElement("div");
-        list.className = "list";
-        wrapper.append(list);
-        var title = document.createElement("label");
-        list.append(title);
-        title.className = "title";
-        title.innerText = "Thông tin gói dịch vụ:";
-        var item = document.createElement("div");
-        item.className = "item";
-        list.append(item);
-        var label = document.createElement("span");
-        label.innerText = "Ngày bắt đầu:";
-        item.append(label);
-        var value = document.createElement("span");
-        value.innerText = moment(this.g.startDate).format("DD/MM/YYYY");
-        item.append(value);
-        //
-        var item = document.createElement("div");
-        item.className = "item";
-        list.append(item);
-        var label = document.createElement("span");
-        label.innerText = "Ngày hết hạn:";
-        item.append(label);
-        var value = document.createElement("span");
-        value.innerText = moment(this.g.expiresDate).format("DD/MM/YYYY");
-        item.append(value);
-        //
-        var item = document.createElement("div");
-        item.className = "item";
-        list.append(item);
-        var label = document.createElement("span");
-        label.innerText = "Số lượng thiết bị:";
-        item.append(label);
-        var value = document.createElement("span");
-        value.innerText = this.g.deviceLimit;
-        item.append(value);
-        //
-        var button = document.createElement("button");
-        wrapper.append(button);
-        button.innerText = "ĐĂNG XUẤT";
-        button.addEventListener("click", () => this.lOu(this));
-        //
-        var routeWrapper = document.createElement("div");
-        routeWrapper.className = "link-group";
-        wrapper.append(routeWrapper);
-        var route = document.createElement("label");
-        routeWrapper.append(route);
-        route.className = "link";
-        route.innerText = "Cài đặt";
-        route.addEventListener("click", e => {
-            this.infCo.style.display = "none";
-            this.optCo.style.display = "block";
-        });
-        var route = document.createElement("label");
-        routeWrapper.append(route);
-        route.className = "link";
-        route.innerText = "Cập nhật";
-        route.addEventListener("click", e => {
-            this.infCo.style.display = "none";
-            this.aboCo.style.display = "block";
-        });
+        this.sPa(this.optCo);
+        this.tLoBu(true);
     };
     cOpCo = () => {
         var div = document.createElement("div");
         div.id = "optionContainer";
         div.className = "section";
-        div.style.display = "none";
         this.conEl.append(div);
         this.optCo = div;
         //
@@ -459,19 +333,126 @@ class Po {
         button.type = "submit";
         this.optSu = button;
         //
+        var routeWrapper = document.createElement("div");
+        routeWrapper.className = "link-group";
+        wrapper.append(routeWrapper);
         var route = document.createElement("label");
-        wrapper.append(route);
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Dịch vụ";
+        route.addEventListener("click", () => this.sPa(this.infCo));
+        var route = document.createElement("label");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Phần mềm";
+        route.addEventListener("click", () => this.sPa(this.aboCo));
+    };
+    cInCo = () => {
+        var div = document.createElement("div");
+        div.className = "section";
+        this.conEl.append(div);
+        this.infCo = div;
+        //
+        var wrapper = document.createElement("div");
+        wrapper.className = "wrapper";
+        div.append(wrapper);
+        //
+        var list = document.createElement("div");
+        list.className = "list";
+        wrapper.append(list);
+        var title = document.createElement("label");
+        list.append(title);
+        title.className = "title";
+        title.innerText = "Thông tin tài khoản:";
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Tên:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.g.user.name;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Email:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.g.user.email;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Điện thoại:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.g.user.phone;
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Ngày đăng ký:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = moment(this.g.registerDate).format("DD/MM/YYYY");
+        item.append(value);
+        //
+        var list = document.createElement("div");
+        list.className = "list";
+        wrapper.append(list);
+        var title = document.createElement("label");
+        list.append(title);
+        title.className = "title";
+        title.innerText = "Thông tin gói dịch vụ:";
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Ngày bắt đầu:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = moment(this.g.startDate).format("DD/MM/YYYY");
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Ngày hết hạn:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = moment(this.g.expiresDate).format("DD/MM/YYYY");
+        item.append(value);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("span");
+        label.innerText = "Số lượng thiết bị:";
+        item.append(label);
+        var value = document.createElement("span");
+        value.innerText = this.g.deviceLimit;
+        item.append(value);
+        //
+        var routeWrapper = document.createElement("div");
+        routeWrapper.className = "link-group";
+        wrapper.append(routeWrapper);
+        var route = document.createElement("label");
+        routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Trở về";
-        route.addEventListener("click", e => {
-            this.optCo.style.display = "none";
-            this.infCo.style.display = "block";
-        });
+        route.addEventListener("click", () => this.sPa(this.optCo));
     };
     cAbCo = () => {
         var div = document.createElement("div");
         div.className = "section";
-        div.style.display = "none";
         this.conEl.append(div);
         this.aboCo = div;
         //
@@ -552,10 +533,7 @@ class Po {
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Trở về";
-        route.addEventListener("click", e => {
-            this.aboCo.style.display = "none";
-            this.infCo.style.display = "block";
-        });
+        route.addEventListener("click", () => this.sPa(this.optCo));
         var route = document.createElement("label");
         routeWrapper.append(route);
         route.className = "link";
@@ -770,7 +748,6 @@ class Po {
                 isVolume: self.isVolCh.checked,
                 isViewChart: self.isVieChCh.checked
             });
-            console.log("data:", data);
             const url = self.g.domain + self.g.endpoint.setConfig;
             fetch(url, {
                 method: "POST",
@@ -813,6 +790,19 @@ class Po {
     t = () => {
         if (this.conEl.classList.contains("show"))
             this.conEl.classList.remove("show");
-        else this.conEl.classList.add("show");
+        else {
+            this.sPa(this.g.isLi ? this.optCo : this.logCo);
+            this.conEl.classList.add("show");
+        }
+    };
+    tLoBu = visible => {
+        this.louBu.style.display = visible ? "block" : "none";
+    };
+    sPa = el => {
+        var activeEl = document.querySelector(
+            "#optionViewContainer .section.active"
+        );
+        if (activeEl) activeEl.classList.remove("active");
+        el.classList.add("active");
     };
 }

@@ -20,6 +20,7 @@ class Ch {
         this.g = g;
         this.cb = c;
         this.g.tSp = this.tSp;
+        this.g.isInSe = this.isInSe;
         this.auAl.loop = true;
     }
 

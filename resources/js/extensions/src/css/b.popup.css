@@ -1,6 +1,6 @@
 #optionViewContainer {
     position: fixed;
-    bottom: 45px;
+    bottom: 40px;
     left: 5px;
     width: 250px;
     height: 300px;
@@ -26,17 +26,16 @@
     position: relative;
     width: 100%;
     text-align: center;
+    margin-top: 3px;
 }
 #optionViewContainer > #hearderContainer > .title {
     font-size: 16px;
     font-weight: bold;
-    margin-top: 3px;
-    margin-bottom: 0;
 }
 #optionViewContainer > #hearderContainer > .logout {
     position: absolute;
-    top: -4px;
-    right: 10px;
+    top: 1px;
+    right: 4px;
     cursor: pointer;
     background: #2e2e2e;
     border: 1px solid #dadada;
@@ -51,12 +50,20 @@
     z-index: -1 !important;
 }
 #optionViewContainer > .section {
-    width: 100%;
-    height: calc(100% - 30px);
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
     background-color: #2e2e2e;
+    transition: opacity 0.5s ease-out;
+    opacity: 0;
+    height: 0;
+    overflow: hidden;
 }
+#optionViewContainer > .section.active {
+    width: 100%;
+    height: calc(100% - 30px);
+    opacity: 1;
+}
+
 #optionViewContainer > .section > .wrapper {
     padding: 5px 10px;
     display: flex !important;

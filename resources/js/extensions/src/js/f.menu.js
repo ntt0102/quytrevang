@@ -77,9 +77,11 @@ class Me {
         this.setBu = button;
     };
     bLiWeBu = self => {
-        if (self.ligWeBu.classList.contains("dark"))
-            self.ligWeBu.classList.remove("dark");
-        else self.ligWeBu.classList.add("dark");
+        if (self.g.isInSe()) {
+            if (self.ligWeBu.classList.contains("dark"))
+                self.ligWeBu.classList.remove("dark");
+            else self.ligWeBu.classList.add("dark");
+        }
     };
     rTrRe = self => {
         self.g.a.s("warning", "Đang gửi báo cáo . . .", false);

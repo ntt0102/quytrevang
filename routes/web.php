@@ -48,7 +48,7 @@ Route::get('test', function () {
     // $newEncrypter = new \Illuminate\Encryption\Encrypter($customKey, config('app.cipher'));
     // $s = $newEncrypter->encrypt($vWord);
     // dd($s);
-    $s = 'eyJpdiI6IkRoSE5SNkloNHdxMCt1YlJkL3QwZnc9PSIsInZhbHVlIjoiMlJmelRFSnFGbFVGQitwcXRVVHAzdz09IiwibWFjIjoiM2RiMTVjODZjODg4OTRmOWMyZWQ5Nzg5NTU3ZGYwZGFkZDVhMDJiMzhjMzdhYTVkYzk1ZWIyZjg4MzExZmM4NCJ9';
+    // $s = 'eyJpdiI6IkRoSE5SNkloNHdxMCt1YlJkL3QwZnc9PSIsInZhbHVlIjoiMlJmelRFSnFGbFVGQitwcXRVVHAzdz09IiwibWFjIjoiM2RiMTVjODZjODg4OTRmOWMyZWQ5Nzg5NTU3ZGYwZGFkZDVhMDJiMzhjMzdhYTVkYzk1ZWIyZjg4MzExZmM4NCJ9';
     // $s = $newEncrypter->decrypt($s);
     // $s = Illuminate\Support\Facades\Crypt::encrypt('tho');
     // $s = 'eyJpdiI6IjQrTGowYnN1RVJtRWROTTJaOWIyd1E9PSIsInZhbHVlIjoibkI2anNBN01jQXBqVmdodit6MURxZz09IiwibWFjIjoiMTgzMjJjZTM1ZDc3YTU0MjNjYTQ1OTczODg5ZTQ2MTlhMzdjZTlhY2I2MjZhMWI5MTVhZjZmNzYzODE1NWYyZCJ9';
@@ -58,7 +58,7 @@ Route::get('test', function () {
     // $s = app(\App\Services\VpsService::class)->checkOpeningMarket();
     // $s = app(\App\Services\SmartOrderService::class)->getInfo('vn30f2304')->r;
     // $s = app(\App\Services\VpsService::class)->getVolumeByPrice();
-    // $s = app(\App\Services\VpsService::class)->exportToCsv();
+    $s = app(\App\Services\SmartOrderService::class)->exportToCsv();
     // $s = app(\App\Services\VpsService::class);
     // $s = $s->getInfo($s->getSymbol())->r;
     // $s = app(\App\Services\VpsService::class)->getFromCsv('2023-01-30');
