@@ -97,6 +97,20 @@ class LoginController extends CoreController
     }
 
     /**
+     * Get the authenticated User
+     * 
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function smartOrderUser(Request $request)
+    {
+        $payload = $this->decrypt($request);
+        $data = $this->loginService->smartOrderUser($payload);
+        return $this->sendResponse($this->encrypt($data));
+    }
+
+    /**
      * Check the PIN
      *
      * @param \Illuminate\Http\Request $request

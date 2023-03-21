@@ -32,7 +32,7 @@ class RegisterService extends CoreService
     {
         return $this->transaction(function () use ($request) {
             if ($request->chanel == 'SmartOrder') {
-                if ($this->smartOrderRepository->hasDevice($request->deviceId))
+                if ($this->smartOrderRepository->duplicateDevice($request->deviceId))
                     return ['isOk' => false, 'message' => 'deviceExist'];
                 if (count($this->userRepository->where([['email', $request->email]])) != 0)
                     return ['isOk' => false, 'message' => 'emailExist'];

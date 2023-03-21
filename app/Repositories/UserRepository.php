@@ -27,7 +27,7 @@ class UserRepository extends CoreRepository
      */
     public function getAuthUser($model)
     {
-        return (object) [
+        return [
             'id' => $model->id,
             'code' => $model->code,
             'name' => $model->name,

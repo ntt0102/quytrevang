@@ -25,7 +25,7 @@ class SmartOrderRepository extends CoreRepository
     /**
      * @inheritdoc
      */
-    public function hasDevice($deviceId)
+    public function duplicateDevice($deviceId)
     {
         return count($this->model->whereJsonContains('devices', $deviceId)->get()) > 0;
     }

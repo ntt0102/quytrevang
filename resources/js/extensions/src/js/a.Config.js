@@ -8,14 +8,14 @@ class Co {
     domain1 = "http://localhost";
     endpoint = {
         socket: "https://datafeed.vps.com.vn",
-        getConfig: "/api/smart-order/get-config",
-        setConfig: "/api/smart-order/set-config",
-        getChart: "/api/smart-order/get-chart",
-        report: "/api/smart-order/report",
+        getConfig: "/api/so/get-config",
+        setConfig: "/api/so/set-config",
+        getChart: "/api/so/get-chart",
+        report: "/api/so/report",
         register: "/api/auth/create-account",
         login: "/api/auth/login",
         logout: "/api/auth/logout",
-        user: "/api/auth/user"
+        user: "/api/auth/so/user"
     };
     timFrs = [
         { text: "Tick", value: 0 },

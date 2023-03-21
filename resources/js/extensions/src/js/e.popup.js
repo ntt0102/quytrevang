@@ -672,8 +672,7 @@ class Po {
             }
         }).then(() => {
             self.rTo();
-            self.infCo.style.display = "none";
-            self.logCo.style.display = "block";
+            self.sPa(self.logCo);
             self.cb.lou();
             self.logUs.focus();
         });
@@ -683,22 +682,34 @@ class Po {
             this.g.accessToken = this.gTo();
             if (!this.g.accessToken) resolve();
             else {
+                const data = this.g.c.e({ deviceId: self.g.deviceId });
                 const url = this.g.domain + this.g.endpoint.user;
                 fetch(url, {
-                    method: "GET",
+                    method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                         Authorization: `Bearer ${this.g.accessToken}`
-                    }
+                    },
+                    body: data
                 })
                     .then(response => {
                         if (response.ok) return response.json();
                         throw new Error(response.statusText);
                     })
                     .then(json => {
-                        // console.log("gU: ", json);
-                        this.g.user = json;
-                        this.g.isLi = !!json.code;
+                        json = this.g.c.d(json);
+                        console.log("gU: ", json);
+                        this.g.isLi = json.isOk;
+                        if (json.isOk) this.g.user = json.user;
+                        else {
+                            this.rTo();
+                            // this.sPa(this.logCo);
+                            // this.logUs.focus();
+                            this.g.a.s(
+                                "error",
+                                "Tài khoản không đăng nhập đúng cách"
+                            );
+                        }
                         resolve();
                     })
                     .catch(error => resolve());
@@ -773,9 +784,10 @@ class Po {
     rTo = () => localStorage.removeItem(this.TK);
     gTo = () => {
         const token = JSON.parse(localStorage.getItem(this.TK));
-        if (!!token && moment().isBefore(token.expires_at))
-            return token.access_token;
-        else return false;
+        if (!token) return false;
+        if (moment().isBefore(token.expires_at)) return token.access_token;
+        this.g.a.s("waring", "Phiên đăng nhập hết hạn");
+        return false;
     };
     gDeId = () => {
         return new Promise(resolve => {

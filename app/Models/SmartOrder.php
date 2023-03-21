@@ -30,4 +30,12 @@ class SmartOrder extends CoreModel
     ];
     protected static $recordEvents = [];
     protected $casts = ['devices' => 'array'];
+
+    /**
+     * Get the contracts for the user.
+     */
+    public function validDevice($deviceId)
+    {
+        return in_array($deviceId, $this->devices);
+    }
 }

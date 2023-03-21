@@ -36,7 +36,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::get('verify/{id}', 'VerificationController@verify')->name('verification.verify');
             });
             Route::get('logout', 'LoginController@logout')->middleware('cors');
-            Route::get('user', 'LoginController@user')->middleware('cors');
+            Route::get('user', 'LoginController@user');
+            Route::get('so/user', 'LoginController@smartOrderUser')->middleware('cors');
             Route::post('register-webauthn', 'LoginController@registerWebAuthn');
             Route::post('confirm-webauthn', 'LoginController@confirmWebAuthn');
             Route::post('check-pin', 'LoginController@checkPin');
@@ -57,7 +58,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::post('/', 'PushSubscriptionController@update');
                 Route::post('destroy', 'PushSubscriptionController@destroy');
             });
-            Route::group(['prefix' => 'smart-order', 'middleware' => 'cors'], function () {
+            Route::group(['prefix' => 'so', 'middleware' => 'cors'], function () {
                 Route::post('report', 'SmartOrderController@report');
                 Route::post('get-config', 'SmartOrderController@getConfig');
                 Route::post('set-config', 'SmartOrderController@setConfig');
