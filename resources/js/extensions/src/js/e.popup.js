@@ -1,6 +1,6 @@
 class Po {
     // Các thuộc tính
-    T_K = "SOAT";
+    TK = "__so";
 
     // Hàm khởi tạo
     constructor(g, c) {
@@ -792,10 +792,10 @@ class Po {
                 .catch(error => resolve(false));
         });
     };
-    sTo = token => localStorage.setItem(this.T_K, JSON.stringify(token));
-    rTo = () => localStorage.removeItem(this.T_K);
+    sTo = token => localStorage.setItem(this.TK, JSON.stringify(token));
+    rTo = () => localStorage.removeItem(this.TK);
     gTo = () => {
-        const token = JSON.parse(localStorage.getItem(this.T_K));
+        const token = JSON.parse(localStorage.getItem(this.TK));
         if (!!token && moment().isBefore(token.expires_at))
             return token.access_token;
         else return false;
