@@ -50,8 +50,6 @@ class SmartOrderController extends CoreController
      */
     public function getChartData(Request $request)
     {
-        // $data = $this->decrypt($request);
-        // return $this->sendResponse($data);
         $data = $this->smartOrderService->getChartData($this->decrypt($request));
         return $this->sendResponse($this->encrypt($data));
     }
