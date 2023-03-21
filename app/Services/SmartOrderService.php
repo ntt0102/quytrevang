@@ -156,7 +156,7 @@ class SmartOrderService extends CoreService
                     );
                     event(new UpdateTradeEvent());
                 }
-                return ['isOk' => $isOk, 'isExecuted' => true, 'data' => $request->all()];
+                return ['isOk' => $isOk, 'isExecuted' => true, 'data' => $request];
             }
         );
     }
@@ -271,12 +271,12 @@ class SmartOrderService extends CoreService
         $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
-        $keys = ['time', 'price', 'volume', 'action'];
+        $keys = ['time', 'price', 'volume'];
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
                 $lines[] = collect($line)->reduce(function ($carry, $item, $index) use ($keys) {
-                    $carry[$keys[$index]] = in_array($keys[$index], ['time', 'price', 'volume']) ? $item + 0 : $item;
+                    $carry[$keys[$index]] = $item + 0;
                     return $carry;
                 }, []);
             }
