@@ -796,7 +796,7 @@ class Chart {
     getServerData = () => {
         return new Promise(async (resolve, reject) => {
             const date = this.datIn.value;
-            const data = this.global.crypto.e({
+            const data = this.global.crypto.encrypt({
                 date: date,
                 deviceId: this.global.deviceId
             });
@@ -812,7 +812,7 @@ class Chart {
                         body: data
                     });
                     var json = await response.json();
-                    json = this.global.crypto.d(json);
+                    json = this.global.crypto.decrypt(json);
                     // console.log("json: ", json);
                     if (!json.isOk) this.callback.alertInvalidAccessCallback();
                     resolve(json.data);

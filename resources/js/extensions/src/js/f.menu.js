@@ -98,7 +98,7 @@ class Menu {
             self.global.isReportedResult = true;
             self.global.toggleSpinner(true);
             const url = self.global.domain + self.global.endpoint.report;
-            const data = self.global.crypto.e({
+            const data = self.global.crypto.encrypt({
                 ...self.callback.getReportDataCallback(),
                 ...{ deviceId: self.global.deviceId }
             });
@@ -115,7 +115,7 @@ class Menu {
                     throw new Error(response.statusText);
                 })
                 .then(json => {
-                    json = self.global.crypto.d(json);
+                    json = self.global.crypto.decrypt(json);
                     self.global.isReportedResult = json.isOk;
                     if (json.isOk) {
                         self.global.alert.hide().then(() => {

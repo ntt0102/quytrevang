@@ -565,7 +565,7 @@ class Popup {
             self.regSu.innerText = "Đang đăng ký...";
             self.regSu.disabled = true;
             self.regMe.innerText = "";
-            const data = self.global.crypto.e({
+            const data = self.global.crypto.encrypt({
                 name: self.regNa.value,
                 email: self.regEm.value,
                 phone: self.regPh.value,
@@ -584,7 +584,7 @@ class Popup {
                     throw new Error(response.statusText);
                 })
                 .then(async json => {
-                    json = self.global.crypto.d(json);
+                    json = self.global.crypto.decrypt(json);
                     // console.log("register: ", json);
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
@@ -624,7 +624,7 @@ class Popup {
         self.logSu.innerText = "Đang đăng nhập...";
         self.logSu.disabled = true;
         self.logMe.innerText = "";
-        const data = self.global.crypto.e({
+        const data = self.global.crypto.encrypt({
             username: self.logUs.value,
             password: self.logPa.value,
             rememberMe: self.logReMe.checked,
@@ -642,7 +642,7 @@ class Popup {
                 throw new Error(response.statusText);
             })
             .then(async json => {
-                json = self.global.crypto.d(json);
+                json = self.global.crypto.decrypt(json);
                 console.log("login: ", json);
                 if (json.isOk) {
                     this.global.isLoggedin = true;
@@ -690,7 +690,7 @@ class Popup {
             this.global.accessToken = this.getToken();
             if (!this.global.accessToken) resolve();
             else {
-                const data = this.global.crypto.e({
+                const data = this.global.crypto.encrypt({
                     deviceId: this.global.deviceId
                 });
                 const url = this.global.domain + this.global.endpoint.user;
@@ -707,7 +707,7 @@ class Popup {
                         throw new Error(response.statusText);
                     })
                     .then(json => {
-                        json = this.global.crypto.d(json);
+                        json = this.global.crypto.decrypt(json);
                         // console.log("gU: ", json);
                         this.global.isLoggedin = json.isOk;
                         if (json.isOk) this.global.user = json.user;
@@ -720,7 +720,7 @@ class Popup {
     };
     getServerConfig = () => {
         return new Promise((resolve, reject) => {
-            const data = this.global.crypto.e({
+            const data = this.global.crypto.encrypt({
                 securities: this.global.securities,
                 deviceId: this.global.deviceId
             });
@@ -735,7 +735,7 @@ class Popup {
             })
                 .then(response => response.json())
                 .then(json => {
-                    json = this.global.crypto.d(json);
+                    json = this.global.crypto.decrypt(json);
                     // console.log("serverConfig", json);
                     if (json.isOk)
                         for (const key in json.config)
@@ -757,7 +757,7 @@ class Popup {
         return new Promise(resolve => {
             self.optSu.innerText = "Đang lưu cài đặt...";
             self.optSu.disabled = true;
-            const data = self.global.crypto.e({
+            const data = self.global.crypto.encrypt({
                 timeFrame: +self.timFrSe.value,
                 chartType: self.chaTySe.value,
                 contractNumber: +self.conNuIn.value,
@@ -781,7 +781,7 @@ class Popup {
                     throw new Error(response.statusText);
                 })
                 .then(async json => {
-                    json = self.global.crypto.d(json);
+                    json = self.global.crypto.decrypt(json);
                     // console.log("setConfig: ", json);
                     self.optSu.innerText = "LƯU CÀI ĐẶT";
                     self.optSu.disabled = false;

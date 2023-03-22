@@ -1,11 +1,11 @@
 class Crypto {
-    k = "19AqVgG36ekVzc1HyEmE9vfA7PH78DFCwhdwUxJ7dns=";
+    key = "19AqVgG36ekVzc1HyEmE9vfA7PH78DFCwhdwUxJ7dns=";
     // Hàm khởi tạo
-    constructor(g) {
-        this.fo = this.f();
+    constructor() {
+        this.format = this.formatCrypto();
     }
     // Các phương thức
-    f = () => {
+    formatCrypto = () => {
         return {
             stringify: cipherParams => {
                 var j = {
@@ -26,15 +26,15 @@ class Crypto {
             }
         };
     };
-    e = text => {
-        return CryptoJS.AES.encrypt(JSON.stringify(text), this.k, {
-            format: this.fo
+    encrypt = text => {
+        return CryptoJS.AES.encrypt(JSON.stringify(text), this.key, {
+            format: this.format
         }).toString();
     };
-    d = encrypted => {
+    decrypt = encrypted => {
         return JSON.parse(
-            CryptoJS.AES.decrypt(JSON.stringify(encrypted), this.k, {
-                format: this.fo
+            CryptoJS.AES.decrypt(JSON.stringify(encrypted), this.key, {
+                format: this.format
             }).toString(CryptoJS.enc.Utf8)
         );
     };
