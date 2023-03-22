@@ -9,10 +9,9 @@ const headerComment = require("gulp-header-comment");
 const bundleJs = () => {
     return (
         src("./src/js/**/*.js")
-            .pipe(sourceMap.init())
+            // .pipe(sourceMap.init())
             .pipe(concat("smart-order.min.js"))
-            .pipe(minifyJs())
-            // .pipe(javascriptObfuscator({ compact: true }))
+            .pipe(javascriptObfuscator({ compact: true }))
             .pipe(
                 headerComment(`
                 <%= pkg.description %> v<%= pkg.version %>
@@ -20,24 +19,26 @@ const bundleJs = () => {
                 <%= pkg.license %>
             `)
             )
-            .pipe(sourceMap.write())
+            // .pipe(sourceMap.write())
             .pipe(dest("./dist/js"))
     );
 };
 const bundleCss = () => {
-    return src("./src/css/**/*.css")
-        .pipe(sourceMap.init())
-        .pipe(concat("smart-order.min.css"))
-        .pipe(minifyCss())
-        .pipe(
-            headerComment(`
+    return (
+        src("./src/css/**/*.css")
+            // .pipe(sourceMap.init())
+            .pipe(concat("smart-order.min.css"))
+            .pipe(minifyCss())
+            .pipe(
+                headerComment(`
                     <%= pkg.description %> v<%= pkg.version %>
                     Author: <%= _.capitalize(pkg.author) %>
                     <%= pkg.license %>
                 `)
-        )
-        .pipe(sourceMap.write())
-        .pipe(dest("./dist/css"));
+            )
+            // .pipe(sourceMap.write())
+            .pipe(dest("./dist/css"))
+    );
 };
 
 const devWatch = () => {

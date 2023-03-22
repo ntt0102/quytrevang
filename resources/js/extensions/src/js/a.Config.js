@@ -1,6 +1,6 @@
 class Config {
     appName = "SmartOrder";
-    version = "2.0.1";
+    version = "2.0.2";
     publishDate = "17/03/2023";
     developer = "Tho PS";
     securities = "vps";
