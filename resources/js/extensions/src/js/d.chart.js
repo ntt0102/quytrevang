@@ -19,8 +19,8 @@ class Chart {
     constructor(global, callback) {
         this.global = global;
         this.callback = callback;
-        this.global.tSp = this.tSp;
-        this.global.isInSe = this.isInSe;
+        this.global.toggleSpinner = this.toggleSpinner;
+        this.global.isInSession = this.isInSession;
         this.auAl.loop = true;
     }
 
