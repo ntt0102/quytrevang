@@ -1,11 +1,11 @@
 class Store {
     // Hàm khởi tạo
     constructor() {
-        this.i();
+        this.create();
     }
 
     // Các phương thức
-    i = () => {
+    create = () => {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open("vpsDB", 1);
             request.onupgradeneeded = e => {
@@ -31,7 +31,7 @@ class Store {
             };
         });
     };
-    g = tables => {
+    get = tables => {
         var database = this.store;
         return new Promise(function(resolve, reject) {
             var tx = database.transaction(tables, "readonly");
@@ -53,7 +53,7 @@ class Store {
             });
         }
     };
-    s = (table, data) => {
+    set = (table, data) => {
         const store = this.store
             .transaction(table, "readwrite")
             .objectStore(table);
@@ -61,7 +61,7 @@ class Store {
             if (data.length > 0) data.forEach(item => store.put(item));
         } else store.put(data);
     };
-    c = table => {
+    clear = table => {
         var database = this.store;
         return new Promise(function(resolve, reject) {
             const request = database
