@@ -93,12 +93,12 @@ class Menu {
         }
     };
     reportTradingResult = self => {
-        self.global.a.s("warning", "Đang gửi báo cáo . . .", false);
+        self.global.alert.s("warning", "Đang gửi báo cáo . . .", false);
         if (self.global.isOpeningMarket && !self.global.isReportedResult) {
             self.global.isReportedResult = true;
             self.global.toggleSpinner(true);
             const url = self.global.domain + self.global.endpoint.report;
-            const data = self.global.c.e({
+            const data = self.global.crypto.e({
                 ...self.callback.getReportDataCallback(),
                 ...{ deviceId: self.global.deviceId }
             });
@@ -115,16 +115,20 @@ class Menu {
                     throw new Error(response.statusText);
                 })
                 .then(json => {
-                    json = self.global.c.d(json);
+                    json = self.global.crypto.d(json);
                     self.global.isReportedResult = json.isOk;
                     if (json.isOk) {
-                        self.global.a.h().then(() => {
+                        self.global.alert.h().then(() => {
                             if (json.isExecuted)
-                                self.global.a.s(
+                                self.global.alert.s(
                                     "success",
                                     "Báo cáo đã gửi thành công."
                                 );
-                            else self.global.a.s("warning", "Đã gửi báo cáo");
+                            else
+                                self.global.alert.s(
+                                    "warning",
+                                    "Đã gửi báo cáo"
+                                );
                         });
                         self.repBu.remove();
                     } else if (json.message == "unauthorized")
@@ -137,7 +141,7 @@ class Menu {
                     self.global.a
                         .h()
                         .then(() =>
-                            self.global.a.s("error", "Gửi báo cáo thất bại")
+                            self.global.alert.s("error", "Gửi báo cáo thất bại")
                         );
                     self.global.toggleSpinner(false);
                 });

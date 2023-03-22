@@ -2,11 +2,11 @@ class SmartOrder {
     // Hàm khởi tạo
     constructor() {
         this.global = new Config();
-        this.global.a = new Alert();
-        this.global.s = new Store();
-        this.global.c = new Crypto(this.global);
-        this.global.isM = navigator.userAgentData.mobile;
-        this.c = new Chart(this.global, {
+        this.global.alert = new Alert();
+        this.global.store = new Store();
+        this.global.crypto = new Crypto(this.global);
+        this.global.isMobile = navigator.userAgentData.mobile;
+        this.chart = new Chart(this.global, {
             getOrderPositionCallback: this.getOrderPositionCallback,
             closeOrderPositionCallback: this.closeOrderPositionCallback,
             orderEntryPriceCallback: this.orderEntryPriceCallback,
@@ -15,12 +15,12 @@ class SmartOrder {
             cancelOrderCallback: this.cancelOrderCallback,
             alertInvalidAccessCallback: this.alertInvalidAccessCallback
         });
-        this.p = new Popup(this.global, {
+        this.popup = new Popup(this.global, {
             loginCallback: this.loginCallback,
             logoutCallback: this.logoutCallback,
             toggleChartVolumeCallback: this.toggleChartVolumeCallback
         });
-        this.m = new Menu(this.global, {
+        this.menu = new Menu(this.global, {
             toggleTradingViewButtonCallback: this
                 .toggleTradingViewButtonCallback,
             toggleLightWeightButtonCallback: this
@@ -34,33 +34,33 @@ class SmartOrder {
     //
     // Các phương thức
     init = async () => {
-        this.p.createNoLoginElement();
-        await this.p.getDeviceId();
-        await this.p.getUser();
-        if (this.global.isLi) {
+        this.popup.createNoLoginElement();
+        await this.popup.getDeviceId();
+        await this.popup.getUser();
+        if (this.global.isLoggedin) {
             await this.loginCallback();
             document.getElementById(
                 "sohopdong"
             ).value = this.global.contractNumber;
             document.getElementById("right_price").value = "MTL";
-        } else this.m.setBu.click();
+        } else this.menu.setBu.click();
     };
     loginCallback = async () => {
-        this.global.a.s("warning", "Đang khởi tạo biểu đồ . . .", false);
-        await this.p.getServerConfig();
-        this.p.createLoggedinElement();
-        this.c.create();
-        await this.c.loadChartData();
-        await this.c.getToolsData();
-        this.m.createLoggedinElement();
-        if (!!this.global.isViewChart) this.m.ligWeBu.click();
-        this.c.connectSocket();
-        this.global.a.h();
+        this.global.alert.s("warning", "Đang khởi tạo biểu đồ . . .", false);
+        await this.popup.getServerConfig();
+        this.popup.createLoggedinElement();
+        this.chart.create();
+        await this.chart.loadChartData();
+        await this.chart.getToolsData();
+        this.menu.createLoggedinElement();
+        if (!!this.global.isViewChart) this.menu.ligWeBu.click();
+        this.chart.connectSocket();
+        this.global.alert.h();
     };
     logoutCallback = () => {
-        this.m.removeLoggedinElement();
-        this.p.removeLoggedinElement();
-        this.c.remove();
+        this.menu.removeLoggedinElement();
+        this.popup.removeLoggedinElement();
+        this.chart.remove();
         this.toggleTradingViewButtonCallback(false);
         this.toggleLightWeightButtonCallback(false);
     };
@@ -206,9 +206,9 @@ class SmartOrder {
         this.callJavascript("onCancelAllOrderPending('order')");
     };
     toggleChartVolumeCallback = visible =>
-        this.c.toggleChartVolumeCallback(visible);
-    togglePopupCallback = visible => this.p.toggle(visible);
-    alertInvalidAccessCallback = () => this.p.alertInvalidAccessCallback();
+        this.chart.toggleChartVolumeCallback(visible);
+    togglePopupCallback = visible => this.popup.toggle(visible);
+    alertInvalidAccessCallback = () => this.popup.alertInvalidAccessCallback();
     callJavascript = script => {
         var button = document.createElement("button");
         button.setAttribute("onclick", script);

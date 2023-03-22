@@ -181,7 +181,7 @@ class Chart {
         select.addEventListener("change", e => {
             if (this.timFr == 0 && e.target.value != "line") {
                 this.chaTySe.value = "line";
-                this.global.a.s(
+                this.global.alert.s(
                     "warning",
                     "Chỉ có thể mở biểu đồ Đường trong khung thời gian Tick."
                 );
@@ -232,7 +232,7 @@ class Chart {
         button.className = "command fa fa-trash";
         button.title = "Xoá ngày khác [Ctrl+,]";
         button.addEventListener("click", () => {
-            this.global.s.c("data");
+            this.global.store.c("data");
             this.loadChartData();
         });
         container.append(button);
@@ -355,7 +355,7 @@ class Chart {
             this.removeOrderLine("entry");
             this.removeOrderLine("tp");
             this.removeOrderLine("sl");
-            this.global.s.c("order");
+            this.global.store.c("order");
         });
         container.append(button);
         this.canOrBu = button;
@@ -418,7 +418,7 @@ class Chart {
             self.cr.price = price;
         } else {
             self.hsCr = false;
-            if (!self.global.isM) {
+            if (!self.global.isMobile) {
                 self.cr.time = null;
                 self.cr.price = null;
             }
@@ -459,44 +459,44 @@ class Chart {
                     //
                     if (!isChanged) {
                         line.applyOptions({ price: oldPrice });
-                        self.global.a.s("warning", "Không được thay đổi.");
+                        self.global.alert.s("warning", "Không được thay đổi.");
                     }
                 }
                 break;
             case "line":
-                self.global.s.s("line", {
+                self.global.store.s("line", {
                     price: oldPrice,
                     removed: true
                 });
-                self.global.s.s("line", lineOptions);
+                self.global.store.s("line", lineOptions);
                 self.draLiBu.classList.remove("selected");
                 break;
             case "ruler":
                 if (lineOptions.point == 1) {
-                    self.global.s.s("ruler", lineOptions);
+                    self.global.store.s("ruler", lineOptions);
                     if (self.ru.point == 2) {
                         const distance = +self.ru.end.options().title;
                         const endPrice = +(newPrice + distance).toFixed(1);
                         self.ru.end.applyOptions({ price: endPrice });
-                        self.global.s.s("ruler", self.ru.end.options());
+                        self.global.store.s("ruler", self.ru.end.options());
                     }
                 } else {
                     const startPrice = +self.ru.start.options().price;
                     const distance = (newPrice - startPrice).toFixed(1);
                     line.applyOptions({ title: distance });
-                    self.global.s.s("ruler", line.options());
+                    self.global.store.s("ruler", line.options());
                 }
                 break;
             case "alert":
                 self.auAl.pause();
-                self.global.s.s("alert", {
+                self.global.store.s("alert", {
                     price: oldPrice,
                     removed: true
                 });
                 const currentPrice = self.da.price.slice(-1)[0].value;
                 var title = newPrice >= currentPrice ? ">" : "<";
                 line.applyOptions({ title: title });
-                self.global.s.s("alert", line.options());
+                self.global.store.s("alert", line.options());
                 self.draAlBu.classList.remove("selected");
                 break;
         }
@@ -567,7 +567,7 @@ class Chart {
                 draggable: true
             });
         }
-        this.global.s.s("order", {
+        this.global.store.s("order", {
             kind: kind,
             price: +this.or[kind].price,
             side: this.or.side
@@ -590,7 +590,7 @@ class Chart {
         if (existIndex != -1) {
             const removeLine = this.li.splice(existIndex, 1);
             this.se.price.removePriceLine(removeLine[0]);
-            this.global.s.s("line", { price: price, removed: true });
+            this.global.store.s("line", { price: price, removed: true });
         } else {
             const options = {
                 lineType: TYPE,
@@ -601,14 +601,14 @@ class Chart {
                 draggable: true
             };
             this.li.push(this.se.price.createPriceLine(options));
-            this.global.s.s("line", options);
+            this.global.store.s("line", options);
         }
         this.draLiBu.classList.remove("selected");
     };
     removeHorizontalLine = () => {
         this.li.forEach(line => this.se.price.removePriceLine(line));
         this.li = [];
-        this.global.s.c("line");
+        this.global.store.c("line");
     };
     //
     drawMaker = () => {
@@ -627,7 +627,7 @@ class Chart {
             this.se.price.setMarkers(this.ma);
             this.global.s
                 .c("marker")
-                .then(() => this.global.s.s("marker", this.ma));
+                .then(() => this.global.store.s("marker", this.ma));
             //
             this.draMaBu.classList.remove("selected");
         }
@@ -635,7 +635,7 @@ class Chart {
     removeMaker = () => {
         this.ma = [];
         this.se.price.setMarkers([]);
-        this.global.s.c("marker");
+        this.global.store.c("marker");
     };
     //
     drawRuler = () => {
@@ -654,7 +654,7 @@ class Chart {
             options.title = "0";
             this.ru.start = this.se.price.createPriceLine(options);
             this.ru.point = point;
-            this.global.s.s("ruler", options);
+            this.global.store.s("ruler", options);
         } else if (this.ru.point == 1) {
             const startPrice = +this.ru.start.options().price;
             const point = 2;
@@ -662,7 +662,7 @@ class Chart {
             options.title = (price - startPrice).toFixed(1);
             this.ru.end = this.se.price.createPriceLine(options);
             this.ru.point = point;
-            this.global.s.s("ruler", options);
+            this.global.store.s("ruler", options);
             this.draRuBu.classList.remove("selected");
         }
     };
@@ -672,7 +672,7 @@ class Chart {
             if (this.ru.point > 1) this.se.price.removePriceLine(this.ru.end);
             //
             this.ru = { start: {}, end: {}, point: 0 };
-            this.global.s.c("ruler");
+            this.global.store.c("ruler");
         }
     };
     //
@@ -686,7 +686,7 @@ class Chart {
         if (existIndex != -1) {
             const removeLine = this.al.splice(existIndex, 1);
             this.se.price.removePriceLine(removeLine[0]);
-            this.global.s.s("alert", { price: price, removed: true });
+            this.global.store.s("alert", { price: price, removed: true });
         } else {
             const options = {
                 lineType: TYPE,
@@ -698,7 +698,7 @@ class Chart {
                 draggable: true
             };
             this.al.push(this.se.price.createPriceLine(options));
-            this.global.s.s("alert", options);
+            this.global.store.s("alert", options);
         }
         this.draAlBu.classList.remove("selected");
         this.auAl.pause();
@@ -706,7 +706,7 @@ class Chart {
     removeAlert = () => {
         this.al.forEach(line => this.se.price.removePriceLine(line));
         this.al = [];
-        this.global.s.c("alert");
+        this.global.store.c("alert");
         this.auAl.pause();
     };
     //
@@ -734,16 +734,16 @@ class Chart {
             const svData = await this.getServerData();
             start: while (true) {
                 this.hsNeDa = false;
-                const lcData = await this.global.s.g("data");
+                const lcData = await this.global.store.g("data");
                 const ids = new Set(svData.map(d => d.time));
                 const data = [
                     ...svData,
                     ...lcData.filter(d => !ids.has(d.time))
                 ].sort((a, b) => a.time - b.time);
                 if (this.hsNeDa) continue start;
-                this.global.s
+                this.global.store
                     .c("data")
-                    .then(() => this.global.s.s("data", data));
+                    .then(() => this.global.store.s("data", data));
                 //
                 this.da = data.reduce(
                     (r, item) => this.generateChartData(r, item),
@@ -787,13 +787,13 @@ class Chart {
             this.updateLegend(lastPrice.value, lastVolume.value);
         }
         //
-        this.global.s.s("data", param);
+        this.global.store.s("data", param);
         this.da.original.push(param);
     };
     getServerData = () => {
         return new Promise(async (resolve, reject) => {
             const date = this.datIn.value;
-            const data = this.global.c.e({
+            const data = this.global.crypto.e({
                 date: date,
                 deviceId: this.global.deviceId
             });
@@ -809,7 +809,7 @@ class Chart {
                         body: data
                     });
                     var json = await response.json();
-                    json = this.global.c.d(json);
+                    json = this.global.crypto.d(json);
                     // console.log("json: ", json);
                     if (!json.isOk) this.callback.alertInvalidAccessCallback();
                     resolve(json.data);
@@ -873,7 +873,7 @@ class Chart {
     };
     getToolsData = () => {
         return new Promise(async (resolve, reject) => {
-            const order = await this.global.s.g("order");
+            const order = await this.global.store.g("order");
             order.map(item => {
                 this.or.side = item.side;
                 this.or[item.kind].price = item.price;
@@ -888,16 +888,16 @@ class Chart {
                 }
             });
             //
-            const lines = await this.global.s.g("line");
+            const lines = await this.global.store.g("line");
             lines.forEach(line => {
                 if (!line.removed)
                     this.li.push(this.se.price.createPriceLine(line));
             });
             //
-            this.ma = await this.global.s.g("marker");
+            this.ma = await this.global.store.g("marker");
             this.se.price.setMarkers(this.ma);
             //
-            const rulerLines = await this.global.s.g("ruler");
+            const rulerLines = await this.global.store.g("ruler");
             if (rulerLines.length == 2) {
                 rulerLines.forEach(line => {
                     this.ru.point = 2;
@@ -907,7 +907,7 @@ class Chart {
                 });
             }
             //
-            const alertLines = await this.global.s.g("alert");
+            const alertLines = await this.global.store.g("alert");
             alertLines.forEach(line => {
                 if (!line.removed)
                     this.al.push(this.se.price.createPriceLine(line));
@@ -952,7 +952,7 @@ class Chart {
                 self.or.entry.line.applyOptions({
                     draggable: false
                 });
-                self.global.a.s("success", "Đã mở vị thế.");
+                self.global.alert.s("success", "Đã mở vị thế.");
             }
         } else {
             if (self.or.tp.hasOwnProperty("line")) {
@@ -961,8 +961,8 @@ class Chart {
                 self.removeOrderLine("entry");
                 self.removeOrderLine("tp");
                 self.removeOrderLine("sl");
-                self.global.s.c("order");
-                self.global.a.s("success", "Đã đóng vị thế.");
+                self.global.store.c("order");
+                self.global.alert.s("success", "Đã đóng vị thế.");
             }
         }
         if (self.auAl.paused) {

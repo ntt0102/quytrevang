@@ -64,7 +64,7 @@ class Popup {
         input.placeholder = "Email hoặc Số điện thoại";
         input.required = true;
         this.logUs = input;
-        if (!this.global.isLi) this.logUs.focus();
+        if (!this.global.isLoggedin) this.logUs.focus();
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -565,7 +565,7 @@ class Popup {
             self.regSu.innerText = "Đang đăng ký...";
             self.regSu.disabled = true;
             self.regMe.innerText = "";
-            const data = self.global.c.e({
+            const data = self.global.crypto.e({
                 name: self.regNa.value,
                 email: self.regEm.value,
                 phone: self.regPh.value,
@@ -584,17 +584,17 @@ class Popup {
                     throw new Error(response.statusText);
                 })
                 .then(async json => {
-                    json = self.global.c.d(json);
+                    json = self.global.crypto.d(json);
                     // console.log("register: ", json);
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
                     if (json.isOk) {
-                        this.global.isLi = true;
+                        this.global.isLoggedin = true;
                         self.setToken(json.token);
                         self.global.accessToken = json.token.access_token;
                         self.global.user = json.user;
                         await self.callback.loginCallback();
-                        self.global.a.s("success", "Đăng ký thành công");
+                        self.global.alert.s("success", "Đăng ký thành công");
                         self.regNa.value = "";
                         self.regEm.value = "";
                         self.regPh.value = "";
@@ -613,7 +613,7 @@ class Popup {
                 })
                 .catch(error => {
                     console.log(error);
-                    self.global.a.s("error", "Đăng ký lỗi");
+                    self.global.alert.s("error", "Đăng ký lỗi");
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
                 });
@@ -624,7 +624,7 @@ class Popup {
         self.logSu.innerText = "Đang đăng nhập...";
         self.logSu.disabled = true;
         self.logMe.innerText = "";
-        const data = self.global.c.e({
+        const data = self.global.crypto.e({
             username: self.logUs.value,
             password: self.logPa.value,
             rememberMe: self.logReMe.checked,
@@ -642,10 +642,10 @@ class Popup {
                 throw new Error(response.statusText);
             })
             .then(async json => {
-                json = self.global.c.d(json);
+                json = self.global.crypto.d(json);
                 console.log("login: ", json);
                 if (json.isOk) {
-                    this.global.isLi = true;
+                    this.global.isLoggedin = true;
                     self.setToken(json.token);
                     self.global.accessToken = json.token.access_token;
                     self.global.user = json.user;
@@ -666,7 +666,7 @@ class Popup {
                 self.logSu.disabled = false;
             })
             .catch(error => {
-                self.global.a.s("error", "Đăng nhập lỗi");
+                self.global.alert.s("error", "Đăng nhập lỗi");
                 self.logSu.innerText = "ĐĂNG NHẬP";
                 self.logSu.disabled = false;
             });
@@ -680,7 +680,7 @@ class Popup {
                 Authorization: `Bearer ${self.global.accessToken}`
             }
         }).then(() => {
-            this.global.isLi = false;
+            this.global.isLoggedin = false;
             self.removeToken();
             self.callback.logoutCallback();
         });
@@ -690,7 +690,7 @@ class Popup {
             this.global.accessToken = this.getToken();
             if (!this.global.accessToken) resolve();
             else {
-                const data = this.global.c.e({
+                const data = this.global.crypto.e({
                     deviceId: this.global.deviceId
                 });
                 const url = this.global.domain + this.global.endpoint.user;
@@ -707,9 +707,9 @@ class Popup {
                         throw new Error(response.statusText);
                     })
                     .then(json => {
-                        json = this.global.c.d(json);
+                        json = this.global.crypto.d(json);
                         // console.log("gU: ", json);
-                        this.global.isLi = json.isOk;
+                        this.global.isLoggedin = json.isOk;
                         if (json.isOk) this.global.user = json.user;
                         else this.alertInvalidAccessCallback(true);
                         resolve();
@@ -720,7 +720,7 @@ class Popup {
     };
     getServerConfig = () => {
         return new Promise((resolve, reject) => {
-            const data = this.global.c.e({
+            const data = this.global.crypto.e({
                 securities: this.global.securities,
                 deviceId: this.global.deviceId
             });
@@ -735,7 +735,7 @@ class Popup {
             })
                 .then(response => response.json())
                 .then(json => {
-                    json = this.global.c.d(json);
+                    json = this.global.crypto.d(json);
                     // console.log("serverConfig", json);
                     if (json.isOk)
                         for (const key in json.config)
@@ -757,7 +757,7 @@ class Popup {
         return new Promise(resolve => {
             self.optSu.innerText = "Đang lưu cài đặt...";
             self.optSu.disabled = true;
-            const data = self.global.c.e({
+            const data = self.global.crypto.e({
                 timeFrame: +self.timFrSe.value,
                 chartType: self.chaTySe.value,
                 contractNumber: +self.conNuIn.value,
@@ -781,17 +781,24 @@ class Popup {
                     throw new Error(response.statusText);
                 })
                 .then(async json => {
-                    json = self.global.c.d(json);
+                    json = self.global.crypto.d(json);
                     // console.log("setConfig: ", json);
                     self.optSu.innerText = "LƯU CÀI ĐẶT";
                     self.optSu.disabled = false;
                     if (json.isOk) {
-                        self.global.a.s("success", "Lưu cài đặt thành công");
+                        self.global.alert.s(
+                            "success",
+                            "Lưu cài đặt thành công"
+                        );
                         self.callback.toggleChartVolume(self.isVolCh.checked);
                     } else {
                         if (json.message == "unauthorized")
                             self.alertInvalidAccessCallback();
-                        else self.global.a.s("error", "Lưu cài đặt thất bại");
+                        else
+                            self.global.alert.s(
+                                "error",
+                                "Lưu cài đặt thất bại"
+                            );
                     }
                     resolve();
                 });
@@ -807,7 +814,7 @@ class Popup {
         const token = JSON.parse(localStorage.getItem(this.TK));
         if (!token) return false;
         if (moment().isBefore(token.expires_at)) return token.access_token;
-        this.global.a.s("waring", "Phiên đăng nhập hết hạn");
+        this.global.alert.s("waring", "Phiên đăng nhập hết hạn");
         return false;
     };
     getDeviceId = () => {
@@ -824,7 +831,9 @@ class Popup {
         if (!visible || this.conEl.classList.contains("show"))
             this.conEl.classList.remove("show");
         else {
-            this.setActivedSection(this.global.isLi ? this.optCo : this.logCo);
+            this.setActivedSection(
+                this.global.isLoggedin ? this.optCo : this.logCo
+            );
             this.conEl.classList.add("show");
         }
     };
@@ -844,7 +853,7 @@ class Popup {
         if (h)
             this.global.a
                 .h()
-                .then(() => this.global.a.s("error", msg, true, true));
-        else this.global.a.s("error", msg);
+                .then(() => this.global.alert.s("error", msg, true, true));
+        else this.global.alert.s("error", msg);
     };
 }
