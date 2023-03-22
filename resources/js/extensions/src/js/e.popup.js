@@ -14,7 +14,7 @@ class Popup {
         var container = document.createElement("div");
         container.id = "optionViewContainer";
         document.body.append(container);
-        this.conEl = container;
+        this.containerElement = container;
     };
     createNoLoginElement = () => {
         this.createHeaderContainer();
@@ -24,7 +24,7 @@ class Popup {
     createHeaderContainer = () => {
         var div = document.createElement("div");
         div.id = "hearderContainer";
-        this.conEl.append(div);
+        this.containerElement.append(div);
         this.heaCo = div;
         //
         var p = document.createElement("span");
@@ -44,7 +44,7 @@ class Popup {
         var div = document.createElement("div");
         div.id = "loginContainer";
         div.className = "section";
-        this.conEl.append(div);
+        this.containerElement.append(div);
         this.logCo = div;
         //
         var wrapper = document.createElement("form");
@@ -115,7 +115,7 @@ class Popup {
         var div = document.createElement("div");
         div.id = "registerContainer";
         div.className = "section";
-        this.conEl.append(div);
+        this.containerElement.append(div);
         this.regCo = div;
         //
         var wrapper = document.createElement("form");
@@ -206,7 +206,7 @@ class Popup {
         var div = document.createElement("div");
         div.id = "optionContainer";
         div.className = "section";
-        this.conEl.append(div);
+        this.containerElement.append(div);
         this.optCo = div;
         //
         var wrapper = document.createElement("form");
@@ -226,14 +226,14 @@ class Popup {
         item.append(label);
         var select = document.createElement("select");
         select.style.width = "69px";
-        this.global.timFrs.forEach((item, index) => {
+        this.global.timeFrames.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
             select.appendChild(option);
         });
         select.value = this.global.timeFrame;
-        this.timFrSe = select;
+        this.timeFramese = select;
         item.append(select);
         //
         item = document.createElement("div");
@@ -244,14 +244,14 @@ class Popup {
         item.append(label);
         select = document.createElement("select");
         select.style.width = "69px";
-        this.global.chaTys.forEach((item, index) => {
+        this.global.chartTypes.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
             select.appendChild(option);
         });
         select.value = this.global.chartType;
-        this.chaTySe = select;
+        this.chartTypese = select;
         item.append(select);
         //
         item = document.createElement("div");
@@ -350,7 +350,7 @@ class Popup {
         var div = document.createElement("div");
         div.id = "infoContainer";
         div.className = "section";
-        this.conEl.append(div);
+        this.containerElement.append(div);
         this.infCo = div;
         //
         var wrapper = document.createElement("div");
@@ -456,7 +456,7 @@ class Popup {
         var div = document.createElement("div");
         div.id = "aboutContainer";
         div.className = "section";
-        this.conEl.append(div);
+        this.containerElement.append(div);
         this.aboCo = div;
         //
         var wrapper = document.createElement("div");
@@ -758,8 +758,8 @@ class Popup {
             self.optSu.innerText = "Đang lưu cài đặt...";
             self.optSu.disabled = true;
             const data = self.global.crypto.encrypt({
-                timeFrame: +self.timFrSe.value,
-                chartType: self.chaTySe.value,
+                timeFrame: +self.timeFramese.value,
+                chartType: self.chartTypese.value,
                 contractNumber: +self.conNuIn.value,
                 takeProfit: +self.takPrIn.value,
                 stopLoss: +self.stoLoIn.value,
@@ -828,13 +828,13 @@ class Popup {
         });
     };
     toggle = (visible = true) => {
-        if (!visible || this.conEl.classList.contains("show"))
-            this.conEl.classList.remove("show");
+        if (!visible || this.containerElement.classList.contains("show"))
+            this.containerElement.classList.remove("show");
         else {
             this.setActivedSection(
                 this.global.isLoggedin ? this.optCo : this.logCo
             );
-            this.conEl.classList.add("show");
+            this.containerElement.classList.add("show");
         }
     };
     toggleLogoutButton = visible => {

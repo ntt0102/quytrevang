@@ -17,7 +17,7 @@ class Config {
         logout: "/api/auth/logout",
         user: "/api/auth/so/user"
     };
-    timFrs = [
+    timeFrames = [
         { text: "Tick", value: 0 },
         { text: "1 min", value: 1 },
         { text: "2 min", value: 2 },
@@ -29,7 +29,7 @@ class Config {
         { text: "30 min", value: 30 },
         { text: "1 day", value: 1440 }
     ];
-    chaTys = [
+    chartTypes = [
         { text: "Nến", value: "candlestick" },
         { text: "Đường", value: "line" },
         { text: "Thanh", value: "bar" }

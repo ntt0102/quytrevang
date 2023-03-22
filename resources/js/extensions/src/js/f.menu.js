@@ -14,7 +14,7 @@ class Menu {
         var container = document.createElement("div");
         container.id = "menuContainer";
         document.body.append(container);
-        this.conEl = container;
+        this.containerElement = container;
     };
     createLoggedinElement = () => {
         var button = document.createElement("button");
@@ -24,7 +24,7 @@ class Menu {
         button.addEventListener("click", () =>
             this.callback.toggleLightWeightButtonCallback()
         );
-        this.conEl.prepend(button);
+        this.containerElement.prepend(button);
         this.ligWeBu = button;
         //
         var button = document.createElement("button");
@@ -33,7 +33,7 @@ class Menu {
         button.addEventListener("click", () =>
             this.callback.toggleTradingViewButtonCallback()
         );
-        this.conEl.prepend(button);
+        this.containerElement.prepend(button);
         this.traViBu = button;
         //
         if (
@@ -48,7 +48,7 @@ class Menu {
             button.addEventListener("click", () =>
                 this.reportTradingResult(this)
             );
-            this.conEl.append(button);
+            this.containerElement.append(button);
             this.repBu = button;
         }
         //
@@ -82,7 +82,7 @@ class Menu {
         button.addEventListener("click", () =>
             this.callback.togglePopupCallback(true)
         );
-        this.conEl.append(button);
+        this.containerElement.append(button);
         this.setBu = button;
     };
     blinkLightWeightButton = self => {
