@@ -7,27 +7,27 @@ class SmartOrder {
         this.global.c = new Crypto(this.global);
         this.global.isM = navigator.userAgentData.mobile;
         this.c = new Chart(this.global, {
-            gOrPo: this.gOrPoCb,
-            cPo: this.cPoCb,
-            oEnPr: this.oEnPrCb,
-            oTpPr: this.oTpPrCb,
-            oSlPr: this.oSlPrCb,
-            cOr: this.cOrCb,
-            aIvAc: this.aIvAcCb
+            gOrPo: this.getOrderPositionCallback,
+            cPo: this.closeOrderPositionCallback,
+            oEnPr: this.orderEntryPriceCallback,
+            oTpPr: this.orderTpPriceCallback,
+            oSlPr: this.orderSlPriceCallback,
+            cOr: this.cancelOrderCallback,
+            aIvAc: this.alertInvalidAccessCallback
         });
         this.p = new Popup(this.global, {
-            lin: this.liCb,
-            lou: this.loCb,
-            tVo: this.tVoCb
+            lin: this.loginCallback,
+            lou: this.logoutCallback,
+            tVo: this.toggleChartVolumeCallback
         });
         this.m = new Menu(this.global, {
-            tTrViCh: this.tTrViCb,
-            tLiWeCh: this.tLiWeCb,
-            tPo: this.tPoCb,
-            gReDa: this.gReDaCb,
-            aIvAc: this.aIvAcCb
+            tTrViCh: this.toggleTradingViewButtonCallback,
+            tLiWeCh: this.toggleLightWeightButtonCallback,
+            tPo: this.togglePopupCallback,
+            gReDa: this.getReportDataCallback,
+            aIvAc: this.alertInvalidAccessCallback
         });
-        this.rFuEv();
+        this.reportTradingResult();
     }
     //
     // Các phương thức
@@ -36,14 +36,14 @@ class SmartOrder {
         await this.p.getDeviceId();
         await this.p.getUser();
         if (this.global.isLi) {
-            await this.liCb();
+            await this.loginCallback();
             document.getElementById(
                 "sohopdong"
             ).value = this.global.contractNumber;
             document.getElementById("right_price").value = "MTL";
         } else this.m.setBu.click();
     };
-    liCb = async () => {
+    loginCallback = async () => {
         this.global.a.s("warning", "Đang khởi tạo biểu đồ . . .", false);
         await this.p.getServerConfig();
         this.p.createLoggedinElement();
@@ -55,14 +55,14 @@ class SmartOrder {
         this.c.connectSocket();
         this.global.a.h();
     };
-    loCb = () => {
+    logoutCallback = () => {
         this.m.removeLoggedinElement();
         this.p.removeLoggedinElement();
         this.c.remove();
-        this.tTrViCb(false);
-        this.tLiWeCb(false);
+        this.toggleTradingViewButtonCallback(false);
+        this.toggleLightWeightButtonCallback(false);
     };
-    tTrViCb = (visible = true) => {
+    toggleTradingViewButtonCallback = (visible = true) => {
         var leftEl = document.getElementById("left_order_type");
         var rightEl = document.getElementById("right_order_type");
         var orderEl = document.querySelector(
@@ -81,7 +81,7 @@ class SmartOrder {
             orderEl.innerText = "DANH SÁCH LỆNH";
             condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
-            this.tPoCb(false);
+            this.togglePopupCallback(false);
             document.body.classList.add("tradingview-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("lightweight-chart");
@@ -91,7 +91,7 @@ class SmartOrder {
             condOrderEl.innerText = "L. ĐIỀU KIỆN";
         }
     };
-    tLiWeCb = (visible = true) => {
+    toggleLightWeightButtonCallback = (visible = true) => {
         var leftEl = document.getElementById("left_order_type");
         var rightEl = document.getElementById("right_order_type");
         var orderEl = document.querySelector(
@@ -111,7 +111,7 @@ class SmartOrder {
             condOrderEl.classList.remove("fa", "fa-question-circle");
             condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
-            this.tPoCb(false);
+            this.togglePopupCallback(false);
             document.body.classList.add("lightweight-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("tradingview-chart");
@@ -124,7 +124,7 @@ class SmartOrder {
             condOrderEl.innerText = "";
         }
     };
-    gReDaCb = () => {
+    getReportDataCallback = () => {
         return {
             revenue: +document
                 .getElementById("vmAccInfo")
@@ -134,7 +134,7 @@ class SmartOrder {
                 .innerText.replaceAll(",", "")
         };
     };
-    gOrPoCb = () => {
+    getOrderPositionCallback = () => {
         const el = document.querySelector(
             `#danhmuc_${this.global.symbol} > td:nth-child(2)`
         );
@@ -143,8 +143,8 @@ class SmartOrder {
         if (isNaN(position)) return 0;
         else return +position;
     };
-    cPoCb = () => {
-        const position = this.gOrPoCb();
+    closeOrderPositionCallback = () => {
+        const position = this.getOrderPositionCallback();
         if (position) {
             document.getElementById("select_normal_order_wrapper").click();
             document.getElementById("right_price").value = "MTL";
@@ -154,8 +154,8 @@ class SmartOrder {
                 .click();
         }
     };
-    oEnPrCb = order => {
-        this.cSc("onCancelAllOrderPending('order_condition')");
+    orderEntryPriceCallback = order => {
+        this.callJavascript("onCancelAllOrderPending('order_condition')");
         document.getElementById("select_condition_order_wrapper").click();
         document.getElementById("right_stopOrderIndex").value =
             order.entry.price;
@@ -169,8 +169,8 @@ class SmartOrder {
                 .click();
         }, 1000);
     };
-    oTpPrCb = (order, isInit = false) => {
-        this.cSc("onCancelAllOrderPending('order')");
+    orderTpPriceCallback = (order, isInit = false) => {
+        this.callJavascript("onCancelAllOrderPending('order')");
         if (isInit)
             order.tp.price =
                 +order.entry.price + order.side * this.global.takeProfit;
@@ -182,8 +182,8 @@ class SmartOrder {
                 .click();
         }, 1000);
     };
-    oSlPrCb = (order, isInit = false) => {
-        this.cSc("onCancelAllOrderPending('order_condition')");
+    orderSlPriceCallback = (order, isInit = false) => {
+        this.callJavascript("onCancelAllOrderPending('order_condition')");
         if (isInit)
             order.sl.price =
                 +order.entry.price - order.side * this.global.stopLoss;
@@ -199,19 +199,19 @@ class SmartOrder {
                 .click();
         }, 1000);
     };
-    cOrCb = () => {
-        this.cSc("onCancelAllOrderPending('order_condition')");
-        this.cSc("onCancelAllOrderPending('order')");
+    cancelOrderCallback = () => {
+        this.callJavascript("onCancelAllOrderPending('order_condition')");
+        this.callJavascript("onCancelAllOrderPending('order')");
     };
-    tVoCb = visible => this.c.toggleChartVolume(visible);
-    tPoCb = visible => this.p.toggle(visible);
-    aIvAcCb = () => this.p.alertInvalidAccess();
-    cSc = script => {
+    toggleChartVolumeCallback = visible => this.c.toggleChartVolume(visible);
+    togglePopupCallback = visible => this.p.toggle(visible);
+    alertInvalidAccessCallback = () => this.p.alertInvalidAccess();
+    callJavascript = script => {
         var button = document.createElement("button");
         button.setAttribute("onclick", script);
         button.click();
     };
-    rFuEv = () => {
+    reportTradingResult = () => {
         document
             .querySelector(".timeStamp")
             .addEventListener("dblclick", () => {
