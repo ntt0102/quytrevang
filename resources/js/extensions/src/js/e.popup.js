@@ -42,6 +42,7 @@ class Po {
     };
     cLoCo = () => {
         var div = document.createElement("div");
+        div.id = "loginContainer";
         div.className = "section";
         this.conEl.append(div);
         this.logCo = div;
@@ -58,6 +59,7 @@ class Po {
         //
         var input = document.createElement("input");
         wrapper.append(input);
+        input.id = "LoginUserName";
         input.type = "text";
         input.placeholder = "Email hoặc Số điện thoại";
         input.required = true;
@@ -66,6 +68,7 @@ class Po {
         //
         input = document.createElement("input");
         wrapper.append(input);
+        input.id = "LoginPassword";
         input.type = "password";
         input.placeholder = "Mật khẩu";
         input.required = true;
@@ -83,7 +86,7 @@ class Po {
         checkboxWrapper.append(span);
         span.innerHTML = "&ensp;Lưu đăng nhập";
         //
-        var button = document.createElement("button");
+        var button = document.createElement("input");
         wrapper.append(button);
         button.innerText = "ĐĂNG NHẬP";
         button.type = "submit";
@@ -110,6 +113,7 @@ class Po {
     };
     cReCo = () => {
         var div = document.createElement("div");
+        div.id = "registerContainer";
         div.className = "section";
         this.conEl.append(div);
         this.regCo = div;
@@ -239,6 +243,7 @@ class Po {
         label.innerText = "Loại biểu đồ:";
         item.append(label);
         select = document.createElement("select");
+        select.style.width = "69px";
         this.g.chaTys.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
@@ -339,6 +344,7 @@ class Po {
     };
     cInCo = () => {
         var div = document.createElement("div");
+        div.id = "infoContainer";
         div.className = "section";
         this.conEl.append(div);
         this.infCo = div;
@@ -442,6 +448,7 @@ class Po {
     };
     cAbCo = () => {
         var div = document.createElement("div");
+        div.id = "aboutContainer";
         div.className = "section";
         this.conEl.append(div);
         this.aboCo = div;
@@ -574,6 +581,7 @@ class Po {
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
                     if (json.isOk) {
+                        this.g.isLi = true;
                         self.sTo(json.token);
                         self.g.accessToken = json.token.access_token;
                         self.g.user = json.user;
@@ -629,6 +637,7 @@ class Po {
                 json = self.g.c.d(json);
                 console.log("login: ", json);
                 if (json.isOk) {
+                    this.g.isLi = true;
                     self.sTo(json.token);
                     self.g.accessToken = json.token.access_token;
                     self.g.user = json.user;
@@ -663,6 +672,7 @@ class Po {
                 Authorization: `Bearer ${self.g.accessToken}`
             }
         }).then(() => {
+            this.g.isLi = false;
             self.rTo();
             self.cb.lou();
         });
@@ -795,10 +805,11 @@ class Po {
                 });
         });
     };
-    t = () => {
-        if (this.conEl.classList.contains("show"))
+    t = (visible = true) => {
+        if (!visible || this.conEl.classList.contains("show"))
             this.conEl.classList.remove("show");
         else {
+            console.log("popup-toggle-isLi: ", this.g.isLi);
             this.sPa(this.g.isLi ? this.optCo : this.logCo);
             this.conEl.classList.add("show");
         }
@@ -807,6 +818,7 @@ class Po {
         this.louBu.style.display = visible ? "block" : "none";
     };
     sPa = el => {
+        console.log("sPa: ", el);
         var activeEl = document.querySelector(
             "#optionViewContainer .section.active"
         );

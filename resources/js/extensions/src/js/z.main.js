@@ -32,7 +32,6 @@ class So {
     }
     // Các phương thức
     i = async () => {
-        this.g.a.s("warning", "Đang khởi động SmartOrder . . .", false);
         this.p.cNoLoEl();
         await this.p.gDeId();
         await this.p.gU();
@@ -41,27 +40,28 @@ class So {
             document.getElementById("sohopdong").value = this.g.contractNumber;
             document.getElementById("right_price").value = "MTL";
         } else this.m.setBu.click();
-        this.g.a.h();
     };
     liCb = async () => {
+        this.g.a.s("warning", "Đang khởi tạo biểu đồ . . .", false);
         await this.p.gSeCo();
+        this.p.cLoEl();
         this.c.c();
+        this.m.cLoEl();
         console.log("global: ", this.g);
         await this.c.lChDa();
         await this.c.gToDa();
-        this.p.cLoEl();
-        this.m.cLoEl();
         if (!!this.g.isViewChart) this.m.ligWeBu.click();
         this.c.cnSk();
+        this.g.a.h();
     };
     loCb = () => {
         this.m.rLoEl();
         this.p.rLoEl();
         this.c.r();
-        this.tTrViCb(true);
-        this.tLiWeCb(true);
+        this.tTrViCb(false);
+        this.tLiWeCb(false);
     };
-    tTrViCb = (hide = false) => {
+    tTrViCb = (visible = true) => {
         var leftEl = document.getElementById("left_order_type");
         var rightEl = document.getElementById("right_order_type");
         var orderEl = document.querySelector(
@@ -72,7 +72,7 @@ class So {
         );
         orderEl.classList.remove("fa", "fa-check-circle");
         condOrderEl.classList.remove("fa", "fa-question-circle");
-        if (hide || document.body.classList.contains("tradingview-chart")) {
+        if (!visible || document.body.classList.contains("tradingview-chart")) {
             document.body.classList.remove("tradingview-chart");
             document.body.classList.remove("full-chart");
             leftEl.innerText = "Lệnh thường";
@@ -80,6 +80,7 @@ class So {
             orderEl.innerText = "DANH SÁCH LỆNH";
             condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
+            this.tPoCb(false);
             document.body.classList.add("tradingview-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("lightweight-chart");
@@ -89,7 +90,7 @@ class So {
             condOrderEl.innerText = "L. ĐIỀU KIỆN";
         }
     };
-    tLiWeCb = (hide = false) => {
+    tLiWeCb = (visible = true) => {
         var leftEl = document.getElementById("left_order_type");
         var rightEl = document.getElementById("right_order_type");
         var orderEl = document.querySelector(
@@ -98,7 +99,7 @@ class So {
         var condOrderEl = document.querySelector(
             "#mainFooter .foot_tab:nth-child(2)"
         );
-        if (hide || document.body.classList.contains("lightweight-chart")) {
+        if (!visible || document.body.classList.contains("lightweight-chart")) {
             document.body.classList.remove("lightweight-chart");
             document.body.classList.remove("full-chart");
             leftEl.innerText = "Lệnh thường";
@@ -109,6 +110,7 @@ class So {
             condOrderEl.classList.remove("fa", "fa-question-circle");
             condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
         } else {
+            this.tPoCb(false);
             document.body.classList.add("lightweight-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("tradingview-chart");
@@ -200,7 +202,7 @@ class So {
         this.cSc("onCancelAllOrderPending('order')");
     };
     tVoCb = () => this.c.tVo();
-    tPoCb = () => this.p.t();
+    tPoCb = visible => this.p.t(visible);
     aIvAcCb = () => this.p.aIvAc();
     cSc = script => {
         var button = document.createElement("button");

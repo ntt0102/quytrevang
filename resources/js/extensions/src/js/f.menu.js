@@ -72,7 +72,7 @@ class Me {
         button.id = "settingButton";
         button.classList = "fa fa-sign-in";
         button.title = "Cài đặt";
-        button.addEventListener("click", this.cb.tPo);
+        button.addEventListener("click", () => this.cb.tPo(true));
         this.conEl.append(button);
         this.setBu = button;
     };
