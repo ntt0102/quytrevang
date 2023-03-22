@@ -7,27 +7,29 @@ class SmartOrder {
         this.global.c = new Crypto(this.global);
         this.global.isM = navigator.userAgentData.mobile;
         this.c = new Chart(this.global, {
-            gOrPo: this.getOrderPositionCallback,
-            cPo: this.closeOrderPositionCallback,
-            oEnPr: this.orderEntryPriceCallback,
-            oTpPr: this.orderTpPriceCallback,
-            oSlPr: this.orderSlPriceCallback,
-            cOr: this.cancelOrderCallback,
-            aIvAc: this.alertInvalidAccessCallback
+            getOrderPositionCallback: this.getOrderPositionCallback,
+            closeOrderPositionCallback: this.closeOrderPositionCallback,
+            orderEntryPriceCallback: this.orderEntryPriceCallback,
+            orderTpPriceCallback: this.orderTpPriceCallback,
+            orderSlPriceCallback: this.orderSlPriceCallback,
+            cancelOrderCallback: this.cancelOrderCallback,
+            alertInvalidAccessCallback: this.alertInvalidAccessCallback
         });
         this.p = new Popup(this.global, {
-            lin: this.loginCallback,
-            lou: this.logoutCallback,
-            tVo: this.toggleChartVolumeCallback
+            loginCallback: this.loginCallback,
+            logoutCallback: this.logoutCallback,
+            toggleChartVolumeCallback: this.toggleChartVolumeCallback
         });
         this.m = new Menu(this.global, {
-            tTrViCh: this.toggleTradingViewButtonCallback,
-            tLiWeCh: this.toggleLightWeightButtonCallback,
-            tPo: this.togglePopupCallback,
-            gReDa: this.getReportDataCallback,
-            aIvAc: this.alertInvalidAccessCallback
+            toggleTradingViewButtonCallback: this
+                .toggleTradingViewButtonCallback,
+            toggleLightWeightButtonCallback: this
+                .toggleLightWeightButtonCallback,
+            togglePopupCallback: this.togglePopupCallback,
+            getReportDataCallback: this.getReportDataCallback,
+            alertInvalidAccessCallback: this.alertInvalidAccessCallback
         });
-        this.reportTradingResult();
+        this.registerFullscreenEvent();
     }
     //
     // Các phương thức
@@ -203,15 +205,16 @@ class SmartOrder {
         this.callJavascript("onCancelAllOrderPending('order_condition')");
         this.callJavascript("onCancelAllOrderPending('order')");
     };
-    toggleChartVolumeCallback = visible => this.c.toggleChartVolume(visible);
+    toggleChartVolumeCallback = visible =>
+        this.c.toggleChartVolumeCallback(visible);
     togglePopupCallback = visible => this.p.toggle(visible);
-    alertInvalidAccessCallback = () => this.p.alertInvalidAccess();
+    alertInvalidAccessCallback = () => this.p.alertInvalidAccessCallback();
     callJavascript = script => {
         var button = document.createElement("button");
         button.setAttribute("onclick", script);
         button.click();
     };
-    reportTradingResult = () => {
+    registerFullscreenEvent = () => {
         document
             .querySelector(".timeStamp")
             .addEventListener("dblclick", () => {

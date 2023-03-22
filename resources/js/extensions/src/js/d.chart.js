@@ -349,8 +349,8 @@ class Chart {
         button.innerText = "X";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.callback.cPo();
-            this.callback.cOr();
+            this.callback.closeOrderPositionCallback();
+            this.callback.cancelOrderCallback();
             this.toggleCancelOrderButton(false);
             this.removeOrderLine("entry");
             this.removeOrderLine("tp");
@@ -365,7 +365,7 @@ class Chart {
         button.innerText = "Entry";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.callback.oEnPr(this.or);
+            this.callback.orderEntryPriceCallback(this.or);
             this.drawOrderLine("entry");
             this.toggleCancelOrderButton(true);
             this.hideOrderButton();
@@ -378,9 +378,9 @@ class Chart {
         button.innerText = "TP/SL";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.callback.oTpPr(this.or, true);
+            this.callback.orderTpPriceCallback(this.or, true);
             this.drawOrderLine("tp");
-            this.callback.oSlPr(this.or, true);
+            this.callback.orderSlPriceCallback(this.or, true);
             this.drawOrderLine("sl");
             this.hideOrderButton();
         });
@@ -438,12 +438,12 @@ class Chart {
             case "order":
                 if (newPrice != oldPrice) {
                     var isChanged = false;
-                    const position = self.callback.gOrPo();
+                    const position = self.callback.getOrderPositionCallback();
                     if (lineOptions.kind == "entry") {
                         if (!position) {
                             isChanged = true;
                             self.or[lineOptions.kind].price = newPrice;
-                            self.callback.oEnPr(self.or);
+                            self.callback.orderEntryPriceCallback(self.or);
                             self.drawOrderLine(lineOptions.kind);
                         }
                     } else {
@@ -451,8 +451,8 @@ class Chart {
                             isChanged = true;
                             self.or[lineOptions.kind].price = newPrice;
                             if (lineOptions.kind == "tp")
-                                self.callback.oTpPr(self.or);
-                            else self.callback.oSlPr(self.or);
+                                self.callback.orderTpPriceCallback(self.or);
+                            else self.callback.orderSlPriceCallback(self.or);
                             self.drawOrderLine(lineOptions.kind);
                         }
                     }
@@ -503,7 +503,7 @@ class Chart {
     };
     //
     showOrderButton = () => {
-        if (this.callback.gOrPo()) {
+        if (this.callback.getOrderPositionCallback()) {
             if (!this.or.tp.hasOwnProperty("line")) {
                 this.tpsOrBu.style.left = +(this.cr.x + 10) + "px";
                 this.tpsOrBu.style.top = +(this.cr.y + 10) + "px";
@@ -811,7 +811,7 @@ class Chart {
                     var json = await response.json();
                     json = this.global.c.d(json);
                     // console.log("json: ", json);
-                    if (!json.isOk) this.callback.alertInvalidAccess();
+                    if (!json.isOk) this.callback.alertInvalidAccessCallback();
                     resolve(json.data);
                     break;
                 } catch (e) {
@@ -879,7 +879,7 @@ class Chart {
                 this.or[item.kind].price = item.price;
                 this.drawOrderLine(item.kind);
                 if (item.kind == "entry") {
-                    if (this.callback.gOrPo()) {
+                    if (this.callback.getOrderPositionCallback()) {
                         this.or.entry.line.applyOptions({
                             draggable: false
                         });
@@ -940,14 +940,14 @@ class Chart {
     };
     //
     secIntervalHandler = self => {
-        if (self.callback.gOrPo()) {
+        if (self.callback.getOrderPositionCallback()) {
             if (
                 self.or.entry.hasOwnProperty("line") &&
                 !self.or.tp.hasOwnProperty("line")
             ) {
-                self.callback.oTpPr(self.or, true);
+                self.callback.orderTpPriceCallback(self.or, true);
                 self.drawOrderLine("tp");
-                self.callback.oSlPr(self.or, true);
+                self.callback.orderSlPriceCallback(self.or, true);
                 self.drawOrderLine("sl");
                 self.or.entry.line.applyOptions({
                     draggable: false
@@ -956,7 +956,7 @@ class Chart {
             }
         } else {
             if (self.or.tp.hasOwnProperty("line")) {
-                self.callback.cOr();
+                self.callback.cancelOrderCallback();
                 self.toggleCancelOrderButton(false);
                 self.removeOrderLine("entry");
                 self.removeOrderLine("tp");

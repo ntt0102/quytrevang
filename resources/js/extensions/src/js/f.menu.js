@@ -21,14 +21,18 @@ class Menu {
         button.id = "lightWeightButton";
         button.classList = "fa fa-line-chart";
         button.title = "Biểu đồ đặt lệnh";
-        button.addEventListener("click", () => this.callback.tLiWeCh());
+        button.addEventListener("click", () =>
+            this.callback.toggleLightWeightButtonCallback()
+        );
         this.conEl.prepend(button);
         this.ligWeBu = button;
         //
         var button = document.createElement("button");
         button.classList = "fa fa-bar-chart";
         button.title = "Biểu đồ phân tích";
-        button.addEventListener("click", () => this.callback.tTrViCh());
+        button.addEventListener("click", () =>
+            this.callback.toggleTradingViewButtonCallback()
+        );
         this.conEl.prepend(button);
         this.traViBu = button;
         //
@@ -75,7 +79,9 @@ class Menu {
         button.id = "settingButton";
         button.classList = "fa fa-sign-in";
         button.title = "Cài đặt";
-        button.addEventListener("click", () => this.callback.tPo(true));
+        button.addEventListener("click", () =>
+            this.callback.togglePopupCallback(true)
+        );
         this.conEl.append(button);
         this.setBu = button;
     };
@@ -93,7 +99,7 @@ class Menu {
             self.global.toggleSpinner(true);
             const url = self.global.domain + self.global.endpoint.report;
             const data = self.global.c.e({
-                ...self.callback.gReDa(),
+                ...self.callback.getReportDataCallback(),
                 ...{ deviceId: self.global.deviceId }
             });
             fetch(url, {
@@ -122,7 +128,7 @@ class Menu {
                         });
                         self.repBu.remove();
                     } else if (json.message == "unauthorized")
-                        self.callback.alertInvalidAccess();
+                        self.callback.alertInvalidAccessCallback();
                     //
                     self.global.toggleSpinner(false);
                 })

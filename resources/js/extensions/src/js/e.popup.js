@@ -526,7 +526,7 @@ class Popup {
             var button = document.createElement("button");
             download.append(button);
             button.innerText = "TẢI XUỐNG";
-            button.addEventListener("click", e => this.lOu(e, this));
+            button.addEventListener("click", e => this.logoutCallback(e, this));
         }
         //
         var routeWrapper = document.createElement("div");
@@ -593,7 +593,7 @@ class Popup {
                         self.setToken(json.token);
                         self.global.accessToken = json.token.access_token;
                         self.global.user = json.user;
-                        await self.callback.lin();
+                        await self.callback.loginCallback();
                         self.global.a.s("success", "Đăng ký thành công");
                         self.regNa.value = "";
                         self.regEm.value = "";
@@ -649,7 +649,7 @@ class Popup {
                     self.setToken(json.token);
                     self.global.accessToken = json.token.access_token;
                     self.global.user = json.user;
-                    await self.callback.lin();
+                    await self.callback.loginCallback();
                     self.logUs.value = "";
                     self.logPa.value = "";
                 } else {
@@ -682,7 +682,7 @@ class Popup {
         }).then(() => {
             this.global.isLi = false;
             self.removeToken();
-            self.callback.lou();
+            self.callback.logoutCallback();
         });
     };
     getUser = () => {
@@ -711,7 +711,7 @@ class Popup {
                         // console.log("gU: ", json);
                         this.global.isLi = json.isOk;
                         if (json.isOk) this.global.user = json.user;
-                        else this.alertInvalidAccess(true);
+                        else this.alertInvalidAccessCallback(true);
                         resolve();
                     })
                     .catch(error => resolve());
@@ -740,7 +740,7 @@ class Popup {
                     if (json.isOk)
                         for (const key in json.config)
                             this.global[key] = json.config[key];
-                    else this.alertInvalidAccess();
+                    else this.alertInvalidAccessCallback();
                     resolve();
                 })
                 .catch(err => {
@@ -790,7 +790,7 @@ class Popup {
                         self.callback.toggleChartVolume(self.isVolCh.checked);
                     } else {
                         if (json.message == "unauthorized")
-                            self.alertInvalidAccess();
+                            self.alertInvalidAccessCallback();
                         else self.global.a.s("error", "Lưu cài đặt thất bại");
                     }
                     resolve();
