@@ -93,7 +93,7 @@ class Menu {
         }
     };
     reportTradingResult = self => {
-        self.global.alert.s("warning", "Đang gửi báo cáo . . .", false);
+        self.global.alert.show("warning", "Đang gửi báo cáo . . .", false);
         if (self.global.isOpeningMarket && !self.global.isReportedResult) {
             self.global.isReportedResult = true;
             self.global.toggleSpinner(true);
@@ -118,14 +118,14 @@ class Menu {
                     json = self.global.crypto.d(json);
                     self.global.isReportedResult = json.isOk;
                     if (json.isOk) {
-                        self.global.alert.h().then(() => {
+                        self.global.alert.hide().then(() => {
                             if (json.isExecuted)
-                                self.global.alert.s(
+                                self.global.alert.show(
                                     "success",
                                     "Báo cáo đã gửi thành công."
                                 );
                             else
-                                self.global.alert.s(
+                                self.global.alert.show(
                                     "warning",
                                     "Đã gửi báo cáo"
                                 );
@@ -141,7 +141,10 @@ class Menu {
                     self.global.a
                         .h()
                         .then(() =>
-                            self.global.alert.s("error", "Gửi báo cáo thất bại")
+                            self.global.alert.show(
+                                "error",
+                                "Gửi báo cáo thất bại"
+                            )
                         );
                     self.global.toggleSpinner(false);
                 });

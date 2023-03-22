@@ -594,7 +594,7 @@ class Popup {
                         self.global.accessToken = json.token.access_token;
                         self.global.user = json.user;
                         await self.callback.loginCallback();
-                        self.global.alert.s("success", "Đăng ký thành công");
+                        self.global.alert.show("success", "Đăng ký thành công");
                         self.regNa.value = "";
                         self.regEm.value = "";
                         self.regPh.value = "";
@@ -613,7 +613,7 @@ class Popup {
                 })
                 .catch(error => {
                     console.log(error);
-                    self.global.alert.s("error", "Đăng ký lỗi");
+                    self.global.alert.show("error", "Đăng ký lỗi");
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
                 });
@@ -666,7 +666,7 @@ class Popup {
                 self.logSu.disabled = false;
             })
             .catch(error => {
-                self.global.alert.s("error", "Đăng nhập lỗi");
+                self.global.alert.show("error", "Đăng nhập lỗi");
                 self.logSu.innerText = "ĐĂNG NHẬP";
                 self.logSu.disabled = false;
             });
@@ -786,7 +786,7 @@ class Popup {
                     self.optSu.innerText = "LƯU CÀI ĐẶT";
                     self.optSu.disabled = false;
                     if (json.isOk) {
-                        self.global.alert.s(
+                        self.global.alert.show(
                             "success",
                             "Lưu cài đặt thành công"
                         );
@@ -795,7 +795,7 @@ class Popup {
                         if (json.message == "unauthorized")
                             self.alertInvalidAccessCallback();
                         else
-                            self.global.alert.s(
+                            self.global.alert.show(
                                 "error",
                                 "Lưu cài đặt thất bại"
                             );
@@ -814,7 +814,7 @@ class Popup {
         const token = JSON.parse(localStorage.getItem(this.TK));
         if (!token) return false;
         if (moment().isBefore(token.expires_at)) return token.access_token;
-        this.global.alert.s("waring", "Phiên đăng nhập hết hạn");
+        this.global.alert.show("waring", "Phiên đăng nhập hết hạn");
         return false;
     };
     getDeviceId = () => {
@@ -853,7 +853,7 @@ class Popup {
         if (h)
             this.global.a
                 .h()
-                .then(() => this.global.alert.s("error", msg, true, true));
-        else this.global.alert.s("error", msg);
+                .then(() => this.global.alert.show("error", msg, true, true));
+        else this.global.alert.show("error", msg);
     };
 }

@@ -46,7 +46,7 @@ class SmartOrder {
         } else this.menu.setBu.click();
     };
     loginCallback = async () => {
-        this.global.alert.s("warning", "Đang khởi tạo biểu đồ . . .", false);
+        this.global.alert.show("warning", "Đang khởi tạo biểu đồ . . .", false);
         await this.popup.getServerConfig();
         this.popup.createLoggedinElement();
         this.chart.create();
@@ -55,7 +55,7 @@ class SmartOrder {
         this.menu.createLoggedinElement();
         if (!!this.global.isViewChart) this.menu.ligWeBu.click();
         this.chart.connectSocket();
-        this.global.alert.h();
+        this.global.alert.hide();
     };
     logoutCallback = () => {
         this.menu.removeLoggedinElement();

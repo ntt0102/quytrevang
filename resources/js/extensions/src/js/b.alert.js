@@ -2,7 +2,7 @@ class Alert {
     // Hàm khởi tạo
     constructor() {}
     // Các phương thức
-    s = (
+    show = (
         status = "success",
         text = "message",
         autoclose = true,
@@ -16,7 +16,7 @@ class Alert {
         });
         this.keep = keep;
     };
-    h = () =>
+    hide = () =>
         new Promise(resolve => {
             if (!this.keep) this.notify.close();
             else this.keep = false;

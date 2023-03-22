@@ -181,7 +181,7 @@ class Chart {
         select.addEventListener("change", e => {
             if (this.timFr == 0 && e.target.value != "line") {
                 this.chaTySe.value = "line";
-                this.global.alert.s(
+                this.global.alert.show(
                     "warning",
                     "Chỉ có thể mở biểu đồ Đường trong khung thời gian Tick."
                 );
@@ -459,7 +459,10 @@ class Chart {
                     //
                     if (!isChanged) {
                         line.applyOptions({ price: oldPrice });
-                        self.global.alert.s("warning", "Không được thay đổi.");
+                        self.global.alert.show(
+                            "warning",
+                            "Không được thay đổi."
+                        );
                     }
                 }
                 break;
@@ -952,7 +955,7 @@ class Chart {
                 self.or.entry.line.applyOptions({
                     draggable: false
                 });
-                self.global.alert.s("success", "Đã mở vị thế.");
+                self.global.alert.show("success", "Đã mở vị thế.");
             }
         } else {
             if (self.or.tp.hasOwnProperty("line")) {
@@ -962,7 +965,7 @@ class Chart {
                 self.removeOrderLine("tp");
                 self.removeOrderLine("sl");
                 self.global.store.c("order");
-                self.global.alert.s("success", "Đã đóng vị thế.");
+                self.global.alert.show("success", "Đã đóng vị thế.");
             }
         }
         if (self.auAl.paused) {
