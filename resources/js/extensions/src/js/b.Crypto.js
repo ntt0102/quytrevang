@@ -1,4 +1,4 @@
-class Cr {
+class Crypto {
     k = "19AqVgG36ekVzc1HyEmE9vfA7PH78DFCwhdwUxJ7dns=";
     // Hàm khởi tạo
     constructor(g) {

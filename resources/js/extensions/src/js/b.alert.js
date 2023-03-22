@@ -1,4 +1,4 @@
-class Al {
+class Alert {
     // Hàm khởi tạo
     constructor() {}
     // Các phương thức

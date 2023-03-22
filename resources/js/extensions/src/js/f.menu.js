@@ -1,47 +1,49 @@
-class Me {
+class Menu {
     // Các thuộc tính
 
     // Hàm khởi tạo
-    constructor(g, c) {
-        this.g = g;
-        this.cb = c;
-        this.cCoEl();
-        this.cNoLoEl();
+    constructor(global, callback) {
+        this.global = global;
+        this.callback = callback;
+        this.createContainerElement();
+        this.createNoLoginElement();
     }
     //
     // Các phương thức
-    cCoEl = () => {
+    createContainerElement = () => {
         var container = document.createElement("div");
         container.id = "menuContainer";
         document.body.append(container);
         this.conEl = container;
     };
-    cLoEl = () => {
+    createLoggedinElement = () => {
         var button = document.createElement("button");
         button.id = "lightWeightButton";
         button.classList = "fa fa-line-chart";
         button.title = "Biểu đồ đặt lệnh";
-        button.addEventListener("click", () => this.cb.tLiWeCh());
+        button.addEventListener("click", () => this.callback.tLiWeCh());
         this.conEl.prepend(button);
         this.ligWeBu = button;
         //
         var button = document.createElement("button");
         button.classList = "fa fa-bar-chart";
         button.title = "Biểu đồ phân tích";
-        button.addEventListener("click", () => this.cb.tTrViCh());
+        button.addEventListener("click", () => this.callback.tTrViCh());
         this.conEl.prepend(button);
         this.traViBu = button;
         //
         if (
-            !!this.g.isReport &&
-            this.g.isOpeningMarket &&
-            !this.g.isReportedResult
+            !!this.global.isReport &&
+            this.global.isOpeningMarket &&
+            !this.global.isReportedResult
         ) {
             var button = document.createElement("button");
             button.id = "reportButton";
             button.classList = "fa fa-flag-checkered";
             button.title = "Báo cáo kết quả";
-            button.addEventListener("click", () => this.rTrRe(this));
+            button.addEventListener("click", () =>
+                this.reportTradingResult(this)
+            );
             this.conEl.append(button);
             this.repBu = button;
         }
@@ -49,17 +51,18 @@ class Me {
         this.setBu.classList.replace("fa-sign-in", "fa-cog");
         //
         this.interval = setInterval(() => {
-            this.bLiWeBu(this);
-            if (moment().unix() == this.g.time.end) this.rTrRe(this);
+            this.blinkLightWeightButton(this);
+            if (moment().unix() == this.global.time.end)
+                this.reportTradingResult(this);
         }, 1000);
     };
-    rLoEl = () => {
+    removeLoggedinElement = () => {
         if (!!this.traViBu) this.traViBu.remove();
         if (!!this.ligWeBu) this.ligWeBu.remove();
         if (
-            !!this.g.isReport &&
-            this.g.isOpeningMarket &&
-            !this.g.isReportedResult
+            !!this.global.isReport &&
+            this.global.isOpeningMarket &&
+            !this.global.isReportedResult
         )
             if (!!this.repBu) this.repBu.remove();
         //
@@ -67,37 +70,37 @@ class Me {
         //
         clearInterval(this.interval);
     };
-    cNoLoEl = () => {
+    createNoLoginElement = () => {
         var button = document.createElement("button");
         button.id = "settingButton";
         button.classList = "fa fa-sign-in";
         button.title = "Cài đặt";
-        button.addEventListener("click", () => this.cb.tPo(true));
+        button.addEventListener("click", () => this.callback.tPo(true));
         this.conEl.append(button);
         this.setBu = button;
     };
-    bLiWeBu = self => {
-        if (self.g.isInSe()) {
+    blinkLightWeightButton = self => {
+        if (self.global.isInSession()) {
             if (self.ligWeBu.classList.contains("dark"))
                 self.ligWeBu.classList.remove("dark");
             else self.ligWeBu.classList.add("dark");
         }
     };
-    rTrRe = self => {
-        self.g.a.s("warning", "Đang gửi báo cáo . . .", false);
-        if (self.g.isOpeningMarket && !self.g.isReportedResult) {
-            self.g.isReportedResult = true;
-            self.g.tSp(true);
-            const url = self.g.domain + self.g.endpoint.report;
-            const data = self.g.c.e({
-                ...self.cb.gReDa(),
-                ...{ deviceId: self.g.deviceId }
+    reportTradingResult = self => {
+        self.global.a.s("warning", "Đang gửi báo cáo . . .", false);
+        if (self.global.isOpeningMarket && !self.global.isReportedResult) {
+            self.global.isReportedResult = true;
+            self.global.toggleSpinner(true);
+            const url = self.global.domain + self.global.endpoint.report;
+            const data = self.global.c.e({
+                ...self.callback.gReDa(),
+                ...{ deviceId: self.global.deviceId }
             });
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${self.g.accessToken}`
+                    Authorization: `Bearer ${self.global.accessToken}`
                 },
                 body: data
             })
@@ -106,30 +109,31 @@ class Me {
                     throw new Error(response.statusText);
                 })
                 .then(json => {
-                    json = self.g.c.d(json);
-                    self.g.isReportedResult = json.isOk;
+                    json = self.global.c.d(json);
+                    self.global.isReportedResult = json.isOk;
                     if (json.isOk) {
-                        self.g.a.h().then(() => {
+                        self.global.a.h().then(() => {
                             if (json.isExecuted)
-                                self.g.a.s(
+                                self.global.a.s(
                                     "success",
                                     "Báo cáo đã gửi thành công."
                                 );
-                            else self.g.a.s("warning", "Đã gửi báo cáo");
+                            else self.global.a.s("warning", "Đã gửi báo cáo");
                         });
                         self.repBu.remove();
-                    } else if (json.message == "unauthorized") self.cb.aIvAc();
+                    } else if (json.message == "unauthorized")
+                        self.callback.alertInvalidAccess();
                     //
-                    self.g.tSp(false);
+                    self.global.toggleSpinner(false);
                 })
                 .catch(error => {
-                    self.g.isReportedResult = false;
-                    self.g.a
+                    self.global.isReportedResult = false;
+                    self.global.a
                         .h()
                         .then(() =>
-                            self.g.a.s("error", "Gửi báo cáo thất bại")
+                            self.global.a.s("error", "Gửi báo cáo thất bại")
                         );
-                    self.g.tSp(false);
+                    self.global.toggleSpinner(false);
                 });
         }
     };

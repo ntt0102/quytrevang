@@ -1,4 +1,4 @@
-class St {
+class Store {
     // Hàm khởi tạo
     constructor() {
         this.i();

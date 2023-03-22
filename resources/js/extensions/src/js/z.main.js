@@ -1,12 +1,12 @@
-class So {
+class SmartOrder {
     // Hàm khởi tạo
     constructor() {
-        this.g = new Co();
-        this.g.a = new Al();
-        this.g.s = new St();
-        this.g.c = new Cr(this.g);
-        this.g.isM = navigator.userAgentData.mobile;
-        this.c = new Ch(this.g, {
+        this.global = new Config();
+        this.global.a = new Alert();
+        this.global.s = new Store();
+        this.global.c = new Crypto(this.global);
+        this.global.isM = navigator.userAgentData.mobile;
+        this.c = new Chart(this.global, {
             gOrPo: this.gOrPoCb,
             cPo: this.cPoCb,
             oEnPr: this.oEnPrCb,
@@ -15,12 +15,12 @@ class So {
             cOr: this.cOrCb,
             aIvAc: this.aIvAcCb
         });
-        this.p = new Po(this.g, {
+        this.p = new Popup(this.global, {
             lin: this.liCb,
             lou: this.loCb,
             tVo: this.tVoCb
         });
-        this.m = new Me(this.g, {
+        this.m = new Menu(this.global, {
             tTrViCh: this.tTrViCb,
             tLiWeCh: this.tLiWeCb,
             tPo: this.tPoCb,
@@ -31,32 +31,34 @@ class So {
     }
     //
     // Các phương thức
-    i = async () => {
-        this.p.cNoLoEl();
-        await this.p.gDeId();
-        await this.p.gU();
-        if (this.g.isLi) {
+    init = async () => {
+        this.p.createNoLoginElement();
+        await this.p.getDeviceId();
+        await this.p.getUser();
+        if (this.global.isLi) {
             await this.liCb();
-            document.getElementById("sohopdong").value = this.g.contractNumber;
+            document.getElementById(
+                "sohopdong"
+            ).value = this.global.contractNumber;
             document.getElementById("right_price").value = "MTL";
         } else this.m.setBu.click();
     };
     liCb = async () => {
-        this.g.a.s("warning", "Đang khởi tạo biểu đồ . . .", false);
-        await this.p.gSeCo();
-        this.p.cLoEl();
-        this.c.c();
-        await this.c.lChDa();
-        await this.c.gToDa();
-        this.m.cLoEl();
-        if (!!this.g.isViewChart) this.m.ligWeBu.click();
-        this.c.cnSk();
-        this.g.a.h();
+        this.global.a.s("warning", "Đang khởi tạo biểu đồ . . .", false);
+        await this.p.getServerConfig();
+        this.p.createLoggedinElement();
+        this.c.create();
+        await this.c.loadChartData();
+        await this.c.getToolsData();
+        this.m.createLoggedinElement();
+        if (!!this.global.isViewChart) this.m.ligWeBu.click();
+        this.c.connectSocket();
+        this.global.a.h();
     };
     loCb = () => {
-        this.m.rLoEl();
-        this.p.rLoEl();
-        this.c.r();
+        this.m.removeLoggedinElement();
+        this.p.removeLoggedinElement();
+        this.c.remove();
         this.tTrViCb(false);
         this.tLiWeCb(false);
     };
@@ -134,7 +136,7 @@ class So {
     };
     gOrPoCb = () => {
         const el = document.querySelector(
-            `#danhmuc_${this.g.symbol} > td:nth-child(2)`
+            `#danhmuc_${this.global.symbol} > td:nth-child(2)`
         );
         if (!el) return 0;
         const position = el.innerText;
@@ -171,7 +173,7 @@ class So {
         this.cSc("onCancelAllOrderPending('order')");
         if (isInit)
             order.tp.price =
-                +order.entry.price + order.side * this.g.takeProfit;
+                +order.entry.price + order.side * this.global.takeProfit;
         setTimeout(() => {
             document.getElementById("select_normal_order_wrapper").click();
             document.getElementById("right_price").value = order.tp.price;
@@ -183,7 +185,8 @@ class So {
     oSlPrCb = (order, isInit = false) => {
         this.cSc("onCancelAllOrderPending('order_condition')");
         if (isInit)
-            order.sl.price = +order.entry.price - order.side * this.g.stopLoss;
+            order.sl.price =
+                +order.entry.price - order.side * this.global.stopLoss;
         setTimeout(() => {
             document.getElementById("select_condition_order_wrapper").click();
             document.getElementById("right_stopOrderIndex").value =
@@ -200,9 +203,9 @@ class So {
         this.cSc("onCancelAllOrderPending('order_condition')");
         this.cSc("onCancelAllOrderPending('order')");
     };
-    tVoCb = visible => this.c.tVo(visible);
-    tPoCb = visible => this.p.t(visible);
-    aIvAcCb = () => this.p.aIvAc();
+    tVoCb = visible => this.c.toggleChartVolume(visible);
+    tPoCb = visible => this.p.toggle(visible);
+    aIvAcCb = () => this.p.alertInvalidAccess();
     cSc = script => {
         var button = document.createElement("button");
         button.setAttribute("onclick", script);
@@ -218,5 +221,5 @@ class So {
     };
 }
 
-var so = new So();
-so.i();
+var smartOrder = new SmartOrder();
+smartOrder.init();

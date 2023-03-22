@@ -1,4 +1,4 @@
-class Ch {
+class Chart {
     // Các thuộc tính
     ch = {};
     se = {};
@@ -16,40 +16,43 @@ class Ch {
     D_C = "rgb(239,83,80)";
 
     // Hàm khởi tạo
-    constructor(g, c) {
-        this.g = g;
-        this.cb = c;
-        this.g.tSp = this.tSp;
-        this.g.isInSe = this.isInSe;
+    constructor(global, callback) {
+        this.global = global;
+        this.callback = callback;
+        this.global.tSp = this.tSp;
+        this.global.isInSe = this.isInSe;
         this.auAl.loop = true;
     }
 
     // Các phương thức
-    c = () => {
-        this.timFr = this.g.timeFrame;
-        this.chaTy = this.g.chartType;
-        this.cCoEl();
-        this.cCh();
-        this.cDaAr();
-        this.cToAr();
-        this.cLeAr();
-        this.cFrAr();
-        if (this.g.isOpeningMarket) {
-            this.secIn = setInterval(() => this.inSec(this), 1000);
-            this.minIn = setInterval(() => this.inMin(this), 60000);
+    create = () => {
+        this.timFr = this.global.timeFrame;
+        this.chaTy = this.global.chartType;
+        this.createContainerElement();
+        this.createChart();
+        this.createDataArea();
+        this.createToolArea();
+        this.createLegendArea();
+        this.createFreeArea();
+        if (this.global.isOpeningMarket) {
+            this.secIn = setInterval(() => this.secIntervalHandler(this), 1000);
+            this.minIn = setInterval(
+                () => this.minIntervalHandler(this),
+                60000
+            );
         }
-        window.addEventListener("resize", () => this.eChRe(this));
-        window.addEventListener("keydown", e => this.eKePr(e, this));
+        window.addEventListener("resize", () => this.eventChartResize(this));
+        window.addEventListener("keydown", e => this.eventKeyPress(e, this));
     };
-    r = () => {
-        window.removeEventListener("resize", () => this.eChRe(this));
-        window.removeEventListener("keydown", e => this.eKePr(e, this));
+    remove = () => {
+        window.removeEventListener("resize", () => this.eventChartResize(this));
+        window.removeEventListener("keydown", e => this.eventKeyPress(e, this));
         clearInterval(this.secIn);
         clearInterval(this.minIn);
         //
         this.conEl.remove();
     };
-    cCoEl = () => {
+    createContainerElement = () => {
         var container = document.createElement("div");
         document.body.append(container);
         container.id = "lightWeightChartContainer";
@@ -61,18 +64,20 @@ class Ch {
         chartContainer.style.width = "100%";
         chartContainer.style.height = "100%";
         chartContainer.addEventListener("contextmenu", e =>
-            this.eChCoMe(e, this)
+            this.eventChartContextmenu(e, this)
         );
-        chartContainer.addEventListener("click", e => this.eChCl(e, this));
+        chartContainer.addEventListener("click", e =>
+            this.eventChartClick(e, this)
+        );
         this.conEl = container;
         this.chaCoEl = chartContainer;
     };
-    cCh = () => {
+    createChart = () => {
         const chartOptions = {
             localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
             rightPriceScale: {
                 visible: true,
-                scaleMargins: this.g.isVolume
+                scaleMargins: this.global.isVolume
                     ? { top: 0.1, bottom: 0.21 }
                     : { top: 0.2, bottom: 0.1 }
             },
@@ -99,20 +104,24 @@ class Ch {
             }
         };
         this.ch = LightweightCharts.createChart(this.chaCoEl, chartOptions);
-        this.ch.subscribeCrosshairMove(e => this.eChCrMo(e, this));
-        this.ch.subscribeCustomPriceLineDragged(e => this.ePrLiDr(e, this));
+        this.ch.subscribeCrosshairMove(e =>
+            this.eventChartCrosshairMove(e, this)
+        );
+        this.ch.subscribeCustomPriceLineDragged(e =>
+            this.eventPriceLineDrag(e, this)
+        );
         //
         this.se.volume = this.ch.addHistogramSeries({
             priceScaleId: "volume",
             priceFormat: { type: "volume" },
             scaleMargins: { top: 0.8, bottom: 0 },
-            visible: this.g.isVolume
+            visible: this.global.isVolume
         });
         //
-        this.cPrSe();
+        this.createPriceSeries();
         this.ch.timeScale().fitContent();
     };
-    cPrSe = () => {
+    createPriceSeries = () => {
         switch (this.chaTy) {
             case "candlestick":
                 this.se.price = this.ch.addCandlestickSeries({
@@ -133,7 +142,7 @@ class Ch {
                 break;
         }
     };
-    cDaAr = () => {
+    createDataArea = () => {
         var container = document.createElement("div");
         container.id = "dataAreaDiv";
         container.className = "area";
@@ -153,7 +162,7 @@ class Ch {
         input.className = "command";
         input.title = "Dữ liệu của ngày";
         input.addEventListener("change", e => {
-            if (!!e.target.value) this.lChDa();
+            if (!!e.target.value) this.loadChartData();
         });
         container.append(input);
         this.datIn = input;
@@ -162,7 +171,7 @@ class Ch {
         select.id = "chartTypeSelect";
         select.className = "command";
         select.title = "Loại biểu đồ giá";
-        this.g.chaTys.forEach((item, index) => {
+        this.global.chaTys.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
@@ -172,7 +181,7 @@ class Ch {
         select.addEventListener("change", e => {
             if (this.timFr == 0 && e.target.value != "line") {
                 this.chaTySe.value = "line";
-                this.g.a.s(
+                this.global.a.s(
                     "warning",
                     "Chỉ có thể mở biểu đồ Đường trong khung thời gian Tick."
                 );
@@ -180,10 +189,10 @@ class Ch {
             }
             this.chaTy = e.target.value;
             this.ch.remove();
-            this.cCh();
+            this.createChart();
             this.se.price.setData(this.da.price);
             this.se.volume.setData(this.da.volume);
-            this.gToDa();
+            this.getToolsData();
         });
         container.append(select);
         this.chaTySe = select;
@@ -192,7 +201,7 @@ class Ch {
         select.id = "timeFrameSelect";
         select.className = "command";
         select.title = "Khung thời gian [Ctrl+0]";
-        this.g.timFrs.forEach((item, index) => {
+        this.global.timFrs.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
@@ -201,7 +210,9 @@ class Ch {
         select.value = this.timFr;
         select.addEventListener("change", e => {
             this.timFr = e.target.value;
-            this.lChDa().then(() => this.ch.timeScale().resetTimeScale());
+            this.loadChartData().then(() =>
+                this.ch.timeScale().resetTimeScale()
+            );
             if (this.timFr == 0 && this.chaTy != "line") {
                 this.chaTySe.value = "line";
                 this.chaTySe.dispatchEvent(new Event("change"));
@@ -213,7 +224,7 @@ class Ch {
         var button = document.createElement("div");
         button.className = "command fa fa-refresh";
         button.title = "Làm mới [Ctrl+M]";
-        button.addEventListener("click", () => this.lChDa());
+        button.addEventListener("click", () => this.loadChartData());
         container.append(button);
         this.refBu = button;
         //
@@ -221,13 +232,13 @@ class Ch {
         button.className = "command fa fa-trash";
         button.title = "Xoá ngày khác [Ctrl+,]";
         button.addEventListener("click", () => {
-            this.g.s.c("data");
-            this.lChDa();
+            this.global.s.c("data");
+            this.loadChartData();
         });
         container.append(button);
         this.cleBu = button;
     };
-    cToAr = () => {
+    createToolArea = () => {
         var container = document.createElement("div");
         container.id = "toolAreaDiv";
         container.className = "area";
@@ -245,7 +256,7 @@ class Ch {
             e.stopPropagation();
         });
         button.addEventListener("contextmenu", e => {
-            this.rToLi();
+            this.removeHorizontalLine();
             e.target.classList.remove("selected");
             e.preventDefault();
             e.stopPropagation();
@@ -265,7 +276,7 @@ class Ch {
             e.stopPropagation();
         });
         button.addEventListener("contextmenu", e => {
-            this.rMa();
+            this.removeMaker();
             e.target.classList.remove("selected");
             e.preventDefault();
             e.stopPropagation();
@@ -283,12 +294,12 @@ class Ch {
                 .forEach(el => el.classList.remove("selected"));
             if (!selected) {
                 e.target.classList.add("selected");
-                this.rRu();
+                this.removeRuler();
             }
             e.stopPropagation();
         });
         button.addEventListener("contextmenu", e => {
-            this.rRu();
+            this.removeRuler();
             e.target.classList.remove("selected");
             e.preventDefault();
             e.stopPropagation();
@@ -308,7 +319,7 @@ class Ch {
             e.stopPropagation();
         });
         button.addEventListener("contextmenu", e => {
-            this.rAl();
+            this.removeAlert();
             e.target.classList.remove("selected");
             e.preventDefault();
             e.stopPropagation();
@@ -316,7 +327,7 @@ class Ch {
         container.append(button);
         this.draAlBu = button;
     };
-    cLeAr = () => {
+    createLegendArea = () => {
         var container = document.createElement("div");
         container.id = "legendAreaDiv";
         this.conEl.append(container);
@@ -326,11 +337,11 @@ class Ch {
         this.priLeP = p;
         //
         var p = document.createElement("p");
-        p.style.display = this.g.isVolume ? "block" : "none";
+        p.style.display = this.global.isVolume ? "block" : "none";
         container.append(p);
         this.volLeP = p;
     };
-    cFrAr = () => {
+    createFreeArea = () => {
         var container = this.conEl;
         //
         var button = document.createElement("button");
@@ -338,13 +349,13 @@ class Ch {
         button.innerText = "X";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.cb.cPo();
-            this.cb.cOr();
-            this.tCaOrBu(false);
-            this.rOrLi("entry");
-            this.rOrLi("tp");
-            this.rOrLi("sl");
-            this.g.s.c("order");
+            this.callback.cPo();
+            this.callback.cOr();
+            this.toggleCancelOrderButton(false);
+            this.removeOrderLine("entry");
+            this.removeOrderLine("tp");
+            this.removeOrderLine("sl");
+            this.global.s.c("order");
         });
         container.append(button);
         this.canOrBu = button;
@@ -354,10 +365,10 @@ class Ch {
         button.innerText = "Entry";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.cb.oEnPr(this.or);
-            this.dOrLi("entry");
-            this.tCaOrBu(true);
-            this.hOrBu();
+            this.callback.oEnPr(this.or);
+            this.drawOrderLine("entry");
+            this.toggleCancelOrderButton(true);
+            this.hideOrderButton();
         });
         container.append(button);
         this.entOrBu = button;
@@ -367,11 +378,11 @@ class Ch {
         button.innerText = "TP/SL";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.cb.oTpPr(this.or, true);
-            this.dOrLi("tp");
-            this.cb.oSlPr(this.or, true);
-            this.dOrLi("sl");
-            this.hOrBu();
+            this.callback.oTpPr(this.or, true);
+            this.drawOrderLine("tp");
+            this.callback.oSlPr(this.or, true);
+            this.drawOrderLine("sl");
+            this.hideOrderButton();
         });
         container.append(button);
         this.tpsOrBu = button;
@@ -384,29 +395,30 @@ class Ch {
         );
         container.append(button);
     };
-    eChCoMe = (e, self) => {
-        self.sOrBu();
+    eventChartContextmenu = (e, self) => {
+        self.showOrderButton();
         e.preventDefault();
     };
-    eChCl = (e, self) => {
-        self.hOrBu();
-        if (self.draLiBu.classList.contains("selected")) self.dToLi();
-        else if (self.draMaBu.classList.contains("selected")) self.dMa();
-        else if (self.draRuBu.classList.contains("selected")) self.dRu();
-        else if (self.draAlBu.classList.contains("selected")) self.dAl();
+    eventChartClick = (e, self) => {
+        self.hideOrderButton();
+        if (self.draLiBu.classList.contains("selected"))
+            self.drawHorizontalLine();
+        else if (self.draMaBu.classList.contains("selected")) self.drawMaker();
+        else if (self.draRuBu.classList.contains("selected")) self.drawRuler();
+        else if (self.draAlBu.classList.contains("selected")) self.drawAlert();
     };
-    eChCrMo = (e, self) => {
+    eventChartCrosshairMove = (e, self) => {
         if (e.time) {
             var price = e.seriesPrices.get(self.se.price);
             var volume = e.seriesPrices.get(self.se.volume);
             if (!!price && self.chaTy != "line") price = price.close;
-            self.uLe(price, volume);
+            self.updateLegend(price, volume);
             self.hsCr = true;
             self.cr.time = e.time;
             self.cr.price = price;
         } else {
             self.hsCr = false;
-            if (!self.g.isM) {
+            if (!self.global.isM) {
                 self.cr.time = null;
                 self.cr.price = null;
             }
@@ -416,82 +428,82 @@ class Ch {
             self.cr.y = e.point.y;
         }
     };
-    ePrLiDr = (e, self) => {
+    eventPriceLineDrag = (e, self) => {
         var line = e.customPriceLine;
         var lineOptions = line.options();
-        lineOptions.price = self.fPr(lineOptions.price);
+        lineOptions.price = self.formatPrice(lineOptions.price);
         const oldPrice = +e.fromPriceString;
         const newPrice = lineOptions.price;
         switch (lineOptions.lineType) {
             case "order":
                 if (newPrice != oldPrice) {
                     var isChanged = false;
-                    const position = self.cb.gOrPo();
+                    const position = self.callback.gOrPo();
                     if (lineOptions.kind == "entry") {
                         if (!position) {
                             isChanged = true;
                             self.or[lineOptions.kind].price = newPrice;
-                            self.cb.oEnPr(self.or);
-                            self.dOrLi(lineOptions.kind);
+                            self.callback.oEnPr(self.or);
+                            self.drawOrderLine(lineOptions.kind);
                         }
                     } else {
                         if (self.or.side * position > 0) {
                             isChanged = true;
                             self.or[lineOptions.kind].price = newPrice;
                             if (lineOptions.kind == "tp")
-                                self.cb.oTpPr(self.or);
-                            else self.cb.oSlPr(self.or);
-                            self.dOrLi(lineOptions.kind);
+                                self.callback.oTpPr(self.or);
+                            else self.callback.oSlPr(self.or);
+                            self.drawOrderLine(lineOptions.kind);
                         }
                     }
                     //
                     if (!isChanged) {
                         line.applyOptions({ price: oldPrice });
-                        self.g.a.s("warning", "Không được thay đổi.");
+                        self.global.a.s("warning", "Không được thay đổi.");
                     }
                 }
                 break;
             case "line":
-                self.g.s.s("line", {
+                self.global.s.s("line", {
                     price: oldPrice,
                     removed: true
                 });
-                self.g.s.s("line", lineOptions);
+                self.global.s.s("line", lineOptions);
                 self.draLiBu.classList.remove("selected");
                 break;
             case "ruler":
                 if (lineOptions.point == 1) {
-                    self.g.s.s("ruler", lineOptions);
+                    self.global.s.s("ruler", lineOptions);
                     if (self.ru.point == 2) {
                         const distance = +self.ru.end.options().title;
                         const endPrice = +(newPrice + distance).toFixed(1);
                         self.ru.end.applyOptions({ price: endPrice });
-                        self.g.s.s("ruler", self.ru.end.options());
+                        self.global.s.s("ruler", self.ru.end.options());
                     }
                 } else {
                     const startPrice = +self.ru.start.options().price;
                     const distance = (newPrice - startPrice).toFixed(1);
                     line.applyOptions({ title: distance });
-                    self.g.s.s("ruler", line.options());
+                    self.global.s.s("ruler", line.options());
                 }
                 break;
             case "alert":
                 self.auAl.pause();
-                self.g.s.s("alert", {
+                self.global.s.s("alert", {
                     price: oldPrice,
                     removed: true
                 });
                 const currentPrice = self.da.price.slice(-1)[0].value;
                 var title = newPrice >= currentPrice ? ">" : "<";
                 line.applyOptions({ title: title });
-                self.g.s.s("alert", line.options());
+                self.global.s.s("alert", line.options());
                 self.draAlBu.classList.remove("selected");
                 break;
         }
     };
     //
-    sOrBu = () => {
-        if (this.cb.gOrPo()) {
+    showOrderButton = () => {
+        if (this.callback.gOrPo()) {
             if (!this.or.tp.hasOwnProperty("line")) {
                 this.tpsOrBu.style.left = +(this.cr.x + 10) + "px";
                 this.tpsOrBu.style.top = +(this.cr.y + 10) + "px";
@@ -499,7 +511,7 @@ class Ch {
             }
         } else {
             if (!this.or.entry.hasOwnProperty("line")) {
-                const price = this.cCo2Pr(this.cr.y);
+                const price = this.coordinateToPrice(this.cr.y);
                 const side = price >= this.da.price.slice(-1)[0].value ? 1 : -1;
                 this.or.entry.price = price;
                 this.or.side = side;
@@ -513,12 +525,12 @@ class Ch {
             }
         }
     };
-    hOrBu = () => {
+    hideOrderButton = () => {
         this.entOrBu.style.display = "none";
         this.tpsOrBu.style.display = "none";
     };
     //
-    dOrLi = kind => {
+    drawOrderLine = kind => {
         var color, title;
         switch (kind) {
             case "entry":
@@ -555,22 +567,22 @@ class Ch {
                 draggable: true
             });
         }
-        this.g.s.s("order", {
+        this.global.s.s("order", {
             kind: kind,
             price: +this.or[kind].price,
             side: this.or.side
         });
     };
-    rOrLi = kind => {
+    removeOrderLine = kind => {
         if (this.or[kind].hasOwnProperty("line")) {
             this.se.price.removePriceLine(this.or[kind].line);
             delete this.or[kind].line;
         }
     };
     //
-    dToLi = () => {
+    drawHorizontalLine = () => {
         const TYPE = "line";
-        const price = this.fPr(this.cCo2Pr(this.cr.y));
+        const price = this.formatPrice(this.coordinateToPrice(this.cr.y));
         const existIndex = this.li.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
@@ -578,7 +590,7 @@ class Ch {
         if (existIndex != -1) {
             const removeLine = this.li.splice(existIndex, 1);
             this.se.price.removePriceLine(removeLine[0]);
-            this.g.s.s("line", { price: price, removed: true });
+            this.global.s.s("line", { price: price, removed: true });
         } else {
             const options = {
                 lineType: TYPE,
@@ -589,17 +601,17 @@ class Ch {
                 draggable: true
             };
             this.li.push(this.se.price.createPriceLine(options));
-            this.g.s.s("line", options);
+            this.global.s.s("line", options);
         }
         this.draLiBu.classList.remove("selected");
     };
-    rToLi = () => {
+    removeHorizontalLine = () => {
         this.li.forEach(line => this.se.price.removePriceLine(line));
         this.li = [];
-        this.g.s.c("line");
+        this.global.s.c("line");
     };
     //
-    dMa = () => {
+    drawMaker = () => {
         if (this.cr.time) {
             const markers = this.ma.filter(item => item.time != this.cr.time);
             if (markers.length == this.ma.length) {
@@ -613,19 +625,21 @@ class Ch {
                 });
             } else this.ma = markers;
             this.se.price.setMarkers(this.ma);
-            this.g.s.c("marker").then(() => this.g.s.s("marker", this.ma));
+            this.global.s
+                .c("marker")
+                .then(() => this.global.s.s("marker", this.ma));
             //
             this.draMaBu.classList.remove("selected");
         }
     };
-    rMa = () => {
+    removeMaker = () => {
         this.ma = [];
         this.se.price.setMarkers([]);
-        this.g.s.c("marker");
+        this.global.s.c("marker");
     };
     //
-    dRu = () => {
-        const price = this.cCo2Pr(this.cr.y);
+    drawRuler = () => {
+        const price = this.coordinateToPrice(this.cr.y);
         var options = {
             lineType: "ruler",
             price: price,
@@ -640,7 +654,7 @@ class Ch {
             options.title = "0";
             this.ru.start = this.se.price.createPriceLine(options);
             this.ru.point = point;
-            this.g.s.s("ruler", options);
+            this.global.s.s("ruler", options);
         } else if (this.ru.point == 1) {
             const startPrice = +this.ru.start.options().price;
             const point = 2;
@@ -648,23 +662,23 @@ class Ch {
             options.title = (price - startPrice).toFixed(1);
             this.ru.end = this.se.price.createPriceLine(options);
             this.ru.point = point;
-            this.g.s.s("ruler", options);
+            this.global.s.s("ruler", options);
             this.draRuBu.classList.remove("selected");
         }
     };
-    rRu = () => {
+    removeRuler = () => {
         if (this.ru.point > 0) {
             this.se.price.removePriceLine(this.ru.start);
             if (this.ru.point > 1) this.se.price.removePriceLine(this.ru.end);
             //
             this.ru = { start: {}, end: {}, point: 0 };
-            this.g.s.c("ruler");
+            this.global.s.c("ruler");
         }
     };
     //
-    dAl = () => {
+    drawAlert = () => {
         const TYPE = "alert";
-        const price = this.fPr(this.cCo2Pr(this.cr.y));
+        const price = this.formatPrice(this.coordinateToPrice(this.cr.y));
         const existIndex = this.al.findIndex(line => {
             const ops = line.options();
             return (ops.type = TYPE && +ops.price == price);
@@ -672,7 +686,7 @@ class Ch {
         if (existIndex != -1) {
             const removeLine = this.al.splice(existIndex, 1);
             this.se.price.removePriceLine(removeLine[0]);
-            this.g.s.s("alert", { price: price, removed: true });
+            this.global.s.s("alert", { price: price, removed: true });
         } else {
             const options = {
                 lineType: TYPE,
@@ -684,76 +698,81 @@ class Ch {
                 draggable: true
             };
             this.al.push(this.se.price.createPriceLine(options));
-            this.g.s.s("alert", options);
+            this.global.s.s("alert", options);
         }
         this.draAlBu.classList.remove("selected");
         this.auAl.pause();
     };
-    rAl = () => {
+    removeAlert = () => {
         this.al.forEach(line => this.se.price.removePriceLine(line));
         this.al = [];
-        this.g.s.c("alert");
+        this.global.s.c("alert");
         this.auAl.pause();
     };
     //
-    tCaOrBu = visible => {
+    toggleCancelOrderButton = visible => {
         if (visible) {
             this.canOrBu.style.display = "block";
             this.canOrBu.style.background = this.or.side > 0 ? "green" : "red";
         } else this.canOrBu.style.display = "none";
     };
     //
-    uLe = (price, volume) => {
+    updateLegend = (price, volume) => {
         if (!!price) this.priLeP.innerText = price;
         if (!!volume) this.volLeP.innerText = volume.toLocaleString("en-US");
     };
-    cCo2Pr = y => {
-        return this.fPr(this.se.price.coordinateToPrice(y));
+    coordinateToPrice = y => {
+        return this.formatPrice(this.se.price.coordinateToPrice(y));
     };
-    fPr = price => {
+    formatPrice = price => {
         return +(+price.toFixed(1));
     };
     //
-    lChDa = () => {
+    loadChartData = () => {
         return new Promise(async (resolve, reject) => {
-            this.tSp(true);
-            const svData = await this.gSeDa();
+            this.toggleSpinner(true);
+            const svData = await this.getServerData();
             start: while (true) {
                 this.hsNeDa = false;
-                const lcData = await this.g.s.g("data");
+                const lcData = await this.global.s.g("data");
                 const ids = new Set(svData.map(d => d.time));
                 const data = [
                     ...svData,
                     ...lcData.filter(d => !ids.has(d.time))
                 ].sort((a, b) => a.time - b.time);
                 if (this.hsNeDa) continue start;
-                this.g.s.c("data").then(() => this.g.s.s("data", data));
+                this.global.s
+                    .c("data")
+                    .then(() => this.global.s.s("data", data));
                 //
-                this.da = data.reduce((r, item) => this.cChDa(r, item), {
-                    original: [],
-                    price: [],
-                    volume: []
-                });
+                this.da = data.reduce(
+                    (r, item) => this.generateChartData(r, item),
+                    {
+                        original: [],
+                        price: [],
+                        volume: []
+                    }
+                );
                 // console.log("data: ", this.da);
                 //
                 if (!!this.da.original.length) {
                     this.se.price.setData(this.da.price);
                     this.se.volume.setData(this.da.volume);
-                    this.uLe(
+                    this.updateLegend(
                         this.da.price.slice(-1)[0].value,
                         this.da.volume.slice(-1)[0].value
                     );
                 }
                 //
-                this.tSp(false);
+                this.toggleSpinner(false);
                 resolve();
                 break;
             }
         });
     };
-    uChDa = param => {
+    updateChartData = param => {
         this.hsNeDa = true;
-        this.da = this.cChDa(this.da, param);
+        this.da = this.generateChartData(this.da, param);
         const lastPrice = this.da.price.slice(-1)[0];
         const lastVolume = this.da.volume.slice(-1)[0];
         //
@@ -765,31 +784,34 @@ class Ch {
             this.se.volume.update(lastVolume);
         }
         if (!this.hsCr) {
-            this.uLe(lastPrice.value, lastVolume.value);
+            this.updateLegend(lastPrice.value, lastVolume.value);
         }
         //
-        this.g.s.s("data", param);
+        this.global.s.s("data", param);
         this.da.original.push(param);
     };
-    gSeDa = () => {
+    getServerData = () => {
         return new Promise(async (resolve, reject) => {
             const date = this.datIn.value;
-            const data = this.g.c.e({ date: date, deviceId: this.g.deviceId });
-            const url = this.g.domain + this.g.endpoint.getChart;
+            const data = this.global.c.e({
+                date: date,
+                deviceId: this.global.deviceId
+            });
+            const url = this.global.domain + this.global.endpoint.getChart;
             start: while (true) {
                 try {
                     var response = await fetch(url, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${this.g.accessToken}`
+                            Authorization: `Bearer ${this.global.accessToken}`
                         },
                         body: data
                     });
                     var json = await response.json();
-                    json = this.g.c.d(json);
+                    json = this.global.c.d(json);
                     // console.log("json: ", json);
-                    if (!json.isOk) this.cb.aIvAc();
+                    if (!json.isOk) this.callback.alertInvalidAccess();
                     resolve(json.data);
                     break;
                 } catch (e) {
@@ -798,7 +820,7 @@ class Ch {
             }
         });
     };
-    cChDa = (r, item) => {
+    generateChartData = (r, item) => {
         var time = item.time + 7 * 60 * 60;
         var volumeColor = this.U_C;
         var volume = item.volume,
@@ -849,33 +871,33 @@ class Ch {
         //
         return r;
     };
-    gToDa = () => {
+    getToolsData = () => {
         return new Promise(async (resolve, reject) => {
-            const order = await this.g.s.g("order");
+            const order = await this.global.s.g("order");
             order.map(item => {
                 this.or.side = item.side;
                 this.or[item.kind].price = item.price;
-                this.dOrLi(item.kind);
+                this.drawOrderLine(item.kind);
                 if (item.kind == "entry") {
-                    if (this.cb.gOrPo()) {
+                    if (this.callback.gOrPo()) {
                         this.or.entry.line.applyOptions({
                             draggable: false
                         });
                     }
-                    this.tCaOrBu(true);
+                    this.toggleCancelOrderButton(true);
                 }
             });
             //
-            const lines = await this.g.s.g("line");
+            const lines = await this.global.s.g("line");
             lines.forEach(line => {
                 if (!line.removed)
                     this.li.push(this.se.price.createPriceLine(line));
             });
             //
-            this.ma = await this.g.s.g("marker");
+            this.ma = await this.global.s.g("marker");
             this.se.price.setMarkers(this.ma);
             //
-            const rulerLines = await this.g.s.g("ruler");
+            const rulerLines = await this.global.s.g("ruler");
             if (rulerLines.length == 2) {
                 rulerLines.forEach(line => {
                     this.ru.point = 2;
@@ -885,7 +907,7 @@ class Ch {
                 });
             }
             //
-            const alertLines = await this.g.s.g("alert");
+            const alertLines = await this.global.s.g("alert");
             alertLines.forEach(line => {
                 if (!line.removed)
                     this.al.push(this.se.price.createPriceLine(line));
@@ -894,14 +916,14 @@ class Ch {
             resolve();
         });
     };
-    cnSk = () => {
+    connectSocket = () => {
         var self = this;
-        var msg = { action: "join", list: self.g.symbol };
-        var socket = io(self.g.endpoint.socket);
+        var msg = { action: "join", list: self.global.symbol };
+        var socket = io(self.global.endpoint.socket);
         socket.on("connect", () => socket.emit("regs", JSON.stringify(msg)));
         socket.on("reconnect", () => {
-            self.lChDa();
-            if (self.isInSe()) socket.emit("regs", JSON.stringify(msg));
+            self.loadChartData();
+            if (self.isInSession()) socket.emit("regs", JSON.stringify(msg));
         });
         socket.on("stockps", data => {
             if (data.data.id == 3220) {
@@ -912,35 +934,35 @@ class Ch {
                     price: data.data.lastPrice,
                     volume: data.data.lastVol
                 };
-                self.uChDa(param);
+                self.updateChartData(param);
             }
         });
     };
     //
-    inSec = self => {
-        if (self.cb.gOrPo()) {
+    secIntervalHandler = self => {
+        if (self.callback.gOrPo()) {
             if (
                 self.or.entry.hasOwnProperty("line") &&
                 !self.or.tp.hasOwnProperty("line")
             ) {
-                self.cb.oTpPr(self.or, true);
-                self.dOrLi("tp");
-                self.cb.oSlPr(self.or, true);
-                self.dOrLi("sl");
+                self.callback.oTpPr(self.or, true);
+                self.drawOrderLine("tp");
+                self.callback.oSlPr(self.or, true);
+                self.drawOrderLine("sl");
                 self.or.entry.line.applyOptions({
                     draggable: false
                 });
-                self.g.a.s("success", "Đã mở vị thế.");
+                self.global.a.s("success", "Đã mở vị thế.");
             }
         } else {
             if (self.or.tp.hasOwnProperty("line")) {
-                self.cb.cOr();
-                self.tCaOrBu(false);
-                self.rOrLi("entry");
-                self.rOrLi("tp");
-                self.rOrLi("sl");
-                self.g.s.c("order");
-                self.g.a.s("success", "Đã đóng vị thế.");
+                self.callback.cOr();
+                self.toggleCancelOrderButton(false);
+                self.removeOrderLine("entry");
+                self.removeOrderLine("tp");
+                self.removeOrderLine("sl");
+                self.global.s.c("order");
+                self.global.a.s("success", "Đã đóng vị thế.");
             }
         }
         if (self.auAl.paused) {
@@ -956,20 +978,20 @@ class Ch {
                 }
             });
         }
-        if (moment().unix() == self.g.time.start) self.cnSk();
+        if (moment().unix() == self.global.time.start) self.connectSocket();
     };
-    inMin = self => {
-        if (self.isInSe()) self.lChDa();
+    minIntervalHandler = self => {
+        if (self.isInSession()) self.loadChartData();
     };
-    isInSe = () => {
+    isInSession = () => {
         return (
-            moment().unix() >= this.g.time.start &&
-            moment().unix() <= this.g.time.end
+            moment().unix() >= this.global.time.start &&
+            moment().unix() <= this.global.time.end
         );
     };
     //
-    tVo = visible => {
-        this.g.isVolume = visible;
+    toggleChartVolume = visible => {
+        this.global.isVolume = visible;
         this.se.volume.applyOptions({ visible: visible });
         this.volLeP.style.display = visible ? "block" : "none";
         this.ch.applyOptions({
@@ -981,13 +1003,13 @@ class Ch {
         });
     };
     //
-    tSp = visible => {
+    toggleSpinner = visible => {
         this.spiIm.style.opacity = visible ? 1 : 0;
     };
-    eChRe = self => {
+    eventChartResize = self => {
         self.ch.resize(window.innerWidth, window.innerHeight);
     };
-    eKePr = (e, self) => {
+    eventKeyPress = (e, self) => {
         try {
             if (e.ctrlKey || e.metaKey) {
                 if (e.shiftKey) {
@@ -1042,62 +1064,72 @@ class Ch {
                             self.draAlBu.click();
                             break;
                         case 96:
-                            if (self.timFr != self.g.timFrs[0].value) {
-                                self.timFrSe.value = self.g.timFrs[0].value;
+                            if (self.timFr != self.global.timFrs[0].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[0].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;
                         case 97:
-                            if (self.timFr != self.g.timFrs[1].value) {
-                                self.timFrSe.value = self.g.timFrs[1].value;
+                            if (self.timFr != self.global.timFrs[1].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[1].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;
                         case 98:
-                            if (self.timFr != self.g.timFrs[2].value) {
-                                self.timFrSe.value = self.g.timFrs[2].value;
+                            if (self.timFr != self.global.timFrs[2].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[2].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;
                         case 99:
-                            if (self.timFr != self.g.timFrs[3].value) {
-                                self.timFrSe.value = self.g.timFrs[3].value;
+                            if (self.timFr != self.global.timFrs[3].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[3].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;
                         case 100:
-                            if (self.timFr != self.g.timFrs[4].value) {
-                                self.timFrSe.value = self.g.timFrs[4].value;
+                            if (self.timFr != self.global.timFrs[4].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[4].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;
                         case 101:
-                            if (self.timFr != self.g.timFrs[5].value) {
-                                self.timFrSe.value = self.g.timFrs[5].value;
+                            if (self.timFr != self.global.timFrs[5].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[5].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;
                         case 102:
-                            if (self.timFr != self.g.timFrs[6].value) {
-                                self.timFrSe.value = self.g.timFrs[6].value;
+                            if (self.timFr != self.global.timFrs[6].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[6].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;
                         case 103:
-                            if (self.timFr != self.g.timFrs[7].value) {
-                                self.timFrSe.value = self.g.timFrs[7].value;
+                            if (self.timFr != self.global.timFrs[7].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[7].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;
                         case 104:
-                            if (self.timFr != self.g.timFrs[8].value) {
-                                self.timFrSe.value = self.g.timFrs[8].value;
+                            if (self.timFr != self.global.timFrs[8].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[8].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;
                         case 105:
-                            if (self.timFr != self.g.timFrs[9].value) {
-                                self.timFrSe.value = self.g.timFrs[9].value;
+                            if (self.timFr != self.global.timFrs[9].value) {
+                                self.timFrSe.value =
+                                    self.global.timFrs[9].value;
                                 self.timFrSe.dispatchEvent(new Event("change"));
                             }
                             break;

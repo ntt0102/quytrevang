@@ -1,4 +1,4 @@
-class Co {
+class Config {
     appName = "SmartOrder";
     version = "2.0.1";
     publishDate = "17/03/2023";

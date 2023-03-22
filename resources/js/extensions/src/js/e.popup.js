@@ -1,27 +1,27 @@
-class Po {
+class Popup {
     // Các thuộc tính
     TK = "__so";
 
     // Hàm khởi tạo
-    constructor(g, c) {
-        this.g = g;
-        this.cb = c;
-        this.cCoEl();
+    constructor(global, callback) {
+        this.global = global;
+        this.callback = callback;
+        this.createContainerElement();
     }
 
     // Các phương thức
-    cCoEl = () => {
+    createContainerElement = () => {
         var container = document.createElement("div");
         container.id = "optionViewContainer";
         document.body.append(container);
         this.conEl = container;
     };
-    cNoLoEl = () => {
-        this.cHeCo();
-        this.cLoCo();
-        this.cReCo();
+    createNoLoginElement = () => {
+        this.createHeaderContainer();
+        this.createLoginContainer();
+        this.createRegisterContainer();
     };
-    cHeCo = () => {
+    createHeaderContainer = () => {
         var div = document.createElement("div");
         div.id = "hearderContainer";
         this.conEl.append(div);
@@ -30,17 +30,17 @@ class Po {
         var p = document.createElement("span");
         div.append(p);
         p.className = "title";
-        p.innerText = this.g.appName;
+        p.innerText = this.global.appName;
         //
         var logout = document.createElement("span");
         div.append(logout);
         logout.className = "logout fa fa-sign-out";
         logout.title = "Đăng xuất";
         logout.style.display = "none";
-        logout.addEventListener("click", () => this.lOu(this));
+        logout.addEventListener("click", () => this.logout(this));
         this.louBu = logout;
     };
-    cLoCo = () => {
+    createLoginContainer = () => {
         var div = document.createElement("div");
         div.id = "loginContainer";
         div.className = "section";
@@ -50,7 +50,7 @@ class Po {
         var wrapper = document.createElement("form");
         div.append(wrapper);
         wrapper.className = "wrapper";
-        wrapper.addEventListener("submit", e => this.lIn(e, this));
+        wrapper.addEventListener("submit", e => this.login(e, this));
         //
         var p = document.createElement("label");
         wrapper.append(p);
@@ -64,7 +64,7 @@ class Po {
         input.placeholder = "Email hoặc Số điện thoại";
         input.required = true;
         this.logUs = input;
-        if (!this.g.isLi) this.logUs.focus();
+        if (!this.global.isLi) this.logUs.focus();
         //
         input = document.createElement("input");
         wrapper.append(input);
@@ -100,7 +100,7 @@ class Po {
         route.className = "link";
         route.innerText = "Đăng ký";
         route.addEventListener("click", () => {
-            this.sPa(this.regCo);
+            this.setActivedSection(this.regCo);
             this.regNa.focus();
         });
         var route = document.createElement("label");
@@ -111,7 +111,7 @@ class Po {
             window.open("https://www.w3schools.com")
         );
     };
-    cReCo = () => {
+    createRegisterContainer = () => {
         var div = document.createElement("div");
         div.id = "registerContainer";
         div.className = "section";
@@ -121,7 +121,7 @@ class Po {
         var wrapper = document.createElement("form");
         div.append(wrapper);
         wrapper.className = "wrapper";
-        wrapper.addEventListener("submit", e => this.rAc(e, this));
+        wrapper.addEventListener("submit", e => this.registerAccount(e, this));
         //
         var span = document.createElement("span");
         span.innerText = "Được 7 ngày dùng thử với 2 thiết bị.";
@@ -183,7 +183,7 @@ class Po {
         route.className = "link";
         route.innerText = "Đăng nhập";
         route.addEventListener("click", () => {
-            this.sPa(this.logCo);
+            this.setActivedSection(this.logCo);
             this.logUs.focus();
         });
         var route = document.createElement("label");
@@ -194,15 +194,15 @@ class Po {
             window.open("https://www.w3schools.com")
         );
     };
-    cLoEl = () => {
-        this.cOpCo();
-        this.cInCo();
-        this.cAbCo();
+    createLoggedinElement = () => {
+        this.createOptionContainer();
+        this.createInfoContainer();
+        this.createAboutContainer();
         //
-        this.sPa(this.optCo);
-        this.tLoBu(true);
+        this.setActivedSection(this.optCo);
+        this.toggleLogoutButton(true);
     };
-    cOpCo = () => {
+    createOptionContainer = () => {
         var div = document.createElement("div");
         div.id = "optionContainer";
         div.className = "section";
@@ -212,7 +212,7 @@ class Po {
         var wrapper = document.createElement("form");
         div.append(wrapper);
         wrapper.className = "wrapper";
-        wrapper.addEventListener("submit", e => this.sSeCo(e, this));
+        wrapper.addEventListener("submit", e => this.setServerConfig(e, this));
         //
         var list = document.createElement("div");
         list.className = "list";
@@ -226,13 +226,13 @@ class Po {
         item.append(label);
         var select = document.createElement("select");
         select.style.width = "69px";
-        this.g.timFrs.forEach((item, index) => {
+        this.global.timFrs.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
             select.appendChild(option);
         });
-        select.value = this.g.timeFrame;
+        select.value = this.global.timeFrame;
         this.timFrSe = select;
         item.append(select);
         //
@@ -244,13 +244,13 @@ class Po {
         item.append(label);
         select = document.createElement("select");
         select.style.width = "69px";
-        this.g.chaTys.forEach((item, index) => {
+        this.global.chaTys.forEach((item, index) => {
             var option = document.createElement("option");
             option.value = item.value;
             option.text = item.text;
             select.appendChild(option);
         });
-        select.value = this.g.chartType;
+        select.value = this.global.chartType;
         this.chaTySe = select;
         item.append(select);
         //
@@ -264,7 +264,7 @@ class Po {
         input.type = "number";
         input.style.width = "69px";
         input.style.height = "21px";
-        input.value = this.g.contractNumber;
+        input.value = this.global.contractNumber;
         this.conNuIn = input;
         item.append(input);
         //
@@ -278,7 +278,7 @@ class Po {
         input.type = "number";
         input.style.width = "69px";
         input.style.height = "21px";
-        input.value = this.g.takeProfit;
+        input.value = this.global.takeProfit;
         this.takPrIn = input;
         item.append(input);
         //
@@ -292,7 +292,7 @@ class Po {
         input.type = "number";
         input.style.width = "69px";
         input.style.height = "21px";
-        input.value = this.g.stopLoss;
+        input.value = this.global.stopLoss;
         this.stoLoIn = input;
         item.append(input);
         //
@@ -305,7 +305,7 @@ class Po {
         input = document.createElement("input");
         input.type = "checkbox";
         input.style.width = "17px";
-        input.checked = !!this.g.isVolume;
+        input.checked = !!this.global.isVolume;
         this.isVolCh = input;
         item.append(input);
         //
@@ -318,7 +318,7 @@ class Po {
         input = document.createElement("input");
         input.type = "checkbox";
         input.style.width = "17px";
-        input.checked = !!this.g.isViewChart;
+        input.checked = !!this.global.isViewChart;
         this.isVieChCh = input;
         item.append(input);
         //
@@ -335,14 +335,18 @@ class Po {
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Dịch vụ";
-        route.addEventListener("click", () => this.sPa(this.infCo));
+        route.addEventListener("click", () =>
+            this.setActivedSection(this.infCo)
+        );
         var route = document.createElement("label");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Phần mềm";
-        route.addEventListener("click", () => this.sPa(this.aboCo));
+        route.addEventListener("click", () =>
+            this.setActivedSection(this.aboCo)
+        );
     };
-    cInCo = () => {
+    createInfoContainer = () => {
         var div = document.createElement("div");
         div.id = "infoContainer";
         div.className = "section";
@@ -367,7 +371,7 @@ class Po {
         label.innerText = "Tên:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.g.user.name;
+        value.innerText = this.global.user.name;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -377,7 +381,7 @@ class Po {
         label.innerText = "Email:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.g.user.email;
+        value.innerText = this.global.user.email;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -387,7 +391,7 @@ class Po {
         label.innerText = "Điện thoại:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.g.user.phone;
+        value.innerText = this.global.user.phone;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -397,7 +401,7 @@ class Po {
         label.innerText = "Ngày đăng ký:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = moment(this.g.registerDate).format("DD/MM/YYYY");
+        value.innerText = moment(this.global.registerDate).format("DD/MM/YYYY");
         item.append(value);
         //
         var list = document.createElement("div");
@@ -414,7 +418,7 @@ class Po {
         label.innerText = "Ngày bắt đầu:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = moment(this.g.startDate).format("DD/MM/YYYY");
+        value.innerText = moment(this.global.startDate).format("DD/MM/YYYY");
         item.append(value);
         //
         var item = document.createElement("div");
@@ -424,7 +428,7 @@ class Po {
         label.innerText = "Ngày hết hạn:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = moment(this.g.expiresDate).format("DD/MM/YYYY");
+        value.innerText = moment(this.global.expiresDate).format("DD/MM/YYYY");
         item.append(value);
         //
         var item = document.createElement("div");
@@ -434,7 +438,7 @@ class Po {
         label.innerText = "Số lượng thiết bị:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.g.deviceLimit;
+        value.innerText = this.global.deviceLimit;
         item.append(value);
         //
         var routeWrapper = document.createElement("div");
@@ -444,9 +448,11 @@ class Po {
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Trở về";
-        route.addEventListener("click", () => this.sPa(this.optCo));
+        route.addEventListener("click", () =>
+            this.setActivedSection(this.optCo)
+        );
     };
-    cAbCo = () => {
+    createAboutContainer = () => {
         var div = document.createElement("div");
         div.id = "aboutContainer";
         div.className = "section";
@@ -467,7 +473,7 @@ class Po {
         label.innerText = "Phiên bản:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.g.version;
+        value.innerText = this.global.version;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -477,7 +483,7 @@ class Po {
         label.innerText = "Ngày xuất bản:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.g.publishDate;
+        value.innerText = this.global.publishDate;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -487,7 +493,7 @@ class Po {
         label.innerText = "Nhà phát triển:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.g.developer;
+        value.innerText = this.global.developer;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -497,7 +503,7 @@ class Po {
         label.innerText = "Số điện thoại:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.g.contact.phone;
+        value.innerText = this.global.contact.phone;
         item.append(value);
         //
         var item = document.createElement("div");
@@ -507,10 +513,10 @@ class Po {
         label.innerText = "Email:";
         item.append(label);
         var value = document.createElement("span");
-        value.innerText = this.g.contact.email;
+        value.innerText = this.global.contact.email;
         item.append(value);
         //
-        if (this.g.version != this.g.latestVersion) {
+        if (this.global.version != this.global.latestVersion) {
             var download = document.createElement("div");
             download.className = "download";
             wrapper.append(download);
@@ -530,7 +536,9 @@ class Po {
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Trở về";
-        route.addEventListener("click", () => this.sPa(this.optCo));
+        route.addEventListener("click", () =>
+            this.setActivedSection(this.optCo)
+        );
         var route = document.createElement("label");
         routeWrapper.append(route);
         route.className = "link";
@@ -539,16 +547,16 @@ class Po {
             window.open("https://www.w3schools.com")
         );
     };
-    rLoEl = () => {
+    removeLoggedinElement = () => {
         if (!!this.infCo) this.infCo.remove();
         if (!!this.optCo) this.optCo.remove();
         if (!!this.aboCo) this.aboCo.remove();
         //
         this.louBu.style.display = "none";
-        this.sPa(this.logCo);
+        this.setActivedSection(this.logCo);
         this.logUs.focus();
     };
-    rAc = (e, self) => {
+    registerAccount = (e, self) => {
         e.preventDefault();
         if (self.regCoPa.value != self.regPa.value) {
             self.regMe.innerText = "Mật khẩu không khớp";
@@ -557,15 +565,15 @@ class Po {
             self.regSu.innerText = "Đang đăng ký...";
             self.regSu.disabled = true;
             self.regMe.innerText = "";
-            const data = self.g.c.e({
+            const data = self.global.c.e({
                 name: self.regNa.value,
                 email: self.regEm.value,
                 phone: self.regPh.value,
                 password: self.regPa.value,
-                deviceId: self.g.deviceId,
-                chanel: self.g.appName
+                deviceId: self.global.deviceId,
+                chanel: self.global.appName
             });
-            const url = this.g.domain + this.g.endpoint.register;
+            const url = this.global.domain + this.global.endpoint.register;
             fetch(url, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -576,17 +584,17 @@ class Po {
                     throw new Error(response.statusText);
                 })
                 .then(async json => {
-                    json = self.g.c.d(json);
+                    json = self.global.c.d(json);
                     // console.log("register: ", json);
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
                     if (json.isOk) {
-                        this.g.isLi = true;
-                        self.sTo(json.token);
-                        self.g.accessToken = json.token.access_token;
-                        self.g.user = json.user;
-                        await self.cb.lin();
-                        self.g.a.s("success", "Đăng ký thành công");
+                        this.global.isLi = true;
+                        self.setToken(json.token);
+                        self.global.accessToken = json.token.access_token;
+                        self.global.user = json.user;
+                        await self.callback.lin();
+                        self.global.a.s("success", "Đăng ký thành công");
                         self.regNa.value = "";
                         self.regEm.value = "";
                         self.regPh.value = "";
@@ -605,25 +613,25 @@ class Po {
                 })
                 .catch(error => {
                     console.log(error);
-                    self.g.a.s("error", "Đăng ký lỗi");
+                    self.global.a.s("error", "Đăng ký lỗi");
                     self.regSu.innerText = "ĐĂNG KÝ";
                     self.regSu.disabled = false;
                 });
         }
     };
-    lIn = (e, self) => {
+    login = (e, self) => {
         e.preventDefault();
         self.logSu.innerText = "Đang đăng nhập...";
         self.logSu.disabled = true;
         self.logMe.innerText = "";
-        const data = self.g.c.e({
+        const data = self.global.c.e({
             username: self.logUs.value,
             password: self.logPa.value,
             rememberMe: self.logReMe.checked,
-            deviceId: self.g.deviceId,
-            chanel: self.g.appName
+            deviceId: self.global.deviceId,
+            chanel: self.global.appName
         });
-        const url = self.g.domain + self.g.endpoint.login;
+        const url = self.global.domain + self.global.endpoint.login;
         fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -634,14 +642,14 @@ class Po {
                 throw new Error(response.statusText);
             })
             .then(async json => {
-                json = self.g.c.d(json);
+                json = self.global.c.d(json);
                 console.log("login: ", json);
                 if (json.isOk) {
-                    this.g.isLi = true;
-                    self.sTo(json.token);
-                    self.g.accessToken = json.token.access_token;
-                    self.g.user = json.user;
-                    await self.cb.lin();
+                    this.global.isLi = true;
+                    self.setToken(json.token);
+                    self.global.accessToken = json.token.access_token;
+                    self.global.user = json.user;
+                    await self.callback.lin();
                     self.logUs.value = "";
                     self.logPa.value = "";
                 } else {
@@ -658,37 +666,39 @@ class Po {
                 self.logSu.disabled = false;
             })
             .catch(error => {
-                self.g.a.s("error", "Đăng nhập lỗi");
+                self.global.a.s("error", "Đăng nhập lỗi");
                 self.logSu.innerText = "ĐĂNG NHẬP";
                 self.logSu.disabled = false;
             });
     };
-    lOu = self => {
-        const url = self.g.domain + self.g.endpoint.logout;
+    logout = self => {
+        const url = self.global.domain + self.global.endpoint.logout;
         fetch(url, {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${self.g.accessToken}`
+                Authorization: `Bearer ${self.global.accessToken}`
             }
         }).then(() => {
-            this.g.isLi = false;
-            self.rTo();
-            self.cb.lou();
+            this.global.isLi = false;
+            self.removeToken();
+            self.callback.lou();
         });
     };
-    gU = () => {
+    getUser = () => {
         return new Promise(resolve => {
-            this.g.accessToken = this.gTo();
-            if (!this.g.accessToken) resolve();
+            this.global.accessToken = this.getToken();
+            if (!this.global.accessToken) resolve();
             else {
-                const data = this.g.c.e({ deviceId: this.g.deviceId });
-                const url = this.g.domain + this.g.endpoint.user;
+                const data = this.global.c.e({
+                    deviceId: this.global.deviceId
+                });
+                const url = this.global.domain + this.global.endpoint.user;
                 fetch(url, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${this.g.accessToken}`
+                        Authorization: `Bearer ${this.global.accessToken}`
                     },
                     body: data
                 })
@@ -697,40 +707,40 @@ class Po {
                         throw new Error(response.statusText);
                     })
                     .then(json => {
-                        json = this.g.c.d(json);
+                        json = this.global.c.d(json);
                         // console.log("gU: ", json);
-                        this.g.isLi = json.isOk;
-                        if (json.isOk) this.g.user = json.user;
-                        else this.aIvAc(true);
+                        this.global.isLi = json.isOk;
+                        if (json.isOk) this.global.user = json.user;
+                        else this.alertInvalidAccess(true);
                         resolve();
                     })
                     .catch(error => resolve());
             }
         });
     };
-    gSeCo = () => {
+    getServerConfig = () => {
         return new Promise((resolve, reject) => {
-            const data = this.g.c.e({
-                securities: this.g.securities,
-                deviceId: this.g.deviceId
+            const data = this.global.c.e({
+                securities: this.global.securities,
+                deviceId: this.global.deviceId
             });
-            const url = this.g.domain + this.g.endpoint.getConfig;
+            const url = this.global.domain + this.global.endpoint.getConfig;
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${this.g.accessToken}`
+                    Authorization: `Bearer ${this.global.accessToken}`
                 },
                 body: data
             })
                 .then(response => response.json())
                 .then(json => {
-                    json = this.g.c.d(json);
+                    json = this.global.c.d(json);
                     // console.log("serverConfig", json);
                     if (json.isOk)
                         for (const key in json.config)
-                            this.g[key] = json.config[key];
-                    else this.aIvAc();
+                            this.global[key] = json.config[key];
+                    else this.alertInvalidAccess();
                     resolve();
                 })
                 .catch(err => {
@@ -742,12 +752,12 @@ class Po {
                 });
         });
     };
-    sSeCo = (e, self) => {
+    setServerConfig = (e, self) => {
         e.preventDefault();
         return new Promise(resolve => {
             self.optSu.innerText = "Đang lưu cài đặt...";
             self.optSu.disabled = true;
-            const data = self.g.c.e({
+            const data = self.global.c.e({
                 timeFrame: +self.timFrSe.value,
                 chartType: self.chaTySe.value,
                 contractNumber: +self.conNuIn.value,
@@ -755,14 +765,14 @@ class Po {
                 stopLoss: +self.stoLoIn.value,
                 isVolume: self.isVolCh.checked,
                 isViewChart: self.isVieChCh.checked,
-                deviceId: self.g.deviceId
+                deviceId: self.global.deviceId
             });
-            const url = self.g.domain + self.g.endpoint.setConfig;
+            const url = self.global.domain + self.global.endpoint.setConfig;
             fetch(url, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${self.g.accessToken}`
+                    Authorization: `Bearer ${self.global.accessToken}`
                 },
                 body: data
             })
@@ -771,62 +781,70 @@ class Po {
                     throw new Error(response.statusText);
                 })
                 .then(async json => {
-                    json = self.g.c.d(json);
+                    json = self.global.c.d(json);
                     // console.log("setConfig: ", json);
                     self.optSu.innerText = "LƯU CÀI ĐẶT";
                     self.optSu.disabled = false;
                     if (json.isOk) {
-                        self.g.a.s("success", "Lưu cài đặt thành công");
-                        self.cb.tVo(self.isVolCh.checked);
+                        self.global.a.s("success", "Lưu cài đặt thành công");
+                        self.callback.toggleChartVolume(self.isVolCh.checked);
                     } else {
-                        if (json.message == "unauthorized") self.aIvAc();
-                        else self.g.a.s("error", "Lưu cài đặt thất bại");
+                        if (json.message == "unauthorized")
+                            self.alertInvalidAccess();
+                        else self.global.a.s("error", "Lưu cài đặt thất bại");
                     }
                     resolve();
                 });
         });
     };
-    sTo = token => localStorage.setItem(this.TK, JSON.stringify(token));
-    rTo = () => localStorage.removeItem(this.TK);
-    gTo = () => {
+    setToken = token => {
+        localStorage.setItem(this.TK, JSON.stringify(token));
+    };
+    removeToken = () => {
+        localStorage.removeItem(this.TK);
+    };
+    getToken = () => {
         const token = JSON.parse(localStorage.getItem(this.TK));
         if (!token) return false;
         if (moment().isBefore(token.expires_at)) return token.access_token;
-        this.g.a.s("waring", "Phiên đăng nhập hết hạn");
+        this.global.a.s("waring", "Phiên đăng nhập hết hạn");
         return false;
     };
-    gDeId = () => {
+    getDeviceId = () => {
         return new Promise(resolve => {
             FingerprintJS.load()
                 .then(fp => fp.get())
                 .then(result => {
-                    this.g.deviceId = result.visitorId;
+                    this.global.deviceId = result.visitorId;
                     resolve();
                 });
         });
     };
-    t = (visible = true) => {
+    toggle = (visible = true) => {
         if (!visible || this.conEl.classList.contains("show"))
             this.conEl.classList.remove("show");
         else {
-            this.sPa(this.g.isLi ? this.optCo : this.logCo);
+            this.setActivedSection(this.global.isLi ? this.optCo : this.logCo);
             this.conEl.classList.add("show");
         }
     };
-    tLoBu = visible => {
+    toggleLogoutButton = visible => {
         this.louBu.style.display = visible ? "block" : "none";
     };
-    sPa = el => {
+    setActivedSection = el => {
         var activeEl = document.querySelector(
             "#optionViewContainer .section.active"
         );
         if (activeEl) activeEl.classList.remove("active");
         el.classList.add("active");
     };
-    aIvAc = (h = false) => {
-        this.lOu(this);
+    alertInvalidAccess = (h = false) => {
+        this.logout(this);
         const msg = "Tài khoản đăng nhập sai cách";
-        if (h) this.g.a.h().then(() => this.g.a.s("error", msg, true, true));
-        else this.g.a.s("error", msg);
+        if (h)
+            this.global.a
+                .h()
+                .then(() => this.global.a.s("error", msg, true, true));
+        else this.global.a.s("error", msg);
     };
 }
