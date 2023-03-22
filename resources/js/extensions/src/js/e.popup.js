@@ -698,7 +698,7 @@ class Po {
                     })
                     .then(json => {
                         json = this.g.c.d(json);
-                        console.log("gU: ", json);
+                        // console.log("gU: ", json);
                         this.g.isLi = json.isOk;
                         if (json.isOk) this.g.user = json.user;
                         else this.aIvAc(true);
@@ -726,7 +726,7 @@ class Po {
                 .then(response => response.json())
                 .then(json => {
                     json = this.g.c.d(json);
-                    console.log("serverConfig", json);
+                    // console.log("serverConfig", json);
                     if (json.isOk)
                         for (const key in json.config)
                             this.g[key] = json.config[key];
@@ -775,13 +775,13 @@ class Po {
                     // console.log("setConfig: ", json);
                     self.optSu.innerText = "LƯU CÀI ĐẶT";
                     self.optSu.disabled = false;
-                    if (json.isOk)
+                    if (json.isOk) {
                         self.g.a.s("success", "Lưu cài đặt thành công");
-                    else {
+                        self.cb.tVo(self.isVolCh.checked);
+                    } else {
                         if (json.message == "unauthorized") self.aIvAc();
                         else self.g.a.s("error", "Lưu cài đặt thất bại");
                     }
-                    self.cb.tVo(self.isVolCh.checked);
                     resolve();
                 });
         });
@@ -809,7 +809,6 @@ class Po {
         if (!visible || this.conEl.classList.contains("show"))
             this.conEl.classList.remove("show");
         else {
-            console.log("popup-toggle-isLi: ", this.g.isLi);
             this.sPa(this.g.isLi ? this.optCo : this.logCo);
             this.conEl.classList.add("show");
         }
@@ -818,7 +817,6 @@ class Po {
         this.louBu.style.display = visible ? "block" : "none";
     };
     sPa = el => {
-        console.log("sPa: ", el);
         var activeEl = document.querySelector(
             "#optionViewContainer .section.active"
         );

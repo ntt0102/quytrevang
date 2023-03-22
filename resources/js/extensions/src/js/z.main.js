@@ -1,5 +1,4 @@
 class So {
-    //
     // Hàm khởi tạo
     constructor() {
         this.g = new Co();
@@ -30,6 +29,7 @@ class So {
         });
         this.rFuEv();
     }
+    //
     // Các phương thức
     i = async () => {
         this.p.cNoLoEl();
@@ -46,10 +46,9 @@ class So {
         await this.p.gSeCo();
         this.p.cLoEl();
         this.c.c();
-        this.m.cLoEl();
-        console.log("global: ", this.g);
         await this.c.lChDa();
         await this.c.gToDa();
+        this.m.cLoEl();
         if (!!this.g.isViewChart) this.m.ligWeBu.click();
         this.c.cnSk();
         this.g.a.h();
@@ -201,7 +200,7 @@ class So {
         this.cSc("onCancelAllOrderPending('order_condition')");
         this.cSc("onCancelAllOrderPending('order')");
     };
-    tVoCb = () => this.c.tVo();
+    tVoCb = visible => this.c.tVo(visible);
     tPoCb = visible => this.p.t(visible);
     aIvAcCb = () => this.p.aIvAc();
     cSc = script => {

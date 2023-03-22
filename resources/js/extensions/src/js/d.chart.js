@@ -201,11 +201,11 @@ class Ch {
         select.value = this.timFr;
         select.addEventListener("change", e => {
             this.timFr = e.target.value;
-            if (this.timFr == 0) {
+            this.lChDa().then(() => this.ch.timeScale().resetTimeScale());
+            if (this.timFr == 0 && this.chaTy != "line") {
                 this.chaTySe.value = "line";
                 this.chaTySe.dispatchEvent(new Event("change"));
-            } else
-                this.lChDa().then(() => this.ch.timeScale().resetTimeScale());
+            }
         });
         container.append(select);
         this.timFrSe = select;
@@ -736,10 +736,9 @@ class Ch {
                 });
                 // console.log("data: ", this.da);
                 //
-                this.se.price.setData(this.da.price);
-                this.se.volume.setData(this.da.volume);
-                //
-                if (!this.hsCr && !!this.da.original.length) {
+                if (!!this.da.original.length) {
+                    this.se.price.setData(this.da.price);
+                    this.se.volume.setData(this.da.volume);
                     this.uLe(
                         this.da.price.slice(-1)[0].value,
                         this.da.volume.slice(-1)[0].value
@@ -970,6 +969,7 @@ class Ch {
     };
     //
     tVo = visible => {
+        this.g.isVolume = visible;
         this.se.volume.applyOptions({ visible: visible });
         this.volLeP.style.display = visible ? "block" : "none";
         this.ch.applyOptions({
@@ -991,7 +991,11 @@ class Ch {
         try {
             if (e.ctrlKey || e.metaKey) {
                 if (e.shiftKey) {
-                    if (e.keyCode == 39) self.ch.timeScale().scrollToRealTime();
+                    switch (e.keyCode) {
+                        case 39:
+                            self.ch.timeScale().scrollToRealTime();
+                            break;
+                    }
                 } else {
                     switch (e.keyCode) {
                         case 38:
@@ -1038,53 +1042,70 @@ class Ch {
                             self.draAlBu.click();
                             break;
                         case 96:
-                            self.timFrSe.value = self.g.timFrs[0].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[0].value) {
+                                self.timFrSe.value = self.g.timFrs[0].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 97:
-                            self.timFrSe.value = self.g.timFrs[1].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[1].value) {
+                                self.timFrSe.value = self.g.timFrs[1].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 98:
-                            self.timFrSe.value = self.g.timFrs[2].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[2].value) {
+                                self.timFrSe.value = self.g.timFrs[2].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 99:
-                            self.timFrSe.value = self.g.timFrs[3].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[3].value) {
+                                self.timFrSe.value = self.g.timFrs[3].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 100:
-                            self.timFrSe.value = self.g.timFrs[4].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[4].value) {
+                                self.timFrSe.value = self.g.timFrs[4].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 101:
-                            self.timFrSe.value = self.g.timFrs[5].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[5].value) {
+                                self.timFrSe.value = self.g.timFrs[5].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 102:
-                            self.timFrSe.value = self.g.timFrs[6].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[6].value) {
+                                self.timFrSe.value = self.g.timFrs[6].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 103:
-                            self.timFrSe.value = self.g.timFrs[7].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[7].value) {
+                                self.timFrSe.value = self.g.timFrs[7].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 104:
-                            self.timFrSe.value = self.g.timFrs[8].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[8].value) {
+                                self.timFrSe.value = self.g.timFrs[8].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 105:
-                            self.timFrSe.value = self.g.timFrs[9].value;
-                            self.timFrSe.dispatchEvent(new Event("change"));
+                            if (self.timFr != self.g.timFrs[9].value) {
+                                self.timFrSe.value = self.g.timFrs[9].value;
+                                self.timFrSe.dispatchEvent(new Event("change"));
+                            }
                             break;
                         case 77:
                             self.refBu.click();
                             break;
                         case 188:
                             self.cleBu.click();
-                            break;
-
-                        default:
                             break;
                     }
                 }

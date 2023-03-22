@@ -10,7 +10,6 @@
     height: unset !important;
     border-radius: 5px;
 }
-
 .full-chart .aside-menu > .nav,
 .full-chart .aside-menu .list-group-item:nth-child(2),
 .full-chart .aside-menu .list-group-item:nth-child(3),
@@ -97,31 +96,24 @@
     padding: 12px;
 }
 
-.lightweight-chart #mainFooter .foot_tab:nth-child(2) {
+.lightweight-chart #mainFooter .foot_tab {
     position: fixed;
-    top: 310px;
-    left: 37.5px;
     z-index: 2001;
     font-size: 20px;
     padding: 5px 9px !important;
-    border-radius: 3px !important;
+    border-radius: 5px !important;
     background: #f0f0f0 !important;
     color: #848484 !important;
     font-weight: bold;
 }
+.lightweight-chart #mainFooter .foot_tab:nth-child(2) {
+    top: 310px;
+    left: 37.5px;
+}
 
 .lightweight-chart #mainFooter .foot_tab:nth-child(1) {
-    position: fixed;
     top: 310px;
     left: 0px;
-    z-index: 2001;
-    font-size: 20px;
-    padding: 5px 9px !important;
-    margin: unset !important;
-    border-radius: 3px !important;
-    background: #f0f0f0 !important;
-    color: #848484 !important;
-    font-weight: bold;
 }
 
 .lightweight-chart #mainFooter .foot_tab:hover {
@@ -205,8 +197,8 @@
 }
 
 .tradingview-chart .aside-menu {
-    top: 40px;
-    right: 60px !important;
+    top: 40px !important;
+    right: 62px !important;
 }
 
 .tradingview-chart #mainFooter > div:nth-child(2) {

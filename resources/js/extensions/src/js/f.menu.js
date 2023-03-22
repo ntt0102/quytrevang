@@ -8,7 +8,7 @@ class Me {
         this.cCoEl();
         this.cNoLoEl();
     }
-
+    //
     // Các phương thức
     cCoEl = () => {
         var container = document.createElement("div");
