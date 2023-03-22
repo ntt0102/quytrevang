@@ -1,6 +1,5 @@
 const { src, dest, watch } = require("gulp");
 const javascriptObfuscator = require("gulp-javascript-obfuscator");
-const minifyJs = require("gulp-uglify");
 const minifyCss = require("gulp-clean-css");
 const sourceMap = require("gulp-sourcemaps");
 const concat = require("gulp-concat");
