@@ -384,9 +384,9 @@ class Chart {
         button.innerText = "TP/SL";
         button.style.display = "none";
         button.addEventListener("click", () => {
-            this.callback.orderTpPriceCallback(this.or, true);
+            this.callback.orderTpPriceCallback(this.order, true);
             this.drawOrderLine("tp");
-            this.callback.orderSlPriceCallback(this.or, true);
+            this.callback.orderSlPriceCallback(this.order, true);
             this.drawOrderLine("sl");
             this.hideOrderButton();
         });
@@ -451,17 +451,17 @@ class Chart {
                     if (lineOptions.kind == "entry") {
                         if (!position) {
                             isChanged = true;
-                            self.or[lineOptions.kind].price = newPrice;
-                            self.callback.orderEntryPriceCallback(self.or);
+                            self.order[lineOptions.kind].price = newPrice;
+                            self.callback.orderEntryPriceCallback(self.order);
                             self.drawOrderLine(lineOptions.kind);
                         }
                     } else {
                         if (self.order.side * position > 0) {
                             isChanged = true;
-                            self.or[lineOptions.kind].price = newPrice;
+                            self.order[lineOptions.kind].price = newPrice;
                             if (lineOptions.kind == "tp")
-                                self.callback.orderTpPriceCallback(self.or);
-                            else self.callback.orderSlPriceCallback(self.or);
+                                self.callback.orderTpPriceCallback(self.order);
+                            else self.callback.orderSlPriceCallback(self.order);
                             self.drawOrderLine(lineOptions.kind);
                         }
                     }
@@ -651,8 +651,8 @@ class Chart {
                 });
             } else this.markers = markers;
             this.series.price.setMarkers(this.markers);
-            this.global.s
-                .c("marker")
+            this.global.store
+                .clear("marker")
                 .then(() => this.global.store.set("marker", this.markers));
             //
             this.drawMarkerButton.classList.remove("selected");

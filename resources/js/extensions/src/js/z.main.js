@@ -43,7 +43,7 @@ class SmartOrder {
                 "sohopdong"
             ).value = this.global.contractNumber;
             document.getElementById("right_price").value = "MTL";
-        } else this.menu.setBu.click();
+        } else this.menu.settingButton.click();
     };
     loginCallback = async () => {
         this.global.alert.show("warning", "Đang khởi tạo biểu đồ . . .", false);
@@ -53,7 +53,7 @@ class SmartOrder {
         await this.chart.loadChartData();
         await this.chart.getToolsData();
         this.menu.createLoggedinElement();
-        if (!!this.global.isViewChart) this.menu.ligWeBu.click();
+        if (!!this.global.isViewChart) this.menu.lightWeightButton.click();
         this.chart.connectSocket();
         this.global.alert.hide();
     };
@@ -206,9 +206,9 @@ class SmartOrder {
         this.callJavascript("onCancelAllOrderPending('order')");
     };
     toggleChartVolumeCallback = visible =>
-        this.chart.toggleChartVolumeCallback(visible);
+        this.chart.toggleChartVolume(visible);
     togglePopupCallback = visible => this.popup.toggle(visible);
-    alertInvalidAccessCallback = () => this.popup.alertInvalidAccessCallback();
+    alertInvalidAccessCallback = () => this.popup.alertInvalidAccess();
     callJavascript = script => {
         var button = document.createElement("button");
         button.setAttribute("onclick", script);

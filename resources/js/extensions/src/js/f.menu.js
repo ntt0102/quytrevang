@@ -25,7 +25,7 @@ class Menu {
             this.callback.toggleLightWeightButtonCallback()
         );
         this.containerElement.prepend(button);
-        this.ligWeBu = button;
+        this.lightWeightButton = button;
         //
         var button = document.createElement("button");
         button.classList = "fa fa-bar-chart";
@@ -34,7 +34,7 @@ class Menu {
             this.callback.toggleTradingViewButtonCallback()
         );
         this.containerElement.prepend(button);
-        this.traViBu = button;
+        this.tradingViewButton = button;
         //
         if (
             !!this.global.isReport &&
@@ -49,10 +49,10 @@ class Menu {
                 this.reportTradingResult(this)
             );
             this.containerElement.append(button);
-            this.repBu = button;
+            this.reportButton = button;
         }
         //
-        this.setBu.classList.replace("fa-sign-in", "fa-cog");
+        this.settingButton.classList.replace("fa-sign-in", "fa-cog");
         //
         this.interval = setInterval(() => {
             this.blinkLightWeightButton(this);
@@ -61,16 +61,16 @@ class Menu {
         }, 1000);
     };
     removeLoggedinElement = () => {
-        if (!!this.traViBu) this.traViBu.remove();
-        if (!!this.ligWeBu) this.ligWeBu.remove();
+        if (!!this.tradingViewButton) this.tradingViewButton.remove();
+        if (!!this.lightWeightButton) this.lightWeightButton.remove();
         if (
             !!this.global.isReport &&
             this.global.isOpeningMarket &&
             !this.global.isReportedResult
         )
-            if (!!this.repBu) this.repBu.remove();
+            if (!!this.reportButton) this.reportButton.remove();
         //
-        this.setBu.classList.replace("fa-cog", "fa-sign-in");
+        this.settingButton.classList.replace("fa-cog", "fa-sign-in");
         //
         clearInterval(this.interval);
     };
@@ -83,13 +83,13 @@ class Menu {
             this.callback.togglePopupCallback(true)
         );
         this.containerElement.append(button);
-        this.setBu = button;
+        this.settingButton = button;
     };
     blinkLightWeightButton = self => {
         if (self.global.isInSession()) {
-            if (self.ligWeBu.classList.contains("dark"))
-                self.ligWeBu.classList.remove("dark");
-            else self.ligWeBu.classList.add("dark");
+            if (self.lightWeightButton.classList.contains("dark"))
+                self.lightWeightButton.classList.remove("dark");
+            else self.lightWeightButton.classList.add("dark");
         }
     };
     reportTradingResult = self => {
@@ -130,7 +130,7 @@ class Menu {
                                     "Đã gửi báo cáo"
                                 );
                         });
-                        self.repBu.remove();
+                        self.reportButton.remove();
                     } else if (json.message == "unauthorized")
                         self.callback.alertInvalidAccessCallback();
                     //
@@ -138,8 +138,8 @@ class Menu {
                 })
                 .catch(error => {
                     self.global.isReportedResult = false;
-                    self.global.a
-                        .h()
+                    self.global.alert
+                        .hide()
                         .then(() =>
                             self.global.alert.show(
                                 "error",
