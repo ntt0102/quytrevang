@@ -17,8 +17,9 @@ class CreateSoPlansTable extends Migration
             $table->id();
             $table->string('name');
             $table->integer('months');
-            $table->integer('price');
-            $table->json('renewal_price');
+            $table->float('price');
+            $table->float('highest_price');
+            $table->float('renewal_price');
             $table->timestamps();
         });
     }
