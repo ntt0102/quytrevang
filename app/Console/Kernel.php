@@ -50,7 +50,7 @@ class Kernel extends ConsoleKernel
         //
         $schedule->call(function () {
             if (get_global_value('openingMarketFlag') == '1')
-                app(\App\Services\VpsService::class)->exportToCsv();
+                app(\App\Services\SmartOrderService::class)->exportToCsv();
         })->dailyAt('14:35');
     }
 
