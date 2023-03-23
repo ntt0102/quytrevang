@@ -24,11 +24,13 @@ class LoginController extends CoreController
      */
     public function login(Request $request)
     {
+        if ($request->has('username')) {
+            $data = $this->loginService->login($request);
+            return $this->sendResponse($data);
+        }
         $payload = $this->decrypt($request);
         $data = $this->loginService->login($payload);
-        if ($payload->chanel == 'SmartOrder')
-            return $this->sendResponse($this->encrypt($data));
-        return $this->sendResponse($data);
+        return $this->sendResponse($this->encrypt($data));
     }
 
     /**

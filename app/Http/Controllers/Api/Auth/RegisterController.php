@@ -24,11 +24,13 @@ class RegisterController extends CoreController
      */
     public function createAccount(Request $request)
     {
+        if ($request->has('name')) {
+            $data = $this->registerService->createAccount($request);
+            return $this->sendResponse($data);
+        }
         $payload = $this->decrypt($request);
         $data = $this->registerService->createAccount($payload);
-        if ($payload->chanel == 'SmartOrder')
-            return $this->sendResponse($this->encrypt($data));
-        return $this->sendResponse($data);
+        return $this->sendResponse($this->encrypt($data));
     }
 
     /**
