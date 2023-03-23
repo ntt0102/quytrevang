@@ -1,6 +1,6 @@
 {
   "name": "SmartOrder",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "manifest_version": 3,
   "description": "Đặt lệnh phái sinh tiện lợi và chuyên nghiệp bằng thao tác kéo thả trên website SmartPro của công ty chứng khoán VPS.",
   "icons": {
@@ -30,12 +30,12 @@
   ],
   "web_accessible_resources": [
     {
+      "matches": [
+        "https://smartpro.vps.com.vn/v1/"
+      ],
       "resources": [
         "spinner.gif",
         "alert.wav"
-      ],
-      "matches": [
-        "https://smartpro.vps.com.vn/*"
       ]
     }
   ]
