@@ -44,7 +44,7 @@ class SmartOrderService extends CoreService
         $isOpeningMarket = $this->checkOpeningMarket();
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
-        $latestVersion = $this->parameterRepository->getValue($request->securities . 'SmartOrderVer');
+        $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
         $pCode = (int) $this->parameterRepository->getValue('representUser');
         $contactUser = $this->userRepository->findByCode($pCode);
         $config = [
