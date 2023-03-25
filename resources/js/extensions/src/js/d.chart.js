@@ -402,7 +402,7 @@ class Chart {
         container.append(button);
     };
     eventChartContextmenu = (e, self) => {
-        self.showOrderButton();
+        if (self.global.isSmartPro) self.showOrderButton();
         e.preventDefault();
     };
     eventChartClick = (e, self) => {

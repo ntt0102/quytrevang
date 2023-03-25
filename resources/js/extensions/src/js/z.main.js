@@ -30,6 +30,7 @@ class SmartOrder {
             alertInvalidAccessCallback: this.alertInvalidAccessCallback
         });
         this.registerFullscreenEvent();
+        this.detectVpsSystem();
     }
     //
     // Các phương thức
@@ -78,19 +79,23 @@ class SmartOrder {
         if (!visible || document.body.classList.contains("tradingview-chart")) {
             document.body.classList.remove("tradingview-chart");
             document.body.classList.remove("full-chart");
-            leftEl.innerText = "Lệnh thường";
-            rightEl.innerText = "Lệnh điều kiện";
-            orderEl.innerText = "DANH SÁCH LỆNH";
-            condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            if (this.global.isSmartPro) {
+                leftEl.innerText = "Lệnh thường";
+                rightEl.innerText = "Lệnh điều kiện";
+                orderEl.innerText = "DANH SÁCH LỆNH";
+                condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            }
         } else {
             this.togglePopupCallback(false);
             document.body.classList.add("tradingview-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("lightweight-chart");
-            leftEl.innerText = "LT";
-            rightEl.innerText = "LĐK";
-            orderEl.innerText = "LỆNH THƯỜNG";
-            condOrderEl.innerText = "L. ĐIỀU KIỆN";
+            if (this.global.isSmartPro) {
+                leftEl.innerText = "LT";
+                rightEl.innerText = "LĐK";
+                orderEl.innerText = "LỆNH THƯỜNG";
+                condOrderEl.innerText = "L. ĐIỀU KIỆN";
+            }
         }
     };
     toggleLightWeightButtonCallback = (visible = true) => {
@@ -105,25 +110,27 @@ class SmartOrder {
         if (!visible || document.body.classList.contains("lightweight-chart")) {
             document.body.classList.remove("lightweight-chart");
             document.body.classList.remove("full-chart");
-            leftEl.innerText = "Lệnh thường";
-            rightEl.innerText = "Lệnh điều kiện";
-            //
-            orderEl.classList.remove("fa", "fa-check-circle");
-            orderEl.innerText = "DANH SÁCH LỆNH";
-            condOrderEl.classList.remove("fa", "fa-question-circle");
-            condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            if (this.global.isSmartPro) {
+                leftEl.innerText = "Lệnh thường";
+                rightEl.innerText = "Lệnh điều kiện";
+                orderEl.classList.remove("fa", "fa-check-circle");
+                orderEl.innerText = "DANH SÁCH LỆNH";
+                condOrderEl.classList.remove("fa", "fa-question-circle");
+                condOrderEl.innerText = "DANH SÁCH LỆNH ĐIỀU KIỆN";
+            }
         } else {
             this.togglePopupCallback(false);
             document.body.classList.add("lightweight-chart");
             document.body.classList.add("full-chart");
             document.body.classList.remove("tradingview-chart");
-            leftEl.innerText = "LT";
-            rightEl.innerText = "LĐK";
-            //
-            orderEl.classList.add("fa", "fa-check-circle");
-            orderEl.innerText = "";
-            condOrderEl.classList.add("fa", "fa-question-circle");
-            condOrderEl.innerText = "";
+            if (this.global.isSmartPro) {
+                leftEl.innerText = "LT";
+                rightEl.innerText = "LĐK";
+                orderEl.classList.add("fa", "fa-check-circle");
+                orderEl.innerText = "";
+                condOrderEl.classList.add("fa", "fa-question-circle");
+                condOrderEl.innerText = "";
+            }
         }
     };
     getReportDataCallback = () => {
@@ -221,6 +228,11 @@ class SmartOrder {
                 if (document.fullscreenElement) document.exitFullscreen();
                 else document.documentElement.requestFullscreen();
             });
+    };
+    detectVpsSystem = () => {
+        const site = window.location.hostname.split(".")[0];
+        document.body.classList.add(site);
+        this.global.isSmartPro = site == "smartpro";
     };
 }
 

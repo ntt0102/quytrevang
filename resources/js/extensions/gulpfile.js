@@ -4,6 +4,7 @@ const minifyCss = require("gulp-clean-css");
 const sourceMap = require("gulp-sourcemaps");
 const concat = require("gulp-concat");
 const headerComment = require("gulp-header-comment");
+const sass = require("gulp-sass")(require("sass"));
 
 const bundleJs = () => {
     return (
@@ -24,7 +25,7 @@ const bundleJs = () => {
 };
 const bundleCss = () => {
     return (
-        src("./src/css/**/*.css")
+        src("./src/sass/**/*.scss")
             .pipe(sourceMap.init())
             .pipe(concat("smart-order.min.css"))
             // .pipe(minifyCss())
@@ -35,6 +36,7 @@ const bundleCss = () => {
             //         <%= pkg.license %>
             //     `)
             // )
+            .pipe(sass().on("error", sass.logError))
             .pipe(sourceMap.write())
             .pipe(dest("./dist/css"))
     );
@@ -42,7 +44,7 @@ const bundleCss = () => {
 
 const devWatch = () => {
     watch("./src/js/**/*.js", bundleJs);
-    watch("./src/css/**/*.css", bundleCss);
+    watch("./src/sass/**/*.scss", bundleCss);
 };
 
 exports.bundleJs = bundleJs;
