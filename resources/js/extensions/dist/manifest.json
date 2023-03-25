@@ -9,7 +9,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://smartpro.vps.com.vn/v1/"
+        "https://smartpro.vps.com.vn/v1/",
+        "https://smarteasy.vps.com.vn/v1/"
       ],
       "js": [
         "js/moment.min.js",
@@ -31,7 +32,8 @@
   "web_accessible_resources": [
     {
       "matches": [
-        "https://smartpro.vps.com.vn/*"
+        "https://smartpro.vps.com.vn/*",
+        "https://smarteasy.vps.com.vn/*"
       ],
       "resources": [
         "spinner.gif",
