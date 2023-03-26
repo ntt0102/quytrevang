@@ -25,6 +25,7 @@ class CreateSmartOrdersTable extends Migration
             $table->integer('contracts')->default(1);
             $table->integer('take_profit')->default(3);
             $table->integer('stop_loss')->default(2);
+            $table->boolean('tpsl')->default(1);
             $table->boolean('volume')->default(0);
             $table->boolean('view_chart')->default(1);
             $table->boolean('report')->default(0);

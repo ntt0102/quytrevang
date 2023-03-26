@@ -24,6 +24,7 @@ class SmartOrder extends CoreModel
         'contracts',
         'take_profit',
         'stop_loss',
+        'tpsl',
         'volume',
         'view_chart',
         'report'

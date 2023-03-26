@@ -29,6 +29,19 @@ class SmartOrderController extends CoreController
     }
 
     /**
+     * Get config
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getBackground(Request $request)
+    {
+        $data = $this->smartOrderService->getBackground($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
+    }
+
+    /**
      * Set option
      *
      * @param \Illuminate\Http\Request $request

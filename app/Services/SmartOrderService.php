@@ -9,6 +9,7 @@ use App\Repositories\ParameterRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\TradeRepository;
 use App\Repositories\SmartOrderRepository;
+use App\Repositories\SoPlanRepository;
 use App\Events\UpdateTradeEvent;
 
 class SmartOrderService extends CoreService
@@ -17,17 +18,20 @@ class SmartOrderService extends CoreService
     private $userRepository;
     private $tradeRepository;
     private $smartOrderRepository;
+    private $soPlanRepository;
 
     public function __construct(
         ParameterRepository $parameterRepository,
         UserRepository $userRepository,
         TradeRepository $tradeRepository,
-        SmartOrderRepository $smartOrderRepository
+        SmartOrderRepository $smartOrderRepository,
+        SoPlanRepository $soPlanRepository
     ) {
         $this->parameterRepository = $parameterRepository;
         $this->userRepository = $userRepository;
         $this->tradeRepository = $tradeRepository;
         $this->smartOrderRepository = $smartOrderRepository;
+        $this->soPlanRepository = $soPlanRepository;
     }
 
     /**
@@ -64,6 +68,7 @@ class SmartOrderService extends CoreService
             'chartType' => $so->chart_type,
             'takeProfit' => $so->take_profit,
             'stopLoss' => $so->stop_loss,
+            'isTpSl' => !!$so->tpsl,
             'isVolume' => !!$so->volume,
             'isViewChart' => !!$so->view_chart,
             'isReport' => !!$so->report,
@@ -72,7 +77,37 @@ class SmartOrderService extends CoreService
                 'email' => $contactUser->email,
                 'phone' => $contactUser->phone,
             ],
-            'bankAccount' => $contactUser->bank_account
+            'bankAccount' => $contactUser->bank_account,
+            'pricing' => $this->soPlanRepository->findAll(),
+        ];
+        return [
+            'isOk' => true,
+            'config' => $config
+        ];
+    }
+
+    /**
+     * Get Background
+     *
+     * @param $request
+     * 
+     */
+    public function getBackground($request)
+    {
+        $so = request()->user()->smartOrder;
+        if (!$so->validDevice($request->deviceId)) return ['isOk' => false];
+        //
+        $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
+        $pCode = (int) $this->parameterRepository->getValue('representUser');
+        $contactUser = $this->userRepository->findByCode($pCode);
+        $config = [
+            'latestVersion' => $latestVersion,
+            'contact' => [
+                'email' => $contactUser->email,
+                'phone' => $contactUser->phone,
+            ],
+            'bankAccount' => $contactUser->bank_account,
+            'pricing' => $this->soPlanRepository->findAll(),
         ];
         return [
             'isOk' => true,
@@ -100,6 +135,7 @@ class SmartOrderService extends CoreService
                     'contracts' => $request->contractNumber,
                     'take_profit' => $request->takeProfit,
                     'stop_loss' => $request->stopLoss,
+                    'tpsl' => $request->isTpSl,
                     'volume' => $request->isVolume,
                     'view_chart' => $request->isViewChart,
                 ]);
