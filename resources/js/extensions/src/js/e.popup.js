@@ -584,10 +584,48 @@ class Popup {
         item.className = "item";
         list.append(item);
         var label = document.createElement("div");
-        label.innerText = "1. Chọn thời gian:";
+        label.innerText = "1. Chọn lần mua:";
+        label.className = "title";
         item.append(label);
         var select = document.createElement("select");
-        select.style.width = "70px";
+        select.style.width = "80px";
+        [
+            { t: "Mua mới", v: 1 },
+            { t: "Gia hạn", v: 2 }
+        ].forEach(item => {
+            var option = document.createElement("option");
+            option.value = item.v;
+            option.text = item.t;
+            select.appendChild(option);
+        });
+        this.buyType = 2;
+        select.value = this.buyType;
+        select.addEventListener("change", e => {
+            this.buyType = e.target.value;
+            if (!!this.plan) {
+                const temp = this.updatePlanInfo(this.buyType, this.plan);
+                this.planPrice = temp.planPrice;
+                this.planSaveMoney = temp.planSaveMoney;
+                if (this.deviceNumber > 0) {
+                    this.updatePaymentInfo(
+                        this.deviceNumber,
+                        this.planPrice,
+                        this.planSaveMoney
+                    );
+                }
+            }
+        });
+        item.append(select);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("div");
+        label.innerText = "2. Chọn thời gian:";
+        label.className = "title";
+        item.append(label);
+        var select = document.createElement("select");
+        select.style.width = "80px";
         var option = document.createElement("option");
         option.value = 0;
         option.text = "";
@@ -598,50 +636,97 @@ class Popup {
             option.text = item.name;
             select.appendChild(option);
         });
-        this.planSelect = select;
+        select.addEventListener("change", e => {
+            const value = e.target.value;
+            if (value > 0) {
+                this.plan = this.global.plans.filter(p => p.months == value)[0];
+                const temp = this.updatePlanInfo(this.buyType, this.plan);
+                this.planPrice = temp.planPrice;
+                this.planSaveMoney = temp.planSaveMoney;
+                this.priceInfo.style.display = "flex";
+                //
+                if (this.deviceNumber > 0) {
+                    this.updatePaymentInfo(
+                        this.deviceNumber,
+                        this.planPrice,
+                        this.planSaveMoney
+                    );
+                }
+            } else {
+                this.updatePaymentInfo();
+                this.priceInfo.style.display = "none";
+            }
+        });
         item.append(select);
         //
         var item = document.createElement("div");
         item.className = "item";
         item.style.display = "none";
         list.append(item);
+        this.priceInfo = item;
         var label = document.createElement("div");
-        label.innerText = "50.000 ₫";
         item.append(label);
         this.priceLabel = label;
         var label = document.createElement("div");
-        label.innerText = "Giá gia hạn: 70.000 ₫";
         item.append(label);
-        this.renewalPriceLabel = label;
-        //
-        var item = document.createElement("div");
-        item.className = "item";
-        list.append(item);
-        var label = document.createElement("div");
-        label.innerText = "2. Chọn số thiết bị:";
-        item.append(label);
-        var input = document.createElement("input");
-        input.type = "number";
-        input.style.width = "70px";
-        input.style.height = "21px";
-        input.value = this.global.contractNumber;
-        this.deviceLimitInput = input;
-        item.append(input);
-        //
+        this.saveMoneyLabel = label;
         //
         var item = document.createElement("div");
         item.className = "item";
         list.append(item);
         var label = document.createElement("div");
         label.innerText = "3. Chọn số thiết bị:";
+        label.className = "title";
         item.append(label);
         var input = document.createElement("input");
         input.type = "number";
-        input.style.width = "70px";
+        input.style.width = "80px";
         input.style.height = "21px";
-        input.value = this.global.contractNumber;
-        this.deviceLimitInput = input;
+        input.addEventListener("change", e => {
+            this.deviceNumber = Math.floor(e.target.value);
+            this.updatePaymentInfo(
+                this.deviceNumber,
+                this.planPrice,
+                this.planSaveMoney
+            );
+        });
         item.append(input);
+        //
+        var label = document.createElement("div");
+        label.innerText = "4. Thanh toán:";
+        label.className = "title";
+        list.append(label);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var bank = document.createElement("div");
+        item.append(bank);
+        var info = document.createElement("div");
+        info.innerText = `${this.global.bankAccount.bank_name}: ${this.global.bankAccount.account_number}`;
+        bank.append(info);
+        var info = document.createElement("div");
+        info.innerText = `Tên: ${this.global.bankAccount.account_name.toLowerCase()}`;
+        bank.append(info);
+        var info = document.createElement("div");
+        info.innerText = `NDCK: so ${
+            this.global.isLoggedin ? this.global.user.phone : "<SĐT>"
+        }`;
+        bank.append(info);
+        var info = document.createElement("div");
+        bank.append(info);
+        this.totalPriceInfo = info;
+        var info = document.createElement("div");
+        bank.append(info);
+        this.totalSaveMoneyInfo = info;
+
+        var qrCode = document.createElement("img");
+        qrCode.style.width = "90px";
+        qrCode.style.height = "90px";
+        qrCode.style.visibility = "hidden";
+        item.append(qrCode);
+        this.qrCodeImg = qrCode;
+
         //
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
@@ -1000,5 +1085,57 @@ class Popup {
                 .hide()
                 .then(() => this.global.alert.show("error", msg, true, true));
         else this.global.alert.show("error", msg);
+    };
+    currencyFormat = input => {
+        return new Intl.NumberFormat("vi-VN", {
+            style: "currency",
+            currency: "VND"
+        }).format(input);
+    };
+    updatePlanInfo = (buyType, plan) => {
+        const isRenewal = buyType == "2";
+        const pricePerDevice = isRenewal ? plan.renewal_price : plan.price;
+        this.priceLabel.innerText = `${this.currencyFormat(
+            pricePerDevice
+        )}/tháng`;
+        const planPrice = plan.months * pricePerDevice;
+        const planSaveMoney =
+            plan.months * (plan.highest_price - pricePerDevice);
+        this.saveMoneyLabel.innerText = `Tiết kiệm: ${this.currencyFormat(
+            planSaveMoney
+        )}`;
+        return {
+            planPrice,
+            planSaveMoney
+        };
+    };
+    updatePaymentInfo = (
+        deviceNumber = 0,
+        planPrice = 0,
+        planSaveMoney = 0
+    ) => {
+        if (deviceNumber > 0) {
+            const price = deviceNumber * planPrice;
+            this.totalPriceInfo.innerText = `Tổng giá: ${this.currencyFormat(
+                price
+            )}`;
+            this.totalSaveMoneyInfo.innerText = `Tiết kiệm: ${this.currencyFormat(
+                deviceNumber * planSaveMoney
+            )}`;
+            this.qrCodeImg.src = `https://img.vietqr.io/image/${
+                this.global.bankAccount.bank_name
+            }-${
+                this.global.bankAccount.account_number
+            }-fcaSnpq.jpg?accountName=${
+                this.global.bankAccount.account_name
+            }&amount=${price}&addInfo=so ${
+                this.global.isLoggedin ? this.global.user.phone : ""
+            }`;
+            this.qrCodeImg.style.visibility = "visible";
+        } else {
+            this.totalPriceInfo.innerText = "";
+            this.totalSaveMoneyInfo.innerText = "";
+            this.qrCodeImg.style.visibility = "hidden";
+        }
     };
 }
