@@ -51,7 +51,7 @@ class Popup {
         wrapper.className = "wrapper";
         wrapper.addEventListener("submit", e => this.login(e, this));
         //
-        var p = document.createElement("label");
+        var p = document.createElement("span");
         wrapper.append(p);
         p.className = "invalid";
         this.loginMessage = p;
@@ -94,7 +94,14 @@ class Popup {
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
         wrapper.append(routeWrapper);
-        var route = document.createElement("label");
+        var route = document.createElement("span");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Gia hạn";
+        route.addEventListener("click", () => {
+            this.setActivedSection(this.renewalContainer);
+        });
+        var route = document.createElement("span");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Đăng ký";
@@ -102,7 +109,18 @@ class Popup {
             this.setActivedSection(this.registerContainer);
             this.registerName.focus();
         });
-        var route = document.createElement("label");
+        //
+        var routeWrapper = document.createElement("div");
+        routeWrapper.className = "link-group";
+        wrapper.append(routeWrapper);
+        var route = document.createElement("span");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Phần mềm";
+        route.addEventListener("click", () => {
+            this.setActivedSection(this.aboutContainer);
+        });
+        var route = document.createElement("span");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Trang chủ";
@@ -177,7 +195,7 @@ class Popup {
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
         wrapper.append(routeWrapper);
-        var route = document.createElement("label");
+        var route = document.createElement("span");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Đăng nhập";
@@ -185,7 +203,7 @@ class Popup {
             this.setActivedSection(this.loginContainer);
             this.loginUsername.focus();
         });
-        var route = document.createElement("label");
+        var route = document.createElement("span");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Trang chủ";
@@ -197,6 +215,7 @@ class Popup {
         this.createOptionContainer();
         this.createInfoContainer();
         this.createAboutContainer();
+        this.createRenewalContainer();
         //
         this.setActivedSection(this.optionContainer);
         this.toggleLogoutButton(true);
@@ -330,14 +349,14 @@ class Popup {
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
         wrapper.append(routeWrapper);
-        var route = document.createElement("label");
+        var route = document.createElement("span");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Dịch vụ";
         route.addEventListener("click", () =>
             this.setActivedSection(this.infoContainer)
         );
-        var route = document.createElement("label");
+        var route = document.createElement("span");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Phần mềm";
@@ -359,7 +378,7 @@ class Popup {
         var list = document.createElement("div");
         list.className = "list";
         wrapper.append(list);
-        var title = document.createElement("label");
+        var title = document.createElement("span");
         list.append(title);
         title.className = "title";
         title.innerText = "Thông tin tài khoản:";
@@ -406,7 +425,7 @@ class Popup {
         var list = document.createElement("div");
         list.className = "list";
         wrapper.append(list);
-        var title = document.createElement("label");
+        var title = document.createElement("span");
         list.append(title);
         title.className = "title";
         title.innerText = "Thông tin gói dịch vụ:";
@@ -443,12 +462,12 @@ class Popup {
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
         wrapper.append(routeWrapper);
-        var route = document.createElement("label");
+        var route = document.createElement("span");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Trở về";
         route.addEventListener("click", () =>
-            this.setActivedSection(this.optionContainer)
+            this.setActivedSection(this.prevSection)
         );
     };
     createAboutContainer = () => {
@@ -519,7 +538,7 @@ class Popup {
             var download = document.createElement("div");
             download.className = "download";
             wrapper.append(download);
-            var label = document.createElement("label");
+            var label = document.createElement("span");
             download.append(label);
             label.innerHTML = "Đã có phiên bản cập nhật mới.";
             var button = document.createElement("button");
@@ -531,19 +550,108 @@ class Popup {
         var routeWrapper = document.createElement("div");
         routeWrapper.className = "link-group";
         wrapper.append(routeWrapper);
-        var route = document.createElement("label");
+        var route = document.createElement("span");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Trở về";
         route.addEventListener("click", () =>
-            this.setActivedSection(this.optionContainer)
+            this.setActivedSection(this.prevSection)
         );
-        var route = document.createElement("label");
+        var route = document.createElement("span");
         routeWrapper.append(route);
         route.className = "link";
         route.innerText = "Trang chủ";
         route.addEventListener("click", () =>
             window.open("https://www.w3schools.com")
+        );
+    };
+    createRenewalContainer = () => {
+        var container = document.createElement("div");
+        container.id = "renewalContainer";
+        container.className = "section";
+        this.containerElement.append(container);
+        this.renewalContainer = container;
+        //
+        var wrapper = document.createElement("div");
+        wrapper.className = "wrapper";
+        container.append(wrapper);
+        //
+        var list = document.createElement("div");
+        list.className = "list";
+        wrapper.append(list);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("div");
+        label.innerText = "1. Chọn thời gian:";
+        item.append(label);
+        var select = document.createElement("select");
+        select.style.width = "70px";
+        var option = document.createElement("option");
+        option.value = 0;
+        option.text = "";
+        select.appendChild(option);
+        this.global.plans.forEach((item, index) => {
+            var option = document.createElement("option");
+            option.value = item.months;
+            option.text = item.name;
+            select.appendChild(option);
+        });
+        this.planSelect = select;
+        item.append(select);
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        item.style.display = "none";
+        list.append(item);
+        var label = document.createElement("div");
+        label.innerText = "50.000 ₫";
+        item.append(label);
+        this.priceLabel = label;
+        var label = document.createElement("div");
+        label.innerText = "Giá gia hạn: 70.000 ₫";
+        item.append(label);
+        this.renewalPriceLabel = label;
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("div");
+        label.innerText = "2. Chọn số thiết bị:";
+        item.append(label);
+        var input = document.createElement("input");
+        input.type = "number";
+        input.style.width = "70px";
+        input.style.height = "21px";
+        input.value = this.global.contractNumber;
+        this.deviceLimitInput = input;
+        item.append(input);
+        //
+        //
+        var item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        var label = document.createElement("div");
+        label.innerText = "3. Chọn số thiết bị:";
+        item.append(label);
+        var input = document.createElement("input");
+        input.type = "number";
+        input.style.width = "70px";
+        input.style.height = "21px";
+        input.value = this.global.contractNumber;
+        this.deviceLimitInput = input;
+        item.append(input);
+        //
+        var routeWrapper = document.createElement("div");
+        routeWrapper.className = "link-group";
+        wrapper.append(routeWrapper);
+        var route = document.createElement("span");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Trở về";
+        route.addEventListener("click", () =>
+            this.setActivedSection(this.prevSection)
         );
     };
     removeLoggedinElement = () => {
@@ -877,7 +985,11 @@ class Popup {
         var activeEl = document.querySelector(
             "#optionViewContainer .section.active"
         );
-        if (activeEl) activeEl.classList.remove("active");
+        if (activeEl) {
+            this.prevSection = activeEl;
+            activeEl.classList.remove("active");
+        }
+        this.currSection = el;
         el.classList.add("active");
     };
     alertInvalidAccess = (h = false) => {

@@ -46,6 +46,8 @@ class SmartOrder {
             document.getElementById("right_price").value = "MTL";
         } else {
             await this.popup.getServerBackground();
+            this.popup.createAboutContainer();
+            this.popup.createRenewalContainer();
             this.menu.settingButton.click();
         }
     };

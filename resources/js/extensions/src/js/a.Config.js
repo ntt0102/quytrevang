@@ -3,8 +3,8 @@ class Config {
     version = "2.0.2";
     publishDate = "17/03/2023";
     developer = "Tho PS";
-    domain1 = "https://quytrevang.nguyenvanxuanphu.com";
-    domain = "http://localhost";
+    domain = "https://quytrevang.nguyenvanxuanphu.com";
+    domain1 = "http://localhost";
     endpoint = {
         socket: "https://datafeed.vps.com.vn",
         getConfig: "/api/so/get-config",
