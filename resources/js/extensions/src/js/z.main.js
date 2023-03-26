@@ -44,7 +44,10 @@ class SmartOrder {
                 "sohopdong"
             ).value = this.global.contractNumber;
             document.getElementById("right_price").value = "MTL";
-        } else this.menu.settingButton.click();
+        } else {
+            await this.popup.getServerBackground();
+            this.menu.settingButton.click();
+        }
     };
     loginCallback = async () => {
         this.global.alert.show("warning", "Đang khởi tạo biểu đồ . . .", false);

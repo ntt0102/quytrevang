@@ -721,7 +721,6 @@ class Popup {
     getServerConfig = () => {
         return new Promise((resolve, reject) => {
             const data = this.global.crypto.encrypt({
-                securities: this.global.securities,
                 deviceId: this.global.deviceId
             });
             const url = this.global.domain + this.global.endpoint.getConfig;
@@ -736,7 +735,7 @@ class Popup {
                 .then(response => response.json())
                 .then(json => {
                     json = this.global.crypto.decrypt(json);
-                    // console.log("serverConfig", json);
+                    console.log("serverConfig", json);
                     if (json.isOk)
                         for (const key in json.config)
                             this.global[key] = json.config[key];
@@ -803,6 +802,36 @@ class Popup {
                             );
                     }
                     resolve();
+                });
+        });
+    };
+    getServerBackground = () => {
+        return new Promise((resolve, reject) => {
+            const data = this.global.crypto.encrypt({
+                deviceId: this.global.deviceId
+            });
+            const url = this.global.domain + this.global.endpoint.getBackground;
+            fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: data
+            })
+                .then(response => response.json())
+                .then(json => {
+                    json = this.global.crypto.decrypt(json);
+                    console.log("serverBackground", json);
+                    if (json.isOk)
+                        for (const key in json.config)
+                            this.global[key] = json.config[key];
+                    else this.alertInvalidAccess();
+                    resolve();
+                })
+                .catch(err => {
+                    console.log(err);
+                    var choice = confirm(
+                        "Get server config error. Refresh now?"
+                    );
+                    if (choice) location.reload();
                 });
         });
     };

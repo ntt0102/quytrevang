@@ -19,7 +19,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('send-comment', 'AppController@sendComment');
     Route::get('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
-    Route::post('so/background', 'User\SmartOrderController@getBackground')->middleware('cors');
+    Route::post('so/background', 'SmartOrderController@getBackground')->middleware('cors');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login')->name('login')->middleware('cors');
@@ -46,6 +46,12 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     });
 
     Route::group(['middleware' => 'auth:api'], function () {
+        Route::group(['prefix' => 'so', 'middleware' => 'cors'], function () {
+            Route::post('report', 'SmartOrderController@report');
+            Route::post('get-config', 'SmartOrderController@getConfig');
+            Route::post('set-config', 'SmartOrderController@setConfig');
+            Route::post('get-chart', 'SmartOrderController@getChartData');
+        });
         Route::group(['namespace' => 'User'], function () {
             Route::group(['prefix' => 'notifications'], function () {
                 Route::get('/', 'NotificationController@fetch');
@@ -58,12 +64,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             Route::group(['prefix' => 'subscriptions'], function () {
                 Route::post('/', 'PushSubscriptionController@update');
                 Route::post('destroy', 'PushSubscriptionController@destroy');
-            });
-            Route::group(['prefix' => 'so', 'middleware' => 'cors'], function () {
-                Route::post('report', 'SmartOrderController@report');
-                Route::post('get-config', 'SmartOrderController@getConfig');
-                Route::post('set-config', 'SmartOrderController@setConfig');
-                Route::post('get-chart', 'SmartOrderController@getChartData');
             });
         });
 

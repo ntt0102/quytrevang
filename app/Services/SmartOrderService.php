@@ -94,9 +94,6 @@ class SmartOrderService extends CoreService
      */
     public function getBackground($request)
     {
-        $so = request()->user()->smartOrder;
-        if (!$so->validDevice($request->deviceId)) return ['isOk' => false];
-        //
         $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
         $pCode = (int) $this->parameterRepository->getValue('representUser');
         $contactUser = $this->userRepository->findByCode($pCode);
