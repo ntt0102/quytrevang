@@ -26,6 +26,7 @@ class PermissionsTableSeeder extends Seeder
         Permission::create(['name' => 'trades@view']);
         Permission::create(['name' => 'trades@edit']);
         Permission::create(['name' => 'finbooks@control']);
+        Permission::create(['name' => 'smartorders@control']);
 
         Permission::create(['name' => 'setting@control']);
         Permission::create(['name' => 'setting.parameters@control']);

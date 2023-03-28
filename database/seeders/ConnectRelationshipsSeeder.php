@@ -42,6 +42,7 @@ class ConnectRelationshipsSeeder extends Seeder
         $adminRole->givePermissionTo('trades@view');
         $adminRole->givePermissionTo('trades@edit');
         $adminRole->givePermissionTo('finbooks@control');
+        $adminRole->givePermissionTo('smartorders@control');
         $adminRole->givePermissionTo('setting.parameters@control');
         $adminRole->givePermissionTo('setting.database@control');
         $adminRole->givePermissionTo('setting.command@control');

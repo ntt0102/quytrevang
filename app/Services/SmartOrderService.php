@@ -343,4 +343,70 @@ class SmartOrderService extends CoreService
         $unique_times = array_unique($times);
         return array_values(array_intersect_key($lines, $unique_times));
     }
+
+    /**
+     * Return all the SO
+     * 
+     * @param $request
+     *
+     * @return array
+     */
+    public function getList($request)
+    {
+        $sos = $this->smartOrderRepository->findAll();
+        $users = $this->userRepository->findAllWithTrashed(['code', 'name']);
+        return [
+            'sos' => $sos,
+            'users' => $users,
+        ];
+    }
+
+    /**
+     * Save
+     * 
+     * @param $request
+     * 
+     */
+    public function saveSo($request)
+    {
+        return $this->transaction(function () use ($request) {
+            foreach ($request->changes as $change) {
+                $response = [];
+                switch ($change['type']) {
+                    case 'insert':
+                        $data = [
+                            "display" => $change['data']['display'],
+                            "name" => $change['data']['name'],
+                            "balance" => $change['data']['balance'],
+                            "last_transaction" => $change['data']['last_transaction']
+                        ];
+                        $finbook = $this->smartOrderRepository->create($data);
+                        $isOk = !!$finbook;
+                        $response['isOk'] = $isOk;
+                        break;
+
+                    case 'update':
+                        $finbook = $this->smartOrderRepository->findById($change['key']);
+                        $data = [
+                            "display" => $change['data']['display'],
+                            "name" => $change['data']['name'],
+                            "balance" => $change['data']['balance'],
+                            "last_transaction" => $change['data']['last_transaction']
+                        ];
+                        $hasChangedBalance = $data["balance"] != $finbook->balance;
+                        $isOk = $this->smartOrderRepository->update($finbook, $data);
+                        $response['isOk'] = $isOk;
+                        break;
+
+                    case 'remove':
+                        $finbook = $this->smartOrderRepository->findById($change['key']);
+                        $isOk = $this->smartOrderRepository->delete($finbook);
+                        $response['isOk'] = $isOk;
+                        break;
+                }
+                if (!$response['isOk']) break;
+            }
+            return $response;
+        });
+    }
 }

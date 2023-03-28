@@ -45,6 +45,12 @@ export default [
         permission: "trades@view"
     },
     {
+        text: i18n.t("admin.smartorders.title"),
+        name: "smartorders",
+        icon: "far fa-store",
+        permission: "smartorders@control"
+    },
+    {
         text: i18n.t("admin.comments.title"),
         name: "comments",
         icon: "far fa-comment",
