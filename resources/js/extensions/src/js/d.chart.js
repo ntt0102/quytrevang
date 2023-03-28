@@ -519,11 +519,20 @@ class Chart {
     //
     showOrderButton = () => {
         if (this.callback.getOrderPositionCallback()) {
-            if (!this.order.tp.hasOwnProperty("line")) {
+            if (
+                this.order.entry.hasOwnProperty("line") &&
+                !this.order.tp.hasOwnProperty("line")
+            ) {
                 this.tpslOrderButton.style.left =
-                    +(this.crosshair.x + 10) + "px";
+                    +(
+                        this.crosshair.x +
+                        (this.crosshair.x > innerWidth - 61 ? -61 : 1)
+                    ) + "px";
                 this.tpslOrderButton.style.top =
-                    +(this.crosshair.y + 10) + "px";
+                    +(
+                        this.crosshair.y +
+                        (this.crosshair.y > innerHeight - 51 ? -51 : 1)
+                    ) + "px";
                 this.tpslOrderButton.style.display = "block";
             }
         } else {
@@ -533,14 +542,21 @@ class Chart {
                     price >= this.data.price.slice(-1)[0].value ? 1 : -1;
                 this.order.entry.price = price;
                 this.order.side = side;
+
                 this.entryOrderButton.style.left =
-                    +(this.crosshair.x + 10) + "px";
+                    +(
+                        this.crosshair.x +
+                        (this.crosshair.x > innerWidth - 71 ? -71 : 1)
+                    ) + "px";
                 this.entryOrderButton.style.top =
-                    +(this.crosshair.y + 10) + "px";
+                    +(
+                        this.crosshair.y +
+                        (this.crosshair.y > innerHeight - 61 ? -61 : 1)
+                    ) + "px";
                 this.entryOrderButton.style.background =
                     side > 0 ? "green" : "red";
                 this.entryOrderButton.innerText = `${
-                    side > 0 ? "Long" : "Short"
+                    side > 0 ? "LONG" : "SHORT"
                 } ${price}`;
                 this.entryOrderButton.style.display = "block";
             }
@@ -981,6 +997,7 @@ class Chart {
     secIntervalHandler = self => {
         if (self.callback.getOrderPositionCallback()) {
             if (
+                self.global.isTpSl &&
                 self.order.entry.hasOwnProperty("line") &&
                 !self.order.tp.hasOwnProperty("line")
             ) {

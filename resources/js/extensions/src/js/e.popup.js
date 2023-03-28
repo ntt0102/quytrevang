@@ -318,6 +318,19 @@ class Popup {
         item.className = "item";
         list.append(item);
         label = document.createElement("span");
+        label.innerText = "Tự động đặt TP/SL:";
+        item.append(label);
+        input = document.createElement("input");
+        input.type = "checkbox";
+        input.style.width = "17px";
+        input.checked = !!this.global.isTpSl;
+        this.isTpSlCheckbox = input;
+        item.append(input);
+        //
+        item = document.createElement("div");
+        item.className = "item";
+        list.append(item);
+        label = document.createElement("span");
         label.innerText = "Hiển thị biểu đồ khối lượng:";
         item.append(label);
         input = document.createElement("input");
@@ -955,6 +968,7 @@ class Popup {
                 contractNumber: +self.contractNumberInput.value,
                 takeProfit: +self.takeProfitInput.value,
                 stopLoss: +self.stopLossInput.value,
+                isTpSl: self.isTpSlCheckbox.checked,
                 isVolume: self.isVolumeCheckbox.checked,
                 isViewChart: self.isViewChartCheckbox.checked,
                 deviceId: self.global.deviceId
@@ -982,6 +996,7 @@ class Popup {
                             "success",
                             "Lưu cài đặt thành công"
                         );
+                        self.global.isTpSl = self.isTpSlCheckbox.checked;
                         self.callback.toggleChartVolumeCallback(
                             self.isVolumeCheckbox.checked
                         );
