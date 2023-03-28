@@ -93,8 +93,8 @@ class Menu {
         }
     };
     reportTradingResult = self => {
-        self.global.alert.show("warning", "Đang gửi báo cáo . . .", false);
         if (self.global.isOpeningMarket && !self.global.isReportedResult) {
+            self.global.alert.show("warning", "Đang gửi báo cáo . . .", false);
             self.global.isReportedResult = true;
             self.global.toggleSpinner(true);
             const url = self.global.domain + self.global.endpoint.report;
