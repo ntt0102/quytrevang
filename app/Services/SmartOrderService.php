@@ -362,6 +362,19 @@ class SmartOrderService extends CoreService
     }
 
     /**
+     * validate User
+     * 
+     * @param $request
+     *
+     * @return array
+     */
+    public function validateUser($request)
+    {
+        $sos = $this->smartOrderRepository->where([['user_code', $request->userCode]]);
+        return count($sos) == 0;
+    }
+
+    /**
      * Save
      * 
      * @param $request
@@ -375,32 +388,98 @@ class SmartOrderService extends CoreService
                 switch ($change['type']) {
                     case 'insert':
                         $data = [
-                            "display" => $change['data']['display'],
-                            "name" => $change['data']['name'],
-                            "balance" => $change['data']['balance'],
-                            "last_transaction" => $change['data']['last_transaction']
+                            "user_code" => $change['data']['user_code'],
+                            "started_at" => $change['data']['started_at'],
+                            "periods" => $change['data']['periods'],
+                            "device_limit" => $change['data']['device_limit'],
+                            "devices" => [],
                         ];
-                        $finbook = $this->smartOrderRepository->create($data);
-                        $isOk = !!$finbook;
+                        $so = $this->smartOrderRepository->create($data);
+                        $isOk = !!$so;
                         $response['isOk'] = $isOk;
                         break;
 
                     case 'update':
-                        $finbook = $this->smartOrderRepository->findById($change['key']);
+                        $so = $this->smartOrderRepository->findById($change['key']);
                         $data = [
-                            "display" => $change['data']['display'],
-                            "name" => $change['data']['name'],
-                            "balance" => $change['data']['balance'],
-                            "last_transaction" => $change['data']['last_transaction']
+                            "user_code" => $change['data']['user_code'],
+                            "started_at" => $change['data']['started_at'],
+                            "periods" => $change['data']['periods'],
+                            "device_limit" => $change['data']['device_limit'],
+                            "devices" => $change['data']['devices'],
                         ];
-                        $hasChangedBalance = $data["balance"] != $finbook->balance;
-                        $isOk = $this->smartOrderRepository->update($finbook, $data);
+                        $isOk = $this->smartOrderRepository->update($so, $data);
                         $response['isOk'] = $isOk;
                         break;
 
                     case 'remove':
-                        $finbook = $this->smartOrderRepository->findById($change['key']);
-                        $isOk = $this->smartOrderRepository->delete($finbook);
+                        $so = $this->smartOrderRepository->findById($change['key']);
+                        $isOk = $this->smartOrderRepository->delete($so);
+                        $response['isOk'] = $isOk;
+                        break;
+                }
+                if (!$response['isOk']) break;
+            }
+            return $response;
+        });
+    }
+
+    /**
+     * Return all the plans
+     * 
+     * @param $request
+     *
+     * @return array
+     */
+    public function getPlans($request)
+    {
+        $plans = $this->soPlanRepository->findAll(['*'], ['months', 'asc']);
+        return [
+            'plans' => $plans,
+        ];
+    }
+
+    /**
+     * Save Plans
+     * 
+     * @param $request
+     * 
+     */
+    public function savePlans($request)
+    {
+        return $this->transaction(function () use ($request) {
+            foreach ($request->changes as $change) {
+                $response = [];
+                switch ($change['type']) {
+                    case 'insert':
+                        $data = [
+                            "name" => $change['data']['name'],
+                            "months" => $change['data']['months'],
+                            "price" => $change['data']['price'],
+                            "renewal_price" => $change['data']['renewal_price'],
+                            "highest_price" => $change['data']['highest_price'],
+                        ];
+                        $plan = $this->soPlanRepository->create($data);
+                        $isOk = !!$plan;
+                        $response['isOk'] = $isOk;
+                        break;
+
+                    case 'update':
+                        $plan = $this->soPlanRepository->findById($change['key']);
+                        $data = [
+                            "name" => $change['data']['name'],
+                            "months" => $change['data']['months'],
+                            "price" => $change['data']['price'],
+                            "renewal_price" => $change['data']['renewal_price'],
+                            "highest_price" => $change['data']['highest_price'],
+                        ];
+                        $isOk = $this->soPlanRepository->update($plan, $data);
+                        $response['isOk'] = $isOk;
+                        break;
+
+                    case 'remove':
+                        $plan = $this->soPlanRepository->findById($change['key']);
+                        $isOk = $this->soPlanRepository->delete($plan);
                         $response['isOk'] = $isOk;
                         break;
                 }

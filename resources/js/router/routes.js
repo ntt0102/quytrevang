@@ -16,8 +16,8 @@ const Finbooks = () =>
     import(/* webpackPrefetch: true */ "../views/admin/Finbooks");
 const Trades = () =>
     import(/* webpackPrefetch: true */ "../views/admin/Trades");
-const Smartorders = () =>
-    import(/* webpackPrefetch: true */ "../views/admin/Smartorders");
+const SmartOrders = () =>
+    import(/* webpackPrefetch: true */ "../views/admin/SmartOrders");
 const Comments = () =>
     import(/* webpackPrefetch: true */ "../views/admin/Comments");
 
@@ -120,7 +120,7 @@ export default ({ authGuard, guestGuard }) => [
                 {
                     path: "admin-sos",
                     name: "smartorders",
-                    component: Smartorders,
+                    component: SmartOrders,
                     meta: {
                         title: i18n.t("admin.smartorders.title"),
                         permission: "smartorders@control"

@@ -276,19 +276,17 @@
         "smartorders": {
             "title": "Smart Order",
             "user": "Khách hàng",
-            "userPhone": "Số điện thoại",
-            "userEmail": "Email",
             "startedAt": "Ngày bắt đầu",
             "periods": "Thời gian",
-            "deviceLimit": "Số thiết bị",
-            "balance": "Số dư hiện tại",
-            "lastTransaction": "Nội dung GD gần nhất",
-            "display": "Thứ tự",
-            "updatedAt": "Ngày GD gần nhất",
-            "openNewBook": "Mở sổ mới",
-            "create": "Tạo sổ mới",
-            "edit": "Sửa sổ",
-            "createTransaction": "Tạo giao dịch"
+            "deviceLimit": "TB giới hạn",
+            "devices": "Thiết bị",
+            "clearDevices": "Xoá thiết bị",
+            "pricePlans": "Bảng giá",
+            "planName": "Tên",
+            "months": "Số tháng",
+            "planPrice": "Giá",
+            "renewalPrice": "Giá gia hạn",
+            "highestPrice": "Giá cao nhất"
         }
     },
     "models": {

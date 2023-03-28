@@ -34,7 +34,7 @@ const actions = {
         });
     },
     validateDuplicateIdNumber({ state, rootGetters }, param) {
-        console.log("validateDuplicateIdNumber", param);
+        // console.log("validateDuplicateIdNumber", param);
         const oldUser = state.users.find(x => x.id === param.data.id);
         if (!!oldUser && param.value == oldUser.identity.number)
             return Promise.resolve(true);

@@ -94,6 +94,19 @@ class SmartOrderController extends CoreController
     }
 
     /**
+     * validate User
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function validateUser(Request $request)
+    {
+        $data = $this->smartOrderService->validateUser($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Save
      *
      * @param Illuminate\Http\Request $request
@@ -103,6 +116,32 @@ class SmartOrderController extends CoreController
     public function saveSo(Request $request)
     {
         $data = $this->smartOrderService->saveSo($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Get Plans
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getPlans(Request $request)
+    {
+        $data = $this->smartOrderService->getPlans($request);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Save Plans
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function savePlans(Request $request)
+    {
+        $data = $this->smartOrderService->savePlans($request);
         return $this->sendResponse($data);
     }
 }

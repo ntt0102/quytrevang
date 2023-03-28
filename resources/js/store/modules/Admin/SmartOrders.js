@@ -3,23 +3,42 @@ import moment from "moment/moment";
 function initialState() {
     return {
         sos: [],
-        users: []
+        users: [],
+        plans: []
     };
 }
 
 const getters = {
     sos: state => state.sos,
-    users: state => state.users
+    users: state => state.users,
+    plans: state => state.plans
 };
 
 const actions = {
     fetch({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios.get("so/manage").then(response => {
-                console.log(response.data);
+                // console.log(response.data);
                 commit("setState", response.data);
                 resolve();
             });
+        });
+    },
+    validateDuplicateUser({ state, rootGetters }, param) {
+        const oldSo = state.sos.find(x => x.id === param.data.id);
+        if (!!oldSo && param.value == oldSo.user_code)
+            return Promise.resolve(true);
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "so/manage/validate-user",
+                    { userCode: param.value },
+                    { noLoading: true }
+                )
+                .then(response => {
+                    // console.log(response);
+                    resolve(response.data);
+                });
         });
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
@@ -31,22 +50,21 @@ const actions = {
             });
         });
     },
-    getFinbooksName({ commit, dispatch, getters, state, rootGetters }) {
+    getPlans({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios
-                .post("finbooks/name", null, { noLoading: true })
-                .then(response => {
-                    // console.log(response.data);
-                    resolve(response.data);
-                });
+            axios.get("so/plans").then(response => {
+                // console.log(response.data);
+                commit("setPlans", response.data);
+                resolve();
+            });
         });
     },
-    updateBalance({ commit, dispatch, getters, state, rootGetters }, param) {
+    savePlans({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("finbooks/update-balance", param).then(response => {
+            axios.post("so/plans", param).then(response => {
                 // console.log(response.data);
-                resolve(response.data.isOk);
-                if (response.data.isOk) dispatch("fetch");
+                resolve();
+                if (response.data.isOk) dispatch("getPlans");
             });
         });
     },
@@ -59,6 +77,9 @@ const mutations = {
     setState(state, data) {
         state.sos = data.sos;
         state.users = data.users;
+    },
+    setPlans(state, data) {
+        state.plans = data.plans;
     },
     resetState(state) {
         state = Object.assign(state, initialState());

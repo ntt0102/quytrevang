@@ -12,6 +12,11 @@
                 :column-auto-width="true"
                 :allow-column-reordering="true"
                 :allow-column-resizing="true"
+                :column-chooser="{
+                    enabled: true,
+                    mode: 'select',
+                    allowSearch: true
+                }"
                 column-resizing-mode="widget"
                 :paging="{ pageSize: 10 }"
                 :headerFilter="{ visible: true }"
@@ -26,6 +31,7 @@
                 }"
                 @contentReady="$mf.dataGridPreload(gridData, dataGrid)"
                 @init-new-row="onInitNewRow"
+                @toolbar-preparing="onToolbarPreparing"
                 @saved="onSave"
             >
                 <DxColumn
@@ -67,7 +73,7 @@
                 />
                 <DxColumn
                     data-field="device_limit"
-                    dataType="string"
+                    dataType="number"
                     :header-filter="{ allowSearch: true }"
                     :caption="$t('admin.smartorders.deviceLimit')"
                     :validation-rules="validationRules.deviceLimit"
@@ -80,6 +86,13 @@
                     }"
                     :caption="$t('admin.smartorders.startedAt')"
                 />
+                <DxColumn
+                    :visible="false"
+                    data-field="devices"
+                    dataType="string"
+                    :header-filter="{ allowSearch: true }"
+                    :caption="$t('admin.smartorders.devices')"
+                />
                 <template #commandCellTemplate="{ data }">
                     <DxToolbar
                         :items="[
@@ -90,21 +103,18 @@
                                 widget: 'dxButton',
                                 options: {
                                     type: 'default',
-                                    icon: 'far fa-envelope-open-dollar small',
-                                    hint: $t(
-                                        'admin.smartorders.createTransaction'
-                                    ),
-                                    text: $t(
-                                        'admin.smartorders.createTransaction'
-                                    ),
+                                    icon: 'far fa-empty-set small',
+                                    hint: $t('admin.smartorders.clearDevices'),
+                                    text: $t('admin.smartorders.clearDevices'),
                                     onClick: () =>
-                                        $refs.transactionFinbookPopup.show(
-                                            data.data
+                                        dataGrid.cellValue(
+                                            data.rowIndex,
+                                            'devices',
+                                            []
                                         )
                                 }
                             },
                             {
-                                visible: data.data.balance == 0,
                                 locateInMenu: 'auto',
                                 showText: 'inMenu',
                                 location: 'center',
@@ -123,20 +133,20 @@
                 </template>
             </DxDataGrid>
         </div>
-        <!-- <TransactionFinbookPopup ref="transactionFinbookPopup" /> -->
+        <PricePlansPopup ref="pricePlansPopup" />
     </div>
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
-// import TransactionFinbookPopup from "../../components/Popups/TransactionFinbookPopup.vue";
+import PricePlansPopup from "../../components/Popups/PricePlansPopup.vue";
 import adminSmartOrdersStore from "../../store/modules/Admin/SmartOrders";
 
 export default {
     components: {
         DxDataGrid,
-        DxColumn
-        // TransactionFinbookPopup
+        DxColumn,
+        PricePlansPopup
     },
     data() {
         return {
@@ -148,6 +158,13 @@ export default {
                         message:
                             this.$t("admin.smartorders.user") +
                             this.$mt.validations.required
+                    },
+                    {
+                        type: "async",
+                        validationCallback: this.validateDuplicateUser,
+                        message:
+                            this.$t("admin.smartorders.user") +
+                            this.$mt.validations.duplicate
                     }
                 ],
                 balance: [
@@ -198,7 +215,11 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Admin.smartorders", ["fetch", "save", "resetState"]),
+        ...mapActions("Admin.smartorders", [
+            "fetch",
+            "validateDuplicateUser",
+            "save"
+        ]),
         onSave(e) {
             this.$bus.emit("checkPin", () => this.save({ changes: e.changes }));
         },
@@ -207,6 +228,19 @@ export default {
         },
         onInitNewRow(e) {
             e.data.last_transaction = this.$t("admin.smartorders.openNewBook");
+        },
+        onToolbarPreparing(e) {
+            e.toolbarOptions.items.unshift({
+                location: "before",
+                widget: "dxButton",
+                options: {
+                    icon: "far fa-tags small",
+                    hint: this.$t("admin.smartorders.pricePlans"),
+                    onClick: () => {
+                        this.$refs.pricePlansPopup.show();
+                    }
+                }
+            });
         }
     }
 };

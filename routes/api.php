@@ -51,7 +51,13 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             Route::post('get-config', 'SmartOrderController@getConfig');
             Route::post('set-config', 'SmartOrderController@setConfig');
             Route::post('get-chart', 'SmartOrderController@getChartData');
-            Route::get('manage', 'SmartOrderController@getList');
+            Route::group(['middleware' => 'can:smartorders@control'], function () {
+                Route::get('manage', 'SmartOrderController@getList');
+                Route::post('manage/validate-user', 'SmartOrderController@validateUser');
+                Route::post('manage', 'SmartOrderController@saveSo');
+                Route::get('plans', 'SmartOrderController@getPlans');
+                Route::post('plans', 'SmartOrderController@savePlans');
+            });
         });
         Route::group(['namespace' => 'User'], function () {
             Route::group(['prefix' => 'notifications'], function () {
