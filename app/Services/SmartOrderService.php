@@ -149,7 +149,8 @@ class SmartOrderService extends CoreService
     public function getChartData($request)
     {
         $so = request()->user()->smartOrder;
-        if (!$so->validDevice($request->deviceId)) return ['isOk' => false, 'data' => []];
+        if (!$so->validDevice($request->deviceId))
+            return ['isOk' => false, 'data' => []];
         //
         return [
             'isOk' => true,

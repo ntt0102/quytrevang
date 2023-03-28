@@ -61,7 +61,7 @@ Route::get('test', function () {
     // $s = app(\App\Services\SmartOrderService::class)->exportToCsv();
     // $s = app(\App\Services\VpsService::class);
     // $s = $s->getInfo($s->getSymbol())->r;
-    // $s = app(\App\Services\VpsService::class)->getFromCsv('2023-01-30');
+    $s = app(\App\Services\SmartOrderService::class)->getFromCsv('2023-03-28');
     // $s = app(\App\Repositories\StrategyRepository::class)->getStrategies(-10, -5);
     // dd($s);
     // $n = now()->sub(date_interval_create_from_date_string('178 minutes'));
@@ -71,8 +71,8 @@ Route::get('test', function () {
     // $v = number_format('123.452', 2);
     // $s = is_numeric("1000.1");
     // $s = !![1, 2];
-    $s = \App\Models\User::find(1);
-    $s = $s->smartOrder->validDevice('24efbc2f1f3b09283ee0d2b246a665a01');
+    // $s = \App\Models\User::find(1);
+    // $s = $s->smartOrder->validDevice('24efbc2f1f3b09283ee0d2b246a665a01');
     // $s = date_create() < date_add(date_create($s->smartOrder->started_at), date_interval_create_from_date_string("7 days"));
     dd($s);
 })->middleware('cors');

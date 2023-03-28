@@ -847,7 +847,8 @@ class Chart {
                     resolve(json.data);
                     break;
                 } catch (e) {
-                    continue start;
+                    console.log(e);
+                    // continue start;
                 }
             }
         });

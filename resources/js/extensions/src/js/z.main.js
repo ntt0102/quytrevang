@@ -5,6 +5,7 @@ class SmartOrder {
         this.global.alert = new Alert();
         this.global.store = new Store();
         this.global.crypto = new Crypto(this.global);
+        this.global.deviceId = new DeviceUUID().get();
         this.global.isMobile = navigator.userAgentData.mobile;
         this.chart = new Chart(this.global, {
             getOrderPositionCallback: this.getOrderPositionCallback,
@@ -36,7 +37,7 @@ class SmartOrder {
     // Các phương thức
     init = async () => {
         this.popup.createNoLoginElement();
-        await this.popup.getDeviceId();
+        console.log("deviceId: ", this.global.deviceId);
         await this.popup.getUser();
         if (this.global.isLoggedin) {
             await this.loginCallback();

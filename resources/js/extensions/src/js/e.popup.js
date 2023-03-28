@@ -1041,16 +1041,6 @@ class Popup {
         this.global.alert.show("waring", "Phiên đăng nhập hết hạn");
         return false;
     };
-    getDeviceId = () => {
-        return new Promise(resolve => {
-            FingerprintJS.load()
-                .then(fp => fp.get())
-                .then(result => {
-                    this.global.deviceId = result.visitorId;
-                    resolve();
-                });
-        });
-    };
     toggle = (visible = true) => {
         if (!visible || this.containerElement.classList.contains("show"))
             this.containerElement.classList.remove("show");

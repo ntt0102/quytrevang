@@ -262,8 +262,7 @@ body {
                 z-index: 2002;
             }
 
-            .tradingview-chart
-                #taisanAccount
+            #taisanAccount
                 > div:first-child
                 > div:first-child
                 > div:last-child {
@@ -322,23 +321,11 @@ body {
 
 @media (max-width: 991.98px) {
     body.smartpro {
-        &.lightweight-chart {
-            #footerPanel {
-                left: 78px;
-                bottom: 0px;
-                width: calc(100% - 78px);
-                max-height: calc(100vh - 29px);
-            }
-
-            .aside-menu {
-                top: 0px;
-                margin-right: 0px !important;
-                height: calc(100vh - 38px) !important;
-
-                .tab-content {
-                    overflow-y: auto !important;
-                }
-            }
+        &.lightweight-chart #footerPanel {
+            left: 78px;
+            bottom: 0px;
+            width: calc(100% - 78px);
+            max-height: calc(100vh - 29px);
         }
 
         &.tradingview-chart {
