@@ -65,6 +65,14 @@
                     }"
                 />
                 <DxColumn
+                    data-field="started_at"
+                    data-type="date"
+                    :editor-options="{
+                        dateSerializationFormat: $mc.DX_SERVER_DATE_FORMAT
+                    }"
+                    :caption="$t('admin.smartorders.startedAt')"
+                />
+                <DxColumn
                     data-field="periods"
                     dataType="string"
                     :header-filter="{ allowSearch: true }"
@@ -77,14 +85,6 @@
                     :header-filter="{ allowSearch: true }"
                     :caption="$t('admin.smartorders.deviceLimit')"
                     :validation-rules="validationRules.deviceLimit"
-                />
-                <DxColumn
-                    data-field="started_at"
-                    data-type="date"
-                    :editor-options="{
-                        dateSerializationFormat: $mc.DX_SERVER_DATE_FORMAT
-                    }"
-                    :caption="$t('admin.smartorders.startedAt')"
                 />
                 <DxColumn
                     :visible="false"
