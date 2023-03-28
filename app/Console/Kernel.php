@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('subscription:clean')->yearly();
         //
         $schedule->call(function () {
-            $openingMarketFlag = app(\App\Services\VpsService::class)->checkOpeningMarket();
+            $openingMarketFlag = app(\App\Services\SmartOrderService::class)->checkOpeningMarket();
             set_global_value('openingMarketFlag', $openingMarketFlag ? '1' : '0');
             if ($openingMarketFlag) {
                 // set_global_value('bidPrice', '0');
