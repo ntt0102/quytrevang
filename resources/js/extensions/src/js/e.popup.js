@@ -125,7 +125,7 @@ class Popup {
         route.className = "link";
         route.innerText = "Trang chủ";
         route.addEventListener("click", () =>
-            window.open("https://www.w3schools.com")
+            window.open("https://smartorder.nguyenvanxuanphu.com")
         );
     };
     createRegisterContainer = () => {
@@ -208,7 +208,7 @@ class Popup {
         route.className = "link";
         route.innerText = "Trang chủ";
         route.addEventListener("click", () =>
-            window.open("https://www.w3schools.com")
+            window.open("https://smartorder.nguyenvanxuanphu.com")
         );
     };
     createLoggedinElement = () => {
@@ -480,8 +480,15 @@ class Popup {
         route.className = "link";
         route.innerText = "Trở về";
         route.addEventListener("click", () =>
-            this.setActivedSection(this.prevSection)
+            this.setActivedSection(this.optionContainer)
         );
+        var route = document.createElement("span");
+        routeWrapper.append(route);
+        route.className = "link";
+        route.innerText = "Gia hạn";
+        route.addEventListener("click", () => {
+            this.setActivedSection(this.renewalContainer);
+        });
     };
     createAboutContainer = () => {
         var div = document.createElement("div");
@@ -548,7 +555,12 @@ class Popup {
         item.append(value);
         //
         if (this.global.version != this.global.latestVersion) {
-            var download = document.createElement("div");
+            var download = document.createElement("form");
+            download.setAttribute("method", "get");
+            download.setAttribute(
+                "action",
+                "https://quytrevang.nguyenvanxuanphu.com/storage/files/smartorder.zip"
+            );
             download.className = "download";
             wrapper.append(download);
             var label = document.createElement("span");
@@ -556,8 +568,8 @@ class Popup {
             label.innerHTML = "Đã có phiên bản cập nhật mới.";
             var button = document.createElement("button");
             download.append(button);
+            button.type = "submit";
             button.innerText = "TẢI XUỐNG";
-            button.addEventListener("click", e => this.logout(e, this));
         }
         //
         var routeWrapper = document.createElement("div");
@@ -575,7 +587,7 @@ class Popup {
         route.className = "link";
         route.innerText = "Trang chủ";
         route.addEventListener("click", () =>
-            window.open("https://www.w3schools.com")
+            window.open("https://smartorder.nguyenvanxuanphu.com")
         );
     };
     createRenewalContainer = () => {
