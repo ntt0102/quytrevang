@@ -92,7 +92,7 @@ class SmartOrderService extends CoreService
      * @param $request
      * 
      */
-    public function getBackground($request)
+    public function getBackground()
     {
         $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
         $pCode = (int) $this->parameterRepository->getValue('representUser');

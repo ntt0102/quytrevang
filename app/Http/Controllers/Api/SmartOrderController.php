@@ -29,7 +29,7 @@ class SmartOrderController extends CoreController
     }
 
     /**
-     * Get config
+     * Get Background
      *
      * @param \Illuminate\Http\Request $request
      * 
@@ -37,8 +37,21 @@ class SmartOrderController extends CoreController
      */
     public function getBackground(Request $request)
     {
-        $data = $this->smartOrderService->getBackground($this->decrypt($request));
+        $data = $this->smartOrderService->getBackground();
         return $this->sendResponse($this->encrypt($data));
+    }
+
+    /**
+     * Get Background
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getWebBackground(Request $request)
+    {
+        $data = $this->smartOrderService->getBackground();
+        return $this->sendResponse($data);
     }
 
     /**
@@ -142,19 +155,6 @@ class SmartOrderController extends CoreController
     public function savePlans(Request $request)
     {
         $data = $this->smartOrderService->savePlans($request);
-        return $this->sendResponse($data);
-    }
-
-    /**
-     * get Web Plans
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getWebPlans(Request $request)
-    {
-        $data = $this->smartOrderService->getPlans($request);
         return $this->sendResponse($data);
     }
 }
