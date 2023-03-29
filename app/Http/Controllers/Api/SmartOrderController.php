@@ -144,4 +144,17 @@ class SmartOrderController extends CoreController
         $data = $this->smartOrderService->savePlans($request);
         return $this->sendResponse($data);
     }
+
+    /**
+     * get Web Plans
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getWebPlans(Request $request)
+    {
+        $data = $this->smartOrderService->getPlans($request);
+        return $this->sendResponse($data);
+    }
 }
