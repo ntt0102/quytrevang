@@ -78,7 +78,7 @@ class SmartOrderService extends CoreService
                 'phone' => $contactUser->phone,
             ],
             'bankAccount' => $contactUser->bank_account,
-            'plans' => $this->soPlanRepository->findAll(),
+            'plans' => $this->soPlanRepository->findAll(['*'], ['months', 'asc']),
         ];
         return [
             'isOk' => true,
