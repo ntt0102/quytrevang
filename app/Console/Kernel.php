@@ -29,14 +29,16 @@ class Kernel extends ConsoleKernel
         $schedule->command('subscription:clean')->yearly();
         //
         $schedule->call(function () {
-            if (app(\App\Services\SmartOrderService::class)->checkOpeningMarket())
+            $openingMarketFlag = app(\App\Services\SmartOrderService::class)->checkOpeningMarket();
+            set_global_value('openingMarketFlag', $openingMarketFlag ? '1' : '0');
+            if ($openingMarketFlag)
                 set_global_value('reportedTradingFlag', '0');
-        })->dailyAt('08:55');
+        })->dailyAt('00:30');
         //
         $schedule->call(function () {
-            if (app(\App\Services\SmartOrderService::class)->checkOpeningMarket())
+            if (get_global_value('openingMarketFlag') == '1')
                 app(\App\Services\SmartOrderService::class)->exportToCsv();
-        })->dailyAt('14:35');
+        })->dailyAt('14:46');
     }
 
     /**

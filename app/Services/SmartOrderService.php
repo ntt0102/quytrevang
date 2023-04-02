@@ -45,10 +45,9 @@ class SmartOrderService extends CoreService
         $so = request()->user()->smartOrder;
         if (!$so->validDevice($request->deviceId)) return ['isOk' => false];
         //
-        $isOpeningMarket = $this->checkOpeningMarket();
+        $isOpeningMarket = get_global_value('openingMarketFlag') == '1';
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
-        $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
         $pCode = (int) $this->parameterRepository->getValue('representUser');
         $contactUser = $this->userRepository->findByCode($pCode);
         $config = [
@@ -72,11 +71,6 @@ class SmartOrderService extends CoreService
             'isVolume' => !!$so->volume,
             'isViewChart' => !!$so->view_chart,
             'isReport' => !!$so->report,
-            'latestVersion' => $latestVersion,
-            'contact' => [
-                'email' => $contactUser->email,
-                'phone' => $contactUser->phone,
-            ],
             'bankAccount' => $contactUser->bank_account,
             'plans' => $this->soPlanRepository->findAll(['*'], ['months', 'asc']),
         ];
@@ -94,15 +88,9 @@ class SmartOrderService extends CoreService
      */
     public function getBackground()
     {
-        $latestVersion = $this->parameterRepository->getValue('smartOrderVersion');
         $pCode = (int) $this->parameterRepository->getValue('representUser');
         $contactUser = $this->userRepository->findByCode($pCode);
         $config = [
-            'latestVersion' => $latestVersion,
-            'contact' => [
-                'email' => $contactUser->email,
-                'phone' => $contactUser->phone,
-            ],
             'bankAccount' => $contactUser->bank_account,
             'plans' => $this->soPlanRepository->findAll(['*'], ['months', 'asc']),
         ];
@@ -152,9 +140,17 @@ class SmartOrderService extends CoreService
         if (!$so->validDevice($request->deviceId))
             return ['isOk' => false, 'data' => []];
         //
+        $date = date('Y-m-d');
+        $data = [];
+        if ($request->date < $date)
+            $data = $this->getFromCsv($request->date);
+        else if ($request->date == $date) {
+            if (get_global_value('openingMarketFlag') == '1')
+                $data = $this->getVpsData();
+        }
         return [
             'isOk' => true,
-            'data' => $request->date == date('Y-m-d') ? $this->getVpsData() : $this->getFromCsv($request->date)
+            'data' => $data
         ];
     }
     /**
@@ -252,19 +248,27 @@ class SmartOrderService extends CoreService
      */
     public function getVpsData()
     {
-        $array = $this->vpsData();
-        $temp = collect($array)->reduce(function ($carry, $item) {
-            $time = strtotime(date('Y-m-d ') . $item->time);
-            $carry['data'][] = [
-                'time' => $time,
+        $list = $this->vpsData();
+        return collect($list)->map(function ($item) {
+            return [
+                'time' => strtotime(date('Y-m-d ') . $item->time),
                 'price' => $item->lastPrice,
                 'volume' => $item->lastVol
             ];
-            $carry['times'][] = $time;
-            return $carry;
-        }, ['data' => [], 'times' => []]);
-        $unique_times = array_unique($temp['times']);
-        return array_values(array_intersect_key($temp['data'], $unique_times));
+        });
+        // $array = $this->vpsData();
+        // $temp = collect($array)->reduce(function ($carry, $item) {
+        //     $time = strtotime(date('Y-m-d ') . $item->time);
+        //     $carry['data'][] = [
+        //         'time' => $time,
+        //         'price' => $item->lastPrice,
+        //         'volume' => $item->lastVol
+        //     ];
+        //     $carry['times'][] = $time;
+        //     return $carry;
+        // }, ['data' => [], 'times' => []]);
+        // $unique_times = array_unique($temp['times']);
+        // return array_values(array_intersect_key($temp['data'], $unique_times));
     }
     /**
      * Get Symbol
@@ -308,11 +312,11 @@ class SmartOrderService extends CoreService
         $list = $this->vpsData();
         $fp = fopen($filename, 'w');
         foreach ($list as $item) {
-            $a = [];
-            $a[] = strtotime(date('Y-m-d ') . $item->time);
-            $a[] = $item->lastPrice;
-            $a[] = $item->lastVol;
-            fputcsv($fp, $a);
+            $line = [];
+            $line[] = strtotime(date('Y-m-d ') . $item->time);
+            $line[] = $item->lastPrice;
+            $line[] = $item->lastVol;
+            fputcsv($fp, $line);
         }
         fclose($fp);
     }
@@ -336,12 +340,7 @@ class SmartOrderService extends CoreService
             }
         }
         fclose($fp);
-        $times = collect($lines)->reduce(function ($ts, $item) {
-            $ts[] = $item['time'];
-            return $ts;
-        }, []);
-        $unique_times = array_unique($times);
-        return array_values(array_intersect_key($lines, $unique_times));
+        return $lines;
     }
 
     /**

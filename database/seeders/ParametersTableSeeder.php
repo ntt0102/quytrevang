@@ -40,16 +40,6 @@ class ParametersTableSeeder extends Seeder
             'description' => "Tỷ lệ ký quỹ",
         ]);
         Parameter::create([
-            'slug' => "smartOrderVersion",
-            'value' => "2.0.3",
-            'description' => "Phiên bản SmartOrder VPS",
-        ]);
-        Parameter::create([
-            'slug' => "VN30F1M",
-            'value' => "VN30F2211",
-            'description' => "Hợp đồng VN30F1M",
-        ]);
-        Parameter::create([
             'slug' => "startTradingTime",
             'value' => "08:59:00",
             'description' => "Thời gian bắt đầu giao dịch",
@@ -58,16 +48,6 @@ class ParametersTableSeeder extends Seeder
             'slug' => "endTradingTime",
             'value' => "14:31:00",
             'description' => "Thời gian kết thúc giao dịch",
-        ]);
-        Parameter::create([
-            'slug' => "startBreakTime",
-            'value' => "11:31:00",
-            'description' => "Thời gian bắt đầu nghỉ trưa",
-        ]);
-        Parameter::create([
-            'slug' => "endBreakTime",
-            'value' => "12:59:00",
-            'description' => "Thời gian kết thúc nghỉ trưa",
         ]);
     }
 }
