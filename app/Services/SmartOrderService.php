@@ -91,6 +91,10 @@ class SmartOrderService extends CoreService
         $pCode = (int) $this->parameterRepository->getValue('representUser');
         $contactUser = $this->userRepository->findByCode($pCode);
         $config = [
+            'contact' => [
+                'email' => $contactUser->email,
+                'phone' => $contactUser->phone,
+            ],
             'bankAccount' => $contactUser->bank_account,
             'plans' => $this->soPlanRepository->findAll(['*'], ['months', 'asc']),
         ];
