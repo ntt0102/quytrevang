@@ -48,6 +48,7 @@ class SmartOrderService extends CoreService
         $isOpeningMarket = get_global_value('openingMarketFlag') == '1';
         $startTime = $this->parameterRepository->getValue('startTradingTime');
         $endTime = $this->parameterRepository->getValue('endTradingTime');
+        $message = $this->parameterRepository->getValue('smartOrderMessage');
         $pCode = (int) $this->parameterRepository->getValue('representUser');
         $contactUser = $this->userRepository->findByCode($pCode);
         $config = [
@@ -57,6 +58,7 @@ class SmartOrderService extends CoreService
                 'start' => strtotime(date('Y-m-d ') . $startTime),
                 'end' => strtotime(date('Y-m-d ') . $endTime)
             ],
+            'message' => $message,
             'symbol' => $this->getSymbol(),
             'registerDate' => date_create($so->created_at)->format('Y-m-d'),
             'startDate' => $so->started_at,
@@ -88,9 +90,11 @@ class SmartOrderService extends CoreService
      */
     public function getBackground()
     {
+        $message = $this->parameterRepository->getValue('smartOrderMessage');
         $pCode = (int) $this->parameterRepository->getValue('representUser');
         $contactUser = $this->userRepository->findByCode($pCode);
         $config = [
+            'message' => $message,
             'contact' => [
                 'email' => $contactUser->email,
                 'phone' => $contactUser->phone,

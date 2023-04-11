@@ -36,17 +36,22 @@ class ParametersTableSeeder extends Seeder
         ]);
         Parameter::create([
             'slug' => "marginRate",
-            'value' => "0.16875",
+            'value' => "0.2125",
             'description' => "Tỷ lệ ký quỹ",
         ]);
         Parameter::create([
+            'slug' => "smartOrderMessage",
+            'value' => "",
+            'description' => "Thông báo SmartOrder",
+        ]);
+        Parameter::create([
             'slug' => "startTradingTime",
-            'value' => "08:59:00",
+            'value' => "08:45:00",
             'description' => "Thời gian bắt đầu giao dịch",
         ]);
         Parameter::create([
             'slug' => "endTradingTime",
-            'value' => "14:31:00",
+            'value' => "14:45:00",
             'description' => "Thời gian kết thúc giao dịch",
         ]);
     }
