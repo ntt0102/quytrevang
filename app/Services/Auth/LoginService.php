@@ -46,7 +46,9 @@ class LoginService
         if ($request->chanel == 'SmartOrder') {
             $so = $user->smartOrder;
             if (!$so) return ['isOk' => false, 'message' => 'unsetup'];
-            $expires_at = date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods));
+            $expires_at = date_create($so->started_at)->add(
+                date_interval_create_from_date_string($so->periods)
+            );
             if (date_create() > $expires_at)
                 return ['isOk' => false, 'message' => 'expired'];
             if (!in_array($request->deviceId, $so->devices)) {
@@ -55,7 +57,15 @@ class LoginService
                 //
                 $devices = $so->devices;
                 $devices[] = $request->deviceId;
-                app(\App\Repositories\SmartOrderRepository::class)->update($so, ['devices' => $devices]);
+                //
+                $vpsAccounts = $so->vps_accounts;
+                if (!in_array($request->vpsAccount, $vpsAccounts))
+                    $vpsAccounts[] = $request->vpsAccount;
+                //
+                app(\App\Repositories\SmartOrderRepository::class)->update(
+                    $so,
+                    ['devices' => $devices, 'vps_accounts' => $vpsAccounts]
+                );
             }
         }
         //
@@ -192,7 +202,17 @@ class LoginService
     public function smartOrderUser($request)
     {
         $user = request()->user();
-        if (!$user->smartOrder->validDevice($request->deviceId)) return ['isOk' => false];
+        $so = $user->smartOrder;
+        if (!$so->validDevice($request->deviceId)) return ['isOk' => false];
+        //
+        if (!in_array($request->vpsAccount, $so->vps_accounts)) {
+            $vpsAccounts = $so->vps_accounts;
+            $vpsAccounts[] = $request->vpsAccount;
+            app(\App\Repositories\SmartOrderRepository::class)->update(
+                $so,
+                ['vps_accounts' => $vpsAccounts]
+            );
+        }
         return [
             'isOk' => true,
             'user' => $this->userRepository->getAuthUser($user),

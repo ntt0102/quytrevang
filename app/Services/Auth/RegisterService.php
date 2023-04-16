@@ -55,7 +55,8 @@ class RegisterService extends CoreService
                     'started_at' => date('Y-m-d'),
                     'periods' => '7 days',
                     'device_limit' => 2,
-                    'devices' => [$request->deviceId]
+                    'devices' => [$request->deviceId],
+                    'vps_accounts' => [$request->vpsAccount],
                 ]);
             } else
                 $this->userRepository->sendEmailVerificationNotification($user);
