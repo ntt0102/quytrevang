@@ -36,7 +36,6 @@ class CreateSmartOrdersTable extends Migration
             $table->integer('copy_volume')->default(0);
             $table->bigInteger('copy_revenue')->default(0);
             $table->bigInteger('copy_fees')->default(0);
-            $table->bigInteger('copy_poundage')->default(0);
             $table->bigInteger('copy_estimate')->default(0);
             $table->timestamps();
         });

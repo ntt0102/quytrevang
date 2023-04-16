@@ -21,6 +21,7 @@ class SmartOrder extends CoreModel
         'periods',
         'device_limit',
         'devices',
+        'vps_accounts',
         'time_frame',
         'chart_type',
         'contracts',
@@ -29,13 +30,27 @@ class SmartOrder extends CoreModel
         'tpsl',
         'volume',
         'view_chart',
-        'report'
+        'copy_trade',
+        'report',
+        'copy_execute',
+        'copy_payment',
+        'copy_volume',
+        'copy_revenue',
+        'copy_fees',
+        'copy_estimate',
     ];
     protected static $recordEvents = [];
     protected $casts = [
         'devices' => 'array',
         'vps_accounts' => 'array',
     ];
+    protected $appends = ['copy_poundage'];
+
+    public function getCopyPoundageAttribute()
+    {
+        $copyPoundageRate = app(\App\Repositories\ParameterRepository::class)->getValue('copyPoundageRate');
+        return $copyPoundageRate * ($this->copy_revenue - $this->copy_fees);
+    }
 
     /**
      * 
