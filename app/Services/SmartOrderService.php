@@ -46,8 +46,6 @@ class SmartOrderService extends CoreService
         if (!$so->validDevice($request->deviceId)) return ['isOk' => false];
         //
         $isOpeningMarket = get_global_value('openingMarketFlag') == '1';
-        $startTime = $this->parameterRepository->getValue('startTradingTime');
-        $endTime = $this->parameterRepository->getValue('endTradingTime');
         $message = $this->parameterRepository->getValue('smartOrderMessage');
         $pCode = (int) $this->parameterRepository->getValue('representUser');
         $contactUser = $this->userRepository->findByCode($pCode);
@@ -55,8 +53,10 @@ class SmartOrderService extends CoreService
             'isOpeningMarket' => $isOpeningMarket,
             'isReportedResult' => get_global_value('reportedTradingFlag') == '1',
             'time' => [
-                'start' => strtotime(date('Y-m-d ') . $startTime),
-                'end' => strtotime(date('Y-m-d ') . $endTime)
+                'start' => strtotime(date('Y-m-d') . ' 08:45:00'),
+                'ato' => strtotime(date('Y-m-d') . ' 09:00:00'),
+                'atc' => strtotime(date('Y-m-d') . ' 14:30:00'),
+                'end' => strtotime(date('Y-m-d') . ' 14:45:00'),
             ],
             'message' => $message,
             'symbol' => $this->getSymbol(),
