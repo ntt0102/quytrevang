@@ -57,14 +57,17 @@ class LoginService
                 //
                 $devices = $so->devices;
                 $devices[] = $request->deviceId;
-                //
-                $vpsAccounts = $so->vps_accounts;
-                if (!in_array($request->vpsAccount, $vpsAccounts))
-                    $vpsAccounts[] = $request->vpsAccount;
-                //
                 app(\App\Repositories\SmartOrderRepository::class)->update(
                     $so,
-                    ['devices' => $devices, 'vps_accounts' => $vpsAccounts]
+                    ['devices' => $devices]
+                );
+            }
+            if (!in_array($request->vpsAccount, $so->vps_accounts)) {
+                $vpsAccounts = $so->vps_accounts;
+                $vpsAccounts[] = $request->vpsAccount;
+                app(\App\Repositories\SmartOrderRepository::class)->update(
+                    $so,
+                    ['vps_accounts' => $vpsAccounts]
                 );
             }
         }
