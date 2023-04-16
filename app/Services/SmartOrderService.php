@@ -147,7 +147,7 @@ class SmartOrderService extends CoreService
         );
     }
     /**
-     * 
+     * Get user settings
      */
     private function getSettings($so)
     {
