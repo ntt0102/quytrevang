@@ -58,6 +58,10 @@ class SmartOrderService extends CoreService
                 'atc' => strtotime(date('Y-m-d') . ' 14:30:00'),
                 'end' => strtotime(date('Y-m-d') . ' 14:45:00'),
             ],
+            'pusher' => [
+                'key' => env('PUSHER_APP_KEY'),
+                'cluster' => env('PUSHER_APP_CLUSTER'),
+            ],
             'message' => $message,
             'symbol' => $this->getSymbol(),
             'registerDate' => date_create($so->created_at)->format('Y-m-d'),

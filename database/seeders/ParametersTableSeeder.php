@@ -45,14 +45,9 @@ class ParametersTableSeeder extends Seeder
             'description' => "Thông báo SmartOrder",
         ]);
         Parameter::create([
-            'slug' => "startTradingTime",
-            'value' => "08:45:00",
-            'description' => "Thời gian bắt đầu giao dịch",
-        ]);
-        Parameter::create([
-            'slug' => "endTradingTime",
-            'value' => "14:45:00",
-            'description' => "Thời gian kết thúc giao dịch",
+            'slug' => "copyPoundageRate",
+            'value' => "0.2",
+            'description' => "Tỷ lệ hoa hồng sao chép",
         ]);
     }
 }
