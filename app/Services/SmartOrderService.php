@@ -68,22 +68,22 @@ class SmartOrderService extends CoreService
             'startDate' => $so->started_at,
             'expiresDate' => date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods))->format('Y-m-d'),
             'deviceLimit' => $so->device_limit,
-            'contractNumber' => $so->contracts,
-            'timeFrame' => $so->time_frame,
-            'chartType' => $so->chart_type,
-            'takeProfit' => $so->take_profit,
-            'stopLoss' => $so->stop_loss,
-            'isTpSl' => !!$so->tpsl,
-            'isVolume' => !!$so->volume,
-            'isViewChart' => !!$so->view_chart,
-            'isCopyTrade' => !!$so->copy_trade,
+            // 'timeFrame' => $so->time_frame,
+            // 'chartType' => $so->chart_type,
+            // 'contractNumber' => $so->contracts,
+            // 'takeProfit' => $so->take_profit,
+            // 'stopLoss' => $so->stop_loss,
+            // 'isTpSl' => !!$so->tpsl,
+            // 'isVolume' => !!$so->volume,
+            // 'isViewChart' => !!$so->view_chart,
+            // 'isCopyTrade' => !!$so->copy_trade,
             'isReport' => !!$so->report,
             'bankAccount' => $contactUser->bank_account,
             'plans' => $this->soPlanRepository->findAll(['*'], ['months', 'asc']),
         ];
         return [
             'isOk' => true,
-            'config' => $config
+            'config' => array_merge($config, $this->getSettings($so))
         ];
     }
 
@@ -136,10 +136,31 @@ class SmartOrderService extends CoreService
                     'tpsl' => $request->isTpSl,
                     'volume' => $request->isVolume,
                     'view_chart' => $request->isViewChart,
+                    'copy_trade' => $request->isCopyTrade,
                 ]);
-                return ['isOk' => $isOk];
+                if (!$isOk) return ['isOk' => false];
+                return [
+                    'isOk' => true,
+                    'config' => $this->getSettings($so)
+                ];
             }
         );
+    }
+    /**
+     * 
+     */
+    private function getSettings($so)
+    {
+        return [
+            'timeFrame' => $so->time_frame,
+            'chartType' => $so->chart_type,
+            'takeProfit' => $so->take_profit,
+            'stopLoss' => $so->stop_loss,
+            'isTpSl' => !!$so->tpsl,
+            'isVolume' => !!$so->volume,
+            'isViewChart' => !!$so->view_chart,
+            'isCopyTrade' => !!$so->copy_trade
+        ];
     }
     /**
      * Get chart data
