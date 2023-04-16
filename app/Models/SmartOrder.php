@@ -35,11 +35,19 @@ class SmartOrder extends CoreModel
     protected $casts = ['devices' => 'array'];
 
     /**
-     * Get the contracts for the user.
+     * 
      */
     public function validDevice($deviceId)
     {
         return in_array($deviceId, $this->devices);
+    }
+
+    /**
+     * 
+     */
+    public function validCopyTrade()
+    {
+        return count($this->vps_accounts) == 1;
     }
 
     // /**

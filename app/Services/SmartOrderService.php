@@ -117,6 +117,8 @@ class SmartOrderService extends CoreService
                 $so = request()->user()->smartOrder;
                 if (!$so->validDevice($request->deviceId))
                     return ['isOk' => false, 'message' => 'unauthorized'];
+                if ($request->isCopyTrade && !$so->validCopyTrade())
+                    return ['isOk' => false, 'message' => 'invalidCopyTrade'];
                 //
                 $isOk = $this->smartOrderRepository->update($so, [
                     'time_frame' => $request->timeFrame,
@@ -154,6 +156,13 @@ class SmartOrderService extends CoreService
             'isCopyTrade' => !!$so->copy_trade
         ];
     }
+    // /**
+    //  * 
+    //  */
+    // private function checkCopyTradeValid($so)
+    // {
+    //     return $so->copy_trade && count($so->vps_accounts) == 1;
+    // }
     /**
      * Get chart data
      *
