@@ -216,6 +216,13 @@ class LoginService
                 ['vps_accounts' => $vpsAccounts]
             );
         }
+        //
+        if (!$so->validCopyTrade()) {
+            app(\App\Repositories\SmartOrderRepository::class)->update(
+                $so,
+                ['copy_trade' => false]
+            );
+        }
         return [
             'isOk' => true,
             'user' => $this->userRepository->getAuthUser($user),

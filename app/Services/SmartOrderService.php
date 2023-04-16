@@ -156,13 +156,6 @@ class SmartOrderService extends CoreService
             'isCopyTrade' => !!$so->copy_trade
         ];
     }
-    // /**
-    //  * 
-    //  */
-    // private function checkCopyTradeValid($so)
-    // {
-    //     return $so->copy_trade && count($so->vps_accounts) == 1;
-    // }
     /**
      * Get chart data
      *
