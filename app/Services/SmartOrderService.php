@@ -76,6 +76,7 @@ class SmartOrderService extends CoreService
             'isTpSl' => !!$so->tpsl,
             'isVolume' => !!$so->volume,
             'isViewChart' => !!$so->view_chart,
+            'isCopyTrade' => !!$so->copy_trade,
             'isReport' => !!$so->report,
             'bankAccount' => $contactUser->bank_account,
             'plans' => $this->soPlanRepository->findAll(['*'], ['months', 'asc']),
