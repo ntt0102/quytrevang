@@ -32,7 +32,10 @@ class SmartOrder extends CoreModel
         'report'
     ];
     protected static $recordEvents = [];
-    protected $casts = ['devices' => 'array'];
+    protected $casts = [
+        'devices' => 'array',
+        'vps_accounts' => 'array',
+    ];
 
     /**
      * 
