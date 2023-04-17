@@ -30,7 +30,6 @@ class CreateSmartOrdersTable extends Migration
             $table->boolean('volume')->default(0);
             $table->boolean('view_chart')->default(1);
             $table->boolean('copy_trade')->default(0);
-            $table->boolean('report')->default(0);
             $table->boolean('copy_execute')->default(0);
             $table->boolean('copy_payment')->default(1);
             $table->integer('copy_volume')->default(0);

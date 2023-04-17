@@ -46,7 +46,8 @@ class SmartOrderService extends CoreService
      */
     public function getConfig($request)
     {
-        $so = request()->user()->smartOrder;
+        $user = request()->user();
+        $so = $user->smartOrder;
         if (!$so->validDevice($request->deviceId)) return ['isOk' => false];
         //
         $isOpeningMarket = get_global_value('openingMarketFlag') == '1';
@@ -72,7 +73,7 @@ class SmartOrderService extends CoreService
             'startDate' => $so->started_at,
             'expiresDate' => date_create($so->started_at)->add(date_interval_create_from_date_string($so->periods))->format('Y-m-d'),
             'deviceLimit' => $so->device_limit,
-            'isReport' => !!$so->report,
+            'isAdmin' => $user->can('system@control'),
             'bankAccount' => $contactUser->bank_account,
             'plans' => $this->soPlanRepository->findAll(['*'], ['months', 'asc']),
         ];
