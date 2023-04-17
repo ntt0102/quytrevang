@@ -17,6 +17,7 @@ class CreateSoOrdersTable extends Migration
             $table->id();
             $table->unsignedBigInteger('user_code');
             $table->string('type');
+            $table->string('side');
             $table->integer('volume');
             $table->string('price');
             $table->timestamps();

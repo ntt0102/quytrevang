@@ -89,8 +89,7 @@ class SmartOrderController extends CoreController
      */
     public function saveOrder(Request $request)
     {
-        $data = $this->smartOrderService->saveOrder($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $this->smartOrderService->saveOrder($this->decrypt($request));
     }
 
     /**

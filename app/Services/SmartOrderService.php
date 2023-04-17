@@ -193,20 +193,16 @@ class SmartOrderService extends CoreService
      */
     public function saveOrder($request)
     {
-        return $this->transaction(
+        $this->transaction(
             function () use ($request) {
                 $user = request()->user();
-                $so = $user->smartOrder;
-                if (!$so->validDevice($request->deviceId))
-                    return ['isOk' => false, 'message' => 'unauthorized'];
-                //
-                $order = $this->soOrderRepository->create([
+                $this->soOrderRepository->create([
                     "user_code" => $user->code,
                     "type" => $request->type,
+                    "side" => $request->side,
                     "volume" => $request->volume,
                     "price" => $request->price,
                 ]);
-                return ['isOk' => !!$order];
             }
         );
     }

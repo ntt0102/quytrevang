@@ -10,6 +10,7 @@ class SoOrder extends CoreModel
         'id',
         'user_code',
         'type',
+        'side',
         'volume',
         'price'
     ];
@@ -17,6 +18,7 @@ class SoOrder extends CoreModel
     protected $fillable = [
         'user_code',
         'type',
+        'side',
         'volume',
         'price',
     ];
