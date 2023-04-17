@@ -81,6 +81,19 @@ class SmartOrderController extends CoreController
     }
 
     /**
+     * Save Order
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function saveOrder(Request $request)
+    {
+        $data = $this->smartOrderService->saveOrder($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
+    }
+
+    /**
      * Update Trades
      *
      * @param \Illuminate\Http\Request $request

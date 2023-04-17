@@ -10,6 +10,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\TradeRepository;
 use App\Repositories\SmartOrderRepository;
 use App\Repositories\SoPlanRepository;
+use App\Repositories\SoOrderRepository;
 use App\Events\UpdateTradeEvent;
 
 class SmartOrderService extends CoreService
@@ -19,19 +20,22 @@ class SmartOrderService extends CoreService
     private $tradeRepository;
     private $smartOrderRepository;
     private $soPlanRepository;
+    private $soOrderRepository;
 
     public function __construct(
         ParameterRepository $parameterRepository,
         UserRepository $userRepository,
         TradeRepository $tradeRepository,
         SmartOrderRepository $smartOrderRepository,
-        SoPlanRepository $soPlanRepository
+        SoPlanRepository $soPlanRepository,
+        SoOrderRepository $soOrderRepository
     ) {
         $this->parameterRepository = $parameterRepository;
         $this->userRepository = $userRepository;
         $this->tradeRepository = $tradeRepository;
         $this->smartOrderRepository = $smartOrderRepository;
         $this->soPlanRepository = $soPlanRepository;
+        $this->soOrderRepository = $soOrderRepository;
     }
 
     /**
@@ -181,6 +185,32 @@ class SmartOrderService extends CoreService
             'data' => $data
         ];
     }
+    /**
+     * Save Order
+     *
+     * @param $request
+     * 
+     */
+    public function saveOrder($request)
+    {
+        return $this->transaction(
+            function () use ($request) {
+                $user = request()->user();
+                $so = $user->smartOrder;
+                if (!$so->validDevice($request->deviceId))
+                    return ['isOk' => false, 'message' => 'unauthorized'];
+                //
+                $order = $this->soOrderRepository->create([
+                    "user_code" => $user->code,
+                    "type" => $request->type,
+                    "volume" => $request->volume,
+                    "price" => $request->price,
+                ]);
+                return ['isOk' => !!$order];
+            }
+        );
+    }
+
     /**
      * Report
      *

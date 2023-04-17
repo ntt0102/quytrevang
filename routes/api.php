@@ -47,11 +47,14 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     });
 
     Route::group(['middleware' => 'auth:api'], function () {
-        Route::group(['prefix' => 'so', 'middleware' => 'cors'], function () {
-            Route::post('report', 'SmartOrderController@report');
-            Route::post('get-config', 'SmartOrderController@getConfig');
-            Route::post('set-config', 'SmartOrderController@setConfig');
-            Route::post('get-chart', 'SmartOrderController@getChartData');
+        Route::group(['prefix' => 'so'], function () {
+            Route::group(['middleware' => 'cors'], function () {
+                Route::post('get-config', 'SmartOrderController@getConfig');
+                Route::post('set-config', 'SmartOrderController@setConfig');
+                Route::post('get-chart', 'SmartOrderController@getChartData');
+                Route::post('save-order', 'SmartOrderController@saveOrder');
+                Route::post('report', 'SmartOrderController@report');
+            });
             Route::group(['middleware' => 'can:smartorders@control'], function () {
                 Route::get('manage', 'SmartOrderController@getList');
                 Route::post('manage/validate-user', 'SmartOrderController@validateUser');
