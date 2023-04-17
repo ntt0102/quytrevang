@@ -26,5 +26,5 @@ Broadcast::channel('finbook', function ($user) {
     return $user->can('finbooks@control');
 });
 Broadcast::channel('so-copytrade', function ($user) {
-    return $user->smartOrder->copy_trade && $user->smartOrder->copy_payment;
+    return $user->can('system@control') || ($user->smartOrder->copy_trade && $user->smartOrder->copy_payment);
 });
