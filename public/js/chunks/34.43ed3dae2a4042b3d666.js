@@ -82,6 +82,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 var chartOptions = {
@@ -144,17 +155,29 @@ var chartOptions = {
       },
       crosshair: {},
       spinnerShow: false,
-      chartDate: moment().format("YYYY-MM-DD")
+      chartDate: moment().format("YYYY-MM-DD"),
+      interval: null,
+      time: null,
+      isFullscreen: false
     };
   },
   beforeCreate: function beforeCreate() {
     this.$store.registerModule("User.orderChart", _store_modules_Admin_OrderChart__WEBPACK_IMPORTED_MODULE_2__["default"]);
   },
   created: function created() {
+    var _this = this;
+
     this.getChartData(true);
+    this.interval = setInterval(function () {
+      _this.time = Intl.DateTimeFormat(navigator.language, {
+        hour: "numeric",
+        minute: "numeric",
+        second: "numeric"
+      }).format();
+    }, 1000);
   },
   mounted: function mounted() {
-    var _this = this;
+    var _this2 = this;
 
     if (document.getElementById("orderChartJs")) return;
     var scriptTag = document.createElement("script");
@@ -163,36 +186,40 @@ var chartOptions = {
     document.getElementsByTagName("head")[0].appendChild(scriptTag); //
 
     setTimeout(function () {
-      _this.chart = LightweightCharts.createChart(_this.$refs.orderChart, chartOptions);
+      _this2.chart = LightweightCharts.createChart(_this2.$refs.orderChart, chartOptions);
 
-      _this.chart.subscribeCrosshairMove(function (e) {
-        return _this.eventChartCrosshairMove(e, _this);
+      _this2.chart.subscribeCrosshairMove(function (e) {
+        return _this2.eventChartCrosshairMove(e, _this2);
       });
 
-      _this.chart.subscribeCustomPriceLineDragged(function (e) {
-        return _this.eventPriceLineDrag(e, _this);
+      _this2.chart.subscribeCustomPriceLineDragged(function (e) {
+        return _this2.eventPriceLineDrag(e, _this2);
       });
 
-      _this.series.whitespace = _this.chart.addLineSeries({
+      _this2.series.whitespace = _this2.chart.addLineSeries({
         priceScaleId: "whitespace",
         visible: false
       });
-      _this.series.price = _this.chart.addLineSeries({
+      _this2.series.price = _this2.chart.addLineSeries({
         color: "#CCCCCC",
         priceFormat: {
           minMove: 0.1
         }
       });
       window.addEventListener("resize", function () {
-        return _this.eventChartResize(_this);
+        return _this2.eventChartResize(_this2);
       });
       window.addEventListener("keydown", function (e) {
-        return _this.eventKeyPress(e, _this);
+        return _this2.eventKeyPress(e, _this2);
+      });
+      document.addEventListener("fullscreenchange", function () {
+        return _this2.isFullscreen = document.fullscreenElement;
       }); // this.loadChartData();
     }, 1000);
   },
   destroyed: function destroyed() {
     this.$store.unregisterModule("User.orderChart");
+    clearInterval(this.interval);
   },
   computed: _objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapGetters"])("User.orderChart", ["config"])),
   methods: {
@@ -308,7 +335,7 @@ var chartOptions = {
       }
     },
     getChartData: function getChartData() {
-      var _this2 = this;
+      var _this3 = this;
 
       var loadWhitespace = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
       this.spinnerShow = true;
@@ -319,21 +346,21 @@ var chartOptions = {
       }).then(function (response) {
         // console.log(response.data);
         if (loadWhitespace) {
-          _this2.data.whitespace = _this2.mergeChartData(_this2.data.whitespace, _this2.generateWhitespaceData());
+          _this3.data.whitespace = _this3.mergeChartData(_this3.data.whitespace, _this3.generateWhitespaceData());
 
-          _this2.series.whitespace.setData(_this2.data.whitespace);
+          _this3.series.whitespace.setData(_this3.data.whitespace);
         }
 
-        _this2.data.price = _this2.mergeChartData(response.data, _this2.data.price);
+        _this3.data.price = _this3.mergeChartData(response.data, _this3.data.price);
 
-        _this2.series.price.setData(_this2.data.price); //
+        _this3.series.price.setData(_this3.data.price); //
 
 
-        _this2.spinnerShow = false;
+        _this3.spinnerShow = false;
       });
     },
     loadChartData: function loadChartData() {
-      var _this3 = this;
+      var _this4 = this;
 
       var loadWhitespace = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
       var loadOriginal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
@@ -344,12 +371,12 @@ var chartOptions = {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
-                  _this3.spinnerShow = true;
+                  _this4.spinnerShow = true;
 
                   if (loadWhitespace) {
-                    _this3.data.whitespace = _this3.mergeChartData(_this3.data.whitespace, _this3.generateWhitespaceData());
+                    _this4.data.whitespace = _this4.mergeChartData(_this4.data.whitespace, _this4.generateWhitespaceData());
 
-                    _this3.series.whitespace.setData(_this3.data.whitespace);
+                    _this4.series.whitespace.setData(_this4.data.whitespace);
                   }
 
                   if (!loadOriginal) {
@@ -358,36 +385,36 @@ var chartOptions = {
                   }
 
                   _context.next = 5;
-                  return _this3.getChartData(_this3.chartDate);
+                  return _this4.getChartData(_this4.chartDate);
 
                 case 5:
                   svData = _context.sent;
-                  _this3.data.original = _this3.mergeChartData(svData, _this3.data.original);
+                  _this4.data.original = _this4.mergeChartData(svData, _this4.data.original);
 
                 case 7:
                   //
-                  if (!!_this3.data.original.length) {
-                    data = _this3.data.original.reduce(function (r, item) {
-                      return _this3.generateChartData(r, item);
+                  if (!!_this4.data.original.length) {
+                    data = _this4.data.original.reduce(function (r, item) {
+                      return _this4.generateChartData(r, item);
                     }, {
                       price: [],
                       volume: []
                     });
 
-                    _this3.series.price.setData(data.price);
+                    _this4.series.price.setData(data.price);
 
-                    _this3.series.volume.setData(data.volume); // this.updateLegend(
+                    _this4.series.volume.setData(data.volume); // this.updateLegend(
                     //     data.price.slice(-1)[0].value,
                     //     data.volume.slice(-1)[0].value
                     // );
 
 
-                    _this3.data.price = data.price;
-                    _this3.data.volume = data.volume;
+                    _this4.data.price = data.price;
+                    _this4.data.volume = data.volume;
                   } //
 
 
-                  _this3.spinnerShow = false;
+                  _this4.spinnerShow = false;
                   resolve();
 
                 case 10:
@@ -502,7 +529,9 @@ var chartOptions = {
       }) == -1) return true;
       return false;
     },
-    eventChartResize: function eventChartResize(self) {// self.chart.resize(window.innerWidth, window.innerHeight);
+    eventChartResize: function eventChartResize(self) {
+      var chartEl = this.$refs.chartContainer;
+      this.chart.resize(chartEl.offsetWidth, chartEl.offsetHeight);
     },
     eventKeyPress: function eventKeyPress(e, self) {
       try {
@@ -620,6 +649,14 @@ var chartOptions = {
       } catch (error) {
         console.log(error);
       }
+    },
+    toggleFullscreen: function toggleFullscreen() {
+      if (document.fullscreenElement) document.exitFullscreen();else this.$refs.chartContainer.requestFullscreen(); // this.$refs.chartContainer.requestFullscreen();
+
+      console.log("document.fullscreenElement", document.fullscreenElement); // console.log(
+      //     "this.$refs.chartContainer.fullscreenElement",
+      //     this.$refs.chartContainer.fullscreenElement
+      // );
     }
   }
 });
@@ -638,7 +675,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".order-chart-container[data-v-cb468136] {\n  position: relative;\n  height: calc(100vh - 56px - 109px - 200px);\n}\n.order-chart-container .chart-wrapper[data-v-cb468136] {\n  height: 100%;\n}\n.order-chart-container .area[data-v-cb468136] {\n  position: absolute;\n  display: flex;\n  justify-content: space-between;\n  font-size: 17px;\n  background: #131722;\n  border: solid 2px #2a2e39;\n  border-radius: 5px;\n  z-index: 3;\n}\n.order-chart-container .area#dataAreaDiv[data-v-cb468136] {\n  top: 0px;\n  right: 55px;\n}\n.order-chart-container .area#dataAreaDiv .command[data-v-cb468136]:not(:first-child) {\n  border-left: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area#dataAreaDiv #timeFrameSelect[data-v-cb468136] {\n  width: 75px;\n}\n.order-chart-container .area#dataAreaDiv #chartTypeSelect[data-v-cb468136] {\n  width: 77px;\n}\n.order-chart-container .area#dataAreaDiv #dateInput[data-v-cb468136] {\n  width: 125px;\n}\n.order-chart-container .area#dataAreaDiv #spinnerImg[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n}\n.order-chart-container .area#toolAreaDiv[data-v-cb468136] {\n  top: 0px;\n  left: 0px;\n  flex-direction: column;\n}\n.order-chart-container .area#toolAreaDiv .command[data-v-cb468136]:not(:first-child) {\n  border-top: solid 2px #2a2e39 !important;\n}\n.order-chart-container .command[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  flex: 1 1 auto;\n  text-align: center;\n  color: #bbbbbb;\n  background: transparent !important;\n  line-height: 30px;\n  font-size: 16px;\n  border: none;\n  cursor: pointer;\n  z-index: 3;\n}\n.order-chart-container .command[data-v-cb468136]:hover {\n  background: #2a2e39 !important;\n}\n.order-chart-container .clock[data-v-cb468136] {\n  width: 100px;\n  height: 30px;\n}", ""]);
+exports.push([module.i, ".order-chart-container[data-v-cb468136] {\n  position: relative;\n  height: calc(100vh - 56px - 109px - 200px);\n}\n.order-chart-container .chart-wrapper[data-v-cb468136] {\n  height: 100%;\n}\n.order-chart-container .area[data-v-cb468136] {\n  position: absolute;\n  display: flex;\n  justify-content: space-between;\n  font-size: 17px;\n  background: #131722;\n  border: solid 2px #2a2e39;\n  border-radius: 5px;\n  z-index: 3;\n}\n.order-chart-container .area#dataAreaDiv[data-v-cb468136] {\n  top: 0px;\n  left: 30px;\n}\n.order-chart-container .area#dataAreaDiv .command[data-v-cb468136]:not(:first-child) {\n  border-left: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area#dataAreaDiv #timeFrameSelect[data-v-cb468136] {\n  width: 75px;\n}\n.order-chart-container .area#dataAreaDiv #chartTypeSelect[data-v-cb468136] {\n  width: 77px;\n}\n.order-chart-container .area#dataAreaDiv #dateInput[data-v-cb468136] {\n  width: 125px;\n}\n.order-chart-container .area#dataAreaDiv #spinnerImg[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n}\n.order-chart-container .area#toolAreaDiv[data-v-cb468136] {\n  top: 0px;\n  left: 0px;\n  flex-direction: column;\n}\n.order-chart-container .area#toolAreaDiv .command[data-v-cb468136]:not(:first-child) {\n  border-top: solid 2px #2a2e39 !important;\n}\n.order-chart-container .command[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  flex: 1 1 auto;\n  text-align: center;\n  color: #bbbbbb;\n  background: transparent !important;\n  line-height: 30px;\n  font-size: 16px;\n  border: none;\n  cursor: pointer;\n  z-index: 3;\n}\n.order-chart-container .command[data-v-cb468136]:hover {\n  background: #2a2e39 !important;\n}\n.order-chart-container .clock[data-v-cb468136] {\n  width: 80px;\n}", ""]);
 
 // exports
 
@@ -717,66 +754,84 @@ var render = function() {
           }
         }),
         _vm._v(" "),
-        _c("div", { staticClass: "order-chart-container" }, [
-          _c("div", { ref: "orderChart", staticClass: "chart-wrapper" }),
-          _vm._v(" "),
-          _c("div", { staticClass: "area", attrs: { id: "dataAreaDiv" } }, [
-            _vm.spinnerShow
-              ? _c("img", { attrs: { id: "spinnerImg", src: "spinner.gif" } })
-              : _vm._e(),
+        _c(
+          "div",
+          { ref: "chartContainer", staticClass: "order-chart-container" },
+          [
+            _c("div", { ref: "orderChart", staticClass: "chart-wrapper" }),
             _vm._v(" "),
-            _c("input", {
-              directives: [
-                {
-                  name: "model",
-                  rawName: "v-model",
-                  value: _vm.chartDate,
-                  expression: "chartDate"
-                }
-              ],
-              staticClass: "command",
-              attrs: {
-                type: "date",
-                id: "dateInput",
-                title: _vm.$t("user.orderChart.dateTitle")
-              },
-              domProps: { value: _vm.chartDate },
-              on: {
-                input: function($event) {
-                  if ($event.target.composing) {
-                    return
+            _c("div", { staticClass: "area", attrs: { id: "dataAreaDiv" } }, [
+              _c("div", { staticClass: "command clock" }, [
+                _vm._v(_vm._s(_vm.time))
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.chartDate,
+                    expression: "chartDate"
                   }
-                  _vm.chartDate = $event.target.value
+                ],
+                staticClass: "command",
+                attrs: {
+                  type: "date",
+                  id: "dateInput",
+                  title: _vm.$t("user.orderChart.dateTitle")
+                },
+                domProps: { value: _vm.chartDate },
+                on: {
+                  change: function() {
+                    return _vm.getChartData()
+                  },
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.chartDate = $event.target.value
+                  }
                 }
-              }
-            }),
+              }),
+              _vm._v(" "),
+              _vm.spinnerShow
+                ? _c("img", { attrs: { id: "spinnerImg", src: "spinner.gif" } })
+                : _vm._e()
+            ]),
             _vm._v(" "),
-            _c("div", { staticClass: "clock" }, [_vm._v("21:21:21")])
-          ]),
-          _vm._v(" "),
-          _vm._m(0)
-        ])
+            _c("div", { staticClass: "area", attrs: { id: "toolAreaDiv" } }, [
+              _c("div", {
+                class:
+                  "command far fa-" +
+                  (_vm.isFullscreen ? "compress" : "expand"),
+                on: {
+                  click: function() {
+                    return _vm.toggleFullscreen()
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("div", {
+                staticClass: "command far fa-sync-alt",
+                on: {
+                  click: function() {
+                    return _vm.getChartData()
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("div", { staticClass: "command far fa-minus" }),
+              _vm._v(" "),
+              _c("div", { staticClass: "command far fa-arrows-v" })
+            ])
+          ]
+        )
       ],
       1
     )
   ])
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "area", attrs: { id: "toolAreaDiv" } }, [
-      _c("div", { staticClass: "command far fa-expand" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "command far fa-sync-alt" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "command far fa-minus" }),
-      _vm._v(" "),
-      _c("div", { staticClass: "command far fa-arrows-v" })
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

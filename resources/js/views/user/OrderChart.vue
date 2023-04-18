@@ -19,22 +19,33 @@
                     }
                 ]"
             />
-            <div class="order-chart-container">
+            <div class="order-chart-container" ref="chartContainer">
                 <div class="chart-wrapper" ref="orderChart"></div>
                 <div id="dataAreaDiv" class="area">
-                    <img id="spinnerImg" src="spinner.gif" v-if="spinnerShow" />
+                    <div class="command clock">{{ time }}</div>
                     <input
                         type="date"
                         id="dateInput"
                         class="command"
                         :title="$t('user.orderChart.dateTitle')"
                         v-model="chartDate"
+                        @change="() => getChartData()"
                     />
-                    <div class="command clock">21:21:21</div>
+                    <img id="spinnerImg" src="spinner.gif" v-if="spinnerShow" />
                 </div>
                 <div id="toolAreaDiv" class="area">
-                    <div class="command far fa-expand"></div>
-                    <div class="command far fa-sync-alt"></div>
+                    <div
+                        :class="
+                            `command far fa-${
+                                isFullscreen ? 'compress' : 'expand'
+                            }`
+                        "
+                        @click="() => toggleFullscreen()"
+                    ></div>
+                    <div
+                        class="command far fa-sync-alt"
+                        @click="() => getChartData()"
+                    ></div>
                     <div class="command far fa-minus"></div>
                     <div class="command far fa-arrows-v"></div>
                 </div>
@@ -85,7 +96,10 @@ export default {
             ruler: { start: {}, end: {}, point: 0 },
             crosshair: {},
             spinnerShow: false,
-            chartDate: moment().format("YYYY-MM-DD")
+            chartDate: moment().format("YYYY-MM-DD"),
+            interval: null,
+            time: null,
+            isFullscreen: false
         };
     },
     beforeCreate() {
@@ -93,6 +107,13 @@ export default {
     },
     created() {
         this.getChartData(true);
+        this.interval = setInterval(() => {
+            this.time = Intl.DateTimeFormat(navigator.language, {
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric"
+            }).format();
+        }, 1000);
     },
     mounted() {
         if (document.getElementById("orderChartJs")) return;
@@ -126,11 +147,16 @@ export default {
             window.addEventListener("keydown", e =>
                 this.eventKeyPress(e, this)
             );
+            document.addEventListener(
+                "fullscreenchange",
+                () => (this.isFullscreen = document.fullscreenElement)
+            );
             // this.loadChartData();
         }, 1000);
     },
     destroyed() {
         this.$store.unregisterModule("User.orderChart");
+        clearInterval(this.interval);
     },
     computed: {
         ...mapGetters("User.orderChart", ["config"])
@@ -395,7 +421,8 @@ export default {
             return false;
         },
         eventChartResize(self) {
-            // self.chart.resize(window.innerWidth, window.innerHeight);
+            const chartEl = this.$refs.chartContainer;
+            this.chart.resize(chartEl.offsetWidth, chartEl.offsetHeight);
         },
         eventKeyPress(e, self) {
             try {
@@ -552,6 +579,20 @@ export default {
             } catch (error) {
                 console.log(error);
             }
+        },
+        toggleFullscreen() {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else this.$refs.chartContainer.requestFullscreen();
+            // this.$refs.chartContainer.requestFullscreen();
+
+            console.log(
+                "document.fullscreenElement",
+                document.fullscreenElement
+            );
+            // console.log(
+            //     "this.$refs.chartContainer.fullscreenElement",
+            //     this.$refs.chartContainer.fullscreenElement
+            // );
         }
     }
 };
@@ -576,7 +617,7 @@ export default {
 
         &#dataAreaDiv {
             top: 0px;
-            right: 55px;
+            left: 30px;
 
             .command:not(:first-child) {
                 border-left: solid 2px #2a2e39 !important;
@@ -628,8 +669,7 @@ export default {
         }
     }
     .clock {
-        width: 100px;
-        height: 30px;
+        width: 80px;
     }
 }
 </style>
