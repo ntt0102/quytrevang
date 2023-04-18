@@ -30,38 +30,13 @@
                         :title="$t('user.orderChart.dateTitle')"
                         v-model="chartDate"
                     />
-                    <select
-                        id="chartTypeSelect"
-                        class="command"
-                        v-model="chartType"
-                    >
-                        <option
-                            v-for="chartType in chartTypes"
-                            :key="chartType.value"
-                            :value="chartType.value"
-                            >{{ chartType.text }}</option
-                        >
-                    </select>
-                    <select
-                        id="timeFrameSelect"
-                        class="command"
-                        v-model="timeFrame"
-                    >
-                        <option
-                            v-for="timeFrame in timeFrames"
-                            :key="timeFrame.value"
-                            :value="timeFrame.value"
-                            >{{ timeFrame.text }}</option
-                        ></select
-                    >
-                    <div id="dataAreaDiv" class="command far fa-sync-alt"></div>
-                    <div id="dataAreaDiv" class="command  far fa-trash"></div>
+                    <div class="command clock">21:21:21</div>
                 </div>
                 <div id="toolAreaDiv" class="area">
+                    <div class="command far fa-expand"></div>
+                    <div class="command far fa-sync-alt"></div>
                     <div class="command far fa-minus"></div>
-                    <div class="command far fa-map-marker-check"></div>
                     <div class="command far fa-arrows-v"></div>
-                    <div class="command far fa-bell-on"></div>
                 </div>
             </div>
         </div>
@@ -70,9 +45,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import userOrderChartStore from "../../store/modules/User/OrderChart";
-const UP_COLOR = "48,161,101";
-const DOWN_COLOR = "236,63,63";
+import adminOrderChartStore from "../../store/modules/Admin/OrderChart";
 const chartOptions = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
@@ -106,41 +79,20 @@ export default {
         return {
             chart: {},
             series: {},
-            data: { original: [], price: [], volume: [], whitespace: [] },
+            data: { whitespace: [], price: [] },
             order: { entry: {}, tp: {}, sl: {} },
             lines: [],
-            makers: [],
             ruler: { start: {}, end: {}, point: 0 },
-            alerts: [],
             crosshair: {},
             spinnerShow: false,
-            chartDate: moment().format("YYYY-MM-DD"),
-            chartType: "line",
-            timeFrame: 0,
-            chartTypes: [
-                { text: "Nến", value: "candlestick" },
-                { text: "Đường", value: "line" },
-                { text: "Thanh", value: "bar" }
-            ],
-            timeFrames: [
-                { text: "Tick", value: 0 },
-                { text: "1 min", value: 1 },
-                { text: "2 min", value: 2 },
-                { text: "3 min", value: 3 },
-                { text: "5 min", value: 5 },
-                { text: "7 min", value: 7 },
-                { text: "10 min", value: 10 },
-                { text: "15 min", value: 15 },
-                { text: "30 min", value: 30 },
-                { text: "1 day", value: 1440 }
-            ]
+            chartDate: moment().format("YYYY-MM-DD")
         };
     },
     beforeCreate() {
-        this.$store.registerModule("User.orderChart", userOrderChartStore);
+        this.$store.registerModule("User.orderChart", adminOrderChartStore);
     },
     created() {
-        this.getConfig().then(() => this.loadChartData());
+        this.getChartData(true);
     },
     mounted() {
         if (document.getElementById("orderChartJs")) return;
@@ -164,13 +116,10 @@ export default {
                 priceScaleId: "whitespace",
                 visible: false
             });
-            this.series.volume = this.chart.addHistogramSeries({
-                priceScaleId: "volume",
-                priceFormat: { type: "volume" },
-                scaleMargins: { top: 0.8, bottom: 0 },
-                visible: false
+            this.series.price = this.chart.addLineSeries({
+                color: "#CCCCCC",
+                priceFormat: { minMove: 0.1 }
             });
-            this.createPriceSeries();
             window.addEventListener("resize", () =>
                 this.eventChartResize(this)
             );
@@ -190,7 +139,7 @@ export default {
         // }
     },
     methods: {
-        ...mapActions("User.orderChart", ["getChartData", "getConfig"]),
+        // ...mapActions("User.orderChart", ["getChartData", "getConfig"]),
         eventChartCrosshairMove(e, self) {
             // if (e.time) {
             //     var price = e.seriesPrices.get(self.series.price);
@@ -298,41 +247,42 @@ export default {
                     break;
             }
         },
-        createPriceSeries() {
-            switch (this.chartType) {
-                case "candlestick":
-                    this.series.price = this.chart.addCandlestickSeries({
-                        upColor: `rgb(${UP_COLOR})`,
-                        downColor: `rgb(${DOWN_COLOR})`,
-                        borderVisible: false,
-                        priceFormat: { minMove: 0.1 }
-                    });
-                    break;
-                case "line":
-                    this.series.price = this.chart.addLineSeries({
-                        color: "#CCCCCC",
-                        priceFormat: { minMove: 0.1 }
-                    });
-                    break;
-                case "bar":
-                    this.series.price = this.chart.addBarSeries({
-                        upColor: `rgb(${UP_COLOR})`,
-                        downColor: `rgb(${DOWN_COLOR})`,
-                        thinBars: false,
-                        priceFormat: { minMove: 0.1 }
-                    });
-                    break;
-            }
+        getChartData(loadWhitespace = false) {
+            this.spinnerShow = true;
+            axios
+                .post(
+                    "order-chart",
+                    { date: this.chartDate },
+                    { noLoading: true }
+                )
+                .then(response => {
+                    // console.log(response.data);
+                    if (loadWhitespace) {
+                        this.data.whitespace = this.mergeChartData(
+                            this.data.whitespace,
+                            this.generateWhitespaceData()
+                        );
+                        this.series.whitespace.setData(this.data.whitespace);
+                    }
+                    this.data.price = this.mergeChartData(
+                        response.data,
+                        this.data.price
+                    );
+                    this.series.price.setData(this.data.price);
+                    //
+                    this.spinnerShow = false;
+                });
         },
         loadChartData(loadWhitespace = true, loadOriginal = true) {
             return new Promise(async resolve => {
                 this.spinnerShow = true;
-                // if (loadWhitespace) {
-                //     this.data.whitespace = this.mergeChartData(
-                //         this.data.whitespace,
-                //         this.generateWhitespaceData()
-                //     );
-                // }
+                if (loadWhitespace) {
+                    this.data.whitespace = this.mergeChartData(
+                        this.data.whitespace,
+                        this.generateWhitespaceData()
+                    );
+                    this.series.whitespace.setData(this.data.whitespace);
+                }
                 if (loadOriginal) {
                     const svData = await this.getChartData(this.chartDate);
                     this.data.original = this.mergeChartData(
@@ -340,10 +290,6 @@ export default {
                         this.data.original
                     );
                 }
-                //
-                // this.series.whitespace.setData(
-                //     this.timeFrame == 0 ? this.data.whitespace : []
-                // );
                 //
                 if (!!this.data.original.length) {
                     const data = this.data.original.reduce(
@@ -374,7 +320,7 @@ export default {
             );
         },
         generateWhitespaceData() {
-            const date = this.dateInput.value;
+            const date = this.chartDate;
             const amStart = moment(`${date} 09:00:00`).unix();
             const amEnd = moment(`${date} 11:30:00`).unix();
             const pmStart = moment(`${date} 13:00:00`).unix();
@@ -392,13 +338,6 @@ export default {
         generateChartData(r, item) {
             if (this.checkDuplicateTime(r, item.time)) {
                 var time = item.time + 7 * 60 * 60;
-                const upColor = `rgba(${this.UP_COLOR},0.35)`;
-                const downColor = `rgba(${this.DOWN_COLOR},0.35)`;
-                var volumeColor = upColor;
-                var volume = item.volume,
-                    openPrice = 0,
-                    highPrice = 0,
-                    lowPrice = 0;
                 if (this.timeFrame > 0) {
                     const period = 60 * this.timeFrame;
                     const timeIndex = Math.floor(time / period);
@@ -687,6 +626,10 @@ export default {
         &:hover {
             background: #2a2e39 !important;
         }
+    }
+    .clock {
+        width: 100px;
+        height: 30px;
     }
 }
 </style>
