@@ -96,6 +96,14 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('withdrawing', 'ContractController@withdrawingContract');
                     Route::get('contract-users', 'ContractController@getContactUsers');
                 });
+                Route::group(['prefix' => 'order-chart', 'middleware' => 'can:service@use'], function () {
+                    Route::post('/chart-data', 'OrderChartController@getChartData');
+                    Route::post('/get-config', 'OrderChartController@getConfig');
+                    // Route::post('/', 'ContractController@save');
+                    // Route::post('paying', 'ContractController@payingContract');
+                    // Route::post('withdrawing', 'ContractController@withdrawingContract');
+                    // Route::get('contract-users', 'ContractController@getContactUsers');
+                });
                 Route::get('trade', 'TradeController@getWeekChart')->middleware('can:trade@view');
             });
 

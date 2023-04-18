@@ -21,7 +21,14 @@ export default [
         level: 5
     },
     {
-        text: "Quản lý",
+        text: i18n.t("user.orderChart.title"),
+        name: "orderChart",
+        icon: "far fa-chart-line",
+        permissions: ["service@use"],
+        level: 5
+    },
+    {
+        text: i18n.t("admin.title"),
         icon: "far fa-tools",
         permissions: [
             "users@control",

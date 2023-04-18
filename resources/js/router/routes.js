@@ -6,6 +6,8 @@ const Profile = () =>
     import(/* webpackPrefetch: true */ "../views/user/Profile");
 const Contract = () =>
     import(/* webpackPrefetch: true */ "../views/user/Contract");
+const OrderChart = () =>
+    import(/* webpackPrefetch: true */ "../views/user/OrderChart");
 
 const Users = () => import(/* webpackPrefetch: true */ "../views/admin/Users");
 const Contracts = () =>
@@ -70,6 +72,15 @@ export default ({ authGuard, guestGuard }) => [
                     meta: {
                         title: i18n.t("user.contract.title"),
                         permission: "contract@control"
+                    }
+                },
+                {
+                    path: "order-chart",
+                    name: "orderChart",
+                    component: OrderChart,
+                    meta: {
+                        title: i18n.t("user.orderChart.title"),
+                        permission: "service@use"
                     }
                 },
                 {
