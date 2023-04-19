@@ -24,7 +24,7 @@ class OrderChartController extends CoreController
      */
     public function getChartData(Request $request)
     {
-        $data = $this->orderChartService->getChartData($request);
-        return $this->sendResponse($data);
+        $data = $this->orderChartService->getChartData($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
     }
 }

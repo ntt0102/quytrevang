@@ -12,6 +12,7 @@ require("laravel-mix-clean");
  |
  */
 // if (!mix.inProduction()) mix.sourceMaps();
+mix.sourceMaps();
 mix.js("resources/js/app.js", "public/js")
     .sass("resources/sass/app.scss", "public/css")
     .copyDirectory("resources/images", "public/images")

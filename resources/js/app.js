@@ -9,10 +9,10 @@ import prototypes from "./prototypes";
 import filters from "./filters";
 import plugins from "./plugins";
 
-require("./configs");
 Vue.use(filters);
 Vue.use(prototypes);
 Vue.use(plugins);
+require("./configs");
 
 new Vue({
     router,

@@ -1,9 +1,10 @@
 import Bus from "./bus";
+import Crypto from "./crypto";
+import VueCookies from "vue-cookies";
 import router from "../router";
 import Toasted from "vue-toasted";
 import Photoswipe from "vue-pswipe";
 import VueGtag from "vue-gtag";
-import VueCookies from "vue-cookies";
 
 const DxScrollView = () =>
     import(/* webpackPrefetch: true */ "devextreme-vue/scroll-view");
@@ -21,6 +22,8 @@ const DxLoadPanel = () =>
 export default {
     install(Vue) {
         Vue.use(Bus);
+        Vue.use(Crypto);
+        Vue.use(VueCookies);
         Vue.use(Toasted, {
             duration: 2000,
             keepOnHover: true,
@@ -38,7 +41,6 @@ export default {
             },
             router
         );
-        Vue.use(VueCookies);
 
         Vue.component("DxScrollView", DxScrollView);
         Vue.component("DxToolbar", DxToolbar);

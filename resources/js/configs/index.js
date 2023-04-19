@@ -14,6 +14,8 @@ axios.interceptors.request.use(
             if (navigator.onLine) store.dispatch("setSyncing", true);
             else Vue.toasted.info(i18n.t("messages.info.offline"));
         }
+        if (!!config.crypto)
+            config.data = Vue.prototype.$crypto.encrypt(config.data);
         return config;
     },
     error => {
@@ -24,6 +26,8 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
     response => {
         store.dispatch("setSyncing", false);
+        if (!!response.config.crypto)
+            response.data = Vue.prototype.$crypto.decrypt(response.data);
         console.log(
             "response:" + response.config.method + "/" + response.config.url,
             response.data
