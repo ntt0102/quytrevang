@@ -21,19 +21,18 @@
             />
             <div class="order-chart-container" ref="chartContainer">
                 <div class="chart-wrapper" ref="orderChart"></div>
-                <div id="dataAreaDiv" class="area">
+                <div class="area data-area">
                     <div class="command clock">{{ clock }}</div>
                     <input
                         type="date"
-                        id="dateInput"
-                        class="command"
+                        class="chart-date command"
                         :title="$t('user.orderChart.dateTitle')"
                         v-model="chartDate"
                         @change="() => getChartData()"
                     />
-                    <img id="spinnerImg" src="spinner.gif" v-if="spinnerShow" />
+                    <img class="spinner" src="spinner.gif" v-if="spinnerShow" />
                 </div>
-                <div id="toolAreaDiv" class="area">
+                <div class="area tool-area">
                     <div
                         :class="
                             `command far fa-${
@@ -62,34 +61,32 @@
                 <div>
                     <button
                         ref="cancelOrder"
-                        id="cancelOrderButton"
+                        class="cancel-order"
                         @click="cancelOrderClick"
                     >
                         X
                     </button>
                     <button
                         ref="entryOrder"
-                        id="entryOrderButton"
+                        class="order-button entry"
                         @click="entryOrderClick"
                     >
                         Entry
                     </button>
                     <button
                         ref="tpslOrder"
-                        id="tpslOrderButton"
+                        class="order-button tpsl"
                         @click="tpslOrderClick"
                     >
                         TP/SL
                     </button>
                     <div
-                        id="charTopButton"
-                        class="command far fa-angle-double-right"
+                        class="chart-top command far fa-angle-double-right"
                         @click="charTopClick"
                     ></div>
                 </div>
             </div>
         </div>
-        {{ $crypto }}
     </div>
 </template>
 
@@ -133,7 +130,7 @@ export default {
             chart: {},
             series: {},
             data: { whitespace: [], price: [] },
-            order: { entry: {}, tp: {}, sl: {} },
+            order: { side: 0, entry: {}, tp: {}, sl: {} },
             lines: [],
             ruler: { start: {}, end: {}, point: 0 },
             crosshair: {},
@@ -156,7 +153,7 @@ export default {
         this.$store.registerModule("User.orderChart", adminOrderChartStore);
     },
     created() {
-        this.getChartData(true);
+        this.getChartData(true).then(() => this.loadOrderChartDb());
         this.clockInterval = setInterval(() => {
             this.clock = Intl.DateTimeFormat(navigator.language, {
                 hour: "numeric",
@@ -249,73 +246,77 @@ export default {
         eventPriceLineDrag(e) {
             var line = e.customPriceLine;
             var lineOptions = line.options();
-            lineOptions.price = self.formatPrice(lineOptions.price);
+            lineOptions.price = this.formatPrice(lineOptions.price);
             const oldPrice = +e.fromPriceString;
             const newPrice = lineOptions.price;
             switch (lineOptions.lineType) {
                 case "order":
                     if (newPrice != oldPrice) {
                         var isChanged = false;
-                        const position = self.callback.getOrderPositionCallback();
+                        // const position = this.callback.getOrderPositionCallback();
                         if (lineOptions.kind == "entry") {
-                            if (!position) {
+                            if (!this.orderPosition) {
                                 isChanged = true;
-                                self.order[lineOptions.kind].price = newPrice;
-                                self.callback.orderEntryPriceCallback(
-                                    self.order,
-                                    true
-                                );
-                                self.drawOrderLine(lineOptions.kind);
+                                this.order[lineOptions.kind].price = newPrice;
+                                this.executeOrder({
+                                    type: "entry",
+                                    cmd: "change",
+                                    side: this.order.side,
+                                    price: this.order.entry.price
+                                });
+                                this.drawOrderLine(lineOptions.kind);
                             }
                         } else {
-                            if (self.order.side * position > 0) {
+                            if (this.order.side * position > 0) {
                                 isChanged = true;
-                                self.order[lineOptions.kind].price = newPrice;
+                                this.order[lineOptions.kind].price = newPrice;
                                 if (lineOptions.kind == "tp")
-                                    self.callback.orderTpPriceCallback(
-                                        self.order,
-                                        true
-                                    );
+                                    this.executeOrder({
+                                        type: "tp",
+                                        cmd: "change",
+                                        side: -this.order.side,
+                                        price: this.order.tp.price
+                                    });
                                 else
-                                    self.callback.orderSlPriceCallback(
-                                        self.order,
-                                        true
-                                    );
-                                self.drawOrderLine(lineOptions.kind);
+                                    this.executeOrder({
+                                        type: "sl",
+                                        cmd: "change",
+                                        side: -this.order.side,
+                                        price: this.order.sl.price
+                                    });
+
+                                this.drawOrderLine(lineOptions.kind);
                             }
                         }
                         //
                         if (!isChanged) {
                             line.applyOptions({ price: oldPrice });
-                            self.global.alert.warning("Không được thay đổi.");
+                            this.$toasted.show("Không được thay đổi.");
                         }
                     }
                     break;
                 case "line":
-                    self.global.store.set("line", {
+                    orderChartDb.set("line", {
                         price: oldPrice,
                         removed: true
                     });
-                    self.global.store.set("line", lineOptions);
-                    self.drawLineButton.classList.remove("selected");
+                    orderChartDb.set("line", lineOptions);
+                    this.$refs.lineTool.classList.remove("selected");
                     break;
                 case "ruler":
                     if (lineOptions.point == 1) {
-                        self.global.store.set("ruler", lineOptions);
-                        if (self.ruler.point == 2) {
-                            const distance = +self.ruler.end.options().title;
+                        orderChartDb.set("ruler", lineOptions);
+                        if (this.ruler.point == 2) {
+                            const distance = +this.ruler.end.options().title;
                             const endPrice = +(newPrice + distance).toFixed(1);
-                            self.ruler.end.applyOptions({ price: endPrice });
-                            self.global.store.set(
-                                "ruler",
-                                self.ruler.end.options()
-                            );
+                            this.ruler.end.applyOptions({ price: endPrice });
+                            orderChartDb.set("ruler", this.ruler.end.options());
                         }
                     } else {
-                        const startPrice = +self.ruler.start.options().price;
+                        const startPrice = +this.ruler.start.options().price;
                         const distance = (newPrice - startPrice).toFixed(1);
                         line.applyOptions({ title: distance });
-                        self.global.store.set("ruler", line.options());
+                        orderChartDb.set("ruler", line.options());
                     }
                     break;
             }
@@ -372,31 +373,94 @@ export default {
             if (document.fullscreenElement) document.exitFullscreen();
             else this.chartContainer.requestFullscreen();
         },
-        getChartData(loadWhitespace = false) {
-            this.spinnerShow = true;
-            axios
-                .post(
-                    "order-chart",
-                    { date: this.chartDate },
-                    { noLoading: true, crypto: true }
-                )
-                .then(response => {
-                    // console.log(response.data);
-                    if (loadWhitespace) {
-                        this.data.whitespace = this.mergeChartData(
-                            this.data.whitespace,
-                            this.createWhitespaceData()
-                        );
-                        this.series.whitespace.setData(this.data.whitespace);
+        executeOrder(data) {
+            return new Promise(resolve => {
+                this.spinnerShow = true;
+                axios
+                    .post("order-chart/order", data, {
+                        noLoading: true,
+                        crypto: true
+                    })
+                    .then(response => {
+                        // console.log(response.data);
+
+                        this.spinnerShow = false;
+                        resolve();
+                    });
+            });
+        },
+        loadOrderChartDb() {
+            return new Promise(async (resolve, reject) => {
+                const order = await orderChartDb.get("order");
+                order.map(item => {
+                    this.order.side = item.side;
+                    this.order[item.kind].price = item.price;
+                    this.drawOrderLine(item.kind);
+                    if (item.kind == "entry") {
+                        // if (this.callback.getOrderPositionCallback()) {
+                        //     this.order.entry.line.applyOptions({
+                        //         draggable: false
+                        //     });
+                        // }
+                        this.toggleCancelOrderButton(true);
                     }
-                    this.data.price = this.mergeChartData(
-                        response.data,
-                        this.data.price
-                    );
-                    this.series.price.setData(this.data.price);
-                    //
-                    this.spinnerShow = false;
                 });
+                //
+                const lines = await orderChartDb.get("line");
+                lines.forEach(line => {
+                    if (!line.removed)
+                        this.lines.push(
+                            this.series.price.createPriceLine(line)
+                        );
+                });
+                //
+                const rulerLines = await orderChartDb.get("ruler");
+                if (rulerLines.length == 2) {
+                    rulerLines.forEach(line => {
+                        this.ruler.point = 2;
+                        if (line.point == 1)
+                            this.ruler.start = this.series.price.createPriceLine(
+                                line
+                            );
+                        else
+                            this.ruler.end = this.series.price.createPriceLine(
+                                line
+                            );
+                    });
+                }
+                //
+                resolve();
+            });
+        },
+        getChartData(loadWhitespace = false) {
+            return new Promise(async resolve => {
+                this.spinnerShow = true;
+                axios
+                    .post(
+                        "order-chart",
+                        { date: this.chartDate },
+                        { noLoading: true, crypto: true }
+                    )
+                    .then(response => {
+                        if (loadWhitespace) {
+                            this.data.whitespace = this.mergeChartData(
+                                this.data.whitespace,
+                                this.createWhitespaceData()
+                            );
+                            this.series.whitespace.setData(
+                                this.data.whitespace
+                            );
+                        }
+                        this.data.price = this.mergeChartData(
+                            response.data,
+                            this.data.price
+                        );
+                        this.series.price.setData(this.data.price);
+                        //
+                        this.spinnerShow = false;
+                        resolve();
+                    });
+            });
         },
         createWhitespaceData() {
             const date = this.chartDate;
@@ -421,49 +485,57 @@ export default {
             );
         },
         showOrderButton() {
-            if (this.orderPosition) {
-                if (
-                    this.order.entry.hasOwnProperty("line") &&
-                    !this.order.tp.hasOwnProperty("line")
-                ) {
-                    this.$refs.tpslOrder.style.left =
-                        +(
-                            this.crosshair.x +
-                            (this.crosshair.x > innerWidth - 61 ? -61 : 1)
-                        ) + "px";
-                    this.$refs.tpslOrder.style.top =
-                        +(
-                            this.crosshair.y +
-                            (this.crosshair.y > innerHeight - 51 ? -51 : 1)
-                        ) + "px";
-                    this.$refs.tpslOrder.style.display = "block";
-                }
-            } else {
-                if (!this.order.entry.hasOwnProperty("line")) {
-                    const price = this.coordinateToPrice(this.crosshair.y);
-                    const side =
-                        price >= this.data.price.slice(-1)[0].value ? 1 : -1;
-                    this.order.entry.price = price;
-                    this.order.tp.price = price + side * this.tpDefault;
-                    this.order.sl.price = price - side * this.slDefault;
-                    this.order.side = side;
-
-                    this.$refs.entryOrder.style.left =
-                        +(
-                            this.crosshair.x +
-                            (this.crosshair.x > innerWidth - 71 ? -71 : 1)
-                        ) + "px";
-                    this.$refs.entryOrder.style.top =
-                        +(
-                            this.crosshair.y +
-                            (this.crosshair.y > innerHeight - 61 ? -61 : 1)
-                        ) + "px";
-                    this.$refs.entryOrder.style.background =
-                        side > 0 ? "green" : "red";
-                    this.$refs.entryOrder.innerText = `${
-                        side > 0 ? "LONG" : "SHORT"
-                    } ${price}`;
-                    this.$refs.entryOrder.style.display = "block";
+            const CURRENT_SEC = moment().unix();
+            // if (this.isInSession(CURRENT_SEC)) {
+            if (true) {
+                if (this.orderPosition) {
+                    if (
+                        this.order.entry.hasOwnProperty("line") &&
+                        !this.order.tp.hasOwnProperty("line")
+                    ) {
+                        this.$refs.tpslOrder.style.left =
+                            +(
+                                this.crosshair.x +
+                                (this.crosshair.x > innerWidth - 61 ? -61 : 1)
+                            ) + "px";
+                        this.$refs.tpslOrder.style.top =
+                            +(
+                                this.crosshair.y +
+                                (this.crosshair.y > innerHeight - 51 ? -51 : 1)
+                            ) + "px";
+                        this.$refs.tpslOrder.style.display = "block";
+                    }
+                } else {
+                    if (!this.order.entry.hasOwnProperty("line")) {
+                        var price = this.coordinateToPrice(this.crosshair.y);
+                        const side =
+                            price >= this.data.price.slice(-1)[0].value
+                                ? 1
+                                : -1;
+                        this.order.side = side;
+                        if (CURRENT_SEC < this.time.ato) price = "ATO";
+                        else if (CURRENT_SEC < this.time.atc) {
+                            this.order.entry.price = price;
+                            this.order.tp.price = price + side * this.tpDefault;
+                            this.order.sl.price = price - side * this.slDefault;
+                        } else price = "ATC";
+                        this.$refs.entryOrder.style.left =
+                            +(
+                                this.crosshair.x +
+                                (this.crosshair.x > innerWidth - 71 ? -71 : 1)
+                            ) + "px";
+                        this.$refs.entryOrder.style.top =
+                            +(
+                                this.crosshair.y +
+                                (this.crosshair.y > innerHeight - 61 ? -61 : 1)
+                            ) + "px";
+                        this.$refs.entryOrder.style.background =
+                            side > 0 ? "green" : "red";
+                        this.$refs.entryOrder.innerText = `${
+                            side > 0 ? "LONG" : "SHORT"
+                        } ${price}`;
+                        this.$refs.entryOrder.style.display = "block";
+                    }
                 }
             }
         },
@@ -526,7 +598,7 @@ export default {
         lineToolClick(e) {
             const selected = e.target.classList.contains("selected");
             document
-                .querySelectorAll("#toolAreaDiv > .command")
+                .querySelectorAll(".tool-area > .command")
                 .forEach(el => el.classList.remove("selected"));
             if (!selected) e.target.classList.add("selected");
             e.stopPropagation();
@@ -572,9 +644,12 @@ export default {
         rulerToolClick(e) {
             const selected = e.target.classList.contains("selected");
             document
-                .querySelectorAll("#toolAreaDiv > .command")
+                .querySelectorAll(".tool-area > .command")
                 .forEach(el => el.classList.remove("selected"));
-            if (!selected) e.target.classList.add("selected");
+            if (!selected) {
+                e.target.classList.add("selected");
+                this.removeRulerTool();
+            }
             e.stopPropagation();
         },
         rulerToolContextmenu(e) {
@@ -624,47 +699,113 @@ export default {
         cancelOrderClick() {
             this.toggleCancelOrderButton(false);
             if (this.order.entry.hasOwnProperty("line")) {
-                // this.callback.cancelOrderCallback();
-                orderChartDb.clear("order");
-                this.removeOrderLine("entry");
                 if (this.order.tp.hasOwnProperty("line")) {
-                    // this.callback.closeOrderPositionCallback("MTL");
-                    this.removeOrderLine("tp");
-                    this.removeOrderLine("sl");
-                    this.$toasted.error("Đã huỷ lệnh và đóng tất cả vị thế");
-                } else this.$toasted.show("Đã huỷ lệnh entry.");
-            }
-
-            const CURRENT_SEC = moment().unix();
-            if (this.isInSession()) {
-                if (CURRENT_SEC < this.time.ato) {
-                    // this.callback.closeOrderPositionCallback("ATO");
-                    this.$toasted.error("Đã đặt lệnh ATO để đóng vị thế.");
-                } else if (CURRENT_SEC < this.time.atc) {
-                    if (this.order.entry.hasOwnProperty("line")) {
-                        // this.callback.cancelOrderCallback();
-                        orderChartDb.clear("order");
-                        this.removeOrderLine("entry");
-                        if (this.order.tp.hasOwnProperty("line")) {
-                            // this.callback.closeOrderPositionCallback("MTL");
+                    this.executeOrder({
+                        type: "exit",
+                        side: -this.order.side,
+                        price: "MTL"
+                    }).then(isOk => {
+                        if (isOk) {
+                            this.removeOrderLine("entry");
                             this.removeOrderLine("tp");
                             this.removeOrderLine("sl");
+                            orderChartDb.clear("order");
                             this.$toasted.error(
                                 "Đã huỷ lệnh và đóng tất cả vị thế"
                             );
-                        } else this.$toasted.show("Đã huỷ lệnh entry.");
-                    }
+                        } else this.toggleCancelOrderButton(true);
+                    });
                 } else {
-                    // this.callback.closeOrderPositionCallback("ATC");
-                    this.$toasted.error("Đã đặt lệnh ATC để đóng vị thế.");
+                    this.executeOrder({
+                        type: "entry",
+                        cmd: "delete"
+                    }).then(isOk => {
+                        if (isOk) {
+                            this.removeOrderLine("entry");
+                            orderChartDb.clear("order");
+                            this.$toasted.show("Đã huỷ lệnh entry.");
+                        } else this.toggleCancelOrderButton(true);
+                    });
                 }
             }
+
+            // const CURRENT_SEC = moment().unix();
+            // if (this.isInSession()) {
+            //     if (CURRENT_SEC < this.time.ato) {
+            //         // this.executeOrder({
+            //         //     type: "exit",
+            //         //     side: -this.order.side,
+            //         //     price: "ATO"
+            //         // }).then(isOk => {
+            //         //     if (isOk)
+            //         //         this.$toasted.success("Đặt lệnh ATO thành công");
+            //         //     else this.$toasted.error("Đặt lệnh ATO thất bại");
+            //         // });
+            //     } else if (CURRENT_SEC < this.time.atc) {
+            //         if (this.order.entry.hasOwnProperty("line")) {
+            //             // this.callback.cancelOrderCallback();
+            //             orderChartDb.clear("order");
+            //             this.removeOrderLine("entry");
+            //             if (this.order.tp.hasOwnProperty("line")) {
+            //                 // this.callback.closeOrderPositionCallback("MTL");
+            //                 this.removeOrderLine("tp");
+            //                 this.removeOrderLine("sl");
+            //                 this.$toasted.error(
+            //                     "Đã huỷ lệnh và đóng tất cả vị thế"
+            //                 );
+            //             } else this.$toasted.show("Đã huỷ lệnh entry.");
+            //         }
+            //     } else {
+            //         // this.callback.closeOrderPositionCallback("ATC");
+            //         this.$toasted.error("Đã đặt lệnh ATC để đóng vị thế.");
+            //     }
+            // }
         },
         entryOrderClick() {
-            // this.callback.orderEntryPriceCallback(this.order, false);
-            this.drawOrderLine("entry");
-            this.toggleCancelOrderButton(true);
-            this.hideOrderButton();
+            const CURRENT_SEC = moment().unix();
+            if (this.isInSession(CURRENT_SEC)) {
+                if (CURRENT_SEC < this.time.ato) {
+                    var choice = confirm("Đặt lệnh ATO?");
+                    if (choice) {
+                        this.executeOrder({
+                            type: "exit",
+                            side: -this.order.side,
+                            price: "ATO"
+                        }).then(isOk => {
+                            if (isOk)
+                                this.$toasted.success(
+                                    "Đặt lệnh ATO thành công"
+                                );
+                            else this.$toasted.error("Đặt lệnh ATO thất bại");
+                        });
+                    }
+                } else if (CURRENT_SEC < this.time.atc) {
+                    this.executeOrder({
+                        type: "entry",
+                        cmd: "new",
+                        side: this.order.side,
+                        price: this.order.entry.price
+                    });
+                    this.drawOrderLine("entry");
+                    this.toggleCancelOrderButton(true);
+                } else {
+                    var choice = confirm("Đặt lệnh ATC?");
+                    if (choice) {
+                        this.executeOrder({
+                            type: "exit",
+                            side: -this.order.side,
+                            price: "ATC"
+                        }).then(isOk => {
+                            if (isOk)
+                                this.$toasted.success(
+                                    "Đặt lệnh ATC thành công"
+                                );
+                            else this.$toasted.error("Đặt lệnh ATC thất bại");
+                        });
+                    }
+                }
+                this.hideOrderButton();
+            }
         },
         tpslOrderClick() {
             // this.callback.orderTpPriceCallback(this.order, false);
@@ -709,7 +850,7 @@ export default {
         border-radius: 5px;
         z-index: 3;
 
-        &#dataAreaDiv {
+        &.data-area {
             top: 0px;
             left: 30px;
 
@@ -717,25 +858,17 @@ export default {
                 border-left: solid 2px #2a2e39 !important;
             }
 
-            #timeFrameSelect {
-                width: 75px;
-            }
-
-            #chartTypeSelect {
-                width: 77px;
-            }
-
-            #dateInput {
+            .chart-date {
                 width: 125px;
             }
 
-            #spinnerImg {
+            .spinner {
                 width: 30px;
                 height: 30px;
             }
         }
 
-        &#toolAreaDiv {
+        &.tool-area {
             top: 0px;
             left: 0px;
             flex-direction: column;
@@ -774,7 +907,7 @@ export default {
         opacity: 1 !important;
     }
 
-    #cancelOrderButton {
+    .cancel-order {
         position: absolute;
         top: 130px;
         left: 0px;
@@ -792,35 +925,30 @@ export default {
         }
     }
 
-    #entryOrderButton {
+    .order-button {
         position: absolute;
-        width: 70px;
-        height: 60px;
-        display: none;
-        padding: auto;
-        text-align: center;
-        border-radius: 7px;
-        color: white;
-        background: silver;
-        z-index: 3;
-        cursor: pointer;
-    }
-
-    #tpslOrderButton {
-        position: absolute;
-        width: 60px;
-        height: 50px;
         display: none;
         padding: 5px;
         text-align: center;
         border-radius: 7px;
         color: black;
         background: silver;
+        line-height: 21px;
         z-index: 3;
         cursor: pointer;
+
+        &.entry {
+            width: 70px;
+            height: 60px;
+        }
+
+        &.tpsl {
+            width: 60px;
+            height: 50px;
+        }
     }
 
-    #charTopButton {
+    .chart-top {
         position: absolute;
         bottom: 30px;
         right: 60px;
