@@ -22,7 +22,7 @@
             <div class="order-chart-container" ref="chartContainer">
                 <div class="chart-wrapper" ref="orderChart"></div>
                 <div id="dataAreaDiv" class="area">
-                    <div class="command clock">{{ time }}</div>
+                    <div class="command clock">{{ clock }}</div>
                     <input
                         type="date"
                         id="dateInput"
@@ -97,8 +97,8 @@ export default {
             crosshair: {},
             spinnerShow: false,
             chartDate: moment().format("YYYY-MM-DD"),
-            interval: null,
-            time: null,
+            clockInterval: null,
+            clock: null,
             isFullscreen: false
         };
     },
@@ -107,8 +107,8 @@ export default {
     },
     created() {
         this.getChartData(true);
-        this.interval = setInterval(() => {
-            this.time = Intl.DateTimeFormat(navigator.language, {
+        this.clockInterval = setInterval(() => {
+            this.clock = Intl.DateTimeFormat(navigator.language, {
                 hour: "numeric",
                 minute: "numeric",
                 second: "numeric"
@@ -141,17 +141,14 @@ export default {
                 color: "#CCCCCC",
                 priceFormat: { minMove: 0.1 }
             });
-            window.addEventListener("resize", () =>
-                this.eventChartResize(this)
+            new ResizeObserver(this.eventChartResize).observe(
+                this.$refs.chartContainer
             );
-            window.addEventListener("keydown", e =>
-                this.eventKeyPress(e, this)
-            );
+            window.addEventListener("keydown", this.eventKeyPress);
             document.addEventListener(
                 "fullscreenchange",
                 () => (this.isFullscreen = document.fullscreenElement)
             );
-            // this.loadChartData();
         }, 1000);
     },
     destroyed() {
@@ -273,6 +270,58 @@ export default {
                     break;
             }
         },
+        eventChartResize() {
+            const el = this.$refs.chartContainer;
+            this.chart.resize(el.offsetWidth, el.offsetHeight);
+        },
+        eventKeyPress(e) {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.keyCode) {
+                    case 38:
+                        this.chart.timeScale().applyOptions({
+                            barSpacing:
+                                this.chart.options().timeScale.barSpacing + 0.05
+                        });
+                        break;
+                    case 40:
+                        this.chart.timeScale().applyOptions({
+                            barSpacing:
+                                this.chart.options().timeScale.barSpacing - 0.05
+                        });
+                        break;
+                    case 37:
+                        this.chart
+                            .timeScale()
+                            .scrollToPosition(
+                                this.chart.timeScale().scrollPosition() - 10
+                            );
+                        break;
+                    case 39:
+                        this.chart
+                            .timeScale()
+                            .scrollToPosition(
+                                this.chart.timeScale().scrollPosition() + 10
+                            );
+                        break;
+                    case 96:
+                        self.drawAlertButton.click();
+                        break;
+                    case 97:
+                        self.drawMarkerButton.click();
+                        break;
+                    case 98:
+                        this.getChartData();
+                        break;
+                    case 99:
+                        this.toggleFullscreen();
+                        break;
+                }
+            }
+        },
+        toggleFullscreen() {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else this.$refs.chartContainer.requestFullscreen();
+        },
         getChartData(loadWhitespace = false) {
             this.spinnerShow = true;
             axios
@@ -286,7 +335,7 @@ export default {
                     if (loadWhitespace) {
                         this.data.whitespace = this.mergeChartData(
                             this.data.whitespace,
-                            this.generateWhitespaceData()
+                            this.createWhitespaceData()
                         );
                         this.series.whitespace.setData(this.data.whitespace);
                     }
@@ -299,53 +348,7 @@ export default {
                     this.spinnerShow = false;
                 });
         },
-        loadChartData(loadWhitespace = true, loadOriginal = true) {
-            return new Promise(async resolve => {
-                this.spinnerShow = true;
-                if (loadWhitespace) {
-                    this.data.whitespace = this.mergeChartData(
-                        this.data.whitespace,
-                        this.generateWhitespaceData()
-                    );
-                    this.series.whitespace.setData(this.data.whitespace);
-                }
-                if (loadOriginal) {
-                    const svData = await this.getChartData(this.chartDate);
-                    this.data.original = this.mergeChartData(
-                        svData,
-                        this.data.original
-                    );
-                }
-                //
-                if (!!this.data.original.length) {
-                    const data = this.data.original.reduce(
-                        (r, item) => this.generateChartData(r, item),
-                        {
-                            price: [],
-                            volume: []
-                        }
-                    );
-                    this.series.price.setData(data.price);
-                    this.series.volume.setData(data.volume);
-                    // this.updateLegend(
-                    //     data.price.slice(-1)[0].value,
-                    //     data.volume.slice(-1)[0].value
-                    // );
-                    this.data.price = data.price;
-                    this.data.volume = data.volume;
-                }
-                //
-                this.spinnerShow = false;
-                resolve();
-            });
-        },
-        mergeChartData(data1, data2) {
-            const ids = new Set(data1.map(d => d.time));
-            return [...data1, ...data2.filter(d => !ids.has(d.time))].sort(
-                (a, b) => a.time - b.time
-            );
-        },
-        generateWhitespaceData() {
+        createWhitespaceData() {
             const date = this.chartDate;
             const amStart = moment(`${date} 09:00:00`).unix();
             const amEnd = moment(`${date} 11:30:00`).unix();
@@ -361,238 +364,11 @@ export default {
             }
             return data;
         },
-        generateChartData(r, item) {
-            if (this.checkDuplicateTime(r, item.time)) {
-                var time = item.time + 7 * 60 * 60;
-                if (this.timeFrame > 0) {
-                    const period = 60 * this.timeFrame;
-                    const timeIndex = Math.floor(time / period);
-                    var isSameTime = false;
-                    if (!!r.price.length) {
-                        const prevTime = r.price.slice(-1)[0].time;
-                        if (timeIndex == Math.floor(prevTime / period))
-                            isSameTime = true;
-                    }
-                    if (isSameTime) {
-                        const prevPrice = r.price.pop();
-                        openPrice = prevPrice.open;
-                        highPrice = prevPrice.high;
-                        lowPrice = prevPrice.low;
-                        if (item.price < lowPrice) lowPrice = item.price;
-                        if (item.price > highPrice) highPrice = item.price;
-                        //
-                        const prevVolume = r.volume.pop();
-                        volume += prevVolume.value;
-                        volumeColor =
-                            item.price >= openPrice ? upColor : downColor;
-                    } else {
-                        openPrice = item.price;
-                        highPrice = item.price;
-                        lowPrice = item.price;
-                    }
-                    time = timeIndex * period;
-                }
-                r.price.push({
-                    time: time,
-                    value: item.price,
-                    open: openPrice,
-                    high: highPrice,
-                    low: lowPrice,
-                    close: item.price
-                });
-                r.volume.push({
-                    time: time,
-                    value: volume,
-                    color: volumeColor
-                });
-            }
-            return r;
-
-            function checkDuplicateTime(r, time) {
-                if (r.price.length == 0) return true;
-                if (r.price.findIndex(item => item.time == time) == -1)
-                    return true;
-                return false;
-            }
-        },
-        checkDuplicateTime(r, time) {
-            if (r.price.length == 0) return true;
-            if (r.price.findIndex(item => item.time == time) == -1) return true;
-            return false;
-        },
-        eventChartResize(self) {
-            const chartEl = this.$refs.chartContainer;
-            this.chart.resize(chartEl.offsetWidth, chartEl.offsetHeight);
-        },
-        eventKeyPress(e, self) {
-            try {
-                if (e.ctrlKey || e.metaKey) {
-                    if (e.shiftKey) {
-                        switch (e.keyCode) {
-                            case 39:
-                                self.chart.timeScale().scrollToRealTime();
-                                break;
-                        }
-                    } else {
-                        switch (e.keyCode) {
-                            case 38:
-                                self.chart.timeScale().applyOptions({
-                                    barSpacing:
-                                        self.chart.options().timeScale
-                                            .barSpacing + 0.1
-                                });
-                                break;
-                            case 40:
-                                if (
-                                    options.timeScale.barSpacing >
-                                    options.timeScale.minBarSpacing
-                                )
-                                    self.chart.timeScale().applyOptions({
-                                        barSpacing:
-                                            self.chart.options().timeScale
-                                                .barSpacing - 0.1
-                                    });
-                                break;
-                            case 37:
-                                self.ch
-                                    .timeScale()
-                                    .scrollToPosition(
-                                        self.chart
-                                            .timeScale()
-                                            .scrollPosition() - 10
-                                    );
-                                break;
-                            case 39:
-                                self.ch
-                                    .timeScale()
-                                    .scrollToPosition(
-                                        self.chart
-                                            .timeScale()
-                                            .scrollPosition() + 10
-                                    );
-                                break;
-                            case 75:
-                                self.drawLineButton.click();
-                                break;
-                            case 76:
-                                self.drawMarkerButton.click();
-                                break;
-                            case 186:
-                                self.drawRulerButton.click();
-                                break;
-                            case 222:
-                                self.drawAlertButton.click();
-                                break;
-                            case 48:
-                                if (
-                                    self.timeFrame !=
-                                    self.global.timeFrames[0].value
-                                ) {
-                                    self.timeFrameSelect.value =
-                                        self.global.timeFrames[0].value;
-                                    self.timeFrameSelect.dispatchEvent(
-                                        new Event("change")
-                                    );
-                                }
-                                break;
-                            case 49:
-                                if (
-                                    self.timeFrame !=
-                                    self.global.timeFrames[1].value
-                                ) {
-                                    self.timeFrameSelect.value =
-                                        self.global.timeFrames[1].value;
-                                    self.timeFrameSelect.dispatchEvent(
-                                        new Event("change")
-                                    );
-                                }
-                                break;
-                            case 50:
-                                if (
-                                    self.timeFrame !=
-                                    self.global.timeFrames[2].value
-                                ) {
-                                    self.timeFrameSelect.value =
-                                        self.global.timeFrames[2].value;
-                                    self.timeFrameSelect.dispatchEvent(
-                                        new Event("change")
-                                    );
-                                }
-                                break;
-                            case 51:
-                                if (
-                                    self.timeFrame !=
-                                    self.global.timeFrames[3].value
-                                ) {
-                                    self.timeFrameSelect.value =
-                                        self.global.timeFrames[3].value;
-                                    self.timeFrameSelect.dispatchEvent(
-                                        new Event("change")
-                                    );
-                                }
-                                break;
-                            case 52:
-                                if (
-                                    self.chartType !=
-                                    self.global.chartTypes[0].value
-                                ) {
-                                    self.chartTypeSelect.value =
-                                        self.global.chartTypes[0].value;
-                                    self.chartTypeSelect.dispatchEvent(
-                                        new Event("change")
-                                    );
-                                }
-                                break;
-                            case 53:
-                                if (
-                                    self.chartType !=
-                                    self.global.chartTypes[1].value
-                                ) {
-                                    self.chartTypeSelect.value =
-                                        self.global.chartTypes[1].value;
-                                    self.chartTypeSelect.dispatchEvent(
-                                        new Event("change")
-                                    );
-                                }
-                                break;
-                            case 54:
-                                if (
-                                    self.chartType !=
-                                    self.global.chartTypes[2].value
-                                ) {
-                                    self.chartTypeSelect.value =
-                                        self.global.chartTypes[2].value;
-                                    self.chartTypeSelect.dispatchEvent(
-                                        new Event("change")
-                                    );
-                                }
-                                break;
-                            case 77:
-                                self.refreshButton.click();
-                                break;
-                            case 188:
-                                self.clearButton.click();
-                                break;
-                        }
-                    }
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        },
-        toggleFullscreen() {
-            if (document.fullscreenElement) document.exitFullscreen();
-            else this.$refs.chartContainer.requestFullscreen();
-            // this.$refs.chartContainer.requestFullscreen();
-
-            console.log(
-                "document.fullscreenElement",
-                document.fullscreenElement
+        mergeChartData(data1, data2) {
+            const ids = new Set(data1.map(d => d.time));
+            return [...data1, ...data2.filter(d => !ids.has(d.time))].sort(
+                (a, b) => a.time - b.time
             );
-            // console.log(
-            //     "this.$refs.chartContainer.fullscreenElement",
-            //     this.$refs.chartContainer.fullscreenElement
-            // );
         }
     }
 };
@@ -600,8 +376,9 @@ export default {
 <style lang="scss" scoped>
 .order-chart-container {
     position: relative;
-    height: calc(100vh - 56px - 109px - 200px);
-
+    height: 350px;
+    background: #131722;
+    border: none;
     .chart-wrapper {
         height: 100%;
     }

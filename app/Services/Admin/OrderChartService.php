@@ -3,32 +3,10 @@
 namespace App\Services\Admin;
 
 use App\Services\CoreService;
-use Illuminate\Support\Facades\Notification;
-use App\Notifications\CreatedContractNotification;
-use App\Notifications\PayingContractNotification;
-use App\Notifications\WithdrawingContractNotification;
-use App\Repositories\ContractRepository;
-use App\Repositories\ParameterRepository;
-use App\Repositories\UserRepository;
-use Illuminate\Support\Facades\Storage;
-
 
 class OrderChartService extends CoreService
 {
-    private $contractRepository;
-    private $parameterRepository;
-    private $userRepository;
     private $SHIFT_TIME = 7 * 60 * 60;
-
-    public function __construct(
-        ContractRepository $contractRepository,
-        ParameterRepository $parameterRepository,
-        UserRepository $userRepository
-    ) {
-        $this->contractRepository = $contractRepository;
-        $this->parameterRepository = $parameterRepository;
-        $this->userRepository = $userRepository;
-    }
 
     /**
      * Get chart data
@@ -41,10 +19,10 @@ class OrderChartService extends CoreService
         $date = date('Y-m-d');
         $data = [];
         if ($request->date < $date)
-            $data = $this->getFromCsv($request->date);
+            $data = $this->generateDataFromCsv($request->date);
         else if ($request->date == $date) {
             if (get_global_value('openingMarketFlag') == '1')
-                $data = $this->getVpsData();
+                $data = $this->generateDataFromVps();
         }
         return $data;
     }
@@ -52,9 +30,9 @@ class OrderChartService extends CoreService
     /**
      * Get data from VPS website
      */
-    public function getVpsData()
+    public function generateDataFromVps()
     {
-        $list = $this->vpsData();
+        $list = $this->cloneVpsData();
         return collect($list)->map(function ($item) {
             return [
                 'time' => strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME,
@@ -64,23 +42,12 @@ class OrderChartService extends CoreService
     }
 
     /**
-     * Vps data
-     */
-    private function vpsData()
-    {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-        $res = $client->get($url);
-        return json_decode($res->getBody());
-    }
-
-    /**
      * 
      */
     public function exportToCsv()
     {
         $filename = storage_path('app/public/vn30f1m/' . date('Y-m-d') . '.csv');
-        $list = $this->vpsData();
+        $list = $this->cloneVpsData();
         $fp = fopen($filename, 'w');
         foreach ($list as $item) {
             $line = [];
@@ -94,12 +61,12 @@ class OrderChartService extends CoreService
     /**
      * 
      */
-    public function getFromCsv($date)
+    public function generateDataFromCsv($date)
     {
         $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
-        $keys = ['time', 'price'];
+        $keys = ['time', 'value'];
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
@@ -111,6 +78,17 @@ class OrderChartService extends CoreService
         }
         fclose($fp);
         return $lines;
+    }
+
+    /**
+     * Vps data
+     */
+    private function cloneVpsData()
+    {
+        $client = new \GuzzleHttp\Client();
+        $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+        $res = $client->get($url);
+        return json_decode($res->getBody());
     }
 
     /**

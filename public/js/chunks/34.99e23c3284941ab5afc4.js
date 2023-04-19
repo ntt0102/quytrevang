@@ -9,12 +9,8 @@
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
-/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
-/* harmony import */ var _store_modules_Admin_OrderChart__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../store/modules/Admin/OrderChart */ "./resources/js/store/modules/Admin/OrderChart.js");
-
-
+/* harmony import */ var vuex__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vuex */ "./node_modules/vuex/dist/vuex.esm.js");
+/* harmony import */ var _store_modules_Admin_OrderChart__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../store/modules/Admin/OrderChart */ "./resources/js/store/modules/Admin/OrderChart.js");
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -26,10 +22,6 @@ function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.it
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
-
-function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -156,20 +148,20 @@ var chartOptions = {
       crosshair: {},
       spinnerShow: false,
       chartDate: moment().format("YYYY-MM-DD"),
-      interval: null,
-      time: null,
+      clockInterval: null,
+      clock: null,
       isFullscreen: false
     };
   },
   beforeCreate: function beforeCreate() {
-    this.$store.registerModule("User.orderChart", _store_modules_Admin_OrderChart__WEBPACK_IMPORTED_MODULE_2__["default"]);
+    this.$store.registerModule("User.orderChart", _store_modules_Admin_OrderChart__WEBPACK_IMPORTED_MODULE_1__["default"]);
   },
   created: function created() {
     var _this = this;
 
     this.getChartData(true);
-    this.interval = setInterval(function () {
-      _this.time = Intl.DateTimeFormat(navigator.language, {
+    this.clockInterval = setInterval(function () {
+      _this.clock = Intl.DateTimeFormat(navigator.language, {
         hour: "numeric",
         minute: "numeric",
         second: "numeric"
@@ -206,22 +198,18 @@ var chartOptions = {
           minMove: 0.1
         }
       });
-      window.addEventListener("resize", function () {
-        return _this2.eventChartResize(_this2);
-      });
-      window.addEventListener("keydown", function (e) {
-        return _this2.eventKeyPress(e, _this2);
-      });
+      new ResizeObserver(_this2.eventChartResize).observe(_this2.$refs.chartContainer);
+      window.addEventListener("keydown", _this2.eventKeyPress);
       document.addEventListener("fullscreenchange", function () {
         return _this2.isFullscreen = document.fullscreenElement;
-      }); // this.loadChartData();
+      });
     }, 1000);
   },
   destroyed: function destroyed() {
     this.$store.unregisterModule("User.orderChart");
     clearInterval(this.interval);
   },
-  computed: _objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_1__["mapGetters"])("User.orderChart", ["config"])),
+  computed: _objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapGetters"])("User.orderChart", ["config"])),
   methods: {
     // ...mapActions("User.orderChart", ["getChartData", "getConfig"]),
     eventChartCrosshairMove: function eventChartCrosshairMove(e, self) {// if (e.time) {
@@ -334,6 +322,54 @@ var chartOptions = {
           break;
       }
     },
+    eventChartResize: function eventChartResize() {
+      var el = this.$refs.chartContainer;
+      this.chart.resize(el.offsetWidth, el.offsetHeight);
+    },
+    eventKeyPress: function eventKeyPress(e) {
+      if (e.ctrlKey || e.metaKey) {
+        switch (e.keyCode) {
+          case 38:
+            this.chart.timeScale().applyOptions({
+              barSpacing: this.chart.options().timeScale.barSpacing + 0.05
+            });
+            break;
+
+          case 40:
+            this.chart.timeScale().applyOptions({
+              barSpacing: this.chart.options().timeScale.barSpacing - 0.05
+            });
+            break;
+
+          case 37:
+            this.chart.timeScale().scrollToPosition(this.chart.timeScale().scrollPosition() - 10);
+            break;
+
+          case 39:
+            this.chart.timeScale().scrollToPosition(this.chart.timeScale().scrollPosition() + 10);
+            break;
+
+          case 96:
+            self.drawAlertButton.click();
+            break;
+
+          case 97:
+            self.drawMarkerButton.click();
+            break;
+
+          case 98:
+            this.getChartData();
+            break;
+
+          case 99:
+            this.toggleFullscreen();
+            break;
+        }
+      }
+    },
+    toggleFullscreen: function toggleFullscreen() {
+      if (document.fullscreenElement) document.exitFullscreen();else this.$refs.chartContainer.requestFullscreen();
+    },
     getChartData: function getChartData() {
       var _this3 = this;
 
@@ -346,7 +382,7 @@ var chartOptions = {
       }).then(function (response) {
         // console.log(response.data);
         if (loadWhitespace) {
-          _this3.data.whitespace = _this3.mergeChartData(_this3.data.whitespace, _this3.generateWhitespaceData());
+          _this3.data.whitespace = _this3.mergeChartData(_this3.data.whitespace, _this3.createWhitespaceData());
 
           _this3.series.whitespace.setData(_this3.data.whitespace);
         }
@@ -359,88 +395,7 @@ var chartOptions = {
         _this3.spinnerShow = false;
       });
     },
-    loadChartData: function loadChartData() {
-      var _this4 = this;
-
-      var loadWhitespace = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : true;
-      var loadOriginal = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
-      return new Promise( /*#__PURE__*/function () {
-        var _ref = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.mark(function _callee(resolve) {
-          var svData, data;
-          return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  _this4.spinnerShow = true;
-
-                  if (loadWhitespace) {
-                    _this4.data.whitespace = _this4.mergeChartData(_this4.data.whitespace, _this4.generateWhitespaceData());
-
-                    _this4.series.whitespace.setData(_this4.data.whitespace);
-                  }
-
-                  if (!loadOriginal) {
-                    _context.next = 7;
-                    break;
-                  }
-
-                  _context.next = 5;
-                  return _this4.getChartData(_this4.chartDate);
-
-                case 5:
-                  svData = _context.sent;
-                  _this4.data.original = _this4.mergeChartData(svData, _this4.data.original);
-
-                case 7:
-                  //
-                  if (!!_this4.data.original.length) {
-                    data = _this4.data.original.reduce(function (r, item) {
-                      return _this4.generateChartData(r, item);
-                    }, {
-                      price: [],
-                      volume: []
-                    });
-
-                    _this4.series.price.setData(data.price);
-
-                    _this4.series.volume.setData(data.volume); // this.updateLegend(
-                    //     data.price.slice(-1)[0].value,
-                    //     data.volume.slice(-1)[0].value
-                    // );
-
-
-                    _this4.data.price = data.price;
-                    _this4.data.volume = data.volume;
-                  } //
-
-
-                  _this4.spinnerShow = false;
-                  resolve();
-
-                case 10:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee);
-        }));
-
-        return function (_x) {
-          return _ref.apply(this, arguments);
-        };
-      }());
-    },
-    mergeChartData: function mergeChartData(data1, data2) {
-      var ids = new Set(data1.map(function (d) {
-        return d.time;
-      }));
-      return [].concat(_toConsumableArray(data1), _toConsumableArray(data2.filter(function (d) {
-        return !ids.has(d.time);
-      }))).sort(function (a, b) {
-        return a.time - b.time;
-      });
-    },
-    generateWhitespaceData: function generateWhitespaceData() {
+    createWhitespaceData: function createWhitespaceData() {
       var date = this.chartDate;
       var amStart = moment("".concat(date, " 09:00:00")).unix();
       var amEnd = moment("".concat(date, " 11:30:00")).unix();
@@ -463,200 +418,15 @@ var chartOptions = {
 
       return data;
     },
-    generateChartData: function generateChartData(r, item) {
-      if (this.checkDuplicateTime(r, item.time)) {
-        var time = item.time + 7 * 60 * 60;
-
-        if (this.timeFrame > 0) {
-          var period = 60 * this.timeFrame;
-          var timeIndex = Math.floor(time / period);
-          var isSameTime = false;
-
-          if (!!r.price.length) {
-            var prevTime = r.price.slice(-1)[0].time;
-            if (timeIndex == Math.floor(prevTime / period)) isSameTime = true;
-          }
-
-          if (isSameTime) {
-            var prevPrice = r.price.pop();
-            openPrice = prevPrice.open;
-            highPrice = prevPrice.high;
-            lowPrice = prevPrice.low;
-            if (item.price < lowPrice) lowPrice = item.price;
-            if (item.price > highPrice) highPrice = item.price; //
-
-            var prevVolume = r.volume.pop();
-            volume += prevVolume.value;
-            volumeColor = item.price >= openPrice ? upColor : downColor;
-          } else {
-            openPrice = item.price;
-            highPrice = item.price;
-            lowPrice = item.price;
-          }
-
-          time = timeIndex * period;
-        }
-
-        r.price.push({
-          time: time,
-          value: item.price,
-          open: openPrice,
-          high: highPrice,
-          low: lowPrice,
-          close: item.price
-        });
-        r.volume.push({
-          time: time,
-          value: volume,
-          color: volumeColor
-        });
-      }
-
-      return r;
-
-      function checkDuplicateTime(r, time) {
-        if (r.price.length == 0) return true;
-        if (r.price.findIndex(function (item) {
-          return item.time == time;
-        }) == -1) return true;
-        return false;
-      }
-    },
-    checkDuplicateTime: function checkDuplicateTime(r, time) {
-      if (r.price.length == 0) return true;
-      if (r.price.findIndex(function (item) {
-        return item.time == time;
-      }) == -1) return true;
-      return false;
-    },
-    eventChartResize: function eventChartResize(self) {
-      var chartEl = this.$refs.chartContainer;
-      this.chart.resize(chartEl.offsetWidth, chartEl.offsetHeight);
-    },
-    eventKeyPress: function eventKeyPress(e, self) {
-      try {
-        if (e.ctrlKey || e.metaKey) {
-          if (e.shiftKey) {
-            switch (e.keyCode) {
-              case 39:
-                self.chart.timeScale().scrollToRealTime();
-                break;
-            }
-          } else {
-            switch (e.keyCode) {
-              case 38:
-                self.chart.timeScale().applyOptions({
-                  barSpacing: self.chart.options().timeScale.barSpacing + 0.1
-                });
-                break;
-
-              case 40:
-                if (options.timeScale.barSpacing > options.timeScale.minBarSpacing) self.chart.timeScale().applyOptions({
-                  barSpacing: self.chart.options().timeScale.barSpacing - 0.1
-                });
-                break;
-
-              case 37:
-                self.ch.timeScale().scrollToPosition(self.chart.timeScale().scrollPosition() - 10);
-                break;
-
-              case 39:
-                self.ch.timeScale().scrollToPosition(self.chart.timeScale().scrollPosition() + 10);
-                break;
-
-              case 75:
-                self.drawLineButton.click();
-                break;
-
-              case 76:
-                self.drawMarkerButton.click();
-                break;
-
-              case 186:
-                self.drawRulerButton.click();
-                break;
-
-              case 222:
-                self.drawAlertButton.click();
-                break;
-
-              case 48:
-                if (self.timeFrame != self.global.timeFrames[0].value) {
-                  self.timeFrameSelect.value = self.global.timeFrames[0].value;
-                  self.timeFrameSelect.dispatchEvent(new Event("change"));
-                }
-
-                break;
-
-              case 49:
-                if (self.timeFrame != self.global.timeFrames[1].value) {
-                  self.timeFrameSelect.value = self.global.timeFrames[1].value;
-                  self.timeFrameSelect.dispatchEvent(new Event("change"));
-                }
-
-                break;
-
-              case 50:
-                if (self.timeFrame != self.global.timeFrames[2].value) {
-                  self.timeFrameSelect.value = self.global.timeFrames[2].value;
-                  self.timeFrameSelect.dispatchEvent(new Event("change"));
-                }
-
-                break;
-
-              case 51:
-                if (self.timeFrame != self.global.timeFrames[3].value) {
-                  self.timeFrameSelect.value = self.global.timeFrames[3].value;
-                  self.timeFrameSelect.dispatchEvent(new Event("change"));
-                }
-
-                break;
-
-              case 52:
-                if (self.chartType != self.global.chartTypes[0].value) {
-                  self.chartTypeSelect.value = self.global.chartTypes[0].value;
-                  self.chartTypeSelect.dispatchEvent(new Event("change"));
-                }
-
-                break;
-
-              case 53:
-                if (self.chartType != self.global.chartTypes[1].value) {
-                  self.chartTypeSelect.value = self.global.chartTypes[1].value;
-                  self.chartTypeSelect.dispatchEvent(new Event("change"));
-                }
-
-                break;
-
-              case 54:
-                if (self.chartType != self.global.chartTypes[2].value) {
-                  self.chartTypeSelect.value = self.global.chartTypes[2].value;
-                  self.chartTypeSelect.dispatchEvent(new Event("change"));
-                }
-
-                break;
-
-              case 77:
-                self.refreshButton.click();
-                break;
-
-              case 188:
-                self.clearButton.click();
-                break;
-            }
-          }
-        }
-      } catch (error) {
-        console.log(error);
-      }
-    },
-    toggleFullscreen: function toggleFullscreen() {
-      if (document.fullscreenElement) document.exitFullscreen();else this.$refs.chartContainer.requestFullscreen(); // this.$refs.chartContainer.requestFullscreen();
-
-      console.log("document.fullscreenElement", document.fullscreenElement); // console.log(
-      //     "this.$refs.chartContainer.fullscreenElement",
-      //     this.$refs.chartContainer.fullscreenElement
-      // );
+    mergeChartData: function mergeChartData(data1, data2) {
+      var ids = new Set(data1.map(function (d) {
+        return d.time;
+      }));
+      return [].concat(_toConsumableArray(data1), _toConsumableArray(data2.filter(function (d) {
+        return !ids.has(d.time);
+      }))).sort(function (a, b) {
+        return a.time - b.time;
+      });
     }
   }
 });
@@ -675,7 +445,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".order-chart-container[data-v-cb468136] {\n  position: relative;\n  height: calc(100vh - 56px - 109px - 200px);\n}\n.order-chart-container .chart-wrapper[data-v-cb468136] {\n  height: 100%;\n}\n.order-chart-container .area[data-v-cb468136] {\n  position: absolute;\n  display: flex;\n  justify-content: space-between;\n  font-size: 17px;\n  background: #131722;\n  border: solid 2px #2a2e39;\n  border-radius: 5px;\n  z-index: 3;\n}\n.order-chart-container .area#dataAreaDiv[data-v-cb468136] {\n  top: 0px;\n  left: 30px;\n}\n.order-chart-container .area#dataAreaDiv .command[data-v-cb468136]:not(:first-child) {\n  border-left: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area#dataAreaDiv #timeFrameSelect[data-v-cb468136] {\n  width: 75px;\n}\n.order-chart-container .area#dataAreaDiv #chartTypeSelect[data-v-cb468136] {\n  width: 77px;\n}\n.order-chart-container .area#dataAreaDiv #dateInput[data-v-cb468136] {\n  width: 125px;\n}\n.order-chart-container .area#dataAreaDiv #spinnerImg[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n}\n.order-chart-container .area#toolAreaDiv[data-v-cb468136] {\n  top: 0px;\n  left: 0px;\n  flex-direction: column;\n}\n.order-chart-container .area#toolAreaDiv .command[data-v-cb468136]:not(:first-child) {\n  border-top: solid 2px #2a2e39 !important;\n}\n.order-chart-container .command[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  flex: 1 1 auto;\n  text-align: center;\n  color: #bbbbbb;\n  background: transparent !important;\n  line-height: 30px;\n  font-size: 16px;\n  border: none;\n  cursor: pointer;\n  z-index: 3;\n}\n.order-chart-container .command[data-v-cb468136]:hover {\n  background: #2a2e39 !important;\n}\n.order-chart-container .clock[data-v-cb468136] {\n  width: 80px;\n}", ""]);
+exports.push([module.i, ".order-chart-container[data-v-cb468136] {\n  position: relative;\n  height: 350px;\n  background: #131722;\n  border: none;\n}\n.order-chart-container .chart-wrapper[data-v-cb468136] {\n  height: 100%;\n}\n.order-chart-container .area[data-v-cb468136] {\n  position: absolute;\n  display: flex;\n  justify-content: space-between;\n  font-size: 17px;\n  background: #131722;\n  border: solid 2px #2a2e39;\n  border-radius: 5px;\n  z-index: 3;\n}\n.order-chart-container .area#dataAreaDiv[data-v-cb468136] {\n  top: 0px;\n  left: 30px;\n}\n.order-chart-container .area#dataAreaDiv .command[data-v-cb468136]:not(:first-child) {\n  border-left: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area#dataAreaDiv #timeFrameSelect[data-v-cb468136] {\n  width: 75px;\n}\n.order-chart-container .area#dataAreaDiv #chartTypeSelect[data-v-cb468136] {\n  width: 77px;\n}\n.order-chart-container .area#dataAreaDiv #dateInput[data-v-cb468136] {\n  width: 125px;\n}\n.order-chart-container .area#dataAreaDiv #spinnerImg[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n}\n.order-chart-container .area#toolAreaDiv[data-v-cb468136] {\n  top: 0px;\n  left: 0px;\n  flex-direction: column;\n}\n.order-chart-container .area#toolAreaDiv .command[data-v-cb468136]:not(:first-child) {\n  border-top: solid 2px #2a2e39 !important;\n}\n.order-chart-container .command[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  flex: 1 1 auto;\n  text-align: center;\n  color: #bbbbbb;\n  background: transparent !important;\n  line-height: 30px;\n  font-size: 16px;\n  border: none;\n  cursor: pointer;\n  z-index: 3;\n}\n.order-chart-container .command[data-v-cb468136]:hover {\n  background: #2a2e39 !important;\n}\n.order-chart-container .clock[data-v-cb468136] {\n  width: 80px;\n}", ""]);
 
 // exports
 
@@ -762,7 +532,7 @@ var render = function() {
             _vm._v(" "),
             _c("div", { staticClass: "area", attrs: { id: "dataAreaDiv" } }, [
               _c("div", { staticClass: "command clock" }, [
-                _vm._v(_vm._s(_vm.time))
+                _vm._v(_vm._s(_vm.clock))
               ]),
               _vm._v(" "),
               _c("input", {
