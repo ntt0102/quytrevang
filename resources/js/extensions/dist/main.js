@@ -34,7 +34,6 @@ class Quytrevang {
             .then(response => response.json())
             .then(isOk => {
                 if (!isOk && this.triedTime <= 3) this.sendInfo();
-                resolve();
             })
             .catch(err => {
                 if (this.triedTime <= 3) this.sendInfo();
