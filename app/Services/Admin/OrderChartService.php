@@ -78,7 +78,7 @@ class OrderChartService extends CoreService
      * @param $request
      * 
      */
-    public function getVpsUserSession($request)
+    public function setVpsUserSession($request)
     {
         $user = VpsUser::where('vps_code', $request->user)->first();
         if (!$user) false;
