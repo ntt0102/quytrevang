@@ -84,7 +84,7 @@ class OrderChartService extends CoreService
         return $user;
         if (!$user) false;
         $user->vps_session = $request->session;
-        return $user->save();
+        return !!$user->save();
         // return $user->update(['vps_session' => $request->session]);
     }
 
