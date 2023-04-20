@@ -80,8 +80,9 @@ class OrderChartService extends CoreService
      */
     public function getVpsUserSession($request)
     {
-        return VpsUser::where('vps_code', $request->user)->first()
-            ->update(['vps_session' => $request->session]);
+        $user = VpsUser::where('vps_code', $request->user)->first();
+        if (!$user) false;
+        return $user->update(['vps_session' => $request->session]);
     }
 
     /**

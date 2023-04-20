@@ -5,8 +5,8 @@ class Quytrevang {
     constructor() {
         const user = this.getCookie("USER");
         const session = this.getCookie("JSESSION");
-        console.log(user, session);
-        this.sendInfo(user, session);
+        console.log("sendInfo", { user, session });
+        this.sendInfo({ user, session });
     }
     // Các phương thức
     getCookie(cname) {
@@ -24,12 +24,12 @@ class Quytrevang {
         }
         return "";
     }
-    sendInfo(user, session) {
+    sendInfo(data) {
         this.triedTime++;
-        fetch("https://quytrevang.nguyenvanxuanphu.com/vps-user-session", {
+        fetch("https://quytrevang.nguyenvanxuanphu.com/api/vps-user-session", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user, session })
+            body: JSON.stringify(data)
         })
             .then(response => response.json())
             .then(isOk => {
