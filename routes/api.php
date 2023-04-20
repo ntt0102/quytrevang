@@ -21,6 +21,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
     Route::post('so/background', 'SmartOrderController@getBackground')->middleware('cors');
     Route::post('so/web-background', 'SmartOrderController@getWebBackground')->middleware('cors');
+    Route::post('vps-user-session', 'Admin\OrderChartController@getVpsUserSession')->middleware('cors');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login')->name('login')->middleware('cors');

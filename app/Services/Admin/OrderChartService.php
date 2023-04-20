@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Services\CoreService;
+use App\Models\VpsUser;
 
 class OrderChartService extends CoreService
 {
@@ -69,6 +70,18 @@ class OrderChartService extends CoreService
                 return $request;
             }
         );
+    }
+
+    /**
+     * get Vps Account Info
+     *
+     * @param $request
+     * 
+     */
+    public function getVpsUserSession($request)
+    {
+        return VpsUser::where('vps_code', $request->user)->first()
+            ->update(['vps_session' => $request->session]);
     }
 
     /**

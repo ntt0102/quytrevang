@@ -74,7 +74,7 @@ Route::get('test', function () {
     // $s = \App\Models\User::find(1);
     // $s = $s->smartOrder->validDevice('24efbc2f1f3b09283ee0d2b246a665a01');
     // $s = date_create() < date_add(date_create($s->smartOrder->started_at), date_interval_create_from_date_string("7 days"));
-    $s = App\Models\SmartOrder::all();
+    $s = App\Models\VpsUser::where('vps_code', 2285828)->first()->update(['vps_session' => 'abc']);
     // $s = $so->vps_accounts;
     dd($s);
 })->middleware('cors');

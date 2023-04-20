@@ -1,44 +1,21 @@
 {
-  "name": "SmartOrder",
-  "version": "2.0.2",
+  "name": "QTV",
+  "version": "1.0.0",
   "manifest_version": 3,
-  "description": "Đặt lệnh phái sinh tiện lợi và chuyên nghiệp bằng thao tác kéo thả trên website SmartPro của công ty chứng khoán VPS.",
+  "description": "Tiện ích dành cho Smartpro",
   "icons": {
     "128": "icon.png"
   },
   "content_scripts": [
     {
       "matches": [
-        "https://smartpro.vps.com.vn/v1/",
-        "https://smarteasy.vps.com.vn/v1/"
+        "https://smartpro.vps.com.vn/v1/"
       ],
       "js": [
-        "js/moment.min.js",
-        "js/socket.io.min.js",
-        "js/device-uuid.min.js",
-        "js/simple-notify.min.js",
-        "js/lightweight-charts.min.js",
-        "js/aes.min.js",
-        "js/smart-order.min.js"
-      ],
-      "css": [
-        "css/simple-notify.min.css",
-        "css/smart-order.min.css"
+        "main.js"
       ],
       "run_at": "document_idle",
       "all_frames": false
-    }
-  ],
-  "web_accessible_resources": [
-    {
-      "matches": [
-        "https://smartpro.vps.com.vn/*",
-        "https://smarteasy.vps.com.vn/*"
-      ],
-      "resources": [
-        "spinner.gif",
-        "alert.wav"
-      ]
     }
   ]
 }

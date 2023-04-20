@@ -184,6 +184,14 @@ class User extends Authenticatable implements MustVerifyEmail, WebAuthnAuthentic
     }
 
     /**
+     * Get VpsUser.
+     */
+    public function vpsUser()
+    {
+        return $this->hasOne(VpsUser::class, 'user_code', 'code');
+    }
+
+    /**
      * Get the phone smartOrder associated with the user.
      */
     public function smartOrder()

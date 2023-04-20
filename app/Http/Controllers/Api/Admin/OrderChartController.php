@@ -66,4 +66,17 @@ class OrderChartController extends CoreController
         $data = $this->orderChartService->executeOrder($this->decrypt($request));
         return $this->sendResponse($this->encrypt($data));
     }
+
+    /**
+     * Execute Order
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getVpsUserSession(Request $request)
+    {
+        $data = $this->orderChartService->getVpsUserSession($request);
+        return $this->sendResponse($data);
+    }
 }
