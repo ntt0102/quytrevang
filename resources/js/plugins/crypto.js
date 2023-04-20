@@ -1,6 +1,4 @@
-import Vue from "vue";
-import VueCryptojs from "vue-cryptojs";
-Vue.use(VueCryptojs);
+import CryptoJS from "crypto-js";
 class Crypto {
     // Hàm khởi tạo
     constructor() {
@@ -12,9 +10,7 @@ class Crypto {
         return {
             stringify: cipherParams => {
                 var j = {
-                    ct: cipherParams.ciphertext.toString(
-                        Vue.CryptoJS.enc.Base64
-                    )
+                    ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64)
                 };
                 if (cipherParams.iv) j.iv = cipherParams.iv.toString();
                 if (cipherParams.salt) j.s = cipherParams.salt.toString();
@@ -22,27 +18,27 @@ class Crypto {
             },
             parse: jsonStr => {
                 var j = JSON.parse(jsonStr);
-                var cipherParams = Vue.CryptoJS.lib.CipherParams.create({
-                    ciphertext: Vue.CryptoJS.enc.Base64.parse(j.ct)
+                var cipherParams = CryptoJS.lib.CipherParams.create({
+                    ciphertext: CryptoJS.enc.Base64.parse(j.ct)
                 });
-                if (j.iv) cipherParams.iv = Vue.CryptoJS.enc.Hex.parse(j.iv);
-                if (j.s) cipherParams.salt = Vue.CryptoJS.enc.Hex.parse(j.s);
+                if (j.iv) cipherParams.iv = CryptoJS.enc.Hex.parse(j.iv);
+                if (j.s) cipherParams.salt = CryptoJS.enc.Hex.parse(j.s);
                 return cipherParams;
             }
         };
     }
     encrypt(text) {
         return JSON.parse(
-            Vue.CryptoJS.AES.encrypt(JSON.stringify(text), this.key, {
+            CryptoJS.AES.encrypt(JSON.stringify(text), this.key, {
                 format: this.format
             }).toString()
         );
     }
     decrypt(encrypted) {
         return JSON.parse(
-            Vue.CryptoJS.AES.decrypt(JSON.stringify(encrypted), this.key, {
+            CryptoJS.AES.decrypt(JSON.stringify(encrypted), this.key, {
                 format: this.format
-            }).toString(Vue.CryptoJS.enc.Utf8)
+            }).toString(CryptoJS.enc.Utf8)
         );
     }
 }

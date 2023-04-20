@@ -170,6 +170,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('/', 'OrderChartController@getChartData');
                     Route::post('/get-config', 'OrderChartController@getConfig');
                     Route::post('/set-config', 'OrderChartController@setConfig');
+                    Route::post('/execute-order', 'OrderChartController@executeOrder');
                 });
                 Route::group(['prefix' => 'finbooks', 'middleware' => 'can:finbooks@control'], function () {
                     Route::get('/', 'FinbookController@fetch');

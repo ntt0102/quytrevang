@@ -28,9 +28,13 @@
                         class="chart-date command"
                         :title="$t('user.orderChart.dateTitle')"
                         v-model="chartDate"
-                        @change="() => getChartData()"
+                        @change="() => getChartData(chartDate)"
                     />
-                    <img class="spinner" src="spinner.gif" v-if="spinnerShow" />
+                    <img
+                        class="spinner"
+                        src="spinner.gif"
+                        v-if="isChartLoading"
+                    />
                 </div>
                 <div class="area tool-area">
                     <div
@@ -43,7 +47,7 @@
                     ></div>
                     <div
                         class="command far fa-sync-alt"
-                        @click="() => getChartData()"
+                        @click="() => getChartData(chartDate)"
                     ></div>
                     <div
                         ref="lineTool"
@@ -59,7 +63,7 @@
                     ></div>
                     <div
                         ref="cancelOrder"
-                        class="command far fa-trash-alt"
+                        class="cancel-order command far fa-trash-alt"
                         @click="cancelOrderClick"
                     ></div>
                 </div>
@@ -80,7 +84,7 @@
                     </div>
                     <div
                         class="chart-top command far fa-angle-double-right"
-                        @click="charTopClick"
+                        @click="chartTopClick"
                     ></div>
                 </div>
             </div>
@@ -90,7 +94,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import orderChartDb from "../../plugins/orderChartDb.js";
+import toolsStore from "../../plugins/orderChartDb.js";
 import adminOrderChartStore from "../../store/modules/Admin/OrderChart";
 import { confirm } from "devextreme/ui/dialog";
 const CHART_OPTIONS = {
@@ -133,18 +137,16 @@ const TIME = {
 export default {
     data() {
         return {
-            orderPosition: 0,
             chart: {},
             series: {},
             data: { whitespace: [], price: [] },
-            order: { side: 0, entry: {}, tp: {}, sl: {} },
+            order: { side: 0, position: 0, entry: {}, tp: {}, sl: {} },
             lines: [],
             ruler: { start: {}, end: {}, point: 0 },
             crosshair: {},
-            spinnerShow: false,
-            loadWhitespace: false,
+            loadWhitespace: true,
             chartDate: CURRENT_DATE,
-            clockInterval: null,
+            secInterval: null,
             clock: moment().format("HH:mm:ss"),
             isFullscreen: false
         };
@@ -153,18 +155,14 @@ export default {
         this.$store.registerModule("Admin.orderChart", adminOrderChartStore);
     },
     created() {
-        this.getConfig();
-        this.loadWhitespace = true;
-        this.getChartData(this.chartDate).then(() => this.loadToolsData());
-        this.clockInterval = setInterval(() => {
-            this.clock = Intl.DateTimeFormat(navigator.language, {
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric"
-            }).format();
-        }, 1000);
-        orderChartDb.create();
-        this.connectSocket();
+        this.getConfig().then(this.connectSocket);
+        this.getChartData(this.chartDate).then(() => {
+            this.loadToolsData();
+            this.loadWhitespace = true;
+        });
+        this.secInterval = setInterval(this.secIntervalHandler, 1000);
+        this.minInterval = setInterval(this.minIntervalHandler, 60000);
+        toolsStore.create();
     },
     mounted() {
         if (document.getElementById("orderChartJs")) return;
@@ -201,43 +199,19 @@ export default {
                 "fullscreenchange",
                 () => (this.isFullscreen = document.fullscreenElement)
             );
-            // console.log("$crypto: ", this.$crypto.encrypt({ a: 0 }));
         }, 1000);
-
-        // const socket = io("https://datafeed.vps.com.vn");
-        // console.log("socket: ", socket);
-        // socket.on("connect", () => {
-        //     console.log("socket-connect");
-        //     var msg = { action: "join", list: this.config.symbol };
-        //     socket.emit("regs", JSON.stringify(msg));
-        // });
-
-        // socket.on("connect_error", () => {
-        //     console.log("socket-connect_error");
-        //     // this.loadWhitespace = false;
-        //     // this.getChartData(this.chartDate);
-        //     // if (this.isInSession()) socket.connect();
-        //     socket.connect();
-        // });
-
-        // socket.on("stockps", e => {
-        //     console.log("socket-stockps", e);
-        //     if (e.data.id == 3220) {
-        //         const param = {
-        //             time: moment(`${CURRENT_DATE} ${e.data.time}`).unix(),
-        //             price: e.data.lastPrice,
-        //             volume: e.data.lastVol
-        //         };
-        //         this.updateChartData(param);
-        //     }
-        // });
     },
     destroyed() {
         this.$store.unregisterModule("Admin.orderChart");
-        clearInterval(this.interval);
+        clearInterval(this.secInterval);
+        clearInterval(this.minInterval);
     },
     computed: {
-        ...mapGetters("Admin.orderChart", ["chartData", "config"]),
+        ...mapGetters("Admin.orderChart", [
+            "chartData",
+            "config",
+            "isChartLoading"
+        ]),
         chartContainer: function() {
             return this.$refs.chartContainer;
         },
@@ -250,19 +224,12 @@ export default {
             this.loadChartData();
         }
     },
-    sockets: {
-        connect: function() {
-            console.log("socket connected");
-            this.$socket.emit("emit_method", data);
-        },
-        customEmit: function(val) {
-            console.log(
-                'this method fired by socket server. eg: io.emit("customEmit", data)'
-            );
-        }
-    },
     methods: {
-        ...mapActions("Admin.orderChart", ["getChartData", "getConfig"]),
+        ...mapActions("Admin.orderChart", [
+            "getChartData",
+            "getConfig",
+            "executeOrder"
+        ]),
         eventChartContextmenu(e) {
             this.showOrderButton();
             e.preventDefault();
@@ -302,9 +269,8 @@ export default {
                 case "order":
                     if (newPrice != oldPrice) {
                         var isChanged = false;
-                        // const position = this.callback.getOrderPositionCallback();
                         if (lineOptions.kind == "entry") {
-                            if (!this.orderPosition) {
+                            if (!this.order.position) {
                                 isChanged = true;
                                 this.order[lineOptions.kind].price = newPrice;
                                 this.executeOrder({
@@ -316,26 +282,24 @@ export default {
                                 this.drawOrderLine(lineOptions.kind);
                             }
                         } else {
-                            if (this.order.side * position > 0) {
-                                isChanged = true;
-                                this.order[lineOptions.kind].price = newPrice;
-                                if (lineOptions.kind == "tp")
-                                    this.executeOrder({
-                                        type: "tp",
-                                        cmd: "change",
-                                        side: -this.order.side,
-                                        price: this.order.tp.price
-                                    });
-                                else
-                                    this.executeOrder({
-                                        type: "sl",
-                                        cmd: "change",
-                                        side: -this.order.side,
-                                        price: this.order.sl.price
-                                    });
+                            isChanged = true;
+                            this.order[lineOptions.kind].price = newPrice;
+                            if (lineOptions.kind == "tp")
+                                this.executeOrder({
+                                    type: "tp",
+                                    cmd: "change",
+                                    side: -this.order.side,
+                                    price: this.order.tp.price
+                                });
+                            else
+                                this.executeOrder({
+                                    type: "sl",
+                                    cmd: "change",
+                                    side: -this.order.side,
+                                    price: this.order.sl.price
+                                });
 
-                                this.drawOrderLine(lineOptions.kind);
-                            }
+                            this.drawOrderLine(lineOptions.kind);
                         }
                         //
                         if (!isChanged) {
@@ -345,27 +309,27 @@ export default {
                     }
                     break;
                 case "line":
-                    orderChartDb.set("line", {
+                    toolsStore.set("line", {
                         price: oldPrice,
                         removed: true
                     });
-                    orderChartDb.set("line", lineOptions);
+                    toolsStore.set("line", lineOptions);
                     this.$refs.lineTool.classList.remove("selected");
                     break;
                 case "ruler":
                     if (lineOptions.point == 1) {
-                        orderChartDb.set("ruler", lineOptions);
+                        toolsStore.set("ruler", lineOptions);
                         if (this.ruler.point == 2) {
                             const distance = +this.ruler.end.options().title;
                             const endPrice = +(newPrice + distance).toFixed(1);
                             this.ruler.end.applyOptions({ price: endPrice });
-                            orderChartDb.set("ruler", this.ruler.end.options());
+                            toolsStore.set("ruler", this.ruler.end.options());
                         }
                     } else {
                         const startPrice = +this.ruler.start.options().price;
                         const distance = (newPrice - startPrice).toFixed(1);
                         line.applyOptions({ title: distance });
-                        orderChartDb.set("ruler", line.options());
+                        toolsStore.set("ruler", line.options());
                     }
                     break;
             }
@@ -410,7 +374,7 @@ export default {
                         self.drawMarkerButton.click();
                         break;
                     case 98:
-                        this.getChartData();
+                        this.getChartData(this.chartDate);
                         break;
                     case 99:
                         this.toggleFullscreen();
@@ -418,44 +382,22 @@ export default {
                 }
             }
         },
-        toggleFullscreen() {
-            if (document.fullscreenElement) document.exitFullscreen();
-            else this.chartContainer.requestFullscreen();
-        },
-        executeOrder(data) {
-            return new Promise(resolve => {
-                // this.spinnerShow = true;
-                // axios
-                //     .post("order-chart/order", data, {
-                //         noLoading: true,
-                //         crypto: true
-                //     })
-                //     .then(response => {
-                //         // console.log(response.data);
-                //         this.spinnerShow = false;
-                //         resolve();
-                //     });
-                resolve(true);
-            });
-        },
         loadToolsData() {
             return new Promise(async (resolve, reject) => {
-                const order = await orderChartDb.get("order");
+                const order = await toolsStore.get("order");
                 order.map(item => {
                     this.order.side = item.side;
                     this.order[item.kind].price = item.price;
                     this.drawOrderLine(item.kind);
-                    if (item.kind == "entry") {
-                        // if (this.callback.getOrderPositionCallback()) {
-                        //     this.order.entry.line.applyOptions({
-                        //         draggable: false
-                        //     });
-                        // }
-                        this.toggleCancelOrderButton(true);
-                    }
+                    this.toggleCancelOrderButton(true);
+                    if (item.kind == "tp") this.order.position = item.side;
                 });
+                if (this.order.tp.hasOwnProperty("line"))
+                    this.order.entry.line.applyOptions({
+                        draggable: false
+                    });
                 //
-                const lines = await orderChartDb.get("line");
+                const lines = await toolsStore.get("line");
                 lines.forEach(line => {
                     if (!line.removed)
                         this.lines.push(
@@ -463,7 +405,7 @@ export default {
                         );
                 });
                 //
-                const rulerLines = await orderChartDb.get("ruler");
+                const rulerLines = await toolsStore.get("ruler");
                 if (rulerLines.length == 2) {
                     rulerLines.forEach(line => {
                         this.ruler.point = 2;
@@ -494,8 +436,6 @@ export default {
                 this.data.price
             );
             this.series.price.setData(this.data.price);
-            //
-            this.spinnerShow = false;
         },
         updateChartData(data) {
             this.data.price = this.mergeChartData([data], this.data.price);
@@ -523,11 +463,89 @@ export default {
                 (a, b) => a.time - b.time
             );
         },
+        connectSocket() {
+            let self = this;
+            const endpoint =
+                "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
+            let websocket = new WebSocket(endpoint);
+            websocket.onopen = e => {
+                console.log("onopen", e);
+                var msg = { action: "join", list: self.config.symbol };
+                websocket.send(
+                    `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
+                );
+            };
+            websocket.onclose = e => {
+                console.log("onclose", e);
+                if (self.inSession()) {
+                    self.connectSocket();
+                    self.getChartData(this.chartDate);
+                }
+            };
+            websocket.onmessage = e => {
+                if (e.data.substr(0, 1) == 4) {
+                    if (e.data.substr(1, 1) == 2) {
+                        const event = JSON.parse(e.data.substr(2));
+                        // console.log(event);
+                        if (event[0] == "stockps") {
+                            const data = event[1].data;
+                            if (data.id == 3220) {
+                                self.updateChartData({
+                                    time: moment(
+                                        `${CURRENT_DATE} ${data.time}`
+                                    ).unix(),
+                                    value: data.lastPrice
+                                });
+                            }
+                        }
+                    }
+                }
+            };
+            websocket.onerror = e => {
+                console.log("onerror", e);
+            };
+        },
+        secIntervalHandler() {
+            const CURRENT_SEC = moment().unix();
+            if (this.inSession(CURRENT_SEC)) {
+                if (CURRENT_SEC > TIME.ATC - 5 * 60) {
+                    this.blinkCancelOrderButton();
+                    if (
+                        CURRENT_SEC > TIME.ATC - 60 &&
+                        this.order.tp.hasOwnProperty("line")
+                    ) {
+                        this.executeOrder({ type: "exit" }).then(isOk => {
+                            if (isOk) {
+                                this.removeOrderLine("entry");
+                                this.removeOrderLine("tp");
+                                this.removeOrderLine("sl");
+                                toolsStore.clear("order");
+                                this.$toasted.success(
+                                    "Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế"
+                                );
+                            } else
+                                this.$toasted.error(
+                                    "Tự động huỷ lệnh thất bại"
+                                );
+                        });
+                    }
+                }
+                if (CURRENT_SEC == TIME.START) this.connectSocket();
+            }
+            this.clock = Intl.DateTimeFormat(navigator.language, {
+                hour: "numeric",
+                minute: "numeric",
+                second: "numeric"
+            }).format();
+        },
+        minIntervalHandler() {
+            if (this.inSession()) this.getConfig();
+        },
         showOrderButton() {
             const CURRENT_SEC = moment().unix();
-            if (this.isInSession(CURRENT_SEC)) {
-                // if (true) {
-                if (this.orderPosition) {
+            if (true) {
+                // if (this.inSession(CURRENT_SEC)) {
+                if (this.order.position) {
                     if (
                         this.order.entry.hasOwnProperty("line") &&
                         !this.order.tp.hasOwnProperty("line")
@@ -585,6 +603,11 @@ export default {
         toggleCancelOrderButton(visible) {
             this.$refs.cancelOrder.style.display = visible ? "block" : "none";
         },
+        blinkCancelOrderButton() {
+            if (this.$refs.cancelOrder.classList.contains("warning"))
+                this.$refs.cancelOrder.classList.remove("warning");
+            else this.$refs.cancelOrder.classList.add("warning");
+        },
         drawOrderLine(kind) {
             var color, title;
             switch (kind) {
@@ -622,7 +645,7 @@ export default {
                     draggable: true
                 });
             }
-            orderChartDb.set("order", {
+            toolsStore.set("order", {
                 kind: kind,
                 price: +this.order[kind].price,
                 side: this.order.side
@@ -660,7 +683,7 @@ export default {
             if (existIndex != -1) {
                 const removeLine = this.lines.splice(existIndex, 1);
                 this.series.price.removePriceLine(removeLine[0]);
-                orderChartDb.set("line", { price: price, removed: true });
+                toolsStore.set("line", { price: price, removed: true });
             } else {
                 const options = {
                     lineType: TYPE,
@@ -671,14 +694,14 @@ export default {
                     draggable: true
                 };
                 this.lines.push(this.series.price.createPriceLine(options));
-                orderChartDb.set("line", options);
+                toolsStore.set("line", options);
             }
             this.$refs.lineTool.classList.remove("selected");
         },
         removeLineTool() {
             this.lines.forEach(line => this.series.price.removePriceLine(line));
             this.lines = [];
-            orderChartDb.clear("line");
+            toolsStore.clear("line");
         },
         rulerToolClick(e) {
             const selected = e.target.classList.contains("selected");
@@ -713,7 +736,7 @@ export default {
                 options.title = "0";
                 this.ruler.start = this.series.price.createPriceLine(options);
                 this.ruler.point = point;
-                orderChartDb.set("ruler", options);
+                toolsStore.set("ruler", options);
             } else if (this.ruler.point == 1) {
                 const startPrice = +this.ruler.start.options().price;
                 const point = 2;
@@ -721,7 +744,7 @@ export default {
                 options.title = (price - startPrice).toFixed(1);
                 this.ruler.end = this.series.price.createPriceLine(options);
                 this.ruler.point = point;
-                orderChartDb.set("ruler", options);
+                toolsStore.set("ruler", options);
                 this.$refs.rulerTool.classList.remove("selected");
             }
         },
@@ -732,7 +755,7 @@ export default {
                     this.series.price.removePriceLine(this.ruler.end);
                 //
                 this.ruler = { start: {}, end: {}, point: 0 };
-                orderChartDb.clear("ruler");
+                toolsStore.clear("ruler");
             }
         },
         cancelOrderClick() {
@@ -748,7 +771,7 @@ export default {
                             this.removeOrderLine("entry");
                             this.removeOrderLine("tp");
                             this.removeOrderLine("sl");
-                            orderChartDb.clear("order");
+                            toolsStore.clear("order");
                             this.$toasted.error(
                                 "Đã huỷ lệnh và đóng tất cả vị thế"
                             );
@@ -761,53 +784,27 @@ export default {
                     }).then(isOk => {
                         if (isOk) {
                             this.removeOrderLine("entry");
-                            orderChartDb.clear("order");
+                            toolsStore.clear("order");
                             this.$toasted.show("Đã huỷ lệnh entry.");
                         } else this.toggleCancelOrderButton(true);
                     });
                 }
             }
-
-            // const CURRENT_SEC = moment().unix();
-            // if (this.isInSession()) {
-            //     if (CURRENT_SEC < TIME.ATO) {
-            //         // this.executeOrder({
-            //         //     type: "exit",
-            //         //     side: -this.order.side,
-            //         //     price: "ATO"
-            //         // }).then(isOk => {
-            //         //     if (isOk)
-            //         //         this.$toasted.success("Đặt lệnh ATO thành công");
-            //         //     else this.$toasted.error("Đặt lệnh ATO thất bại");
-            //         // });
-            //     } else if (CURRENT_SEC < TIME.ATC) {
-            //         if (this.order.entry.hasOwnProperty("line")) {
-            //             // this.callback.cancelOrderCallback();
-            //             orderChartDb.clear("order");
-            //             this.removeOrderLine("entry");
-            //             if (this.order.tp.hasOwnProperty("line")) {
-            //                 // this.callback.closeOrderPositionCallback("MTL");
-            //                 this.removeOrderLine("tp");
-            //                 this.removeOrderLine("sl");
-            //                 this.$toasted.error(
-            //                     "Đã huỷ lệnh và đóng tất cả vị thế"
-            //                 );
-            //             } else this.$toasted.show("Đã huỷ lệnh entry.");
-            //         }
-            //     } else {
-            //         // this.callback.closeOrderPositionCallback("ATC");
-            //         this.$toasted.error("Đã đặt lệnh ATC để đóng vị thế.");
-            //     }
-            // }
         },
         entryOrderClick() {
+            this.executeOrder({
+                type: "entry",
+                cmd: "new",
+                side: this.order.side,
+                price: this.order.entry.price
+            });
+            this.drawOrderLine("entry");
+            this.toggleCancelOrderButton(true);
+            //
             const CURRENT_SEC = moment().unix();
-            if (this.isInSession(CURRENT_SEC)) {
+            if (this.inSession(CURRENT_SEC)) {
                 if (CURRENT_SEC < TIME.ATO) {
-                    let result = confirm(
-                        "<i>Đặt lệnh ATO?</i>",
-                        "Xác nhận đặt lệnh"
-                    );
+                    let result = confirm("Đặt lệnh ATO?", "Xác nhận đặt lệnh");
                     result.then(dialogResult => {
                         if (dialogResult) {
                             this.executeOrder({
@@ -836,10 +833,7 @@ export default {
                     this.drawOrderLine("entry");
                     this.toggleCancelOrderButton(true);
                 } else {
-                    let result = confirm(
-                        "<i>Đặt lệnh ATC?</i>",
-                        "Xác nhận đặt lệnh"
-                    );
+                    let result = confirm("Đặt lệnh ATC?", "Xác nhận đặt lệnh");
                     result.then(dialogResult => {
                         if (dialogResult) {
                             this.executeOrder({
@@ -859,21 +853,39 @@ export default {
                         }
                     });
                 }
-                this.hideOrderButton();
             }
         },
         tpslOrderClick() {
-            // this.callback.orderTpPriceCallback(this.order, false);
+            this.executeOrder({
+                type: "tp",
+                cmd: "new",
+                side: -this.order.side,
+                price: this.order.tp.price
+            }).then(isOk => {
+                if (isOk) this.$toasted.success("Đặt lệnh TP thành công");
+                else this.$toasted.error("Đặt lệnh TP thất bại");
+            });
             this.drawOrderLine("tp");
-            // this.callback.orderSlPriceCallback(this.order, false);
+            this.executeOrder({
+                type: "sl",
+                cmd: "new",
+                side: -this.order.side,
+                price: this.order.sl.price
+            }).then(isOk => {
+                if (isOk) this.$toasted.success("Đặt lệnh SL thành công");
+                else this.$toasted.error("Đặt lệnh SL thất bại");
+            });
             this.drawOrderLine("sl");
-            this.hideOrderButton();
             this.order.entry.line.applyOptions({ draggable: false });
         },
-        charTopClick() {
+        chartTopClick() {
             this.chart.timeScale().scrollToRealTime();
         },
-        isInSession(currentSec = null) {
+        toggleFullscreen() {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else this.chartContainer.requestFullscreen();
+        },
+        inSession(currentSec = null) {
             if (!currentSec) currentSec = moment().unix();
             return currentSec >= TIME.START && currentSec <= TIME.END;
         },
@@ -882,29 +894,6 @@ export default {
         },
         formatPrice(price) {
             return +(+price.toFixed(1));
-        },
-        connectSocket() {
-            let websocket = new WebSocket(
-                "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket"
-            );
-            websocket.onopen = function(e) {
-                console.log("onopen", e);
-                var msg = { action: "join", list: this.config.symbol };
-                // websocket.send("2");
-                websocket.send(
-                    "42" + JSON.stringify(["regs", JSON.stringify(msg)])
-                );
-            };
-            websocket.onclose = function(e) {
-                console.log("onclose", e);
-                this.connectSocket();
-            };
-            websocket.onmessage = function(e) {
-                console.log("onmessage", e.data);
-            };
-            websocket.onerror = function(e) {
-                console.log("onerror", e);
-            };
         }
     }
 };
@@ -925,7 +914,7 @@ export default {
         font-size: 17px;
         background: #131722;
         border: solid 2px #2a2e39;
-        border-radius: 5px;
+        border-bottom-right-radius: 5px;
         z-index: 3;
 
         &.data-area {
@@ -973,13 +962,17 @@ export default {
             background: #2a2e39 !important;
         }
 
-        .selected {
+        &.selected {
             color: #1f62ff !important;
         }
 
         &.warning {
             background: yellow;
             color: black;
+        }
+
+        &.cancel-order {
+            display: none;
         }
 
         &.clock {
@@ -995,13 +988,13 @@ export default {
         border-radius: 7px;
         color: black;
         background: silver;
-        line-height: 21px;
         z-index: 3;
         cursor: pointer;
 
         &.entry {
             width: 70px;
-            height: 60px;
+            height: 55px;
+            color: white !important;
         }
 
         &.tpsl {

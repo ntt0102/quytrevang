@@ -53,4 +53,17 @@ class OrderChartController extends CoreController
         $data = $this->orderChartService->setConfig($this->decrypt($request));
         return $this->sendResponse($this->encrypt($data));
     }
+
+    /**
+     * Execute Order
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function executeOrder(Request $request)
+    {
+        $data = $this->orderChartService->executeOrder($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
+    }
 }

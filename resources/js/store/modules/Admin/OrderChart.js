@@ -3,18 +3,20 @@ import moment from "moment/moment";
 function initialState() {
     return {
         config: {},
-        chartData: []
+        chartData: [],
+        isChartLoading: false
     };
 }
 
 const getters = {
     config: state => state.config,
-    chartData: state => state.chartData
+    chartData: state => state.chartData,
+    isChartLoading: state => state.isChartLoading
 };
 
 const actions = {
     getChartData({ commit, dispatch, getters, state, rootGetters }, chartDate) {
-        console.log("getChartData: ", chartDate);
+        commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .post(
@@ -24,6 +26,7 @@ const actions = {
                 )
                 .then(response => {
                     commit("setChartData", response.data);
+                    commit("setChartLoading", false);
                     resolve();
                 });
         });
@@ -31,11 +34,7 @@ const actions = {
     getConfig({ commit, dispatch, getters, state, rootGetters }, chartDate) {
         return new Promise((resolve, reject) => {
             axios
-                .post(
-                    "order-chart/get-config",
-                    {},
-                    { noLoading: true, crypto: true }
-                )
+                .post("order-chart/get-config", {}, { crypto: true })
                 .then(response => {
                     commit("setConfig", response.data);
                     resolve();
@@ -53,6 +52,22 @@ const actions = {
                 .then(response => {
                     // console.log(response.data);
                     commit("setChartData", response.data);
+                    resolve();
+                });
+        });
+    },
+    executeOrder({ commit, dispatch, getters, state, rootGetters }, data) {
+        commit("setChartLoading", true);
+        return new Promise((resolve, reject) => {
+            axios
+                .post("order-chart/execute-order", data, {
+                    noLoading: true,
+                    crypto: true
+                })
+                .then(response => {
+                    // console.log(response.data);
+                    // commit("setChartData", response.data);
+                    commit("setChartLoading", false);
                     resolve();
                 });
         });
@@ -108,9 +123,11 @@ const actions = {
 };
 
 const mutations = {
-    setState(state, data) {},
     setChartData(state, data) {
         state.chartData = data;
+    },
+    setChartLoading(state, data) {
+        state.isChartLoading = data;
     },
     setConfig(state, data) {
         state.config = data;

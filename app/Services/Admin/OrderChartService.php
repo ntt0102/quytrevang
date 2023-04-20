@@ -57,6 +57,21 @@ class OrderChartService extends CoreService
     }
 
     /**
+     * Execute Order
+     *
+     * @param $request
+     * 
+     */
+    public function executeOrder($request)
+    {
+        return $this->transaction(
+            function () use ($request) {
+                return $request;
+            }
+        );
+    }
+
+    /**
      * Get data from VPS website
      */
     public function generateDataFromVps()
