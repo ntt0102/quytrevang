@@ -57,29 +57,27 @@
                         @click="rulerToolClick"
                         @contextmenu="rulerToolContextmenu"
                     ></div>
+                    <div
+                        ref="cancelOrder"
+                        class="command far fa-trash-alt"
+                        @click="cancelOrderClick"
+                    ></div>
                 </div>
                 <div>
-                    <button
-                        ref="cancelOrder"
-                        class="cancel-order"
-                        @click="cancelOrderClick"
-                    >
-                        X
-                    </button>
-                    <button
+                    <div
                         ref="entryOrder"
                         class="order-button entry"
                         @click="entryOrderClick"
                     >
                         Entry
-                    </button>
-                    <button
+                    </div>
+                    <div
                         ref="tpslOrder"
                         class="order-button tpsl"
                         @click="tpslOrderClick"
                     >
                         TP/SL
-                    </button>
+                    </div>
                     <div
                         class="chart-top command far fa-angle-double-right"
                         @click="charTopClick"
@@ -94,7 +92,8 @@
 import { mapGetters, mapActions } from "vuex";
 import orderChartDb from "../../plugins/orderChartDb.js";
 import adminOrderChartStore from "../../store/modules/Admin/OrderChart";
-const chartOptions = {
+import { confirm } from "devextreme/ui/dialog";
+const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
@@ -122,9 +121,17 @@ const chartOptions = {
         minBarSpacing: 0.05
     }
 };
+const TP_DEFAULT = 3;
+const SL_DEFAULT = 2;
+const CURRENT_DATE = moment().format("YYYY-MM-DD");
+const TIME = {
+    START: moment(CURRENT_DATE + " 08:45:00").unix(),
+    ATO: moment(CURRENT_DATE + " 09:00:00").unix(),
+    ATC: moment(CURRENT_DATE + " 14:30:00").unix(),
+    END: moment(CURRENT_DATE + " 14:45:00").unix()
+};
 export default {
     data() {
-        const CURRENT_DATE = moment().format("YYYY-MM-DD");
         return {
             orderPosition: 0,
             chart: {},
@@ -135,25 +142,20 @@ export default {
             ruler: { start: {}, end: {}, point: 0 },
             crosshair: {},
             spinnerShow: false,
+            loadWhitespace: false,
             chartDate: CURRENT_DATE,
             clockInterval: null,
             clock: moment().format("HH:mm:ss"),
-            isFullscreen: false,
-            tpDefault: 3,
-            slDefault: 2,
-            time: {
-                start: moment(CURRENT_DATE + " 08:45:00").unix(),
-                ato: moment(CURRENT_DATE + " 09:00:00").unix(),
-                atc: moment(CURRENT_DATE + " 14:30:00").unix(),
-                end: moment(CURRENT_DATE + " 14:45:00").unix()
-            }
+            isFullscreen: false
         };
     },
     beforeCreate() {
-        this.$store.registerModule("User.orderChart", adminOrderChartStore);
+        this.$store.registerModule("Admin.orderChart", adminOrderChartStore);
     },
     created() {
-        this.getChartData(true).then(() => this.loadOrderChartDb());
+        this.getConfig();
+        this.loadWhitespace = true;
+        this.getChartData(this.chartDate).then(() => this.loadToolsData());
         this.clockInterval = setInterval(() => {
             this.clock = Intl.DateTimeFormat(navigator.language, {
                 hour: "numeric",
@@ -162,6 +164,7 @@ export default {
             }).format();
         }, 1000);
         orderChartDb.create();
+        this.connectSocket();
     },
     mounted() {
         if (document.getElementById("orderChartJs")) return;
@@ -173,7 +176,7 @@ export default {
         setTimeout(() => {
             this.chart = LightweightCharts.createChart(
                 this.$refs.orderChart,
-                chartOptions
+                CHART_OPTIONS
             );
             this.chartContainer.addEventListener("click", this.eventChartClick);
             this.chartContainer.addEventListener(
@@ -200,21 +203,67 @@ export default {
             );
             // console.log("$crypto: ", this.$crypto.encrypt({ a: 0 }));
         }, 1000);
+
+        // const socket = io("https://datafeed.vps.com.vn");
+        // console.log("socket: ", socket);
+        // socket.on("connect", () => {
+        //     console.log("socket-connect");
+        //     var msg = { action: "join", list: this.config.symbol };
+        //     socket.emit("regs", JSON.stringify(msg));
+        // });
+
+        // socket.on("connect_error", () => {
+        //     console.log("socket-connect_error");
+        //     // this.loadWhitespace = false;
+        //     // this.getChartData(this.chartDate);
+        //     // if (this.isInSession()) socket.connect();
+        //     socket.connect();
+        // });
+
+        // socket.on("stockps", e => {
+        //     console.log("socket-stockps", e);
+        //     if (e.data.id == 3220) {
+        //         const param = {
+        //             time: moment(`${CURRENT_DATE} ${e.data.time}`).unix(),
+        //             price: e.data.lastPrice,
+        //             volume: e.data.lastVol
+        //         };
+        //         this.updateChartData(param);
+        //     }
+        // });
     },
     destroyed() {
-        this.$store.unregisterModule("User.orderChart");
+        this.$store.unregisterModule("Admin.orderChart");
         clearInterval(this.interval);
     },
     computed: {
-        ...mapGetters("User.orderChart", ["config"]),
+        ...mapGetters("Admin.orderChart", ["chartData", "config"]),
         chartContainer: function() {
             return this.$refs.chartContainer;
+        },
+        lastPrice: function() {
+            return this.data.price.slice(-1)[0].value;
+        }
+    },
+    watch: {
+        chartData() {
+            this.loadChartData();
+        }
+    },
+    sockets: {
+        connect: function() {
+            console.log("socket connected");
+            this.$socket.emit("emit_method", data);
+        },
+        customEmit: function(val) {
+            console.log(
+                'this method fired by socket server. eg: io.emit("customEmit", data)'
+            );
         }
     },
     methods: {
-        // ...mapActions("User.orderChart", ["getChartData", "getConfig"]),
+        ...mapActions("Admin.orderChart", ["getChartData", "getConfig"]),
         eventChartContextmenu(e) {
-            // if (this.isInSession())
             this.showOrderButton();
             e.preventDefault();
         },
@@ -375,21 +424,21 @@ export default {
         },
         executeOrder(data) {
             return new Promise(resolve => {
-                this.spinnerShow = true;
-                axios
-                    .post("order-chart/order", data, {
-                        noLoading: true,
-                        crypto: true
-                    })
-                    .then(response => {
-                        // console.log(response.data);
-
-                        this.spinnerShow = false;
-                        resolve();
-                    });
+                // this.spinnerShow = true;
+                // axios
+                //     .post("order-chart/order", data, {
+                //         noLoading: true,
+                //         crypto: true
+                //     })
+                //     .then(response => {
+                //         // console.log(response.data);
+                //         this.spinnerShow = false;
+                //         resolve();
+                //     });
+                resolve(true);
             });
         },
-        loadOrderChartDb() {
+        loadToolsData() {
             return new Promise(async (resolve, reject) => {
                 const order = await orderChartDb.get("order");
                 order.map(item => {
@@ -432,35 +481,25 @@ export default {
                 resolve();
             });
         },
-        getChartData(loadWhitespace = false) {
-            return new Promise(async resolve => {
-                this.spinnerShow = true;
-                axios
-                    .post(
-                        "order-chart",
-                        { date: this.chartDate },
-                        { noLoading: true, crypto: true }
-                    )
-                    .then(response => {
-                        if (loadWhitespace) {
-                            this.data.whitespace = this.mergeChartData(
-                                this.data.whitespace,
-                                this.createWhitespaceData()
-                            );
-                            this.series.whitespace.setData(
-                                this.data.whitespace
-                            );
-                        }
-                        this.data.price = this.mergeChartData(
-                            response.data,
-                            this.data.price
-                        );
-                        this.series.price.setData(this.data.price);
-                        //
-                        this.spinnerShow = false;
-                        resolve();
-                    });
-            });
+        loadChartData() {
+            if (this.loadWhitespace) {
+                this.data.whitespace = this.mergeChartData(
+                    this.data.whitespace,
+                    this.createWhitespaceData()
+                );
+                this.series.whitespace.setData(this.data.whitespace);
+            }
+            this.data.price = this.mergeChartData(
+                this.chartData,
+                this.data.price
+            );
+            this.series.price.setData(this.data.price);
+            //
+            this.spinnerShow = false;
+        },
+        updateChartData(data) {
+            this.data.price = this.mergeChartData([data], this.data.price);
+            this.series.price.update(this.lastPrice);
         },
         createWhitespaceData() {
             const date = this.chartDate;
@@ -486,8 +525,8 @@ export default {
         },
         showOrderButton() {
             const CURRENT_SEC = moment().unix();
-            // if (this.isInSession(CURRENT_SEC)) {
-            if (true) {
+            if (this.isInSession(CURRENT_SEC)) {
+                // if (true) {
                 if (this.orderPosition) {
                     if (
                         this.order.entry.hasOwnProperty("line") &&
@@ -513,11 +552,11 @@ export default {
                                 ? 1
                                 : -1;
                         this.order.side = side;
-                        if (CURRENT_SEC < this.time.ato) price = "ATO";
-                        else if (CURRENT_SEC < this.time.atc) {
+                        if (CURRENT_SEC < TIME.ATO) price = "ATO";
+                        else if (CURRENT_SEC < TIME.ATC) {
                             this.order.entry.price = price;
-                            this.order.tp.price = price + side * this.tpDefault;
-                            this.order.sl.price = price - side * this.slDefault;
+                            this.order.tp.price = price + side * TP_DEFAULT;
+                            this.order.sl.price = price - side * SL_DEFAULT;
                         } else price = "ATC";
                         this.$refs.entryOrder.style.left =
                             +(
@@ -731,7 +770,7 @@ export default {
 
             // const CURRENT_SEC = moment().unix();
             // if (this.isInSession()) {
-            //     if (CURRENT_SEC < this.time.ato) {
+            //     if (CURRENT_SEC < TIME.ATO) {
             //         // this.executeOrder({
             //         //     type: "exit",
             //         //     side: -this.order.side,
@@ -741,7 +780,7 @@ export default {
             //         //         this.$toasted.success("Đặt lệnh ATO thành công");
             //         //     else this.$toasted.error("Đặt lệnh ATO thất bại");
             //         // });
-            //     } else if (CURRENT_SEC < this.time.atc) {
+            //     } else if (CURRENT_SEC < TIME.ATC) {
             //         if (this.order.entry.hasOwnProperty("line")) {
             //             // this.callback.cancelOrderCallback();
             //             orderChartDb.clear("order");
@@ -764,22 +803,30 @@ export default {
         entryOrderClick() {
             const CURRENT_SEC = moment().unix();
             if (this.isInSession(CURRENT_SEC)) {
-                if (CURRENT_SEC < this.time.ato) {
-                    var choice = confirm("Đặt lệnh ATO?");
-                    if (choice) {
-                        this.executeOrder({
-                            type: "exit",
-                            side: -this.order.side,
-                            price: "ATO"
-                        }).then(isOk => {
-                            if (isOk)
-                                this.$toasted.success(
-                                    "Đặt lệnh ATO thành công"
-                                );
-                            else this.$toasted.error("Đặt lệnh ATO thất bại");
-                        });
-                    }
-                } else if (CURRENT_SEC < this.time.atc) {
+                if (CURRENT_SEC < TIME.ATO) {
+                    let result = confirm(
+                        "<i>Đặt lệnh ATO?</i>",
+                        "Xác nhận đặt lệnh"
+                    );
+                    result.then(dialogResult => {
+                        if (dialogResult) {
+                            this.executeOrder({
+                                type: "exit",
+                                side: -this.order.side,
+                                price: "ATO"
+                            }).then(isOk => {
+                                if (isOk)
+                                    this.$toasted.success(
+                                        "Đặt lệnh ATO thành công"
+                                    );
+                                else
+                                    this.$toasted.error(
+                                        "Đặt lệnh ATO thất bại"
+                                    );
+                            });
+                        }
+                    });
+                } else if (CURRENT_SEC < TIME.ATC) {
                     this.executeOrder({
                         type: "entry",
                         cmd: "new",
@@ -789,20 +836,28 @@ export default {
                     this.drawOrderLine("entry");
                     this.toggleCancelOrderButton(true);
                 } else {
-                    var choice = confirm("Đặt lệnh ATC?");
-                    if (choice) {
-                        this.executeOrder({
-                            type: "exit",
-                            side: -this.order.side,
-                            price: "ATC"
-                        }).then(isOk => {
-                            if (isOk)
-                                this.$toasted.success(
-                                    "Đặt lệnh ATC thành công"
-                                );
-                            else this.$toasted.error("Đặt lệnh ATC thất bại");
-                        });
-                    }
+                    let result = confirm(
+                        "<i>Đặt lệnh ATC?</i>",
+                        "Xác nhận đặt lệnh"
+                    );
+                    result.then(dialogResult => {
+                        if (dialogResult) {
+                            this.executeOrder({
+                                type: "exit",
+                                side: -this.order.side,
+                                price: "ATC"
+                            }).then(isOk => {
+                                if (isOk)
+                                    this.$toasted.success(
+                                        "Đặt lệnh ATC thành công"
+                                    );
+                                else
+                                    this.$toasted.error(
+                                        "Đặt lệnh ATC thất bại"
+                                    );
+                            });
+                        }
+                    });
                 }
                 this.hideOrderButton();
             }
@@ -820,13 +875,36 @@ export default {
         },
         isInSession(currentSec = null) {
             if (!currentSec) currentSec = moment().unix();
-            return currentSec >= this.time.start && currentSec <= this.time.end;
+            return currentSec >= TIME.START && currentSec <= TIME.END;
         },
         coordinateToPrice(y) {
             return this.formatPrice(this.series.price.coordinateToPrice(y));
         },
         formatPrice(price) {
             return +(+price.toFixed(1));
+        },
+        connectSocket() {
+            let websocket = new WebSocket(
+                "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket"
+            );
+            websocket.onopen = function(e) {
+                console.log("onopen", e);
+                var msg = { action: "join", list: this.config.symbol };
+                // websocket.send("2");
+                websocket.send(
+                    "42" + JSON.stringify(["regs", JSON.stringify(msg)])
+                );
+            };
+            websocket.onclose = function(e) {
+                console.log("onclose", e);
+                this.connectSocket();
+            };
+            websocket.onmessage = function(e) {
+                console.log("onmessage", e.data);
+            };
+            websocket.onerror = function(e) {
+                console.log("onerror", e);
+            };
         }
     }
 };
@@ -894,34 +972,18 @@ export default {
         &:hover {
             background: #2a2e39 !important;
         }
-    }
-    .clock {
-        width: 80px;
-    }
 
-    .selected {
-        color: #1f62ff !important;
-    }
-
-    .hover-light:hover {
-        opacity: 1 !important;
-    }
-
-    .cancel-order {
-        position: absolute;
-        top: 130px;
-        left: 0px;
-        display: none;
-        padding: 4.5px 10.5px;
-        border-radius: 5px;
-        background: red;
-        color: white;
-        z-index: 3;
-        cursor: pointer;
+        .selected {
+            color: #1f62ff !important;
+        }
 
         &.warning {
             background: yellow;
             color: black;
+        }
+
+        &.clock {
+            width: 80px;
         }
     }
 
@@ -950,8 +1012,8 @@ export default {
 
     .chart-top {
         position: absolute;
-        bottom: 30px;
-        right: 60px;
+        bottom: 29px;
+        right: 55px;
         border-radius: 50%;
         border: 1px solid gray;
         padding-left: 1px;

@@ -27,6 +27,35 @@ class OrderChartService extends CoreService
         return $data;
     }
 
+
+    /**
+     * Get Config
+     *
+     * @param $request
+     * 
+     */
+    public function getConfig($request)
+    {
+        return [
+            'symbol' => $this->getSymbol()
+        ];
+    }
+
+    /**
+     * Set config
+     *
+     * @param $request
+     * 
+     */
+    public function setConfig($request)
+    {
+        return $this->transaction(
+            function () use ($request) {
+                $so = request()->user()->smartOrder;
+            }
+        );
+    }
+
     /**
      * Get data from VPS website
      */
@@ -89,6 +118,28 @@ class OrderChartService extends CoreService
         $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
         $res = $client->get($url);
         return json_decode($res->getBody());
+    }
+
+    /**
+     * Get Symbol
+     */
+    public function getSymbol()
+    {
+        $client = new \GuzzleHttp\Client();
+        $url = "https://spwapidatafeed.vps.com.vn/pslistdata";
+        $res = $client->get($url);
+        return json_decode($res->getBody())[0];
+    }
+
+    /**
+     * Get Info
+     */
+    public function getInfo($symbol)
+    {
+        $client = new \GuzzleHttp\Client();
+        $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
+        $res = $client->get($url);
+        return json_decode($res->getBody())[0];
     }
 
     /**

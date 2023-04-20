@@ -3,28 +3,57 @@ import moment from "moment/moment";
 function initialState() {
     return {
         config: {},
-        original: [],
-        whitespace: [],
-        price: []
+        chartData: []
     };
 }
 
 const getters = {
     config: state => state.config,
-    original: state => state.original,
-    whitespace: state => state.whitespace,
-    price: state => state.price
+    chartData: state => state.chartData
 };
 
 const actions = {
     getChartData({ commit, dispatch, getters, state, rootGetters }, chartDate) {
+        console.log("getChartData: ", chartDate);
         return new Promise((resolve, reject) => {
             axios
-                .post("order-chart", { date: chartDate }, { noLoading: true })
+                .post(
+                    "order-chart",
+                    { date: chartDate },
+                    { noLoading: true, crypto: true }
+                )
+                .then(response => {
+                    commit("setChartData", response.data);
+                    resolve();
+                });
+        });
+    },
+    getConfig({ commit, dispatch, getters, state, rootGetters }, chartDate) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "order-chart/get-config",
+                    {},
+                    { noLoading: true, crypto: true }
+                )
+                .then(response => {
+                    commit("setConfig", response.data);
+                    resolve();
+                });
+        });
+    },
+    setConfig({ commit, dispatch, getters, state, rootGetters }, chartDate) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "order-chart/set-config",
+                    { date: chartDate },
+                    { noLoading: true, crypto: true }
+                )
                 .then(response => {
                     // console.log(response.data);
-                    // commit("setChartData", response.data);
-                    resolve(response.data);
+                    commit("setChartData", response.data);
+                    resolve();
                 });
         });
     },
@@ -79,9 +108,9 @@ const actions = {
 };
 
 const mutations = {
-    setState(state, data) {
-        state.sos = data.sos;
-        state.users = data.users;
+    setState(state, data) {},
+    setChartData(state, data) {
+        state.chartData = data;
     },
     setConfig(state, data) {
         state.config = data;

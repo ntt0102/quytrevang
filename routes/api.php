@@ -168,6 +168,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 });
                 Route::group(['prefix' => 'order-chart', 'middleware' => 'can:orderChart@control'], function () {
                     Route::post('/', 'OrderChartController@getChartData');
+                    Route::post('/get-config', 'OrderChartController@getConfig');
+                    Route::post('/set-config', 'OrderChartController@setConfig');
                 });
                 Route::group(['prefix' => 'finbooks', 'middleware' => 'can:finbooks@control'], function () {
                     Route::get('/', 'FinbookController@fetch');
