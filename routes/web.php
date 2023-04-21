@@ -78,7 +78,7 @@ Route::get('test', function () {
     // $s = app(App\Services\Admin\OrderChartService::class)->setVpsUserSession();
     $vpsUser = App\Models\VpsUser::where('vps_code', 228582)->first();
     $vos = new App\Services\Special\VpsOrderService($vpsUser);
-    $s = $vos->getPosition();
+    $s = $vos->getAccountStatus();
     // $s = $so->vps_accounts;
     dd($s);
 })->middleware('cors');

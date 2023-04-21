@@ -69,7 +69,10 @@ class OrderChartService extends CoreService
             function () use ($request) {
                 $user = request()->user();
                 $vos = new \App\Services\Special\VpsOrderService($user->vpsUser);
-                return $vos->getPosition();
+                return [
+                    'isOk' => true,
+                    'data' => $vos->getAccountStatus()
+                ];
             }
         );
     }

@@ -23,12 +23,8 @@ class VpsOrderService extends CoreService
         $this->symbol = get_global_value('vn30f1m');
     }
 
-    public function getPosition()
+    public function getAccountStatus()
     {
-        // return [
-        //     "user" => $this->vpsCode,
-        //     "session" => $this->vpsSession,
-        // ];
         $payload = [
             "group" => "Q",
             "user" => $this->vpsCode,
@@ -43,25 +39,15 @@ class VpsOrderService extends CoreService
                 "p4" => "null",
             ],
         ];
-        // return $payload;
-        // $payload = [
-        //     "user" => $this->vpsCode,
-        //     "session" => $this->vpsSession,
-        // ];
         $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
-        // $url = "https://quytrevang.nguyenvanxuanphu.com/api/core.vpbs";
-        $res = $this->client->post($url, [
-            // 'headers' => [
-            //     // 'Accept' => 'application/json',
-            //     // 'Content-Type' => 'application/json'
-            // ],
-            'json' => $payload
-        ]);
-        return json_decode($res->getBody());
-        // return $res->getBody()->getContents();
-        // $request = $this->client->post($url,  ['body' => $payload]);
-        // $response = $request->send();
-
-        // dd($response);
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        if (!$rsp->rc) return [];
+        return [
+            'max_vol' => $rsp->data->max_vol,
+            'fee' => $rsp->data->others,
+            'vm' => $rsp->data->vm,
+            'net' => $rsp->data->net != 'NO' ? $rsp->data->net : 0
+        ];
     }
 }
