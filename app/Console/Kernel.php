@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Services\Admin\OrderChartService;
 
 class Kernel extends ConsoleKernel
 {
@@ -25,19 +26,19 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $oCS = new OrderChartService();
+
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
         //
-        $schedule->call(function () {
-            $openingMarketFlag = app(\App\Services\SmartOrderService::class)->checkOpeningMarket();
-            set_global_value('openingMarketFlag', $openingMarketFlag ? '1' : '0');
-            if ($openingMarketFlag)
-                set_global_value('reportedTradingFlag', '0');
+        $schedule->call(function () use ($oCS) {
+            set_global_value('openingMarketFlag', $oCS->checkOpeningMarket() ? '1' : '0');
+            set_global_value('vn30f1m', $oCS->getSymbol());
+            set_global_value('reportedTradingFlag', '0');
         })->dailyAt('00:30');
         //
-        $schedule->call(function () {
-            if (get_global_value('openingMarketFlag') == '1')
-                app(\App\Services\SmartOrderService::class)->exportToCsv();
+        $schedule->call(function () use ($oCS) {
+            $oCS->exportToCsv();
         })->dailyAt('14:46');
     }
 

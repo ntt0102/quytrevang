@@ -27,20 +27,8 @@ class VariablesTableSeeder extends Seeder
             'value' => "0",
         ]);
         Variable::create([
-            'name' => "runningSocketFlag",
-            'value' => "0",
-        ]);
-        Variable::create([
-            'name' => "startSocketTime",
-            'value' => "17:48:00",
-        ]);
-        Variable::create([
-            'name' => "bidPrice",
-            'value' => "0",
-        ]);
-        Variable::create([
-            'name' => "askPrice",
-            'value' => "0",
+            'name' => "vn30f1m",
+            'value' => "VN30F2305",
         ]);
     }
 }

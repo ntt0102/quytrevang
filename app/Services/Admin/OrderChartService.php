@@ -107,16 +107,18 @@ class OrderChartService extends CoreService
      */
     public function exportToCsv()
     {
-        $filename = storage_path('app/public/vn30f1m/' . date('Y-m-d') . '.csv');
-        $list = $this->cloneVpsData();
-        $fp = fopen($filename, 'w');
-        foreach ($list as $item) {
-            $line = [];
-            $line[] = strtotime(date('Y-m-d ') . $item->time + $this->SHIFT_TIME);
-            $line[] = $item->lastPrice;
-            fputcsv($fp, $line);
+        if (get_global_value('openingMarketFlag') == '1') {
+            $filename = storage_path('app/public/vn30f1m/' . date('Y-m-d') . '.csv');
+            $list = $this->cloneVpsData();
+            $fp = fopen($filename, 'w');
+            foreach ($list as $item) {
+                $line = [];
+                $line[] = strtotime(date('Y-m-d ') . $item->time + $this->SHIFT_TIME);
+                $line[] = $item->lastPrice;
+                fputcsv($fp, $line);
+            }
+            fclose($fp);
         }
-        fclose($fp);
     }
 
     /**
