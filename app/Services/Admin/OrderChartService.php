@@ -38,7 +38,7 @@ class OrderChartService extends CoreService
     public function getConfig($request)
     {
         return [
-            'symbol' => $this->getSymbol()
+            'symbol' => get_global_value('vn30f1m')
         ];
     }
 
@@ -67,7 +67,9 @@ class OrderChartService extends CoreService
     {
         return $this->transaction(
             function () use ($request) {
-                return $request;
+                $user = request()->user();
+                $vos = new \App\Services\Special\VpsOrderService($user->vpsUser);
+                return $vos->getPosition();
             }
         );
     }

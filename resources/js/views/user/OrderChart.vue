@@ -31,9 +31,9 @@
                         @change="() => getChartData(chartDate)"
                     />
                     <img
-                        class="spinner"
+                        ref="spinner"
+                        class="command spinner"
                         src="spinner.gif"
-                        v-if="isChartLoading"
                     />
                 </div>
                 <div class="area tool-area">
@@ -146,7 +146,7 @@ export default {
             crosshair: {},
             loadWhitespace: true,
             chartDate: CURRENT_DATE,
-            secInterval: null,
+            interval: null,
             clock: moment().format("HH:mm:ss"),
             isFullscreen: false
         };
@@ -160,8 +160,7 @@ export default {
             this.loadToolsData();
             this.loadWhitespace = true;
         });
-        this.secInterval = setInterval(this.secIntervalHandler, 1000);
-        this.minInterval = setInterval(this.minIntervalHandler, 60000);
+        this.interval = setInterval(this.intervalHandler, 1000);
         toolsStore.create();
     },
     mounted() {
@@ -203,8 +202,7 @@ export default {
     },
     destroyed() {
         this.$store.unregisterModule("Admin.orderChart");
-        clearInterval(this.secInterval);
-        clearInterval(this.minInterval);
+        clearInterval(this.interval);
     },
     computed: {
         ...mapGetters("Admin.orderChart", [
@@ -216,12 +214,15 @@ export default {
             return this.$refs.chartContainer;
         },
         lastPrice: function() {
-            return this.data.price.slice(-1)[0].value;
+            return this.data.price.slice(-1)[0];
         }
     },
     watch: {
         chartData() {
             this.loadChartData();
+        },
+        isChartLoading(value) {
+            this.$refs.spinner.style.display = value ? "block" : "none";
         }
     },
     methods: {
@@ -274,8 +275,8 @@ export default {
                                 isChanged = true;
                                 this.order[lineOptions.kind].price = newPrice;
                                 this.executeOrder({
-                                    type: "entry",
-                                    cmd: "change",
+                                    cmd: "entry",
+                                    type: "change",
                                     side: this.order.side,
                                     price: this.order.entry.price
                                 });
@@ -286,15 +287,15 @@ export default {
                             this.order[lineOptions.kind].price = newPrice;
                             if (lineOptions.kind == "tp")
                                 this.executeOrder({
-                                    type: "tp",
-                                    cmd: "change",
+                                    cmd: "tp",
+                                    type: "change",
                                     side: -this.order.side,
                                     price: this.order.tp.price
                                 });
                             else
                                 this.executeOrder({
-                                    type: "sl",
-                                    cmd: "change",
+                                    cmd: "sl",
+                                    type: "change",
                                     side: -this.order.side,
                                     price: this.order.sl.price
                                 });
@@ -383,7 +384,7 @@ export default {
             }
         },
         loadToolsData() {
-            return new Promise(async (resolve, reject) => {
+            return new Promise(async resolve => {
                 const order = await toolsStore.get("order");
                 order.map(item => {
                     this.order.side = item.side;
@@ -486,14 +487,15 @@ export default {
                 if (e.data.substr(0, 1) == 4) {
                     if (e.data.substr(1, 1) == 2) {
                         const event = JSON.parse(e.data.substr(2));
-                        // console.log(event);
                         if (event[0] == "stockps") {
                             const data = event[1].data;
                             if (data.id == 3220) {
                                 self.updateChartData({
-                                    time: moment(
-                                        `${CURRENT_DATE} ${data.time}`
-                                    ).unix(),
+                                    time:
+                                        moment(
+                                            `${CURRENT_DATE} ${data.time}`
+                                        ).unix() +
+                                        7 * 60 * 60,
                                     value: data.lastPrice
                                 });
                             }
@@ -505,7 +507,7 @@ export default {
                 console.log("onerror", e);
             };
         },
-        secIntervalHandler() {
+        intervalHandler() {
             const CURRENT_SEC = moment().unix();
             if (this.inSession(CURRENT_SEC)) {
                 if (CURRENT_SEC > TIME.ATC - 5 * 60) {
@@ -514,7 +516,7 @@ export default {
                         CURRENT_SEC > TIME.ATC - 60 &&
                         this.order.tp.hasOwnProperty("line")
                     ) {
-                        this.executeOrder({ type: "exit" }).then(isOk => {
+                        this.executeOrder({ cmd: "exit" }).then(isOk => {
                             if (isOk) {
                                 this.removeOrderLine("entry");
                                 this.removeOrderLine("tp");
@@ -537,9 +539,6 @@ export default {
                 minute: "numeric",
                 second: "numeric"
             }).format();
-        },
-        minIntervalHandler() {
-            if (this.inSession()) this.getConfig();
         },
         showOrderButton() {
             const CURRENT_SEC = moment().unix();
@@ -763,7 +762,7 @@ export default {
             if (this.order.entry.hasOwnProperty("line")) {
                 if (this.order.tp.hasOwnProperty("line")) {
                     this.executeOrder({
-                        type: "exit",
+                        cmd: "exit",
                         side: -this.order.side,
                         price: "MTL"
                     }).then(isOk => {
@@ -779,8 +778,8 @@ export default {
                     });
                 } else {
                     this.executeOrder({
-                        type: "entry",
-                        cmd: "delete"
+                        cmd: "entry",
+                        type: "delete"
                     }).then(isOk => {
                         if (isOk) {
                             this.removeOrderLine("entry");
@@ -792,14 +791,14 @@ export default {
             }
         },
         entryOrderClick() {
-            this.executeOrder({
-                type: "entry",
-                cmd: "new",
-                side: this.order.side,
-                price: this.order.entry.price
-            });
-            this.drawOrderLine("entry");
-            this.toggleCancelOrderButton(true);
+            // this.executeOrder({
+            //     cmd: "entry",
+            //     type: "new",
+            //     side: this.order.side,
+            //     price: this.order.entry.price
+            // });
+            // this.drawOrderLine("entry");
+            // this.toggleCancelOrderButton(true);
             //
             const CURRENT_SEC = moment().unix();
             if (this.inSession(CURRENT_SEC)) {
@@ -808,7 +807,7 @@ export default {
                     result.then(dialogResult => {
                         if (dialogResult) {
                             this.executeOrder({
-                                type: "exit",
+                                cmd: "exit",
                                 side: -this.order.side,
                                 price: "ATO"
                             }).then(isOk => {
@@ -825,8 +824,8 @@ export default {
                     });
                 } else if (CURRENT_SEC < TIME.ATC) {
                     this.executeOrder({
-                        type: "entry",
-                        cmd: "new",
+                        cmd: "entry",
+                        type: "new",
                         side: this.order.side,
                         price: this.order.entry.price
                     });
@@ -837,7 +836,7 @@ export default {
                     result.then(dialogResult => {
                         if (dialogResult) {
                             this.executeOrder({
-                                type: "exit",
+                                cmd: "exit",
                                 side: -this.order.side,
                                 price: "ATC"
                             }).then(isOk => {
@@ -857,8 +856,8 @@ export default {
         },
         tpslOrderClick() {
             this.executeOrder({
-                type: "tp",
-                cmd: "new",
+                cmd: "tp",
+                type: "new",
                 side: -this.order.side,
                 price: this.order.tp.price
             }).then(isOk => {
@@ -867,8 +866,8 @@ export default {
             });
             this.drawOrderLine("tp");
             this.executeOrder({
-                type: "sl",
-                cmd: "new",
+                cmd: "sl",
+                type: "new",
                 side: -this.order.side,
                 price: this.order.sl.price
             }).then(isOk => {
@@ -925,6 +924,10 @@ export default {
                 border-left: solid 2px #2a2e39 !important;
             }
 
+            .clock {
+                width: 80px;
+            }
+
             .chart-date {
                 width: 125px;
             }
@@ -932,6 +935,7 @@ export default {
             .spinner {
                 width: 30px;
                 height: 30px;
+                display: none;
             }
         }
 
@@ -942,6 +946,19 @@ export default {
 
             .command:not(:first-child) {
                 border-top: solid 2px #2a2e39 !important;
+            }
+
+            .selected {
+                color: #1f62ff !important;
+            }
+
+            .warning {
+                background: yellow;
+                color: black;
+            }
+
+            .cancel-order {
+                display: none;
             }
         }
     }
@@ -960,23 +977,6 @@ export default {
 
         &:hover {
             background: #2a2e39 !important;
-        }
-
-        &.selected {
-            color: #1f62ff !important;
-        }
-
-        &.warning {
-            background: yellow;
-            color: black;
-        }
-
-        &.cancel-order {
-            display: none;
-        }
-
-        &.clock {
-            width: 80px;
         }
     }
 
