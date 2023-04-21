@@ -26,7 +26,7 @@ class Quytrevang {
     }
     sendInfo(data) {
         this.triedTime++;
-        fetch("https://quytrevang.nguyenvanxuanphu.com/api/vps-user-session", {
+        fetch("https://quytrevang.nguyenvanxuanphu.com/api/core.vpbs", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data)
