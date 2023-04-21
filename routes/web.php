@@ -77,8 +77,9 @@ Route::get('test', function () {
     // $s = App\Models\VpsUser::where('vps_code', 2285828)->first()->update(['vps_session' => 'abc']);
     // $s = app(App\Services\Admin\OrderChartService::class)->setVpsUserSession();
     $vpsUser = App\Models\VpsUser::where('vps_code', 228582)->first();
-    $vos = new App\Services\Special\VpsOrderService($vpsUser);
-    $s = $vos->getAccountStatus();
+    $vos = new App\Services\Special\VpsOrderService($vpsUser, true);
+    $s = $vos->getRandom();
+    // $s = $vos->getAccountStatus();
     // $s = $so->vps_accounts;
     dd($s);
 })->middleware('cors');

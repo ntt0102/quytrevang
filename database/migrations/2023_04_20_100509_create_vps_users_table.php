@@ -16,7 +16,7 @@ class CreateVpsUsersTable extends Migration
         Schema::create('vps_users', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedBigInteger('user_code');
-            $table->integer('vps_code')->nullable();
+            $table->string('vps_code')->nullable();
             $table->string('vps_session')->nullable();
             $table->boolean('allow_copy')->default(0);
             $table->boolean('allow_share')->default(0);
