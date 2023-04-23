@@ -280,10 +280,12 @@ export default {
                                 isChanged = true;
                                 this.order[lineOptions.kind].price = newPrice;
                                 this.executeOrder({
-                                    cmd: "entry",
-                                    type: "change",
-                                    side: this.order.side,
-                                    price: this.order.entry.price
+                                    action: "entry",
+                                    data: {
+                                        cmd: "change",
+                                        side: this.order.side,
+                                        price: this.order.entry.price
+                                    }
                                 });
                                 this.drawOrderLine(lineOptions.kind);
                             }
@@ -292,17 +294,21 @@ export default {
                             this.order[lineOptions.kind].price = newPrice;
                             if (lineOptions.kind == "tp")
                                 this.executeOrder({
-                                    cmd: "tp",
-                                    type: "change",
-                                    side: -this.order.side,
-                                    price: this.order.tp.price
+                                    action: "tp",
+                                    data: {
+                                        cmd: "change",
+                                        side: -this.order.side,
+                                        price: this.order.tp.price
+                                    }
                                 });
                             else
                                 this.executeOrder({
-                                    cmd: "sl",
-                                    type: "change",
-                                    side: -this.order.side,
-                                    price: this.order.sl.price
+                                    action: "sl",
+                                    data: {
+                                        action: "change",
+                                        side: -this.order.side,
+                                        price: this.order.sl.price
+                                    }
                                 });
 
                             this.drawOrderLine(lineOptions.kind);
@@ -503,6 +509,100 @@ export default {
                                         7 * 60 * 60,
                                     value: data.lastPrice
                                 });
+                                if (this.order.entry.hasOwnProperty("line")) {
+                                    if (this.order.tp.hasOwnProperty("line")) {
+                                        if (
+                                            (self.order.side > 0 &&
+                                                data.lastPrice >=
+                                                    self.order.tp.price) ||
+                                            (self.order.side < 0 &&
+                                                data.lastPrice <=
+                                                    self.order.tp.price)
+                                        )
+                                            this.executeOrder({
+                                                action: "sl",
+                                                data: { cmd: "delete" }
+                                            }).then(isOk => {
+                                                if (isOk) {
+                                                    this.removeOrderLine(
+                                                        "entry"
+                                                    );
+                                                    this.removeOrderLine("tp");
+                                                    this.removeOrderLine("sl");
+                                                    toolsStore.clear("order");
+                                                    this.$toasted.success(
+                                                        "Đã khớp lệnh TP và đóng vị thế"
+                                                    );
+                                                } else
+                                                    this.$toasted.error(
+                                                        "Huỷ lệnh SL thất bại"
+                                                    );
+                                            });
+                                        if (
+                                            (self.order.side > 0 &&
+                                                data.lastPrice <=
+                                                    self.order.sl.price) ||
+                                            (self.order.side < 0 &&
+                                                data.lastPrice >=
+                                                    self.order.sl.price)
+                                        )
+                                            this.executeOrder({
+                                                action: "tp",
+                                                data: { cmd: "cancel" }
+                                            }).then(isOk => {
+                                                if (isOk) {
+                                                    this.removeOrderLine(
+                                                        "entry"
+                                                    );
+                                                    this.removeOrderLine("tp");
+                                                    this.removeOrderLine("sl");
+                                                    toolsStore.clear("order");
+                                                    this.$toasted.success(
+                                                        "Đã khớp lệnh SL và đóng vị thế"
+                                                    );
+                                                } else
+                                                    this.$toasted.error(
+                                                        "Huỷ lệnh TP thất bại"
+                                                    );
+                                            });
+                                    } else {
+                                        if (
+                                            (self.order.side > 0 &&
+                                                data.lastPrice >=
+                                                    self.order.entry.price) ||
+                                            (self.order.side < 0 &&
+                                                data.lastPrice <=
+                                                    self.order.entry.price)
+                                        )
+                                            this.executeOrder({
+                                                action: "tpsl",
+                                                tpData: {
+                                                    cmd: "new",
+                                                    side: -this.order.side,
+                                                    price: this.order.tp.price
+                                                },
+                                                slData: {
+                                                    cmd: "new",
+                                                    side: -this.order.side,
+                                                    price: this.order.sl.price
+                                                }
+                                            }).then(isOk => {
+                                                if (isOk) {
+                                                    this.drawOrderLine("tp");
+                                                    this.drawOrderLine("sl");
+                                                    this.order.entry.line.applyOptions(
+                                                        { draggable: false }
+                                                    );
+                                                    this.$toasted.success(
+                                                        "Tự động đặt lệnh TP/SL thành công"
+                                                    );
+                                                } else
+                                                    this.$toasted.error(
+                                                        "Tự động đặt lệnh TP/SL thất bại"
+                                                    );
+                                            });
+                                    }
+                                }
                             }
                         }
                     }
@@ -521,7 +621,11 @@ export default {
                         CURRENT_SEC > TIME.ATC - 60 &&
                         this.order.tp.hasOwnProperty("line")
                     ) {
-                        this.executeOrder({ cmd: "exit" }).then(isOk => {
+                        this.executeOrder({
+                            action: "cancel",
+                            tpData: { cmd: "cancel" },
+                            slData: { cmd: "delete" }
+                        }).then(isOk => {
                             if (isOk) {
                                 this.removeOrderLine("entry");
                                 this.removeOrderLine("tp");
@@ -547,8 +651,7 @@ export default {
         },
         showOrderButton() {
             const CURRENT_SEC = moment().unix();
-            if (true) {
-                // if (this.inSession(CURRENT_SEC)) {
+            if (this.inSession(CURRENT_SEC)) {
                 if (this.order.position) {
                     if (
                         this.order.entry.hasOwnProperty("line") &&
@@ -574,12 +677,12 @@ export default {
                                 ? 1
                                 : -1;
                         this.order.side = side;
-                        if (CURRENT_SEC < TIME.ATO) price = "ATO";
-                        else if (CURRENT_SEC < TIME.ATC) {
-                            this.order.entry.price = price;
-                            this.order.tp.price = price + side * TP_DEFAULT;
-                            this.order.sl.price = price - side * SL_DEFAULT;
-                        } else price = "ATC";
+                        // if (CURRENT_SEC < TIME.ATO) price = "ATO";
+                        // else if (CURRENT_SEC < TIME.ATC) {
+                        this.order.tp.price = price + side * TP_DEFAULT;
+                        this.order.sl.price = price - side * SL_DEFAULT;
+                        // } else price = "ATC";
+                        this.order.entry.price = price;
                         this.$refs.entryOrder.style.left =
                             +(
                                 this.crosshair.x +
@@ -767,9 +870,14 @@ export default {
             if (this.order.entry.hasOwnProperty("line")) {
                 if (this.order.tp.hasOwnProperty("line")) {
                     this.executeOrder({
-                        cmd: "exit",
-                        side: -this.order.side,
-                        price: "MTL"
+                        action: "exit",
+                        tpData: { cmd: "cancel" },
+                        slData: { cmd: "delete" },
+                        exitData: {
+                            cmd: "new",
+                            side: -this.order.side,
+                            price: "MTL"
+                        }
                     }).then(isOk => {
                         if (isOk) {
                             this.removeOrderLine("entry");
@@ -783,8 +891,8 @@ export default {
                     });
                 } else {
                     this.executeOrder({
-                        cmd: "cancel",
-                        type: "entry"
+                        action: "entry",
+                        data: { cmd: "delete" }
                     }).then(isOk => {
                         if (isOk) {
                             this.removeOrderLine("entry");
@@ -796,91 +904,79 @@ export default {
             }
         },
         entryOrderClick() {
-            this.executeOrder({
-                cmd: "entry",
-                type: "new",
-                side: this.order.side,
-                price: this.order.entry.price
-            });
-            this.drawOrderLine("entry");
-            this.toggleCancelOrderButton(true);
-            //
             const CURRENT_SEC = moment().unix();
             if (this.inSession(CURRENT_SEC)) {
-                if (CURRENT_SEC < TIME.ATO) {
-                    let result = confirm("Đặt lệnh ATO?", "Xác nhận đặt lệnh");
-                    result.then(dialogResult => {
-                        if (dialogResult) {
-                            this.executeOrder({
-                                cmd: "exit",
-                                side: -this.order.side,
-                                price: "ATO"
-                            }).then(isOk => {
-                                if (isOk)
-                                    this.$toasted.success(
-                                        "Đặt lệnh ATO thành công"
-                                    );
-                                else
-                                    this.$toasted.error(
-                                        "Đặt lệnh ATO thất bại"
-                                    );
-                            });
-                        }
-                    });
-                } else if (CURRENT_SEC < TIME.ATC) {
-                    this.executeOrder({
-                        cmd: "entry",
-                        type: "new",
+                // if (CURRENT_SEC < TIME.ATO) {
+                //     let result = confirm("Đặt lệnh ATO?", "Xác nhận đặt lệnh");
+                //     result.then(dialogResult => {
+                // if (dialogResult) {
+                //     this.executeOrder({
+                //         action: "exit",
+                //         exitData: {
+                //             cmd: "new",
+                //             side: -this.order.side,
+                //             price: "ATO"
+                //         }
+                //     }).then(isOk => {
+                //         if (isOk)
+                //             this.$toasted.success("Đặt lệnh ATO thành công");
+                //         else this.$toasted.error("Đặt lệnh ATO thất bại");
+                //     });
+                // }
+                //     });
+                // } else if (CURRENT_SEC < TIME.ATC) {
+                this.executeOrder({
+                    action: "entry",
+                    data: {
+                        cmd: "new",
                         side: this.order.side,
                         price: this.order.entry.price
-                    });
-                    this.drawOrderLine("entry");
-                    this.toggleCancelOrderButton(true);
-                } else {
-                    let result = confirm("Đặt lệnh ATC?", "Xác nhận đặt lệnh");
-                    result.then(dialogResult => {
-                        if (dialogResult) {
-                            this.executeOrder({
-                                cmd: "exit",
-                                side: -this.order.side,
-                                price: "ATC"
-                            }).then(isOk => {
-                                if (isOk)
-                                    this.$toasted.success(
-                                        "Đặt lệnh ATC thành công"
-                                    );
-                                else
-                                    this.$toasted.error(
-                                        "Đặt lệnh ATC thất bại"
-                                    );
-                            });
-                        }
-                    });
-                }
+                    }
+                });
+                this.drawOrderLine("entry");
+                this.toggleCancelOrderButton(true);
+                // } else {
+                //     let result = confirm("Đặt lệnh ATC?", "Xác nhận đặt lệnh");
+                //     result.then(dialogResult => {
+                // if (dialogResult) {
+                //     this.executeOrder({
+                //         action: "exit",
+                //         exitData: {
+                //             cmd: "new",
+                //             side: -this.order.side,
+                //             price: "ATC"
+                //         }
+                //     }).then(isOk => {
+                //         if (isOk)
+                //             this.$toasted.success("Đặt lệnh ATC thành công");
+                //         else this.$toasted.error("Đặt lệnh ATC thất bại");
+                //     });
+                // }
+                //     });
+                // }
             }
         },
         tpslOrderClick() {
             this.executeOrder({
-                cmd: "tp",
-                type: "new",
-                side: -this.order.side,
-                price: this.order.tp.price
+                action: "tpsl",
+                tpData: {
+                    cmd: "new",
+                    side: -this.order.side,
+                    price: this.order.tp.price
+                },
+                slData: {
+                    cmd: "new",
+                    side: -this.order.side,
+                    price: this.order.sl.price
+                }
             }).then(isOk => {
-                if (isOk) this.$toasted.success("Đặt lệnh TP thành công");
-                else this.$toasted.error("Đặt lệnh TP thất bại");
+                if (isOk) {
+                    this.drawOrderLine("tp");
+                    this.drawOrderLine("sl");
+                    this.order.entry.line.applyOptions({ draggable: false });
+                    this.$toasted.success("Đặt lệnh TP/SL thành công");
+                } else this.$toasted.error("Đặt lệnh TP/SL thất bại");
             });
-            this.drawOrderLine("tp");
-            this.executeOrder({
-                cmd: "sl",
-                type: "new",
-                side: -this.order.side,
-                price: this.order.sl.price
-            }).then(isOk => {
-                if (isOk) this.$toasted.success("Đặt lệnh SL thành công");
-                else this.$toasted.error("Đặt lệnh SL thất bại");
-            });
-            this.drawOrderLine("sl");
-            this.order.entry.line.applyOptions({ draggable: false });
         },
         chartTopClick() {
             this.chart.timeScale().scrollToRealTime();
@@ -890,6 +986,7 @@ export default {
             else this.chartContainer.requestFullscreen();
         },
         inSession(currentSec = null) {
+            return true;
             if (!currentSec) currentSec = moment().unix();
             return currentSec >= TIME.START && currentSec <= TIME.END;
         },
@@ -958,12 +1055,12 @@ export default {
             }
 
             .warning {
-                background: yellow;
-                color: black;
+                color: yellow !important;
             }
 
             .cancel-order {
                 display: none;
+                color: red;
             }
         }
     }

@@ -58,6 +58,7 @@ const actions = {
     },
     executeOrder({ commit, dispatch, getters, state, rootGetters }, data) {
         commit("setChartLoading", true);
+        console.log("executeOrder", data);
         return new Promise((resolve, reject) => {
             axios
                 .post("order-chart/execute-order", data, {

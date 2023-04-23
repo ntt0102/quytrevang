@@ -69,37 +69,78 @@ class OrderChartService extends CoreService
         return $this->transaction(
             function () use ($payload) {
                 $vpsUser = request()->user()->vpsUser;
-                switch ($payload->cmd) {
+                $vos = new VpsOrderService($vpsUser);
+                switch ($payload->action) {
                     case 'entry':
-                        $isNew = $payload->type == 'new';
-                        $vos = new VpsOrderService($vpsUser, $isNew);
-                        if (($isNew && !!$vos->status && $vos->status['net'] == 0) || !$isNew)
-                            $result = $vos->orderCondition($payload, $vpsUser->entry_order_id);
-                        else return [
-                            'isOk' => false,
-                            'message' => 'openedPosition',
-                        ];
+                        $isNew = $payload->data->cmd == 'new';
+                        if ($isNew && $vos->status->connect && $vos->status->net != 0)
+                            return [
+                                'isOk' => false,
+                                'message' => 'openedPosition',
+                            ];
+                        $result = $vos->conditionOrder(
+                            $payload->action,
+                            $payload->data,
+                            $vpsUser->entry_order_id
+                        );
                         break;
 
                     case 'tpsl':
-                        $result = true;
+                        if ($vos->status->connect && $vos->status->net == 0)
+                            return [
+                                'isOk' => false,
+                                'message' => 'unopenedPosition',
+                            ];
+                        $tp = $vos->order('tp', $payload->tpData);
+                        $sl = $vos->conditionOrder('sl', $payload->slData);
+                        $result = !!$tp && !!$sl;
                         break;
                     case 'tp':
-                        $result = true;
+                        $result = $vos->order(
+                            $payload->action,
+                            $payload->data,
+                            $vpsUser->tp_order_id
+                        );
                         break;
                     case 'sl':
-                        $result = true;
+                        $result = $vos->conditionOrder(
+                            $payload->action,
+                            $payload->data,
+                            $vpsUser->sl_order_id
+                        );
                         break;
                     case 'cancel':
-                        $result = true;
+                        $tp = $vos->order(
+                            'tp',
+                            $payload->tpData,
+                            $vpsUser->tp_order_id
+                        );
+                        $sl = $vos->conditionOrder(
+                            'sl',
+                            $payload->slData,
+                            $vpsUser->sl_order_id
+                        );
+                        $result = !!$tp && !!$sl;
                         break;
                     case 'exit':
-                        $result = true;
+                        if (isset($payload->tpData))
+                            $tp = $vos->order(
+                                'tp',
+                                $payload->tpData,
+                                $vpsUser->tp_order_id
+                            );
+                        if (isset($payload->slData))
+                            $sl = $vos->conditionOrder(
+                                'sl',
+                                $payload->slData,
+                                $vpsUser->sl_order_id
+                            );
+                        $exit = $vos->order('exit', $payload->exitData);
                         break;
                 }
                 return [
                     'isOk' => !!$result,
-                    'data' => $result
+                    // 'data' => $result
                 ];
             }
         );

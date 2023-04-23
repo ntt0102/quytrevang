@@ -13,12 +13,12 @@ class VpsOrderService extends CoreService
     private $symbol;
     public $status;
 
-    public function __construct(VpsUser $vpsUser, bool $withStatus = false)
+    public function __construct(VpsUser $vpsUser)
     {
         $this->client = new Client();
         $this->vpsUser = $vpsUser;
         $this->symbol = get_global_value('vn30f1m');
-        if ($withStatus) $this->status = $this->getAccountStatus();
+        $this->status = $this->getAccountStatus();
     }
 
     public function getAccountStatus()
@@ -32,32 +32,32 @@ class VpsOrderService extends CoreService
                 "type" => "string",
                 "cmd" => "Web.Portfolio.AccountStatus",
                 "p1" => $this->formatAccount(),
-                "p2" => "",
-                "p3" => "",
-                "p4" => "null",
             ],
         ];
         $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1) return false;
-        return [
-            'max_vol' => $rsp->data->max_vol,
+        if ($rsp->rc != 1) return (object)['connect' => false];
+        return (object)[
+            'connect' => true,
+            'maxVol' => $rsp->data->max_vol,
             'fee' => $rsp->data->others,
             'vm' => $rsp->data->vm,
             'net' => $rsp->data->net != 'NO' ? $rsp->data->net : 0
         ];
     }
 
-    public function orderCondition($data, $orderId = "")
+    public function conditionOrder($type, $data, $orderId = "")
     {
+        $isNew = $data->action == "new";
+        $isNotDelete = $data->action != 'delete';
         $payload = [
             "group" => "O",
             "user" => $this->vpsUser->vps_code,
             "session" => $this->vpsUser->vps_session,
             "language" => "vi",
             "data" => [
-                "cmd" => "co.stop.order." . $data->type,
+                "cmd" => "co.stop.order." . $data->action,
                 "accountNo" => $this->formatAccount(),
                 "pin" => "",
                 "orderId" => $orderId,
@@ -65,38 +65,37 @@ class VpsOrderService extends CoreService
                 "priceType" => "MTL",
                 "quantity" => strval($this->vpsUser->volume),
                 "relation" => "GTEQ",
-                "side" => $this->formatSide($data->side),
+                "side" => $isNew ? $this->formatSide($data->side) : "",
                 "stopOrderType" => "stop",
                 "symbol" => $this->symbol,
-                "triggerPrice" => $this->formatPrice($data->price)
+                "triggerPrice" => $isNotDelete ?  $this->formatPrice($data->price) : ""
             ]
         ];
         $url = "https://smartpro.vps.com.vn/handler/core_ext.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        return $rsp;
         if ($rsp->rc != 1) return false;
         return $rsp->stopOrderID;
     }
 
-    public function order($data, $orderNo = "")
+    public function order($type, $data, $orderNo = "")
     {
-        $price = $this->formatPrice($data->price);
-        $side = $this->formatSide($data->side);
+        $isNew = $data->action == "new";
+        $isNotCancel = $data->action != "cancel";
+        $price = $isNotCancel ? $this->formatPrice($data->price) : "";
+        $side = $isNew ? $this->formatSide($data->side) : "";
         $account = $this->formatAccount();
         $refId = $this->createRefId();
-        $isNew = $data->type == "new";
-        $checkSum = $this->createCheckSum($isNew, $price, $side, $account, $refId);
         $payload = [
             "group" => "FD",
             "user" => $this->vpsUser->vps_code,
             "session" => $this->vpsUser->vps_session,
             "c" => "H",
-            "checksum" => $checkSum,
+            "checksum" => $isNotCancel ? $this->createCheckSum($isNew, $price, $side, $account, $refId) : "",
             "language" => "vi",
             "data" => [
                 "type" => "string",
-                "cmd" => "Web." . $data->type . "Order",
+                "cmd" => "Web." . $data->action . "Order",
                 "account" => $account,
                 "pin" => "",
                 "orderNo" => $orderNo,
