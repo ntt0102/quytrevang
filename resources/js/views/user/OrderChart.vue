@@ -47,7 +47,12 @@
                     ></div>
                     <div
                         class="command far fa-sync-alt"
-                        @click="() => getChartData(chartDate)"
+                        @click="
+                            () => {
+                                data.price = [];
+                                getChartData(chartDate);
+                            }
+                        "
                     ></div>
                     <div
                         ref="lineTool"
@@ -778,8 +783,8 @@ export default {
                     });
                 } else {
                     this.executeOrder({
-                        cmd: "entry",
-                        type: "delete"
+                        cmd: "cancel",
+                        type: "entry"
                     }).then(isOk => {
                         if (isOk) {
                             this.removeOrderLine("entry");
@@ -791,14 +796,14 @@ export default {
             }
         },
         entryOrderClick() {
-            // this.executeOrder({
-            //     cmd: "entry",
-            //     type: "new",
-            //     side: this.order.side,
-            //     price: this.order.entry.price
-            // });
-            // this.drawOrderLine("entry");
-            // this.toggleCancelOrderButton(true);
+            this.executeOrder({
+                cmd: "entry",
+                type: "new",
+                side: this.order.side,
+                price: this.order.entry.price
+            });
+            this.drawOrderLine("entry");
+            this.toggleCancelOrderButton(true);
             //
             const CURRENT_SEC = moment().unix();
             if (this.inSession(CURRENT_SEC)) {

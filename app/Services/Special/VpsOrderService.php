@@ -10,13 +10,6 @@ class VpsOrderService extends CoreService
 {
     private $client;
     private $vpsUser;
-    private $vpsCode;
-    private $vpsSession;
-    private $volume;
-    private $entryId;
-    private $tpId;
-    private $slId;
-    private $exitId;
     private $symbol;
     public $status;
 
@@ -24,13 +17,6 @@ class VpsOrderService extends CoreService
     {
         $this->client = new Client();
         $this->vpsUser = $vpsUser;
-        // $this->vpsCode = $vpsUser->vps_code;
-        // $this->vpsSession = $vpsUser->vps_session;
-        // $this->volume = $vpsUser->volume;
-        // $this->entryId = $vpsUser->entry_id;
-        // $this->tpId = $vpsUser->tp_id;
-        // $this->slId = $vpsUser->sl_id;
-        // $this->exitId = $vpsUser->exit_id;
         $this->symbol = get_global_value('vn30f1m');
         if ($withStatus) $this->status = $this->getAccountStatus();
     }
@@ -39,13 +25,13 @@ class VpsOrderService extends CoreService
     {
         $payload = [
             "group" => "Q",
-            "user" => $this->vpsUser->vpsCode,
-            "session" => $this->vpsUser->vpsSession,
+            "user" => $this->vpsUser->vps_code,
+            "session" => $this->vpsUser->vps_session,
             "c" => "H",
             "data" => [
                 "type" => "string",
                 "cmd" => "Web.Portfolio.AccountStatus",
-                "p1" => $this->vpsUser->vpsCode . "8",
+                "p1" => $this->formatAccount(),
                 "p2" => "",
                 "p3" => "",
                 "p4" => "null",
@@ -62,54 +48,61 @@ class VpsOrderService extends CoreService
             'net' => $rsp->data->net != 'NO' ? $rsp->data->net : 0
         ];
     }
-    public function orderCondition($data, $orderId)
+
+    public function orderCondition($data, $orderId = "")
     {
         $payload = [
             "group" => "O",
-            "user" => $this->vpsUser->vpsCode,
-            "session" => $this->vpsUser->vpsSession,
+            "user" => $this->vpsUser->vps_code,
+            "session" => $this->vpsUser->vps_session,
             "language" => "vi",
             "data" => [
                 "cmd" => "co.stop.order." . $data->type,
-                "accountNo" => $this->vpsUser->vpsCode . "8",
+                "accountNo" => $this->formatAccount(),
                 "pin" => "",
                 "orderId" => $orderId,
                 "channel" => "H",
                 "priceType" => "MTL",
                 "quantity" => strval($this->vpsUser->volume),
                 "relation" => "GTEQ",
-                "side" => $this->convertSide($data->side),
+                "side" => $this->formatSide($data->side),
                 "stopOrderType" => "stop",
                 "symbol" => $this->symbol,
-                "triggerPrice" => strval($data->price)
+                "triggerPrice" => $this->formatPrice($data->price)
             ]
         ];
         $url = "https://smartpro.vps.com.vn/handler/core_ext.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
+        return $rsp;
         if ($rsp->rc != 1) return false;
         return $rsp->stopOrderID;
     }
 
-    public function order($data, $orderNo)
+    public function order($data, $orderNo = "")
     {
+        $price = $this->formatPrice($data->price);
+        $side = $this->formatSide($data->side);
+        $account = $this->formatAccount();
         $refId = $this->createRefId();
+        $isNew = $data->type == "new";
+        $checkSum = $this->createCheckSum($isNew, $price, $side, $account, $refId);
         $payload = [
             "group" => "FD",
-            "user" => $this->vpsUser->vpsCode,
-            "session" => $this->vpsUser->vpsSession,
+            "user" => $this->vpsUser->vps_code,
+            "session" => $this->vpsUser->vps_session,
             "c" => "H",
-            "checksum" => "e98580362777fe537071c8ac9f095f48",
+            "checksum" => $checkSum,
             "language" => "vi",
             "data" => [
                 "type" => "string",
                 "cmd" => "Web." . $data->type . "Order",
-                "account" => $this->vpsUser->vpsCode . "8",
+                "account" => $account,
                 "pin" => "",
                 "orderNo" => $orderNo,
-                "price" => strval($data->price),
-                "nprice" => strval($data->price),
-                "side" => $this->convertSide($data->side),
+                "price" => $price,
+                "nprice" => $price,
+                "side" => $side,
                 "volume" => $this->vpsUser->volume,
                 "nvol" => $this->vpsUser->volume,
                 "symbol" => $this->symbol,
@@ -123,9 +116,20 @@ class VpsOrderService extends CoreService
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
         if ($rsp->rc != 1) return false;
-        return $rsp->stopOrderID;
+        return $rsp->orderNo;
     }
-    private function convertSide($side)
+
+    public function formatAccount()
+    {
+        return $this->vpsUser->vps_code . "8";
+    }
+
+    public function formatPrice($price)
+    {
+        return str_replace('.0', '', strval($price));
+    }
+
+    public function formatSide($side)
     {
         if ($side == -1) return "S";
         if ($side == 1) return "B";
@@ -140,6 +144,20 @@ class VpsOrderService extends CoreService
         for ($i = 0; $i < 23; $i++)
             $text .= substr($str, floor(strlen($str) * rand() / getrandmax()), 1);
 
-        return $this->vpsUser->vpsCode . ".H." . $text;
+        return $this->vpsUser->vps_code . ".H." . $text;
+    }
+
+    public function createCheckSum($isNew, $price, $side, $account, $refId)
+    {
+        $checkSum = $this->vpsUser->vps_session;
+        $checkSum .= $isNew ? $price : "undefined";
+        if ($isNew) $checkSum .= $side;
+        $checkSum .= ($isNew ? $this->vpsUser->volume * 100 : 0) . "vpbs@456";
+        if ($isNew) {
+            $checkSum .= $account;
+            $checkSum .= $this->symbol;
+        }
+        $checkSum .= $refId;
+        return $checkSum;
     }
 }

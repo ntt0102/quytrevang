@@ -22,6 +22,10 @@ class CreateVpsUsersTable extends Migration
             $table->boolean('allow_share')->default(0);
             $table->boolean('allow_vol_max')->default(1);
             $table->integer('volume')->default(1);
+            $table->string('entry_order_id')->nullable();
+            $table->string('tp_order_id')->nullable();
+            $table->string('sl_order_id')->nullable();
+            $table->string('exit_order_id')->nullable();
             $table->timestamps();
         });
     }

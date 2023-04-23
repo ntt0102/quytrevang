@@ -4,6 +4,7 @@ namespace App\Services\Admin;
 
 use App\Services\CoreService;
 use App\Models\VpsUser;
+use App\Services\Special\VpsOrderService;
 
 class OrderChartService extends CoreService
 {
@@ -12,16 +13,16 @@ class OrderChartService extends CoreService
     /**
      * Get chart data
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function getChartData($request)
+    public function getChartData($payload)
     {
         $date = date('Y-m-d');
         $data = [];
-        if ($request->date < $date)
-            $data = $this->generateDataFromCsv($request->date);
-        else if ($request->date == $date) {
+        if ($payload->date < $date)
+            $data = $this->generateDataFromCsv($payload->date);
+        else if ($payload->date == $date) {
             if (get_global_value('openingMarketFlag') == '1')
                 $data = $this->generateDataFromVps();
         }
@@ -32,10 +33,10 @@ class OrderChartService extends CoreService
     /**
      * Get Config
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function getConfig($request)
+    public function getConfig($payload)
     {
         return [
             'symbol' => get_global_value('vn30f1m')
@@ -45,13 +46,13 @@ class OrderChartService extends CoreService
     /**
      * Set config
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function setConfig($request)
+    public function setConfig($payload)
     {
         return $this->transaction(
-            function () use ($request) {
+            function () use ($payload) {
                 $so = request()->user()->smartOrder;
             }
         );
@@ -60,18 +61,45 @@ class OrderChartService extends CoreService
     /**
      * Execute Order
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function executeOrder($request)
+    public function executeOrder($payload)
     {
         return $this->transaction(
-            function () use ($request) {
-                $user = request()->user();
-                $vos = new \App\Services\Special\VpsOrderService($user->vpsUser);
+            function () use ($payload) {
+                $vpsUser = request()->user()->vpsUser;
+                switch ($payload->cmd) {
+                    case 'entry':
+                        $isNew = $payload->type == 'new';
+                        $vos = new VpsOrderService($vpsUser, $isNew);
+                        if (($isNew && !!$vos->status && $vos->status['net'] == 0) || !$isNew)
+                            $result = $vos->orderCondition($payload, $vpsUser->entry_order_id);
+                        else return [
+                            'isOk' => false,
+                            'message' => 'openedPosition',
+                        ];
+                        break;
+
+                    case 'tpsl':
+                        $result = true;
+                        break;
+                    case 'tp':
+                        $result = true;
+                        break;
+                    case 'sl':
+                        $result = true;
+                        break;
+                    case 'cancel':
+                        $result = true;
+                        break;
+                    case 'exit':
+                        $result = true;
+                        break;
+                }
                 return [
-                    'isOk' => true,
-                    'data' => $vos->getAccountStatus()
+                    'isOk' => !!$result,
+                    'data' => $result
                 ];
             }
         );
@@ -80,17 +108,17 @@ class OrderChartService extends CoreService
     /**
      * get Vps Account Info
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function setVpsUserSession($request)
+    public function setVpsUserSession($payload)
     {
-        $user = VpsUser::where('vps_code', $request->user)->first();
+        $user = VpsUser::where('vps_code', $payload->user)->first();
         if (!$user) false;
-        $user->vps_session = $request->session;
+        $user->vps_session = $payload->session;
         return !!$user->save();
 
-        // return $user->update(['vps_session' => $request->session]);
+        // return $user->update(['vps_session' => $payload->session]);
     }
 
     /**
@@ -110,15 +138,16 @@ class OrderChartService extends CoreService
     /**
      * 
      */
-    public function exportToCsv()
+    public function exportToCsv($date = null)
     {
         if (get_global_value('openingMarketFlag') == '1') {
-            $filename = storage_path('app/public/vn30f1m/' . date('Y-m-d') . '.csv');
+            if (!$date) $date = date('Y-m-d');
+            $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
             $list = $this->cloneVpsData();
             $fp = fopen($filename, 'w');
             foreach ($list as $item) {
                 $line = [];
-                $line[] = strtotime(date('Y-m-d ') . $item->time + $this->SHIFT_TIME);
+                $line[] = strtotime($date . $item->time) + $this->SHIFT_TIME;
                 $line[] = $item->lastPrice;
                 fputcsv($fp, $line);
             }

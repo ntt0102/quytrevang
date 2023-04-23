@@ -58,7 +58,7 @@ Route::get('test', function () {
     // $s = app(\App\Services\VpsService::class)->checkOpeningMarket();
     // $s = app(\App\Services\SmartOrderService::class)->getInfo('vn30f2304')->r;
     // $s = app(\App\Services\VpsService::class)->getVolumeByPrice();
-    // $s = app(\App\Services\SmartOrderService::class)->exportToCsv();
+    // $s = app(\App\Services\Admin\OrderChartService::class)->generateDataFromCsv('2023-04-22');
     // $s = app(\App\Services\VpsService::class);
     // $s = $s->getInfo($s->getSymbol())->r;
     // $s = app(\App\Services\SmartOrderService::class)->getFromCsv('2023-03-28');
@@ -77,9 +77,10 @@ Route::get('test', function () {
     // $s = App\Models\VpsUser::where('vps_code', 2285828)->first()->update(['vps_session' => 'abc']);
     // $s = app(App\Services\Admin\OrderChartService::class)->setVpsUserSession();
     $vpsUser = App\Models\VpsUser::where('vps_code', 228582)->first();
-    $vos = new App\Services\Special\VpsOrderService($vpsUser, true);
-    $s = $vos->getRandom();
+    // $vos = new App\Services\Special\VpsOrderService($vpsUser, true);
+    // $s = $vos->getRandom();
     // $s = $vos->getAccountStatus();
     // $s = $so->vps_accounts;
+    $s = new App\Services\Special\VpsOrderService($vpsUser, true);
     dd($s);
 })->middleware('cors');

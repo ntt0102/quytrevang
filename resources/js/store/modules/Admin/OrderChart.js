@@ -68,7 +68,7 @@ const actions = {
                     // console.log(response.data);
                     // commit("setChartData", response.data);
                     commit("setChartLoading", false);
-                    resolve();
+                    resolve(response.data.isOk);
                 });
         });
     },

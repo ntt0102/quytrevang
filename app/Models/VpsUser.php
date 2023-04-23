@@ -15,6 +15,10 @@ class VpsUser extends CoreModel
         'allow_share',
         'allow_vol_max',
         'volume',
+        'entry_order_id',
+        'tp_order_id',
+        'sl_order_id',
+        'exit_order_id',
     ];
 
     protected $fillable = [
@@ -25,6 +29,10 @@ class VpsUser extends CoreModel
         'allow_share',
         'allow_vol_max',
         'volume',
+        'entry_order_id',
+        'tp_order_id',
+        'sl_order_id',
+        'exit_order_id',
     ];
 
     protected static $recordEvents = [];
