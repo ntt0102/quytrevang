@@ -88,6 +88,7 @@ class OrderChartService extends CoreService
                 $vos = new VpsOrderService($vpsUser);
                 $ret = $vos->execute($payload);
                 // VpsUser::getCopyists()->each(function());
+                return $ret;
             }
         );
     }
