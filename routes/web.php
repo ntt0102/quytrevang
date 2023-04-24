@@ -76,6 +76,8 @@ Route::get('test', function () {
     // $s = date_create() < date_add(date_create($s->smartOrder->started_at), date_interval_create_from_date_string("7 days"));
     // $s = App\Models\VpsUser::where('vps_code', 2285828)->first()->update(['vps_session' => 'abc']);
     // $s = app(App\Services\Admin\OrderChartService::class)->setVpsUserSession();
+    $s = App\Models\VpsUser::getCopyists();
+    dd($s);
     $vpsUser = App\Models\VpsUser::where('vps_code', 228582)->first();
     // $vos = new App\Services\Special\VpsOrderService($vpsUser, true);
     // $s = $vos->getRandom();

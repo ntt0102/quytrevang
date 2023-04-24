@@ -45,4 +45,9 @@ class VpsUser extends CoreModel
     {
         return $this->belongsTo(User::class, 'user_code', 'code');
     }
+
+    public static function getCopyists()
+    {
+        return parent::where('allow_copy', 1)->get();
+    }
 }

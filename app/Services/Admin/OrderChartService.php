@@ -86,38 +86,8 @@ class OrderChartService extends CoreService
             function () use ($payload) {
                 $vpsUser = request()->user()->vpsUser;
                 $vos = new VpsOrderService($vpsUser);
-                switch ($payload->action) {
-                    case 'entry':
-                        return $vos->conditionOrder($payload->action, $payload->data);
-                        break;
-                    case 'tpsl':
-                        $tp = $vos->order('tp', $payload->tpData);
-                        if (!$tp['isOk']) return $tp;
-                        return $vos->conditionOrder('sl', $payload->slData);
-                        break;
-                    case 'tp':
-                        return $vos->order($payload->action, $payload->data);
-                        break;
-                    case 'sl':
-                        return $vos->conditionOrder($payload->action, $payload->data);
-                        break;
-                    case 'cancel':
-                        $tp = $vos->order('tp', $payload->tpData);
-                        if (!$tp['isOk']) return $tp;
-                        return $vos->conditionOrder('sl', $payload->slData);
-                        break;
-                    case 'exit':
-                        if (isset($payload->tpData)) {
-                            $tp = $vos->order('tp', $payload->tpData);
-                            if (!$tp['isOk']) return $tp;
-                        }
-                        if (isset($payload->slData)) {
-                            $sl = $vos->conditionOrder('sl', $payload->slData);
-                            if (!$sl['isOk']) return $sl;
-                        }
-                        return $vos->order('exit', $payload->exitData);
-                        break;
-                }
+                $ret = $vos->execute($payload);
+                // VpsUser::getCopyists()->each(function());
             }
         );
     }

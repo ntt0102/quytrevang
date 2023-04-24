@@ -47,6 +47,42 @@ class VpsOrderService extends CoreService
         ];
     }
 
+    public function execute($payload)
+    {
+        switch ($payload->action) {
+            case 'entry':
+                return $this->conditionOrder($payload->action, $payload->data);
+                break;
+            case 'tpsl':
+                $tp = $this->order('tp', $payload->tpData);
+                if (!$tp['isOk']) return $tp;
+                return $this->conditionOrder('sl', $payload->slData);
+                break;
+            case 'tp':
+                return $this->order($payload->action, $payload->data);
+                break;
+            case 'sl':
+                return $this->conditionOrder($payload->action, $payload->data);
+                break;
+            case 'cancel':
+                $tp = $this->order('tp', $payload->tpData);
+                if (!$tp['isOk']) return $tp;
+                return $this->conditionOrder('sl', $payload->slData);
+                break;
+            case 'exit':
+                if (isset($payload->tpData)) {
+                    $tp = $this->order('tp', $payload->tpData);
+                    if (!$tp['isOk']) return $tp;
+                }
+                if (isset($payload->slData)) {
+                    $sl = $this->conditionOrder('sl', $payload->slData);
+                    if (!$sl['isOk']) return $sl;
+                }
+                return $this->order('exit', $payload->exitData);
+                break;
+        }
+    }
+
     public function conditionOrder($type, $data)
     {
         if (!$this->status->connect)
