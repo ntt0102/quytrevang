@@ -47,24 +47,34 @@ class VpsOrderService extends CoreService
         ];
     }
 
-    public function conditionOrder($type, $data, $orderId = "")
+    public function conditionOrder($type, $data)
     {
-        $isNew = $data->action == "new";
-        $isNotDelete = $data->action != 'delete';
+        if (!$this->status->connect)
+            return ['isOk' => false, 'message' => 'notConnect'];
+        //
+        $isEntry = $type == "entry";
+        $isSl = $type == "sl";
+        $isNew = $data->cmd == "new";
+        if ($isEntry && $isNew && $this->status->net != 0)
+            return ['isOk' => false, 'message' => 'openedPosition'];
+        if ($isSl && $isNew && $this->status->net == 0)
+            return ['isOk' => false, 'message' => 'unopenedPosition'];
+        //
+        $isNotDelete = $data->cmd != 'delete';
         $payload = [
             "group" => "O",
             "user" => $this->vpsUser->vps_code,
             "session" => $this->vpsUser->vps_session,
             "language" => "vi",
             "data" => [
-                "cmd" => "co.stop.order." . $data->action,
+                "cmd" => "co.stop.order." . $data->cmd,
                 "accountNo" => $this->formatAccount(),
                 "pin" => "",
-                "orderId" => $orderId,
+                "orderId" => $this->vpsUser->{$type . '_order_id'},
                 "channel" => "H",
                 "priceType" => "MTL",
                 "quantity" => strval($this->vpsUser->volume),
-                "relation" => "GTEQ",
+                "relation" => $isNotDelete ? $this->formatRelation($data->side) : "",
                 "side" => $isNew ? $this->formatSide($data->side) : "",
                 "stopOrderType" => "stop",
                 "symbol" => $this->symbol,
@@ -74,14 +84,22 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core_ext.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1) return false;
-        return $rsp->stopOrderID;
+        if ($rsp->rc != 1) return ['isOk' => false, 'message' => 'failOrder'];
+        $isOk = $this->vpsUser->update([$type . '_order_id' => $rsp->data->stopOrderID]);
+        if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
+        return ['isOk' => true];
     }
 
-    public function order($type, $data, $orderNo = "")
+    public function order($type, $data)
     {
-        $isNew = $data->action == "new";
-        $isNotCancel = $data->action != "cancel";
+        if (!$this->status->connect)
+            return ['isOk' => false, 'message' => 'notConnect'];
+        //
+        $isNew = $data->cmd == "new";
+        if ($isNew && $this->status->net == 0)
+            return ['isOk' => false, 'message' => 'unopenedPosition'];
+        //
+        $isNotCancel = $data->cmd != "cancel";
         $price = $isNotCancel ? $this->formatPrice($data->price) : "";
         $side = $isNew ? $this->formatSide($data->side) : "";
         $account = $this->formatAccount();
@@ -95,10 +113,10 @@ class VpsOrderService extends CoreService
             "language" => "vi",
             "data" => [
                 "type" => "string",
-                "cmd" => "Web." . $data->action . "Order",
+                "cmd" => "Web." . $data->cmd . "Order",
                 "account" => $account,
                 "pin" => "",
-                "orderNo" => $orderNo,
+                "orderNo" => $this->vpsUser->{$type . '_order_id'},
                 "price" => $price,
                 "nprice" => $price,
                 "side" => $side,
@@ -114,8 +132,10 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1) return false;
-        return $rsp->orderNo;
+        if ($rsp->rc != 1) return ['isOk' => false, 'message' => 'failOrder'];
+        $isOk = $this->vpsUser->update([$type . '_order_id' => $rsp->data->orderNo]);
+        if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
+        return ['isOk' => true];
     }
 
     public function formatAccount()
@@ -132,7 +152,12 @@ class VpsOrderService extends CoreService
     {
         if ($side == -1) return "S";
         if ($side == 1) return "B";
-        return "";
+    }
+
+    public function formatRelation($side)
+    {
+        if ($side == -1) return "LTEQ";
+        if ($side == 1) return "GTEQ";
     }
 
     public function createRefId()

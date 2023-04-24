@@ -11,7 +11,6 @@ class OrderChartDb {
             request.onupgradeneeded = e => {
                 console.log("onupgradeneeded");
                 this.store = e.target.result;
-                this.store.createObjectStore("data", { keyPath: "time" });
                 this.store.createObjectStore("order", { keyPath: "kind" });
                 this.store.createObjectStore("line", { keyPath: "price" });
                 this.store.createObjectStore("ruler", { keyPath: "point" });

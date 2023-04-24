@@ -20,7 +20,7 @@ class CreateVpsUsersTable extends Migration
             $table->string('vps_session')->nullable();
             $table->boolean('allow_copy')->default(0);
             $table->boolean('allow_share')->default(0);
-            $table->boolean('allow_vol_max')->default(1);
+            $table->boolean('allow_max_vol')->default(1);
             $table->integer('volume')->default(1);
             $table->string('entry_order_id')->nullable();
             $table->string('tp_order_id')->nullable();

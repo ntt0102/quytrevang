@@ -286,8 +286,17 @@ export default {
                                         side: this.order.side,
                                         price: this.order.entry.price
                                     }
+                                }).then(resp => {
+                                    if (resp.isOk) {
+                                        this.drawOrderLine(lineOptions.kind);
+                                        this.$toasted.success(
+                                            "Sửa lệnh Entry thành công"
+                                        );
+                                    } else {
+                                        line.applyOptions({ price: oldPrice });
+                                        this.toasteOrderError(resp.message);
+                                    }
                                 });
-                                this.drawOrderLine(lineOptions.kind);
                             }
                         } else {
                             isChanged = true;
@@ -300,6 +309,16 @@ export default {
                                         side: -this.order.side,
                                         price: this.order.tp.price
                                     }
+                                }).then(resp => {
+                                    if (resp.isOk) {
+                                        this.drawOrderLine(lineOptions.kind);
+                                        this.$toasted.success(
+                                            "Sửa lệnh TP thành công"
+                                        );
+                                    } else {
+                                        line.applyOptions({ price: oldPrice });
+                                        this.toasteOrderError(resp.message);
+                                    }
                                 });
                             else
                                 this.executeOrder({
@@ -309,9 +328,17 @@ export default {
                                         side: -this.order.side,
                                         price: this.order.sl.price
                                     }
+                                }).then(resp => {
+                                    if (resp.isOk) {
+                                        this.drawOrderLine(lineOptions.kind);
+                                        this.$toasted.success(
+                                            "Sửa lệnh SL thành công"
+                                        );
+                                    } else {
+                                        line.applyOptions({ price: oldPrice });
+                                        this.toasteOrderError(resp.message);
+                                    }
                                 });
-
-                            this.drawOrderLine(lineOptions.kind);
                         }
                         //
                         if (!isChanged) {
@@ -522,8 +549,8 @@ export default {
                                             this.executeOrder({
                                                 action: "sl",
                                                 data: { cmd: "delete" }
-                                            }).then(isOk => {
-                                                if (isOk) {
+                                            }).then(resp => {
+                                                if (resp.isOk) {
                                                     this.removeOrderLine(
                                                         "entry"
                                                     );
@@ -534,8 +561,8 @@ export default {
                                                         "Đã khớp lệnh TP và đóng vị thế"
                                                     );
                                                 } else
-                                                    this.$toasted.error(
-                                                        "Huỷ lệnh SL thất bại"
+                                                    this.toasteOrderError(
+                                                        resp.message
                                                     );
                                             });
                                         if (
@@ -549,8 +576,8 @@ export default {
                                             this.executeOrder({
                                                 action: "tp",
                                                 data: { cmd: "cancel" }
-                                            }).then(isOk => {
-                                                if (isOk) {
+                                            }).then(resp => {
+                                                if (resp.isOk) {
                                                     this.removeOrderLine(
                                                         "entry"
                                                     );
@@ -561,8 +588,8 @@ export default {
                                                         "Đã khớp lệnh SL và đóng vị thế"
                                                     );
                                                 } else
-                                                    this.$toasted.error(
-                                                        "Huỷ lệnh TP thất bại"
+                                                    this.toasteOrderError(
+                                                        resp.message
                                                     );
                                             });
                                     } else {
@@ -586,8 +613,8 @@ export default {
                                                     side: -this.order.side,
                                                     price: this.order.sl.price
                                                 }
-                                            }).then(isOk => {
-                                                if (isOk) {
+                                            }).then(resp => {
+                                                if (reps.isOk) {
                                                     this.drawOrderLine("tp");
                                                     this.drawOrderLine("sl");
                                                     this.order.entry.line.applyOptions(
@@ -597,8 +624,8 @@ export default {
                                                         "Tự động đặt lệnh TP/SL thành công"
                                                     );
                                                 } else
-                                                    this.$toasted.error(
-                                                        "Tự động đặt lệnh TP/SL thất bại"
+                                                    this.toasteOrderError(
+                                                        resp.message
                                                     );
                                             });
                                     }
@@ -625,8 +652,8 @@ export default {
                             action: "cancel",
                             tpData: { cmd: "cancel" },
                             slData: { cmd: "delete" }
-                        }).then(isOk => {
-                            if (isOk) {
+                        }).then(resp => {
+                            if (resp.isOk) {
                                 this.removeOrderLine("entry");
                                 this.removeOrderLine("tp");
                                 this.removeOrderLine("sl");
@@ -634,10 +661,7 @@ export default {
                                 this.$toasted.success(
                                     "Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế"
                                 );
-                            } else
-                                this.$toasted.error(
-                                    "Tự động huỷ lệnh thất bại"
-                                );
+                            } else this.toasteOrderError(resp.message);
                         });
                     }
                 }
@@ -878,27 +902,31 @@ export default {
                             side: -this.order.side,
                             price: "MTL"
                         }
-                    }).then(isOk => {
-                        if (isOk) {
+                    }).then(resp => {
+                        if (resp.isOk) {
                             this.removeOrderLine("entry");
                             this.removeOrderLine("tp");
                             this.removeOrderLine("sl");
                             toolsStore.clear("order");
-                            this.$toasted.error(
-                                "Đã huỷ lệnh và đóng tất cả vị thế"
-                            );
-                        } else this.toggleCancelOrderButton(true);
+                            this.$toasted.success("Đóng vị thế thành công");
+                        } else {
+                            this.toggleCancelOrderButton(true);
+                            this.toasteOrderError(resp.message);
+                        }
                     });
                 } else {
                     this.executeOrder({
                         action: "entry",
                         data: { cmd: "delete" }
-                    }).then(isOk => {
-                        if (isOk) {
+                    }).then(resp => {
+                        if (resp.isOk) {
                             this.removeOrderLine("entry");
                             toolsStore.clear("order");
-                            this.$toasted.show("Đã huỷ lệnh entry.");
-                        } else this.toggleCancelOrderButton(true);
+                            this.$toasted.success("Huỷ lệnh Entry thành công");
+                        } else {
+                            this.toggleCancelOrderButton(true);
+                            this.toasteOrderError(resp.message);
+                        }
                     });
                 }
             }
@@ -917,10 +945,10 @@ export default {
                 //             side: -this.order.side,
                 //             price: "ATO"
                 //         }
-                //     }).then(isOk => {
-                //         if (isOk)
+                //     }).then(resp => {
+                //         if (resp.isOk)
                 //             this.$toasted.success("Đặt lệnh ATO thành công");
-                //         else this.$toasted.error("Đặt lệnh ATO thất bại");
+                //         else this.toasteOrderError(resp.message);
                 //     });
                 // }
                 //     });
@@ -932,9 +960,14 @@ export default {
                         side: this.order.side,
                         price: this.order.entry.price
                     }
+                }).then(resp => {
+                    if (resp.isOk) {
+                        this.drawOrderLine("entry");
+                        this.toggleCancelOrderButton(true);
+                        this.$toasted.success("Đặt lệnh Entry thành công");
+                    } else this.toasteOrderError(resp.message);
                 });
-                this.drawOrderLine("entry");
-                this.toggleCancelOrderButton(true);
+
                 // } else {
                 //     let result = confirm("Đặt lệnh ATC?", "Xác nhận đặt lệnh");
                 //     result.then(dialogResult => {
@@ -946,10 +979,10 @@ export default {
                 //             side: -this.order.side,
                 //             price: "ATC"
                 //         }
-                //     }).then(isOk => {
-                //         if (isOk)
+                //     }).then(resp => {
+                //         if (resp.isOk)
                 //             this.$toasted.success("Đặt lệnh ATC thành công");
-                //         else this.$toasted.error("Đặt lệnh ATC thất bại");
+                //         else this.toasteOrderError(resp.message);
                 //     });
                 // }
                 //     });
@@ -969,13 +1002,13 @@ export default {
                     side: -this.order.side,
                     price: this.order.sl.price
                 }
-            }).then(isOk => {
-                if (isOk) {
+            }).then(resp => {
+                if (resp.isOk) {
                     this.drawOrderLine("tp");
                     this.drawOrderLine("sl");
                     this.order.entry.line.applyOptions({ draggable: false });
                     this.$toasted.success("Đặt lệnh TP/SL thành công");
-                } else this.$toasted.error("Đặt lệnh TP/SL thất bại");
+                } else this.toasteOrderError(resp.message);
             });
         },
         chartTopClick() {
@@ -995,6 +1028,31 @@ export default {
         },
         formatPrice(price) {
             return +(+price.toFixed(1));
+        },
+        toasteOrderError(error) {
+            let message = "";
+            switch (error) {
+                case "notConnect":
+                    message = "Chưa kết nối tài khoản VPS";
+                    break;
+                case "openedPosition":
+                    message = "Đã có vị thế đang mở";
+                    break;
+                case "unopenedPosition":
+                    message = "Chưa có vị thế được mở";
+                    break;
+                case "failOrder":
+                    message = "Đặt lệnh thất bại";
+                    break;
+                case "failSave":
+                    message = "Lưu lệnh thất bại";
+                    break;
+
+                default:
+                    message = "Lỗi chưa xác định";
+                    break;
+            }
+            this.$toasted.error(message);
         }
     }
 };

@@ -32,7 +32,7 @@ axios.interceptors.response.use(
             "response:" + response.config.method + "/" + response.config.url,
             response.data
         );
-        if (response.data.hasOwnProperty("isOk")) {
+        if (!response.config.notify && response.data.hasOwnProperty("isOk")) {
             if (response.data.isOk) {
                 if (response.data.hasOwnProperty("message")) {
                     if (response.data.message !== null)

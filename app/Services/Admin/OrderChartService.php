@@ -72,76 +72,36 @@ class OrderChartService extends CoreService
                 $vos = new VpsOrderService($vpsUser);
                 switch ($payload->action) {
                     case 'entry':
-                        $isNew = $payload->data->cmd == 'new';
-                        if ($isNew && $vos->status->connect && $vos->status->net != 0)
-                            return [
-                                'isOk' => false,
-                                'message' => 'openedPosition',
-                            ];
-                        $result = $vos->conditionOrder(
-                            $payload->action,
-                            $payload->data,
-                            $vpsUser->entry_order_id
-                        );
+                        return $vos->conditionOrder($payload->action, $payload->data);
                         break;
-
                     case 'tpsl':
-                        if ($vos->status->connect && $vos->status->net == 0)
-                            return [
-                                'isOk' => false,
-                                'message' => 'unopenedPosition',
-                            ];
                         $tp = $vos->order('tp', $payload->tpData);
-                        $sl = $vos->conditionOrder('sl', $payload->slData);
-                        $result = !!$tp && !!$sl;
+                        if (!$tp['isOk']) return $tp;
+                        return $vos->conditionOrder('sl', $payload->slData);
                         break;
                     case 'tp':
-                        $result = $vos->order(
-                            $payload->action,
-                            $payload->data,
-                            $vpsUser->tp_order_id
-                        );
+                        return $vos->order($payload->action, $payload->data);
                         break;
                     case 'sl':
-                        $result = $vos->conditionOrder(
-                            $payload->action,
-                            $payload->data,
-                            $vpsUser->sl_order_id
-                        );
+                        return $vos->conditionOrder($payload->action, $payload->data);
                         break;
                     case 'cancel':
-                        $tp = $vos->order(
-                            'tp',
-                            $payload->tpData,
-                            $vpsUser->tp_order_id
-                        );
-                        $sl = $vos->conditionOrder(
-                            'sl',
-                            $payload->slData,
-                            $vpsUser->sl_order_id
-                        );
-                        $result = !!$tp && !!$sl;
+                        $tp = $vos->order('tp', $payload->tpData);
+                        if (!$tp['isOk']) return $tp;
+                        return $vos->conditionOrder('sl', $payload->slData);
                         break;
                     case 'exit':
-                        if (isset($payload->tpData))
-                            $tp = $vos->order(
-                                'tp',
-                                $payload->tpData,
-                                $vpsUser->tp_order_id
-                            );
-                        if (isset($payload->slData))
-                            $sl = $vos->conditionOrder(
-                                'sl',
-                                $payload->slData,
-                                $vpsUser->sl_order_id
-                            );
-                        $exit = $vos->order('exit', $payload->exitData);
+                        if (isset($payload->tpData)) {
+                            $tp = $vos->order('tp', $payload->tpData);
+                            if (!$tp['isOk']) return $tp;
+                        }
+                        if (isset($payload->slData)) {
+                            $sl = $vos->conditionOrder('sl', $payload->slData);
+                            if (!$sl['isOk']) return $sl;
+                        }
+                        return $vos->order('exit', $payload->exitData);
                         break;
                 }
-                return [
-                    'isOk' => !!$result,
-                    // 'data' => $result
-                ];
             }
         );
     }
@@ -158,8 +118,6 @@ class OrderChartService extends CoreService
         if (!$user) false;
         $user->vps_session = $payload->session;
         return !!$user->save();
-
-        // return $user->update(['vps_session' => $payload->session]);
     }
 
     /**

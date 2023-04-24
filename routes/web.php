@@ -82,6 +82,6 @@ Route::get('test', function () {
     // $s = $vos->getAccountStatus();
     // $s = $so->vps_accounts;
     $s = new App\Services\Special\VpsOrderService($vpsUser);
-    $s = $s->status->connect;
+    $s = $s->status->{'connect'};
     dd($s);
 })->middleware('cors');
