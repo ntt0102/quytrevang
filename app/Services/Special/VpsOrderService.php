@@ -182,6 +182,6 @@ class VpsOrderService extends CoreService
             $checkSum .= $this->symbol;
         }
         $checkSum .= $refId;
-        return $checkSum;
+        return md5($checkSum);
     }
 }
