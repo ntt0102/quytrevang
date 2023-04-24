@@ -1,0 +1,110 @@
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[59],{
+
+/***/ "./node_modules/devextreme-vue/check-box.js":
+/*!**************************************************!*\
+  !*** ./node_modules/devextreme-vue/check-box.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/*!
+ * devextreme-vue
+ * Version: 21.2.7
+ * Build date: Mon Apr 11 2022
+ *
+ * Copyright (c) 2012 - 2022 Developer Express Inc. ALL RIGHTS RESERVED
+ *
+ * This software may be modified and distributed under the terms
+ * of the MIT license. See the LICENSE file in the root of the project for details.
+ *
+ * https://github.com/DevExpress/devextreme-vue
+ */
+
+
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.DxCheckBox = void 0;
+var check_box_1 = __importDefault(__webpack_require__(/*! devextreme/ui/check_box */ "./node_modules/devextreme/esm/ui/check_box.js"));
+var index_1 = __webpack_require__(/*! ./core/index */ "./node_modules/devextreme-vue/core/index.js");
+var DxCheckBox = index_1.createComponent({
+    props: {
+        accessKey: String,
+        activeStateEnabled: Boolean,
+        disabled: Boolean,
+        elementAttr: Object,
+        focusStateEnabled: Boolean,
+        height: [Function, Number, String],
+        hint: String,
+        hoverStateEnabled: Boolean,
+        iconSize: [Number, String],
+        isValid: Boolean,
+        name: String,
+        onContentReady: Function,
+        onDisposing: Function,
+        onInitialized: Function,
+        onOptionChanged: Function,
+        onValueChanged: Function,
+        readOnly: Boolean,
+        rtlEnabled: Boolean,
+        tabIndex: Number,
+        text: String,
+        validationError: {},
+        validationErrors: Array,
+        validationMessageMode: String,
+        validationStatus: String,
+        value: {},
+        visible: Boolean,
+        width: [Function, Number, String]
+    },
+    emits: {
+        "update:isActive": null,
+        "update:hoveredElement": null,
+        "update:accessKey": null,
+        "update:activeStateEnabled": null,
+        "update:disabled": null,
+        "update:elementAttr": null,
+        "update:focusStateEnabled": null,
+        "update:height": null,
+        "update:hint": null,
+        "update:hoverStateEnabled": null,
+        "update:iconSize": null,
+        "update:isValid": null,
+        "update:name": null,
+        "update:onContentReady": null,
+        "update:onDisposing": null,
+        "update:onInitialized": null,
+        "update:onOptionChanged": null,
+        "update:onValueChanged": null,
+        "update:readOnly": null,
+        "update:rtlEnabled": null,
+        "update:tabIndex": null,
+        "update:text": null,
+        "update:validationError": null,
+        "update:validationErrors": null,
+        "update:validationMessageMode": null,
+        "update:validationStatus": null,
+        "update:value": null,
+        "update:visible": null,
+        "update:width": null,
+    },
+    model: { prop: "value", event: "update:value" },
+    computed: {
+        instance: function () {
+            return this.$_instance;
+        }
+    },
+    beforeCreate: function () {
+        this.$_WidgetClass = check_box_1.default;
+        this.$_hasAsyncTemplate = true;
+    }
+});
+exports.DxCheckBox = DxCheckBox;
+exports.default = DxCheckBox;
+
+
+/***/ })
+
+}]);

@@ -85,8 +85,9 @@ class VpsOrderService extends CoreService
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
         if ($rsp->rc != 1) {
-            if (!$isNotDelete && $rsp->data->description == "CANCELED") return ['isOk' => true];
-            return ['isOk' => false, 'message' => 'failOrder'];
+            if ($isNotDelete)
+                return ['isOk' => false, 'message' => 'failOrder'];
+            else return ['isOk' => true];
         }
         $isOk = $this->vpsUser->update([$type . '_order_id' => $rsp->data->stopOrderID]);
         if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
@@ -135,7 +136,11 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1) return ['isOk' => false, 'message' => 'failOrder'];
+        if ($rsp->rc != 1) {
+            if ($isNotCancel)
+                return ['isOk' => false, 'message' => 'failOrder'];
+            else return ['isOk' => true];
+        }
         $isOk = $this->vpsUser->update([$type . '_order_id' => $rsp->data->orderNo]);
         if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
         return ['isOk' => true];

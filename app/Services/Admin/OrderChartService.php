@@ -31,6 +31,19 @@ class OrderChartService extends CoreService
 
 
     /**
+     * Get Status
+     *
+     * @param $payload
+     * 
+     */
+    public function getStatus($payload)
+    {
+        $vpsUser = request()->user()->vpsUser;
+        $vos = new VpsOrderService($vpsUser);
+        return $vos->status;
+    }
+
+    /**
      * Get Config
      *
      * @param $payload
@@ -38,8 +51,11 @@ class OrderChartService extends CoreService
      */
     public function getConfig($payload)
     {
+        $vpsUser = request()->user()->vpsUser;
+        $vos = new VpsOrderService($vpsUser);
         return [
-            'symbol' => get_global_value('vn30f1m')
+            'symbol' => get_global_value('vn30f1m'),
+            'status' => $vos->status,
         ];
     }
 

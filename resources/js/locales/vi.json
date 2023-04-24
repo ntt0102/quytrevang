@@ -72,7 +72,7 @@
             }
         },
         "profile": {
-            "title": "Hồ sơ của tôi",
+            "title": "Hồ sơ",
             "detailInfo": "Thông tin chi tiết",
             "fingerPrint": "Đăng ký vân tay",
             "delete": {
@@ -87,7 +87,7 @@
             }
         },
         "contract": {
-            "title": "Hợp đồng của tôi",
+            "title": "Sổ tiết kiệm",
             "paidContract": "Nộp tiền",
             "editPaidContract": "Đổi biên lai",
             "withdrawContract": "Rút tiền",
@@ -96,14 +96,11 @@
             "principalMin": "Tiền gốc (P) tối thiểu",
             "holdWeeksMin": "Tuần nắm giữ (n) tối thiểu",
             "interestFormula": "Công thức tính lãi"
-        },
-        "orderChart": {
-            "title": "Công cụ đặt lệnh",
-            "dateTitle": "Dữ liệu của ngày"
         }
     },
     "admin": {
-        "title": "Quản lý",
+        "manager": "Quản lý",
+        "trading": "Đầu tư",
         "users": {
             "title": "Tài khoản",
             "deletedUsers": "Tài khoản đã xóa",
@@ -225,7 +222,7 @@
             "viewUser": "Xem tài khoản {code}"
         },
         "trades": {
-            "title": "Đầu tư",
+            "title": "Thống kê",
             "amount": "Số HĐ",
             "scores": "Điểm TT",
             "revenue": "Lãi",
@@ -293,6 +290,12 @@
             "planPrice": "Giá",
             "renewalPrice": "Giá gia hạn",
             "highestPrice": "Giá cao nhất"
+        },
+        "orderChart": {
+            "title": "Đặt lệnh",
+            "dateTitle": "Dữ liệu của ngày",
+            "net": "Vị thế",
+            "vm": "Tổng lãi lỗ"
         }
     },
     "models": {

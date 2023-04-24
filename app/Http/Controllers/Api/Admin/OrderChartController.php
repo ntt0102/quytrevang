@@ -29,15 +29,28 @@ class OrderChartController extends CoreController
     }
 
     /**
-     * Get config
+     * Get Status
      *
      * @param \Illuminate\Http\Request $request
      * 
      * @return \Illuminate\Http\Response
      */
-    public function getconfig(Request $request)
+    public function getStatus(Request $request)
     {
-        $data = $this->orderChartService->getconfig($this->decrypt($request));
+        $data = $this->orderChartService->getStatus($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
+    }
+
+    /**
+     * Get Config
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getConfig(Request $request)
+    {
+        $data = $this->orderChartService->getConfig($this->decrypt($request));
         return $this->sendResponse($this->encrypt($data));
     }
 

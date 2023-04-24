@@ -1,7 +1,7 @@
 <template>
     <div class="order-chart-page">
         <h2 class="content-block">
-            {{ $t("user.orderChart.title") }}
+            {{ $t("admin.orderChart.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <DxToolbar
@@ -26,10 +26,24 @@
                     <input
                         type="date"
                         class="chart-date command"
-                        :title="$t('user.orderChart.dateTitle')"
+                        :title="$t('admin.orderChart.dateTitle')"
                         v-model="chartDate"
                         @change="() => getChartData(chartDate)"
                     />
+                    <div
+                        class="command status"
+                        :class="{ green: status.net > 0, red: status.net < 0 }"
+                        :title="$t('admin.orderChart.net')"
+                    >
+                        {{ status.net | currency("", "") }}
+                    </div>
+                    <div
+                        class="command status"
+                        :class="{ green: status.vm > 0, red: status.vm < 0 }"
+                        :title="$t('admin.orderChart.vm')"
+                    >
+                        {{ status.vm | currency("", "") }}
+                    </div>
                     <img
                         ref="spinner"
                         class="command spinner"
@@ -38,6 +52,7 @@
                 </div>
                 <div class="area tool-area">
                     <div
+                        ref="fullscreenTool"
                         :class="
                             `command far fa-${
                                 isFullscreen ? 'compress' : 'expand'
@@ -46,6 +61,7 @@
                         @click="toggleFullscreen"
                     ></div>
                     <div
+                        ref="reloadTool"
                         class="command far fa-sync-alt"
                         @click="
                             () => {
@@ -152,8 +168,10 @@ export default {
             loadWhitespace: true,
             chartDate: CURRENT_DATE,
             interval: null,
+            interval60: null,
             clock: moment().format("HH:mm:ss"),
-            isFullscreen: false
+            isFullscreen: false,
+            websocket: null
         };
     },
     beforeCreate() {
@@ -161,19 +179,21 @@ export default {
     },
     created() {
         this.getConfig().then(this.connectSocket);
-        this.getChartData(this.chartDate).then(() => {
-            this.loadToolsData();
-            this.loadWhitespace = true;
-        });
+        this.getStatus();
         this.interval = setInterval(this.intervalHandler, 1000);
+        this.interval60 = setInterval(
+            () => (this.inSession() ? this.getStatus() : false),
+            60000
+        );
         toolsStore.create();
     },
     mounted() {
-        if (document.getElementById("orderChartJs")) return;
-        var scriptTag = document.createElement("script");
-        scriptTag.src = "/js/order-chart.min.js";
-        scriptTag.id = "orderChartJs";
-        document.getElementsByTagName("head")[0].appendChild(scriptTag);
+        if (!document.getElementById("orderChartJs")) {
+            var scriptTag = document.createElement("script");
+            scriptTag.src = "/js/order-chart.min.js";
+            scriptTag.id = "orderChartJs";
+            document.getElementsByTagName("head")[0].appendChild(scriptTag);
+        }
         //
         setTimeout(() => {
             this.chart = LightweightCharts.createChart(
@@ -203,15 +223,23 @@ export default {
                 "fullscreenchange",
                 () => (this.isFullscreen = document.fullscreenElement)
             );
-        }, 1000);
+            this.getChartData(this.chartDate).then(() => {
+                this.loadToolsData();
+                this.loadWhitespace = true;
+            });
+        }, 2000);
     },
     destroyed() {
         this.$store.unregisterModule("Admin.orderChart");
         clearInterval(this.interval);
+        clearInterval(this.interval60);
+        this.websocket.close();
+        this.websocket = null;
     },
     computed: {
         ...mapGetters("Admin.orderChart", [
             "chartData",
+            "status",
             "config",
             "isChartLoading"
         ]),
@@ -233,6 +261,7 @@ export default {
     methods: {
         ...mapActions("Admin.orderChart", [
             "getChartData",
+            "getStatus",
             "getConfig",
             "executeOrder"
         ]),
@@ -407,16 +436,16 @@ export default {
                             );
                         break;
                     case 96:
-                        self.drawAlertButton.click();
+                        this.$refs.rulerTool.click();
                         break;
                     case 97:
-                        self.drawMarkerButton.click();
+                        this.$refs.lineTool.click();
                         break;
                     case 98:
-                        this.getChartData(this.chartDate);
+                        this.$refs.reloadTool.click();
                         break;
                     case 99:
-                        this.toggleFullscreen();
+                        this.$refs.fullscreenTool.click();
                         break;
                 }
             }
@@ -506,22 +535,23 @@ export default {
             let self = this;
             const endpoint =
                 "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
-            let websocket = new WebSocket(endpoint);
-            websocket.onopen = e => {
+            self.websocket = new WebSocket(endpoint);
+            self.websocket.onopen = e => {
                 console.log("onopen", e);
                 var msg = { action: "join", list: self.config.symbol };
-                websocket.send(
+                self.websocket.send(
                     `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
                 );
             };
-            websocket.onclose = e => {
+            self.websocket.onclose = e => {
                 console.log("onclose", e);
+                if (this._isDestroyed) return false;
                 if (self.inSession()) {
                     self.connectSocket();
                     self.getChartData(this.chartDate);
                 }
             };
-            websocket.onmessage = e => {
+            self.websocket.onmessage = e => {
                 if (e.data.substr(0, 1) == 4) {
                     if (e.data.substr(1, 1) == 2) {
                         const event = JSON.parse(e.data.substr(2));
@@ -635,7 +665,7 @@ export default {
                     }
                 }
             };
-            websocket.onerror = e => {
+            self.websocket.onerror = e => {
                 console.log("onerror", e);
             };
         },
@@ -1090,6 +1120,18 @@ export default {
 
             .chart-date {
                 width: 125px;
+            }
+
+            .status {
+                width: unset !important;
+                padding: 0 10px !important;
+
+                &.green {
+                    color: lime !important;
+                }
+                &.red {
+                    color: red !important;
+                }
             }
 
             .spinner {

@@ -169,6 +169,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 });
                 Route::group(['prefix' => 'order-chart', 'middleware' => 'can:orderChart@control'], function () {
                     Route::post('/', 'OrderChartController@getChartData');
+                    Route::post('/get-status', 'OrderChartController@getStatus');
                     Route::post('/get-config', 'OrderChartController@getConfig');
                     Route::post('/set-config', 'OrderChartController@setConfig');
                     Route::post('/execute-order', 'OrderChartController@executeOrder');

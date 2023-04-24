@@ -3,6 +3,7 @@ import moment from "moment/moment";
 function initialState() {
     return {
         config: {},
+        status: {},
         chartData: [],
         isChartLoading: false
     };
@@ -10,6 +11,7 @@ function initialState() {
 
 const getters = {
     config: state => state.config,
+    status: state => state.status,
     chartData: state => state.chartData,
     isChartLoading: state => state.isChartLoading
 };
@@ -31,7 +33,21 @@ const actions = {
                 });
         });
     },
-    getConfig({ commit, dispatch, getters, state, rootGetters }, chartDate) {
+    getStatus({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "order-chart/get-status",
+                    {},
+                    { noLoading: true, crypto: true }
+                )
+                .then(response => {
+                    commit("setStatus", response.data);
+                    resolve();
+                });
+        });
+    },
+    getConfig({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
                 .post("order-chart/get-config", {}, { crypto: true })
@@ -85,6 +101,9 @@ const mutations = {
     },
     setChartLoading(state, data) {
         state.isChartLoading = data;
+    },
+    setStatus(state, data) {
+        state.status = data;
     },
     setConfig(state, data) {
         state.config = data;

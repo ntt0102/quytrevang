@@ -21,14 +21,7 @@ export default [
         level: 5
     },
     {
-        text: i18n.t("user.orderChart.title"),
-        name: "orderChart",
-        icon: "far fa-chart-line",
-        permissions: ["service@use"],
-        level: 5
-    },
-    {
-        text: i18n.t("admin.title"),
+        text: i18n.t("admin.manager"),
         icon: "far fa-tools",
         permissions: [
             "users@control",
@@ -53,18 +46,6 @@ export default [
                 permissions: ["contracts@control"]
             },
             {
-                text: i18n.t("admin.finbooks.title"),
-                name: "finbooks",
-                icon: "far fa-book",
-                permissions: ["finbooks@control"]
-            },
-            {
-                text: i18n.t("admin.trades.title"),
-                name: "trades",
-                icon: "far fa-analytics",
-                permissions: ["trades@view"]
-            },
-            {
                 text: i18n.t("admin.smartorders.title"),
                 name: "smartorders",
                 icon: "far fa-store",
@@ -82,6 +63,36 @@ export default [
                 icon: "far fa-cog",
                 permissions: ["setting@control"],
                 level: 3
+            }
+        ]
+    },
+    {
+        text: i18n.t("admin.trading"),
+        icon: "far fa-chart-line",
+        permissions: [
+            "orderChart@control",
+            "trades@view",
+            "trades@edit",
+            "finbooks@control"
+        ],
+        items: [
+            {
+                text: i18n.t("admin.orderChart.title"),
+                name: "orderChart",
+                icon: "far fa-gavel",
+                permissions: ["orderChart@control"]
+            },
+            {
+                text: i18n.t("admin.trades.title"),
+                name: "trades",
+                icon: "far fa-analytics",
+                permissions: ["trades@view", "trades@edit"]
+            },
+            {
+                text: i18n.t("admin.finbooks.title"),
+                name: "finbooks",
+                icon: "far fa-book",
+                permissions: ["finbooks@control"]
             }
         ]
     },

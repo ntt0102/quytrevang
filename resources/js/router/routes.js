@@ -79,7 +79,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "orderChart",
                     component: OrderChart,
                     meta: {
-                        title: i18n.t("user.orderChart.title"),
+                        title: i18n.t("admin.orderChart.title"),
                         permission: "service@use"
                     }
                 },
