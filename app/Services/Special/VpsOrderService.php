@@ -84,7 +84,7 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core_ext.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1) return ['isOk' => false, 'message' => 'failOrder'];
+        if ($rsp->rc != 1) return $isNotDelete ? ['isOk' => false, 'message' => 'failOrder'] : ['isOk' => true];
         $isOk = $this->vpsUser->update([$type . '_order_id' => $rsp->data->stopOrderID]);
         if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
         return ['isOk' => true];
