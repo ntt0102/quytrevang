@@ -198,7 +198,7 @@ class OrderChartService extends CoreService
     /**
      * Get Info
      */
-    public function getInfo($symbol)
+    public function getVn30f1mInfo($symbol)
     {
         $client = new \GuzzleHttp\Client();
         $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
@@ -256,7 +256,7 @@ class OrderChartService extends CoreService
                 $loss = $info->vm < 0 ? -$info->vm : 0;
                 $trade = Trade::create([
                     "amount" => $vpsUser->volume,
-                    "scores" => $this->getInfo($this->getSymbol())->r,
+                    "scores" => $this->getVn30f1mInfo($vos->symbol)->r,
                     "revenue" => $revenue,
                     "loss" => $loss,
                     "fees" => $info->fee,

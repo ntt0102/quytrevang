@@ -10,7 +10,7 @@ class VpsOrderService extends CoreService
 {
     private $client;
     private $vpsUser;
-    private $symbol;
+    public $symbol;
     public $connection;
     public $position;
 
