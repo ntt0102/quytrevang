@@ -125,7 +125,6 @@
 import { mapGetters, mapActions } from "vuex";
 import toolsStore from "../../plugins/orderChartDb.js";
 import adminOrderChartStore from "../../store/modules/Admin/OrderChart";
-import { confirm } from "devextreme/ui/dialog";
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
