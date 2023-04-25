@@ -149,16 +149,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -376,7 +366,7 @@ var TIME = {
                   if (resp.isOk) {
                     _this2.drawOrderLine(lineOptions.kind);
 
-                    _this2.$toasted.success("Sửa lệnh Entry thành công");
+                    _this2.$toasted.success(_this2.$t("admin.orderChart.changeEntrySuccess"));
                   } else {
                     line.applyOptions({
                       price: oldPrice
@@ -400,7 +390,7 @@ var TIME = {
                 if (resp.isOk) {
                   _this2.drawOrderLine(lineOptions.kind);
 
-                  _this2.$toasted.success("Sửa lệnh TP thành công");
+                  _this2.$toasted.success(_this2.$t("admin.orderChart.changeTpSuccess"));
                 } else {
                   line.applyOptions({
                     price: oldPrice
@@ -419,7 +409,7 @@ var TIME = {
                 if (resp.isOk) {
                   _this2.drawOrderLine(lineOptions.kind);
 
-                  _this2.$toasted.success("Sửa lệnh SL thành công");
+                  _this2.$toasted.success(_this2.$t("admin.orderChart.changeSlSuccess"));
                 } else {
                   line.applyOptions({
                     price: oldPrice
@@ -435,7 +425,7 @@ var TIME = {
               line.applyOptions({
                 price: oldPrice
               });
-              this.$toasted.show("Không được thay đổi.");
+              this.$toasted.show(this.$t("admin.orderChart.noChangeOrderLine"));
             }
           }
 
@@ -649,6 +639,8 @@ var TIME = {
       });
     },
     connectSocket: function connectSocket() {
+      var _this4 = this;
+
       var self = this;
       var endpoint = "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
       self.websocket = new WebSocket(endpoint);
@@ -702,7 +694,7 @@ var TIME = {
                             self.removeOrderLine("tp");
                             self.removeOrderLine("sl");
                             _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-                            self.$toasted.success("Đã khớp lệnh TP và đóng vị thế");
+                            self.$toasted.success(_this4.$t("admin.orderChart.deleteTpSuccess"));
                           } else self.toasteOrderError(resp.message);
 
                           self.isAutoOrdering = false;
@@ -724,7 +716,7 @@ var TIME = {
                             self.removeOrderLine("tp");
                             self.removeOrderLine("sl");
                             _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-                            self.$toasted.success("Đã khớp lệnh SL và đóng vị thế");
+                            self.$toasted.success(_this4.$t("admin.orderChart.deleteSlSuccess"));
                           } else self.toasteOrderError(resp.message);
 
                           self.isAutoOrdering = false;
@@ -754,7 +746,7 @@ var TIME = {
                             self.order.entry.line.applyOptions({
                               draggable: false
                             });
-                            self.$toasted.success("Tự động đặt lệnh TP/SL thành công");
+                            self.$toasted.success(_this4.$t("admin.orderChart.autoNewTpSlSuccess"));
                           } else self.toasteOrderError(resp.message);
 
                           self.isAutoOrdering = false;
@@ -774,7 +766,7 @@ var TIME = {
       };
     },
     intervalHandler: function intervalHandler() {
-      var _this4 = this;
+      var _this5 = this;
 
       var CURRENT_SEC = moment().unix();
 
@@ -793,16 +785,16 @@ var TIME = {
               }
             }).then(function (resp) {
               if (resp.isOk) {
-                _this4.removeOrderLine("entry");
+                _this5.removeOrderLine("entry");
 
-                _this4.removeOrderLine("tp");
+                _this5.removeOrderLine("tp");
 
-                _this4.removeOrderLine("sl");
+                _this5.removeOrderLine("sl");
 
                 _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
 
-                _this4.$toasted.success("Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế");
-              } else _this4.toasteOrderError(resp.message);
+                _this5.$toasted.success(_this5.$t("admin.orderChart.autoCancelTpSlSuccess"));
+              } else _this5.toasteOrderError(resp.message);
             });
           }
         }
@@ -950,10 +942,10 @@ var TIME = {
       this.$refs.lineTool.classList.remove("selected");
     },
     removeLineTool: function removeLineTool() {
-      var _this5 = this;
+      var _this6 = this;
 
       this.lines.forEach(function (line) {
-        return _this5.series.price.removePriceLine(line);
+        return _this6.series.price.removePriceLine(line);
       });
       this.lines = [];
       _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("line");
@@ -1020,16 +1012,16 @@ var TIME = {
       }
     },
     cancelOrderClick: function cancelOrderClick() {
-      var _this6 = this;
+      var _this7 = this;
 
-      var result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])("Huỷ lệnh?", "Xác nhận");
+      var result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])(this.$t("admin.orderChart.cancelOrder"), this.$t("admin.orderChart.cancelConfirm"));
       result.then(function (dialogResult) {
         if (dialogResult) {
-          _this6.toggleCancelOrderButton(false);
+          _this7.toggleCancelOrderButton(false);
 
-          if (_this6.order.entry.hasOwnProperty("line")) {
-            if (_this6.order.tp.hasOwnProperty("line")) {
-              _this6.executeOrder({
+          if (_this7.order.entry.hasOwnProperty("line")) {
+            if (_this7.order.tp.hasOwnProperty("line")) {
+              _this7.executeOrder({
                 action: "exit",
                 tpData: {
                   cmd: "cancel"
@@ -1039,43 +1031,43 @@ var TIME = {
                 },
                 exitData: {
                   cmd: "new",
-                  side: -_this6.order.side,
+                  side: -_this7.order.side,
                   price: "MTL"
                 }
               }).then(function (resp) {
                 if (resp.isOk) {
-                  _this6.removeOrderLine("entry");
+                  _this7.removeOrderLine("entry");
 
-                  _this6.removeOrderLine("tp");
+                  _this7.removeOrderLine("tp");
 
-                  _this6.removeOrderLine("sl");
+                  _this7.removeOrderLine("sl");
 
                   _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
 
-                  _this6.$toasted.success("Đóng vị thế thành công");
+                  _this7.$toasted.success(_this7.$t("admin.orderChart.exitSuccess"));
                 } else {
-                  _this6.toggleCancelOrderButton(true);
+                  _this7.toggleCancelOrderButton(true);
 
-                  _this6.toasteOrderError(resp.message);
+                  _this7.toasteOrderError(resp.message);
                 }
               });
             } else {
-              _this6.executeOrder({
+              _this7.executeOrder({
                 action: "entry",
                 data: {
                   cmd: "delete"
                 }
               }).then(function (resp) {
                 if (resp.isOk) {
-                  _this6.removeOrderLine("entry");
+                  _this7.removeOrderLine("entry");
 
                   _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
 
-                  _this6.$toasted.success("Huỷ lệnh Entry thành công");
+                  _this7.$toasted.success(_this7.$t("admin.orderChart.deleteEntrySuccess"));
                 } else {
-                  _this6.toggleCancelOrderButton(true);
+                  _this7.toggleCancelOrderButton(true);
 
-                  _this6.toasteOrderError(resp.message);
+                  _this7.toasteOrderError(resp.message);
                 }
               });
             }
@@ -1084,24 +1076,24 @@ var TIME = {
       });
     },
     entryOrderClick: function entryOrderClick() {
-      var _this7 = this;
+      var _this8 = this;
 
       var CURRENT_SEC = moment().unix();
 
       if (this.inSession(CURRENT_SEC)) {
         if (CURRENT_SEC < TIME.ATO) {
-          var result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])("Đặt lệnh ATO?", "Xác nhận");
+          var result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])(this.$t("admin.orderChart.atoOrder"), this.$t("admin.orderChart.cancelConfirm"));
           result.then(function (dialogResult) {
             if (dialogResult) {
-              _this7.executeOrder({
+              _this8.executeOrder({
                 action: "exit",
                 exitData: {
                   cmd: "new",
-                  side: -_this7.order.side,
+                  side: -_this8.order.side,
                   price: "ATO"
                 }
               }).then(function (resp) {
-                if (resp.isOk) _this7.$toasted.success("Đặt lệnh ATO thành công");else _this7.toasteOrderError(resp.message);
+                if (resp.isOk) _this8.$toasted.success(_this8.$t("admin.orderChart.atoOrderSuccess"));else _this8.toasteOrderError(resp.message);
               });
             }
           });
@@ -1115,27 +1107,27 @@ var TIME = {
             }
           }).then(function (resp) {
             if (resp.isOk) {
-              _this7.drawOrderLine("entry");
+              _this8.drawOrderLine("entry");
 
-              _this7.toggleCancelOrderButton(true);
+              _this8.toggleCancelOrderButton(true);
 
-              _this7.$toasted.success("Đặt lệnh Entry thành công");
-            } else _this7.toasteOrderError(resp.message);
+              _this8.$toasted.success(_this8.$t("admin.orderChart.newEntrySuccess"));
+            } else _this8.toasteOrderError(resp.message);
           });
         } else {
-          var _result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])("Đặt lệnh ATC?", "Xác nhận");
+          var _result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])(this.$t("admin.orderChart.atcOrder"), this.$t("admin.orderChart.cancelConfirm"));
 
           _result.then(function (dialogResult) {
             if (dialogResult) {
-              _this7.executeOrder({
+              _this8.executeOrder({
                 action: "exit",
                 exitData: {
                   cmd: "new",
-                  side: -_this7.order.side,
+                  side: -_this8.order.side,
                   price: "ATC"
                 }
               }).then(function (resp) {
-                if (resp.isOk) _this7.$toasted.success("Đặt lệnh ATC thành công");else _this7.toasteOrderError(resp.message);
+                if (resp.isOk) _this8.$toasted.success(_this8.$t("admin.orderChart.atcOrderSuccess"));else _this8.toasteOrderError(resp.message);
               });
             }
           });
@@ -1143,7 +1135,7 @@ var TIME = {
       }
     },
     tpslOrderClick: function tpslOrderClick() {
-      var _this8 = this;
+      var _this9 = this;
 
       this.executeOrder({
         action: "tpsl",
@@ -1159,16 +1151,16 @@ var TIME = {
         }
       }).then(function (resp) {
         if (resp.isOk) {
-          _this8.drawOrderLine("tp");
+          _this9.drawOrderLine("tp");
 
-          _this8.drawOrderLine("sl");
+          _this9.drawOrderLine("sl");
 
-          _this8.order.entry.line.applyOptions({
+          _this9.order.entry.line.applyOptions({
             draggable: false
           });
 
-          _this8.$toasted.success("Đặt lệnh TP/SL thành công");
-        } else _this8.toasteOrderError(resp.message);
+          _this9.$toasted.success(_this9.$t("admin.orderChart.newTpSlSuccess"));
+        } else _this9.toasteOrderError(resp.message);
       });
     },
     chartTopClick: function chartTopClick() {
@@ -1186,40 +1178,8 @@ var TIME = {
       return + +price.toFixed(1);
     },
     toasteOrderError: function toasteOrderError(error) {
-      if (error == "ordering") return false;
-      var message = "";
-
-      switch (error) {
-        case "notConnect":
-          message = "Chưa kết nối tài khoản VPS";
-          break;
-
-        case "invalidVolume":
-          message = "Số hợp đồng lớn hơn sức mua";
-          break;
-
-        case "openedPosition":
-          message = "Đã có vị thế đang mở";
-          break;
-
-        case "unopenedPosition":
-          message = "Chưa có vị thế được mở";
-          break;
-
-        case "failOrder":
-          message = "Đặt lệnh thất bại";
-          break;
-
-        case "failSave":
-          message = "Lưu lệnh thất bại";
-          break;
-
-        default:
-          message = "Lỗi chưa xác định";
-          break;
-      }
-
-      this.$toasted.error(message);
+      if (!error) error = "unknown";
+      this.$toasted.error(this.$t("admin.orderChart.".concat(error)));
     }
   })
 });
@@ -1525,186 +1485,163 @@ var render = function() {
       _vm._v("\n        " + _vm._s(_vm.$t("admin.orderChart.title")) + "\n    ")
     ]),
     _vm._v(" "),
-    _c(
-      "div",
-      { staticClass: "content-block dx-card responsive-paddings" },
-      [
-        _c("DxToolbar", {
-          attrs: {
-            items: [
-              {
-                location: "before",
-                widget: "dxButton",
-                options: {
-                  icon: "far fa-arrow-left small",
-                  hint: _vm.$t("buttons.back"),
-                  onClick: function() {
-                    _vm.$router.push({ name: _vm.$route.query.redirect })
+    _c("div", { staticClass: "content-block dx-card responsive-paddings" }, [
+      _c(
+        "div",
+        { ref: "chartContainer", staticClass: "order-chart-container" },
+        [
+          _c("div", { ref: "orderChart", staticClass: "chart-wrapper" }, [
+            _c("div", { staticClass: "area data-area" }, [
+              _c("div", {
+                class:
+                  "command noaction far fa-" +
+                  (_vm.status.connection ? "link" : "unlink"),
+                attrs: { title: _vm.$t("admin.orderChart.connection") }
+              }),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "command noaction status",
+                  class: {
+                    green: _vm.status.position > 0,
+                    red: _vm.status.position < 0
+                  },
+                  attrs: { title: _vm.$t("admin.orderChart.position") }
+                },
+                [
+                  _vm._v(
+                    "\n                        " +
+                      _vm._s(_vm._f("currency")(_vm.status.position, "", "")) +
+                      "\n                    "
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "command noaction clock" }, [
+                _vm._v(_vm._s(_vm.clock))
+              ]),
+              _vm._v(" "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.chartDate,
+                    expression: "chartDate"
+                  }
+                ],
+                staticClass: "chart-date command",
+                attrs: { type: "date", title: _vm.$t("admin.orderChart.date") },
+                domProps: { value: _vm.chartDate },
+                on: {
+                  change: function() {
+                    return _vm.getChartData(_vm.chartDate)
+                  },
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.chartDate = $event.target.value
                   }
                 }
-              }
-            ]
-          }
-        }),
-        _vm._v(" "),
-        _c(
-          "div",
-          { ref: "chartContainer", staticClass: "order-chart-container" },
-          [
-            _c("div", { ref: "orderChart", staticClass: "chart-wrapper" }, [
-              _c("div", { staticClass: "area data-area" }, [
-                _c("div", {
-                  class:
-                    "command noaction far fa-" +
-                    (_vm.status.connection ? "link" : "unlink"),
-                  attrs: { title: _vm.$t("admin.orderChart.connection") }
-                }),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  {
-                    staticClass: "command noaction status",
-                    class: {
-                      green: _vm.status.position > 0,
-                      red: _vm.status.position < 0
-                    },
-                    attrs: { title: _vm.$t("admin.orderChart.position") }
-                  },
-                  [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(
-                          _vm._f("currency")(_vm.status.position, "", "")
-                        ) +
-                        "\n                    "
-                    )
-                  ]
-                ),
-                _vm._v(" "),
-                _c("div", { staticClass: "command noaction clock" }, [
-                  _vm._v(_vm._s(_vm.clock))
-                ]),
-                _vm._v(" "),
-                _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.chartDate,
-                      expression: "chartDate"
-                    }
-                  ],
-                  staticClass: "chart-date command",
-                  attrs: {
-                    type: "date",
-                    title: _vm.$t("admin.orderChart.dateTitle")
-                  },
-                  domProps: { value: _vm.chartDate },
-                  on: {
-                    change: function() {
-                      return _vm.getChartData(_vm.chartDate)
-                    },
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
-                      }
-                      _vm.chartDate = $event.target.value
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c("img", {
-                  ref: "spinner",
-                  staticClass: "command spinner",
-                  attrs: { src: "spinner.gif" }
-                })
-              ]),
+              }),
               _vm._v(" "),
-              _c("div", { staticClass: "area tool-area" }, [
-                _c("div", {
-                  ref: "fullscreenTool",
-                  class:
-                    "command far fa-" +
-                    (_vm.isFullscreen ? "compress" : "expand"),
-                  on: { click: _vm.toggleFullscreen }
-                }),
-                _vm._v(" "),
-                _c("div", {
-                  ref: "reloadTool",
-                  staticClass: "command far fa-sync-alt",
-                  on: {
-                    click: function() {
-                      _vm.data.price = []
-                      _vm.getChartData(_vm.chartDate)
-                    }
-                  }
-                }),
-                _vm._v(" "),
-                _c("div", {
-                  ref: "lineTool",
-                  staticClass: "command far fa-minus",
-                  on: {
-                    click: _vm.lineToolClick,
-                    contextmenu: _vm.lineToolContextmenu
-                  }
-                }),
-                _vm._v(" "),
-                _c("div", {
-                  ref: "rulerTool",
-                  staticClass: "command far fa-arrows-v",
-                  on: {
-                    click: _vm.rulerToolClick,
-                    contextmenu: _vm.rulerToolContextmenu
-                  }
-                }),
-                _vm._v(" "),
-                _c("div", {
-                  ref: "cancelOrder",
-                  staticClass: "cancel-order command far fa-trash-alt",
-                  on: { click: _vm.cancelOrderClick }
-                })
-              ]),
+              _c("img", {
+                ref: "spinner",
+                staticClass: "command spinner",
+                attrs: { src: "spinner.gif" }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: "area tool-area" }, [
+              _c("div", {
+                ref: "fullscreenTool",
+                class:
+                  "command far fa-" +
+                  (_vm.isFullscreen ? "compress" : "expand"),
+                attrs: { title: _vm.$t("admin.orderChart.fullscreen") },
+                on: { click: _vm.toggleFullscreen }
+              }),
               _vm._v(" "),
-              _c("div", [
-                _c(
-                  "div",
-                  {
-                    ref: "entryOrder",
-                    staticClass: "order-button entry",
-                    on: { click: _vm.entryOrderClick }
-                  },
-                  [
-                    _vm._v(
-                      "\n                        Entry\n                    "
-                    )
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  {
-                    ref: "tpslOrder",
-                    staticClass: "order-button tpsl",
-                    on: { click: _vm.tpslOrderClick }
-                  },
-                  [
-                    _vm._v(
-                      "\n                        TP/SL\n                    "
-                    )
-                  ]
-                ),
-                _vm._v(" "),
-                _c("div", {
-                  staticClass: "chart-top command far fa-angle-double-right",
-                  on: { click: _vm.chartTopClick }
-                })
-              ])
+              _c("div", {
+                ref: "reloadTool",
+                staticClass: "command far fa-sync-alt",
+                attrs: { title: _vm.$t("admin.orderChart.reload") },
+                on: {
+                  click: function() {
+                    _vm.data.price = []
+                    _vm.getChartData(_vm.chartDate)
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("div", {
+                ref: "lineTool",
+                staticClass: "command far fa-minus",
+                attrs: { title: _vm.$t("admin.orderChart.lineTool") },
+                on: {
+                  click: _vm.lineToolClick,
+                  contextmenu: _vm.lineToolContextmenu
+                }
+              }),
+              _vm._v(" "),
+              _c("div", {
+                ref: "rulerTool",
+                staticClass: "command far fa-arrows-v",
+                attrs: { title: _vm.$t("admin.orderChart.rulerTool") },
+                on: {
+                  click: _vm.rulerToolClick,
+                  contextmenu: _vm.rulerToolContextmenu
+                }
+              }),
+              _vm._v(" "),
+              _c("div", {
+                ref: "cancelOrder",
+                staticClass: "cancel-order command far fa-trash-alt",
+                attrs: { title: _vm.$t("admin.orderChart.cancelTool") },
+                on: { click: _vm.cancelOrderClick }
+              })
+            ]),
+            _vm._v(" "),
+            _c("div", [
+              _c(
+                "div",
+                {
+                  ref: "entryOrder",
+                  staticClass: "order-button entry",
+                  on: { click: _vm.entryOrderClick }
+                },
+                [
+                  _vm._v(
+                    "\n                        Entry\n                    "
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  ref: "tpslOrder",
+                  staticClass: "order-button tpsl",
+                  on: { click: _vm.tpslOrderClick }
+                },
+                [
+                  _vm._v(
+                    "\n                        TP/SL\n                    "
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c("div", {
+                staticClass: "chart-top command far fa-angle-double-right",
+                on: { click: _vm.chartTopClick }
+              })
             ])
-          ]
-        )
-      ],
-      1
-    )
+          ])
+        ]
+      )
+    ])
   ])
 }
 var staticRenderFns = []

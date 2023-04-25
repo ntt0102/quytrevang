@@ -4,21 +4,6 @@
             {{ $t("admin.orderChart.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
-            <DxToolbar
-                :items="[
-                    {
-                        location: 'before',
-                        widget: 'dxButton',
-                        options: {
-                            icon: 'far fa-arrow-left small',
-                            hint: $t('buttons.back'),
-                            onClick: () => {
-                                $router.push({ name: $route.query.redirect });
-                            }
-                        }
-                    }
-                ]"
-            />
             <div class="order-chart-container" ref="chartContainer">
                 <div class="chart-wrapper" ref="orderChart">
                     <div class="area data-area">
@@ -44,7 +29,7 @@
                         <input
                             type="date"
                             class="chart-date command"
-                            :title="$t('admin.orderChart.dateTitle')"
+                            :title="$t('admin.orderChart.date')"
                             v-model="chartDate"
                             @change="() => getChartData(chartDate)"
                         />
@@ -62,11 +47,13 @@
                                     isFullscreen ? 'compress' : 'expand'
                                 }`
                             "
+                            :title="$t('admin.orderChart.fullscreen')"
                             @click="toggleFullscreen"
                         ></div>
                         <div
                             ref="reloadTool"
                             class="command far fa-sync-alt"
+                            :title="$t('admin.orderChart.reload')"
                             @click="
                                 () => {
                                     data.price = [];
@@ -77,18 +64,21 @@
                         <div
                             ref="lineTool"
                             class="command far fa-minus"
+                            :title="$t('admin.orderChart.lineTool')"
                             @click="lineToolClick"
                             @contextmenu="lineToolContextmenu"
                         ></div>
                         <div
                             ref="rulerTool"
                             class="command far fa-arrows-v"
+                            :title="$t('admin.orderChart.rulerTool')"
                             @click="rulerToolClick"
                             @contextmenu="rulerToolContextmenu"
                         ></div>
                         <div
                             ref="cancelOrder"
                             class="cancel-order command far fa-trash-alt"
+                            :title="$t('admin.orderChart.cancelTool')"
                             @click="cancelOrderClick"
                         ></div>
                     </div>
@@ -321,7 +311,9 @@ export default {
                                     if (resp.isOk) {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
-                                            "Sửa lệnh Entry thành công"
+                                            this.$t(
+                                                "admin.orderChart.changeEntrySuccess"
+                                            )
                                         );
                                     } else {
                                         line.applyOptions({ price: oldPrice });
@@ -344,7 +336,9 @@ export default {
                                     if (resp.isOk) {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
-                                            "Sửa lệnh TP thành công"
+                                            this.$t(
+                                                "admin.orderChart.changeTpSuccess"
+                                            )
                                         );
                                     } else {
                                         line.applyOptions({ price: oldPrice });
@@ -363,7 +357,9 @@ export default {
                                     if (resp.isOk) {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
-                                            "Sửa lệnh SL thành công"
+                                            this.$t(
+                                                "admin.orderChart.changeSlSuccess"
+                                            )
                                         );
                                     } else {
                                         line.applyOptions({ price: oldPrice });
@@ -374,7 +370,9 @@ export default {
                         //
                         if (!isChanged) {
                             line.applyOptions({ price: oldPrice });
-                            this.$toasted.show("Không được thay đổi.");
+                            this.$toasted.show(
+                                this.$t("admin.orderChart.noChangeOrderLine")
+                            );
                         }
                     }
                     break;
@@ -617,7 +615,9 @@ export default {
                                                             "order"
                                                         );
                                                         self.$toasted.success(
-                                                            "Đã khớp lệnh TP và đóng vị thế"
+                                                            this.$t(
+                                                                "admin.orderChart.deleteTpSuccess"
+                                                            )
                                                         );
                                                     } else
                                                         self.toasteOrderError(
@@ -655,7 +655,9 @@ export default {
                                                             "order"
                                                         );
                                                         self.$toasted.success(
-                                                            "Đã khớp lệnh SL và đóng vị thế"
+                                                            this.$t(
+                                                                "admin.orderChart.deleteSlSuccess"
+                                                            )
                                                         );
                                                     } else
                                                         self.toasteOrderError(
@@ -702,7 +704,9 @@ export default {
                                                             { draggable: false }
                                                         );
                                                         self.$toasted.success(
-                                                            "Tự động đặt lệnh TP/SL thành công"
+                                                            this.$t(
+                                                                "admin.orderChart.autoNewTpSlSuccess"
+                                                            )
                                                         );
                                                     } else
                                                         self.toasteOrderError(
@@ -743,7 +747,9 @@ export default {
                                 this.removeOrderLine("sl");
                                 toolsStore.clear("order");
                                 this.$toasted.success(
-                                    "Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế"
+                                    this.$t(
+                                        "admin.orderChart.autoCancelTpSlSuccess"
+                                    )
                                 );
                             } else this.toasteOrderError(resp.message);
                         });
@@ -974,7 +980,10 @@ export default {
             }
         },
         cancelOrderClick() {
-            let result = confirm("Huỷ lệnh?", "Xác nhận");
+            let result = confirm(
+                this.$t("admin.orderChart.cancelOrder"),
+                this.$t("admin.orderChart.cancelConfirm")
+            );
             result.then(dialogResult => {
                 if (dialogResult) {
                     this.toggleCancelOrderButton(false);
@@ -996,7 +1005,7 @@ export default {
                                     this.removeOrderLine("sl");
                                     toolsStore.clear("order");
                                     this.$toasted.success(
-                                        "Đóng vị thế thành công"
+                                        this.$t("admin.orderChart.exitSuccess")
                                     );
                                 } else {
                                     this.toggleCancelOrderButton(true);
@@ -1012,7 +1021,9 @@ export default {
                                     this.removeOrderLine("entry");
                                     toolsStore.clear("order");
                                     this.$toasted.success(
-                                        "Huỷ lệnh Entry thành công"
+                                        this.$t(
+                                            "admin.orderChart.deleteEntrySuccess"
+                                        )
                                     );
                                 } else {
                                     this.toggleCancelOrderButton(true);
@@ -1028,7 +1039,10 @@ export default {
             const CURRENT_SEC = moment().unix();
             if (this.inSession(CURRENT_SEC)) {
                 if (CURRENT_SEC < TIME.ATO) {
-                    let result = confirm("Đặt lệnh ATO?", "Xác nhận");
+                    let result = confirm(
+                        this.$t("admin.orderChart.atoOrder"),
+                        this.$t("admin.orderChart.cancelConfirm")
+                    );
                     result.then(dialogResult => {
                         if (dialogResult) {
                             this.executeOrder({
@@ -1041,7 +1055,9 @@ export default {
                             }).then(resp => {
                                 if (resp.isOk)
                                     this.$toasted.success(
-                                        "Đặt lệnh ATO thành công"
+                                        this.$t(
+                                            "admin.orderChart.atoOrderSuccess"
+                                        )
                                     );
                                 else this.toasteOrderError(resp.message);
                             });
@@ -1059,11 +1075,16 @@ export default {
                         if (resp.isOk) {
                             this.drawOrderLine("entry");
                             this.toggleCancelOrderButton(true);
-                            this.$toasted.success("Đặt lệnh Entry thành công");
+                            this.$toasted.success(
+                                this.$t("admin.orderChart.newEntrySuccess")
+                            );
                         } else this.toasteOrderError(resp.message);
                     });
                 } else {
-                    let result = confirm("Đặt lệnh ATC?", "Xác nhận");
+                    let result = confirm(
+                        this.$t("admin.orderChart.atcOrder"),
+                        this.$t("admin.orderChart.cancelConfirm")
+                    );
                     result.then(dialogResult => {
                         if (dialogResult) {
                             this.executeOrder({
@@ -1076,7 +1097,9 @@ export default {
                             }).then(resp => {
                                 if (resp.isOk)
                                     this.$toasted.success(
-                                        "Đặt lệnh ATC thành công"
+                                        this.$t(
+                                            "admin.orderChart.atcOrderSuccess"
+                                        )
                                     );
                                 else this.toasteOrderError(resp.message);
                             });
@@ -1103,7 +1126,9 @@ export default {
                     this.drawOrderLine("tp");
                     this.drawOrderLine("sl");
                     this.order.entry.line.applyOptions({ draggable: false });
-                    this.$toasted.success("Đặt lệnh TP/SL thành công");
+                    this.$toasted.success(
+                        this.$t("admin.orderChart.newTpSlSuccess")
+                    );
                 } else this.toasteOrderError(resp.message);
             });
         },
@@ -1121,32 +1146,8 @@ export default {
             return +(+price.toFixed(1));
         },
         toasteOrderError(error) {
-            if (error == "ordering") return false;
-            let message = "";
-            switch (error) {
-                case "notConnect":
-                    message = "Chưa kết nối tài khoản VPS";
-                    break;
-                case "invalidVolume":
-                    message = "Số hợp đồng lớn hơn sức mua";
-                    break;
-                case "openedPosition":
-                    message = "Đã có vị thế đang mở";
-                    break;
-                case "unopenedPosition":
-                    message = "Chưa có vị thế được mở";
-                    break;
-                case "failOrder":
-                    message = "Đặt lệnh thất bại";
-                    break;
-                case "failSave":
-                    message = "Lưu lệnh thất bại";
-                    break;
-                default:
-                    message = "Lỗi chưa xác định";
-                    break;
-            }
-            this.$toasted.error(message);
+            if (!error) error = "unknown";
+            this.$toasted.error(this.$t(`admin.orderChart.${error}`));
         }
     }
 };
