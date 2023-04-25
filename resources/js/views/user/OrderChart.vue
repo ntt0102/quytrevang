@@ -676,7 +676,7 @@ export default {
                                                     price: self.order.sl.price
                                                 }
                                             }).then(resp => {
-                                                if (reps.isOk) {
+                                                if (resp.isOk) {
                                                     self.drawOrderLine("tp");
                                                     self.drawOrderLine("sl");
                                                     self.order.entry.line.applyOptions(

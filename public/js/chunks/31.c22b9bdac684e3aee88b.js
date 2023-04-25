@@ -744,7 +744,7 @@ var TIME = {
                         price: self.order.sl.price
                       }
                     }).then(function (resp) {
-                      if (reps.isOk) {
+                      if (resp.isOk) {
                         self.drawOrderLine("tp");
                         self.drawOrderLine("sl");
                         self.order.entry.line.applyOptions({
