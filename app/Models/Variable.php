@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\CoreModel;
 
-class Variable extends Model
+class Variable extends CoreModel
 {
     protected $fillable = [
         'name',

@@ -3,8 +3,14 @@
 namespace App\Services\Admin;
 
 use App\Services\CoreService;
+use App\Models\User;
 use App\Models\VpsUser;
+use App\Models\Trade;
 use App\Services\Special\VpsOrderService;
+use App\Jobs\OrderVpsJob;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\UpdatedTradesNotification;
+use App\Events\UpdateTradeEvent;
 
 class OrderChartService extends CoreService
 {
@@ -87,7 +93,11 @@ class OrderChartService extends CoreService
                 $vpsUser = request()->user()->vpsUser;
                 $vos = new VpsOrderService($vpsUser);
                 $ret = $vos->execute($payload);
-                // VpsUser::getCopyists()->each(function());
+                if ($vpsUser->share && $ret['isOk']) {
+                    VpsUser::getCopyists()->each(function ($copyist) use ($payload) {
+                        OrderVpsJob::dispatch($copyist, $payload);
+                    });
+                }
                 return $ret;
             }
         );
@@ -227,5 +237,40 @@ class OrderChartService extends CoreService
             }, []);
         if (in_array($currentDate, $holidays)) return false;
         return true;
+    }
+
+    /**
+     * Report
+     *
+     * 
+     */
+    public function reportTrading()
+    {
+        return $this->transaction(
+            function () {
+                $vpsUser = User::permission('trades@edit')->first()->vpsUser;
+                $vos = new VpsOrderService($vpsUser);
+                if (!$vos->status->connect) return false;
+                $revenue = $vos->status->vm > 0 ? $vos->status->vm : 0;
+                $loss = $vos->status->vm < 0 ? -$vos->status->vm : 0;
+                $trade = Trade::create([
+                    "amount" => $vpsUser->volume,
+                    "scores" => $this->getInfo($this->getSymbol())->r,
+                    "revenue" => $revenue,
+                    "loss" => $loss,
+                    "fees" => $vos->status->fee,
+                    "monday" => date_create()->format('Y-m-d'),
+                ]);
+                if (!$trade) return false;
+                Notification::send(
+                    User::permission('trades@view')->get(),
+                    new UpdatedTradesNotification(
+                        number_format($vos->status->vm, 0, ",", ".") . ' ₫',
+                        number_format($vos->status->fee, 0, ",", ".") . ' ₫'
+                    )
+                );
+                event(new UpdateTradeEvent());
+            }
+        );
     }
 }

@@ -34,10 +34,11 @@ class Kernel extends ConsoleKernel
         $schedule->call(function () use ($oCS) {
             set_global_value('openingMarketFlag', $oCS->checkOpeningMarket() ? '1' : '0');
             set_global_value('vn30f1m', $oCS->getSymbol());
-            set_global_value('reportedTradingFlag', '0');
+            // set_global_value('reportedTradingFlag', '0');
         })->dailyAt('00:30');
         //
         $schedule->call(function () use ($oCS) {
+            $oCS->reportTrading();
             $oCS->exportToCsv();
         })->dailyAt('14:46');
     }

@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\CoreModel;
 
-class Parameter extends Model
+class Parameter extends CoreModel
 {
     protected $visible = [
         'id',

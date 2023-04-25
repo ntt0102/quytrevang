@@ -154,6 +154,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -294,7 +302,7 @@ var TIME = {
 
         _this2.loadWhitespace = true;
       });
-    }, 2000);
+    }, 1000);
   },
   destroyed: function destroyed() {
     this.$store.unregisterModule("Admin.orderChart");
@@ -636,8 +644,6 @@ var TIME = {
       });
     },
     connectSocket: function connectSocket() {
-      var _this5 = this;
-
       var self = this;
       var endpoint = "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
       self.websocket = new WebSocket(endpoint);
@@ -653,11 +659,11 @@ var TIME = {
 
       self.websocket.onclose = function (e) {
         console.log("onclose", e);
-        if (_this5._isDestroyed) return false;
+        if (self._isDestroyed) return false;
 
         if (self.inSession()) {
           self.connectSocket();
-          self.getChartData(_this5.chartDate);
+          self.getChartData(self.chartDate);
         }
       };
 
@@ -675,69 +681,58 @@ var TIME = {
                   value: data.lastPrice
                 });
 
-                if (_this5.order.entry.hasOwnProperty("line")) {
-                  if (_this5.order.tp.hasOwnProperty("line")) {
-                    if (self.order.side > 0 && data.lastPrice >= self.order.tp.price || self.order.side < 0 && data.lastPrice <= self.order.tp.price) _this5.executeOrder({
+                if (self.order.entry.hasOwnProperty("line")) {
+                  if (self.order.tp.hasOwnProperty("line")) {
+                    if (self.order.side > 0 && data.lastPrice >= self.order.tp.price || self.order.side < 0 && data.lastPrice <= self.order.tp.price) self.executeOrder({
                       action: "sl",
                       data: {
                         cmd: "delete"
                       }
                     }).then(function (resp) {
                       if (resp.isOk) {
-                        _this5.removeOrderLine("entry");
-
-                        _this5.removeOrderLine("tp");
-
-                        _this5.removeOrderLine("sl");
-
+                        self.removeOrderLine("entry");
+                        self.removeOrderLine("tp");
+                        self.removeOrderLine("sl");
                         _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-
-                        _this5.$toasted.success("Đã khớp lệnh TP và đóng vị thế");
-                      } else _this5.toasteOrderError(resp.message);
+                        self.$toasted.success("Đã khớp lệnh TP và đóng vị thế");
+                      } else self.toasteOrderError(resp.message);
                     });
-                    if (self.order.side > 0 && data.lastPrice <= self.order.sl.price || self.order.side < 0 && data.lastPrice >= self.order.sl.price) _this5.executeOrder({
+                    if (self.order.side > 0 && data.lastPrice <= self.order.sl.price || self.order.side < 0 && data.lastPrice >= self.order.sl.price) self.executeOrder({
                       action: "tp",
                       data: {
                         cmd: "cancel"
                       }
                     }).then(function (resp) {
                       if (resp.isOk) {
-                        _this5.removeOrderLine("entry");
-
-                        _this5.removeOrderLine("tp");
-
-                        _this5.removeOrderLine("sl");
-
+                        self.removeOrderLine("entry");
+                        self.removeOrderLine("tp");
+                        self.removeOrderLine("sl");
                         _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-
-                        _this5.$toasted.success("Đã khớp lệnh SL và đóng vị thế");
-                      } else _this5.toasteOrderError(resp.message);
+                        self.$toasted.success("Đã khớp lệnh SL và đóng vị thế");
+                      } else self.toasteOrderError(resp.message);
                     });
                   } else {
-                    if (self.order.side > 0 && data.lastPrice >= self.order.entry.price || self.order.side < 0 && data.lastPrice <= self.order.entry.price) _this5.executeOrder({
+                    if (self.order.side > 0 && data.lastPrice >= self.order.entry.price || self.order.side < 0 && data.lastPrice <= self.order.entry.price) self.executeOrder({
                       action: "tpsl",
                       tpData: {
                         cmd: "new",
-                        side: -_this5.order.side,
-                        price: _this5.order.tp.price
+                        side: -self.order.side,
+                        price: self.order.tp.price
                       },
                       slData: {
                         cmd: "new",
-                        side: -_this5.order.side,
-                        price: _this5.order.sl.price
+                        side: -self.order.side,
+                        price: self.order.sl.price
                       }
                     }).then(function (resp) {
                       if (reps.isOk) {
-                        _this5.drawOrderLine("tp");
-
-                        _this5.drawOrderLine("sl");
-
-                        _this5.order.entry.line.applyOptions({
+                        self.drawOrderLine("tp");
+                        self.drawOrderLine("sl");
+                        self.order.entry.line.applyOptions({
                           draggable: false
                         });
-
-                        _this5.$toasted.success("Tự động đặt lệnh TP/SL thành công");
-                      } else _this5.toasteOrderError(resp.message);
+                        self.$toasted.success("Tự động đặt lệnh TP/SL thành công");
+                      } else self.toasteOrderError(resp.message);
                     });
                   }
                 }
@@ -752,7 +747,7 @@ var TIME = {
       };
     },
     intervalHandler: function intervalHandler() {
-      var _this6 = this;
+      var _this5 = this;
 
       var CURRENT_SEC = moment().unix();
 
@@ -771,16 +766,16 @@ var TIME = {
               }
             }).then(function (resp) {
               if (resp.isOk) {
-                _this6.removeOrderLine("entry");
+                _this5.removeOrderLine("entry");
 
-                _this6.removeOrderLine("tp");
+                _this5.removeOrderLine("tp");
 
-                _this6.removeOrderLine("sl");
+                _this5.removeOrderLine("sl");
 
                 _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
 
-                _this6.$toasted.success("Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế");
-              } else _this6.toasteOrderError(resp.message);
+                _this5.$toasted.success("Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế");
+              } else _this5.toasteOrderError(resp.message);
             });
           }
         }
@@ -808,12 +803,11 @@ var TIME = {
           if (!this.order.entry.hasOwnProperty("line")) {
             var price = this.coordinateToPrice(this.crosshair.y);
             var side = price >= this.data.price.slice(-1)[0].value ? 1 : -1;
-            this.order.side = side; // if (CURRENT_SEC < TIME.ATO) price = "ATO";
-            // else if (CURRENT_SEC < TIME.ATC) {
-
-            this.order.tp.price = price + side * TP_DEFAULT;
-            this.order.sl.price = price - side * SL_DEFAULT; // } else price = "ATC";
-
+            this.order.side = side;
+            if (CURRENT_SEC < TIME.ATO) price = "ATO";else if (CURRENT_SEC < TIME.ATC) {
+              this.order.tp.price = price + side * TP_DEFAULT;
+              this.order.sl.price = price - side * SL_DEFAULT;
+            } else price = "ATC";
             this.order.entry.price = price;
             this.$refs.entryOrder.style.left = +(this.crosshair.x + (this.crosshair.x > innerWidth - 71 ? -71 : 1)) + "px";
             this.$refs.entryOrder.style.top = +(this.crosshair.y + (this.crosshair.y > innerHeight - 61 ? -61 : 1)) + "px";
@@ -929,10 +923,10 @@ var TIME = {
       this.$refs.lineTool.classList.remove("selected");
     },
     removeLineTool: function removeLineTool() {
-      var _this7 = this;
+      var _this6 = this;
 
       this.lines.forEach(function (line) {
-        return _this7.series.price.removePriceLine(line);
+        return _this6.series.price.removePriceLine(line);
       });
       this.lines = [];
       _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("line");
@@ -999,127 +993,130 @@ var TIME = {
       }
     },
     cancelOrderClick: function cancelOrderClick() {
+      var _this7 = this;
+
+      var result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])("Huỷ lệnh?", "Xác nhận");
+      result.then(function (dialogResult) {
+        if (dialogResult) {
+          _this7.toggleCancelOrderButton(false);
+
+          if (_this7.order.entry.hasOwnProperty("line")) {
+            if (_this7.order.tp.hasOwnProperty("line")) {
+              _this7.executeOrder({
+                action: "exit",
+                tpData: {
+                  cmd: "cancel"
+                },
+                slData: {
+                  cmd: "delete"
+                },
+                exitData: {
+                  cmd: "new",
+                  side: -_this7.order.side,
+                  price: "MTL"
+                }
+              }).then(function (resp) {
+                if (resp.isOk) {
+                  _this7.removeOrderLine("entry");
+
+                  _this7.removeOrderLine("tp");
+
+                  _this7.removeOrderLine("sl");
+
+                  _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
+
+                  _this7.$toasted.success("Đóng vị thế thành công");
+                } else {
+                  _this7.toggleCancelOrderButton(true);
+
+                  _this7.toasteOrderError(resp.message);
+                }
+              });
+            } else {
+              _this7.executeOrder({
+                action: "entry",
+                data: {
+                  cmd: "delete"
+                }
+              }).then(function (resp) {
+                if (resp.isOk) {
+                  _this7.removeOrderLine("entry");
+
+                  _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
+
+                  _this7.$toasted.success("Huỷ lệnh Entry thành công");
+                } else {
+                  _this7.toggleCancelOrderButton(true);
+
+                  _this7.toasteOrderError(resp.message);
+                }
+              });
+            }
+          }
+        }
+      });
+    },
+    entryOrderClick: function entryOrderClick() {
       var _this8 = this;
 
-      this.toggleCancelOrderButton(false);
+      var CURRENT_SEC = moment().unix();
 
-      if (this.order.entry.hasOwnProperty("line")) {
-        if (this.order.tp.hasOwnProperty("line")) {
-          this.executeOrder({
-            action: "exit",
-            tpData: {
-              cmd: "cancel"
-            },
-            slData: {
-              cmd: "delete"
-            },
-            exitData: {
-              cmd: "new",
-              side: -this.order.side,
-              price: "MTL"
-            }
-          }).then(function (resp) {
-            if (resp.isOk) {
-              _this8.removeOrderLine("entry");
-
-              _this8.removeOrderLine("tp");
-
-              _this8.removeOrderLine("sl");
-
-              _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-
-              _this8.$toasted.success("Đóng vị thế thành công");
-            } else {
-              _this8.toggleCancelOrderButton(true);
-
-              _this8.toasteOrderError(resp.message);
+      if (this.inSession(CURRENT_SEC)) {
+        if (CURRENT_SEC < TIME.ATO) {
+          var result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])("Đặt lệnh ATO?", "Xác nhận");
+          result.then(function (dialogResult) {
+            if (dialogResult) {
+              _this8.executeOrder({
+                action: "exit",
+                exitData: {
+                  cmd: "new",
+                  side: -_this8.order.side,
+                  price: "ATO"
+                }
+              }).then(function (resp) {
+                if (resp.isOk) _this8.$toasted.success("Đặt lệnh ATO thành công");else _this8.toasteOrderError(resp.message);
+              });
             }
           });
-        } else {
+        } else if (CURRENT_SEC < TIME.ATC) {
           this.executeOrder({
             action: "entry",
             data: {
-              cmd: "delete"
+              cmd: "new",
+              side: this.order.side,
+              price: this.order.entry.price
             }
           }).then(function (resp) {
             if (resp.isOk) {
-              _this8.removeOrderLine("entry");
+              _this8.drawOrderLine("entry");
 
-              _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-
-              _this8.$toasted.success("Huỷ lệnh Entry thành công");
-            } else {
               _this8.toggleCancelOrderButton(true);
 
-              _this8.toasteOrderError(resp.message);
+              _this8.$toasted.success("Đặt lệnh Entry thành công");
+            } else _this8.toasteOrderError(resp.message);
+          });
+        } else {
+          var _result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])("Đặt lệnh ATC?", "Xác nhận");
+
+          _result.then(function (dialogResult) {
+            if (dialogResult) {
+              _this8.executeOrder({
+                action: "exit",
+                exitData: {
+                  cmd: "new",
+                  side: -_this8.order.side,
+                  price: "ATC"
+                }
+              }).then(function (resp) {
+                if (resp.isOk) _this8.$toasted.success("Đặt lệnh ATC thành công");else _this8.toasteOrderError(resp.message);
+              });
             }
           });
         }
       }
     },
-    entryOrderClick: function entryOrderClick() {
-      var _this9 = this;
-
-      var CURRENT_SEC = moment().unix();
-
-      if (this.inSession(CURRENT_SEC)) {
-        // if (CURRENT_SEC < TIME.ATO) {
-        //     let result = confirm("Đặt lệnh ATO?", "Xác nhận đặt lệnh");
-        //     result.then(dialogResult => {
-        // if (dialogResult) {
-        //     this.executeOrder({
-        //         action: "exit",
-        //         exitData: {
-        //             cmd: "new",
-        //             side: -this.order.side,
-        //             price: "ATO"
-        //         }
-        //     }).then(resp => {
-        //         if (resp.isOk)
-        //             this.$toasted.success("Đặt lệnh ATO thành công");
-        //         else this.toasteOrderError(resp.message);
-        //     });
-        // }
-        //     });
-        // } else if (CURRENT_SEC < TIME.ATC) {
-        this.executeOrder({
-          action: "entry",
-          data: {
-            cmd: "new",
-            side: this.order.side,
-            price: this.order.entry.price
-          }
-        }).then(function (resp) {
-          if (resp.isOk) {
-            _this9.drawOrderLine("entry");
-
-            _this9.toggleCancelOrderButton(true);
-
-            _this9.$toasted.success("Đặt lệnh Entry thành công");
-          } else _this9.toasteOrderError(resp.message);
-        }); // } else {
-        //     let result = confirm("Đặt lệnh ATC?", "Xác nhận đặt lệnh");
-        //     result.then(dialogResult => {
-        // if (dialogResult) {
-        //     this.executeOrder({
-        //         action: "exit",
-        //         exitData: {
-        //             cmd: "new",
-        //             side: -this.order.side,
-        //             price: "ATC"
-        //         }
-        //     }).then(resp => {
-        //         if (resp.isOk)
-        //             this.$toasted.success("Đặt lệnh ATC thành công");
-        //         else this.toasteOrderError(resp.message);
-        //     });
-        // }
-        //     });
-        // }
-      }
-    },
     tpslOrderClick: function tpslOrderClick() {
-      var _this10 = this;
+      var _this9 = this;
 
       this.executeOrder({
         action: "tpsl",
@@ -1135,16 +1132,16 @@ var TIME = {
         }
       }).then(function (resp) {
         if (resp.isOk) {
-          _this10.drawOrderLine("tp");
+          _this9.drawOrderLine("tp");
 
-          _this10.drawOrderLine("sl");
+          _this9.drawOrderLine("sl");
 
-          _this10.order.entry.line.applyOptions({
+          _this9.order.entry.line.applyOptions({
             draggable: false
           });
 
-          _this10.$toasted.success("Đặt lệnh TP/SL thành công");
-        } else _this10.toasteOrderError(resp.message);
+          _this9.$toasted.success("Đặt lệnh TP/SL thành công");
+        } else _this9.toasteOrderError(resp.message);
       });
     },
     chartTopClick: function chartTopClick() {
@@ -1155,7 +1152,6 @@ var TIME = {
     },
     inSession: function inSession() {
       var currentSec = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
-      return true;
       if (!currentSec) currentSec = moment().unix();
       return currentSec >= TIME.START && currentSec <= TIME.END;
     },
@@ -1171,6 +1167,10 @@ var TIME = {
       switch (error) {
         case "notConnect":
           message = "Chưa kết nối tài khoản VPS";
+          break;
+
+        case "invalidVolume":
+          message = "Số hợp đồng lớn hơn sức mua";
           break;
 
         case "openedPosition":
@@ -1213,7 +1213,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".order-chart-container[data-v-cb468136] {\n  position: relative;\n  height: 300px;\n  background: #131722;\n  border: none;\n}\n.order-chart-container .chart-wrapper[data-v-cb468136] {\n  height: 100%;\n}\n.order-chart-container .area[data-v-cb468136] {\n  position: absolute;\n  display: flex;\n  justify-content: space-between;\n  font-size: 17px;\n  background: #131722;\n  border: solid 2px #2a2e39;\n  border-bottom-right-radius: 5px;\n  z-index: 3;\n}\n.order-chart-container .area.data-area[data-v-cb468136] {\n  top: 0px;\n  left: 30px;\n}\n.order-chart-container .area.data-area .command[data-v-cb468136]:not(:first-child) {\n  border-left: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.data-area .clock[data-v-cb468136] {\n  width: 80px;\n}\n.order-chart-container .area.data-area .chart-date[data-v-cb468136] {\n  width: 125px;\n}\n.order-chart-container .area.data-area .status[data-v-cb468136] {\n  width: unset !important;\n  padding: 0 10px !important;\n}\n.order-chart-container .area.data-area .status.green[data-v-cb468136] {\n  color: lime !important;\n}\n.order-chart-container .area.data-area .status.red[data-v-cb468136] {\n  color: red !important;\n}\n.order-chart-container .area.data-area .spinner[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  display: none;\n}\n.order-chart-container .area.tool-area[data-v-cb468136] {\n  top: 0px;\n  left: 0px;\n  flex-direction: column;\n}\n.order-chart-container .area.tool-area .command[data-v-cb468136]:not(:first-child) {\n  border-top: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.tool-area .selected[data-v-cb468136] {\n  color: #1f62ff !important;\n}\n.order-chart-container .area.tool-area .warning[data-v-cb468136] {\n  color: yellow !important;\n}\n.order-chart-container .area.tool-area .cancel-order[data-v-cb468136] {\n  display: none;\n  color: red;\n}\n.order-chart-container .command[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  flex: 1 1 auto;\n  text-align: center;\n  color: #bbbbbb;\n  background: transparent !important;\n  line-height: 30px;\n  font-size: 16px;\n  border: none;\n  cursor: pointer;\n  z-index: 3;\n}\n.order-chart-container .command[data-v-cb468136]:hover {\n  background: #2a2e39 !important;\n}\n.order-chart-container .order-button[data-v-cb468136] {\n  position: absolute;\n  display: none;\n  padding: 5px;\n  text-align: center;\n  border-radius: 7px;\n  color: black;\n  background: silver;\n  z-index: 3;\n  cursor: pointer;\n}\n.order-chart-container .order-button.entry[data-v-cb468136] {\n  width: 70px;\n  height: 55px;\n  color: white !important;\n}\n.order-chart-container .order-button.tpsl[data-v-cb468136] {\n  width: 60px;\n  height: 50px;\n}\n.order-chart-container .chart-top[data-v-cb468136] {\n  position: absolute;\n  bottom: 29px;\n  right: 55px;\n  border-radius: 50%;\n  border: 1px solid gray;\n  padding-left: 1px;\n  line-height: 22px !important;\n  width: 25px !important;\n  height: 25px !important;\n  font-size: 18px;\n}", ""]);
+exports.push([module.i, ".order-chart-container[data-v-cb468136] {\n  position: relative;\n  height: 300px;\n  background: #131722;\n  border: none;\n}\n.order-chart-container .chart-wrapper[data-v-cb468136] {\n  height: 100%;\n}\n.order-chart-container .area[data-v-cb468136] {\n  position: absolute;\n  display: flex;\n  justify-content: space-between;\n  font-size: 17px;\n  background: #131722;\n  border: solid 2px #2a2e39;\n  border-bottom-right-radius: 5px;\n  z-index: 3;\n}\n.order-chart-container .area.data-area[data-v-cb468136] {\n  top: 0px;\n  left: 30px;\n}\n.order-chart-container .area.data-area .command[data-v-cb468136]:not(:first-child) {\n  border-left: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.data-area .clock[data-v-cb468136] {\n  width: 80px;\n}\n.order-chart-container .area.data-area .chart-date[data-v-cb468136] {\n  width: 125px;\n}\n.order-chart-container .area.data-area .status[data-v-cb468136] {\n  width: unset !important;\n  padding: 0 10px !important;\n}\n.order-chart-container .area.data-area .status.green[data-v-cb468136] {\n  color: lime !important;\n}\n.order-chart-container .area.data-area .status.red[data-v-cb468136] {\n  color: red !important;\n}\n.order-chart-container .area.data-area .spinner[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  display: none;\n}\n.order-chart-container .area.tool-area[data-v-cb468136] {\n  top: 0px;\n  left: 0px;\n  flex-direction: column;\n}\n.order-chart-container .area.tool-area .command[data-v-cb468136]:not(:first-child) {\n  border-top: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.tool-area .selected[data-v-cb468136] {\n  color: #1f62ff !important;\n}\n.order-chart-container .area.tool-area .warning[data-v-cb468136] {\n  color: yellow !important;\n}\n.order-chart-container .area.tool-area .cancel-order[data-v-cb468136] {\n  display: none;\n  color: red;\n}\n.order-chart-container .command[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  flex: 1 1 auto;\n  text-align: center;\n  color: #bbbbbb;\n  background: transparent !important;\n  line-height: 30px;\n  font-size: 16px;\n  border: none;\n  cursor: pointer;\n  z-index: 3;\n}\n.order-chart-container .command[data-v-cb468136]:not(.noaction):hover {\n  background: #2a2e39 !important;\n}\n.order-chart-container .command.noaction[data-v-cb468136] {\n  cursor: unset !important;\n}\n.order-chart-container .order-button[data-v-cb468136] {\n  position: absolute;\n  display: none;\n  padding: 5px;\n  text-align: center;\n  border-radius: 7px;\n  color: black;\n  background: silver;\n  z-index: 3;\n  cursor: pointer;\n}\n.order-chart-container .order-button.entry[data-v-cb468136] {\n  width: 70px;\n  height: 55px;\n  color: white !important;\n}\n.order-chart-container .order-button.tpsl[data-v-cb468136] {\n  width: 60px;\n  height: 50px;\n}\n.order-chart-container .chart-top[data-v-cb468136] {\n  position: absolute;\n  bottom: 29px;\n  right: 55px;\n  border-radius: 50%;\n  border: 1px solid gray;\n  padding-left: 1px;\n  line-height: 22px !important;\n  width: 25px !important;\n  height: 25px !important;\n  font-size: 18px;\n}", ""]);
 
 // exports
 
@@ -1529,7 +1529,39 @@ var render = function() {
             _c("div", { ref: "orderChart", staticClass: "chart-wrapper" }),
             _vm._v(" "),
             _c("div", { staticClass: "area data-area" }, [
-              _c("div", { staticClass: "command clock" }, [
+              _c(
+                "div",
+                {
+                  staticClass: "command noaction status",
+                  class: { green: _vm.status.net > 0, red: _vm.status.net < 0 },
+                  attrs: { title: _vm.$t("admin.orderChart.net") }
+                },
+                [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm._f("currency")(_vm.status.net, "", "")) +
+                      "\n                "
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c(
+                "div",
+                {
+                  staticClass: "command noaction status",
+                  class: { green: _vm.status.vm > 0, red: _vm.status.vm < 0 },
+                  attrs: { title: _vm.$t("admin.orderChart.vm") }
+                },
+                [
+                  _vm._v(
+                    "\n                    " +
+                      _vm._s(_vm._f("currency")(_vm.status.vm, "", "")) +
+                      "\n                "
+                  )
+                ]
+              ),
+              _vm._v(" "),
+              _c("div", { staticClass: "command noaction clock" }, [
                 _vm._v(_vm._s(_vm.clock))
               ]),
               _vm._v(" "),
@@ -1561,38 +1593,6 @@ var render = function() {
                 }
               }),
               _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticClass: "command status",
-                  class: { green: _vm.status.net > 0, red: _vm.status.net < 0 },
-                  attrs: { title: _vm.$t("admin.orderChart.net") }
-                },
-                [
-                  _vm._v(
-                    "\n                    " +
-                      _vm._s(_vm._f("currency")(_vm.status.net, "", "")) +
-                      "\n                "
-                  )
-                ]
-              ),
-              _vm._v(" "),
-              _c(
-                "div",
-                {
-                  staticClass: "command status",
-                  class: { green: _vm.status.vm > 0, red: _vm.status.vm < 0 },
-                  attrs: { title: _vm.$t("admin.orderChart.vm") }
-                },
-                [
-                  _vm._v(
-                    "\n                    " +
-                      _vm._s(_vm._f("currency")(_vm.status.vm, "", "")) +
-                      "\n                "
-                  )
-                ]
-              ),
-              _vm._v(" "),
               _c("img", {
                 ref: "spinner",
                 staticClass: "command spinner",
@@ -1601,6 +1601,13 @@ var render = function() {
             ]),
             _vm._v(" "),
             _c("div", { staticClass: "area tool-area" }, [
+              _c("div", {
+                class:
+                  "command noaction far fa-" +
+                  (_vm.status.connect ? "link" : "unlink"),
+                attrs: { title: _vm.$t("admin.orderChart.connect") }
+              }),
+              _vm._v(" "),
               _c("div", {
                 ref: "fullscreenTool",
                 class:

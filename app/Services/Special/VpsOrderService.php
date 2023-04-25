@@ -40,15 +40,20 @@ class VpsOrderService extends CoreService
         if ($rsp->rc != 1) return (object)['connect' => false];
         return (object)[
             'connect' => true,
-            'maxVol' => $rsp->data->max_vol,
-            'fee' => $rsp->data->others,
-            'vm' => $rsp->data->vm,
-            'net' => $rsp->data->net != 'NO' ? $rsp->data->net : 0
+            'maxVol' => intval($rsp->data->max_vol),
+            'fee' => intval($rsp->data->others),
+            'vm' => intval($rsp->data->vm),
+            'net' => $rsp->data->net != 'NO' ? intval($rsp->data->net) : 0
         ];
     }
 
     public function execute($payload)
     {
+        if (!$this->status->connect)
+            return ['isOk' => false, 'message' => 'notConnect'];
+        if ($this->vpsUser->volume > $this->status->maxVol)
+            return ['isOk' => false, 'message' => 'invalidVolume'];
+        //
         switch ($payload->action) {
             case 'entry':
                 return $this->conditionOrder($payload->action, $payload->data);
@@ -85,9 +90,6 @@ class VpsOrderService extends CoreService
 
     public function conditionOrder($type, $data)
     {
-        if (!$this->status->connect)
-            return ['isOk' => false, 'message' => 'notConnect'];
-        //
         $isEntry = $type == "entry";
         $isSl = $type == "sl";
         $isNew = $data->cmd == "new";
@@ -132,9 +134,6 @@ class VpsOrderService extends CoreService
 
     public function order($type, $data)
     {
-        if (!$this->status->connect)
-            return ['isOk' => false, 'message' => 'notConnect'];
-        //
         $isNew = $data->cmd == "new";
         if ($isNew && $this->status->net == 0)
             return ['isOk' => false, 'message' => 'unopenedPosition'];

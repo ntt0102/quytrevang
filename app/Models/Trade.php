@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use App\Models\CoreModel;
 
-class Trade extends Model
+class Trade extends CoreModel
 {
     protected $visible = [
         'id',
