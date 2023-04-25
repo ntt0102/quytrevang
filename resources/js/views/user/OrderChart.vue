@@ -928,78 +928,62 @@ export default {
             }
         },
         cancelOrderClick() {
-            let result = confirm("Huỷ lệnh?", "Xác nhận");
-            result.then(dialogResult => {
-                if (dialogResult) {
-                    this.toggleCancelOrderButton(false);
-                    if (this.order.entry.hasOwnProperty("line")) {
-                        if (this.order.tp.hasOwnProperty("line")) {
-                            this.executeOrder({
-                                action: "exit",
-                                tpData: { cmd: "cancel" },
-                                slData: { cmd: "delete" },
-                                exitData: {
-                                    cmd: "new",
-                                    side: -this.order.side,
-                                    price: "MTL"
-                                }
-                            }).then(resp => {
-                                if (resp.isOk) {
-                                    this.removeOrderLine("entry");
-                                    this.removeOrderLine("tp");
-                                    this.removeOrderLine("sl");
-                                    toolsStore.clear("order");
-                                    this.$toasted.success(
-                                        "Đóng vị thế thành công"
-                                    );
-                                } else {
-                                    this.toggleCancelOrderButton(true);
-                                    this.toasteOrderError(resp.message);
-                                }
-                            });
-                        } else {
-                            this.executeOrder({
-                                action: "entry",
-                                data: { cmd: "delete" }
-                            }).then(resp => {
-                                if (resp.isOk) {
-                                    this.removeOrderLine("entry");
-                                    toolsStore.clear("order");
-                                    this.$toasted.success(
-                                        "Huỷ lệnh Entry thành công"
-                                    );
-                                } else {
-                                    this.toggleCancelOrderButton(true);
-                                    this.toasteOrderError(resp.message);
-                                }
-                            });
+            this.toggleCancelOrderButton(false);
+            if (this.order.entry.hasOwnProperty("line")) {
+                if (this.order.tp.hasOwnProperty("line")) {
+                    this.executeOrder({
+                        action: "exit",
+                        tpData: { cmd: "cancel" },
+                        slData: { cmd: "delete" },
+                        exitData: {
+                            cmd: "new",
+                            side: -this.order.side,
+                            price: "MTL"
                         }
-                    }
+                    }).then(resp => {
+                        if (resp.isOk) {
+                            this.removeOrderLine("entry");
+                            this.removeOrderLine("tp");
+                            this.removeOrderLine("sl");
+                            toolsStore.clear("order");
+                            this.$toasted.success("Đóng vị thế thành công");
+                        } else {
+                            this.toggleCancelOrderButton(true);
+                            this.toasteOrderError(resp.message);
+                        }
+                    });
+                } else {
+                    this.executeOrder({
+                        action: "entry",
+                        data: { cmd: "delete" }
+                    }).then(resp => {
+                        if (resp.isOk) {
+                            this.removeOrderLine("entry");
+                            toolsStore.clear("order");
+                            this.$toasted.success("Huỷ lệnh Entry thành công");
+                        } else {
+                            this.toggleCancelOrderButton(true);
+                            this.toasteOrderError(resp.message);
+                        }
+                    });
                 }
-            });
+            }
         },
         entryOrderClick() {
             const CURRENT_SEC = moment().unix();
             if (this.inSession(CURRENT_SEC)) {
                 if (CURRENT_SEC < TIME.ATO) {
-                    let result = confirm("Đặt lệnh ATO?", "Xác nhận");
-                    result.then(dialogResult => {
-                        if (dialogResult) {
-                            this.executeOrder({
-                                action: "exit",
-                                exitData: {
-                                    cmd: "new",
-                                    side: -this.order.side,
-                                    price: "ATO"
-                                }
-                            }).then(resp => {
-                                if (resp.isOk)
-                                    this.$toasted.success(
-                                        "Đặt lệnh ATO thành công"
-                                    );
-                                else this.toasteOrderError(resp.message);
-                            });
+                    this.executeOrder({
+                        action: "exit",
+                        exitData: {
+                            cmd: "new",
+                            side: -this.order.side,
+                            price: "ATO"
                         }
+                    }).then(resp => {
+                        if (resp.isOk)
+                            this.$toasted.success("Đặt lệnh ATO thành công");
+                        else this.toasteOrderError(resp.message);
                     });
                 } else if (CURRENT_SEC < TIME.ATC) {
                     this.executeOrder({
@@ -1017,24 +1001,17 @@ export default {
                         } else this.toasteOrderError(resp.message);
                     });
                 } else {
-                    let result = confirm("Đặt lệnh ATC?", "Xác nhận");
-                    result.then(dialogResult => {
-                        if (dialogResult) {
-                            this.executeOrder({
-                                action: "exit",
-                                exitData: {
-                                    cmd: "new",
-                                    side: -this.order.side,
-                                    price: "ATC"
-                                }
-                            }).then(resp => {
-                                if (resp.isOk)
-                                    this.$toasted.success(
-                                        "Đặt lệnh ATC thành công"
-                                    );
-                                else this.toasteOrderError(resp.message);
-                            });
+                    this.executeOrder({
+                        action: "exit",
+                        exitData: {
+                            cmd: "new",
+                            side: -this.order.side,
+                            price: "ATC"
                         }
+                    }).then(resp => {
+                        if (resp.isOk)
+                            this.$toasted.success("Đặt lệnh ATC thành công");
+                        else this.toasteOrderError(resp.message);
                     });
                 }
             }

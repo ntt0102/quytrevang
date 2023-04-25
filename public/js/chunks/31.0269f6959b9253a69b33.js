@@ -995,66 +995,61 @@ var TIME = {
     cancelOrderClick: function cancelOrderClick() {
       var _this7 = this;
 
-      var result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])("Huỷ lệnh?", "Xác nhận");
-      result.then(function (dialogResult) {
-        if (dialogResult) {
-          _this7.toggleCancelOrderButton(false);
+      this.toggleCancelOrderButton(false);
 
-          if (_this7.order.entry.hasOwnProperty("line")) {
-            if (_this7.order.tp.hasOwnProperty("line")) {
-              _this7.executeOrder({
-                action: "exit",
-                tpData: {
-                  cmd: "cancel"
-                },
-                slData: {
-                  cmd: "delete"
-                },
-                exitData: {
-                  cmd: "new",
-                  side: -_this7.order.side,
-                  price: "MTL"
-                }
-              }).then(function (resp) {
-                if (resp.isOk) {
-                  _this7.removeOrderLine("entry");
-
-                  _this7.removeOrderLine("tp");
-
-                  _this7.removeOrderLine("sl");
-
-                  _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-
-                  _this7.$toasted.success("Đóng vị thế thành công");
-                } else {
-                  _this7.toggleCancelOrderButton(true);
-
-                  _this7.toasteOrderError(resp.message);
-                }
-              });
-            } else {
-              _this7.executeOrder({
-                action: "entry",
-                data: {
-                  cmd: "delete"
-                }
-              }).then(function (resp) {
-                if (resp.isOk) {
-                  _this7.removeOrderLine("entry");
-
-                  _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-
-                  _this7.$toasted.success("Huỷ lệnh Entry thành công");
-                } else {
-                  _this7.toggleCancelOrderButton(true);
-
-                  _this7.toasteOrderError(resp.message);
-                }
-              });
+      if (this.order.entry.hasOwnProperty("line")) {
+        if (this.order.tp.hasOwnProperty("line")) {
+          this.executeOrder({
+            action: "exit",
+            tpData: {
+              cmd: "cancel"
+            },
+            slData: {
+              cmd: "delete"
+            },
+            exitData: {
+              cmd: "new",
+              side: -this.order.side,
+              price: "MTL"
             }
-          }
+          }).then(function (resp) {
+            if (resp.isOk) {
+              _this7.removeOrderLine("entry");
+
+              _this7.removeOrderLine("tp");
+
+              _this7.removeOrderLine("sl");
+
+              _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
+
+              _this7.$toasted.success("Đóng vị thế thành công");
+            } else {
+              _this7.toggleCancelOrderButton(true);
+
+              _this7.toasteOrderError(resp.message);
+            }
+          });
+        } else {
+          this.executeOrder({
+            action: "entry",
+            data: {
+              cmd: "delete"
+            }
+          }).then(function (resp) {
+            if (resp.isOk) {
+              _this7.removeOrderLine("entry");
+
+              _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
+
+              _this7.$toasted.success("Huỷ lệnh Entry thành công");
+            } else {
+              _this7.toggleCancelOrderButton(true);
+
+              _this7.toasteOrderError(resp.message);
+            }
+          });
         }
-      });
+      }
     },
     entryOrderClick: function entryOrderClick() {
       var _this8 = this;
@@ -1063,20 +1058,15 @@ var TIME = {
 
       if (this.inSession(CURRENT_SEC)) {
         if (CURRENT_SEC < TIME.ATO) {
-          var result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])("Đặt lệnh ATO?", "Xác nhận");
-          result.then(function (dialogResult) {
-            if (dialogResult) {
-              _this8.executeOrder({
-                action: "exit",
-                exitData: {
-                  cmd: "new",
-                  side: -_this8.order.side,
-                  price: "ATO"
-                }
-              }).then(function (resp) {
-                if (resp.isOk) _this8.$toasted.success("Đặt lệnh ATO thành công");else _this8.toasteOrderError(resp.message);
-              });
+          this.executeOrder({
+            action: "exit",
+            exitData: {
+              cmd: "new",
+              side: -this.order.side,
+              price: "ATO"
             }
+          }).then(function (resp) {
+            if (resp.isOk) _this8.$toasted.success("Đặt lệnh ATO thành công");else _this8.toasteOrderError(resp.message);
           });
         } else if (CURRENT_SEC < TIME.ATC) {
           this.executeOrder({
@@ -1096,21 +1086,15 @@ var TIME = {
             } else _this8.toasteOrderError(resp.message);
           });
         } else {
-          var _result = Object(devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__["confirm"])("Đặt lệnh ATC?", "Xác nhận");
-
-          _result.then(function (dialogResult) {
-            if (dialogResult) {
-              _this8.executeOrder({
-                action: "exit",
-                exitData: {
-                  cmd: "new",
-                  side: -_this8.order.side,
-                  price: "ATC"
-                }
-              }).then(function (resp) {
-                if (resp.isOk) _this8.$toasted.success("Đặt lệnh ATC thành công");else _this8.toasteOrderError(resp.message);
-              });
+          this.executeOrder({
+            action: "exit",
+            exitData: {
+              cmd: "new",
+              side: -this.order.side,
+              price: "ATC"
             }
+          }).then(function (resp) {
+            if (resp.isOk) _this8.$toasted.success("Đặt lệnh ATC thành công");else _this8.toasteOrderError(resp.message);
           });
         }
       }
