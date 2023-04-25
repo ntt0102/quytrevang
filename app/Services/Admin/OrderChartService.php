@@ -260,7 +260,7 @@ class OrderChartService extends CoreService
                     "revenue" => $revenue,
                     "loss" => $loss,
                     "fees" => $info->fee,
-                    "monday" => date_create()->format('Y-m-d'),
+                    "date" => date_create()->format('Y-m-d'),
                 ]);
                 if (!$trade) return false;
                 Notification::send(

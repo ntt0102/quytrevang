@@ -36,37 +36,37 @@
                             onClick: () => $refs.trackTradePopup.show()
                         }
                     },
-                    {
-                        visible: permissions.includes('trades@edit'),
-                        location: 'before',
-                        widget: 'dxButton',
-                        options: {
-                            icon: 'far fa-image small',
-                            hint: $t('admin.trades.buttons.pickImage'),
-                            onClick: () =>
-                                $refs.pickImagePopup.show({ clientPath: 'vps' })
-                        }
-                    },
-                    {
-                        visible: permissions.includes('trades@edit'),
-                        location: 'before',
-                        widget: 'dxButton',
-                        options: {
-                            icon: 'far fa-chart-line small',
-                            hint: $t('admin.trades.buttons.vn30f1mChart'),
-                            onClick: () => $refs.vn30f1mChartPopup.show()
-                        }
-                    },
-                    {
-                        visible: permissions.includes('trades@edit'),
-                        location: 'before',
-                        widget: 'dxButton',
-                        options: {
-                            icon: 'far fa-chart-area small',
-                            hint: $t('admin.trades.buttons.shareChart'),
-                            onClick: () => $refs.shareChartPopup.show()
-                        }
-                    },
+                    // {
+                    //     visible: permissions.includes('trades@edit'),
+                    //     location: 'before',
+                    //     widget: 'dxButton',
+                    //     options: {
+                    //         icon: 'far fa-image small',
+                    //         hint: $t('admin.trades.buttons.pickImage'),
+                    //         onClick: () =>
+                    //             $refs.pickImagePopup.show({ clientPath: 'vps' })
+                    //     }
+                    // },
+                    // {
+                    //     visible: permissions.includes('trades@edit'),
+                    //     location: 'before',
+                    //     widget: 'dxButton',
+                    //     options: {
+                    //         icon: 'far fa-chart-line small',
+                    //         hint: $t('admin.trades.buttons.vn30f1mChart'),
+                    //         onClick: () => $refs.vn30f1mChartPopup.show()
+                    //     }
+                    // },
+                    // {
+                    //     visible: permissions.includes('trades@edit'),
+                    //     location: 'before',
+                    //     widget: 'dxButton',
+                    //     options: {
+                    //         icon: 'far fa-chart-area small',
+                    //         hint: $t('admin.trades.buttons.shareChart'),
+                    //         onClick: () => $refs.shareChartPopup.show()
+                    //     }
+                    // },
                     {
                         location: 'after',
                         widget: 'dxSelectBox',

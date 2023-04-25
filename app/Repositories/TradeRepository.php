@@ -27,6 +27,6 @@ class TradeRepository extends CoreRepository
      */
     public function getData($limit = 5)
     {
-        return $this->model->orderBy('monday', 'DESC')->take($limit)->get();
+        return $this->model->orderBy('date', 'DESC')->take($limit)->get();
     }
 }

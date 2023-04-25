@@ -317,20 +317,24 @@ export default {
     getChartPeriodList: () => {
         return [
             {
+                name: i18n.t("admin.trades.selects.period.date"),
+                value: "day"
+            },
+            {
                 name: i18n.t("admin.trades.selects.period.week"),
-                value: 1
+                value: "week"
             },
             {
                 name: i18n.t("admin.trades.selects.period.month"),
-                value: 4
+                value: "month"
             },
             {
                 name: i18n.t("admin.trades.selects.period.quarter"),
-                value: 13
+                value: "quarter"
             },
             {
                 name: i18n.t("admin.trades.selects.period.year"),
-                value: 52
+                value: "year"
             }
         ];
     },

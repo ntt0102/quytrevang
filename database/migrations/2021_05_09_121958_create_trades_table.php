@@ -20,7 +20,7 @@ class CreateTradesTable extends Migration
             $table->unsignedInteger('revenue');
             $table->unsignedInteger('loss');
             $table->unsignedInteger('fees');
-            $table->date('monday');
+            $table->date('date');
             $table->timestamps();
         });
     }

@@ -13,7 +13,7 @@ class Trade extends CoreModel
         'revenue',
         'loss',
         'fees',
-        'monday'
+        'date'
     ];
 
     protected $fillable = [
@@ -22,7 +22,7 @@ class Trade extends CoreModel
         'revenue',
         'loss',
         'fees',
-        'monday'
+        'date'
     ];
 
     protected static $logAttributes = [
@@ -31,6 +31,6 @@ class Trade extends CoreModel
         'revenue',
         'loss',
         'fees',
-        'monday'
+        'date'
     ];
 }

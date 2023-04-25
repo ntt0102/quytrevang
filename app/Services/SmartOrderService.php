@@ -228,8 +228,8 @@ class SmartOrderService extends CoreService
                 $revenue = $request->revenue > 0 ? $request->revenue : 0;
                 $loss = $request->revenue < 0 ? -$request->revenue : 0;
                 $currentDate = date_create();
-                $lastTrade = $this->tradeRepository->latest('monday');
-                if ($currentDate->format('W') != date_create($lastTrade->monday)->format('W')) {
+                $lastTrade = $this->tradeRepository->latest('date');
+                if ($currentDate->format('W') != date_create($lastTrade->date)->format('W')) {
                     $amount = request()->user()->smartOrder->contracts;
                     $trade = $this->tradeRepository->create([
                         "amount" => $amount,
@@ -237,7 +237,7 @@ class SmartOrderService extends CoreService
                         "revenue" => $revenue,
                         "loss" => $loss,
                         "fees" => $request->fees,
-                        "monday" => $currentDate->sub(date_interval_create_from_date_string(($currentDate->format('w') - 1) . ' days'))->format('Y-m-d'),
+                        "date" => $currentDate->sub(date_interval_create_from_date_string(($currentDate->format('w') - 1) . ' days'))->format('Y-m-d'),
                     ]);
                     $isOk = !!$trade;
                 } else {

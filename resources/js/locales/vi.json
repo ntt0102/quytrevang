@@ -228,10 +228,10 @@
             "revenue": "Lãi",
             "loss": "Lỗ",
             "fees": "Phí",
-            "monday": "Thứ Hai",
+            "date": "Thứ Hai",
             "validations": {
                 "duplicate": "Không được trùng ngày",
-                "monday": "Không phải thứ Hai"
+                "date": "Không phải thứ Hai"
             },
             "charTitle": "Kết quả đầu tư",
             "chartSubtitle": "Biểu đồ",
@@ -247,6 +247,7 @@
             "kpi": "KPI",
             "selects": {
                 "period": {
+                    "date": "Ngày",
                     "week": "Tuần",
                     "month": "Tháng",
                     "quarter": "Quý",

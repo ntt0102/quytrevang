@@ -24,10 +24,10 @@ class TradeService extends CoreService
     public function getWeekChart($request)
     {
         $chart = $this->tradeRepository->getData(10);
-        $chart = $chart->sortBy('monday')->values()->reduce(function ($carry, $ch) {
-            $monday = date_create($ch->monday);
-            $week = $monday->format('W');
-            $year = $monday->format('Y');
+        $chart = $chart->sortBy('date')->values()->reduce(function ($carry, $ch) {
+            $date = date_create($ch->date);
+            $week = $date->format('W');
+            $year = $date->format('Y');
             $profit = $ch->revenue - $ch->loss - $ch->fees;
             $accumulatedProfit = !!count($carry) ? end($carry)['accumulatedProfit'] + $profit : $profit;
             $carry[] = [

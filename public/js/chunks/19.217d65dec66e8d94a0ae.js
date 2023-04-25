@@ -296,13 +296,13 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
           type: "required",
           message: this.$t("admin.trades.fees") + this.$mt.validations.required
         }],
-        monday: [{
+        date: [{
           type: "required",
-          message: this.$t("admin.trades.monday") + this.$mt.validations.required
+          message: this.$t("admin.trades.date") + this.$mt.validations.required
         }, {
           type: "custom",
-          validationCallback: this.validateMonday,
-          message: this.$t("admin.trades.validations.monday")
+          validationCallback: this.validatedate,
+          message: this.$t("admin.trades.validations.date")
         }]
       }
     };
@@ -339,7 +339,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         });
       }, 100);
     },
-    validateMonday: function validateMonday(e) {
+    validatedate: function validatedate(e) {
       return moment(e.value).day() === 1;
     },
     onHiding: function onHiding() {
@@ -824,7 +824,7 @@ var render = function render() {
           }
         }), _vm._v(" "), _c("DxColumn", {
           attrs: {
-            "data-field": "monday",
+            "data-field": "date",
             "data-type": "date",
             "editor-options": {
               dateSerializationFormat: _vm.$mc.DX_SERVER_DATE_FORMAT,
@@ -832,8 +832,8 @@ var render = function render() {
               useMaskBehavior: "true",
               applyValueMode: "useButtons"
             },
-            caption: _vm.$t("admin.trades.monday"),
-            "validation-rules": _vm.validationRules.monday
+            caption: _vm.$t("admin.trades.date"),
+            "validation-rules": _vm.validationRules.date
           }
         }), _vm._v(" "), _c("DxColumn", {
           attrs: {
@@ -1003,42 +1003,39 @@ var render = function render() {
             return _vm.$refs.trackTradePopup.show();
           }
         }
-      }, {
-        visible: _vm.permissions.includes("trades@edit"),
-        location: "before",
-        widget: "dxButton",
-        options: {
-          icon: "far fa-image small",
-          hint: _vm.$t("admin.trades.buttons.pickImage"),
-          onClick: function onClick() {
-            return _vm.$refs.pickImagePopup.show({
-              clientPath: "vps"
-            });
-          }
-        }
-      }, {
-        visible: _vm.permissions.includes("trades@edit"),
-        location: "before",
-        widget: "dxButton",
-        options: {
-          icon: "far fa-chart-line small",
-          hint: _vm.$t("admin.trades.buttons.vn30f1mChart"),
-          onClick: function onClick() {
-            return _vm.$refs.vn30f1mChartPopup.show();
-          }
-        }
-      }, {
-        visible: _vm.permissions.includes("trades@edit"),
-        location: "before",
-        widget: "dxButton",
-        options: {
-          icon: "far fa-chart-area small",
-          hint: _vm.$t("admin.trades.buttons.shareChart"),
-          onClick: function onClick() {
-            return _vm.$refs.shareChartPopup.show();
-          }
-        }
-      }, {
+      },
+      // {
+      //     visible: permissions.includes('trades@edit'),
+      //     location: 'before',
+      //     widget: 'dxButton',
+      //     options: {
+      //         icon: 'far fa-image small',
+      //         hint: $t('admin.trades.buttons.pickImage'),
+      //         onClick: () =>
+      //             $refs.pickImagePopup.show({ clientPath: 'vps' })
+      //     }
+      // },
+      // {
+      //     visible: permissions.includes('trades@edit'),
+      //     location: 'before',
+      //     widget: 'dxButton',
+      //     options: {
+      //         icon: 'far fa-chart-line small',
+      //         hint: $t('admin.trades.buttons.vn30f1mChart'),
+      //         onClick: () => $refs.vn30f1mChartPopup.show()
+      //     }
+      // },
+      // {
+      //     visible: permissions.includes('trades@edit'),
+      //     location: 'before',
+      //     widget: 'dxButton',
+      //     options: {
+      //         icon: 'far fa-chart-area small',
+      //         hint: $t('admin.trades.buttons.shareChart'),
+      //         onClick: () => $refs.shareChartPopup.show()
+      //     }
+      // },
+      {
         location: "after",
         widget: "dxSelectBox",
         options: {

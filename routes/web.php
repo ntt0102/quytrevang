@@ -76,14 +76,25 @@ Route::get('test', function () {
     // $s = date_create() < date_add(date_create($s->smartOrder->started_at), date_interval_create_from_date_string("7 days"));
     // $s = App\Models\VpsUser::where('vps_code', 2285828)->first()->update(['vps_session' => 'abc']);
     // $s = app(App\Services\Admin\OrderChartService::class)->setVpsUserSession();
-    $s = App\Models\VpsUser::getCopyists();
-    dd($s);
-    $vpsUser = App\Models\VpsUser::where('vps_code', 228582)->first();
+    // $s = App\Models\VpsUser::getCopyists();
+    // dd($s);
+    // $vpsUser = App\Models\VpsUser::where('vps_code', 228582)->first();
     // $vos = new App\Services\Special\VpsOrderService($vpsUser, true);
     // $s = $vos->getRandom();
     // $s = $vos->getAccountStatus();
     // $s = $so->vps_accounts;
-    $s = new App\Services\Special\VpsOrderService($vpsUser);
-    $s = $s->status->{'connect'};
-    dd($s);
+    // $s = new App\Services\Special\VpsOrderService($vpsUser);
+    // $s = $s->status->{'connect'};
+    // dd($s);
+    // First day of the week.
+    // echo $day = date('w');
+    // echo $week_start = date('m-d-Y', strtotime('-' . $day . ' days'));
+    // echo $week_end = date('m-d-Y', strtotime('+' . (6 - $day) . ' days'));
+    // // First day of the month.
+    // echo $query_date = '2023-04-25';
+    // echo date('Y-m-01', strtotime($query_date));
+    // echo date('Y-m-t', strtotime($query_date));
+    $date = date_create('2006-12-12');
+    $date->modify('-0 day');
+    echo $date->format('Y-m-d');
 })->middleware('cors');
