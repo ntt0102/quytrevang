@@ -187,7 +187,7 @@ class OrderChartService extends CoreService
     /**
      * Get Symbol
      */
-    public function getSymbol()
+    public function getVn30f1mSymbol()
     {
         $client = new \GuzzleHttp\Client();
         $url = "https://spwapidatafeed.vps.com.vn/pslistdata";

@@ -23,6 +23,14 @@
                 <div class="chart-wrapper" ref="orderChart">
                     <div class="area data-area">
                         <div
+                            :class="
+                                `command noaction far fa-${
+                                    status.connection ? 'link' : 'unlink'
+                                }`
+                            "
+                            :title="$t('admin.orderChart.connection')"
+                        ></div>
+                        <div
                             class="command noaction status"
                             :class="{
                                 green: status.position > 0,
@@ -47,14 +55,6 @@
                         />
                     </div>
                     <div class="area tool-area">
-                        <div
-                            :class="
-                                `command noaction far fa-${
-                                    status.connection ? 'link' : 'unlink'
-                                }`
-                            "
-                            :title="$t('admin.orderChart.connection')"
-                        ></div>
                         <div
                             ref="fullscreenTool"
                             :class="
@@ -181,25 +181,21 @@ export default {
     },
     beforeCreate() {
         this.$store.registerModule("Admin.orderChart", adminOrderChartStore);
-    },
-    created() {
-        this.getConfig().then(this.connectSocket);
-        this.getStatus();
-        this.interval = setInterval(this.intervalHandler, 1000);
-        this.interval60 = setInterval(
-            () => (this.inSession() ? this.getStatus() : false),
-            60000
-        );
-        toolsStore.create();
-    },
-    mounted() {
         if (!document.getElementById("orderChartJs")) {
             var scriptTag = document.createElement("script");
             scriptTag.src = "/js/order-chart.min.js";
             scriptTag.id = "orderChartJs";
             document.getElementsByTagName("head")[0].appendChild(scriptTag);
         }
-        //
+    },
+    created() {
+        this.getConfig().then(this.connectSocket);
+        this.getStatus();
+        this.interval = setInterval(this.intervalHandler, 1000);
+        this.interval60 = setInterval(this.getStatus, 60000);
+        toolsStore.create();
+    },
+    mounted() {
         setTimeout(() => {
             this.chart = LightweightCharts.createChart(
                 this.$refs.orderChart,
@@ -1149,7 +1145,7 @@ export default {
 
         &.data-area {
             top: 0px;
-            left: 30px;
+            left: 0px;
 
             .command:not(:first-child) {
                 border-left: solid 2px #2a2e39 !important;
@@ -1183,7 +1179,7 @@ export default {
         }
 
         &.tool-area {
-            top: 0px;
+            top: 32px;
             left: 0px;
             flex-direction: column;
 
