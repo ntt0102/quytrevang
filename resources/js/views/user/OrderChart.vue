@@ -457,23 +457,23 @@ export default {
                 this.chartContainer.classList.add("fullscreen");
                 // document.querySelector(".dx-drawer-content").style.transform =
                 //     "unset";
+                // document.querySelector(
+                //     ".dx-drawer-panel-content"
+                // ).style.display = "none";
                 document.querySelector(
                     ".dx-drawer-panel-content"
-                ).style.display = "none";
-                // document.querySelector(
-                //     ".side-navigation-menu"
-                // ).style.transform = "transform: translate(-250px, 0px)";
+                ).style.transform = "translate(-250px, 0px)";
             } else {
                 this.isFullscreen = false;
                 this.chartContainer.classList.remove("fullscreen");
                 // document.querySelector(".dx-drawer-content").style.transform =
                 //     "translate(0px, 0px)";
+                // document.querySelector(
+                //     ".dx-drawer-panel-content"
+                // ).style.display = "unset";
                 document.querySelector(
                     ".dx-drawer-panel-content"
-                ).style.display = "unset";
-                // document.querySelector(
-                //     ".side-navigation-menu"
-                // ).style.transform = "unset";
+                ).style.transform = "unset";
             }
         },
         toggleFullscreen() {
