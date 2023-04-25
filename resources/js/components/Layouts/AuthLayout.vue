@@ -461,10 +461,10 @@ export default {
         overflow: hidden;
     }
     .dx-drawer-panel-content {
-        z-index: 1401 !important;
+        z-index: 1501 !important;
     }
     .dx-drawer-shader {
-        z-index: 1400 !important;
+        z-index: 1500 !important;
     }
 }
 </style>
