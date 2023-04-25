@@ -25,22 +25,12 @@
                         <div
                             class="command noaction status"
                             :class="{
-                                green: status.net > 0,
-                                red: status.net < 0
+                                green: status.position > 0,
+                                red: status.position < 0
                             }"
-                            :title="$t('admin.orderChart.net')"
+                            :title="$t('admin.orderChart.position')"
                         >
-                            {{ status.net | currency("", "") }}
-                        </div>
-                        <div
-                            class="command noaction status"
-                            :class="{
-                                green: status.vm > 0,
-                                red: status.vm < 0
-                            }"
-                            :title="$t('admin.orderChart.vm')"
-                        >
-                            {{ status.vm | currency("", "") }}
+                            {{ status.position | currency("", "") }}
                         </div>
                         <div class="command noaction clock">{{ clock }}</div>
                         <input
@@ -60,10 +50,10 @@
                         <div
                             :class="
                                 `command noaction far fa-${
-                                    status.connect ? 'link' : 'unlink'
+                                    status.connection ? 'link' : 'unlink'
                                 }`
                             "
-                            :title="$t('admin.orderChart.connect')"
+                            :title="$t('admin.orderChart.connection')"
                         ></div>
                         <div
                             ref="fullscreenTool"

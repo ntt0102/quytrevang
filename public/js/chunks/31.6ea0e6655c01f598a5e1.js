@@ -159,16 +159,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 
 
@@ -1550,34 +1540,17 @@ var render = function() {
                   {
                     staticClass: "command noaction status",
                     class: {
-                      green: _vm.status.net > 0,
-                      red: _vm.status.net < 0
+                      green: _vm.status.position > 0,
+                      red: _vm.status.position < 0
                     },
-                    attrs: { title: _vm.$t("admin.orderChart.net") }
+                    attrs: { title: _vm.$t("admin.orderChart.position") }
                   },
                   [
                     _vm._v(
                       "\n                        " +
-                        _vm._s(_vm._f("currency")(_vm.status.net, "", "")) +
-                        "\n                    "
-                    )
-                  ]
-                ),
-                _vm._v(" "),
-                _c(
-                  "div",
-                  {
-                    staticClass: "command noaction status",
-                    class: {
-                      green: _vm.status.vm > 0,
-                      red: _vm.status.vm < 0
-                    },
-                    attrs: { title: _vm.$t("admin.orderChart.vm") }
-                  },
-                  [
-                    _vm._v(
-                      "\n                        " +
-                        _vm._s(_vm._f("currency")(_vm.status.vm, "", "")) +
+                        _vm._s(
+                          _vm._f("currency")(_vm.status.position, "", "")
+                        ) +
                         "\n                    "
                     )
                   ]
@@ -1626,8 +1599,8 @@ var render = function() {
                 _c("div", {
                   class:
                     "command noaction far fa-" +
-                    (_vm.status.connect ? "link" : "unlink"),
-                  attrs: { title: _vm.$t("admin.orderChart.connect") }
+                    (_vm.status.connection ? "link" : "unlink"),
+                  attrs: { title: _vm.$t("admin.orderChart.connection") }
                 }),
                 _vm._v(" "),
                 _c("div", {

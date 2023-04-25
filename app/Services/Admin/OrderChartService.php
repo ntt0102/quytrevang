@@ -46,7 +46,10 @@ class OrderChartService extends CoreService
     {
         $vpsUser = request()->user()->vpsUser;
         $vos = new VpsOrderService($vpsUser);
-        return $vos->status;
+        return [
+            'connection' => $vos->connection,
+            'position' => $vos->position,
+        ];
     }
 
     /**
@@ -57,11 +60,8 @@ class OrderChartService extends CoreService
      */
     public function getConfig($payload)
     {
-        $vpsUser = request()->user()->vpsUser;
-        $vos = new VpsOrderService($vpsUser);
         return [
             'symbol' => get_global_value('vn30f1m'),
-            'status' => $vos->status,
         ];
     }
 
@@ -250,23 +250,24 @@ class OrderChartService extends CoreService
             function () {
                 $vpsUser = User::permission('trades@edit')->first()->vpsUser;
                 $vos = new VpsOrderService($vpsUser);
-                if (!$vos->status->connect) return false;
-                $revenue = $vos->status->vm > 0 ? $vos->status->vm : 0;
-                $loss = $vos->status->vm < 0 ? -$vos->status->vm : 0;
+                if (!$vos->connection) return false;
+                $info = $vos->getAccountInfo();
+                $revenue = $info->vm > 0 ? $info->vm : 0;
+                $loss = $info->vm < 0 ? -$info->vm : 0;
                 $trade = Trade::create([
                     "amount" => $vpsUser->volume,
                     "scores" => $this->getInfo($this->getSymbol())->r,
                     "revenue" => $revenue,
                     "loss" => $loss,
-                    "fees" => $vos->status->fee,
+                    "fees" => $info->fee,
                     "monday" => date_create()->format('Y-m-d'),
                 ]);
                 if (!$trade) return false;
                 Notification::send(
                     User::permission('trades@view')->get(),
                     new UpdatedTradesNotification(
-                        number_format($vos->status->vm, 0, ",", ".") . ' ₫',
-                        number_format($vos->status->fee, 0, ",", ".") . ' ₫'
+                        number_format($info->vm, 0, ",", ".") . ' ₫',
+                        number_format($info->fee, 0, ",", ".") . ' ₫'
                     )
                 );
                 event(new UpdateTradeEvent());

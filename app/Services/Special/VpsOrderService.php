@@ -11,17 +11,38 @@ class VpsOrderService extends CoreService
     private $client;
     private $vpsUser;
     private $symbol;
-    public $status;
+    public $connection;
+    public $position;
 
     public function __construct(VpsUser $vpsUser)
     {
         $this->client = new Client();
         $this->vpsUser = $vpsUser;
         $this->symbol = get_global_value('vn30f1m');
-        $this->status = $this->getAccountStatus();
+        $this->getPosition();
     }
 
-    public function getAccountStatus()
+    public function getPosition()
+    {
+        $payload = [
+            "group" => "Q",
+            "user" => $this->vpsUser->vps_code,
+            "session" => $this->vpsUser->vps_session,
+            "c" => "H",
+            "data" => [
+                "type" => "string",
+                "cmd" => "Web.Portfolio.PortfolioStatus2",
+                "p1" => $this->formatAccount(),
+            ],
+        ];
+        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        $this->connection = $rsp->rc == 1;
+        $this->position = $rsp->rc == 1 ? intval($rsp->data[0]->net) : 0;
+    }
+
+    public function getAccountInfo()
     {
         $payload = [
             "group" => "Q",
@@ -37,22 +58,18 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1) return (object)['connect' => false];
-        return (object)[
-            'connect' => true,
-            'maxVol' => intval($rsp->data->max_vol),
-            'fee' => intval($rsp->data->others),
-            'vm' => intval($rsp->data->vm),
-            'net' => $rsp->data->net != 'NO' ? intval($rsp->data->net) : 0
-        ];
+        if ($rsp->rc == 1)
+            return (object)[
+                'maxVol' => intval($rsp->data->max_vol),
+                'fee' => intval($rsp->data->others),
+                'vm' => intval($rsp->data->vm)
+            ];
     }
 
     public function execute($payload)
     {
-        if (!$this->status->connect)
+        if (!$this->connection)
             return ['isOk' => false, 'message' => 'notConnect'];
-        if ($this->vpsUser->volume > $this->status->maxVol)
-            return ['isOk' => false, 'message' => 'invalidVolume'];
         //
         switch ($payload->action) {
             case 'entry':
@@ -93,9 +110,9 @@ class VpsOrderService extends CoreService
         $isEntry = $type == "entry";
         $isSl = $type == "sl";
         $isNew = $data->cmd == "new";
-        if ($isEntry && $isNew && $this->status->net != 0)
+        if ($isEntry && $isNew && $this->position != 0)
             return ['isOk' => false, 'message' => 'openedPosition'];
-        if ($isSl && $isNew && $this->status->net == 0)
+        if ($isSl && $isNew && $this->position == 0)
             return ['isOk' => false, 'message' => 'unopenedPosition'];
         //
         $isNotDelete = $data->cmd != 'delete';
@@ -135,7 +152,7 @@ class VpsOrderService extends CoreService
     public function order($type, $data)
     {
         $isNew = $data->cmd == "new";
-        if ($isNew && $this->status->net == 0)
+        if ($isNew && $this->position == 0)
             return ['isOk' => false, 'message' => 'unopenedPosition'];
         //
         $isNotCancel = $data->cmd != "cancel";
