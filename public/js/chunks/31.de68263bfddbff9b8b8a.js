@@ -1801,7 +1801,9 @@ __webpack_require__.r(__webpack_exports__);
 function initialState() {
   return {
     config: {},
-    status: {},
+    status: {
+      connection: true
+    },
     chartData: [],
     isChartLoading: false
   };

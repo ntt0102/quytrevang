@@ -1,7 +1,7 @@
 function initialState() {
     return {
         config: {},
-        status: {},
+        status: { connection: true },
         chartData: [],
         isChartLoading: false
     };
