@@ -176,7 +176,8 @@ export default {
             interval60: null,
             clock: moment().format("HH:mm:ss"),
             isFullscreen: false,
-            websocket: null
+            websocket: null,
+            isAutoOrdering: false
         };
     },
     beforeCreate() {
@@ -595,26 +596,37 @@ export default {
                                             (self.order.side < 0 &&
                                                 data.lastPrice <=
                                                     self.order.tp.price)
-                                        )
-                                            self.executeOrder({
-                                                action: "sl",
-                                                data: { cmd: "delete" }
-                                            }).then(resp => {
-                                                if (resp.isOk) {
-                                                    self.removeOrderLine(
-                                                        "entry"
-                                                    );
-                                                    self.removeOrderLine("tp");
-                                                    self.removeOrderLine("sl");
-                                                    toolsStore.clear("order");
-                                                    self.$toasted.success(
-                                                        "Đã khớp lệnh TP và đóng vị thế"
-                                                    );
-                                                } else
-                                                    self.toasteOrderError(
-                                                        resp.message
-                                                    );
-                                            });
+                                        ) {
+                                            if (!self.isAutoOrdering) {
+                                                self.isAutoOrdering = true;
+                                                self.executeOrder({
+                                                    action: "sl",
+                                                    data: { cmd: "delete" }
+                                                }).then(resp => {
+                                                    if (resp.isOk) {
+                                                        self.removeOrderLine(
+                                                            "entry"
+                                                        );
+                                                        self.removeOrderLine(
+                                                            "tp"
+                                                        );
+                                                        self.removeOrderLine(
+                                                            "sl"
+                                                        );
+                                                        toolsStore.clear(
+                                                            "order"
+                                                        );
+                                                        self.$toasted.success(
+                                                            "Đã khớp lệnh TP và đóng vị thế"
+                                                        );
+                                                    } else
+                                                        self.toasteOrderError(
+                                                            resp.message
+                                                        );
+                                                    self.isAutoOrdering = false;
+                                                });
+                                            }
+                                        }
                                         if (
                                             (self.order.side > 0 &&
                                                 data.lastPrice <=
@@ -622,26 +634,37 @@ export default {
                                             (self.order.side < 0 &&
                                                 data.lastPrice >=
                                                     self.order.sl.price)
-                                        )
-                                            self.executeOrder({
-                                                action: "tp",
-                                                data: { cmd: "cancel" }
-                                            }).then(resp => {
-                                                if (resp.isOk) {
-                                                    self.removeOrderLine(
-                                                        "entry"
-                                                    );
-                                                    self.removeOrderLine("tp");
-                                                    self.removeOrderLine("sl");
-                                                    toolsStore.clear("order");
-                                                    self.$toasted.success(
-                                                        "Đã khớp lệnh SL và đóng vị thế"
-                                                    );
-                                                } else
-                                                    self.toasteOrderError(
-                                                        resp.message
-                                                    );
-                                            });
+                                        ) {
+                                            if (!self.isAutoOrdering) {
+                                                self.isAutoOrdering = true;
+                                                self.executeOrder({
+                                                    action: "tp",
+                                                    data: { cmd: "cancel" }
+                                                }).then(resp => {
+                                                    if (resp.isOk) {
+                                                        self.removeOrderLine(
+                                                            "entry"
+                                                        );
+                                                        self.removeOrderLine(
+                                                            "tp"
+                                                        );
+                                                        self.removeOrderLine(
+                                                            "sl"
+                                                        );
+                                                        toolsStore.clear(
+                                                            "order"
+                                                        );
+                                                        self.$toasted.success(
+                                                            "Đã khớp lệnh SL và đóng vị thế"
+                                                        );
+                                                    } else
+                                                        self.toasteOrderError(
+                                                            resp.message
+                                                        );
+                                                    self.isAutoOrdering = false;
+                                                });
+                                            }
+                                        }
                                     } else {
                                         if (
                                             (self.order.side > 0 &&
@@ -650,34 +673,45 @@ export default {
                                             (self.order.side < 0 &&
                                                 data.lastPrice <=
                                                     self.order.entry.price)
-                                        )
-                                            self.executeOrder({
-                                                action: "tpsl",
-                                                tpData: {
-                                                    cmd: "new",
-                                                    side: -self.order.side,
-                                                    price: self.order.tp.price
-                                                },
-                                                slData: {
-                                                    cmd: "new",
-                                                    side: -self.order.side,
-                                                    price: self.order.sl.price
-                                                }
-                                            }).then(resp => {
-                                                if (resp.isOk) {
-                                                    self.drawOrderLine("tp");
-                                                    self.drawOrderLine("sl");
-                                                    self.order.entry.line.applyOptions(
-                                                        { draggable: false }
-                                                    );
-                                                    self.$toasted.success(
-                                                        "Tự động đặt lệnh TP/SL thành công"
-                                                    );
-                                                } else
-                                                    self.toasteOrderError(
-                                                        resp.message
-                                                    );
-                                            });
+                                        ) {
+                                            if (!self.isAutoOrdering) {
+                                                self.isAutoOrdering = true;
+                                                self.executeOrder({
+                                                    action: "tpsl",
+                                                    tpData: {
+                                                        cmd: "new",
+                                                        side: -self.order.side,
+                                                        price:
+                                                            self.order.tp.price
+                                                    },
+                                                    slData: {
+                                                        cmd: "new",
+                                                        side: -self.order.side,
+                                                        price:
+                                                            self.order.sl.price
+                                                    }
+                                                }).then(resp => {
+                                                    if (resp.isOk) {
+                                                        self.drawOrderLine(
+                                                            "tp"
+                                                        );
+                                                        self.drawOrderLine(
+                                                            "sl"
+                                                        );
+                                                        self.order.entry.line.applyOptions(
+                                                            { draggable: false }
+                                                        );
+                                                        self.$toasted.success(
+                                                            "Tự động đặt lệnh TP/SL thành công"
+                                                        );
+                                                    } else
+                                                        self.toasteOrderError(
+                                                            resp.message
+                                                        );
+                                                    self.isAutoOrdering = false;
+                                                });
+                                            }
+                                        }
                                     }
                                 }
                             }

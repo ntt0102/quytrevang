@@ -1,12 +1,9 @@
-import moment from "moment/moment";
-
 function initialState() {
     return {
         config: {},
         status: {},
         chartData: [],
-        isChartLoading: false,
-        isOrdering: false
+        isChartLoading: false
     };
 }
 
@@ -73,11 +70,8 @@ const actions = {
         });
     },
     executeOrder({ commit, dispatch, getters, state, rootGetters }, data) {
+        commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
-            if (state.isOrdering == true)
-                resolve({ isOk: false, message: "ordering" });
-            commit("setOrdering", true);
-            commit("setChartLoading", true);
             axios
                 .post("order-chart/execute-order", data, {
                     noLoading: true,
@@ -85,7 +79,6 @@ const actions = {
                     notify: true
                 })
                 .then(response => {
-                    commit("setOrdering", false);
                     commit("setChartLoading", false);
                     resolve(response.data);
                 });
@@ -102,9 +95,6 @@ const mutations = {
     },
     setChartLoading(state, data) {
         state.isChartLoading = data;
-    },
-    setOrdering(state, data) {
-        state.isOrdering = data;
     },
     setStatus(state, data) {
         state.status = data;

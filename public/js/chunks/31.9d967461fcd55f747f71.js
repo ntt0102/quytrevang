@@ -239,7 +239,8 @@ var TIME = {
       interval60: null,
       clock: moment().format("HH:mm:ss"),
       isFullscreen: false,
-      websocket: null
+      websocket: null,
+      isAutoOrdering: false
     };
   },
   beforeCreate: function beforeCreate() {
@@ -687,57 +688,79 @@ var TIME = {
 
                 if (self.order.entry.hasOwnProperty("line")) {
                   if (self.order.tp.hasOwnProperty("line")) {
-                    if (self.order.side > 0 && data.lastPrice >= self.order.tp.price || self.order.side < 0 && data.lastPrice <= self.order.tp.price) self.executeOrder({
-                      action: "sl",
-                      data: {
-                        cmd: "delete"
-                      }
-                    }).then(function (resp) {
-                      if (resp.isOk) {
-                        self.removeOrderLine("entry");
-                        self.removeOrderLine("tp");
-                        self.removeOrderLine("sl");
-                        _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-                        self.$toasted.success("Đã khớp lệnh TP và đóng vị thế");
-                      } else self.toasteOrderError(resp.message);
-                    });
-                    if (self.order.side > 0 && data.lastPrice <= self.order.sl.price || self.order.side < 0 && data.lastPrice >= self.order.sl.price) self.executeOrder({
-                      action: "tp",
-                      data: {
-                        cmd: "cancel"
-                      }
-                    }).then(function (resp) {
-                      if (resp.isOk) {
-                        self.removeOrderLine("entry");
-                        self.removeOrderLine("tp");
-                        self.removeOrderLine("sl");
-                        _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
-                        self.$toasted.success("Đã khớp lệnh SL và đóng vị thế");
-                      } else self.toasteOrderError(resp.message);
-                    });
-                  } else {
-                    if (self.order.side > 0 && data.lastPrice >= self.order.entry.price || self.order.side < 0 && data.lastPrice <= self.order.entry.price) self.executeOrder({
-                      action: "tpsl",
-                      tpData: {
-                        cmd: "new",
-                        side: -self.order.side,
-                        price: self.order.tp.price
-                      },
-                      slData: {
-                        cmd: "new",
-                        side: -self.order.side,
-                        price: self.order.sl.price
-                      }
-                    }).then(function (resp) {
-                      if (resp.isOk) {
-                        self.drawOrderLine("tp");
-                        self.drawOrderLine("sl");
-                        self.order.entry.line.applyOptions({
-                          draggable: false
+                    if (self.order.side > 0 && data.lastPrice >= self.order.tp.price || self.order.side < 0 && data.lastPrice <= self.order.tp.price) {
+                      if (!self.isAutoOrdering) {
+                        self.isAutoOrdering = true;
+                        self.executeOrder({
+                          action: "sl",
+                          data: {
+                            cmd: "delete"
+                          }
+                        }).then(function (resp) {
+                          if (resp.isOk) {
+                            self.removeOrderLine("entry");
+                            self.removeOrderLine("tp");
+                            self.removeOrderLine("sl");
+                            _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
+                            self.$toasted.success("Đã khớp lệnh TP và đóng vị thế");
+                          } else self.toasteOrderError(resp.message);
+
+                          self.isAutoOrdering = false;
                         });
-                        self.$toasted.success("Tự động đặt lệnh TP/SL thành công");
-                      } else self.toasteOrderError(resp.message);
-                    });
+                      }
+                    }
+
+                    if (self.order.side > 0 && data.lastPrice <= self.order.sl.price || self.order.side < 0 && data.lastPrice >= self.order.sl.price) {
+                      if (!self.isAutoOrdering) {
+                        self.isAutoOrdering = true;
+                        self.executeOrder({
+                          action: "tp",
+                          data: {
+                            cmd: "cancel"
+                          }
+                        }).then(function (resp) {
+                          if (resp.isOk) {
+                            self.removeOrderLine("entry");
+                            self.removeOrderLine("tp");
+                            self.removeOrderLine("sl");
+                            _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__["default"].clear("order");
+                            self.$toasted.success("Đã khớp lệnh SL và đóng vị thế");
+                          } else self.toasteOrderError(resp.message);
+
+                          self.isAutoOrdering = false;
+                        });
+                      }
+                    }
+                  } else {
+                    if (self.order.side > 0 && data.lastPrice >= self.order.entry.price || self.order.side < 0 && data.lastPrice <= self.order.entry.price) {
+                      if (!self.isAutoOrdering) {
+                        self.isAutoOrdering = true;
+                        self.executeOrder({
+                          action: "tpsl",
+                          tpData: {
+                            cmd: "new",
+                            side: -self.order.side,
+                            price: self.order.tp.price
+                          },
+                          slData: {
+                            cmd: "new",
+                            side: -self.order.side,
+                            price: self.order.sl.price
+                          }
+                        }).then(function (resp) {
+                          if (resp.isOk) {
+                            self.drawOrderLine("tp");
+                            self.drawOrderLine("sl");
+                            self.order.entry.line.applyOptions({
+                              draggable: false
+                            });
+                            self.$toasted.success("Tự động đặt lệnh TP/SL thành công");
+                          } else self.toasteOrderError(resp.message);
+
+                          self.isAutoOrdering = false;
+                        });
+                      }
+                    }
                   }
                 }
               }
@@ -1838,17 +1861,12 @@ var OrderChartDb = /*#__PURE__*/function () {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var moment_moment__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! moment/moment */ "./node_modules/moment/moment.js");
-/* harmony import */ var moment_moment__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(moment_moment__WEBPACK_IMPORTED_MODULE_0__);
-
-
 function initialState() {
   return {
     config: {},
     status: {},
     chartData: [],
-    isChartLoading: false,
-    isOrdering: false
+    isChartLoading: false
   };
 }
 
@@ -1942,19 +1960,13 @@ var actions = {
         getters = _ref5.getters,
         state = _ref5.state,
         rootGetters = _ref5.rootGetters;
+    commit("setChartLoading", true);
     return new Promise(function (resolve, reject) {
-      if (state.isOrdering == true) resolve({
-        isOk: false,
-        message: "ordering"
-      });
-      commit("setOrdering", true);
-      commit("setChartLoading", true);
       axios.post("order-chart/execute-order", data, {
         noLoading: true,
         crypto: true,
         notify: true
       }).then(function (response) {
-        commit("setOrdering", false);
         commit("setChartLoading", false);
         resolve(response.data);
       });
@@ -1971,9 +1983,6 @@ var mutations = {
   },
   setChartLoading: function setChartLoading(state, data) {
     state.isChartLoading = data;
-  },
-  setOrdering: function setOrdering(state, data) {
-    state.isOrdering = data;
   },
   setStatus: function setStatus(state, data) {
     state.status = data;
