@@ -1099,6 +1099,7 @@ export default {
             return +(+price.toFixed(1));
         },
         toasteOrderError(error) {
+            if (error == "ordering") return false;
             let message = "";
             switch (error) {
                 case "notConnect":
@@ -1119,7 +1120,6 @@ export default {
                 case "failSave":
                     message = "Lưu lệnh thất bại";
                     break;
-
                 default:
                     message = "Lỗi chưa xác định";
                     break;

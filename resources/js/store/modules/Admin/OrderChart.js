@@ -5,7 +5,8 @@ function initialState() {
         config: {},
         status: {},
         chartData: [],
-        isChartLoading: false
+        isChartLoading: false,
+        isOrdering: false
     };
 }
 
@@ -66,16 +67,17 @@ const actions = {
                     { noLoading: true, crypto: true }
                 )
                 .then(response => {
-                    // console.log(response.data);
                     commit("setChartData", response.data);
                     resolve();
                 });
         });
     },
     executeOrder({ commit, dispatch, getters, state, rootGetters }, data) {
-        commit("setChartLoading", true);
-        console.log("executeOrder", data);
         return new Promise((resolve, reject) => {
+            if (state.isOrdering == true)
+                resolve({ isOk: false, message: "ordering" });
+            commit("setOrdering", true);
+            commit("setChartLoading", true);
             axios
                 .post("order-chart/execute-order", data, {
                     noLoading: true,
@@ -83,8 +85,7 @@ const actions = {
                     notify: true
                 })
                 .then(response => {
-                    // console.log(response.data);
-                    // commit("setChartData", response.data);
+                    commit("setOrdering", false);
                     commit("setChartLoading", false);
                     resolve(response.data);
                 });
@@ -101,6 +102,9 @@ const mutations = {
     },
     setChartLoading(state, data) {
         state.isChartLoading = data;
+    },
+    setOrdering(state, data) {
+        state.isOrdering = data;
     },
     setStatus(state, data) {
         state.status = data;

@@ -300,9 +300,7 @@ var TIME = {
       });
       new ResizeObserver(_this2.eventChartResize).observe(_this2.chartContainer);
       window.addEventListener("keydown", _this2.eventKeyPress);
-      document.addEventListener("fullscreenchange", function () {
-        return _this2.isFullscreen = document.fullscreenElement;
-      });
+      document.addEventListener("fullscreenchange", _this2.eventFullscreenChange);
 
       _this2.getChartData(_this2.chartDate).then(function () {
         _this2.loadToolsData();
@@ -536,6 +534,20 @@ var TIME = {
             break;
         }
       }
+    },
+    eventFullscreenChange: function eventFullscreenChange() {
+      if (document.fullscreenElement) {
+        this.isFullscreen = true;
+        this.chartContainer.classList.add("fullscreen");
+        document.querySelector(".dx-drawer-content").style.transform = "unset";
+      } else {
+        this.isFullscreen = false;
+        this.chartContainer.classList.remove("fullscreen");
+        document.querySelector(".dx-drawer-content").style.transform = "translate(0px, 0px)";
+      }
+    },
+    toggleFullscreen: function toggleFullscreen() {
+      if (document.fullscreenElement) document.exitFullscreen();else document.documentElement.requestFullscreen();
     },
     loadToolsData: function loadToolsData() {
       var _this4 = this;
@@ -1154,10 +1166,6 @@ var TIME = {
     chartTopClick: function chartTopClick() {
       this.chart.timeScale().scrollToRealTime();
     },
-    toggleFullscreen: function toggleFullscreen() {
-      if (document.fullscreenElement) document.exitFullscreen(); // else this.chartContainer.requestFullscreen();
-      else document.documentElement.requestFullscreen();
-    },
     inSession: function inSession() {
       var currentSec = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
       if (!currentSec) currentSec = moment().unix();
@@ -1170,6 +1178,7 @@ var TIME = {
       return + +price.toFixed(1);
     },
     toasteOrderError: function toasteOrderError(error) {
+      if (error == "ordering") return false;
       var message = "";
 
       switch (error) {
@@ -1214,9 +1223,17 @@ var TIME = {
   !*** ./node_modules/css-loader!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--7-2!./node_modules/sass-loader/dist/cjs.js??ref--7-3!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/views/user/OrderChart.vue?vue&type=style&index=0&id=cb468136&lang=scss&scoped=true& ***!
   \********************************************************************************************************************************************************************************************************************************************************************************************************************************************/
 /*! no static exports found */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-throw new Error("Module build failed (from ./node_modules/sass-loader/dist/cjs.js):\nSassError: expected \";\".\n     ╷\n1129 │         left:0,\r\n     │             ^\n     ╵\n  C:\\xampp\\htdocs\\quytrevang\\resources\\js\\views\\user\\OrderChart.vue 1129:13  root stylesheet");
+exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, ".order-chart-container[data-v-cb468136] {\n  height: 300px;\n  background: #131722;\n  border: none;\n}\n.order-chart-container.fullscreen[data-v-cb468136] {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  z-index: 1501;\n}\n.order-chart-container .chart-wrapper[data-v-cb468136] {\n  position: relative;\n  height: 100%;\n}\n.order-chart-container .area[data-v-cb468136] {\n  position: absolute;\n  display: flex;\n  justify-content: space-between;\n  font-size: 17px;\n  background: #131722;\n  border: solid 2px #2a2e39;\n  border-bottom-right-radius: 5px;\n  z-index: 3;\n}\n.order-chart-container .area.data-area[data-v-cb468136] {\n  top: 0px;\n  left: 30px;\n}\n.order-chart-container .area.data-area .command[data-v-cb468136]:not(:first-child) {\n  border-left: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.data-area .clock[data-v-cb468136] {\n  width: 80px;\n}\n.order-chart-container .area.data-area .chart-date[data-v-cb468136] {\n  width: 125px;\n}\n.order-chart-container .area.data-area .status[data-v-cb468136] {\n  width: unset !important;\n  padding: 0 10px !important;\n}\n.order-chart-container .area.data-area .status.green[data-v-cb468136] {\n  color: lime !important;\n}\n.order-chart-container .area.data-area .status.red[data-v-cb468136] {\n  color: red !important;\n}\n.order-chart-container .area.data-area .spinner[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  display: none;\n}\n.order-chart-container .area.tool-area[data-v-cb468136] {\n  top: 0px;\n  left: 0px;\n  flex-direction: column;\n}\n.order-chart-container .area.tool-area .command[data-v-cb468136]:not(:first-child) {\n  border-top: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.tool-area .selected[data-v-cb468136] {\n  color: #1f62ff !important;\n}\n.order-chart-container .area.tool-area .warning[data-v-cb468136] {\n  color: yellow !important;\n}\n.order-chart-container .area.tool-area .cancel-order[data-v-cb468136] {\n  display: none;\n  color: red;\n}\n.order-chart-container .command[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  flex: 1 1 auto;\n  text-align: center;\n  color: #bbbbbb;\n  background: transparent !important;\n  line-height: 30px;\n  font-size: 16px;\n  border: none;\n  cursor: pointer;\n  z-index: 3;\n}\n.order-chart-container .command[data-v-cb468136]:not(.noaction):hover {\n  background: #2a2e39 !important;\n}\n.order-chart-container .command.noaction[data-v-cb468136] {\n  cursor: unset !important;\n}\n.order-chart-container .order-button[data-v-cb468136] {\n  position: absolute;\n  display: none;\n  padding: 5px;\n  text-align: center;\n  border-radius: 7px;\n  color: black;\n  background: silver;\n  z-index: 3;\n  cursor: pointer;\n}\n.order-chart-container .order-button.entry[data-v-cb468136] {\n  width: 70px;\n  height: 55px;\n  color: white !important;\n}\n.order-chart-container .order-button.tpsl[data-v-cb468136] {\n  width: 60px;\n  height: 50px;\n}\n.order-chart-container .chart-top[data-v-cb468136] {\n  position: absolute;\n  bottom: 29px;\n  right: 55px;\n  border-radius: 50%;\n  border: 1px solid gray;\n  padding-left: 1px;\n  line-height: 22px !important;\n  width: 25px !important;\n  height: 25px !important;\n  font-size: 18px;\n}", ""]);
+
+// exports
+
 
 /***/ }),
 
@@ -1524,10 +1541,7 @@ var render = function() {
         _vm._v(" "),
         _c(
           "div",
-          {
-            ref: "chartContainer",
-            staticClass: "order-chart-container fullscreen"
-          },
+          { ref: "chartContainer", staticClass: "order-chart-container" },
           [
             _c("div", { ref: "orderChart", staticClass: "chart-wrapper" }, [
               _c("div", { staticClass: "area data-area" }, [
@@ -1865,7 +1879,8 @@ function initialState() {
     config: {},
     status: {},
     chartData: [],
-    isChartLoading: false
+    isChartLoading: false,
+    isOrdering: false
   };
 }
 
@@ -1948,7 +1963,6 @@ var actions = {
         noLoading: true,
         crypto: true
       }).then(function (response) {
-        // console.log(response.data);
         commit("setChartData", response.data);
         resolve();
       });
@@ -1960,16 +1974,19 @@ var actions = {
         getters = _ref5.getters,
         state = _ref5.state,
         rootGetters = _ref5.rootGetters;
-    commit("setChartLoading", true);
-    console.log("executeOrder", data);
     return new Promise(function (resolve, reject) {
+      if (state.isOrdering == true) resolve({
+        isOk: false,
+        message: "ordering"
+      });
+      commit("setOrdering", true);
+      commit("setChartLoading", true);
       axios.post("order-chart/execute-order", data, {
         noLoading: true,
         crypto: true,
         notify: true
       }).then(function (response) {
-        // console.log(response.data);
-        // commit("setChartData", response.data);
+        commit("setOrdering", false);
         commit("setChartLoading", false);
         resolve(response.data);
       });
@@ -1986,6 +2003,9 @@ var mutations = {
   },
   setChartLoading: function setChartLoading(state, data) {
     state.isChartLoading = data;
+  },
+  setOrdering: function setOrdering(state, data) {
+    state.isOrdering = data;
   },
   setStatus: function setStatus(state, data) {
     state.status = data;
