@@ -20,101 +20,108 @@
                 ]"
             />
             <div class="order-chart-container" ref="chartContainer">
-                <div class="chart-wrapper" ref="orderChart"></div>
-                <div class="area data-area">
-                    <div
-                        class="command noaction status"
-                        :class="{ green: status.net > 0, red: status.net < 0 }"
-                        :title="$t('admin.orderChart.net')"
-                    >
-                        {{ status.net | currency("", "") }}
+                <div class="chart-wrapper" ref="orderChart">
+                    <div class="area data-area">
+                        <div
+                            class="command noaction status"
+                            :class="{
+                                green: status.net > 0,
+                                red: status.net < 0
+                            }"
+                            :title="$t('admin.orderChart.net')"
+                        >
+                            {{ status.net | currency("", "") }}
+                        </div>
+                        <div
+                            class="command noaction status"
+                            :class="{
+                                green: status.vm > 0,
+                                red: status.vm < 0
+                            }"
+                            :title="$t('admin.orderChart.vm')"
+                        >
+                            {{ status.vm | currency("", "") }}
+                        </div>
+                        <div class="command noaction clock">{{ clock }}</div>
+                        <input
+                            type="date"
+                            class="chart-date command"
+                            :title="$t('admin.orderChart.dateTitle')"
+                            v-model="chartDate"
+                            @change="() => getChartData(chartDate)"
+                        />
+                        <img
+                            ref="spinner"
+                            class="command spinner"
+                            src="spinner.gif"
+                        />
                     </div>
-                    <div
-                        class="command noaction status"
-                        :class="{ green: status.vm > 0, red: status.vm < 0 }"
-                        :title="$t('admin.orderChart.vm')"
-                    >
-                        {{ status.vm | currency("", "") }}
+                    <div class="area tool-area">
+                        <div
+                            :class="
+                                `command noaction far fa-${
+                                    status.connect ? 'link' : 'unlink'
+                                }`
+                            "
+                            :title="$t('admin.orderChart.connect')"
+                        ></div>
+                        <div
+                            ref="fullscreenTool"
+                            :class="
+                                `command far fa-${
+                                    isFullscreen ? 'compress' : 'expand'
+                                }`
+                            "
+                            @click="toggleFullscreen"
+                        ></div>
+                        <div
+                            ref="reloadTool"
+                            class="command far fa-sync-alt"
+                            @click="
+                                () => {
+                                    data.price = [];
+                                    getChartData(chartDate);
+                                }
+                            "
+                        ></div>
+                        <div
+                            ref="lineTool"
+                            class="command far fa-minus"
+                            @click="lineToolClick"
+                            @contextmenu="lineToolContextmenu"
+                        ></div>
+                        <div
+                            ref="rulerTool"
+                            class="command far fa-arrows-v"
+                            @click="rulerToolClick"
+                            @contextmenu="rulerToolContextmenu"
+                        ></div>
+                        <div
+                            ref="cancelOrder"
+                            class="cancel-order command far fa-trash-alt"
+                            @click="cancelOrderClick"
+                        ></div>
                     </div>
-                    <div class="command noaction clock">{{ clock }}</div>
-                    <input
-                        type="date"
-                        class="chart-date command"
-                        :title="$t('admin.orderChart.dateTitle')"
-                        v-model="chartDate"
-                        @change="() => getChartData(chartDate)"
-                    />
-                    <img
-                        ref="spinner"
-                        class="command spinner"
-                        src="spinner.gif"
-                    />
-                </div>
-                <div class="area tool-area">
-                    <div
-                        :class="
-                            `command noaction far fa-${
-                                status.connect ? 'link' : 'unlink'
-                            }`
-                        "
-                        :title="$t('admin.orderChart.connect')"
-                    ></div>
-                    <div
-                        ref="fullscreenTool"
-                        :class="
-                            `command far fa-${
-                                isFullscreen ? 'compress' : 'expand'
-                            }`
-                        "
-                        @click="toggleFullscreen"
-                    ></div>
-                    <div
-                        ref="reloadTool"
-                        class="command far fa-sync-alt"
-                        @click="
-                            () => {
-                                data.price = [];
-                                getChartData(chartDate);
-                            }
-                        "
-                    ></div>
-                    <div
-                        ref="lineTool"
-                        class="command far fa-minus"
-                        @click="lineToolClick"
-                        @contextmenu="lineToolContextmenu"
-                    ></div>
-                    <div
-                        ref="rulerTool"
-                        class="command far fa-arrows-v"
-                        @click="rulerToolClick"
-                        @contextmenu="rulerToolContextmenu"
-                    ></div>
-                    <div
-                        ref="cancelOrder"
-                        class="cancel-order command far fa-trash-alt"
-                        @click="cancelOrderClick"
-                    ></div>
-                </div>
-                <div>
-                    <div
-                        ref="entryOrder"
-                        class="order-button entry"
-                        @click="entryOrderClick"
-                    >
-                        Entry
+                    <div>
+                        <div
+                            ref="entryOrder"
+                            class="order-button entry"
+                            @click="entryOrderClick"
+                        >
+                            Entry
+                        </div>
+                        <div
+                            ref="tpslOrder"
+                            class="order-button tpsl"
+                            @click="tpslOrderClick"
+                        >
+                            TP/SL
+                        </div>
+                        <div
+                            class="chart-top command far fa-angle-double-right"
+                            @click="chartTopClick"
+                        ></div>
                     </div>
-                    <div
-                        ref="tpslOrder"
-                        class="order-button tpsl"
-                        @click="tpslOrderClick"
-                    >
-                        TP/SL
-                    </div>
-                    <div
-                        class="chart-top command far fa-angle-double-right"
-                        @click="chartTopClick"
-                    ></div>
                 </div>
             </div>
         </div>
@@ -125,6 +132,7 @@
 import { mapGetters, mapActions } from "vuex";
 import toolsStore from "../../plugins/orderChartDb.js";
 import adminOrderChartStore from "../../store/modules/Admin/OrderChart";
+import { confirm } from "devextreme/ui/dialog";
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
@@ -228,7 +236,7 @@ export default {
             window.addEventListener("keydown", this.eventKeyPress);
             document.addEventListener(
                 "fullscreenchange",
-                () => (this.isFullscreen = document.fullscreenElement)
+                this.eventFullscreenChange
             );
             this.getChartData(this.chartDate).then(() => {
                 this.loadToolsData();
@@ -456,6 +464,23 @@ export default {
                         break;
                 }
             }
+        },
+        eventFullscreenChange() {
+            if (document.fullscreenElement) {
+                this.isFullscreen = true;
+                this.chartContainer.classList.add("fullscreen");
+                document.querySelector(".dx-drawer-content").style.transform =
+                    "unset";
+            } else {
+                this.isFullscreen = false;
+                this.chartContainer.classList.remove("fullscreen");
+                document.querySelector(".dx-drawer-content").style.transform =
+                    "translate(0px, 0px)";
+            }
+        },
+        toggleFullscreen() {
+            if (document.fullscreenElement) document.exitFullscreen();
+            else document.documentElement.requestFullscreen();
         },
         loadToolsData() {
             return new Promise(async resolve => {
@@ -927,62 +952,78 @@ export default {
             }
         },
         cancelOrderClick() {
-            this.toggleCancelOrderButton(false);
-            if (this.order.entry.hasOwnProperty("line")) {
-                if (this.order.tp.hasOwnProperty("line")) {
-                    this.executeOrder({
-                        action: "exit",
-                        tpData: { cmd: "cancel" },
-                        slData: { cmd: "delete" },
-                        exitData: {
-                            cmd: "new",
-                            side: -this.order.side,
-                            price: "MTL"
-                        }
-                    }).then(resp => {
-                        if (resp.isOk) {
-                            this.removeOrderLine("entry");
-                            this.removeOrderLine("tp");
-                            this.removeOrderLine("sl");
-                            toolsStore.clear("order");
-                            this.$toasted.success("Đóng vị thế thành công");
+            let result = confirm("Huỷ lệnh?", "Xác nhận");
+            result.then(dialogResult => {
+                if (dialogResult) {
+                    this.toggleCancelOrderButton(false);
+                    if (this.order.entry.hasOwnProperty("line")) {
+                        if (this.order.tp.hasOwnProperty("line")) {
+                            this.executeOrder({
+                                action: "exit",
+                                tpData: { cmd: "cancel" },
+                                slData: { cmd: "delete" },
+                                exitData: {
+                                    cmd: "new",
+                                    side: -this.order.side,
+                                    price: "MTL"
+                                }
+                            }).then(resp => {
+                                if (resp.isOk) {
+                                    this.removeOrderLine("entry");
+                                    this.removeOrderLine("tp");
+                                    this.removeOrderLine("sl");
+                                    toolsStore.clear("order");
+                                    this.$toasted.success(
+                                        "Đóng vị thế thành công"
+                                    );
+                                } else {
+                                    this.toggleCancelOrderButton(true);
+                                    this.toasteOrderError(resp.message);
+                                }
+                            });
                         } else {
-                            this.toggleCancelOrderButton(true);
-                            this.toasteOrderError(resp.message);
+                            this.executeOrder({
+                                action: "entry",
+                                data: { cmd: "delete" }
+                            }).then(resp => {
+                                if (resp.isOk) {
+                                    this.removeOrderLine("entry");
+                                    toolsStore.clear("order");
+                                    this.$toasted.success(
+                                        "Huỷ lệnh Entry thành công"
+                                    );
+                                } else {
+                                    this.toggleCancelOrderButton(true);
+                                    this.toasteOrderError(resp.message);
+                                }
+                            });
                         }
-                    });
-                } else {
-                    this.executeOrder({
-                        action: "entry",
-                        data: { cmd: "delete" }
-                    }).then(resp => {
-                        if (resp.isOk) {
-                            this.removeOrderLine("entry");
-                            toolsStore.clear("order");
-                            this.$toasted.success("Huỷ lệnh Entry thành công");
-                        } else {
-                            this.toggleCancelOrderButton(true);
-                            this.toasteOrderError(resp.message);
-                        }
-                    });
+                    }
                 }
-            }
+            });
         },
         entryOrderClick() {
             const CURRENT_SEC = moment().unix();
             if (this.inSession(CURRENT_SEC)) {
                 if (CURRENT_SEC < TIME.ATO) {
-                    this.executeOrder({
-                        action: "exit",
-                        exitData: {
-                            cmd: "new",
-                            side: -this.order.side,
-                            price: "ATO"
+                    let result = confirm("Đặt lệnh ATO?", "Xác nhận");
+                    result.then(dialogResult => {
+                        if (dialogResult) {
+                            this.executeOrder({
+                                action: "exit",
+                                exitData: {
+                                    cmd: "new",
+                                    side: -this.order.side,
+                                    price: "ATO"
+                                }
+                            }).then(resp => {
+                                if (resp.isOk)
+                                    this.$toasted.success(
+                                        "Đặt lệnh ATO thành công"
+                                    );
+                                else this.toasteOrderError(resp.message);
+                            });
                         }
-                    }).then(resp => {
-                        if (resp.isOk)
-                            this.$toasted.success("Đặt lệnh ATO thành công");
-                        else this.toasteOrderError(resp.message);
                     });
                 } else if (CURRENT_SEC < TIME.ATC) {
                     this.executeOrder({
@@ -1000,17 +1041,24 @@ export default {
                         } else this.toasteOrderError(resp.message);
                     });
                 } else {
-                    this.executeOrder({
-                        action: "exit",
-                        exitData: {
-                            cmd: "new",
-                            side: -this.order.side,
-                            price: "ATC"
+                    let result = confirm("Đặt lệnh ATC?", "Xác nhận");
+                    result.then(dialogResult => {
+                        if (dialogResult) {
+                            this.executeOrder({
+                                action: "exit",
+                                exitData: {
+                                    cmd: "new",
+                                    side: -this.order.side,
+                                    price: "ATC"
+                                }
+                            }).then(resp => {
+                                if (resp.isOk)
+                                    this.$toasted.success(
+                                        "Đặt lệnh ATC thành công"
+                                    );
+                                else this.toasteOrderError(resp.message);
+                            });
                         }
-                    }).then(resp => {
-                        if (resp.isOk)
-                            this.$toasted.success("Đặt lệnh ATC thành công");
-                        else this.toasteOrderError(resp.message);
                     });
                 }
             }
@@ -1039,10 +1087,6 @@ export default {
         },
         chartTopClick() {
             this.chart.timeScale().scrollToRealTime();
-        },
-        toggleFullscreen() {
-            if (document.fullscreenElement) document.exitFullscreen();
-            else this.chartContainer.requestFullscreen();
         },
         inSession(currentSec = null) {
             if (!currentSec) currentSec = moment().unix();
@@ -1087,11 +1131,20 @@ export default {
 </script>
 <style lang="scss" scoped>
 .order-chart-container {
-    position: relative;
     height: 300px;
     background: #131722;
     border: none;
+
+    &.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: 1501;
+    }
     .chart-wrapper {
+        position: relative;
         height: 100%;
     }
     .area {
