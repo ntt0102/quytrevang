@@ -15,7 +15,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../plugins/orderChartDb.js */ "./resources/js/plugins/orderChartDb.js");
 /* harmony import */ var _store_modules_Admin_OrderChart__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../store/modules/Admin/OrderChart */ "./resources/js/store/modules/Admin/OrderChart.js");
 /* harmony import */ var devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! devextreme/ui/dialog */ "./node_modules/devextreme/esm/ui/dialog.js");
-/* harmony import */ var devextreme_ui_overlay__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! devextreme/ui/overlay */ "./node_modules/devextreme/esm/ui/overlay.js");
 
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
@@ -164,7 +163,6 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 
 
-
 var CHART_OPTIONS = {
   localization: {
     dateFormat: "dd/MM/yyyy",
@@ -212,7 +210,6 @@ var TIME = {
   ATC: moment(CURRENT_DATE + " 14:30:00").unix(),
   END: moment(CURRENT_DATE + " 14:45:00").unix()
 };
-Object(devextreme_ui_overlay__WEBPACK_IMPORTED_MODULE_5__["baseZIndex"])(1503);
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
@@ -526,12 +523,16 @@ Object(devextreme_ui_overlay__WEBPACK_IMPORTED_MODULE_5__["baseZIndex"])(1503);
     eventFullscreenChange: function eventFullscreenChange() {
       if (document.fullscreenElement) {
         this.isFullscreen = true;
-        this.chartContainer.classList.add("fullscreen");
-        document.querySelector(".dx-drawer-content").style.transform = "unset";
+        this.chartContainer.classList.add("fullscreen"); // document.querySelector(".dx-drawer-content").style.transform =
+        //     "unset";
+
+        document.querySelector(".side-navigation-menu").style.display = "none";
       } else {
         this.isFullscreen = false;
-        this.chartContainer.classList.remove("fullscreen");
-        document.querySelector(".dx-drawer-content").style.transform = "translate(0px, 0px)";
+        this.chartContainer.classList.remove("fullscreen"); // document.querySelector(".dx-drawer-content").style.transform =
+        //     "translate(0px, 0px)";
+
+        document.querySelector(".side-navigation-menu").style.display = "flex";
       }
     },
     toggleFullscreen: function toggleFullscreen() {
@@ -1218,7 +1219,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../node_modules/css-
 
 
 // module
-exports.push([module.i, ".order-chart-container[data-v-cb468136] {\n  height: 300px;\n  background: #131722;\n  border: none;\n}\n.order-chart-container.fullscreen[data-v-cb468136] {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  z-index: 1502;\n}\n.order-chart-container .chart-wrapper[data-v-cb468136] {\n  position: relative;\n  height: 100%;\n}\n.order-chart-container .area[data-v-cb468136] {\n  position: absolute;\n  display: flex;\n  justify-content: space-between;\n  font-size: 17px;\n  background: #131722;\n  border: solid 2px #2a2e39;\n  border-bottom-right-radius: 5px;\n  z-index: 3;\n}\n.order-chart-container .area.data-area[data-v-cb468136] {\n  top: 0px;\n  left: 0px;\n}\n.order-chart-container .area.data-area .command[data-v-cb468136]:not(:first-child) {\n  border-left: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.data-area .clock[data-v-cb468136] {\n  width: 80px;\n}\n.order-chart-container .area.data-area .chart-date[data-v-cb468136] {\n  width: 125px;\n}\n.order-chart-container .area.data-area .status[data-v-cb468136] {\n  width: unset !important;\n  padding: 0 10px !important;\n}\n.order-chart-container .area.data-area .status.green[data-v-cb468136] {\n  color: lime !important;\n}\n.order-chart-container .area.data-area .status.red[data-v-cb468136] {\n  color: red !important;\n}\n.order-chart-container .area.data-area .spinner[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  display: none;\n}\n.order-chart-container .area.tool-area[data-v-cb468136] {\n  top: 32px;\n  left: 0px;\n  flex-direction: column;\n}\n.order-chart-container .area.tool-area .command[data-v-cb468136]:not(:first-child) {\n  border-top: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.tool-area .selected[data-v-cb468136] {\n  color: #1f62ff !important;\n}\n.order-chart-container .area.tool-area .warning[data-v-cb468136] {\n  color: yellow !important;\n}\n.order-chart-container .area.tool-area .cancel-order[data-v-cb468136] {\n  display: none;\n  color: red;\n}\n.order-chart-container .command[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  flex: 1 1 auto;\n  text-align: center;\n  color: #bbbbbb;\n  background: transparent !important;\n  line-height: 30px;\n  font-size: 16px;\n  border: none;\n  cursor: pointer;\n  z-index: 3;\n}\n.order-chart-container .command[data-v-cb468136]:not(.noaction):hover {\n  background: #2a2e39 !important;\n}\n.order-chart-container .command.noaction[data-v-cb468136] {\n  cursor: unset !important;\n}\n.order-chart-container .order-button[data-v-cb468136] {\n  position: absolute;\n  display: none;\n  padding: 5px;\n  text-align: center;\n  border-radius: 7px;\n  color: black;\n  background: silver;\n  z-index: 3;\n  cursor: pointer;\n}\n.order-chart-container .order-button.entry[data-v-cb468136] {\n  width: 70px;\n  height: 55px;\n  color: white !important;\n}\n.order-chart-container .order-button.tpsl[data-v-cb468136] {\n  width: 60px;\n  height: 50px;\n}\n.order-chart-container .chart-top[data-v-cb468136] {\n  position: absolute;\n  bottom: 29px;\n  right: 55px;\n  border-radius: 50%;\n  border: 1px solid gray;\n  padding-left: 1px;\n  line-height: 22px !important;\n  width: 25px !important;\n  height: 25px !important;\n  font-size: 18px;\n}", ""]);
+exports.push([module.i, ".order-chart-container[data-v-cb468136] {\n  height: 300px;\n  background: #131722;\n  border: none;\n}\n.order-chart-container.fullscreen[data-v-cb468136] {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100vw;\n  height: 100vh;\n  z-index: 1501;\n}\n.order-chart-container .chart-wrapper[data-v-cb468136] {\n  position: relative;\n  height: 100%;\n}\n.order-chart-container .area[data-v-cb468136] {\n  position: absolute;\n  display: flex;\n  justify-content: space-between;\n  font-size: 17px;\n  background: #131722;\n  border: solid 2px #2a2e39;\n  border-bottom-right-radius: 5px;\n  z-index: 3;\n}\n.order-chart-container .area.data-area[data-v-cb468136] {\n  top: 0px;\n  left: 0px;\n}\n.order-chart-container .area.data-area .command[data-v-cb468136]:not(:first-child) {\n  border-left: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.data-area .clock[data-v-cb468136] {\n  width: 80px;\n}\n.order-chart-container .area.data-area .chart-date[data-v-cb468136] {\n  width: 125px;\n}\n.order-chart-container .area.data-area .status[data-v-cb468136] {\n  width: unset !important;\n  padding: 0 10px !important;\n}\n.order-chart-container .area.data-area .status.green[data-v-cb468136] {\n  color: lime !important;\n}\n.order-chart-container .area.data-area .status.red[data-v-cb468136] {\n  color: red !important;\n}\n.order-chart-container .area.data-area .spinner[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  display: none;\n}\n.order-chart-container .area.tool-area[data-v-cb468136] {\n  top: 32px;\n  left: 0px;\n  flex-direction: column;\n}\n.order-chart-container .area.tool-area .command[data-v-cb468136]:not(:first-child) {\n  border-top: solid 2px #2a2e39 !important;\n}\n.order-chart-container .area.tool-area .selected[data-v-cb468136] {\n  color: #1f62ff !important;\n}\n.order-chart-container .area.tool-area .warning[data-v-cb468136] {\n  color: yellow !important;\n}\n.order-chart-container .area.tool-area .cancel-order[data-v-cb468136] {\n  display: none;\n  color: red;\n}\n.order-chart-container .command[data-v-cb468136] {\n  width: 30px;\n  height: 30px;\n  flex: 1 1 auto;\n  text-align: center;\n  color: #bbbbbb;\n  background: transparent !important;\n  line-height: 30px;\n  font-size: 16px;\n  border: none;\n  cursor: pointer;\n  z-index: 3;\n}\n.order-chart-container .command[data-v-cb468136]:not(.noaction):hover {\n  background: #2a2e39 !important;\n}\n.order-chart-container .command.noaction[data-v-cb468136] {\n  cursor: unset !important;\n}\n.order-chart-container .order-button[data-v-cb468136] {\n  position: absolute;\n  display: none;\n  padding: 5px;\n  text-align: center;\n  border-radius: 7px;\n  color: black;\n  background: silver;\n  z-index: 3;\n  cursor: pointer;\n}\n.order-chart-container .order-button.entry[data-v-cb468136] {\n  width: 70px;\n  height: 55px;\n  color: white !important;\n}\n.order-chart-container .order-button.tpsl[data-v-cb468136] {\n  width: 60px;\n  height: 50px;\n}\n.order-chart-container .chart-top[data-v-cb468136] {\n  position: absolute;\n  bottom: 29px;\n  right: 55px;\n  border-radius: 50%;\n  border: 1px solid gray;\n  padding-left: 1px;\n  line-height: 22px !important;\n  width: 25px !important;\n  height: 25px !important;\n  font-size: 18px;\n}", ""]);
 
 // exports
 
@@ -1451,32 +1452,6 @@ var confirm = function(messageHtml) {
     };
     return custom(options).show()
 };
-
-
-/***/ }),
-
-/***/ "./node_modules/devextreme/esm/ui/overlay.js":
-/*!***************************************************!*\
-  !*** ./node_modules/devextreme/esm/ui/overlay.js ***!
-  \***************************************************/
-/*! exports provided: baseZIndex */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "baseZIndex", function() { return baseZIndex; });
-/* harmony import */ var _overlay_ui_overlay__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./overlay/ui.overlay */ "./node_modules/devextreme/esm/ui/overlay/ui.overlay.js");
-/**
- * DevExtreme (esm/ui/overlay.js)
- * Version: 21.2.7
- * Build date: Mon Apr 11 2022
- *
- * Copyright (c) 2012 - 2022 Developer Express Inc. ALL RIGHTS RESERVED
- * Read about DevExtreme licensing here: https://js.devexpress.com/Licensing/
- */
-
-var baseZIndex = _overlay_ui_overlay__WEBPACK_IMPORTED_MODULE_0__["default"].baseZIndex;
-
 
 
 /***/ }),

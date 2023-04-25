@@ -123,7 +123,6 @@ import { mapGetters, mapActions } from "vuex";
 import toolsStore from "../../plugins/orderChartDb.js";
 import adminOrderChartStore from "../../store/modules/Admin/OrderChart";
 import { confirm } from "devextreme/ui/dialog";
-import { baseZIndex } from "devextreme/ui/overlay";
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
@@ -161,7 +160,6 @@ const TIME = {
     ATC: moment(CURRENT_DATE + " 14:30:00").unix(),
     END: moment(CURRENT_DATE + " 14:45:00").unix()
 };
-baseZIndex(1503);
 export default {
     data() {
         return {
@@ -457,13 +455,17 @@ export default {
             if (document.fullscreenElement) {
                 this.isFullscreen = true;
                 this.chartContainer.classList.add("fullscreen");
-                document.querySelector(".dx-drawer-content").style.transform =
-                    "unset";
+                // document.querySelector(".dx-drawer-content").style.transform =
+                //     "unset";
+                document.querySelector(".side-navigation-menu").style.display =
+                    "none";
             } else {
                 this.isFullscreen = false;
                 this.chartContainer.classList.remove("fullscreen");
-                document.querySelector(".dx-drawer-content").style.transform =
-                    "translate(0px, 0px)";
+                // document.querySelector(".dx-drawer-content").style.transform =
+                //     "translate(0px, 0px)";
+                document.querySelector(".side-navigation-menu").style.display =
+                    "flex";
             }
         },
         toggleFullscreen() {
@@ -1129,7 +1131,7 @@ export default {
         left: 0;
         width: 100vw;
         height: 100vh;
-        z-index: 1502;
+        z-index: 1501;
     }
     .chart-wrapper {
         position: relative;
