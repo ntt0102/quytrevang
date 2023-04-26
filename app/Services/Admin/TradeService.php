@@ -3,6 +3,8 @@
 namespace App\Services\Admin;
 
 use App\Services\CoreService;
+use App\Models\Parameter;
+use App\Models\Trade;
 use App\Repositories\TradeRepository;
 use App\Repositories\ParameterRepository;
 use Illuminate\Support\Facades\Storage;
@@ -41,7 +43,7 @@ class TradeService extends CoreService
      */
     public function getChart($request)
     {
-        $period = (int) $request->period;
+        $period = $request->period;
         $page = (int) $request->page;
         $charts = $this->createChartData($period, $page);
         if (!count($charts)) $page -= 1;
@@ -57,94 +59,193 @@ class TradeService extends CoreService
      * @param int $period
      * @param int $page
      */
-    private function createChartData($period = 'day', $page = 1)
+    public function createChartData($period = 'day', $page = 1)
     {
-        $thisDate = date_create();
-        $end = $thisDate->modify('-' . (($page - 1) * $this->BARS_PER_PAGE) . ' ' . $period);
-        $start = $thisDate->modify('-' . ($page * $this->BARS_PER_PAGE - 1) . ' ' . $period);
-        $endDate = $page > 1 ? $this->getStartDateOfPage($period, $page - 1) : $this->tradeRepository->latest('date')->date;
-        $startDate = $this->getStartDateOfPage($period, $page);
-        $charts = $this->tradeRepository->where([['date', '>', $startDate], ['date', '<=', $endDate]], ['*'], ['date', 'asc']);
-        $charts = $charts->reduce(function ($group, $ch) use ($period) {
-            $week = date_create($ch->date)->format('W');
-            $time = floor(($week - 1) / $period) + 1;
-            $length = count($group);
-            $maxIndex = $length - 1;
-            if (
-                $length == 0
-                || $period == 1
-                || ($week != 53 && (($week - 1) % $period == 0 || $group[$maxIndex]->time != $time))
-            ) {
-                $ch->id = 1;
-                $ch->time = $time;
-                $group[] = $ch;
-            } else {
-                $group[$maxIndex]->id++;
-                $group[$maxIndex]->amount += $ch->amount;
-                $group[$maxIndex]->scores += $ch->scores;
-                $group[$maxIndex]->revenue += $ch->revenue;
-                $group[$maxIndex]->loss += $ch->loss;
-                $group[$maxIndex]->fees += $ch->fees;
-            }
-            return $group;
-        }, []);
-        $charts = collect($charts)->reduce(function ($carry, $ch) use ($period) {
-            if ($ch->fees > 0) {
-                $profit = $ch->revenue - $ch->loss - $ch->fees;
-                $marginRate = (float) $this->parameterRepository->getValue('marginRate');
-                $principal = ($ch->amount / $ch->id) * ($ch->scores / $ch->id) * 100000 * $marginRate;
-                $year = date_create($ch->date)->format('Y');
+        $multiplier = $period == 'quarter' ? 3 : 1;
+        $unit = $period == 'quarter' ? 'month' : $period;
+        $startOfPage = date_create()->modify('-' . ($multiplier * ($page * $this->BARS_PER_PAGE - 1)) . ' ' . $unit);
+        $endOfPage = date_create()->modify('-' . (($page - 1) * $multiplier * $this->BARS_PER_PAGE) . ' ' . $unit);
+        $startDate = $this->firstDayOf($period, $startOfPage)->format('Y-m-d');
+        $endDate = $this->lastDayOf($period, $endOfPage)->format('Y-m-d');
+        $charts = Trade::where('date', '>=', $startDate)->where('date', '<=', $endDate);
+        switch ($period) {
+            case 'day':
+                $charts->selectRaw("CONCAT(DATE_FORMAT(date,'%Y%m%d'),'-',DAY(date),'/',MONTH(date),'/',YEAR(date)) AS time");
+                break;
+            case 'week':
+                $charts->selectRaw("CONCAT(DATE_FORMAT(date,'%Y%m%d'),'-',WEEK(date),'/',YEAR(date)) AS time");
+                break;
+            case 'month':
+                $charts->selectRaw("CONCAT(DATE_FORMAT(date,'%Y%m%d'),'-',MONTH(date),'/',YEAR(date)) AS time");
+                break;
+            case 'quarter':
+                $charts->selectRaw("CONCAT(DATE_FORMAT(date,'%Y%m%d'),'-',QUARTER(date),'/',YEAR(date)) AS time");
+                break;
+            case 'year':
+                $charts->selectRaw("CONCAT(DATE_FORMAT(date,'%Y%m%d'),'-',YEAR(date)) AS time");
+                break;
+        }
+        $charts->selectRaw('CAST(count(*) as INT) as counter');
+        $charts->selectRaw('CAST(sum(amount) as INT) as amount');
+        $charts->selectRaw('CAST(sum(scores) as INT) as scores');
+        $charts->selectRaw('CAST(sum(revenue) as INT) as revenue');
+        $charts->selectRaw('CAST(sum(loss) as INT) as loss');
+        $charts->selectRaw('CAST(sum(fees) as INT) as fees');
+        $charts->orderBy('time', 'asc');
+        $charts->groupBy('time');
+        // return $charts->get();
+        return $charts->get()->reduce(function ($carry, $item) use ($period) {
+            if ($item->fees > 0) {
+                $profit = $item->revenue - $item->loss - $item->fees;
+                $marginRate = (float) Parameter::getValue('marginRate');
+                $principal = ($item->amount / $item->counter) * ($item->scores / $item->counter) * 100000 * $marginRate;
                 $temp =  [
                     's1' => 0,
                     's2' => 0,
                     's3' => $profit,
-                    's4' => $ch->loss,
-                    's5' => $ch->fees,
-                    'revenue' => $ch->revenue,
-                    'loss' => $ch->loss,
-                    'fees' => $ch->fees,
-                    'copyRate' => $profit > 0 ? round(40 * (1 - ($ch->loss / ($ch->revenue - $ch->fees)))) : 0,
+                    's4' => $item->loss,
+                    's5' => $item->fees,
+                    'revenue' => $item->revenue,
+                    'loss' => $item->loss,
+                    'fees' => $item->fees,
+                    'copyRate' => $profit > 0 ? round(40 * (1 - ($item->loss / ($item->revenue - $item->fees)))) : 0,
                     'profit' => $profit,
                     'principal' => (int) $principal,
-                    'profitPerFees' => round($profit / $ch->fees, 1),
+                    'profitPerFees' => round($profit / $item->fees, 1),
                     'profitPerPrincipal' => round(100 * $profit / ($principal), 1),
-                    'time' => trans('custom.chart.period.' . $period) . ' ' . ($period == 52 ? $year : $ch->time . ($year != date("Y") ? '/' . $year : ''))
+                    'time' => $this->createChartTime($period, $item->time),
                 ];
                 if ($profit < 0) {
                     $temp['s3'] = 0;
-                    if (-$profit <=  $ch->loss) {
+                    if (-$profit <=  $item->loss) {
                         $temp['s1'] = $profit;
                         $temp['s2'] = 0;
-                        $temp['s4'] = $ch->loss + $profit;
+                        $temp['s4'] = $item->loss + $profit;
                     } else {
-                        $temp['s1'] = -$ch->loss;
-                        $temp['s2'] = $ch->loss + $profit;
+                        $temp['s1'] = -$item->loss;
+                        $temp['s2'] = $item->loss + $profit;
                         $temp['s4'] = 0;
-                        $temp['s5'] = $ch->loss + $ch->fees + $profit;
+                        $temp['s5'] = $item->loss + $item->fees + $profit;
                     }
                 }
                 $carry[] = $temp;
             }
             return $carry;
         }, []);
-        return $charts;
     }
-
-    /**
-     * @param integer $period
-     * @param integer $page
-     * @return string $startDate
-     */
-    private function getStartDateOfPage($period, $page)
+    private function createChartTime($period, $time)
     {
-        $bars = $this->BARS_PER_PAGE * $page;
-        $endDate = $this->tradeRepository->latest('date')->date;
-        $endDateObject = date_create($endDate);
-        $weekOfYear = $endDateObject->format('W');
-        if (!($period > 1 && $weekOfYear == 53)) $bars -= 1;
-        $oddWeeks = ($weekOfYear - 1) % $period;
-        return $endDateObject->sub(date_interval_create_from_date_string(($period * $bars + $oddWeeks + 1) . ' weeks'))->format('Y-m-d');
+        [, $t] = explode("-", $time);
+        if ($period != 'year') {
+            $year = '/' . date("Y");
+            if (strpos($t, $year)) {
+                $t = str_replace($year, '', $t);
+                if ($period == 'day') {
+                    $month = '/' . date("n");
+                    if (strpos($t, $month))
+                        $t = str_replace($month, '', $t);
+                }
+            }
+        }
+        return trans('custom.chart.period.' . $period) . ' ' . $t;
     }
+    // /**
+    //  * Create Chart Data
+    //  * @param int $period
+    //  * @param int $page
+    //  */
+    // private function createChartData($period = 'day', $page = 1)
+    // {
+    //     $currDate = date_create();
+    //     $startOfPage = $currDate->modify('-' . ($page * $this->BARS_PER_PAGE - 1) . ' ' . $period);
+    //     $endOfPage = $currDate->modify('-' . (($page - 1) * $this->BARS_PER_PAGE) . ' ' . $period);
+    //     $startDate = $this->firstDayOf($period, $startOfPage);
+    //     $endDate = $this->lastDayOf($period, $endOfPage);
+
+    //     // $endDate = $page > 1 ? $this->getStartDateOfPage($period, $page - 1) : $this->tradeRepository->latest('date')->date;
+    //     // $startDate = $this->getStartDateOfPage($period, $page);
+    //     $charts = Trade::where('date', '>=', $startDate)->where('date', '<=', $endDate);
+    //     // [[], ['date', '<=', $endDate]], ['*'], ['date', 'asc']);
+    //     $charts = $charts->reduce(function ($group, $ch) use ($period) {
+    //         $week = date_create($ch->date)->format('W');
+    //         $time = floor(($week - 1) / $period) + 1;
+    //         $length = count($group);
+    //         $maxIndex = $length - 1;
+    //         if (
+    //             $length == 0
+    //             || $period == 1
+    //             || ($week != 53 && (($week - 1) % $period == 0 || $group[$maxIndex]->time != $time))
+    //         ) {
+    //             $ch->id = 1;
+    //             $ch->time = $time;
+    //             $group[] = $ch;
+    //         } else {
+    //             $group[$maxIndex]->id++;
+    //             $group[$maxIndex]->amount += $ch->amount;
+    //             $group[$maxIndex]->scores += $ch->scores;
+    //             $group[$maxIndex]->revenue += $ch->revenue;
+    //             $group[$maxIndex]->loss += $ch->loss;
+    //             $group[$maxIndex]->fees += $ch->fees;
+    //         }
+    //         return $group;
+    //     }, []);
+    //     $charts = collect($charts)->reduce(function ($carry, $ch) use ($period) {
+    //         if ($ch->fees > 0) {
+    //             $profit = $ch->revenue - $ch->loss - $ch->fees;
+    //             $marginRate = (float) $this->parameterRepository->getValue('marginRate');
+    //             $principal = ($ch->amount / $ch->id) * ($ch->scores / $ch->id) * 100000 * $marginRate;
+    //             $year = date_create($ch->date)->format('Y');
+    //             $temp =  [
+    //                 's1' => 0,
+    //                 's2' => 0,
+    //                 's3' => $profit,
+    //                 's4' => $ch->loss,
+    //                 's5' => $ch->fees,
+    //                 'revenue' => $ch->revenue,
+    //                 'loss' => $ch->loss,
+    //                 'fees' => $ch->fees,
+    //                 'copyRate' => $profit > 0 ? round(40 * (1 - ($ch->loss / ($ch->revenue - $ch->fees)))) : 0,
+    //                 'profit' => $profit,
+    //                 'principal' => (int) $principal,
+    //                 'profitPerFees' => round($profit / $ch->fees, 1),
+    //                 'profitPerPrincipal' => round(100 * $profit / ($principal), 1),
+    //                 'time' => trans('custom.chart.period.' . $period) . ' ' . ($period == 52 ? $year : $ch->time . ($year != date("Y") ? '/' . $year : ''))
+    //             ];
+    //             if ($profit < 0) {
+    //                 $temp['s3'] = 0;
+    //                 if (-$profit <=  $ch->loss) {
+    //                     $temp['s1'] = $profit;
+    //                     $temp['s2'] = 0;
+    //                     $temp['s4'] = $ch->loss + $profit;
+    //                 } else {
+    //                     $temp['s1'] = -$ch->loss;
+    //                     $temp['s2'] = $ch->loss + $profit;
+    //                     $temp['s4'] = 0;
+    //                     $temp['s5'] = $ch->loss + $ch->fees + $profit;
+    //                 }
+    //             }
+    //             $carry[] = $temp;
+    //         }
+    //         return $carry;
+    //     }, []);
+    //     return $charts;
+    // }
+
+    // /**
+    //  * @param integer $period
+    //  * @param integer $page
+    //  * @return string $startDate
+    //  */
+    // private function getStartDateOfPage($period, $page)
+    // {
+    //     $bars = $this->BARS_PER_PAGE * $page;
+    //     $endDate = $this->tradeRepository->latest('date')->date;
+    //     $endDateObject = date_create($endDate);
+    //     $weekOfYear = $endDateObject->format('W');
+    //     if (!($period > 1 && $weekOfYear == 53)) $bars -= 1;
+    //     $oddWeeks = ($weekOfYear - 1) % $period;
+    //     return $endDateObject->sub(date_interval_create_from_date_string(($period * $bars + $oddWeeks + 1) . ' weeks'))->format('Y-m-d');
+    // }
 
     /**
      * Return the summary.

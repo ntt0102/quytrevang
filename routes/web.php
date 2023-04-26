@@ -94,7 +94,10 @@ Route::get('test', function () {
     // echo $query_date = '2023-04-25';
     // echo date('Y-m-01', strtotime($query_date));
     // echo date('Y-m-t', strtotime($query_date));
-    $date = date_create('2006-12-12');
-    $date->modify('-0 day');
-    echo $date->format('Y-m-d');
+    // $date = date_create('2006-12-12');
+    // $date->modify('-0 day');
+    // echo $date->format('Y-m-d');
+    $s = app(App\Services\Admin\TradeService::class)->createChartData('day', 1);
+    // $s = date("n/Y");
+    dd($s);
 })->middleware('cors');

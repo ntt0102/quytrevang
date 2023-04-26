@@ -5,10 +5,11 @@ return [
     'loading' => 'Đang tải...',
     'chart' => [
         'period' => [
-            '1' => 'Tuần',
-            '4' => 'Tháng',
-            '13' => 'Quý',
-            '52' => 'Năm',
+            'day' => 'Ngày',
+            'week' => 'Tuần',
+            'month' => 'Tháng',
+            'quarter' => 'Quý',
+            'year' => 'Năm',
         ],
     ],
     'day' => ' ngày',

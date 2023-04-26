@@ -544,7 +544,7 @@ var DxChart = function DxChart() {
   created: function created() {
     var _this$$route$query$pe,
       _this = this;
-    this.getChart((_this$$route$query$pe = this.$route.query.period) !== null && _this$$route$query$pe !== void 0 ? _this$$route$query$pe : 1);
+    this.getChart((_this$$route$query$pe = this.$route.query.period) !== null && _this$$route$query$pe !== void 0 ? _this$$route$query$pe : "day");
     this.$bus.on("toggleMenu", function () {
       setTimeout(function () {
         return _this.chart.render();

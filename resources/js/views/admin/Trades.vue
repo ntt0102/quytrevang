@@ -13,8 +13,8 @@
                         options: {
                             icon: 'far fa-arrow-left small',
                             hint: $t('buttons.back'),
-                            onClick: () => $router.go(-1)
-                        }
+                            onClick: () => $router.go(-1),
+                        },
                     },
                     {
                         location: 'before',
@@ -24,8 +24,8 @@
                             icon: 'far fa-backward small',
                             hint: $t('admin.trades.buttons.more'),
                             elementAttr: { 'data-page': page },
-                            onClick: () => lazyLoad()
-                        }
+                            onClick: () => lazyLoad(),
+                        },
                     },
                     {
                         location: 'before',
@@ -33,8 +33,8 @@
                         options: {
                             icon: 'far fa-database small',
                             hint: $t('admin.trades.buttons.addData'),
-                            onClick: () => $refs.trackTradePopup.show()
-                        }
+                            onClick: () => $refs.trackTradePopup.show(),
+                        },
                     },
                     // {
                     //     visible: permissions.includes('trades@edit'),
@@ -76,9 +76,9 @@
                             displayExpr: 'name',
                             valueExpr: 'value',
                             value: charts.period,
-                            onValueChanged: e => getChart(e.value)
-                        }
-                    }
+                            onValueChanged: (e) => getChart(e.value),
+                        },
+                    },
                 ]"
             />
             <DxChart
@@ -87,20 +87,20 @@
                 :customize-point="customizePoint"
                 :title="{
                     text: $t('admin.trades.charTitle'),
-                    horizontalAlignment: 'center'
+                    horizontalAlignment: 'center',
                 }"
                 :size="{ width: '100%' }"
                 :zoomAndPan="{ argumentAxis: 'both' }"
                 :loadingIndicator="{
                     enabled: true,
                     show: true,
-                    text: $t('titles.loadingText')
+                    text: $t('titles.loadingText'),
                 }"
                 :export="{
                     enabled: true,
                     formats: ['PNG'],
                     fileName: 'chart',
-                    printingEnabled: false
+                    printingEnabled: false,
                 }"
                 :commonSeriesSettings="{ argumentField: 'time', barPadding: 0 }"
                 :series="[
@@ -112,7 +112,7 @@
                         type: 'stackedbar',
                         stack: 'money',
                         color: 'DarkGreen',
-                        visible: visibleSeries.money
+                        visible: visibleSeries.money,
                     },
                     {
                         name: $t('admin.trades.lossSum'),
@@ -122,7 +122,7 @@
                         stack: 'money',
                         color: 'FireBrick',
                         showInLegend: false,
-                        visible: visibleSeries.money
+                        visible: visibleSeries.money,
                     },
                     {
                         name: $t('admin.trades.feesSum'),
@@ -132,7 +132,7 @@
                         stack: 'money',
                         color: 'DarkOrange',
                         showInLegend: false,
-                        visible: visibleSeries.money
+                        visible: visibleSeries.money,
                     },
 
                     {
@@ -143,7 +143,7 @@
                         stack: 'money',
                         color: 'DarkOrange',
                         showInLegend: false,
-                        visible: visibleSeries.money
+                        visible: visibleSeries.money,
                     },
                     {
                         name: $t('admin.trades.lossSum'),
@@ -153,7 +153,7 @@
                         stack: 'money',
                         color: 'FireBrick',
                         showInLegend: false,
-                        visible: visibleSeries.money
+                        visible: visibleSeries.money,
                     },
 
                     {
@@ -164,7 +164,7 @@
                         type: 'stackedbar',
                         stack: 'profitPerPrincipal',
                         color: 'Teal',
-                        visible: visibleSeries.profitPerPrincipal
+                        visible: visibleSeries.profitPerPrincipal,
                     },
                     {
                         name: $t('admin.trades.profitPerFees'),
@@ -174,7 +174,7 @@
                         type: 'stackedbar',
                         stack: 'profitPerFees',
                         color: 'Purple',
-                        visible: visibleSeries.profitPerFees
+                        visible: visibleSeries.profitPerFees,
                     },
                     {
                         name: $t('admin.trades.accumulatedProfit'),
@@ -183,7 +183,7 @@
                         axis: 'accumulatedProfit',
                         type: 'spline',
                         color: 'White',
-                        visible: visibleSeries.accumulatedProfit
+                        visible: visibleSeries.accumulatedProfit,
                     },
                     {
                         name: $t('admin.trades.copyRate'),
@@ -192,14 +192,14 @@
                         axis: 'copyRate',
                         type: 'stackedbar',
                         color: 'yellow',
-                        visible: visibleSeries.copyRate
-                    }
+                        visible: visibleSeries.copyRate,
+                    },
                 ]"
                 :valueAxis="[
                     {
                         name: 'money',
                         synchronizedValue: 0,
-                        label: { customizeText: customizeText }
+                        label: { customizeText: customizeText },
                     },
                     {
                         name: 'profitPerPrincipal',
@@ -207,7 +207,7 @@
                         label: { visible: false },
                         tick: { visible: false },
                         grid: { visible: false },
-                        visible: false
+                        visible: false,
                     },
                     {
                         name: 'profitPerFees',
@@ -215,14 +215,14 @@
                         label: { visible: false },
                         tick: { visible: false },
                         grid: { visible: false },
-                        visible: false
+                        visible: false,
                     },
                     {
                         name: 'accumulatedProfit',
                         label: { visible: false },
                         tick: { visible: false },
                         grid: { visible: false },
-                        visible: false
+                        visible: false,
                     },
                     {
                         name: 'copyRate',
@@ -230,19 +230,19 @@
                         label: { visible: false },
                         tick: { visible: false },
                         grid: { visible: false },
-                        visible: false
-                    }
+                        visible: false,
+                    },
                 ]"
                 :tooltip="{
                     enabled: true,
                     shared: false,
-                    customizeTooltip: customizeTooltip
+                    customizeTooltip: customizeTooltip,
                 }"
                 :legend="{
                     verticalAlignment: 'top',
                     horizontalAlignment: 'center',
                     hoverMode: 'none',
-                    markerTemplate: 'markerTemplate'
+                    markerTemplate: 'markerTemplate',
                 }"
                 :argumentAxis="{
                     constantLines: [
@@ -250,9 +250,9 @@
                             width: 2,
                             color: 'white',
                             dashStyle: 'dot',
-                            value: null
-                        }
-                    ]
+                            value: null,
+                        },
+                    ],
                 }"
                 @pointClick="onPointClick"
                 @legendClick="onLegendClick"
@@ -330,7 +330,7 @@ export default {
         TrackTradePopup,
         PickImagePopup,
         Vn30f1mChartPopup,
-        ShareChartPopup
+        ShareChartPopup,
     },
     data() {
         return {
@@ -341,15 +341,15 @@ export default {
                 profitPerPrincipal: false,
                 profitPerFees: false,
                 accumulatedProfit: false,
-                copyRate: false
-            }
+                copyRate: false,
+            },
         };
     },
     beforeCreate() {
         this.$store.registerModule("Admin.trades", adminTradesStore);
     },
     created() {
-        this.getChart(this.$route.query.period ?? 1);
+        this.getChart(this.$route.query.period ?? "day");
         this.$bus.on("toggleMenu", () => {
             setTimeout(() => this.chart.render(), 300);
         });
@@ -366,7 +366,7 @@ export default {
         ...mapGetters("Admin.trades", ["charts", "page", "period"]),
         chart() {
             return this.$refs.chart.instance;
-        }
+        },
     },
     methods: {
         ...mapActions("Admin.trades", ["getChart", "lazyLoad", "resetState"]),
@@ -384,7 +384,7 @@ export default {
             else
                 return {
                     color: series.color,
-                    hoverStyle: { color: series.color }
+                    hoverStyle: { color: series.color },
                 };
         },
         customizeText({ valueText }) {
@@ -395,7 +395,7 @@ export default {
             let referenceTime = this.getReferenceTime();
             if (referenceTime !== null) {
                 let referenceAccumulatedProfit = this.charts.data.find(
-                    c => c.time === referenceTime
+                    (c) => c.time === referenceTime
                 ).accumulatedProfit;
                 accumulatedProfit =
                     accumulatedProfit - referenceAccumulatedProfit;
@@ -525,7 +525,7 @@ export default {
                     </span>
                   </div>
                 </div>
-              </div>`
+              </div>`,
             };
         },
         onPointClick({ target }) {
@@ -555,8 +555,8 @@ export default {
                 "argumentAxis.constantLines[0].value",
                 value
             );
-        }
-    }
+        },
+    },
 };
 </script>
 <style lang="scss">
