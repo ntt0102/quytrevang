@@ -12,8 +12,6 @@ const OrderChart = () =>
 const Users = () => import(/* webpackPrefetch: true */ "../views/admin/Users");
 const Contracts = () =>
     import(/* webpackPrefetch: true */ "../views/admin/Contracts");
-const Settings = () =>
-    import(/* webpackPrefetch: true */ "../views/admin/Settings");
 const Finbooks = () =>
     import(/* webpackPrefetch: true */ "../views/admin/Finbooks");
 const Trades = () =>
@@ -22,6 +20,23 @@ const SmartOrders = () =>
     import(/* webpackPrefetch: true */ "../views/admin/SmartOrders");
 const Comments = () =>
     import(/* webpackPrefetch: true */ "../views/admin/Comments");
+
+const Command = () =>
+    import(/* webpackPrefetch: true */ "../views/Settings/Command");
+const Notification = () =>
+    import(/* webpackPrefetch: true */ "../views/Settings/Notification");
+const Files = () =>
+    import(/* webpackPrefetch: true */ "../views/Settings/Files");
+const Log = () => import(/* webpackPrefetch: true */ "../views/Settings/Log");
+const Faqs = () => import(/* webpackPrefetch: true */ "../views/Settings/Faqs");
+const Parameters = () =>
+    import(/* webpackPrefetch: true */ "../views/Settings/Parameters");
+const Database = () =>
+    import(/* webpackPrefetch: true */ "../views/Settings/Database");
+const Roles = () =>
+    import(/* webpackPrefetch: true */ "../views/Settings/Roles");
+const Permissions = () =>
+    import(/* webpackPrefetch: true */ "../views/Settings/Permissions");
 
 const Login = () => import(/* webpackPrefetch: true */ "../views/auth/Login");
 const CreateAccount = () =>
@@ -53,8 +68,8 @@ export default ({ authGuard, guestGuard }) => [
                     component: Overview,
                     meta: {
                         title: i18n.t("user.overview.title"),
-                        permission: "profile@control"
-                    }
+                        permission: "profile@control",
+                    },
                 },
                 {
                     path: "profile",
@@ -62,8 +77,8 @@ export default ({ authGuard, guestGuard }) => [
                     component: Profile,
                     meta: {
                         title: i18n.t("user.profile.title"),
-                        permission: "profile@control"
-                    }
+                        permission: "profile@control",
+                    },
                 },
                 {
                     path: "contract",
@@ -71,8 +86,8 @@ export default ({ authGuard, guestGuard }) => [
                     component: Contract,
                     meta: {
                         title: i18n.t("user.contract.title"),
-                        permission: "contract@control"
-                    }
+                        permission: "contract@control",
+                    },
                 },
                 {
                     path: "order-chart",
@@ -80,8 +95,8 @@ export default ({ authGuard, guestGuard }) => [
                     component: OrderChart,
                     meta: {
                         title: i18n.t("admin.orderChart.title"),
-                        permission: "service@use"
-                    }
+                        permission: "service@use",
+                    },
                 },
                 {
                     path: "admin-users",
@@ -89,8 +104,8 @@ export default ({ authGuard, guestGuard }) => [
                     component: Users,
                     meta: {
                         title: i18n.t("admin.users.title"),
-                        permission: "users@control"
-                    }
+                        permission: "users@control",
+                    },
                 },
                 {
                     path: "admin-contracts",
@@ -98,17 +113,8 @@ export default ({ authGuard, guestGuard }) => [
                     component: Contracts,
                     meta: {
                         title: i18n.t("admin.contracts.title"),
-                        permission: "contracts@control"
-                    }
-                },
-                {
-                    path: "settings",
-                    name: "settings",
-                    component: Settings,
-                    meta: {
-                        title: i18n.t("admin.settings.title"),
-                        permission: "setting@control"
-                    }
+                        permission: "contracts@control",
+                    },
                 },
                 {
                     path: "admin-finbooks",
@@ -116,8 +122,8 @@ export default ({ authGuard, guestGuard }) => [
                     component: Finbooks,
                     meta: {
                         title: i18n.t("admin.finbooks.title"),
-                        permission: "finbooks@control"
-                    }
+                        permission: "finbooks@control",
+                    },
                 },
                 {
                     path: "admin-trades",
@@ -125,8 +131,8 @@ export default ({ authGuard, guestGuard }) => [
                     component: Trades,
                     meta: {
                         title: i18n.t("admin.trades.title"),
-                        permission: "trades@view"
-                    }
+                        permission: "trades@view",
+                    },
                 },
                 {
                     path: "admin-sos",
@@ -134,8 +140,8 @@ export default ({ authGuard, guestGuard }) => [
                     component: SmartOrders,
                     meta: {
                         title: i18n.t("admin.smartorders.title"),
-                        permission: "smartorders@control"
-                    }
+                        permission: "smartorders@control",
+                    },
                 },
                 {
                     path: "admin-comments",
@@ -143,11 +149,92 @@ export default ({ authGuard, guestGuard }) => [
                     component: Comments,
                     meta: {
                         title: i18n.t("admin.comments.title"),
-                        permission: "comments@control"
-                    }
-                }
-            ]
-        }
+                        permission: "comments@control",
+                    },
+                },
+                {
+                    path: "setting-command",
+                    name: "command",
+                    component: Command,
+                    meta: {
+                        title: i18n.t("admin.settings.command.title"),
+                        permission: "setting.command@control",
+                    },
+                },
+                {
+                    path: "setting-notification",
+                    name: "notification",
+                    component: Notification,
+                    meta: {
+                        title: i18n.t("admin.settings.notification.title"),
+                        permission: "setting.notification@control",
+                    },
+                },
+                {
+                    path: "setting-files",
+                    name: "files",
+                    component: Files,
+                    meta: {
+                        title: i18n.t("admin.settings.files.title"),
+                        permission: "setting.files@control",
+                    },
+                },
+                {
+                    path: "setting-log",
+                    name: "log",
+                    component: Log,
+                    meta: {
+                        title: i18n.t("admin.settings.log.title"),
+                        permission: "setting.log@control",
+                    },
+                },
+                {
+                    path: "setting-faqs",
+                    name: "faqs",
+                    component: Faqs,
+                    meta: {
+                        title: i18n.t("admin.settings.faqs.title"),
+                        permission: "setting.faqs@control",
+                    },
+                },
+                {
+                    path: "setting-parameters",
+                    name: "parameters",
+                    component: Parameters,
+                    meta: {
+                        title: i18n.t("admin.settings.parameters.title"),
+                        permission: "setting.parameters@control",
+                    },
+                },
+                {
+                    path: "setting-database",
+                    name: "database",
+                    component: Database,
+                    meta: {
+                        title: i18n.t("admin.settings.database.title"),
+                        permission: "setting.database@control",
+                    },
+                },
+                {
+                    path: "setting-roles",
+                    name: "roles",
+                    component: Roles,
+                    meta: {
+                        title: i18n.t("admin.settings.roles.title"),
+                        permission: "setting.roles@control",
+                    },
+                },
+                {
+                    path: "setting-permissions",
+                    name: "permissions",
+                    component: Permissions,
+                    meta: {
+                        title: i18n.t("admin.settings.permissions.title"),
+                        permission: "setting.permissions@control",
+                    },
+                },
+            ],
+        },
     ]),
 
     // Guest routes
@@ -162,52 +249,52 @@ export default ({ authGuard, guestGuard }) => [
                     name: "login",
                     component: Login,
                     meta: {
-                        title: i18n.t("auth.login.title")
-                    }
+                        title: i18n.t("auth.login.title"),
+                    },
                 },
                 {
                     path: "login-for-maintenance",
-                    redirect: "login"
+                    redirect: "login",
                 },
                 {
                     path: "create-account",
                     name: "create-account",
                     component: CreateAccount,
                     meta: {
-                        title: i18n.t("auth.createAccount.title")
-                    }
+                        title: i18n.t("auth.createAccount.title"),
+                    },
                 },
                 {
                     path: "reset-password",
                     name: "reset-password",
                     component: ResetPassword,
                     meta: {
-                        title: i18n.t("auth.resetPassword.title")
-                    }
+                        title: i18n.t("auth.resetPassword.title"),
+                    },
                 },
                 {
                     path: "change-password",
                     component: ChangePassword,
                     meta: {
-                        title: i18n.t("auth.resetPassword.title")
-                    }
+                        title: i18n.t("auth.resetPassword.title"),
+                    },
                 },
                 {
                     path: "verify-email",
                     name: "verify-email",
                     component: VerifyEmail,
                     meta: {
-                        title: i18n.t("auth.verifyEmail.title")
-                    }
-                }
-            ]
+                        title: i18n.t("auth.verifyEmail.title"),
+                    },
+                },
+            ],
         },
         {
             path: "/policy",
             name: "policy",
             component: Policy,
-            meta: { title: i18n.t("policy.title") }
-        }
+            meta: { title: i18n.t("policy.title") },
+        },
     ]),
-    { path: "*", component: NotFound }
+    { path: "*", component: NotFound },
 ];

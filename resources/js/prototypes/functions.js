@@ -261,35 +261,35 @@ export default {
     getCommandList: () => {
         return [
             {
-                name: i18n.t("admin.settings.commands.selects.cache"),
+                name: i18n.t("admin.settings.command.selects.cache"),
                 value: "config:cache",
             },
             {
-                name: i18n.t("admin.settings.commands.selects.resetMigrate"),
+                name: i18n.t("admin.settings.command.selects.resetMigrate"),
                 value: "migrate:refresh --seed,passport:install --force",
             },
             {
-                name: i18n.t("admin.settings.commands.selects.downMaintance"),
+                name: i18n.t("admin.settings.command.selects.downMaintance"),
                 value: "down",
             },
             {
-                name: i18n.t("admin.settings.commands.selects.upMaintance"),
+                name: i18n.t("admin.settings.command.selects.upMaintance"),
                 value: "up",
             },
             {
-                name: i18n.t("admin.settings.commands.selects.cleanLog"),
+                name: i18n.t("admin.settings.command.selects.cleanLog"),
                 value: "activitylog:clean --days=0",
             },
             {
-                name: i18n.t("admin.settings.commands.selects.updateTrade"),
+                name: i18n.t("admin.settings.command.selects.updateTrade"),
                 value: "trades:update",
             },
             {
-                name: i18n.t("admin.settings.commands.selects.storageLink"),
+                name: i18n.t("admin.settings.command.selects.storageLink"),
                 value: "storage:link",
             },
             {
-                name: i18n.t("admin.settings.commands.selects.custom"),
+                name: i18n.t("admin.settings.command.selects.custom"),
                 value: "custom",
             },
         ];

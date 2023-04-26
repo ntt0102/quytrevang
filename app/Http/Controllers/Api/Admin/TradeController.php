@@ -5,20 +5,14 @@ namespace App\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Api\CoreController;
 use Illuminate\Http\Request;
 use App\Services\Admin\TradeService;
-use App\Services\Admin\ShareService;
-use App\Services\Admin\Vn30f1mService;
 
 class TradeController extends CoreController
 {
     protected $tradeService;
-    protected $shareService;
-    protected $vn30f1mService;
 
-    public function __construct(TradeService $tradeService, ShareService $shareService, Vn30f1mService $vn30f1mService)
+    public function __construct(TradeService $tradeService)
     {
         $this->tradeService = $tradeService;
-        $this->shareService = $shareService;
-        $this->vn30f1mService = $vn30f1mService;
     }
 
     /**
