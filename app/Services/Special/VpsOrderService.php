@@ -193,7 +193,7 @@ class VpsOrderService extends CoreService
                 return ['isOk' => false, 'message' => 'failOrder'];
             else return ['isOk' => true];
         }
-        $isOk = $this->vpsUser->update([$type . '_order_id' => $rsp->data->orderNo]);
+        $isOk = $this->vpsUser->update([$type . '_order_id' => $rsp->data[0]->orderNo]);
         if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
         return ['isOk' => true];
     }
