@@ -1,27 +1,29 @@
 function initialState() {
-    return { charts: {} };
+    return { charts: {}, copyRate: 0 };
 }
 
 const getters = {
-    charts: state => state.charts
+    charts: (state) => state.charts,
+    copyRate: (state) => state.copyRate,
 };
 
 const actions = {
-    getWeekChart({ commit, dispatch, getters, state, rootGetters }) {
+    getMonthChart({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("trade").then(response => {
+            axios.get("trade", { crypto: true }).then((response) => {
                 // console.log(response.data);
                 commit("setState", response.data);
                 resolve();
             });
         });
-    }
+    },
 };
 
 const mutations = {
     setState(state, data) {
-        state.charts = data;
-    }
+        state.charts = data.charts;
+        state.copyRate = data.copyRate;
+    },
 };
 
 export default {
@@ -29,5 +31,5 @@ export default {
     state: initialState,
     getters,
     actions,
-    mutations
+    mutations,
 };

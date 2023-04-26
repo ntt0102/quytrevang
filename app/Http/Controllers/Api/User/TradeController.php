@@ -22,9 +22,9 @@ class TradeController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function getWeekChart(Request $request)
+    public function getMonthChart(Request $request)
     {
-        $data = $this->tradeService->getWeekChart($request);
-        return $this->sendResponse($data);
+        $data = $this->tradeService->getMonthChart($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
     }
 }

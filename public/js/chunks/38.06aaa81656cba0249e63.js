@@ -45,7 +45,7 @@ var DxChart = function DxChart() {
     this.$store.unregisterModule("User.trade");
     this.$bus.off("toggleMenu");
   },
-  computed: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapGetters"])("User.trade", ["charts"])), {}, {
+  computed: _objectSpread(_objectSpread({}, Object(vuex__WEBPACK_IMPORTED_MODULE_0__["mapGetters"])("User.trade", ["charts", "copyRate"])), {}, {
     chart: function chart() {
       return this.$refs.chart.instance;
     }
@@ -78,7 +78,7 @@ var render = function render() {
       title: {
         text: _vm.$t("user.overview.weekTrade.title"),
         subtitle: {
-          text: _vm.$t("user.overview.weekTrade.subtitle")
+          text: _vm.$t("user.overview.weekTrade.subtitle").replace("{copy}", _vm.copyRate)
         },
         horizontalAlignment: "center"
       },
@@ -169,48 +169,9 @@ if(false) {}
   !*** ./resources/js/store/modules/User/Trade.js ***!
   \**************************************************/
 /*! exports provided: default */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports) {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-function initialState() {
-  return {
-    charts: {}
-  };
-}
-var getters = {
-  charts: function charts(state) {
-    return state.charts;
-  }
-};
-var actions = {
-  getWeekChart: function getWeekChart(_ref) {
-    var commit = _ref.commit,
-      dispatch = _ref.dispatch,
-      getters = _ref.getters,
-      state = _ref.state,
-      rootGetters = _ref.rootGetters;
-    return new Promise(function (resolve, reject) {
-      axios.get("trade").then(function (response) {
-        // console.log(response.data);
-        commit("setState", response.data);
-        resolve();
-      });
-    });
-  }
-};
-var mutations = {
-  setState: function setState(state, data) {
-    state.charts = data;
-  }
-};
-/* harmony default export */ __webpack_exports__["default"] = ({
-  namespaced: true,
-  state: initialState,
-  getters: getters,
-  actions: actions,
-  mutations: mutations
-});
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: C:\\xampp\\htdocs\\quytrevang\\resources\\js\\store\\modules\\User\\Trade.js: Unexpected token, expected \",\" (13:29)\n\n\u001b[0m \u001b[90m 11 |\u001b[39m     getWeekChart({ commit\u001b[33m,\u001b[39m dispatch\u001b[33m,\u001b[39m getters\u001b[33m,\u001b[39m state\u001b[33m,\u001b[39m rootGetters }) {\u001b[0m\n\u001b[0m \u001b[90m 12 |\u001b[39m         \u001b[36mreturn\u001b[39m \u001b[36mnew\u001b[39m \u001b[33mPromise\u001b[39m((resolve\u001b[33m,\u001b[39m reject) \u001b[33m=>\u001b[39m {\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 13 |\u001b[39m             axios\u001b[33m.\u001b[39m\u001b[36mget\u001b[39m(\u001b[32m\"trade\"\u001b[39m{ crypto\u001b[33m:\u001b[39m \u001b[36mtrue\u001b[39m })\u001b[33m.\u001b[39mthen((response) \u001b[33m=>\u001b[39m {\u001b[0m\n\u001b[0m \u001b[90m    |\u001b[39m                              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 14 |\u001b[39m                 \u001b[90m// console.log(response.data);\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 15 |\u001b[39m                 commit(\u001b[32m\"setState\"\u001b[39m\u001b[33m,\u001b[39m response\u001b[33m.\u001b[39mdata)\u001b[33m;\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 16 |\u001b[39m                 resolve()\u001b[33m;\u001b[39m\u001b[0m\n    at instantiate (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:653:32)\n    at constructor (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:947:12)\n    at Parser.raise (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:3271:19)\n    at Parser.unexpected (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:3301:16)\n    at Parser.expect (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:3643:28)\n    at Parser.parseCallExpressionArguments (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11058:14)\n    at Parser.parseCoverCallAndAsyncArrowHead (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10987:29)\n    at Parser.parseSubscript (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10922:19)\n    at Parser.parseSubscripts (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10893:19)\n    at Parser.parseExprSubscripts (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10884:17)\n    at Parser.parseUpdate (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10863:21)\n    at Parser.parseMaybeUnary (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10839:23)\n    at Parser.parseMaybeUnaryOrPrivate (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10677:61)\n    at Parser.parseExprOps (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10682:23)\n    at Parser.parseMaybeConditional (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10659:23)\n    at Parser.parseMaybeAssign (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10620:21)\n    at Parser.parseExpressionBase (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10574:23)\n    at C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10570:39\n    at Parser.allowInAnd (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12260:16)\n    at Parser.parseExpression (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10570:17)\n    at Parser.parseStatementContent (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12691:23)\n    at Parser.parseStatementLike (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12557:17)\n    at Parser.parseStatementListItem (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12537:17)\n    at Parser.parseBlockOrModuleBlockBody (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:13129:61)\n    at Parser.parseBlockBody (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:13122:10)\n    at Parser.parseBlock (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:13110:10)\n    at Parser.parseFunctionBody (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11932:24)\n    at Parser.parseArrowExpression (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11907:10)\n    at Parser.parseParenAndDistinguishExpression (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11510:12)\n    at Parser.parseExprAtom (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11149:23)\n    at Parser.parseExprSubscripts (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10880:23)\n    at Parser.parseUpdate (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10863:21)\n    at Parser.parseMaybeUnary (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10839:23)\n    at Parser.parseMaybeUnaryOrPrivate (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10677:61)\n    at Parser.parseExprOps (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10682:23)\n    at Parser.parseMaybeConditional (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10659:23)\n    at Parser.parseMaybeAssign (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10620:21)\n    at C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10590:39\n    at Parser.allowInAnd (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12265:12)\n    at Parser.parseMaybeAssignAllowIn (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10590:17)\n    at Parser.parseExprListItem (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:12017:18)\n    at Parser.parseExprList (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11989:22)\n    at Parser.parseNew (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11572:25)\n    at Parser.parseNewOrNewTarget (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11567:17)\n    at Parser.parseExprAtom (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:11176:21)\n    at Parser.parseExprSubscripts (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10880:23)\n    at Parser.parseUpdate (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10863:21)\n    at Parser.parseMaybeUnary (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10839:23)\n    at Parser.parseMaybeUnaryOrPrivate (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10677:61)\n    at Parser.parseExprOps (C:\\xampp\\htdocs\\quytrevang\\node_modules\\@babel\\parser\\lib\\index.js:10682:23)");
 
 /***/ }),
 

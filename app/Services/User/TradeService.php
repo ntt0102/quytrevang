@@ -3,39 +3,56 @@
 namespace App\Services\User;
 
 use App\Services\CoreService;
-use App\Repositories\TradeRepository;
+use App\Models\Trade;
 
 class TradeService extends CoreService
 {
-    private $tradeRepository;
-
-    public function __construct(
-        TradeRepository $tradeRepository
-    ) {
-        $this->tradeRepository = $tradeRepository;
-    }
 
     /**
-     * Get the week trade
+     * Get the month trade
      *
      * @param $request
      * 
      */
-    public function getWeekChart($request)
+    public function getMonthChart($request)
     {
-        $chart = $this->tradeRepository->getData(10);
-        $chart = $chart->sortBy('date')->values()->reduce(function ($carry, $ch) {
-            $date = date_create($ch->date);
-            $week = $date->format('W');
-            $year = $date->format('Y');
-            $profit = $ch->revenue - $ch->loss - $ch->fees;
-            $accumulatedProfit = !!count($carry) ? end($carry)['accumulatedProfit'] + $profit : $profit;
-            $carry[] = [
-                'accumulatedProfit' => $accumulatedProfit,
-                'time' => trans('custom.chart.period.1') . ' ' . $week . ($year != date("Y") ? '/' . $year : '')
-            ];
-            return $carry;
-        }, []);
-        return $chart;
+        $startDate = date_create()->modify('-1 month')->format('Y-m-d');
+        $endDate = date_create()->format('Y-m-d');
+        $data = Trade::where('date', '>=', $startDate)
+            ->where('date', '<=', $endDate)
+            ->orderBy('date', 'asc')->get()
+            ->reduce(function ($carry, $item) {
+                $carry['revenue'] += $item->revenue;
+                $carry['loss'] += $item->loss;
+                $carry['fees'] += $item->fees;
+                $profit = $item->revenue - $item->loss - $item->fees;
+                $accumulatedProfit = !!count($carry['charts']) ? end($carry['charts'])['accumulatedProfit'] + $profit : $profit;
+                $carry['charts'][] = [
+                    'accumulatedProfit' => $accumulatedProfit,
+                    'time' => $this->createChartTime($item->date)
+                ];
+                return $carry;
+            }, [
+                'revenue' => 0,
+                'loss' => 0,
+                'fees' => 0,
+                'charts' => [],
+            ]);
+        $copyRate = $data['revenue'] - $data['loss'] - $data['fees'] > 0
+            ? round(50 * (1 - ($data['loss'] / ($data['revenue'] - $data['fees'])))) : 0;
+        return [
+            'charts' => $data['charts'],
+            'copyRate' => $copyRate,
+        ];
+    }
+    private function createChartTime($time)
+    {
+        [$y, $m, $d] = explode("-", $time);
+        $t = $d;
+        if ($y != date("Y")) $t .= '/' . $m . '/' . $y;
+        else if ($m != date("m")) $t .= '/' . $m;
+        $t = trans('custom.chart.period.day') . ' ' . $t;
+        $t = str_replace(' 0', ' ', $t);
+        return str_replace('/0', '/', $t);
     }
 }

@@ -97,7 +97,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('withdrawing', 'ContractController@withdrawingContract');
                     Route::get('contract-users', 'ContractController@getContactUsers');
                 });
-                Route::get('trade', 'TradeController@getWeekChart')->middleware('can:trade@view');
+                Route::get('trade', 'TradeController@getMonthChart')->middleware('can:trade@view');
             });
 
             Route::group(['namespace' => 'Admin'], function () {

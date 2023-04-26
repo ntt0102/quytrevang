@@ -127,9 +127,9 @@ var render = function render() {
     staticClass: "period"
   }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.day")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.day >= 0 ? "good" : "bad")
-  }, [_c("i", {
+  }, [!_vm.$devices.phone ? _c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.day >= 0 ? "up" : "down")
-  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.day, 1)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+  }) : _vm._e(), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.day, 1)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
     on: {
       click: function click($event) {
         return _vm.viewDetail("week");
@@ -139,9 +139,9 @@ var render = function render() {
     staticClass: "period"
   }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.week")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.week >= 0 ? "good" : "bad")
-  }, [_c("i", {
+  }, [!_vm.$devices.phone ? _c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.week >= 0 ? "up" : "down")
-  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.week, 1)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+  }) : _vm._e(), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.week, 1)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
     on: {
       click: function click($event) {
         return _vm.viewDetail("month");
@@ -151,9 +151,9 @@ var render = function render() {
     staticClass: "period"
   }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.month")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.month >= 0 ? "good" : "bad")
-  }, [_c("i", {
+  }, [!_vm.$devices.phone ? _c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.month >= 0 ? "up" : "down")
-  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.month, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+  }) : _vm._e(), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.month, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
     on: {
       click: function click($event) {
         return _vm.viewDetail("quater");
@@ -163,9 +163,9 @@ var render = function render() {
     staticClass: "period"
   }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.quarter")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.quarter >= 0 ? "good" : "bad")
-  }, [_c("i", {
+  }, [!_vm.$devices.phone ? _c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.quarter >= 0 ? "up" : "down")
-  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.quarter, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+  }) : _vm._e(), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.quarter, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
     on: {
       click: function click($event) {
         return _vm.viewDetail("year");
@@ -175,9 +175,9 @@ var render = function render() {
     staticClass: "period"
   }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.year")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.year >= 0 ? "good" : "bad")
-  }, [_c("i", {
+  }, [!_vm.$devices.phone ? _c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.year >= 0 ? "up" : "down")
-  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.year, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+  }) : _vm._e(), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.year, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
     on: {
       click: function click($event) {
         return _vm.viewDetail("year");
@@ -187,9 +187,9 @@ var render = function render() {
     staticClass: "period"
   }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.all")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.all >= 0 ? "good" : "bad")
-  }, [_c("i", {
+  }, [!_vm.$devices.phone ? _c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.all >= 0 ? "up" : "down")
-  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.all, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])])]);
+  }) : _vm._e(), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.all, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])])]);
 };
 var staticRenderFns = [];
 render._withStripped = true;

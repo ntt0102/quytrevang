@@ -41,14 +41,14 @@
                                 options: {
                                     icon: 'menu',
                                     stylingMode: 'text',
-                                    onClick: toggleMenu
-                                }
+                                    onClick: toggleMenu,
+                                },
                             },
                             {
                                 location: 'before',
                                 cssClass: 'header-title dx-toolbar-label',
-                                template: 'appNameTemplate'
-                            }
+                                template: 'appNameTemplate',
+                            },
                         ]"
                     >
                         <template #appNameTemplate>
@@ -88,16 +88,16 @@ export default {
         SideNavMenu,
         AppFooter,
         InstallAppPopup,
-        CheckPinPopup
+        CheckPinPopup,
     },
     props: {
         isSmall: Boolean,
-        isLarge: Boolean
+        isLarge: Boolean,
     },
     data() {
         return {
             menuOpened: this.isLarge,
-            menuTemporaryOpened: false
+            menuTemporaryOpened: false,
         };
     },
     beforeCreate() {
@@ -134,7 +134,7 @@ export default {
                 minMenuSize: this.isSmall ? 0 : 60,
                 menuOpened: this.isLarge,
                 closeOnOutsideClick: shaderEnabled,
-                shaderEnabled
+                shaderEnabled,
             };
         },
         headerMenuTogglerEnabled() {
@@ -142,7 +142,7 @@ export default {
         },
         scrollView() {
             return this.$refs.scrollView.instance;
-        }
+        },
     },
     watch: {
         isLarge() {
@@ -154,7 +154,7 @@ export default {
                 this.menuTemporaryOpened = false;
             }
             this.scrollView.scrollTo(0);
-        }
+        },
     },
     methods: {
         ...mapActions("User.layout", [
@@ -162,7 +162,7 @@ export default {
             "fetchNotification",
             "updateSubscription",
             "setPushEnabled",
-            "dismissNotification"
+            "dismissNotification",
         ]),
         toggleMenu(e) {
             const pointerEvent = e.event;
@@ -184,15 +184,15 @@ export default {
                 authEndpoint: `${axios.defaults.baseURL}/broadcasting/auth`,
                 auth: {
                     headers: {
-                        Authorization: `Bearer ${this.token}`
-                    }
-                }
+                        Authorization: `Bearer ${this.token}`,
+                    },
+                },
             });
             this.$pusher
                 .subscribe(`private-user-${this.id}`)
                 .bind(
                     "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated",
-                    e => {
+                    (e) => {
                         setTimeout(() => {
                             let layout = ["notification"];
                             switch (e.event) {
@@ -255,16 +255,14 @@ export default {
                         }, 2000);
                     }
                 )
-                .bind("read-notification", e => {
+                .bind("read-notification", (e) => {
                     this.initLayout(["notification"]);
                     this.fetchNotification();
                 });
             if (
-                [
-                    "users@control",
-                    "contracts@control",
-                    "comments@control"
-                ].some(p => this.permissions.includes(p))
+                ["users@control", "contracts@control", "comments@control"].some(
+                    (p) => this.permissions.includes(p)
+                )
             ) {
                 this.$pusher
                     .subscribe("private-admin")
@@ -281,7 +279,7 @@ export default {
                     });
             }
             if (
-                ["trades@view", "trade@view"].some(p =>
+                ["trades@view", "trade@view"].some((p) =>
                     this.permissions.includes(p)
                 )
             ) {
@@ -307,7 +305,9 @@ export default {
                                 this.permissions.includes("trade@view") &&
                                 this.$route.name == "overview"
                             )
-                                this.$store.dispatch("User.trade/getWeekChart");
+                                this.$store.dispatch(
+                                    "User.trade/getMonthChart"
+                                );
                         }, 2000);
                     });
             }
@@ -337,10 +337,10 @@ export default {
                 return;
             }
 
-            navigator.serviceWorker.ready.then(registration => {
+            navigator.serviceWorker.ready.then((registration) => {
                 registration.pushManager
                     .getSubscription()
-                    .then(subscription => {
+                    .then((subscription) => {
                         Notification.requestPermission();
                         if (!subscription) {
                             this.setPushEnabled(false);
@@ -348,12 +348,12 @@ export default {
                         }
                         this.updateSubscription(subscription);
                     })
-                    .catch(e => {
+                    .catch((e) => {
                         console.log("Error during getSubscription()", e);
                     });
             });
 
-            navigator.serviceWorker.onmessage = event => {
+            navigator.serviceWorker.onmessage = (event) => {
                 if (event.data) {
                     if (event.data.type === "DISMISS")
                         this.dismissNotification(event.data.data);
@@ -374,14 +374,14 @@ export default {
 
             navigator.serviceWorker
                 .register("/sw.js")
-                .then(swReg => {
+                .then((swReg) => {
                     swReg.update();
                 })
-                .catch(err => {
+                .catch((err) => {
                     console.error("Service Worker Error", err);
                 });
-        }
-    }
+        },
+    },
 };
 </script>
 
