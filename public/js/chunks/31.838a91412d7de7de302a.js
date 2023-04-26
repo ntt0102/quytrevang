@@ -499,7 +499,7 @@ var TIME = {
                 });
                 if (self.order.entry.hasOwnProperty("line")) {
                   if (self.order.tp.hasOwnProperty("line")) {
-                    if (self.order.side > 0 && data.lastPrice >= self.order.tp.price || self.order.side < 0 && data.lastPrice <= self.order.tp.price) {
+                    if (!_this4.status.position && Math.abs(_this4.lastPrice.value - _this4.order.tp.price) < Math.abs(_this4.lastPrice.value - _this4.order.sl.price) || self.order.side > 0 && data.lastPrice >= self.order.tp.price || self.order.side < 0 && data.lastPrice <= self.order.tp.price) {
                       if (!self.isAutoOrdering) {
                         self.isAutoOrdering = true;
                         self.executeOrder({
@@ -519,7 +519,7 @@ var TIME = {
                         });
                       }
                     }
-                    if (self.order.side > 0 && data.lastPrice <= self.order.sl.price || self.order.side < 0 && data.lastPrice >= self.order.sl.price) {
+                    if (!_this4.status.position && Math.abs(_this4.lastPrice.value - _this4.order.sl.price) < Math.abs(_this4.lastPrice.value - _this4.order.tp.price) || self.order.side > 0 && data.lastPrice <= self.order.sl.price || self.order.side < 0 && data.lastPrice >= self.order.sl.price) {
                       if (!self.isAutoOrdering) {
                         self.isAutoOrdering = true;
                         self.executeOrder({
@@ -540,7 +540,7 @@ var TIME = {
                       }
                     }
                   } else {
-                    if (self.order.side > 0 && data.lastPrice >= self.order.entry.price || self.order.side < 0 && data.lastPrice <= self.order.entry.price) {
+                    if (!!_this4.status.position || self.order.side > 0 && data.lastPrice >= self.order.entry.price || self.order.side < 0 && data.lastPrice <= self.order.entry.price) {
                       if (!self.isAutoOrdering) {
                         self.isAutoOrdering = true;
                         self.executeOrder({
@@ -583,35 +583,7 @@ var TIME = {
       var _this5 = this;
       var CURRENT_SEC = moment().unix();
       if (this.inSession(CURRENT_SEC)) {
-        if (this.status.position) {
-          if (this.order.entry.hasOwnProperty("line") && !this.order.tp.hasOwnProperty("line")) {
-            if (!this.isAutoOrdering) {
-              this.isAutoOrdering = true;
-              this.executeOrder({
-                action: "tpsl",
-                tpData: {
-                  cmd: "new",
-                  side: -this.order.side,
-                  price: this.order.tp.price
-                },
-                slData: {
-                  cmd: "new",
-                  side: -this.order.side,
-                  price: this.order.sl.price
-                }
-              }).then(function (resp) {
-                if (resp.isOk) {
-                  _this5.drawOrderLine("tp");
-                  _this5.drawOrderLine("sl");
-                  _this5.order.entry.line.applyOptions({
-                    draggable: false
-                  });
-                  _this5.$toasted.success(_this5.$t("admin.orderChart.autoNewTpSlSuccess"));
-                } else _this5.toasteOrderError(resp.message);
-                _this5.isAutoOrdering = false;
-              });
-            }
-          }
+        if (!!this.status.position) {
           if (CURRENT_SEC > TIME.ATC - 5 * 60) {
             this.blinkCancelOrderButton();
             if (CURRENT_SEC > TIME.ATC - 60 && this.order.tp.hasOwnProperty("line")) {
@@ -632,48 +604,6 @@ var TIME = {
                   _this5.$toasted.success(_this5.$t("admin.orderChart.autoCancelTpSlSuccess"));
                 } else _this5.toasteOrderError(resp.message);
               });
-            }
-          }
-        } else {
-          if (this.order.tp.hasOwnProperty("line")) {
-            if (Math.abs(this.lastPrice.value - this.order.tp.price) < Math.abs(this.lastPrice.value - this.order.sl.price)) {
-              if (!this.isAutoOrdering) {
-                this.isAutoOrdering = true;
-                this.executeOrder({
-                  action: "sl",
-                  data: {
-                    cmd: "delete"
-                  }
-                }).then(function (resp) {
-                  if (resp.isOk) {
-                    _this5.removeOrderLine("entry");
-                    _this5.removeOrderLine("tp");
-                    _this5.removeOrderLine("sl");
-                    _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_1__["default"].clear("order");
-                    _this5.$toasted.success(_this5.$t("admin.orderChart.deleteTpSuccess"));
-                  } else _this5.toasteOrderError(resp.message);
-                  _this5.isAutoOrdering = false;
-                });
-              }
-            } else {
-              if (!this.isAutoOrdering) {
-                this.isAutoOrdering = true;
-                this.executeOrder({
-                  action: "tp",
-                  data: {
-                    cmd: "cancel"
-                  }
-                }).then(function (resp) {
-                  if (resp.isOk) {
-                    _this5.removeOrderLine("entry");
-                    _this5.removeOrderLine("tp");
-                    _this5.removeOrderLine("sl");
-                    _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_1__["default"].clear("order");
-                    _this5.$toasted.success(_this5.$t("admin.orderChart.deleteSlSuccess"));
-                  } else _this5.toasteOrderError(resp.message);
-                  _this5.isAutoOrdering = false;
-                });
-              }
             }
           }
         }

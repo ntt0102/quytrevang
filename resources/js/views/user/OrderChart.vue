@@ -584,6 +584,15 @@ export default {
                                 if (self.order.entry.hasOwnProperty("line")) {
                                     if (self.order.tp.hasOwnProperty("line")) {
                                         if (
+                                            (!this.status.position &&
+                                                Math.abs(
+                                                    this.lastPrice.value -
+                                                        this.order.tp.price
+                                                ) <
+                                                    Math.abs(
+                                                        this.lastPrice.value -
+                                                            this.order.sl.price
+                                                    )) ||
                                             (self.order.side > 0 &&
                                                 data.lastPrice >=
                                                     self.order.tp.price) ||
@@ -624,6 +633,15 @@ export default {
                                             }
                                         }
                                         if (
+                                            (!this.status.position &&
+                                                Math.abs(
+                                                    this.lastPrice.value -
+                                                        this.order.sl.price
+                                                ) <
+                                                    Math.abs(
+                                                        this.lastPrice.value -
+                                                            this.order.tp.price
+                                                    )) ||
                                             (self.order.side > 0 &&
                                                 data.lastPrice <=
                                                     self.order.sl.price) ||
@@ -665,6 +683,7 @@ export default {
                                         }
                                     } else {
                                         if (
+                                            !!this.status.position ||
                                             (self.order.side > 0 &&
                                                 data.lastPrice >=
                                                     self.order.entry.price) ||
@@ -726,42 +745,7 @@ export default {
         intervalHandler() {
             const CURRENT_SEC = moment().unix();
             if (this.inSession(CURRENT_SEC)) {
-                if (this.status.position) {
-                    if (
-                        this.order.entry.hasOwnProperty("line") &&
-                        !this.order.tp.hasOwnProperty("line")
-                    ) {
-                        if (!this.isAutoOrdering) {
-                            this.isAutoOrdering = true;
-                            this.executeOrder({
-                                action: "tpsl",
-                                tpData: {
-                                    cmd: "new",
-                                    side: -this.order.side,
-                                    price: this.order.tp.price,
-                                },
-                                slData: {
-                                    cmd: "new",
-                                    side: -this.order.side,
-                                    price: this.order.sl.price,
-                                },
-                            }).then((resp) => {
-                                if (resp.isOk) {
-                                    this.drawOrderLine("tp");
-                                    this.drawOrderLine("sl");
-                                    this.order.entry.line.applyOptions({
-                                        draggable: false,
-                                    });
-                                    this.$toasted.success(
-                                        this.$t(
-                                            "admin.orderChart.autoNewTpSlSuccess"
-                                        )
-                                    );
-                                } else this.toasteOrderError(resp.message);
-                                this.isAutoOrdering = false;
-                            });
-                        }
-                    }
+                if (!!this.status.position) {
                     if (CURRENT_SEC > TIME.ATC - 5 * 60) {
                         this.blinkCancelOrderButton();
                         if (
@@ -785,57 +769,6 @@ export default {
                                     );
                                 } else this.toasteOrderError(resp.message);
                             });
-                        }
-                    }
-                } else {
-                    if (this.order.tp.hasOwnProperty("line")) {
-                        if (
-                            Math.abs(
-                                this.lastPrice.value - this.order.tp.price
-                            ) <
-                            Math.abs(this.lastPrice.value - this.order.sl.price)
-                        ) {
-                            if (!this.isAutoOrdering) {
-                                this.isAutoOrdering = true;
-                                this.executeOrder({
-                                    action: "sl",
-                                    data: { cmd: "delete" },
-                                }).then((resp) => {
-                                    if (resp.isOk) {
-                                        this.removeOrderLine("entry");
-                                        this.removeOrderLine("tp");
-                                        this.removeOrderLine("sl");
-                                        toolsStore.clear("order");
-                                        this.$toasted.success(
-                                            this.$t(
-                                                "admin.orderChart.deleteTpSuccess"
-                                            )
-                                        );
-                                    } else this.toasteOrderError(resp.message);
-                                    this.isAutoOrdering = false;
-                                });
-                            }
-                        } else {
-                            if (!this.isAutoOrdering) {
-                                this.isAutoOrdering = true;
-                                this.executeOrder({
-                                    action: "tp",
-                                    data: { cmd: "cancel" },
-                                }).then((resp) => {
-                                    if (resp.isOk) {
-                                        this.removeOrderLine("entry");
-                                        this.removeOrderLine("tp");
-                                        this.removeOrderLine("sl");
-                                        toolsStore.clear("order");
-                                        this.$toasted.success(
-                                            this.$t(
-                                                "admin.orderChart.deleteSlSuccess"
-                                            )
-                                        );
-                                    } else this.toasteOrderError(resp.message);
-                                    this.isAutoOrdering = false;
-                                });
-                            }
                         }
                     }
                 }
