@@ -185,15 +185,6 @@
                         color: 'White',
                         visible: visibleSeries.accumulatedProfit,
                     },
-                    {
-                        name: $t('admin.trades.copyRate'),
-                        tag: 'copyRate',
-                        valueField: 'copyRate',
-                        axis: 'copyRate',
-                        type: 'stackedbar',
-                        color: 'yellow',
-                        visible: visibleSeries.copyRate,
-                    },
                 ]"
                 :valueAxis="[
                     {
@@ -219,14 +210,6 @@
                     },
                     {
                         name: 'accumulatedProfit',
-                        label: { visible: false },
-                        tick: { visible: false },
-                        grid: { visible: false },
-                        visible: false,
-                    },
-                    {
-                        name: 'copyRate',
-                        synchronizedValue: 0,
                         label: { visible: false },
                         tick: { visible: false },
                         grid: { visible: false },
@@ -341,7 +324,6 @@ export default {
                 profitPerPrincipal: false,
                 profitPerFees: false,
                 accumulatedProfit: false,
-                copyRate: false,
             },
         };
     },
@@ -512,16 +494,6 @@ export default {
                   <div class='value-text'>
                     <span class='bottom-series-value'>
                       ${this.$options.filters.currency(accumulatedProfit)}
-                    </span>
-                  </div>
-                  <div class='series-name'>
-                    <span class='bottom-series-name'>
-                      ${this.$t("admin.trades.copyRate")}
-                    </span>:
-                  </div>
-                  <div class='value-text'>
-                    <span class='bottom-series-value'>
-                      ${pointInfo.point.data.copyRate}%
                     </span>
                   </div>
                 </div>

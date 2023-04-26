@@ -75,7 +75,6 @@ class TradeService extends CoreService
                     'revenue' => $item->revenue,
                     'loss' => $item->loss,
                     'fees' => $item->fees,
-                    'copyRate' => $profit > 0 ? round(40 * (1 - ($item->loss / ($item->revenue - $item->fees)))) : 0,
                     'profit' => $profit,
                     'principal' => (int) $principal,
                     'profitPerFees' => round($profit / $item->fees, 1),
