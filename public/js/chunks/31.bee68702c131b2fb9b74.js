@@ -583,26 +583,98 @@ var TIME = {
       var _this5 = this;
       var CURRENT_SEC = moment().unix();
       if (this.inSession(CURRENT_SEC)) {
-        if (CURRENT_SEC > TIME.ATC - 5 * 60) {
-          this.blinkCancelOrderButton();
-          if (CURRENT_SEC > TIME.ATC - 60 && this.order.tp.hasOwnProperty("line")) {
-            this.executeOrder({
-              action: "cancel",
-              tpData: {
-                cmd: "cancel"
-              },
-              slData: {
-                cmd: "delete"
+        if (this.status.position) {
+          if (this.order.entry.hasOwnProperty("line") && !this.order.tp.hasOwnProperty("line")) {
+            if (!this.isAutoOrdering) {
+              this.isAutoOrdering = true;
+              this.executeOrder({
+                action: "tpsl",
+                tpData: {
+                  cmd: "new",
+                  side: -this.order.side,
+                  price: this.order.tp.price
+                },
+                slData: {
+                  cmd: "new",
+                  side: -this.order.side,
+                  price: this.order.sl.price
+                }
+              }).then(function (resp) {
+                if (resp.isOk) {
+                  _this5.drawOrderLine("tp");
+                  _this5.drawOrderLine("sl");
+                  _this5.order.entry.line.applyOptions({
+                    draggable: false
+                  });
+                  _this5.$toasted.success(_this5.$t("admin.orderChart.autoNewTpSlSuccess"));
+                } else _this5.toasteOrderError(resp.message);
+                _this5.isAutoOrdering = false;
+              });
+            }
+          }
+          if (CURRENT_SEC > TIME.ATC - 5 * 60) {
+            this.blinkCancelOrderButton();
+            if (CURRENT_SEC > TIME.ATC - 60 && this.order.tp.hasOwnProperty("line")) {
+              this.executeOrder({
+                action: "cancel",
+                tpData: {
+                  cmd: "cancel"
+                },
+                slData: {
+                  cmd: "delete"
+                }
+              }).then(function (resp) {
+                if (resp.isOk) {
+                  _this5.removeOrderLine("entry");
+                  _this5.removeOrderLine("tp");
+                  _this5.removeOrderLine("sl");
+                  _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_1__["default"].clear("order");
+                  _this5.$toasted.success(_this5.$t("admin.orderChart.autoCancelTpSlSuccess"));
+                } else _this5.toasteOrderError(resp.message);
+              });
+            }
+          }
+        } else {
+          if (this.order.tp.hasOwnProperty("line")) {
+            if (Math.abs(this.lastPrice.value - this.order.tp.price) < Math.abs(this.lastPrice.value - this.order.sl.price)) {
+              if (!this.isAutoOrdering) {
+                this.isAutoOrdering = true;
+                this.executeOrder({
+                  action: "sl",
+                  data: {
+                    cmd: "delete"
+                  }
+                }).then(function (resp) {
+                  if (resp.isOk) {
+                    _this5.removeOrderLine("entry");
+                    _this5.removeOrderLine("tp");
+                    _this5.removeOrderLine("sl");
+                    _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_1__["default"].clear("order");
+                    _this5.$toasted.success(_this5.$t("admin.orderChart.deleteTpSuccess"));
+                  } else _this5.toasteOrderError(resp.message);
+                  _this5.isAutoOrdering = false;
+                });
               }
-            }).then(function (resp) {
-              if (resp.isOk) {
-                _this5.removeOrderLine("entry");
-                _this5.removeOrderLine("tp");
-                _this5.removeOrderLine("sl");
-                _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_1__["default"].clear("order");
-                _this5.$toasted.success(_this5.$t("admin.orderChart.autoCancelTpSlSuccess"));
-              } else _this5.toasteOrderError(resp.message);
-            });
+            } else {
+              if (!this.isAutoOrdering) {
+                this.isAutoOrdering = true;
+                this.executeOrder({
+                  action: "tp",
+                  data: {
+                    cmd: "cancel"
+                  }
+                }).then(function (resp) {
+                  if (resp.isOk) {
+                    _this5.removeOrderLine("entry");
+                    _this5.removeOrderLine("tp");
+                    _this5.removeOrderLine("sl");
+                    _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_1__["default"].clear("order");
+                    _this5.$toasted.success(_this5.$t("admin.orderChart.deleteSlSuccess"));
+                  } else _this5.toasteOrderError(resp.message);
+                  _this5.isAutoOrdering = false;
+                });
+              }
+            }
           }
         }
         if (CURRENT_SEC == TIME.START) this.connectSocket();

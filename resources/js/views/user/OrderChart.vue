@@ -8,18 +8,16 @@
                 <div class="chart-wrapper" ref="orderChart">
                     <div class="area data-area">
                         <div
-                            :class="
-                                `command noaction far fa-${
-                                    status.connection ? 'link' : 'unlink'
-                                }`
-                            "
+                            :class="`command noaction far fa-${
+                                status.connection ? 'link' : 'unlink'
+                            }`"
                             :title="$t('admin.orderChart.connection')"
                         ></div>
                         <div
                             class="command noaction status"
                             :class="{
                                 green: status.position > 0,
-                                red: status.position < 0
+                                red: status.position < 0,
                             }"
                             :title="$t('admin.orderChart.position')"
                         >
@@ -42,11 +40,9 @@
                     <div class="area tool-area">
                         <div
                             ref="fullscreenTool"
-                            :class="
-                                `command far fa-${
-                                    isFullscreen ? 'compress' : 'expand'
-                                }`
-                            "
+                            :class="`command far fa-${
+                                isFullscreen ? 'compress' : 'expand'
+                            }`"
                             :title="$t('admin.orderChart.fullscreen')"
                             @click="toggleFullscreen"
                         ></div>
@@ -117,29 +113,29 @@ const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.2, bottom: 0.1 }
+        scaleMargins: { top: 0.2, bottom: 0.1 },
     },
     leftPriceScale: { visible: false },
     layout: {
         backgroundColor: "#000000",
-        textColor: "#CCCCCC"
+        textColor: "#CCCCCC",
     },
     grid: {
         vertLines: {
             color: "#1B1E27",
-            style: 2
+            style: 2,
         },
         horzLines: {
             color: "#1B1E27",
-            style: 2
-        }
+            style: 2,
+        },
     },
     crosshair: { mode: 0 },
     timeScale: {
         timeVisible: true,
         rightOffset: 20,
-        minBarSpacing: 0.05
-    }
+        minBarSpacing: 0.05,
+    },
 };
 const TP_DEFAULT = 3;
 const SL_DEFAULT = 2;
@@ -148,7 +144,7 @@ const TIME = {
     START: moment(CURRENT_DATE + " 08:45:00").unix(),
     ATO: moment(CURRENT_DATE + " 09:00:00").unix(),
     ATC: moment(CURRENT_DATE + " 14:30:00").unix(),
-    END: moment(CURRENT_DATE + " 14:45:00").unix()
+    END: moment(CURRENT_DATE + " 14:45:00").unix(),
 };
 export default {
     data() {
@@ -167,7 +163,7 @@ export default {
             clock: moment().format("HH:mm:ss"),
             isFullscreen: false,
             websocket: null,
-            isAutoOrdering: false
+            isAutoOrdering: false,
         };
     },
     beforeCreate() {
@@ -201,11 +197,11 @@ export default {
             this.chart.subscribeCustomPriceLineDragged(this.eventPriceLineDrag);
             this.series.whitespace = this.chart.addLineSeries({
                 priceScaleId: "whitespace",
-                visible: false
+                visible: false,
             });
             this.series.price = this.chart.addLineSeries({
                 color: "#CCCCCC",
-                priceFormat: { minMove: 0.1 }
+                priceFormat: { minMove: 0.1 },
             });
             new ResizeObserver(this.eventChartResize).observe(
                 this.chartContainer
@@ -233,14 +229,14 @@ export default {
             "chartData",
             "status",
             "config",
-            "isChartLoading"
+            "isChartLoading",
         ]),
-        chartContainer: function() {
+        chartContainer: function () {
             return this.$refs.chartContainer;
         },
-        lastPrice: function() {
+        lastPrice: function () {
             return this.data.price.slice(-1)[0];
-        }
+        },
     },
     watch: {
         chartData() {
@@ -248,14 +244,14 @@ export default {
         },
         isChartLoading(value) {
             this.$refs.spinner.style.display = value ? "block" : "none";
-        }
+        },
     },
     methods: {
         ...mapActions("Admin.orderChart", [
             "getChartData",
             "getStatus",
             "getConfig",
-            "executeOrder"
+            "executeOrder",
         ]),
         eventChartContextmenu(e) {
             this.showOrderButton();
@@ -305,9 +301,9 @@ export default {
                                     data: {
                                         cmd: "change",
                                         side: this.order.side,
-                                        price: this.order.entry.price
-                                    }
-                                }).then(resp => {
+                                        price: this.order.entry.price,
+                                    },
+                                }).then((resp) => {
                                     if (resp.isOk) {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
@@ -330,9 +326,9 @@ export default {
                                     data: {
                                         cmd: "change",
                                         side: -this.order.side,
-                                        price: this.order.tp.price
-                                    }
-                                }).then(resp => {
+                                        price: this.order.tp.price,
+                                    },
+                                }).then((resp) => {
                                     if (resp.isOk) {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
@@ -351,9 +347,9 @@ export default {
                                     data: {
                                         action: "change",
                                         side: -this.order.side,
-                                        price: this.order.sl.price
-                                    }
-                                }).then(resp => {
+                                        price: this.order.sl.price,
+                                    },
+                                }).then((resp) => {
                                     if (resp.isOk) {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
@@ -379,7 +375,7 @@ export default {
                 case "line":
                     toolsStore.set("line", {
                         price: oldPrice,
-                        removed: true
+                        removed: true,
                     });
                     toolsStore.set("line", lineOptions);
                     this.$refs.lineTool.classList.remove("selected");
@@ -412,13 +408,15 @@ export default {
                     case 38:
                         this.chart.timeScale().applyOptions({
                             barSpacing:
-                                this.chart.options().timeScale.barSpacing + 0.05
+                                this.chart.options().timeScale.barSpacing +
+                                0.05,
                         });
                         break;
                     case 40:
                         this.chart.timeScale().applyOptions({
                             barSpacing:
-                                this.chart.options().timeScale.barSpacing - 0.05
+                                this.chart.options().timeScale.barSpacing -
+                                0.05,
                         });
                         break;
                     case 37:
@@ -470,9 +468,9 @@ export default {
             else document.documentElement.requestFullscreen();
         },
         loadToolsData() {
-            return new Promise(async resolve => {
+            return new Promise(async (resolve) => {
                 const order = await toolsStore.get("order");
-                order.map(item => {
+                order.map((item) => {
                     this.order.side = item.side;
                     this.order[item.kind].price = item.price;
                     this.drawOrderLine(item.kind);
@@ -481,11 +479,11 @@ export default {
                 });
                 if (this.order.tp.hasOwnProperty("line"))
                     this.order.entry.line.applyOptions({
-                        draggable: false
+                        draggable: false,
                     });
                 //
                 const lines = await toolsStore.get("line");
-                lines.forEach(line => {
+                lines.forEach((line) => {
                     if (!line.removed)
                         this.lines.push(
                             this.series.price.createPriceLine(line)
@@ -494,16 +492,14 @@ export default {
                 //
                 const rulerLines = await toolsStore.get("ruler");
                 if (rulerLines.length == 2) {
-                    rulerLines.forEach(line => {
+                    rulerLines.forEach((line) => {
                         this.ruler.point = 2;
                         if (line.point == 1)
-                            this.ruler.start = this.series.price.createPriceLine(
-                                line
-                            );
+                            this.ruler.start =
+                                this.series.price.createPriceLine(line);
                         else
-                            this.ruler.end = this.series.price.createPriceLine(
-                                line
-                            );
+                            this.ruler.end =
+                                this.series.price.createPriceLine(line);
                     });
                 }
                 //
@@ -545,8 +541,8 @@ export default {
             return data;
         },
         mergeChartData(data1, data2) {
-            const ids = new Set(data1.map(d => d.time));
-            return [...data1, ...data2.filter(d => !ids.has(d.time))].sort(
+            const ids = new Set(data1.map((d) => d.time));
+            return [...data1, ...data2.filter((d) => !ids.has(d.time))].sort(
                 (a, b) => a.time - b.time
             );
         },
@@ -555,14 +551,14 @@ export default {
             const endpoint =
                 "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
             self.websocket = new WebSocket(endpoint);
-            self.websocket.onopen = e => {
+            self.websocket.onopen = (e) => {
                 console.log("onopen", e);
                 var msg = { action: "join", list: self.config.symbol };
                 self.websocket.send(
                     `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
                 );
             };
-            self.websocket.onclose = e => {
+            self.websocket.onclose = (e) => {
                 console.log("onclose", e);
                 if (self._isDestroyed) return false;
                 if (self.inSession()) {
@@ -570,7 +566,7 @@ export default {
                     self.getChartData(self.chartDate);
                 }
             };
-            self.websocket.onmessage = e => {
+            self.websocket.onmessage = (e) => {
                 if (e.data.substr(0, 1) == 4) {
                     if (e.data.substr(1, 1) == 2) {
                         const event = JSON.parse(e.data.substr(2));
@@ -583,7 +579,7 @@ export default {
                                             `${CURRENT_DATE} ${data.time}`
                                         ).unix() +
                                         7 * 60 * 60,
-                                    value: data.lastPrice
+                                    value: data.lastPrice,
                                 });
                                 if (self.order.entry.hasOwnProperty("line")) {
                                     if (self.order.tp.hasOwnProperty("line")) {
@@ -599,8 +595,8 @@ export default {
                                                 self.isAutoOrdering = true;
                                                 self.executeOrder({
                                                     action: "sl",
-                                                    data: { cmd: "delete" }
-                                                }).then(resp => {
+                                                    data: { cmd: "delete" },
+                                                }).then((resp) => {
                                                     if (resp.isOk) {
                                                         self.removeOrderLine(
                                                             "entry"
@@ -639,8 +635,8 @@ export default {
                                                 self.isAutoOrdering = true;
                                                 self.executeOrder({
                                                     action: "tp",
-                                                    data: { cmd: "cancel" }
-                                                }).then(resp => {
+                                                    data: { cmd: "cancel" },
+                                                }).then((resp) => {
                                                     if (resp.isOk) {
                                                         self.removeOrderLine(
                                                             "entry"
@@ -683,16 +679,16 @@ export default {
                                                     tpData: {
                                                         cmd: "new",
                                                         side: -self.order.side,
-                                                        price:
-                                                            self.order.tp.price
+                                                        price: self.order.tp
+                                                            .price,
                                                     },
                                                     slData: {
                                                         cmd: "new",
                                                         side: -self.order.side,
-                                                        price:
-                                                            self.order.sl.price
-                                                    }
-                                                }).then(resp => {
+                                                        price: self.order.sl
+                                                            .price,
+                                                    },
+                                                }).then((resp) => {
                                                     if (resp.isOk) {
                                                         self.drawOrderLine(
                                                             "tp"
@@ -723,36 +719,124 @@ export default {
                     }
                 }
             };
-            self.websocket.onerror = e => {
+            self.websocket.onerror = (e) => {
                 console.log("onerror", e);
             };
         },
         intervalHandler() {
             const CURRENT_SEC = moment().unix();
             if (this.inSession(CURRENT_SEC)) {
-                if (CURRENT_SEC > TIME.ATC - 5 * 60) {
-                    this.blinkCancelOrderButton();
+                if (this.status.position) {
                     if (
-                        CURRENT_SEC > TIME.ATC - 60 &&
-                        this.order.tp.hasOwnProperty("line")
+                        this.order.entry.hasOwnProperty("line") &&
+                        !this.order.tp.hasOwnProperty("line")
                     ) {
-                        this.executeOrder({
-                            action: "cancel",
-                            tpData: { cmd: "cancel" },
-                            slData: { cmd: "delete" }
-                        }).then(resp => {
-                            if (resp.isOk) {
-                                this.removeOrderLine("entry");
-                                this.removeOrderLine("tp");
-                                this.removeOrderLine("sl");
-                                toolsStore.clear("order");
-                                this.$toasted.success(
-                                    this.$t(
-                                        "admin.orderChart.autoCancelTpSlSuccess"
-                                    )
-                                );
-                            } else this.toasteOrderError(resp.message);
-                        });
+                        if (!this.isAutoOrdering) {
+                            this.isAutoOrdering = true;
+                            this.executeOrder({
+                                action: "tpsl",
+                                tpData: {
+                                    cmd: "new",
+                                    side: -this.order.side,
+                                    price: this.order.tp.price,
+                                },
+                                slData: {
+                                    cmd: "new",
+                                    side: -this.order.side,
+                                    price: this.order.sl.price,
+                                },
+                            }).then((resp) => {
+                                if (resp.isOk) {
+                                    this.drawOrderLine("tp");
+                                    this.drawOrderLine("sl");
+                                    this.order.entry.line.applyOptions({
+                                        draggable: false,
+                                    });
+                                    this.$toasted.success(
+                                        this.$t(
+                                            "admin.orderChart.autoNewTpSlSuccess"
+                                        )
+                                    );
+                                } else this.toasteOrderError(resp.message);
+                                this.isAutoOrdering = false;
+                            });
+                        }
+                    }
+                    if (CURRENT_SEC > TIME.ATC - 5 * 60) {
+                        this.blinkCancelOrderButton();
+                        if (
+                            CURRENT_SEC > TIME.ATC - 60 &&
+                            this.order.tp.hasOwnProperty("line")
+                        ) {
+                            this.executeOrder({
+                                action: "cancel",
+                                tpData: { cmd: "cancel" },
+                                slData: { cmd: "delete" },
+                            }).then((resp) => {
+                                if (resp.isOk) {
+                                    this.removeOrderLine("entry");
+                                    this.removeOrderLine("tp");
+                                    this.removeOrderLine("sl");
+                                    toolsStore.clear("order");
+                                    this.$toasted.success(
+                                        this.$t(
+                                            "admin.orderChart.autoCancelTpSlSuccess"
+                                        )
+                                    );
+                                } else this.toasteOrderError(resp.message);
+                            });
+                        }
+                    }
+                } else {
+                    if (this.order.tp.hasOwnProperty("line")) {
+                        if (
+                            Math.abs(
+                                this.lastPrice.value - this.order.tp.price
+                            ) <
+                            Math.abs(this.lastPrice.value - this.order.sl.price)
+                        ) {
+                            if (!this.isAutoOrdering) {
+                                this.isAutoOrdering = true;
+                                this.executeOrder({
+                                    action: "sl",
+                                    data: { cmd: "delete" },
+                                }).then((resp) => {
+                                    if (resp.isOk) {
+                                        this.removeOrderLine("entry");
+                                        this.removeOrderLine("tp");
+                                        this.removeOrderLine("sl");
+                                        toolsStore.clear("order");
+                                        this.$toasted.success(
+                                            this.$t(
+                                                "admin.orderChart.deleteTpSuccess"
+                                            )
+                                        );
+                                    } else this.toasteOrderError(resp.message);
+                                    this.isAutoOrdering = false;
+                                });
+                            }
+                        } else {
+                            if (!this.isAutoOrdering) {
+                                this.isAutoOrdering = true;
+                                this.executeOrder({
+                                    action: "tp",
+                                    data: { cmd: "cancel" },
+                                }).then((resp) => {
+                                    if (resp.isOk) {
+                                        this.removeOrderLine("entry");
+                                        this.removeOrderLine("tp");
+                                        this.removeOrderLine("sl");
+                                        toolsStore.clear("order");
+                                        this.$toasted.success(
+                                            this.$t(
+                                                "admin.orderChart.deleteSlSuccess"
+                                            )
+                                        );
+                                    } else this.toasteOrderError(resp.message);
+                                    this.isAutoOrdering = false;
+                                });
+                            }
+                        }
                     }
                 }
                 if (CURRENT_SEC == TIME.START) this.connectSocket();
@@ -760,7 +844,7 @@ export default {
             this.clock = Intl.DateTimeFormat(navigator.language, {
                 hour: "numeric",
                 minute: "numeric",
-                second: "numeric"
+                second: "numeric",
             }).format();
         },
         showOrderButton() {
@@ -852,7 +936,7 @@ export default {
             if (this.order[kind].hasOwnProperty("line")) {
                 this.order[kind].line.applyOptions({
                     price: this.order[kind].price,
-                    title: title
+                    title: title,
                 });
             } else {
                 this.order[kind].line = this.series.price.createPriceLine({
@@ -863,13 +947,13 @@ export default {
                     lineWidth: 1,
                     lineStyle: LightweightCharts.LineStyle.Solid,
                     title: title,
-                    draggable: true
+                    draggable: true,
                 });
             }
             toolsStore.set("order", {
                 kind: kind,
                 price: +this.order[kind].price,
-                side: this.order.side
+                side: this.order.side,
             });
         },
         removeOrderLine(kind) {
@@ -882,7 +966,7 @@ export default {
             const selected = e.target.classList.contains("selected");
             document
                 .querySelectorAll(".tool-area > .command")
-                .forEach(el => el.classList.remove("selected"));
+                .forEach((el) => el.classList.remove("selected"));
             if (!selected) e.target.classList.add("selected");
             e.stopPropagation();
         },
@@ -897,7 +981,7 @@ export default {
             const price = this.formatPrice(
                 this.coordinateToPrice(this.crosshair.y)
             );
-            const existIndex = this.lines.findIndex(line => {
+            const existIndex = this.lines.findIndex((line) => {
                 const ops = line.options();
                 return (ops.type = TYPE && +ops.price == price);
             });
@@ -912,7 +996,7 @@ export default {
                     color: "aqua",
                     lineWidth: 1,
                     lineStyle: LightweightCharts.LineStyle.Dotted,
-                    draggable: true
+                    draggable: true,
                 };
                 this.lines.push(this.series.price.createPriceLine(options));
                 toolsStore.set("line", options);
@@ -920,7 +1004,9 @@ export default {
             this.$refs.lineTool.classList.remove("selected");
         },
         removeLineTool() {
-            this.lines.forEach(line => this.series.price.removePriceLine(line));
+            this.lines.forEach((line) =>
+                this.series.price.removePriceLine(line)
+            );
             this.lines = [];
             toolsStore.clear("line");
         },
@@ -928,7 +1014,7 @@ export default {
             const selected = e.target.classList.contains("selected");
             document
                 .querySelectorAll(".tool-area > .command")
-                .forEach(el => el.classList.remove("selected"));
+                .forEach((el) => el.classList.remove("selected"));
             if (!selected) {
                 e.target.classList.add("selected");
                 this.removeRulerTool();
@@ -949,7 +1035,7 @@ export default {
                 color: "#FF00FF",
                 lineWidth: 1,
                 lineStyle: LightweightCharts.LineStyle.Dotted,
-                draggable: true
+                draggable: true,
             };
             if (this.ruler.point == 0) {
                 const point = 1;
@@ -984,7 +1070,7 @@ export default {
                 this.$t("admin.orderChart.cancelOrder"),
                 this.$t("admin.orderChart.cancelConfirm")
             );
-            result.then(dialogResult => {
+            result.then((dialogResult) => {
                 if (dialogResult) {
                     this.toggleCancelOrderButton(false);
                     if (this.order.entry.hasOwnProperty("line")) {
@@ -996,9 +1082,9 @@ export default {
                                 exitData: {
                                     cmd: "new",
                                     side: -this.order.side,
-                                    price: "MTL"
-                                }
-                            }).then(resp => {
+                                    price: "MTL",
+                                },
+                            }).then((resp) => {
                                 if (resp.isOk) {
                                     this.removeOrderLine("entry");
                                     this.removeOrderLine("tp");
@@ -1015,8 +1101,8 @@ export default {
                         } else {
                             this.executeOrder({
                                 action: "entry",
-                                data: { cmd: "delete" }
-                            }).then(resp => {
+                                data: { cmd: "delete" },
+                            }).then((resp) => {
                                 if (resp.isOk) {
                                     this.removeOrderLine("entry");
                                     toolsStore.clear("order");
@@ -1043,16 +1129,16 @@ export default {
                         this.$t("admin.orderChart.atoOrder"),
                         this.$t("admin.orderChart.cancelConfirm")
                     );
-                    result.then(dialogResult => {
+                    result.then((dialogResult) => {
                         if (dialogResult) {
                             this.executeOrder({
                                 action: "exit",
                                 exitData: {
                                     cmd: "new",
                                     side: -this.order.side,
-                                    price: "ATO"
-                                }
-                            }).then(resp => {
+                                    price: "ATO",
+                                },
+                            }).then((resp) => {
                                 if (resp.isOk)
                                     this.$toasted.success(
                                         this.$t(
@@ -1069,9 +1155,9 @@ export default {
                         data: {
                             cmd: "new",
                             side: this.order.side,
-                            price: this.order.entry.price
-                        }
-                    }).then(resp => {
+                            price: this.order.entry.price,
+                        },
+                    }).then((resp) => {
                         if (resp.isOk) {
                             this.drawOrderLine("entry");
                             this.toggleCancelOrderButton(true);
@@ -1085,16 +1171,16 @@ export default {
                         this.$t("admin.orderChart.atcOrder"),
                         this.$t("admin.orderChart.cancelConfirm")
                     );
-                    result.then(dialogResult => {
+                    result.then((dialogResult) => {
                         if (dialogResult) {
                             this.executeOrder({
                                 action: "exit",
                                 exitData: {
                                     cmd: "new",
                                     side: -this.order.side,
-                                    price: "ATC"
-                                }
-                            }).then(resp => {
+                                    price: "ATC",
+                                },
+                            }).then((resp) => {
                                 if (resp.isOk)
                                     this.$toasted.success(
                                         this.$t(
@@ -1114,14 +1200,14 @@ export default {
                 tpData: {
                     cmd: "new",
                     side: -this.order.side,
-                    price: this.order.tp.price
+                    price: this.order.tp.price,
                 },
                 slData: {
                     cmd: "new",
                     side: -this.order.side,
-                    price: this.order.sl.price
-                }
-            }).then(resp => {
+                    price: this.order.sl.price,
+                },
+            }).then((resp) => {
                 if (resp.isOk) {
                     this.drawOrderLine("tp");
                     this.drawOrderLine("sl");
@@ -1148,8 +1234,8 @@ export default {
         toasteOrderError(error) {
             if (!error) error = "unknown";
             this.$toasted.error(this.$t(`admin.orderChart.${error}`));
-        }
-    }
+        },
+    },
 };
 </script>
 <style lang="scss" scoped>
