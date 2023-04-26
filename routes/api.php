@@ -155,17 +155,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 });
                 Route::group(['prefix' => 'trades', 'middleware' => 'can:trades@view'], function () {
                     Route::get('/', 'TradeController@fetch');
-                    Route::get('chart', 'TradeController@getChart');
+                    Route::post('chart', 'TradeController@getChart');
                     Route::get('summary', 'TradeController@getSummary');
-                    Route::group(['middleware' => 'can:trades@edit'], function () {
-                        Route::post('/', 'TradeController@save');
-                        Route::post('/share', 'TradeController@getShare');
-                        Route::post('/vn30f1m', 'TradeController@getVn30f1m');
-                        Route::group(['prefix' => 'flow'], function () {
-                            Route::get('/', 'TradeController@getFlow');
-                            Route::post('save', 'TradeController@saveFlow');
-                        });
-                    });
+                    Route::post('/', 'TradeController@save')->middleware('can:trades@edit');;
                 });
                 Route::group(['prefix' => 'order-chart', 'middleware' => 'can:orderChart@control'], function () {
                     Route::post('/', 'OrderChartController@getChartData');

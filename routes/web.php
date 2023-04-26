@@ -97,7 +97,7 @@ Route::get('test', function () {
     // $date = date_create('2006-12-12');
     // $date->modify('-0 day');
     // echo $date->format('Y-m-d');
-    $s = app(App\Services\Admin\TradeService::class)->createChartData('day', 1);
+    $s = app(App\Services\Admin\TradeService::class)->calculateSummary('all');
     // $s = date("n/Y");
     dd($s);
 })->middleware('cors');

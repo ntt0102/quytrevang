@@ -29,6 +29,7 @@ var INTERVAL = 4; // 4ms
       interval: null,
       change: {},
       doneFlag: false,
+      day: 0,
       week: 0,
       month: 0,
       quarter: 0,
@@ -53,6 +54,7 @@ var INTERVAL = 4; // 4ms
         this.calculateChange();
         if (!this.interval) {
           this.interval = setInterval(function () {
+            _this.animatedNumber("day");
             _this.animatedNumber("week");
             _this.animatedNumber("month");
             _this.animatedNumber("quarter");
@@ -87,6 +89,7 @@ var INTERVAL = 4; // 4ms
     },
     calculateChange: function calculateChange() {
       var counterTimes = DURATION / INTERVAL;
+      this.change.day = this.summary.day / counterTimes;
       this.change.week = this.summary.week / counterTimes;
       this.change.month = this.summary.month / counterTimes;
       this.change.quarter = this.summary.quarter / counterTimes;
@@ -117,64 +120,76 @@ var render = function render() {
   }, [_c("div", {
     on: {
       click: function click($event) {
-        return _vm.viewDetail(1);
+        return _vm.viewDetail("day");
       }
     }
   }, [_c("div", {
     staticClass: "period"
-  }, [_vm._v(_vm._s(_vm.$t("admin.trades.selects.period.week")))]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
+  }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.day")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
+    "class": "quality ".concat(_vm.summary.day >= 0 ? "good" : "bad")
+  }, [_c("i", {
+    "class": "far fa-long-arrow-alt-".concat(_vm.summary.day >= 0 ? "up" : "down")
+  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.day, 1)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+    on: {
+      click: function click($event) {
+        return _vm.viewDetail("week");
+      }
+    }
+  }, [_c("div", {
+    staticClass: "period"
+  }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.week")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.week >= 0 ? "good" : "bad")
   }, [_c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.week >= 0 ? "up" : "down")
-  }), _vm._v("\n      " + _vm._s(_vm._f("numberVnFormat")(_vm.week, 1)) + "%\n    ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.week, 1)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
     on: {
       click: function click($event) {
-        return _vm.viewDetail(4);
+        return _vm.viewDetail("month");
       }
     }
   }, [_c("div", {
     staticClass: "period"
-  }, [_vm._v(_vm._s(_vm.$t("admin.trades.selects.period.month")))]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
+  }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.month")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.month >= 0 ? "good" : "bad")
   }, [_c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.month >= 0 ? "up" : "down")
-  }), _vm._v("\n      " + _vm._s(_vm._f("numberVnFormat")(_vm.month, 1)) + "%\n    ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.month, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
     on: {
       click: function click($event) {
-        return _vm.viewDetail(13);
+        return _vm.viewDetail("quater");
       }
     }
   }, [_c("div", {
     staticClass: "period"
-  }, [_vm._v("\n      " + _vm._s(_vm.$t("admin.trades.selects.period.quarter")) + "\n    ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
+  }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.quarter")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.quarter >= 0 ? "good" : "bad")
   }, [_c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.quarter >= 0 ? "up" : "down")
-  }), _vm._v("\n      " + _vm._s(_vm._f("numberVnFormat")(_vm.quarter, 1)) + "%\n    ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.quarter, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
     on: {
       click: function click($event) {
-        return _vm.viewDetail(52);
+        return _vm.viewDetail("year");
       }
     }
   }, [_c("div", {
     staticClass: "period"
-  }, [_vm._v(_vm._s(_vm.$t("admin.trades.selects.period.year")))]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
+  }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.year")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.year >= 0 ? "good" : "bad")
   }, [_c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.year >= 0 ? "up" : "down")
-  }), _vm._v("\n      " + _vm._s(_vm._f("numberVnFormat")(_vm.year, 1)) + "%\n    ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
+  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.year, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])]), _vm._v(" "), _c("div", {
     on: {
       click: function click($event) {
-        return _vm.viewDetail(52);
+        return _vm.viewDetail("year");
       }
     }
   }, [_c("div", {
     staticClass: "period"
-  }, [_vm._v(_vm._s(_vm.$t("admin.trades.selects.period.all")))]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
+  }, [_vm._v("\n            " + _vm._s(_vm.$t("admin.trades.selects.period.all")) + "\n        ")]), _vm._v(" "), _vm.$mf.isSet(_vm.summary) ? _c("div", {
     "class": "quality ".concat(_vm.summary.all >= 0 ? "good" : "bad")
   }, [_c("i", {
     "class": "far fa-long-arrow-alt-".concat(_vm.summary.all >= 0 ? "up" : "down")
-  }), _vm._v("\n      " + _vm._s(_vm._f("numberVnFormat")(_vm.all, 1)) + "%\n    ")]) : _c("div", [_vm._v("-")])])]);
+  }), _vm._v("\n            " + _vm._s(_vm._f("numberVnFormat")(_vm.all, 0)) + "%\n        ")]) : _c("div", [_vm._v("-")])])]);
 };
 var staticRenderFns = [];
 render._withStripped = true;
@@ -256,6 +271,13 @@ function initialState() {
     updatedAt: null
   };
 }
+function createAccumulatedProfit(data) {
+  return data.reduce(function (carry, item) {
+    item.accumulatedProfit = item.profit + (!!carry.length ? carry.at(-1).accumulatedProfit : 0);
+    carry.push(item);
+    return carry;
+  }, []);
+}
 var getters = {
   charts: function charts(state) {
     return state.charts;
@@ -281,8 +303,9 @@ var actions = {
       state = _ref.state,
       rootGetters = _ref.rootGetters;
     return new Promise(function (resolve, reject) {
-      axios.get("trades").then(function (response) {
-        // console.log(response.data);
+      axios.get("trades", {
+        crypto: true
+      }).then(function (response) {
         commit("setState", response.data);
         resolve();
       });
@@ -296,13 +319,13 @@ var actions = {
       rootGetters = _ref2.rootGetters;
     if (moment().diff(state.updatedAt, "seconds") < 3) return false;
     return new Promise(function (resolve, reject) {
-      axios.get("trades/chart?period=".concat(period, "&page=1")).then(function (response) {
-        // console.log(response.data);
-        response.data.data = response.data.data.reduce(function (carry, item) {
-          item.accumulatedProfit = item.profit + (!!carry.length ? carry.at(-1).accumulatedProfit : 0);
-          carry.push(item);
-          return carry;
-        }, []);
+      axios.post("trades/chart", {
+        period: period,
+        page: 1
+      }, {
+        crypto: true
+      }).then(function (response) {
+        response.data.data = createAccumulatedProfit(response.data.data);
         commit("setChart", response.data);
         resolve();
       });
@@ -314,17 +337,16 @@ var actions = {
       getters = _ref3.getters,
       state = _ref3.state,
       rootGetters = _ref3.rootGetters;
-    var page = state.charts.page + 1;
     return new Promise(function (resolve, reject) {
-      axios.get("trades/chart?period=".concat(state.charts.period, "&page=").concat(page)).then(function (response) {
-        // console.log(response.data);
+      axios.post("trades/chart", {
+        period: state.charts.period,
+        page: state.charts.page + 1
+      }, {
+        crypto: true
+      }).then(function (response) {
         if (response.data.page > state.charts.page) {
           var chartData = [].concat(_toConsumableArray(response.data.data), _toConsumableArray(JSON.parse(JSON.stringify(state.charts.data))));
-          response.data.data = chartData.reduce(function (carry, item) {
-            item.accumulatedProfit = item.profit + (!!carry.length ? carry.at(-1).accumulatedProfit : 0);
-            carry.push(item);
-            return carry;
-          }, []);
+          response.data.data = createAccumulatedProfit(chartData);
           commit("setChart", response.data);
         }
         resolve();
@@ -340,8 +362,9 @@ var actions = {
     return new Promise(function (resolve, reject) {
       axios.post("trades", {
         changes: param.changes
+      }, {
+        crypto: true
       }).then(function (response) {
-        // console.log(response.data);
         resolve();
         dispatch("fetch");
         dispatch("getChart", state.charts.period);
@@ -355,69 +378,16 @@ var actions = {
       state = _ref5.state,
       rootGetters = _ref5.rootGetters;
     return new Promise(function (resolve, reject) {
-      axios.get("trades/summary").then(function (response) {
-        // console.log(response.data);
+      axios.get("trades/summary", {
+        crypto: true
+      }).then(function (response) {
         commit("setSummary", response.data);
         resolve();
       });
     });
   },
-  getShare: function getShare(_ref6, param) {
-    var commit = _ref6.commit,
-      dispatch = _ref6.dispatch,
-      getters = _ref6.getters,
-      state = _ref6.state,
-      rootGetters = _ref6.rootGetters;
-    return new Promise(function (resolve, reject) {
-      axios.post("trades/share", param).then(function (response) {
-        // console.log(response.data);
-        resolve(response.data);
-      });
-    });
-  },
-  getVn30f1m: function getVn30f1m(_ref7) {
-    var commit = _ref7.commit,
-      dispatch = _ref7.dispatch,
-      getters = _ref7.getters,
-      state = _ref7.state,
-      rootGetters = _ref7.rootGetters;
-    return new Promise(function (resolve, reject) {
-      axios.post("trades/vn30f1m").then(function (response) {
-        // console.log(response.data);
-        resolve(response.data);
-      });
-    });
-  },
-  getFlow: function getFlow(_ref8) {
-    var commit = _ref8.commit,
-      dispatch = _ref8.dispatch,
-      getters = _ref8.getters,
-      state = _ref8.state,
-      rootGetters = _ref8.rootGetters;
-    return new Promise(function (resolve, reject) {
-      axios.get("trades/flow").then(function (response) {
-        // console.log(response.data);
-        resolve(response.data);
-      });
-    });
-  },
-  saveFlow: function saveFlow(_ref9, param) {
-    var commit = _ref9.commit,
-      dispatch = _ref9.dispatch,
-      getters = _ref9.getters,
-      state = _ref9.state,
-      rootGetters = _ref9.rootGetters;
-    return new Promise(function (resolve, reject) {
-      axios.post("trades/flow/save", {
-        data: param
-      }).then(function (response) {
-        // console.log(response.data);
-        resolve();
-      });
-    });
-  },
-  resetState: function resetState(_ref10) {
-    var commit = _ref10.commit;
+  resetState: function resetState(_ref6) {
+    var commit = _ref6.commit;
     commit("resetState");
   }
 };

@@ -30,8 +30,8 @@ class TradeController extends CoreController
      */
     public function fetch(Request $request)
     {
-        $data = $this->tradeService->fetch($request);
-        return $this->sendResponse($data);
+        $data = $this->tradeService->fetch($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
     }
 
     /**
@@ -43,8 +43,8 @@ class TradeController extends CoreController
      */
     public function getChart(Request $request)
     {
-        $data = $this->tradeService->getChart($request);
-        return $this->sendResponse($data);
+        $data = $this->tradeService->getChart($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
     }
 
     /**
@@ -56,8 +56,8 @@ class TradeController extends CoreController
      */
     public function getSummary(Request $request)
     {
-        $data = $this->tradeService->getSummary($request);
-        return $this->sendResponse($data);
+        $data = $this->tradeService->getSummary($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
     }
 
     /**
@@ -69,60 +69,7 @@ class TradeController extends CoreController
      */
     public function save(Request $request)
     {
-        $data = $this->tradeService->save($request);
-        return $this->sendResponse($data);
-    }
-
-    /**
-     * Get Share
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getShare(Request $request)
-    {
-        $data = $this->shareService->getShare($request);
-        return $this->sendResponse($data);
-    }
-
-    /**
-     * Get Vn30f1m
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function getVn30f1m(Request $request)
-    {
-        $data = $this->vn30f1mService->getVn30f1m($request);
-        return $this->sendResponse($data);
-    }
-
-    /**
-     * Get the flow
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function getFlow(Request $request)
-    {
-        $data = $this->tradeService->getFlow($request);
-        return $this->sendResponse($data);
-    }
-
-    /**
-     * Save changed flow.
-     *
-     * @param Illuminate\Http\Request $request
-     * @param int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function saveFlow(Request $request)
-    {
-        $this->tradeService->saveFlow($request);
-        return $this->sendResponse();
+        $data = $this->tradeService->save($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
     }
 }
