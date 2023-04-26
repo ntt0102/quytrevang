@@ -38,7 +38,6 @@ class UsersTableSeeder extends Seeder
             'avatar' => '4fee13b01615da5a5bd100522c9a2ac0.png',
         ]);
         $user->assignRole('user');
-        $user->assignRole('assistant');
         $user->assignRole('admin');
 
         $user = User::create([

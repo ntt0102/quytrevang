@@ -14,29 +14,28 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run()
     {
-        Permission::create(['name' => 'profile@control']);
-        Permission::create(['name' => 'contract@control']);
-        Permission::create(['name' => 'method@control']);
-        Permission::create(['name' => 'trade@view']);
+        Permission::create(['name' => 'common@access']);
 
         Permission::create(['name' => 'system@control']);
+
         Permission::create(['name' => 'users@control']);
         Permission::create(['name' => 'contracts@control']);
+        Permission::create(['name' => 'copyists@control']);
         Permission::create(['name' => 'comments@control']);
+
+        Permission::create(['name' => 'stock@order']);
         Permission::create(['name' => 'trades@view']);
         Permission::create(['name' => 'trades@edit']);
         Permission::create(['name' => 'finbooks@control']);
-        Permission::create(['name' => 'smartorders@control']);
 
-        Permission::create(['name' => 'setting@control']);
-        Permission::create(['name' => 'setting.parameters@control']);
-        Permission::create(['name' => 'setting.faqs@control']);
-        Permission::create(['name' => 'setting.database@control']);
-        Permission::create(['name' => 'setting.command@control']);
-        Permission::create(['name' => 'setting.notification@control']);
-        Permission::create(['name' => 'setting.files@control']);
-        Permission::create(['name' => 'setting.log@control']);
-        Permission::create(['name' => 'setting.roles@control']);
-        Permission::create(['name' => 'setting.permissions@control']);
+        Permission::create(['name' => 'command@setting']);
+        Permission::create(['name' => 'notification@setting']);
+        Permission::create(['name' => 'files@setting']);
+        Permission::create(['name' => 'log@setting']);
+        Permission::create(['name' => 'faqs@setting']);
+        Permission::create(['name' => 'parameters@setting']);
+        Permission::create(['name' => 'database@setting']);
+        Permission::create(['name' => 'roles@setting']);
+        Permission::create(['name' => 'permissions@setting']);
     }
 }

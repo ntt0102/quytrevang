@@ -68,7 +68,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Overview,
                     meta: {
                         title: i18n.t("user.overview.title"),
-                        permission: "profile@control",
+                        permission: "common@access",
                     },
                 },
                 {
@@ -77,7 +77,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Profile,
                     meta: {
                         title: i18n.t("user.profile.title"),
-                        permission: "profile@control",
+                        permission: "common@access",
                     },
                 },
                 {
@@ -86,16 +86,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Contract,
                     meta: {
                         title: i18n.t("user.contract.title"),
-                        permission: "contract@control",
-                    },
-                },
-                {
-                    path: "order-chart",
-                    name: "orderChart",
-                    component: OrderChart,
-                    meta: {
-                        title: i18n.t("admin.orderChart.title"),
-                        permission: "service@use",
+                        permission: "common@access",
                     },
                 },
                 {
@@ -117,30 +108,12 @@ export default ({ authGuard, guestGuard }) => [
                     },
                 },
                 {
-                    path: "admin-finbooks",
-                    name: "finbooks",
-                    component: Finbooks,
-                    meta: {
-                        title: i18n.t("admin.finbooks.title"),
-                        permission: "finbooks@control",
-                    },
-                },
-                {
-                    path: "admin-trades",
-                    name: "trades",
-                    component: Trades,
-                    meta: {
-                        title: i18n.t("admin.trades.title"),
-                        permission: "trades@view",
-                    },
-                },
-                {
                     path: "admin-sos",
                     name: "smartorders",
                     component: SmartOrders,
                     meta: {
                         title: i18n.t("admin.smartorders.title"),
-                        permission: "smartorders@control",
+                        permission: "copyists@control",
                     },
                 },
                 {
@@ -153,12 +126,39 @@ export default ({ authGuard, guestGuard }) => [
                     },
                 },
                 {
+                    path: "trading-order",
+                    name: "order",
+                    component: OrderChart,
+                    meta: {
+                        title: i18n.t("admin.orderChart.title"),
+                        permission: "stock@order",
+                    },
+                },
+                {
+                    path: "trading-trades",
+                    name: "trades",
+                    component: Trades,
+                    meta: {
+                        title: i18n.t("admin.trades.title"),
+                        permission: "trades@view",
+                    },
+                },
+                {
+                    path: "trading-finbooks",
+                    name: "finbooks",
+                    component: Finbooks,
+                    meta: {
+                        title: i18n.t("admin.finbooks.title"),
+                        permission: "finbooks@control",
+                    },
+                },
+                {
                     path: "setting-command",
                     name: "command",
                     component: Command,
                     meta: {
                         title: i18n.t("admin.settings.command.title"),
-                        permission: "setting.command@control",
+                        permission: "command@setting",
                     },
                 },
                 {
@@ -167,7 +167,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Notification,
                     meta: {
                         title: i18n.t("admin.settings.notification.title"),
-                        permission: "setting.notification@control",
+                        permission: "notification@setting",
                     },
                 },
                 {
@@ -176,7 +176,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Files,
                     meta: {
                         title: i18n.t("admin.settings.files.title"),
-                        permission: "setting.files@control",
+                        permission: "files@setting",
                     },
                 },
                 {
@@ -185,7 +185,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Log,
                     meta: {
                         title: i18n.t("admin.settings.log.title"),
-                        permission: "setting.log@control",
+                        permission: "log@setting",
                     },
                 },
                 {
@@ -194,7 +194,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Faqs,
                     meta: {
                         title: i18n.t("admin.settings.faqs.title"),
-                        permission: "setting.faqs@control",
+                        permission: "faqs@setting",
                     },
                 },
                 {
@@ -203,7 +203,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Parameters,
                     meta: {
                         title: i18n.t("admin.settings.parameters.title"),
-                        permission: "setting.parameters@control",
+                        permission: "parameters@setting",
                     },
                 },
                 {
@@ -212,7 +212,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Database,
                     meta: {
                         title: i18n.t("admin.settings.database.title"),
-                        permission: "setting.database@control",
+                        permission: "database@setting",
                     },
                 },
                 {
@@ -221,7 +221,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Roles,
                     meta: {
                         title: i18n.t("admin.settings.roles.title"),
-                        permission: "setting.roles@control",
+                        permission: "roles@setting",
                     },
                 },
                 {
@@ -230,7 +230,7 @@ export default ({ authGuard, guestGuard }) => [
                     component: Permissions,
                     meta: {
                         title: i18n.t("admin.settings.permissions.title"),
-                        permission: "setting.permissions@control",
+                        permission: "permissions@setting",
                     },
                 },
             ],

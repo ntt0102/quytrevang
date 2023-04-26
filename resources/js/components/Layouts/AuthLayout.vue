@@ -279,7 +279,7 @@ export default {
                     });
             }
             if (
-                ["trades@view", "trade@view"].some((p) =>
+                ["trades@view", "common@access"].some((p) =>
                     this.permissions.includes(p)
                 )
             ) {
@@ -302,7 +302,7 @@ export default {
                                     );
                             }
                             if (
-                                this.permissions.includes("trade@view") &&
+                                this.permissions.includes("common@access") &&
                                 this.$route.name == "overview"
                             )
                                 this.$store.dispatch(

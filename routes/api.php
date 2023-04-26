@@ -56,7 +56,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::post('save-order', 'SmartOrderController@saveOrder');
                 Route::post('report', 'SmartOrderController@report');
             });
-            Route::group(['middleware' => 'can:smartorders@control'], function () {
+            Route::group(['middleware' => 'can:copyists@control'], function () {
                 Route::get('manage', 'SmartOrderController@getList');
                 Route::post('manage/validate-user', 'SmartOrderController@validateUser');
                 Route::post('manage', 'SmartOrderController@saveSo');
@@ -81,7 +81,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
 
         Route::group(['middleware' => 'verified'], function () {
             Route::group(['namespace' => 'User'], function () {
-                Route::group(['prefix' => 'profile', 'middleware' => 'can:profile@control'], function () {
+                Route::group(['prefix' => 'profile', 'middleware' => 'can:common@access'], function () {
                     Route::get('/', 'ProfileController@fetch');
                     Route::post('/', 'ProfileController@save');
                     Route::post('password', 'ProfileController@changePassword');
@@ -90,14 +90,14 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('delete', 'ProfileController@delete');
                     Route::post('validate-duplicate', 'ProfileController@validateDuplicate');
                 });
-                Route::group(['prefix' => 'contract', 'middleware' => 'can:contract@control'], function () {
+                Route::group(['prefix' => 'contract', 'middleware' => 'can:common@access'], function () {
                     Route::get('/', 'ContractController@fetch');
                     Route::post('/', 'ContractController@save');
                     Route::post('paying', 'ContractController@payingContract');
                     Route::post('withdrawing', 'ContractController@withdrawingContract');
                     Route::get('contract-users', 'ContractController@getContactUsers');
                 });
-                Route::get('trade', 'TradeController@getMonthChart')->middleware('can:trade@view');
+                Route::get('trade', 'TradeController@getMonthChart')->middleware('can:common@access');
             });
 
             Route::group(['namespace' => 'Admin'], function () {
@@ -117,22 +117,22 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::get('summary', 'ContractController@summary');
                     Route::get('receipt-info', 'ContractController@getReceiptInfo');
                 });
-                Route::group(['prefix' => 'settings', 'middleware' => 'can:setting@control'], function () {
-                    Route::group(['prefix' => 'parameters', 'middleware' => 'can:setting.parameters@control'], function () {
+                Route::group(['prefix' => 'settings'], function () {
+                    Route::group(['prefix' => 'parameters', 'middleware' => 'can:parameters@setting'], function () {
                         Route::get('/', 'SettingController@fetchParameters');
                         Route::post('/', 'SettingController@saveParameters');
                     });
-                    Route::group(['prefix' => 'faqs', 'middleware' => 'can:setting.faqs@control'], function () {
+                    Route::group(['prefix' => 'faqs', 'middleware' => 'can:faqs@setting'], function () {
                         Route::get('/', 'SettingController@fetchFaqs');
                         Route::post('/', 'SettingController@saveFaqs');
                     });
-                    Route::group(['prefix' => 'database', 'middleware' => 'can:setting.database@control'], function () {
+                    Route::group(['prefix' => 'database', 'middleware' => 'can:database@setting'], function () {
                         Route::post('backup', 'SettingController@backupDatabase');
                         Route::post('restore', 'SettingController@restoreDatabase');
                     });
-                    Route::post('command/run', 'SettingController@runCommand')->middleware('can:setting.command@control');
-                    Route::post('notification/send', 'SettingController@sendNotification')->middleware('can:setting.notification@control');
-                    Route::group(['prefix' => 'files', 'middleware' => 'can:setting.files@control'], function () {
+                    Route::post('command/run', 'SettingController@runCommand')->middleware('can:command@setting');
+                    Route::post('notification/send', 'SettingController@sendNotification')->middleware('can:notification@setting');
+                    Route::group(['prefix' => 'files', 'middleware' => 'can:files@setting'], function () {
                         Route::get('getItems', 'SettingController@getItems');
                         Route::post('createDirectory', 'SettingController@createDirectory');
                         Route::post('renameItem', 'SettingController@renameItem');
@@ -141,13 +141,13 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                         Route::post('moveItem', 'SettingController@moveItem');
                         Route::post('uploadFileChunk', 'SettingController@uploadFileChunk');
                     });
-                    Route::get('log', 'SettingController@fetchLog')->middleware('can:setting.log@control');
-                    Route::group(['prefix' => 'roles', 'middleware' => 'can:setting.roles@control'], function () {
+                    Route::get('log', 'SettingController@fetchLog')->middleware('can:log@setting');
+                    Route::group(['prefix' => 'roles', 'middleware' => 'can:roles@setting'], function () {
                         Route::get('/', 'SettingController@fetchRoles');
                         Route::post('/', 'SettingController@saveRoles');
                         Route::post('validate-duplicate-name', 'SettingController@validateDuplicateRoleName');
                     });
-                    Route::group(['prefix' => 'permissions', 'middleware' => 'can:setting.permissions@control'], function () {
+                    Route::group(['prefix' => 'permissions', 'middleware' => 'can:permissions@setting'], function () {
                         Route::get('/', 'SettingController@fetchPermissions');
                         Route::post('/', 'SettingController@savePermissions');
                         Route::post('validate-duplicate-name', 'SettingController@validateDuplicatePermissionName');
@@ -159,7 +159,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::get('summary', 'TradeController@getSummary');
                     Route::post('/', 'TradeController@save')->middleware('can:trades@edit');;
                 });
-                Route::group(['prefix' => 'order-chart', 'middleware' => 'can:orderChart@control'], function () {
+                Route::group(['prefix' => 'order-chart', 'middleware' => 'can:stock@order'], function () {
                     Route::post('/', 'OrderChartController@getChartData');
                     Route::post('/get-status', 'OrderChartController@getStatus');
                     Route::post('/get-config', 'OrderChartController@getConfig');

@@ -40,14 +40,9 @@ class ParametersTableSeeder extends Seeder
             'description' => "Tỷ lệ ký quỹ",
         ]);
         Parameter::create([
-            'slug' => "smartOrderMessage",
-            'value' => "",
-            'description' => "Thông báo SmartOrder",
-        ]);
-        Parameter::create([
-            'slug' => "copyPoundageRate",
+            'slug' => "copyRate",
             'value' => "0.2",
-            'description' => "Tỷ lệ hoa hồng sao chép",
+            'description' => "Tỷ lệ sao chép",
         ]);
     }
 }
