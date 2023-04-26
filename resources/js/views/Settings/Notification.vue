@@ -146,6 +146,7 @@
 import { mapGetters, mapActions } from "vuex";
 import DxForm, { DxItem } from "devextreme-vue/form";
 import PickImagePopup from "../../components/Popups/PickImagePopup.vue";
+import adminSettingsStore from "../../store/modules/Admin/Settings";
 
 export default {
     components: {
@@ -193,6 +194,9 @@ export default {
             },
         };
     },
+    beforeCreate() {
+        this.$store.registerModule("Admin.settings", adminSettingsStore);
+    },
     created() {
         this.actionOptions = this.getActionsOptions(this.formData.actions);
         this.addActionOptions = {
@@ -209,6 +213,9 @@ export default {
     mounted() {
         this.formData.receiver = this.$route.query.codes || null;
         setTimeout(() => this.form.getEditor("receiver").focus(), 1000);
+    },
+    destroyed() {
+        this.$store.unregisterModule("Admin.settings");
     },
     computed: {
         toolbar: function () {

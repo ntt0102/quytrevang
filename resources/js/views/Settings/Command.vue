@@ -49,6 +49,7 @@
 import { mapGetters, mapActions } from "vuex";
 import DxForm, { DxItem } from "devextreme-vue/form";
 import DxRadioGroup from "devextreme-vue/radio-group";
+import adminSettingsStore from "../../store/modules/Admin/Settings";
 
 export default {
     components: {
@@ -71,6 +72,12 @@ export default {
                 },
             ],
         };
+    },
+    beforeCreate() {
+        this.$store.registerModule("Admin.settings", adminSettingsStore);
+    },
+    destroyed() {
+        this.$store.unregisterModule("Admin.settings");
     },
     computed: {
         form: function () {

@@ -80,8 +80,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
         });
 
         Route::group(['middleware' => 'verified'], function () {
-            Route::group(['namespace' => 'User'], function () {
-                Route::group(['prefix' => 'profile', 'middleware' => 'can:common@access'], function () {
+            Route::group(['namespace' => 'User', 'middleware' => 'can:common@access'], function () {
+                Route::group(['prefix' => 'profile'], function () {
                     Route::get('/', 'ProfileController@fetch');
                     Route::post('/', 'ProfileController@save');
                     Route::post('password', 'ProfileController@changePassword');
@@ -90,14 +90,14 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('delete', 'ProfileController@delete');
                     Route::post('validate-duplicate', 'ProfileController@validateDuplicate');
                 });
-                Route::group(['prefix' => 'contract', 'middleware' => 'can:common@access'], function () {
+                Route::group(['prefix' => 'contract'], function () {
                     Route::get('/', 'ContractController@fetch');
                     Route::post('/', 'ContractController@save');
                     Route::post('paying', 'ContractController@payingContract');
                     Route::post('withdrawing', 'ContractController@withdrawingContract');
                     Route::get('contract-users', 'ContractController@getContactUsers');
                 });
-                Route::get('trade', 'TradeController@getMonthChart')->middleware('can:common@access');
+                Route::get('trade', 'TradeController@getMonthChart');
             });
 
             Route::group(['namespace' => 'Admin'], function () {

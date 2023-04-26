@@ -1,4 +1,4 @@
-(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[41],{
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[35],{
 
 /***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/views/Settings/Log.vue?vue&type=script&lang=js&":
 /*!******************************************************************************************************************************************************************!*\
@@ -13,12 +13,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var devextreme_vue_data_grid__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! devextreme-vue/data-grid */ "./node_modules/devextreme-vue/data-grid.js");
 /* harmony import */ var devextreme_vue_data_grid__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(devextreme_vue_data_grid__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var devextreme_ui_dialog__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! devextreme/ui/dialog */ "./node_modules/devextreme/esm/ui/dialog.js");
+/* harmony import */ var _store_modules_Admin_Settings__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../store/modules/Admin/Settings */ "./resources/js/store/modules/Admin/Settings.js");
 function _typeof(obj) { "@babel/helpers - typeof"; return _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function (obj) { return typeof obj; } : function (obj) { return obj && "function" == typeof Symbol && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }, _typeof(obj); }
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); enumerableOnly && (symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; })), keys.push.apply(keys, symbols); } return keys; }
 function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = null != arguments[i] ? arguments[i] : {}; i % 2 ? ownKeys(Object(source), !0).forEach(function (key) { _defineProperty(target, key, source[key]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)) : ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } return target; }
 function _defineProperty(obj, key, value) { key = _toPropertyKey(key); if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _typeof(key) === "symbol" ? key : String(key); }
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
+
 
 
 
@@ -32,11 +34,17 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       gridData: null
     };
   },
+  beforeCreate: function beforeCreate() {
+    this.$store.registerModule("Admin.settings", _store_modules_Admin_Settings__WEBPACK_IMPORTED_MODULE_3__["default"]);
+  },
   created: function created() {
     var _this = this;
     this.fetchLog().then(function (activities) {
       return _this.gridData = activities;
     });
+  },
+  destroyed: function destroyed() {
+    this.$store.unregisterModule("Admin.settings");
   },
   computed: {
     dataGrid: function dataGrid() {
@@ -231,6 +239,131 @@ var update = __webpack_require__(/*! ../../../../node_modules/style-loader/lib/a
 if(content.locals) module.exports = content.locals;
 
 if(false) {}
+
+/***/ }),
+
+/***/ "./resources/js/store/modules/Admin/Settings.js":
+/*!******************************************************!*\
+  !*** ./resources/js/store/modules/Admin/Settings.js ***!
+  \******************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+function initialState() {
+  return {};
+}
+var getters = {};
+var actions = {
+  backupDatabase: function backupDatabase(_ref, param) {
+    var commit = _ref.commit,
+      dispatch = _ref.dispatch,
+      getters = _ref.getters,
+      state = _ref.state,
+      rootGetters = _ref.rootGetters;
+    return new Promise(function (resolve, reject) {
+      axios.post("settings/database/backup", param).then(function (response) {
+        // console.log(response.data);
+        if (response.data.isOk == false) resolve(false);else {
+          if (param.download) {
+            var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+            var fileLink = document.createElement("a");
+            fileLink.href = fileURL;
+            var filename = response.headers["content-disposition"].split("=").pop();
+            fileLink.setAttribute("download", filename);
+            document.body.appendChild(fileLink);
+            fileLink.click();
+          }
+          resolve(true);
+        }
+      });
+    });
+  },
+  restoreDatabase: function restoreDatabase(_ref2, param) {
+    var commit = _ref2.commit,
+      dispatch = _ref2.dispatch,
+      getters = _ref2.getters,
+      state = _ref2.state,
+      rootGetters = _ref2.rootGetters;
+    return new Promise(function (resolve, reject) {
+      axios.post("settings/database/restore", param, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      }).then(function (response) {
+        // console.log(response.data);
+        resolve(response.data.isOk);
+        if (response.data.isOk) dispatch("Auth/fetch", true, {
+          root: true
+        });
+      });
+    });
+  },
+  runCommand: function runCommand(_ref3, param) {
+    var commit = _ref3.commit,
+      dispatch = _ref3.dispatch,
+      getters = _ref3.getters,
+      state = _ref3.state,
+      rootGetters = _ref3.rootGetters;
+    return new Promise(function (resolve, reject) {
+      axios.post("settings/command/run", {
+        commands: param
+      }).then(function (response) {
+        // console.log(response.data);
+        resolve(response.data);
+        if (response.data.isOk) dispatch("Auth/fetch", true, {
+          root: true
+        });
+      });
+    });
+  },
+  sendNotification: function sendNotification(_ref4, param) {
+    var commit = _ref4.commit,
+      dispatch = _ref4.dispatch,
+      getters = _ref4.getters,
+      state = _ref4.state,
+      rootGetters = _ref4.rootGetters;
+    return new Promise(function (resolve, reject) {
+      axios.post("settings/notification/send", param).then(function (response) {
+        // console.log(response.data);
+        resolve();
+      });
+    });
+  },
+  fetchLog: function fetchLog(_ref5, param) {
+    var commit = _ref5.commit,
+      dispatch = _ref5.dispatch,
+      getters = _ref5.getters,
+      state = _ref5.state,
+      rootGetters = _ref5.rootGetters;
+    return new Promise(function (resolve, reject) {
+      axios.get("settings/log").then(function (response) {
+        // console.log(response.data);
+        resolve(response.data);
+      });
+    });
+  },
+  resetState: function resetState(_ref6) {
+    var commit = _ref6.commit;
+    commit("resetState");
+  }
+};
+var mutations = {
+  setState: function setState(state, data) {
+    state.parameters = data.parameters;
+  },
+  resetState: function resetState(state) {
+    state = Object.assign(state, initialState());
+  }
+};
+/* harmony default export */ __webpack_exports__["default"] = ({
+  namespaced: true,
+  state: initialState,
+  getters: getters,
+  actions: actions,
+  mutations: mutations
+});
 
 /***/ }),
 

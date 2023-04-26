@@ -119,6 +119,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { DxAccordion } from "devextreme-vue/accordion";
 import DxForm, { DxItem } from "devextreme-vue/form";
+import adminSettingsStore from "../../store/modules/Admin/Settings";
 
 export default {
     components: {
@@ -135,6 +136,12 @@ export default {
             RESTORE_FILE_EXTENSION: "sql",
             restoreFileName: null,
         };
+    },
+    beforeCreate() {
+        this.$store.registerModule("Admin.settings", adminSettingsStore);
+    },
+    destroyed() {
+        this.$store.unregisterModule("Admin.settings");
     },
     methods: {
         ...mapActions("Admin.settings", ["backupDatabase", "restoreDatabase"]),

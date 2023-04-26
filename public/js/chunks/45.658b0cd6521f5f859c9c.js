@@ -18,22 +18,22 @@ function _toPropertyKey(arg) { var key = _toPrimitive(arg, "string"); return _ty
 function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input === null) return input; var prim = input[Symbol.toPrimitive]; if (prim !== undefined) { var res = prim.call(input, hint || "default"); if (_typeof(res) !== "object") return res; throw new TypeError("@@toPrimitive must return a primitive value."); } return (hint === "string" ? String : Number)(input); }
 
 var MonthTrade = function MonthTrade() {
-  return __webpack_require__.e(/*! import() */ 35).then(__webpack_require__.bind(null, /*! ./Overview/MonthTrade.vue */ "./resources/js/views/user/Overview/MonthTrade.vue"));
+  return __webpack_require__.e(/*! import() */ 38).then(__webpack_require__.bind(null, /*! ./Overview/MonthTrade.vue */ "./resources/js/views/user/Overview/MonthTrade.vue"));
 };
 var TradeSummary = function TradeSummary() {
-  return __webpack_require__.e(/*! import() */ 37).then(__webpack_require__.bind(null, /*! ./Overview/TradeSummary.vue */ "./resources/js/views/user/Overview/TradeSummary.vue"));
+  return __webpack_require__.e(/*! import() */ 40).then(__webpack_require__.bind(null, /*! ./Overview/TradeSummary.vue */ "./resources/js/views/user/Overview/TradeSummary.vue"));
 };
 var Finbook = function Finbook() {
   return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(8), __webpack_require__.e(53), __webpack_require__.e(12), __webpack_require__.e(52)]).then(__webpack_require__.bind(null, /*! ./Overview/Finbook.vue */ "./resources/js/views/user/Overview/Finbook.vue"));
 };
 var Summary = function Summary() {
-  return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(3), __webpack_require__.e(36)]).then(__webpack_require__.bind(null, /*! ./Overview/Summary.vue */ "./resources/js/views/user/Overview/Summary.vue"));
+  return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(3), __webpack_require__.e(39)]).then(__webpack_require__.bind(null, /*! ./Overview/Summary.vue */ "./resources/js/views/user/Overview/Summary.vue"));
 };
 var LevelBar = function LevelBar() {
   return Promise.all(/*! import() */[__webpack_require__.e(14), __webpack_require__.e(25)]).then(__webpack_require__.bind(null, /*! ./Overview/LevelBar.vue */ "./resources/js/views/user/Overview/LevelBar.vue"));
 };
 var Contracts = function Contracts() {
-  return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(3), __webpack_require__.e(9), __webpack_require__.e(34)]).then(__webpack_require__.bind(null, /*! ./Overview/Contracts.vue */ "./resources/js/views/user/Overview/Contracts.vue"));
+  return Promise.all(/*! import() */[__webpack_require__.e(0), __webpack_require__.e(1), __webpack_require__.e(2), __webpack_require__.e(3), __webpack_require__.e(9), __webpack_require__.e(37)]).then(__webpack_require__.bind(null, /*! ./Overview/Contracts.vue */ "./resources/js/views/user/Overview/Contracts.vue"));
 };
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {
@@ -211,4 +211,4 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ })
 
-},0,[0,1,2,3,9,34,8,53,12,52,36,14,25,35,37]]);
+},0,[0,1,2,3,9,37,8,53,12,52,39,14,25,38,40]]);
