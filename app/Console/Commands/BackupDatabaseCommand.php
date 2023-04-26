@@ -40,10 +40,10 @@ class BackupDatabaseCommand extends Command
     {
         if (get_global_value('changedDatabaseFlag') == '1') {
             $db = new DatabaseService();
-            $param = new \stdClass();
-            $param->download = false;
-            $param->sendMail = true;
-            $db->backup($param);
+            $db->backup((object)[
+                'download' => false,
+                'sendMail' => true,
+            ]);
             //
             set_global_value('changedDatabaseFlag', '0');
         }
