@@ -139,7 +139,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       this.passwordMode = !this.passwordMode;
     },
     getLoggedinUsersCookie: function getLoggedinUsersCookie() {
-      return this.$cookies.isKey(this.$mc.LOGGEDIN_USERS_COOKIE_NAME) ? JSON.parse(this.$cookies.get(this.$mc.LOGGEDIN_USERS_COOKIE_NAME)) : [];
+      return this.$cookies.isKey(this.$mc.LOGGEDIN_USERS_COOKIE_NAME) ? this.$cookies.get(this.$mc.LOGGEDIN_USERS_COOKIE_NAME) : [];
     },
     setLoggedinUsersCookie: function setLoggedinUsersCookie(user) {
       var users = this.getLoggedinUsersCookie();
@@ -148,7 +148,7 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
       });
       users.push(user);
       users = users.slice(-5);
-      this.$cookies.set(this.$mc.LOGGEDIN_USERS_COOKIE_NAME, JSON.stringify(users), "1y");
+      this.$cookies.set(this.$mc.LOGGEDIN_USERS_COOKIE_NAME, users, "1y");
     },
     onItemClick: function onItemClick(e) {
       var _this4 = this;

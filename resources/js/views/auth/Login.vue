@@ -21,7 +21,7 @@
                     :use-select-mode="false"
                     :items="[
                         ...loggedinUsers,
-                        { name: $t('auth.login.anotherAccount') }
+                        { name: $t('auth.login.anotherAccount') },
                     ]"
                     :text="formData.name"
                     display-expr="name"
@@ -29,7 +29,7 @@
                     itemTemplate="itemTemplate"
                     :dropDownOptions="{
                         minWidth: 260,
-                        wrapperAttr: { class: 'login-users-popup' }
+                        wrapperAttr: { class: 'login-users-popup' },
                     }"
                     @item-click="onItemClick"
                 >
@@ -39,7 +39,11 @@
                                 v-if="!!data.avatar"
                                 :alt="$appName"
                                 :src="data.avatar"
-                                style="width: 30px; border-radius: 50%; margin-right: 5px"
+                                style="
+                                    width: 30px;
+                                    border-radius: 50%;
+                                    margin-right: 5px;
+                                "
                             />
                             <span style="font-size: 16px; padding: 5px">{{
                                 data.name
@@ -67,12 +71,12 @@
                                 {
                                     options: {
                                         icon: 'far fa-eye',
-                                        onClick: viewPasswordClick
+                                        onClick: viewPasswordClick,
                                     },
                                     name: 'btPw',
-                                    location: 'after'
-                                }
-                            ]
+                                    location: 'after',
+                                },
+                            ],
                         }"
                         :validation-rules="validationRules.password"
                         :label="{ text: $t('models.user.password') }"
@@ -82,7 +86,7 @@
                         editor-type="dxCheckBox"
                         :editor-options="{
                             text: $t('auth.login.rememberMe'),
-                            elementAttr: { class: 'form-text' }
+                            elementAttr: { class: 'form-text' },
                         }"
                         :label="{ visible: false }"
                     />
@@ -92,7 +96,7 @@
                             width: '100%',
                             type: 'default',
                             text: $t('auth.login.submit'),
-                            useSubmitBehavior: true
+                            useSubmitBehavior: true,
                         }"
                     />
                 </DxForm>
@@ -139,7 +143,7 @@ export default {
     components: {
         DxForm,
         DxItem,
-        DxDropDownButton
+        DxDropDownButton,
     },
     data() {
         return {
@@ -150,7 +154,7 @@ export default {
                 password: null,
                 rememberMe: false,
                 avatar: null,
-                name: null
+                name: null,
             },
             validationRules: {
                 username: [
@@ -158,18 +162,18 @@ export default {
                         type: "required",
                         message:
                             this.$t("models.user.username") +
-                            this.$mt.validations.required
-                    }
+                            this.$mt.validations.required,
+                    },
                 ],
                 password: [
                     {
                         type: "required",
                         message:
                             this.$t("models.user.password") +
-                            this.$mt.validations.required
-                    }
-                ]
-            }
+                            this.$mt.validations.required,
+                    },
+                ],
+            },
         };
     },
     created() {
@@ -195,9 +199,9 @@ export default {
             );
     },
     computed: {
-        form: function() {
+        form: function () {
             return this.$refs.form.instance;
-        }
+        },
     },
     methods: {
         ...mapActions("Auth", ["login", "setState", "loginWebAuthn"]),
@@ -243,7 +247,7 @@ export default {
                     this.$router.push({
                         name: nextRouteName,
                         query: query,
-                        hash: this.$route.hash
+                        hash: this.$route.hash,
                     });
                 }
             }
@@ -261,33 +265,27 @@ export default {
                                 icon: this.passwordMode
                                     ? "far fa-eye-slash"
                                     : "far fa-eye",
-                                onClick: this.viewPasswordClick
+                                onClick: this.viewPasswordClick,
                             },
                             name: "btPw",
-                            location: "after"
-                        }
-                    ]
-                }
+                            location: "after",
+                        },
+                    ],
+                },
             });
             this.passwordMode = !this.passwordMode;
         },
         getLoggedinUsersCookie() {
             return this.$cookies.isKey(this.$mc.LOGGEDIN_USERS_COOKIE_NAME)
-                ? JSON.parse(
-                      this.$cookies.get(this.$mc.LOGGEDIN_USERS_COOKIE_NAME)
-                  )
+                ? this.$cookies.get(this.$mc.LOGGEDIN_USERS_COOKIE_NAME)
                 : [];
         },
         setLoggedinUsersCookie(user) {
             let users = this.getLoggedinUsersCookie();
-            users = users.filter(item => item.username != user.username);
+            users = users.filter((item) => item.username != user.username);
             users.push(user);
             users = users.slice(-5);
-            this.$cookies.set(
-                this.$mc.LOGGEDIN_USERS_COOKIE_NAME,
-                JSON.stringify(users),
-                "1y"
-            );
+            this.$cookies.set(this.$mc.LOGGEDIN_USERS_COOKIE_NAME, users, "1y");
         },
         onItemClick(e) {
             if (!!e.itemData.username) {
@@ -305,8 +303,8 @@ export default {
                 this.formData.avatar = null;
                 setTimeout(() => this.form.getEditor("username").focus(), 500);
             }
-        }
-    }
+        },
+    },
 };
 </script>
 
@@ -325,7 +323,9 @@ export default {
             border-radius: 50%;
         }
     }
-    .dx-field-item:not(.dx-field-item-has-group):not(.dx-field-item-has-tabs):not(.dx-first-row):not(.dx-label-v-align) {
+    .dx-field-item:not(.dx-field-item-has-group):not(
+            .dx-field-item-has-tabs
+        ):not(.dx-first-row):not(.dx-label-v-align) {
         padding-top: 10px;
     }
     .link {
