@@ -3,15 +3,15 @@ function initialState() {
         config: {},
         status: { connection: true },
         chartData: [],
-        isChartLoading: false
+        isChartLoading: false,
     };
 }
 
 const getters = {
-    config: state => state.config,
-    status: state => state.status,
-    chartData: state => state.chartData,
-    isChartLoading: state => state.isChartLoading
+    config: (state) => state.config,
+    status: (state) => state.status,
+    chartData: (state) => state.chartData,
+    isChartLoading: (state) => state.isChartLoading,
 };
 
 const actions = {
@@ -24,7 +24,7 @@ const actions = {
                     { date: chartDate },
                     { noLoading: true, crypto: true }
                 )
-                .then(response => {
+                .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
                     resolve();
@@ -35,11 +35,42 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
+                    "https://smartpro.vps.com.vn/handler/core.vpbs",
+                    {
+                        group: "Q",
+                        user: state.config.vpsCode,
+                        session: state.config.vpsSession,
+                        c: "H",
+                        data: {
+                            type: "string",
+                            cmd: "Web.Portfolio.PortfolioStatus2",
+                            p1: state.config.vpsCode + "8",
+                        },
+                    },
+                    { noLoading: true }
+                )
+                .then((response) => {
+                    const status = {
+                        connection: response.data.rc == 1,
+                        position:
+                            response.data.rc == 1
+                                ? +response.data.data[0].net
+                                : 0,
+                    };
+                    commit("setStatus", status);
+                    resolve();
+                });
+        });
+    },
+    getStatus1({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
                     "order-chart/get-status",
                     {},
                     { noLoading: true, crypto: true }
                 )
-                .then(response => {
+                .then((response) => {
                     commit("setStatus", response.data);
                     resolve();
                 });
@@ -49,7 +80,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post("order-chart/get-config", {}, { crypto: true })
-                .then(response => {
+                .then((response) => {
                     commit("setConfig", response.data);
                     resolve();
                 });
@@ -63,7 +94,7 @@ const actions = {
                     { date: chartDate },
                     { noLoading: true, crypto: true }
                 )
-                .then(response => {
+                .then((response) => {
                     commit("setChartData", response.data);
                     resolve();
                 });
@@ -76,9 +107,9 @@ const actions = {
                 .post("order-chart/execute-order", data, {
                     noLoading: true,
                     crypto: true,
-                    notify: true
+                    notify: true,
                 })
-                .then(response => {
+                .then((response) => {
                     commit("setChartLoading", false);
                     resolve(response.data);
                 });
@@ -86,7 +117,7 @@ const actions = {
     },
     resetState({ commit }) {
         commit("resetState");
-    }
+    },
 };
 
 const mutations = {
@@ -104,7 +135,7 @@ const mutations = {
     },
     resetState(state) {
         state = Object.assign(state, initialState());
-    }
+    },
 };
 
 export default {
@@ -112,5 +143,5 @@ export default {
     state: initialState,
     getters,
     actions,
-    mutations
+    mutations,
 };
