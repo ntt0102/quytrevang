@@ -35,37 +35,6 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "https://smartpro.vps.com.vn/handler/core.vpbs",
-                    {
-                        group: "Q",
-                        user: state.config.vpsCode,
-                        session: state.config.vpsSession,
-                        c: "H",
-                        data: {
-                            type: "string",
-                            cmd: "Web.Portfolio.PortfolioStatus2",
-                            p1: state.config.vpsCode + "8",
-                        },
-                    },
-                    { noLoading: true }
-                )
-                .then((response) => {
-                    const status = {
-                        connection: response.data.rc == 1,
-                        position:
-                            response.data.rc == 1
-                                ? +response.data.data[0].net
-                                : 0,
-                    };
-                    commit("setStatus", status);
-                    resolve();
-                });
-        });
-    },
-    getStatus1({ commit, dispatch, getters, state, rootGetters }) {
-        return new Promise((resolve, reject) => {
-            axios
-                .post(
                     "order-chart/get-status",
                     {},
                     { noLoading: true, crypto: true }

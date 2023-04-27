@@ -1569,35 +1569,6 @@ var actions = {
       state = _ref2.state,
       rootGetters = _ref2.rootGetters;
     return new Promise(function (resolve, reject) {
-      axios.post("https://smartpro.vps.com.vn/handler/core.vpbs", {
-        group: "Q",
-        user: state.config.vpsCode,
-        session: state.config.vpsSession,
-        c: "H",
-        data: {
-          type: "string",
-          cmd: "Web.Portfolio.PortfolioStatus2",
-          p1: state.config.vpsCode + "8"
-        }
-      }, {
-        noLoading: true
-      }).then(function (response) {
-        var status = {
-          connection: response.data.rc == 1,
-          position: response.data.rc == 1 ? +response.data.data[0].net : 0
-        };
-        commit("setStatus", status);
-        resolve();
-      });
-    });
-  },
-  getStatus1: function getStatus1(_ref3) {
-    var commit = _ref3.commit,
-      dispatch = _ref3.dispatch,
-      getters = _ref3.getters,
-      state = _ref3.state,
-      rootGetters = _ref3.rootGetters;
-    return new Promise(function (resolve, reject) {
       axios.post("order-chart/get-status", {}, {
         noLoading: true,
         crypto: true
@@ -1607,12 +1578,12 @@ var actions = {
       });
     });
   },
-  getConfig: function getConfig(_ref4) {
-    var commit = _ref4.commit,
-      dispatch = _ref4.dispatch,
-      getters = _ref4.getters,
-      state = _ref4.state,
-      rootGetters = _ref4.rootGetters;
+  getConfig: function getConfig(_ref3) {
+    var commit = _ref3.commit,
+      dispatch = _ref3.dispatch,
+      getters = _ref3.getters,
+      state = _ref3.state,
+      rootGetters = _ref3.rootGetters;
     return new Promise(function (resolve, reject) {
       axios.post("order-chart/get-config", {}, {
         crypto: true
@@ -1622,12 +1593,12 @@ var actions = {
       });
     });
   },
-  setConfig: function setConfig(_ref5, chartDate) {
-    var commit = _ref5.commit,
-      dispatch = _ref5.dispatch,
-      getters = _ref5.getters,
-      state = _ref5.state,
-      rootGetters = _ref5.rootGetters;
+  setConfig: function setConfig(_ref4, chartDate) {
+    var commit = _ref4.commit,
+      dispatch = _ref4.dispatch,
+      getters = _ref4.getters,
+      state = _ref4.state,
+      rootGetters = _ref4.rootGetters;
     return new Promise(function (resolve, reject) {
       axios.post("order-chart/set-config", {
         date: chartDate
@@ -1640,12 +1611,12 @@ var actions = {
       });
     });
   },
-  executeOrder: function executeOrder(_ref6, data) {
-    var commit = _ref6.commit,
-      dispatch = _ref6.dispatch,
-      getters = _ref6.getters,
-      state = _ref6.state,
-      rootGetters = _ref6.rootGetters;
+  executeOrder: function executeOrder(_ref5, data) {
+    var commit = _ref5.commit,
+      dispatch = _ref5.dispatch,
+      getters = _ref5.getters,
+      state = _ref5.state,
+      rootGetters = _ref5.rootGetters;
     commit("setChartLoading", true);
     return new Promise(function (resolve, reject) {
       axios.post("order-chart/execute-order", data, {
@@ -1658,8 +1629,8 @@ var actions = {
       });
     });
   },
-  resetState: function resetState(_ref7) {
-    var commit = _ref7.commit;
+  resetState: function resetState(_ref6) {
+    var commit = _ref6.commit;
     commit("resetState");
   }
 };
