@@ -60,11 +60,8 @@ class OrderChartService extends CoreService
      */
     public function getConfig($payload)
     {
-        $vpsUser = request()->user()->vpsUser;
         return [
             'symbol' => get_global_value('vn30f1m'),
-            'vpsCode' => $vpsUser->vps_code,
-            'vpsSession' => $vpsUser->vps_session,
         ];
     }
 
