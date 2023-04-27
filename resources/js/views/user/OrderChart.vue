@@ -582,15 +582,6 @@ export default {
                                 if (self.order.entry.hasOwnProperty("line")) {
                                     if (self.order.tp.hasOwnProperty("line")) {
                                         if (
-                                            (!this.status.position &&
-                                                Math.abs(
-                                                    this.lastPrice.value -
-                                                        this.order.tp.price
-                                                ) <
-                                                    Math.abs(
-                                                        this.lastPrice.value -
-                                                            this.order.sl.price
-                                                    )) ||
                                             (self.order.side > 0 &&
                                                 data.lastPrice >=
                                                     self.order.tp.price) ||
@@ -631,15 +622,6 @@ export default {
                                             }
                                         }
                                         if (
-                                            (!this.status.position &&
-                                                Math.abs(
-                                                    this.lastPrice.value -
-                                                        this.order.sl.price
-                                                ) <
-                                                    Math.abs(
-                                                        this.lastPrice.value -
-                                                            this.order.tp.price
-                                                    )) ||
                                             (self.order.side > 0 &&
                                                 data.lastPrice <=
                                                     self.order.sl.price) ||
@@ -681,7 +663,6 @@ export default {
                                         }
                                     } else {
                                         if (
-                                            !!this.status.position ||
                                             (self.order.side > 0 &&
                                                 data.lastPrice >=
                                                     self.order.entry.price) ||

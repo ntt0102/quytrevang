@@ -497,7 +497,7 @@ var TIME = {
                 });
                 if (self.order.entry.hasOwnProperty("line")) {
                   if (self.order.tp.hasOwnProperty("line")) {
-                    if (!_this4.status.position && Math.abs(_this4.lastPrice.value - _this4.order.tp.price) < Math.abs(_this4.lastPrice.value - _this4.order.sl.price) || self.order.side > 0 && data.lastPrice >= self.order.tp.price || self.order.side < 0 && data.lastPrice <= self.order.tp.price) {
+                    if (self.order.side > 0 && data.lastPrice >= self.order.tp.price || self.order.side < 0 && data.lastPrice <= self.order.tp.price) {
                       if (!self.isAutoOrdering) {
                         self.isAutoOrdering = true;
                         self.executeOrder({
@@ -517,7 +517,7 @@ var TIME = {
                         });
                       }
                     }
-                    if (!_this4.status.position && Math.abs(_this4.lastPrice.value - _this4.order.sl.price) < Math.abs(_this4.lastPrice.value - _this4.order.tp.price) || self.order.side > 0 && data.lastPrice <= self.order.sl.price || self.order.side < 0 && data.lastPrice >= self.order.sl.price) {
+                    if (self.order.side > 0 && data.lastPrice <= self.order.sl.price || self.order.side < 0 && data.lastPrice >= self.order.sl.price) {
                       if (!self.isAutoOrdering) {
                         self.isAutoOrdering = true;
                         self.executeOrder({
@@ -538,7 +538,7 @@ var TIME = {
                       }
                     }
                   } else {
-                    if (!!_this4.status.position || self.order.side > 0 && data.lastPrice >= self.order.entry.price || self.order.side < 0 && data.lastPrice <= self.order.entry.price) {
+                    if (self.order.side > 0 && data.lastPrice >= self.order.entry.price || self.order.side < 0 && data.lastPrice <= self.order.entry.price) {
                       if (!self.isAutoOrdering) {
                         self.isAutoOrdering = true;
                         self.executeOrder({
