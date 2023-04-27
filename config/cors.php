@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://quytrevang.nguyenvanxuanphu.com'],
+    'allowed_origins' => [request()->getHost()],
 
     'allowed_origins_patterns' => [],
 
