@@ -471,7 +471,6 @@ var TIME = {
       var endpoint = "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
       self.websocket = new WebSocket(endpoint);
       self.websocket.onopen = function (e) {
-        console.log("onopen", e);
         var msg = {
           action: "join",
           list: self.config.symbol
@@ -479,7 +478,6 @@ var TIME = {
         self.websocket.send("42".concat(JSON.stringify(["regs", JSON.stringify(msg)])));
       };
       self.websocket.onclose = function (e) {
-        console.log("onclose", e);
         if (self._isDestroyed) return false;
         if (self.inSession()) {
           self.connectSocket();
@@ -574,9 +572,6 @@ var TIME = {
             }
           }
         }
-      };
-      self.websocket.onerror = function (e) {
-        console.log("onerror", e);
       };
     },
     intervalHandler: function intervalHandler() {
@@ -951,6 +946,7 @@ var TIME = {
       return this.formatPrice(this.series.price.coordinateToPrice(y));
     },
     formatPrice: function formatPrice(price) {
+      if (!price) return 0;
       return + +price.toFixed(1);
     },
     toasteOrderError: function toasteOrderError(error) {

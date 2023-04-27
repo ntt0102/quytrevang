@@ -552,14 +552,12 @@ export default {
                 "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
             self.websocket = new WebSocket(endpoint);
             self.websocket.onopen = (e) => {
-                console.log("onopen", e);
                 var msg = { action: "join", list: self.config.symbol };
                 self.websocket.send(
                     `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
                 );
             };
             self.websocket.onclose = (e) => {
-                console.log("onclose", e);
                 if (self._isDestroyed) return false;
                 if (self.inSession()) {
                     self.connectSocket();
@@ -737,9 +735,6 @@ export default {
                         }
                     }
                 }
-            };
-            self.websocket.onerror = (e) => {
-                console.log("onerror", e);
             };
         },
         intervalHandler() {
@@ -1162,6 +1157,7 @@ export default {
             return this.formatPrice(this.series.price.coordinateToPrice(y));
         },
         formatPrice(price) {
+            if (!price) return 0;
             return +(+price.toFixed(1));
         },
         toasteOrderError(error) {
