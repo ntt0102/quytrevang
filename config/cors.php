@@ -19,7 +19,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['https://quytrevang.nguyenvanxuanphu.com', 'https://smartpro.vps.com.vn'],
+    'allowed_origins' => ['https://quytrevang.nguyenvanxuanphu.com'],
 
     'allowed_origins_patterns' => [],
 
