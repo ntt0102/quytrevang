@@ -1,0 +1,31 @@
+(window["webpackJsonp"] = window["webpackJsonp"] || []).push([[17],{
+
+/***/ "./resources/js/locales/chatbot/vi/me.js":
+/*!***********************************************!*\
+  !*** ./resources/js/locales/chatbot/vi/me.js ***!
+  \***********************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony default export */ __webpack_exports__["default"] = ([{
+  question: "Bạn là ai?",
+  answer: "Tôi là robot trợ lý của trang Quỹ Tre Vàng"
+}, {
+  question: "Bạn tên gì?",
+  answer: "Tên tôi là CB_QTV_01"
+}, {
+  question: "Bạn làm gì ở đây?",
+  answer: "Tôi ở đây để giải đáp các thắc mắc của quý khách"
+}, {
+  question: "Bạn là nam hay nữ, trai hay gái",
+  answer: "Bạn nghĩ tôi là gì :))"
+}, {
+  question: "Bạn đến từ đâu",
+  answer: "Tôi đến từ Việt Nam"
+}]);
+
+/***/ })
+
+}]);

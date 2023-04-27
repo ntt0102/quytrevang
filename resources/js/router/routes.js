@@ -6,20 +6,21 @@ const Profile = () =>
     import(/* webpackPrefetch: true */ "../views/user/Profile");
 const Contract = () =>
     import(/* webpackPrefetch: true */ "../views/user/Contract");
-const OrderChart = () =>
-    import(/* webpackPrefetch: true */ "../views/user/OrderChart");
 
 const Users = () => import(/* webpackPrefetch: true */ "../views/admin/Users");
 const Contracts = () =>
     import(/* webpackPrefetch: true */ "../views/admin/Contracts");
-const Finbooks = () =>
-    import(/* webpackPrefetch: true */ "../views/admin/Finbooks");
-const Trades = () =>
-    import(/* webpackPrefetch: true */ "../views/admin/Trades");
 const SmartOrders = () =>
     import(/* webpackPrefetch: true */ "../views/admin/SmartOrders");
 const Comments = () =>
     import(/* webpackPrefetch: true */ "../views/admin/Comments");
+
+const OrderChart = () =>
+    import(/* webpackPrefetch: true */ "../views/Trading/OrderChart");
+const Trades = () =>
+    import(/* webpackPrefetch: true */ "../views/Trading/Trades");
+const Finbooks = () =>
+    import(/* webpackPrefetch: true */ "../views/Trading/Finbooks");
 
 const Command = () =>
     import(/* webpackPrefetch: true */ "../views/Settings/Command");

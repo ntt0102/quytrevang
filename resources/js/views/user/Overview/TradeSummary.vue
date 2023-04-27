@@ -112,7 +112,7 @@
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
-import adminTradesStore from "../../../store/modules/Admin/Trades";
+import adminTradesStore from "../../../store/modules/Trading/Trades";
 
 const DURATION = 200;
 const INTERVAL = 4; // 4ms

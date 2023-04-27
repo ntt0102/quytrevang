@@ -119,7 +119,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { DxAccordion } from "devextreme-vue/accordion";
 import DxForm, { DxItem } from "devextreme-vue/form";
-import adminSettingsStore from "../../store/modules/Admin/Settings";
+import adminSettingsStore from "../../store/modules/Settings";
 
 export default {
     components: {

@@ -45,7 +45,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
-import adminSettingsParametersStore from "../../store/modules/Admin/Settings/Parameters";
+import adminSettingsParametersStore from "../../store/modules/Settings/Parameters";
 
 export default {
     components: {

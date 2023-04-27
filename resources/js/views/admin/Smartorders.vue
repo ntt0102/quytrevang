@@ -15,7 +15,7 @@
                 :column-chooser="{
                     enabled: true,
                     mode: 'select',
-                    allowSearch: true
+                    allowSearch: true,
                 }"
                 column-resizing-mode="widget"
                 :paging="{ pageSize: 10 }"
@@ -27,7 +27,7 @@
                     allowUpdating: true,
                     allowDeleting: true,
                     confirmDelete: false,
-                    mode: 'batch'
+                    mode: 'batch',
                 }"
                 @contentReady="$mf.dataGridPreload(gridData, dataGrid)"
                 @init-new-row="onInitNewRow"
@@ -61,14 +61,14 @@
                         displayExpr: 'name',
                         valueExpr: 'code',
                         searchEnabled: true,
-                        searchExpr: ['code', 'name']
+                        searchExpr: ['code', 'name'],
                     }"
                 />
                 <DxColumn
                     data-field="started_at"
                     data-type="date"
                     :editor-options="{
-                        dateSerializationFormat: $mc.DX_SERVER_DATE_FORMAT
+                        dateSerializationFormat: $mc.DX_SERVER_DATE_FORMAT,
                     }"
                     :caption="$t('admin.smartorders.startedAt')"
                 />
@@ -111,8 +111,8 @@
                                             data.rowIndex,
                                             'devices',
                                             []
-                                        )
-                                }
+                                        ),
+                                },
                             },
                             {
                                 locateInMenu: 'auto',
@@ -125,9 +125,9 @@
                                     hint: $t('buttons.delete'),
                                     text: $t('buttons.delete'),
                                     onClick: () =>
-                                        dataGrid.deleteRow(data.rowIndex)
-                                }
-                            }
+                                        dataGrid.deleteRow(data.rowIndex),
+                                },
+                            },
                         ]"
                     />
                 </template>
@@ -140,13 +140,13 @@
 import { mapGetters, mapActions } from "vuex";
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import PricePlansPopup from "../../components/Popups/PricePlansPopup.vue";
-import adminSmartOrdersStore from "../../store/modules/Admin/SmartOrders";
+import adminSmartOrdersStore from "../../store/modules/Trading/SmartOrders";
 
 export default {
     components: {
         DxDataGrid,
         DxColumn,
-        PricePlansPopup
+        PricePlansPopup,
     },
     data() {
         return {
@@ -157,41 +157,41 @@ export default {
                         type: "required",
                         message:
                             this.$t("admin.smartorders.user") +
-                            this.$mt.validations.required
+                            this.$mt.validations.required,
                     },
                     {
                         type: "async",
                         validationCallback: this.validateDuplicateUser,
                         message:
                             this.$t("admin.smartorders.user") +
-                            this.$mt.validations.duplicate
-                    }
+                            this.$mt.validations.duplicate,
+                    },
                 ],
                 balance: [
                     {
                         type: "periods",
                         message:
                             this.$t("admin.smartorders.periods") +
-                            this.$mt.validations.required
-                    }
+                            this.$mt.validations.required,
+                    },
                 ],
                 lastTransaction: [
                     {
                         type: "deviceLimit",
                         message:
                             this.$t("admin.smartorders.deviceLimit") +
-                            this.$mt.validations.required
-                    }
+                            this.$mt.validations.required,
+                    },
                 ],
                 startedAt: [
                     {
                         type: "required",
                         message:
                             this.$t("admin.smartorders.startedAt") +
-                            this.$mt.validations.required
-                    }
-                ]
-            }
+                            this.$mt.validations.required,
+                    },
+                ],
+            },
         };
     },
     beforeCreate() {
@@ -205,20 +205,20 @@ export default {
     },
     computed: {
         ...mapGetters("Admin.smartorders", ["sos", "users"]),
-        dataGrid: function() {
+        dataGrid: function () {
             return this.$refs.dataGrid.instance;
-        }
+        },
     },
     watch: {
         sos() {
             this.cloneDeepData();
-        }
+        },
     },
     methods: {
         ...mapActions("Admin.smartorders", [
             "fetch",
             "validateDuplicateUser",
-            "save"
+            "save",
         ]),
         onSave(e) {
             this.$bus.emit("checkPin", () => this.save({ changes: e.changes }));
@@ -238,11 +238,11 @@ export default {
                     hint: this.$t("admin.smartorders.pricePlans"),
                     onClick: () => {
                         this.$refs.pricePlansPopup.show();
-                    }
-                }
+                    },
+                },
             });
-        }
-    }
+        },
+    },
 };
 </script>
 <style lang="scss"></style>

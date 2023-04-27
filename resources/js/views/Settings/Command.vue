@@ -49,7 +49,7 @@
 import { mapGetters, mapActions } from "vuex";
 import DxForm, { DxItem } from "devextreme-vue/form";
 import DxRadioGroup from "devextreme-vue/radio-group";
-import adminSettingsStore from "../../store/modules/Admin/Settings";
+import adminSettingsStore from "../../store/modules/Settings";
 
 export default {
     components: {
