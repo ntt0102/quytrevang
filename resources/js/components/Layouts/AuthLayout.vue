@@ -289,16 +289,18 @@ export default {
                         setTimeout(() => {
                             if (this.permissions.includes("trades@view")) {
                                 if (this.$route.name == "trades") {
-                                    this.$store.dispatch("Admin.trades/fetch");
                                     this.$store.dispatch(
-                                        "Admin.trades/getChart",
+                                        "Trading.trades/fetch"
+                                    );
+                                    this.$store.dispatch(
+                                        "Trading.trades/getChart",
                                         this.$store.getters[
-                                            "Admin.trades/period"
+                                            "Trading.trades/period"
                                         ]
                                     );
                                 } else if (this.$route.name == "overview")
                                     this.$store.dispatch(
-                                        "Admin.trades/getSummary"
+                                        "Trading.trades/getSummary"
                                     );
                             }
                             if (
@@ -319,7 +321,7 @@ export default {
                             setTimeout(
                                 () =>
                                     this.$store.dispatch(
-                                        "Admin.finbooks/fetch"
+                                        "Trading.finbooks/fetch"
                                     ),
                                 2000
                             );

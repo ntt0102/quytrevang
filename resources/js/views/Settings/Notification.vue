@@ -21,7 +21,7 @@
                                 editor-type="dxTextBox"
                                 :editor-options="{
                                     placeholder: $t(
-                                        'admin.settings.notification.receiverPlaceholder'
+                                        'settings.notification.receiverPlaceholder'
                                     ),
                                     buttons: [
                                         {
@@ -43,9 +43,7 @@
                                 }"
                                 :validation-rules="validationRules.receiver"
                                 :label="{
-                                    text: $t(
-                                        'admin.settings.notification.receiver'
-                                    ),
+                                    text: $t('settings.notification.receiver'),
                                 }"
                             />
                             <DxItem
@@ -53,7 +51,7 @@
                                 :validation-rules="validationRules.title"
                                 :label="{
                                     text: $t(
-                                        'admin.settings.notification.notificationTitle'
+                                        'settings.notification.notificationTitle'
                                     ),
                                 }"
                             />
@@ -61,9 +59,7 @@
                                 data-field="body"
                                 :validation-rules="validationRules.body"
                                 :label="{
-                                    text: $t(
-                                        'admin.settings.notification.body'
-                                    ),
+                                    text: $t('settings.notification.body'),
                                 }"
                             />
                             <DxItem
@@ -89,17 +85,13 @@
                                     ],
                                 }"
                                 :label="{
-                                    text: $t(
-                                        'admin.settings.notification.image'
-                                    ),
+                                    text: $t('settings.notification.image'),
                                 }"
                             />
                         </DxItem>
                         <DxItem
                             item-type="group"
-                            :caption="
-                                $t('admin.settings.notification.action.title')
-                            "
+                            :caption="$t('settings.notification.action.title')"
                             name="actions-container"
                         >
                             <DxItem item-type="group" name="actions">
@@ -111,7 +103,7 @@
                                     :label="{
                                         text:
                                             $t(
-                                                'admin.settings.notification.action.title'
+                                                'settings.notification.action.title'
                                             ) +
                                             ' ' +
                                             (index + 1),
@@ -178,9 +170,8 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t(
-                                "admin.settings.notification.notificationTitle"
-                            ) + this.$mt.validations.required,
+                            this.$t("settings.notification.notificationTitle") +
+                            this.$mt.validations.required,
                     },
                 ],
                 body: [
@@ -242,7 +233,7 @@ export default {
         generateNewActionOptions(index) {
             return {
                 placeholder: this.$t(
-                    "admin.settings.notification.action.placeholder"
+                    "settings.notification.action.placeholder"
                 ),
                 buttons: [
                     {

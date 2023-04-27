@@ -31,19 +31,19 @@
                     <DxColumn
                         data-field="created_at"
                         data-type="date"
-                        :caption="$t('admin.settings.log.createdAt')"
+                        :caption="$t('settings.log.createdAt')"
                     />
                     <DxColumn
                         data-field="causer"
-                        :caption="$t('admin.settings.log.causer')"
+                        :caption="$t('settings.log.causer')"
                     />
                     <DxColumn
                         data-field="subject"
-                        :caption="$t('admin.settings.log.subject')"
+                        :caption="$t('settings.log.subject')"
                     />
                     <DxColumn
                         data-field="description"
-                        :caption="$t('admin.settings.log.description')"
+                        :caption="$t('settings.log.description')"
                     />
                     <template #commandCellTemplate="{ data }">
                         <DxToolbar
@@ -56,12 +56,8 @@
                                     options: {
                                         type: 'default',
                                         icon: 'info',
-                                        hint: $t(
-                                            'admin.settings.log.propertiesBtn'
-                                        ),
-                                        text: $t(
-                                            'admin.settings.log.propertiesBtn'
-                                        ),
+                                        hint: $t('settings.log.propertiesBtn'),
+                                        text: $t('settings.log.propertiesBtn'),
                                         onClick: () =>
                                             showProperties(
                                                 data.data.properties

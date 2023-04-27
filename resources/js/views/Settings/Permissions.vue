@@ -38,7 +38,7 @@
                 <DxColumn
                     data-field="name"
                     :header-filter="{ allowSearch: true }"
-                    :caption="$t('admin.settings.permissions.name')"
+                    :caption="$t('settings.permissions.name')"
                     :validation-rules="validationRules.name"
                 />
                 <template #commandCellTemplate="{ data }">

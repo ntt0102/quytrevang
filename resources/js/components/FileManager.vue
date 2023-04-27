@@ -16,8 +16,8 @@
                 {
                     widget: 'dxButton',
                     options: {
-                        text: $t('admin.settings.files.copyUrl'),
-                        hint: $t('admin.settings.files.copyUrl'),
+                        text: $t('settings.files.copyUrl'),
+                        hint: $t('settings.files.copyUrl'),
                         icon: 'link',
                     },
                     location: 'before',

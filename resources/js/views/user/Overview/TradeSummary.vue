@@ -142,7 +142,7 @@ export default {
         this.$store.unregisterModule("Trading.trades");
     },
     computed: {
-        ...mapGetters("Admin.trades", ["summary"]),
+        ...mapGetters("Trading.trades", ["summary"]),
     },
     watch: {
         summary(value) {
@@ -166,7 +166,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.trades", ["getSummary", "resetState"]),
+        ...mapActions("Trading.trades", ["getSummary", "resetState"]),
         viewDetail(period) {
             this.$router.push({ name: "trades", query: { period } });
         },

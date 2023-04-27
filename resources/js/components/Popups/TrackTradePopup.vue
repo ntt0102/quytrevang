@@ -5,7 +5,7 @@
         :showCloseButton="true"
         :fullScreen="$devices.phone ? true : false"
         :show-title="true"
-        :title="$t('admin.trades.buttons.addData')"
+        :title="$t('trading.trades.buttons.addData')"
         @hiding="onHiding"
     >
         <template #content>
@@ -53,14 +53,14 @@
                                 useMaskBehavior: 'true',
                                 applyValueMode: 'useButtons',
                             }"
-                            :caption="$t('admin.trades.date')"
+                            :caption="$t('trading.trades.date')"
                             :validation-rules="validationRules.date"
                         />
                         <DxColumn
                             data-field="amount"
                             data-type="number"
                             :width="100"
-                            :caption="$t('admin.trades.amount')"
+                            :caption="$t('trading.trades.amount')"
                             :validation-rules="validationRules.amount"
                         />
                         <DxColumn
@@ -71,7 +71,7 @@
                                 step: '0.1',
                                 format: '#0.#',
                             }"
-                            :caption="$t('admin.trades.scores')"
+                            :caption="$t('trading.trades.scores')"
                             :validation-rules="validationRules.scores"
                         />
                         <DxColumn
@@ -82,7 +82,7 @@
                                 step: '1',
                                 format: '#,##0',
                             }"
-                            :caption="$t('admin.trades.revenue')"
+                            :caption="$t('trading.trades.revenue')"
                             :validation-rules="validationRules.revenue"
                         />
                         <DxColumn
@@ -93,7 +93,7 @@
                                 step: '1',
                                 format: '#,##0',
                             }"
-                            :caption="$t('admin.trades.loss')"
+                            :caption="$t('trading.trades.loss')"
                             :validation-rules="validationRules.loss"
                         />
                         <DxColumn
@@ -104,7 +104,7 @@
                                 step: '1',
                                 format: '#,##0',
                             }"
-                            :caption="$t('admin.trades.fees')"
+                            :caption="$t('trading.trades.fees')"
                             :validation-rules="validationRules.fees"
                         />
                         <template #commandCellTemplate="{ data }">
@@ -208,7 +208,7 @@ export default {
     },
     computed: {
         ...mapGetters("Auth", ["permissions"]),
-        ...mapGetters("Admin.trades", ["chart", "trades"]),
+        ...mapGetters("Trading.trades", ["chart", "trades"]),
         popup() {
             return this.$refs.popup.instance;
         },
@@ -222,7 +222,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.trades", ["fetch", "save"]),
+        ...mapActions("Trading.trades", ["fetch", "save"]),
         show() {
             this.popup.show();
             this.fetch().then(() => {

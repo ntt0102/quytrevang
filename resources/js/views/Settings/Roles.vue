@@ -38,7 +38,7 @@
                 <DxColumn
                     data-field="name"
                     :header-filter="{ allowSearch: true }"
-                    :caption="$t('admin.settings.roles.name')"
+                    :caption="$t('settings.roles.name')"
                     :validation-rules="validationRules.name"
                 />
                 <DxColumn
@@ -48,7 +48,7 @@
                     :calculate-filter-expression="calculateFilterExpression"
                     :header-filter="{ allowSearch: true }"
                     edit-cell-template="tagBoxEditor"
-                    :caption="$t('admin.settings.roles.permission')"
+                    :caption="$t('settings.roles.permission')"
                     :validation-rules="validationRules.permissions"
                     :lookup="{
                         dataSource: permissions,

@@ -22,7 +22,7 @@
                         widget: 'dxButton',
                         options: {
                             icon: 'far fa-backward small',
-                            hint: $t('admin.trades.buttons.more'),
+                            hint: $t('trading.trades.buttons.more'),
                             elementAttr: { 'data-page': page },
                             onClick: () => lazyLoad(),
                         },
@@ -32,7 +32,7 @@
                         widget: 'dxButton',
                         options: {
                             icon: 'far fa-database small',
-                            hint: $t('admin.trades.buttons.addData'),
+                            hint: $t('trading.trades.buttons.addData'),
                             onClick: () => $refs.trackTradePopup.show(),
                         },
                     },
@@ -55,7 +55,7 @@
                 :data-source="charts.data"
                 :customize-point="customizePoint"
                 :title="{
-                    text: $t('admin.trades.charTitle'),
+                    text: $t('trading.trades.charTitle'),
                     horizontalAlignment: 'center',
                 }"
                 :size="{ width: '100%' }"
@@ -74,7 +74,7 @@
                 :commonSeriesSettings="{ argumentField: 'time', barPadding: 0 }"
                 :series="[
                     {
-                        name: $t('admin.trades.profitSum'),
+                        name: $t('trading.trades.profitSum'),
                         tag: 'money',
                         valueField: 's3',
                         axis: 'money',
@@ -84,7 +84,7 @@
                         visible: visibleSeries.money,
                     },
                     {
-                        name: $t('admin.trades.lossSum'),
+                        name: $t('trading.trades.lossSum'),
                         valueField: 's4',
                         axis: 'money',
                         type: 'stackedbar',
@@ -94,7 +94,7 @@
                         visible: visibleSeries.money,
                     },
                     {
-                        name: $t('admin.trades.feesSum'),
+                        name: $t('trading.trades.feesSum'),
                         valueField: 's5',
                         axis: 'money',
                         type: 'stackedbar',
@@ -105,7 +105,7 @@
                     },
 
                     {
-                        name: $t('admin.trades.feesSum'),
+                        name: $t('trading.trades.feesSum'),
                         valueField: 's2',
                         axis: 'money',
                         type: 'stackedbar',
@@ -115,7 +115,7 @@
                         visible: visibleSeries.money,
                     },
                     {
-                        name: $t('admin.trades.lossSum'),
+                        name: $t('trading.trades.lossSum'),
                         valueField: 's1',
                         axis: 'money',
                         type: 'stackedbar',
@@ -126,7 +126,7 @@
                     },
 
                     {
-                        name: $t('admin.trades.profitPerPrincipal'),
+                        name: $t('trading.trades.profitPerPrincipal'),
                         tag: 'profitPerPrincipal',
                         valueField: 'profitPerPrincipal',
                         axis: 'profitPerPrincipal',
@@ -136,7 +136,7 @@
                         visible: visibleSeries.profitPerPrincipal,
                     },
                     {
-                        name: $t('admin.trades.profitPerFees'),
+                        name: $t('trading.trades.profitPerFees'),
                         tag: 'profitPerFees',
                         valueField: 'profitPerFees',
                         axis: 'profitPerFees',
@@ -146,7 +146,7 @@
                         visible: visibleSeries.profitPerFees,
                     },
                     {
-                        name: $t('admin.trades.accumulatedProfit'),
+                        name: $t('trading.trades.accumulatedProfit'),
                         tag: 'accumulatedProfit',
                         valueField: 'accumulatedProfit',
                         axis: 'accumulatedProfit',
@@ -310,13 +310,13 @@ export default {
     },
     computed: {
         ...mapGetters("Auth", ["permissions"]),
-        ...mapGetters("Admin.trades", ["charts", "page", "period"]),
+        ...mapGetters("Trading.trades", ["charts", "page", "period"]),
         chart() {
             return this.$refs.chart.instance;
         },
     },
     methods: {
-        ...mapActions("Admin.trades", ["getChart", "lazyLoad", "resetState"]),
+        ...mapActions("Trading.trades", ["getChart", "lazyLoad", "resetState"]),
         customizePoint({ value, series }) {
             if (
                 series.tag === "profitPerPrincipal" &&

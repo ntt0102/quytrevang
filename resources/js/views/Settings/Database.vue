@@ -9,11 +9,11 @@
                     :collapsible="true"
                     :items="[
                         {
-                            title: $t('admin.settings.database.backup'),
+                            title: $t('settings.database.backup'),
                             template: 'backupTemplate',
                         },
                         {
-                            title: $t('admin.settings.database.restore'),
+                            title: $t('settings.database.restore'),
                             template: 'restoreTemplate',
                         },
                     ]"
@@ -33,9 +33,7 @@
                                     editor-type="dxCheckBox"
                                     :label="{
                                         location: 'left',
-                                        text: $t(
-                                            'admin.settings.database.sendMail'
-                                        ),
+                                        text: $t('settings.database.sendMail'),
                                     }"
                                 />
                                 <DxItem
@@ -43,9 +41,7 @@
                                     editor-type="dxCheckBox"
                                     :label="{
                                         location: 'left',
-                                        text: $t(
-                                            'admin.settings.database.download'
-                                        ),
+                                        text: $t('settings.database.download'),
                                     }"
                                 />
                                 <DxItem
@@ -163,9 +159,10 @@ export default {
                 this.restoreFileName = fileName;
             else
                 this.$toasted.show(
-                    this.$t(
-                        "admin.settings.database.notMatchExtension"
-                    ).replace("{extension}", this.RESTORE_FILE_EXTENSION)
+                    this.$t("settings.database.notMatchExtension").replace(
+                        "{extension}",
+                        this.RESTORE_FILE_EXTENSION
+                    )
                 );
         },
     },

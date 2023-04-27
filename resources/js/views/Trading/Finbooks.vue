@@ -46,14 +46,14 @@
                 <DxColumn
                     data-field="display"
                     dataType="number"
-                    :caption="$t('admin.finbooks.display')"
+                    :caption="$t('trading.finbooks.display')"
                     :validation-rules="validationRules.display"
                 />
                 <DxColumn
                     data-field="name"
                     dataType="string"
                     :header-filter="{ allowSearch: true }"
-                    :caption="$t('admin.finbooks.name')"
+                    :caption="$t('trading.finbooks.name')"
                     :validation-rules="validationRules.name"
                 />
                 <DxColumn
@@ -65,14 +65,14 @@
                         format: '#,##0 ₫',
                     }"
                     :header-filter="{ allowSearch: true }"
-                    :caption="$t('admin.finbooks.balance')"
+                    :caption="$t('trading.finbooks.balance')"
                     :validation-rules="validationRules.balance"
                 />
                 <DxColumn
                     data-field="last_transaction"
                     dataType="string"
                     :header-filter="{ allowSearch: true }"
-                    :caption="$t('admin.finbooks.lastTransaction')"
+                    :caption="$t('trading.finbooks.lastTransaction')"
                     :validation-rules="validationRules.lastTransaction"
                 />
                 <DxColumn
@@ -82,7 +82,7 @@
                     :editor-options="{
                         dateSerializationFormat: $mc.DX_SERVER_DATE_FORMAT,
                     }"
-                    :caption="$t('admin.finbooks.updatedAt')"
+                    :caption="$t('trading.finbooks.updatedAt')"
                 />
                 <template #commandCellTemplate="{ data }">
                     <DxToolbar
@@ -96,10 +96,10 @@
                                     type: 'default',
                                     icon: 'far fa-envelope-open-dollar small',
                                     hint: $t(
-                                        'admin.finbooks.createTransaction'
+                                        'trading.finbooks.createTransaction'
                                     ),
                                     text: $t(
-                                        'admin.finbooks.createTransaction'
+                                        'trading.finbooks.createTransaction'
                                     ),
                                     onClick: () =>
                                         $refs.transactionFinbookPopup.show(
@@ -192,7 +192,7 @@ export default {
         this.$store.unregisterModule("Trading.finbooks");
     },
     computed: {
-        ...mapGetters("Admin.finbooks", ["finbooks"]),
+        ...mapGetters("Trading.finbooks", ["finbooks"]),
         dataGrid: function () {
             return this.$refs.dataGrid.instance;
         },
@@ -203,7 +203,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.finbooks", ["fetch", "save", "resetState"]),
+        ...mapActions("Trading.finbooks", ["fetch", "save", "resetState"]),
         onSave(e) {
             this.$bus.emit("checkPin", () => this.save({ changes: e.changes }));
         },

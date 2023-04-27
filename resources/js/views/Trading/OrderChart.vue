@@ -11,7 +11,7 @@
                             :class="`command noaction far fa-${
                                 status.connection ? 'link' : 'unlink'
                             }`"
-                            :title="$t('admin.orderChart.connection')"
+                            :title="$t('trading.orderChart.connection')"
                         ></div>
                         <div
                             class="command noaction status"
@@ -19,7 +19,7 @@
                                 green: status.position > 0,
                                 red: status.position < 0,
                             }"
-                            :title="$t('admin.orderChart.position')"
+                            :title="$t('trading.orderChart.position')"
                         >
                             {{ status.position | currency("", "") }}
                         </div>
@@ -27,7 +27,7 @@
                         <input
                             type="date"
                             class="chart-date command"
-                            :title="$t('admin.orderChart.date')"
+                            :title="$t('trading.orderChart.date')"
                             v-model="chartDate"
                             @change="() => getChartData(chartDate)"
                         />
@@ -43,13 +43,13 @@
                             :class="`command far fa-${
                                 isFullscreen ? 'compress' : 'expand'
                             }`"
-                            :title="$t('admin.orderChart.fullscreen')"
+                            :title="$t('trading.orderChart.fullscreen')"
                             @click="toggleFullscreen"
                         ></div>
                         <div
                             ref="reloadTool"
                             class="command far fa-sync-alt"
-                            :title="$t('admin.orderChart.reload')"
+                            :title="$t('trading.orderChart.reload')"
                             @click="
                                 () => {
                                     data.price = [];
@@ -60,21 +60,21 @@
                         <div
                             ref="lineTool"
                             class="command far fa-minus"
-                            :title="$t('admin.orderChart.lineTool')"
+                            :title="$t('trading.orderChart.lineTool')"
                             @click="lineToolClick"
                             @contextmenu="lineToolContextmenu"
                         ></div>
                         <div
                             ref="rulerTool"
                             class="command far fa-arrows-v"
-                            :title="$t('admin.orderChart.rulerTool')"
+                            :title="$t('trading.orderChart.rulerTool')"
                             @click="rulerToolClick"
                             @contextmenu="rulerToolContextmenu"
                         ></div>
                         <div
                             ref="cancelOrder"
                             class="cancel-order command far fa-trash-alt"
-                            :title="$t('admin.orderChart.cancelTool')"
+                            :title="$t('trading.orderChart.cancelTool')"
                             @click="cancelOrderClick"
                         ></div>
                     </div>
@@ -225,7 +225,7 @@ export default {
         this.websocket = null;
     },
     computed: {
-        ...mapGetters("Admin.orderChart", [
+        ...mapGetters("Trading.orderChart", [
             "chartData",
             "status",
             "config",
@@ -247,7 +247,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.orderChart", [
+        ...mapActions("Trading.orderChart", [
             "getChartData",
             "getStatus",
             "getConfig",
@@ -308,7 +308,7 @@ export default {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
                                             this.$t(
-                                                "admin.orderChart.changeEntrySuccess"
+                                                "Trading.orderChart.changeEntrySuccess"
                                             )
                                         );
                                     } else {
@@ -333,7 +333,7 @@ export default {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
                                             this.$t(
-                                                "admin.orderChart.changeTpSuccess"
+                                                "Trading.orderChart.changeTpSuccess"
                                             )
                                         );
                                     } else {
@@ -354,7 +354,7 @@ export default {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
                                             this.$t(
-                                                "admin.orderChart.changeSlSuccess"
+                                                "Trading.orderChart.changeSlSuccess"
                                             )
                                         );
                                     } else {
@@ -610,7 +610,7 @@ export default {
                                                         );
                                                         self.$toasted.success(
                                                             this.$t(
-                                                                "admin.orderChart.deleteTpSuccess"
+                                                                "Trading.orderChart.deleteTpSuccess"
                                                             )
                                                         );
                                                         this.hideOrderButton();
@@ -651,7 +651,7 @@ export default {
                                                         );
                                                         self.$toasted.success(
                                                             this.$t(
-                                                                "admin.orderChart.deleteSlSuccess"
+                                                                "Trading.orderChart.deleteSlSuccess"
                                                             )
                                                         );
                                                         this.hideOrderButton();
@@ -701,7 +701,7 @@ export default {
                                                         );
                                                         self.$toasted.success(
                                                             this.$t(
-                                                                "admin.orderChart.autoNewTpSlSuccess"
+                                                                "Trading.orderChart.autoNewTpSlSuccess"
                                                             )
                                                         );
                                                     } else
@@ -742,7 +742,7 @@ export default {
                                     toolsStore.clear("order");
                                     this.$toasted.success(
                                         this.$t(
-                                            "admin.orderChart.autoCancelTpSlSuccess"
+                                            "Trading.orderChart.autoCancelTpSlSuccess"
                                         )
                                     );
                                 } else this.toasteOrderError(resp.message);
@@ -1021,7 +1021,7 @@ export default {
                                     toolsStore.clear("order");
                                     this.$toasted.success(
                                         this.$t(
-                                            "admin.orderChart.deleteEntrySuccess"
+                                            "Trading.orderChart.deleteEntrySuccess"
                                         )
                                     );
                                 } else {
@@ -1055,7 +1055,7 @@ export default {
                                 if (resp.isOk)
                                     this.$toasted.success(
                                         this.$t(
-                                            "admin.orderChart.atoOrderSuccess"
+                                            "Trading.orderChart.atoOrderSuccess"
                                         )
                                     );
                                 else this.toasteOrderError(resp.message);
@@ -1097,7 +1097,7 @@ export default {
                                 if (resp.isOk)
                                     this.$toasted.success(
                                         this.$t(
-                                            "admin.orderChart.atcOrderSuccess"
+                                            "Trading.orderChart.atcOrderSuccess"
                                         )
                                     );
                                 else this.toasteOrderError(resp.message);

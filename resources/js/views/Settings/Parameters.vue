@@ -31,11 +31,11 @@
                     :allow-editing="false"
                     data-field="description"
                     :header-filter="{ allowSearch: true }"
-                    :caption="$t('admin.settings.parameters.description')"
+                    :caption="$t('settings.parameters.description')"
                 />
                 <DxColumn
                     data-field="value"
-                    :caption="$t('admin.settings.parameters.value')"
+                    :caption="$t('settings.parameters.value')"
                     :validation-rules="validationRules.value"
                 />
             </DxDataGrid>

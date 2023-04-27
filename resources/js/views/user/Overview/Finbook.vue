@@ -63,7 +63,7 @@ export default {
         this.$bus.off("toggleMenu");
     },
     computed: {
-        ...mapGetters("Admin.finbooks", ["finbooks"]),
+        ...mapGetters("Trading.finbooks", ["finbooks"]),
         pie: function () {
             return this.$refs.pie.instance;
         },
@@ -87,7 +87,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.finbooks", ["fetch"]),
+        ...mapActions("Trading.finbooks", ["fetch"]),
         pointClickHandler({ target: { data } }) {
             this.$refs.transactionFinbookPopup.show(data);
         },

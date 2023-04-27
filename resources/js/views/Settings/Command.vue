@@ -36,7 +36,7 @@
                             left: 0,
                             type: 'default',
                             icon: 'far fa-running',
-                            text: $t('admin.settings.command.run'),
+                            text: $t('settings.command.run'),
                             useSubmitBehavior: true,
                         }"
                     />

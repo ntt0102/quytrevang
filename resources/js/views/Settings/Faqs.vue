@@ -48,7 +48,7 @@
                                         onValueChanged: onUseHtmlChange,
                                     },
                                     label: {
-                                        text: $t('admin.settings.faqs.useHtml'),
+                                        text: $t('settings.faqs.useHtml'),
                                     },
                                 },
                                 {
@@ -124,20 +124,20 @@
                     <DxColumn
                         data-field="topic"
                         :header-filter="{ allowSearch: true }"
-                        :caption="$t('admin.settings.faqs.topic')"
+                        :caption="$t('settings.faqs.topic')"
                         :validation-rules="validationRules.topic"
                     />
                     <DxColumn
                         data-field="question"
                         :header-filter="{ allowSearch: true }"
-                        :caption="$t('admin.settings.faqs.question')"
+                        :caption="$t('settings.faqs.question')"
                         :validation-rules="validationRules.question"
                     />
                     <DxColumn
                         :visible="false"
                         data-field="answer"
                         :header-filter="{ allowSearch: true }"
-                        :caption="$t('admin.settings.faqs.answer')"
+                        :caption="$t('settings.faqs.answer')"
                         :validation-rules="validationRules.answer"
                     />
                     <template #commandCellTemplate="{ data }">
