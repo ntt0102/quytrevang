@@ -19,7 +19,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('send-comment', 'AppController@sendComment');
     Route::get('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
-    Route::post('core.vpbs', 'Admin\OrderChartController@setVpsUserSession')->middleware('cors');
+    Route::post('core.vpbs', 'Admin\OrderChartController@setVpsUserSession')->middleware(['cors']);
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login')->name('login')->middleware('cors');
