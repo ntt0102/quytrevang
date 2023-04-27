@@ -613,6 +613,7 @@ export default {
                                                                 "admin.orderChart.deleteTpSuccess"
                                                             )
                                                         );
+                                                        this.hideOrderButton();
                                                     } else
                                                         self.toasteOrderError(
                                                             resp.message
@@ -653,6 +654,7 @@ export default {
                                                                 "admin.orderChart.deleteSlSuccess"
                                                             )
                                                         );
+                                                        this.hideOrderButton();
                                                     } else
                                                         self.toasteOrderError(
                                                             resp.message

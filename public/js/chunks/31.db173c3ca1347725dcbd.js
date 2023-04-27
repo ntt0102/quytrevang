@@ -512,6 +512,7 @@ var TIME = {
                             self.removeOrderLine("sl");
                             _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_1__["default"].clear("order");
                             self.$toasted.success(_this4.$t("admin.orderChart.deleteTpSuccess"));
+                            _this4.hideOrderButton();
                           } else self.toasteOrderError(resp.message);
                           self.isAutoOrdering = false;
                         });
@@ -532,6 +533,7 @@ var TIME = {
                             self.removeOrderLine("sl");
                             _plugins_orderChartDb_js__WEBPACK_IMPORTED_MODULE_1__["default"].clear("order");
                             self.$toasted.success(_this4.$t("admin.orderChart.deleteSlSuccess"));
+                            _this4.hideOrderButton();
                           } else self.toasteOrderError(resp.message);
                           self.isAutoOrdering = false;
                         });
