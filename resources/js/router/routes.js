@@ -3,9 +3,9 @@ import i18n from "../plugins/i18n";
 const Overview = () =>
     import(/* webpackPrefetch: true */ "../views/user/Overview/Index");
 const Profile = () =>
-    import(/* webpackPrefetch: true */ "../views/user/Profile");
+    import(/* webpackPrefetch: true */ "../views/user/Profile/Index");
 const Contract = () =>
-    import(/* webpackPrefetch: true */ "../views/user/Contract");
+    import(/* webpackPrefetch: true */ "../views/user/Contract/Index");
 
 const Users = () =>
     import(/* webpackPrefetch: true */ "../views/admin/User/Index");
@@ -19,7 +19,7 @@ const Comments = () =>
 const OrderChart = () =>
     import(/* webpackPrefetch: true */ "../views/Trading/OrderChart");
 const Trades = () =>
-    import(/* webpackPrefetch: true */ "../views/Trading/Trades");
+    import(/* webpackPrefetch: true */ "../views/Trading/Statistic/Index");
 const Finbooks = () =>
     import(/* webpackPrefetch: true */ "../views/Trading/Finbooks");
 
