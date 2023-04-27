@@ -317,7 +317,7 @@ var actions = {
       getters = _ref2.getters,
       state = _ref2.state,
       rootGetters = _ref2.rootGetters;
-    if (moment().diff(state.updatedAt, "seconds") < 3) return false;
+    // if (moment().diff(state.updatedAt, "seconds") < 3) return false;
     return new Promise(function (resolve, reject) {
       axios.post("trades/chart", {
         period: period,

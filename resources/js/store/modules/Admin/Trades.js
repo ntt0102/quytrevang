@@ -34,7 +34,7 @@ const actions = {
         });
     },
     getChart({ commit, dispatch, getters, state, rootGetters }, period) {
-        if (moment().diff(state.updatedAt, "seconds") < 3) return false;
+        // if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
             axios
                 .post(
