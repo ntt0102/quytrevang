@@ -36,37 +36,6 @@
                             onClick: () => $refs.trackTradePopup.show(),
                         },
                     },
-                    // {
-                    //     visible: permissions.includes('trades@edit'),
-                    //     location: 'before',
-                    //     widget: 'dxButton',
-                    //     options: {
-                    //         icon: 'far fa-image small',
-                    //         hint: $t('admin.trades.buttons.pickImage'),
-                    //         onClick: () =>
-                    //             $refs.pickImagePopup.show({ clientPath: 'vps' })
-                    //     }
-                    // },
-                    // {
-                    //     visible: permissions.includes('trades@edit'),
-                    //     location: 'before',
-                    //     widget: 'dxButton',
-                    //     options: {
-                    //         icon: 'far fa-chart-line small',
-                    //         hint: $t('admin.trades.buttons.vn30f1mChart'),
-                    //         onClick: () => $refs.vn30f1mChartPopup.show()
-                    //     }
-                    // },
-                    // {
-                    //     visible: permissions.includes('trades@edit'),
-                    //     location: 'before',
-                    //     widget: 'dxButton',
-                    //     options: {
-                    //         icon: 'far fa-chart-area small',
-                    //         hint: $t('admin.trades.buttons.shareChart'),
-                    //         onClick: () => $refs.shareChartPopup.show()
-                    //     }
-                    // },
                     {
                         location: 'after',
                         widget: 'dxSelectBox',
@@ -292,32 +261,28 @@
             </DxChart>
         </div>
         <TrackTradePopup ref="trackTradePopup" />
-        <PickImagePopup ref="pickImagePopup" />
-        <Vn30f1mChartPopup ref="vn30f1mChartPopup" />
-        <ShareChartPopup ref="shareChartPopup" />
     </div>
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
-const DxChart = () =>
-    import(/* webpackPrefetch: true */ "devextreme-vue/chart");
+import DxChart from "devextreme-vue/chart";
 import TrackTradePopup from "../../components/Popups/TrackTradePopup.vue";
-import PickImagePopup from "../../components/Popups/PickImagePopup.vue";
-import Vn30f1mChartPopup from "../../components/Popups/Vn30f1mChartPopup.vue";
-import ShareChartPopup from "../../components/Popups/ShareChartPopup.vue";
 import adminTradesStore from "../../store/modules/Admin/Trades";
 
 export default {
     components: {
         DxChart,
         TrackTradePopup,
-        PickImagePopup,
-        Vn30f1mChartPopup,
-        ShareChartPopup,
     },
     data() {
         return {
-            principalTargetThreshold: 5,
+            principalTargetThreshold: {
+                day: 1,
+                week: 5,
+                month: 22,
+                quarter: 65,
+                year: 260,
+            },
             feesTargetThreshold: 5,
             visibleSeries: {
                 money: true,
@@ -355,7 +320,7 @@ export default {
         customizePoint({ value, series }) {
             if (
                 series.tag === "profitPerPrincipal" &&
-                value >= this.principalTargetThreshold * this.charts.period
+                value >= this.principalTargetThreshold[this.charts.period]
             )
                 return { color: "Aqua", hoverStyle: { color: "Aqua" } };
             else if (
@@ -463,7 +428,7 @@ export default {
                       )}%
                       (${(
                           (100 * pointInfo.point.data.profitPerPrincipal) /
-                          (this.principalTargetThreshold * this.charts.period)
+                          this.principalTargetThreshold[this.charts.period]
                       ).toFixed(0)}%
                       ${this.$t("admin.trades.kpi")})
                     </span>
