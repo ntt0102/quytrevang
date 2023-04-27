@@ -19,13 +19,13 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('send-comment', 'AppController@sendComment');
     Route::get('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
-    Route::post('core.vpbs', 'Admin\OrderChartController@setVpsUserSession')->middleware(['cors']);
+    Route::post('core.vpbs', 'Admin\OrderChartController@setVpsUserSession');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
-        Route::post('login', 'LoginController@login')->name('login')->middleware('cors');
+        Route::post('login', 'LoginController@login')->name('login');
         Route::post('login-webauthn', 'LoginController@loginWebAuthn');
         Route::post('validate-duplicate-email', 'RegisterController@validateDuplicateEmail');
-        Route::post('create-account', 'RegisterController@createAccount')->middleware('cors');
+        Route::post('create-account', 'RegisterController@createAccount');
         Route::group(['prefix' => 'password'], function () {
             Route::post('reset', 'ResetPasswordController@resetPassword');
             Route::post('change', 'ResetPasswordController@changePassword')->name('password.reset');
@@ -36,9 +36,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::post('resend', 'VerificationController@resend');
                 Route::get('verify/{id}', 'VerificationController@verify')->name('verification.verify');
             });
-            Route::get('logout', 'LoginController@logout')->middleware('cors');
+            Route::get('logout', 'LoginController@logout');
             Route::get('user', 'LoginController@user');
-            Route::post('so/user', 'LoginController@smartOrderUser')->middleware('cors');
             Route::post('register-webauthn', 'LoginController@registerWebAuthn');
             Route::post('confirm-webauthn', 'LoginController@confirmWebAuthn');
             Route::post('check-pin', 'LoginController@checkPin');
@@ -47,13 +46,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
 
     Route::group(['middleware' => 'auth:api'], function () {
         Route::group(['prefix' => 'so'], function () {
-            Route::group(['middleware' => 'cors'], function () {
-                Route::post('get-config', 'SmartOrderController@getConfig');
-                Route::post('set-config', 'SmartOrderController@setConfig');
-                Route::post('get-chart', 'SmartOrderController@getChartData');
-                Route::post('save-order', 'SmartOrderController@saveOrder');
-                Route::post('report', 'SmartOrderController@report');
-            });
             Route::group(['middleware' => 'can:copyists@control'], function () {
                 Route::get('manage', 'SmartOrderController@getList');
                 Route::post('manage/validate-user', 'SmartOrderController@validateUser');
