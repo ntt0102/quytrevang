@@ -1,7 +1,7 @@
 <template>
     <div class="settings-page">
         <h2 class="content-block">
-            {{ $t("admin.settings.faqs.title") }}
+            {{ $t("settings.faqs.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <div>
@@ -210,7 +210,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.settings.faqs.topic") +
+                            this.$t("settings.faqs.topic") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -218,7 +218,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.settings.faqs.question") +
+                            this.$t("settings.faqs.question") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -226,7 +226,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.settings.faqs.answer") +
+                            this.$t("settings.faqs.answer") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -234,19 +234,16 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule(
-            "Admin.settings.faqs",
-            adminSettingsFaqsStore
-        );
+        this.$store.registerModule("Settings.faqs", adminSettingsFaqsStore);
     },
     created() {
         this.fetch();
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.settings.faqs");
+        this.$store.unregisterModule("Settings.faqs");
     },
     computed: {
-        ...mapGetters("Admin.settings.faqs", ["faqs"]),
+        ...mapGetters("Settings.faqs", ["faqs"]),
         dataGrid: function () {
             return this.$refs.dataGrid.instance;
         },
@@ -257,7 +254,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.settings.faqs", ["fetch", "save", "resetState"]),
+        ...mapActions("Settings.faqs", ["fetch", "save", "resetState"]),
         onSave(formData) {
             this.save(formData);
         },
@@ -275,7 +272,7 @@ export default {
         onInitNewRow(e) {
             this.dataGrid.option(
                 "editing.popup.title",
-                this.$t("admin.settings.faqs.popup.create")
+                this.$t("settings.faqs.popup.create")
             );
         },
         onEditingStart(e) {
@@ -283,7 +280,7 @@ export default {
             this.onUseHtmlChange({ value: isUseHtml });
             this.dataGrid.option(
                 "editing.popup.title",
-                this.$t("admin.settings.faqs.popup.edit")
+                this.$t("settings.faqs.popup.edit")
             );
         },
         onShown(e) {

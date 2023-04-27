@@ -1,7 +1,7 @@
 <template>
     <div class="finbooks-page">
         <h2 class="content-block">
-            {{ $t("admin.finbooks.title") }}
+            {{ $t("trading.finbooks.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <DxDataGrid
@@ -151,7 +151,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.finbooks.name") +
+                            this.$t("trading.finbooks.name") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -159,7 +159,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.finbooks.balance") +
+                            this.$t("trading.finbooks.balance") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -167,7 +167,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.finbooks.lastTransaction") +
+                            this.$t("trading.finbooks.lastTransaction") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -175,7 +175,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.finbooks.display") +
+                            this.$t("trading.finbooks.display") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -183,13 +183,13 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule("Admin.finbooks", adminFinbooksStore);
+        this.$store.registerModule("Trading.finbooks", adminFinbooksStore);
     },
     created() {
         this.fetch();
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.finbooks");
+        this.$store.unregisterModule("Trading.finbooks");
     },
     computed: {
         ...mapGetters("Admin.finbooks", ["finbooks"]),
@@ -211,7 +211,7 @@ export default {
             this.gridData = this.$mf.cloneDeep(this.finbooks);
         },
         onInitNewRow(e) {
-            e.data.last_transaction = this.$t("admin.finbooks.openNewBook");
+            e.data.last_transaction = this.$t("trading.finbooks.openNewBook");
         },
     },
 };

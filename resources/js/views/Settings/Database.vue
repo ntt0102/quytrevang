@@ -1,7 +1,7 @@
 <template>
     <div class="settings-page">
         <h2 class="content-block">
-            {{ $t("admin.settings.database.title") }}
+            {{ $t("settings.database.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <div class="settings-database-tab">
@@ -138,13 +138,13 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule("Admin.settings", adminSettingsStore);
+        this.$store.registerModule("Settings", adminSettingsStore);
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.settings");
+        this.$store.unregisterModule("Settings");
     },
     methods: {
-        ...mapActions("Admin.settings", ["backupDatabase", "restoreDatabase"]),
+        ...mapActions("Settings", ["backupDatabase", "restoreDatabase"]),
         onBackupForm() {
             this.$bus.emit("checkPin", () =>
                 this.backupDatabase(this.backupData)

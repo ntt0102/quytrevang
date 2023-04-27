@@ -1,7 +1,7 @@
 <template>
     <div class="order-chart-page">
         <h2 class="content-block">
-            {{ $t("admin.orderChart.title") }}
+            {{ $t("trading.orderChart.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <div class="order-chart-container" ref="chartContainer">
@@ -167,7 +167,7 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule("Admin.orderChart", adminOrderChartStore);
+        this.$store.registerModule("Trading.orderChart", adminOrderChartStore);
         if (!document.getElementById("orderChartJs")) {
             var scriptTag = document.createElement("script");
             scriptTag.src = "/js/order-chart.min.js";
@@ -218,7 +218,7 @@ export default {
         }, 1000);
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.orderChart");
+        this.$store.unregisterModule("Trading.orderChart");
         clearInterval(this.interval);
         clearInterval(this.interval60);
         this.websocket.close();
@@ -367,7 +367,7 @@ export default {
                         if (!isChanged) {
                             line.applyOptions({ price: oldPrice });
                             this.$toasted.show(
-                                this.$t("admin.orderChart.noChangeOrderLine")
+                                this.$t("trading.orderChart.noChangeOrderLine")
                             );
                         }
                     }
@@ -978,8 +978,8 @@ export default {
         },
         cancelOrderClick() {
             let result = confirm(
-                this.$t("admin.orderChart.cancelOrder"),
-                this.$t("admin.orderChart.cancelConfirm")
+                this.$t("trading.orderChart.cancelOrder"),
+                this.$t("trading.orderChart.cancelConfirm")
             );
             result.then((dialogResult) => {
                 if (dialogResult) {
@@ -1002,7 +1002,9 @@ export default {
                                     this.removeOrderLine("sl");
                                     toolsStore.clear("order");
                                     this.$toasted.success(
-                                        this.$t("admin.orderChart.exitSuccess")
+                                        this.$t(
+                                            "trading.orderChart.exitSuccess"
+                                        )
                                     );
                                 } else {
                                     this.toggleCancelOrderButton(true);
@@ -1037,8 +1039,8 @@ export default {
             if (this.inSession(CURRENT_SEC)) {
                 if (CURRENT_SEC < TIME.ATO) {
                     let result = confirm(
-                        this.$t("admin.orderChart.atoOrder"),
-                        this.$t("admin.orderChart.cancelConfirm")
+                        this.$t("trading.orderChart.atoOrder"),
+                        this.$t("trading.orderChart.cancelConfirm")
                     );
                     result.then((dialogResult) => {
                         if (dialogResult) {
@@ -1073,14 +1075,14 @@ export default {
                             this.drawOrderLine("entry");
                             this.toggleCancelOrderButton(true);
                             this.$toasted.success(
-                                this.$t("admin.orderChart.newEntrySuccess")
+                                this.$t("trading.orderChart.newEntrySuccess")
                             );
                         } else this.toasteOrderError(resp.message);
                     });
                 } else {
                     let result = confirm(
-                        this.$t("admin.orderChart.atcOrder"),
-                        this.$t("admin.orderChart.cancelConfirm")
+                        this.$t("trading.orderChart.atcOrder"),
+                        this.$t("trading.orderChart.cancelConfirm")
                     );
                     result.then((dialogResult) => {
                         if (dialogResult) {
@@ -1124,7 +1126,7 @@ export default {
                     this.drawOrderLine("sl");
                     this.order.entry.line.applyOptions({ draggable: false });
                     this.$toasted.success(
-                        this.$t("admin.orderChart.newTpSlSuccess")
+                        this.$t("trading.orderChart.newTpSlSuccess")
                     );
                 } else this.toasteOrderError(resp.message);
             });

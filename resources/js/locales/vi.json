@@ -99,8 +99,7 @@
         }
     },
     "admin": {
-        "manager": "Quản lý",
-        "trading": "Đầu tư",
+        "title": "Quản lý",
         "users": {
             "title": "Tài khoản",
             "deletedUsers": "Tài khoản đã xóa",
@@ -133,93 +132,65 @@
             "title": "Hợp đồng",
             "confirmingContracts": "{count} hợp đồng chờ xác nhận"
         },
-        "settings": {
-            "title": "Cài đặt",
-            "parameters": {
-                "title": "Thông số",
-                "value": "Giá trị",
-                "description": "Tên thông số"
-            },
-            "faqs": {
-                "title": "Hỏi đáp",
-                "topic": "Chủ đề",
-                "question": "Câu hỏi",
-                "answer": "Trả lời",
-                "useHtml": "Dùng HTML",
-                "popup": {
-                    "create": "Thêm hỏi đáp",
-                    "edit": "Sửa hỏi đáp"
-                }
-            },
-            "database": {
-                "title": "Dữ liệu",
-                "backup": "Sao lưu dữ liệu",
-                "sendMail": "Gửi email",
-                "download": "Tải xuống",
-                "restore": "Khôi phục dữ liệu",
-                "notMatchExtension": "Không phải tệp {extension}"
-            },
-            "command": {
-                "title": "Lệnh",
-                "run": "Thực hiện",
-                "selects": {
-                    "cache": "Xóa cache",
-                    "resetMigrate": "Đặt lại cơ sở dữ liệu",
-                    "downMaintance": "Bật chế độ bảo trì",
-                    "upMaintance": "Tắt chế độ bảo trì",
-                    "cleanLog": "Xóa toàn bộ nhật ký",
-                    "updateTrade": "Bật tự động cập nhật đầu tư",
-                    "storageLink": "Tạo liên kết tượng trưng",
-                    "custom": "Nhập lệnh khác"
-                }
-            },
-            "notification": {
-                "title": "Thông báo",
-                "receiver": "Người nhận",
-                "notificationTitle": "Tiêu đề",
-                "body": "Nội dung",
-                "image": "Hình ảnh",
-                "receiverPlaceholder": "<*> | <MTK1,MTK2,...>",
-                "action": {
-                    "title": "Phím bấm",
-                    "placeholder": "<Tên phím bấm>,<Đường dẫn>"
-                }
-            },
-            "files": {
-                "title": "Tập tin",
-                "copyUrl": "Lấy đường dẫn",
-                "messages": {
-                    "multiFile": "Chỉ được chọn một tập tin",
-                    "notIsFile": "Mục chọn không phải là tập tin",
-                    "notIsImage": "Không thể mở tập tin không phải hình ảnh",
-                    "copiedUrl": "Đã sao chép đường dẫn",
-                    "notCopiedUrl": "Đường dẫn chưa được sao chép"
-                }
-            },
-            "log": {
-                "title": "Nhật ký",
-                "causer": "Người tạo",
-                "subject": "Đối tượng",
-                "description": "Mô tả",
-                "createdAt": "Ngày tạo",
-                "propertiesBtn": "Xem dữ liệu",
-                "propertiesTitle": "Dữ liệu thay đổi"
-            },
-            "roles": {
-                "title": "Vai trò",
-                "name": "Tên vai trò",
-                "permission": "Các quyền"
-            },
-            "permissions": {
-                "title": "Quyền",
-                "name": "Tên quyền"
-            }
+        "smartorders": {
+            "title": "Smart Order",
+            "user": "Khách hàng",
+            "startedAt": "Ngày bắt đầu",
+            "periods": "Thời hạn",
+            "deviceLimit": "TB giới hạn",
+            "devices": "Thiết bị",
+            "clearDevices": "Xoá thiết bị",
+            "pricePlans": "Bảng giá",
+            "planName": "Tên",
+            "months": "Số tháng",
+            "planPrice": "Giá",
+            "renewalPrice": "Giá gia hạn",
+            "highestPrice": "Giá cao nhất"
         },
         "comments": {
             "title": "Phản hồi",
             "markAsRead": "Đánh dấu đã đọc",
             "unreadComments": "{count} phản hồi chưa đọc",
             "viewUser": "Xem tài khoản {code}"
+        }
+    },
+    "trading": {
+        "title": "Đầu tư",
+        "orderChart": {
+            "title": "Đặt lệnh",
+            "connection": "Trạng thái kết nối VPS",
+            "position": "Vị thế đang mở",
+            "date": "Dữ liệu của ngày",
+            "fullscreen": "Bật tắt toàn màn hình",
+            "reload": "Tải lại dữ liệu",
+            "lineTool": "Vẽ đường giá",
+            "rulerTool": "Đo khoảng cách giá",
+            "cancelTool": "Huỷ lệnh và đóng vị thế",
+            "newEntrySuccess": "Đặt lệnh Entry thành công",
+            "changeEntrySuccess": "Sửa lệnh Entry thành công",
+            "deleteEntrySuccess": "Huỷ lệnh Entry thành công",
+            "newTpSlSuccess": "Đặt lệnh TP/SL thành công",
+            "autoNewTpSlSuccess": "Tự động đặt lệnh TP/SL thành công",
+            "changeTpSuccess": "Sửa lệnh TP thành công",
+            "deleteTpSuccess": "Đã khớp lệnh TP và đóng vị thế",
+            "changeSlSuccess": "Sửa lệnh SL thành công",
+            "deleteSlSuccess": "Đã khớp lệnh SL và đóng vị thế",
+            "exitSuccess": "Đóng vị thế thành công",
+            "atoOrderSuccess": "Đặt lệnh ATO thành công",
+            "atcOrderSuccess": "Đặt lệnh ATC thành công",
+            "autoCancelTpSlSuccess": "Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế",
+            "cancelOrder": "Huỷ lệnh?",
+            "atoOrder": "Đặt lệnh ATO?",
+            "atcOrder": "Đặt lệnh ATC?",
+            "cancelConfirm": "Xác nhận",
+            "noChangeOrderLine": "Không được thay đổi",
+            "notConnect": "Chưa kết nối tài khoản VPS",
+            "invalidVolume": "Số hợp đồng vượt quá sức mua",
+            "openedPosition": "Đã có vị thế đang mở",
+            "unopenedPosition": "Đã có vị thế đang mở",
+            "failOrder": "Đặt lệnh thất bại",
+            "failSave": "Lưu lệnh thất bại",
+            "unknown": "Lỗi chưa xác định"
         },
         "trades": {
             "title": "Thống kê",
@@ -275,57 +246,88 @@
             "create": "Tạo sổ mới",
             "edit": "Sửa sổ",
             "createTransaction": "Tạo giao dịch"
+        }
+    },
+    "settings": {
+        "title": "Cài đặt",
+        "parameters": {
+            "title": "Thông số",
+            "value": "Giá trị",
+            "description": "Tên thông số"
         },
-        "smartorders": {
-            "title": "Smart Order",
-            "user": "Khách hàng",
-            "startedAt": "Ngày bắt đầu",
-            "periods": "Thời hạn",
-            "deviceLimit": "TB giới hạn",
-            "devices": "Thiết bị",
-            "clearDevices": "Xoá thiết bị",
-            "pricePlans": "Bảng giá",
-            "planName": "Tên",
-            "months": "Số tháng",
-            "planPrice": "Giá",
-            "renewalPrice": "Giá gia hạn",
-            "highestPrice": "Giá cao nhất"
+        "faqs": {
+            "title": "Hỏi đáp",
+            "topic": "Chủ đề",
+            "question": "Câu hỏi",
+            "answer": "Trả lời",
+            "useHtml": "Dùng HTML",
+            "popup": {
+                "create": "Thêm hỏi đáp",
+                "edit": "Sửa hỏi đáp"
+            }
         },
-        "orderChart": {
-            "title": "Đặt lệnh",
-            "connection": "Trạng thái kết nối VPS",
-            "position": "Vị thế đang mở",
-            "date": "Dữ liệu của ngày",
-            "fullscreen": "Bật tắt toàn màn hình",
-            "reload": "Tải lại dữ liệu",
-            "lineTool": "Vẽ đường giá",
-            "rulerTool": "Đo khoảng cách giá",
-            "cancelTool": "Huỷ lệnh và đóng vị thế",
-            "newEntrySuccess": "Đặt lệnh Entry thành công",
-            "changeEntrySuccess": "Sửa lệnh Entry thành công",
-            "deleteEntrySuccess": "Huỷ lệnh Entry thành công",
-            "newTpSlSuccess": "Đặt lệnh TP/SL thành công",
-            "autoNewTpSlSuccess": "Tự động đặt lệnh TP/SL thành công",
-            "changeTpSuccess": "Sửa lệnh TP thành công",
-            "deleteTpSuccess": "Đã khớp lệnh TP và đóng vị thế",
-            "changeSlSuccess": "Sửa lệnh SL thành công",
-            "deleteSlSuccess": "Đã khớp lệnh SL và đóng vị thế",
-            "exitSuccess": "Đóng vị thế thành công",
-            "atoOrderSuccess": "Đặt lệnh ATO thành công",
-            "atcOrderSuccess": "Đặt lệnh ATC thành công",
-            "autoCancelTpSlSuccess": "Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế",
-            "cancelOrder": "Huỷ lệnh?",
-            "atoOrder": "Đặt lệnh ATO?",
-            "atcOrder": "Đặt lệnh ATC?",
-            "cancelConfirm": "Xác nhận",
-            "noChangeOrderLine": "Không được thay đổi",
-            "notConnect": "Chưa kết nối tài khoản VPS",
-            "invalidVolume": "Số hợp đồng vượt quá sức mua",
-            "openedPosition": "Đã có vị thế đang mở",
-            "unopenedPosition": "Đã có vị thế đang mở",
-            "failOrder": "Đặt lệnh thất bại",
-            "failSave": "Lưu lệnh thất bại",
-            "unknown": "Lỗi chưa xác định"
+        "database": {
+            "title": "Dữ liệu",
+            "backup": "Sao lưu dữ liệu",
+            "sendMail": "Gửi email",
+            "download": "Tải xuống",
+            "restore": "Khôi phục dữ liệu",
+            "notMatchExtension": "Không phải tệp {extension}"
+        },
+        "command": {
+            "title": "Lệnh",
+            "run": "Thực hiện",
+            "selects": {
+                "cache": "Xóa cache",
+                "resetMigrate": "Đặt lại cơ sở dữ liệu",
+                "downMaintance": "Bật chế độ bảo trì",
+                "upMaintance": "Tắt chế độ bảo trì",
+                "cleanLog": "Xóa toàn bộ nhật ký",
+                "updateTrade": "Bật tự động cập nhật đầu tư",
+                "storageLink": "Tạo liên kết tượng trưng",
+                "custom": "Nhập lệnh khác"
+            }
+        },
+        "notification": {
+            "title": "Thông báo",
+            "receiver": "Người nhận",
+            "notificationTitle": "Tiêu đề",
+            "body": "Nội dung",
+            "image": "Hình ảnh",
+            "receiverPlaceholder": "<*> | <MTK1,MTK2,...>",
+            "action": {
+                "title": "Phím bấm",
+                "placeholder": "<Tên phím bấm>,<Đường dẫn>"
+            }
+        },
+        "files": {
+            "title": "Tập tin",
+            "copyUrl": "Lấy đường dẫn",
+            "messages": {
+                "multiFile": "Chỉ được chọn một tập tin",
+                "notIsFile": "Mục chọn không phải là tập tin",
+                "notIsImage": "Không thể mở tập tin không phải hình ảnh",
+                "copiedUrl": "Đã sao chép đường dẫn",
+                "notCopiedUrl": "Đường dẫn chưa được sao chép"
+            }
+        },
+        "log": {
+            "title": "Nhật ký",
+            "causer": "Người tạo",
+            "subject": "Đối tượng",
+            "description": "Mô tả",
+            "createdAt": "Ngày tạo",
+            "propertiesBtn": "Xem dữ liệu",
+            "propertiesTitle": "Dữ liệu thay đổi"
+        },
+        "roles": {
+            "title": "Vai trò",
+            "name": "Tên vai trò",
+            "permission": "Các quyền"
+        },
+        "permissions": {
+            "title": "Quyền",
+            "name": "Tên quyền"
         }
     },
     "models": {

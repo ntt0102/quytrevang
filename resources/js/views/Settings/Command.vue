@@ -1,7 +1,7 @@
 <template>
     <div class="settings-page">
         <h2 class="content-block">
-            {{ $t("admin.settings.command.title") }}
+            {{ $t("settings.command.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <form class="setting-command-tab" @submit.prevent="onSubmit">
@@ -67,17 +67,17 @@ export default {
                 {
                     type: "required",
                     message:
-                        this.$t("admin.settings.command.title") +
+                        this.$t("settings.command.title") +
                         this.$mt.validations.required,
                 },
             ],
         };
     },
     beforeCreate() {
-        this.$store.registerModule("Admin.settings", adminSettingsStore);
+        this.$store.registerModule("Settings", adminSettingsStore);
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.settings");
+        this.$store.unregisterModule("Settings");
     },
     computed: {
         form: function () {
@@ -85,7 +85,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.settings", ["runCommand"]),
+        ...mapActions("Settings", ["runCommand"]),
         onSubmit() {
             this.$bus.emit("checkPin", () => {
                 let data =

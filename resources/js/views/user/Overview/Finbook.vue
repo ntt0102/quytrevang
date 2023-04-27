@@ -50,7 +50,7 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule("Admin.finbooks", adminFinbooksStore);
+        this.$store.registerModule("Trading.finbooks", adminFinbooksStore);
     },
     created() {
         this.fetch();
@@ -59,7 +59,7 @@ export default {
         });
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.finbooks");
+        this.$store.unregisterModule("Trading.finbooks");
         this.$bus.off("toggleMenu");
     },
     computed: {

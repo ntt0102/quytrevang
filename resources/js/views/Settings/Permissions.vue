@@ -1,7 +1,7 @@
 <template>
     <div class="settings-page">
         <h2 class="content-block">
-            {{ $t("admin.settings.permissions.title") }}
+            {{ $t("settings.permissions.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <DxDataGrid
@@ -84,14 +84,14 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.settings.permissions.name") +
+                            this.$t("settings.permissions.name") +
                             this.$mt.validations.required,
                     },
                     {
                         type: "async",
                         validationCallback: this.validateDuplicateName,
                         message:
-                            this.$t("admin.settings.permissions.name") +
+                            this.$t("settings.permissions.name") +
                             this.$mt.validations.duplicate,
                     },
                 ],
@@ -100,7 +100,7 @@ export default {
     },
     beforeCreate() {
         this.$store.registerModule(
-            "Admin.settings.permissions",
+            "Settings.permissions",
             adminSettingsPermissionsStore
         );
     },
@@ -108,7 +108,7 @@ export default {
         this.fetch();
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.settings.permissions");
+        this.$store.unregisterModule("Settings.permissions");
     },
     watch: {
         permissions() {
@@ -116,13 +116,13 @@ export default {
         },
     },
     computed: {
-        ...mapGetters("Admin.settings.permissions", ["permissions"]),
+        ...mapGetters("Settings.permissions", ["permissions"]),
         dataGrid: function () {
             return this.$refs.dataGrid.instance;
         },
     },
     methods: {
-        ...mapActions("Admin.settings.permissions", [
+        ...mapActions("Settings.permissions", [
             "fetch",
             "save",
             "validateDuplicateName",

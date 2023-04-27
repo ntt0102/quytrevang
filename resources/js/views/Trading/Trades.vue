@@ -1,7 +1,7 @@
 <template>
     <div class="trades-page">
         <h2 class="content-block">
-            {{ $t("admin.trades.title") }}
+            {{ $t("trading.trades.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <DxToolbar
@@ -293,7 +293,7 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule("Admin.trades", adminTradesStore);
+        this.$store.registerModule("Trading.trades", adminTradesStore);
     },
     created() {
         this.getChart(this.$route.query.period ?? "day");
@@ -305,7 +305,7 @@ export default {
         if (this.$route.hash == "#data") this.$refs.trackTradePopup.show();
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.trades");
+        this.$store.unregisterModule("Trading.trades");
         this.$bus.off("toggleMenu");
     },
     computed: {
@@ -355,7 +355,7 @@ export default {
                 <div class='tooltip-body'>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${this.$t("admin.trades.principalAvg")}
+                      ${this.$t("trading.trades.principalAvg")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -367,7 +367,7 @@ export default {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${this.$t("admin.trades.revenueSum")}
+                      ${this.$t("trading.trades.revenueSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -379,7 +379,7 @@ export default {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${this.$t("admin.trades.lossSum")}
+                      ${this.$t("trading.trades.lossSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -391,7 +391,7 @@ export default {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${this.$t("admin.trades.feesSum")}
+                      ${this.$t("trading.trades.feesSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -403,7 +403,7 @@ export default {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${this.$t("admin.trades.profitSum")}
+                      ${this.$t("trading.trades.profitSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -417,7 +417,7 @@ export default {
                   </div>
                   <div class='series-name'>
                     <span class='top-series-name'>
-                      ${this.$t("admin.trades.profitPerPrincipal")}
+                      ${this.$t("trading.trades.profitPerPrincipal")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -430,12 +430,12 @@ export default {
                           (100 * pointInfo.point.data.profitPerPrincipal) /
                           this.principalTargetThreshold[this.charts.period]
                       ).toFixed(0)}%
-                      ${this.$t("admin.trades.kpi")})
+                      ${this.$t("trading.trades.kpi")})
                     </span>
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${this.$t("admin.trades.profitPerFees")}
+                      ${this.$t("trading.trades.profitPerFees")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -448,12 +448,12 @@ export default {
                           (100 * pointInfo.point.data.profitPerFees) /
                           this.feesTargetThreshold
                       ).toFixed(0)}%
-                      ${this.$t("admin.trades.kpi")})
+                      ${this.$t("trading.trades.kpi")})
                     </span>
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${this.$t("admin.trades.accumulatedProfit")}
+                      ${this.$t("trading.trades.accumulatedProfit")}
                     </span>:
                   </div>
                   <div class='value-text'>

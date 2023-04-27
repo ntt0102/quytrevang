@@ -2,7 +2,7 @@
     <div class="overview-trading dx-card responsive-paddings content-block">
         <div @click="viewDetail('day')">
             <div class="period">
-                {{ $t("admin.trades.selects.period.day") }}
+                {{ $t("trading.trades.selects.period.day") }}
             </div>
             <div
                 v-if="$mf.isSet(summary)"
@@ -20,7 +20,7 @@
         </div>
         <div @click="viewDetail('week')">
             <div class="period">
-                {{ $t("admin.trades.selects.period.week") }}
+                {{ $t("trading.trades.selects.period.week") }}
             </div>
             <div
                 v-if="$mf.isSet(summary)"
@@ -38,7 +38,7 @@
         </div>
         <div @click="viewDetail('month')">
             <div class="period">
-                {{ $t("admin.trades.selects.period.month") }}
+                {{ $t("trading.trades.selects.period.month") }}
             </div>
             <div
                 v-if="$mf.isSet(summary)"
@@ -56,7 +56,7 @@
         </div>
         <div @click="viewDetail('quater')">
             <div class="period">
-                {{ $t("admin.trades.selects.period.quarter") }}
+                {{ $t("trading.trades.selects.period.quarter") }}
             </div>
             <div
                 v-if="$mf.isSet(summary)"
@@ -74,7 +74,7 @@
         </div>
         <div @click="viewDetail('year')">
             <div class="period">
-                {{ $t("admin.trades.selects.period.year") }}
+                {{ $t("trading.trades.selects.period.year") }}
             </div>
             <div
                 v-if="$mf.isSet(summary)"
@@ -92,7 +92,7 @@
         </div>
         <div @click="viewDetail('year')">
             <div class="period">
-                {{ $t("admin.trades.selects.period.all") }}
+                {{ $t("trading.trades.selects.period.all") }}
             </div>
             <div
                 v-if="$mf.isSet(summary)"
@@ -133,13 +133,13 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule("Admin.trades", adminTradesStore);
+        this.$store.registerModule("Trading.trades", adminTradesStore);
     },
     created() {
         this.getSummary();
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.trades");
+        this.$store.unregisterModule("Trading.trades");
     },
     computed: {
         ...mapGetters("Admin.trades", ["summary"]),

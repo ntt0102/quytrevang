@@ -1,7 +1,7 @@
 <template>
     <div class="settings-page">
         <h2 class="content-block">
-            {{ $t("admin.settings.notification.title") }}
+            {{ $t("settings.notification.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <div>
@@ -170,7 +170,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.settings.notification.receiver") +
+                            this.$t("settings.notification.receiver") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -187,7 +187,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.settings.notification.body") +
+                            this.$t("settings.notification.body") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -195,7 +195,7 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule("Admin.settings", adminSettingsStore);
+        this.$store.registerModule("Settings", adminSettingsStore);
     },
     created() {
         this.actionOptions = this.getActionsOptions(this.formData.actions);
@@ -215,7 +215,7 @@ export default {
         setTimeout(() => this.form.getEditor("receiver").focus(), 1000);
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.settings");
+        this.$store.unregisterModule("Settings");
     },
     computed: {
         toolbar: function () {
@@ -226,7 +226,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.settings", ["sendNotification"]),
+        ...mapActions("Settings", ["sendNotification"]),
         onSubmit() {
             this.$bus.emit("checkPin", () => {
                 this.sendNotification(this.formData);

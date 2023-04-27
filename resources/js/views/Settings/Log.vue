@@ -1,7 +1,7 @@
 <template>
     <div class="settings-page">
         <h2 class="content-block">
-            {{ $t("admin.settings.log.title") }}
+            {{ $t("settings.log.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <div>
@@ -93,13 +93,13 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule("Admin.settings", adminSettingsStore);
+        this.$store.registerModule("Settings", adminSettingsStore);
     },
     created() {
         this.fetchLog().then((activities) => (this.gridData = activities));
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.settings");
+        this.$store.unregisterModule("Settings");
     },
     computed: {
         dataGrid: function () {
@@ -107,13 +107,13 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.settings", ["fetchLog"]),
+        ...mapActions("Settings", ["fetchLog"]),
         showProperties(properties) {
             this.$bus.emit("checkPin", () => {
                 let html = JSON.stringify(properties.attributes, undefined, 4);
                 alert(
                     `<pre>${this.syntaxHighlight(html)}</pre>`,
-                    this.$t("admin.settings.log.propertiesTitle")
+                    this.$t("settings.log.propertiesTitle")
                 );
             });
         },

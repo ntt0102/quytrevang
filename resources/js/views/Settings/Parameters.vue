@@ -1,7 +1,7 @@
 <template>
     <div class="settings-page">
         <h2 class="content-block">
-            {{ $t("admin.settings.parameters.title") }}
+            {{ $t("settings.parameters.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <DxDataGrid
@@ -60,7 +60,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.settings.parameters.value") +
+                            this.$t("settings.parameters.value") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -69,7 +69,7 @@ export default {
     },
     beforeCreate() {
         this.$store.registerModule(
-            "Admin.settings.parameters",
+            "Settings.parameters",
             adminSettingsParametersStore
         );
     },
@@ -77,10 +77,10 @@ export default {
         this.fetch();
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.settings.parameters");
+        this.$store.unregisterModule("Settings.parameters");
     },
     computed: {
-        ...mapGetters("Admin.settings.parameters", ["parameters"]),
+        ...mapGetters("Settings.parameters", ["parameters"]),
         dataGrid: function () {
             return this.$refs.dataGrid.instance;
         },
@@ -91,11 +91,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Admin.settings.parameters", [
-            "fetch",
-            "save",
-            "resetState",
-        ]),
+        ...mapActions("Settings.parameters", ["fetch", "save", "resetState"]),
         onSave(formData) {
             this.$bus.emit("checkPin", () => this.save(formData));
         },

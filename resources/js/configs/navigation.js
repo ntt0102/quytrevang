@@ -21,7 +21,7 @@ export default [
         level: 5,
     },
     {
-        text: i18n.t("admin.manager"),
+        text: i18n.t("admin.title"),
         icon: "far fa-tools",
         permissions: [
             "users@control",
@@ -57,7 +57,7 @@ export default [
         ],
     },
     {
-        text: i18n.t("admin.trading"),
+        text: i18n.t("trading.title"),
         icon: "far fa-chart-line",
         permissions: [
             "stock@order",
@@ -67,19 +67,19 @@ export default [
         ],
         items: [
             {
-                text: i18n.t("admin.orderChart.title"),
+                text: i18n.t("trading.orderChart.title"),
                 name: "order",
                 icon: "far fa-gavel",
                 permissions: ["stock@order"],
             },
             {
-                text: i18n.t("admin.trades.title"),
+                text: i18n.t("trading.trades.title"),
                 name: "trades",
                 icon: "far fa-analytics",
                 permissions: ["trades@view", "trades@edit"],
             },
             {
-                text: i18n.t("admin.finbooks.title"),
+                text: i18n.t("trading.finbooks.title"),
                 name: "finbooks",
                 icon: "far fa-book",
                 permissions: ["finbooks@control"],
@@ -87,7 +87,7 @@ export default [
         ],
     },
     {
-        text: i18n.t("admin.settings.title"),
+        text: i18n.t("settings.title"),
         icon: "far fa-cog",
         permissions: [
             "command@setting",
@@ -102,55 +102,55 @@ export default [
         ],
         items: [
             {
-                text: i18n.t("admin.settings.command.title"),
+                text: i18n.t("settings.command.title"),
                 name: "command",
                 icon: "far fa-terminal",
                 permissions: ["command@setting"],
             },
             {
-                text: i18n.t("admin.settings.notification.title"),
+                text: i18n.t("settings.notification.title"),
                 name: "notification",
                 icon: "far fa-paper-plane",
                 permissions: ["notification@setting"],
             },
             {
-                text: i18n.t("admin.settings.files.title"),
+                text: i18n.t("settings.files.title"),
                 name: "files",
                 icon: "far fa-folder-tree",
                 permissions: ["files@setting"],
             },
             {
-                text: i18n.t("admin.settings.log.title"),
+                text: i18n.t("settings.log.title"),
                 name: "log",
                 icon: "far fa-clipboard-list",
                 permissions: ["log@setting"],
             },
             {
-                text: i18n.t("admin.settings.faqs.title"),
+                text: i18n.t("settings.faqs.title"),
                 name: "faqs",
                 icon: "far fa-question-square",
                 permissions: ["faqs@setting"],
             },
             {
-                text: i18n.t("admin.settings.parameters.title"),
+                text: i18n.t("settings.parameters.title"),
                 name: "parameters",
                 icon: "far fa-sliders-h",
                 permissions: ["parameters@setting"],
             },
             {
-                text: i18n.t("admin.settings.database.title"),
+                text: i18n.t("settings.database.title"),
                 name: "database",
                 icon: "far fa-database",
                 permissions: ["database@setting"],
             },
             {
-                text: i18n.t("admin.settings.roles.title"),
+                text: i18n.t("settings.roles.title"),
                 name: "roles",
                 icon: "far fa-user-tag",
                 permissions: ["roles@setting"],
             },
             {
-                text: i18n.t("admin.settings.permissions.title"),
+                text: i18n.t("settings.permissions.title"),
                 name: "permissions",
                 icon: "far fa-user-shield",
                 permissions: ["permissions@setting"],

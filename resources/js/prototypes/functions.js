@@ -261,35 +261,35 @@ export default {
     getCommandList: () => {
         return [
             {
-                name: i18n.t("admin.settings.command.selects.cache"),
+                name: i18n.t("settings.command.selects.cache"),
                 value: "config:cache",
             },
             {
-                name: i18n.t("admin.settings.command.selects.resetMigrate"),
+                name: i18n.t("settings.command.selects.resetMigrate"),
                 value: "migrate:refresh --seed,passport:install --force",
             },
             {
-                name: i18n.t("admin.settings.command.selects.downMaintance"),
+                name: i18n.t("settings.command.selects.downMaintance"),
                 value: "down",
             },
             {
-                name: i18n.t("admin.settings.command.selects.upMaintance"),
+                name: i18n.t("settings.command.selects.upMaintance"),
                 value: "up",
             },
             {
-                name: i18n.t("admin.settings.command.selects.cleanLog"),
+                name: i18n.t("settings.command.selects.cleanLog"),
                 value: "activitylog:clean --days=0",
             },
             {
-                name: i18n.t("admin.settings.command.selects.updateTrade"),
+                name: i18n.t("settings.command.selects.updateTrade"),
                 value: "trades:update",
             },
             {
-                name: i18n.t("admin.settings.command.selects.storageLink"),
+                name: i18n.t("settings.command.selects.storageLink"),
                 value: "storage:link",
             },
             {
-                name: i18n.t("admin.settings.command.selects.custom"),
+                name: i18n.t("settings.command.selects.custom"),
                 value: "custom",
             },
         ];
@@ -297,19 +297,19 @@ export default {
     getNotificationReceiverList: () => {
         return [
             {
-                name: i18n.t("admin.settings.notification.selects.all"),
+                name: i18n.t("settings.notification.selects.all"),
                 value: "all",
             },
             {
-                name: i18n.t("admin.settings.notification.selects.exists"),
+                name: i18n.t("settings.notification.selects.exists"),
                 value: "exists",
             },
             {
-                name: i18n.t("admin.settings.notification.selects.notExists"),
+                name: i18n.t("settings.notification.selects.notExists"),
                 value: "not_exists",
             },
             {
-                name: i18n.t("admin.settings.notification.selects.ids"),
+                name: i18n.t("settings.notification.selects.ids"),
                 value: "ids",
             },
         ];
@@ -317,23 +317,23 @@ export default {
     getChartPeriodList: () => {
         return [
             {
-                name: i18n.t("admin.trades.selects.period.day"),
+                name: i18n.t("trading.trades.selects.period.day"),
                 value: "day",
             },
             {
-                name: i18n.t("admin.trades.selects.period.week"),
+                name: i18n.t("trading.trades.selects.period.week"),
                 value: "week",
             },
             {
-                name: i18n.t("admin.trades.selects.period.month"),
+                name: i18n.t("trading.trades.selects.period.month"),
                 value: "month",
             },
             {
-                name: i18n.t("admin.trades.selects.period.quarter"),
+                name: i18n.t("trading.trades.selects.period.quarter"),
                 value: "quarter",
             },
             {
-                name: i18n.t("admin.trades.selects.period.year"),
+                name: i18n.t("trading.trades.selects.period.year"),
                 value: "year",
             },
         ];

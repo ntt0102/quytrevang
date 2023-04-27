@@ -29,7 +29,7 @@
                             allowUpdating: permissions.includes(editPermission),
                             allowDeleting: permissions.includes(editPermission),
                             mode: 'batch',
-                            startEditAction: 'dblClick'
+                            startEditAction: 'dblClick',
                         }"
                         @contentReady="$mf.dataGridPreload(gridData, dataGrid)"
                         @saved="onSave"
@@ -51,7 +51,7 @@
                                     $mc.DX_SERVER_DATE_FORMAT,
                                 showClearButton: 'true',
                                 useMaskBehavior: 'true',
-                                applyValueMode: 'useButtons'
+                                applyValueMode: 'useButtons',
                             }"
                             :caption="$t('admin.trades.date')"
                             :validation-rules="validationRules.date"
@@ -69,7 +69,7 @@
                             format="#0.#"
                             :editor-options="{
                                 step: '0.1',
-                                format: '#0.#'
+                                format: '#0.#',
                             }"
                             :caption="$t('admin.trades.scores')"
                             :validation-rules="validationRules.scores"
@@ -80,7 +80,7 @@
                             format="#,##0"
                             :editor-options="{
                                 step: '1',
-                                format: '#,##0'
+                                format: '#,##0',
                             }"
                             :caption="$t('admin.trades.revenue')"
                             :validation-rules="validationRules.revenue"
@@ -91,7 +91,7 @@
                             format="#,##0"
                             :editor-options="{
                                 step: '1',
-                                format: '#,##0'
+                                format: '#,##0',
                             }"
                             :caption="$t('admin.trades.loss')"
                             :validation-rules="validationRules.loss"
@@ -102,7 +102,7 @@
                             format="#,##0"
                             :editor-options="{
                                 step: '1',
-                                format: '#,##0'
+                                format: '#,##0',
                             }"
                             :caption="$t('admin.trades.fees')"
                             :validation-rules="validationRules.fees"
@@ -124,9 +124,9 @@
                                                 dataGrid.deleteRow(
                                                     data.rowIndex
                                                 );
-                                            }
-                                        }
-                                    }
+                                            },
+                                        },
+                                    },
                                 ]"
                             />
                         </template>
@@ -143,7 +143,7 @@ import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 export default {
     components: {
         DxDataGrid,
-        DxColumn
+        DxColumn,
     },
     data() {
         return {
@@ -154,56 +154,56 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.trades.amount") +
-                            this.$mt.validations.required
-                    }
+                            this.$t("trading.trades.amount") +
+                            this.$mt.validations.required,
+                    },
                 ],
                 scores: [
                     {
                         type: "required",
                         message:
-                            this.$t("admin.trades.scores") +
-                            this.$mt.validations.required
-                    }
+                            this.$t("trading.trades.scores") +
+                            this.$mt.validations.required,
+                    },
                 ],
                 revenue: [
                     {
                         type: "required",
                         message:
-                            this.$t("admin.trades.revenue") +
-                            this.$mt.validations.required
-                    }
+                            this.$t("trading.trades.revenue") +
+                            this.$mt.validations.required,
+                    },
                 ],
                 loss: [
                     {
                         type: "required",
                         message:
-                            this.$t("admin.trades.loss") +
-                            this.$mt.validations.required
-                    }
+                            this.$t("trading.trades.loss") +
+                            this.$mt.validations.required,
+                    },
                 ],
                 fees: [
                     {
                         type: "required",
                         message:
-                            this.$t("admin.trades.fees") +
-                            this.$mt.validations.required
-                    }
+                            this.$t("trading.trades.fees") +
+                            this.$mt.validations.required,
+                    },
                 ],
                 date: [
                     {
                         type: "required",
                         message:
-                            this.$t("admin.trades.date") +
-                            this.$mt.validations.required
+                            this.$t("trading.trades.date") +
+                            this.$mt.validations.required,
                     },
                     {
                         type: "custom",
                         validationCallback: this.validatedate,
-                        message: this.$t("admin.trades.validations.date")
-                    }
-                ]
-            }
+                        message: this.$t("trading.trades.validations.date"),
+                    },
+                ],
+            },
         };
     },
     computed: {
@@ -212,14 +212,14 @@ export default {
         popup() {
             return this.$refs.popup.instance;
         },
-        dataGrid: function() {
+        dataGrid: function () {
             return this.$refs.dataGrid.instance;
-        }
+        },
     },
     watch: {
         trades() {
             this.gridData = this.$mf.cloneDeep(this.trades);
-        }
+        },
     },
     methods: {
         ...mapActions("Admin.trades", ["fetch", "save"]),
@@ -242,8 +242,8 @@ export default {
         onHiding() {
             this.gridData = null;
             this.$mf.popRouteHistoryState();
-        }
-    }
+        },
+    },
 };
 </script>
 <style lang="scss">

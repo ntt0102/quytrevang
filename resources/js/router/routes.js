@@ -1,15 +1,16 @@
 import i18n from "../plugins/i18n";
 
 const Overview = () =>
-    import(/* webpackPrefetch: true */ "../views/user/Overview");
+    import(/* webpackPrefetch: true */ "../views/user/Overview/Index");
 const Profile = () =>
     import(/* webpackPrefetch: true */ "../views/user/Profile");
 const Contract = () =>
     import(/* webpackPrefetch: true */ "../views/user/Contract");
 
-const Users = () => import(/* webpackPrefetch: true */ "../views/admin/Users");
+const Users = () =>
+    import(/* webpackPrefetch: true */ "../views/admin/User/Index");
 const Contracts = () =>
-    import(/* webpackPrefetch: true */ "../views/admin/Contracts");
+    import(/* webpackPrefetch: true */ "../views/admin/Contract/Index");
 const SmartOrders = () =>
     import(/* webpackPrefetch: true */ "../views/admin/SmartOrders");
 const Comments = () =>
@@ -49,7 +50,8 @@ const ChangePassword = () =>
 const VerifyEmail = () =>
     import(/* webpackPrefetch: true */ "../views/auth/VerifyEmail");
 
-const Policy = () => import(/* webpackPrefetch: true */ "../views/Policy");
+const Policy = () =>
+    import(/* webpackPrefetch: true */ "../views/Policy/Index");
 const NotFound = () => import(/* webpackPrefetch: true */ "../views/NotFound");
 
 import AuthLayout from "../components/Layouts/AuthLayout";
@@ -131,7 +133,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "order",
                     component: OrderChart,
                     meta: {
-                        title: i18n.t("admin.orderChart.title"),
+                        title: i18n.t("trading.orderChart.title"),
                         permission: "stock@order",
                     },
                 },
@@ -140,7 +142,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "trades",
                     component: Trades,
                     meta: {
-                        title: i18n.t("admin.trades.title"),
+                        title: i18n.t("trading.trades.title"),
                         permission: "trades@view",
                     },
                 },
@@ -149,7 +151,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "finbooks",
                     component: Finbooks,
                     meta: {
-                        title: i18n.t("admin.finbooks.title"),
+                        title: i18n.t("trading.finbooks.title"),
                         permission: "finbooks@control",
                     },
                 },
@@ -158,7 +160,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "command",
                     component: Command,
                     meta: {
-                        title: i18n.t("admin.settings.command.title"),
+                        title: i18n.t("settings.command.title"),
                         permission: "command@setting",
                     },
                 },
@@ -167,7 +169,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "notification",
                     component: Notification,
                     meta: {
-                        title: i18n.t("admin.settings.notification.title"),
+                        title: i18n.t("settings.notification.title"),
                         permission: "notification@setting",
                     },
                 },
@@ -176,7 +178,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "files",
                     component: Files,
                     meta: {
-                        title: i18n.t("admin.settings.files.title"),
+                        title: i18n.t("settings.files.title"),
                         permission: "files@setting",
                     },
                 },
@@ -185,7 +187,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "log",
                     component: Log,
                     meta: {
-                        title: i18n.t("admin.settings.log.title"),
+                        title: i18n.t("settings.log.title"),
                         permission: "log@setting",
                     },
                 },
@@ -194,7 +196,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "faqs",
                     component: Faqs,
                     meta: {
-                        title: i18n.t("admin.settings.faqs.title"),
+                        title: i18n.t("settings.faqs.title"),
                         permission: "faqs@setting",
                     },
                 },
@@ -203,7 +205,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "parameters",
                     component: Parameters,
                     meta: {
-                        title: i18n.t("admin.settings.parameters.title"),
+                        title: i18n.t("settings.parameters.title"),
                         permission: "parameters@setting",
                     },
                 },
@@ -212,7 +214,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "database",
                     component: Database,
                     meta: {
-                        title: i18n.t("admin.settings.database.title"),
+                        title: i18n.t("settings.database.title"),
                         permission: "database@setting",
                     },
                 },
@@ -221,7 +223,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "roles",
                     component: Roles,
                     meta: {
-                        title: i18n.t("admin.settings.roles.title"),
+                        title: i18n.t("settings.roles.title"),
                         permission: "roles@setting",
                     },
                 },
@@ -230,7 +232,7 @@ export default ({ authGuard, guestGuard }) => [
                     name: "permissions",
                     component: Permissions,
                     meta: {
-                        title: i18n.t("admin.settings.permissions.title"),
+                        title: i18n.t("settings.permissions.title"),
                         permission: "permissions@setting",
                     },
                 },

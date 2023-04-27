@@ -1,7 +1,7 @@
 <template>
     <div class="settings-page">
         <h2 class="content-block">
-            {{ $t("admin.settings.roles.title") }}
+            {{ $t("settings.roles.title") }}
         </h2>
         <div class="content-block dx-card responsive-paddings">
             <DxDataGrid
@@ -123,14 +123,14 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.settings.roles.name") +
+                            this.$t("settings.roles.name") +
                             this.$mt.validations.required,
                     },
                     {
                         type: "async",
                         validationCallback: this.validateDuplicateName,
                         message:
-                            this.$t("admin.settings.roles.name") +
+                            this.$t("settings.roles.name") +
                             this.$mt.validations.duplicate,
                     },
                 ],
@@ -138,7 +138,7 @@ export default {
                     {
                         type: "required",
                         message:
-                            this.$t("admin.settings.roles.permission") +
+                            this.$t("settings.roles.permission") +
                             this.$mt.validations.required,
                     },
                 ],
@@ -146,16 +146,13 @@ export default {
         };
     },
     beforeCreate() {
-        this.$store.registerModule(
-            "Admin.settings.roles",
-            adminSettingsRolesStore
-        );
+        this.$store.registerModule("Settings.roles", adminSettingsRolesStore);
     },
     created() {
         this.fetch();
     },
     destroyed() {
-        this.$store.unregisterModule("Admin.settings.roles");
+        this.$store.unregisterModule("Settings.roles");
     },
     watch: {
         roles() {
@@ -163,13 +160,13 @@ export default {
         },
     },
     computed: {
-        ...mapGetters("Admin.settings.roles", ["roles", "permissions"]),
+        ...mapGetters("Settings.roles", ["roles", "permissions"]),
         dataGrid: function () {
             return this.$refs.dataGrid.instance;
         },
     },
     methods: {
-        ...mapActions("Admin.settings.roles", [
+        ...mapActions("Settings.roles", [
             "fetch",
             "save",
             "validateDuplicateName",
