@@ -308,7 +308,7 @@ export default {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
                                             this.$t(
-                                                "Trading.orderChart.changeEntrySuccess"
+                                                "trading.orderChart.changeEntrySuccess"
                                             )
                                         );
                                     } else {
@@ -333,7 +333,7 @@ export default {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
                                             this.$t(
-                                                "Trading.orderChart.changeTpSuccess"
+                                                "trading.orderChart.changeTpSuccess"
                                             )
                                         );
                                     } else {
@@ -354,7 +354,7 @@ export default {
                                         this.drawOrderLine(lineOptions.kind);
                                         this.$toasted.success(
                                             this.$t(
-                                                "Trading.orderChart.changeSlSuccess"
+                                                "trading.orderChart.changeSlSuccess"
                                             )
                                         );
                                     } else {
@@ -610,7 +610,7 @@ export default {
                                                         );
                                                         self.$toasted.success(
                                                             this.$t(
-                                                                "Trading.orderChart.deleteTpSuccess"
+                                                                "trading.orderChart.deleteTpSuccess"
                                                             )
                                                         );
                                                         this.hideOrderButton();
@@ -651,7 +651,7 @@ export default {
                                                         );
                                                         self.$toasted.success(
                                                             this.$t(
-                                                                "Trading.orderChart.deleteSlSuccess"
+                                                                "trading.orderChart.deleteSlSuccess"
                                                             )
                                                         );
                                                         this.hideOrderButton();
@@ -701,7 +701,7 @@ export default {
                                                         );
                                                         self.$toasted.success(
                                                             this.$t(
-                                                                "Trading.orderChart.autoNewTpSlSuccess"
+                                                                "trading.orderChart.autoNewTpSlSuccess"
                                                             )
                                                         );
                                                     } else
@@ -742,7 +742,7 @@ export default {
                                     toolsStore.clear("order");
                                     this.$toasted.success(
                                         this.$t(
-                                            "Trading.orderChart.autoCancelTpSlSuccess"
+                                            "trading.orderChart.autoCancelTpSlSuccess"
                                         )
                                     );
                                 } else this.toasteOrderError(resp.message);
@@ -1021,7 +1021,7 @@ export default {
                                     toolsStore.clear("order");
                                     this.$toasted.success(
                                         this.$t(
-                                            "Trading.orderChart.deleteEntrySuccess"
+                                            "trading.orderChart.deleteEntrySuccess"
                                         )
                                     );
                                 } else {
@@ -1055,7 +1055,7 @@ export default {
                                 if (resp.isOk)
                                     this.$toasted.success(
                                         this.$t(
-                                            "Trading.orderChart.atoOrderSuccess"
+                                            "trading.orderChart.atoOrderSuccess"
                                         )
                                     );
                                 else this.toasteOrderError(resp.message);
@@ -1097,7 +1097,7 @@ export default {
                                 if (resp.isOk)
                                     this.$toasted.success(
                                         this.$t(
-                                            "Trading.orderChart.atcOrderSuccess"
+                                            "trading.orderChart.atcOrderSuccess"
                                         )
                                     );
                                 else this.toasteOrderError(resp.message);

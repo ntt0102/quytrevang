@@ -19,9 +19,9 @@ mix.js("resources/js/app.js", "public/js")
     .version()
     .webpackConfig({
         output: {
-            chunkFilename: "js/chunks/[name].[hash].js"
-        }
+            chunkFilename: "js/chunks/[name].[hash].js",
+        },
     })
     .clean({
-        cleanOnceBeforeBuildPatterns: ["./js/chunks"]
+        cleanOnceBeforeBuildPatterns: ["./js/chunks"],
     });
