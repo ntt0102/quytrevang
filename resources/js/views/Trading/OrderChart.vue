@@ -3,6 +3,7 @@
         <h2 class="content-block">
             {{ $t("trading.orderChart.title") }}
         </h2>
+        {{}}
         <div class="content-block dx-card responsive-paddings">
             <div class="order-chart-container" ref="chartContainer">
                 <div class="chart-wrapper" ref="orderChart">
