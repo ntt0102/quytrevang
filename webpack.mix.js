@@ -23,5 +23,5 @@ mix.js("resources/js/app.js", "public/js")
         },
     })
     .clean({
-        cleanOnceBeforeBuildPatterns: ["./js/chunks"],
+        cleanOnceBeforeBuildPatterns: ["js/chunks"],
     });
