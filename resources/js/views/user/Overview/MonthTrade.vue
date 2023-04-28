@@ -38,8 +38,7 @@
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
-const DxChart = () =>
-    import(/* webpackPrefetch: true */ "devextreme-vue/chart");
+import DxChart from "devextreme-vue/chart";
 import userTradeStore from "../../../store/modules/User/Trade";
 
 export default {

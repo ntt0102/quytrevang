@@ -13,13 +13,13 @@
 </template>
 <script>
 import { mapGetters, mapActions } from "vuex";
-const MonthTrade = () => import(/* webpackPrefetch: true */ "./MonthTrade.vue");
-const TradeSummary = () =>
-    import(/* webpackPrefetch: true */ "./TradeSummary.vue");
-const Finbook = () => import(/* webpackPrefetch: true */ "./Finbook.vue");
-const Summary = () => import(/* webpackPrefetch: true */ "./Summary.vue");
-const LevelBar = () => import(/* webpackPrefetch: true */ "./LevelBar.vue");
-const Contracts = () => import(/* webpackPrefetch: true */ "./Contracts.vue");
+import MonthTrade from "./MonthTrade.vue";
+import TradeSummary from "./TradeSummary.vue";
+import Finbook from "./Finbook.vue";
+import Summary from "./Summary.vue";
+import LevelBar from "./LevelBar.vue";
+import Contracts from "./Contracts.vue";
+
 export default {
     components: {
         MonthTrade,
