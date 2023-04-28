@@ -24,4 +24,5 @@ mix.js("resources/js/app.js", "public/js")
     })
     .clean({
         cleanOnceBeforeBuildPatterns: ["js/chunks"],
-    });
+    })
+    .browserSync("http://localhost");
