@@ -401,6 +401,12 @@ export default {
         eventChartResize() {
             const el = this.chartContainer;
             this.chart.resize(el.offsetWidth, el.offsetHeight);
+            if (this.chartContainer.classList.contains("fullscreen")) {
+                // if (document.fullscreenElement) {
+                document.querySelector(
+                    ".dx-drawer-panel-content"
+                ).style.transform = "translate(-250px, 0px)";
+            }
         },
         eventKeyPress(e) {
             if (e.ctrlKey || e.metaKey) {
