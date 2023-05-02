@@ -98,10 +98,13 @@ Route::get('test', function () {
     // $date->modify('-0 day');
     // echo $date->format('Y-m-d');
     // $s = app(App\Services\Admin\TradeService::class)->calculateSummary('all');
-    $s = app(App\Services\Admin\Setting\DatabaseService::class)->backup((object)[
-        'download' => false,
-        'sendMail' => true,
-    ]);
+    // $s = app(App\Services\Admin\Setting\DatabaseService::class)->backup((object)[
+    //     'download' => false,
+    //     'sendMail' => true,
+    // ]);
     // $s = date("n/Y");
+    $s = App\Models\User::find(1);
+    // $s = $s->can('stock@order');
+    $s = $s->roles;
     dd($s);
-})->middleware('cors');
+});

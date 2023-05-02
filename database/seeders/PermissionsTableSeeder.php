@@ -14,28 +14,28 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run()
     {
-        Permission::create(['name' => 'common@access']);
+        Permission::create(['guard_name' => 'api', 'name' => 'common@access']);
 
-        Permission::create(['name' => 'system@control']);
+        Permission::create(['guard_name' => 'api', 'name' => 'system@control']);
 
-        Permission::create(['name' => 'users@control']);
-        Permission::create(['name' => 'contracts@control']);
-        Permission::create(['name' => 'copyists@control']);
-        Permission::create(['name' => 'comments@control']);
+        Permission::create(['guard_name' => 'api', 'name' => 'users@control']);
+        Permission::create(['guard_name' => 'api', 'name' => 'contracts@control']);
+        Permission::create(['guard_name' => 'api', 'name' => 'copyists@control']);
+        Permission::create(['guard_name' => 'api', 'name' => 'comments@control']);
 
-        Permission::create(['name' => 'stock@order']);
-        Permission::create(['name' => 'trades@view']);
-        Permission::create(['name' => 'trades@edit']);
-        Permission::create(['name' => 'finbooks@control']);
+        Permission::create(['guard_name' => 'api', 'name' => 'stock@order']);
+        Permission::create(['guard_name' => 'api', 'name' => 'trades@view']);
+        Permission::create(['guard_name' => 'api', 'name' => 'trades@edit']);
+        Permission::create(['guard_name' => 'api', 'name' => 'finbooks@control']);
 
-        Permission::create(['name' => 'command@setting']);
-        Permission::create(['name' => 'notification@setting']);
-        Permission::create(['name' => 'files@setting']);
-        Permission::create(['name' => 'log@setting']);
-        Permission::create(['name' => 'faqs@setting']);
-        Permission::create(['name' => 'parameters@setting']);
-        Permission::create(['name' => 'database@setting']);
-        Permission::create(['name' => 'roles@setting']);
-        Permission::create(['name' => 'permissions@setting']);
+        Permission::create(['guard_name' => 'api', 'name' => 'command@setting']);
+        Permission::create(['guard_name' => 'api', 'name' => 'notification@setting']);
+        Permission::create(['guard_name' => 'api', 'name' => 'files@setting']);
+        Permission::create(['guard_name' => 'api', 'name' => 'log@setting']);
+        Permission::create(['guard_name' => 'api', 'name' => 'faqs@setting']);
+        Permission::create(['guard_name' => 'api', 'name' => 'parameters@setting']);
+        Permission::create(['guard_name' => 'api', 'name' => 'database@setting']);
+        Permission::create(['guard_name' => 'api', 'name' => 'roles@setting']);
+        Permission::create(['guard_name' => 'api', 'name' => 'permissions@setting']);
     }
 }

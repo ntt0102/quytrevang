@@ -37,7 +37,7 @@ class UserRepository extends CoreRepository
             'level' => $model->level,
             'avatar' => $model->url_avatar,
             'permissions' => $model->getAllPermissions()->pluck('name'),
-            'webauthn' => $model->webAuthnCredentials->count() > 0
+            'webauthn' => false //$model->webAuthnCredentials->count() > 0
         ];
     }
 

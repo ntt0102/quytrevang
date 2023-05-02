@@ -147,9 +147,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::get('/', 'TradeController@fetch');
                     Route::post('chart', 'TradeController@getChart');
                     Route::get('summary', 'TradeController@getSummary');
-                    Route::post('/', 'TradeController@save')->middleware('can:trades@edit');;
+                    Route::post('/', 'TradeController@save')->middleware('can:trades@edit');
                 });
-                Route::group(['prefix' => 'order-chart', 'middleware' => 'can:stock@order'], function () {
+                Route::group(['prefix' => 'order-chart', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'OrderChartController@getChartData');
                     Route::post('/get-status', 'OrderChartController@getStatus');
                     Route::post('/get-config', 'OrderChartController@getConfig');

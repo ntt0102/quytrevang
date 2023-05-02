@@ -6,12 +6,12 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Foundation\Application;
-use DarkGhostHunter\Larapass\Facades\WebAuthn;
-use DarkGhostHunter\Larapass\Http\WebAuthnRules;
+use Laragear\WebAuthn\Facades\WebAuthn;
+// use Laragear\WebAuthn\Http\WebAuthnRules;
 
 class LoginService
 {
-    use WebAuthnRules;
+    // use WebAuthnRules;
 
     private $userRepository;
     private $isMaintenance;
