@@ -4,7 +4,7 @@
             <div class="title">{{ $t("components.changePassword.title") }}</div>
         </div>
         <div class="change-password-form">
-            <ChangePasswordForm @onSubmit="onSubmit" />
+            <ChangePasswordForm :hasEmail="true" @onSubmit="onSubmit" />
         </div>
     </div>
 </template>
@@ -23,6 +23,7 @@ export default {
     methods: {
         ...mapActions("Auth", ["changePassword"]),
         onSubmit(formData) {
+            console.log("formData: ", formData);
             const { token } = this.$route.query;
             formData.token = token;
             this.changePassword(formData).then((isOk) => {

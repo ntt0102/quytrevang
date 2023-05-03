@@ -3,13 +3,10 @@
 namespace App\Services\Auth;
 
 use Illuminate\Support\Facades\Password;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use App\Repositories\UserRepository;
 
 class ResetPasswordService
 {
-    use SendsPasswordResetEmails;
-
     private $userRepository;
 
     public function __construct(UserRepository $userRepository)
@@ -26,10 +23,10 @@ class ResetPasswordService
      */
     public function resetPassword($request)
     {
-        $response = Password::broker()->sendResetLink(
+        $status = Password::sendResetLink(
             $request->only('email')
         );
-        return ['isOk' => $response == Password::RESET_LINK_SENT, 'message' => 'sendResetPasswordLink'];
+        return ['isOk' => $status == Password::RESET_LINK_SENT, 'message' => 'sendResetPasswordLink'];
     }
 
     /**

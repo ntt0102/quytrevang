@@ -252,6 +252,15 @@ class OrderChartService extends CoreService
                 $vos = new VpsOrderService($vpsUser);
                 if (!$vos->connection) return false;
                 $info = $vos->getAccountInfo();
+                //
+                Notification::send(
+                    User::permission('trades@view')->get(),
+                    new UpdatedTradesNotification(
+                        number_format($info->vm, 0, ",", ".") . ' ₫',
+                        number_format($info->fee, 0, ",", ".") . ' ₫'
+                    )
+                );
+                //
                 $revenue = $info->vm > 0 ? $info->vm : 0;
                 $loss = $info->vm < 0 ? -$info->vm : 0;
                 $trade = Trade::create([
@@ -263,13 +272,6 @@ class OrderChartService extends CoreService
                     "date" => date_create()->format('Y-m-d'),
                 ]);
                 if (!$trade) return false;
-                Notification::send(
-                    User::permission('trades@view')->get(),
-                    new UpdatedTradesNotification(
-                        number_format($info->vm, 0, ",", ".") . ' ₫',
-                        number_format($info->fee, 0, ",", ".") . ' ₫'
-                    )
-                );
                 event(new UpdateTradeEvent());
             }
         );

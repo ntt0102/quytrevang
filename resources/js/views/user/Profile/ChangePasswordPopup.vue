@@ -9,7 +9,11 @@
         @hiding="$mf.popRouteHistoryState"
     >
         <template #content>
-            <ChangePasswordForm ref="cpForm" @onSubmit="onSubmit" />
+            <ChangePasswordForm
+                ref="cpForm"
+                :hasEmail="false"
+                @onSubmit="onSubmit"
+            />
         </template>
     </DxPopup>
 </template>
@@ -43,14 +47,8 @@ export default {
             this.$bus.emit("checkPin", () => {
                 this.changePassword(formData).then((isOk) => {
                     if (isOk) {
-                        this.$toasted.success(
-                            this.$t("components.changePassword.success")
-                        );
                         this.popup.hide();
-                    } else
-                        this.$toasted.info(
-                            this.$t("components.changePassword.error")
-                        );
+                    }
                 });
             });
         },
