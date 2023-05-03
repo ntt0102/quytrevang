@@ -7,13 +7,20 @@ window.moment = require("moment");
  */
 
 window.axios = require("axios");
+
 window.axios.defaults.headers.common["X-Requested-With"] = "XMLHttpRequest";
-window.axios.defaults.withCredentials = false;
 
 /**
  * Next we will register the CSRF Token as a common header with Axios so that
  * all outgoing HTTP requests automatically have it attached. This is just
  * a simple convenience so we don't have to attach every token manually.
+ */
+
+let token = document.head.querySelector('meta[name="csrf-token"]');
+window.axios.defaults.headers.common["X-CSRF-TOKEN"] = token.content;
+
+/**
+ * Set base URL
  */
 
 let baseURL = document.head.querySelector('meta[name="base-url"]');
@@ -23,7 +30,7 @@ window.axios.defaults.baseURL = baseURL.content + "/api";
 /**
  * Set app name
  */
-let appName = document.head.querySelector('meta[name="description"]');
+let appName = document.head.querySelector('meta[name="app-name"]');
 window.appName = appName.content;
 /**
  * Language of site
