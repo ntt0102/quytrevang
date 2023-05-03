@@ -20,11 +20,8 @@ Broadcast::channel('admin', function ($user) {
     return $user->hasAnyPermission(['users@control', 'contracts@control', 'comments@control']);
 });
 Broadcast::channel('trade', function ($user) {
-    return $user->hasAnyPermission(['trades@view', 'common@access']);
+    return $user->hasAnyPermission(['trades@view', 'trades@edit']);
 });
 Broadcast::channel('finbook', function ($user) {
     return $user->can('finbooks@control');
-});
-Broadcast::channel('so-copytrade', function ($user) {
-    return $user->can('system@control') || ($user->smartOrder->copy_trade && $user->smartOrder->copy_payment);
 });
