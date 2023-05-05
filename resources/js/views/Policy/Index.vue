@@ -58,7 +58,7 @@
 
 <script>
 import { mapGetters, mapActions } from "vuex";
-import AppFooter from "../../components/Partials/AppFooter";
+import AppFooter from "../../components/Partials/AppFooter.vue";
 import Terms from "./Terms.vue";
 import Privacy from "./Privacy.vue";
 import Faq from "./Faq.vue";

@@ -294,8 +294,8 @@
                         dataSource: allPermissionsName,
                     }"
                 />
-                <template #avatarCellTemplate="{ data }">
-                    <Photoswipe
+                <template #avatarCellTemplate="{}">
+                    <!-- <Photoswipe
                         @opened="$mf.pushPhotoswipeToHistoryState"
                         @close="$mf.popRouteHistoryState"
                     >
@@ -306,7 +306,7 @@
                             :alt="$appName"
                             style="border-radius: 50%"
                         />
-                    </Photoswipe>
+                    </Photoswipe> -->
                 </template>
                 <template #roleTagBoxEditor="{ data: cellInfo }">
                     <ListTagBox

@@ -62,12 +62,12 @@
             />
             <div class="info">
                 <div class="avatar">
-                    <Photoswipe
+                    <!-- <Photoswipe
                         @opened="$mf.pushPhotoswipeToHistoryState"
                         @close="$mf.popRouteHistoryState"
                     >
                         <img :src="avatar" v-pswp="avatar" :alt="$appName" />
-                    </Photoswipe>
+                    </Photoswipe> -->
                 </div>
                 <div class="personal">
                     <div>

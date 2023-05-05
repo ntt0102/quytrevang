@@ -62,8 +62,8 @@ export default {
     },
     getBanks() {
         let vietQR = new VietQR({
-            clientID: process.env.MIX_VIETQR_CLIENT_ID,
-            apiKey: process.env.MIX_VIETQR_API_KEY,
+            clientID: import.meta.env.VITE_VIETQR_CLIENT_ID,
+            apiKey: import.meta.env.VITE_VIETQR_API_KEY,
         });
         return new Promise((resolve, reject) => {
             vietQR

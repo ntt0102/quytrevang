@@ -106,7 +106,7 @@
                                             "
                                         />
                                     </div>
-                                    <Photoswipe
+                                    <!-- <Photoswipe
                                         v-if="formData.documents.length"
                                         @opened="
                                             $mf.pushPhotoswipeToHistoryState
@@ -125,7 +125,7 @@
                                                 :alt="$appName"
                                             />
                                         </div>
-                                    </Photoswipe>
+                                    </Photoswipe> -->
                                 </div>
                             </template>
                         </DxAccordion>

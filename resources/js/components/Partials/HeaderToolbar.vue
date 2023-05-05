@@ -336,7 +336,7 @@ export default {
         subscribeNotification() {
             navigator.serviceWorker.ready.then((registration) => {
                 const options = { userVisibleOnly: true };
-                const vapidPublicKey = process.env.MIX_VAPID_PUBLIC_KEY;
+                const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
 
                 if (vapidPublicKey) {
                     options.applicationServerKey =

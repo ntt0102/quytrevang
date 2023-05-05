@@ -62,7 +62,7 @@
                                 </div>
                                 <div class="method">
                                     <div class="method1">
-                                        <Photoswipe
+                                        <!-- <Photoswipe
                                             v-if="!!qrSrc"
                                             @opened="
                                                 $mf.pushPhotoswipeToHistoryState
@@ -91,7 +91,7 @@
                                             v-else
                                             :height="40"
                                             :width="40"
-                                        />
+                                        /> -->
                                     </div>
                                     <div class="method2">
                                         <div>
@@ -227,7 +227,7 @@
                                         @valueChanged="onCheckBoxDeleteChange"
                                     />
                                 </div>
-                                <Photoswipe
+                                <!-- <Photoswipe
                                     v-if="formData.documents.length"
                                     @opened="$mf.pushPhotoswipeToHistoryState"
                                     @close="$mf.popRouteHistoryState"
@@ -244,7 +244,7 @@
                                             :alt="$appName"
                                         />
                                     </div>
-                                </Photoswipe>
+                                </Photoswipe> -->
                             </div>
                         </template>
                     </DxAccordion>

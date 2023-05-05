@@ -34,7 +34,7 @@
                         <img
                             ref="spinner"
                             class="command spinner"
-                            src="spinner.gif"
+                            src="../../../images/spinner.gif"
                         />
                     </div>
                     <div class="area tool-area">
@@ -170,7 +170,7 @@ export default {
         this.$store.registerModule("Trading.orderChart", adminOrderChartStore);
         if (!document.getElementById("orderChartJs")) {
             var scriptTag = document.createElement("script");
-            scriptTag.src = "/js/order-chart.min.js";
+            scriptTag.src = "/order-chart.min.js";
             scriptTag.id = "orderChartJs";
             document.getElementsByTagName("head")[0].appendChild(scriptTag);
         }

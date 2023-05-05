@@ -3,7 +3,7 @@ import Crypto from "./crypto";
 import VueCookies from "vue-cookies";
 import router from "../router";
 import Toasted from "vue-toasted";
-import Photoswipe from "vue-pswipe";
+// import Photoswipe from "vue-pswipe";
 import VueGtag from "vue-gtag";
 
 import DxScrollView from "devextreme-vue/scroll-view";
@@ -25,11 +25,11 @@ export default {
             position: "bottom-right",
             iconPack: "custom-class",
         });
-        Vue.use(Photoswipe, { shareEl: false });
+        // Vue.use(Photoswipe, { shareEl: false });
         Vue.use(
             VueGtag,
             {
-                config: { id: process.env.MIX_GA_MEASUREMENT_ID },
+                config: { id: import.meta.env.VITE_GA_MEASUREMENT_ID },
                 appName: window.appName,
                 pageTrackerScreenviewEnabled: true,
             },

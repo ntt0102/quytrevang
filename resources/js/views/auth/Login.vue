@@ -5,7 +5,7 @@
         </div>
         <div class="login-form">
             <div class="user" v-if="!!formData.name">
-                <Photoswipe
+                <!-- <Photoswipe
                     @opened="$mf.pushPhotoswipeToHistoryState"
                     @close="$mf.popRouteHistoryState"
                 >
@@ -15,7 +15,7 @@
                         :src="formData.avatar"
                         v-pswp="formData.avatar"
                     />
-                </Photoswipe>
+                </Photoswipe> -->
                 <DxDropDownButton
                     :split-button="true"
                     :use-select-mode="false"

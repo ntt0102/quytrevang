@@ -73,9 +73,9 @@
 import { mapGetters, mapActions } from "vuex";
 import Pusher from "pusher-js";
 import DxDrawer from "devextreme-vue/drawer";
-import HeaderToolbar from "../Partials/HeaderToolbar";
-import SideNavMenu from "../Partials/SideNavMenu";
-import AppFooter from "../Partials/AppFooter";
+import HeaderToolbar from "../Partials/HeaderToolbar.vue";
+import SideNavMenu from "../Partials/SideNavMenu.vue";
+import AppFooter from "../Partials/AppFooter.vue";
 import InstallAppPopup from "../Popups/InstallAppPopup.vue";
 import CheckPinPopup from "../Popups/CheckPinPopup.vue";
 import userLayoutStore from "../../store/modules/User/Layout";
@@ -178,22 +178,8 @@ export default {
             this.menuOpened = true;
         },
         connectPusher() {
-            console.log(
-                "process.env.MIX_PUSHER_APP_KEY: ",
-                process.env.MIX_PUSHER_APP_KEY
-            );
-            console.log("connectPusher: ", {
-                cluster: process.env.MIX_PUSHER_APP_CLUSTER,
-                encrypted: true,
-                authEndpoint: `${window.baseURL}/broadcasting/auth`,
-                auth: {
-                    headers: {
-                        Authorization: `Bearer ${this.token}`,
-                    },
-                },
-            });
-            this.$pusher = new Pusher(process.env.MIX_PUSHER_APP_KEY, {
-                cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+            this.$pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
+                cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
                 encrypted: true,
                 authEndpoint: `${window.baseURL}/broadcasting/auth`,
                 auth: {
