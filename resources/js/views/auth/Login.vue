@@ -237,7 +237,7 @@ export default {
             if (isOk) {
                 this.setLoggedinUsersCookie(user);
                 if (isMaintenance)
-                    this.$router.push({ name: "settings", hash: "#command" });
+                    this.$router.push({ name: "setting-command" });
                 else {
                     let query = this.$route.query;
                     const nextRouteName = query.redirect

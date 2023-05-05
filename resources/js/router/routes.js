@@ -157,7 +157,7 @@ export default ({ authGuard, guestGuard }) => [
                 },
                 {
                     path: "setting-command",
-                    name: "command",
+                    name: "setting-command",
                     component: Command,
                     meta: {
                         title: i18n.t("settings.command.title"),
@@ -166,7 +166,7 @@ export default ({ authGuard, guestGuard }) => [
                 },
                 {
                     path: "setting-notification",
-                    name: "notification",
+                    name: "setting-notification",
                     component: Notification,
                     meta: {
                         title: i18n.t("settings.notification.title"),
@@ -175,7 +175,7 @@ export default ({ authGuard, guestGuard }) => [
                 },
                 {
                     path: "setting-files",
-                    name: "files",
+                    name: "setting-files",
                     component: Files,
                     meta: {
                         title: i18n.t("settings.files.title"),
@@ -184,7 +184,7 @@ export default ({ authGuard, guestGuard }) => [
                 },
                 {
                     path: "setting-log",
-                    name: "log",
+                    name: "setting-log",
                     component: Log,
                     meta: {
                         title: i18n.t("settings.log.title"),
@@ -193,7 +193,7 @@ export default ({ authGuard, guestGuard }) => [
                 },
                 {
                     path: "setting-faqs",
-                    name: "faqs",
+                    name: "setting-faqs",
                     component: Faqs,
                     meta: {
                         title: i18n.t("settings.faqs.title"),
@@ -202,7 +202,7 @@ export default ({ authGuard, guestGuard }) => [
                 },
                 {
                     path: "setting-parameters",
-                    name: "parameters",
+                    name: "setting-parameters",
                     component: Parameters,
                     meta: {
                         title: i18n.t("settings.parameters.title"),
@@ -211,7 +211,7 @@ export default ({ authGuard, guestGuard }) => [
                 },
                 {
                     path: "setting-database",
-                    name: "database",
+                    name: "setting-database",
                     component: Database,
                     meta: {
                         title: i18n.t("settings.database.title"),
@@ -220,7 +220,7 @@ export default ({ authGuard, guestGuard }) => [
                 },
                 {
                     path: "setting-roles",
-                    name: "roles",
+                    name: "setting-roles",
                     component: Roles,
                     meta: {
                         title: i18n.t("settings.roles.title"),
@@ -229,7 +229,7 @@ export default ({ authGuard, guestGuard }) => [
                 },
                 {
                     path: "setting-permissions",
-                    name: "permissions",
+                    name: "setting-permissions",
                     component: Permissions,
                     meta: {
                         title: i18n.t("settings.permissions.title"),

@@ -696,8 +696,7 @@ export default {
                                 this.dataGrid.getSelectedRowKeys();
                             if (selectedRowKeys.length > 0) {
                                 this.$router.push({
-                                    name: "settings",
-                                    hash: "#notification",
+                                    name: "setting-notification",
                                     query: {
                                         codes: this.dataGrid
                                             .getSelectedRowKeys()
