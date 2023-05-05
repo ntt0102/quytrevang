@@ -197,48 +197,25 @@ class TradeService extends CoreService
     {
         return $this->transaction(function () use ($request) {
             foreach ($request->changes as $change) {
-                $response = [];
-                if (in_array($change->type, ["insert", "update"])) {
-                    $data = [
-                        "amount" => $change->data->amount,
-                        "scores" => $change->data->scores,
-                        "revenue" => $change->data->revenue,
-                        "loss" => $change->data->loss,
-                        "fees" => $change->data->fees,
-                        "date" => $change->data->date,
-                    ];
-                }
                 switch ($change->type) {
                     case 'insert':
-                        $currentdate = $data['date'];
-                        $lastTrade = $this->tradeRepository->latest('date');
-                        $lastdate = $lastTrade->date;
-                        if ($currentdate != $lastdate) {
-                            $trade = $this->tradeRepository->create($data);
-                            $response['isOk'] = !!$trade;
-                        } else {
-                            $response['isOk'] = $this->tradeRepository->update($lastTrade, [
-                                'revenue' => $data['revenue'] + $lastTrade->revenue,
-                                'loss' => $data['loss'] + $lastTrade->loss,
-                                'fees' => $data['fees'] + $lastTrade->fees,
-                            ]);
-                        }
+                        $isOk = !!$this->tradeRepository->create((array)$change->data);
                         break;
 
                     case 'update':
                         $trade = $this->tradeRepository->findById($change->key);
-                        $response['isOk'] = $this->tradeRepository->update($trade, $data);
+                        $isOk = $this->tradeRepository->update($trade, (array)$change->data);
                         break;
 
                     case 'remove':
                         $trade = $this->tradeRepository->findById($change->key);
-                        $response['isOk'] = $this->tradeRepository->delete($trade);
+                        $isOk = $this->tradeRepository->delete($trade);
                         break;
                 }
-                if (!$response['isOk']) break;
+                if (!$isOk) break;
             }
-            if ($response['isOk']) event(new UpdateTradeEvent());
-            return $response;
+            if ($isOk) event(new UpdateTradeEvent());
+            return ['isOk' => $isOk];
         });
     }
 
