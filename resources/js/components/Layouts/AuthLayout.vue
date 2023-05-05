@@ -207,7 +207,6 @@ export default {
                 .bind(
                     "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated",
                     (e) => {
-                        console.log("BroadcastNotificationCreated", e);
                         setTimeout(() => {
                             let layout = ["notification"];
                             switch (e.event) {
@@ -271,7 +270,6 @@ export default {
                     }
                 )
                 .bind("read-notification", (e) => {
-                    console.log("read-notification", e);
                     this.initLayout(["notification"]);
                     this.fetchNotification();
                 });
@@ -283,7 +281,6 @@ export default {
                 this.$pusher
                     .subscribe("private-admin")
                     .bind("broadcast", ({ model }) => {
-                        console.log("broadcast", model);
                         if (this.permissions.includes(`${model}@control`)) {
                             setTimeout(() => {
                                 this.initLayout([model]);
@@ -303,7 +300,6 @@ export default {
                 this.$pusher
                     .subscribe("private-trade")
                     .bind("update-trade", () => {
-                        console.log("update-trade");
                         setTimeout(() => {
                             if (this.permissions.includes("trades@view")) {
                                 if (this.$route.name == "trades") {
@@ -335,7 +331,6 @@ export default {
                 this.$pusher
                     .subscribe("private-finbook")
                     .bind("update-finbook", () => {
-                        console.log("update-finbook");
                         if (["finbooks", "overview"].includes(this.$route.name))
                             setTimeout(
                                 () =>

@@ -5,21 +5,12 @@ namespace App\Services\Admin;
 use App\Services\CoreService;
 use App\Models\Parameter;
 use App\Models\Trade;
-use App\Repositories\TradeRepository;
-use Illuminate\Support\Facades\Storage;
 use App\Events\UpdateTradeEvent;
 
 
 class TradeService extends CoreService
 {
-    private $tradeRepository;
     private $BARS_PER_PAGE = 8;
-
-    public function __construct(
-        TradeRepository $tradeRepository
-    ) {
-        $this->tradeRepository = $tradeRepository;
-    }
 
     /**
      * Return all the trades.
@@ -28,7 +19,7 @@ class TradeService extends CoreService
      */
     public function fetch()
     {
-        return $this->tradeRepository->getData();
+        return Trade::orderBy('date', 'DESC')->take(5)->get();
     }
 
     /**
@@ -199,17 +190,17 @@ class TradeService extends CoreService
             foreach ($request->changes as $change) {
                 switch ($change->type) {
                     case 'insert':
-                        $isOk = !!$this->tradeRepository->create((array)$change->data);
+                        $isOk = !!Trade::create((array)$change->data);
                         break;
 
                     case 'update':
-                        $trade = $this->tradeRepository->findById($change->key);
-                        $isOk = $this->tradeRepository->update($trade, (array)$change->data);
+                        $trade = Trade::find($change->key);
+                        $isOk = $trade->update((array)$change->data);
                         break;
 
                     case 'remove':
-                        $trade = $this->tradeRepository->findById($change->key);
-                        $isOk = $this->tradeRepository->delete($trade);
+                        $trade = Trade::find($change->key);
+                        $isOk = $trade->delete();
                         break;
                 }
                 if (!$isOk) break;
@@ -231,8 +222,6 @@ class TradeService extends CoreService
     function firstDayOf($period, $date = null)
     {
         $period = strtolower($period);
-        // $validPeriods = array('year', 'quarter', 'month', 'week');
-
         $newDate = ($date === null) ? date_create() : clone $date;
 
         switch ($period) {
@@ -276,8 +265,6 @@ class TradeService extends CoreService
     function lastDayOf($period, $date = null)
     {
         $period = strtolower($period);
-        // $validPeriods = array('year', 'quarter', 'month', 'week');
-
         $newDate = ($date === null) ? date_create() : clone $date;
 
         switch ($period) {
