@@ -8,7 +8,7 @@ import i18n from "./plugins/i18n";
 import prototypes from "./prototypes";
 import filters from "./filters";
 import plugins from "./plugins";
-// import "../sass/app.scss";
+import "../sass/app.scss";
 
 Vue.use(filters);
 Vue.use(prototypes);

@@ -10,16 +10,16 @@
     <meta name="app-name" content="{{ config('app.name') }}">
     <meta name="description" content="{{ config('app.name') }}">
     <meta name="theme-color" content="#2A2A32" />
-    <link rel="apple-touch-icon" href="images/icons/logo/apple-touch-icon.png">
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
     <link rel="manifest" href="/manifest.json">
-    @vite(['resources/sass/app.scss','resources/js/app.js'])
 </head>
 
 <body class="dx-viewport">
     <div id="app"></div>
     <div id="preload" style="left: 0; top: 0; width: 100%; height: 100%; position: fixed; background-color: #2A2A32;">
-        <embed style="position: absolute; top: 50%; left: 50%; width: 200px; transform: translate(-50%, -50%);" src="{{ asset('android-chrome-reverse-512x512.svg') }}" />
+        <embed style="position: absolute; top: 50%; left: 50%; width: 200px; transform: translate(-50%, -50%);" src="{{ asset('images/android-chrome-reverse-512x512.svg') }}" />
     </div>
+    @vite(['resources/js/app.js'])
 </body>
 
 </html>
