@@ -138,7 +138,7 @@ class OrderChartService extends CoreService
     {
         if (get_global_value('openingMarketFlag') == '1') {
             if (!$date) $date = date('Y-m-d');
-            $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
+            $filename = storage_path('app/vn30f1m/' . $date . '.csv');
             $list = $this->cloneVpsData();
             $fp = fopen($filename, 'w');
             foreach ($list as $item) {
@@ -156,7 +156,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $filename = storage_path('app/public/vn30f1m/' . $date . '.csv');
+        $filename = storage_path('app/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
         $keys = ['time', 'value'];
