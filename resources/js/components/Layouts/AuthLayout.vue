@@ -269,6 +269,7 @@ export default {
                 this.$pusher
                     .subscribe("private-admin")
                     .bind("broadcast", ({ model }) => {
+                        console.log("broadcast", model);
                         if (this.permissions.includes(`${model}@control`)) {
                             setTimeout(() => {
                                 this.initLayout([model]);
@@ -281,13 +282,14 @@ export default {
                     });
             }
             if (
-                ["trades@view", "common@access"].some((p) =>
+                ["trades@view", "trades@edit"].some((p) =>
                     this.permissions.includes(p)
                 )
             ) {
                 this.$pusher
                     .subscribe("private-trade")
                     .bind("update-trade", () => {
+                        console.log("update-trade");
                         setTimeout(() => {
                             if (this.permissions.includes("trades@view")) {
                                 if (this.$route.name == "trades") {
@@ -319,6 +321,7 @@ export default {
                 this.$pusher
                     .subscribe("private-finbook")
                     .bind("update-finbook", () => {
+                        console.log("update-finbook");
                         if (["finbooks", "overview"].includes(this.$route.name))
                             setTimeout(
                                 () =>
