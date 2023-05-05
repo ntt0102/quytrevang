@@ -198,17 +198,17 @@ class TradeService extends CoreService
         return $this->transaction(function () use ($request) {
             foreach ($request->changes as $change) {
                 $response = [];
-                if (in_array($change['type'], ["insert", "update"])) {
+                if (in_array($change->type, ["insert", "update"])) {
                     $data = [
-                        "amount" => $change['data']['amount'],
-                        "scores" => $change['data']['scores'],
-                        "revenue" => $change['data']['revenue'],
-                        "loss" => $change['data']['loss'],
-                        "fees" => $change['data']['fees'],
-                        "date" => $change['data']['date'],
+                        "amount" => $change->data->amount,
+                        "scores" => $change->data->scores,
+                        "revenue" => $change->data->revenue,
+                        "loss" => $change->data->loss,
+                        "fees" => $change->data->fees,
+                        "date" => $change->data->date,
                     ];
                 }
-                switch ($change['type']) {
+                switch ($change->type) {
                     case 'insert':
                         $currentdate = $data['date'];
                         $lastTrade = $this->tradeRepository->latest('date');
@@ -226,12 +226,12 @@ class TradeService extends CoreService
                         break;
 
                     case 'update':
-                        $trade = $this->tradeRepository->findById($change['key']);
+                        $trade = $this->tradeRepository->findById($change->key);
                         $response['isOk'] = $this->tradeRepository->update($trade, $data);
                         break;
 
                     case 'remove':
-                        $trade = $this->tradeRepository->findById($change['key']);
+                        $trade = $this->tradeRepository->findById($change->key);
                         $response['isOk'] = $this->tradeRepository->delete($trade);
                         break;
                 }
