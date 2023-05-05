@@ -313,7 +313,7 @@ var render = function render() {
       "editor-type": "dxCheckBox",
       "editor-options": {
         text: _vm.$t("auth.login.rememberMe"),
-        wrapperAttr: {
+        elementAttr: {
           "class": "form-text"
         }
       },

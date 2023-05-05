@@ -286,7 +286,7 @@ var render = function render() {
         options: {
           icon: "far fa-backward small",
           hint: _vm.$t("trading.trades.buttons.more"),
-          wrapperAttr: {
+          elementAttr: {
             "data-page": _vm.page
           },
           onClick: function onClick() {
