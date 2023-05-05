@@ -86,7 +86,7 @@
                         editor-type="dxCheckBox"
                         :editor-options="{
                             text: $t('auth.login.rememberMe'),
-                            elementAttr: { class: 'form-text' },
+                            wrapperAttr: { class: 'form-text' },
                         }"
                         :label="{ visible: false }"
                     />

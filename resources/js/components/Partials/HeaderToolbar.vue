@@ -10,7 +10,7 @@
                     options: {
                         icon: 'menu',
                         stylingMode: 'text',
-                        elementAttr: {
+                        wrapperAttr: {
                             'data-count': menuNotifications,
                         },
                         onClick: toggleMenuFunc,

@@ -193,6 +193,7 @@ export default {
                 .bind(
                     "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated",
                     (e) => {
+                        console.log("BroadcastNotificationCreated", e);
                         setTimeout(() => {
                             let layout = ["notification"];
                             switch (e.event) {
@@ -256,6 +257,7 @@ export default {
                     }
                 )
                 .bind("read-notification", (e) => {
+                    console.log("read-notification", e);
                     this.initLayout(["notification"]);
                     this.fetchNotification();
                 });

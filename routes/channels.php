@@ -23,5 +23,6 @@ Broadcast::channel('trade', function ($user) {
     return $user->hasAnyPermission(['trades@view', 'trades@edit']);
 });
 Broadcast::channel('finbook', function ($user) {
-    return $user->can('finbooks@control');
+    // return $user->can('finbooks@control');
+    return true;
 });
