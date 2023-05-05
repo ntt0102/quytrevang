@@ -194,10 +194,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
         date: [{
           type: "required",
           message: this.$t("trading.trades.date") + this.$mt.validations.required
-        }, {
-          type: "custom",
-          validationCallback: this.validatedate,
-          message: this.$t("trading.trades.validations.date")
         }]
       }
     };
@@ -233,9 +229,6 @@ function _toPrimitive(input, hint) { if (_typeof(input) !== "object" || input ==
           return _this2.save(formData);
         });
       }, 100);
-    },
-    validatedate: function validatedate(e) {
-      return moment(e.value).day() === 1;
     },
     onHiding: function onHiding() {
       this.gridData = null;

@@ -108,28 +108,5 @@ Route::get('test', function () {
     // $s = $s->roles;
     $s = event(new App\Events\UpdateFinbookEvent());
     dd($s);
-    // New Pusher instance with our config data
-    // $pusher = new \Pusher\Laravel\Facades\Pusher(
-    //     config('broadcasting.connections.pusher.key'),
-    //     config('broadcasting.connections.pusher.secret'),
-    //     config('broadcasting.connections.pusher.app_id'),
-    //     config('broadcasting.connections.pusher.options')
-    // );
-
-    // // Enable pusher logging - I used an anonymous class and the Monolog
-    // $pusher->set_logger(new class
-    // {
-    //     public function log($msg)
-    //     {
-    //         // \Log::info($msg);
-    //     }
-    // });
-
-    // // Your data that you would like to send to Pusher
-    // $data = ['text' => 'hello world from Laravel 5.3'];
-
-    // // Sending the data to channel: "test_channel" with "my_event" event
-    // $pusher->trigger('test_channel', 'my_event', $data);
-
     return 'ok';
 });

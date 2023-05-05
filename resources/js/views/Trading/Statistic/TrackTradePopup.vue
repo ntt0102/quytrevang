@@ -197,11 +197,6 @@ export default {
                             this.$t("trading.trades.date") +
                             this.$mt.validations.required,
                     },
-                    {
-                        type: "custom",
-                        validationCallback: this.validatedate,
-                        message: this.$t("trading.trades.validations.date"),
-                    },
                 ],
             },
         };
@@ -235,9 +230,6 @@ export default {
                 () => this.$bus.emit("checkPin", () => this.save(formData)),
                 100
             );
-        },
-        validatedate(e) {
-            return moment(e.value).day() === 1;
         },
         onHiding() {
             this.gridData = null;
