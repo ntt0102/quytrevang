@@ -60,6 +60,11 @@ class CoreNotification extends Notification
         return $this->params;
     }
 
+    public function toBroadcast($notifiable)
+    {
+        return (new BroadcastMessage([$this->params]))->onConnection('sync');
+    }
+
     /**
      * Get the web push representation of the notification.
      *

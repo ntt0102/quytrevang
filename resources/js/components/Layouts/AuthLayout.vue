@@ -178,6 +178,20 @@ export default {
             this.menuOpened = true;
         },
         connectPusher() {
+            console.log(
+                "process.env.MIX_PUSHER_APP_KEY: ",
+                process.env.MIX_PUSHER_APP_KEY
+            );
+            console.log("connectPusher: ", {
+                cluster: process.env.MIX_PUSHER_APP_CLUSTER,
+                encrypted: true,
+                authEndpoint: `${window.baseURL}/broadcasting/auth`,
+                auth: {
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                    },
+                },
+            });
             this.$pusher = new Pusher(process.env.MIX_PUSHER_APP_KEY, {
                 cluster: process.env.MIX_PUSHER_APP_CLUSTER,
                 encrypted: true,
