@@ -345,7 +345,7 @@ export default {
                                 this.executeOrder({
                                     action: "sl",
                                     data: {
-                                        action: "change",
+                                        cmd: "change",
                                         side: -this.order.side,
                                         price: this.order.sl.price,
                                     },
