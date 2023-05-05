@@ -23,7 +23,7 @@
                         options: {
                             icon: 'far fa-backward small',
                             hint: $t('trading.trades.buttons.more'),
-                            wrapperAttr: { 'data-page': page },
+                            elementAttr: { 'data-page': page },
                             onClick: () => lazyLoad(),
                         },
                     },
