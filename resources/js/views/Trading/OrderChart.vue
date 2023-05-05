@@ -611,6 +611,9 @@ export default {
                                                         self.removeOrderLine(
                                                             "sl"
                                                         );
+                                                        self.toggleCancelOrderButton(
+                                                            false
+                                                        );
                                                         toolsStore.clear(
                                                             "order"
                                                         );
@@ -651,6 +654,9 @@ export default {
                                                         );
                                                         self.removeOrderLine(
                                                             "sl"
+                                                        );
+                                                        self.toggleCancelOrderButton(
+                                                            false
                                                         );
                                                         toolsStore.clear(
                                                             "order"
@@ -745,6 +751,7 @@ export default {
                                     this.removeOrderLine("entry");
                                     this.removeOrderLine("tp");
                                     this.removeOrderLine("sl");
+                                    this.toggleCancelOrderButton(false);
                                     toolsStore.clear("order");
                                     this.$toasted.success(
                                         this.$t(
@@ -989,7 +996,6 @@ export default {
             );
             result.then((dialogResult) => {
                 if (dialogResult) {
-                    this.toggleCancelOrderButton(false);
                     if (this.order.entry.hasOwnProperty("line")) {
                         if (this.order.tp.hasOwnProperty("line")) {
                             this.executeOrder({
@@ -1006,6 +1012,7 @@ export default {
                                     this.removeOrderLine("entry");
                                     this.removeOrderLine("tp");
                                     this.removeOrderLine("sl");
+                                    this.toggleCancelOrderButton(false);
                                     toolsStore.clear("order");
                                     this.$toasted.success(
                                         this.$t(
@@ -1024,6 +1031,7 @@ export default {
                             }).then((resp) => {
                                 if (resp.isOk) {
                                     this.removeOrderLine("entry");
+                                    this.toggleCancelOrderButton(false);
                                     toolsStore.clear("order");
                                     this.$toasted.success(
                                         this.$t(
