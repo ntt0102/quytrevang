@@ -1062,7 +1062,7 @@ export default {
                                 action: "exit",
                                 exitData: {
                                     cmd: "new",
-                                    side: -this.order.side,
+                                    side: this.order.side,
                                     price: "ATO",
                                 },
                             }).then((resp) => {
@@ -1104,7 +1104,7 @@ export default {
                                 action: "exit",
                                 exitData: {
                                     cmd: "new",
-                                    side: -this.order.side,
+                                    side: this.order.side,
                                     price: "ATC",
                                 },
                             }).then((resp) => {
