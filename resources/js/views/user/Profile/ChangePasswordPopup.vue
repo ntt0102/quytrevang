@@ -1,58 +1,48 @@
 <template>
-    <DxPopup
-        ref="popup"
+    <CorePopup
+        ref="popupRef"
         :width="300"
         :height="310"
-        :showCloseButton="true"
-        :show-title="true"
         :title="$t('components.changePassword.title')"
-        @hiding="$mf.popRouteHistoryState"
+        @shown="onShown"
     >
-        <template #content>
-            <ChangePasswordForm
-                ref="cpForm"
-                :hasEmail="false"
-                @onSubmit="onSubmit"
-            />
-        </template>
-    </DxPopup>
+        <ChangePasswordForm
+            ref="changePasswordFormRef"
+            :hasEmail="false"
+            @onSubmit="onSubmit"
+        />
+    </CorePopup>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import ChangePasswordForm from "../../../components/Forms/ChangePasswordForm.vue";
+import CorePopup from "../../../components/Popups/CorePopup.vue";
+import { inject, ref } from "vue";
+import { useStore } from "vuex";
 
-export default {
-    components: {
-        ChangePasswordForm,
-    },
-    data() {
-        return {};
-    },
-    computed: {
-        popup() {
-            return this.$refs.popup.instance;
-        },
-        popup() {
-            return this.$refs.popup.instance;
-        },
-    },
-    methods: {
-        ...mapActions("User.profile", ["changePassword"]),
-        show() {
-            this.popup.show();
-            this.$refs.cpForm.setFocus();
-            this.$mf.pushPopupToHistoryState(() => this.popup.hide());
-        },
-        onSubmit(formData) {
-            this.$bus.emit("checkPin", () => {
-                this.changePassword(formData).then((isOk) => {
-                    if (isOk) {
-                        this.popup.hide();
-                    }
-                });
-            });
-        },
-    },
-};
+const store = useStore();
+const bus = inject("bus");
+const popupRef = ref(null);
+const changePasswordFormRef = ref(null);
+
+function show() {
+    popupRef.value.show();
+}
+
+function onSubmit(formData) {
+    bus.emit("checkPin", () => {
+        store.dispatch("userProfile/changePassword", formData).then((isOk) => {
+            if (isOk) {
+                popupRef.value.hide();
+            }
+        });
+    });
+}
+
+function onShown() {
+    changePasswordFormRef.value.setFocus();
+}
+
+defineExpose({
+    show,
+});
 </script>
-<style></style>

@@ -1,8 +1,24 @@
 <template>
-    <div class="app">
-        <RouterView :is-small="screenSize.Small" :is-large="screenSize.Large" />
+    <div id="root">
+        <div :class="cssClasses">
+            <component
+                :is="$route.meta.layout"
+                :is-x-small="screen.getScreenSizeInfo.isXSmall"
+                :is-large="screen.getScreenSizeInfo.isLarge"
+            >
+                <!-- <router-view></router-view> -->
+                <router-view v-slot="{ Component, route }">
+                    <transition name="fade">
+                        <component :is="Component" :key="route.path" />
+                    </transition>
+                </router-view>
+                <template #footer>
+                    <app-footer />
+                </template>
+            </component>
+        </div>
         <DxLoadPanel
-            :position="{ of: '.app' }"
+            :position="{ of: '#root' }"
             :visible="isSyncing"
             :show-pane="false"
             height="200"
@@ -13,60 +29,67 @@
             indicatorSrc="../images/android-chrome-reverse-512x512.svg"
             shading-color="rgba(0,0,0,0.4)"
         />
-        <Chatbot data-v-step="1" />
     </div>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex";
-import { locale, loadMessages } from "devextreme/localization";
-import viMessages from "./locales/devextreme/vi.json";
-import Chatbot from "./components/Chatbot.vue";
+<script setup>
+import AppFooter from "./components/Layouts/Partials/AppFooter.vue";
+import { sizes, subscribe, unsubscribe } from "./utils/media-query";
+import {
+    getCurrentInstance,
+    reactive,
+    inject,
+    computed,
+    onMounted,
+    onBeforeUnmount,
+    onUnmounted,
+} from "vue";
+import { useStore } from "vuex";
 
-export default {
-    components: {
-        Chatbot,
-    },
-    name: "app",
-    data() {
-        return {
-            screenSize: this.$mf.getScreenSize(),
-        };
-    },
-    created() {
-        loadMessages(viMessages);
-        locale(this.$i18n.locale);
-        window.addEventListener("resize", this.resizeEventHandler);
-        window.addEventListener("popstate", this.popRouteHistoryState);
-    },
-    destroyed() {
-        window.removeEventListener("resize", this.resizeEventHandler);
-        window.removeEventListener("popstate", this.popRouteHistoryState);
-    },
-    computed: {
-        ...mapGetters(["isSyncing"]),
-    },
-    methods: {
-        async resizeEventHandler(e) {
-            this.screenSize = this.$mf.getScreenSize();
-        },
-        popRouteHistoryState(e) {
-            if (this.$routeHistoryState.length > 0) {
-                if (
-                    !this.$routeHistoryState[this.$routeHistoryState.length - 1]
-                        .poppedFlag
-                ) {
-                    this.$routeHistoryState[
-                        this.$routeHistoryState.length - 1
-                    ].poppedFlag = true;
-                    this.$routeHistoryState[
-                        this.$routeHistoryState.length - 1
-                    ].callback();
-                } else this.$routeHistoryState.pop();
-            }
-        },
-    },
-};
+const store = useStore();
+const vm = getCurrentInstance();
+const mf = inject("mf");
+const routeHistoryState = inject("routeHistoryState");
+
+const screen = reactive({ getScreenSizeInfo: {} });
+screen.getScreenSizeInfo = getScreenSizeInfo();
+
+function screenSizeChanged() {
+    screen.getScreenSizeInfo = getScreenSizeInfo();
+}
+
+function getScreenSizeInfo() {
+    const screenSizes = sizes();
+
+    return {
+        isXSmall: screenSizes["screen-x-small"],
+        isLarge: screenSizes["screen-large"],
+        cssClasses: Object.keys(screenSizes).filter((cl) => screenSizes[cl]),
+    };
+}
+
+onMounted(() => {
+    subscribe(screenSizeChanged);
+});
+
+onBeforeUnmount(() => {
+    unsubscribe(screenSizeChanged);
+});
+
+const cssClasses = computed(() => {
+    return ["app"].concat(screen.getScreenSizeInfo.cssClasses);
+});
+
+window.addEventListener("popstate", () =>
+    mf.popRouteHistoryState(routeHistoryState, true)
+);
+onUnmounted(() => {
+    window.removeEventListener("popstate", () =>
+        mf.popRouteHistoryState(routeHistoryState, true)
+    );
+});
+
+const isSyncing = computed(() => store.state.isSyncing);
 </script>
 
 <style lang="scss">
@@ -76,7 +99,10 @@ body {
     margin: 0px;
     min-height: 100%;
     height: 100%;
-    min-width: 336px;
+}
+
+#root {
+    height: 100%;
 }
 
 * {
@@ -85,7 +111,7 @@ body {
 
 .app {
     background-color: darken($base-bg, 5);
-    overflow-y: hidden;
+    display: flex;
     height: 100%;
     width: 100%;
 }

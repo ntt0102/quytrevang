@@ -192,7 +192,7 @@ import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import DxTextArea from "devextreme-vue/text-area";
 import DxHtmlEditor from "devextreme-vue/html-editor";
 import PickImagePopup from "../../components/Popups/PickImagePopup.vue";
-import adminSettingsFaqsStore from "../../store/modules/Settings/Faqs";
+import adminSettingsFaqsStore from "../../store/modules/Setting/Faq";
 
 export default {
     components: {

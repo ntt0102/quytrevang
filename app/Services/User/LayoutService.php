@@ -29,25 +29,22 @@ class LayoutService extends CoreService
      * @param $request
      * 
      */
-    public function fetch($request)
+    public function getNotify($request)
     {
         $user = $request->user();
         $types = $request->types;
         $ret = [];
         if (in_array("notification", $types)) {
-            $ret['unreadNotificationsNumber'] = $user->unreadNotifications->count();
+            $ret['notification'] = $user->unreadNotifications->count();
         }
-        if ($user->can('contracts@control') && in_array("contracts", $types)) {
-            $confirmingContractsNumber = $this->contractRepository->getConfirmingNumber();
-            $ret['confirmingContractsNumber'] = $confirmingContractsNumber;
+        if ($user->can('users@control') && in_array("adminUser", $types)) {
+            $ret['adminUser'] = $this->userRepository->getSigningNumber();
         }
-        if ($user->can('users@control') && in_array("users", $types)) {
-            $signingUsersNumber = $this->userRepository->getSigningNumber();
-            $ret['signingUsersNumber'] = $signingUsersNumber;
+        if ($user->can('contracts@control') && in_array("adminContract", $types)) {
+            $ret['adminContract'] = $this->contractRepository->getConfirmingNumber();
         }
-        if ($user->can('comments@control') && in_array("comments", $types)) {
-            $unreadCommentsNumber = $this->commentRepository->getUnreadNumber();
-            $ret['unreadCommentsNumber'] = $unreadCommentsNumber;
+        if ($user->can('comments@control') && in_array("adminComment", $types)) {
+            $ret['adminComment'] = $this->commentRepository->getUnreadNumber();
         }
 
         return $ret;

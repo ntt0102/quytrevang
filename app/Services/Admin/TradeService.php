@@ -5,7 +5,7 @@ namespace App\Services\Admin;
 use App\Services\CoreService;
 use App\Models\Parameter;
 use App\Models\Trade;
-use App\Events\UpdateTradeEvent;
+use App\Events\UpdateStatisticEvent;
 
 
 class TradeService extends CoreService
@@ -205,7 +205,7 @@ class TradeService extends CoreService
                 }
                 if (!$isOk) break;
             }
-            if ($isOk) event(new UpdateTradeEvent());
+            if ($isOk) event(new UpdateStatisticEvent());
             return ['isOk' => $isOk];
         });
     }
@@ -293,5 +293,16 @@ class TradeService extends CoreService
         }
 
         return $newDate;
+    }
+
+    /**
+     * Validate Duplicate Date
+     * 
+     * @param \$request
+     */
+    public function validateDuplicateDate($request)
+    {
+        $count = Trade::where('date', $request->date)->count();
+        return $count == 0;
     }
 }

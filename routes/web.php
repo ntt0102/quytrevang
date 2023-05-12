@@ -103,10 +103,11 @@ Route::get('test', function () {
     //     'sendMail' => true,
     // ]);
     // $s = date("n/Y");
-    // $s = App\Models\User::find(1);
+    $s = App\Models\User::find(1);
+    $s = $s->url_avatar;
     // $s = $s->can('stock@order');
     // $s = $s->roles;
-    $s = event(new App\Events\UpdateFinbookEvent());
+    // $s = event(new App\Events\UpdateFinbookEvent());
     dd($s);
     return 'ok';
 });

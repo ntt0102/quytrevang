@@ -1,15 +1,12 @@
 <template>
     <div class="overview-week-trade dx-card responsive-paddings content-block">
         <DxChart
-            ref="chart"
+            ref="chartRef"
             :data-source="charts"
             :title="{
                 text: $t('user.overview.monthTrade.title'),
                 subtitle: {
-                    text: $t('user.overview.monthTrade.subtitle').replace(
-                        '{copy}',
-                        copyRate
-                    ),
+                    text: $t('user.overview.monthTrade.subtitle', [copyRate]),
                 },
                 horizontalAlignment: 'center',
             }"
@@ -36,39 +33,22 @@
         </DxChart>
     </div>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import DxChart from "devextreme-vue/chart";
-import userTradeStore from "../../../store/modules/User/Trade";
+import { useStore } from "vuex";
+import { computed, inject, onUnmounted, ref } from "vue";
 
-export default {
-    components: { DxChart },
-    data() {
-        return {};
-    },
-    beforeCreate() {
-        this.$store.registerModule("User.trade", userTradeStore);
-    },
-    created() {
-        this.getMonthChart();
-        this.$bus.on("toggleMenu", () => {
-            setTimeout(() => this.chart.render(), 300);
-        });
-    },
-    destroyed() {
-        this.$store.unregisterModule("User.trade");
-        this.$bus.off("toggleMenu");
-    },
-    computed: {
-        ...mapGetters("User.trade", ["charts", "copyRate"]),
-        chart() {
-            return this.$refs.chart.instance;
-        },
-    },
-    methods: {
-        ...mapActions("User.trade", ["getMonthChart"]),
-    },
-};
+const store = useStore();
+const chartRef = ref(null);
+const bus = inject("bus");
+const charts = computed(() => store.state.userTrade.charts);
+const copyRate = computed(() => store.state.userTrade.copyRate);
+store.dispatch("userTrade/getMonthChart");
+bus.on("toggleMenu", () => {
+    setTimeout(() => chartRef.value.instance.render(), 300);
+});
+
+onUnmounted(() => bus.off("toggleMenu"));
 </script>
 <style lang="scss">
 .overview-week-trade {

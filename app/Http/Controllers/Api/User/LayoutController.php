@@ -22,9 +22,9 @@ class LayoutController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function fetch(Request $request)
+    public function getNotify(Request $request)
     {
-        $data = $this->layoutService->fetch($request);
+        $data = $this->layoutService->getNotify($request);
         return $this->sendResponse($data);
     }
 }

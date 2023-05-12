@@ -76,7 +76,7 @@
 import { mapGetters, mapActions } from "vuex";
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import { alert } from "devextreme/ui/dialog";
-import adminSettingsStore from "../../store/modules/Settings";
+import adminSettingsStore from "../../store/modules/Setting";
 
 export default {
     components: {

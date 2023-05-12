@@ -4,7 +4,6 @@ namespace App\Events;
 
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 use Illuminate\Queue\SerializesModels;
 
@@ -29,7 +28,7 @@ class UpdateFinbookEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return [new PrivateChannel("finbook")];
+        return [new PrivateChannel("trading-finbook")];
     }
 
     /**

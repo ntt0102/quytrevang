@@ -90,7 +90,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
-import adminCommentsStore from "../../store/modules/Admin/Comments";
+import adminCommentsStore from "../../store/modules/Admin/Comment";
 
 export default {
     components: {

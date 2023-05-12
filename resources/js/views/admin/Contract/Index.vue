@@ -299,7 +299,7 @@ import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import PaidContractPopup from "./PaidContractPopup.vue";
 import WithdrawnContractPopup from "./WithdrawnContractPopup.vue";
 import ContractDetailPopup from "../../../components/Popups/ContractDetailPopup.vue";
-import adminContractsStore from "../../../store/modules/Admin/Contracts";
+import adminContractsStore from "../../../store/modules/Admin/Contract";
 
 export default {
     components: {

@@ -82,7 +82,6 @@ export default {
                         `settings/files/getItems?clientPath=${this.clientPath}&path=${parentDirectory.path}`
                     )
                     .then((response) => {
-                        // console.log(response.data);
                         resolve(response.data);
                         this.currentFolderItems = response.data;
                     });
@@ -97,7 +96,6 @@ export default {
                         name: name,
                     })
                     .then((response) => {
-                        // console.log(response.data);
                         if (response.data) resolve();
                         else reject();
                     });
@@ -113,7 +111,6 @@ export default {
                         newName: newName,
                     })
                     .then((response) => {
-                        // console.log(response.data);
                         if (response.data) resolve();
                         else reject();
                     });
@@ -128,7 +125,6 @@ export default {
                         isDirectory: item.isDirectory,
                     })
                     .then((response) => {
-                        // console.log(response.data);
                         if (response.data) resolve();
                         else reject();
                     });
@@ -144,7 +140,6 @@ export default {
                         name: item.name,
                     })
                     .then((response) => {
-                        // console.log(response.data);
                         if (response.data) resolve();
                         else reject();
                     });
@@ -161,7 +156,6 @@ export default {
                         name: item.name,
                     })
                     .then((response) => {
-                        // console.log(response.data);
                         if (response.data) resolve();
                         else reject();
                     });
@@ -189,7 +183,6 @@ export default {
                         headers: { "Content-Type": "multipart/form-data" },
                     })
                     .then((response) => {
-                        // console.log(response.data);
                         if (response.data) resolve();
                         else reject();
                     });

@@ -1,4 +1,5 @@
-import Vue from "vue";
+import { useCookies } from "vue3-cookies";
+const { cookies } = useCookies();
 
 function initialState() {
     return {
@@ -11,27 +12,23 @@ function initialState() {
             level: 0,
             avartar: null,
             permissions: [],
-            webauthn: false
+            webauthn: false,
         },
-        token: null
+        token: null,
     };
 }
 
 function setTokenCookie(token) {
-    Vue.$cookies.set(
-        "AccessToken",
-        token.access_token,
-        new Date(token.expires_at)
-    );
+    cookies.set("AccessToken", token.access_token, new Date(token.expires_at));
 }
 
 function removeTokenCookie() {
     console.log("clearToken");
-    Vue.$cookies.remove("AccessToken");
+    cookies.remove("AccessToken");
 }
 
 function getTokenCookie() {
-    return Vue.$cookies.get("AccessToken");
+    return cookies.get("AccessToken");
 }
 
 /**
@@ -67,7 +64,7 @@ function base64UrlDecode(input) {
 function uint8Array(input, atob = false) {
     return Uint8Array.from(
         atob ? window.atob(input) : base64UrlDecode(input),
-        c => c.charCodeAt(0)
+        (c) => c.charCodeAt(0)
     );
 }
 /**
@@ -91,15 +88,15 @@ function parseIncomingServerOptions(publicKey) {
     if (publicKey.user !== undefined) {
         publicKey.user = {
             ...publicKey.user,
-            id: uint8Array(publicKey.user.id, true)
+            id: uint8Array(publicKey.user.id, true),
         };
         delete publicKey.user.icon;
     }
 
     ["excludeCredentials", "allowCredentials"]
-        .filter(key => publicKey[key] !== undefined)
-        .forEach(key => {
-            publicKey[key] = publicKey[key].map(data => {
+        .filter((key) => publicKey[key] !== undefined)
+        .forEach((key) => {
+            publicKey[key] = publicKey[key].map((data) => {
                 return { ...data, id: uint8Array(data.id) };
             });
         });
@@ -117,17 +114,17 @@ function parseOutgoingCredentials(credentials) {
         id: credentials.id,
         type: credentials.type,
         rawId: arrayToBase64String(credentials.rawId),
-        response: {}
+        response: {},
     };
     [
         "clientDataJSON",
         "attestationObject",
         "authenticatorData",
         "signature",
-        "userHandle"
+        "userHandle",
     ]
-        .filter(key => credentials.response[key] !== undefined)
-        .forEach(key => {
+        .filter((key) => credentials.response[key] !== undefined)
+        .forEach((key) => {
             parseCredentials.response[key] = arrayToBase64String(
                 credentials.response[key]
             );
@@ -136,18 +133,19 @@ function parseOutgoingCredentials(credentials) {
 }
 
 const getters = {
-    id: state => state.user.id,
-    code: state => state.user.code,
-    name: state => state.user.name,
-    sex: state => state.user.sex,
-    email: state => state.user.email,
-    phone: state => state.user.phone,
-    avatar: state => state.user.avatar,
-    permissions: state => state.user.permissions,
-    webauthn: state => state.user.webauthn,
-    isLoggedin: state => !!state.user.code,
-    level: state => state.user.level,
-    token: state => state.token
+    user: (state) => state.user,
+    id: (state) => state.user.id,
+    code: (state) => state.user.code,
+    name: (state) => state.user.name,
+    sex: (state) => state.user.sex,
+    email: (state) => state.user.email,
+    phone: (state) => state.user.phone,
+    avatar: (state) => state.user.avatar,
+    permissions: (state) => state.user.permissions,
+    webauthn: (state) => state.user.webauthn,
+    isLoggedin: (state) => !!state.user.code,
+    level: (state) => state.user.level,
+    token: (state) => state.token,
 };
 
 const actions = {
@@ -159,7 +157,7 @@ const actions = {
                     { email: param.value },
                     { noLoading: true }
                 )
-                .then(response => {
+                .then((response) => {
                     // console.log(response);
                     resolve(response.data);
                 });
@@ -173,7 +171,7 @@ const actions = {
                     { email: param.value },
                     { noLoading: true }
                 )
-                .then(response => {
+                .then((response) => {
                     // console.log(response);
                     resolve(response.data);
                 });
@@ -181,14 +179,14 @@ const actions = {
     },
     resendEmail({ commit, dispatch, getters }) {
         return new Promise((resolve, reject) => {
-            axios.post("auth/email/resend").then(response => {
+            axios.post("auth/email/resend").then((response) => {
                 resolve();
             });
         });
     },
     verifyEmail({ commit, dispatch, getters }, url) {
         return new Promise((resolve, reject) => {
-            axios.get(url).then(response => {
+            axios.get(url).then((response) => {
                 // console.log(response);
                 if (response.data.isOk) {
                     commit("setUser", response.data.user);
@@ -199,7 +197,7 @@ const actions = {
     },
     resetPassword({ commit, dispatch, getters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("auth/password/reset", param).then(response => {
+            axios.post("auth/password/reset", param).then((response) => {
                 // console.log(response);
                 resolve();
             });
@@ -207,7 +205,7 @@ const actions = {
     },
     changePassword({ commit, dispatch, getters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("auth/password/change", param).then(response => {
+            axios.post("auth/password/change", param).then((response) => {
                 // console.log(response);
                 if (response.data.isOk) {
                     setTokenCookie(response.data.token);
@@ -221,7 +219,7 @@ const actions = {
     createAccount({ commit, dispatch, getters }, param) {
         delete param.password_confirmation;
         return new Promise((resolve, reject) => {
-            axios.post("auth/create-account", param).then(response => {
+            axios.post("auth/create-account", param).then((response) => {
                 // console.log(response);
                 if (response.data.isOk) {
                     setTokenCookie(response.data.token);
@@ -240,17 +238,19 @@ const actions = {
             );
             navigator.credentials
                 .create({
-                    publicKey: parseIncomingServerOptions(optionsResponse.data)
+                    publicKey: parseIncomingServerOptions(
+                        JSON.parse(optionsResponse.data)
+                    ),
                 })
-                .then(credentials => {
+                .then((credentials) => {
                     axios
                         .post("auth/register-webauthn", {
                             ...parseOutgoingCredentials(credentials),
-                            routeAction: "verify"
+                            routeAction: "verify",
                         })
-                        .then(response => {
+                        .then((response) => {
                             // console.log(response);
-                            dispatch("fetch", true);
+                            dispatch("check", true);
                             resolve();
                         });
                 });
@@ -265,15 +265,17 @@ const actions = {
             );
             navigator.credentials
                 .get({
-                    publicKey: parseIncomingServerOptions(optionsResponse.data)
+                    publicKey: parseIncomingServerOptions(
+                        JSON.parse(optionsResponse.data)
+                    ),
                 })
-                .then(credentials => {
+                .then((credentials) => {
                     axios
                         .post("auth/login-webauthn", {
                             ...parseOutgoingCredentials(credentials),
-                            routeAction: "verify"
+                            routeAction: "verify",
                         })
-                        .then(response => {
+                        .then((response) => {
                             // console.log(response);
                             if (response.data.isOk) {
                                 setTokenCookie(response.data.token);
@@ -285,13 +287,13 @@ const actions = {
                                         username: response.data.user.email,
                                         avatar: response.data.user.avatar,
                                         name: response.data.user.name,
-                                        webauthn: response.data.user.webauthn
-                                    }
+                                        webauthn: response.data.user.webauthn,
+                                    },
                                 });
                             } else resolve({ isOk: false });
                         });
                 })
-                .catch(e => {
+                .catch((e) => {
                     reject();
                 });
         });
@@ -305,15 +307,17 @@ const actions = {
             );
             navigator.credentials
                 .get({
-                    publicKey: parseIncomingServerOptions(optionsResponse.data)
+                    publicKey: parseIncomingServerOptions(
+                        JSON.parse(optionsResponse.data)
+                    ),
                 })
-                .then(credentials => {
+                .then((credentials) => {
                     axios
                         .post("auth/confirm-webauthn", {
                             ...parseOutgoingCredentials(credentials),
-                            routeAction: "verify"
+                            routeAction: "verify",
                         })
-                        .then(response => {
+                        .then((response) => {
                             // console.log(response);
                             resolve(response.data.isOk);
                         });
@@ -322,8 +326,7 @@ const actions = {
     },
     login({ commit, dispatch, getters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("auth/login", param).then(response => {
-                // console.log(response.data);
+            axios.post("auth/login", param).then((response) => {
                 if (response.data.isOk) {
                     setTokenCookie(response.data.token);
                     commit("setState", response.data);
@@ -334,16 +337,16 @@ const actions = {
                             username: response.data.user.email,
                             avatar: response.data.user.avatar,
                             name: response.data.user.name,
-                            webauthn: response.data.user.webauthn
-                        }
+                            webauthn: response.data.user.webauthn,
+                        },
                     });
                 } else resolve({ isOk: false });
             });
         });
     },
     logout({ commit, dispatch, getters }) {
-        return new Promise(resolve => {
-            axios.get("auth/logout").then(response => {
+        return new Promise((resolve) => {
+            axios.get("auth/logout").then((response) => {
                 // console.log(response);
                 removeTokenCookie();
                 commit("resetState");
@@ -351,20 +354,20 @@ const actions = {
             });
         });
     },
-    fetch({ commit, dispatch, getters }, force = false) {
-        if (!force && getters.isLoggedin) return Promise.resolve();
+    check({ commit, dispatch, state }, force = false) {
+        if (!force && state.user.code) return Promise.resolve();
         var access_token = getTokenCookie();
         if (!access_token) return Promise.resolve();
         commit("setToken", access_token);
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             axios
                 .get("auth/user", { noLoading: true })
-                .then(response => {
+                .then((response) => {
                     console.log(response);
                     commit("setUser", response.data);
                     resolve();
                 })
-                .catch(error => {
+                .catch((error) => {
                     if (error.status == 401) {
                         removeTokenCookie();
                         commit("resetState");
@@ -377,8 +380,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post("auth/check-pin", { pin: param }, { noLoading: true })
-                .then(response => {
-                    // console.log(response.data);
+                .then((response) => {
                     resolve(response.data.isOk);
                 });
         });
@@ -393,7 +395,7 @@ const actions = {
     clearData: ({ commit }) => {
         removeTokenCookie();
         commit("resetState");
-    }
+    },
 };
 
 const mutations = {
@@ -412,7 +414,7 @@ const mutations = {
     },
     resetState(state) {
         state = Object.assign(state, initialState());
-    }
+    },
 };
 
 export default {
@@ -420,5 +422,5 @@ export default {
     state: initialState,
     getters,
     mutations,
-    actions
+    actions,
 };

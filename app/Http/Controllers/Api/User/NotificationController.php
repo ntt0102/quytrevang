@@ -22,9 +22,9 @@ class NotificationController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function fetch(Request $request)
+    public function getNotifications(Request $request)
     {
-        $data = $this->notificationService->fetch($request);
+        $data = $this->notificationService->getNotifications($request);
         return $this->sendResponse($data);
     }
 

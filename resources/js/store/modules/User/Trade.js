@@ -2,16 +2,12 @@ function initialState() {
     return { charts: {}, copyRate: 0 };
 }
 
-const getters = {
-    charts: (state) => state.charts,
-    copyRate: (state) => state.copyRate,
-};
+const getters = {};
 
 const actions = {
-    getMonthChart({ commit, dispatch, getters, state, rootGetters }) {
+    getMonthChart({ commit, dispatch, getters, state }) {
         return new Promise((resolve, reject) => {
             axios.get("trade", { crypto: true }).then((response) => {
-                // console.log(response.data);
                 commit("setState", response.data);
                 resolve();
             });

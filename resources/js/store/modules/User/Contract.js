@@ -1,5 +1,3 @@
-// import _ from "lodash";
-
 function initialState() {
     return {
         contracts: [],
@@ -7,23 +5,20 @@ function initialState() {
         principalMin: 0,
         holdWeeksMin: 0,
         transferInfo: null,
-        updatedAt: null
+        updatedAt: null,
     };
 }
 
-const getters = {
-    contracts: state => state.contracts,
-    interestRate: state => state.interestRate,
-    principalMin: state => state.principalMin,
-    holdWeeksMin: state => state.holdWeeksMin,
-    transferInfo: state => state.transferInfo
-};
+const getters = {};
 
 const actions = {
-    fetch({ commit, dispatch, getters, state, rootGetters }, isOld = true) {
+    getContracts(
+        { commit, dispatch, getters, state, rootGetters },
+        isOld = true
+    ) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
-            axios.get("contract?isOld=" + isOld).then(response => {
+            axios.get("contract?isOld=" + isOld).then((response) => {
                 // console.log(response);
                 commit("setState", response.data);
                 resolve();
@@ -32,10 +27,9 @@ const actions = {
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("contract", param).then(response => {
-                // console.log(response.data);
+            axios.post("contract", param).then((response) => {
                 dispatch("fetch");
-                dispatch("Auth/fetch", true, { root: true });
+                dispatch("auth/check", true, { root: true });
                 resolve(response.data);
             });
         });
@@ -44,10 +38,9 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post("contract/paying", param, {
-                    headers: { "Content-Type": "multipart/form-data" }
+                    headers: { "Content-Type": "multipart/form-data" },
                 })
-                .then(response => {
-                    // console.log(response.data);
+                .then((response) => {
                     if (response.data.isOk) dispatch("fetch");
                     resolve(response.data.isOk);
                 });
@@ -55,8 +48,7 @@ const actions = {
     },
     withdrawingContract({ commit, dispatch, getters, state }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("contract/withdrawing", param).then(response => {
-                // console.log(response.data);
+            axios.post("contract/withdrawing", param).then((response) => {
                 if (response.data.isOk) dispatch("fetch");
                 resolve(response.data.isOk);
             });
@@ -64,7 +56,7 @@ const actions = {
     },
     resetState({ commit }) {
         commit("resetState");
-    }
+    },
 };
 
 const mutations = {
@@ -78,7 +70,7 @@ const mutations = {
     },
     resetState(state) {
         state = Object.assign(state, initialState());
-    }
+    },
 };
 
 export default {
@@ -86,5 +78,5 @@ export default {
     state: initialState,
     getters,
     actions,
-    mutations
+    mutations,
 };

@@ -8,7 +8,7 @@ class OrderChartDb {
     create() {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open("orderChart", 1);
-            request.onupgradeneeded = e => {
+            request.onupgradeneeded = (e) => {
                 console.log("onupgradeneeded");
                 this.store = e.target.result;
                 this.store.createObjectStore("order", { keyPath: "kind" });
@@ -16,7 +16,7 @@ class OrderChartDb {
                 this.store.createObjectStore("ruler", { keyPath: "point" });
                 resolve();
             };
-            request.onsuccess = e => {
+            request.onsuccess = (e) => {
                 console.log("onsuccess");
                 this.store = e.target.result;
                 resolve();
@@ -30,22 +30,22 @@ class OrderChartDb {
     }
     get(tables) {
         var database = this.store;
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             var tx = database.transaction(tables, "readonly");
             if (Array.isArray(tables)) {
-                var stores = tables.map(table => tx.objectStore(table));
+                var stores = tables.map((table) => tx.objectStore(table));
                 var promises = stores.map(loadStore);
-                Promise.all(promises).then(arr => resolve(arr));
+                Promise.all(promises).then((arr) => resolve(arr));
             } else {
                 var store = tx.objectStore(tables);
-                loadStore(store).then(d => resolve(d));
+                loadStore(store).then((d) => resolve(d));
             }
         });
 
         function loadStore(store) {
-            return new Promise(function(resolve, reject) {
+            return new Promise(function (resolve, reject) {
                 const request = store.getAll();
-                request.onsuccess = e => resolve(e.target.result);
+                request.onsuccess = (e) => resolve(e.target.result);
                 request.onerror = () => reject();
             });
         }
@@ -55,12 +55,12 @@ class OrderChartDb {
             .transaction(table, "readwrite")
             .objectStore(table);
         if (Array.isArray(data)) {
-            if (data.length > 0) data.forEach(item => store.put(item));
+            if (data.length > 0) data.forEach((item) => store.put(item));
         } else store.put(data);
     }
     clear(table) {
         var database = this.store;
-        return new Promise(function(resolve, reject) {
+        return new Promise(function (resolve, reject) {
             const request = database
                 .transaction(table, "readwrite")
                 .objectStore(table)
@@ -70,7 +70,7 @@ class OrderChartDb {
                 resolve();
             };
 
-            request.onerror = err => {
+            request.onerror = (err) => {
                 console.error(`Error to empty Object Store: ${table}`);
                 reject();
             };

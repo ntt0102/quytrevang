@@ -1,125 +1,117 @@
 <template>
-  <DxPopup
-    ref="popup"
-    :width="275"
-    :height="190"
-    :showCloseButton="true"
-    :title="$t('components.checkPin.title')"
-    :show-title="true"
-    :wrapperAttr="{ class: 'check-pin-popup' }"
-    :toolbarItems="[
-      {
-        toolbar: 'bottom',
-        location: 'center',
-        widget: 'dxButton',
-        options: {
-          text: $t('components.checkPin.fingerPrint'),
-          icon: 'far fa-fingerprint small',
-          onClick: scanFingerPrint,
-        },
-      },
-    ]"
-    @hiding="onHiding"
-  >
-    <template #content>
-      <OtpInput
-        v-if="isEnabled"
-        ref="otpInput"
-        input-classes="otp-input"
-        separator="-"
-        :num-inputs="4"
-        :should-auto-focus="true"
-        :is-input-num="true"
-        @on-complete="handleOnComplete"
-      />
-    </template>
-  </DxPopup>
+    <CorePopup
+        ref="popupRef"
+        :width="275"
+        :height="190"
+        class="check-pin-popup"
+        :title="$t('components.checkPin.title')"
+        :toolbarItems="[
+            {
+                toolbar: 'bottom',
+                location: 'center',
+                widget: 'dxButton',
+                options: {
+                    text: $t('components.checkPin.fingerPrint'),
+                    icon: 'far fa-fingerprint small',
+                    onClick: scanFingerPrint,
+                },
+            },
+        ]"
+        @shown="onShown"
+        @hidden="onHidden"
+    >
+        <OtpInput
+            v-if="isEnabled"
+            ref="otpInputRef"
+            v-model:value="pin"
+            input-classes="otp-input"
+            separator="-"
+            :num-inputs="4"
+            :should-auto-focus="true"
+            input-type="letter-numeric"
+            :conditionalClass="['one', 'two', 'three', 'four']"
+            :placeholder="['*', '*', '*', '*']"
+            @on-complete="handleOnComplete"
+        />
+    </CorePopup>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
-import OtpInput from "@bachdgvn/vue-otp-input";
+<script setup>
+import OtpInput from "vue3-otp-input";
+import CorePopup from "./CorePopup.vue";
+import { inject, ref } from "vue";
+import { useStore } from "vuex";
 
-export default {
-  components: {
-    OtpInput,
-  },
-  data() {
-    return {
-      isEnabled: false,
-      callback: null,
-    };
-  },
-  computed: {
-    ...mapGetters(["isSyncing"]),
-    ...mapGetters("Auth", ["webauthn"]),
-    popup() {
-      return this.$refs.popup.instance;
-    },
-  },
-  methods: {
-    ...mapActions("Auth", ["checkPin", "confirmWebAuthn"]),
-    show({ callback, forcePin }) {
-      this.popup.show();
-      setTimeout(() => (this.isEnabled = true), 400);
+const store = useStore();
+const devices = inject("devices");
+const popupRef = ref(null);
+const otpInputRef = ref(null);
+const isEnabled = ref(false);
+const pin = ref("");
+let params = null;
 
-      if (this.$devices.phone && this.webauthn && !forcePin)
-        this.scanFingerPrint();
-
-      this.callback = callback;
-      this.$mf.pushPopupToHistoryState(() => this.popup.hide());
-    },
-    scanFingerPrint() {
-      this.confirmWebAuthn().then((isOk) => {
+function show(e) {
+    popupRef.value.show();
+    params = e;
+}
+function scanFingerPrint() {
+    store.dispatch("auth/confirmWebAuthn").then((isOk) => {
         if (isOk) {
-          this.callback();
-          this.popup.hide();
+            params.callback();
+            popupRef.value.hide();
         }
-      });
-    },
-    handleOnComplete(e) {
-      this.checkPin(e).then((isOk) => {
+    });
+}
+function handleOnComplete(e) {
+    store.dispatch("auth/checkPin", e).then((isOk) => {
         if (isOk) {
-          this.callback();
-          this.popup.hide();
-        } else this.$refs.otpInput.clearInput();
-      });
-    },
-    onHiding() {
-      this.isEnabled = false;
-      this.$mf.popRouteHistoryState();
-    },
-  },
-};
+            params.callback();
+            popupRef.value.hide();
+        }
+        otpInputRef.value.clearInput();
+    });
+}
+function onShown() {
+    isEnabled.value = true;
+    if (!params.forcePin && devices.phone && store.state.auth.user.webauthn)
+        scanFingerPrint();
+}
+function onHidden() {
+    isEnabled.value = false;
+}
+
+defineExpose({ show });
 </script>
 <style lang="scss">
 @import "../../../sass/variables.scss";
 .check-pin-popup {
-  .dx-popup-content {
-    padding: 25px 10px !important;
-    text-align: center;
+    .dx-popup-content {
+        padding: 25px 10px !important;
+        text-align: center;
 
-    .otp-input {
-      width: 40px;
-      height: 40px;
-      padding: 5px;
-      margin: 0 10px;
-      font-size: 20px;
-      border-radius: 4px;
-      text-align: center;
-
-      &:focus {
-        outline: none !important;
-        border: 2px solid $base-accent;
-        box-shadow: 0 0 10px lighten($base-accent, 20);
-      }
-
-      &::-webkit-inner-spin-button,
-      &::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-      }
+        .otp-input {
+            width: 40px;
+            height: 40px;
+            padding: 5px;
+            margin: 0 10px;
+            font-size: 20px;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        /* Background colour of an input field with value */
+        .otp-input.is-complete {
+            background-color: #e4e4e4;
+        }
+        .otp-input::-webkit-inner-spin-button,
+        .otp-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input::placeholder {
+            font-size: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
     }
-  }
 }
 </style>
-

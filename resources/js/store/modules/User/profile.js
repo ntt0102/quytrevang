@@ -1,11 +1,11 @@
 function initialState() {
     return {
-        profile: {}
+        profile: {},
     };
 }
 
 const getters = {
-    profile: state => state.profile
+    profile: (state) => state.profile,
 };
 
 const actions = {
@@ -18,7 +18,7 @@ const actions = {
                     { field: "email", email: param.value },
                     { noLoading: true }
                 )
-                .then(response => {
+                .then((response) => {
                     // console.log(response);
                     resolve(response.data);
                 });
@@ -34,7 +34,7 @@ const actions = {
                     { field: "id_number", id_number: param.value },
                     { noLoading: true }
                 )
-                .then(response => {
+                .then((response) => {
                     // console.log(response);
                     resolve(response.data);
                 });
@@ -49,7 +49,7 @@ const actions = {
                     { field: "phone", phone: param.value },
                     { noLoading: true }
                 )
-                .then(response => {
+                .then((response) => {
                     // console.log(response);
                     resolve(response.data);
                 });
@@ -57,10 +57,10 @@ const actions = {
     },
     changeAvatar({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("profile/avatar", { avatar: param }).then(response => {
+            axios.post("profile/avatar", { avatar: param }).then((response) => {
                 // console.log(response);
-                dispatch("Auth/setAvatar", response.data.avatar, {
-                    root: true
+                dispatch("auth/setAvatar", response.data.avatar, {
+                    root: true,
                 });
                 commit("setAvatar", response.data.avatar);
                 resolve(response.data.isOk);
@@ -69,41 +69,37 @@ const actions = {
     },
     changePassword({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("profile/password", param).then(response => {
+            axios.post("profile/password", param).then((response) => {
                 resolve(response.data.isOk);
             });
         });
     },
     changePin({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("profile/change-pin", param).then(response => {
-                // console.log(response.data);
+            axios.post("profile/change-pin", param).then((response) => {
                 resolve(response.data.isOk);
             });
         });
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("profile", param).then(response => {
-                // console.log(response.data);
+            axios.post("profile", param).then((response) => {
                 resolve(response.data.isOk);
-                dispatch("Auth/fetch", true, { root: true });
+                dispatch("auth/check", true, { root: true });
                 commit("setState", param);
             });
         });
     },
     delete({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.post("profile/delete").then(response => {
-                // console.log(response.data);
+            axios.post("profile/delete").then((response) => {
                 resolve(response.data.isOk);
             });
         });
     },
     fetch({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("profile").then(response => {
-                // console.log(response.data);
+            axios.get("profile").then((response) => {
                 commit("setState", response.data);
                 resolve(response.data);
             });
@@ -114,7 +110,7 @@ const actions = {
     },
     resetState({ commit }) {
         commit("resetState");
-    }
+    },
 };
 
 const mutations = {
@@ -126,7 +122,7 @@ const mutations = {
     },
     resetState(state) {
         state = Object.assign(state, initialState());
-    }
+    },
 };
 
 export default {
@@ -134,5 +130,5 @@ export default {
     state: initialState,
     getters,
     mutations,
-    actions
+    actions,
 };

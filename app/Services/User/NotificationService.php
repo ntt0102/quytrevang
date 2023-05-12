@@ -18,7 +18,7 @@ class NotificationService extends CoreService
      * @param $request
      * 
      */
-    public function fetch($request)
+    public function getNotifications($request)
     {
         $user = $request->user();
 

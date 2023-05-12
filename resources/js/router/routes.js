@@ -1,307 +1,275 @@
-import i18n from "../plugins/i18n";
-
-const Overview = () =>
-    import(/* webpackPrefetch: true */ "../views/user/Overview/Index.vue");
-const Profile = () =>
-    import(/* webpackPrefetch: true */ "../views/user/Profile/Index.vue");
-const Contract = () =>
-    import(/* webpackPrefetch: true */ "../views/user/Contract/Index.vue");
-
-const Users = () =>
-    import(/* webpackPrefetch: true */ "../views/admin/User/Index.vue");
-const Contracts = () =>
-    import(/* webpackPrefetch: true */ "../views/admin/Contract/Index.vue");
-const SmartOrders = () =>
-    import(/* webpackPrefetch: true */ "../views/admin/SmartOrders.vue");
-const Comments = () =>
-    import(/* webpackPrefetch: true */ "../views/admin/Comments.vue");
-
-const OrderChart = () =>
-    import(/* webpackPrefetch: true */ "../views/Trading/OrderChart.vue");
-const Trades = () =>
-    import(/* webpackPrefetch: true */ "../views/Trading/Statistic/Index.vue");
-const Finbooks = () =>
-    import(/* webpackPrefetch: true */ "../views/Trading/Finbooks.vue");
-
-const Command = () =>
-    import(/* webpackPrefetch: true */ "../views/Settings/Command.vue");
-const Notification = () =>
-    import(/* webpackPrefetch: true */ "../views/Settings/Notification.vue");
-const Files = () =>
-    import(/* webpackPrefetch: true */ "../views/Settings/Files.vue");
-const Log = () =>
-    import(/* webpackPrefetch: true */ "../views/Settings/Log.vue");
-const Faqs = () =>
-    import(/* webpackPrefetch: true */ "../views/Settings/Faqs.vue");
-const Parameters = () =>
-    import(/* webpackPrefetch: true */ "../views/Settings/Parameters.vue");
-const Database = () =>
-    import(/* webpackPrefetch: true */ "../views/Settings/Database.vue");
-const Roles = () =>
-    import(/* webpackPrefetch: true */ "../views/Settings/Roles.vue");
-const Permissions = () =>
-    import(/* webpackPrefetch: true */ "../views/Settings/Permissions.vue");
-
-const Login = () =>
-    import(/* webpackPrefetch: true */ "../views/auth/Login.vue");
-const CreateAccount = () =>
-    import(/* webpackPrefetch: true */ "../views/auth/CreateAccount.vue");
-const ResetPassword = () =>
-    import(/* webpackPrefetch: true */ "../views/auth/ResetPassword.vue");
-const ChangePassword = () =>
-    import(/* webpackPrefetch: true */ "../views/auth/ChangePassword.vue");
-const VerifyEmail = () =>
-    import(/* webpackPrefetch: true */ "../views/auth/VerifyEmail.vue");
-
-const Policy = () =>
-    import(/* webpackPrefetch: true */ "../views/Policy/Index.vue");
-const NotFound = () =>
-    import(/* webpackPrefetch: true */ "../views/NotFound.vue");
+import lang from "../lang";
 
 import AuthLayout from "../components/Layouts/AuthLayout.vue";
 import GuestLayout from "../components/Layouts/GuestLayout.vue";
-export default ({ authGuard, guestGuard }) => [
-    // User routes
-    ...authGuard([
-        {
-            path: "/",
-            component: AuthLayout,
-            redirect: "overview",
-            meta: { auth: true },
-            children: [
-                {
-                    path: "overview",
-                    name: "overview",
-                    component: Overview,
-                    meta: {
-                        title: i18n.t("user.overview.title"),
-                        permission: "common@access",
-                    },
-                },
-                {
-                    path: "profile",
-                    name: "profile",
-                    component: Profile,
-                    meta: {
-                        title: i18n.t("user.profile.title"),
-                        permission: "common@access",
-                    },
-                },
-                {
-                    path: "contract",
-                    name: "contract",
-                    component: Contract,
-                    meta: {
-                        title: i18n.t("user.contract.title"),
-                        permission: "common@access",
-                    },
-                },
-                {
-                    path: "admin-users",
-                    name: "users",
-                    component: Users,
-                    meta: {
-                        title: i18n.t("admin.users.title"),
-                        permission: "users@control",
-                    },
-                },
-                {
-                    path: "admin-contracts",
-                    name: "contracts",
-                    component: Contracts,
-                    meta: {
-                        title: i18n.t("admin.contracts.title"),
-                        permission: "contracts@control",
-                    },
-                },
-                {
-                    path: "admin-sos",
-                    name: "smartorders",
-                    component: SmartOrders,
-                    meta: {
-                        title: i18n.t("admin.smartorders.title"),
-                        permission: "copyists@control",
-                    },
-                },
-                {
-                    path: "admin-comments",
-                    name: "comments",
-                    component: Comments,
-                    meta: {
-                        title: i18n.t("admin.comments.title"),
-                        permission: "comments@control",
-                    },
-                },
-                {
-                    path: "trading-order",
-                    name: "order",
-                    component: OrderChart,
-                    meta: {
-                        title: i18n.t("trading.orderChart.title"),
-                        permission: "stock@order",
-                    },
-                },
-                {
-                    path: "trading-trades",
-                    name: "trades",
-                    component: Trades,
-                    meta: {
-                        title: i18n.t("trading.trades.title"),
-                        permission: "trades@view",
-                    },
-                },
-                {
-                    path: "trading-finbooks",
-                    name: "finbooks",
-                    component: Finbooks,
-                    meta: {
-                        title: i18n.t("trading.finbooks.title"),
-                        permission: "finbooks@control",
-                    },
-                },
-                {
-                    path: "setting-command",
-                    name: "setting-command",
-                    component: Command,
-                    meta: {
-                        title: i18n.t("settings.command.title"),
-                        permission: "command@setting",
-                    },
-                },
-                {
-                    path: "setting-notification",
-                    name: "setting-notification",
-                    component: Notification,
-                    meta: {
-                        title: i18n.t("settings.notification.title"),
-                        permission: "notification@setting",
-                    },
-                },
-                {
-                    path: "setting-files",
-                    name: "setting-files",
-                    component: Files,
-                    meta: {
-                        title: i18n.t("settings.files.title"),
-                        permission: "files@setting",
-                    },
-                },
-                {
-                    path: "setting-log",
-                    name: "setting-log",
-                    component: Log,
-                    meta: {
-                        title: i18n.t("settings.log.title"),
-                        permission: "log@setting",
-                    },
-                },
-                {
-                    path: "setting-faqs",
-                    name: "setting-faqs",
-                    component: Faqs,
-                    meta: {
-                        title: i18n.t("settings.faqs.title"),
-                        permission: "faqs@setting",
-                    },
-                },
-                {
-                    path: "setting-parameters",
-                    name: "setting-parameters",
-                    component: Parameters,
-                    meta: {
-                        title: i18n.t("settings.parameters.title"),
-                        permission: "parameters@setting",
-                    },
-                },
-                {
-                    path: "setting-database",
-                    name: "setting-database",
-                    component: Database,
-                    meta: {
-                        title: i18n.t("settings.database.title"),
-                        permission: "database@setting",
-                    },
-                },
-                {
-                    path: "setting-roles",
-                    name: "setting-roles",
-                    component: Roles,
-                    meta: {
-                        title: i18n.t("settings.roles.title"),
-                        permission: "roles@setting",
-                    },
-                },
-                {
-                    path: "setting-permissions",
-                    name: "setting-permissions",
-                    component: Permissions,
-                    meta: {
-                        title: i18n.t("settings.permissions.title"),
-                        permission: "permissions@setting",
-                    },
-                },
-            ],
-        },
-    ]),
 
-    // Guest routes
-    ...guestGuard([
-        {
-            path: "/",
-            component: GuestLayout,
-            meta: { auth: false },
-            children: [
-                {
-                    path: "login",
-                    name: "login",
-                    component: Login,
-                    meta: {
-                        title: i18n.t("auth.login.title"),
-                    },
-                },
-                {
-                    path: "login-for-maintenance",
-                    redirect: "login",
-                },
-                {
-                    path: "create-account",
-                    name: "create-account",
-                    component: CreateAccount,
-                    meta: {
-                        title: i18n.t("auth.createAccount.title"),
-                    },
-                },
-                {
-                    path: "reset-password",
-                    name: "reset-password",
-                    component: ResetPassword,
-                    meta: {
-                        title: i18n.t("auth.resetPassword.title"),
-                    },
-                },
-                {
-                    path: "change-password",
-                    component: ChangePassword,
-                    meta: {
-                        title: i18n.t("auth.resetPassword.title"),
-                    },
-                },
-                {
-                    path: "verify-email",
-                    name: "verify-email",
-                    component: VerifyEmail,
-                    meta: {
-                        title: i18n.t("auth.verifyEmail.title"),
-                    },
-                },
-            ],
+function loadView(name1, name2, name3) {
+    if (!!name3) return () => import(`../views/${name1}/${name2}/${name3}.vue`);
+    if (!!name2) return () => import(`../views/${name1}/${name2}.vue`);
+    return () => import(`../views/${name1}.vue`);
+}
+const guestRoute = [
+    {
+        path: "/login",
+        name: "login",
+        meta: {
+            auth: false,
+            layout: GuestLayout,
+            title: lang.global.t("auth.login.title"),
         },
-        {
-            path: "/policy",
-            name: "policy",
-            component: Policy,
-            meta: { title: i18n.t("policy.title") },
+        component: loadView("Auth", "Login"),
+    },
+    {
+        path: "/login-for-maintenance",
+        redirect: "login",
+    },
+    {
+        path: "/register",
+        name: "create-account",
+        meta: {
+            auth: false,
+            layout: GuestLayout,
+            title: lang.global.t("auth.createAccount.title"),
         },
-    ]),
-    { path: "*", component: NotFound },
+        component: loadView("Auth", "CreateAccount"),
+    },
+    {
+        path: "/reset-password",
+        name: "reset-password",
+        meta: {
+            auth: false,
+            layout: GuestLayout,
+            title: lang.global.t("auth.resetPassword.title"),
+        },
+        component: loadView("Auth", "ResetPassword"),
+    },
+    {
+        path: "/change-password",
+        meta: {
+            auth: false,
+            layout: GuestLayout,
+            title: lang.global.t("auth.resetPassword.title"),
+        },
+        component: loadView("Auth", "ChangePassword"),
+    },
+    {
+        path: "/verify-email",
+        name: "verify-email",
+        meta: {
+            auth: false,
+            layout: GuestLayout,
+            title: lang.global.t("auth.verifyEmail.title"),
+        },
+        component: loadView("Auth", "VerifyEmail"),
+    },
+    { path: "/:pathMatch(.*)*", component: loadView("NotFound") },
 ];
+const authRoute = [
+    // User
+    {
+        path: "/",
+        redirect: "/overview",
+    },
+    {
+        path: "/overview",
+        name: "overview",
+        meta: {
+            auth: true,
+            permission: "common@access",
+            title: lang.global.t("user.overview.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("User", "Overview", "Index"),
+    },
+    {
+        path: "/profile",
+        name: "profile",
+        meta: {
+            auth: true,
+            permission: "common@access",
+            title: lang.global.t("user.profile.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("User", "Profile", "Index"),
+    },
+    {
+        path: "/contract",
+        name: "contract",
+        meta: {
+            auth: true,
+            permission: "common@access",
+            title: lang.global.t("user.contract.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("User", "Contract", "Index"),
+    },
+    // Manager
+    {
+        path: "/admin-users",
+        name: "users",
+        meta: {
+            auth: true,
+            permission: "users@control",
+            title: lang.global.t("admin.users.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Admin", "User", "Index"),
+    },
+    {
+        path: "/admin-contracts",
+        name: "contracts",
+        meta: {
+            auth: true,
+            permission: "contracts@control",
+            title: lang.global.t("admin.contracts.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Admin", "Contract", "Index"),
+    },
+    {
+        path: "/admin-comments",
+        name: "comments",
+        meta: {
+            auth: true,
+            permission: "comments@control",
+            title: lang.global.t("admin.comments.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Admin", "Comments"),
+    },
+    // Trading
+    {
+        path: "/trading-order",
+        name: "order",
+        meta: {
+            auth: true,
+            permission: "stock@order",
+            title: lang.global.t("trading.orderChart.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Trading", "Order", "Index"),
+    },
+    {
+        path: "/trading-statistic",
+        name: "statistic",
+        meta: {
+            auth: true,
+            permission: "stock@order",
+            title: lang.global.t("trading.trades.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Trading", "Statistic", "Index"),
+    },
+    {
+        path: "/trading-finbooks",
+        name: "finbooks",
+        meta: {
+            auth: true,
+            permission: "finbooks@control",
+            title: lang.global.t("trading.finbooks.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Trading", "Finbook", "Index"),
+    },
+    // Settings
+    {
+        path: "/setting-command",
+        name: "setting-command",
+        meta: {
+            auth: true,
+            permission: "command@setting",
+            title: lang.global.t("settings.command.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Settings", "Command"),
+    },
+    {
+        path: "/setting-notification",
+        name: "setting-notification",
+        meta: {
+            auth: true,
+            permission: "notification@setting",
+            title: lang.global.t("settings.notification.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Settings", "Notification"),
+    },
+    {
+        path: "/setting-files",
+        name: "setting-files",
+        meta: {
+            auth: true,
+            permission: "files@setting",
+            title: lang.global.t("settings.files.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Settings", "Files"),
+    },
+    {
+        path: "/setting-log",
+        name: "setting-log",
+        meta: {
+            auth: true,
+            permission: "log@setting",
+            title: lang.global.t("settings.log.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Settings", "Log"),
+    },
+    {
+        path: "/setting-faqs",
+        name: "setting-faqs",
+        meta: {
+            auth: true,
+            permission: "faqs@setting",
+            title: lang.global.t("settings.faqs.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Settings", "Faqs"),
+    },
+    {
+        path: "/setting-parameters",
+        name: "setting-parameters",
+        meta: {
+            auth: true,
+            permission: "parameters@setting",
+            title: lang.global.t("settings.parameters.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Settings", "Parameters"),
+    },
+    {
+        path: "/setting-database",
+        name: "setting-database",
+        meta: {
+            auth: true,
+            permission: "database@setting",
+            title: lang.global.t("settings.database.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Settings", "Database"),
+    },
+    {
+        path: "/setting-roles",
+        name: "setting-roles",
+        meta: {
+            auth: true,
+            permission: "roles@setting",
+            title: lang.global.t("settings.roles.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Settings", "Roles"),
+    },
+    {
+        path: "/setting-permissions",
+        name: "setting-permissions",
+        meta: {
+            auth: true,
+            permission: "permissions@setting",
+            title: lang.global.t("settings.permissions.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Settings", "Permissions"),
+    },
+];
+export default [...guestRoute, ...authRoute];

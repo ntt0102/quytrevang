@@ -2,7 +2,15 @@ export default {
     isSyncing: false,
     contact: {
         email: null,
-        phone: null
+        phone: null,
     },
-    faqs: []
+    faqs: [],
+    notify: {
+        notification: 0,
+        adminUser: 0,
+        adminContract: 0,
+        adminComment: 0,
+    },
+    pushSubscribed: true,
+    notifications: [],
 };

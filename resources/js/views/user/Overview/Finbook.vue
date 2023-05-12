@@ -1,7 +1,7 @@
 <template>
     <div class="finbook-chart dx-card responsive-paddings content-block">
         <DxPieChart
-            ref="pie"
+            ref="pieRef"
             :data-source="finbooks"
             resolve-label-overlapping="shift"
             palette="Bright"
@@ -30,83 +30,68 @@
             @point-click="pointClickHandler"
             @legend-click="legendClickHandler"
         />
-        <TransactionFinbookPopup ref="transactionFinbookPopup" />
+        <TransactionFinbookPopup ref="transactionFinbookPopupRef" />
     </div>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import DxPieChart from "devextreme-vue/pie-chart";
-import TransactionFinbookPopup from "../../../components/Popups/TransactionFinbookPopup.vue";
-import adminFinbooksStore from "../../../store/modules/Trading/Finbooks";
+import TransactionFinbookPopup from "../../Trading/Finbook/TransactionFinbookPopup.vue";
+import { computed, inject, onUnmounted, ref, watch } from "vue";
+import { useStore } from "vuex";
+import { useI18n } from "vue-i18n";
 
-export default {
-    components: {
-        DxPieChart,
-        TransactionFinbookPopup,
-    },
-    data() {
-        return {
-            sum: 0,
-        };
-    },
-    beforeCreate() {
-        this.$store.registerModule("Trading.finbooks", adminFinbooksStore);
-    },
-    created() {
-        this.fetch();
-        this.$bus.on("toggleMenu", () => {
-            setTimeout(() => this.pie.render(), 300);
-        });
-    },
-    destroyed() {
-        this.$store.unregisterModule("Trading.finbooks");
-        this.$bus.off("toggleMenu");
-    },
-    computed: {
-        ...mapGetters("Trading.finbooks", ["finbooks"]),
-        pie: function () {
-            return this.$refs.pie.instance;
-        },
-    },
-    watch: {
-        finbooks() {
-            this.sum = this.finbooks.reduce(
-                (accumulator, object) => accumulator + object.balance,
-                0
-            );
-            setTimeout(
-                () =>
-                    this.pie.option(
-                        "title.subtitle.text",
-                        `${this.$t(
-                            "user.overview.finbook.subtitle"
-                        )}: ${this.$options.filters.currency(this.sum)}`
-                    ),
-                0
-            );
-        },
-    },
-    methods: {
-        ...mapActions("Trading.finbooks", ["fetch"]),
-        pointClickHandler({ target: { data } }) {
-            this.$refs.transactionFinbookPopup.show(data);
-        },
-        legendClickHandler(e) {
-            const arg = e.target;
-            const item = e.component.getAllSeries()[0].getPointsByArg(arg)[0];
-            if (item.isVisible()) item.hide();
-            else item.show();
-        },
-        toggleVisibility(item) {
-            item.isVisible() ? item.hide() : item.show();
-        },
-        customizeLabel(pointInfo) {
-            return `${this.$options.filters.currency(pointInfo.valueText)} (${(
-                (pointInfo.valueText / this.sum) *
-                100
-            ).toFixed(1)}%)`;
-        },
-    },
-};
+const store = useStore();
+const { t } = useI18n();
+const filters = inject("filters");
+const bus = inject("bus");
+const pieRef = ref(null);
+const transactionFinbookPopupRef = ref(null);
+const finbooks = computed(() => store.state.tradingFinbook.finbooks);
+let sum = 0;
+
+store.dispatch("tradingFinbook/getFinbook");
+bus.on("toggleMenu", () => {
+    setTimeout(() => pieRef.value.instance.render(), 300);
+});
+
+onUnmounted(() => bus.off("toggleMenu"));
+
+watch(
+    () => store.state.tradingFinbook.finbooks,
+    (value) => {
+        sum = value.reduce(
+            (accumulator, object) => accumulator + object.balance,
+            0
+        );
+        setTimeout(
+            () =>
+                pieRef.value.instance.option(
+                    "title.subtitle.text",
+                    `${t("user.overview.finbook.subtitle", [
+                        filters.currency(sum),
+                    ])}`
+                ),
+            0
+        );
+    }
+);
+
+function pointClickHandler({ target: { data } }) {
+    transactionFinbookPopupRef.value.show(data);
+}
+function legendClickHandler(e) {
+    const arg = e.target;
+    const item = e.component.getAllSeries()[0].getPointsByArg(arg)[0];
+    if (item.isVisible()) item.hide();
+    else item.show();
+}
+function toggleVisibility(item) {
+    item.isVisible() ? item.hide() : item.show();
+}
+function customizeLabel(pointInfo) {
+    return `${filters.currency(pointInfo.valueText)} (${(
+        (pointInfo.valueText / sum) *
+        100
+    ).toFixed(1)}%)`;
+}
 </script>
-<style lang="scss"></style>

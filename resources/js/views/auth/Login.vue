@@ -1,136 +1,122 @@
 <template>
-    <div>
-        <div class="header">
-            <div class="title">{{ $t("auth.login.title") }}</div>
+    <div class="login-form">
+        <div class="user" v-if="!!formData.name">
+            <Photoswipe :images="[formData.avatar]" />
+            <DxDropDownButton
+                :split-button="true"
+                :use-select-mode="false"
+                :items="[
+                    ...loggedinUsers,
+                    { name: $t('auth.login.anotherAccount') },
+                ]"
+                :text="formData.name"
+                display-expr="name"
+                key-expr="username"
+                itemTemplate="itemTemplate"
+                :dropDownOptions="{
+                    minWidth: 260,
+                    wrapperAttr: { class: 'login-users-popup' },
+                }"
+                @item-click="onItemClick"
+            >
+                <template #itemTemplate="{ data }">
+                    <div style="display: flex; align-items: center">
+                        <img
+                            v-if="!!data.avatar"
+                            :alt="$appName"
+                            :src="data.avatar"
+                            style="
+                                width: 30px;
+                                border-radius: 50%;
+                                margin-right: 5px;
+                            "
+                        />
+                        <span style="font-size: 16px; padding: 5px">{{
+                            data.name
+                        }}</span>
+                    </div>
+                </template>
+            </DxDropDownButton>
         </div>
-        <div class="login-form">
-            <div class="user" v-if="!!formData.name">
-                <!-- <Photoswipe
-                    @opened="$mf.pushPhotoswipeToHistoryState"
-                    @close="$mf.popRouteHistoryState"
-                >
-                    <img
-                        class="avatar"
-                        :alt="$appName"
-                        :src="formData.avatar"
-                        v-pswp="formData.avatar"
-                    />
-                </Photoswipe> -->
-                <DxDropDownButton
-                    :split-button="true"
-                    :use-select-mode="false"
-                    :items="[
-                        ...loggedinUsers,
-                        { name: $t('auth.login.anotherAccount') },
-                    ]"
-                    :text="formData.name"
-                    display-expr="name"
-                    key-expr="username"
-                    itemTemplate="itemTemplate"
-                    :dropDownOptions="{
-                        minWidth: 260,
-                        wrapperAttr: { class: 'login-users-popup' },
-                    }"
-                    @item-click="onItemClick"
-                >
-                    <template #itemTemplate="{ data }">
-                        <div style="display: flex; align-items: center">
-                            <img
-                                v-if="!!data.avatar"
-                                :alt="$appName"
-                                :src="data.avatar"
-                                style="
-                                    width: 30px;
-                                    border-radius: 50%;
-                                    margin-right: 5px;
-                                "
-                            />
-                            <span style="font-size: 16px; padding: 5px">{{
-                                data.name
-                            }}</span>
-                        </div>
-                    </template>
-                </DxDropDownButton>
-            </div>
-            <form @submit.prevent="onSubmit">
-                <DxForm ref="form" :form-data="formData" labelMode="floating">
-                    <DxItem
-                        :visible="!formData.name"
-                        data-field="username"
-                        editor-type="dxTextBox"
-                        :validation-rules="validationRules.username"
-                        :label="{ text: $t('models.user.username') }"
-                    />
-                    <DxItem
-                        name="password"
-                        data-field="password"
-                        editor-type="dxTextBox"
-                        :editor-options="{
-                            mode: 'password',
-                            buttons: [
-                                {
-                                    options: {
-                                        icon: 'far fa-eye',
-                                        onClick: viewPasswordClick,
-                                    },
-                                    name: 'btPw',
-                                    location: 'after',
-                                },
-                            ],
-                        }"
-                        :validation-rules="validationRules.password"
-                        :label="{ text: $t('models.user.password') }"
-                    />
-                    <DxItem
-                        data-field="rememberMe"
-                        editor-type="dxCheckBox"
-                        :editor-options="{
-                            text: $t('auth.login.rememberMe'),
-                            elementAttr: { class: 'form-text' },
-                        }"
-                        :label="{ visible: false }"
-                    />
-                    <DxItem
-                        item-type="button"
-                        :button-options="{
-                            width: '100%',
-                            type: 'default',
-                            text: $t('auth.login.submit'),
-                            useSubmitBehavior: true,
-                        }"
-                    />
-                </DxForm>
-            </form>
-            <div class="fingerprint">
-                <DxButton
-                    icon="../../../images/fingerprint.png"
-                    @click="fingerPrintClick"
+        <form @submit.prevent="onSubmit">
+            <DxForm ref="form" :form-data="formData" labelMode="floating">
+                <DxItem
+                    :visible="!formData.name"
+                    data-field="username"
+                    editor-type="dxTextBox"
+                    :validation-rules="validationRules.username"
+                    :label="{ text: $t('models.user.username') }"
                 />
-            </div>
-            <DxForm>
-                <DxItem>
-                    <template #default>
-                        <div class="link">
-                            <RouterLink :to="{ name: 'reset-password' }">{{
-                                $t("auth.login.forgotPassword")
-                            }}</RouterLink>
-                        </div>
-                    </template>
-                </DxItem>
-                <DxItem>
-                    <template #default>
-                        <div class="create-account">
-                            <span>{{ $t("auth.login.haveNotAccount") }}</span>
-                            <span class="link">
-                                <RouterLink :to="{ name: 'create-account' }">{{
-                                    $t("auth.login.createAccount")
-                                }}</RouterLink>
-                            </span>
-                        </div>
-                    </template>
-                </DxItem>
+                <DxItem
+                    name="password"
+                    data-field="password"
+                    editor-type="dxTextBox"
+                    :editor-options="{
+                        mode: 'password',
+                        buttons: [
+                            {
+                                options: {
+                                    icon: 'far fa-eye',
+                                    onClick: viewPasswordClick,
+                                },
+                                name: 'btPw',
+                                location: 'after',
+                            },
+                        ],
+                    }"
+                    :validation-rules="validationRules.password"
+                    :label="{ text: $t('models.user.password') }"
+                />
+                <DxItem
+                    data-field="rememberMe"
+                    editor-type="dxCheckBox"
+                    :editor-options="{
+                        text: $t('auth.login.rememberMe'),
+                        elementAttr: { class: 'form-text' },
+                    }"
+                    :label="{ visible: false }"
+                />
+                <DxItem
+                    item-type="button"
+                    :button-options="{
+                        width: '100%',
+                        type: 'default',
+                        text: $t('auth.login.submit'),
+                        useSubmitBehavior: true,
+                    }"
+                />
             </DxForm>
+        </form>
+        <div class="fingerprint">
+            <DxButton
+                icon="../../../images/fingerprint.png"
+                @click="fingerPrintClick"
+            />
         </div>
+        <DxForm>
+            <DxItem>
+                <template #default>
+                    <div class="link">
+                        <RouterLink :to="{ name: 'reset-password' }">{{
+                            $t("auth.login.forgotPassword")
+                        }}</RouterLink>
+                    </div>
+                </template>
+            </DxItem>
+            <DxItem>
+                <template #default>
+                    <div class="create-account">
+                        <span>{{ $t("auth.login.haveNotAccount") }}</span>
+                        &nbsp;
+                        <span class="link">
+                            <RouterLink :to="{ name: 'create-account' }">{{
+                                $t("auth.login.createAccount")
+                            }}</RouterLink>
+                        </span>
+                    </div>
+                </template>
+            </DxItem>
+        </DxForm>
     </div>
 </template>
 
@@ -138,12 +124,17 @@
 import { mapGetters, mapActions } from "vuex";
 import DxForm, { DxItem } from "devextreme-vue/form";
 import DxDropDownButton from "devextreme-vue/drop-down-button";
+import Photoswipe from "../../components/Photoswipe.vue";
+import { toast } from "vue3-toastify";
+import { useCookies } from "vue3-cookies";
+const { cookies } = useCookies();
 
 export default {
     components: {
         DxForm,
         DxItem,
         DxDropDownButton,
+        Photoswipe,
     },
     data() {
         return {
@@ -177,8 +168,10 @@ export default {
         };
     },
     created() {
-        // this.$cookies.remove(this.$mc.LOGGEDIN_USERS_COOKIE_NAME);
+        // toast.success(this.$t("messages.warning.unregisteredFingerPrint"));
+        // cookies.remove(this.$mc.LOGGEDIN_USERS_COOKIE_NAME);
         this.loggedinUsers = this.getLoggedinUsersCookie();
+        console.log("loggedinUsers", this.loggedinUsers);
         if (this.loggedinUsers.length > 0) {
             this.loggedinUsers.reverse();
             this.formData = { ...this.formData, ...this.loggedinUsers[0] };
@@ -204,7 +197,7 @@ export default {
         },
     },
     methods: {
-        ...mapActions("Auth", ["login", "setState", "loginWebAuthn"]),
+        ...mapActions("auth", ["login", "loginWebAuthn"]),
         onSubmit() {
             this.login(this.formData).then(({ isOk, isMaintenance, user }) =>
                 this.responseProcess(isOk, isMaintenance, user)
@@ -217,21 +210,18 @@ export default {
                     ? "email"
                     : "phone";
                 param[username] = this.formData.username;
-                param.username = username;
-                param.routeAction = "assert";
+                // param.username = username;
+                // param.routeAction = "assert";
                 this.loginWebAuthn(param)
                     .then(({ isOk, isMaintenance, user }) =>
                         this.responseProcess(isOk, isMaintenance, user)
                     )
                     .catch(() =>
-                        this.$toasted.show(
+                        toast.show(
                             this.$t("messages.warning.unregisteredFingerPrint")
                         )
                     );
-            } else
-                this.$toasted.show(
-                    this.$t("messages.warning.fingerUsernameEmpty")
-                );
+            } else toast.show(this.$t("messages.warning.fingerUsernameEmpty"));
         },
         responseProcess(isOk, isMaintenance, user) {
             if (isOk) {
@@ -276,8 +266,8 @@ export default {
             this.passwordMode = !this.passwordMode;
         },
         getLoggedinUsersCookie() {
-            return this.$cookies.isKey(this.$mc.LOGGEDIN_USERS_COOKIE_NAME)
-                ? this.$cookies.get(this.$mc.LOGGEDIN_USERS_COOKIE_NAME)
+            return cookies.isKey(this.$mc.LOGGEDIN_USERS_COOKIE_NAME)
+                ? JSON.parse(cookies.get(this.$mc.LOGGEDIN_USERS_COOKIE_NAME))
                 : [];
         },
         setLoggedinUsersCookie(user) {
@@ -285,7 +275,11 @@ export default {
             users = users.filter((item) => item.username != user.username);
             users.push(user);
             users = users.slice(-5);
-            this.$cookies.set(this.$mc.LOGGEDIN_USERS_COOKIE_NAME, users, "1y");
+            cookies.set(
+                this.$mc.LOGGEDIN_USERS_COOKIE_NAME,
+                JSON.stringify(users),
+                "1y"
+            );
         },
         onItemClick(e) {
             if (!!e.itemData.username) {
@@ -317,7 +311,7 @@ export default {
         align-items: center;
         margin-bottom: 20px;
 
-        .avatar {
+        img {
             width: 50px;
             margin-bottom: 10px;
             border-radius: 50%;
@@ -380,8 +374,6 @@ export default {
             .dx-icon {
                 width: 55px;
                 height: 55px;
-                margin-top: -5px;
-                margin-left: -5px;
             }
         }
     }

@@ -17,7 +17,7 @@ class PushSubscriptionService extends CoreService
      * @param $request
      * 
      */
-    public function update($request)
+    public function subscribe($request)
     {
         $request->user()->updatePushSubscription(
             $request->endpoint,
@@ -32,7 +32,7 @@ class PushSubscriptionService extends CoreService
      * @param $request
      * 
      */
-    public function destroy($request)
+    public function unsubscribe($request)
     {
         $request->user()->deletePushSubscription($request->endpoint);
     }

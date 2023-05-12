@@ -1,6 +1,6 @@
-import i18n from "../plugins/i18n";
+import lang from "../lang";
 export default function percentInterestRate(value) {
-    const frequency = i18n.t("models.contract.frequency");
+    const frequency = lang.global.t("models.contract.frequency");
     let ret = "";
     if (!value) ret = "0";
     else ret = value * 100 + "";

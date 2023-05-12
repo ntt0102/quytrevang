@@ -138,7 +138,7 @@
 import { mapGetters, mapActions } from "vuex";
 import DxForm, { DxItem } from "devextreme-vue/form";
 import PickImagePopup from "../../components/Popups/PickImagePopup.vue";
-import adminSettingsStore from "../../store/modules/Settings";
+import adminSettingsStore from "../../store/modules/Setting";
 
 export default {
     components: {

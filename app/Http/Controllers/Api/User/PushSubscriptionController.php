@@ -22,9 +22,9 @@ class PushSubscriptionController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request)
+    public function subscribe(Request $request)
     {
-        $this->pushSubscriptionService->update($request);
+        $this->pushSubscriptionService->subscribe($request);
         return $this->sendResponse();
     }
 
@@ -35,9 +35,9 @@ class PushSubscriptionController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Request $request)
+    public function unsubscribe(Request $request)
     {
-        $this->pushSubscriptionService->destroy($request);
+        $this->pushSubscriptionService->unsubscribe($request);
         return $this->sendResponse();
     }
 }

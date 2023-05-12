@@ -1,9 +1,7 @@
 <template>
-    <DxPopup
-        ref="popup"
-        :showCloseButton="true"
-        :fullScreen="$devices.phone ? true : false"
-        :show-title="true"
+    <CorePopup
+        ref="popupRef"
+        class="sent-comment-popup"
         :title="$t('components.sendComment.title')"
         :toolbarItems="[
             {
@@ -12,7 +10,8 @@
                 widget: 'dxButton',
                 options: {
                     text: $t('buttons.send'),
-                    onClick: () => form.getButton('submit').element().click(),
+                    onClick: () =>
+                        formRef.instance.getButton('submit').element().click(),
                 },
             },
             {
@@ -21,278 +20,266 @@
                 widget: 'dxButton',
                 options: {
                     text: $t('buttons.cancel'),
-                    onClick: () => popup.hide(),
+                    onClick: () => popupRef.hide(),
                 },
             },
         ]"
-        @hiding="onHiding"
+        @shown="onShown"
+        @hidden="onHidden"
     >
-        <template #content>
-            <form class="sent-comment-popup" @submit.prevent="onSubmit">
-                <DxForm
-                    ref="form"
-                    :form-data="formData"
-                    :label-location="$devices.phone ? 'top' : 'left'"
-                    :scrolling-enabled="true"
-                >
-                    <DxItem
-                        :visible="!isLoggedin"
-                        data-field="name"
-                        :validation-rules="
-                            !isLoggedin ? validationRules.name : null
-                        "
-                        :label="{ text: $t('components.sendComment.name') }"
-                    />
-                    <DxItem
-                        :visible="!isLoggedin"
-                        data-field="phone"
-                        :editorOptions="{
-                            mask: '0000.000.000',
-                        }"
-                        :validation-rules="
-                            !isLoggedin ? validationRules.phone : null
-                        "
-                        :label="{ text: $t('components.sendComment.phone') }"
-                    />
-                    <DxItem
-                        data-field="subject"
-                        :validation-rules="validationRules.subject"
-                        :label="{ text: $t('components.sendComment.subject') }"
-                    />
-                    <DxItem
-                        data-field="content"
-                        editor-type="dxTextArea"
-                        :editor-options="{ height: 150 }"
-                        :validation-rules="validationRules.content"
-                        :label="{ text: $t('components.sendComment.content') }"
-                    />
-                    <DxItem>
-                        <template #default>
-                            <div>
-                                <div class="upload-browser">
-                                    <input
-                                        ref="file"
-                                        type="file"
-                                        id="file"
-                                        multiple="multiple"
-                                        accept="images/*"
-                                        @change="onFileChange"
+        <DxScrollView>
+            <div>
+                <form @submit.prevent="onSubmit">
+                    <DxForm
+                        ref="formRef"
+                        :form-data="state.formData"
+                        :label-location="$devices.phone ? 'top' : 'left'"
+                        :scrolling-enabled="true"
+                    >
+                        <DxItem
+                            :visible="!userCode"
+                            data-field="name"
+                            :validation-rules="
+                                !userCode ? state.validationRules.name : null
+                            "
+                            :label="{ text: $t('components.sendComment.name') }"
+                        />
+                        <DxItem
+                            :visible="!userCode"
+                            data-field="phone"
+                            :editorOptions="{
+                                mask: '0000.000.000',
+                            }"
+                            :validation-rules="
+                                !userCode ? state.validationRules.phone : null
+                            "
+                            :label="{
+                                text: $t('components.sendComment.phone'),
+                            }"
+                        />
+                        <DxItem
+                            data-field="subject"
+                            :validation-rules="state.validationRules.subject"
+                            :label="{
+                                text: $t('components.sendComment.subject'),
+                            }"
+                        />
+                        <DxItem
+                            data-field="content"
+                            editor-type="dxTextArea"
+                            :editor-options="{ height: 150 }"
+                            :validation-rules="state.validationRules.content"
+                            :label="{
+                                text: $t('components.sendComment.content'),
+                            }"
+                        />
+                        <DxItem :visible="!userCode">
+                            <template #default>
+                                <div class="recaptcha-container">
+                                    <VueRecaptcha
+                                        ref="vueRecaptchaRef"
+                                        theme="dark"
+                                        :size="
+                                            $devices.phone
+                                                ? 'compact'
+                                                : 'normal'
+                                        "
+                                        @verify="onVerify"
+                                        @expired="onExpired"
+                                        :sitekey="state.siteKey"
                                     />
-                                    <label for="file"
-                                        ><i class="far fa-file-upload"></i>
-                                        {{
-                                            $t(
-                                                "components.sendComment.chooseFile"
-                                            )
-                                        }}</label
-                                    >
-                                    <span v-if="formData.files.length">{{
-                                        $t(
-                                            "components.sendComment.fileCounter"
-                                        ).replace(
-                                            "{count}",
-                                            formData.files.length
-                                        )
-                                    }}</span>
                                 </div>
-                                <Photoswipe v-if="formData.files.length">
-                                    <div
-                                        v-for="(url, index) in formData.files"
-                                        :key="index"
-                                    >
-                                        <img
-                                            :src="url"
-                                            v-pswp="url"
-                                            :alt="$appName"
+                            </template>
+                        </DxItem>
+                        <DxItem>
+                            <template #default>
+                                <div>
+                                    <div class="upload-browser">
+                                        <input
+                                            ref="fileRef"
+                                            type="file"
+                                            id="file"
+                                            multiple="multiple"
+                                            accept="images/*"
+                                            @change="onFileChange"
                                         />
+                                        <label for="file"
+                                            ><i class="far fa-file-upload"></i>
+                                            {{
+                                                $t(
+                                                    "components.sendComment.chooseFile"
+                                                )
+                                            }}</label
+                                        >
+                                        <span
+                                            v-if="state.pictureItems.length"
+                                            >{{
+                                                $t(
+                                                    "components.sendComment.fileCounter",
+                                                    [state.pictureItems.length]
+                                                )
+                                            }}</span
+                                        >
                                     </div>
-                                </Photoswipe>
-                            </div>
-                        </template>
-                    </DxItem>
-                    <DxItem :visible="!isLoggedin">
-                        <template #default>
-                            <div class="recaptcha-container">
-                                <VueRecaptcha
-                                    ref="recaptcha"
-                                    theme="dark"
-                                    :size="
-                                        $devices.phone ? 'compact' : 'normal'
-                                    "
-                                    @verify="onVerify"
-                                    @expired="onExpired"
-                                    :sitekey="siteKey"
-                                />
-                            </div>
-                        </template>
-                    </DxItem>
-                    <DxItem
-                        name="submit"
-                        cssClass="display-none"
-                        item-type="button"
-                        :button-options="{
-                            useSubmitBehavior: true,
-                        }"
-                    />
-                </DxForm>
-            </form>
-        </template>
-    </DxPopup>
+                                </div>
+                            </template>
+                        </DxItem>
+                        <DxItem
+                            name="submit"
+                            cssClass="display-none"
+                            item-type="button"
+                            :button-options="{
+                                useSubmitBehavior: true,
+                            }"
+                        />
+                    </DxForm>
+                    <Photoswipe :images="state.pictureItems" />
+                </form>
+            </div>
+        </DxScrollView>
+    </CorePopup>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import { DxForm, DxItem } from "devextreme-vue/form";
-import DxTextBox from "devextreme-vue/text-box";
 import DxTextArea from "devextreme-vue/text-area";
-import DxValidator from "devextreme-vue/validator";
-import VueRecaptcha from "vue-recaptcha";
+import VueRecaptcha from "vue3-recaptcha2";
+import CorePopup from "./CorePopup.vue";
+import Photoswipe from "../Photoswipe.vue";
+import { inject, ref, reactive, onMounted, onUnmounted, computed } from "vue";
+import { useStore } from "vuex";
+import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
+import { toast } from "vue3-toastify";
 
-export default {
-    components: {
-        DxForm,
-        DxItem,
-        DxTextBox,
-        DxTextArea,
-        DxValidator,
-        VueRecaptcha,
-    },
-    data() {
-        return {
-            formData: {},
-            siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY,
-            isReCaptchaVerified: false,
-            validationRules: {
-                name: [
-                    {
-                        type: "required",
-                        message:
-                            this.$t("components.sendComment.name") +
-                            this.$mt.validations.required,
-                    },
-                ],
-                phone: [
-                    {
-                        type: "required",
-                        message:
-                            this.$t("components.sendComment.phone") +
-                            this.$mt.validations.required,
-                    },
-                ],
-                subject: [
-                    {
-                        type: "required",
-                        message:
-                            this.$t("components.sendComment.subject") +
-                            this.$mt.validations.required,
-                    },
-                ],
-                content: [
-                    {
-                        type: "required",
-                        message:
-                            this.$t("components.sendComment.content") +
-                            this.$mt.validations.required,
-                    },
-                ],
+const store = useStore();
+const route = useRoute();
+const { t } = useI18n();
+const bus = inject("bus");
+const mt = inject("mt");
+const mc = inject("mc");
+const mf = inject("mf");
+const popupRef = ref(null);
+const formRef = ref(null);
+const fileRef = ref(null);
+const vueRecaptchaRef = ref(null);
+const state = reactive({
+    formData: {},
+    pictureItems: [],
+    siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY,
+    validationRules: {
+        name: [
+            {
+                type: "required",
+                message:
+                    t("components.sendComment.name") + mt.validations.required,
             },
-        };
+        ],
+        phone: [
+            {
+                type: "required",
+                message:
+                    t("components.sendComment.phone") + mt.validations.required,
+            },
+        ],
+        subject: [
+            {
+                type: "required",
+                message:
+                    t("components.sendComment.subject") +
+                    mt.validations.required,
+            },
+        ],
+        content: [
+            {
+                type: "required",
+                message:
+                    t("components.sendComment.content") +
+                    mt.validations.required,
+            },
+        ],
     },
-    created() {
-        this.initFormData();
-    },
-    mounted() {
-        this.$mf.includeScript("on", {
-            src: "https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit",
-            id: "recaptcha",
+});
+const userCode = computed(() => store.state.auth.user.code);
+let isReCaptchaVerified = false;
+initFormData();
+
+onMounted(() => {
+    mf.includeScript("on", {
+        src: "https://www.google.com/recaptcha/api.js?onload=vueRecaptchaApiLoaded&render=explicit",
+        id: "recaptcha",
+    });
+});
+
+onUnmounted(() => {
+    mf.includeScript("off", "recaptcha");
+});
+
+function show() {
+    popupRef.value.show();
+}
+async function onSubmit() {
+    if (isReCaptchaVerified) {
+        let formData = new FormData();
+        for (var key in state.formData) {
+            formData.append(key, state.formData[key]);
+        }
+        for (var i = 0; i < fileRef.value.files.length; i++) {
+            let file = await mf.resizeImage({
+                file: fileRef.value.files[i],
+                maxSize: mc.MAX_SIZE_IMAGE_UPLOAD,
+            });
+            formData.append(`files[${i}]`, file);
+        }
+        store.dispatch("sendComment", formData).then((isOk) => {
+            if (isOk) {
+                popupRef.value.hide();
+                if (route.name == "comments")
+                    store.dispatch("adminComment/getComments");
+            }
         });
-    },
-    destroyed() {
-        this.$mf.includeScript("off", "recaptcha");
-    },
-    computed: {
-        ...mapGetters("Auth", ["isLoggedin", "code"]),
-        popup() {
-            return this.$refs.popup.instance;
-        },
-        form() {
-            return this.$refs.form.instance;
-        },
-    },
-    methods: {
-        ...mapActions(["sendComment"]),
-        ...mapActions("Admin.comments", ["fetch"]),
-        show() {
-            this.popup.show();
-            if (this.isLoggedin) {
-                this.formData.userCode = this.code;
-                this.isReCaptchaVerified = true;
-            }
-            setTimeout(
-                () =>
-                    this.form
-                        .getEditor(this.isLoggedin ? "subject" : "name")
-                        .focus(),
-                1000
-            );
-            this.$mf.pushPopupToHistoryState(() => this.popup.hide());
-        },
-        async onSubmit() {
-            if (this.isReCaptchaVerified) {
-                let formData = new FormData();
-                for (var key in this.formData) {
-                    formData.append(key, this.formData[key]);
-                }
-                for (var i = 0; i < this.$refs.file.files.length; i++) {
-                    let file = await this.$mf.resizeImage({
-                        file: this.$refs.file.files[i],
-                        maxSize: this.$mc.MAX_SIZE_IMAGE_UPLOAD,
-                    });
-                    formData.append(`files[${i}]`, file);
-                }
-                this.sendComment(formData).then((isOk) => {
-                    if (isOk) {
-                        this.popup.hide();
-                        if (this.$route.name == "comments") this.fetch();
-                    }
-                });
-            } else
-                this.$toasted.show(
-                    this.$t("messages.warning.unVerifiedReCaptcha")
-                );
-        },
-        onHiding() {
-            this.initFormData();
-            this.$mf.popRouteHistoryState();
-        },
-        onFileChange(e) {
-            this.formData.files = [];
-            for (var i = 0; i < e.target.files.length; i++) {
-                this.formData.files.push(
-                    URL.createObjectURL(e.target.files[i])
-                );
-            }
-        },
-        initFormData() {
-            this.formData = {
-                userCode: 0,
-                name: "",
-                phone: "",
-                subject: "",
-                content: "",
-                files: [],
-            };
-            this.isReCaptchaVerified = false;
-        },
-        onVerify: function (response) {
-            this.isReCaptchaVerified = true;
-        },
-        onExpired: function () {
-            this.isReCaptchaVerified = false;
-        },
-    },
-};
+    } else toast.show(t("messages.warning.unVerifiedReCaptcha"));
+}
+function onFileChange(e) {
+    state.pictureItems = [];
+    for (var i = 0; i < e.target.files.length; i++) {
+        state.pictureItems.push(URL.createObjectURL(e.target.files[i]));
+    }
+}
+function initFormData() {
+    state.formData = {
+        userCode: 0,
+        name: "",
+        phone: "",
+        subject: "",
+        content: "",
+        files: [],
+    };
+    isReCaptchaVerified = false;
+}
+function onVerify() {
+    isReCaptchaVerified = true;
+}
+function onExpired() {
+    isReCaptchaVerified = false;
+    vueRecaptchaRef.reset();
+}
+
+function onShown() {
+    if (!!userCode.value) {
+        state.formData.userCode = userCode.value;
+        isReCaptchaVerified = true;
+    }
+    formRef.value.instance
+        .getEditor(!!userCode.value ? "subject" : "name")
+        .focus();
+}
+function onHidden() {
+    initFormData();
+}
+
+defineExpose({ show });
 </script>
-<
+
 <style lang="scss">
 .sent-comment-popup {
     .dx-field-label {

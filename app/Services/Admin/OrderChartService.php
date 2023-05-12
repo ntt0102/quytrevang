@@ -10,7 +10,7 @@ use App\Services\Special\VpsOrderService;
 use App\Jobs\OrderVpsJob;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\UpdatedTradesNotification;
-use App\Events\UpdateTradeEvent;
+use App\Events\UpdateStatisticEvent;
 
 class OrderChartService extends CoreService
 {
@@ -273,7 +273,7 @@ class OrderChartService extends CoreService
                     "date" => date_create()->format('Y-m-d'),
                 ]);
                 if (!$trade) return false;
-                event(new UpdateTradeEvent());
+                event(new UpdateStatisticEvent());
             }
         );
     }

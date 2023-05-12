@@ -1,5 +1,5 @@
-import Vue from "vue";
-import i18n from "../plugins/i18n";
+import constants from "../properties/constants";
+import lang from "../lang";
 export default function formatDate(value, isFull = false) {
     let ret = "";
     if (!value) ret = "";
@@ -8,8 +8,8 @@ export default function formatDate(value, isFull = false) {
         if (momentDate.isValid())
             ret = momentDate.format(
                 isFull
-                    ? i18n.t("titles.dateFullFormat")
-                    : Vue.prototype.$mc.DATE_FORMAT
+                    ? lang.global.t("titles.dateFullFormat")
+                    : constants.DATE_FORMAT
             );
         else ret = value;
     }

@@ -1,1 +1,0 @@
-start chrome --disable-web-security --user-data-dir="%CD%/Temp" "file:///%CD%/signalr.html"

@@ -101,7 +101,7 @@
 <script>
 import { mapGetters, mapActions } from "vuex";
 import DxForm, { DxItem } from "devextreme-vue/form";
-import VueRecaptcha from "vue-recaptcha";
+import VueRecaptcha from "vue3-recaptcha2";
 
 export default {
     components: {

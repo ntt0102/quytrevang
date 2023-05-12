@@ -1,102 +1,69 @@
-import Vue from "vue";
-import VueRouter from "vue-router";
+// import auth from "../auth";
+import { getCurrentInstance } from "vue";
+import { createRouter, createWebHistory } from "vue-router";
 import routes from "./routes";
 import store from "../store";
 
-const originalPush = VueRouter.prototype.push;
-VueRouter.prototype.push = function push(location) {
-    return originalPush.call(this, location).catch(err => err);
-};
+const vm = getCurrentInstance();
+const router = createRouter({
+    history: createWebHistory(),
+    routes: routes,
+});
 
-Vue.use(VueRouter);
+// router.beforeEach((to, from, next) => {
+//     if (to.name === "login-form" && auth.loggedIn()) {
+//         next({ name: "home" });
+//     }
 
-let router = make(routes({ authGuard, guestGuard }));
+//     if (to.matched.some((record) => record.meta.requiresAuth)) {
+//         if (!auth.loggedIn()) {
+//             next({
+//                 name: "login-form",
+//                 query: { redirect: to.fullPath },
+//             });
+//         } else {
+//             next();
+//         }
+//     } else {
+//         next();
+//     }
+// });
+
+// Register before guard.
+router.beforeEach(async (to, from, next) => {
+    await store.dispatch("auth/check");
+    //
+    let nextRoute = {};
+    const isLoggedin = store.state.auth.user.code;
+    console.log("isLoggedin: ", isLoggedin);
+    console.log("to: ", to);
+    if (to.name != "policy") {
+        if (isLoggedin) {
+            const permissions = store.state.auth.user.permissions;
+            if (
+                (!!to.meta.permission &&
+                    !permissions.includes(to.meta.permission)) ||
+                !to.meta.auth
+            )
+                nextRoute.name = "overview";
+        } else if (to.meta.auth)
+            nextRoute = {
+                name: "login",
+                query: {
+                    ...{ redirect: to.name },
+                    ...to.query,
+                },
+                hash: to.hash,
+            };
+    }
+    console.log("nextRoute: ", nextRoute);
+    if (Object.keys(nextRoute).length === 0) next();
+    else next(nextRoute);
+});
+
+// Register after hook.
+router.afterEach((to, from) => {
+    document.title = to.meta.title || vm.proxy.$appName;
+});
+
 export default router;
-
-function make(routes) {
-    const router = new VueRouter({
-        routes,
-        scrollBehavior,
-        mode: "history"
-    });
-
-    // Register before guard.
-    router.beforeEach(async (to, from, next) => {
-        await store.dispatch("Auth/fetch");
-        //
-        let nextRoute = {};
-        const isLoggedin = store.getters["Auth/isLoggedin"];
-        if (to.name != "policy") {
-            if (isLoggedin) {
-                const permissions = store.getters["Auth/permissions"];
-                if (
-                    (!!to.meta.permission &&
-                        !permissions.includes(to.meta.permission)) ||
-                    !to.matched[0].meta.auth
-                )
-                    nextRoute.name = "overview";
-            } else if (to.matched[0].meta.auth)
-                nextRoute = {
-                    name: "login",
-                    query: {
-                        ...{ redirect: to.name },
-                        ...to.query
-                    },
-                    hash: to.hash
-                };
-        }
-        if (Object.keys(nextRoute).length === 0) next();
-        else router.push(nextRoute);
-    });
-
-    // Register after hook.
-    router.afterEach((to, from) => {
-        router.app.$nextTick(() => {
-            // router.app.$loading.finish()
-            document.title = to.meta.title || Vue.prototype.$appName;
-        });
-    });
-
-    return router;
-}
-
-function authGuard(routes) {
-    return beforeEnter(routes, (to, from, next) => {
-        next();
-    });
-}
-
-function guestGuard(routes) {
-    return beforeEnter(routes, (to, from, next) => {
-        next();
-    });
-}
-
-function beforeEnter(routes, beforeEnter) {
-    return routes.map(route => {
-        return { ...route, beforeEnter };
-    });
-}
-
-function scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-        return savedPosition;
-    }
-
-    if (to.hash) {
-        return new Promise((resolve, reject) => {
-            setTimeout(
-                () =>
-                    resolve({
-                        selector: to.hash,
-                        behavior: "smooth"
-                    }),
-                500
-            );
-        });
-    }
-
-    if (to.matched.some(m => m.meta.scrollToTop)) {
-        return { x: 0, y: 0 };
-    }
-}

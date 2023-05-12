@@ -47,9 +47,8 @@ class EventBus {
 }
 
 export default {
-    install(Vue) {
+    install(app) {
         const bus = new EventBus();
-
-        Vue.prototype.$bus = bus;
-    }
+        app.config.globalProperties.$bus = bus;
+    },
 };

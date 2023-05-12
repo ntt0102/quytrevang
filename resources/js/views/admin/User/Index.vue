@@ -462,7 +462,7 @@ import ListTagBox from "../../../components/ListTagBox.vue";
 import DeletedUsersPopup from "./DeletedUsersPopup.vue";
 import ConfirmUserPopup from "./ConfirmUserPopup.vue";
 import UserDetailPopup from "../../../components/Popups/UserDetailPopup.vue";
-import adminUsersStore from "../../../store/modules/Admin/Users";
+import adminUsersStore from "../../../store/modules/Admin/User";
 
 export default {
     components: {

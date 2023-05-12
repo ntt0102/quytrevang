@@ -11,12 +11,9 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Spatie\Activitylog\Traits\LogsActivity;
-use Laragear\WebAuthn\Contracts\WebAuthnAuthenticatable;
-use Laragear\WebAuthn\WebAuthnAuthentication;
 use App\Notifications\ResetPasswordNotification;
 
 class User extends Authenticatable implements MustVerifyEmail
-//, WebAuthnAuthenticatable
 {
     use Notifiable;
     use HasFactory;
@@ -25,7 +22,6 @@ class User extends Authenticatable implements MustVerifyEmail
     use SoftDeletes;
     use HasPushSubscriptions;
     // use LogsActivity;
-    // use WebAuthnAuthentication;
 
     protected $guard_name = 'api';
 

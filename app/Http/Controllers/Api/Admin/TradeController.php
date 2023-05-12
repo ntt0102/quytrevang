@@ -66,4 +66,17 @@ class TradeController extends CoreController
         $data = $this->tradeService->save($this->decrypt($request));
         return $this->sendResponse($this->encrypt($data));
     }
+
+    /**
+     * validate Duplicate Date
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function validateDuplicateDate(Request $request)
+    {
+        $data = $this->tradeService->validateDuplicateDate($this->decrypt($request));
+        return $this->sendResponse($this->encrypt($data));
+    }
 }

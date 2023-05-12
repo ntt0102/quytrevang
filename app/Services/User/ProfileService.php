@@ -128,10 +128,11 @@ class ProfileService extends CoreService
             $imageData = base64_decode($img);
             $filename = md5(time()) . '.png';
             if (Storage::put($path . $filename, $imageData)) {
-                $isOk = $this->userRepository->update($user, ['avatar' => $filename]);
+                $isOk = $user->update(['avatar' => $filename]);
                 return [
                     'isOk' => $isOk,
                     'avatar' => $request->user()->url_avatar,
+                    'filename' => $filename
                 ];
             }
             return ['isOk' => false];

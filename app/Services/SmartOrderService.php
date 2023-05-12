@@ -11,7 +11,7 @@ use App\Repositories\TradeRepository;
 use App\Repositories\SmartOrderRepository;
 use App\Repositories\SoPlanRepository;
 use App\Repositories\SoOrderRepository;
-use App\Events\UpdateTradeEvent;
+use App\Events\UpdateStatisticEvent;
 
 class SmartOrderService extends CoreService
 {
@@ -259,7 +259,7 @@ class SmartOrderService extends CoreService
                             number_format($request->fees, 0, ",", ".") . ' ₫'
                         )
                     );
-                    event(new UpdateTradeEvent());
+                    event(new UpdateStatisticEvent());
                 }
                 return ['isOk' => $isOk, 'isExecuted' => true, 'data' => $request];
             }

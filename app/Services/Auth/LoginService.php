@@ -6,12 +6,15 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Foundation\Application;
-use Laragear\WebAuthn\Facades\WebAuthn;
-// use Laragear\WebAuthn\Http\WebAuthnRules;
+use Illuminate\Support\Arr;
+use App\Models\User;
+use Rawilk\Webauthn\Actions\PrepareKeyCreationData;
+use Rawilk\Webauthn\Actions\RegisterNewKeyAction;
+use Rawilk\Webauthn\Actions\PrepareAssertionData;
+use Rawilk\Webauthn\Facades\Webauthn;
 
 class LoginService
 {
-    // use WebAuthnRules;
 
     private $userRepository;
     private $isMaintenance;
@@ -84,18 +87,21 @@ class LoginService
      */
     public function loginWebAuthn($request)
     {
+        $username  = $request->username;
+        $fieldName = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+        $user = User::where($fieldName, $username)->first();
         switch ($request->routeAction) {
             case 'assert':
-                $user = $this->userRepository->findOne([[$request->username, $request->input($request->username)]]);
-                try {
-                    return WebAuthn::generateAssertion($user);
-                } catch (\Throwable $th) {
-                    return 'Lỗi';
-                }
+                return json_encode(app(PrepareAssertionData::class)($user));
                 break;
             case 'verify':
-                if (!$request->id) return ['isOk' => false];
-                $user = $this->userRepository->getFromCredentialId($request->id);
+                $valid = Webauthn::validateAssertion($user, Arr::only($request->all(), [
+                    'id',
+                    'rawId',
+                    'response',
+                    'type',
+                ]));
+                if (!$valid) return ['isOk' => false];
                 return $this->createToken($user);
                 break;
         }
@@ -113,17 +119,19 @@ class LoginService
         $user = $request->user();
         switch ($request->routeAction) {
             case 'attest':
-                return WebAuthn::generateAttestation($user);
+                return json_encode(app(PrepareKeyCreationData::class)($user));
                 break;
             case 'verify':
-                $credential = WebAuthn::validateAttestation(
-                    $request->all(),
-                    $user
-                );
-                if (!$credential) return ['isOk' => false];
-                $user->flushCredentials();
-                $user->addCredential($credential);
-                return ['isOk' => true];
+                try {
+                    app(RegisterNewKeyAction::class)(
+                        $user,
+                        Arr::only($request->all(), ['id', 'rawId', 'response', 'type']),
+                        'keyName',
+                    );
+                    return ['isOk' => true];
+                } catch (\Rawilk\Webauthn\Exceptions\WebauthnRegisterException $e) {
+                    return ['isOk' => false, 'message' => $e->getMessage()];
+                }
 
                 break;
         }
@@ -141,13 +149,17 @@ class LoginService
         $user = $request->user();
         switch ($request->routeAction) {
             case 'assert':
-                return WebAuthn::generateAssertion($user);
+                return json_encode(app(PrepareAssertionData::class)($user));
                 break;
             case 'verify':
-                if (!$request->id) return ['isOk' => false];
-                if ($user->hasCredential($request->id))
-                    return ['isOk' => true, 'message' => null];
-                return ['isOk' => false, 'message' => 'checkPinFail'];
+                $valid = Webauthn::validateAssertion($user, Arr::only($request->all(), [
+                    'id',
+                    'rawId',
+                    'response',
+                    'type',
+                ]));
+                if (!$valid) return ['isOk' => false, 'message' => 'checkPinFail'];
+                return ['isOk' => true];
                 break;
         }
     }
@@ -160,7 +172,7 @@ class LoginService
      */
     private function createToken($user, $remember = false)
     {
-        $tokenResult = $this->userRepository->createToken($user);
+        $tokenResult = $user->createToken(config('app.name'));
         $token = $tokenResult->token;
         if ($remember)
             $token->expires_at = date_create()->modify('+7 days');
@@ -184,7 +196,7 @@ class LoginService
      */
     public function logout($request)
     {
-        $this->userRepository->revokeToken($request->user());
+        $request->user()->token()->revoke();
     }
 
     /**
@@ -195,38 +207,6 @@ class LoginService
     public function user()
     {
         return $this->userRepository->getAuthUser(request()->user());
-    }
-
-    /**
-     * Get the authenticated smart order user
-     * 
-     * @return object $user
-     */
-    public function smartOrderUser($request)
-    {
-        $user = request()->user();
-        $so = $user->smartOrder;
-        if (!$so->validDevice($request->deviceId)) return ['isOk' => false];
-        //
-        if (!in_array($request->vpsAccount, $so->vps_accounts)) {
-            $vpsAccounts = $so->vps_accounts;
-            $vpsAccounts[] = $request->vpsAccount;
-            app(\App\Repositories\SmartOrderRepository::class)->update(
-                $so,
-                ['vps_accounts' => $vpsAccounts]
-            );
-        }
-        //
-        if (!$so->validCopyTrade()) {
-            app(\App\Repositories\SmartOrderRepository::class)->update(
-                $so,
-                ['copy_trade' => false]
-            );
-        }
-        return [
-            'isOk' => true,
-            'user' => $this->userRepository->getAuthUser($user),
-        ];
     }
 
     /**

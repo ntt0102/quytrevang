@@ -14,7 +14,7 @@
                         summary.day >= 0 ? 'up' : 'down'
                     }`"
                 ></i>
-                {{ day | numberVnFormat(1) }}%
+                {{ $filters.numberVnFormat(state.day, 1) }}%
             </div>
             <div v-else>-</div>
         </div>
@@ -32,7 +32,7 @@
                         summary.week >= 0 ? 'up' : 'down'
                     }`"
                 ></i>
-                {{ week | numberVnFormat(1) }}%
+                {{ $filters.numberVnFormat(state.week, 1) }}%
             </div>
             <div v-else>-</div>
         </div>
@@ -50,7 +50,7 @@
                         summary.month >= 0 ? 'up' : 'down'
                     }`"
                 ></i>
-                {{ month | numberVnFormat(0) }}%
+                {{ $filters.numberVnFormat(state.month, 0) }}%
             </div>
             <div v-else>-</div>
         </div>
@@ -68,7 +68,7 @@
                         summary.quarter >= 0 ? 'up' : 'down'
                     }`"
                 ></i>
-                {{ quarter | numberVnFormat(0) }}%
+                {{ $filters.numberVnFormat(state.quarter, 0) }}%
             </div>
             <div v-else>-</div>
         </div>
@@ -86,7 +86,7 @@
                         summary.year >= 0 ? 'up' : 'down'
                     }`"
                 ></i>
-                {{ year | numberVnFormat(0) }}%
+                {{ $filters.numberVnFormat(state.year, 0) }}%
             </div>
             <div v-else>-</div>
         </div>
@@ -104,95 +104,86 @@
                         summary.all >= 0 ? 'up' : 'down'
                     }`"
                 ></i>
-                {{ all | numberVnFormat(0) }}%
+                {{ $filters.numberVnFormat(state.all, 0) }}%
             </div>
             <div v-else>-</div>
         </div>
     </div>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
-import adminTradesStore from "../../../store/modules/Trading/Trades";
+<script setup>
+import { computed, inject, reactive, watch } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 const DURATION = 200;
 const INTERVAL = 4; // 4ms
 
-export default {
-    components: {},
-    data() {
-        return {
-            interval: null,
-            change: {},
-            doneFlag: false,
-            day: 0,
-            week: 0,
-            month: 0,
-            quarter: 0,
-            year: 0,
-            all: 0,
-        };
-    },
-    beforeCreate() {
-        this.$store.registerModule("Trading.trades", adminTradesStore);
-    },
-    created() {
-        this.getSummary();
-    },
-    destroyed() {
-        this.$store.unregisterModule("Trading.trades");
-    },
-    computed: {
-        ...mapGetters("Trading.trades", ["summary"]),
-    },
-    watch: {
-        summary(value) {
-            if (this.$mf.isSet(value)) {
-                this.calculateChange();
-                if (!this.interval) {
-                    this.interval = setInterval(() => {
-                        this.animatedNumber("day");
-                        this.animatedNumber("week");
-                        this.animatedNumber("month");
-                        this.animatedNumber("quarter");
-                        this.animatedNumber("year");
-                        this.animatedNumber("all");
-                        if (this.doneFlag) {
-                            clearInterval(this.interval);
-                            this.interval = null;
-                        }
-                    }, INTERVAL);
-                }
-            }
-        },
-    },
-    methods: {
-        ...mapActions("Trading.trades", ["getSummary", "resetState"]),
-        viewDetail(period) {
-            this.$router.push({ name: "trades", query: { period } });
-        },
-        animatedNumber(type) {
-            if (
-                Math.abs(this[type]) <
-                Math.abs(this.summary[type] - this.change[type])
-            ) {
-                this[type] += this.change[type];
-                this.doneFlag = false;
-            } else {
-                this[type] = this.summary[type];
-                this.doneFlag = true;
-            }
-        },
-        calculateChange() {
-            let counterTimes = DURATION / INTERVAL;
-            this.change.day = this.summary.day / counterTimes;
-            this.change.week = this.summary.week / counterTimes;
-            this.change.month = this.summary.month / counterTimes;
-            this.change.quarter = this.summary.quarter / counterTimes;
-            this.change.year = this.summary.year / counterTimes;
-            this.change.all = this.summary.all / counterTimes;
-        },
-    },
+const store = useStore();
+const router = useRouter();
+const mf = inject("mf");
+const summary = computed(() => store.state.tradingStatistic.summary);
+const state = reactive({
+    day: 0,
+    week: 0,
+    month: 0,
+    quarter: 0,
+    year: 0,
+    all: 0,
+});
+let params = {
+    interval: null,
+    change: {},
+    doneFlag: false,
 };
+
+store.dispatch("tradingStatistic/getSummary");
+
+watch(
+    () => store.state.tradingStatistic.summary,
+    (value) => {
+        if (mf.isSet(value)) {
+            calculateChange();
+            if (!params.interval) {
+                params.interval = setInterval(() => {
+                    animatedNumber("day");
+                    animatedNumber("week");
+                    animatedNumber("month");
+                    animatedNumber("quarter");
+                    animatedNumber("year");
+                    animatedNumber("all");
+                    if (params.doneFlag) {
+                        clearInterval(params.interval);
+                        params.interval = null;
+                    }
+                }, INTERVAL);
+            }
+        }
+    }
+);
+function viewDetail(period) {
+    router.push({ name: "trades", query: { period } });
+}
+function animatedNumber(type) {
+    if (
+        Math.abs(state[type]) <
+        Math.abs(summary.value[type] - params.change[type])
+    ) {
+        state[type] += params.change[type];
+        params.doneFlag = false;
+    } else {
+        state[type] = summary.value[type];
+        params.doneFlag = true;
+    }
+}
+function calculateChange() {
+    let counterTimes = DURATION / INTERVAL;
+    params.change.day = summary.value.day / counterTimes;
+    params.change.week = summary.value.week / counterTimes;
+    params.change.month = summary.value.month / counterTimes;
+    params.change.quarter = summary.value.quarter / counterTimes;
+    params.change.year = summary.value.year / counterTimes;
+    params.change.all = summary.value.all / counterTimes;
+}
 </script>
 <style lang="scss">
 .overview-trading {

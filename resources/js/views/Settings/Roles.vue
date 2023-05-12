@@ -95,7 +95,7 @@
 import { mapGetters, mapActions } from "vuex";
 import ListTagBox from "../../components/ListTagBox.vue";
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
-import adminSettingsRolesStore from "../../store/modules/Settings/Roles";
+import adminSettingsRolesStore from "../../store/modules/Setting/Role";
 
 export default {
     components: {

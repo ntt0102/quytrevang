@@ -1,73 +1,75 @@
 <template>
     <div class="level-bar content-block">
-        <center>
-            <ul :style="{ counterReset: 'levelNumber 0' }">
-                <li
-                    v-for="item in $mf.getAccountLevelList()"
-                    :key="item.level"
-                    :class="{
-                        'is-active': item.level == level + 1,
-                        'guiding-step-1': item.level == 2,
-                        'guiding-step-2': item.level == 3,
-                        'guiding-step-3': item.level == 4,
-                    }"
-                    @click="
-                        item.level == level + 1
-                            ? onLevelClick(item.level)
-                            : null
-                    "
-                >
-                    {{ item.text }}
-                </li>
-            </ul>
-        </center>
-        <ResendVerifyEmailPopup ref="resendVerifyEmailPopup" />
-        <EditProfilePopup ref="editProfilePopup" />
-        <ChangePinPopup ref="changePinPopup" />
+        <ul :style="{ counterReset: 'levelNumber 0' }">
+            <li
+                v-for="item in $mf.getAccountLevelList()"
+                :key="item.level"
+                :class="{
+                    'is-active': item.level == level + 1,
+                    'guiding-step-1': item.level == 2,
+                    'guiding-step-2': item.level == 3,
+                    'guiding-step-3': item.level == 4,
+                }"
+                @click="
+                    item.level == level + 1 ? onLevelClick(item.level) : null
+                "
+            >
+                {{ item.text }}
+            </li>
+        </ul>
+        <!-- <ResendVerifyEmailPopup ref="resendVerifyEmailPopupRef" />
+        <EditProfilePopup ref="editProfilePopupRef" />
+        <ChangePinPopup ref="changePinPopupRef" /> -->
     </div>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import { alert } from "devextreme/ui/dialog";
-import ResendVerifyEmailPopup from "../../../components/Popups/ResendVerifyEmailPopup.vue";
-import EditProfilePopup from "../Profile/EditProfilePopup.vue";
-import ChangePinPopup from "../Profile/ChangePinPopup.vue";
+import { useStore } from "vuex";
+import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
+import { computed, ref } from "vue";
+// import ResendVerifyEmailPopup from "../../../components/Popups/ResendVerifyEmailPopup.vue";
+// import EditProfilePopup from "../Profile/EditProfilePopup.vue";
+// import ChangePinPopup from "../Profile/ChangePinPopup.vue";
 
-export default {
-    components: { ResendVerifyEmailPopup, EditProfilePopup, ChangePinPopup },
-    computed: {
-        ...mapGetters("Auth", ["level"]),
-    },
-    methods: {
-        onLevelClick(nextLevel) {
-            switch (nextLevel) {
-                case 2:
-                    this.$refs.resendVerifyEmailPopup.show();
-                    break;
-                case 3:
-                    this.$refs.changePinPopup.show();
-                    break;
-                case 4:
-                    this.$refs.editProfilePopup.show();
-                    break;
-                case 5:
-                    alert(
-                        this.$t("user.overview.signContractGuide"),
-                        this.$t("user.overview.levels.signContract")
-                    );
-                    break;
-                case 6:
-                    this.$router.push({
-                        name: "contract",
-                        query: { redirect: this.$router.currentRoute.name },
-                    });
-                    break;
-                default:
-                    break;
-            }
-        },
-    },
-};
+const store = useStore();
+const route = useRoute();
+const router = useRouter();
+const { t } = useI18n();
+
+const resendVerifyEmailPopupRef = ref(null);
+const changePinPopupRef = ref(null);
+const editProfilePopupRef = ref(null);
+
+const level = computed(() => store.state.auth.user.level);
+
+function onLevelClick(nextLevel) {
+    switch (nextLevel) {
+        case 2:
+            resendVerifyEmailPopup.value.show();
+            break;
+        case 3:
+            changePinPopup.value.show();
+            break;
+        case 4:
+            editProfilePopup.value.show();
+            break;
+        case 5:
+            alert(
+                t("user.overview.signContractGuide"),
+                t("user.overview.levels.signContract")
+            );
+            break;
+        case 6:
+            router.push({
+                name: "contract",
+                query: { redirect: router.currentRoute.name },
+            });
+            break;
+        default:
+            break;
+    }
+}
 </script>
 <style lang="scss">
 @import "../../../../sass/variables.scss";

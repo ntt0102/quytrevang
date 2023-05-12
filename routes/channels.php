@@ -19,9 +19,18 @@ Broadcast::channel('user-{id}', function ($user, $id) {
 Broadcast::channel('admin', function ($user) {
     return $user->hasAnyPermission(['users@control', 'contracts@control', 'comments@control']);
 });
-Broadcast::channel('trade', function ($user) {
+Broadcast::channel('admin-user', function ($user) {
+    return $user->can('users@control');
+});
+Broadcast::channel('admin-contract', function ($user) {
+    return $user->can('contracts@control');
+});
+Broadcast::channel('admin-comment', function ($user) {
+    return $user->can('comments@control');
+});
+Broadcast::channel('trading-statistic', function ($user) {
     return $user->hasAnyPermission(['trades@view', 'trades@edit']);
 });
-Broadcast::channel('finbook', function ($user) {
+Broadcast::channel('trading-finbook', function ($user) {
     return $user->can('finbooks@control');
 });

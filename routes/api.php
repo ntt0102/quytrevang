@@ -56,17 +56,13 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
         });
         Route::group(['namespace' => 'User'], function () {
             Route::group(['prefix' => 'notifications'], function () {
-                Route::get('/', 'NotificationController@fetch');
+                Route::get('/', 'NotificationController@getNotifications');
                 Route::post('{id}/read', 'NotificationController@markAsRead');
                 Route::post('mark-all-read', 'NotificationController@markAllRead');
             });
-            Route::group(['prefix' => 'layout'], function () {
-                Route::post('/', 'LayoutController@fetch');
-            });
-            Route::group(['prefix' => 'subscriptions'], function () {
-                Route::post('/', 'PushSubscriptionController@update');
-                Route::post('destroy', 'PushSubscriptionController@destroy');
-            });
+            Route::post('get-notify', 'LayoutController@getNotify');
+            Route::post('subscribe-push', 'PushSubscriptionController@subscribe');
+            Route::post('unsubscribe-push', 'PushSubscriptionController@unsubscribe');
         });
 
         Route::group(['middleware' => 'verified'], function () {
@@ -145,6 +141,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 });
                 Route::group(['prefix' => 'trades', 'middleware' => 'can:trades@view'], function () {
                     Route::get('/', 'TradeController@fetch');
+                    Route::post('validate-duplicate-date', 'TradeController@validateDuplicateDate');
                     Route::post('chart', 'TradeController@getChart');
                     Route::get('summary', 'TradeController@getSummary');
                     Route::post('/', 'TradeController@save')->middleware('can:trades@edit');
