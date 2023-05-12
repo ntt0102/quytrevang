@@ -4,8 +4,96 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ce4fb7439be0e9d0f75b2bcff50649af",
+    "content-hash": "654f196abf062b2c1b9955263c2e462e",
     "packages": [
+        {
+            "name": "asbiin/laravel-webauthn",
+            "version": "3.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/asbiin/laravel-webauthn.git",
+                "reference": "fa246351081aac52c7cb48fbabf42510c3475ab9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/asbiin/laravel-webauthn/zipball/fa246351081aac52c7cb48fbabf42510c3475ab9",
+                "reference": "fa246351081aac52c7cb48fbabf42510c3475ab9",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^9.0 || ^10.0",
+                "php": ">=8.1",
+                "psr/http-factory-implementation": "1.0",
+                "thecodingmachine/safe": "^2.0",
+                "web-auth/cose-lib": "^4.0",
+                "web-auth/webauthn-lib": "^4.0",
+                "web-token/jwt-signature": "^3.0"
+            },
+            "require-dev": {
+                "ext-sqlite3": "*",
+                "guzzlehttp/psr7": "^2.1",
+                "laravel/legacy-factories": "^1.0",
+                "nunomaduro/larastan": "^2.0",
+                "ocramius/package-versions": "^2.0",
+                "orchestra/testbench": "^7.0 || ^8.0",
+                "phpstan/phpstan-deprecation-rules": "^1.0",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpstan/phpstan-strict-rules": "^1.0",
+                "phpunit/phpunit": "^9.5",
+                "thecodingmachine/phpstan-safe-rule": "^1.0"
+            },
+            "suggest": {
+                "guzzlehttp/psr7": "To provide a psr/http-factory-implementation implementation",
+                "php-http/discovery": "To find a psr/http-factory-implementation implementation",
+                "psr/http-client-implementation": "Required for the AndroidSafetyNet Attestation Statement support",
+                "symfony/psr-http-message-bridge": "To find a psr/http-factory-implementation implementation",
+                "web-token/jwt-key-mgmt": "Required for the AndroidSafetyNet Attestation Statement support",
+                "web-token/jwt-signature-algorithm-ecdsa": "Required for the AndroidSafetyNet Attestation Statement support",
+                "web-token/jwt-signature-algorithm-eddsa": "Required for the AndroidSafetyNet Attestation Statement support",
+                "web-token/jwt-signature-algorithm-rsa": "Required for the AndroidSafetyNet Attestation Statement support"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "LaravelWebauthn\\WebauthnServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "LaravelWebauthn\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexis Saettler",
+                    "email": "alexis@saettler.org"
+                }
+            ],
+            "description": "Laravel Webauthn support",
+            "keywords": [
+                "laravel",
+                "php",
+                "security",
+                "webauthn"
+            ],
+            "support": {
+                "issues": "https://github.com/asbiin/laravel-webauthn/issues",
+                "source": "https://github.com/asbiin/laravel-webauthn"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/asbiin",
+                    "type": "github"
+                }
+            ],
+            "time": "2023-02-19T17:57:47+00:00"
+        },
         {
             "name": "brick/math",
             "version": "0.11.0",
@@ -500,25 +588,25 @@
         },
         {
             "name": "firebase/php-jwt",
-            "version": "v6.4.0",
+            "version": "v6.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "4dd1e007f22a927ac77da5a3fbb067b42d3bc224"
+                "reference": "e94e7353302b0c11ec3cfff7180cd0b1743975d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/4dd1e007f22a927ac77da5a3fbb067b42d3bc224",
-                "reference": "4dd1e007f22a927ac77da5a3fbb067b42d3bc224",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/e94e7353302b0c11ec3cfff7180cd0b1743975d2",
+                "reference": "e94e7353302b0c11ec3cfff7180cd0b1743975d2",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.1||^8.0"
+                "php": "^7.4||^8.0"
             },
             "require-dev": {
                 "guzzlehttp/guzzle": "^6.5||^7.4",
-                "phpspec/prophecy-phpunit": "^1.1",
-                "phpunit/phpunit": "^7.5||^9.5",
+                "phpspec/prophecy-phpunit": "^2.0",
+                "phpunit/phpunit": "^9.5",
                 "psr/cache": "^1.0||^2.0",
                 "psr/http-client": "^1.0",
                 "psr/http-factory": "^1.0"
@@ -557,9 +645,9 @@
             ],
             "support": {
                 "issues": "https://github.com/firebase/php-jwt/issues",
-                "source": "https://github.com/firebase/php-jwt/tree/v6.4.0"
+                "source": "https://github.com/firebase/php-jwt/tree/v6.5.0"
             },
-            "time": "2023-02-09T21:01:23+00:00"
+            "time": "2023-05-12T15:47:07+00:00"
         },
         {
             "name": "fruitcake/php-cors",
@@ -4301,91 +4389,6 @@
             "time": "2023-04-15T23:01:58+00:00"
         },
         {
-            "name": "rawilk/laravel-webauthn",
-            "version": "v1.0.6",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/rawilk/laravel-webauthn.git",
-                "reference": "344ea7d3ba16e62bdcdfbd23cd50db8036a4b44a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/rawilk/laravel-webauthn/zipball/344ea7d3ba16e62bdcdfbd23cd50db8036a4b44a",
-                "reference": "344ea7d3ba16e62bdcdfbd23cd50db8036a4b44a",
-                "shasum": ""
-            },
-            "require": {
-                "illuminate/contracts": "^9.12|^10.0",
-                "nyholm/psr7": "^1.5",
-                "php": "^8.1|^8.2",
-                "spatie/laravel-package-tools": "^1.9",
-                "symfony/psr-http-message-bridge": "^2.1",
-                "web-auth/webauthn-lib": "^4.0"
-            },
-            "require-dev": {
-                "laravel/pint": "^1.5",
-                "nunomaduro/collision": "^6.0",
-                "orchestra/testbench": "^7.0|^8.0",
-                "pestphp/pest": "^1.21",
-                "pestphp/pest-plugin-laravel": "^1.1",
-                "pestphp/pest-plugin-parallel": "^1.2",
-                "spatie/laravel-ray": "^1.26"
-            },
-            "suggest": {
-                "web-token/jwt-key-mgmt": "Required for the AndroidSafetyNet Attestation Statement support",
-                "web-token/jwt-signature-algorithm-ecdsa": "Required for the AndroidSafetyNet Attestation Statement support",
-                "web-token/jwt-signature-algorithm-eddsa": "Required for the AndroidSafetyNet Attestation Statement support",
-                "web-token/jwt-signature-algorithm-rsa": "Required for the AndroidSafetyNet Attestation Statement support"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Rawilk\\Webauthn\\WebauthnServiceProvider"
-                    ],
-                    "aliases": {
-                        "Webauthn": "Rawilk\\Webauthn\\Facades\\Webauthn"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Rawilk\\Webauthn\\": "src",
-                    "Rawilk\\Webauthn\\Database\\Factories\\": "database/factories"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Randall Wilk",
-                    "email": "randall@randallwilk.dev",
-                    "homepage": "https://randallwilk.dev",
-                    "role": "Developer"
-                }
-            ],
-            "description": "Add webauthn functionality to Laravel",
-            "homepage": "https://github.com/rawilk/laravel-webauthn",
-            "keywords": [
-                "laravel",
-                "rawilk",
-                "webauthn"
-            ],
-            "support": {
-                "issues": "https://github.com/rawilk/laravel-webauthn/issues",
-                "source": "https://github.com/rawilk/laravel-webauthn/tree/v1.0.6"
-            },
-            "funding": [
-                {
-                    "url": "https://github.com/rawilk",
-                    "type": "github"
-                }
-            ],
-            "time": "2023-04-14T14:23:12+00:00"
-        },
-        {
             "name": "spatie/laravel-activitylog",
             "version": "4.7.3",
             "source": {
@@ -7160,6 +7163,145 @@
             "time": "2023-04-18T13:46:08+00:00"
         },
         {
+            "name": "thecodingmachine/safe",
+            "version": "v2.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thecodingmachine/safe.git",
+                "reference": "3115ecd6b4391662b4931daac4eba6b07a2ac1f0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thecodingmachine/safe/zipball/3115ecd6b4391662b4931daac4eba6b07a2ac1f0",
+                "reference": "3115ecd6b4391662b4931daac4eba6b07a2ac1f0",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.0"
+            },
+            "require-dev": {
+                "phpstan/phpstan": "^1.5",
+                "phpunit/phpunit": "^9.5",
+                "squizlabs/php_codesniffer": "^3.2",
+                "thecodingmachine/phpstan-strict-rules": "^1.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.2.x-dev"
+                }
+            },
+            "autoload": {
+                "files": [
+                    "deprecated/apc.php",
+                    "deprecated/array.php",
+                    "deprecated/datetime.php",
+                    "deprecated/libevent.php",
+                    "deprecated/misc.php",
+                    "deprecated/password.php",
+                    "deprecated/mssql.php",
+                    "deprecated/stats.php",
+                    "deprecated/strings.php",
+                    "lib/special_cases.php",
+                    "deprecated/mysqli.php",
+                    "generated/apache.php",
+                    "generated/apcu.php",
+                    "generated/array.php",
+                    "generated/bzip2.php",
+                    "generated/calendar.php",
+                    "generated/classobj.php",
+                    "generated/com.php",
+                    "generated/cubrid.php",
+                    "generated/curl.php",
+                    "generated/datetime.php",
+                    "generated/dir.php",
+                    "generated/eio.php",
+                    "generated/errorfunc.php",
+                    "generated/exec.php",
+                    "generated/fileinfo.php",
+                    "generated/filesystem.php",
+                    "generated/filter.php",
+                    "generated/fpm.php",
+                    "generated/ftp.php",
+                    "generated/funchand.php",
+                    "generated/gettext.php",
+                    "generated/gmp.php",
+                    "generated/gnupg.php",
+                    "generated/hash.php",
+                    "generated/ibase.php",
+                    "generated/ibmDb2.php",
+                    "generated/iconv.php",
+                    "generated/image.php",
+                    "generated/imap.php",
+                    "generated/info.php",
+                    "generated/inotify.php",
+                    "generated/json.php",
+                    "generated/ldap.php",
+                    "generated/libxml.php",
+                    "generated/lzf.php",
+                    "generated/mailparse.php",
+                    "generated/mbstring.php",
+                    "generated/misc.php",
+                    "generated/mysql.php",
+                    "generated/network.php",
+                    "generated/oci8.php",
+                    "generated/opcache.php",
+                    "generated/openssl.php",
+                    "generated/outcontrol.php",
+                    "generated/pcntl.php",
+                    "generated/pcre.php",
+                    "generated/pgsql.php",
+                    "generated/posix.php",
+                    "generated/ps.php",
+                    "generated/pspell.php",
+                    "generated/readline.php",
+                    "generated/rpminfo.php",
+                    "generated/rrd.php",
+                    "generated/sem.php",
+                    "generated/session.php",
+                    "generated/shmop.php",
+                    "generated/sockets.php",
+                    "generated/sodium.php",
+                    "generated/solr.php",
+                    "generated/spl.php",
+                    "generated/sqlsrv.php",
+                    "generated/ssdeep.php",
+                    "generated/ssh2.php",
+                    "generated/stream.php",
+                    "generated/strings.php",
+                    "generated/swoole.php",
+                    "generated/uodbc.php",
+                    "generated/uopz.php",
+                    "generated/url.php",
+                    "generated/var.php",
+                    "generated/xdiff.php",
+                    "generated/xml.php",
+                    "generated/xmlrpc.php",
+                    "generated/yaml.php",
+                    "generated/yaz.php",
+                    "generated/zip.php",
+                    "generated/zlib.php"
+                ],
+                "classmap": [
+                    "lib/DateTime.php",
+                    "lib/DateTimeImmutable.php",
+                    "lib/Exceptions/",
+                    "deprecated/Exceptions/",
+                    "generated/Exceptions/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "PHP core functions that throw exceptions instead of returning FALSE on error",
+            "support": {
+                "issues": "https://github.com/thecodingmachine/safe/issues",
+                "source": "https://github.com/thecodingmachine/safe/tree/v2.5.0"
+            },
+            "time": "2023-04-05T11:54:14+00:00"
+        },
+        {
             "name": "tijsverkoyen/css-to-inline-styles",
             "version": "2.2.6",
             "source": {
@@ -7454,7 +7596,7 @@
         },
         {
             "name": "web-auth/metadata-service",
-            "version": "4.5.1",
+            "version": "4.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-auth/webauthn-metadata-service.git",
@@ -7513,7 +7655,7 @@
                 "webauthn"
             ],
             "support": {
-                "source": "https://github.com/web-auth/webauthn-metadata-service/tree/4.5.1"
+                "source": "https://github.com/web-auth/webauthn-metadata-service/tree/4.5.2"
             },
             "funding": [
                 {
@@ -7529,16 +7671,16 @@
         },
         {
             "name": "web-auth/webauthn-lib",
-            "version": "4.5.1",
+            "version": "4.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/web-auth/webauthn-lib.git",
-                "reference": "64920a2eb97d93cdfe30bcb2fdba3b48b669ad04"
+                "reference": "30c5e891c6418abef6d87a4351132b01b1828a98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/web-auth/webauthn-lib/zipball/64920a2eb97d93cdfe30bcb2fdba3b48b669ad04",
-                "reference": "64920a2eb97d93cdfe30bcb2fdba3b48b669ad04",
+                "url": "https://api.github.com/repos/web-auth/webauthn-lib/zipball/30c5e891c6418abef6d87a4351132b01b1828a98",
+                "reference": "30c5e891c6418abef6d87a4351132b01b1828a98",
                 "shasum": ""
             },
             "require": {
@@ -7595,7 +7737,7 @@
                 "webauthn"
             ],
             "support": {
-                "source": "https://github.com/web-auth/webauthn-lib/tree/4.5.1"
+                "source": "https://github.com/web-auth/webauthn-lib/tree/4.5.2"
             },
             "funding": [
                 {
@@ -7607,7 +7749,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2023-01-31T17:31:30+00:00"
+            "time": "2023-05-12T18:26:01+00:00"
         },
         {
             "name": "web-token/jwt-core",

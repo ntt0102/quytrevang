@@ -236,13 +236,13 @@ const actions = {
                 { routeAction: "attest" },
                 { noLoading: true }
             );
+            console.log("credentials", optionsResponse.data);
             navigator.credentials
                 .create({
-                    publicKey: parseIncomingServerOptions(
-                        JSON.parse(optionsResponse.data)
-                    ),
+                    publicKey: parseIncomingServerOptions(optionsResponse.data),
                 })
                 .then((credentials) => {
+                    console.log("credentials", credentials);
                     axios
                         .post("auth/register-webauthn", {
                             ...parseOutgoingCredentials(credentials),

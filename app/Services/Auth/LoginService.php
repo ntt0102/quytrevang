@@ -6,12 +6,13 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Support\Arr;
 use App\Models\User;
-use Rawilk\Webauthn\Actions\PrepareKeyCreationData;
-use Rawilk\Webauthn\Actions\RegisterNewKeyAction;
-use Rawilk\Webauthn\Actions\PrepareAssertionData;
-use Rawilk\Webauthn\Facades\Webauthn;
+// use Illuminate\Support\Arr;
+// use Rawilk\Webauthn\Actions\PrepareKeyCreationData;
+// use Rawilk\Webauthn\Actions\RegisterNewKeyAction;
+// use Rawilk\Webauthn\Actions\PrepareAssertionData;
+// use Rawilk\Webauthn\Facades\Webauthn;
+
 
 class LoginService
 {
@@ -119,19 +120,25 @@ class LoginService
         $user = $request->user();
         switch ($request->routeAction) {
             case 'attest':
-                return json_encode(app(PrepareKeyCreationData::class)($user));
+                // return json_encode(app(PrepareKeyCreationData::class)($user));
+                return app(PrepareCreationData::class)($user);
                 break;
             case 'verify':
-                try {
-                    app(RegisterNewKeyAction::class)(
-                        $user,
-                        Arr::only($request->all(), ['id', 'rawId', 'response', 'type']),
-                        'keyName',
-                    );
-                    return ['isOk' => true];
-                } catch (\Rawilk\Webauthn\Exceptions\WebauthnRegisterException $e) {
-                    return ['isOk' => false, 'message' => $e->getMessage()];
-                }
+                // try {
+                //     app(RegisterNewKeyAction::class)(
+                //         $user,
+                //         Arr::only($request->all(), ['id', 'rawId', 'response', 'type']),
+                //         'keyName',
+                //     );
+                //     return ['isOk' => true];
+                // } catch (\Rawilk\Webauthn\Exceptions\WebauthnRegisterException $e) {
+                //     return ['isOk' => false, 'message' => $e->getMessage()];
+                // }
+                app(ValidateKeyCreation::class)(
+                    $user,
+                    $request->only(['id', 'rawId', 'response', 'type']),
+                    $user->name
+                );
 
                 break;
         }

@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\Auth;
 use App\Http\Controllers\Api\CoreController;
 use Illuminate\Http\Request;
 use App\Services\Auth\LoginService;
+use LaravelWebauthn\Actions\PrepareCreationData;
+use LaravelWebauthn\Actions\ValidateKeyCreation;
 
 class LoginController extends CoreController
 {
@@ -55,7 +57,21 @@ class LoginController extends CoreController
      */
     public function registerWebAuthn(Request $request)
     {
-        $data = $this->loginService->registerWebAuthn($request);
+        $user = $request->user();
+        switch ($request->routeAction) {
+            case 'attest':
+                $data = app(PrepareCreationData::class)($user);
+                break;
+            case 'verify':
+                $data = app(ValidateKeyCreation::class)(
+                    $user,
+                    $request->only(['id', 'rawId', 'response', 'type']),
+                    $user->name
+                );
+
+                break;
+        }
+        // $data = $this->loginService->registerWebAuthn($request);
         return $this->sendResponse($data);
     }
 
@@ -96,20 +112,6 @@ class LoginController extends CoreController
     {
         $data = $this->loginService->user();
         return $this->sendResponse($data);
-    }
-
-    /**
-     * Get the authenticated User
-     * 
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function smartOrderUser(Request $request)
-    {
-        $payload = $this->decrypt($request);
-        $data = $this->loginService->smartOrderUser($payload);
-        return $this->sendResponse($this->encrypt($data));
     }
 
     /**

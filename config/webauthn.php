@@ -1,90 +1,32 @@
 <?php
 
+use LaravelWebauthn\Models\WebauthnKey;
+
 return [
-    /*
-    |--------------------------------------------------------------------------
-    | Enabled
-    |--------------------------------------------------------------------------
-    |
-    | Set to false to completely disable WebAuthn from this package.
-    |
-    */
-    'enabled' => env('WEBAUTHN_ENABLED', true),
 
     /*
     |--------------------------------------------------------------------------
-    | Relying Party
+    | LaravelWebauthn Master Switch
     |--------------------------------------------------------------------------
     |
-    | We will use your application information to inform the device who is the
-    | relying party. While only the name is enough, you can further set a
-    | custom domain as the ID and even an icon image data encoded as base64.
+    | This option may be used to disable LaravelWebauthn.
     |
     */
-    'relying_party' => [
-        'name' => env('WEBAUTHN_NAME', env('APP_NAME')),
-        'id' => env('WEBAUTHN_ID'),
-        'icon' => env('WEBAUTHN_ICON'),
-    ],
+
+    'enable' => true,
 
     /*
     |--------------------------------------------------------------------------
-    | Webauthn Challenge Length
+    | Webauthn Guard
     |--------------------------------------------------------------------------
     |
-    | Length of random string used in the challenge request.
+    | Here you may specify which authentication guard Webauthn will use while
+    | authenticating users. This value should correspond with one of your
+    | guards that is already present in your "auth" configuration file.
     |
     */
-    'challenge_length' => 32,
 
-    /*
-    |--------------------------------------------------------------------------
-    | Webauthn Timeout (milliseconds)
-    |--------------------------------------------------------------------------
-    |
-    | Time that the caller is willing to wait for the call to complete.
-    |
-    */
-    'timeout' => 60000,
-
-    /*
-    |--------------------------------------------------------------------------
-    | Credentials Attachment
-    |--------------------------------------------------------------------------
-    |
-    | Authentication can be tied to the current device (i.e. Windows Hello
-    | or Touch ID) or a cross-platform device (USB key). When this
-    | is `null`, the user will decide where to store their authentication
-    | information.
-    |
-    | See https://www.w3.org/TR/webauthn/#enum-attachment
-    |
-    | Supported: `null`, `cross-platform`, `platform`
-    |
-    */
-    'attachment_mode' => env('WEBAUTHN_ATTACHMENT_MODE'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Database
-    |--------------------------------------------------------------------------
-    |
-    | Basic configuration settings for how the package stores webauthn
-    | credentials.
-    |
-    */
-    'database' => [
-        'table' => 'webauthn_keys',
-
-        /*
-         * You may either extend our model or use your own model
-         * to represent a webauthn key credential.
-         *
-         * If you use your own model, it must implement the
-         * \Rawilk\Webauthn\Contracts\WebauthnKey interface.
-         */
-        'model' => \Rawilk\Webauthn\Models\WebauthnKey::class,
-    ],
+    'guard' => 'web',
 
     /*
     |--------------------------------------------------------------------------
@@ -93,101 +35,254 @@ return [
     |
     | This value defines which model attribute should be considered as your
     | application's "username" field. Typically, this might be the email
-    | address of the users, but you are free to use a different value.
+    | address of the users but you are free to change this value here.
     |
     */
+
     'username' => 'email',
 
     /*
     |--------------------------------------------------------------------------
-    | Webauthn Public Key Credential Parameters
+    | Webauthn Routes Prefix / Subdomain
     |--------------------------------------------------------------------------
     |
-    | List of allowed Cryptographic Algorithm Identifiers.
-    | See https://www.w3.org/TR/webauthn/#sctn-alg-identifier
+    | Here you may specify which prefix Webauthn will assign to all the routes
+    | that it registers with the application. If necessary, you may change
+    | subdomain under which all of the Webauthn routes will be available.
     |
     */
-    'public_key_credential_parameters' => [
-        (string) \Cose\Algorithms::COSE_ALGORITHM_ES256, // ECDSA with SHA-256
-        (string) \Cose\Algorithms::COSE_ALGORITHM_ES512, // ECDSA with SHA-512
-        (string) \Cose\Algorithms::COSE_ALGORITHM_RS256, // RSASSA-PKCS1-v1_5 with SHA-256
-        (string) \Cose\Algorithms::COSE_ALGORITHM_EdDSA, // EdDSA
-        (string) \Cose\Algorithms::COSE_ALGORITHM_ES384, // ECDSA with SHA-384
+
+    'prefix' => 'webauthn',
+
+    'domain' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webauthn Routes Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify which middleware Webauthn will assign to the routes
+    | that it registers with the application. If necessary, you may change
+    | these middleware but typically this provided default is preferred.
+    |
+    */
+
+    'middleware' => ['web'],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webauthn key model
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify the model used to create Webauthn keys.
+    |
+    */
+
+    'model' => WebauthnKey::class,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Rate Limiting
+    |--------------------------------------------------------------------------
+    |
+    | By default, Laravel Webauthn will throttle logins to five requests per
+    | minute for every email and IP address combination. However, if you would
+    | like to specify a custom rate limiter to call then you may specify it here.
+    |
+    */
+
+    'limiters' => [
+        'login' => null,
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Redirect routes
+    |--------------------------------------------------------------------------
+    |
+    | When using navigation, redirects to these url on success:
+    | - login: after a successfull login.
+    | - register: after a successfull Webauthn key creation.
+    |
+    | Redirects are not used in case of application/json requests.
+    |
+    */
+
+    'redirects' => [
+        'login' => null,
+        'register' => null,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | View to load after middleware login request.
+    |--------------------------------------------------------------------------
+    |
+    | The name of blade template to load:
+    | - authenticate: when a user login, and has to validate Webauthn 2nd factor.
+    | - register: when a user request to create a Webauthn key.
+    |
+    | If the views are empty or null, then the route will not be registered.
+    |
+    */
+
+    'views' => [
+        'authenticate' => 'webauthn::authenticate',
+        'register' => 'webauthn::register',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Session name
+    |--------------------------------------------------------------------------
+    |
+    | Name of the session parameter to store the successful login.
+    |
+    */
+
+    'session_name' => 'webauthn_auth',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webauthn challenge length
+    |--------------------------------------------------------------------------
+    |
+    | Length of the random string used in the challenge request.
+    |
+    */
+
+    'challenge_length' => 32,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webauthn timeout (milliseconds)
+    |--------------------------------------------------------------------------
+    |
+    | Time that the caller is willing to wait for the call to complete.
+    |
+    */
+
+    'timeout' => 60000,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webauthn extension client input
+    |--------------------------------------------------------------------------
+    |
+    | Optional authentication extension.
+    | See https://www.w3.org/TR/webauthn/#client-extension-input
+    |
+    */
+
+    'extensions' => [],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Webauthn icon
+    |--------------------------------------------------------------------------
+    |
+    | Url which resolves to an image associated with the entity.
+    | See https://www.w3.org/TR/webauthn/#dom-publickeycredentialentity-icon
+    |
+    */
+
+    'icon' => env('WEBAUTHN_ICON'),
 
     /*
     |--------------------------------------------------------------------------
     | Webauthn Attestation Conveyance
     |--------------------------------------------------------------------------
     |
-    | This parameter specifies the preference regarding the attestation conveyance
+    | This parameter specify the preference regarding the attestation conveyance
     | during credential generation.
-    |
     | See https://www.w3.org/TR/webauthn/#enum-attestation-convey
     |
-    | Supported: `none`, `indirect`, `direct`, `enterprise`
-    |
+    | Supported: "none", "indirect", "direct", "enterprise".
     */
-    'attestation_conveyance' => env('WEBAUTHN_ATTESTATION_CONVEYANCE', \Rawilk\Webauthn\Enums\AttestationConveyancePreference::NONE->value),
+
+    'attestation_conveyance' => 'none',
 
     /*
     |--------------------------------------------------------------------------
-    | Google Safetynet Api Key
+    | Google Safetynet ApiKey
     |--------------------------------------------------------------------------
     |
-    | Api key to use Google Safetynet when `attestation_conveyance`
-    | is set to something other than `none`.
-    |
+    | Api key to use Google Safetynet.
     | See https://developer.android.com/training/safetynet/attestation
     |
     */
+
     'google_safetynet_api_key' => env('GOOGLE_SAFETYNET_API_KEY'),
 
     /*
     |--------------------------------------------------------------------------
-    | User Presence and Verification
+    | Webauthn Public Key Credential Parameters
+    |--------------------------------------------------------------------------
+    |
+    | List of allowed Cryptographic Algorithm Identifier.
+    | See https://www.w3.org/TR/webauthn/#sctn-alg-identifier
+    |
+    */
+
+    'public_key_credential_parameters' => [
+        \Cose\Algorithms::COSE_ALGORITHM_ES256, // ECDSA with SHA-256
+        \Cose\Algorithms::COSE_ALGORITHM_ES512, // ECDSA with SHA-512
+        \Cose\Algorithms::COSE_ALGORITHM_RS256, // RSASSA-PKCS1-v1_5 with SHA-256
+        \Cose\Algorithms::COSE_ALGORITHM_EdDSA, // EdDSA
+        \Cose\Algorithms::COSE_ALGORITHM_ES384, // ECDSA with SHA-384
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Credentials Attachment.
+    |--------------------------------------------------------------------------
+    |
+    | Authentication can be tied to the current device (like when using Windows
+    | Hello or Touch ID) or a cross-platform device (like USB Key). When this
+    | is "null" the user will decide where to store his authentication info.
+    |
+    | See https://www.w3.org/TR/webauthn/#enum-attachment
+    |
+    | Supported: "null", "cross-platform", "platform".
+    |
+    */
+
+    'attachment_mode' => null,
+
+    /*
+    |--------------------------------------------------------------------------
+    | User presence and verification
     |--------------------------------------------------------------------------
     |
     | Most authenticators and smartphones will ask the user to actively verify
-    | themselves to log in. Use `required` to always ask to verify, `preferred`
-    | to ask when possible, and `discourage` to just ask for user preference.
+    | themselves for log in. Use "required" to always ask verify, "preferred"
+    | to ask when possible, and "discouraged" to just ask for user presence.
     |
     | See https://www.w3.org/TR/webauthn/#enum-userVerificationRequirement
     |
-    | Supported: `required`, `preferred`, `discouraged`
+    | Supported: "required", "preferred", "discouraged".
+    |
     */
-    'user_verification' => env('WEBAUTHN_USER_VERIFICATION', \Rawilk\Webauthn\Enums\UserVerification::PREFERRED->value),
+
+    'user_verification' => 'preferred',
 
     /*
     |--------------------------------------------------------------------------
-    | Userless (One Touch, Typeless) Login
+    | Userless (One touch, Typeless) login
     |--------------------------------------------------------------------------
     |
-    | By default, users must input their email to receive a list of credential
-    | IDs to use for authentication, but they can also log in without specifying
+    | By default, users must input their email to receive a list of credentials
+    | ID to use for authentication, but they can also login without specifying
     | one if the device can remember them, allowing for true one-touch login.
     |
-    | If required or preferred, login verification will always be required.
+    | If required or preferred, login verification will be always required.
     |
     | See https://www.w3.org/TR/webauthn/#enum-residentKeyRequirement
     |
-    | Supported: `null`, `required`, `preferred`, `discouraged`
+    | Supported: "null", "required", "preferred", "discouraged".
     |
     */
-    'userless' => env('WEBAUTHN_USERLESS'),
 
-    /*
-    |--------------------------------------------------------------------------
-    | Assets URL
-    |--------------------------------------------------------------------------
-    |
-    | This value sets the path to the WebAuthn JavaScript assets for cases
-    | where your app's domain root is not the correct path. By default,
-    | WebAuthn will load its JavaScript assets from the app's
-    | "relative root".
-    |
-    | Examples: "/assets", "myapp.com/app",
-    |
-    */
-    'asset_url' => null,
+    'userless' => null,
+
 ];
