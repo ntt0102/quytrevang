@@ -435,6 +435,8 @@ function eventChartResize() {
         if (chartContainerRef.value.classList.contains("fullscreen")) {
             document.querySelector(".dx-drawer-panel-content").style.transform =
                 "translate(-250px, 0px)";
+            document.querySelector(".header-component").style.transform =
+                "translate(0px, -56px)";
             document.querySelector(".dx-drawer-content").style.transform =
                 "unset";
         }
@@ -491,12 +493,16 @@ function eventFullscreenChange() {
             chartContainerRef.value.classList.add("fullscreen");
             document.querySelector(".dx-drawer-panel-content").style.transform =
                 "translate(-250px, 0px)";
+            document.querySelector(".header-component").style.transform =
+                "translate(0px, -56px)";
             document.querySelector(".dx-drawer-content").style.transform =
                 "unset";
         } else {
             state.isFullscreen = false;
             chartContainerRef.value.classList.remove("fullscreen");
             document.querySelector(".dx-drawer-panel-content").style.transform =
+                "unset";
+            document.querySelector(".header-component").style.transform =
                 "unset";
             document.querySelector(".dx-drawer-content").style.transform =
                 "translate(0px, 0px)";
