@@ -22,7 +22,6 @@
             :valueAxis="[
                 {
                     name: 'accumulatedProfit',
-                    synchronizedValue: 0,
                     label: { visible: false },
                     tick: { visible: false },
                     visible: false,
