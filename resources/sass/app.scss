@@ -15,6 +15,21 @@
     font-size: 16px !important;
 }
 
+.content-block {
+    margin-left: 20px !important;
+    margin-right: 20px !important;
+
+    .screen-large & {
+        margin-left: 40px !important;
+        margin-right: 40px !important;
+    }
+
+    .screen-x-small & {
+        margin-left: 0px !important;
+        margin-right: 0px !important;
+    }
+}
+
 .dx-datagrid-command-column {
     padding: 5px !important;
 

@@ -161,7 +161,7 @@ watch(
     }
 );
 function viewDetail(period) {
-    router.push({ name: "trades", query: { period } });
+    router.push({ name: "statistic", query: { period } });
 }
 function animatedNumber(type) {
     if (

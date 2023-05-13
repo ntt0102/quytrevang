@@ -10,7 +10,6 @@ use App\Events\UpdateStatisticEvent;
 
 class TradeService extends CoreService
 {
-    private $BARS_PER_PAGE = 8;
 
     /**
      * Return all the trades.
@@ -46,10 +45,11 @@ class TradeService extends CoreService
      */
     public function createChartData($period = 'day', $page = 1)
     {
+        $barsPerPage = $period == 'day' ? 30 : 10;
         $multiplier = $period == 'quarter' ? 3 : 1;
         $unit = $period == 'quarter' ? 'month' : $period;
-        $startOfPage = date_create()->modify('-' . ($multiplier * ($page * $this->BARS_PER_PAGE - 1)) . ' ' . $unit);
-        $endOfPage = date_create()->modify('-' . (($page - 1) * $multiplier * $this->BARS_PER_PAGE) . ' ' . $unit);
+        $startOfPage = date_create()->modify('-' . ($multiplier * ($page * $barsPerPage - 1)) . ' ' . $unit);
+        $endOfPage = date_create()->modify('-' . (($page - 1) * $multiplier * $barsPerPage) . ' ' . $unit);
         $startDate = $this->firstDayOf($period, $startOfPage)->format('Y-m-d');
         $endDate = $this->lastDayOf($period, $endOfPage)->format('Y-m-d');
         return $this->queryChart($period, $startDate, $endDate)->get()->reduce(function ($carry, $item) use ($period) {

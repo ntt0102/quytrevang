@@ -166,6 +166,14 @@
                     name: 'money',
                     synchronizedValue: 0,
                     label: { customizeText: customizeText },
+                    constantLines: [
+                        {
+                            value: 0,
+                            color: 'White',
+                            label: { visible: false },
+                            displayBehindSeries: true,
+                        },
+                    ],
                 },
                 {
                     name: 'profitPerPrincipal',
