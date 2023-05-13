@@ -272,6 +272,7 @@ import { useI18n } from "vue-i18n";
 const store = useStore();
 const route = useRoute();
 const { t } = useI18n();
+const bus = inject("bus");
 const filters = inject("filters");
 let params = {
     principalTargetThreshold: {
@@ -293,13 +294,11 @@ const chartRef = ref(null);
 const charts = computed(() => store.state.tradingStatistic.charts);
 
 store.dispatch("tradingStatistic/getChart", route.query.period ?? "day");
-// this.$bus.on("toggleMenu", () => {
-//     setTimeout(() => chartRef.value.instance.render(), 300);
-// });
-
-onUnmounted(() => {
-    // this.$bus.off("toggleMenu");
+bus.on("toggleMenu", () => {
+    setTimeout(() => chartRef.value.instance.render(), 300);
 });
+
+onUnmounted(() => bus.off("toggleMenu"));
 
 function customizePoint({ value, series }) {
     if (
