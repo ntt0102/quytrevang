@@ -30,6 +30,12 @@
     }
 }
 
+h2.content-block {
+    .screen-x-small & {
+        padding-left: 20px;
+    }
+}
+
 .dx-datagrid-command-column {
     padding: 5px !important;
 

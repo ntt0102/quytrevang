@@ -211,9 +211,11 @@ function calculateChange() {
             color: red;
         }
     }
-}
-body[screen-size="small"] {
-    .overview-trading {
+
+    .screen-x-small & {
+        margin-left: 20px;
+        margin-right: 20px;
+
         & > div {
             flex-direction: column;
 
@@ -223,4 +225,15 @@ body[screen-size="small"] {
         }
     }
 }
+// body[screen-size="small"] {
+//     .overview-trading {
+//         & > div {
+//             flex-direction: column;
+
+//             .period {
+//                 padding-right: 0;
+//             }
+//         }
+//     }
+// }
 </style>
