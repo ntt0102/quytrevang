@@ -296,7 +296,7 @@ const visibleSeries = reactive({
     money: true,
     profitPerPrincipal: false,
     profitPerFees: false,
-    accumulatedProfit: false,
+    accumulatedProfit: true,
 });
 const chartRef = ref(null);
 const charts = computed(() => store.state.tradingStatistic.charts);
