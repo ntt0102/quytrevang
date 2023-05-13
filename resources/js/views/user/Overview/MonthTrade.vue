@@ -35,12 +35,12 @@
 </template>
 <script setup>
 import DxChart from "devextreme-vue/chart";
-import { useStore } from "vuex";
 import { computed, inject, onUnmounted, ref } from "vue";
+import { useStore } from "vuex";
 
 const store = useStore();
-const chartRef = ref(null);
 const bus = inject("bus");
+const chartRef = ref(null);
 const charts = computed(() => store.state.userTrade.charts);
 const copyRate = computed(() => store.state.userTrade.copyRate);
 store.dispatch("userTrade/getMonthChart");
