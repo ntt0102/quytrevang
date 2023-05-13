@@ -164,10 +164,7 @@ function onLevelClick(nextLevel) {
             }
         }
     }
-}
-
-body[screen-size="small"] {
-    .level-bar {
+    .screen-x-small & {
         ul {
             width: 180px;
             margin-left: 0px;

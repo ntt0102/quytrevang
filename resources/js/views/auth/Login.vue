@@ -178,7 +178,7 @@ export default {
         }
     },
     mounted() {
-        if (this.$devices.phone && this.formData.webauthn)
+        if (this.$screen.getScreenSizeInfo.isXSmall && this.formData.webauthn)
             this.fingerPrintClick();
         else
             setTimeout(
@@ -286,7 +286,10 @@ export default {
         onItemClick(e) {
             if (!!e.itemData.username) {
                 this.formData = { ...this.formData, ...e.itemData };
-                if (this.$devices.phone && e.itemData.webauthn)
+                if (
+                    this.$screen.getScreenSizeInfo.isXSmall &&
+                    e.itemData.webauthn
+                )
                     this.fingerPrintClick();
                 else
                     setTimeout(

@@ -24,7 +24,9 @@
                                 ref="form"
                                 :form-data="backupData"
                                 :label-location="
-                                    $devices.phone ? 'top' : 'left'
+                                    $screen.getScreenSizeInfo.isXSmall
+                                        ? 'top'
+                                        : 'left'
                                 "
                                 :scrolling-enabled="true"
                             >
@@ -67,7 +69,9 @@
                                 ref="form"
                                 :form-data="backupData"
                                 :label-location="
-                                    $devices.phone ? 'top' : 'left'
+                                    $screen.getScreenSizeInfo.isXSmall
+                                        ? 'top'
+                                        : 'left'
                                 "
                                 :scrolling-enabled="true"
                             >

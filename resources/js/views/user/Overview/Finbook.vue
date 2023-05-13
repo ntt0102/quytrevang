@@ -10,7 +10,9 @@
                 subtitle: { text: null },
             }"
             :legend="{
-                horizontalAlignment: $devices.phone ? 'center' : 'right',
+                horizontalAlignment: $screen.getScreenSizeInfo.isXSmall
+                    ? 'center'
+                    : 'right',
                 itemTextPosition: 'right',
             }"
             :series="{

@@ -10,7 +10,7 @@
     </DxPopup>
 </template>
 <script setup>
-import { inject, ref, onMounted } from "vue";
+import { getCurrentInstance, inject, ref, onMounted } from "vue";
 
 const props = defineProps({
     width: {
@@ -35,8 +35,10 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(["shown", "hidden"]);
+const app = getCurrentInstance();
+const screenSize =
+    app.appContext.config.globalProperties.$screen.getScreenSizeInfo;
 const mf = inject("mf");
-const devices = inject("devices");
 const routeHistoryState = inject("routeHistoryState");
 const popupRef = ref(null);
 let popupInstance = null;
@@ -45,7 +47,7 @@ onMounted(() => {
     if (!!props.width) popupInstance.option("width", props.width);
     if (!!props.height) popupInstance.option("height", props.height);
     if (!props.width)
-        popupInstance.option("fullScreen", devices.phone ? true : false);
+        popupInstance.option("fullScreen", screenSize.isXSmall ? true : false);
     if (!!props.title) popupInstance.option("title", props.title);
     if (!!props.class)
         popupInstance.option("wrapperAttr", {

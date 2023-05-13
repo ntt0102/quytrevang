@@ -2,19 +2,6 @@
     <div class="content-block">
         <footer class="footer">
             <div class="wrapper">
-                <div class="policy">
-                    <span class="link" @click="policyClick('#terms')">{{
-                        $t("policy.terms.short")
-                    }}</span>
-                    &#8226;
-                    <span class="link" @click="policyClick('#privacy')">{{
-                        $t("policy.privacy.short")
-                    }}</span>
-                    &#8226;
-                    <span class="link" @click="policyClick('#faq')">{{
-                        $t("policy.faq.short")
-                    }}</span>
-                </div>
                 <div class="contact">
                     <div>
                         <i class="dx-icon-like"></i>
@@ -24,7 +11,6 @@
                             >{{ $t("admin.comments.title") }}</span
                         >
                     </div>
-                    &nbsp;
                     <div>
                         <i class="dx-icon-tel"></i>
                         <span
@@ -35,7 +21,6 @@
                             >{{ $filters.phone(contact.phone) }}</span
                         >
                     </div>
-                    &nbsp;
                     <div>
                         <i class="dx-icon-email"></i>
                         <span
@@ -43,7 +28,7 @@
                             @click="
                                 $mf.openLink(
                                     `${
-                                        $devices.phone
+                                        $screen.getScreenSizeInfo.isXSmall
                                             ? 'mailto:'
                                             : 'https://mail.google.com/mail/?view=cm&fs=1&to='
                                     }${contact.email}`
@@ -52,6 +37,17 @@
                             >{{ contact.email }}</span
                         >
                     </div>
+                </div>
+                <div class="policy">
+                    <span class="link" @click="policyClick('#terms')">{{
+                        $t("policy.terms.short")
+                    }}</span>
+                    <span class="link" @click="policyClick('#privacy')">{{
+                        $t("policy.privacy.short")
+                    }}</span>
+                    <span class="link" @click="policyClick('#faq')">{{
+                        $t("policy.faq.short")
+                    }}</span>
                 </div>
             </div>
             <div class="copyright">
@@ -64,7 +60,7 @@
 
 <script setup>
 import SendCommentPopup from "../../Popups/SendCommentPopup.vue";
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 
@@ -92,22 +88,40 @@ function policyClick(hash) {
 
     .wrapper {
         display: flex;
-        flex-direction: row-reverse;
-
-        .policy {
-            margin-left: auto;
-        }
+        justify-content: space-between;
 
         .contact {
             display: flex;
-            -webkit-flex-wrap: wrap;
-            flex-wrap: wrap;
-            & > div {
-                flex-grow: 1;
-                text-align: center;
-                &:not(:first-child) {
-                    margin-left: 10px;
-                }
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+
+            .screen-large & {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .screen-x-small & {
+                padding-left: 20px;
+            }
+
+            div > span {
+                padding-left: 5px;
+            }
+        }
+        .policy {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+
+            .screen-large & {
+                flex-direction: row;
+                gap: 10px;
+            }
+
+            .screen-x-small & {
+                padding-right: 20px;
             }
         }
     }

@@ -3,7 +3,7 @@
         <DxPopup
             ref="popup"
             :showCloseButton="true"
-            :fullScreen="$devices.phone ? true : false"
+            :fullScreen="$screen.getScreenSizeInfo.isXSmall ? true : false"
             :show-title="true"
             :toolbarItems="[
                 {
@@ -69,7 +69,10 @@
                                             "
                                         />
                                         <DxCheckBox
-                                            v-if="!$devices.phone"
+                                            v-if="
+                                                !$screen.getScreenSizeInfo
+                                                    .isXSmall
+                                            "
                                             v-model="formData.isPdfPreview"
                                             :text="
                                                 $t(
@@ -287,9 +290,8 @@ export default {
         margin: 20px;
         line-height: 2;
     }
-}
-body[screen-size="small"] {
-    .confirm-contract-popup {
+
+    .screen-x-small & {
         .dx-popup-content {
             padding: 24px 0 !important;
         }

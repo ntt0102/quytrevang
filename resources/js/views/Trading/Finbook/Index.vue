@@ -28,7 +28,7 @@
         >
             <DxColumn
                 :fixed="true"
-                :width="$devices.phone ? 35 : 70"
+                :width="$screen.getScreenSizeInfo.isXSmall ? 35 : 70"
                 alignment="center"
                 type="buttons"
                 cssClass="dx-datagrid-command-column"
@@ -36,7 +36,7 @@
                 :caption="
                     $t(
                         `titles.commandHeaderTitle${
-                            $devices.phone ? 'Short' : ''
+                            $screen.getScreenSizeInfo.isXSmall ? 'Short' : ''
                         }`
                     )
                 "

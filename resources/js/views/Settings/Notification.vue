@@ -12,7 +12,9 @@
                     <DxForm
                         ref="form"
                         :form-data="formData"
-                        :label-location="$devices.phone ? 'top' : 'left'"
+                        :label-location="
+                            $screen.getScreenSizeInfo.isXSmall ? 'top' : 'left'
+                        "
                         :scrolling-enabled="true"
                     >
                         <DxItem item-type="group">

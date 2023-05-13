@@ -9,7 +9,7 @@
                 :class="`quality ${summary.day >= 0 ? 'good' : 'bad'}`"
             >
                 <i
-                    v-if="!$devices.phone"
+                    v-if="!$screen.getScreenSizeInfo.isXSmall"
                     :class="`far fa-long-arrow-alt-${
                         summary.day >= 0 ? 'up' : 'down'
                     }`"
@@ -27,7 +27,7 @@
                 :class="`quality ${summary.week >= 0 ? 'good' : 'bad'}`"
             >
                 <i
-                    v-if="!$devices.phone"
+                    v-if="!$screen.getScreenSizeInfo.isXSmall"
                     :class="`far fa-long-arrow-alt-${
                         summary.week >= 0 ? 'up' : 'down'
                     }`"
@@ -45,7 +45,7 @@
                 :class="`quality ${summary.month >= 0 ? 'good' : 'bad'}`"
             >
                 <i
-                    v-if="!$devices.phone"
+                    v-if="!$screen.getScreenSizeInfo.isXSmall"
                     :class="`far fa-long-arrow-alt-${
                         summary.month >= 0 ? 'up' : 'down'
                     }`"
@@ -63,7 +63,7 @@
                 :class="`quality ${summary.quarter >= 0 ? 'good' : 'bad'}`"
             >
                 <i
-                    v-if="!$devices.phone"
+                    v-if="!$screen.getScreenSizeInfo.isXSmall"
                     :class="`far fa-long-arrow-alt-${
                         summary.quarter >= 0 ? 'up' : 'down'
                     }`"
@@ -81,7 +81,7 @@
                 :class="`quality ${summary.year >= 0 ? 'good' : 'bad'}`"
             >
                 <i
-                    v-if="!$devices.phone"
+                    v-if="!$screen.getScreenSizeInfo.isXSmall"
                     :class="`far fa-long-arrow-alt-${
                         summary.year >= 0 ? 'up' : 'down'
                     }`"
@@ -99,7 +99,7 @@
                 :class="`quality ${summary.all >= 0 ? 'good' : 'bad'}`"
             >
                 <i
-                    v-if="!$devices.phone"
+                    v-if="!$screen.getScreenSizeInfo.isXSmall"
                     :class="`far fa-long-arrow-alt-${
                         summary.all >= 0 ? 'up' : 'down'
                     }`"
@@ -225,15 +225,4 @@ function calculateChange() {
         }
     }
 }
-// body[screen-size="small"] {
-//     .overview-trading {
-//         & > div {
-//             flex-direction: column;
-
-//             .period {
-//                 padding-right: 0;
-//             }
-//         }
-//     }
-// }
 </style>

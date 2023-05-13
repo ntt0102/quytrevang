@@ -24,13 +24,17 @@
                     confirmDelete: false,
                     mode: 'popup',
                     popup: {
-                        fullScreen: $devices.phone ? true : false,
+                        fullScreen: $screen.getScreenSizeInfo.isXSmall
+                            ? true
+                            : false,
                         showTitle: true,
                         onShown: onShown,
                         onHiding: $mf.popRouteHistoryState,
                     },
                     form: {
-                        labelLocation: $devices.phone ? 'top' : 'left',
+                        labelLocation: $screen.getScreenSizeInfo.isXSmall
+                            ? 'top'
+                            : 'left',
                         items: [
                             { dataField: 'user_code' },
                             { dataField: 'principal' },
@@ -51,7 +55,7 @@
             >
                 <DxColumn
                     :fixed="true"
-                    :width="$devices.phone ? 35 : 125"
+                    :width="$screen.getScreenSizeInfo.isXSmall ? 35 : 125"
                     alignment="center"
                     type="buttons"
                     cssClass="dx-datagrid-command-column"
@@ -59,7 +63,9 @@
                     :caption="
                         $t(
                             `titles.commandHeaderTitle${
-                                $devices.phone ? 'Short' : ''
+                                $screen.getScreenSizeInfo.isXSmall
+                                    ? 'Short'
+                                    : ''
                             }`
                         )
                     "

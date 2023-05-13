@@ -26,14 +26,16 @@
                     mode: 'popup',
                     popup: {
                         width: 300,
-                        height: $devices.phone ? 250 : 210,
+                        height: $screen.getScreenSizeInfo.isXSmall ? 250 : 210,
                         fullScreen: false,
                         showTitle: true,
                         onShown: onShown,
                         onHiding: $mf.popRouteHistoryState,
                     },
                     form: {
-                        labelLocation: $devices.phone ? 'top' : 'left',
+                        labelLocation: $screen.getScreenSizeInfo.isXSmall
+                            ? 'top'
+                            : 'left',
                         items: [{ dataField: 'principal', colSpan: 2 }],
                     },
                 }"
@@ -46,14 +48,16 @@
             >
                 <DxColumn
                     :fixed="true"
-                    :width="$devices.phone ? 35 : 98"
+                    :width="$screen.getScreenSizeInfo.isXSmall ? 35 : 98"
                     type="buttons"
                     cssClass="dx-datagrid-command-column"
                     cell-template="commandCellTemplate"
                     :caption="
                         $t(
                             `titles.commandHeaderTitle${
-                                $devices.phone ? 'Short' : ''
+                                $screen.getScreenSizeInfo.isXSmall
+                                    ? 'Short'
+                                    : ''
                             }`
                         )
                     "

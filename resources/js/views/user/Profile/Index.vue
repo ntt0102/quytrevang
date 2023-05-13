@@ -296,9 +296,8 @@ export default {
             color: red;
         }
     }
-}
-body[screen-size="small"] {
-    .profile-page {
+
+    .screen-x-small & {
         .info {
             flex-direction: column;
 

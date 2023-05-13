@@ -1,8 +1,6 @@
 <template>
     <CorePopup
         ref="popupRef"
-        :width="$devices.generic ? $screen.height * 0.6 : null"
-        :height="$devices.generic ? $screen.height * 0.8 : null"
         class="change-avatar-popup"
         :title="$t('components.changeAvatar.title')"
         :toolbarItems="[

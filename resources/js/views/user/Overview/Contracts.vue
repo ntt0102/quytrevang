@@ -317,9 +317,8 @@ function animatedNumber(type) {
             }
         }
     }
-}
-body[screen-size="small"] {
-    .overview-contracts {
+
+    .screen-x-small & {
         .sum > div {
             width: 100%;
             justify-content: space-between;

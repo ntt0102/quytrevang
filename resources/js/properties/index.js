@@ -7,12 +7,7 @@ import "./other";
 export default {
     install(app) {
         app.config.globalProperties.$appName = window.appName;
-        //
-        const currentDevice = devices.current();
-        app.config.globalProperties.$devices = currentDevice;
-        app.provide("devices", currentDevice);
-        //
-        app.config.globalProperties.$screen = window.screen;
+        app.provide("devices", devices.current());
         app.provide("routeHistoryState", []);
         //
         app.config.globalProperties.$mc = constants;

@@ -46,7 +46,11 @@
                         <DxForm
                             ref="depositFormRef"
                             :form-data="state.formData"
-                            :label-location="$devices.phone ? 'top' : 'left'"
+                            :label-location="
+                                $screen.getScreenSizeInfo.isXSmall
+                                    ? 'top'
+                                    : 'left'
+                            "
                             :scrolling-enabled="true"
                         >
                             <DxItem
@@ -88,7 +92,11 @@
                         <DxForm
                             ref="withdrawFormRef"
                             :form-data="state.formData"
-                            :label-location="$devices.phone ? 'top' : 'left'"
+                            :label-location="
+                                $screen.getScreenSizeInfo.isXSmall
+                                    ? 'top'
+                                    : 'left'
+                            "
                             :scrolling-enabled="true"
                         >
                             <DxItem
@@ -130,7 +138,11 @@
                         <DxForm
                             ref="transferFormRef"
                             :form-data="state.formData"
-                            :label-location="$devices.phone ? 'top' : 'left'"
+                            :label-location="
+                                $screen.getScreenSizeInfo.isXSmall
+                                    ? 'top'
+                                    : 'left'
+                            "
                             :scrolling-enabled="true"
                         >
                             <DxItem
@@ -190,7 +202,11 @@
                         <DxForm
                             ref="adjustmentFormRef"
                             :form-data="state.formData"
-                            :label-location="$devices.phone ? 'top' : 'left'"
+                            :label-location="
+                                $screen.getScreenSizeInfo.isXSmall
+                                    ? 'top'
+                                    : 'left'
+                            "
                             :scrolling-enabled="true"
                         >
                             <DxItem

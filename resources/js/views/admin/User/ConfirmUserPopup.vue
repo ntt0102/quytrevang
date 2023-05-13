@@ -3,7 +3,7 @@
         <DxPopup
             ref="popup"
             :showCloseButton="true"
-            :fullScreen="$devices.phone ? true : false"
+            :fullScreen="$screen.getScreenSizeInfo.isXSmall ? true : false"
             :show-title="true"
             :toolbarItems="[
                 {
@@ -62,7 +62,7 @@
                                     "
                                 />
                                 <DxCheckBox
-                                    v-if="!$devices.phone"
+                                    v-if="!$screen.getScreenSizeInfo.isXSmall"
                                     v-model="formData.isPdfPreview"
                                     :text="$t('components.confirmUser.preview')"
                                 />
@@ -325,9 +325,8 @@ export default {
             border: solid 1px darken(white, 70);
         }
     }
-}
-body[screen-size="small"] {
-    .confirm-user-popup {
+
+    .screen-x-small & {
         .dx-popup-content {
             padding: 24px 0 !important;
 

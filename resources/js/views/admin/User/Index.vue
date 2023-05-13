@@ -35,7 +35,9 @@
                     },
                     form: {
                         colCount: 2,
-                        labelLocation: $devices.phone ? 'top' : 'left',
+                        labelLocation: $screen.getScreenSizeInfo.isXSmall
+                            ? 'top'
+                            : 'left',
                         items: [
                             {
                                 itemType: 'group',
@@ -113,14 +115,16 @@
             >
                 <DxColumn
                     :fixed="true"
-                    :width="$devices.phone ? 35 : 125"
+                    :width="$screen.getScreenSizeInfo.isXSmall ? 35 : 125"
                     type="buttons"
                     cssClass="dx-datagrid-command-column"
                     cell-template="commandCellTemplate"
                     :caption="
                         $t(
                             `titles.commandHeaderTitle${
-                                $devices.phone ? 'Short' : ''
+                                $screen.getScreenSizeInfo.isXSmall
+                                    ? 'Short'
+                                    : ''
                             }`
                         )
                     "

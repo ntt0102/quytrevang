@@ -2,7 +2,7 @@
     <DxPopup
         ref="popup"
         :showCloseButton="true"
-        :fullScreen="$devices.phone ? true : false"
+        :fullScreen="$screen.getScreenSizeInfo.isXSmall ? true : false"
         :show-title="true"
         :wrapperAttr="{ class: 'paying-contract-popup' }"
         :toolbarItems="[
@@ -441,9 +441,7 @@ export default {
             }
         }
     }
-}
-body[screen-size="small"] {
-    .paying-contract-popup {
+    .screen-x-small & {
         .dx-popup-content {
             padding: 24px 0 !important;
         }

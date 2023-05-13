@@ -33,7 +33,9 @@
                     <DxForm
                         ref="formRef"
                         :form-data="state.formData"
-                        :label-location="$devices.phone ? 'top' : 'left'"
+                        :label-location="
+                            $screen.getScreenSizeInfo.isXSmall ? 'top' : 'left'
+                        "
                         :scrolling-enabled="true"
                     >
                         <DxItem
@@ -80,7 +82,7 @@
                                         ref="vueRecaptchaRef"
                                         theme="dark"
                                         :size="
-                                            $devices.phone
+                                            $screen.getScreenSizeInfo.isXSmall
                                                 ? 'compact'
                                                 : 'normal'
                                         "

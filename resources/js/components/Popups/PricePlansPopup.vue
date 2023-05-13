@@ -3,7 +3,7 @@
         ref="popup"
         class="price-plans-popup"
         :showCloseButton="true"
-        :fullScreen="$devices.phone ? true : false"
+        :fullScreen="$screen.getScreenSizeInfo.isXSmall ? true : false"
         :show-title="true"
         :title="$t('admin.smartorders.pricePlans')"
         @hiding="onHiding"
@@ -29,7 +29,7 @@
                             allowUpdating: true,
                             allowDeleting: true,
                             mode: 'batch',
-                            startEditAction: 'dblClick'
+                            startEditAction: 'dblClick',
                         }"
                         @contentReady="$mf.dataGridPreload(gridData, dataGrid)"
                         @saved="onSave"
@@ -60,7 +60,7 @@
                             format="#,##0"
                             :editor-options="{
                                 step: '1000',
-                                format: '#,##0'
+                                format: '#,##0',
                             }"
                             :caption="$t('admin.smartorders.planPrice')"
                             :validation-rules="validationRules.price"
@@ -71,7 +71,7 @@
                             format="#,##0"
                             :editor-options="{
                                 step: '1000',
-                                format: '#,##0'
+                                format: '#,##0',
                             }"
                             :caption="$t('admin.smartorders.renewalPrice')"
                             :validation-rules="validationRules.renewalPrice"
@@ -82,7 +82,7 @@
                             format="#,##0"
                             :editor-options="{
                                 step: '1000',
-                                format: '#,##0'
+                                format: '#,##0',
                             }"
                             :caption="$t('admin.smartorders.highestPrice')"
                             :validation-rules="validationRules.highestPrice"
@@ -104,9 +104,9 @@
                                                 dataGrid.deleteRow(
                                                     data.rowIndex
                                                 );
-                                            }
-                                        }
-                                    }
+                                            },
+                                        },
+                                    },
                                 ]"
                             />
                         </template>
@@ -123,7 +123,7 @@ import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 export default {
     components: {
         DxDataGrid,
-        DxColumn
+        DxColumn,
     },
     data() {
         return {
@@ -134,42 +134,42 @@ export default {
                         type: "required",
                         message:
                             this.$t("admin.smartorders.planName") +
-                            this.$mt.validations.required
-                    }
+                            this.$mt.validations.required,
+                    },
                 ],
                 months: [
                     {
                         type: "required",
                         message:
                             this.$t("admin.smartorders.months") +
-                            this.$mt.validations.required
-                    }
+                            this.$mt.validations.required,
+                    },
                 ],
                 price: [
                     {
                         type: "required",
                         message:
                             this.$t("admin.smartorders.planPrice") +
-                            this.$mt.validations.required
-                    }
+                            this.$mt.validations.required,
+                    },
                 ],
                 renewalPrice: [
                     {
                         type: "required",
                         message:
                             this.$t("admin.smartorders.renewalPrice") +
-                            this.$mt.validations.required
-                    }
+                            this.$mt.validations.required,
+                    },
                 ],
                 highestPrice: [
                     {
                         type: "required",
                         message:
                             this.$t("admin.smartorders.highestPrice") +
-                            this.$mt.validations.required
-                    }
-                ]
-            }
+                            this.$mt.validations.required,
+                    },
+                ],
+            },
         };
     },
     computed: {
@@ -177,14 +177,14 @@ export default {
         popup() {
             return this.$refs.popup.instance;
         },
-        dataGrid: function() {
+        dataGrid: function () {
             return this.$refs.dataGrid.instance;
-        }
+        },
     },
     watch: {
         plans() {
             this.gridData = this.$mf.cloneDeep(this.plans);
-        }
+        },
     },
     methods: {
         ...mapActions("Admin.smartorders", ["getPlans", "savePlans"]),
@@ -208,8 +208,8 @@ export default {
         onHiding() {
             this.gridData = null;
             this.$mf.popRouteHistoryState();
-        }
-    }
+        },
+    },
 };
 </script>
 <style lang="scss">

@@ -341,10 +341,11 @@ export default {
             background-color: #f5f5f5;
         }
     }
-}
-body[screen-size="small"] {
-    .qkb-bot-ui .qkb-board {
-        left: -1rem !important;
+
+    .screen-x-small & {
+        .qkb-board {
+            left: -1rem !important;
+        }
     }
 }
 </style>

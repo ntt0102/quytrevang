@@ -30,7 +30,9 @@
                             onHiding: $mf.popRouteHistoryState,
                         },
                         form: {
-                            labelLocation: $devices.phone ? 'top' : 'left',
+                            labelLocation: $screen.getScreenSizeInfo.isXSmall
+                                ? 'top'
+                                : 'left',
                             items: [
                                 {
                                     dataField: 'topic',
@@ -109,14 +111,16 @@
                 >
                     <DxColumn
                         :fixed="true"
-                        :width="$devices.phone ? 35 : 65"
+                        :width="$screen.getScreenSizeInfo.isXSmall ? 35 : 65"
                         type="buttons"
                         cssClass="dx-datagrid-command-column"
                         cell-template="commandCellTemplate"
                         :caption="
                             $t(
                                 `titles.commandHeaderTitle${
-                                    $devices.phone ? 'Short' : ''
+                                    $screen.getScreenSizeInfo.isXSmall
+                                        ? 'Short'
+                                        : ''
                                 }`
                             )
                         "

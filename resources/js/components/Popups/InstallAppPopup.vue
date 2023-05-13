@@ -4,7 +4,7 @@
         :position="{ my: 'top', at: 'top' }"
         :showTitle="false"
         :shading="true"
-        :width="$devices.phone ? '100%' : '400px'"
+        :width="$screen.getScreenSizeInfo.isXSmall ? '100%' : '400px'"
         height="90px"
     >
         <template #content>

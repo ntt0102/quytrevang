@@ -6,7 +6,6 @@
                 :is-x-small="screen.getScreenSizeInfo.isXSmall"
                 :is-large="screen.getScreenSizeInfo.isLarge"
             >
-                <!-- <router-view></router-view> -->
                 <router-view v-slot="{ Component, route }">
                     <transition name="fade">
                         <component :is="Component" :key="route.path" />
@@ -37,6 +36,7 @@ import AppFooter from "./components/Layouts/Partials/AppFooter.vue";
 import { sizes, subscribe, unsubscribe } from "./utils/media-query";
 import {
     getCurrentInstance,
+    ref,
     reactive,
     inject,
     computed,
@@ -47,15 +47,24 @@ import {
 import { useStore } from "vuex";
 
 const store = useStore();
-const vm = getCurrentInstance();
 const mf = inject("mf");
 const routeHistoryState = inject("routeHistoryState");
 
-const screen = reactive({ getScreenSizeInfo: {} });
+const app = getCurrentInstance();
+
+console.log("window.screen", window.screen);
+
+const screen = reactive({
+    getScreenSizeInfo: {},
+    width: window.screen.width,
+    height: window.screen.height,
+});
 screen.getScreenSizeInfo = getScreenSizeInfo();
+app.appContext.config.globalProperties.$screen = screen;
 
 function screenSizeChanged() {
     screen.getScreenSizeInfo = getScreenSizeInfo();
+    app.appContext.config.globalProperties.$screen = screen;
 }
 
 function getScreenSizeInfo() {

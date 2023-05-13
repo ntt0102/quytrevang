@@ -38,15 +38,18 @@
 <script setup>
 import OtpInput from "vue3-otp-input";
 import CorePopup from "./CorePopup.vue";
-import { inject, ref } from "vue";
+import { getCurrentInstance, ref } from "vue";
 import { useStore } from "vuex";
 
+const app = getCurrentInstance();
+const screenSize =
+    app.appContext.config.globalProperties.$screen.getScreenSizeInfo.value;
 const store = useStore();
-const devices = inject("devices");
 const popupRef = ref(null);
 const otpInputRef = ref(null);
 const isEnabled = ref(false);
 const pin = ref("");
+
 let params = null;
 
 function show(e) {
@@ -72,7 +75,11 @@ function handleOnComplete(e) {
 }
 function onShown() {
     isEnabled.value = true;
-    if (!params.forcePin && devices.phone && store.state.auth.user.webauthn)
+    if (
+        !params.forcePin &&
+        screenSize.isXSmall &&
+        store.state.auth.user.webauthn
+    )
         scanFingerPrint();
 }
 function onHidden() {

@@ -243,10 +243,7 @@ export default {
             }
         }
     }
-}
-
-body[screen-size="small"] {
-    .policy-page {
+    .screen-x-small & {
         .scroll {
             &::-webkit-scrollbar {
                 width: 0px;

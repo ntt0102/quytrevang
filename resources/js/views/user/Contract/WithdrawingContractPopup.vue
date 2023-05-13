@@ -2,7 +2,7 @@
     <DxPopup
         ref="popup"
         :showCloseButton="true"
-        :fullScreen="$devices.phone ? true : false"
+        :fullScreen="$screen.getScreenSizeInfo.isXSmall ? true : false"
         :show-title="true"
         :wrapperAttr="{ class: 'withdrawing-contract-popup' }"
         :toolbarItems="[
@@ -258,9 +258,7 @@ export default {
             }
         }
     }
-}
-body[screen-size="small"] {
-    .withdrawing-contract-popup {
+    .screen-x-small & {
         .dx-popup-content {
             padding: 24px 0 !important;
         }
