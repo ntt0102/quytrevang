@@ -9,9 +9,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.1",
-        "asbiin/laravel-webauthn": "^3.0",
+        "2tvenom/cborencode": "^1.0",
         "guzzlehttp/guzzle": "^7.2",
-        "guzzlehttp/psr7": "^2.1",
         "intervention/image": "^2.7",
         "laravel-notification-channels/webpush": "^7.1",
         "laravel/framework": "^10.8",

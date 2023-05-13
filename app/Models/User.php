@@ -54,6 +54,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'password',
         'pin',
+        'webauthn',
         'email',
         'phone',
         'sex',

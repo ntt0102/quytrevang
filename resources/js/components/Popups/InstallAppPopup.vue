@@ -79,11 +79,9 @@ defineExpose({
 
             .dx-button-content {
                 padding: 0;
-                padding-top: 25px;
 
                 .dx-button-text {
                     white-space: pre-line;
-                    line-height: 0px;
                     color: blanchedalmond;
                 }
             }

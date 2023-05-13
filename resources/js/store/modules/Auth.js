@@ -1,5 +1,6 @@
 import { useCookies } from "vue3-cookies";
 const { cookies } = useCookies();
+import { webauthnAuthenticate, webauthnRegister } from "../../plugins/webauthn";
 
 function initialState() {
     return {
@@ -236,66 +237,62 @@ const actions = {
                 { routeAction: "attest" },
                 { noLoading: true }
             );
-            console.log("credentials", optionsResponse.data);
-            navigator.credentials
-                .create({
-                    publicKey: parseIncomingServerOptions(optionsResponse.data),
-                })
-                .then((credentials) => {
-                    console.log("credentials", credentials);
-                    axios
-                        .post("auth/register-webauthn", {
-                            ...parseOutgoingCredentials(credentials),
-                            routeAction: "verify",
-                        })
-                        .then((response) => {
-                            // console.log(response);
-                            dispatch("check", true);
-                            resolve();
-                        });
-                });
+            webauthnRegister(
+                optionsResponse.data.challenge,
+                (success, info) => {
+                    if (success) {
+                        axios
+                            .post("auth/register-webauthn", {
+                                credentials: info,
+                                routeAction: "verify",
+                            })
+                            .then((response) => {
+                                dispatch("check", true);
+                                resolve();
+                            });
+                    }
+                }
+            );
         });
     },
-    loginWebAuthn({ commit, dispatch, getters, state, rootGetters }, param) {
+    loginWebAuthn({ commit, dispatch, getters, state, rootGetters }, username) {
         return new Promise(async (resolve, reject) => {
             const optionsResponse = await axios.post(
                 "auth/login-webauthn",
-                param,
+                { routeAction: "assert", username: username },
                 { noLoading: true }
             );
-            navigator.credentials
-                .get({
-                    publicKey: parseIncomingServerOptions(
-                        JSON.parse(optionsResponse.data)
-                    ),
-                })
-                .then((credentials) => {
-                    axios
-                        .post("auth/login-webauthn", {
-                            ...parseOutgoingCredentials(credentials),
-                            routeAction: "verify",
-                        })
-                        .then((response) => {
-                            // console.log(response);
-                            if (response.data.isOk) {
-                                setTokenCookie(response.data.token);
-                                commit("setState", response.data);
-                                resolve({
-                                    isOk: response.data.isOk,
-                                    isMaintenance: response.data.isMaintenance,
-                                    user: {
-                                        username: response.data.user.email,
-                                        avatar: response.data.user.avatar,
-                                        name: response.data.user.name,
-                                        webauthn: response.data.user.webauthn,
-                                    },
-                                });
-                            } else resolve({ isOk: false });
-                        });
-                })
-                .catch((e) => {
-                    reject();
-                });
+            webauthnAuthenticate(
+                optionsResponse.data.challenge,
+                (success, info) => {
+                    if (success) {
+                        axios
+                            .post("auth/login-webauthn", {
+                                credentials: info,
+                                userId: optionsResponse.data.userId,
+                                routeAction: "verify",
+                            })
+                            .then((response) => {
+                                if (response.data.isOk) {
+                                    setTokenCookie(response.data.token);
+                                    commit("setState", response.data);
+                                    resolve({
+                                        isOk: response.data.isOk,
+                                        isMaintenance:
+                                            response.data.isMaintenance,
+                                        user: {
+                                            username: response.data.user.email,
+                                            avatar: response.data.user.avatar,
+                                            name: response.data.user.name,
+                                            webauthn:
+                                                response.data.user.webauthn,
+                                        },
+                                    });
+                                } else resolve({ isOk: false });
+                            });
+                    }
+                }
+            );
         });
     },
     confirmWebAuthn({ commit, dispatch, getters, state, rootGetters }, param) {
@@ -305,23 +302,25 @@ const actions = {
                 { routeAction: "assert" },
                 { noLoading: true }
             );
-            navigator.credentials
-                .get({
-                    publicKey: parseIncomingServerOptions(
-                        JSON.parse(optionsResponse.data)
-                    ),
-                })
-                .then((credentials) => {
-                    axios
-                        .post("auth/confirm-webauthn", {
-                            ...parseOutgoingCredentials(credentials),
-                            routeAction: "verify",
-                        })
-                        .then((response) => {
-                            // console.log(response);
-                            resolve(response.data.isOk);
-                        });
-                });
+            webauthnAuthenticate(
+                optionsResponse.data.challenge,
+                (success, info) => {
+                    if (success) {
+                        axios
+                            .post(
+                                "auth/confirm-webauthn",
+                                {
+                                    credentials: info,
+                                    routeAction: "verify",
+                                },
+                                { noLoading: true, notify: true }
+                            )
+                            .then((response) => {
+                                resolve(response.data.isOk);
+                            });
+                    }
+                }
+            );
         });
     },
     login({ commit, dispatch, getters }, param) {

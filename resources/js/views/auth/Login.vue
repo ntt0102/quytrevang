@@ -205,14 +205,16 @@ export default {
         },
         fingerPrintClick() {
             if (this.formData.username) {
-                let param = {};
-                let username = this.formData.username.includes("@")
-                    ? "email"
-                    : "phone";
-                param[username] = this.formData.username;
+                // let param = {};
+                // let username = this.formData.username.includes("@")
+                //     ? "email"
+                //     : "phone";
+                // param[username] = this.formData.username;
                 // param.username = username;
+                // {username : this.formData.username,
+                // routeAction: "assert"
                 // param.routeAction = "assert";
-                this.loginWebAuthn(param)
+                this.loginWebAuthn(this.formData.username)
                     .then(({ isOk, isMaintenance, user }) =>
                         this.responseProcess(isOk, isMaintenance, user)
                     )

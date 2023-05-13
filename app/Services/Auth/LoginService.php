@@ -7,11 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Foundation\Application;
 use App\Models\User;
-// use Illuminate\Support\Arr;
-// use Rawilk\Webauthn\Actions\PrepareKeyCreationData;
-// use Rawilk\Webauthn\Actions\RegisterNewKeyAction;
-// use Rawilk\Webauthn\Actions\PrepareAssertionData;
-// use Rawilk\Webauthn\Facades\Webauthn;
+use App\Services\Special\WebauthnService;
 
 
 class LoginService
@@ -88,20 +84,20 @@ class LoginService
      */
     public function loginWebAuthn($request)
     {
-        $username  = $request->username;
-        $fieldName = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
-        $user = User::where($fieldName, $username)->first();
+        $webauthn = new WebauthnService(request()->getHost());
         switch ($request->routeAction) {
             case 'assert':
-                return json_encode(app(PrepareAssertionData::class)($user));
+                $username  = $request->username;
+                $fieldName = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
+                $user = User::where($fieldName, $username)->first();
+                return [
+                    'challenge' => $webauthn->prepareForLogin($user->webauthn),
+                    'userId' => $user->id
+                ];
                 break;
             case 'verify':
-                $valid = Webauthn::validateAssertion($user, Arr::only($request->all(), [
-                    'id',
-                    'rawId',
-                    'response',
-                    'type',
-                ]));
+                $user = User::find($request->userId);
+                $valid = $webauthn->authenticate($request->credentials, $user->webauthn);
                 if (!$valid) return ['isOk' => false];
                 return $this->createToken($user);
                 break;
@@ -117,29 +113,16 @@ class LoginService
      */
     public function registerWebAuthn($request)
     {
+        $webauthn = new WebauthnService(request()->getHost());
         $user = $request->user();
         switch ($request->routeAction) {
             case 'attest':
-                // return json_encode(app(PrepareKeyCreationData::class)($user));
-                return app(PrepareCreationData::class)($user);
+                return ['challenge' => $webauthn->prepareChallengeForRegistration($user->email, strval($user->id))];
                 break;
             case 'verify':
-                // try {
-                //     app(RegisterNewKeyAction::class)(
-                //         $user,
-                //         Arr::only($request->all(), ['id', 'rawId', 'response', 'type']),
-                //         'keyName',
-                //     );
-                //     return ['isOk' => true];
-                // } catch (\Rawilk\Webauthn\Exceptions\WebauthnRegisterException $e) {
-                //     return ['isOk' => false, 'message' => $e->getMessage()];
-                // }
-                app(ValidateKeyCreation::class)(
-                    $user,
-                    $request->only(['id', 'rawId', 'response', 'type']),
-                    $user->name
-                );
-
+                $user->webauthn = $webauthn->register($request->credentials, null);
+                $isOk = $user->save();
+                return ['isOk' => $isOk];
                 break;
         }
     }
@@ -153,18 +136,14 @@ class LoginService
      */
     public function confirmWebAuthn($request)
     {
+        $webauthn = new WebauthnService(request()->getHost());
         $user = $request->user();
         switch ($request->routeAction) {
             case 'assert':
-                return json_encode(app(PrepareAssertionData::class)($user));
+                return ['challenge' => $webauthn->prepareForLogin($user->webauthn)];
                 break;
             case 'verify':
-                $valid = Webauthn::validateAssertion($user, Arr::only($request->all(), [
-                    'id',
-                    'rawId',
-                    'response',
-                    'type',
-                ]));
+                $valid = $webauthn->authenticate($request->credentials, $user->webauthn);
                 if (!$valid) return ['isOk' => false, 'message' => 'checkPinFail'];
                 return ['isOk' => true];
                 break;

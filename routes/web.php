@@ -103,8 +103,10 @@ Route::get('test', function () {
     //     'sendMail' => true,
     // ]);
     // $s = date("n/Y");
-    $s = App\Models\User::find(1);
-    $s = $s->url_avatar;
+    $user = App\Models\User::find(1);
+    $webauthn = new App\Services\Special\WebauthnService('https://quytrevang.com');
+    // $s = $webauthn->prepareChallengeForRegistration($user->email, strval($user->id));
+    $s = $webauthn->prepareForLogin($user->webauthn);
     // $s = $s->can('stock@order');
     // $s = $s->roles;
     // $s = event(new App\Events\UpdateFinbookEvent());
