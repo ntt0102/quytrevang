@@ -11,8 +11,8 @@ class VpsOrderService extends CoreService
     private $client;
     private $vpsUser;
     public $symbol;
-    public $connection;
-    public $position;
+    public $connection = false;
+    public $position = 0;
 
     public function __construct(VpsUser $vpsUser)
     {
@@ -38,6 +38,7 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
+        if (!$rsp) return;
         $this->connection = $rsp->rc == 1;
         $this->position = $rsp->rc == 1 ? intval($rsp->data[0]->net) : 0;
     }
