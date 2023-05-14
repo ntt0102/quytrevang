@@ -195,7 +195,7 @@ const state = reactive({
     chartDate: CURRENT_DATE,
     clock: moment().format("HH:mm:ss"),
     isFullscreen: false,
-    color: "#FF6900",
+    color: "#F44336",
     showColorPicker: false,
 });
 const status = computed(() => store.state.tradingOrder.status);
