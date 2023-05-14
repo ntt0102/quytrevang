@@ -7,6 +7,7 @@
                 :is-large="screen.getScreenSizeInfo.isLarge"
             >
                 <router-view v-slot="{ Component, route }">
+                    {{ baseAccentColor }}
                     <transition name="fade">
                         <component :is="Component" :key="route.path" />
                     </transition>
@@ -28,15 +29,16 @@
             indicatorSrc="../images/android-chrome-reverse-512x512.svg"
             shading-color="rgba(0,0,0,0.4)"
         />
+        <Chatbot />
     </div>
 </template>
 
 <script setup>
 import AppFooter from "./components/Layouts/Partials/AppFooter.vue";
+import Chatbot from "./components/Chatbot.vue";
 import { sizes, subscribe, unsubscribe } from "./utils/media-query";
 import {
     getCurrentInstance,
-    ref,
     reactive,
     inject,
     computed,

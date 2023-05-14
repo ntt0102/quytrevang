@@ -17,6 +17,11 @@ export default defineConfig({
             },
         }),
     ],
+    css: {
+        modules: {
+            scopeBehaviour: "global",
+        },
+    },
     // resolve: {
     //     alias: {
     //         vue: "vue/dist/vue.esm.js",

@@ -4,6 +4,7 @@ import mitt from "mitt";
 // import router from "../router";
 // import Toasted from "vue-toasted";
 // import VueGtag from "vue-gtag";
+import Chat from "vue3-beautiful-chat";
 
 import DxScrollView from "devextreme-vue/scroll-view";
 import DxToolbar from "devextreme-vue/toolbar";
@@ -18,6 +19,8 @@ export default {
         const bus = mitt();
         app.config.globalProperties.$bus = bus;
         app.provide("bus", bus);
+
+        app.use(Chat);
         // app.use(Crypto);
         // app.use(VueCookies);
         // app.use(Toasted, {

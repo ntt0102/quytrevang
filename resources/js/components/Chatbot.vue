@@ -1,351 +1,134 @@
 <template>
-    <VueBotUI
-        :options="botOptions"
-        :messages="messageData"
-        :bot-typing="botTyping"
-        :input-disable="false"
-        :is-open="false"
-        @init="onInit"
-        @msg-send="onMsgSend"
-        @destroy="onDestroy"
-    />
+    <beautiful-chat
+        :participants="state.participants"
+        :titleImageUrl="state.titleImageUrl"
+        :onMessageWasSent="onMessageWasSent"
+        :messageList="state.messageList"
+        :newMessagesCount="state.newMessagesCount"
+        :isOpen="state.isChatOpen"
+        :close="closeChat"
+        :open="openChat"
+        :showEmoji="false"
+        :showFile="true"
+        :showEdition="true"
+        :showDeletion="true"
+        :deletionConfirmation="true"
+        :showTypingIndicator="state.showTypingIndicator"
+        :showLauncher="true"
+        :showCloseButton="true"
+        :colors="state.colors"
+        :alwaysScrollToBottom="state.alwaysScrollToBottom"
+        :disableUserListToggle="false"
+        :messageStyling="state.messageStyling"
+        @onType="handleOnType"
+        @edit="editMessage"
+    >
+        <template v-slot:header>Trợ lý ảo - trả lời tự động</template>
+    </beautiful-chat>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex";
-import { VueBotUI } from "vue-bot-ui";
+<script setup>
+import { baseAccentColor } from "../../sass/style.module.scss";
+import { reactive } from "vue";
+import { useStore } from "vuex";
 
-function similarity(s1, s2) {
-    var longer = adjust(s1);
-    var shorter = adjust(s2);
-    if (s1.length < s2.length) {
-        longer = s2;
-        shorter = s1;
+const store = useStore();
+const state = reactive({
+    participants: [
+        {
+            id: "user1",
+            name: "Support",
+            imageUrl:
+                // "https://avatars3.githubusercontent.com/u/37018832?s=200&v=4",
+                "/images/android-chrome-512x512.png",
+        },
+        {
+            id: "user2",
+            name: "Matteo",
+            imageUrl:
+                "https://avatars3.githubusercontent.com/u/1915989?s=230&v=4",
+        },
+    ], // the list of all the participant of the conversation. `name` is the user name, `id` is used to establish the author of a message, `imageUrl` is supposed to be the user avatar.
+    // titleImageUrl:
+    //     "https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png",
+    titleImageUrl: "/images/chatbot.png",
+    messageList: [
+        { type: "text", author: `me`, data: { text: `Say yes!` } },
+        { type: "text", author: `user1`, data: { text: `No.` } },
+    ], // the list of the messages to show, can be paginated and adjusted dynamically
+    newMessagesCount: 0,
+    isChatOpen: false, // to determine whether the chat window should be open or closed
+    showTypingIndicator: "", // when set to a value matching the participant.id it shows the typing indicator for the specific user
+    colors: {
+        header: {
+            bg: baseAccentColor,
+            text: "#ffffff",
+        },
+        launcher: {
+            bg: baseAccentColor,
+        },
+        messageList: {
+            bg: "#ffffff",
+        },
+        sentMessage: {
+            bg: baseAccentColor,
+            text: "#ffffff",
+        },
+        receivedMessage: {
+            bg: "#eaeaea",
+            text: "#222222",
+        },
+        userInput: {
+            bg: "#f4f7f9",
+            text: "#565867",
+        },
+    }, // specifies the color scheme for the component
+    alwaysScrollToBottom: false, // when set to true always scrolls the chat to the bottom when new events are in (new message, user starts typing...)
+    messageStyling: true, // enables *bold* /emph/ _underline_ and such (more info at github.com/mattezza/msgdown)
+});
+
+function sendMessage(text) {
+    if (text.length > 0) {
+        state.newMessagesCount = state.isChatOpen
+            ? state.newMessagesCount
+            : state.newMessagesCount + 1;
+        onMessageWasSent({
+            author: "support",
+            type: "text",
+            data: { text },
+        });
     }
-    var longerLength = longer.length;
-    if (longerLength == 0) {
-        return 1.0;
-    }
-    return (
-        (longerLength - editDistance(longer, shorter)) /
-        parseFloat(longerLength)
-    );
 }
-function editDistance(s1, s2) {
-    var costs = new Array();
-    for (var i = 0; i <= s1.length; i++) {
-        var lastValue = i;
-        for (var j = 0; j <= s2.length; j++) {
-            if (i == 0) costs[j] = j;
-            else {
-                if (j > 0) {
-                    var newValue = costs[j - 1];
-                    if (s1.charAt(i - 1) != s2.charAt(j - 1))
-                        newValue =
-                            Math.min(Math.min(newValue, lastValue), costs[j]) +
-                            1;
-                    costs[j - 1] = lastValue;
-                    lastValue = newValue;
-                }
-            }
-        }
-        if (i > 0) costs[s2.length] = lastValue;
-    }
-    return costs[s2.length];
+function onMessageWasSent(message) {
+    // called when the user sends a message
+    state.messageList = [...state.messageList, message];
 }
-
-function adjust(str) {
-    return str
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/đ/g, "d")
-        .replace(/Đ/g, "D")
-        .replace("gi", "")
-        .replace("bang cach nao", "")
-        .replace("nhu the nao", "")
-        .replace("bao nhieu", "")
-        .replace("dau", "")
-        .replace("o dau", "")
-        .replace("lam gi", "")
-        .replace("?", "")
-        .toLowerCase()
-        .trim();
+function openChat() {
+    // called when the user clicks on the fab button to open the chat
+    state.isChatOpen = true;
+    state.newMessagesCount = 0;
 }
-
-export default {
-    components: {
-        VueBotUI,
-    },
-    data() {
-        return {
-            data: [],
-            topics: [],
-            messageData: [],
-            botTyping: false,
-            botOptions: {
-                botTitle: this.$t("components.chatbot.botTitle"),
-                colorScheme: "#ff5722",
-                bubbleBtnSize: 50,
-                botAvatarImg: "../../images/android-chrome-512x512.png",
-                inputPlaceholder: this.$t(
-                    "components.chatbot.inputPlaceholder"
-                ),
-            },
-            voiceApi: `https://api.voicerss.org/?key=${
-                import.meta.env.VITE_VOICERSS_KEY
-            }&hl=vi-vn&src=`,
-            resizeObserver: null,
-        };
-    },
-    mounted() {
-        this.resizeObserver = new ResizeObserver(this.showLatestMessage);
-    },
-    computed: {
-        ...mapGetters(["faqs", "contact"]),
-        ...mapGetters("Auth", ["name", "sex", "isLoggedin"]),
-        userName() {
-            return !!this.name ? " " + this.name.split(" ").pop() : "";
-        },
-        userTitle() {
-            return this.$t(`components.chatbot.title.user${this.sex || ""}`);
-        },
-    },
-    watch: {
-        isLoggedin() {
-            this.messageData = [];
-        },
-        faqs() {
-            import(`../locales/chatbot/${window.lang}.js`).then((extra) => {
-                this.data = [...this.faqs, ...extra.default];
-                this.topics = this.faqs.reduce((topics, item) => {
-                    if (!topics.includes(item.topic)) topics.push(item.topic);
-                    return topics;
-                }, []);
-            });
-        },
-    },
-    methods: {
-        onInit() {
-            console.log("onInit");
-            if (this.$mf.isEmpty(this.messageData)) {
-                this.botTyping = true;
-                let text = this.$t("components.chatbot.hello")
-                    .replace("{name}", this.userName)
-                    .replaceAll("{title}", this.userTitle);
-                let audio = new Audio(`${this.voiceApi}${text}`);
-                audio.play();
-                setTimeout(() => {
-                    this.botTyping = false;
-                    this.messageData.push({
-                        agent: "bot",
-                        type: "text",
-                        text: text,
-                    });
-                }, 500);
-            }
-            setTimeout(() => {
-                this.showLatestMessage();
-                this.resizeObserver.observe(
-                    document.querySelector(".qkb-board-content")
-                );
-            }, 0);
-        },
-        onMsgSend(response) {
-            this.messageData.push({
-                agent: "user",
-                type: "text",
-                text: response.text,
-            });
-            this.botTyping = true;
-            let replyMessage = this.getResponse(response);
-            if (replyMessage.text) {
-                let audio = new Audio(`${this.voiceApi}${replyMessage.text}`);
-                audio.play();
-            }
-            setTimeout(() => {
-                this.messageData.push(replyMessage);
-                this.botTyping = false;
-            }, 500);
-        },
-        getResponse(response) {
-            let replyMessage = { agent: "bot" };
-            //
-            if (response.action == "postback") {
-                switch (response.value) {
-                    case "question":
-                        let msg = this.faqs.filter(
-                            (item) => item.question == response.text
-                        )[0];
-                        if (/<\/?[a-z][\s\S]*>/i.test(msg.answer)) {
-                            replyMessage.type = "button";
-                            replyMessage.text = this.$t(
-                                "components.chatbot.detail"
-                            );
-                            replyMessage.options = [
-                                {
-                                    text: this.$t("components.chatbot.more"),
-                                    value: this.$router.resolve({
-                                        name: "policy",
-                                        hash: "#faq",
-                                        query: { search: msg.question },
-                                    }).href,
-                                    action: "url",
-                                },
-                            ];
-                        } else {
-                            replyMessage.type = "text";
-                            replyMessage.text = msg.answer;
-                        }
-                        break;
-                    case "topic":
-                        replyMessage.type = "button";
-                        replyMessage.text =
-                            this.$t("components.chatbot.questionsInTopic") +
-                            " " +
-                            response.text;
-                        let filtered = this.faqs.filter(
-                            (item) => item.topic == response.text
-                        );
-                        replyMessage.options = [];
-                        filtered.forEach((item) => {
-                            replyMessage.options.push({
-                                text: item.question,
-                                value: "question",
-                                action: "postback",
-                            });
-                        });
-                        break;
-                }
-            } else {
-                const matched = this.data.reduce(
-                    (match, item) => {
-                        let point = similarity(item.question, response.text);
-                        if (point > match.point)
-                            match = {
-                                msg: item,
-                                point: point,
-                            };
-                        return match;
-                    },
-                    { msg: {}, point: 0 }
-                );
-                if (matched.point >= 0.6) {
-                    if (/<\/?[a-z][\s\S]*>/i.test(matched.msg.answer)) {
-                        replyMessage.type = "button";
-                        replyMessage.text = this.$t(
-                            "components.chatbot.detail"
-                        );
-                        replyMessage.options = [
-                            {
-                                text: this.$t("components.chatbot.more"),
-                                value: this.$router.resolve({
-                                    name: "policy",
-                                    hash: "#faq",
-                                    query: { search: matched.msg.question },
-                                }).href,
-                                action: "url",
-                            },
-                        ];
-                    } else {
-                        replyMessage.text = matched.msg.answer;
-                        if (!!matched.msg.url) {
-                            replyMessage.type = "button";
-                            replyMessage.options = [
-                                {
-                                    text: this.$t("components.chatbot.more"),
-                                    value: matched.msg.url,
-                                    action: "url",
-                                },
-                            ];
-                        } else replyMessage.type = "text";
-                    }
-                } else {
-                    replyMessage.type = "button";
-                    replyMessage.text = this.$t(
-                        "components.chatbot.topicConfirm"
-                    ).replaceAll("{title}", this.userTitle);
-
-                    replyMessage.options = [];
-                    this.topics.forEach((item) => {
-                        replyMessage.options.push({
-                            text: item,
-                            value: "topic",
-                            action: "postback",
-                        });
-                    });
-                    replyMessage.options.push({
-                        text: this.$t("components.chatbot.sendZalo"),
-                        value: `https://zalo.me/${this.contact.phone}`,
-                        action: "url",
-                    });
-                }
-            }
-            return replyMessage;
-        },
-        showLatestMessage() {
-            document
-                .querySelector(".qkb-board-content .qkb-msg-bubble:last-child")
-                .scrollIntoView();
-        },
-        onDestroy() {
-            this.resizeObserver.unobserve(
-                document.querySelector(".qkb-board-content")
-            );
-        },
-    },
-};
+function closeChat() {
+    // called when the user clicks on the botton to close the chat
+    state.isChatOpen = false;
+}
+function handleScrollToTop() {
+    // called when the user scrolls message list to top
+    // leverage pagination for loading another page of messages
+}
+function handleOnType() {
+    console.log("Emit typing event");
+}
+function editMessage(message) {
+    const m = state.messageList.find((m) => m.id === message.id);
+    m.isEdited = true;
+    m.data.text = message.data.text;
+}
 </script>
 <style lang="scss">
-.qkb-bot-ui {
-    left: 1.5rem;
-    right: auto !important;
-
-    .qkb-board {
-        left: 0;
-        right: auto !important;
-    }
-
-    .qkb-bubble-btn {
-        opacity: 0.5;
-
-        &:hover {
-            opacity: 1;
-        }
-    }
-
-    .qkb-board-action__disable-text {
-        color: black;
-    }
-    .qkb-mb-button-options__btn {
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        max-width: 270px;
-    }
-    .qkb-msg-bubble-component,
-    .qkb-board-header__title {
-        font-size: unset;
-    }
-    .qkb-msg-bubble-component__text {
-        white-space: pre-line;
-    }
-    .qkb-board-content {
-        &::-webkit-scrollbar {
-            width: 6px;
-            background-color: #f5f5f5;
-        }
-        &::-webkit-scrollbar-thumb {
-            background-color: #c1c1c1;
-        }
-        &::-webkit-scrollbar-track {
-            box-shadow: inset 0 0 6px lighten(#c1c1c1, 30);
-            background-color: #f5f5f5;
-        }
-    }
-
-    .screen-x-small & {
-        .qkb-board {
-            left: -1rem !important;
-        }
+.sc-chat-window {
+    &.opened {
+        z-index: 1500;
     }
 }
 </style>
