@@ -4,9 +4,7 @@ function initialState() {
     };
 }
 
-const getters = {
-    permissions: (state) => state.permissions,
-};
+const getters = {};
 
 const actions = {
     validateDuplicateName({ state, rootGetters }, param) {
@@ -28,7 +26,7 @@ const actions = {
                 });
         });
     },
-    fetch({ commit, dispatch, getters, state, rootGetters }) {
+    getPermissions({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios.get("settings/permissions").then((response) => {
                 commit("setState", response.data);
@@ -42,8 +40,7 @@ const actions = {
                 .post("settings/permissions", { changes: param.changes })
                 .then((response) => {
                     resolve();
-                    dispatch("fetch");
-                    // dispatch("Admin.roles/fetch", null, { root: true });
+                    dispatch("getPermissions");
                 });
         });
     },

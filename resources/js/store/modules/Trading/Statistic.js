@@ -28,13 +28,13 @@ const actions = {
     validateDuplicateDate({ state }, param) {
         const oldDate = state.data.find((x) => x.id === param.data.id);
         if (oldDate != undefined) {
-            if (param.data.date == oldDate.date) return Promise.resolve(true);
+            if (param.value == oldDate.date) return Promise.resolve(true);
         }
         return new Promise((resolve, reject) => {
             axios
                 .post(
                     "trades/validate-duplicate-date",
-                    { date: param.data.date },
+                    { date: param.value },
                     { nonLoading: true, crypto: true }
                 )
                 .then((response) => {

@@ -36,6 +36,7 @@ class ParameterService extends CoreService
     public function save($request)
     {
         return $this->transaction(function () use ($request) {
+            $response = [];
             foreach ($request->changes as $change) {
                 $response = [];
                 if ($change['type'] == 'update') {

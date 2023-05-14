@@ -59,7 +59,7 @@ const actions = {
             });
         });
     },
-    fetchLog({ commit, dispatch, getters, state, rootGetters }, param) {
+    getLog({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios.get("settings/log").then((response) => {
                 resolve(response.data);

@@ -487,7 +487,7 @@ export default {
                 target
             ) {
                 if (target === "search" && typeof filterValue === "string") {
-                    return [this.dataField, "contains", filterValue];
+                    return ["roles", "contains", filterValue];
                 }
                 return function (data) {
                     return (data.roles || []).indexOf(filterValue) !== -1;
@@ -499,7 +499,7 @@ export default {
                 target
             ) {
                 if (target === "search" && typeof filterValue === "string") {
-                    return [this.dataField, "contains", filterValue];
+                    return ["permissions", "contains", filterValue];
                 }
                 return function (data) {
                     return (data.permissions || []).indexOf(filterValue) !== -1;

@@ -205,12 +205,9 @@ function show() {
     popupRef.value.show();
 }
 function onSave(formData) {
-    setTimeout(
-        () =>
-            bus.emit("checkPin", () =>
-                store.dispatch("tradingStatistic/save", formData)
-            ),
-        100
+    if (!formData.length) return;
+    bus.emit("checkPin", () =>
+        store.dispatch("tradingStatistic/save", formData)
     );
 }
 function onShown() {

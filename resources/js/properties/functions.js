@@ -1,6 +1,8 @@
 import lang from "../lang";
 import { VietQR } from "vietqr";
 import { toast } from "vue3-toastify";
+import mt from "./texts";
+import mitt from "mitt";
 
 export default {
     handleError: (error, message) => {
@@ -46,16 +48,16 @@ export default {
             ],
         });
     },
-    checkPinDataGrid(e, vm) {
+    checkPinDataGrid(e, dataGridInstance) {
         let items = e.component.option("toolbarItems");
         items[0].options.onClick = () => {
-            if (vm.dataGrid.hasEditData()) {
-                vm.$bus.emit("checkPin", () => {
-                    vm.dataGrid.saveEditData();
+            if (dataGridInstance.hasEditData()) {
+                mitt().emit("checkPin", () => {
+                    dataGridInstance.saveEditData();
                 });
             } else {
-                vm.$toasted.info(vm.$mt.messages.info.noChangedData);
-                vm.dataGrid.cancelEditData();
+                toast.info(mt.messages.info.noChangedData);
+                dataGridInstance.cancelEditData();
             }
         };
         e.component.option("toolbarItems", items);

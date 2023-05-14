@@ -43,7 +43,7 @@ import { useStore } from "vuex";
 
 const app = getCurrentInstance();
 const screenSize =
-    app.appContext.config.globalProperties.$screen.getScreenSizeInfo.value;
+    app.appContext.config.globalProperties.$screen.getScreenSizeInfo;
 const store = useStore();
 const popupRef = ref(null);
 const otpInputRef = ref(null);

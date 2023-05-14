@@ -4,12 +4,10 @@ function initialState() {
     };
 }
 
-const getters = {
-    parameters: (state) => state.parameters,
-};
+const getters = {};
 
 const actions = {
-    fetch({ commit, dispatch, getters, state, rootGetters }) {
+    getParameters({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios.get("settings/parameters").then((response) => {
                 commit("setState", response.data);
@@ -23,7 +21,7 @@ const actions = {
                 .post("settings/parameters", { changes: param.changes })
                 .then((response) => {
                     resolve();
-                    dispatch("fetch");
+                    dispatch("getParameters");
                 });
         });
     },
