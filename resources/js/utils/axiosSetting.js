@@ -1,13 +1,9 @@
-// import Vue from "vue";
 import lang from "../lang";
 import store from "../store";
 import crypto from "./crypto";
 import { toast } from "vue3-toastify";
 import functions from "../properties/functions";
-// import config from "devextreme/core/config";
-
-// Vue.config.productionTip = false;
-// toast.success(lang.global.t("messages.success.saved"));
+import config from "devextreme/core/config";
 
 axios.interceptors.request.use(
     (config) => {
@@ -77,6 +73,6 @@ axios.interceptors.response.use(
 store.dispatch("getContact");
 store.dispatch("getFaqs");
 
-// config({
-//     editorStylingMode: "underlined",
-// });
+config({
+    editorStylingMode: "underlined",
+});

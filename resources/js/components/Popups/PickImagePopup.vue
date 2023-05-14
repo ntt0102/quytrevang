@@ -1,54 +1,38 @@
 <template>
-    <DxPopup
-        ref="popup"
-        :showCloseButton="true"
-        :fullScreen="$screen.getScreenSizeInfo.isXSmall ? true : false"
-        :show-title="true"
+    <CorePopup
+        ref="popupRef"
         :title="$t('components.pickImage.title')"
-        @hiding="onHiding"
+        @shown="onShown"
+        @hidden="onHidden"
     >
-        <template #content>
-            <DxScrollView>
-                <FileManager
-                    @copiedUrl="onCopiedUrl"
-                    :clientPath="clientPath"
-                />
-            </DxScrollView>
-        </template>
-    </DxPopup>
+        <DxScrollView>
+            <FileManager
+                @copiedUrl="onCopiedUrl"
+                :clientPath="state.clientPath"
+            />
+        </DxScrollView>
+    </CorePopup>
 </template>
-<script>
+<script setup>
+import { reactive, ref } from "vue";
 import FileManager from "../../components/FileManager.vue";
+import CorePopup from "./CorePopup.vue";
+const popupRef = ref(null);
+const state = reactive({ clientPath: "" });
+let params = { callback: null, emitData: null };
+function show({ clientPath, callback }) {
+    state.clientPath = clientPath;
+    params.callback = callback;
+    popupRef.value.show();
+}
+function onCopiedUrl(copiedUrl) {
+    params.emitData = copiedUrl;
+    popupRef.value.hide();
+}
 
-export default {
-    components: {
-        FileManager,
-    },
-    data() {
-        return { clientPath: "", callback: null, emitData: null };
-    },
-    computed: {
-        popup() {
-            return this.$refs.popup.instance;
-        },
-    },
-    methods: {
-        show({ clientPath, callback }) {
-            this.clientPath = clientPath;
-            this.callback = callback;
-            this.popup.show();
-            this.$mf.pushPopupToHistoryState(() => this.popup.hide());
-        },
-        onHiding() {
-            if (typeof this.callback === "function")
-                this.callback(this.emitData);
-            this.$mf.popRouteHistoryState();
-        },
-        onCopiedUrl(copiedUrl) {
-            this.emitData = copiedUrl;
-            this.popup.hide();
-        },
-    },
-};
+function onShown() {}
+function onHidden() {
+    if (typeof params.callback === "function") params.callback(params.emitData);
+}
+defineExpose({ show });
 </script>
-<style></style>

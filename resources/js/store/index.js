@@ -20,7 +20,7 @@ import tradingStatistic from "./modules/Trading/Statistic";
 import tradingOrder from "./modules/Trading/Order";
 import tradingFinbook from "./modules/Trading/Finbook";
 // Setting
-import settingCommon from "./modules/Setting/Index";
+import setting from "./modules/Setting/Index";
 import settingFaq from "./modules/Setting/Faq";
 import settingParameter from "./modules/Setting/Parameter";
 import settingRole from "./modules/Setting/Role";
@@ -47,7 +47,7 @@ export default createStore({
         tradingOrder,
         tradingFinbook,
         // Setting
-        settingCommon,
+        setting,
         settingFaq,
         settingParameter,
         settingRole,

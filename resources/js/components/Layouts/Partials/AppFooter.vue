@@ -39,15 +39,15 @@
                     </div>
                 </div>
                 <div class="policy">
-                    <span class="link" @click="policyClick('#terms')">{{
-                        $t("policy.terms.short")
-                    }}</span>
-                    <span class="link" @click="policyClick('#privacy')">{{
-                        $t("policy.privacy.short")
-                    }}</span>
-                    <span class="link" @click="policyClick('#faq')">{{
-                        $t("policy.faq.short")
-                    }}</span>
+                    <div class="link" @click="policyClick('#terms')">
+                        {{ $t("policy.terms.short") }}
+                    </div>
+                    <div class="link" @click="policyClick('#privacy')">
+                        {{ $t("policy.privacy.short") }}
+                    </div>
+                    <div class="link" @click="policyClick('#faq')">
+                        {{ $t("policy.faq.short") }}
+                    </div>
                 </div>
             </div>
             <div class="copyright">
@@ -88,40 +88,16 @@ function policyClick(hash) {
 
     .wrapper {
         display: flex;
-        justify-content: space-between;
+        justify-content: space-around;
 
-        .contact {
+        & > div {
             display: flex;
             flex-direction: column;
             align-items: flex-start;
             gap: 5px;
 
-            .screen-large & {
-                flex-direction: row;
-                gap: 10px;
-            }
-
-            .screen-x-small & {
-                padding-left: 20px;
-            }
-
-            div > span {
-                padding-left: 5px;
-            }
-        }
-        .policy {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 5px;
-
-            .screen-large & {
-                flex-direction: row;
-                gap: 10px;
-            }
-
-            .screen-x-small & {
-                padding-right: 20px;
+            i {
+                padding-right: 5px;
             }
         }
     }
