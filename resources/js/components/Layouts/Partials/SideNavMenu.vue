@@ -146,6 +146,10 @@ watch(
                     width: $side-panel-min-width !important;
                     margin: 0 !important;
                 }
+
+                .dx-treeview-item-content span {
+                    padding-left: 1px;
+                }
             }
             // ##
 
