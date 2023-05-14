@@ -4,15 +4,20 @@ import { toast } from "vue3-toastify";
 import mt from "./texts";
 import mitt from "mitt";
 
+let shown429At = moment();
+
 export default {
     handleError: (error, message) => {
         if (!error.response) return false;
         if (error.response.status == 401) return false;
         if (error.response.status == 403)
             message = lang.global.t("messages.error.server.403");
-        else if (error.response.status == 429)
-            message = lang.global.t("messages.error.server.429");
-        else {
+        else if (error.response.status == 429) {
+            if (moment().diff(shown429At, "seconds") > 3) {
+                message = lang.global.t("messages.error.server.429");
+                shown429At = moment();
+            } else message = null;
+        } else {
             if (message == undefined)
                 message = lang.global.t("messages.error.server.500");
 
@@ -23,30 +28,36 @@ export default {
                 " " +
                 "]";
         }
-        toast.error(message, {
-            duration: 5000,
-            action: [
-                {
-                    text: lang.global.t("buttons.copy"),
-                    onClick: (e, toastObject) => {
-                        navigator.clipboard
-                            .writeText(toastObject.el.innerText.split(" ")[1])
-                            .then(() => {
-                                toastObject.text(
-                                    lang.global.t("messages.info.copiedError")
-                                );
-                                toastObject.goAway(2000);
-                            });
+        if (message) {
+            toast.error(message, {
+                duration: 5000,
+                action: [
+                    {
+                        text: lang.global.t("buttons.copy"),
+                        onClick: (e, toastObject) => {
+                            navigator.clipboard
+                                .writeText(
+                                    toastObject.el.innerText.split(" ")[1]
+                                )
+                                .then(() => {
+                                    toastObject.text(
+                                        lang.global.t(
+                                            "messages.info.copiedError"
+                                        )
+                                    );
+                                    toastObject.goAway(2000);
+                                });
+                        },
                     },
-                },
-                {
-                    text: lang.global.t("buttons.close"),
-                    onClick: (e, toastObject) => {
-                        toastObject.goAway(0);
+                    {
+                        text: lang.global.t("buttons.close"),
+                        onClick: (e, toastObject) => {
+                            toastObject.goAway(0);
+                        },
                     },
-                },
-            ],
-        });
+                ],
+            });
+        }
     },
     checkPinDataGrid(e, dataGridInstance) {
         let items = e.component.option("toolbarItems");

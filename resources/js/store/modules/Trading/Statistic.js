@@ -16,13 +16,7 @@ function createAccumulatedProfit(data) {
     }, []);
 }
 
-const getters = {
-    // charts: (state) => state.charts,
-    // trades: (state) => state.trades,
-    // summary: (state) => state.summary,
-    // period: (state) => state.charts.period,
-    // page: (state) => state.charts.page,
-};
+const getters = {};
 
 const actions = {
     validateDuplicateDate({ state }, param) {

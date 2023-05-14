@@ -2,7 +2,7 @@ import lang from "../lang";
 import store from "../store";
 import crypto from "./crypto";
 import { toast } from "vue3-toastify";
-import functions from "../properties/functions";
+import mf from "../properties/functions";
 import config from "devextreme/core/config";
 
 axios.interceptors.request.use(
@@ -64,7 +64,7 @@ axios.interceptors.response.use(
         console.log(error.response);
         store.dispatch("setSyncing", false);
         if (navigator.onLine) {
-            if (!!error.response) functions.handleError(error);
+            if (!!error.response) mf.handleError(error);
         } else toast.error(lang.global.t("messages.error.offline"));
         return Promise.reject(error);
     }
