@@ -31,7 +31,7 @@ const guestRoute = [
             layout: GuestLayout,
             title: lang.global.t("auth.createAccount.title"),
         },
-        component: loadView("Auth", "CreateAccount"),
+        component: loadView("Auth", "Register"),
     },
     {
         path: "/reset-password",
@@ -59,8 +59,15 @@ const guestRoute = [
             auth: false,
             layout: GuestLayout,
             title: lang.global.t("auth.verifyEmail.title"),
+            description: lang.global.t("auth.verifyEmail.description"),
         },
         component: loadView("Auth", "VerifyEmail"),
+    },
+    {
+        path: "/policy",
+        name: "policy",
+        meta: { title: lang.global.t("policy.title") },
+        component: loadView("Policy"),
     },
     { path: "/:pathMatch(.*)*", component: loadView("NotFound") },
 ];

@@ -1,38 +1,24 @@
 <template>
-    <div>
-        <div class="header">
-            <div class="title">{{ $t("components.changePassword.title") }}</div>
-        </div>
-        <div class="change-password-form">
-            <ChangePasswordForm :hasEmail="true" @onSubmit="onSubmit" />
-        </div>
+    <div class="change-password-page">
+        <ChangePasswordForm :hasEmail="true" @onSubmit="onSubmit" />
     </div>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import ChangePasswordForm from "../../components/Forms/ChangePasswordForm.vue";
+import { useStore } from "vuex";
+import { useRoute, useRouter } from "vue-router";
 
-export default {
-    components: {
-        ChangePasswordForm,
-    },
-    data() {
-        return {};
-    },
-    methods: {
-        ...mapActions("Auth", ["changePassword"]),
-        onSubmit(formData) {
-            console.log("formData: ", formData);
-            const { token } = this.$route.query;
-            formData.token = token;
-            this.changePassword(formData).then((isOk) => {
-                if (isOk) this.$router.push({ name: "overview" });
-                else this.$router.push({ name: "reset-password" });
-            });
-        },
-    },
-};
+const store = useStore();
+const router = useRouter();
+const route = useRoute();
+
+function onSubmit(formData) {
+    const { token } = route.query;
+    formData.token = token;
+    store.dispatch("auth/changePassword", formData).then((isOk) => {
+        if (isOk) router.push({ name: "overview" });
+        else router.push({ name: "reset-password" });
+    });
+}
 </script>
-
-<style></style>

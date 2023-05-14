@@ -49,7 +49,6 @@ export default {
         const mf = inject("mf");
         const routeHistoryState = inject("routeHistoryState");
         onMounted(() => {
-            console.log("onMounted-photo");
             if (!lightbox) {
                 lightbox = new PhotoSwipeLightbox({
                     gallery: ".photoswipe",

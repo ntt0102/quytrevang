@@ -1,15 +1,15 @@
 <template>
     <div class="login-form">
-        <div class="user" v-if="!!formData.name">
-            <Photoswipe :images="[formData.avatar]" />
+        <div class="user" v-if="!!state.formData.name">
+            <Photoswipe :images="[state.formData.avatar]" />
             <DxDropDownButton
                 :split-button="true"
                 :use-select-mode="false"
                 :items="[
-                    ...loggedinUsers,
+                    ...state.loggedinUsers,
                     { name: $t('auth.login.anotherAccount') },
                 ]"
-                :text="formData.name"
+                :text="state.formData.name"
                 display-expr="name"
                 key-expr="username"
                 itemTemplate="itemTemplate"
@@ -39,12 +39,16 @@
             </DxDropDownButton>
         </div>
         <form @submit.prevent="onSubmit">
-            <DxForm ref="form" :form-data="formData" labelMode="floating">
+            <DxForm
+                ref="formRef"
+                :form-data="state.formData"
+                labelMode="floating"
+            >
                 <DxItem
-                    :visible="!formData.name"
+                    :visible="!state.formData.name"
                     data-field="username"
                     editor-type="dxTextBox"
-                    :validation-rules="validationRules.username"
+                    :validation-rules="state.validationRules.username"
                     :label="{ text: $t('models.user.username') }"
                 />
                 <DxItem
@@ -64,7 +68,7 @@
                             },
                         ],
                     }"
-                    :validation-rules="validationRules.password"
+                    :validation-rules="state.validationRules.password"
                     :label="{ text: $t('models.user.password') }"
                 />
                 <DxItem
@@ -106,13 +110,10 @@
             <DxItem>
                 <template #default>
                     <div class="create-account">
-                        <span>{{ $t("auth.login.haveNotAccount") }}</span>
-                        &nbsp;
-                        <span class="link">
-                            <RouterLink :to="{ name: 'create-account' }">{{
-                                $t("auth.login.createAccount")
-                            }}</RouterLink>
-                        </span>
+                        {{ $t("auth.login.haveNotAccount") }}
+                        <RouterLink :to="{ name: 'create-account' }">{{
+                            $t("auth.login.createAccount")
+                        }}</RouterLink>
                     </div>
                 </template>
             </DxItem>
@@ -120,191 +121,157 @@
     </div>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import DxForm, { DxItem } from "devextreme-vue/form";
 import DxDropDownButton from "devextreme-vue/drop-down-button";
 import Photoswipe from "../../components/Photoswipe.vue";
-import { toast } from "vue3-toastify";
-import { useCookies } from "vue3-cookies";
+import { getCurrentInstance, inject, onMounted, reactive, ref } from "vue";
+import { useStore } from "vuex";
+import { useRoute, useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 const { cookies } = useCookies();
+import { useCookies } from "vue3-cookies";
+import { toast } from "vue3-toastify";
 
-export default {
-    components: {
-        DxForm,
-        DxItem,
-        DxDropDownButton,
-        Photoswipe,
+const store = useStore();
+const route = useRoute();
+const router = useRouter();
+const { t } = useI18n();
+const mc = inject("mc");
+const mt = inject("mt");
+const app = getCurrentInstance();
+const screenSize =
+    app.appContext.config.globalProperties.$screen.getScreenSizeInfo;
+const formRef = ref(null);
+const state = reactive({
+    loggedinUsers: [],
+    formData: {
+        username: null,
+        password: null,
+        rememberMe: false,
+        avatar: null,
+        name: null,
     },
-    data() {
-        return {
-            passwordMode: true,
-            loggedinUsers: [],
-            formData: {
-                username: null,
-                password: null,
-                rememberMe: false,
-                avatar: null,
-                name: null,
+    validationRules: {
+        username: [
+            {
+                type: "required",
+                message: t("models.user.username") + mt.validations.required,
             },
-            validationRules: {
-                username: [
-                    {
-                        type: "required",
-                        message:
-                            this.$t("models.user.username") +
-                            this.$mt.validations.required,
-                    },
-                ],
-                password: [
-                    {
-                        type: "required",
-                        message:
-                            this.$t("models.user.password") +
-                            this.$mt.validations.required,
-                    },
-                ],
+        ],
+        password: [
+            {
+                type: "required",
+                message: t("models.user.password") + mt.validations.required,
             },
-        };
+        ],
     },
-    created() {
-        // toast.success(this.$t("messages.warning.unregisteredFingerPrint"));
-        // cookies.remove(this.$mc.LOGGEDIN_USERS_COOKIE_NAME);
-        this.loggedinUsers = this.getLoggedinUsersCookie();
-        console.log("loggedinUsers", this.loggedinUsers);
-        if (this.loggedinUsers.length > 0) {
-            this.loggedinUsers.reverse();
-            this.formData = { ...this.formData, ...this.loggedinUsers[0] };
+});
+let passwordMode = true;
+state.loggedinUsers = getLoggedinUsersCookie();
+if (state.loggedinUsers.length > 0) {
+    state.loggedinUsers.reverse();
+    state.formData = { ...state.formData, ...state.loggedinUsers[0] };
+}
+
+onMounted(() => {
+    if (screenSize.isXSmall && state.formData.webauthn) fingerPrintClick();
+    else
+        setTimeout(
+            () =>
+                formRef.value.instance
+                    .getEditor(!state.formData.name ? "username" : "password")
+                    .focus(),
+            500
+        );
+});
+function onSubmit() {
+    store
+        .dispatch("auth/login", state.formData)
+        .then(({ isOk, isMaintenance, user }) =>
+            responseProcess(isOk, isMaintenance, user)
+        );
+}
+function fingerPrintClick() {
+    if (state.formData.username) {
+        store
+            .dispatch("auth/loginWebAuthn", state.formData.username)
+            .then(({ isOk, isMaintenance, user }) =>
+                responseProcess(isOk, isMaintenance, user)
+            )
+            .catch(() =>
+                toast.show(t("messages.warning.unregisteredFingerPrint"))
+            );
+    } else toast.show(t("messages.warning.fingerUsernameEmpty"));
+}
+function responseProcess(isOk, isMaintenance, user) {
+    if (isOk) {
+        setLoggedinUsersCookie(user);
+        if (isMaintenance) router.push({ name: "setting-command" });
+        else {
+            let query = route.query;
+            const nextRouteName = query.redirect ? query.redirect : "overview";
+            delete query.redirect;
+            router.push({
+                name: nextRouteName,
+                query: query,
+                hash: route.hash,
+            });
         }
-    },
-    mounted() {
-        if (this.$screen.getScreenSizeInfo.isXSmall && this.formData.webauthn)
-            this.fingerPrintClick();
+    }
+}
+function viewPasswordClick() {
+    formRef.value.instance.itemOption("password", {
+        editorOptions: {
+            mode: passwordMode ? "text" : "password",
+            buttons: [
+                {
+                    options: {
+                        icon: passwordMode ? "far fa-eye-slash" : "far fa-eye",
+                        onClick: viewPasswordClick,
+                    },
+                    name: "btPw",
+                    location: "after",
+                },
+            ],
+        },
+    });
+    passwordMode = !passwordMode;
+}
+function getLoggedinUsersCookie() {
+    return cookies.isKey(mc.LOGGEDIN_USERS_COOKIE_NAME)
+        ? JSON.parse(cookies.get(mc.LOGGEDIN_USERS_COOKIE_NAME))
+        : [];
+}
+function setLoggedinUsersCookie(user) {
+    let users = getLoggedinUsersCookie();
+    users = users.filter((item) => item.username != user.username);
+    users.push(user);
+    users = users.slice(-5);
+    cookies.set(mc.LOGGEDIN_USERS_COOKIE_NAME, JSON.stringify(users), "1y");
+}
+function onItemClick(e) {
+    if (!!e.itemData.username) {
+        state.formData = {
+            ...state.formData,
+            ...e.itemData,
+        };
+        if (screenSize.isXSmall && e.itemData.webauthn) fingerPrintClick();
         else
             setTimeout(
-                () =>
-                    this.form
-                        .getEditor(
-                            !this.formData.name ? "username" : "password"
-                        )
-                        .focus(),
+                () => formRef.value.instance.getEditor("password").focus(),
                 500
             );
-    },
-    computed: {
-        form: function () {
-            return this.$refs.form.instance;
-        },
-    },
-    methods: {
-        ...mapActions("auth", ["login", "loginWebAuthn"]),
-        onSubmit() {
-            this.login(this.formData).then(({ isOk, isMaintenance, user }) =>
-                this.responseProcess(isOk, isMaintenance, user)
-            );
-        },
-        fingerPrintClick() {
-            if (this.formData.username) {
-                // let param = {};
-                // let username = this.formData.username.includes("@")
-                //     ? "email"
-                //     : "phone";
-                // param[username] = this.formData.username;
-                // param.username = username;
-                // {username : this.formData.username,
-                // routeAction: "assert"
-                // param.routeAction = "assert";
-                this.loginWebAuthn(this.formData.username)
-                    .then(({ isOk, isMaintenance, user }) =>
-                        this.responseProcess(isOk, isMaintenance, user)
-                    )
-                    .catch(() =>
-                        toast.show(
-                            this.$t("messages.warning.unregisteredFingerPrint")
-                        )
-                    );
-            } else toast.show(this.$t("messages.warning.fingerUsernameEmpty"));
-        },
-        responseProcess(isOk, isMaintenance, user) {
-            if (isOk) {
-                this.setLoggedinUsersCookie(user);
-                if (isMaintenance)
-                    this.$router.push({ name: "setting-command" });
-                else {
-                    let query = this.$route.query;
-                    const nextRouteName = query.redirect
-                        ? query.redirect
-                        : "overview";
-                    delete query.redirect;
-                    this.$router.push({
-                        name: nextRouteName,
-                        query: query,
-                        hash: this.$route.hash,
-                    });
-                }
-            }
-        },
-        onCreateAccountClick() {
-            this.$router.push({ name: "create-account" });
-        },
-        viewPasswordClick() {
-            this.form.itemOption("password", {
-                editorOptions: {
-                    mode: this.passwordMode ? "text" : "password",
-                    buttons: [
-                        {
-                            options: {
-                                icon: this.passwordMode
-                                    ? "far fa-eye-slash"
-                                    : "far fa-eye",
-                                onClick: this.viewPasswordClick,
-                            },
-                            name: "btPw",
-                            location: "after",
-                        },
-                    ],
-                },
-            });
-            this.passwordMode = !this.passwordMode;
-        },
-        getLoggedinUsersCookie() {
-            return cookies.isKey(this.$mc.LOGGEDIN_USERS_COOKIE_NAME)
-                ? JSON.parse(cookies.get(this.$mc.LOGGEDIN_USERS_COOKIE_NAME))
-                : [];
-        },
-        setLoggedinUsersCookie(user) {
-            let users = this.getLoggedinUsersCookie();
-            users = users.filter((item) => item.username != user.username);
-            users.push(user);
-            users = users.slice(-5);
-            cookies.set(
-                this.$mc.LOGGEDIN_USERS_COOKIE_NAME,
-                JSON.stringify(users),
-                "1y"
-            );
-        },
-        onItemClick(e) {
-            if (!!e.itemData.username) {
-                this.formData = { ...this.formData, ...e.itemData };
-                if (
-                    this.$screen.getScreenSizeInfo.isXSmall &&
-                    e.itemData.webauthn
-                )
-                    this.fingerPrintClick();
-                else
-                    setTimeout(
-                        () => this.form.getEditor("password").focus(),
-                        500
-                    );
-            } else {
-                this.formData.username = null;
-                this.formData.name = null;
-                this.formData.avatar = null;
-                setTimeout(() => this.form.getEditor("username").focus(), 500);
-            }
-        },
-    },
-};
+    } else {
+        state.formData.username = null;
+        state.formData.name = null;
+        state.formData.avatar = null;
+        setTimeout(
+            () => formRef.value.instance.getEditor("username").focus(),
+            500
+        );
+    }
+}
 </script>
 
 <style lang="scss">
