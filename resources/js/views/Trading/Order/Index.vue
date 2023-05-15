@@ -583,9 +583,10 @@ function createWhitespaceData() {
 }
 function mergeChartData(data1, data2) {
     const ids = new Set(data1.map((d) => d.time));
-    return [...data1, ...data2.filter((d) => !ids.has(d.time))].sort(
-        (a, b) => a.time - b.time
-    );
+    return [
+        ...new Map(data1.map((d) => [d.time, d])).values(),
+        ...data2.filter((d) => !ids.has(d.time)),
+    ].sort((a, b) => a.time - b.time);
 }
 function connectSocket() {
     const endpoint =
