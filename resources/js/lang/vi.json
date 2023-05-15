@@ -469,18 +469,16 @@
         },
         "chatbot": {
             "botTitle": "Trợ lý giải đáp",
-            "inputPlaceholder": "Nhập tin nhắn",
+            "botName": "Trợ lý",
+            "placeholder": "Nhập tin nhắn...",
             "hello": "Xin chào {title}{name}, chúng tôi có thể giúp gì được cho {title}!",
             "title": {
                 "user": "quý khách",
                 "user0": "chị",
                 "user1": "anh"
             },
-            "topicConfirm": "Xin lỗi, tôi chưa rõ yêu cầu của {title}. Chủ đề {title} muốn tìm là gì?",
-            "questionsInTopic": "Đây là các nội dung trong chủ đề",
-            "detail": "Quý khách vui lòng xem chi tiết tại đây",
-            "more": "Xem thêm...",
-            "sendZalo": "Gửi trực tiếp Zalo"
+            "sendZalo": "Tin nhắn Zalo",
+            "unknown": "Xin lỗi, tôi chưa rõ yêu cầu của {title}. Vui lòng nhập từ khác hoặc tra cứu Câu hỏi thường gặp hoặc gửi trực tiếp Zalo."
         },
         "notification": {
             "title": "Thông báo",

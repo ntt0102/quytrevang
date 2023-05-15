@@ -67,7 +67,7 @@ const guestRoute = [
         path: "/policy",
         name: "policy",
         meta: { title: lang.global.t("policy.title") },
-        component: loadView("Policy"),
+        component: loadView("Policy", "Index"),
     },
     { path: "/:pathMatch(.*)*", component: loadView("NotFound") },
 ];

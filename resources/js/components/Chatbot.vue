@@ -1,64 +1,65 @@
 <template>
     <beautiful-chat
         :participants="state.participants"
-        :titleImageUrl="state.titleImageUrl"
+        titleImageUrl="/images/chatbot.png"
         :onMessageWasSent="onMessageWasSent"
         :messageList="state.messageList"
-        :newMessagesCount="state.newMessagesCount"
+        :newMessagesCount="0"
         :isOpen="state.isChatOpen"
         :close="closeChat"
         :open="openChat"
         :showEmoji="false"
-        :showFile="true"
-        :showEdition="true"
-        :showDeletion="true"
+        :showFile="false"
+        :showEdition="false"
+        :showDeletion="false"
         :deletionConfirmation="true"
         :showTypingIndicator="state.showTypingIndicator"
         :showLauncher="true"
         :showCloseButton="true"
         :colors="state.colors"
-        :alwaysScrollToBottom="state.alwaysScrollToBottom"
-        :disableUserListToggle="false"
-        :messageStyling="state.messageStyling"
-        @onType="handleOnType"
-        @edit="editMessage"
+        :alwaysScrollToBottom="true"
+        :disableUserListToggle="true"
+        :messageStyling="true"
     >
-        <template v-slot:header>Trợ lý ảo - trả lời tự động</template>
+        <template v-slot:header>{{
+            $t("components.chatbot.botTitle")
+        }}</template>
+        <template v-slot:text-message-body="{ message }">
+            <div v-html="message.data.text"></div>
+            <div
+                v-if="message.data.links"
+                v-for="(link, index) of message.data.links"
+                :key="index"
+            >
+                <a :target="link.target" :href="link.url">{{ link.text }}</a>
+            </div>
+        </template>
     </beautiful-chat>
 </template>
 
 <script setup>
 import { baseAccentColor } from "../../sass/style.module.scss";
-import { reactive } from "vue";
+import { watch, inject, onMounted, reactive, computed } from "vue";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import { useI18n } from "vue-i18n";
 
 const store = useStore();
+const router = useRouter();
+const { t } = useI18n();
+const mf = inject("mf");
+const routeHistoryState = inject("routeHistoryState");
 const state = reactive({
     participants: [
         {
-            id: "user1",
-            name: "Support",
-            imageUrl:
-                // "https://avatars3.githubusercontent.com/u/37018832?s=200&v=4",
-                "/images/android-chrome-512x512.png",
+            id: "bot",
+            name: t("components.chatbot.botName"),
+            imageUrl: "/images/chatbot.png",
         },
-        {
-            id: "user2",
-            name: "Matteo",
-            imageUrl:
-                "https://avatars3.githubusercontent.com/u/1915989?s=230&v=4",
-        },
-    ], // the list of all the participant of the conversation. `name` is the user name, `id` is used to establish the author of a message, `imageUrl` is supposed to be the user avatar.
-    // titleImageUrl:
-    //     "https://a.slack-edge.com/66f9/img/avatars-teams/ava_0001-34.png",
-    titleImageUrl: "/images/chatbot.png",
-    messageList: [
-        { type: "text", author: `me`, data: { text: `Say yes!` } },
-        { type: "text", author: `user1`, data: { text: `No.` } },
-    ], // the list of the messages to show, can be paginated and adjusted dynamically
-    newMessagesCount: 0,
-    isChatOpen: false, // to determine whether the chat window should be open or closed
-    showTypingIndicator: "", // when set to a value matching the participant.id it shows the typing indicator for the specific user
+    ],
+    messageList: [],
+    isChatOpen: false,
+    showTypingIndicator: "",
     colors: {
         header: {
             bg: baseAccentColor,
@@ -82,53 +83,181 @@ const state = reactive({
             bg: "#f4f7f9",
             text: "#565867",
         },
-    }, // specifies the color scheme for the component
-    alwaysScrollToBottom: false, // when set to true always scrolls the chat to the bottom when new events are in (new message, user starts typing...)
-    messageStyling: true, // enables *bold* /emph/ _underline_ and such (more info at github.com/mattezza/msgdown)
+    },
 });
 
-function sendMessage(text) {
-    if (text.length > 0) {
-        state.newMessagesCount = state.isChatOpen
-            ? state.newMessagesCount
-            : state.newMessagesCount + 1;
-        onMessageWasSent({
-            author: "support",
+const user = store.state.auth.user;
+const userName = computed(() => {
+    return !!user.name ? " " + user.name.split(" ").pop() : "";
+});
+const userTitle = computed(() => {
+    return t(`components.chatbot.title.user${user.sex || ""}`);
+});
+
+let faqsSource = [];
+
+watch(
+    () => store.state.faqs,
+    (value) => {
+        import(`../lang/chatbot/${window.lang}.js`).then((extra) => {
+            faqsSource = [...value, ...extra.default];
+        });
+    }
+);
+
+onMounted(() => {
+    document
+        .querySelector(".sc-user-input--text")
+        .setAttribute("placeholder", t("components.chatbot.placeholder"));
+});
+
+function onMessageWasSent(response) {
+    state.messageList.push(response);
+    state.showTypingIndicator = "bot";
+    let replyMessage = getResponse(response);
+    setTimeout(() => {
+        state.messageList.push(replyMessage);
+        state.showTypingIndicator = "";
+    }, 500);
+}
+function getResponse(response) {
+    let replyMessage = { author: "bot" };
+    const matched = faqsSource.reduce(
+        (match, item) => {
+            let point = similarity(item.question, response.data.text);
+            if (point > match.point)
+                match = {
+                    msg: item,
+                    point: point,
+                };
+            return match;
+        },
+        { msg: {}, point: 0 }
+    );
+    if (matched.point >= 0.6) {
+        replyMessage.type = "text";
+        replyMessage.data = { text: matched.msg.answer };
+    } else {
+        replyMessage.type = "text";
+        replyMessage.data = {
+            text: t("components.chatbot.unknown", { title: userTitle.value }),
+            links: [
+                {
+                    text: t("policy.faq.title"),
+                    url: router.resolve({
+                        name: "policy",
+                        hash: "#faq",
+                    }).href,
+                    target: "_blank",
+                },
+                {
+                    text: t("components.chatbot.sendZalo"),
+                    url: `https://zalo.me/${store.state.contact.phone}`,
+                    target: "_blank",
+                },
+            ],
+        };
+    }
+    return replyMessage;
+}
+function openChat() {
+    state.isChatOpen = true;
+    if (mf.isEmpty(state.messageList)) {
+        let text = t("components.chatbot.hello", {
+            title: userTitle.value,
+            name: userName.value,
+        });
+        state.messageList.push({
             type: "text",
+            author: "bot",
             data: { text },
         });
     }
-}
-function onMessageWasSent(message) {
-    // called when the user sends a message
-    state.messageList = [...state.messageList, message];
-}
-function openChat() {
-    // called when the user clicks on the fab button to open the chat
-    state.isChatOpen = true;
-    state.newMessagesCount = 0;
+    mf.pushPopupToHistoryState(
+        routeHistoryState,
+        () => (state.isChatOpen = false)
+    );
 }
 function closeChat() {
-    // called when the user clicks on the botton to close the chat
     state.isChatOpen = false;
+    mf.popRouteHistoryState(routeHistoryState);
 }
-function handleScrollToTop() {
-    // called when the user scrolls message list to top
-    // leverage pagination for loading another page of messages
+
+function similarity(s1, s2) {
+    var longer = adjust(s1);
+    var shorter = adjust(s2);
+    if (s1.length < s2.length) {
+        longer = s2;
+        shorter = s1;
+    }
+    var longerLength = longer.length;
+    if (longerLength == 0) {
+        return 1.0;
+    }
+    return (
+        (longerLength - editDistance(longer, shorter)) /
+        parseFloat(longerLength)
+    );
 }
-function handleOnType() {
-    console.log("Emit typing event");
+function editDistance(s1, s2) {
+    var costs = new Array();
+    for (var i = 0; i <= s1.length; i++) {
+        var lastValue = i;
+        for (var j = 0; j <= s2.length; j++) {
+            if (i == 0) costs[j] = j;
+            else {
+                if (j > 0) {
+                    var newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) != s2.charAt(j - 1))
+                        newValue =
+                            Math.min(Math.min(newValue, lastValue), costs[j]) +
+                            1;
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+            }
+        }
+        if (i > 0) costs[s2.length] = lastValue;
+    }
+    return costs[s2.length];
 }
-function editMessage(message) {
-    const m = state.messageList.find((m) => m.id === message.id);
-    m.isEdited = true;
-    m.data.text = message.data.text;
+
+function adjust(str) {
+    return str
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/đ/g, "d")
+        .replace(/Đ/g, "D")
+        .replace("gi", "")
+        .replace("bang cach nao", "")
+        .replace("nhu the nao", "")
+        .replace("bao nhieu", "")
+        .replace("dau", "")
+        .replace("o dau", "")
+        .replace("lam gi", "")
+        .replace("?", "")
+        .toLowerCase()
+        .trim();
 }
 </script>
 <style lang="scss">
 .sc-chat-window {
     &.opened {
         z-index: 1500;
+    }
+
+    .sc-message-list {
+        &::-webkit-scrollbar {
+            width: 5px;
+            background-color: #f5f5f5;
+        }
+        &::-webkit-scrollbar-thumb {
+            background-color: #c1c1c1;
+        }
+        &::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 6px lighten(#c1c1c1, 30);
+            background-color: #f5f5f5;
+        }
     }
 }
 </style>
