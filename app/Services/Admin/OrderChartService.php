@@ -246,35 +246,37 @@ class OrderChartService extends CoreService
      */
     public function reportTrading()
     {
-        return $this->transaction(
-            function () {
-                $vpsUser = User::permission('trades@edit')->first()->vpsUser;
-                $vos = new VpsOrderService($vpsUser);
-                if (!$vos->connection) return false;
-                $info = $vos->getAccountInfo();
-                //
-                Notification::send(
-                    User::permission('trades@view')->get(),
-                    new UpdatedTradesNotification(
-                        number_format($info->vm, 0, ",", ".") . ' ₫',
-                        number_format($info->fee, 0, ",", ".") . ' ₫'
-                    )
-                );
-                //
-                if (!$info->fee) return false;
-                $revenue = $info->vm > 0 ? $info->vm : 0;
-                $loss = $info->vm < 0 ? -$info->vm : 0;
-                $trade = Trade::create([
-                    "amount" => $vpsUser->volume,
-                    "scores" => $this->getVn30f1mInfo($vos->symbol)->r,
-                    "revenue" => $revenue,
-                    "loss" => $loss,
-                    "fees" => $info->fee,
-                    "date" => date_create()->format('Y-m-d'),
-                ]);
-                if (!$trade) return false;
-                event(new UpdateStatisticEvent());
-            }
-        );
+        if (get_global_value('openingMarketFlag') == '1') {
+            return $this->transaction(
+                function () {
+                    $vpsUser = User::permission('trades@edit')->first()->vpsUser;
+                    $vos = new VpsOrderService($vpsUser);
+                    if (!$vos->connection) return false;
+                    $info = $vos->getAccountInfo();
+                    //
+                    Notification::send(
+                        User::permission('trades@view')->get(),
+                        new UpdatedTradesNotification(
+                            number_format($info->vm, 0, ",", ".") . ' ₫',
+                            number_format($info->fee, 0, ",", ".") . ' ₫'
+                        )
+                    );
+                    //
+                    if (!$info->fee) return false;
+                    $revenue = $info->vm > 0 ? $info->vm : 0;
+                    $loss = $info->vm < 0 ? -$info->vm : 0;
+                    $trade = Trade::create([
+                        "amount" => $vpsUser->volume,
+                        "scores" => $this->getVn30f1mInfo($vos->symbol)->r,
+                        "revenue" => $revenue,
+                        "loss" => $loss,
+                        "fees" => $info->fee,
+                        "date" => date_create()->format('Y-m-d'),
+                    ]);
+                    if (!$trade) return false;
+                    event(new UpdateStatisticEvent());
+                }
+            );
+        }
     }
 }
