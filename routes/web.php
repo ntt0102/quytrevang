@@ -103,13 +103,15 @@ Route::get('test', function () {
     //     'sendMail' => true,
     // ]);
     // $s = date("n/Y");
-    $user = App\Models\User::find(1);
-    $webauthn = new App\Services\Special\WebauthnService('https://quytrevang.com');
-    // $s = $webauthn->prepareChallengeForRegistration($user->email, strval($user->id));
-    $s = $webauthn->prepareForLogin($user->webauthn);
+    // $user = App\Models\User::find(1);
+    // $webauthn = new App\Services\Special\WebauthnService('https://quytrevang.com');
+    // // $s = $webauthn->prepareChallengeForRegistration($user->email, strval($user->id));
+    // $s = $webauthn->prepareForLogin($user->webauthn);
     // $s = $s->can('stock@order');
     // $s = $s->roles;
     // $s = event(new App\Events\UpdateFinbookEvent());
+    // $s = app(App\Services\Admin\OrderChartService::class)->checkOpeningMarket();
+    $s = App\Jobs\UpdateSymbolJob::dispatch();
     dd($s);
     return 'ok';
 });

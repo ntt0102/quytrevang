@@ -28,6 +28,10 @@ class Kernel extends ConsoleKernel
     {
         $oCS = new OrderChartService();
 
+        $schedule->command('queue:work --stop-when-empty')
+            ->everyMinute()
+            ->withoutOverlapping();
+
         $schedule->command('database:backup')->daily();
         $schedule->command('subscription:clean')->yearly();
         //
