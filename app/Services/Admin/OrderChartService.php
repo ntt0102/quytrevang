@@ -75,7 +75,7 @@ class OrderChartService extends CoreService
     {
         return $this->transaction(
             function () use ($payload) {
-                $so = request()->user()->smartOrder;
+                // $so = request()->user()->smartOrder;
             }
         );
     }
@@ -134,26 +134,6 @@ class OrderChartService extends CoreService
     /**
      * 
      */
-    public function exportToCsv($date = null)
-    {
-        if (get_global_value('openingMarketFlag') == '1') {
-            if (!$date) $date = date('Y-m-d');
-            $filename = storage_path('app/vn30f1m/' . $date . '.csv');
-            $list = $this->cloneVpsData();
-            $fp = fopen($filename, 'w');
-            foreach ($list as $item) {
-                $line = [];
-                $line[] = strtotime($date . $item->time) + $this->SHIFT_TIME;
-                $line[] = $item->lastPrice;
-                fputcsv($fp, $line);
-            }
-            fclose($fp);
-        }
-    }
-
-    /**
-     * 
-     */
     public function generateDataFromCsv($date)
     {
         $filename = storage_path('app/vn30f1m/' . $date . '.csv');
@@ -182,101 +162,5 @@ class OrderChartService extends CoreService
         $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
         $res = $client->get($url);
         return json_decode($res->getBody());
-    }
-
-    /**
-     * Get Symbol
-     */
-    public function getVn30f1mSymbol()
-    {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://spwapidatafeed.vps.com.vn/pslistdata";
-        $res = $client->get($url);
-        return json_decode($res->getBody())[0];
-    }
-
-    /**
-     * Get Info
-     */
-    public function getVn30f1mInfo($symbol)
-    {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
-        $res = $client->get($url);
-        return json_decode($res->getBody())[0];
-    }
-
-    /**
-     * Check Opening Market
-     * @return boolean
-     */
-    public function checkOpeningMarket()
-    {
-        $currentDay = date("w");
-        if ($currentDay == 0 || $currentDay == 6) return false;
-
-        $currentDate = date("Y-m-d");
-        $currentYear = date("Y");
-        $BASE_CALENDAR_URL = "https://www.googleapis.com/calendar/v3/calendars";
-        $BASE_CALENDAR_ID_FOR_PUBLIC_HOLIDAY =
-            "holiday@group.v.calendar.google.com";
-        $API_KEY = env('GOOGLE_CALENDAR_API_KEY');
-        $CALENDAR_REGION = "en.vietnamese";
-        $url = $BASE_CALENDAR_URL . '/' . $CALENDAR_REGION . '%23' . $BASE_CALENDAR_ID_FOR_PUBLIC_HOLIDAY . '/events?key=' . $API_KEY;
-        $client = new \GuzzleHttp\Client();
-        $res = $client->get($url);
-        $resp = json_decode($res->getBody());
-        $holidays = collect($resp->items)
-            ->filter(function ($item) use ($currentYear) {
-                return $item->start->date >= $currentYear . '-01-01' && $item->start->date <= $currentYear . '-31-12';
-            })
-            ->sortBy('start.date')
-            ->reduce(function ($days, $item) {
-                $days[] = $item->start->date;
-                return $days;
-            }, []);
-        if (in_array($currentDate, $holidays)) return false;
-        return true;
-    }
-
-    /**
-     * Report
-     *
-     * 
-     */
-    public function reportTrading()
-    {
-        if (get_global_value('openingMarketFlag') == '1') {
-            return $this->transaction(
-                function () {
-                    $vpsUser = User::permission('trades@edit')->first()->vpsUser;
-                    $vos = new VpsOrderService($vpsUser);
-                    if (!$vos->connection) return false;
-                    $info = $vos->getAccountInfo();
-                    //
-                    Notification::send(
-                        User::permission('trades@view')->get(),
-                        new UpdatedTradesNotification(
-                            number_format($info->vm, 0, ",", ".") . ' ₫',
-                            number_format($info->fee, 0, ",", ".") . ' ₫'
-                        )
-                    );
-                    //
-                    if (!$info->fee) return false;
-                    $revenue = $info->vm > 0 ? $info->vm : 0;
-                    $loss = $info->vm < 0 ? -$info->vm : 0;
-                    $trade = Trade::create([
-                        "amount" => $vpsUser->volume,
-                        "scores" => $this->getVn30f1mInfo($vos->symbol)->r,
-                        "revenue" => $revenue,
-                        "loss" => $loss,
-                        "fees" => $info->fee,
-                        "date" => date_create()->format('Y-m-d'),
-                    ]);
-                    if (!$trade) return false;
-                    event(new UpdateStatisticEvent());
-                }
-            );
-        }
     }
 }

@@ -111,7 +111,7 @@ Route::get('test', function () {
     // $s = $s->roles;
     // $s = event(new App\Events\UpdateFinbookEvent());
     // $s = app(App\Services\Admin\OrderChartService::class)->checkOpeningMarket();
-    $s = App\Jobs\UpdateSymbolJob::dispatch();
+    $s = App\Jobs\ExportTradingJob::dispatch();
     dd($s);
     return 'ok';
 });

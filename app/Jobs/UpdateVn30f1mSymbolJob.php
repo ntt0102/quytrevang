@@ -8,9 +8,8 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Services\Admin\OrderChartService;
 
-class UpdateSymbolJob implements ShouldQueue
+class UpdateVn30f1mSymbolJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -31,8 +30,10 @@ class UpdateSymbolJob implements ShouldQueue
      */
     public function handle()
     {
-        $ocs = new OrderChartService();
-        set_global_value('vn30f1m', $ocs->getVn30f1mSymbol());
-        return 'tho';
+        $client = new \GuzzleHttp\Client();
+        $url = "https://spwapidatafeed.vps.com.vn/pslistdata";
+        $res = $client->get($url);
+        $symbol = json_decode($res->getBody())[0];
+        set_global_value('vn30f1m', $symbol);
     }
 }
