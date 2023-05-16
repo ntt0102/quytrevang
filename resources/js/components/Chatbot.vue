@@ -86,12 +86,12 @@ const state = reactive({
     },
 });
 
-const user = store.state.auth.user;
+const user = computed(() => store.state.auth.user);
 const userName = computed(() => {
-    return !!user.name ? " " + user.name.split(" ").pop() : "";
+    return !!user.value.name ? " " + user.value.name.split(" ").pop() : "";
 });
 const userTitle = computed(() => {
-    return t(`components.chatbot.title.user${user.sex || ""}`);
+    return t(`components.chatbot.title.user${user.value.sex || ""}`);
 });
 
 let faqsSource = [];
