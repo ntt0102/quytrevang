@@ -254,7 +254,7 @@ function adjust(str) {
     }
 
     .sc-header--title {
-        font-size: 24px !important;
+        font-size: 20px !important;
     }
 
     .sc-message {

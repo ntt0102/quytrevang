@@ -5,12 +5,7 @@ function initialState() {
     };
 }
 
-const getters = {
-    interestRate: (state) => state.data.interestRate,
-    principalMin: (state) => state.data.principalMin,
-    holdWeeksMin: (state) => state.data.holdWeeksMin,
-    faqs: (state) => state.data.faqs,
-};
+const getters = {};
 
 const actions = {
     getPolicy({ commit, dispatch, getters, state, rootGetters }, param) {

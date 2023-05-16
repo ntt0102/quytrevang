@@ -233,31 +233,17 @@
                         lòng liên hệ với chúng tôi
                         <span
                             class="link"
-                            @click="$refs.sendCommentPopup.show()"
+                            @click="$refs.sendCommentPopupRef.show()"
                             >tại đây</span
                         >.
                     </div>
                 </div>
             </li>
         </ul>
-        <SendCommentPopup ref="sendCommentPopup" />
+        <SendCommentPopup ref="sendCommentPopupRef" />
     </section>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import SendCommentPopup from "../../components/Popups/SendCommentPopup.vue";
-
-export default {
-    components: { SendCommentPopup },
-    data() {
-        return {};
-    },
-
-    computed: {
-        ...mapGetters("policy", ["interestRate"]),
-    },
-
-    methods: {},
-};
 </script>

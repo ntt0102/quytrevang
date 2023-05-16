@@ -48,8 +48,8 @@
                     Người Sử Dụng sẽ bàn giao tiền vốn bằng cách tạo Hợp đồng
                     trên Trang
                     {{ $appName }} (Tiền vốn tối thiểu mỗi Hợp đồng là
-                    {{ principalMin | currency }}) và chuyển khoản cho
-                    {{ $appName }}.
+                    {{ $filters.currency(data.principalMin) }}) và chuyển khoản
+                    cho {{ $appName }}.
                 </li>
                 <li>
                     {{ $appName }} sẽ tiếp nhận tiền vốn từ Người Sử Dụng và
@@ -58,9 +58,9 @@
                 <li>
                     Khi Người Sử Dụng đóng Hợp đồng (Thời gian nắm giữ tối thiểu
                     là
-                    {{ holdWeeksMin }} tuần), {{ $appName }} sẽ ngừng thực hiện
-                    việc đầu tư trên số vốn tại Điều khoản 2.1 và hoàn trả cả
-                    tiền vốn lẫn tiền lãi cho Người Sử Dụng.
+                    {{ data.holdWeeksMin }} tuần), {{ $appName }} sẽ ngừng thực
+                    hiện việc đầu tư trên số vốn tại Điều khoản 2.1 và hoàn trả
+                    cả tiền vốn lẫn tiền lãi cho Người Sử Dụng.
                 </li>
                 <li>
                     Mọi biên lai hoặc bằng chứng xác minh giao dịch tiền sẽ được
@@ -84,7 +84,7 @@
                         <div>
                             trong đó, I: là tiền lãi, P: là tiền gốc, i: là lãi
                             suất theo tuần ({{
-                                interestRate | percentInterestRate
+                                $filters.percentInterestRate(data.interestRate)
                             }}), n: là số tuần nắm giữ
                         </div>
                     </div>
@@ -189,7 +189,7 @@
                         {{ $appName }}, vui lòng liên hệ {{ $appName }}
                         <span
                             class="link"
-                            @click="$refs.sendCommentPopup.show()"
+                            @click="$refs.sendCommentPopupRef.show()"
                             >tại đây</span
                         >.
                     </div>
@@ -203,31 +203,17 @@
             điện tử mà nó có giá trị và hiệu lực tương tự như chữ ký tôi ký bằng
             tay.
         </div>
-        <SendCommentPopup ref="sendCommentPopup" />
+        <SendCommentPopup ref="sendCommentPopupRef" />
     </section>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import SendCommentPopup from "../../components/Popups/SendCommentPopup.vue";
+import { computed } from "vue";
+import { useStore } from "vuex";
 
-export default {
-    components: { SendCommentPopup },
-
-    data() {
-        return {};
-    },
-
-    computed: {
-        ...mapGetters("policy", [
-            "interestRate",
-            "principalMin",
-            "holdWeeksMin",
-        ]),
-    },
-
-    methods: {},
-};
+const store = useStore();
+const data = computed(() => store.state.policy.data);
 </script>
 
 <style lang="scss">

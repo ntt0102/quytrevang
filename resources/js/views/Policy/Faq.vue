@@ -70,6 +70,8 @@ const state = reactive({
     searchValue: null,
 });
 if (route.query.search) state.searchValue = route.query.search;
+if (mf.isSet(store.state.policy.data.faqs))
+    state.gridData = mf.cloneDeep(store.state.policy.data.faqs);
 watch(
     () => store.state.policy.data.faqs,
     (value) => {
