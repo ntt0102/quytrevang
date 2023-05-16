@@ -276,4 +276,9 @@ function adjust(str) {
         font-size: 16px !important;
     }
 }
+@media (max-width: 450px) {
+    .sc-chat-window {
+        height: 100vh !important;
+    }
+}
 </style>
