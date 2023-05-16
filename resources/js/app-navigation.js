@@ -43,12 +43,6 @@ export default [
                 permissions: ["contracts@control"],
             },
             {
-                text: lang.global.t("admin.smartorders.title"),
-                name: "smartorders",
-                icon: "far fa-store",
-                permissions: ["copyists@control"],
-            },
-            {
                 text: lang.global.t("admin.comments.title"),
                 name: "comments",
                 icon: "far fa-comment",

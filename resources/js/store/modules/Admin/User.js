@@ -8,12 +8,7 @@ function initialState() {
     };
 }
 
-const getters = {
-    users: (state) => state.users,
-    deletedUsers: (state) => state.deletedUsers,
-    allRolesName: (state) => state.allRolesName,
-    allPermissionsName: (state) => state.allPermissionsName,
-};
+const getters = {};
 
 const actions = {
     validateDuplicateEmail({ state, rootGetters }, param) {
@@ -68,7 +63,7 @@ const actions = {
                 });
         });
     },
-    fetch({ commit, dispatch, getters, state, rootGetters }) {
+    getUsers({ commit, dispatch, getters, state, rootGetters }) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
             axios.get("users").then((response) => {

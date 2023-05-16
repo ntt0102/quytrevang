@@ -283,6 +283,9 @@ function adjust(str) {
         font-size: 16px !important;
     }
 }
+.sc-launcher {
+    z-index: 1500;
+}
 @media (max-width: 450px) {
     .sc-chat-window {
         height: 100vh !important;
