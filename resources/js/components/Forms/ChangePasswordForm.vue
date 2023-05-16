@@ -1,13 +1,16 @@
 <template>
-    <form class="change-password" @submit.prevent="$emit('onSubmit', formData)">
-        <DxForm ref="form" :form-data="formData" labelMode="floating">
+    <form
+        class="change-password"
+        @submit.prevent="$emit('onSubmit', state.formData)"
+    >
+        <DxForm ref="formRef" :form-data="state.formData" labelMode="floating">
             <DxItem
                 :visible="hasEmail"
                 name="email"
                 data-field="email"
                 editor-type="dxTextBox"
                 :editor-options="{ mode: 'email' }"
-                :validation-rules="validationRules.email"
+                :validation-rules="state.validationRules.email"
                 :label="{ text: $t('models.user.email') }"
             />
             <DxItem
@@ -27,7 +30,7 @@
                         },
                     ],
                 }"
-                :validation-rules="validationRules.password"
+                :validation-rules="state.validationRules.password"
                 :label="{ text: $t('models.user.password') }"
             />
             <DxItem
@@ -37,7 +40,7 @@
                 :editor-options="{
                     mode: 'password',
                 }"
-                :validation-rules="validationRules.confirmPassword"
+                :validation-rules="state.validationRules.confirmPassword"
                 :label="{ text: $t('models.user.confirmPassword') }"
             />
             <DxItem
@@ -53,111 +56,95 @@
     </form>
 </template>
 
-<script>
+<script setup>
 import DxForm, { DxItem } from "devextreme-vue/form";
+import { onMounted } from "vue";
+import { ref } from "vue";
+import { inject } from "vue";
+import { reactive } from "vue";
+import { useI18n } from "vue-i18n";
 
-export default {
-    components: {
-        DxForm,
-        DxItem,
+const props = defineProps({
+    hasEmail: {
+        type: Boolean,
+        default: false,
     },
-    props: {
-        hasEmail: {
-            type: Boolean,
-            default: false,
-        },
+});
+const { t } = useI18n();
+const mt = inject("mt");
+const formRef = ref(null);
+const state = reactive({
+    formData: {
+        email: "",
+        password: "",
+        password_confirmation: "",
     },
-    data() {
-        return {
-            passwordMode: true,
-            formData: {
-                email: "",
-                password: "",
-                password_confirmation: "",
+    validationRules: {
+        email: [
+            {
+                type: "required",
+                message: t("models.user.email") + mt.validations.required,
             },
-            validationRules: {
-                email: [
-                    {
-                        type: "required",
-                        message:
-                            this.$t("models.user.email") +
-                            this.$mt.validations.required,
-                    },
-                ],
-                password: [
-                    {
-                        type: "required",
-                        message:
-                            this.$t("models.user.password") +
-                            this.$mt.validations.required,
-                    },
-                ],
-                confirmPassword: [
-                    {
-                        type: "required",
-                        message:
-                            this.$t("models.user.password") +
-                            this.$mt.validations.required,
-                    },
-                    {
-                        type: "compare",
-                        comparisonTarget: this.passwordComparison,
-                        message:
-                            this.$t("models.user.password") +
-                            this.$mt.validations.match,
-                    },
-                ],
+        ],
+        password: [
+            {
+                type: "required",
+                message: t("models.user.password") + mt.validations.required,
             },
-        };
+        ],
+        confirmPassword: [
+            {
+                type: "required",
+                message: t("models.user.password") + mt.validations.required,
+            },
+            {
+                type: "compare",
+                comparisonTarget: passwordComparison,
+                message: t("models.user.password") + mt.validations.match,
+            },
+        ],
     },
-    mounted() {
-        this.setFocus();
-    },
-    computed: {
-        form: function () {
-            return this.$refs.form.instance;
-        },
-    },
-    methods: {
-        passwordComparison() {
-            return this.formData.password;
-        },
-        viewPasswordClick() {
-            this.form.itemOption("password", {
-                editorOptions: {
-                    mode: this.passwordMode ? "text" : "password",
-                    buttons: [
-                        {
-                            options: {
-                                icon: this.passwordMode
-                                    ? "far fa-eye-slash"
-                                    : "far fa-eye",
-                                onClick: this.viewPasswordClick,
-                            },
-                            name: "btPw",
-                            location: "after",
-                        },
-                    ],
+});
+let passwordMode = true;
+
+onMounted(() => setFocus());
+
+function passwordComparison() {
+    return state.formData.password;
+}
+function viewPasswordClick() {
+    formRef.value.instance.itemOption("password", {
+        editorOptions: {
+            mode: passwordMode ? "text" : "password",
+            buttons: [
+                {
+                    options: {
+                        icon: passwordMode ? "far fa-eye-slash" : "far fa-eye",
+                        onClick: viewPasswordClick,
+                    },
+                    name: "btPw",
+                    location: "after",
                 },
-            });
-            this.form.itemOption("password_confirmation", {
-                editorOptions: {
-                    mode: this.passwordMode ? "text" : "password",
-                },
-            });
-            this.passwordMode = !this.passwordMode;
+            ],
         },
-        setFocus() {
-            setTimeout(
-                () =>
-                    this.form
-                        .getEditor(this.hasEmail ? "email" : "password")
-                        .focus(),
-                500
-            );
+    });
+    formRef.value.instance.itemOption("password_confirmation", {
+        editorOptions: {
+            mode: passwordMode ? "text" : "password",
         },
-    },
-};
+    });
+    passwordMode = !passwordMode;
+}
+function setFocus() {
+    setTimeout(
+        () =>
+            formRef.value.instance
+                .getEditor(props.hasEmail ? "email" : "password")
+                .focus(),
+        500
+    );
+}
+defineExpose({ setFocus });
 </script>
 <style lang="scss">
 .change-password {
