@@ -58,10 +58,7 @@
 
 <script setup>
 import DxForm, { DxItem } from "devextreme-vue/form";
-import { onMounted } from "vue";
-import { ref } from "vue";
-import { inject } from "vue";
-import { reactive } from "vue";
+import { onMounted, ref, inject, reactive } from "vue";
 import { useI18n } from "vue-i18n";
 
 const props = defineProps({

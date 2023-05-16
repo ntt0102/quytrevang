@@ -45,8 +45,7 @@
 import { DxFileManager } from "devextreme-vue/file-manager";
 import Photoswipe from "./Photoswipe.vue";
 import CustomFileSystemProvider from "devextreme/file_management/custom_provider";
-import { inject } from "vue";
-import { ref, watch } from "vue";
+import { ref, watch, inject } from "vue";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
 
