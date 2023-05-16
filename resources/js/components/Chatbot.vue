@@ -105,6 +105,13 @@ watch(
     }
 );
 
+watch(
+    () => store.state.auth.user,
+    () => {
+        state.messageList = [];
+    }
+);
+
 onMounted(() => {
     document
         .querySelector(".sc-user-input--text")
