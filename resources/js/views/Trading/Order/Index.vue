@@ -568,7 +568,7 @@ function loadToolsData() {
         });
         //
         const rulerLines = await toolsStore.get("ruler");
-        if (rulerLines.length == 3) {
+        if (rulerLines.length == 4) {
             rulerLines.forEach((line) => {
                 params.ruler.pointCount = 2;
                 params.ruler[line.pointName] =
