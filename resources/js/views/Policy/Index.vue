@@ -19,7 +19,10 @@
                     location: 'after',
                     widget: 'dxButton',
                     options: {
-                        type: activeBlock == '#terms' ? 'default' : 'normal',
+                        type:
+                            state.activeBlock == '#terms'
+                                ? 'default'
+                                : 'normal',
                         text: $t('policy.terms.title'),
                         onClick: () => itemClick('#terms'),
                     },
@@ -29,7 +32,10 @@
                     location: 'after',
                     widget: 'dxButton',
                     options: {
-                        type: activeBlock == '#privacy' ? 'default' : 'normal',
+                        type:
+                            state.activeBlock == '#privacy'
+                                ? 'default'
+                                : 'normal',
                         text: $t('policy.privacy.title'),
                         onClick: () => itemClick('#privacy'),
                     },
@@ -39,7 +45,8 @@
                     location: 'after',
                     widget: 'dxButton',
                     options: {
-                        type: activeBlock == '#faq' ? 'default' : 'normal',
+                        type:
+                            state.activeBlock == '#faq' ? 'default' : 'normal',
                         text: $t('policy.faq.title'),
                         onClick: () => itemClick('#faq'),
                     },
@@ -56,98 +63,81 @@
     </div>
 </template>
 
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import AppFooter from "../../components/Layouts/Partials/AppFooter.vue";
 import Terms from "./Terms.vue";
 import Privacy from "./Privacy.vue";
 import Faq from "./Faq.vue";
-import policyStore from "../../store/modules/Policy";
 import buttonUi from "devextreme/ui/button";
+import { inject, reactive, onMounted, onUnmounted } from "vue";
+import { useStore } from "vuex";
+import { useRoute } from "vue-router";
 
-export default {
-    components: {
-        AppFooter,
-        Terms,
-        Privacy,
-        Faq,
-    },
-    data() {
-        return {
-            activeBlock: null,
-            prevScrollTop: 0,
-            scrollElement: null,
-        };
-    },
-    beforeCreate() {
-        this.$store.registerModule("Policy", policyStore);
-    },
-    created() {
-        this.fetch();
-    },
-    mounted() {
-        this.$mf.removePreload();
-        this.activeBlock = this.$route.hash || "#terms";
-        this.scrollHandle(false);
-        this.scrollElement = document.getElementById("scrollPolicy");
-        this.prevScrollTop = this.scrollElement.scrollTop;
-        this.scrollElement.addEventListener("scroll", this.onScroll);
-        window.addEventListener("popstate", this.popstateHandler);
-    },
-    destroyed() {
-        this.$store.unregisterModule("Policy");
-        this.scrollElement.removeEventListener("scroll", this.onScroll);
-        window.removeEventListener("popstate", this.popstateHandler);
-    },
-    methods: {
-        ...mapActions("Policy", ["fetch", "resetState"]),
-        onScroll(e) {
-            const HEADER_OFFSET = 56;
-            let viewportHeight = this.scrollElement.clientHeight;
-            let currentScrollTop = this.scrollElement.scrollTop;
-            let direction = currentScrollTop - this.prevScrollTop;
+const store = useStore();
+const route = useRoute();
+const mf = inject("mf");
+const state = reactive({
+    activeBlock: null,
+});
+let prevScrollTop = 0;
+let scrollElement = null;
 
-            document
-                .querySelectorAll(".policy-page .scroll>section")
-                .forEach((el) => {
-                    let position = el.getBoundingClientRect();
-                    if (
-                        (direction > 0 &&
-                            position.top > HEADER_OFFSET &&
-                            position.top <
-                                0.8 * viewportHeight + HEADER_OFFSET) ||
-                        (direction < 0 &&
-                            position.bottom >
-                                0.2 * viewportHeight + HEADER_OFFSET &&
-                            position.bottom < viewportHeight + HEADER_OFFSET)
-                    )
-                        this.activeBlock = `#${el.id}`;
-                });
-            this.prevScrollTop = currentScrollTop;
-        },
-        scrollHandle(withSmooth = true) {
-            let options = {};
-            if (withSmooth) options.behavior = "smooth";
-            document.querySelector(this.activeBlock).scrollIntoView(options);
-        },
-        itemClick(hash) {
-            this.activeBlock = hash;
-            history.pushState(null, null, this.activeBlock);
-            this.scrollHandle();
-        },
-        popstateHandler(e) {
-            this.activeBlock = this.$route.hash;
-            this.scrollHandle();
-        },
-        onContentReady(e) {
-            let buttonElement = e.element.querySelector(
-                ".dx-toolbar-menu-container .dx-dropdownmenu-button"
-            );
-            let buttonInstance = buttonUi.getInstance(buttonElement);
-            buttonInstance.option("icon", "menu");
-        },
-    },
-};
+store.dispatch("policy/getPolicy");
+
+onMounted(() => {
+    mf.removePreload();
+    state.activeBlock = route.hash || "#terms";
+    scrollHandle(false);
+    scrollElement = document.getElementById("scrollPolicy");
+    prevScrollTop = scrollElement.scrollTop;
+    scrollElement.addEventListener("scroll", onScroll);
+    window.addEventListener("popstate", popstateHandler);
+});
+onUnmounted(() => {
+    scrollElement.removeEventListener("scroll", onScroll);
+    window.removeEventListener("popstate", popstateHandler);
+});
+function onScroll(e) {
+    const HEADER_OFFSET = 56;
+    let viewportHeight = scrollElement.clientHeight;
+    let currentScrollTop = scrollElement.scrollTop;
+    let direction = currentScrollTop - prevScrollTop;
+
+    document.querySelectorAll(".policy-page .scroll>section").forEach((el) => {
+        let position = el.getBoundingClientRect();
+        if (
+            (direction > 0 &&
+                position.top > HEADER_OFFSET &&
+                position.top < 0.8 * viewportHeight + HEADER_OFFSET) ||
+            (direction < 0 &&
+                position.bottom > 0.2 * viewportHeight + HEADER_OFFSET &&
+                position.bottom < viewportHeight + HEADER_OFFSET)
+        )
+            state.activeBlock = `#${el.id}`;
+    });
+    prevScrollTop = currentScrollTop;
+}
+function scrollHandle(withSmooth = true) {
+    let options = {};
+    if (withSmooth) options.behavior = "smooth";
+    document.querySelector(state.activeBlock).scrollIntoView(options);
+}
+function itemClick(hash) {
+    state.activeBlock = hash;
+    history.pushState(null, null, state.activeBlock);
+    scrollHandle();
+}
+function popstateHandler(e) {
+    state.activeBlock = route.hash;
+    scrollHandle();
+}
+function onContentReady(e) {
+    let buttonElement = e.element.querySelector(
+        ".dx-toolbar-menu-container .dx-dropdownmenu-button"
+    );
+    let buttonInstance = buttonUi.getInstance(buttonElement);
+    buttonInstance.option("icon", "menu");
+}
 </script>
 
 <style lang="scss">

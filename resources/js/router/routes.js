@@ -2,6 +2,7 @@ import lang from "../lang";
 
 import AuthLayout from "../components/Layouts/AuthLayout.vue";
 import GuestLayout from "../components/Layouts/GuestLayout.vue";
+import Policy from "../views/Policy/Index.vue";
 
 function loadView(name1, name2, name3) {
     if (!!name3) return () => import(`../views/${name1}/${name2}/${name3}.vue`);
@@ -66,8 +67,8 @@ const guestRoute = [
     {
         path: "/policy",
         name: "policy",
-        meta: { title: lang.global.t("policy.title") },
-        component: loadView("Policy", "Index"),
+        meta: { layout: Policy, title: lang.global.t("policy.title") },
+        component: {},
     },
     { path: "/:pathMatch(.*)*", component: loadView("NotFound") },
 ];

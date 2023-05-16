@@ -1,22 +1,22 @@
 function initialState() {
     return {
         data: {},
-        isLoaded: false
+        isLoaded: false,
     };
 }
 
 const getters = {
-    interestRate: state => state.data.interestRate,
-    principalMin: state => state.data.principalMin,
-    holdWeeksMin: state => state.data.holdWeeksMin,
-    faqs: state => state.data.faqs
+    interestRate: (state) => state.data.interestRate,
+    principalMin: (state) => state.data.principalMin,
+    holdWeeksMin: (state) => state.data.holdWeeksMin,
+    faqs: (state) => state.data.faqs,
 };
 
 const actions = {
-    fetch({ commit, dispatch, getters, state, rootGetters }, param) {
+    getPolicy({ commit, dispatch, getters, state, rootGetters }, param) {
         if (state.isLoaded) return Promise.resolve(true);
         return new Promise((resolve, reject) => {
-            axios.get("policy-params").then(response => {
+            axios.get("policy-params").then((response) => {
                 commit("setState", response.data);
                 resolve(response.data);
             });
@@ -24,7 +24,7 @@ const actions = {
     },
     resetState({ commit }) {
         commit("resetState");
-    }
+    },
 };
 
 const mutations = {
@@ -34,7 +34,7 @@ const mutations = {
     },
     resetState(state) {
         state = Object.assign(state, initialState());
-    }
+    },
 };
 
 export default {
@@ -42,5 +42,5 @@ export default {
     state: initialState,
     getters,
     actions,
-    mutations
+    mutations,
 };
