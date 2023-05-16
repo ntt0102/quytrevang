@@ -1,6 +1,6 @@
 <template>
     <DxFileManager
-        ref="fileManager"
+        ref="fileManagerRef"
         :file-system-provider="fileSystemProvider"
         :permissions="{
             create: true,
@@ -35,217 +35,203 @@
         @errorOccurred="onErrorOccurred"
         @selectedFileOpened="onSelectedFileOpened"
     />
+    <Photoswipe
+        ref="photoswipeRef"
+        :images="selectedImages"
+        :style="{ display: 'none !important' }"
+    />
 </template>
-<script>
+<script setup>
 import { DxFileManager } from "devextreme-vue/file-manager";
+import Photoswipe from "./Photoswipe.vue";
 import CustomFileSystemProvider from "devextreme/file_management/custom_provider";
+import { inject } from "vue";
+import { ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+import { toast } from "vue3-toastify";
 
-export default {
-    components: {
-        DxFileManager,
+const props = defineProps({
+    clientPath: {
+        type: String,
+        default: "",
     },
-    data() {
-        return {
-            fileSystemProvider: new CustomFileSystemProvider({
-                getItems: this.getItems,
-                createDirectory: this.createDirectory,
-                renameItem: this.renameItem,
-                deleteItem: this.deleteItem,
-                copyItem: this.copyItem,
-                moveItem: this.moveItem,
-                uploadFileChunk: this.uploadFileChunk,
-            }),
-            currentFolderItems: [],
+});
+const emit = defineEmits(["copiedUrl"]);
+const { t } = useI18n();
+const mc = inject("mc");
+const mf = inject("mf");
+const fileManagerRef = ref(null);
+const photoswipeRef = ref(null);
+const selectedImages = ref([]);
+const fileSystemProvider = ref(
+    new CustomFileSystemProvider({
+        getItems: getItems,
+        createDirectory: createDirectory,
+        renameItem: renameItem,
+        deleteItem: deleteItem,
+        copyItem: copyItem,
+        moveItem: moveItem,
+        uploadFileChunk: uploadFileChunk,
+    })
+);
+let currentFolderItems = [];
+
+watch(
+    () => props.clientPath,
+    () => {
+        fileManagerRef.value.instance.refresh();
+    }
+);
+
+function getItems(parentDirectory) {
+    return new Promise((resolve, reject) => {
+        axios
+            .get(
+                `settings/files/getItems?clientPath=${props.clientPath}&path=${parentDirectory.path}`
+            )
+            .then((response) => {
+                resolve(response.data);
+                currentFolderItems = response.data;
+            });
+    });
+}
+function createDirectory(parentDirectory, name) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post("settings/files/createDirectory", {
+                clientPath: props.clientPath,
+                path: parentDirectory.path,
+                name: name,
+            })
+            .then((response) => {
+                if (response.data) resolve();
+                else reject();
+            });
+    });
+}
+function renameItem(item, newName) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post("settings/files/renameItem", {
+                clientPath: props.clientPath,
+                path: item.parentPath,
+                oldName: item.name,
+                newName: newName,
+            })
+            .then((response) => {
+                if (response.data) resolve();
+                else reject();
+            });
+    });
+}
+function deleteItem(item) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post("settings/files/deleteItem", {
+                clientPath: props.clientPath,
+                path: item.path,
+                isDirectory: item.isDirectory,
+            })
+            .then((response) => {
+                if (response.data) resolve();
+                else reject();
+            });
+    });
+}
+function copyItem(item, destinationDirectory) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post("settings/files/copyItem", {
+                clientPath: props.clientPath,
+                fromPath: item.parentPath,
+                toPath: destinationDirectory.path,
+                name: item.name,
+            })
+            .then((response) => {
+                if (response.data) resolve();
+                else reject();
+            });
+        resolve();
+    });
+}
+function moveItem(item, destinationDirectory) {
+    return new Promise((resolve, reject) => {
+        axios
+            .post("settings/files/moveItem", {
+                clientPath: props.clientPath,
+                fromPath: item.parentPath,
+                toPath: destinationDirectory.path,
+                name: item.name,
+            })
+            .then((response) => {
+                if (response.data) resolve();
+                else reject();
+            });
+        resolve();
+    });
+}
+async function uploadFileChunk(file, uploadInfo, destinationDirectory) {
+    const fileName = file.name;
+    if (file.type.match(/image.*/)) {
+        const config = {
+            file: file,
+            maxSize: mc.MAX_SIZE_IMAGE_UPLOAD,
         };
-    },
-    props: {
-        clientPath: {
-            type: String,
-            default: "",
-        },
-    },
-    computed: {
-        fileManager() {
-            return this.$refs.fileManager.instance;
-        },
-    },
-    watch: {
-        clientPath() {
-            this.fileManager.refresh();
-        },
-    },
-    methods: {
-        getItems(parentDirectory) {
-            return new Promise((resolve, reject) => {
-                axios
-                    .get(
-                        `settings/files/getItems?clientPath=${this.clientPath}&path=${parentDirectory.path}`
-                    )
-                    .then((response) => {
-                        resolve(response.data);
-                        this.currentFolderItems = response.data;
-                    });
-            });
-        },
-        createDirectory(parentDirectory, name) {
-            return new Promise((resolve, reject) => {
-                axios
-                    .post("settings/files/createDirectory", {
-                        clientPath: this.clientPath,
-                        path: parentDirectory.path,
-                        name: name,
-                    })
-                    .then((response) => {
-                        if (response.data) resolve();
-                        else reject();
-                    });
-            });
-        },
-        renameItem(item, newName) {
-            return new Promise((resolve, reject) => {
-                axios
-                    .post("settings/files/renameItem", {
-                        clientPath: this.clientPath,
-                        path: item.parentPath,
-                        oldName: item.name,
-                        newName: newName,
-                    })
-                    .then((response) => {
-                        if (response.data) resolve();
-                        else reject();
-                    });
-            });
-        },
-        deleteItem(item) {
-            return new Promise((resolve, reject) => {
-                axios
-                    .post("settings/files/deleteItem", {
-                        clientPath: this.clientPath,
-                        path: item.path,
-                        isDirectory: item.isDirectory,
-                    })
-                    .then((response) => {
-                        if (response.data) resolve();
-                        else reject();
-                    });
-            });
-        },
-        copyItem(item, destinationDirectory) {
-            return new Promise((resolve, reject) => {
-                axios
-                    .post("settings/files/copyItem", {
-                        clientPath: this.clientPath,
-                        fromPath: item.parentPath,
-                        toPath: destinationDirectory.path,
-                        name: item.name,
-                    })
-                    .then((response) => {
-                        if (response.data) resolve();
-                        else reject();
-                    });
-                resolve();
-            });
-        },
-        moveItem(item, destinationDirectory) {
-            return new Promise((resolve, reject) => {
-                axios
-                    .post("settings/files/moveItem", {
-                        clientPath: this.clientPath,
-                        fromPath: item.parentPath,
-                        toPath: destinationDirectory.path,
-                        name: item.name,
-                    })
-                    .then((response) => {
-                        if (response.data) resolve();
-                        else reject();
-                    });
-                resolve();
-            });
-        },
-        async uploadFileChunk(file, uploadInfo, destinationDirectory) {
-            const fileName = file.name;
-            if (file.type.match(/image.*/)) {
-                const config = {
-                    file: file,
-                    maxSize: this.$mc.MAX_SIZE_IMAGE_UPLOAD,
-                };
-                file = await this.$mf.resizeImage(config);
-            }
+        file = await mf.resizeImage(config);
+    }
 
-            return new Promise((resolve, reject) => {
-                let formData = new FormData();
-                formData.append("clientPath", this.clientPath);
-                formData.append("file", file);
-                formData.append("name", fileName);
-                formData.append("path", destinationDirectory.path);
-                axios
-                    .post("settings/files/uploadFileChunk", formData, {
-                        headers: { "Content-Type": "multipart/form-data" },
-                    })
-                    .then((response) => {
-                        if (response.data) resolve();
-                        else reject();
-                    });
+    return new Promise((resolve, reject) => {
+        let formData = new FormData();
+        formData.append("clientPath", props.clientPath);
+        formData.append("file", file);
+        formData.append("name", fileName);
+        formData.append("path", destinationDirectory.path);
+        axios
+            .post("settings/files/uploadFileChunk", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+            })
+            .then((response) => {
+                if (response.data) resolve();
+                else reject();
             });
-        },
-        copyUrl() {
-            const items = this.fileManager.getSelectedItems();
-            if (items.length > 1)
-                this.$toasted.info(
-                    this.$t("settings.files.messages.multiFile")
+    });
+}
+function copyUrl() {
+    const items = fileManagerRef.value.instance.getSelectedItems();
+    if (items.length > 1) toast.info(t("settings.files.messages.multiFile"));
+    else if (items[0].isDirectory)
+        toast.info(t("settings.files.messages.notIsFile"));
+    else {
+        let text = `${window.baseURL}/storage/${props.clientPath}/${items[0].path}`;
+        navigator.clipboard.writeText(text).then(
+            () => {
+                toast.success(t("settings.files.messages.copiedUrl"));
+                emit("copiedUrl", text);
+            },
+            (err) =>
+                toast.error(
+                    t("settings.files.messages.notCopiedUrl") +
+                        "<br>ERROR: " +
+                        err
+                )
+        );
+    }
+}
+function onSelectedFileOpened({ file }) {
+    if (file.name.match(/.(jpg|jpeg|png|gif)$/i)) {
+        selectedImages.value = currentFolderItems.reduce((imgs, f) => {
+            if (!f.isDirectory)
+                imgs.push(
+                    `${window.baseURL}/storage/${props.clientPath}/${file.parentPath}/${f.name}`
                 );
-            else if (items[0].isDirectory)
-                this.$toasted.info(
-                    this.$t("settings.files.messages.notIsFile")
-                );
-            else {
-                let text = `${window.baseURL}/storage/${this.clientPath}/${items[0].path}`;
-                navigator.clipboard.writeText(text).then(
-                    () => {
-                        this.$toasted.success(
-                            this.$t("settings.files.messages.copiedUrl")
-                        );
-                        this.$emit("copiedUrl", text);
-                    },
-                    (err) =>
-                        this.$toasted.error(
-                            this.$t("settings.files.messages.notCopiedUrl") +
-                                "<br>ERROR: " +
-                                err
-                        )
-                );
-            }
-        },
-        onSelectedFileOpened({ file }) {
-            if (file.name.match(/.(jpg|jpeg|png|gif)$/i)) {
-                let items = this.currentFolderItems.reduce((imgs, f) => {
-                    if (!f.isDirectory)
-                        imgs.push({
-                            src: `${window.baseURL}/storage/${this.clientPath}/${file.parentPath}/${f.name}`,
-                            title: f.name,
-                        });
-                    return imgs;
-                }, []);
-                let pswp = this.$Pswp.open({
-                    items,
-                    options: {
-                        index: items.findIndex((item) =>
-                            item.src.includes(file.name)
-                        ),
-                    },
-                });
-                pswp.listen("close", () => this.$mf.popRouteHistoryState());
-                this.$mf.pushPhotoswipeToHistoryState(pswp);
-            } else
-                this.$toasted.info(
-                    this.$t("settings.files.messages.notIsImage")
-                );
-        },
-        onErrorOccurred(e) {
-            setTimeout(() => this.fileManager.repaint(), 3000);
-        },
-    },
-};
+            return imgs;
+        }, []);
+        photoswipeRef.value.openSlide(file.name);
+    } else toast.info(t("settings.files.messages.notIsImage"));
+}
+function onErrorOccurred(e) {
+    setTimeout(() => fileManagerRef.value.instance.repaint(), 3000);
+}
 </script>
 <style lang="scss">
 .dx-filemanager {

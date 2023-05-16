@@ -14,70 +14,70 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import PhotoSwipeLightbox from "photoswipe/lightbox";
 import "photoswipe/style.css";
 import { ref, inject, onMounted, onUnmounted, watch } from "vue";
 
-export default {
-    props: {
-        images: Array,
-    },
-    setup(props) {
-        const data = ref([]);
-        if (props.images.length) {
-            createImagesWithSize(props.images);
-        }
-        watch(() => props.images, createImagesWithSize);
+const props = defineProps({
+    images: Array,
+});
+const data = ref([]);
+if (props.images && props.images.length) {
+    createImagesWithSize(props.images);
+}
+watch(() => props.images, createImagesWithSize);
 
-        function createImagesWithSize(imgs) {
-            data.value = [];
-            imgs.forEach((image) => {
-                let img = new Image();
-                img.onload = function () {
-                    data.value.push({
-                        src: image,
-                        width: this.width,
-                        height: this.height,
-                    });
-                };
-                img.src = image;
+function createImagesWithSize(imgs) {
+    data.value = [];
+    imgs.forEach((image) => {
+        let img = new Image();
+        img.onload = function () {
+            data.value.push({
+                src: image,
+                width: this.width,
+                height: this.height,
             });
-        }
-
-        let lightbox = null;
-        const mf = inject("mf");
-        const routeHistoryState = inject("routeHistoryState");
-        onMounted(() => {
-            if (!lightbox) {
-                lightbox = new PhotoSwipeLightbox({
-                    gallery: ".photoswipe",
-                    children: "a",
-                    pswpModule: () => import("photoswipe"),
-                });
-                lightbox.on("beforeOpen", () => {
-                    mf.pushPopupToHistoryState(routeHistoryState, () =>
-                        lightbox.pswp.close()
-                    );
-                });
-                lightbox.on("destroy", () => {
-                    mf.popRouteHistoryState(routeHistoryState);
-                });
-                lightbox.init();
-            }
-        });
-        onUnmounted(() => {
-            if (lightbox) {
-                lightbox.destroy();
-                lightbox = null;
-            }
-        });
-
-        return {
-            data,
         };
-    },
-};
+        img.src = image;
+    });
+}
+
+let lightbox = null;
+const mf = inject("mf");
+const routeHistoryState = inject("routeHistoryState");
+onMounted(() => {
+    if (!lightbox) {
+        lightbox = new PhotoSwipeLightbox({
+            gallery: ".photoswipe",
+            children: "a",
+            pswpModule: () => import("photoswipe"),
+        });
+        lightbox.on("beforeOpen", () => {
+            mf.pushPopupToHistoryState(routeHistoryState, () =>
+                lightbox.destroy()
+            );
+        });
+        lightbox.on("destroy", () => {
+            mf.popRouteHistoryState(routeHistoryState);
+        });
+        lightbox.init();
+    }
+});
+onUnmounted(() => {
+    if (lightbox) {
+        lightbox.destroy();
+        lightbox = null;
+    }
+});
+
+function openSlide(e) {
+    const index = props.images.findIndex((img) => img.includes(e));
+    lightbox.loadAndOpen(index, {
+        gallery: document.querySelector(".photoswipe"),
+    });
+}
+defineExpose({ openSlide });
 </script>
 <style lang="scss" scoped>
 .photoswipe {
