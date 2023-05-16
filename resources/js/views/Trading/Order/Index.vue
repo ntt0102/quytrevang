@@ -467,6 +467,7 @@ function eventChartResize() {
                 "translate(-250px, 0px)";
             document.querySelector(".header-component").style.transform =
                 "translate(0px, -56px)";
+            document.querySelector(".sc-launcher").style.display = "none";
             document.querySelector(".dx-drawer-content").style.transform =
                 "unset";
         }
@@ -525,6 +526,7 @@ function eventFullscreenChange() {
                 "translate(-250px, 0px)";
             document.querySelector(".header-component").style.transform =
                 "translate(0px, -56px)";
+            document.querySelector(".sc-launcher").style.display = "none";
             document.querySelector(".dx-drawer-content").style.transform =
                 "unset";
         } else {
@@ -534,6 +536,7 @@ function eventFullscreenChange() {
                 "unset";
             document.querySelector(".header-component").style.transform =
                 "unset";
+            document.querySelector(".sc-launcher").style.display = "unset";
             document.querySelector(".dx-drawer-content").style.transform =
                 "translate(0px, 0px)";
         }

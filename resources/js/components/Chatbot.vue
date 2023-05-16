@@ -12,7 +12,7 @@
         :showFile="false"
         :showEdition="false"
         :showDeletion="false"
-        :deletionConfirmation="true"
+        :deletionConfirmation="false"
         :showTypingIndicator="state.showTypingIndicator"
         :showLauncher="true"
         :showCloseButton="true"
@@ -246,6 +246,18 @@ function adjust(str) {
         z-index: 1500;
     }
 
+    .sc-header--title {
+        font-size: 24px !important;
+    }
+
+    .sc-message {
+        width: 340px !important;
+
+        .sc-message--text {
+            font-size: 16px !important;
+        }
+    }
+
     .sc-message-list {
         &::-webkit-scrollbar {
             width: 5px;
@@ -258,6 +270,10 @@ function adjust(str) {
             box-shadow: inset 0 0 6px lighten(#c1c1c1, 30);
             background-color: #f5f5f5;
         }
+    }
+
+    .sc-user-input--text {
+        font-size: 16px !important;
     }
 }
 </style>
