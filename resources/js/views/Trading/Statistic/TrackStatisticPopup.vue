@@ -205,7 +205,7 @@ function show() {
     popupRef.value.show();
 }
 function onSave(formData) {
-    if (!formData.length) return;
+    if (!formData.changes.length) return;
     bus.emit("checkPin", () =>
         store.dispatch("tradingStatistic/save", formData)
     );

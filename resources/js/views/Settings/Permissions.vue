@@ -108,7 +108,7 @@ watch(
 );
 onUnmounted(() => store.dispatch("settingPermission/resetState"));
 function onSave(formData) {
-    if (!formData.length) return;
+    if (!formData.changes.length) return;
     bus.emit("checkPin", () =>
         store.dispatch("settingPermission/save", formData)
     );

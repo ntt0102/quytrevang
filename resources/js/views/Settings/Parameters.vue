@@ -73,7 +73,7 @@ watch(
 );
 onUnmounted(() => store.dispatch("settingParameter/resetState"));
 function onSave(formData) {
-    if (!formData.length) return;
+    if (!formData.changes.length) return;
     bus.emit("checkPin", () =>
         store.dispatch("settingParameter/save", formData)
     );

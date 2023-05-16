@@ -239,7 +239,7 @@ watch(
 );
 onUnmounted(() => store.dispatch("settingFaq/resetState"));
 function onSave(formData) {
-    if (!formData.length) return;
+    if (!formData.changes.length) return;
     store.dispatch("settingFaq/save", formData);
 }
 function onUseHtmlChange(e) {

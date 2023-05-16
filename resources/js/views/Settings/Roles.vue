@@ -149,7 +149,7 @@ watch(
 );
 onUnmounted(() => store.dispatch("settingRole/resetState"));
 function onSave(formData) {
-    if (!formData.length) return;
+    if (!formData.changes.length) return;
     bus.emit("checkPin", () => store.dispatch("settingRole/save", formData));
 }
 function cellTemplate(container, options) {
