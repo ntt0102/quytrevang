@@ -389,6 +389,11 @@ function eventPriceLineDrag(e) {
                     toolsStore.set("ruler", lineOptions);
                     if (params.ruler.pointCount == 2) {
                         const distance = +params.ruler.l100.options().title;
+
+                        const l25Price = +(newPrice + distance / 4).toFixed(1);
+                        params.ruler.l25.applyOptions({ price: l25Price });
+                        toolsStore.set("ruler", params.ruler.l25.options());
+                        //
                         const l50Price = +(newPrice + distance / 2).toFixed(1);
                         params.ruler.l50.applyOptions({ price: l50Price });
                         toolsStore.set("ruler", params.ruler.l50.options());
