@@ -9,15 +9,10 @@ function initialState() {
     };
 }
 
-const getters = {
-    contracts: (state) => state.contracts,
-    users: (state) => state.users,
-    interestRate: (state) => state.interestRate,
-    principalMin: (state) => state.principalMin,
-};
+const getters = {};
 
 const actions = {
-    fetch({ commit, dispatch, getters, state, rootGetters }, isOld) {
+    getContracts({ commit, dispatch, getters, state, rootGetters }, isOld) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         if (isOld == undefined) isOld = state.isOld;
         return new Promise((resolve, reject) => {
