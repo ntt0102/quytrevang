@@ -6,12 +6,7 @@
                 :is-x-small="screen.getScreenSizeInfo.isXSmall"
                 :is-large="screen.getScreenSizeInfo.isLarge"
             >
-                <router-view v-slot="{ Component, route }">
-                    {{ baseAccentColor }}
-                    <transition name="fade">
-                        <component :is="Component" :key="route.path" />
-                    </transition>
-                </router-view>
+                <router-view></router-view>
                 <template #footer>
                     <app-footer />
                 </template>
