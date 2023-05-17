@@ -1,285 +1,239 @@
 <template>
-    <div>
-        <DxPopup
-            ref="popup"
-            :showCloseButton="true"
-            :fullScreen="$screen.getScreenSizeInfo.isXSmall ? true : false"
-            :show-title="true"
-            :toolbarItems="[
-                {
-                    toolbar: 'bottom',
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        text: $t('buttons.save'),
-                        onClick: () => $refs.submit.click(),
-                    },
+    <CorePopup
+        ref="popupRef"
+        class="paid-contract-popup"
+        :toolbarItems="[
+            {
+                toolbar: 'bottom',
+                location: 'after',
+                widget: 'dxButton',
+                options: {
+                    text: $t('buttons.save'),
+                    onClick: () => $refs.submitRef.click(),
                 },
-                {
-                    toolbar: 'bottom',
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        text: $t('buttons.cancel'),
-                        onClick: () => popup.hide(),
-                    },
+            },
+            {
+                toolbar: 'bottom',
+                location: 'after',
+                widget: 'dxButton',
+                options: {
+                    text: $t('buttons.cancel'),
+                    onClick: () => popupRef.hide(),
                 },
-            ]"
-            :wrapperAttr="{ class: 'confirm-contract-popup' }"
-            @hiding="onHiding"
-        >
-            <template #content>
-                <DxScrollView>
-                    <form @submit.prevent="onSubmit">
-                        <button ref="submit" class="display-none" />
-                        <DxAccordion
-                            ref="accordion"
-                            :collapsible="true"
-                            :selectedIndex="0"
-                            :items="[
-                                {
-                                    title: $t('components.paidContract.step1'),
-                                    template: 'step1Template',
-                                },
-                                {
-                                    title: $t('components.paidContract.step2'),
-                                    template: 'step2Template',
-                                },
-                            ]"
-                        >
-                            <template #step1Template>
-                                <div class="step1">
-                                    <div class="download">
-                                        <DxButton
-                                            :text="
-                                                $t('buttons.receiptDownload')
-                                            "
-                                            icon="download"
-                                            type="default"
-                                            styling-mode="contained"
-                                            @click="
-                                                () =>
-                                                    $refs.pdf.download({
-                                                        component:
-                                                            'PayReceiptPdf',
-                                                        contract: contract,
-                                                        isPreview:
-                                                            formData.isPdfPreview,
-                                                    })
-                                            "
-                                        />
-                                        <DxCheckBox
-                                            v-if="
-                                                !$screen.getScreenSizeInfo
-                                                    .isXSmall
-                                            "
-                                            v-model="formData.isPdfPreview"
-                                            :text="
-                                                $t(
-                                                    'components.paidContract.preview'
-                                                )
-                                            "
-                                        />
-                                    </div>
-                                </div>
-                            </template>
-                            <template #step2Template>
-                                <div class="upload" :key="refreshKey">
-                                    <div class="upload-browser">
-                                        <input
-                                            ref="receiptImage"
-                                            type="file"
-                                            id="receiptImage"
-                                            multiple="multiple"
-                                            accept="images/*"
-                                            @change="onUploadImageChange"
-                                        />
-                                        <label for="receiptImage"
-                                            ><i class="far fa-file-upload"></i>
-                                            {{
-                                                $t("titles.chooseImage")
-                                            }}</label
-                                        >
-                                        <DxCheckBox
-                                            id="contractDelete"
-                                            v-model="formData.isDelete"
-                                            :text="$t('titles.deleteOldImage')"
-                                            @valueChanged="
-                                                onCheckBoxDeleteChange
-                                            "
-                                        />
-                                    </div>
-                                    <!-- <Photoswipe
-                                        v-if="formData.documents.length"
-                                        @opened="
-                                            $mf.pushPhotoswipeToHistoryState
-                                        "
-                                        @close="$mf.popRouteHistoryState"
-                                    >
-                                        <div
-                                            v-for="(
-                                                image, index
-                                            ) in formData.documents"
-                                            :key="index"
-                                        >
-                                            <img
-                                                :src="image.file"
-                                                v-pswp="image.file"
-                                                :alt="$appName"
-                                            />
-                                        </div>
-                                    </Photoswipe> -->
-                                </div>
-                            </template>
-                        </DxAccordion>
-                        <div class="is-confirmed">
-                            <DxCheckBox
-                                v-model="formData.isConfirmed"
-                                :text="
-                                    $t('components.paidContract.isConfirmed')
-                                "
-                            />
-                            <div v-if="!!contract.confirmed_by">
-                                ({{
-                                    $t("components.paidContract.confirmedBy")
-                                }}
-                                <RouterLink
-                                    :to="{
-                                        name: 'users',
-                                        query: { code: contract.confirmed_by },
-                                    }"
-                                    >#{{ contract.confirmed_by }}</RouterLink
-                                >)
+            },
+        ]"
+        @shown="onShown"
+        @hidden="onHidden"
+    >
+        <DxScrollView>
+            <form @submit.prevent="onSubmit">
+                <button ref="submitRef" class="display-none" />
+                <DxAccordion
+                    ref="accordionRef"
+                    :collapsible="true"
+                    :selectedIndex="0"
+                    :items="[
+                        {
+                            title: $t('components.paidContract.step1'),
+                            template: 'step1Template',
+                        },
+                        {
+                            title: $t('components.paidContract.step2'),
+                            template: 'step2Template',
+                        },
+                    ]"
+                >
+                    <template #step1Template>
+                        <div class="step1">
+                            <div class="download">
+                                <DxButton
+                                    :text="$t('buttons.receiptDownload')"
+                                    icon="download"
+                                    type="default"
+                                    styling-mode="contained"
+                                    @click="
+                                        () =>
+                                            $refs.pdfRef.download({
+                                                component: 'PayReceiptPdf',
+                                                contract: state.contract,
+                                                isPreview:
+                                                    state.formData.isPdfPreview,
+                                            })
+                                    "
+                                />
+                                <DxCheckBox
+                                    v-if="!$screen.getScreenSizeInfo.isXSmall"
+                                    v-model="state.formData.isPdfPreview"
+                                    :text="
+                                        $t('components.paidContract.preview')
+                                    "
+                                />
                             </div>
                         </div>
-                    </form>
-                </DxScrollView>
-            </template>
-        </DxPopup>
-        <Pdf ref="pdf" v-if="$mf.isSet(contract)" />
-    </div>
+                    </template>
+                    <template #step2Template>
+                        <div class="upload" :key="state.refreshKey">
+                            <div class="upload-browser">
+                                <input
+                                    ref="receiptImageRef"
+                                    type="file"
+                                    id="receiptImage"
+                                    multiple="multiple"
+                                    accept="images/*"
+                                    @change="onUploadImageChange"
+                                />
+                                <label for="receiptImage"
+                                    ><i class="far fa-file-upload"></i>
+                                    {{ $t("titles.chooseImage") }}</label
+                                >
+                                <DxCheckBox
+                                    id="contractDelete"
+                                    v-model="state.formData.isDelete"
+                                    :text="$t('titles.deleteOldImage')"
+                                    @valueChanged="onCheckBoxDeleteChange"
+                                />
+                            </div>
+                            <Photoswipe v-if="images.length" :images="images" />
+                        </div>
+                    </template>
+                </DxAccordion>
+                <div class="is-confirmed">
+                    <DxCheckBox
+                        v-model="state.formData.isConfirmed"
+                        :text="$t('components.paidContract.isConfirmed')"
+                    />
+                    <div v-if="!!state.contract.confirmed_by">
+                        ({{ $t("components.paidContract.confirmedBy") }}
+                        <RouterLink
+                            :to="{
+                                name: 'users',
+                                query: { code: state.contract.confirmed_by },
+                            }"
+                            >#{{ state.contract.confirmed_by }}</RouterLink
+                        >)
+                    </div>
+                </div>
+            </form>
+        </DxScrollView>
+    </CorePopup>
+    <Pdf ref="pdfRef" v-if="$mf.isSet(state.contract)" />
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import DxAccordion from "devextreme-vue/accordion";
 import Pdf from "../../../components/Pdfs/Index.vue";
+import CorePopup from "../../../components/Popups/CorePopup.vue";
+import Photoswipe from "../../../components/Photoswipe.vue";
+import { ref, reactive, computed, inject } from "vue";
+import { useStore } from "vuex";
+import { useI18n } from "vue-i18n";
 
-export default {
-    components: { DxAccordion, Pdf },
-    data() {
-        return {
-            refreshKey: 0,
-            contract: {},
-            formData: {},
-            backupDocuments: [],
-        };
-    },
-    mounted() {
-        this.initFormData();
-    },
-    computed: {
-        popup() {
-            return this.$refs.popup.instance;
-        },
-        accordion() {
-            return this.$refs.accordion.instance;
-        },
-    },
-    methods: {
-        ...mapActions("Admin.contracts", ["paidContract"]),
-        show(contract) {
-            this.popup.option(
-                "title",
-                this.$t(
-                    `components.paidContract.${
-                        contract.status == 2 ? "confirmTitle" : "title"
-                    }`
-                ) +
-                    " #" +
-                    contract.code
-            );
-            this.contract = contract;
-            this.formData.isConfirmed = !!contract.confirmed_by;
-            this.popup.show();
-            setTimeout(
-                () =>
-                    this.accordion.option(
-                        "selectedIndex",
-                        contract.status == 0 ? 0 : 1
-                    ),
-                500
-            );
-            this.backupDocuments = contract.url_paid_docs.map((image) => ({
-                file: image,
-                isUpload: false,
-            }));
-            this.formData.documents = this.backupDocuments;
-            this.$mf.pushPopupToHistoryState(() => this.popup.hide());
-        },
-        onUploadImageChange(e) {
-            this.formData.documents = this.formData.documents.filter(
-                (image) => !image.isUpload
-            );
-            [...e.target.files].forEach((file) =>
-                this.formData.documents.push({
-                    file: URL.createObjectURL(file),
-                    isUpload: true,
-                })
-            );
-        },
-        onCheckBoxDeleteChange(e) {
-            if (e.value)
-                this.formData.documents = this.formData.documents.filter(
-                    (image) => image.isUpload
-                );
-            else
-                this.formData.documents = this.backupDocuments.concat(
-                    this.formData.documents
-                );
-        },
-        onSubmit() {
-            this.$bus.emit("checkPin", async () => {
-                let formData = new FormData();
-                formData.append("contractId", this.contract.id);
-                formData.append("isDelete", this.formData.isDelete);
-                formData.append("isConfirmed", this.formData.isConfirmed);
-                if (!!this.$refs.receiptImage) {
-                    for (
-                        var i = 0;
-                        i < this.$refs.receiptImage.files.length;
-                        i++
-                    ) {
-                        let file = await this.$mf.resizeImage({
-                            file: this.$refs.receiptImage.files[i],
-                            maxSize: this.$mc.MAX_SIZE_IMAGE_UPLOAD,
-                        });
-                        formData.append(`receiptImages[${i}]`, file);
-                    }
-                }
-                this.paidContract(formData).then((isOk) => {
-                    if (isOk) this.popup.hide();
+const store = useStore();
+const { t } = useI18n();
+const bus = inject("bus");
+const mc = inject("mc");
+const mf = inject("mf");
+const popupRef = ref(null);
+const accordionRef = ref(null);
+const receiptImageRef = ref(null);
+const state = reactive({
+    refreshKey: 0,
+    contract: {},
+    formData: {},
+});
+let backupDocuments = [];
+const images = computed(() => {
+    return new Set(state.formData.documents.map((d) => d.file));
+});
+initFormData();
+
+function show(contract) {
+    popupRef.value.setTitle(
+        t(
+            `components.paidContract.${
+                contract.status == 2 ? "confirmTitle" : "title"
+            }`
+        ) +
+            " #" +
+            contract.code
+    );
+    popupRef.value.show();
+    state.contract = contract;
+}
+function onUploadImageChange(e) {
+    state.formData.documents = state.formData.documents.filter(
+        (image) => !image.isUpload
+    );
+    [...e.target.files].forEach((file) =>
+        state.formData.documents.push({
+            file: URL.createObjectURL(file),
+            isUpload: true,
+        })
+    );
+}
+function onCheckBoxDeleteChange(e) {
+    if (e.value)
+        state.formData.documents = state.formData.documents.filter(
+            (image) => image.isUpload
+        );
+    else
+        state.formData.documents = backupDocuments.concat(
+            state.formData.documents
+        );
+}
+function onSubmit() {
+    bus.emit("checkPin", async () => {
+        let formData = new FormData();
+        formData.append("contractId", state.contract.id);
+        formData.append("isDelete", state.formData.isDelete);
+        formData.append("isConfirmed", state.formData.isConfirmed);
+        if (!!receiptImageRef.value) {
+            for (var i = 0; i < receiptImageRef.value.files.length; i++) {
+                let file = await mf.resizeImage({
+                    file: receiptImageRef.value.files[i],
+                    maxSize: mc.MAX_SIZE_IMAGE_UPLOAD,
                 });
-            });
-        },
-        initFormData() {
-            this.formData = {
-                isPdfPreview: false,
-                isDelete: false,
-                isConfirmed: false,
-                documents: [],
-            };
-        },
-        onHiding() {
-            this.initFormData();
-            this.refreshKey++;
-            this.$mf.popRouteHistoryState();
-        },
-    },
-};
+                formData.append(`receiptImages[${i}]`, file);
+            }
+        }
+        store.dispatch("adminContract/paidContract", formData).then((isOk) => {
+            if (isOk) popupRef.value.hide();
+        });
+    });
+}
+function initFormData() {
+    state.formData = {
+        isPdfPreview: false,
+        isDelete: false,
+        isConfirmed: false,
+        documents: [],
+    };
+}
+
+function onShown() {
+    state.formData.isConfirmed = !!state.contract.confirmed_by;
+    setTimeout(
+        () =>
+            accordionRef.value.instance.option(
+                "selectedIndex",
+                state.contract.status == 0 ? 0 : 1
+            ),
+        500
+    );
+    backupDocuments = state.contract.url_paid_docs.map((image) => ({
+        file: image,
+        isUpload: false,
+    }));
+    state.formData.documents = backupDocuments;
+}
+function onHidden() {
+    initFormData();
+    state.refreshKey++;
+}
+defineExpose({ show });
 </script>
 <style lang="scss">
 @import "../../../../sass/variables.scss";
-.confirm-contract-popup {
+.paid-contract-popup {
     .download {
         display: flex;
         justify-content: space-between;

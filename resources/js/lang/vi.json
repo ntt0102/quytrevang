@@ -422,7 +422,7 @@
             "transfer": {
                 "amount": "Số tiền",
                 "content": "Nội dung",
-                "contentValue": "QTV{contractCode}",
+                "contentValue": "QTV{0}",
                 "note": "Lưu ý: Nhập chính xác nội dung khi chuyển khoản",
                 "qrCode": "Quét mã QR hoặc chuyển khoản theo thông tin"
             }
@@ -560,9 +560,9 @@
         "withdrawnContract": {
             "title": "Xác nhận đã rút tiền",
             "withdrawnTitle": "Biên lai rút tiền",
-            "amount": "Khách hàng muốn rút",
-            "surplus": "Số dư còn lại ",
-            "newContract": "sẽ được chuyển sang hợp đồng mới",
+            "amount": "Khách hàng muốn rút <b class='text-light'>{0}</b>/{1}",
+            "surplus": "Số dư còn lại <b class='text-light'>{0}</b> sẽ được chuyển sang hợp đồng mới",
+            "newContract": "",
             "step1": "Bước 1: Thanh toán hợp đồng",
             "step2": "Bước 2: Đăng ảnh biên lai",
             "withdrawnWay1": "Cách 1: Chuyển khoản",

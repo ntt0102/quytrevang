@@ -208,6 +208,9 @@ h2.content-block {
     }
 }
 
+.text-light {
+    color: #fff;
+}
 .text-dark {
     color: darken($base-text-color, 20);
 }

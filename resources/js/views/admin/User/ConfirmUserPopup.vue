@@ -19,7 +19,7 @@
                 widget: 'dxButton',
                 options: {
                     text: $t('buttons.cancel'),
-                    onClick: () => $refs.submit.click(),
+                    onClick: () => popupRef.hide(),
                 },
             },
         ]"
@@ -50,7 +50,7 @@
                             styling-mode="contained"
                             @click="
                                 () =>
-                                    $refs.pdf.download({
+                                    $refs.pdfRef.download({
                                         component: 'ContractPdf',
                                         user: state.user,
                                         isPreview: state.formData.isPdfPreview,
@@ -127,7 +127,7 @@
             </DxAccordion>
         </DxScrollView>
     </CorePopup>
-    <Pdf ref="pdf" v-if="$mf.isSet(state.user)" />
+    <Pdf ref="pdfRef" v-if="$mf.isSet(state.user)" />
 </template>
 <script setup>
 import DxAccordion from "devextreme-vue/accordion";
@@ -171,8 +171,8 @@ function show({ user }) {
             " #" +
             user.code
     );
-    state.user = user;
     popupRef.value.show();
+    state.user = user;
 }
 function onUploadImageChange(e) {
     let type = e.target.id.replace("Image", "");

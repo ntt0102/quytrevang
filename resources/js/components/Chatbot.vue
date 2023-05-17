@@ -141,7 +141,7 @@ function getResponse(response) {
         },
         { msg: {}, point: 0 }
     );
-    if (matched.point >= 0.6) {
+    if (matched.point >= 0.5) {
         replyMessage.type = "text";
         replyMessage.data = { text: matched.msg.answer };
     } else {
