@@ -310,7 +310,6 @@
 import DxAccordion from "devextreme-vue/accordion";
 import { DxLoadIndicator } from "devextreme-vue/load-indicator";
 import Pdf from "../../../components/Pdfs/Index.vue";
-
 import CorePopup from "../../../components/Popups/CorePopup.vue";
 import Photoswipe from "../../../components/Photoswipe.vue";
 import { ref, reactive, computed, inject } from "vue";

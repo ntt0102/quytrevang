@@ -1,10 +1,7 @@
 <template>
-    <DxPopup
-        ref="popup"
-        :showCloseButton="true"
-        :fullScreen="$screen.getScreenSizeInfo.isXSmall ? true : false"
-        :show-title="true"
-        :wrapperAttr="{ class: 'paying-contract-popup' }"
+    <CorePopup
+        ref="popupRef"
+        class="paying-contract-popup"
         :toolbarItems="[
             {
                 toolbar: 'bottom',
@@ -13,7 +10,7 @@
                 options: {
                     text: $t(
                         `components.payingContract.${
-                            contract.status == 0
+                            state.contract.status == 0
                                 ? 'paidButton'
                                 : 'changeReceiptButton'
                         }`
@@ -22,364 +19,322 @@
                 },
             },
         ]"
-        @hiding="onHiding"
+        @shown="onShown"
+        @hidden="onHidden"
     >
-        <template #content>
-            <DxScrollView>
-                <form @submit.prevent="onSubmit">
-                    <button ref="submit" class="display-none" />
-                    <div class="caution">
-                        <div>{{ $t("titles.caution") }}:</div>
-                        <div>
-                            &nbsp;-
-                            {{
-                                $t("components.payingContract.paidDateCaution")
-                            }}
-                        </div>
-                        <div>
-                            &nbsp;-
-                            {{ $t("components.payingContract.timeCaution") }}
-                        </div>
+        <DxScrollView>
+            <form @submit.prevent="onSubmit">
+                <button ref="submitRef" class="display-none" />
+                <div class="caution">
+                    <div>{{ $t("titles.caution") }}:</div>
+                    <div>
+                        &nbsp;-
+                        {{ $t("components.payingContract.paidDateCaution") }}
                     </div>
-                    <DxAccordion
-                        ref="accordion"
-                        :collapsible="true"
-                        :items="[
-                            {
-                                title: $t('components.payingContract.step1'),
-                                template: 'step1Template',
-                            },
-                            {
-                                title: $t('components.payingContract.step2'),
-                                template: 'step2Template',
-                            },
-                        ]"
-                    >
-                        <template #step1Template>
-                            <div class="step1">
-                                <div class="description text-darker">
-                                    {{ $t("models.contract.transfer.qrCode") }}
-                                </div>
-                                <div class="method">
-                                    <div class="method1">
-                                        <!-- <Photoswipe
-                                            v-if="!!qrSrc"
-                                            @opened="
-                                                $mf.pushPhotoswipeToHistoryState
-                                            "
-                                            @close="$mf.popRouteHistoryState"
-                                        >
-                                            <div>
-                                                <img
-                                                    :src="qrSrc"
-                                                    v-pswp="qrSrc"
-                                                    :alt="$appName"
-                                                />
-                                                <DxButton
-                                                    class="download-qr"
-                                                    :text="
-                                                        $t('buttons.qrDownload')
-                                                    "
-                                                    icon="download"
-                                                    type="default"
-                                                    styling-mode="text"
-                                                    @click="downloadQR"
-                                                />
-                                            </div>
-                                        </Photoswipe>
-                                        <DxLoadIndicator
-                                            v-else
-                                            :height="40"
-                                            :width="40"
-                                        /> -->
-                                    </div>
-                                    <div class="method2">
-                                        <div>
-                                            <span
-                                                >{{
-                                                    $t("models.user.bankName")
-                                                }}:</span
-                                            >
-                                            <span>{{
-                                                transferInfo.bank_name
-                                            }}</span>
-                                        </div>
-                                        <div>
-                                            <span
-                                                >{{
-                                                    $t(
-                                                        "models.user.accountName"
-                                                    )
-                                                }}:</span
-                                            >
-                                            <span>{{
-                                                transferInfo.account_name
-                                            }}</span>
-                                        </div>
-                                        <div>
-                                            <span
-                                                >{{
-                                                    $t(
-                                                        "models.user.accountNumber"
-                                                    )
-                                                }}:</span
-                                            >
-                                            <span
-                                                >{{
-                                                    transferInfo.account_number
-                                                }}
-                                                <i
-                                                    class="far fa-copy"
-                                                    @click="
-                                                        $mf.copyText(
-                                                            transferInfo.account_number
-                                                        )
-                                                    "
-                                                ></i
-                                            ></span>
-                                        </div>
-                                        <div>
-                                            <span
-                                                >{{
-                                                    $t(
-                                                        "models.contract.transfer.amount"
-                                                    )
-                                                }}:</span
-                                            >
-                                            <span
-                                                >{{
-                                                    contract.principal
-                                                        | currency()
-                                                }}
-                                                <i
-                                                    class="far fa-copy"
-                                                    @click="
-                                                        $mf.copyText(
-                                                            contract.principal
-                                                        )
-                                                    "
-                                                ></i
-                                            ></span>
-                                        </div>
-                                        <div>
-                                            <span
-                                                >{{
-                                                    $t(
-                                                        "models.contract.transfer.content"
-                                                    )
-                                                }}:</span
-                                            >
-                                            <span
-                                                >{{
-                                                    $t(
-                                                        "models.contract.transfer.contentValue"
-                                                    ).replace(
-                                                        "{contractCode}",
-                                                        contract.code
-                                                    )
-                                                }}
-                                                <i
-                                                    class="far fa-copy"
-                                                    @click="
-                                                        $mf.copyText(
-                                                            $t(
-                                                                'models.contract.transfer.contentValue'
-                                                            ).replace(
-                                                                '{contractCode}',
-                                                                contract.code
-                                                            )
-                                                        )
-                                                    "
-                                                ></i
-                                            ></span>
-                                        </div>
-                                        <div class="text-darker">
-                                            {{
-                                                $t(
-                                                    "models.contract.transfer.note"
-                                                )
-                                            }}
-                                        </div>
-                                    </div>
-                                </div>
+                    <div>
+                        &nbsp;-
+                        {{ $t("components.payingContract.timeCaution") }}
+                    </div>
+                </div>
+                <DxAccordion
+                    ref="accordionRef"
+                    :collapsible="true"
+                    :items="[
+                        {
+                            title: $t('components.payingContract.step1'),
+                            template: 'step1Template',
+                        },
+                        {
+                            title: $t('components.payingContract.step2'),
+                            template: 'step2Template',
+                        },
+                    ]"
+                >
+                    <template #step1Template>
+                        <div class="step1">
+                            <div class="description text-darker">
+                                {{ $t("models.contract.transfer.qrCode") }}
                             </div>
-                        </template>
-                        <template #step2Template>
-                            <div class="upload">
-                                <div class="upload-browser">
-                                    <input
-                                        ref="receiptImage"
-                                        type="file"
-                                        id="receiptImage"
-                                        multiple="multiple"
-                                        accept="images/*"
-                                        @change="onUploadImageChange"
-                                    />
-                                    <label for="receiptImage"
-                                        ><i class="far fa-file-upload"></i>
-                                        {{ $t("titles.chooseImage") }}</label
-                                    >
-                                    <DxCheckBox
-                                        v-if="contract.status == 1"
-                                        id="contractDelete"
-                                        v-model="formData.isDelete"
-                                        :text="$t('titles.deleteOldImage')"
-                                        @valueChanged="onCheckBoxDeleteChange"
-                                    />
-                                </div>
-                                <!-- <Photoswipe
-                                    v-if="formData.documents.length"
-                                    @opened="$mf.pushPhotoswipeToHistoryState"
-                                    @close="$mf.popRouteHistoryState"
-                                >
-                                    <div
-                                        v-for="(
-                                            image, index
-                                        ) in formData.documents"
-                                        :key="index"
-                                    >
-                                        <img
-                                            :src="image.file"
-                                            v-pswp="image.file"
-                                            :alt="$appName"
+                            <div class="method">
+                                <div class="method1">
+                                    <div v-if="!!state.qrSrc">
+                                        <Photoswipe :images="[state.qrSrc]" />
+                                        <DxButton
+                                            class="download-qr"
+                                            :text="$t('buttons.qrDownload')"
+                                            icon="download"
+                                            type="default"
+                                            styling-mode="text"
+                                            @click="downloadQR"
                                         />
                                     </div>
-                                </Photoswipe> -->
+                                    <DxLoadIndicator
+                                        v-else
+                                        :height="40"
+                                        :width="40"
+                                    />
+                                </div>
+                                <div class="method2">
+                                    <div>
+                                        <span
+                                            >{{
+                                                $t("models.user.bankName")
+                                            }}:</span
+                                        >
+                                        <span>{{
+                                            transferInfo.bank_name
+                                        }}</span>
+                                    </div>
+                                    <div>
+                                        <span
+                                            >{{
+                                                $t("models.user.accountName")
+                                            }}:</span
+                                        >
+                                        <span>{{
+                                            transferInfo.account_name
+                                        }}</span>
+                                    </div>
+                                    <div>
+                                        <span
+                                            >{{
+                                                $t("models.user.accountNumber")
+                                            }}:</span
+                                        >
+                                        <span
+                                            >{{ transferInfo.account_number }}
+                                            <i
+                                                class="far fa-copy"
+                                                @click="
+                                                    $mf.copyText(
+                                                        transferInfo.account_number
+                                                    )
+                                                "
+                                            ></i
+                                        ></span>
+                                    </div>
+                                    <div>
+                                        <span
+                                            >{{
+                                                $t(
+                                                    "models.contract.transfer.amount"
+                                                )
+                                            }}:</span
+                                        >
+                                        <span
+                                            >{{
+                                                $filters.currency(
+                                                    state.contract.principal
+                                                )
+                                            }}
+                                            <i
+                                                class="far fa-copy"
+                                                @click="
+                                                    $mf.copyText(
+                                                        state.contract.principal
+                                                    )
+                                                "
+                                            ></i
+                                        ></span>
+                                    </div>
+                                    <div>
+                                        <span
+                                            >{{
+                                                $t(
+                                                    "models.contract.transfer.content"
+                                                )
+                                            }}:</span
+                                        >
+                                        <span
+                                            >{{
+                                                $t(
+                                                    "models.contract.transfer.contentValue",
+                                                    [state.contract.code]
+                                                )
+                                            }}
+                                            <i
+                                                class="far fa-copy"
+                                                @click="
+                                                    $mf.copyText(
+                                                        $t(
+                                                            'models.contract.transfer.contentValue',
+                                                            [
+                                                                state.contract
+                                                                    .code,
+                                                            ]
+                                                        )
+                                                    )
+                                                "
+                                            ></i
+                                        ></span>
+                                    </div>
+                                    <div class="text-darker">
+                                        {{
+                                            $t("models.contract.transfer.note")
+                                        }}
+                                    </div>
+                                </div>
                             </div>
-                        </template>
-                    </DxAccordion>
-                </form>
-            </DxScrollView>
-        </template>
-    </DxPopup>
+                        </div>
+                    </template>
+                    <template #step2Template>
+                        <div class="upload">
+                            <div class="upload-browser">
+                                <input
+                                    ref="receiptImageRef"
+                                    type="file"
+                                    id="receiptImage"
+                                    multiple="multiple"
+                                    accept="images/*"
+                                    @change="onUploadImageChange"
+                                />
+                                <label for="receiptImage"
+                                    ><i class="far fa-file-upload"></i>
+                                    {{ $t("titles.chooseImage") }}</label
+                                >
+                                <DxCheckBox
+                                    v-if="state.contract.status == 1"
+                                    id="contractDelete"
+                                    v-model="state.formData.isDelete"
+                                    :text="$t('titles.deleteOldImage')"
+                                    @valueChanged="onCheckBoxDeleteChange"
+                                />
+                            </div>
+                            <Photoswipe v-if="images.length" :images="images" />
+                        </div>
+                    </template>
+                </DxAccordion>
+            </form>
+        </DxScrollView>
+    </CorePopup>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import DxAccordion from "devextreme-vue/accordion";
 import DxLoadIndicator from "devextreme-vue/load-indicator";
+import CorePopup from "../../../components/Popups/CorePopup.vue";
+import Photoswipe from "../../../components/Photoswipe.vue";
+import { inject, ref, reactive, onMounted, computed } from "vue";
+import { useStore } from "vuex";
+import { useI18n } from "vue-i18n";
+import { toast } from "vue3-toastify";
 
-export default {
-    components: { DxAccordion, DxLoadIndicator },
-    data() {
-        return {
-            formData: {},
-            backupDocuments: [],
-            contract: {},
-            qrSrc: null,
-        };
-    },
-    mounted() {
-        this.initFormData();
-    },
-    computed: {
-        ...mapGetters("User.contract", ["transferInfo"]),
-        popup() {
-            return this.$refs.popup.instance;
-        },
-        accordion() {
-            return this.$refs.accordion.instance;
-        },
-    },
-    methods: {
-        ...mapActions("User.contract", ["payingContract"]),
-        show(contract) {
-            this.popup.option(
-                "title",
-                this.$t(
-                    `components.payingContract.${
-                        contract.status == 0 ? "title" : "changeReceiptTitle"
-                    }`
-                ) +
-                    " #" +
-                    contract.code
-            );
-            this.contract = contract;
-            this.popup.show();
-            setTimeout(
-                () => this.accordion.option("selectedIndex", contract.status),
-                0
-            );
-            this.backupDocuments = contract.url_paid_docs.map((image) => ({
-                file: image,
-                isUpload: false,
-            }));
-            this.formData.documents = this.backupDocuments;
-            let qrLink = `https://img.vietqr.io/image/${
-                this.transferInfo.bank_name
-            }-${this.transferInfo.account_number}-KRnx1D.jpg?accountName=${
-                this.transferInfo.account_name
-            }&amount=${this.contract.principal}&addInfo=${this.$t(
-                "models.contract.transfer.contentValue"
-            ).replace("{contractCode}", this.contract.code)}`;
-            this.$mf.fetchImage(qrLink).then((image) => (this.qrSrc = image));
-            this.$mf.pushPopupToHistoryState(() => this.popup.hide());
-        },
-        downloadQR() {
-            let a = document.createElement("a");
-            a.href = this.qrSrc;
-            a.download = `vietQR_${this.contract.code}`;
-            a.click();
-        },
-        onUploadImageChange(e) {
-            this.formData.documents = this.formData.documents.filter(
-                (image) => !image.isUpload
-            );
-            [...e.target.files].forEach((file) =>
-                this.formData.documents.push({
-                    file: URL.createObjectURL(file),
-                    isUpload: true,
-                })
-            );
-        },
-        onCheckBoxDeleteChange(e) {
-            if (e.value)
-                this.formData.documents = this.formData.documents.filter(
-                    (image) => image.isUpload
-                );
-            else
-                this.formData.documents = this.backupDocuments.concat(
-                    this.formData.documents
-                );
-        },
-        saveClick() {
-            if (
-                this.formData.documents.findIndex((image) => image.isUpload) !=
-                -1
-            )
-                this.$refs.submit.click();
-            else this.$toasted.show(this.$t("messages.info.noUploadImage"));
-        },
-        onSubmit() {
-            this.$bus.emit("checkPin", async () => {
-                let formData = new FormData();
-                formData.append("contractId", this.contract.id);
-                formData.append("type", this.type);
-                formData.append("isDelete", this.formData.isDelete);
-                for (var i = 0; i < this.$refs.receiptImage.files.length; i++) {
-                    let file = await this.$mf.resizeImage({
-                        file: this.$refs.receiptImage.files[i],
-                        maxSize: this.$mc.MAX_SIZE_IMAGE_UPLOAD,
-                    });
-                    formData.append(`receiptImages[${i}]`, file);
-                }
-                this.payingContract(formData).then((isOk) => {
-                    if (isOk) this.popup.hide();
-                });
+const store = useStore();
+const { t } = useI18n();
+const bus = inject("bus");
+const mc = inject("mc");
+const mf = inject("mf");
+const popupRef = ref(null);
+const accordionRef = ref(null);
+const submitRef = ref(null);
+const state = reactive({
+    formData: {},
+    contract: {},
+    qrSrc: null,
+});
+let backupDocuments = [];
+const images = computed(() => {
+    return new Set(state.formData.documents.map((d) => d.file));
+});
+const transferInfo = computed(() => store.state.userContract.transferInfo);
+
+onMounted(() => initFormData());
+function show(contract) {
+    popupRef.value.setTitle(
+        t(
+            `components.payingContract.${
+                contract.status == 0 ? "title" : "changeReceiptTitle"
+            }`
+        ) +
+            " #" +
+            contract.code
+    );
+    state.contract = contract;
+    popupRef.value.show();
+}
+function downloadQR() {
+    let a = document.createElement("a");
+    a.href = state.qrSrc;
+    a.download = `vietQR_${state.contract.code}`;
+    a.click();
+}
+function onUploadImageChange(e) {
+    state.formData.documents = state.formData.documents.filter(
+        (image) => !image.isUpload
+    );
+    [...e.target.files].forEach((file) =>
+        state.formData.documents.push({
+            file: URL.createObjectURL(file),
+            isUpload: true,
+        })
+    );
+}
+function onCheckBoxDeleteChange(e) {
+    if (e.value)
+        state.formData.documents = state.formData.documents.filter(
+            (image) => image.isUpload
+        );
+    else
+        state.formData.documents = backupDocuments.concat(
+            state.formData.documents
+        );
+}
+function saveClick() {
+    if (state.formData.documents.findIndex((image) => image.isUpload) != -1)
+        submitRef.value.click();
+    else toast.show(t("messages.info.noUploadImage"));
+}
+function onSubmit() {
+    bus.emit("checkPin", async () => {
+        let formData = new FormData();
+        formData.append("contractId", state.contract.id);
+        formData.append("isDelete", state.formData.isDelete);
+        for (var i = 0; i < receiptImageRef.value.files.length; i++) {
+            let file = await mf.resizeImage({
+                file: receiptImageRef.value.files[i],
+                maxSize: mc.MAX_SIZE_IMAGE_UPLOAD,
             });
-        },
-        initFormData() {
-            this.formData = {
-                isDelete: false,
-                documents: [],
-            };
-            this.qrSrc = null;
-        },
-        onHiding() {
-            this.$mf.popRouteHistoryState();
-            this.initFormData();
-        },
-    },
-};
+            formData.append(`receiptImages[${i}]`, file);
+        }
+        store.dispatch("userContract/payingContract", formData).then((isOk) => {
+            if (isOk) popupRef.value.hide();
+        });
+    });
+}
+function initFormData() {
+    state.formData = {
+        isDelete: false,
+        documents: [],
+    };
+    state.qrSrc = null;
+}
+function onShown() {
+    setTimeout(
+        () =>
+            accordionRef.value.instance.option(
+                "selectedIndex",
+                state.contract.status
+            ),
+        0
+    );
+    backupDocuments = state.contract.url_paid_docs.map((image) => ({
+        file: image,
+        isUpload: false,
+    }));
+    state.formData.documents = backupDocuments;
+    let qrLink = `https://img.vietqr.io/image/${transferInfo.value.bank_name}-${
+        transferInfo.value.account_number
+    }-KRnx1D.jpg?accountName=${transferInfo.value.account_name}&amount=${
+        state.contract.principal
+    }&addInfo=${t("models.contract.transfer.contentValue", [
+        state.contract.code,
+    ])}`;
+    mf.fetchImage(qrLink).then((image) => (state.qrSrc = image));
+}
+function onHidden() {
+    initFormData();
+}
+
+defineExpose({ show });
 </script>
 <style lang="scss">
 @import "../../../../sass/variables.scss";
@@ -403,8 +358,8 @@ export default {
                 width: 200px;
                 text-align: center;
 
-                .pswipe-gallery > div {
-                    max-width: 100%;
+                .photoswipe > a {
+                    max-width: calc(100% - 20px);
                 }
 
                 .dx-button-text {

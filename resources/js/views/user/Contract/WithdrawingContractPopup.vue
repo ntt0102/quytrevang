@@ -1,10 +1,7 @@
 <template>
-    <DxPopup
-        ref="popup"
-        :showCloseButton="true"
-        :fullScreen="$screen.getScreenSizeInfo.isXSmall ? true : false"
-        :show-title="true"
-        :wrapperAttr="{ class: 'withdrawing-contract-popup' }"
+    <CorePopup
+        ref="popupRef"
+        class="withdrawing-contract-popup"
         :toolbarItems="[
             {
                 disabled: isDurationOk,
@@ -13,190 +10,179 @@
                 widget: 'dxButton',
                 options: {
                     text: $t('components.withdrawingContract.withdrawButton'),
-                    onClick: saveClick,
+                    onClick: () => $refs.submitRef.click(),
                 },
             },
         ]"
-        @hiding="onHiding"
+        @shown="onShown"
+        @hidden="onHidden"
     >
-        <template #content>
-            <DxScrollView>
-                <form @submit.prevent="onSubmit">
-                    <button ref="submit" class="display-none" />
-                    <div v-if="isDurationOk" class="duration-fail">
-                        <i class="far fa-exclamation-triangle"></i>
-                        <span>
+        <DxScrollView>
+            <form @submit.prevent="onSubmit">
+                <button ref="submitRef" class="display-none" />
+                <div v-if="isDurationOk" class="duration-fail">
+                    <i class="far fa-exclamation-triangle"></i>
+                    <span>
+                        {{
+                            $t(
+                                "components.withdrawingContract.validateDuration",
+                                [holdWeeksMin]
+                            )
+                        }}
+                    </span>
+                </div>
+                <div class="dx-fieldset">
+                    <div class="dx-field">
+                        <div class="dx-field-label text-dark">
+                            {{ $t("components.withdrawingContract.duration") }}:
+                        </div>
+                        <div class="dx-field-value">
+                            <div>{{ state.contract.duration }}</div>
+                        </div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label text-dark">
                             {{
                                 $t(
-                                    "components.withdrawingContract.validateDuration"
-                                ).replace("{weeks}", holdWeeksMin)
-                            }}
-                        </span>
+                                    "components.withdrawingContract.availableBalances"
+                                )
+                            }}:
+                        </div>
+                        <div class="dx-field-value">
+                            {{ $filters.currency(state.contract.total) }}
+                        </div>
                     </div>
-                    <div class="dx-fieldset">
-                        <div class="dx-field">
-                            <div class="dx-field-label text-dark">
-                                {{
-                                    $t(
-                                        "components.withdrawingContract.duration"
-                                    )
-                                }}:
-                            </div>
-                            <div class="dx-field-value">
-                                <div>{{ contract.duration }}</div>
-                            </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label text-dark">
+                            {{
+                                $t(
+                                    "components.withdrawingContract.withdrawalAmount"
+                                )
+                            }}:
                         </div>
-                        <div class="dx-field">
-                            <div class="dx-field-label text-dark">
-                                {{
-                                    $t(
-                                        "components.withdrawingContract.availableBalances"
-                                    )
-                                }}:
-                            </div>
-                            <div class="dx-field-value">
-                                {{ contract.total | currency }}
-                            </div>
-                        </div>
-                        <div class="dx-field">
-                            <div class="dx-field-label text-dark">
-                                {{
-                                    $t(
-                                        "components.withdrawingContract.withdrawalAmount"
-                                    )
-                                }}:
-                            </div>
-                            <div class="dx-field-value">
-                                <DxRadioGroup
-                                    :items="[
+                        <div class="dx-field-value">
+                            <DxRadioGroup
+                                :items="[
+                                    {
+                                        text: $t(
+                                            'components.withdrawingContract.all'
+                                        ),
+                                        value: 'all',
+                                    },
+                                    {
+                                        text: $t(
+                                            'components.withdrawingContract.other'
+                                        ),
+                                        value: 'other',
+                                    },
+                                ]"
+                                display-expr="text"
+                                value-expr="value"
+                                v-model="state.formData.radio"
+                                :disabled="isDurationOk"
+                                @valueChanged="onRadioChanged"
+                            />
+                            <DxNumberBox
+                                ref="numberBoxRef"
+                                v-if="state.formData.radio == 'other'"
+                                v-model="state.formData.advance"
+                                format="#,##0 ₫"
+                            >
+                                <DxValidator
+                                    :validation-rules="[
                                         {
-                                            text: $t(
-                                                'components.withdrawingContract.all'
-                                            ),
-                                            value: 'all',
-                                        },
-                                        {
-                                            text: $t(
-                                                'components.withdrawingContract.other'
-                                            ),
-                                            value: 'other',
+                                            type: 'custom',
+                                            validationCallback: validateAdvance,
+                                            message: $t(
+                                                'components.withdrawingContract.validateAdvance'
+                                            )
+                                                .replace(
+                                                    '{min}',
+                                                    $filters.currency(
+                                                        0.1 * principalMin
+                                                    )
+                                                )
+                                                .replace(
+                                                    '{max}',
+                                                    $filters.currency(
+                                                        state.contract.total -
+                                                            principalMin
+                                                    )
+                                                ),
                                         },
                                     ]"
-                                    display-expr="text"
-                                    value-expr="value"
-                                    v-model="formData.radio"
-                                    :disabled="isDurationOk"
-                                    @valueChanged="onRadioChanged"
                                 />
-                                <DxNumberBox
-                                    ref="numberBox"
-                                    v-if="formData.radio == 'other'"
-                                    v-model="formData.advance"
-                                    format="#,##0 ₫"
-                                >
-                                    <DxValidator
-                                        :validation-rules="[
-                                            {
-                                                type: 'custom',
-                                                validationCallback:
-                                                    validateAdvance,
-                                                message: $t(
-                                                    'components.withdrawingContract.validateAdvance'
-                                                )
-                                                    .replace(
-                                                        '{min}',
-                                                        $options.filters.currency(
-                                                            0.1 * principalMin
-                                                        )
-                                                    )
-                                                    .replace(
-                                                        '{max}',
-                                                        $options.filters.currency(
-                                                            contract.total -
-                                                                principalMin
-                                                        )
-                                                    ),
-                                            },
-                                        ]"
-                                    />
-                                </DxNumberBox>
-                            </div>
+                            </DxNumberBox>
                         </div>
                     </div>
-                </form>
-            </DxScrollView>
-        </template>
-    </DxPopup>
+                </div>
+            </form>
+        </DxScrollView>
+    </CorePopup>
 </template>
-<script>
-import { mapGetters, mapActions } from "vuex";
+<script setup>
 import DxRadioGroup from "devextreme-vue/radio-group";
 import DxNumberBox from "devextreme-vue/number-box";
 import DxValidator from "devextreme-vue/validator";
+import CorePopup from "../../../components/Popups/CorePopup.vue";
+import { inject, ref, reactive, computed } from "vue";
+import { useStore } from "vuex";
+import { useI18n } from "vue-i18n";
 
-export default {
-    components: { DxRadioGroup, DxNumberBox, DxValidator },
-    data() {
-        return {
-            formData: {},
-            contract: {},
-        };
-    },
-    mounted() {},
-    computed: {
-        ...mapGetters("User.contract", ["principalMin", "holdWeeksMin"]),
-        popup() {
-            return this.$refs.popup.instance;
-        },
-        isDurationOk() {
-            return this.contract.hold_days / 7 < this.holdWeeksMin;
-        },
-    },
-    methods: {
-        ...mapActions("User.contract", ["withdrawingContract"]),
-        show(contract) {
-            this.popup.option(
-                "title",
-                `${this.$t("components.withdrawingContract.title")} #${
-                    contract.code
-                }`
-            );
-            this.contract = contract;
-            this.formData = { radio: "all", advance: contract.total };
-            this.popup.show();
-            this.$mf.pushPopupToHistoryState(() => this.popup.hide());
-        },
-        saveClick() {
-            this.$refs.submit.click();
-        },
-        onSubmit() {
-            this.$bus.emit("checkPin", async () => {
-                this.withdrawingContract({
-                    id: this.contract.id,
-                    advance: this.formData.advance,
-                }).then((isOk) => {
-                    if (isOk) this.popup.hide();
-                });
+const store = useStore();
+const { t } = useI18n();
+const bus = inject("bus");
+const popupRef = ref(null);
+const numberBoxRef = ref(null);
+const state = reactive({
+    formData: {},
+    contract: {},
+});
+const principalMin = computed(() => store.state.userContract.principalMin);
+const holdWeeksMin = computed(() => store.state.userContract.holdWeeksMin);
+const isDurationOk = computed(() => {
+    return state.contract.hold_days / 7 < holdWeeksMin.value;
+});
+
+function show(contract) {
+    popupRef.value.option(
+        "title",
+        `${t("components.withdrawingContract.title")} #${contract.code}`
+    );
+    state.contract = contract;
+    state.formData = { radio: "all", advance: contract.total };
+    popupRef.value.show();
+}
+function onSubmit() {
+    bus.emit("checkPin", async () => {
+        store
+            .dispatch("userContract/ withdrawingContract", {
+                id: state.contract.id,
+                advance: state.formData.advance,
+            })
+            .then((isOk) => {
+                if (isOk) popupRef.value.hide();
             });
-        },
-        onHiding() {
-            this.$mf.popRouteHistoryState();
-        },
-        onRadioChanged(e) {
-            if (e.value == "all") this.formData.advance = this.contract.total;
-            else {
-                setTimeout(() => this.$refs.numberBox.instance.focus(), 0);
-                this.formData.advance = 0;
-            }
-        },
-        validateAdvance(e) {
-            return (
-                e.value >= 0.1 * this.principalMin &&
-                this.contract.total - e.value >= this.principalMin
-            );
-        },
-    },
-};
+    });
+}
+
+function onRadioChanged(e) {
+    if (e.value == "all") state.formData.advance = state.contract.total;
+    else {
+        setTimeout(() => numberBoxRef.value.instance.focus(), 0);
+        state.formData.advance = 0;
+    }
+}
+function validateAdvance(e) {
+    return (
+        e.value >= 0.1 * principalMin.value &&
+        state.contract.total - e.value >= principalMin.value
+    );
+}
+function onShown() {}
+function onHidden() {}
+
+defineExpose({ show });
 </script>
 <style lang="scss">
 @import "../../../../sass/variables.scss";
