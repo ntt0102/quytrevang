@@ -28,116 +28,111 @@
         @hidden="onHidden"
     >
         <DxScrollView>
-            <div>
-                <form @submit.prevent="onSubmit">
-                    <DxForm
-                        ref="formRef"
-                        :form-data="state.formData"
-                        :label-location="
-                            $screen.getScreenSizeInfo.isXSmall ? 'top' : 'left'
+            <form @submit.prevent="onSubmit">
+                <DxForm
+                    ref="formRef"
+                    :form-data="state.formData"
+                    :label-location="
+                        $screen.getScreenSizeInfo.isXSmall ? 'top' : 'left'
+                    "
+                    :scrolling-enabled="true"
+                >
+                    <DxItem
+                        :visible="!userCode"
+                        data-field="name"
+                        :validation-rules="
+                            !userCode ? state.validationRules.name : null
                         "
-                        :scrolling-enabled="true"
-                    >
-                        <DxItem
-                            :visible="!userCode"
-                            data-field="name"
-                            :validation-rules="
-                                !userCode ? state.validationRules.name : null
-                            "
-                            :label="{ text: $t('components.sendComment.name') }"
-                        />
-                        <DxItem
-                            :visible="!userCode"
-                            data-field="phone"
-                            :editorOptions="{
-                                mask: '0000.000.000',
-                            }"
-                            :validation-rules="
-                                !userCode ? state.validationRules.phone : null
-                            "
-                            :label="{
-                                text: $t('components.sendComment.phone'),
-                            }"
-                        />
-                        <DxItem
-                            data-field="subject"
-                            :validation-rules="state.validationRules.subject"
-                            :label="{
-                                text: $t('components.sendComment.subject'),
-                            }"
-                        />
-                        <DxItem
-                            data-field="content"
-                            editor-type="dxTextArea"
-                            :editor-options="{ height: 150 }"
-                            :validation-rules="state.validationRules.content"
-                            :label="{
-                                text: $t('components.sendComment.content'),
-                            }"
-                        />
-                        <DxItem :visible="!userCode">
-                            <template #default>
-                                <div class="recaptcha-container">
-                                    <VueRecaptcha
-                                        ref="vueRecaptchaRef"
-                                        theme="dark"
-                                        :size="
-                                            $screen.getScreenSizeInfo.isXSmall
-                                                ? 'compact'
-                                                : 'normal'
-                                        "
-                                        @verify="onVerify"
-                                        @expired="onExpired"
-                                        :sitekey="state.siteKey"
+                        :label="{ text: $t('components.sendComment.name') }"
+                    />
+                    <DxItem
+                        :visible="!userCode"
+                        data-field="phone"
+                        :editorOptions="{
+                            mask: '0000.000.000',
+                        }"
+                        :validation-rules="
+                            !userCode ? state.validationRules.phone : null
+                        "
+                        :label="{
+                            text: $t('components.sendComment.phone'),
+                        }"
+                    />
+                    <DxItem
+                        data-field="subject"
+                        :validation-rules="state.validationRules.subject"
+                        :label="{
+                            text: $t('components.sendComment.subject'),
+                        }"
+                    />
+                    <DxItem
+                        data-field="content"
+                        editor-type="dxTextArea"
+                        :editor-options="{ height: 150 }"
+                        :validation-rules="state.validationRules.content"
+                        :label="{
+                            text: $t('components.sendComment.content'),
+                        }"
+                    />
+                    <DxItem :visible="!userCode">
+                        <template #default>
+                            <div class="recaptcha-container">
+                                <VueRecaptcha
+                                    ref="vueRecaptchaRef"
+                                    theme="dark"
+                                    :size="
+                                        $screen.getScreenSizeInfo.isXSmall
+                                            ? 'compact'
+                                            : 'normal'
+                                    "
+                                    @verify="onVerify"
+                                    @expired="onExpired"
+                                    :sitekey="state.siteKey"
+                                />
+                            </div>
+                        </template>
+                    </DxItem>
+                    <DxItem>
+                        <template #default>
+                            <div>
+                                <div class="upload-browser">
+                                    <input
+                                        ref="fileRef"
+                                        type="file"
+                                        id="file"
+                                        multiple="multiple"
+                                        accept="images/*"
+                                        @change="onFileChange"
                                     />
+                                    <label for="file"
+                                        ><i class="far fa-file-upload"></i>
+                                        {{
+                                            $t(
+                                                "components.sendComment.chooseFile"
+                                            )
+                                        }}</label
+                                    >
+                                    <span v-if="state.pictureItems.length">{{
+                                        $t(
+                                            "components.sendComment.fileCounter",
+                                            [state.pictureItems.length]
+                                        )
+                                    }}</span>
                                 </div>
-                            </template>
-                        </DxItem>
-                        <DxItem>
-                            <template #default>
-                                <div>
-                                    <div class="upload-browser">
-                                        <input
-                                            ref="fileRef"
-                                            type="file"
-                                            id="file"
-                                            multiple="multiple"
-                                            accept="images/*"
-                                            @change="onFileChange"
-                                        />
-                                        <label for="file"
-                                            ><i class="far fa-file-upload"></i>
-                                            {{
-                                                $t(
-                                                    "components.sendComment.chooseFile"
-                                                )
-                                            }}</label
-                                        >
-                                        <span
-                                            v-if="state.pictureItems.length"
-                                            >{{
-                                                $t(
-                                                    "components.sendComment.fileCounter",
-                                                    [state.pictureItems.length]
-                                                )
-                                            }}</span
-                                        >
-                                    </div>
-                                </div>
-                            </template>
-                        </DxItem>
-                        <DxItem
-                            name="submit"
-                            cssClass="display-none"
-                            item-type="button"
-                            :button-options="{
-                                useSubmitBehavior: true,
-                            }"
-                        />
-                    </DxForm>
-                    <Photoswipe :images="state.pictureItems" />
-                </form>
-            </div>
+                            </div>
+                        </template>
+                    </DxItem>
+                    <DxItem
+                        name="submit"
+                        cssClass="display-none"
+                        item-type="button"
+                        :button-options="{
+                            useSubmitBehavior: true,
+                        }"
+                    />
+                </DxForm>
+                <Photoswipe :images="state.pictureItems" />
+            </form>
         </DxScrollView>
     </CorePopup>
 </template>

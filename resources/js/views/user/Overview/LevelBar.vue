@@ -4,12 +4,7 @@
             <li
                 v-for="item in $mf.getAccountLevelList()"
                 :key="item.level"
-                :class="{
-                    'is-active': item.level == level + 1,
-                    'guiding-step-1': item.level == 2,
-                    'guiding-step-2': item.level == 3,
-                    'guiding-step-3': item.level == 4,
-                }"
+                :class="{ 'is-active': item.level == level + 1 }"
                 @click="
                     item.level == level + 1 ? onLevelClick(item.level) : null
                 "
@@ -17,9 +12,9 @@
                 {{ item.text }}
             </li>
         </ul>
-        <!-- <ResendVerifyEmailPopup ref="resendVerifyEmailPopupRef" />
+        <!-- <ResendVerifyEmailPopup ref="resendVerifyEmailPopupRef" /> -->
         <EditProfilePopup ref="editProfilePopupRef" />
-        <ChangePinPopup ref="changePinPopupRef" /> -->
+        <ChangePinPopup ref="changePinPopupRef" />
     </div>
 </template>
 <script setup>
@@ -28,9 +23,9 @@ import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { computed, ref } from "vue";
-// import ResendVerifyEmailPopup from "../../../components/Popups/ResendVerifyEmailPopup.vue";
-// import EditProfilePopup from "../Profile/EditProfilePopup.vue";
-// import ChangePinPopup from "../Profile/ChangePinPopup.vue";
+import ResendVerifyEmailPopup from "../../../components/Popups/ResendVerifyEmailPopup.vue";
+import EditProfilePopup from "../Profile/EditProfilePopup.vue";
+import ChangePinPopup from "../Profile/ChangePinPopup.vue";
 
 const store = useStore();
 const route = useRoute();

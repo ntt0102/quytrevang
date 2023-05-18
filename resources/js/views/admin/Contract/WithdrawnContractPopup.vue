@@ -27,11 +27,7 @@
     >
         <DxScrollView>
             <form @submit.prevent="onSubmit">
-                <DxButton
-                    ref="submitRef"
-                    class="display-none"
-                    :useSubmitBehavior="true"
-                />
+                <button ref="submitRef" class="display-none" />
                 <div class="amount">
                     <div
                         class="text-dark"
@@ -380,7 +376,7 @@ function onCheckBoxDeleteChange(e) {
 function saveClick() {
     if (!state.formData.isDelete && receiptImageRef.value.files.length == 0)
         toast.info(t("messages.info.noChangedData"));
-    else submitRef.value.instance.element().click();
+    else submitRef.value.click();
 }
 function onSubmit() {
     bus.emit("checkPin", async () => {

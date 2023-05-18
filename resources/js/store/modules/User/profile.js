@@ -97,7 +97,7 @@ const actions = {
             });
         });
     },
-    fetch({ commit, dispatch, getters, state, rootGetters }) {
+    getProfile({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios.get("profile").then((response) => {
                 commit("setState", response.data);

@@ -66,11 +66,7 @@
                 </template>
                 <template #step2Template>
                     <form @submit.prevent="onSubmit">
-                        <DxButton
-                            ref="submitRef"
-                            class="display-none"
-                            :useSubmitBehavior="true"
-                        />
+                        <button ref="submitRef" class="display-none" />
                         <div class="upload" :key="state.refreshKey">
                             <div class="upload-browser">
                                 <input
@@ -209,7 +205,7 @@ function saveClick() {
         toast.info(t("messages.info.noChangedData"));
     else if (state.formData.documents.length == 0)
         toast.show(t("messages.warning.imageEmpty"));
-    else submitRef.value.instance.element().click();
+    else submitRef.value.click();
 }
 function onSubmit() {
     bus.emit("checkPin", async () => {

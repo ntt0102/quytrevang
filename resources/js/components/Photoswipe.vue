@@ -90,10 +90,10 @@ defineExpose({ openSlide });
         -ms-flex: 20%;
         flex: 20%;
         max-width: 20%;
-        padding: 0 4px;
+        // padding: 0 4px;
 
         > img {
-            margin-top: 8px;
+            // margin-top: 8px;
             vertical-align: middle;
             width: 100%;
         }
