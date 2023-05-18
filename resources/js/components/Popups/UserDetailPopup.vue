@@ -6,8 +6,6 @@
         @hidden="onHidden"
     >
         <DxForm
-            ref="formRef"
-            class="user-detail-form"
             :form-data="state.formData"
             :col-count="2"
             :read-only="true"
@@ -128,7 +126,6 @@ import { useI18n } from "vue-i18n";
 
 const { t } = useI18n();
 const popupRef = ref(null);
-const formRef = ref(null);
 const state = reactive({
     formData: { url_documents: [] },
 });
@@ -140,6 +137,7 @@ const images = computed(() => {
 });
 
 function show(e) {
+    console.log("e.user", e.user);
     popupRef.value.setTitle(`${t("admin.users.detailUser")} #${e.user.code}`);
     popupRef.value.show();
     state.formData = e.user;

@@ -121,7 +121,7 @@
                 </template>
             </DxDataGrid>
         </div>
-        <!-- <ContractDetailPopup ref="contractDetailPopupRef" /> -->
+        <ContractDetailPopup ref="contractDetailPopupRef" />
     </div>
 </template>
 <script setup>

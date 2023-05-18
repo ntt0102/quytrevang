@@ -11,6 +11,7 @@ import DxToolbar from "devextreme-vue/toolbar";
 import DxPopup from "devextreme-vue/popup";
 import DxButton from "devextreme-vue/button";
 import DxCheckBox from "devextreme-vue/check-box";
+import dxNumberBox from "devextreme-vue/number-box";
 import DxLoadPanel from "devextreme-vue/load-panel";
 import DxValidator from "devextreme-vue/validator";
 
@@ -45,6 +46,7 @@ export default {
         app.component("DxPopup", DxPopup);
         app.component("DxButton", DxButton);
         app.component("DxCheckBox", DxCheckBox);
+        app.component("dxNumberBox", dxNumberBox);
         app.component("DxLoadPanel", DxLoadPanel);
         app.component("DxValidator", DxValidator);
     },
