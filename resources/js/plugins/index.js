@@ -1,8 +1,4 @@
 import mitt from "mitt";
-// import Crypto from "./crypto";
-// import VueCookies from "vue-cookies";
-// import router from "../router";
-// import Toasted from "vue-toasted";
 // import VueGtag from "vue-gtag";
 import Chat from "vue3-beautiful-chat";
 
@@ -21,15 +17,6 @@ export default {
         app.provide("bus", bus);
 
         app.use(Chat);
-        // app.use(Crypto);
-        // app.use(VueCookies);
-        // app.use(Toasted, {
-        //     duration: 2000,
-        //     keepOnHover: true,
-        //     theme: "bubble",
-        //     position: "bottom-right",
-        //     iconPack: "custom-class",
-        // });
         // app.use(
         //     VueGtag,
         //     {
