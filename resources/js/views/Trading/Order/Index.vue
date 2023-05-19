@@ -182,7 +182,7 @@ let params = {
     data: { whitespace: [], price: [] },
     order: { side: 0, position: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
-    ruler: { l0: {}, l25: {}, l50: {}, l100: {}, pointCount: 0 },
+    ruler: { l0: {}, l50: {}, l100: {}, pointCount: 0 },
     crosshair: {},
     loadWhitespace: true,
     interval: null,
@@ -390,9 +390,9 @@ function eventPriceLineDrag(e) {
                     if (params.ruler.pointCount == 2) {
                         const distance = +params.ruler.l100.options().title;
 
-                        const l25Price = +(newPrice + distance / 4).toFixed(1);
-                        params.ruler.l25.applyOptions({ price: l25Price });
-                        toolsStore.set("ruler", params.ruler.l25.options());
+                        // const l25Price = +(newPrice + distance / 4).toFixed(1);
+                        // params.ruler.l25.applyOptions({ price: l25Price });
+                        // toolsStore.set("ruler", params.ruler.l25.options());
                         //
                         const l50Price = +(newPrice + distance / 2).toFixed(1);
                         params.ruler.l50.applyOptions({ price: l50Price });
@@ -403,24 +403,24 @@ function eventPriceLineDrag(e) {
                         toolsStore.set("ruler", params.ruler.l100.options());
                     }
                     break;
-                case 2:
-                    const l0Price2 = +params.ruler.l0.options().price;
-                    const distance2 = newPrice - l0Price2;
-                    line.applyOptions({ title: distance2.toFixed(1) });
-                    toolsStore.set("ruler", line.options());
-                    //
-                    params.ruler.l100.applyOptions({
-                        title: (distance2 * 4).toFixed(1),
-                        price: +(l0Price2 + distance2 * 4).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l100.options());
-                    //
-                    params.ruler.l50.applyOptions({
-                        title: (distance2 * 2).toFixed(1),
-                        price: +(l0Price2 + distance2 * 2).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l50.options());
-                    break;
+                // case 2:
+                //     const l0Price2 = +params.ruler.l0.options().price;
+                //     const distance2 = newPrice - l0Price2;
+                //     line.applyOptions({ title: distance2.toFixed(1) });
+                //     toolsStore.set("ruler", line.options());
+                //     //
+                //     params.ruler.l100.applyOptions({
+                //         title: (distance2 * 4).toFixed(1),
+                //         price: +(l0Price2 + distance2 * 4).toFixed(1),
+                //     });
+                //     toolsStore.set("ruler", params.ruler.l100.options());
+                //     //
+                //     params.ruler.l50.applyOptions({
+                //         title: (distance2 * 2).toFixed(1),
+                //         price: +(l0Price2 + distance2 * 2).toFixed(1),
+                //     });
+                //     toolsStore.set("ruler", params.ruler.l50.options());
+                //     break;
                 case 3:
                     const l0Price3 = +params.ruler.l0.options().price;
                     const distance3 = newPrice - l0Price3;
@@ -433,11 +433,11 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("ruler", params.ruler.l100.options());
                     //
-                    params.ruler.l25.applyOptions({
-                        title: (distance3 / 2).toFixed(1),
-                        price: +(l0Price3 + distance3 / 2).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l25.options());
+                    // params.ruler.l25.applyOptions({
+                    //     title: (distance3 / 2).toFixed(1),
+                    //     price: +(l0Price3 + distance3 / 2).toFixed(1),
+                    // });
+                    // toolsStore.set("ruler", params.ruler.l25.options());
                     break;
                 case 4:
                     const l0Price4 = +params.ruler.l0.options().price;
@@ -451,11 +451,11 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("ruler", params.ruler.l50.options());
                     //
-                    params.ruler.l25.applyOptions({
-                        title: (distance4 / 4).toFixed(1),
-                        price: +(l0Price4 + distance4 / 4).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l25.options());
+                    // params.ruler.l25.applyOptions({
+                    //     title: (distance4 / 4).toFixed(1),
+                    //     price: +(l0Price4 + distance4 / 4).toFixed(1),
+                    // });
+                    // toolsStore.set("ruler", params.ruler.l25.options());
                     break;
             }
             break;
@@ -573,9 +573,9 @@ function loadToolsData() {
         });
         //
         const rulerLines = await toolsStore.get("ruler");
-        if (rulerLines.length == 4) {
+        if (rulerLines.length > 0) {
+            params.ruler.pointCount = rulerLines.length > 1 ? 2 : 1;
             rulerLines.forEach((line) => {
-                params.ruler.pointCount = 2;
                 params.ruler[line.pointName] =
                     params.series.price.createPriceLine(line);
             });
@@ -1052,8 +1052,6 @@ function drawRulerTool() {
     } else if (params.ruler.pointCount == 1) {
         const l0Price = +params.ruler.l0.options().price;
         const distance4 = price - l0Price;
-        const distance3 = distance4 / 2;
-        const distance2 = distance4 / 4;
 
         options.point = 4;
         options.pointName = "l100";
@@ -1062,6 +1060,7 @@ function drawRulerTool() {
         toolsStore.set("ruler", options);
         params.ruler.pointCount = 2;
 
+        const distance3 = distance4 / 2;
         options.point = 3;
         options.pointName = "l50";
         options.title = distance3.toFixed(1);
@@ -1069,12 +1068,13 @@ function drawRulerTool() {
         params.ruler.l50 = params.series.price.createPriceLine(options);
         toolsStore.set("ruler", options);
 
-        options.point = 2;
-        options.pointName = "l25";
-        options.title = distance2.toFixed(1);
-        options.price = +(l0Price + distance2).toFixed(1);
-        params.ruler.l25 = params.series.price.createPriceLine(options);
-        toolsStore.set("ruler", options);
+        // const distance2 = distance4 / 4;
+        // options.point = 2;
+        // options.pointName = "l25";
+        // options.title = distance2.toFixed(1);
+        // options.price = +(l0Price + distance2).toFixed(1);
+        // params.ruler.l25 = params.series.price.createPriceLine(options);
+        // toolsStore.set("ruler", options);
 
         rulerToolRef.value.classList.remove("selected");
     }
@@ -1083,12 +1083,12 @@ function removeRulerTool() {
     if (params.ruler.pointCount > 0) {
         params.series.price.removePriceLine(params.ruler.l0);
         if (params.ruler.pointCount > 1) {
-            params.series.price.removePriceLine(params.ruler.l25);
+            // params.series.price.removePriceLine(params.ruler.l25);
             params.series.price.removePriceLine(params.ruler.l50);
             params.series.price.removePriceLine(params.ruler.l100);
         }
         //
-        params.ruler = { l0: {}, l25: {}, l50: {}, l100: {}, pointCount: 0 };
+        params.ruler = { l0: {}, l50: {}, l100: {}, pointCount: 0 };
         toolsStore.clear("ruler");
     }
 }
