@@ -40,7 +40,7 @@ class VpsOrderService extends CoreService
         $rsp = json_decode($res->getBody());
         if (!$rsp) return;
         $this->connection = $rsp->rc == 1;
-        $this->position = $rsp->rc == 1 ? intval($rsp->data[0]->net) : 0;
+        $this->position = $rsp->rc == 1 ? (count($rsp->data) ? intval($rsp->data[0]->net) : 0) : 0;
     }
 
     public function getAccountInfo()
