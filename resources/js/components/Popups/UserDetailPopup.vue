@@ -116,7 +116,7 @@
     </CorePopup>
 </template>
 <script setup>
-import { DxForm, DxItem, DxTab } from "devextreme-vue/form";
+import { DxForm, DxItem } from "devextreme-vue/form";
 import DxTextArea from "devextreme-vue/text-area";
 
 import CorePopup from "./CorePopup.vue";
@@ -136,11 +136,10 @@ const images = computed(() => {
     return new Set(state.formData.url_documents.map((d) => d.file));
 });
 
-function show(e) {
-    console.log("e.user", e.user);
-    popupRef.value.setTitle(`${t("admin.users.detailUser")} #${e.user.code}`);
+function show(user) {
+    popupRef.value.setTitle(`${t("admin.users.detailUser")} #${user.code}`);
     popupRef.value.show();
-    state.formData = e.user;
+    state.formData = user;
 }
 function onShown() {}
 function onHidden() {}

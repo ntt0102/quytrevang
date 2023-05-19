@@ -54,7 +54,7 @@
                     :label="{ text: $t('models.contract.paidAt') }"
                 />
                 <DxItem
-                    v-if="state.formData.withdrawn_at"
+                    :visible="!!state.formData.withdrawn_at"
                     data-field="withdrawn_at"
                     editor-type="dxDateBox"
                     :label="{ text: $t('models.contract.withdrawnAt') }"
@@ -105,7 +105,6 @@ const images = computed(() => {
 });
 
 function show(contract) {
-    console.log("contract", contract);
     popupRef.value.setTitle(
         `${t("models.contract.popup.detail")} #${contract.code}`
     );
@@ -123,24 +122,6 @@ defineExpose({ show });
         color: lime;
         font-weight: bold;
     }
-    // .contract {
-    //     display: flex;
-    //     flex-wrap: wrap;
-    //     padding: 0;
-
-    //     > div {
-    //         -ms-flex: 50%;
-    //         flex: 50%;
-    //         max-width: 50%;
-    //         padding: 0 4px;
-
-    //         > img {
-    //             margin-top: 8px;
-    //             vertical-align: middle;
-    //             width: 100%;
-    //         }
-    //     }
-    // }
     .screen-x-small & {
         .contract > div {
             -ms-flex: 100%;

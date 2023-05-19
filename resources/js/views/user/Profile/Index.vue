@@ -151,7 +151,7 @@ onMounted(() => {
     if (route.hash === "#detail") detailInfoClick();
 });
 function detailInfoClick() {
-    userDetailPopupRef.value.show({ user: profile.value });
+    userDetailPopupRef.value.show(profile.value);
 }
 function onDeleteClick() {
     bus.emit("checkPin", () => {

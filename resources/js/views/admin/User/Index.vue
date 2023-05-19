@@ -430,9 +430,7 @@
                                 hint: $t('admin.users.detailUser'),
                                 text: $t('admin.users.detailUser'),
                                 onClick: () =>
-                                    $refs.userDetailPopupRef.show({
-                                        user: data.data,
-                                    }),
+                                    $refs.userDetailPopupRef.show(data.data),
                             },
                         },
                     ]"
