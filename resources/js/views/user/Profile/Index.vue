@@ -16,7 +16,7 @@
                         },
                     },
                     {
-                        visible: level < 5,
+                        visible: user.level < 5,
                         location: 'before',
                         widget: 'dxButton',
                         options: {
@@ -69,7 +69,7 @@
                         <span>{{ $t("models.user.code") }}:</span>
                         <span>{{ user.code }}</span>
                     </div>
-                    <div v-if="!!phone">
+                    <div v-if="!!user.phone">
                         <span>{{ $t("models.user.phone") }}:</span>
                         <span>{{ $filters.phone(user.phone) }}</span>
                     </div>
