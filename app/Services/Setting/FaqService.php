@@ -3,17 +3,11 @@
 namespace App\Services\Setting;
 
 use App\Services\CoreService;
-use App\Repositories\FaqRepository;
+use App\Models\Faq;
 
 
 class FaqService extends CoreService
 {
-    private $faqRepository;
-
-    public function __construct(FaqRepository $faqRepository)
-    {
-        $this->faqRepository = $faqRepository;
-    }
 
     /**
      * Return all the Faqs.
@@ -24,7 +18,7 @@ class FaqService extends CoreService
      */
     public function fetch($request)
     {
-        return $this->faqRepository->findAll();
+        return Faq::all();
     }
 
     /**
@@ -45,7 +39,7 @@ class FaqService extends CoreService
                             "question" => $change['data']['question'],
                             "answer" => $change['data']['answer']
                         ];
-                        $faq = $this->faqRepository->create($data);
+                        $faq = Faq::create($data);
                         $response['isOk'] = !!$faq;
                         break;
 
@@ -55,13 +49,13 @@ class FaqService extends CoreService
                             "question" => $change['data']['question'],
                             "answer" => $change['data']['answer']
                         ];
-                        $faq = $this->faqRepository->findById($change['key']);
-                        $response['isOk'] = $this->faqRepository->update($faq, $data);
+                        $faq = Faq::find($change['key']);
+                        $response['isOk'] = $faq->update($data);
                         break;
 
                     case 'remove':
-                        $faq = $this->faqRepository->findById($change['key']);
-                        $response['isOk'] = $this->faqRepository->delete($faq);
+                        $faq = Faq::find($change['key']);
+                        $response['isOk'] = $faq->delete();
                         break;
                 }
                 if (!$response['isOk']) break;

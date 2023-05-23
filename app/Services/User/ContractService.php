@@ -7,27 +7,14 @@ use Illuminate\Support\Facades\Notification;
 use App\Notifications\CreatedContractNotification;
 use App\Notifications\PayingContractNotification;
 use App\Notifications\WithdrawingContractNotification;
-use App\Repositories\ContractRepository;
-use App\Repositories\ParameterRepository;
-use App\Repositories\UserRepository;
+use App\Models\Contract;
+use App\Models\Parameter;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 
 
 class ContractService extends CoreService
 {
-    private $contractRepository;
-    private $parameterRepository;
-    private $userRepository;
-
-    public function __construct(
-        ContractRepository $contractRepository,
-        ParameterRepository $parameterRepository,
-        UserRepository $userRepository
-    ) {
-        $this->contractRepository = $contractRepository;
-        $this->parameterRepository = $parameterRepository;
-        $this->userRepository = $userRepository;
-    }
 
     /**
      * Return all the Contracts.
@@ -38,16 +25,16 @@ class ContractService extends CoreService
      */
     public function fetch($request)
     {
-        $search = [['user_code', $request->user()->code]];
-        if (!($request->isOld == 'true')) $search[] = ['withdrawn_docs', '[]'];
-        $contracts = $this->contractRepository->where($search, ['*']);
-        $pCode = (int) $this->parameterRepository->getValue('representUser');
-        $representUser = $this->userRepository->findByCode($pCode);
+        $query = Contract::where('user_code', $request->user()->code);
+        if (!($request->isOld == 'true')) $query = $query->where('withdrawn_docs', '[]');
+        $contracts = $query->get();
+        $pCode = (int) Parameter::getValue('representUser');
+        $representUser = User::where('code', $pCode)->first();
         return [
             'contracts' => $contracts,
-            "interestRate" => (float) $this->parameterRepository->getValue('interestRate'),
-            "principalMin" => (int) $this->parameterRepository->getValue('principalMin'),
-            "holdWeeksMin" => (int) $this->parameterRepository->getValue('holdWeeksMin'),
+            "interestRate" => (float) Parameter::getValue('interestRate'),
+            "principalMin" => (int) Parameter::getValue('principalMin'),
+            "holdWeeksMin" => (int) Parameter::getValue('holdWeeksMin'),
             "transferInfo" => $representUser->bank_account,
         ];
     }
@@ -67,15 +54,15 @@ class ContractService extends CoreService
                 switch ($change['type']) {
                     case 'insert':
                         $data = [
-                            "code" => $this->contractRepository->generateUniqueCode(),
+                            "code" => Contract::generateUniqueCode(),
                             "user_code" => $userCode,
                             "principal" => $change['data']['principal'],
-                            "interest_rate" => $this->parameterRepository->getValue('interestRate', '0.005'),
+                            "interest_rate" => Parameter::getValue('interestRate', '0.005'),
                             "paid_at" => date('Y-m-d'),
                         ];
-                        $contract = $this->contractRepository->create($data);
+                        $contract = Contract::create($data);
                         Notification::send(
-                            $this->userRepository->getUsersHasPermission('contracts@control'),
+                            User::permission('contracts@control')->get(),
                             new CreatedContractNotification($contract)
                         );
                         $response['isOk'] = !!$contract;
@@ -83,17 +70,17 @@ class ContractService extends CoreService
                         break;
 
                     case 'update':
-                        $contract = $this->contractRepository->findById($change['key']);
+                        $contract = Contract::find($change['key']);
                         if ($contract->user_code == $userCode || $contract->status == 1) {
                             $data = ["principal" => $change['data']['principal']];
-                            $response['isOk'] =  $this->contractRepository->update($contract, $data);
+                            $response['isOk'] =  $contract->update($data);
                         } else $response = ['isOk' => false, 'message' => 'forbidden'];
                         break;
 
                     case 'remove':
-                        $contract = $this->contractRepository->findById($change['key']);
+                        $contract = Contract::find($change['key']);
                         if ($contract->user_code == $userCode || $contract->status == 1) {
-                            $response['isOk'] = $this->contractRepository->delete($contract);
+                            $response['isOk'] = $contract->delete();
                         } else $response = ['isOk' => false, 'message' => 'forbidden'];
                         break;
                 }
@@ -113,7 +100,7 @@ class ContractService extends CoreService
     public function payingContract($request)
     {
         return $this->transaction(function () use ($request) {
-            $contract = $this->contractRepository->findById((int) $request->contractId);
+            $contract = Contract::find((int) $request->contractId);
             $user = $contract->user;
             $isFirstPaid = count($contract->paid_docs) == 0;
             $path = 'public/' . md5($user->code) . '/c/';
@@ -131,13 +118,12 @@ class ContractService extends CoreService
                     $documents[] = $name;
                 }
             }
-            $isOk = $this->contractRepository->update(
-                $contract,
+            $isOk = $contract->update(
                 ['paid_docs' => $documents, 'paid_at' => date('Y-m-d')]
             );
             if ($isOk && $isFirstPaid)
                 Notification::send(
-                    $this->userRepository->getUsersHasPermission('contracts@control'),
+                    User::permission('contracts@control')->get(),
                     new PayingContractNotification($contract)
                 );
             return ['isOk' => $isOk];
@@ -154,14 +140,14 @@ class ContractService extends CoreService
     {
         return $this->transaction(function () use ($request) {
             $userCode = $request->user()->code;
-            $contract = $this->contractRepository->findById($request->id);
+            $contract = Contract::find($request->id);
             if ($contract->user_code == $userCode) {
                 $data['advance'] = $request->advance;
                 $data['withdrawn_at'] = $request->advance == 0 ? null : date('Y-m-d');
-                $isOk =  $this->contractRepository->update($contract, $data);
+                $isOk = $contract->update($data);
                 if ($isOk)
                     Notification::send(
-                        $this->userRepository->getUsersHasPermission('contracts@control'),
+                        User::permission('contracts@control')->get(),
                         new WithdrawingContractNotification($contract)
                     );
                 return ['isOk' => $isOk];

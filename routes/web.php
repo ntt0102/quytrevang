@@ -62,12 +62,9 @@ Route::get('test', function () {
     // $s = app(\App\Services\VpsService::class);
     // $s = $s->getInfo($s->getSymbol())->r;
     // $s = app(\App\Services\SmartOrderService::class)->getFromCsv('2023-03-28');
-    // $s = app(\App\Repositories\StrategyRepository::class)->getStrategies(-10, -5);
     // dd($s);
     // $n = now()->sub(date_interval_create_from_date_string('178 minutes'));
     // dd($n->format('Y-m-d H:i:s'));
-    // $s = app(\App\Repositories\SmartOrderRepository::class)->hasDevice('24efbc2f1f3b09283ee0d2b246a665a0');
-    // $s = app(\App\Repositories\VpsRepository::class)->getVolumeByPrice('');
     // $v = number_format('123.452', 2);
     // $s = is_numeric("1000.1");
     // $s = !![1, 2];

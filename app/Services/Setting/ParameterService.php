@@ -3,17 +3,11 @@
 namespace App\Services\Setting;
 
 use App\Services\CoreService;
-use App\Repositories\ParameterRepository;
+use App\Models\Parameter;
 
 
 class ParameterService extends CoreService
 {
-    private $parameterRepository;
-
-    public function __construct(ParameterRepository $parameterRepository)
-    {
-        $this->parameterRepository = $parameterRepository;
-    }
 
     /**
      * Return all the Parameters.
@@ -24,7 +18,7 @@ class ParameterService extends CoreService
      */
     public function fetch($request)
     {
-        return $this->parameterRepository->findAll();
+        return Parameter::all();
     }
 
     /**
@@ -43,8 +37,8 @@ class ParameterService extends CoreService
                     $data = [
                         "value" => $change['data']['value'],
                     ];
-                    $parameter = $this->parameterRepository->findById($change['key']);
-                    $response['isOk'] = $this->parameterRepository->update($parameter, $data);
+                    $parameter = Parameter::find($change['key']);
+                    $response['isOk'] = $parameter->update($data);
                 }
                 if (!$response['isOk']) break;
             }

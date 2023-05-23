@@ -5,16 +5,11 @@ namespace App\Services\Setting;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\CoreNotification;
 use App\Services\CoreService;
-use App\Repositories\UserRepository;
+use App\Models\User;
 
 class NotificationService extends CoreService
 {
-    private $userRepository;
 
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-    }
     /**
      * Sent Notification.
      * 
@@ -23,10 +18,10 @@ class NotificationService extends CoreService
      */
     public function send($request)
     {
-        if ($request->receiver == '*') $receiver = $this->userRepository->findAll();
+        if ($request->receiver == '*') $receiver = User::all();
         else {
             $codes = (array) explode(",", $request->receiver);
-            $receiver = $this->userRepository->whereIn('code', $codes);
+            $receiver = User::whereIn('code', $codes)->get();
         }
         $params = [
             'event' => 'received-notification',

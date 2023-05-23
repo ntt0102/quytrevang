@@ -3,19 +3,12 @@
 namespace App\Services\Auth;
 
 use App\Services\CoreService;
-use App\Repositories\UserRepository;
-use Illuminate\Foundation\Auth\RegistersUsers;
+use App\Notifications\VerifyEmailNotification;
+// use Illuminate\Foundation\Auth\RegistersUsers;
 
 class VerificationService extends CoreService
 {
-    use RegistersUsers;
-
-    private $userRepository;
-
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-    }
+    // use RegistersUsers;
 
     /**
      * Mark the authenticated user's email address as verified.
@@ -30,13 +23,13 @@ class VerificationService extends CoreService
             if ($request->route('id') != $user->id || time() > $request->expires || !$request->hasValidSignature())
                 return ['isOk' => false, 'message' => 'invalidVerifyEmailLink'];
 
-            if (!$this->userRepository->hasVerifiedEmail($user))
-                $this->userRepository->markEmailAsVerified($user);
+            if (!$user->hasVerifiedEmail())
+                $user->markEmailAsVerified();
 
             return [
                 'isOk' => true,
                 'message' => null,
-                'user' => $this->userRepository->getAuthUser($user),
+                'user' => $user->getAuthInfo(),
             ];
         });
     }
@@ -49,10 +42,11 @@ class VerificationService extends CoreService
      */
     public function resend($request)
     {
-        if ($this->userRepository->hasVerifiedEmail($request->user()))
+        $user = $request->user();
+        if ($user->hasVerifiedEmail())
             return ['isOk' => true, 'message' => 'verifiedEmail'];
 
-        $this->userRepository->sendEmailVerificationNotification($request->user());
+        $user->notify(new VerifyEmailNotification);
         return ['isOk' => true, 'message' => 'sentVerifyEmailLink'];
     }
 }

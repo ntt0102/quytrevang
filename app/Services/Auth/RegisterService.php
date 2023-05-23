@@ -5,21 +5,11 @@ namespace App\Services\Auth;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\RegisteredUserNotification;
 use App\Services\CoreService;
-use App\Repositories\UserRepository;
-use App\Repositories\SmartOrderRepository;
+use App\Notifications\VerifyEmailNotification;
+use App\Models\User;
 
 class RegisterService extends CoreService
 {
-    private $userRepository;
-    private $smartOrderRepository;
-
-    public function __construct(
-        UserRepository $userRepository,
-        SmartOrderRepository $smartOrderRepository
-    ) {
-        $this->userRepository = $userRepository;
-        $this->smartOrderRepository = $smartOrderRepository;
-    }
 
     /**
      * Register new user.
@@ -31,51 +21,33 @@ class RegisterService extends CoreService
     public function createAccount($request)
     {
         return $this->transaction(function () use ($request) {
-            if ($request->chanel == 'SmartOrder') {
-                if ($this->smartOrderRepository->duplicateDevice($request->deviceId))
-                    return ['isOk' => false, 'message' => 'deviceExist'];
-                if (count($this->userRepository->where([['email', $request->email]])) != 0)
-                    return ['isOk' => false, 'message' => 'emailExist'];
-                if (count($this->userRepository->where([['phone', $request->phone]])) != 0)
-                    return ['isOk' => false, 'message' => 'phoneExist'];
-            }
             $data = [
-                'code' => $this->userRepository->generateUniqueCode(),
+                'code' => User::generateUniqueCode(),
                 'name' => $request->name,
                 'email' => $request->email,
                 'phone' => $request->phone,
                 'password' => bcrypt($request->password),
             ];
-            $user = $this->userRepository->create($data);
+            $user = User::create($data);
             if (empty($user)) return ['isOk' => false, 'message' => 'unknow'];
             //
-            if ($request->chanel == 'SmartOrder') {
-                $this->smartOrderRepository->create([
-                    'user_code' => $user->code,
-                    'started_at' => date('Y-m-d'),
-                    'periods' => '7 days',
-                    'device_limit' => 2,
-                    'devices' => [$request->deviceId],
-                    'vps_accounts' => [$request->vpsAccount],
-                ]);
-            } else
-                $this->userRepository->sendEmailVerificationNotification($user);
+            $user->notify(new VerifyEmailNotification);
             //
             $user->assignRole('user');
             //
-            $tokenResult = $this->userRepository->createToken($user);
+            $tokenResult = $user->createToken(config('app.name'));
             $token = $tokenResult->token;
             $token->expires_at = date_create()->modify('+1 day');
             $token->save();
 
             Notification::send(
-                $this->userRepository->getUsersHasPermission('users@control'),
+                User::permission('users@control')->get(),
                 new RegisteredUserNotification($user)
             );
 
             return [
                 'isOk' => true,
-                'user' => $this->userRepository->getAuthUser($user),
+                'user' => $user->getAuthInfo(),
                 'token' => [
                     'expires_at' => date_create($tokenResult->token->expires_at)->format('Y-m-d H:i:s'),
                     'access_token' => $tokenResult->accessToken
@@ -91,7 +63,6 @@ class RegisterService extends CoreService
      */
     public function validateDuplicateEmail($request)
     {
-        $users = $this->userRepository->where([['email', $request->email]]);
-        return count($users) == 0;
+        return User::where('email', $request->email)->count() == 0;
     }
 }

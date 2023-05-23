@@ -3,25 +3,12 @@
 namespace App\Services\User;
 
 use App\Services\CoreService;
-use App\Repositories\ContractRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\CommentRepository;
+use App\Models\Contract;
+use App\Models\User;
+use App\Models\Comment;
 
 class LayoutService extends CoreService
 {
-    private $contractRepository;
-    private $userRepository;
-    private $commentRepository;
-
-    public function __construct(
-        ContractRepository $contractRepository,
-        UserRepository $userRepository,
-        CommentRepository $commentRepository
-    ) {
-        $this->contractRepository = $contractRepository;
-        $this->userRepository = $userRepository;
-        $this->commentRepository = $commentRepository;
-    }
 
     /**
      * Get the page's params
@@ -38,13 +25,19 @@ class LayoutService extends CoreService
             $ret['notification'] = $user->unreadNotifications->count();
         }
         if ($user->can('users@control') && in_array("adminUser", $types)) {
-            $ret['adminUser'] = $this->userRepository->getSigningNumber();
+            $ret['adminUser'] = User::whereNotNull('phone')->whereNull('deleted_at')
+                ->where('documents', '[]')->count();
         }
         if ($user->can('contracts@control') && in_array("adminContract", $types)) {
-            $ret['adminContract'] = $this->contractRepository->getConfirmingNumber();
+            $ret['adminContract'] = Contract::orWhere(function ($query) {
+                $query->where('paid_at', '<>', null)->where('paid_docs', '[]');
+            })
+                ->orWhere(function ($query) {
+                    $query->where('withdrawn_at', '<>', null)->where('withdrawn_docs', '[]');
+                })->count();
         }
         if ($user->can('comments@control') && in_array("adminComment", $types)) {
-            $ret['adminComment'] = $this->commentRepository->getUnreadNumber();
+            $ret['adminComment'] = Comment::where('read', 0)->count();
         }
 
         return $ret;

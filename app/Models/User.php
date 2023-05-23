@@ -229,4 +229,35 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $this->notify(new ResetPasswordNotification($token));
     }
+
+    /**
+     * Get Auth Info
+     */
+    public function getAuthInfo()
+    {
+        return [
+            'id' => $this->id,
+            'code' => $this->code,
+            'name' => $this->name,
+            'sex' => $this->sex,
+            'email' => $this->email,
+            'phone' => $this->phone,
+            'level' => $this->level,
+            'avatar' => $this->url_avatar,
+            'permissions' => $this->getAllPermissions()->pluck('name'),
+            'webauthn' => !!$this->webauthn
+        ];
+    }
+
+    /**
+     * Create code
+     */
+    static public function generateUniqueCode()
+    {
+        do {
+            $code = random_int(100000, 999999);
+        } while (User::where('code', $code)->first());
+
+        return $code;
+    }
 }

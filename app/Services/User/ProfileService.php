@@ -5,18 +5,12 @@ namespace App\Services\User;
 use App\Services\CoreService;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ConfirmingUserNotification;
-use App\Repositories\UserRepository;
+use App\Models\User;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileService extends CoreService
 {
-    private $userRepository;
-
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-    }
 
     /**
      * Get the profile
@@ -55,13 +49,10 @@ class ProfileService extends CoreService
                     'address' => $request->address,
                     'bank_account' => $request->bank_account
                 ];
-                $isOk = $this->userRepository->update(
-                    $user,
-                    $data
-                );
+                $isOk = $user->update($data);
                 if ($isOk && $isFirstUpdate) {
                     Notification::send(
-                        $this->userRepository->getUsersHasPermission('users@control'),
+                        User::permission('users@control')->get(),
                         new ConfirmingUserNotification($request->user())
                     );
                 }
@@ -80,8 +71,7 @@ class ProfileService extends CoreService
         return $this->transaction(
             function () use ($request) {
                 $user = $request->user();
-                $isOk =  $this->userRepository->update(
-                    $user,
+                $isOk =   $user->update(
                     ['password' => bcrypt($request->password)]
                 );
                 return ['isOk' => $isOk];
@@ -101,8 +91,7 @@ class ProfileService extends CoreService
             function () use ($request) {
                 $user = $request->user();
                 if ($user->level < 3 || $user->level >= 3 && Hash::check($request->pin, $user->pin)) {
-                    $isOk = $this->userRepository->update(
-                        $user,
+                    $isOk =  $user->update(
                         ['pin' => bcrypt($request->new_pin)]
                     );
                     return ['isOk' => $isOk];
@@ -150,7 +139,7 @@ class ProfileService extends CoreService
             function () use ($request) {
                 $user = $request->user();
                 if (count($user->contracts->whereNull('withdrawn_at')) === 0) {
-                    $isOk = $this->userRepository->delete($user);
+                    $isOk =  $user->delete();
                     return ['isOk' => $isOk];
                 } else return ['isOk' => false, 'message' => 'hasOpeningContract', 'param' => $user->code];
             }
@@ -166,8 +155,7 @@ class ProfileService extends CoreService
     {
         $field = $request->field;
         if ($field == 'id_number')
-            $users = $this->userRepository->whereJsonContains('identity', ['number' => $request[$field]]);
-        else $users = $this->userRepository->where([[$field, $request[$field]]]);
-        return count($users) == 0;
+            return User::whereJsonContains('identity', ['number' => $request[$field]])->count() == 0;
+        else return User::where($field, $request[$field])->count() == 0;
     }
 }

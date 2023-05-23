@@ -3,17 +3,11 @@
 namespace App\Services\Setting;
 
 use App\Services\CoreService;
-use App\Repositories\PermissionRepository;
+use Spatie\Permission\Models\Permission;
 
 
 class PermissionService extends CoreService
 {
-    private $permissionRepository;
-
-    public function __construct(PermissionRepository $permissionRepository)
-    {
-        $this->permissionRepository = $permissionRepository;
-    }
 
     /**
      * Return all the permissions.
@@ -23,7 +17,7 @@ class PermissionService extends CoreService
     public function fetch()
     {
         return [
-            'permissions' => $this->permissionRepository->findAll(["id", "name"])
+            'permissions' => Permission::select("id", "name")->get()
         ];
     }
 
@@ -40,18 +34,18 @@ class PermissionService extends CoreService
                 $response = [];
                 switch ($change['type']) {
                     case 'insert':
-                        $permission = $this->permissionRepository->create(["name" => $change['data']['name'], 'guard_name' => 'web']);
+                        $permission = Permission::create(["name" => $change['data']['name'], 'guard_name' => 'web']);
                         $response['isOk'] = !!$permission;
                         break;
 
                     case 'update':
-                        $permission = $this->permissionRepository->findById($change['key']);
-                        $response['isOk'] = $this->permissionRepository->update($permission, ["name" => $change['data']['name']]);
+                        $permission = Permission::find($change['key']);
+                        $response['isOk'] = $permission->update(["name" => $change['data']['name']]);
                         break;
 
                     case 'remove':
-                        $permission = $this->permissionRepository->findById($change['key']);
-                        $response['isOk'] = $this->permissionRepository->delete($permission);
+                        $permission = Permission::find($change['key']);
+                        $response['isOk'] = $permission->delete();
                         break;
                 }
                 if (!$response['isOk']) break;
@@ -67,7 +61,6 @@ class PermissionService extends CoreService
      */
     public function validateDuplicateName($request)
     {
-        $permissions = $this->permissionRepository->where([['name', $request["name"]]]);
-        return count($permissions) == 0;
+        return Permission::where('name', $request["name"])->count() == 0;
     }
 }

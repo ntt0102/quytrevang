@@ -3,16 +3,10 @@
 namespace App\Services\Auth;
 
 use Illuminate\Support\Facades\Password;
-use App\Repositories\UserRepository;
+use App\Models\User;
 
 class ResetPasswordService
 {
-    private $userRepository;
-
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-    }
 
     /**
      * Send password reset link. 
@@ -38,7 +32,6 @@ class ResetPasswordService
      */
     public function validateExistEmail($request)
     {
-        $users = $this->userRepository->where([['email', $request->email]]);
-        return count($users) > 0;
+        return User::where('email', $request->email)->count() > 0;
     }
 }

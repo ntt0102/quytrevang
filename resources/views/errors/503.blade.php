@@ -33,9 +33,8 @@
     }
 </style>
 <?php
-$pr = app(\App\Repositories\ParameterRepository::class);
-$ur = app(\App\Repositories\UserRepository::class);
-$contactUser = $ur->findOne([['code', (int) $pr->getValue('representUser')]]);
+$representUser = (int) App\Models\Parameter::getValue('representUser');
+$contactUser = App\Models\User::where('code', $representUser)->first();
 ?>
 <center>
     <img width="300" src="../../../images/vertical-828x465.png" />

@@ -23,7 +23,7 @@ class Parameter extends CoreModel
     public static function getValue($slug, $default = '')
     {
         $parameter = parent::where('slug', $slug)->first();
-        if (!$parameter) return $default;
-        return $parameter->value;
+        if (!!$parameter) return $parameter->value;
+        return $default;
     }
 }

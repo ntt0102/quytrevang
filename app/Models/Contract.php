@@ -190,4 +190,29 @@ class Contract extends CoreModel
     {
         return $this->belongsTo(User::class, 'user_code', 'code');
     }
+
+    /**
+     * Create code
+     */
+    static public function generateUniqueCode()
+    {
+        do {
+            $code = random_int(10000000, 99999999);
+        } while (self::where('code', $code)->first());
+
+        return $code;
+    }
+
+    /**
+     * Summary
+     */
+    static public function summary()
+    {
+        $contracts = self::whereNotNull('confirmed_by')
+            ->where('withdrawn_docs', '[]')
+            ->groupBy('user_code')
+            ->selectRaw('sum(principal) as sum, user_code')
+            ->get();
+        return $contracts;
+    }
 }

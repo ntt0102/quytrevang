@@ -3,9 +3,9 @@
 namespace App\Services\Admin;
 
 use App\Services\CoreService;
-use App\Repositories\ContractRepository;
-use App\Repositories\UserRepository;
-use App\Repositories\ParameterRepository;
+use App\Models\Contract;
+use App\Models\User;
+use App\Models\Parameter;
 use App\Notifications\PaidContractNotification;
 use App\Notifications\WithdrawnContractNotification;
 use App\Events\AdminBroadcastEvent;
@@ -14,19 +14,6 @@ use Illuminate\Support\Facades\Storage;
 
 class ContractService extends CoreService
 {
-    private $contractRepository;
-    private $userRepository;
-    private $parameterRepository;
-
-    public function __construct(
-        ContractRepository $contractRepository,
-        UserRepository $userRepository,
-        ParameterRepository $parameterRepository
-    ) {
-        $this->contractRepository = $contractRepository;
-        $this->userRepository = $userRepository;
-        $this->parameterRepository = $parameterRepository;
-    }
 
     /**
      * Return all the Contracts.
@@ -37,15 +24,13 @@ class ContractService extends CoreService
      */
     public function fetch($request)
     {
-        $conditions = [];
-        if (!($request->isOld == 'true')) $conditions[] = ['withdrawn_docs', '[]'];
-        $contracts = $this->contractRepository->where($conditions, ['*']);
-        $users = $this->userRepository->findAllWithTrashed(['code', 'name']);
+        $contracts = $request->isOld == 'true' ? Contract::all() : Contract::where('withdrawn_docs', '[]')->get();
+        $users = User::withTrashed()->get(['code', 'name']);
         return [
             'contracts' => $contracts,
             'users' => $users,
-            "interestRate" => (float) $this->parameterRepository->getValue('interestRate', '0.005'),
-            "principalMin" => (int) $this->parameterRepository->getValue('principalMin'),
+            "interestRate" => (float) Parameter::getValue('interestRate', '0.005'),
+            "principalMin" => (int) Parameter::getValue('principalMin'),
         ];
     }
 
@@ -63,7 +48,7 @@ class ContractService extends CoreService
                 switch ($change['type']) {
                     case 'insert':
                         $data = [
-                            "code" => $this->contractRepository->generateUniqueCode(),
+                            "code" => Contract::generateUniqueCode(),
                             "user_code" => $change['data']['user_code'],
                             "principal" => $change['data']['principal'],
                             "interest_rate" => $change['data']['interest_rate'],
@@ -75,12 +60,12 @@ class ContractService extends CoreService
                         if (array_key_exists('withdrawn_at', $change['data'])) {
                             $data["withdrawn_at"] = $change['data']['withdrawn_at'];
                         }
-                        $contract = $this->contractRepository->create($data);
+                        $contract = Contract::create($data);
                         $response['isOk'] = !!$contract;
                         break;
 
                     case 'update':
-                        $contract = $this->contractRepository->findById($change['key']);
+                        $contract = Contract::find($change['key']);
                         if ($contract->status <= 3 || $request->user()->can('system@control')) {
                             $data = [];
                             $isUnconfirmed = false;
@@ -100,7 +85,7 @@ class ContractService extends CoreService
                                     "withdrawn_at" => $change['data']['withdrawn_at'],
                                 ]);
                             //
-                            $isOk = $this->contractRepository->update($contract, $data);
+                            $isOk = $contract->update($data);
                             if ($isOk && $isUnconfirmed && $oldUserCode != $data['user_code']) {
                                 $fromPath = 'public/' . md5($oldUserCode) . '/c/';
                                 $toPath = 'public/' . md5($data['user_code']) . '/c/';
@@ -122,9 +107,9 @@ class ContractService extends CoreService
                         break;
 
                     case 'remove':
-                        $contract = $this->contractRepository->findById($change['key']);
+                        $contract = Contract::find($change['key']);
                         if ($contract->status == 1 || $request->user()->can('system@control')) {
-                            $isOk = $this->contractRepository->delete($contract);
+                            $isOk = $contract->delete();
                             if ($isOk) {
                                 $path = 'public/' . md5($contract->user_code) . '/c/';
                                 if (!!$contract->paid_docs) {
@@ -157,7 +142,7 @@ class ContractService extends CoreService
     public function paidContract($request)
     {
         return $this->transaction(function () use ($request) {
-            $contract = $this->contractRepository->findById((int) $request->contractId);
+            $contract = Contract::find((int) $request->contractId);
             $user = $contract->user;
             $isFirstConfirm = !$contract->confirmed_by;
             $isConfirmed = $request->isConfirmed == 'true';
@@ -176,8 +161,7 @@ class ContractService extends CoreService
                     $documents[] = $name;
                 }
             }
-            $isOk = $this->contractRepository->update(
-                $contract,
+            $isOk = $contract->update(
                 [
                     'paid_docs' => $documents,
                     'confirmed_by' => $isConfirmed ? $request->user()->code : null
@@ -200,7 +184,7 @@ class ContractService extends CoreService
     public function withdrawnContract($request)
     {
         return $this->transaction(function () use ($request) {
-            $contract = $this->contractRepository->findById((int) $request->contractId);
+            $contract = Contract::find((int) $request->contractId);
             $user = $contract->user;
             $isFirstWithdrawn = count($contract->withdrawn_docs) == 0;
             $path = 'public/' . md5($user->code) . '/c/';
@@ -221,8 +205,7 @@ class ContractService extends CoreService
             $createdImageName = md5(time()) . '.png';
             if ($contract->advance < $contract->total) $documents[] = $createdImageName;
 
-            $isOk = $this->contractRepository->update(
-                $contract,
+            $isOk = $contract->update(
                 ['withdrawn_docs' => $documents]
             );
             if ($isOk && $isFirstWithdrawn) {
@@ -230,15 +213,15 @@ class ContractService extends CoreService
                 event(new AdminBroadcastEvent('contracts'));
                 if ($contract->advance < $contract->total) {
                     $data = [
-                        "code" => $this->contractRepository->generateUniqueCode(),
+                        "code" => Contract::generateUniqueCode(),
                         "user_code" => $contract->user_code,
                         "principal" => $contract->total - $contract->advance,
-                        "interest_rate" => (float) $this->parameterRepository->getValue('interestRate', '0.005'),
+                        "interest_rate" => (float) Parameter::getValue('interestRate', '0.005'),
                         "paid_at" => date('Y-m-d'),
                         'paid_docs' => [$createdImageName],
                         'confirmed_by' => $request->user()->code,
                     ];
-                    $newContract = $this->contractRepository->create($data);
+                    $newContract = Contract::create($data);
                     if (!!$newContract) {
                         $img = create_contract_image($user->name, $user->code, $newContract->principal, $contract->code, $newContract->code);
                         $img->save(storage_path('app/' . $path . $createdImageName));
@@ -256,7 +239,7 @@ class ContractService extends CoreService
      */
     public function summary()
     {
-        return $this->contractRepository->summary()->map(function ($item) {
+        return Contract::summary()->map(function ($item) {
             return [
                 'code' => $item->user->code,
                 'name' => $item->user->name,
@@ -272,9 +255,9 @@ class ContractService extends CoreService
      */
     public function getReceiptInfo($request)
     {
-        $pCode = (int) $this->parameterRepository->getValue('representUser');
-        $ret['representUser'] = $this->userRepository->findByCode($pCode);
-        $ret['user'] = $this->userRepository->findByCode((int) $request->userCode);
+        $pCode = (int) Parameter::getValue('representUser');
+        $ret['representUser'] = User::where('code', $pCode)->first();
+        $ret['user'] = User::where('code', (int) $request->userCode)->first();
         return $ret;
     }
 }

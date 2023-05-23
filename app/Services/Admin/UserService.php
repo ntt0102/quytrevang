@@ -3,10 +3,10 @@
 namespace App\Services\Admin;
 
 use App\Services\CoreService;
-use App\Repositories\UserRepository;
-use App\Repositories\RoleRepository;
-use App\Repositories\PermissionRepository;
-use App\Repositories\ParameterRepository;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
+use App\Models\Parameter;
 use Illuminate\Support\Facades\Storage;
 use App\Events\AdminBroadcastEvent;
 use App\Notifications\ConfirmedUserNotification;
@@ -14,23 +14,6 @@ use App\Notifications\ConfirmedUserNotification;
 
 class UserService extends CoreService
 {
-    private $userRepository;
-    private $roleRepository;
-    private $permissionRepository;
-    private $parameterRepository;
-
-
-    public function __construct(
-        UserRepository $userRepository,
-        RoleRepository $roleRepository,
-        PermissionRepository $permissionRepository,
-        ParameterRepository $parameterRepository
-    ) {
-        $this->userRepository = $userRepository;
-        $this->roleRepository = $roleRepository;
-        $this->permissionRepository = $permissionRepository;
-        $this->parameterRepository = $parameterRepository;
-    }
 
     /**
      * Return all the users.
@@ -39,18 +22,18 @@ class UserService extends CoreService
      */
     public function fetch()
     {
-        $users = $this->userRepository->where([['deleted_at', NULL]]);
+        $users = User::where('deleted_at', NULL)->orderBy('id', 'desc')->get();
         $users = $users->map(function ($user) {
             $user->roles = $user->roles()->get()->pluck('name');
             $user->permissions = $user->permissions()->get()->pluck('name');
             return $user;
         });
-        $deletedUsers = $this->userRepository->findTrashedAll(['id', 'code', 'name', 'phone', 'deleted_at']);
+        $deletedUsers = User::onlyTrashed()->get(['id', 'code', 'name', 'phone', 'deleted_at']);
         return [
             'users' => $users,
             'deletedUsers' => $deletedUsers,
-            'allRolesName' => $this->roleRepository->findAll()->pluck('name'),
-            'allPermissionsName' => $this->permissionRepository->findAll()->pluck('name')
+            'allRolesName' => Role::all()->pluck('name'),
+            'allPermissionsName' => Permission::all()->pluck('name')
         ];
     }
 
@@ -80,10 +63,10 @@ class UserService extends CoreService
                 switch ($change['type']) {
                     case 'insert':
                         $data = array_merge($data, [
-                            'code' => $this->userRepository->generateUniqueCode(),
+                            'code' => User::generateUniqueCode(),
                             "password" => bcrypt($change['data']['phone']),
                         ]);
-                        $user = $this->userRepository->create($data);
+                        $user = User::create($data);
                         if ($request->user()->can('system@control')) {
                             $user->syncRoles($change['data']['roles']);
                             $user->syncPermissions($change['data']['permissions']);
@@ -92,9 +75,9 @@ class UserService extends CoreService
                         break;
 
                     case 'update':
-                        $user = $this->userRepository->findByCode($change['key']);
+                        $user = User::where('code', $change['key'])->first();
                         if ($user->level <= 4 || $request->user()->can('system@control')) {
-                            $response['isOk'] = $this->userRepository->update($user, $data);
+                            $response['isOk'] = $user->update($data);
                             if ($request->user()->can('system@control')) {
                                 $user->syncRoles($change['data']['roles']);
                                 $user->syncPermissions($change['data']['permissions']);
@@ -103,9 +86,9 @@ class UserService extends CoreService
                         break;
 
                     case 'remove':
-                        $user = $this->userRepository->findByCode($change['key']);
+                        $user = User::where('code', $change['key'])->first();
                         if ($user->level <= 6) {
-                            $response['isOk'] = $this->userRepository->delete($user);
+                            $response['isOk'] = $user->delete();
                         } else $response = ['isOk' => false, 'message' => 'hasOpeningContract', 'param' => $user->code];
                         break;
                 }
@@ -127,16 +110,16 @@ class UserService extends CoreService
             foreach ($request->changes as $change) {
                 switch ($change['type']) {
                     case 'update':
-                        $this->userRepository->restore($change['key']);
+                        User::withTrashed()->findOrFail($change['key'])->restore();
                         break;
 
                     case 'remove':
-                        $user = $this->userRepository->findByIdWithTrashed($change['key']);
+                        $user = User::withTrashed()->findOrFail($change['key']);
                         $path = 'public/' . md5($user->code);
                         if (Storage::exists($path)) {
                             Storage::deleteDirectory($path);
                         }
-                        $this->userRepository->forceDelete($change['key']);
+                        User::withTrashed()->findOrFail($change['key'])->forceDelete();
                         break;
                 }
             }
@@ -153,7 +136,7 @@ class UserService extends CoreService
     public function uploadDocuments($request)
     {
         return $this->transaction(function () use ($request) {
-            $user = $this->userRepository->findById((int) $request->userId);
+            $user = User::find((int) $request->userId);
             if (in_array($user->level, [4, 5]) || $request->user()->can('system@control')) {
                 $isFirstUpload = count($user->documents) == 0;
                 $path = 'public/' . md5($user->code) . '/u/d/';
@@ -175,7 +158,7 @@ class UserService extends CoreService
                     $request->isIdentityDelete == 'true'
                 );
 
-                $isOk = $this->userRepository->update($user, ['documents' => $documents]);
+                $isOk = $user->update(['documents' => $documents]);
                 //
                 if ($isOk && $isFirstUpload) {
                     $user->notify(new ConfirmedUserNotification());
@@ -224,9 +207,8 @@ class UserService extends CoreService
     {
         $field = $request->field;
         if ($field == 'id_number')
-            $users = $this->userRepository->whereJsonContains('identity', ['number' => $request[$field]]);
-        else $users = $this->userRepository->where([[$field, $request[$field]]]);
-        return count($users) == 0;
+            return User::whereJsonContains('identity', ['number' => $request[$field]])->count() == 0;
+        else return User::where($field, $request[$field])->count() == 0;
     }
 
     /**
@@ -236,11 +218,11 @@ class UserService extends CoreService
      */
     public function getContractInfo($request)
     {
-        $pCode = (int) $this->parameterRepository->getValue('representUser');
-        $ret['representUser'] = $this->userRepository->findByCode($pCode);
-        $ret['interestRate'] = (float) $this->parameterRepository->getValue('interestRate');
-        $ret['principalMin'] = (int) $this->parameterRepository->getValue('principalMin');
-        $ret['holdWeeksMin'] = (int) $this->parameterRepository->getValue('holdWeeksMin');
+        $pCode = (int) Parameter::getValue('representUser');
+        $ret['representUser'] = User::where('code', $pCode)->first();
+        $ret['interestRate'] = (float) Parameter::getValue('interestRate');
+        $ret['principalMin'] = (int) Parameter::getValue('principalMin');
+        $ret['holdWeeksMin'] = (int) Parameter::getValue('holdWeeksMin');
         return $ret;
     }
 }

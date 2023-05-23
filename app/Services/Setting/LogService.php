@@ -3,17 +3,11 @@
 namespace App\Services\Setting;
 
 use App\Services\CoreService;
-use App\Repositories\UserRepository;
 use Spatie\Activitylog\Models\Activity;
 
 class LogService extends CoreService
 {
-    private $userRepository;
 
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-    }
     /**
      * Get the logs.
      * 

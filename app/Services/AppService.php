@@ -5,29 +5,13 @@ namespace App\Services;
 use App\Services\CoreService;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\SentCommentNotification;
-use App\Repositories\ParameterRepository;
-use App\Repositories\FaqRepository;
-use App\Repositories\CommentRepository;
-use App\Repositories\UserRepository;
+use App\Models\Parameter;
+use App\Models\Faq;
+use App\Models\Comment;
+use App\Models\User;
 
 class AppService extends CoreService
 {
-    private $parameterRepository;
-    private $faqRepository;
-    private $commentRepository;
-    private $userRepository;
-
-    public function __construct(
-        ParameterRepository $parameterRepository,
-        FaqRepository $faqRepository,
-        CommentRepository $commentRepository,
-        UserRepository $userRepository
-    ) {
-        $this->parameterRepository = $parameterRepository;
-        $this->faqRepository = $faqRepository;
-        $this->commentRepository = $commentRepository;
-        $this->userRepository = $userRepository;
-    }
 
     /**
      * Get the policy params
@@ -37,10 +21,10 @@ class AppService extends CoreService
      */
     public function getPolicyParams($request)
     {
-        $ret["interestRate"] = (float) $this->parameterRepository->getValue('interestRate', '0.005');
-        $ret["principalMin"] = (int) $this->parameterRepository->getValue('principalMin');
-        $ret["holdWeeksMin"] = (int) $this->parameterRepository->getValue('holdWeeksMin');
-        $ret["faqs"] = $this->faqRepository->findAll();
+        $ret["interestRate"] = (float) Parameter::getValue('interestRate', '0.005');
+        $ret["principalMin"] = (int) Parameter::getValue('principalMin');
+        $ret["holdWeeksMin"] = (int) Parameter::getValue('holdWeeksMin');
+        $ret["faqs"] = Faq::all();
         return $ret;
     }
 
@@ -53,7 +37,7 @@ class AppService extends CoreService
      */
     public function getFaqs($request)
     {
-        return $this->faqRepository->findAll();
+        return Faq::all();
     }
 
     /**
@@ -83,9 +67,9 @@ class AppService extends CoreService
                     "content" => $request->content,
                     "images" => $images,
                 ];
-                $comment = $this->commentRepository->create($data);
+                $comment = Comment::create($data);
                 Notification::send(
-                    $this->userRepository->getUsersHasPermission('comments@control'),
+                    User::permission('comments@control')->get(),
                     new SentCommentNotification($comment)
                 );
                 return ['isOk' => !!$comment];
@@ -99,8 +83,8 @@ class AppService extends CoreService
      */
     public function getContact()
     {
-        $pCode = (int) $this->parameterRepository->getValue('representUser');
-        $contactUser = $this->userRepository->findByCode($pCode);
+        $pCode = (int) Parameter::getValue('representUser');
+        $contactUser = User::where('code', $pCode)->first();
         return [
             'email' => config('mail.from.address'),
             'phone' => !!$contactUser ? $contactUser->phone : null,

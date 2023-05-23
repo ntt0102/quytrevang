@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Repositories\UserRepository;
+use App\Models\User;
 
 class CleanSubscriptionCommand extends Command
 {
@@ -39,7 +39,7 @@ class CleanSubscriptionCommand extends Command
     public function handle()
     {
         $dateYearAgo = date_sub(date_create(), date_interval_create_from_date_string('1 year'));
-        $users = app(UserRepository::class)->findAll();
+        $users = User::all();
         foreach ($users as $user) {
             $subs = $user->routeNotificationForWebPush();
             if (count($subs) > 1) {

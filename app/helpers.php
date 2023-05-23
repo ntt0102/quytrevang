@@ -1,6 +1,7 @@
 <?php
 
-use App\Repositories\VariableRepository;
+use App\Models\Variable;
+use App\Models\Parameter;
 
 if (!function_exists('get_global_value')) {
     /**
@@ -11,7 +12,7 @@ if (!function_exists('get_global_value')) {
      */
     function get_global_value($name)
     {
-        return app(VariableRepository::class)->getValue($name);
+        return Variable::getValue($name);
     }
 }
 
@@ -24,7 +25,7 @@ if (!function_exists('set_global_value')) {
      */
     function set_global_value($name, $value)
     {
-        return app(VariableRepository::class)->setValue($name, $value);
+        return Variable::setValue($name, $value);
     }
 }
 
@@ -36,7 +37,7 @@ if (!function_exists('trading_time')) {
      */
     function trading_time($time, $onlyMin = false)
     {
-        $str = app(\App\Repositories\ParameterRepository::class)->getValue($time);
+        $str = Parameter::getValue($time);
         if ($onlyMin) return substr($str, 0, 5);
         else return $str;
     }

@@ -2,7 +2,6 @@
 
 namespace App\Services\Auth;
 
-use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Foundation\Application;
@@ -13,13 +12,11 @@ use App\Services\Special\WebauthnService;
 class LoginService
 {
 
-    private $userRepository;
     private $isMaintenance;
 
-    public function __construct(Application $app, UserRepository $userRepository)
+    public function __construct(Application $app)
     {
         $this->isMaintenance = $app->isDownForMaintenance();
-        $this->userRepository = $userRepository;
     }
 
 
@@ -43,34 +40,6 @@ class LoginService
             return ['isOk' => false, 'message' => 'unauthorized'];
         //
         $user = request()->user();
-        if ($request->chanel == 'SmartOrder') {
-            $so = $user->smartOrder;
-            if (!$so) return ['isOk' => false, 'message' => 'unsetup'];
-            $expires_at = date_create($so->started_at)->add(
-                date_interval_create_from_date_string($so->periods)
-            );
-            if (date_create() > $expires_at)
-                return ['isOk' => false, 'message' => 'expired'];
-            if (!in_array($request->deviceId, $so->devices)) {
-                if (count($so->devices) >= $so->device_limit)
-                    return ['isOk' => false, 'message' => 'deviceLimit'];
-                //
-                $devices = $so->devices;
-                $devices[] = $request->deviceId;
-                app(\App\Repositories\SmartOrderRepository::class)->update(
-                    $so,
-                    ['devices' => $devices]
-                );
-            }
-            if (!in_array($request->vpsAccount, $so->vps_accounts)) {
-                $vpsAccounts = $so->vps_accounts;
-                $vpsAccounts[] = $request->vpsAccount;
-                app(\App\Repositories\SmartOrderRepository::class)->update(
-                    $so,
-                    ['vps_accounts' => $vpsAccounts]
-                );
-            }
-        }
         //
         return $this->createToken($user, $request->rememberMe);
     }
@@ -168,7 +137,7 @@ class LoginService
         return [
             'isOk' => true,
             'message' => null,
-            'user' => $this->userRepository->getAuthUser($user),
+            'user' => $user->getAuthInfo(),
             'token' => [
                 'expires_at' => date_create($tokenResult->token->expires_at)->format('Y-m-d H:i:s'),
                 'access_token' => $tokenResult->accessToken
@@ -192,7 +161,7 @@ class LoginService
      */
     public function user()
     {
-        return $this->userRepository->getAuthUser(request()->user());
+        return request()->user()->getAuthInfo();
     }
 
     /**

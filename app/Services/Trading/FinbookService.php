@@ -3,18 +3,11 @@
 namespace App\Services\Trading;
 
 use App\Services\CoreService;
-use App\Repositories\FinbookRepository;
+use App\Models\Finbook;
 use App\Events\UpdateFinbookEvent;
 
 class FinbookService extends CoreService
 {
-    private $finbookRepository;
-
-    public function __construct(
-        FinbookRepository $finbookRepository
-    ) {
-        $this->finbookRepository = $finbookRepository;
-    }
 
     /**
      * Return all the Finbooks
@@ -25,7 +18,7 @@ class FinbookService extends CoreService
      */
     public function fetch($request)
     {
-        $finbooks = $this->finbookRepository->findAll(['*'], ['display', 'asc']);
+        $finbooks = Finbook::orderBy('display', 'asc')->get();
         return $finbooks;
     }
 
@@ -48,14 +41,14 @@ class FinbookService extends CoreService
                             "balance" => $change['data']['balance'],
                             "last_transaction" => $change['data']['last_transaction']
                         ];
-                        $finbook = $this->finbookRepository->create($data);
+                        $finbook = Finbook::create($data);
                         $isOk = !!$finbook;
                         if ($isOk && $finbook->balance > 0) event(new UpdateFinbookEvent());
                         $response['isOk'] = $isOk;
                         break;
 
                     case 'update':
-                        $finbook = $this->finbookRepository->findById($change['key']);
+                        $finbook = Finbook::find($change['key']);
                         $data = [
                             "display" => $change['data']['display'],
                             "name" => $change['data']['name'],
@@ -63,14 +56,14 @@ class FinbookService extends CoreService
                             "last_transaction" => $change['data']['last_transaction']
                         ];
                         $hasChangedBalance = $data["balance"] != $finbook->balance;
-                        $isOk = $this->finbookRepository->update($finbook, $data);
+                        $isOk = $finbook->update($data);
                         if ($isOk && $hasChangedBalance) event(new UpdateFinbookEvent());
                         $response['isOk'] = $isOk;
                         break;
 
                     case 'remove':
-                        $finbook = $this->finbookRepository->findById($change['key']);
-                        $isOk = $this->finbookRepository->delete($finbook);
+                        $finbook = Finbook::find($change['key']);
+                        $isOk = $finbook->delete();
                         $response['isOk'] = $isOk;
                         break;
                 }
@@ -89,7 +82,7 @@ class FinbookService extends CoreService
      */
     public function getFinbooksName($request)
     {
-        $finbooks = $this->finbookRepository->findAll(['id', 'name'], ['display', 'asc']);
+        $finbooks = Finbook::select('id', 'name')->orderBy('display', 'asc')->get();
         return $finbooks;
     }
 
@@ -102,7 +95,7 @@ class FinbookService extends CoreService
     public function updateBalance($request)
     {
         return $this->transaction(function () use ($request) {
-            $finbook = $this->finbookRepository->findById($request->id);
+            $finbook = Finbook::find($request->id);
             $lastTransaction = $request->input($request->type)['content'];
             switch ($request->type) {
                 case 'deposit':
@@ -113,8 +106,8 @@ class FinbookService extends CoreService
                     break;
                 case 'transfer':
                     $balance = $finbook->balance - $request->transfer['money'];
-                    $reciever = $this->finbookRepository->findById($request->transfer['receiverId']);
-                    $this->finbookRepository->update($reciever, [
+                    $reciever = Finbook::find($request->transfer['receiverId']);
+                    $reciever->update([
                         'balance' => $reciever->balance + $request->transfer['money'],
                         'last_transaction' => '[' . $finbook->name . ' =>] ' . $lastTransaction
                     ]);
@@ -124,7 +117,7 @@ class FinbookService extends CoreService
                     $balance = $request->adjustment['money'];
                     break;
             }
-            $isOk = $this->finbookRepository->update($finbook, [
+            $isOk = $finbook->update([
                 'balance' => $balance,
                 'last_transaction' => $lastTransaction
             ]);

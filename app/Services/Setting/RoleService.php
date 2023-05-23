@@ -3,20 +3,12 @@
 namespace App\Services\Setting;
 
 use App\Services\CoreService;
-use App\Repositories\RoleRepository;
-use App\Repositories\PermissionRepository;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 
 class RoleService extends CoreService
 {
-    private $roleRepository;
-    private $permissionRepository;
-
-    public function __construct(RoleRepository $roleRepository, PermissionRepository $permissionRepository)
-    {
-        $this->roleRepository = $roleRepository;
-        $this->permissionRepository = $permissionRepository;
-    }
 
     /**
      * Return all the roles.
@@ -25,14 +17,14 @@ class RoleService extends CoreService
      */
     public function fetch()
     {
-        $roles = $this->roleRepository->findAll(["id", "name"]);
+        $roles = Role::select("id", "name")->get();
         $roles = $roles->map(function ($role) {
             $role['permissions'] = $role->permissions()->get()->pluck('name');
             return $role;
         });
         return [
             'roles' => $roles,
-            'permissions' => $this->permissionRepository->findAll()->pluck('name')
+            'permissions' => Permission::all()->pluck('name')
         ];
     }
 
@@ -49,20 +41,20 @@ class RoleService extends CoreService
                 $response = [];
                 switch ($change['type']) {
                     case 'insert':
-                        $role = $this->roleRepository->create(["name" => $change['data']['name'], 'guard_name' => 'web']);
+                        $role = Role::create(["name" => $change['data']['name'], 'guard_name' => 'web']);
                         $role->syncPermissions($change['data']['permissions']);
                         $response['isOk'] = !!$role;
                         break;
 
                     case 'update':
-                        $role = $this->roleRepository->findById($change['key']);
-                        $response['isOk'] = $this->roleRepository->update($role, ["name" => $change['data']['name']]);
+                        $role = Role::find($change['key']);
+                        $response['isOk'] = $role->update(["name" => $change['data']['name']]);
                         $role->syncPermissions($change['data']['permissions']);
                         break;
 
                     case 'remove':
-                        $role = $this->roleRepository->findById($change['key']);
-                        $response['isOk'] = $this->roleRepository->delete($role);
+                        $role = Role::find($change['key']);
+                        $response['isOk'] = $role->delete();
                         break;
                 }
                 if (!$response['isOk']) break;
@@ -78,7 +70,6 @@ class RoleService extends CoreService
      */
     public function validateDuplicateName($request)
     {
-        $roles = $this->roleRepository->where([['name', $request["name"]]]);
-        return count($roles) == 0;
+        return  Role::where('name', $request["name"])->count() == 0;
     }
 }
