@@ -3,7 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Services\Admin\Setting\DatabaseService;
+use App\Services\Setting\DatabaseService;
 
 class BackupDatabaseCommand extends Command
 {
