@@ -28,14 +28,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('queue:work --stop-when-empty')->everyMinute();
-
         $schedule->job(new BackupDatabaseJob)->daily();
         $schedule->job(new CleanSubscriptionJob)->yearly();
         $schedule->job(new UpdateOpeningMarketJob)->dailyAt('06:30');
         $schedule->job(new UpdateVn30f1mSymbolJob)->fridays()->at('08:30');
         $schedule->job(new ReportTradingJob)->dailyAt('14:46');
         $schedule->job(new ExportTradingJob)->dailyAt('14:46');
+
+        $schedule->command('queue:work --stop-when-empty')->everyMinute();
     }
 
     /**
