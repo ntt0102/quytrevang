@@ -103,42 +103,13 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::get('summary', 'ContractController@summary');
                     Route::get('receipt-info', 'ContractController@getReceiptInfo');
                 });
-                Route::group(['prefix' => 'settings'], function () {
-                    Route::group(['prefix' => 'parameters', 'middleware' => 'can:parameters@setting'], function () {
-                        Route::get('/', 'SettingController@fetchParameters');
-                        Route::post('/', 'SettingController@saveParameters');
-                    });
-                    Route::group(['prefix' => 'faqs', 'middleware' => 'can:faqs@setting'], function () {
-                        Route::get('/', 'SettingController@fetchFaqs');
-                        Route::post('/', 'SettingController@saveFaqs');
-                    });
-                    Route::group(['prefix' => 'database', 'middleware' => 'can:database@setting'], function () {
-                        Route::post('backup', 'SettingController@backupDatabase');
-                        Route::post('restore', 'SettingController@restoreDatabase');
-                    });
-                    Route::post('command/run', 'SettingController@runCommand')->middleware('can:command@setting');
-                    Route::post('notification/send', 'SettingController@sendNotification')->middleware('can:notification@setting');
-                    Route::group(['prefix' => 'files', 'middleware' => 'can:files@setting'], function () {
-                        Route::get('getItems', 'SettingController@getItems');
-                        Route::post('createDirectory', 'SettingController@createDirectory');
-                        Route::post('renameItem', 'SettingController@renameItem');
-                        Route::post('deleteItem', 'SettingController@deleteItem');
-                        Route::post('copyItem', 'SettingController@copyItem');
-                        Route::post('moveItem', 'SettingController@moveItem');
-                        Route::post('uploadFileChunk', 'SettingController@uploadFileChunk');
-                    });
-                    Route::get('log', 'SettingController@fetchLog')->middleware('can:log@setting');
-                    Route::group(['prefix' => 'roles', 'middleware' => 'can:roles@setting'], function () {
-                        Route::get('/', 'SettingController@fetchRoles');
-                        Route::post('/', 'SettingController@saveRoles');
-                        Route::post('validate-duplicate-name', 'SettingController@validateDuplicateRoleName');
-                    });
-                    Route::group(['prefix' => 'permissions', 'middleware' => 'can:permissions@setting'], function () {
-                        Route::get('/', 'SettingController@fetchPermissions');
-                        Route::post('/', 'SettingController@savePermissions');
-                        Route::post('validate-duplicate-name', 'SettingController@validateDuplicatePermissionName');
-                    });
+                Route::group(['prefix' => 'comments', 'middleware' => 'can:comments@control'], function () {
+                    Route::get('/', 'CommentController@fetch');
+                    Route::post('/', 'CommentController@markAsRead');
+                    Route::post('delete', 'CommentController@delete');
                 });
+            });
+            Route::group(['namespace' => 'Trading'], function () {
                 Route::group(['prefix' => 'trades', 'middleware' => 'can:trades@view'], function () {
                     Route::get('/', 'TradeController@fetch');
                     Route::post('validate-duplicate-date', 'TradeController@validateDuplicateDate');
@@ -159,10 +130,41 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('/name', 'FinbookController@getFinbooksName');
                     Route::post('/update-balance', 'FinbookController@updateBalance');
                 });
-                Route::group(['prefix' => 'comments', 'middleware' => 'can:comments@control'], function () {
-                    Route::get('/', 'CommentController@fetch');
-                    Route::post('/', 'CommentController@markAsRead');
-                    Route::post('delete', 'CommentController@delete');
+            });
+            Route::group(['prefix' => 'settings'], function () {
+                Route::group(['prefix' => 'parameters', 'middleware' => 'can:parameters@setting'], function () {
+                    Route::get('/', 'SettingController@fetchParameters');
+                    Route::post('/', 'SettingController@saveParameters');
+                });
+                Route::group(['prefix' => 'faqs', 'middleware' => 'can:faqs@setting'], function () {
+                    Route::get('/', 'SettingController@fetchFaqs');
+                    Route::post('/', 'SettingController@saveFaqs');
+                });
+                Route::group(['prefix' => 'database', 'middleware' => 'can:database@setting'], function () {
+                    Route::post('backup', 'SettingController@backupDatabase');
+                    Route::post('restore', 'SettingController@restoreDatabase');
+                });
+                Route::post('command/run', 'SettingController@runCommand')->middleware('can:command@setting');
+                Route::post('notification/send', 'SettingController@sendNotification')->middleware('can:notification@setting');
+                Route::group(['prefix' => 'files', 'middleware' => 'can:files@setting'], function () {
+                    Route::get('getItems', 'SettingController@getItems');
+                    Route::post('createDirectory', 'SettingController@createDirectory');
+                    Route::post('renameItem', 'SettingController@renameItem');
+                    Route::post('deleteItem', 'SettingController@deleteItem');
+                    Route::post('copyItem', 'SettingController@copyItem');
+                    Route::post('moveItem', 'SettingController@moveItem');
+                    Route::post('uploadFileChunk', 'SettingController@uploadFileChunk');
+                });
+                Route::get('log', 'SettingController@fetchLog')->middleware('can:log@setting');
+                Route::group(['prefix' => 'roles', 'middleware' => 'can:roles@setting'], function () {
+                    Route::get('/', 'SettingController@fetchRoles');
+                    Route::post('/', 'SettingController@saveRoles');
+                    Route::post('validate-duplicate-name', 'SettingController@validateDuplicateRoleName');
+                });
+                Route::group(['prefix' => 'permissions', 'middleware' => 'can:permissions@setting'], function () {
+                    Route::get('/', 'SettingController@fetchPermissions');
+                    Route::post('/', 'SettingController@savePermissions');
+                    Route::post('validate-duplicate-name', 'SettingController@validateDuplicatePermissionName');
                 });
             });
         });

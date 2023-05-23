@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Setting;
+namespace App\Services\Setting;
 
 use App\Services\CoreService;
 use App\Repositories\FaqRepository;

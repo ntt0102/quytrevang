@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Api\Trading;
 
 use App\Http\Controllers\Api\CoreController;
 use Illuminate\Http\Request;
-use App\Services\Admin\FinbookService;
+use App\Services\Trading\FinbookService;
 
 class FinbookController extends CoreController
 {

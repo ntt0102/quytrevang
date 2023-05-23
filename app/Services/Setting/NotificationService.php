@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Setting;
+namespace App\Services\Setting;
 
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\CoreNotification;

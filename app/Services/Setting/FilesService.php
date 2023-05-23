@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Admin\Setting;
+namespace App\Services\Setting;
 
 use App\Services\CoreService;
 use Illuminate\Support\Facades\Storage;
@@ -9,7 +9,8 @@ class FilesService extends CoreService
 {
     private const ROOT_PATH = 'public/';
     public function __construct()
-    { }
+    {
+    }
 
     /**
      * Get Items.

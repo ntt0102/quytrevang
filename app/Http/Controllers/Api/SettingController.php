@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers\Api\Admin;
+namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Api\CoreController;
 use Illuminate\Http\Request;
-use App\Services\Admin\Setting\ParameterService;
-use App\Services\Admin\Setting\FaqService;
-use App\Services\Admin\Setting\DatabaseService;
-use App\Services\Admin\Setting\CommandService;
-use App\Services\Admin\Setting\NotificationService;
-use App\Services\Admin\Setting\FilesService;
-use App\Services\Admin\Setting\LogService;
-use App\Services\Admin\Setting\RoleService;
-use App\Services\Admin\Setting\PermissionService;
+use App\Services\Setting\ParameterService;
+use App\Services\Setting\FaqService;
+use App\Services\Setting\DatabaseService;
+use App\Services\Setting\CommandService;
+use App\Services\Setting\NotificationService;
+use App\Services\Setting\FilesService;
+use App\Services\Setting\LogService;
+use App\Services\Setting\RoleService;
+use App\Services\Setting\PermissionService;
 
 class SettingController extends CoreController
 {
