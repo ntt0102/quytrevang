@@ -108,41 +108,8 @@ Route::get('test', function () {
     // $s = $s->roles;
     // $s = event(new App\Events\UpdateFinbookEvent());
     // $s = app(App\Services\Admin\OrderChartService::class)->checkOpeningMarket();
-    $s = App\Jobs\ReportTradingJob::dispatch();
-    $s = App\Jobs\BackupDatabaseJob::dispatch();
-    $s = App\Jobs\CleanSubscriptionJob::dispatch();
-    $s = App\Jobs\ExportTradingJob::dispatch();
     $s = App\Jobs\UpdateOpeningMarketJob::dispatch();
-    $s = App\Jobs\UpdateVn30f1mSymbolJob::dispatch();
-    // if (get_global_value('openingMarketFlag') == '1') {
-    //     $vpsUser = App\Models\User::permission('trades@edit')->first()->vpsUser;
-    //     $vos = new App\Services\Special\VpsOrderService($vpsUser);
-    //     dd($vos->connection);
-    //     if (!$vos->connection) return false;
-    //     $info = $vos->getAccountInfo();
-    //     //
-    //     Illuminate\Support\Facades\Notification::send(
-    //         App\Models\User::permission('trades@view')->get(),
-    //         new App\Notifications\UpdatedTradesNotification(
-    //             number_format($info->vm, 0, ",", ".") . ' ₫',
-    //             number_format($info->fee, 0, ",", ".") . ' ₫'
-    //         )
-    //     );
-    //     //
-    //     if (!$info->fee) return false;
-    //     $revenue = $info->vm > 0 ? $info->vm : 0;
-    //     $loss = $info->vm < 0 ? -$info->vm : 0;
-    //     $trade =  App\Models\Trade::create([
-    //         "amount" => $vpsUser->volume,
-    //         "scores" => $this->getVn30f1mInfo($vos->symbol)->r,
-    //         "revenue" => $revenue,
-    //         "loss" => $loss,
-    //         "fees" => $info->fee,
-    //         "date" => date_create()->format('Y-m-d'),
-    //     ]);
-    //     if (!$trade) return false;
-    //     event(new App\Events\UpdateStatisticEvent());
-    // }
+
     // dd($s);
     return 'ok';
 });
