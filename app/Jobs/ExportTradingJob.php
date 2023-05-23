@@ -16,6 +16,13 @@ class ExportTradingJob implements ShouldQueue
     private $SHIFT_TIME = 7 * 60 * 60;
 
     /**
+     * The number of times the job may be attempted.
+     *
+     * @var int
+     */
+    public $tries = 3;
+
+    /**
      * Create a new job instance.
      *
      * @return void

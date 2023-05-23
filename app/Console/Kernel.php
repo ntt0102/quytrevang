@@ -29,7 +29,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
 
-        $schedule->command('queue:work --stop-when-empty --tries=3')
+        $schedule->command('queue:work --stop-when-empty')
             ->everyMinute()
             ->withoutOverlapping();
 
@@ -37,13 +37,8 @@ class Kernel extends ConsoleKernel
         $schedule->job(new CleanSubscriptionJob)->yearly();
         $schedule->job(new UpdateOpeningMarketJob)->dailyAt('06:30');
         $schedule->job(new UpdateVn30f1mSymbolJob)->fridays()->at('08:30');
-        $schedule->job(new ReportTradingJob)->dailyAt('16:50');
-        $schedule->job(new ExportTradingJob)->dailyAt('16:50');
-        // $schedule->job(new ReportTradingJob)->dailyAt('14:46');
-        // $schedule->job(new ExportTradingJob)->dailyAt('14:46');
-        $schedule->call(function () {
-            set_global_value('test', time());
-        })->everyMinute();
+        $schedule->job(new ReportTradingJob)->dailyAt('14:46');
+        $schedule->job(new ExportTradingJob)->dailyAt('14:46');
     }
 
     /**
