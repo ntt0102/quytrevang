@@ -19,7 +19,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('send-comment', 'AppController@sendComment');
     Route::get('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
-    Route::post('core.vpbs', 'Trading\OrderChartController@setVpsUserSession');
+    Route::post('core.vpbs', 'Trading\OrderChartController@setCopyistSession');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login')->name('login');
@@ -102,6 +102,11 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('withdrawn', 'ContractController@withdrawnContract');
                     Route::get('summary', 'ContractController@summary');
                     Route::get('receipt-info', 'ContractController@getReceiptInfo');
+                });
+                Route::group(['prefix' => 'copyists', 'middleware' => 'can:copyists@control'], function () {
+                    Route::get('/', 'CopyistController@fetch');
+                    Route::post('validate-user', 'CopyistController@markAsRead');
+                    Route::post('delete', 'CopyistController@delete');
                 });
                 Route::group(['prefix' => 'comments', 'middleware' => 'can:comments@control'], function () {
                     Route::get('/', 'CommentController@fetch');

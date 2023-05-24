@@ -43,6 +43,12 @@ export default [
                 permissions: ["contracts@control"],
             },
             {
+                text: lang.global.t("admin.copyists.title"),
+                name: "copyists",
+                icon: "far fa-copy",
+                permissions: ["copyists@control"],
+            },
+            {
                 text: lang.global.t("admin.comments.title"),
                 name: "comments",
                 icon: "far fa-comment",

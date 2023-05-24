@@ -53,7 +53,7 @@
         >
             <DxColumn
                 :fixed="true"
-                :width="$screen.getScreenSizeInfo.isXSmall ? 35 : 125"
+                :width="$screen.getScreenSizeInfo.isXSmall ? 35 : 70"
                 alignment="center"
                 type="buttons"
                 cssClass="dx-datagrid-command-column"
@@ -299,10 +299,10 @@ import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import PaidContractPopup from "./PaidContractPopup.vue";
 import WithdrawnContractPopup from "./WithdrawnContractPopup.vue";
 import ContractDetailPopup from "../../../components/Popups/ContractDetailPopup.vue";
+import { ref, reactive, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { ref, reactive, inject, computed, watch } from "vue";
 
 const store = useStore();
 const router = useRouter();

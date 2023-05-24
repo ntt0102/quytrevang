@@ -14,6 +14,7 @@ import userTrade from "./modules/User/Trade";
 // Admin
 import adminUser from "./modules/Admin/User";
 import adminContract from "./modules/Admin/Contract";
+import adminCopyist from "./modules/Admin/Copyist";
 import adminComment from "./modules/Admin/Comment";
 // Trading
 import tradingStatistic from "./modules/Trading/Statistic";
@@ -41,6 +42,7 @@ export default createStore({
         // Admin
         adminUser,
         adminContract,
+        adminCopyist,
         adminComment,
         // Trading
         tradingStatistic,

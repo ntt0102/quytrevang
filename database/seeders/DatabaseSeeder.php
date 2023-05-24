@@ -11,6 +11,7 @@ use Database\Seeders\ParametersTableSeeder;
 use Database\Seeders\FaqsTableSeeder;
 use Database\Seeders\CommentsTableSeeder;
 use Database\Seeders\VariablesTableSeeder;
+use Database\Seeders\CopyistsTableSeeder;
 use Database\Seeders\TradesTableSeeder;
 use Database\Seeders\FinbooksTableSeeder;
 
@@ -34,6 +35,7 @@ class DatabaseSeeder extends Seeder
         $this->call(FaqsTableSeeder::class);
         $this->call(CommentsTableSeeder::class);
         $this->call(VariablesTableSeeder::class);
+        $this->call(CopyistsTableSeeder::class);
         // $this->call(TradesTableSeeder::class);
         // $this->call(FinbooksTableSeeder::class);
 

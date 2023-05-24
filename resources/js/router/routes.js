@@ -135,6 +135,17 @@ const authRoute = [
         component: loadView("Admin", "Contract", "Index"),
     },
     {
+        path: "/admin-copyists",
+        name: "copyists",
+        meta: {
+            auth: true,
+            permission: "copyists@control",
+            title: lang.global.t("admin.copyists.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Admin", "Copyist", "Index"),
+    },
+    {
         path: "/admin-comments",
         name: "comments",
         meta: {
@@ -143,7 +154,7 @@ const authRoute = [
             title: lang.global.t("admin.comments.title"),
             layout: AuthLayout,
         },
-        component: loadView("Admin", "Comments"),
+        component: loadView("Admin", "Comment"),
     },
     // Trading
     {

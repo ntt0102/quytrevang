@@ -87,9 +87,9 @@ class OrderChartController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function setVpsUserSession(Request $request)
+    public function setCopyistSession(Request $request)
     {
-        $data = $this->orderChartService->setVpsUserSession($request);
+        $data = $this->orderChartService->setCopyistSession($request);
         return $this->sendResponse($data);
     }
 }

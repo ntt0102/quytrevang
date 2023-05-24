@@ -186,19 +186,11 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
-     * Get VpsUser.
+     * Get Copyist.
      */
-    public function vpsUser()
+    public function copyist()
     {
-        return $this->hasOne(VpsUser::class, 'user_code', 'code');
-    }
-
-    /**
-     * Get the phone smartOrder associated with the user.
-     */
-    public function smartOrder()
-    {
-        return $this->hasOne(SmartOrder::class, 'user_code', 'code');
+        return $this->hasOne(Copyist::class, 'user_code', 'code');
     }
 
     /**

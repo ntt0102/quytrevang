@@ -8,14 +8,14 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\VpsUser;
+use App\Models\Copyist;
 use App\Services\Special\VpsOrderService;
 
 class OrderVpsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $vpsUser;
+    private $copyist;
     private $payload;
 
     /**
@@ -30,9 +30,9 @@ class OrderVpsJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct(VpsUser $vpsUser, $payload)
+    public function __construct(Copyist $copyist, $payload)
     {
-        $this->vpsUser = $vpsUser;
+        $this->copyist = $copyist;
         $this->payload = $payload;
     }
 
@@ -43,7 +43,7 @@ class OrderVpsJob implements ShouldQueue
      */
     public function handle()
     {
-        $vos = new VpsOrderService($this->vpsUser);
+        $vos = new VpsOrderService($this->copyist);
         $vos->execute($this->payload);
     }
 }

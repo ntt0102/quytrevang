@@ -43,8 +43,8 @@ class ReportTradingJob implements ShouldQueue
     public function handle()
     {
         if (get_global_value('openingMarketFlag') == '1') {
-            $vpsUser = User::permission('trades@edit')->first()->vpsUser;
-            $vos = new VpsOrderService($vpsUser);
+            $copyist = User::permission('trades@edit')->first()->copyist;
+            $vos = new VpsOrderService($copyist);
             if (!$vos->connection) return false;
             $info = $vos->getAccountInfo();
             //
@@ -60,7 +60,7 @@ class ReportTradingJob implements ShouldQueue
             $revenue = $info->vm > 0 ? $info->vm : 0;
             $loss = $info->vm < 0 ? -$info->vm : 0;
             $trade = Trade::create([
-                "amount" => $vpsUser->volume,
+                "amount" => $copyist->volume,
                 "scores" => $this->getVn30f1mInfo($vos->symbol)->r,
                 "revenue" => $revenue,
                 "loss" => $loss,

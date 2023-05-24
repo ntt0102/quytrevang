@@ -4,7 +4,7 @@ namespace App\Services\Trading;
 
 use App\Services\CoreService;
 use App\Models\User;
-use App\Models\VpsUser;
+use App\Models\Copyist;
 use App\Models\Trade;
 use App\Services\Special\VpsOrderService;
 use App\Jobs\OrderVpsJob;
@@ -44,8 +44,8 @@ class OrderChartService extends CoreService
      */
     public function getStatus($payload)
     {
-        $vpsUser = request()->user()->vpsUser;
-        $vos = new VpsOrderService($vpsUser);
+        $copyist = request()->user()->copyist;
+        $vos = new VpsOrderService($copyist);
         return [
             'connection' => $vos->connection,
             'position' => $vos->position,
@@ -90,11 +90,11 @@ class OrderChartService extends CoreService
     {
         return $this->transaction(
             function () use ($payload) {
-                $vpsUser = request()->user()->vpsUser;
-                $vos = new VpsOrderService($vpsUser);
+                $copyist = request()->user()->copyist;
+                $vos = new VpsOrderService($copyist);
                 $ret = $vos->execute($payload);
-                if ($vpsUser->share && $ret['isOk']) {
-                    VpsUser::getCopyists()->each(function ($copyist) use ($payload) {
+                if ($copyist->share && $ret['isOk']) {
+                    Copyist::getCopyists()->each(function ($copyist) use ($payload) {
                         OrderVpsJob::dispatch($copyist, $payload);
                     });
                 }
@@ -109,9 +109,9 @@ class OrderChartService extends CoreService
      * @param $payload
      * 
      */
-    public function setVpsUserSession($payload)
+    public function setCopyistSession($payload)
     {
-        $user = VpsUser::where('vps_code', $payload->user)->first();
+        $user = Copyist::where('vps_code', $payload->user)->first();
         if (!$user) false;
         $user->vps_session = $payload->session;
         return !!$user->save();
