@@ -12,6 +12,7 @@ class RegisterController extends CoreController
 
     public function __construct(RegisterService $registerService)
     {
+        parent::__construct();
         $this->registerService = $registerService;
     }
 
@@ -25,12 +26,12 @@ class RegisterController extends CoreController
     public function createAccount(Request $request)
     {
         if ($request->has('name')) {
-            $data = $this->registerService->createAccount($request);
+            $data = $this->registerService->createAccount($this->payload);
             return $this->sendResponse($data);
         }
-        $payload = $this->decrypt($request);
+        $payload = $this->decrypt($this->payload);
         $data = $this->registerService->createAccount($payload);
-        return $this->sendResponse($this->encrypt($data));
+        return $this->sendResponse($data);
     }
 
     /**
@@ -42,7 +43,7 @@ class RegisterController extends CoreController
      */
     public function validateDuplicateEmail(Request $request)
     {
-        $isOk = $this->registerService->validateDuplicateEmail($request);
+        $isOk = $this->registerService->validateDuplicateEmail($this->payload);
         return $this->sendResponse($isOk);
     }
 }

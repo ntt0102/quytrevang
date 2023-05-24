@@ -24,39 +24,39 @@ class LoginService
     /**
      * Login.
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function login($request)
+    public function login($payload)
     {
-        $username  = $request->username;
+        $username  = $payload->username;
         $fieldName = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
         $credentials = [
             $fieldName => $username,
-            'password' => $request->password
+            'password' => $payload->password
         ];
         if (!Auth::attempt($credentials))
             return ['isOk' => false, 'message' => 'unauthorized'];
         //
         $user = request()->user();
         //
-        return $this->createToken($user, $request->rememberMe);
+        return $this->createToken($user, $payload->rememberMe);
     }
 
     /**
      * Login via WebAuthn
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function loginWebAuthn($request)
+    public function loginWebAuthn($payload)
     {
         $webauthn = new WebauthnService(request()->getHost());
-        switch ($request->routeAction) {
+        switch ($payload->routeAction) {
             case 'assert':
-                $username  = $request->username;
+                $username  = $payload->username;
                 $fieldName = filter_var($username, FILTER_VALIDATE_EMAIL) ? 'email' : 'phone';
                 $user = User::where($fieldName, $username)->first();
                 return [
@@ -65,8 +65,8 @@ class LoginService
                 ];
                 break;
             case 'verify':
-                $user = User::find($request->userId);
-                $valid = $webauthn->authenticate($request->credentials, $user->webauthn);
+                $user = User::find($payload->userId);
+                $valid = $webauthn->authenticate($payload->credentials, $user->webauthn);
                 if (!$valid) return ['isOk' => false];
                 return $this->createToken($user);
                 break;
@@ -76,20 +76,20 @@ class LoginService
     /**
      * Register WebAuthn
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function registerWebAuthn($request)
+    public function registerWebAuthn($payload)
     {
         $webauthn = new WebauthnService(request()->getHost());
-        $user = $request->user();
-        switch ($request->routeAction) {
+        $user = request()->user();
+        switch ($payload->routeAction) {
             case 'attest':
                 return ['challenge' => $webauthn->prepareChallengeForRegistration($user->email, strval($user->id))];
                 break;
             case 'verify':
-                $user->webauthn = $webauthn->register($request->credentials, null);
+                $user->webauthn = $webauthn->register($payload->credentials, null);
                 $isOk = $user->save();
                 return ['isOk' => $isOk];
                 break;
@@ -99,20 +99,20 @@ class LoginService
     /**
      * Confirm WebAuthn
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function confirmWebAuthn($request)
+    public function confirmWebAuthn($payload)
     {
         $webauthn = new WebauthnService(request()->getHost());
-        $user = $request->user();
-        switch ($request->routeAction) {
+        $user = request()->user();
+        switch ($payload->routeAction) {
             case 'assert':
                 return ['challenge' => $webauthn->prepareForLogin($user->webauthn)];
                 break;
             case 'verify':
-                $valid = $webauthn->authenticate($request->credentials, $user->webauthn);
+                $valid = $webauthn->authenticate($payload->credentials, $user->webauthn);
                 if (!$valid) return ['isOk' => false, 'message' => 'checkPinFail'];
                 return ['isOk' => true];
                 break;
@@ -149,9 +149,9 @@ class LoginService
     /**
      * Logout user (Revoke the token)
      */
-    public function logout($request)
+    public function logout($payload)
     {
-        $request->user()->token()->revoke();
+        request()->user()->token()->revoke();
     }
 
     /**
@@ -167,11 +167,11 @@ class LoginService
     /**
      * Check the PIN.
      * 
-     * @param $request
+     * @param $payload
      */
-    public function checkPin($request)
+    public function checkPin($payload)
     {
-        if (Hash::check($request->pin, $request->user()->pin))
+        if (Hash::check($payload->pin, request()->user()->pin))
             return ['isOk' => true, 'message' => null];
         return ['isOk' => false, 'message' => 'checkPinFail'];
     }

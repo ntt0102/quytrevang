@@ -17,17 +17,21 @@ export default {
 
     getContact({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("contact", { noLoading: true }).then((response) => {
-                commit("getContact", response.data);
-            });
+            axios
+                .post("contact", null, { noLoading: true })
+                .then((response) => {
+                    commit("getContact", response.data);
+                });
         });
     },
 
     getFaqs({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.get("get-faqs", { noLoading: true }).then((response) => {
-                commit("getFaqs", response.data);
-            });
+            axios
+                .post("get-faqs", null, { noLoading: true })
+                .then((response) => {
+                    commit("getFaqs", response.data);
+                });
         });
     },
     getNotify(
@@ -87,10 +91,12 @@ export default {
     },
     getNotifications({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("notifications", { noLoading: true }).then((response) => {
-                commit("setNotifications", response.data);
-                resolve();
-            });
+            axios
+                .post("notifications", null, { noLoading: true })
+                .then((response) => {
+                    commit("setNotifications", response.data);
+                    resolve();
+                });
         });
     },
     markAsRead({ commit, dispatch, getters, state, rootGetters }, id) {

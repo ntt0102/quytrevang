@@ -11,14 +11,14 @@ class ResetPasswordService
     /**
      * Send password reset link. 
      * 
-     * @param $request
+     * @param $payload
      * 
      * @return \Illuminate\Http\JsonResponse
      */
-    public function resetPassword($request)
+    public function resetPassword($payload)
     {
         $status = Password::sendResetLink(
-            $request->only('email')
+            $payload->only('email')
         );
         return ['isOk' => $status == Password::RESET_LINK_SENT, 'message' => 'sendResetPasswordLink'];
     }
@@ -26,12 +26,12 @@ class ResetPasswordService
     /**
      * Validate Exist Email
      * 
-     * @param  $request
+     * @param  $payload
      *
      * @return array
      */
-    public function validateExistEmail($request)
+    public function validateExistEmail($payload)
     {
-        return User::where('email', $request->email)->count() > 0;
+        return User::where('email', $payload->email)->count() > 0;
     }
 }

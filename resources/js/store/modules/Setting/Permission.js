@@ -28,7 +28,7 @@ const actions = {
     },
     getPermissions({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("settings/permissions").then((response) => {
+            axios.post("settings/permissions").then((response) => {
                 commit("setState", response.data);
                 resolve();
             });
@@ -37,7 +37,7 @@ const actions = {
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("settings/permissions", { changes: param.changes })
+                .post("settings/permissions/save", { changes: param.changes })
                 .then((response) => {
                     resolve();
                     dispatch("getPermissions");

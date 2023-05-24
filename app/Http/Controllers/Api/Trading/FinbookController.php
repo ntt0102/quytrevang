@@ -12,6 +12,7 @@ class FinbookController extends CoreController
 
     public function __construct(FinbookService $finbookService)
     {
+        parent::__construct();
         $this->finbookService = $finbookService;
     }
 
@@ -24,7 +25,7 @@ class FinbookController extends CoreController
      */
     public function fetch(Request $request)
     {
-        $data = $this->finbookService->fetch($request);
+        $data = $this->finbookService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -37,7 +38,7 @@ class FinbookController extends CoreController
      */
     public function getFinbooksName(Request $request)
     {
-        $data = $this->finbookService->getFinbooksName($request);
+        $data = $this->finbookService->getFinbooksName($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -50,7 +51,7 @@ class FinbookController extends CoreController
      */
     public function save(Request $request)
     {
-        $data = $this->finbookService->save($request);
+        $data = $this->finbookService->save($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -63,7 +64,7 @@ class FinbookController extends CoreController
      */
     public function updateBalance(Request $request)
     {
-        $data = $this->finbookService->updateBalance($request);
+        $data = $this->finbookService->updateBalance($this->payload);
         return $this->sendResponse($data);
     }
 }

@@ -12,6 +12,7 @@ class CommentController extends CoreController
 
     public function __construct(CommentService $commentService)
     {
+        parent::__construct();
         $this->commentService = $commentService;
     }
 
@@ -24,7 +25,7 @@ class CommentController extends CoreController
      */
     public function fetch(Request $request)
     {
-        $data = $this->commentService->fetch($request);
+        $data = $this->commentService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -38,7 +39,7 @@ class CommentController extends CoreController
      */
     public function markAsRead(Request $request)
     {
-        $this->commentService->markAsRead($request);
+        $this->commentService->markAsRead($this->payload);
         return $this->sendResponse();
     }
 
@@ -51,7 +52,7 @@ class CommentController extends CoreController
      */
     public function delete(Request $request)
     {
-        $data = $this->commentService->delete($request);
-        return $this->fetch($request);
+        $data = $this->commentService->delete($this->payload);
+        return $this->fetch($this->payload);
     }
 }

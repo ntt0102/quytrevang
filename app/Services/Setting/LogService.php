@@ -11,10 +11,10 @@ class LogService extends CoreService
     /**
      * Get the logs.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function fetch($request)
+    public function fetch($payload)
     {
         $activities = Activity::all();
         return $activities->map(function ($activity) {

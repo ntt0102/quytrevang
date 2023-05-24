@@ -13,13 +13,13 @@ class LayoutService extends CoreService
     /**
      * Get the page's params
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function getNotify($request)
+    public function getNotify($payload)
     {
-        $user = $request->user();
-        $types = $request->types;
+        $user = request()->user();
+        $types = $payload->types;
         $ret = [];
         if (in_array("notification", $types)) {
             $ret['notification'] = $user->unreadNotifications->count();

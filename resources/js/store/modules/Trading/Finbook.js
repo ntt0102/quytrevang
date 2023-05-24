@@ -15,7 +15,7 @@ const actions = {
     getFinbook({ commit, dispatch, getters, state, rootGetters }) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
-            axios.get("finbooks").then((response) => {
+            axios.post("finbooks").then((response) => {
                 commit("setState", response.data);
                 resolve();
             });
@@ -23,7 +23,7 @@ const actions = {
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("finbooks", param).then((response) => {
+            axios.post("finbooks/save", param).then((response) => {
                 resolve();
                 if (response.data.isOk) dispatch("getFinbook");
             });

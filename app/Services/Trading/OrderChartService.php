@@ -3,14 +3,9 @@
 namespace App\Services\Trading;
 
 use App\Services\CoreService;
-use App\Models\User;
 use App\Models\Copyist;
-use App\Models\Trade;
 use App\Services\Special\VpsOrderService;
 use App\Jobs\OrderVpsJob;
-use Illuminate\Support\Facades\Notification;
-use App\Notifications\UpdatedTradesNotification;
-use App\Events\UpdateStatisticEvent;
 
 class OrderChartService extends CoreService
 {

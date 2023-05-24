@@ -12,12 +12,12 @@ class ChangePasswordService
     /**
      * Handle reset password 
      * 
-     * @param  $request
+     * @param  $payload
      */
-    public function changePassword($request)
+    public function changePassword($payload)
     {
         $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
+            $payload->only('email', 'password', 'password_confirmation', 'token'),
             function ($user, $password) {
                 $this->authUser = $user;
                 $user->forceFill([

@@ -27,7 +27,7 @@ const actions = {
     },
     getRoles({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("settings/roles").then((response) => {
+            axios.post("settings/roles").then((response) => {
                 commit("setState", response.data);
                 resolve();
             });
@@ -36,7 +36,7 @@ const actions = {
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("settings/roles", { changes: param.changes })
+                .post("settings/roles/save", { changes: param.changes })
                 .then((response) => {
                     resolve();
                     dispatch("getRoles");

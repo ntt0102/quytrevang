@@ -11,10 +11,10 @@ class TradeService extends CoreService
     /**
      * Get the month trade
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function getMonthChart($request)
+    public function getMonthChart($payload)
     {
         $startDate = date_create()->modify('-1 month')->format('Y-m-d');
         $endDate = date_create()->format('Y-m-d');

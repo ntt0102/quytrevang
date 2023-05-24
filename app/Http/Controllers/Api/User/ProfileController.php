@@ -12,6 +12,7 @@ class ProfileController extends CoreController
 
     public function __construct(ProfileService $profileService)
     {
+        parent::__construct();
         $this->profileService = $profileService;
     }
 
@@ -24,7 +25,7 @@ class ProfileController extends CoreController
      */
     public function fetch(Request $request)
     {
-        $data = $this->profileService->fetch($request);
+        $data = $this->profileService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -37,7 +38,7 @@ class ProfileController extends CoreController
      */
     public function save(Request $request)
     {
-        $data = $this->profileService->save($request);
+        $data = $this->profileService->save($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -50,7 +51,7 @@ class ProfileController extends CoreController
      */
     public function changePassword(Request $request)
     {
-        $isOk = $this->profileService->changePassword($request);
+        $isOk = $this->profileService->changePassword($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -63,7 +64,7 @@ class ProfileController extends CoreController
      */
     public function changePin(Request $request)
     {
-        $data = $this->profileService->changePin($request);
+        $data = $this->profileService->changePin($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -76,7 +77,7 @@ class ProfileController extends CoreController
      */
     public function changeAvatar(Request $request)
     {
-        $data = $this->profileService->changeAvatar($request);
+        $data = $this->profileService->changeAvatar($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -89,7 +90,7 @@ class ProfileController extends CoreController
      */
     public function delete(Request $request)
     {
-        $data = $this->profileService->delete($request);
+        $data = $this->profileService->delete($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -102,7 +103,7 @@ class ProfileController extends CoreController
      */
     public function validateDuplicate(Request $request)
     {
-        $isOk = $this->profileService->validateDuplicate($request);
+        $isOk = $this->profileService->validateDuplicate($this->payload);
         return $this->sendResponse($isOk);
     }
 }

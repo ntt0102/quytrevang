@@ -66,7 +66,7 @@ const actions = {
     getUsers({ commit, dispatch, getters, state, rootGetters }) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
-            axios.get("users").then((response) => {
+            axios.post("users").then((response) => {
                 commit("setState", response.data);
                 resolve();
             });
@@ -75,7 +75,7 @@ const actions = {
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("users" + (param.isDeleted ? "/deleted" : ""), {
+                .post("users" + (param.isDeleted ? "/deleted" : "save"), {
                     changes: param.changes,
                 })
                 .then((response) => {
@@ -105,7 +105,7 @@ const actions = {
     getContractInfo({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .get("users/contract-info", { noLoading: true })
+                .post("users/contract-info", null, { noLoading: true })
                 .then((response) => {
                     console.log(response.data);
                     resolve(response.data);

@@ -12,6 +12,7 @@ class OrderChartController extends CoreController
 
     public function __construct(OrderChartService $orderChartService)
     {
+        parent::__construct();
         $this->orderChartService = $orderChartService;
     }
 
@@ -24,8 +25,8 @@ class OrderChartController extends CoreController
      */
     public function getChartData(Request $request)
     {
-        $data = $this->orderChartService->getChartData($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->orderChartService->getChartData($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -37,8 +38,8 @@ class OrderChartController extends CoreController
      */
     public function getStatus(Request $request)
     {
-        $data = $this->orderChartService->getStatus($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->orderChartService->getStatus($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -50,8 +51,8 @@ class OrderChartController extends CoreController
      */
     public function getConfig(Request $request)
     {
-        $data = $this->orderChartService->getConfig($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->orderChartService->getConfig($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -63,8 +64,8 @@ class OrderChartController extends CoreController
      */
     public function setConfig(Request $request)
     {
-        $data = $this->orderChartService->setConfig($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->orderChartService->setConfig($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -76,8 +77,8 @@ class OrderChartController extends CoreController
      */
     public function executeOrder(Request $request)
     {
-        $data = $this->orderChartService->executeOrder($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->orderChartService->executeOrder($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -89,7 +90,7 @@ class OrderChartController extends CoreController
      */
     public function setCopyistSession(Request $request)
     {
-        $data = $this->orderChartService->setCopyistSession($request);
+        $data = $this->orderChartService->setCopyistSession($this->payload);
         return $this->sendResponse($data);
     }
 }

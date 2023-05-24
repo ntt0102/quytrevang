@@ -14,6 +14,7 @@ class AppController extends CoreController
 
     public function __construct(AppService $appService, ContractService $contractService)
     {
+        parent::__construct();
         $this->appService = $appService;
         $this->contractService = $contractService;
     }
@@ -27,7 +28,7 @@ class AppController extends CoreController
      */
     public function getPolicyParams(Request $request)
     {
-        $data = $this->appService->getPolicyParams($request);
+        $data = $this->appService->getPolicyParams($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -40,7 +41,7 @@ class AppController extends CoreController
      */
     public function getFaqs(Request $request)
     {
-        $data = $this->appService->getFaqs($request);
+        $data = $this->appService->getFaqs($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -53,7 +54,7 @@ class AppController extends CoreController
      */
     public function sendComment(Request $request)
     {
-        $data = $this->appService->sendComment($request);
+        $data = $this->appService->sendComment($this->payload);
         return $this->sendResponse($data);
     }
 

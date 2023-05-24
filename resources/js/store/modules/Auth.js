@@ -187,7 +187,7 @@ const actions = {
     },
     verifyEmail({ commit, dispatch, getters }, url) {
         return new Promise((resolve, reject) => {
-            axios.get(url).then((response) => {
+            axios.post(url).then((response) => {
                 // console.log(response);
                 if (response.data.isOk) {
                     commit("setUser", response.data.user);
@@ -345,7 +345,7 @@ const actions = {
     },
     logout({ commit, dispatch, getters }) {
         return new Promise((resolve) => {
-            axios.get("auth/logout").then((response) => {
+            axios.post("auth/logout").then((response) => {
                 // console.log(response);
                 removeTokenCookie();
                 commit("resetState");
@@ -360,7 +360,7 @@ const actions = {
         commit("setToken", access_token);
         return new Promise((resolve) => {
             axios
-                .get("auth/user", { noLoading: true })
+                .post("auth/user", null, { noLoading: true })
                 .then((response) => {
                     console.log(response);
                     commit("setUser", response.data);

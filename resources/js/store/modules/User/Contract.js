@@ -18,7 +18,7 @@ const actions = {
     ) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
-            axios.get("contract?isOld=" + isOld).then((response) => {
+            axios.post("contract", { isOld: isOld }).then((response) => {
                 // console.log(response);
                 commit("setState", response.data);
                 resolve();
@@ -27,7 +27,7 @@ const actions = {
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("contract", param).then((response) => {
+            axios.post("contract/save", param).then((response) => {
                 dispatch("fetch");
                 dispatch("auth/check", true, { root: true });
                 resolve(response.data);

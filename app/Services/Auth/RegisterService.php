@@ -14,19 +14,19 @@ class RegisterService extends CoreService
     /**
      * Register new user.
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function createAccount($request)
+    public function createAccount($payload)
     {
-        return $this->transaction(function () use ($request) {
+        return $this->transaction(function () use ($payload) {
             $data = [
                 'code' => User::generateUniqueCode(),
-                'name' => $request->name,
-                'email' => $request->email,
-                'phone' => $request->phone,
-                'password' => bcrypt($request->password),
+                'name' => $payload->name,
+                'email' => $payload->email,
+                'phone' => $payload->phone,
+                'password' => bcrypt($payload->password),
             ];
             $user = User::create($data);
             if (empty($user)) return ['isOk' => false, 'message' => 'unknow'];
@@ -59,10 +59,10 @@ class RegisterService extends CoreService
     /**
      * Validate Duplicate Email
      * 
-     * @param $request
+     * @param $payload
      */
-    public function validateDuplicateEmail($request)
+    public function validateDuplicateEmail($payload)
     {
-        return User::where('email', $request->email)->count() == 0;
+        return User::where('email', $payload->email)->count() == 0;
     }
 }

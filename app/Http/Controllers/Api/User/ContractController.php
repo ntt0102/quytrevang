@@ -12,6 +12,7 @@ class ContractController extends CoreController
 
     public function __construct(ContractService $contractService)
     {
+        parent::__construct();
         $this->contractService = $contractService;
     }
 
@@ -24,7 +25,7 @@ class ContractController extends CoreController
      */
     public function fetch(Request $request)
     {
-        $data = $this->contractService->fetch($request);
+        $data = $this->contractService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -38,7 +39,7 @@ class ContractController extends CoreController
      */
     public function save(Request $request)
     {
-        $data = $this->contractService->save($request);
+        $data = $this->contractService->save($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -52,7 +53,7 @@ class ContractController extends CoreController
      */
     public function payingContract(Request $request)
     {
-        $data = $this->contractService->payingContract($request);
+        $data = $this->contractService->payingContract($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -66,7 +67,7 @@ class ContractController extends CoreController
      */
     public function withdrawingContract(Request $request)
     {
-        $data = $this->contractService->withdrawingContract($request);
+        $data = $this->contractService->withdrawingContract($this->payload);
         return $this->sendResponse($data);
     }
 }

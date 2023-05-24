@@ -19,14 +19,14 @@ class ContractService extends CoreService
     /**
      * Return all the Contracts.
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function fetch($request)
+    public function fetch($payload)
     {
-        $query = Contract::where('user_code', $request->user()->code);
-        if (!($request->isOld == 'true')) $query = $query->where('withdrawn_docs', '[]');
+        $query = Contract::where('user_code', request()->user()->code);
+        if (!($payload->isOld == 'true')) $query = $query->where('withdrawn_docs', '[]');
         $contracts = $query->get();
         $pCode = (int) Parameter::getValue('representUser');
         $representUser = User::where('code', $pCode)->first();
@@ -42,14 +42,14 @@ class ContractService extends CoreService
     /**
      * Save Contract.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function save($request)
+    public function save($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $userCode = $request->user()->code;
-            foreach ($request->changes as $change) {
+        return $this->transaction(function () use ($payload) {
+            $userCode = request()->user()->code;
+            foreach ($payload->changes as $change) {
                 $response = [];
                 switch ($change['type']) {
                     case 'insert':
@@ -94,25 +94,25 @@ class ContractService extends CoreService
     /**
      * Paying Contract
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function payingContract($request)
+    public function payingContract($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $contract = Contract::find((int) $request->contractId);
+        return $this->transaction(function () use ($payload) {
+            $contract = Contract::find((int) $payload->contractId);
             $user = $contract->user;
             $isFirstPaid = count($contract->paid_docs) == 0;
             $path = 'public/' . md5($user->code) . '/c/';
             $documents = $contract->paid_docs;
-            if ($request->isDelete == 'true') {
+            if ($payload->isDelete == 'true') {
                 foreach ($documents as $image) {
                     if (Storage::exists($path . $image)) Storage::delete($path . $image);
                     $documents = [];
                 }
             }
-            if ($request->hasfile('receiptImages')) {
-                foreach ($request->file('receiptImages') as $index => $file) {
+            if ($payload->hasfile('receiptImages')) {
+                foreach ($payload->file('receiptImages') as $index => $file) {
                     $name = md5(time() . $index) . '.png';
                     $file->storeAs($path, $name);
                     $documents[] = $name;
@@ -133,17 +133,17 @@ class ContractService extends CoreService
     /**
      * Withdrawing Contract
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function withdrawingContract($request)
+    public function withdrawingContract($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $userCode = $request->user()->code;
-            $contract = Contract::find($request->id);
+        return $this->transaction(function () use ($payload) {
+            $userCode = request()->user()->code;
+            $contract = Contract::find($payload->id);
             if ($contract->user_code == $userCode) {
-                $data['advance'] = $request->advance;
-                $data['withdrawn_at'] = $request->advance == 0 ? null : date('Y-m-d');
+                $data['advance'] = $payload->advance;
+                $data['withdrawn_at'] = $payload->advance == 0 ? null : date('Y-m-d');
                 $isOk = $contract->update($data);
                 if ($isOk)
                     Notification::send(

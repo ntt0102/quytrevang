@@ -12,6 +12,7 @@ class CopyistController extends CoreController
 
     public function __construct(CopyistService $copyistService)
     {
+        parent::__construct();
         $this->copyistService = $copyistService;
     }
 
@@ -24,8 +25,10 @@ class CopyistController extends CoreController
      */
     public function fetch(Request $request)
     {
-        $data = $this->copyistService->fetch($request);
-        return $this->sendResponse($data);
+        $data = $this->copyistService->fetch($this->payload);
+        // return $this->sendResponse($data);
+        return $this->sendResponse($this->payload);
+        // return $this->sendResponse($request->tho);
     }
 
     /**
@@ -38,7 +41,7 @@ class CopyistController extends CoreController
      */
     public function markAsRead(Request $request)
     {
-        $this->copyistService->markAsRead($request);
+        $this->copyistService->markAsRead($this->payload);
         return $this->sendResponse();
     }
 
@@ -51,7 +54,7 @@ class CopyistController extends CoreController
      */
     public function delete(Request $request)
     {
-        $data = $this->copyistService->delete($request);
-        return $this->fetch($request);
+        $data = $this->copyistService->delete($this->payload);
+        return $this->fetch($this->payload);
     }
 }

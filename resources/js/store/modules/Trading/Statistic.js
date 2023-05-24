@@ -27,9 +27,9 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "trades/validate-duplicate-date",
+                    "statistic/validate-duplicate-date",
                     { date: param.value },
-                    { nonLoading: true, crypto: true }
+                    { nonLoading: true }
                 )
                 .then((response) => {
                     // console.log(response);
@@ -39,7 +39,7 @@ const actions = {
     },
     getData({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.get("trades", { crypto: true }).then((response) => {
+            axios.post("statistic", null).then((response) => {
                 commit("setData", response.data);
                 resolve();
             });
@@ -50,9 +50,9 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "trades/chart",
+                    "statistic/chart",
                     { period: period, page: 1 },
-                    { noLoading: true, crypto: true }
+                    { noLoading: true }
                 )
                 .then((response) => {
                     response.data.data = createAccumulatedProfit(
@@ -67,12 +67,12 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "trades/chart",
+                    "statistic/chart",
                     {
                         period: state.charts.period,
                         page: state.charts.page + 1,
                     },
-                    { noLoading: true, crypto: true }
+                    { noLoading: true }
                 )
                 .then((response) => {
                     if (response.data.page > state.charts.page) {
@@ -90,7 +90,7 @@ const actions = {
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trades", { changes: param.changes }, { crypto: true })
+                .post("statistic/save", { changes: param.changes })
                 .then((response) => {
                     resolve();
                     dispatch("getData");
@@ -100,7 +100,7 @@ const actions = {
     },
     getSummary({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.get("trades/summary", { crypto: true }).then((response) => {
+            axios.post("statistic/summary", null).then((response) => {
                 commit("setSummary", response.data);
                 resolve();
             });

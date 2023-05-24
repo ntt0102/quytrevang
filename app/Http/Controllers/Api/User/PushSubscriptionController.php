@@ -12,6 +12,7 @@ class PushSubscriptionController extends CoreController
 
     public function __construct(PushSubscriptionService $pushSubscriptionService)
     {
+        parent::__construct();
         $this->pushSubscriptionService = $pushSubscriptionService;
     }
 
@@ -24,7 +25,7 @@ class PushSubscriptionController extends CoreController
      */
     public function subscribe(Request $request)
     {
-        $this->pushSubscriptionService->subscribe($request);
+        $this->pushSubscriptionService->subscribe($this->payload);
         return $this->sendResponse();
     }
 
@@ -37,7 +38,7 @@ class PushSubscriptionController extends CoreController
      */
     public function unsubscribe(Request $request)
     {
-        $this->pushSubscriptionService->unsubscribe($request);
+        $this->pushSubscriptionService->unsubscribe($this->payload);
         return $this->sendResponse();
     }
 }

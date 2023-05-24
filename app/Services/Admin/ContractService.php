@@ -18,13 +18,13 @@ class ContractService extends CoreService
     /**
      * Return all the Contracts.
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function fetch($request)
+    public function fetch($payload)
     {
-        $contracts = $request->isOld == 'true' ? Contract::all() : Contract::where('withdrawn_docs', '[]')->get();
+        $contracts = $payload->isOld == 'true' ? Contract::all() : Contract::where('withdrawn_docs', '[]')->get();
         $users = User::withTrashed()->get(['code', 'name']);
         return [
             'contracts' => $contracts,
@@ -37,13 +37,13 @@ class ContractService extends CoreService
     /**
      * Save Contract.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function save($request)
+    public function save($payload)
     {
-        return $this->transaction(function () use ($request) {
-            foreach ($request->changes as $change) {
+        return $this->transaction(function () use ($payload) {
+            foreach ($payload->changes as $change) {
                 $response = [];
                 switch ($change['type']) {
                     case 'insert':
@@ -66,10 +66,10 @@ class ContractService extends CoreService
 
                     case 'update':
                         $contract = Contract::find($change['key']);
-                        if ($contract->status <= 3 || $request->user()->can('system@control')) {
+                        if ($contract->status <= 3 || request()->user()->can('system@control')) {
                             $data = [];
                             $isUnconfirmed = false;
-                            if ($contract->status <= 1 || $request->user()->can('system@control')) {
+                            if ($contract->status <= 1 || request()->user()->can('system@control')) {
                                 $isUnconfirmed = true;
                                 $oldUserCode = $contract->user_code;
                                 $data = array_merge($data, [
@@ -108,7 +108,7 @@ class ContractService extends CoreService
 
                     case 'remove':
                         $contract = Contract::find($change['key']);
-                        if ($contract->status == 1 || $request->user()->can('system@control')) {
+                        if ($contract->status == 1 || request()->user()->can('system@control')) {
                             $isOk = $contract->delete();
                             if ($isOk) {
                                 $path = 'public/' . md5($contract->user_code) . '/c/';
@@ -136,26 +136,26 @@ class ContractService extends CoreService
     /**
      * Paid Contract.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function paidContract($request)
+    public function paidContract($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $contract = Contract::find((int) $request->contractId);
+        return $this->transaction(function () use ($payload) {
+            $contract = Contract::find((int) $payload->contractId);
             $user = $contract->user;
             $isFirstConfirm = !$contract->confirmed_by;
-            $isConfirmed = $request->isConfirmed == 'true';
+            $isConfirmed = $payload->isConfirmed == 'true';
             $path = 'public/' . md5($user->code) . '/c/';
             $documents = $contract->paid_docs;
-            if ($request->isDelete == 'true') {
+            if ($payload->isDelete == 'true') {
                 foreach ($documents as $image) {
                     if (Storage::exists($path . $image)) Storage::delete($path . $image);
                     $documents = [];
                 }
             }
-            if ($request->hasfile('receiptImages')) {
-                foreach ($request->file('receiptImages') as $index => $file) {
+            if ($payload->hasfile('receiptImages')) {
+                foreach ($payload->file('receiptImages') as $index => $file) {
                     $name = md5(time() . $index) . '.png';
                     $file->storeAs($path, $name);
                     $documents[] = $name;
@@ -164,7 +164,7 @@ class ContractService extends CoreService
             $isOk = $contract->update(
                 [
                     'paid_docs' => $documents,
-                    'confirmed_by' => $isConfirmed ? $request->user()->code : null
+                    'confirmed_by' => $isConfirmed ? request()->user()->code : null
                 ]
             );
             if ($isOk && $isFirstConfirm && $isConfirmed) {
@@ -178,25 +178,25 @@ class ContractService extends CoreService
     /**
      * Withdrawn Contract
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function withdrawnContract($request)
+    public function withdrawnContract($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $contract = Contract::find((int) $request->contractId);
+        return $this->transaction(function () use ($payload) {
+            $contract = Contract::find((int) $payload->contractId);
             $user = $contract->user;
             $isFirstWithdrawn = count($contract->withdrawn_docs) == 0;
             $path = 'public/' . md5($user->code) . '/c/';
             $documents = $contract->withdrawn_docs;
-            if ($request->isDelete == 'true') {
+            if ($payload->isDelete == 'true') {
                 foreach ($documents as $image) {
                     if (Storage::exists($path . $image)) Storage::delete($path . $image);
                     $documents = [];
                 }
             }
-            if ($request->hasfile('receiptImages')) {
-                foreach ($request->file('receiptImages') as $index => $file) {
+            if ($payload->hasfile('receiptImages')) {
+                foreach ($payload->file('receiptImages') as $index => $file) {
                     $name = md5(time() . $index) . '.png';
                     $file->storeAs($path, $name);
                     $documents[] = $name;
@@ -219,7 +219,7 @@ class ContractService extends CoreService
                         "interest_rate" => (float) Parameter::getValue('interestRate', '0.005'),
                         "paid_at" => date('Y-m-d'),
                         'paid_docs' => [$createdImageName],
-                        'confirmed_by' => $request->user()->code,
+                        'confirmed_by' => request()->user()->code,
                     ];
                     $newContract = Contract::create($data);
                     if (!!$newContract) {
@@ -251,13 +251,13 @@ class ContractService extends CoreService
     /**
      * get receipt info
      * 
-     * @param $request
+     * @param $payload
      */
-    public function getReceiptInfo($request)
+    public function getReceiptInfo($payload)
     {
         $pCode = (int) Parameter::getValue('representUser');
         $ret['representUser'] = User::where('code', $pCode)->first();
-        $ret['user'] = User::where('code', (int) $request->userCode)->first();
+        $ret['user'] = User::where('code', (int) $payload->userCode)->first();
         return $ret;
     }
 }

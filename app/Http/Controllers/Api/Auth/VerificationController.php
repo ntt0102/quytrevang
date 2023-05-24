@@ -12,6 +12,7 @@ class VerificationController extends CoreController
 
     public function __construct(VerificationService $verificationService)
     {
+        parent::__construct();
         $this->verificationService = $verificationService;
     }
 
@@ -23,7 +24,7 @@ class VerificationController extends CoreController
      */
     public function resend(Request $request)
     {
-        $data = $this->verificationService->resend($request);
+        $data = $this->verificationService->resend($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -35,7 +36,7 @@ class VerificationController extends CoreController
      */
     public function verify(Request $request)
     {
-        $data = $this->verificationService->verify($request);
+        $data = $this->verificationService->verify($this->payload);
         return $this->sendResponse($data);
     }
 }

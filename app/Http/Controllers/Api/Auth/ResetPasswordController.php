@@ -14,6 +14,7 @@ class ResetPasswordController extends CoreController
 
     public function __construct(ResetPasswordService $resetPasswordService, ChangePasswordService $changePasswordService)
     {
+        parent::__construct();
         $this->resetPasswordService = $resetPasswordService;
         $this->changePasswordService = $changePasswordService;
     }
@@ -27,7 +28,7 @@ class ResetPasswordController extends CoreController
      */
     public function resetPassword(Request $request)
     {
-        $data = $this->resetPasswordService->resetPassword($request);
+        $data = $this->resetPasswordService->resetPassword($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -40,7 +41,7 @@ class ResetPasswordController extends CoreController
      */
     public function validateExistEmail(Request $request)
     {
-        $isOk = $this->resetPasswordService->validateExistEmail($request);
+        $isOk = $this->resetPasswordService->validateExistEmail($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -53,7 +54,7 @@ class ResetPasswordController extends CoreController
      */
     public function changePassword(Request $request)
     {
-        $isOk = $this->changePasswordService->changePassword($request);
+        $isOk = $this->changePasswordService->changePassword($this->payload);
         return $this->sendResponse($isOk);
     }
 }

@@ -11,7 +11,7 @@ const actions = {
     getPolicy({ commit, dispatch, getters, state, rootGetters }, param) {
         if (state.isLoaded) return Promise.resolve(true);
         return new Promise((resolve, reject) => {
-            axios.get("policy-params").then((response) => {
+            axios.post("policy-params").then((response) => {
                 commit("setState", response.data);
                 resolve(response.data);
             });

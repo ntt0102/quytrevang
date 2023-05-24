@@ -15,13 +15,13 @@ class ProfileService extends CoreService
     /**
      * Get the profile
      *
-     * @param $request
+     * @param $payload
      * 
      * @return \App\Models\User
      */
-    public function fetch($request)
+    public function fetch($payload)
     {
-        $user = $request->user();
+        $user = request()->user();
         unset($user->email_verified_at);
         unset($user->roles);
         unset($user->permissions);
@@ -31,29 +31,29 @@ class ProfileService extends CoreService
     /**
      * Update the profile
      *
-     * @param $request
+     * @param $payload
      */
-    public function save($request)
+    public function save($payload)
     {
         return $this->transaction(
-            function () use ($request) {
-                $user = $request->user();
+            function () use ($payload) {
+                $user = request()->user();
                 $isFirstUpdate = !$user->phone;
                 $data = [
-                    'name' => $request->name,
-                    'birthday' => $request->birthday,
-                    'sex' => $request->sex,
-                    'identity' => $request->identity,
-                    'email' => $request->email,
-                    'phone' => $request->phone,
-                    'address' => $request->address,
-                    'bank_account' => $request->bank_account
+                    'name' => $payload->name,
+                    'birthday' => $payload->birthday,
+                    'sex' => $payload->sex,
+                    'identity' => $payload->identity,
+                    'email' => $payload->email,
+                    'phone' => $payload->phone,
+                    'address' => $payload->address,
+                    'bank_account' => $payload->bank_account
                 ];
                 $isOk = $user->update($data);
                 if ($isOk && $isFirstUpdate) {
                     Notification::send(
                         User::permission('users@control')->get(),
-                        new ConfirmingUserNotification($request->user())
+                        new ConfirmingUserNotification(request()->user())
                     );
                 }
                 return ['isOk' => $isOk];
@@ -64,15 +64,15 @@ class ProfileService extends CoreService
     /**
      * Change the password.
      * 
-     * @param $request
+     * @param $payload
      */
-    public function changePassword($request)
+    public function changePassword($payload)
     {
         return $this->transaction(
-            function () use ($request) {
-                $user = $request->user();
+            function () use ($payload) {
+                $user = request()->user();
                 $isOk =   $user->update(
-                    ['password' => bcrypt($request->password)]
+                    ['password' => bcrypt($payload->password)]
                 );
                 return ['isOk' => $isOk];
             }
@@ -83,16 +83,16 @@ class ProfileService extends CoreService
     /**
      * Change the PIN.
      * 
-     * @param $request
+     * @param $payload
      */
-    public function changePin($request)
+    public function changePin($payload)
     {
         return $this->transaction(
-            function () use ($request) {
-                $user = $request->user();
-                if ($user->level < 3 || $user->level >= 3 && Hash::check($request->pin, $user->pin)) {
+            function () use ($payload) {
+                $user = request()->user();
+                if ($user->level < 3 || $user->level >= 3 && Hash::check($payload->pin, $user->pin)) {
                     $isOk =  $user->update(
-                        ['pin' => bcrypt($request->new_pin)]
+                        ['pin' => bcrypt($payload->new_pin)]
                     );
                     return ['isOk' => $isOk];
                 } else return ['isOk' => false];
@@ -103,15 +103,15 @@ class ProfileService extends CoreService
     /**
      * Change the avatar
      *
-     * @param $request
+     * @param $payload
      */
-    public function changeAvatar($request)
+    public function changeAvatar($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $user = $request->user();
+        return $this->transaction(function () use ($payload) {
+            $user = request()->user();
             $path = 'public/' . md5($user->code) . '/u/a/';
             if (Storage::exists($path . $user->avatar)) Storage::delete($path . $user->avatar);
-            $img = $request->avatar;
+            $img = $payload->avatar;
             $img = str_replace('data:image/png;base64,', '', $img);
             $img = str_replace(' ', '+', $img);
             $imageData = base64_decode($img);
@@ -120,7 +120,7 @@ class ProfileService extends CoreService
                 $isOk = $user->update(['avatar' => $filename]);
                 return [
                     'isOk' => $isOk,
-                    'avatar' => $request->user()->url_avatar,
+                    'avatar' => request()->user()->url_avatar,
                     'filename' => $filename
                 ];
             }
@@ -131,13 +131,13 @@ class ProfileService extends CoreService
     /**
      * Delete account
      * 
-     * @param $request
+     * @param $payload
      */
-    public function delete($request)
+    public function delete($payload)
     {
         return $this->transaction(
-            function () use ($request) {
-                $user = $request->user();
+            function () use ($payload) {
+                $user = request()->user();
                 if (count($user->contracts->whereNull('withdrawn_at')) === 0) {
                     $isOk =  $user->delete();
                     return ['isOk' => $isOk];
@@ -149,13 +149,13 @@ class ProfileService extends CoreService
     /**
      * Validate Duplicate
      * 
-     * @param $request
+     * @param $payload
      */
-    public function validateDuplicate($request)
+    public function validateDuplicate($payload)
     {
-        $field = $request->field;
+        $field = $payload->field;
         if ($field == 'id_number')
-            return User::whereJsonContains('identity', ['number' => $request[$field]])->count() == 0;
-        else return User::where($field, $request[$field])->count() == 0;
+            return User::whereJsonContains('identity', ['number' => $payload[$field]])->count() == 0;
+        else return User::where($field, $payload[$field])->count() == 0;
     }
 }

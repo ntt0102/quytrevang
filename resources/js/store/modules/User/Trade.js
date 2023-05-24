@@ -7,7 +7,7 @@ const getters = {};
 const actions = {
     getMonthChart({ commit, dispatch, getters, state }) {
         return new Promise((resolve, reject) => {
-            axios.get("trade", { crypto: true }).then((response) => {
+            axios.post("trade", null).then((response) => {
                 commit("setState", response.data);
                 resolve();
             });

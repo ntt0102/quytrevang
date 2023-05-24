@@ -40,13 +40,13 @@ class UserService extends CoreService
     /**
      * Save user.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function save($request)
+    public function save($payload)
     {
-        return $this->transaction(function () use ($request) {
-            foreach ($request->changes as $change) {
+        return $this->transaction(function () use ($payload) {
+            foreach ($payload->changes as $change) {
                 $response = [];
                 if (in_array($change['type'], ["insert", "update"])) {
                     $data = [
@@ -67,7 +67,7 @@ class UserService extends CoreService
                             "password" => bcrypt($change['data']['phone']),
                         ]);
                         $user = User::create($data);
-                        if ($request->user()->can('system@control')) {
+                        if (request()->user()->can('system@control')) {
                             $user->syncRoles($change['data']['roles']);
                             $user->syncPermissions($change['data']['permissions']);
                         } else $user->assignRole('user');
@@ -76,9 +76,9 @@ class UserService extends CoreService
 
                     case 'update':
                         $user = User::where('code', $change['key'])->first();
-                        if ($user->level <= 4 || $request->user()->can('system@control')) {
+                        if ($user->level <= 4 || request()->user()->can('system@control')) {
                             $response['isOk'] = $user->update($data);
-                            if ($request->user()->can('system@control')) {
+                            if (request()->user()->can('system@control')) {
                                 $user->syncRoles($change['data']['roles']);
                                 $user->syncPermissions($change['data']['permissions']);
                             }
@@ -101,13 +101,13 @@ class UserService extends CoreService
     /**
      * Save deleted user.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function saveDeletedUser($request)
+    public function saveDeletedUser($payload)
     {
-        return $this->transaction(function () use ($request) {
-            foreach ($request->changes as $change) {
+        return $this->transaction(function () use ($payload) {
+            foreach ($payload->changes as $change) {
                 switch ($change['type']) {
                     case 'update':
                         User::withTrashed()->findOrFail($change['key'])->restore();
@@ -130,32 +130,32 @@ class UserService extends CoreService
     /**
      * Upload documents.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function uploadDocuments($request)
+    public function uploadDocuments($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $user = User::find((int) $request->userId);
-            if (in_array($user->level, [4, 5]) || $request->user()->can('system@control')) {
+        return $this->transaction(function () use ($payload) {
+            $user = User::find((int) $payload->userId);
+            if (in_array($user->level, [4, 5]) || request()->user()->can('system@control')) {
                 $isFirstUpload = count($user->documents) == 0;
                 $path = 'public/' . md5($user->code) . '/u/d/';
 
                 $documents = $this->saveImage(
                     $user->documents,
-                    $request->file('contractImages'),
+                    $payload->file('contractImages'),
                     $path,
                     'contract',
-                    $request->hasfile('contractImages'),
-                    $request->isContractDelete == 'true'
+                    $payload->hasfile('contractImages'),
+                    $payload->isContractDelete == 'true'
                 );
                 $documents = $this->saveImage(
                     $documents,
-                    $request->file('identityImages'),
+                    $payload->file('identityImages'),
                     $path,
                     'identity',
-                    $request->hasfile('identityImages'),
-                    $request->isIdentityDelete == 'true'
+                    $payload->hasfile('identityImages'),
+                    $payload->isIdentityDelete == 'true'
                 );
 
                 $isOk = $user->update(['documents' => $documents]);
@@ -201,22 +201,22 @@ class UserService extends CoreService
     /**
      * Validate Duplicate
      * 
-     * @param $request
+     * @param $payload
      */
-    public function validateDuplicate($request)
+    public function validateDuplicate($payload)
     {
-        $field = $request->field;
+        $field = $payload->field;
         if ($field == 'id_number')
-            return User::whereJsonContains('identity', ['number' => $request[$field]])->count() == 0;
-        else return User::where($field, $request[$field])->count() == 0;
+            return User::whereJsonContains('identity', ['number' => $payload[$field]])->count() == 0;
+        else return User::where($field, $payload[$field])->count() == 0;
     }
 
     /**
      * get contract info
      * 
-     * @param $request
+     * @param $payload
      */
-    public function getContractInfo($request)
+    public function getContractInfo($payload)
     {
         $pCode = (int) Parameter::getValue('representUser');
         $ret['representUser'] = User::where('code', $pCode)->first();

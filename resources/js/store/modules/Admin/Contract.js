@@ -16,7 +16,7 @@ const actions = {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         if (isOld == undefined) isOld = state.isOld;
         return new Promise((resolve, reject) => {
-            axios.get("contracts?isOld=" + isOld).then((response) => {
+            axios.post("contracts", { isOld: isOld }).then((response) => {
                 response.data.isOld = isOld;
                 commit("setState", response.data);
                 resolve();
@@ -25,7 +25,7 @@ const actions = {
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("contracts", param).then((response) => {
+            axios.post("contracts/save", param).then((response) => {
                 resolve();
                 if (response.data.isOk) {
                     dispatch("fetch", state.isOld);
@@ -76,7 +76,7 @@ const actions = {
     },
     getSummary({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("contracts/summary").then((response) => {
+            axios.post("contracts/summary").then((response) => {
                 resolve(response.data);
             });
         });
@@ -87,9 +87,13 @@ const actions = {
     ) {
         return new Promise((resolve, reject) => {
             axios
-                .get(`contracts/receipt-info?userCode=${userCode}`, {
-                    noLoading: true,
-                })
+                .post(
+                    "contracts/receipt-info",
+                    { userCode: userCode },
+                    {
+                        noLoading: true,
+                    }
+                )
                 .then((response) => {
                     console.log(response.data);
                     resolve(response.data);

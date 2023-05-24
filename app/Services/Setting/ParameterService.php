@@ -12,11 +12,11 @@ class ParameterService extends CoreService
     /**
      * Return all the Parameters.
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function fetch($request)
+    public function fetch($payload)
     {
         return Parameter::all();
     }
@@ -24,14 +24,14 @@ class ParameterService extends CoreService
     /**
      * Save Parameter.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function save($request)
+    public function save($payload)
     {
-        return $this->transaction(function () use ($request) {
+        return $this->transaction(function () use ($payload) {
             $response = [];
-            foreach ($request->changes as $change) {
+            foreach ($payload->changes as $change) {
                 $response = [];
                 if ($change['type'] == 'update') {
                     $data = [

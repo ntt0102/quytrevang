@@ -16,10 +16,10 @@ class AppService extends CoreService
     /**
      * Get the policy params
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function getPolicyParams($request)
+    public function getPolicyParams($payload)
     {
         $ret["interestRate"] = (float) Parameter::getValue('interestRate', '0.005');
         $ret["principalMin"] = (int) Parameter::getValue('principalMin');
@@ -32,10 +32,10 @@ class AppService extends CoreService
     /**
      * Get the faqs
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function getFaqs($request)
+    public function getFaqs($payload)
     {
         return Faq::all();
     }
@@ -43,28 +43,28 @@ class AppService extends CoreService
     /**
      * Send Comment
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function sendComment($request)
+    public function sendComment($payload)
     {
         return $this->transaction(
-            function () use ($request) {
+            function () use ($payload) {
                 $images = [];
-                if ($request->hasfile('files')) {
-                    $path = 'public/' . (!!$request->userCode ? md5($request->userCode) : 'guests') . '/r/';
-                    foreach ($request->file('files') as $index => $file) {
+                if ($payload->hasfile('files')) {
+                    $path = 'public/' . (!!$payload->userCode ? md5($payload->userCode) : 'guests') . '/r/';
+                    foreach ($payload->file('files') as $index => $file) {
                         $name = md5(time() . $index) . '.png';
                         $file->storeAs($path, $name);
                         $images[] = $name;
                     }
                 }
                 $data = [
-                    "user_code" => $request->userCode ?? 0,
-                    "name" => $request->name ?? NULL,
-                    "phone" => $request->phone ?? NULL,
-                    "subject" => $request->subject,
-                    "content" => $request->content,
+                    "user_code" => $payload->userCode ?? 0,
+                    "name" => $payload->name ?? NULL,
+                    "phone" => $payload->phone ?? NULL,
+                    "subject" => $payload->subject,
+                    "content" => $payload->content,
                     "images" => $images,
                 ];
                 $comment = Comment::create($data);

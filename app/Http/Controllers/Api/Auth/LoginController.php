@@ -12,6 +12,7 @@ class LoginController extends CoreController
 
     public function __construct(LoginService $loginService)
     {
+        parent::__construct();
         $this->loginService = $loginService;
     }
 
@@ -24,13 +25,8 @@ class LoginController extends CoreController
      */
     public function login(Request $request)
     {
-        if ($request->has('username')) {
-            $data = $this->loginService->login($request);
-            return $this->sendResponse($data);
-        }
-        $payload = $this->decrypt($request);
-        $data = $this->loginService->login($payload);
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->loginService->login($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -42,7 +38,7 @@ class LoginController extends CoreController
      */
     public function loginWebAuthn(Request $request)
     {
-        $data = $this->loginService->loginWebAuthn($request);
+        $data = $this->loginService->loginWebAuthn($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -55,7 +51,7 @@ class LoginController extends CoreController
      */
     public function registerWebAuthn(Request $request)
     {
-        $data = $this->loginService->registerWebAuthn($request);
+        $data = $this->loginService->registerWebAuthn($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -68,7 +64,7 @@ class LoginController extends CoreController
      */
     public function confirmWebAuthn(Request $request)
     {
-        $data = $this->loginService->confirmWebAuthn($request);
+        $data = $this->loginService->confirmWebAuthn($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -81,7 +77,7 @@ class LoginController extends CoreController
      */
     public function logout(Request $request)
     {
-        $this->loginService->logout($request);
+        $this->loginService->logout($this->payload);
         return $this->sendResponse();
     }
 
@@ -107,7 +103,7 @@ class LoginController extends CoreController
      */
     public function checkPin(Request $request)
     {
-        $data = $this->loginService->checkPin($request);
+        $data = $this->loginService->checkPin($this->payload);
         return $this->sendResponse($data);
     }
 }

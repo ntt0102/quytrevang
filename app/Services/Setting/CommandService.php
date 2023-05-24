@@ -12,13 +12,13 @@ class CommandService extends CoreService
     /**
      * Run Command.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function run($request)
+    public function run($payload)
     {
         $output = array();
-        foreach (explode(",", $request->commands) as $command) {
+        foreach (explode(",", $payload->commands) as $command) {
             $command = trim($command);
             if (!!$command) {
                 if ($command == 'storage:link') {

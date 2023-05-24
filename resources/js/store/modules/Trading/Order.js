@@ -14,11 +14,7 @@ const actions = {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
-                .post(
-                    "order-chart",
-                    { date: chartDate },
-                    { noLoading: true, crypto: true }
-                )
+                .post("order-chart", { date: chartDate }, { noLoading: true })
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
@@ -29,11 +25,7 @@ const actions = {
     getStatus({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post(
-                    "order-chart/get-status",
-                    {},
-                    { noLoading: true, crypto: true }
-                )
+                .post("order-chart/get-status", {}, { noLoading: true })
                 .then((response) => {
                     commit("setStatus", response.data);
                     resolve();
@@ -43,11 +35,7 @@ const actions = {
     getConfig({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post(
-                    "order-chart/get-config",
-                    {},
-                    { noLoading: true, crypto: true }
-                )
+                .post("order-chart/get-config", {}, { noLoading: true })
                 .then((response) => {
                     commit("setConfig", response.data);
                     resolve();
@@ -60,7 +48,7 @@ const actions = {
                 .post(
                     "order-chart/set-config",
                     { date: chartDate },
-                    { noLoading: true, crypto: true }
+                    { noLoading: true }
                 )
                 .then((response) => {
                     commit("setChartData", response.data);
@@ -76,7 +64,6 @@ const actions = {
             axios
                 .post("order-chart/execute-order", data, {
                     noLoading: true,
-                    crypto: true,
                     notify: true,
                 })
                 .then((response) => {

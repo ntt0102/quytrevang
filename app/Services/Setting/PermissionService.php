@@ -24,13 +24,13 @@ class PermissionService extends CoreService
     /**
      * Save permission.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function save($request)
+    public function save($payload)
     {
-        return $this->transaction(function () use ($request) {
-            foreach ($request->changes as $change) {
+        return $this->transaction(function () use ($payload) {
+            foreach ($payload->changes as $change) {
                 $response = [];
                 switch ($change['type']) {
                     case 'insert':
@@ -57,10 +57,10 @@ class PermissionService extends CoreService
     /**
      * Validate Duplicate Name
      * 
-     * @param \$request
+     * @param \$payload
      */
-    public function validateDuplicateName($request)
+    public function validateDuplicateName($payload)
     {
-        return Permission::where('name', $request["name"])->count() == 0;
+        return Permission::where('name', $payload["name"])->count() == 0;
     }
 }

@@ -15,25 +15,25 @@ class FilesService extends CoreService
     /**
      * Get Items.
      * 
-     * @param $request
+     * @param $payload
      * @return array
      */
-    public function getItems($request)
+    public function getItems($payload)
     {
-        $rootPath = FilesService::ROOT_PATH . $request->clientPath . (!!$request->clientPath ? '/' : '');
-        return $this->scan($rootPath . $request->path . (!!$request->path ? '/' : ''));
+        $rootPath = FilesService::ROOT_PATH . $payload->clientPath . (!!$payload->clientPath ? '/' : '');
+        return $this->scan($rootPath . $payload->path . (!!$payload->path ? '/' : ''));
     }
 
     /**
      * Create Directory.
      * 
-     * @param $request
+     * @param $payload
      * @return array
      */
-    public function createDirectory($request)
+    public function createDirectory($payload)
     {
-        $rootPath = FilesService::ROOT_PATH . $request->clientPath . (!!$request->clientPath ? '/' : '');
-        $path = $rootPath . $request->path . '/' . $request->name;
+        $rootPath = FilesService::ROOT_PATH . $payload->clientPath . (!!$payload->clientPath ? '/' : '');
+        $path = $rootPath . $payload->path . '/' . $payload->name;
         if (Storage::exists($path)) return false;
         return Storage::makeDirectory($path);
     }
@@ -41,15 +41,15 @@ class FilesService extends CoreService
     /**
      * Rename Item.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function renameItem($request)
+    public function renameItem($payload)
     {
         try {
-            $rootPath = FilesService::ROOT_PATH . $request->clientPath . (!!$request->clientPath ? '/' : '');
-            $path = $rootPath . $request->path . '/';
-            return Storage::move($path . $request->oldName, $path . $request->newName);
+            $rootPath = FilesService::ROOT_PATH . $payload->clientPath . (!!$payload->clientPath ? '/' : '');
+            $path = $rootPath . $payload->path . '/';
+            return Storage::move($path . $payload->oldName, $path . $payload->newName);
         } catch (\Exception $e) {
             return false;
         }
@@ -58,14 +58,14 @@ class FilesService extends CoreService
     /**
      * Delete Item.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function deleteItem($request)
+    public function deleteItem($payload)
     {
-        $rootPath = FilesService::ROOT_PATH . $request->clientPath . (!!$request->clientPath ? '/' : '');
-        $path = $rootPath . $request->path;
-        if ($request->isDirectory)
+        $rootPath = FilesService::ROOT_PATH . $payload->clientPath . (!!$payload->clientPath ? '/' : '');
+        $path = $rootPath . $payload->path;
+        if ($payload->isDirectory)
             return Storage::deleteDirectory($path);
         else return Storage::delete($path);
     }
@@ -73,16 +73,16 @@ class FilesService extends CoreService
     /**
      * Copy Item.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function copyItem($request)
+    public function copyItem($payload)
     {
         try {
-            $rootPath = FilesService::ROOT_PATH . $request->clientPath . (!!$request->clientPath ? '/' : '');
-            $fromPath = $rootPath . $request->fromPath . '/';
-            $toPath = $rootPath . $request->toPath . '/';
-            return Storage::copy($fromPath . $request->name, $toPath . $request->name);
+            $rootPath = FilesService::ROOT_PATH . $payload->clientPath . (!!$payload->clientPath ? '/' : '');
+            $fromPath = $rootPath . $payload->fromPath . '/';
+            $toPath = $rootPath . $payload->toPath . '/';
+            return Storage::copy($fromPath . $payload->name, $toPath . $payload->name);
         } catch (\Exception $e) {
             return false;
         }
@@ -91,16 +91,16 @@ class FilesService extends CoreService
     /**
      * Move Item.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function moveItem($request)
+    public function moveItem($payload)
     {
         try {
-            $rootPath = FilesService::ROOT_PATH . $request->clientPath . (!!$request->clientPath ? '/' : '');
-            $fromPath = $rootPath . $request->fromPath . '/';
-            $toPath = $rootPath . $request->toPath . '/';
-            return Storage::move($fromPath . $request->name, $toPath . $request->name);
+            $rootPath = FilesService::ROOT_PATH . $payload->clientPath . (!!$payload->clientPath ? '/' : '');
+            $fromPath = $rootPath . $payload->fromPath . '/';
+            $toPath = $rootPath . $payload->toPath . '/';
+            return Storage::move($fromPath . $payload->name, $toPath . $payload->name);
         } catch (\Exception $e) {
             return false;
         }
@@ -109,14 +109,14 @@ class FilesService extends CoreService
     /**
      * Upload File Chunk.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function uploadFileChunk($request)
+    public function uploadFileChunk($payload)
     {
-        $rootPath = FilesService::ROOT_PATH . $request->clientPath . (!!$request->clientPath ? '/' : '');
-        $path = $rootPath . $request->path;
-        $path = $request->file('file')->storeAs($path, $request->name);
+        $rootPath = FilesService::ROOT_PATH . $payload->clientPath . (!!$payload->clientPath ? '/' : '');
+        $path = $rootPath . $payload->path;
+        $path = $payload->file('file')->storeAs($path, $payload->name);
         return !!$path;
     }
 

@@ -61,7 +61,7 @@ const actions = {
     },
     getLog({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.get("settings/log").then((response) => {
+            axios.post("settings/log").then((response) => {
                 resolve(response.data);
             });
         });

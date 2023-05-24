@@ -14,26 +14,26 @@ class PushSubscriptionService extends CoreService
     /**
      * Get the page's params
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function subscribe($request)
+    public function subscribe($payload)
     {
-        $request->user()->updatePushSubscription(
-            $request->endpoint,
-            $request->key,
-            $request->token
+        request()->user()->updatePushSubscription(
+            $payload->endpoint,
+            $payload->key,
+            $payload->token
         );
     }
 
     /**
      * Get the notifications
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function unsubscribe($request)
+    public function unsubscribe($payload)
     {
-        $request->user()->deletePushSubscription($request->endpoint);
+        request()->user()->deletePushSubscription($payload->endpoint);
     }
 }

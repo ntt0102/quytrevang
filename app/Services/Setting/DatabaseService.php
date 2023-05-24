@@ -25,11 +25,11 @@ class DatabaseService extends CoreService
     /**
      * Backup Database
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function backup($request)
+    public function backup($payload)
     {
         // Expert
         $filename = $this->database . "-" . date('YmdHis') . ".sql";
@@ -38,13 +38,13 @@ class DatabaseService extends CoreService
         // Download
         $ret['isOk'] = is_file($this->directory . $filename);
         if ($ret['isOk']) {
-            $ret['download'] = $request->download;
-            if ($request->download) {
+            $ret['download'] = $payload->download;
+            if ($payload->download) {
                 $ret['file'] = $this->directory . $filename;
                 $ret['filename'] = $filename;
                 $ret['headers'] = ['Content-Type: application/sql'];
             }
-            if ($request->sendMail) {
+            if ($payload->sendMail) {
                 $attachment['file'] = $this->directory . $filename;
                 $attachment['filename'] = $filename;
                 Mail::to(config('mail.from.address'))->send(new BackupMail($attachment));
@@ -56,15 +56,15 @@ class DatabaseService extends CoreService
     /**
      * Restore Database.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function restore($request)
+    public function restore($payload)
     {
-        $ret['isOk'] = $request->hasfile('file');
+        $ret['isOk'] = $payload->hasfile('file');
         if ($ret['isOk']) {
             // Move file
-            $upload = $request->file('file');
+            $upload = $payload->file('file');
             $filename = $upload->getClientOriginalName();
             $upload->move($this->directory, $filename);
             // Restore

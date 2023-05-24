@@ -12,6 +12,7 @@ class TradeController extends CoreController
 
     public function __construct(TradeService $tradeService)
     {
+        parent::__construct();
         $this->tradeService = $tradeService;
     }
 
@@ -24,8 +25,8 @@ class TradeController extends CoreController
      */
     public function fetch(Request $request)
     {
-        $data = $this->tradeService->fetch($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->tradeService->fetch($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -37,8 +38,8 @@ class TradeController extends CoreController
      */
     public function getChart(Request $request)
     {
-        $data = $this->tradeService->getChart($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->tradeService->getChart($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -50,8 +51,8 @@ class TradeController extends CoreController
      */
     public function getSummary(Request $request)
     {
-        $data = $this->tradeService->getSummary($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->tradeService->getSummary($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -63,8 +64,8 @@ class TradeController extends CoreController
      */
     public function save(Request $request)
     {
-        $data = $this->tradeService->save($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->tradeService->save($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -76,7 +77,7 @@ class TradeController extends CoreController
      */
     public function validateDuplicateDate(Request $request)
     {
-        $data = $this->tradeService->validateDuplicateDate($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->tradeService->validateDuplicateDate($this->payload);
+        return $this->sendResponse($data);
     }
 }

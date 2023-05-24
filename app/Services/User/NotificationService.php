@@ -15,12 +15,12 @@ class NotificationService extends CoreService
     /**
      * Get user's notifications.
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function getNotifications($request)
+    public function getNotifications($payload)
     {
-        $user = $request->user();
+        $user = request()->user();
 
         $unread = $user->unreadNotifications()->get();
         $read = $user->readNotifications()->limit(20)->get();
@@ -38,37 +38,37 @@ class NotificationService extends CoreService
     /**
      * Mark user's notification as read.
      *
-     * @param $request
+     * @param $payload
      * @param  int $id
      * 
      */
-    public function markAsRead($request, $id)
+    public function markAsRead($payload, $id)
     {
-        $notification = $request->user()
+        $notification = request()->user()
             ->unreadNotifications()
             ->where('id', $id)
             ->first();
 
         if (!!$notification) {
             $notification->markAsRead();
-            event(new ReadNotificationEvent($request->user()->id));
+            event(new ReadNotificationEvent(request()->user()->id));
         }
     }
 
     /**
      * Mark all user's notifications as read.
      *
-     * @param $request
+     * @param $payload
      * 
      */
-    public function markAllRead($request)
+    public function markAllRead($payload)
     {
-        $request->user()
+        request()->user()
             ->unreadNotifications()
             ->get()->each(function ($n) {
                 $n->markAsRead();
             });
-        event(new ReadNotificationEvent($request->user()->id));
+        event(new ReadNotificationEvent(request()->user()->id));
     }
 
     /**
@@ -77,13 +77,13 @@ class NotificationService extends CoreService
      * This method will be accessed by the service worker
      * so the user is not authenticated and it requires an endpoint.
      *
-     * @param $request
+     * @param $payload
      * @param  int $id
      * 
      */
-    public function dismiss($request, $id)
+    public function dismiss($payload, $id)
     {
-        if (empty($request->endpoint)) {
+        if (empty($payload->endpoint)) {
             return [
                 'isOk' => false,
                 'code' => 403,
@@ -91,7 +91,7 @@ class NotificationService extends CoreService
             ];
         }
 
-        $subscription = PushSubscription::findByEndpoint($request->endpoint);
+        $subscription = PushSubscription::findByEndpoint($payload->endpoint);
         if (is_null($subscription)) {
             return [
                 'isOk' => false,

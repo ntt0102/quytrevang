@@ -12,6 +12,7 @@ class UserController extends CoreController
 
     public function __construct(UserService $userService)
     {
+        parent::__construct();
         $this->userService = $userService;
     }
 
@@ -24,7 +25,7 @@ class UserController extends CoreController
      */
     public function fetch(Request $request)
     {
-        $data = $this->userService->fetch($request);
+        $data = $this->userService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -38,7 +39,7 @@ class UserController extends CoreController
      */
     public function save(Request $request)
     {
-        $data = $this->userService->save($request);
+        $data = $this->userService->save($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -52,7 +53,7 @@ class UserController extends CoreController
      */
     public function saveDeletedUser(Request $request)
     {
-        $data = $this->userService->saveDeletedUser($request);
+        $data = $this->userService->saveDeletedUser($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -66,7 +67,7 @@ class UserController extends CoreController
      */
     public function uploadDocuments(Request $request)
     {
-        $data = $this->userService->uploadDocuments($request);
+        $data = $this->userService->uploadDocuments($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -79,7 +80,7 @@ class UserController extends CoreController
      */
     public function validateDuplicate(Request $request)
     {
-        $isOk = $this->userService->validateDuplicate($request);
+        $isOk = $this->userService->validateDuplicate($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -92,7 +93,7 @@ class UserController extends CoreController
      */
     public function getContractInfo(Request $request)
     {
-        $data = $this->userService->getContractInfo($request);
+        $data = $this->userService->getContractInfo($this->payload);
         return $this->sendResponse($data);
     }
 }

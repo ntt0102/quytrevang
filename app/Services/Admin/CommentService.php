@@ -12,11 +12,11 @@ class CommentService extends CoreService
     /**
      * Return all the Methods.
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function fetch($request)
+    public function fetch($payload)
     {
         $comments = Comment::all();
         $comments = $comments->map(function ($comment) {
@@ -34,13 +34,13 @@ class CommentService extends CoreService
     /**
      * Mark As Read.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function markAsRead($request)
+    public function markAsRead($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $comment = Comment::find($request->id);
+        return $this->transaction(function () use ($payload) {
+            $comment = Comment::find($payload->id);
             $comment->update(['read' => 1]);
         });
     }
@@ -48,13 +48,13 @@ class CommentService extends CoreService
     /**
      * Delete.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function delete($request)
+    public function delete($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $comments = Comment::find($request->ids);
+        return $this->transaction(function () use ($payload) {
+            $comments = Comment::find($payload->ids);
             foreach ($comments as $comment) {
                 $path = 'public/' . (!!$comment->user_code ? md5($comment->user_code) : 'guests') . '/r/';
                 $isOk = $comment->delete();

@@ -6,15 +6,21 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\Request;
 
 class CoreController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     protected $passphrase = '19AqVgG36ekVzc1HyEmE9vfA7PH78DFCwhdwUxJ7dns=';
+    protected $payload;
 
     public function __construct()
     {
         set_time_limit(30);
+        $this->middleware(function (Request $request, $next) {
+            $this->payload = $this->decrypt($request);
+            return $next($request);
+        });
     }
 
     /**
@@ -24,7 +30,7 @@ class CoreController extends Controller
      */
     protected function sendResponse($response = null, $code = 200)
     {
-        return response()->json($response, $code);
+        return response()->json($this->encrypt($response), $code);
     }
 
     /**

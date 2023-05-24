@@ -31,6 +31,7 @@ class SettingController extends CoreController
         RoleService $roleService,
         PermissionService $permissionService
     ) {
+        parent::__construct();
         $this->parameterService = $parameterService;
         $this->faqService = $faqService;
         $this->databaseService = $databaseService;
@@ -48,7 +49,7 @@ class SettingController extends CoreController
      */
     public function fetchParameters(Request $request)
     {
-        $data = $this->parameterService->fetch($request);
+        $data = $this->parameterService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -61,7 +62,7 @@ class SettingController extends CoreController
      */
     public function saveParameters(Request $request)
     {
-        $data = $this->parameterService->save($request);
+        $data = $this->parameterService->save($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -74,7 +75,7 @@ class SettingController extends CoreController
      */
     public function fetchFaqs(Request $request)
     {
-        $data = $this->faqService->fetch($request);
+        $data = $this->faqService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -87,7 +88,7 @@ class SettingController extends CoreController
      */
     public function saveFaqs(Request $request)
     {
-        $data = $this->faqService->save($request);
+        $data = $this->faqService->save($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -101,7 +102,7 @@ class SettingController extends CoreController
     public function backupDatabase(Request $request)
     {
         set_time_limit(300);
-        $data = $this->databaseService->backup($request);
+        $data = $this->databaseService->backup($this->payload);
         if ($data['isOk'] && $data['download']) {
             return $this->sendDownload($data);
         }
@@ -118,7 +119,7 @@ class SettingController extends CoreController
     public function restoreDatabase(Request $request)
     {
         set_time_limit(300);
-        $data = $this->databaseService->restore($request);
+        $data = $this->databaseService->restore($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -132,7 +133,7 @@ class SettingController extends CoreController
     public function runCommand(Request $request)
     {
         set_time_limit(300);
-        $data = app(CommandService::class)->run($request);
+        $data = app(CommandService::class)->run($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -145,7 +146,7 @@ class SettingController extends CoreController
      */
     public function sendNotification(Request $request)
     {
-        $data = app(NotificationService::class)->send($request);
+        $data = app(NotificationService::class)->send($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -158,7 +159,7 @@ class SettingController extends CoreController
      */
     public function getItems(Request $request)
     {
-        $data = $this->filesService->getItems($request);
+        $data = $this->filesService->getItems($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -171,7 +172,7 @@ class SettingController extends CoreController
      */
     public function createDirectory(Request $request)
     {
-        $isOk = $this->filesService->createDirectory($request);
+        $isOk = $this->filesService->createDirectory($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -184,7 +185,7 @@ class SettingController extends CoreController
      */
     public function renameItem(Request $request)
     {
-        $isOk = $this->filesService->renameItem($request);
+        $isOk = $this->filesService->renameItem($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -197,7 +198,7 @@ class SettingController extends CoreController
      */
     public function deleteItem(Request $request)
     {
-        $isOk = $this->filesService->deleteItem($request);
+        $isOk = $this->filesService->deleteItem($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -210,7 +211,7 @@ class SettingController extends CoreController
      */
     public function copyItem(Request $request)
     {
-        $isOk = $this->filesService->copyItem($request);
+        $isOk = $this->filesService->copyItem($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -223,7 +224,7 @@ class SettingController extends CoreController
      */
     public function moveItem(Request $request)
     {
-        $isOk = $this->filesService->moveItem($request);
+        $isOk = $this->filesService->moveItem($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -236,7 +237,7 @@ class SettingController extends CoreController
      */
     public function uploadFileChunk(Request $request)
     {
-        $isOk = $this->filesService->uploadFileChunk($request);
+        $isOk = $this->filesService->uploadFileChunk($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -249,7 +250,7 @@ class SettingController extends CoreController
      */
     public function fetchLog(Request $request)
     {
-        $data = app(LogService::class)->fetch($request);
+        $data = app(LogService::class)->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -262,7 +263,7 @@ class SettingController extends CoreController
      */
     public function fetchRoles(Request $request)
     {
-        $data = $this->roleService->fetch($request);
+        $data = $this->roleService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -276,7 +277,7 @@ class SettingController extends CoreController
      */
     public function saveRoles(Request $request)
     {
-        $data = $this->roleService->save($request);
+        $data = $this->roleService->save($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -289,7 +290,7 @@ class SettingController extends CoreController
      */
     public function validateDuplicateRoleName(Request $request)
     {
-        $isOk = $this->roleService->validateDuplicateName($request);
+        $isOk = $this->roleService->validateDuplicateName($this->payload);
         return $this->sendResponse($isOk);
     }
 
@@ -302,7 +303,7 @@ class SettingController extends CoreController
      */
     public function fetchPermissions(Request $request)
     {
-        $data = $this->permissionService->fetch($request);
+        $data = $this->permissionService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -316,7 +317,7 @@ class SettingController extends CoreController
      */
     public function savePermissions(Request $request)
     {
-        $data = $this->permissionService->save($request);
+        $data = $this->permissionService->save($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -329,7 +330,7 @@ class SettingController extends CoreController
      */
     public function validateDuplicatePermissionName(Request $request)
     {
-        $isOk = $this->permissionService->validateDuplicateName($request);
+        $isOk = $this->permissionService->validateDuplicateName($this->payload);
         return $this->sendResponse($isOk);
     }
 }

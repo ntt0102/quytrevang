@@ -12,6 +12,7 @@ class TradeController extends CoreController
 
     public function __construct(TradeService $tradeService)
     {
+        parent::__construct();
         $this->tradeService = $tradeService;
     }
 
@@ -24,7 +25,7 @@ class TradeController extends CoreController
      */
     public function getMonthChart(Request $request)
     {
-        $data = $this->tradeService->getMonthChart($this->decrypt($request));
-        return $this->sendResponse($this->encrypt($data));
+        $data = $this->tradeService->getMonthChart($this->payload);
+        return $this->sendResponse($data);
     }
 }

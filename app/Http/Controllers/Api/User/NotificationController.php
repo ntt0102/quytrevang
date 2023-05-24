@@ -12,6 +12,7 @@ class NotificationController extends CoreController
 
     public function __construct(NotificationService $notificationService)
     {
+        parent::__construct();
         $this->notificationService = $notificationService;
     }
 
@@ -24,7 +25,7 @@ class NotificationController extends CoreController
      */
     public function getNotifications(Request $request)
     {
-        $data = $this->notificationService->getNotifications($request);
+        $data = $this->notificationService->getNotifications($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -51,7 +52,7 @@ class NotificationController extends CoreController
      */
     public function markAllRead(Request $request)
     {
-        $data = $this->notificationService->markAllRead($request);
+        $data = $this->notificationService->markAllRead($this->payload);
         return $this->sendResponse($data);
     }
 

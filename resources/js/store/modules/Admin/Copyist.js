@@ -11,7 +11,7 @@ const getters = {};
 const actions = {
     getCopyists({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("copyists").then((response) => {
+            axios.post("copyists").then((response) => {
                 // console.log(response.data);
                 commit("setState", response.data);
                 resolve();
@@ -46,7 +46,7 @@ const actions = {
     },
     getPlans({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("so/plans").then((response) => {
+            axios.post("so/plans").then((response) => {
                 // console.log(response.data);
                 commit("setPlans", response.data);
                 resolve();

@@ -13,25 +13,25 @@ class NotificationService extends CoreService
     /**
      * Sent Notification.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function send($request)
+    public function send($payload)
     {
-        if ($request->receiver == '*') $receiver = User::all();
+        if ($payload->receiver == '*') $receiver = User::all();
         else {
-            $codes = (array) explode(",", $request->receiver);
+            $codes = (array) explode(",", $payload->receiver);
             $receiver = User::whereIn('code', $codes)->get();
         }
         $params = [
             'event' => 'received-notification',
-            'title' => $request->title,
-            'body' => $request->body,
+            'title' => $payload->title,
+            'body' => $payload->body,
         ];
-        if (isset($request->image)) $params['image'] = $request->image;
-        if (isset($request->actions)) {
+        if (isset($payload->image)) $params['image'] = $payload->image;
+        if (isset($payload->actions)) {
             $params['actions'] = [];
-            foreach ($request->actions as $action) {
+            foreach ($payload->actions as $action) {
                 if (isset($action)) {
                     list($title, $url) = explode(",", $action);
                     $params['actions'][] = array(

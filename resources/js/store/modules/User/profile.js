@@ -83,7 +83,7 @@ const actions = {
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("profile", param).then((response) => {
+            axios.post("profile/save", param).then((response) => {
                 resolve(response.data.isOk);
                 dispatch("auth/check", true, { root: true });
                 commit("setState", param);
@@ -99,7 +99,7 @@ const actions = {
     },
     getProfile({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.get("profile").then((response) => {
+            axios.post("profile").then((response) => {
                 commit("setState", response.data);
                 resolve(response.data);
             });

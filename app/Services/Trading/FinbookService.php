@@ -12,11 +12,11 @@ class FinbookService extends CoreService
     /**
      * Return all the Finbooks
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function fetch($request)
+    public function fetch($payload)
     {
         $finbooks = Finbook::orderBy('display', 'asc')->get();
         return $finbooks;
@@ -25,13 +25,13 @@ class FinbookService extends CoreService
     /**
      * Save
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function save($request)
+    public function save($payload)
     {
-        return $this->transaction(function () use ($request) {
-            foreach ($request->changes as $change) {
+        return $this->transaction(function () use ($payload) {
+            foreach ($payload->changes as $change) {
                 $response = [];
                 switch ($change['type']) {
                     case 'insert':
@@ -76,11 +76,11 @@ class FinbookService extends CoreService
     /**
      * Get Finbooks Name
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function getFinbooksName($request)
+    public function getFinbooksName($payload)
     {
         $finbooks = Finbook::select('id', 'name')->orderBy('display', 'asc')->get();
         return $finbooks;
@@ -89,32 +89,32 @@ class FinbookService extends CoreService
     /**
      * Update Balance
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function updateBalance($request)
+    public function updateBalance($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $finbook = Finbook::find($request->id);
-            $lastTransaction = $request->input($request->type)['content'];
-            switch ($request->type) {
+        return $this->transaction(function () use ($payload) {
+            $finbook = Finbook::find($payload->id);
+            $lastTransaction = $payload->input($payload->type)['content'];
+            switch ($payload->type) {
                 case 'deposit':
-                    $balance = $finbook->balance + $request->deposit['money'];
+                    $balance = $finbook->balance + $payload->deposit['money'];
                     break;
                 case 'withdraw':
-                    $balance = $finbook->balance - $request->withdraw['money'];
+                    $balance = $finbook->balance - $payload->withdraw['money'];
                     break;
                 case 'transfer':
-                    $balance = $finbook->balance - $request->transfer['money'];
-                    $reciever = Finbook::find($request->transfer['receiverId']);
+                    $balance = $finbook->balance - $payload->transfer['money'];
+                    $reciever = Finbook::find($payload->transfer['receiverId']);
                     $reciever->update([
-                        'balance' => $reciever->balance + $request->transfer['money'],
+                        'balance' => $reciever->balance + $payload->transfer['money'],
                         'last_transaction' => '[' . $finbook->name . ' =>] ' . $lastTransaction
                     ]);
                     $lastTransaction = '[=> ' . $reciever->name . '] ' . $lastTransaction;
                     break;
                 case 'adjustment':
-                    $balance = $request->adjustment['money'];
+                    $balance = $payload->adjustment['money'];
                     break;
             }
             $isOk = $finbook->update([

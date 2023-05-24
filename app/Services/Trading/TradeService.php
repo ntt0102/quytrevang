@@ -26,10 +26,10 @@ class TradeService extends CoreService
      *
      * @return array
      */
-    public function getChart($request)
+    public function getChart($payload)
     {
-        $period = $request->period;
-        $page = (int) $request->page;
+        $period = $payload->period;
+        $page = (int) $payload->page;
         $charts = $this->createChartData($period, $page);
         return [
             'period' => $period,
@@ -148,7 +148,7 @@ class TradeService extends CoreService
      *
      * @return array
      */
-    public function getSummary($request)
+    public function getSummary($payload)
     {
         return [
             'day' => $this->calculateSummary('day'),
@@ -181,13 +181,13 @@ class TradeService extends CoreService
     /**
      * Save trade data
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function save($request)
+    public function save($payload)
     {
-        return $this->transaction(function () use ($request) {
-            foreach ($request->changes as $change) {
+        return $this->transaction(function () use ($payload) {
+            foreach ($payload->changes as $change) {
                 switch ($change->type) {
                     case 'insert':
                         $isOk = !!Trade::create((array)$change->data);
@@ -298,11 +298,11 @@ class TradeService extends CoreService
     /**
      * Validate Duplicate Date
      * 
-     * @param \$request
+     * @param \$payload
      */
-    public function validateDuplicateDate($request)
+    public function validateDuplicateDate($payload)
     {
-        $count = Trade::where('date', $request->date)->count();
+        $count = Trade::where('date', $payload->date)->count();
         return $count == 0;
     }
 }

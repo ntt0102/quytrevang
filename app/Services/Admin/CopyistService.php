@@ -13,11 +13,11 @@ class CopyistService extends CoreService
     /**
      * Return all the Methods.
      * 
-     * @param $request
+     * @param $payload
      *
      * @return array
      */
-    public function fetch($request)
+    public function fetch($payload)
     {
         $copyists = Copyist::all();
         $users = User::withTrashed()->get(['code', 'name']);
@@ -30,13 +30,13 @@ class CopyistService extends CoreService
     /**
      * Mark As Read.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function markAsRead($request)
+    public function markAsRead($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $comment = Copyist::find($request->id);
+        return $this->transaction(function () use ($payload) {
+            $comment = Copyist::find($payload->id);
             $comment->update(['read' => 1]);
         });
     }
@@ -44,13 +44,13 @@ class CopyistService extends CoreService
     /**
      * Delete.
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function delete($request)
+    public function delete($payload)
     {
-        return $this->transaction(function () use ($request) {
-            $comments = Copyist::find($request->ids);
+        return $this->transaction(function () use ($payload) {
+            $comments = Copyist::find($payload->ids);
             foreach ($comments as $comment) {
                 $path = 'public/' . (!!$comment->user_code ? md5($comment->user_code) : 'guests') . '/r/';
                 $isOk = $comment->delete();

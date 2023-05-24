@@ -12,6 +12,7 @@ class LayoutController extends CoreController
 
     public function __construct(LayoutService $layoutService)
     {
+        parent::__construct();
         $this->layoutService = $layoutService;
     }
 
@@ -24,7 +25,7 @@ class LayoutController extends CoreController
      */
     public function getNotify(Request $request)
     {
-        $data = $this->layoutService->getNotify($request);
+        $data = $this->layoutService->getNotify($this->payload);
         return $this->sendResponse($data);
     }
 }

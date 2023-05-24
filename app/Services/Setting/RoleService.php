@@ -31,13 +31,13 @@ class RoleService extends CoreService
     /**
      * Save role
      * 
-     * @param $request
+     * @param $payload
      * 
      */
-    public function save($request)
+    public function save($payload)
     {
-        return $this->transaction(function () use ($request) {
-            foreach ($request->changes as $change) {
+        return $this->transaction(function () use ($payload) {
+            foreach ($payload->changes as $change) {
                 $response = [];
                 switch ($change['type']) {
                     case 'insert':
@@ -66,10 +66,10 @@ class RoleService extends CoreService
     /**
      * Validate Duplicate Name
      * 
-     * @param \$request
+     * @param \$payload
      */
-    public function validateDuplicateName($request)
+    public function validateDuplicateName($payload)
     {
-        return  Role::where('name', $request["name"])->count() == 0;
+        return  Role::where('name', $payload["name"])->count() == 0;
     }
 }
