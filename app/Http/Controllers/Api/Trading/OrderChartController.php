@@ -82,7 +82,7 @@ class OrderChartController extends CoreController
     }
 
     /**
-     * Execute Order
+     * Set Vps Session
      *
      * @param \Illuminate\Http\Request $request
      * 
