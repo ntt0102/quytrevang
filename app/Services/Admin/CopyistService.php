@@ -28,40 +28,44 @@ class CopyistService extends CoreService
     }
 
     /**
-     * Mark As Read.
+     * Validate Duplicate User
      * 
      * @param $payload
-     * 
      */
-    public function markAsRead($payload)
+    public function validateUser($payload)
     {
-        return $this->transaction(function () use ($payload) {
-            $comment = Copyist::find($payload->id);
-            $comment->update(['read' => 1]);
-        });
+        return Copyist::where('user_code', $payload->userCode)->count() == 0;
     }
 
     /**
-     * Delete.
+     * Save
      * 
      * @param $payload
      * 
      */
-    public function delete($payload)
+    public function save($payload)
     {
         return $this->transaction(function () use ($payload) {
-            $comments = Copyist::find($payload->ids);
-            foreach ($comments as $comment) {
-                $path = 'public/' . (!!$comment->user_code ? md5($comment->user_code) : 'guests') . '/r/';
-                $isOk = $comment->delete();
-                if ($isOk && !!$comment->images) {
-                    foreach ($comment->images as $image) {
-                        if (Storage::exists($path . $image)) Storage::delete($path . $image);
-                    }
+            foreach ($payload->changes as $change) {
+                switch ($change->type) {
+                    case 'insert':
+                        unset($change->data->id);
+                        $response['isOk'] = !!Copyist::create((array)$change->data);
+                        break;
+
+                    case 'update':
+                        $copyist = Copyist::find($change->key);
+                        $response['isOk'] = $copyist->update((array)$change->data);
+                        break;
+
+                    case 'remove':
+                        $copyist = Copyist::find($change->key);
+                        $response['isOk'] = $copyist->delete();
+                        break;
                 }
-                if (!$isOk) break;
+                if (!$response['isOk']) break;
             }
-            return ['isOk' => $isOk];
+            return $response;
         });
     }
 }

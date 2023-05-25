@@ -71,7 +71,7 @@ class NotificationController extends CoreController
     {
         $data = $this->notificationService->dismiss($request, $id);
         if ($data['isOk'])
-            return $this->sendResponse();
+            return $this->sendResponse(true);
         else {
             return $this->sendError($data['msg'], $data['code']);
         }

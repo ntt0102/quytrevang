@@ -28,7 +28,6 @@
             @contentReady="
                 $mf.dataGridPreload(state.gridData, dataGridRef.instance)
             "
-            @init-new-row="onInitNewRow"
             @toolbar-preparing="onToolbarPreparing"
             @saved="onSave"
         >
@@ -69,49 +68,54 @@
                 :caption="$t('admin.copyists.vpsCode')"
                 :validation-rules="state.validationRules.vpsCode"
             />
-            <!--<DxColumn
-                data-field="device_limit"
-                dataType="number"
-                :header-filter="{ allowSearch: true }"
-                :caption="$t('admin.copyists.deviceLimit')"
-                :validation-rules="state.validationRules.deviceLimit"
-            />
             <DxColumn
-                data-field="started_at"
-                data-type="date"
-                :editor-options="{
-                    dateSerializationFormat: $mc.DX_SERVER_DATE_FORMAT,
-                }"
-                :caption="$t('admin.copyists.startedAt')"
+                data-field="allow_share"
+                dataType="boolean"
+                :header-filter="{ allowSearch: true }"
+                :caption="$t('admin.copyists.allowShare')"
             />
             <DxColumn
                 :visible="false"
-                data-field="devices"
-                dataType="string"
+                data-field="volume"
+                dataType="number"
                 :header-filter="{ allowSearch: true }"
-                :caption="$t('admin.copyists.devices')"
-            /> -->
+                :caption="$t('admin.copyists.volume')"
+            />
+            <DxColumn
+                :visible="false"
+                data-field="allow_max_vol"
+                dataType="boolean"
+                :header-filter="{ allowSearch: true }"
+                :caption="$t('admin.copyists.allowMaxVol')"
+            />
+            <DxColumn
+                :visible="false"
+                data-field="allow_copy"
+                dataType="boolean"
+                :header-filter="{ allowSearch: true }"
+                :caption="$t('admin.copyists.allowCopy')"
+            />
             <template #commandCellTemplate="{ data }">
                 <DxToolbar
                     :items="[
-                        {
-                            locateInMenu: 'auto',
-                            showText: 'inMenu',
-                            location: 'center',
-                            widget: 'dxButton',
-                            options: {
-                                type: 'default',
-                                icon: 'far fa-empty-set small',
-                                hint: $t('admin.copyists.clearDevices'),
-                                text: $t('admin.copyists.clearDevices'),
-                                onClick: () =>
-                                    dataGridRef.instance.cellValue(
-                                        data.rowIndex,
-                                        'devices',
-                                        []
-                                    ),
-                            },
-                        },
+                        // {
+                        //     locateInMenu: 'auto',
+                        //     showText: 'inMenu',
+                        //     location: 'center',
+                        //     widget: 'dxButton',
+                        //     options: {
+                        //         type: 'default',
+                        //         icon: 'far fa-empty-set small',
+                        //         hint: $t('admin.copyists.clearDevices'),
+                        //         text: $t('admin.copyists.clearDevices'),
+                        //         onClick: () =>
+                        //             dataGridRef.instance.cellValue(
+                        //                 data.rowIndex,
+                        //                 'devices',
+                        //                 []
+                        //             ),
+                        //     },
+                        // },
                         {
                             locateInMenu: 'auto',
                             showText: 'inMenu',
@@ -143,6 +147,7 @@ import { toast } from "vue3-toastify";
 
 const store = useStore();
 const { t } = useI18n();
+const bus = inject("bus");
 const mt = inject("mt");
 const mf = inject("mf");
 const dataGridRef = ref(null);
@@ -167,20 +172,6 @@ const state = reactive({
                 message: t("admin.copyists.vpsCode") + mt.validations.required,
             },
         ],
-        lastTransaction: [
-            {
-                type: "deviceLimit",
-                message:
-                    t("admin.copyists.deviceLimit") + mt.validations.required,
-            },
-        ],
-        startedAt: [
-            {
-                type: "required",
-                message:
-                    t("admin.copyists.startedAt") + mt.validations.required,
-            },
-        ],
     },
 });
 const users = computed(() => store.state.adminCopyist.users);
@@ -195,23 +186,19 @@ watch(
 );
 
 function onSave(e) {
-    bus.emit("checkPin", () =>
-        store.dispatch("adminCopyist/save", { changes: e.changes })
-    );
-}
-function onInitNewRow(e) {
-    e.data.last_transaction = t("admin.copyists.openNewBook");
+    console.log("onSave", e);
+    bus.emit("checkPin", () => store.dispatch("adminCopyist/save", e));
 }
 function onToolbarPreparing(e) {
-    e.toolbarOptions.items.unshift({
-        location: "before",
-        widget: "dxButton",
-        options: {
-            icon: "far fa-tags small",
-            hint: t("admin.copyists.pricePlans"),
-            onClick: () => {},
-        },
-    });
+    // e.toolbarOptions.items.unshift({
+    //     location: "before",
+    //     widget: "dxButton",
+    //     options: {
+    //         icon: "far fa-tags small",
+    //         hint: t("admin.copyists.pricePlans"),
+    //         onClick: () => {},
+    //     },
+    // });
 }
 </script>
 <style lang="scss"></style>

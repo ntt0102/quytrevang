@@ -105,8 +105,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 });
                 Route::group(['prefix' => 'copyists', 'middleware' => 'can:copyists@control'], function () {
                     Route::post('/', 'CopyistController@fetch');
-                    Route::post('validate-user', 'CopyistController@markAsRead');
-                    Route::post('delete', 'CopyistController@delete');
+                    Route::post('validate-user', 'CopyistController@validateUser');
+                    Route::post('save', 'CopyistController@save');
                 });
                 Route::group(['prefix' => 'comments', 'middleware' => 'can:comments@control'], function () {
                     Route::post('/', 'CommentController@fetch');

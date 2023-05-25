@@ -19,7 +19,7 @@ class PushSubscriptionService extends CoreService
      */
     public function subscribe($payload)
     {
-        request()->user()->updatePushSubscription(
+        return request()->user()->updatePushSubscription(
             $payload->endpoint,
             $payload->key,
             $payload->token
@@ -34,6 +34,6 @@ class PushSubscriptionService extends CoreService
      */
     public function unsubscribe($payload)
     {
-        request()->user()->deletePushSubscription($payload->endpoint);
+        return request()->user()->deletePushSubscription($payload->endpoint);
     }
 }

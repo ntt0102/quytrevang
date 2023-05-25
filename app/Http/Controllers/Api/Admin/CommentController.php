@@ -39,8 +39,8 @@ class CommentController extends CoreController
      */
     public function markAsRead(Request $request)
     {
-        $this->commentService->markAsRead($this->payload);
-        return $this->sendResponse();
+        $data = $this->commentService->markAsRead($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**

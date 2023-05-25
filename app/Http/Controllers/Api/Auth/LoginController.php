@@ -77,8 +77,8 @@ class LoginController extends CoreController
      */
     public function logout(Request $request)
     {
-        $this->loginService->logout($this->payload);
-        return $this->sendResponse();
+        $data = $this->loginService->logout($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**

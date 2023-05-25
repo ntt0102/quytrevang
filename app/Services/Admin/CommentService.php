@@ -41,7 +41,7 @@ class CommentService extends CoreService
     {
         return $this->transaction(function () use ($payload) {
             $comment = Comment::find($payload->id);
-            $comment->update(['read' => 1]);
+            return $comment->update(['read' => 1]);
         });
     }
 

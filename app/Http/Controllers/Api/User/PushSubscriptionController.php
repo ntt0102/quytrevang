@@ -25,8 +25,8 @@ class PushSubscriptionController extends CoreController
      */
     public function subscribe(Request $request)
     {
-        $this->pushSubscriptionService->subscribe($this->payload);
-        return $this->sendResponse();
+        $data = $this->pushSubscriptionService->subscribe($this->payload);
+        return $this->sendResponse($data);
     }
 
     /**
@@ -38,7 +38,7 @@ class PushSubscriptionController extends CoreController
      */
     public function unsubscribe(Request $request)
     {
-        $this->pushSubscriptionService->unsubscribe($this->payload);
-        return $this->sendResponse();
+        $data = $this->pushSubscriptionService->unsubscribe($this->payload);
+        return $this->sendResponse($data);
     }
 }

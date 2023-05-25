@@ -19,8 +19,8 @@ const actions = {
         });
     },
     validateDuplicateUser({ state, rootGetters }, param) {
-        const oldSo = state.sos.find((x) => x.id === param.data.id);
-        if (!!oldSo && param.value == oldSo.user_code)
+        const oldCopyist = state.copyists.find((x) => x.id === param.data.id);
+        if (!!oldCopyist && param.value == oldCopyist.user_code)
             return Promise.resolve(true);
         return new Promise((resolve, reject) => {
             axios
@@ -37,11 +37,13 @@ const actions = {
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("copyist/save", param).then((response) => {
-                // console.log(response.data);
-                resolve();
-                if (response.data.isOk) dispatch("getCopyists");
-            });
+            axios
+                .post("copyists/save", { changes: param.changes })
+                .then((response) => {
+                    // console.log(response.data);
+                    resolve();
+                    if (response.data.isOk) dispatch("getCopyists");
+                });
         });
     },
     getPlans({ commit, dispatch, getters, state, rootGetters }) {

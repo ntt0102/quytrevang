@@ -26,35 +26,32 @@ class CopyistController extends CoreController
     public function fetch(Request $request)
     {
         $data = $this->copyistService->fetch($this->payload);
-        // return $this->sendResponse($data);
-        return $this->sendResponse($this->payload);
-        // return $this->sendResponse($request->tho);
+        return $this->sendResponse($data);
     }
 
     /**
-     * Mark As Read.
-     *
-     * @param Illuminate\Http\Request $request
-     * @param int $id
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function markAsRead(Request $request)
-    {
-        $this->copyistService->markAsRead($this->payload);
-        return $this->sendResponse();
-    }
-
-    /**
-     * Delete
+     * Validate User
      *
      * @param \Illuminate\Http\Request $request
      * 
      * @return \Illuminate\Http\Response
      */
-    public function delete(Request $request)
+    public function validateUser(Request $request)
     {
-        $data = $this->copyistService->delete($this->payload);
-        return $this->fetch($this->payload);
+        $data = $this->copyistService->validateUser($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Save
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function save(Request $request)
+    {
+        $data = $this->copyistService->save($this->payload);
+        return $this->sendResponse($data);
     }
 }
