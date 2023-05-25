@@ -34,6 +34,16 @@ class CoreController extends Controller
     }
 
     /**
+     * success response method.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    protected function sendResponseWithoutEncrypt($response = null, $code = 200)
+    {
+        return response()->json($response, $code);
+    }
+
+    /**
      * image response method.
      *
      * @return \Illuminate\Http\Response
