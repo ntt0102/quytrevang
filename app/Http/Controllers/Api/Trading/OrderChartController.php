@@ -90,7 +90,7 @@ class OrderChartController extends CoreController
      */
     public function setCopyistSession(Request $request)
     {
-        $data = $this->orderChartService->setCopyistSession($this->payload);
+        $data = $this->orderChartService->setCopyistSession($request);
         return $this->sendResponse($data);
     }
 }
