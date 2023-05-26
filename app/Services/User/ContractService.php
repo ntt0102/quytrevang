@@ -51,12 +51,12 @@ class ContractService extends CoreService
             $userCode = request()->user()->code;
             foreach ($payload->changes as $change) {
                 $response = [];
-                switch ($change['type']) {
+                switch ($change->type) {
                     case 'insert':
                         $data = [
                             "code" => Contract::generateUniqueCode(),
                             "user_code" => $userCode,
-                            "principal" => $change['data']['principal'],
+                            "principal" => $change->data->principal,
                             "interest_rate" => Parameter::getValue('interestRate', '0.005'),
                             "paid_at" => date('Y-m-d'),
                         ];
@@ -70,22 +70,22 @@ class ContractService extends CoreService
                         break;
 
                     case 'update':
-                        $contract = Contract::find($change['key']);
+                        $contract = Contract::where('code', $change->key)->first();
                         if ($contract->user_code == $userCode || $contract->status == 1) {
-                            $data = ["principal" => $change['data']['principal']];
+                            $data = ["principal" => $change->data->principal];
                             $response['isOk'] =  $contract->update($data);
                         } else $response = ['isOk' => false, 'message' => 'forbidden'];
                         break;
 
                     case 'remove':
-                        $contract = Contract::find($change['key']);
+                        $contract = Contract::where('code', $change->key)->first();
                         if ($contract->user_code == $userCode || $contract->status == 1) {
                             $response['isOk'] = $contract->delete();
                         } else $response = ['isOk' => false, 'message' => 'forbidden'];
                         break;
                 }
                 if (!$response['isOk']) break;
-                else $response['type'] = $change['type'];
+                else $response['type'] = $change->type;
             }
             return $response;
         });

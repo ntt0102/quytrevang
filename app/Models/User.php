@@ -26,7 +26,6 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $guard_name = 'api';
 
     protected $visible = [
-        'id',
         'code',
         'name',
         'email',

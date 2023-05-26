@@ -39,21 +39,21 @@ class RoleService extends CoreService
         return $this->transaction(function () use ($payload) {
             foreach ($payload->changes as $change) {
                 $response = [];
-                switch ($change['type']) {
+                switch ($change->type) {
                     case 'insert':
-                        $role = Role::create(["name" => $change['data']['name'], 'guard_name' => 'web']);
-                        $role->syncPermissions($change['data']['permissions']);
+                        $role = Role::create(["name" => $change->data->name, 'guard_name' => 'web']);
+                        $role->syncPermissions($change->data->permissions);
                         $response['isOk'] = !!$role;
                         break;
 
                     case 'update':
-                        $role = Role::find($change['key']);
-                        $response['isOk'] = $role->update(["name" => $change['data']['name']]);
-                        $role->syncPermissions($change['data']['permissions']);
+                        $role = Role::find($change->key);
+                        $response['isOk'] = $role->update(["name" => $change->data->name]);
+                        $role->syncPermissions($change->data->permissions);
                         break;
 
                     case 'remove':
-                        $role = Role::find($change['key']);
+                        $role = Role::find($change->key);
                         $response['isOk'] = $role->delete();
                         break;
                 }

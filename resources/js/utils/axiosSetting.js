@@ -7,7 +7,7 @@ import config from "devextreme/core/config";
 
 axios.interceptors.request.use(
     (config) => {
-        console.log("request:" + config.method + "/" + config.url);
+        console.log("request:" + config.url, config.data);
         const token = store.state.auth.token;
         if (!!token) config.headers["Authorization"] = `Bearer ${token}`;
         if (config.method === "post" && !config.noLoading) {
@@ -26,10 +26,7 @@ axios.interceptors.response.use(
     (response) => {
         store.dispatch("setSyncing", false);
         response.data = crypto.decrypt(response.data);
-        console.log(
-            "response:" + response.config.method + "/" + response.config.url,
-            response.data
-        );
+        console.log("response:" + response.config.url, response.data);
         if (!response.config.notify && response.data.hasOwnProperty("isOk")) {
             if (response.data.isOk) {
                 if (response.data.hasOwnProperty("message")) {

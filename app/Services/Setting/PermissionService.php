@@ -32,19 +32,19 @@ class PermissionService extends CoreService
         return $this->transaction(function () use ($payload) {
             foreach ($payload->changes as $change) {
                 $response = [];
-                switch ($change['type']) {
+                switch ($change->type) {
                     case 'insert':
-                        $permission = Permission::create(["name" => $change['data']['name'], 'guard_name' => 'web']);
+                        $permission = Permission::create(["name" => $change->data->name, 'guard_name' => 'web']);
                         $response['isOk'] = !!$permission;
                         break;
 
                     case 'update':
-                        $permission = Permission::find($change['key']);
-                        $response['isOk'] = $permission->update(["name" => $change['data']['name']]);
+                        $permission = Permission::find($change->key);
+                        $response['isOk'] = $permission->update(["name" => $change->data->name]);
                         break;
 
                     case 'remove':
-                        $permission = Permission::find($change['key']);
+                        $permission = Permission::find($change->key);
                         $response['isOk'] = $permission->delete();
                         break;
                 }

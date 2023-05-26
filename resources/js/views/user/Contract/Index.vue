@@ -4,7 +4,7 @@
             ref="dataGridRef"
             :column-min-width="40"
             :data-source="state.gridData"
-            key-expr="id"
+            key-expr="code"
             :show-borders="true"
             :column-auto-width="true"
             :allow-column-reordering="true"

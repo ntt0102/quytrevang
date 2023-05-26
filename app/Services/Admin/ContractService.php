@@ -45,27 +45,27 @@ class ContractService extends CoreService
         return $this->transaction(function () use ($payload) {
             foreach ($payload->changes as $change) {
                 $response = [];
-                switch ($change['type']) {
+                switch ($change->type) {
                     case 'insert':
                         $data = [
                             "code" => Contract::generateUniqueCode(),
-                            "user_code" => $change['data']['user_code'],
-                            "principal" => $change['data']['principal'],
-                            "interest_rate" => $change['data']['interest_rate'],
-                            "paid_at" => $change['data']['paid_at'],
+                            "user_code" => $change->data->user_code,
+                            "principal" => $change->data->principal,
+                            "interest_rate" => $change->data->interest_rate,
+                            "paid_at" => $change->data->paid_at,
                         ];
-                        if (array_key_exists('advance', $change['data'])) {
-                            $data["advance"] = $change['data']['advance'];
+                        if (array_key_exists('advance', $change->data)) {
+                            $data["advance"] = $change->data->advance;
                         }
-                        if (array_key_exists('withdrawn_at', $change['data'])) {
-                            $data["withdrawn_at"] = $change['data']['withdrawn_at'];
+                        if (array_key_exists('withdrawn_at', $change->data)) {
+                            $data["withdrawn_at"] = $change->data->withdrawn_at;
                         }
                         $contract = Contract::create($data);
                         $response['isOk'] = !!$contract;
                         break;
 
                     case 'update':
-                        $contract = Contract::find($change['key']);
+                        $contract = Contract::where('code', $change->key)->first();
                         if ($contract->status <= 3 || request()->user()->can('system@control')) {
                             $data = [];
                             $isUnconfirmed = false;
@@ -73,16 +73,16 @@ class ContractService extends CoreService
                                 $isUnconfirmed = true;
                                 $oldUserCode = $contract->user_code;
                                 $data = array_merge($data, [
-                                    "user_code" => $change['data']['user_code'],
-                                    "principal" => $change['data']['principal'],
-                                    "interest_rate" => $change['data']['interest_rate'],
-                                    "paid_at" => $change['data']['paid_at'],
+                                    "user_code" => $change->data->user_code,
+                                    "principal" => $change->data->principal,
+                                    "interest_rate" => $change->data->interest_rate,
+                                    "paid_at" => $change->data->paid_at,
                                 ]);
                             }
                             if (in_array($contract->status, [2, 3]))
                                 $data = array_merge($data, [
-                                    "advance" => $change['data']['advance'],
-                                    "withdrawn_at" => $change['data']['withdrawn_at'],
+                                    "advance" => $change->data->advance,
+                                    "withdrawn_at" => $change->data->withdrawn_at,
                                 ]);
                             //
                             $isOk = $contract->update($data);
@@ -107,7 +107,7 @@ class ContractService extends CoreService
                         break;
 
                     case 'remove':
-                        $contract = Contract::find($change['key']);
+                        $contract = Contract::where('code', $change->key)->first();
                         if ($contract->status == 1 || request()->user()->can('system@control')) {
                             $isOk = $contract->delete();
                             if ($isOk) {

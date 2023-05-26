@@ -32,12 +32,12 @@ class FaqService extends CoreService
         return $this->transaction(function () use ($payload) {
             foreach ($payload->changes as $change) {
                 $response = [];
-                switch ($change['type']) {
+                switch ($change->type) {
                     case 'insert':
                         $data = [
-                            "topic" => $change['data']['topic'],
-                            "question" => $change['data']['question'],
-                            "answer" => $change['data']['answer']
+                            "topic" => $change->data->topic,
+                            "question" => $change->data->question,
+                            "answer" => $change->data->answer
                         ];
                         $faq = Faq::create($data);
                         $response['isOk'] = !!$faq;
@@ -45,16 +45,16 @@ class FaqService extends CoreService
 
                     case 'update':
                         $data = [
-                            "topic" => $change['data']['topic'],
-                            "question" => $change['data']['question'],
-                            "answer" => $change['data']['answer']
+                            "topic" => $change->data->topic,
+                            "question" => $change->data->question,
+                            "answer" => $change->data->answer
                         ];
-                        $faq = Faq::find($change['key']);
+                        $faq = Faq::find($change->key);
                         $response['isOk'] = $faq->update($data);
                         break;
 
                     case 'remove':
-                        $faq = Faq::find($change['key']);
+                        $faq = Faq::find($change->key);
                         $response['isOk'] = $faq->delete();
                         break;
                 }

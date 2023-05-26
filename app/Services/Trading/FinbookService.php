@@ -33,13 +33,13 @@ class FinbookService extends CoreService
         return $this->transaction(function () use ($payload) {
             foreach ($payload->changes as $change) {
                 $response = [];
-                switch ($change['type']) {
+                switch ($change->type) {
                     case 'insert':
                         $data = [
-                            "display" => $change['data']['display'],
-                            "name" => $change['data']['name'],
-                            "balance" => $change['data']['balance'],
-                            "last_transaction" => $change['data']['last_transaction']
+                            "display" => $change->data->display,
+                            "name" => $change->data->name,
+                            "balance" => $change->data->balance,
+                            "last_transaction" => $change->data->last_transaction
                         ];
                         $finbook = Finbook::create($data);
                         $isOk = !!$finbook;
@@ -48,12 +48,12 @@ class FinbookService extends CoreService
                         break;
 
                     case 'update':
-                        $finbook = Finbook::find($change['key']);
+                        $finbook = Finbook::find($change->key);
                         $data = [
-                            "display" => $change['data']['display'],
-                            "name" => $change['data']['name'],
-                            "balance" => $change['data']['balance'],
-                            "last_transaction" => $change['data']['last_transaction']
+                            "display" => $change->data->display,
+                            "name" => $change->data->name,
+                            "balance" => $change->data->balance,
+                            "last_transaction" => $change->data->last_transaction
                         ];
                         $hasChangedBalance = $data["balance"] != $finbook->balance;
                         $isOk = $finbook->update($data);
@@ -62,7 +62,7 @@ class FinbookService extends CoreService
                         break;
 
                     case 'remove':
-                        $finbook = Finbook::find($change['key']);
+                        $finbook = Finbook::find($change->key);
                         $isOk = $finbook->delete();
                         $response['isOk'] = $isOk;
                         break;

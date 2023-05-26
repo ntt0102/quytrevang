@@ -33,11 +33,11 @@ class ParameterService extends CoreService
             $response = [];
             foreach ($payload->changes as $change) {
                 $response = [];
-                if ($change['type'] == 'update') {
+                if ($change->type == 'update') {
                     $data = [
-                        "value" => $change['data']['value'],
+                        "value" => $change->data->value,
                     ];
-                    $parameter = Parameter::find($change['key']);
+                    $parameter = Parameter::find($change->key);
                     $response['isOk'] = $parameter->update($data);
                 }
                 if (!$response['isOk']) break;

@@ -48,45 +48,45 @@ class UserService extends CoreService
         return $this->transaction(function () use ($payload) {
             foreach ($payload->changes as $change) {
                 $response = [];
-                if (in_array($change['type'], ["insert", "update"])) {
+                if (in_array($change->type, ["insert", "update"])) {
                     $data = [
-                        "name" => $change['data']['name'],
-                        "sex" => $change['data']['sex'],
-                        "birthday" => $change['data']['birthday'],
-                        "identity" => $change['data']['identity'],
-                        "phone" => $change['data']['phone'],
-                        "email" => $change['data']['email'],
-                        "address" => $change['data']['address'],
-                        "bank_account" => $change['data']['bank_account'],
+                        "name" => $change->data->name,
+                        "sex" => $change->data->sex,
+                        "birthday" => $change->data->birthday,
+                        "identity" => $change->data->identity,
+                        "phone" => $change->data->phone,
+                        "email" => $change->data->email,
+                        "address" => $change->data->address,
+                        "bank_account" => $change->data->bank_account,
                     ];
                 }
-                switch ($change['type']) {
+                switch ($change->type) {
                     case 'insert':
                         $data = array_merge($data, [
                             'code' => User::generateUniqueCode(),
-                            "password" => bcrypt($change['data']['phone']),
+                            "password" => bcrypt($change->data->phone),
                         ]);
                         $user = User::create($data);
                         if (request()->user()->can('system@control')) {
-                            $user->syncRoles($change['data']['roles']);
-                            $user->syncPermissions($change['data']['permissions']);
+                            $user->syncRoles($change->data->roles);
+                            $user->syncPermissions($change->data->permissions);
                         } else $user->assignRole('user');
                         $response['isOk'] = !!$user;
                         break;
 
                     case 'update':
-                        $user = User::where('code', $change['key'])->first();
+                        $user = User::where('code', $change->key)->first();
                         if ($user->level <= 4 || request()->user()->can('system@control')) {
                             $response['isOk'] = $user->update($data);
                             if (request()->user()->can('system@control')) {
-                                $user->syncRoles($change['data']['roles']);
-                                $user->syncPermissions($change['data']['permissions']);
+                                $user->syncRoles($change->data->roles);
+                                $user->syncPermissions($change->data->permissions);
                             }
                         } else $response = ['isOk' => false, 'message' => 'forbidden'];
                         break;
 
                     case 'remove':
-                        $user = User::where('code', $change['key'])->first();
+                        $user = User::where('code', $change->key)->first();
                         if ($user->level <= 6) {
                             $response['isOk'] = $user->delete();
                         } else $response = ['isOk' => false, 'message' => 'hasOpeningContract', 'param' => $user->code];
@@ -108,18 +108,18 @@ class UserService extends CoreService
     {
         return $this->transaction(function () use ($payload) {
             foreach ($payload->changes as $change) {
-                switch ($change['type']) {
+                switch ($change->type) {
                     case 'update':
-                        User::withTrashed()->findOrFail($change['key'])->restore();
+                        User::withTrashed()->findOrFail($change->key)->restore();
                         break;
 
                     case 'remove':
-                        $user = User::withTrashed()->findOrFail($change['key']);
+                        $user = User::withTrashed()->findOrFail($change->key);
                         $path = 'public/' . md5($user->code);
                         if (Storage::exists($path)) {
                             Storage::deleteDirectory($path);
                         }
-                        User::withTrashed()->findOrFail($change['key'])->forceDelete();
+                        User::withTrashed()->findOrFail($change->key)->forceDelete();
                         break;
                 }
             }

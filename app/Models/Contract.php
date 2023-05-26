@@ -7,7 +7,6 @@ use App\Models\CoreModel;
 class Contract extends CoreModel
 {
     protected $visible = [
-        'id',
         'code',
         'user_code',
         'principal',
