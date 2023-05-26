@@ -40,7 +40,8 @@ class VpsOrderService extends CoreService
         $rsp = json_decode($res->getBody());
         if (!$rsp) return;
         $this->connection = $rsp->rc == 1;
-        $this->position = $rsp->rc == 1 ? (count($rsp->data) ? intval($rsp->data[0]->net) : 0) : 0;
+        if ($this->connection && count($rsp->data))
+            $this->position = intval($rsp->data[0]->net);
     }
 
     public function getAccountInfo()
@@ -129,9 +130,9 @@ class VpsOrderService extends CoreService
                 "orderId" => $this->copyist->{$type . '_order_id'},
                 "channel" => "H",
                 "priceType" => "MTL",
-                "quantity" => strval($this->copyist->volume),
-                "relation" => $isNotDelete ? $this->formatRelation($data->side) : "",
-                "side" => $isNew ? $this->formatSide($data->side) : "",
+                "quantity" => strval($isSl ? (abs($this->position)) : $this->copyist->volume),
+                "relation" => $isNotDelete ? $this->formatRelation($isSl ? -$this->position : $data->side) : "",
+                "side" => $isNew ? $this->formatSide($isSl ? -$this->position : $data->side) : "",
                 "stopOrderType" => "stop",
                 "symbol" => $this->symbol,
                 "triggerPrice" => $isNotDelete ?  $this->formatPrice($data->price) : ""
@@ -158,9 +159,10 @@ class VpsOrderService extends CoreService
         //
         $isNotCancel = $data->cmd != "cancel";
         $price = $isNotCancel ? $this->formatPrice($data->price) : "";
-        $side = $isNew ? $this->formatSide($data->side) : "";
+        $side = $isNew ? $this->formatSide(-$this->position) : "";
         $account = $this->formatAccount();
         $refId = $this->createRefId();
+        $volume = abs($this->position);
         $payload = [
             "group" => "FD",
             "user" => $this->copyist->vps_code,
@@ -177,8 +179,8 @@ class VpsOrderService extends CoreService
                 "price" => $price,
                 "nprice" => $price,
                 "side" => $side,
-                "volume" => $this->copyist->volume,
-                "nvol" => $this->copyist->volume,
+                "volume" => $volume,
+                "nvol" => $volume,
                 "symbol" => $this->symbol,
                 "advance" => "",
                 "refId" => $refId,
@@ -211,14 +213,14 @@ class VpsOrderService extends CoreService
 
     public function formatSide($side)
     {
-        if ($side == -1) return "S";
-        if ($side == 1) return "B";
+        if ($side < 0) return "S";
+        if ($side > 0) return "B";
     }
 
     public function formatRelation($side)
     {
-        if ($side == -1) return "LTEQ";
-        if ($side == 1) return "GTEQ";
+        if ($side < 0) return "LTEQ";
+        if ($side > 0) return "GTEQ";
     }
 
     public function createRefId()
