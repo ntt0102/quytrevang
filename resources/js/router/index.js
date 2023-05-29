@@ -41,8 +41,10 @@ router.beforeEach(async (to, from, next) => {
         if (isLoggedin) {
             const permissions = store.state.auth.user.permissions;
             if (
-                (!!to.meta.permission &&
-                    !permissions.includes(to.meta.permission)) ||
+                (!!to.meta.permissions &&
+                    !permissions.some((p) =>
+                        to.meta.permissions.includes(p)
+                    )) ||
                 !to.meta.auth
             )
                 nextRoute.name = "overview";

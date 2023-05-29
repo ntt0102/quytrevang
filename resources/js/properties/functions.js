@@ -13,7 +13,7 @@ export default {
         if (error.response.status == 403)
             message = lang.global.t("messages.error.server.403");
         else if (error.response.status == 429) {
-            if (moment().diff(shown429At, "seconds") > 3) {
+            if (moment().diff(shown429At, "seconds") > 5) {
                 message = lang.global.t("messages.error.server.429");
                 shown429At = moment();
             } else message = null;

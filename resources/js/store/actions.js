@@ -103,7 +103,7 @@ export default {
         axios.post(`notifications/${id}/read`, null, { noLoading: true });
     },
     markAllRead({ commit, dispatch, getters, state, rootGetters }) {
-        if (state.layout.unreadNotificationsNumber > 0)
+        if (state.notify.notification > 0)
             axios.post(`notifications/mark-all-read`, null, {
                 noLoading: true,
             });
