@@ -104,7 +104,6 @@
             "title": "Tài khoản",
             "deletedUsers": "Tài khoản đã xóa",
             "detailUser": "Chi tiết tài khoản",
-            "signingUsers": "{count} tài khoản chờ ký hợp đồng",
             "buttons": {
                 "remove": "Xóa vĩnh viễn",
                 "revert": "Khôi phục",
@@ -129,8 +128,7 @@
             }
         },
         "contracts": {
-            "title": "Hợp đồng",
-            "confirmingContracts": "{count} hợp đồng chờ xác nhận"
+            "title": "Hợp đồng"
         },
         "copyists": {
             "title": "Sao chép",
@@ -144,7 +142,6 @@
         "comments": {
             "title": "Phản hồi",
             "markAsRead": "Đánh dấu đã đọc",
-            "unreadComments": "{count} phản hồi chưa đọc",
             "viewUser": "Xem tài khoản {code}"
         }
     },

@@ -14,7 +14,19 @@
                 expand-event="click"
                 @item-click="handleItemClick"
                 width="100%"
-            />
+            >
+                <template #item="item">
+                    <div class="item">
+                        <span class="dx-icon">
+                            <i
+                                :class="item.data.icon"
+                                :data-count="getCount(item.data.name)"
+                            />
+                        </span>
+                        <span>{{ item.data.text }}</span>
+                    </div>
+                </template>
+            </dx-tree-view>
         </div>
     </div>
 </template>
@@ -22,7 +34,7 @@
 <script setup>
 import DxTreeView from "devextreme-vue/ui/tree-view";
 import navigation from "../../../app-navigation";
-import { onMounted, ref, inject, watch } from "vue";
+import { onMounted, ref, inject, watch, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 
@@ -66,9 +78,7 @@ function forwardClick(...args) {
 }
 
 function handleItemClick(e) {
-    if (!e.itemData.name || (props.compactMode && mf.isSet(e.itemData.items))) {
-        return;
-    }
+    if (mf.isSet(e.itemData.items)) return;
     if (e.itemData.name == "refresh") window.location.reload();
     else router.push({ name: e.itemData.name });
 
@@ -109,6 +119,29 @@ watch(
         }
     }
 );
+const notify = computed(() => store.state.notify);
+console.log("notify", notify.value);
+function getCount(routeName) {
+    let count = 0;
+    switch (routeName) {
+        case "users":
+            count = notify.value.adminUser;
+            break;
+        case "contracts":
+            count = notify.value.adminContract;
+            break;
+        case "comments":
+            count = notify.value.adminComment;
+            break;
+        case "admin":
+            count =
+                notify.value.adminUser +
+                notify.value.adminContract +
+                notify.value.adminComment;
+            break;
+    }
+    return count;
+}
 </script>
 
 <style lang="scss">
@@ -215,6 +248,29 @@ watch(
             }
         }
         // ##
+    }
+
+    .item {
+        font-size: 18px;
+
+        .dx-icon {
+            position: relative;
+            .far {
+                &:not([data-count="0"]):after {
+                    position: absolute;
+                    content: attr(data-count);
+                    top: -5px;
+                    right: 5px;
+                    padding: 0px 6px 2px 6px;
+                    background: red;
+                    border-radius: 10px;
+                    color: #fff;
+                    font-size: 18px;
+                    font-weight: bold;
+                    pointer-events: none;
+                }
+            }
+        }
     }
 }
 </style>

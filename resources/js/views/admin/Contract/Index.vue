@@ -319,6 +319,7 @@ const state = reactive({
     gridData: null,
     validationRules: {},
 });
+const users = computed(() => store.state.adminContract.users);
 const permissions = computed(() => store.state.auth.user.permissions);
 let isOld = false;
 

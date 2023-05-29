@@ -22,6 +22,7 @@ export default [
     },
     {
         text: lang.global.t("admin.title"),
+        name: "admin",
         icon: "far fa-tools",
         permissions: [
             "users@control",

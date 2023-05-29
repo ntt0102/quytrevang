@@ -12,7 +12,7 @@
                 {{ item.text }}
             </li>
         </ul>
-        <!-- <ResendVerifyEmailPopup ref="resendVerifyEmailPopupRef" /> -->
+        <ResendVerifyEmailPopup ref="resendVerifyEmailPopupRef" />
         <EditProfilePopup ref="editProfilePopupRef" />
         <ChangePinPopup ref="changePinPopupRef" />
     </div>
@@ -25,10 +25,9 @@ import { useI18n } from "vue-i18n";
 import { computed, ref } from "vue";
 import ResendVerifyEmailPopup from "../../../components/Popups/ResendVerifyEmailPopup.vue";
 import EditProfilePopup from "../Profile/EditProfilePopup.vue";
-// import ChangePinPopup from "../Profile/ChangePinPopup.vue";
+import ChangePinPopup from "../Profile/ChangePinPopup.vue";
 
 const store = useStore();
-const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 
@@ -41,13 +40,13 @@ const level = computed(() => store.state.auth.user.level);
 function onLevelClick(nextLevel) {
     switch (nextLevel) {
         case 2:
-            resendVerifyEmailPopup.value.show();
+            resendVerifyEmailPopupRef.value.show();
             break;
         case 3:
-            changePinPopup.value.show();
+            changePinPopupRef.value.show();
             break;
         case 4:
-            editProfilePopup.value.show();
+            editProfilePopupRef.value.show();
             break;
         case 5:
             alert(
@@ -160,6 +159,8 @@ function onLevelClick(nextLevel) {
         }
     }
     .screen-x-small & {
+        padding-left: 80px;
+
         ul {
             width: 180px;
             margin-left: 0px;
