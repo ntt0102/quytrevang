@@ -49,8 +49,6 @@ const routeHistoryState = inject("routeHistoryState");
 
 const app = getCurrentInstance();
 
-console.log("window.screen", window.screen);
-
 const screen = reactive({
     getScreenSizeInfo: {},
     width: window.screen.width,

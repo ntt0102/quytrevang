@@ -22,7 +22,7 @@
 <script setup>
 import DxTreeView from "devextreme-vue/ui/tree-view";
 import navigation from "../../../app-navigation";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, inject, watch } from "vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 
@@ -34,9 +34,10 @@ const emit = defineEmits(["click"]);
 const route = useRoute();
 const router = useRouter();
 const store = useStore();
+const mf = inject("mf");
 
 const user = store.state.auth.user;
-const items = filter(navigation).map((item) => ({
+const items = filter(mf.cloneDeep(navigation)).map((item) => ({
     ...item,
     expanded: false,
 }));
@@ -65,7 +66,7 @@ function forwardClick(...args) {
 }
 
 function handleItemClick(e) {
-    if (!e.itemData.name || props.compactMode) {
+    if (!e.itemData.name || (props.compactMode && mf.isSet(e.itemData.items))) {
         return;
     }
     if (e.itemData.name == "refresh") window.location.reload();

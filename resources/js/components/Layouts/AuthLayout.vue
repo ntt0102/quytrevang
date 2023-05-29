@@ -21,15 +21,15 @@
                     ref="scrollViewRef"
                     class="layout-body with-footer"
                 >
-                    <!-- <div> -->
-                    <div class="content">
-                        <h2 class="content-block">
-                            {{ $route.meta.title }}
-                        </h2>
-                        <slot />
+                    <div>
+                        <div class="content">
+                            <h2 class="content-block">
+                                {{ $route.meta.title }}
+                            </h2>
+                            <slot />
+                        </div>
+                        <slot name="footer" />
                     </div>
-                    <slot name="footer" />
-                    <!-- </div> -->
                 </dx-scroll-view>
             </div>
             <template #menuTemplate>

@@ -1,5 +1,5 @@
 <template>
-    <div class="level-bar content-block">
+    <div v-if="!!level" class="level-bar content-block">
         <ul :style="{ counterReset: 'levelNumber 0' }">
             <li
                 v-for="item in $mf.getAccountLevelList()"
@@ -25,7 +25,7 @@ import { useI18n } from "vue-i18n";
 import { computed, ref } from "vue";
 import ResendVerifyEmailPopup from "../../../components/Popups/ResendVerifyEmailPopup.vue";
 import EditProfilePopup from "../Profile/EditProfilePopup.vue";
-import ChangePinPopup from "../Profile/ChangePinPopup.vue";
+// import ChangePinPopup from "../Profile/ChangePinPopup.vue";
 
 const store = useStore();
 const route = useRoute();
