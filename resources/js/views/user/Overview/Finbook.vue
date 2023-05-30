@@ -8,6 +8,7 @@
             :title="{
                 text: $t('user.overview.finbook.title'),
                 subtitle: { text: null },
+                horizontalAlignment: 'left',
             }"
             :legend="{
                 horizontalAlignment: $screen.getScreenSizeInfo.isXSmall

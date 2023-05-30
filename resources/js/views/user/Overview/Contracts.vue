@@ -27,7 +27,7 @@
             <DxDataGrid
                 ref="dataGridRef"
                 :data-source="state.gridData"
-                key-expr="id"
+                key-expr="code"
                 :show-borders="false"
                 :column-auto-width="true"
                 :allow-column-reordering="true"

@@ -8,7 +8,7 @@
                 subtitle: {
                     text: $t('user.overview.monthTrade.subtitle', [copyRate]),
                 },
-                horizontalAlignment: 'center',
+                horizontalAlignment: 'left',
             }"
             :size="{ width: '100%', height: 300 }"
             :series="[
