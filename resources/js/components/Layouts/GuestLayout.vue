@@ -1,20 +1,18 @@
 <template>
     <dx-scroll-view height="100%" width="100%" class="with-footer single-card">
-        <div>
-            <div class="dx-card content">
-                <div class="header">
-                    <img
-                        class="logo"
-                        src="../../../images/vertical-828x465.png"
-                        :alt="$appName"
-                    />
-                    <div class="title">{{ $route.meta.title }}</div>
-                    <div class="description">{{ $route.meta.description }}</div>
-                </div>
-                <slot />
+        <div class="dx-card content">
+            <div class="header">
+                <img
+                    class="logo"
+                    src="../../../images/vertical-828x465.png"
+                    :alt="$appName"
+                />
+                <div class="title">{{ $route.meta.title }}</div>
+                <div class="description">{{ $route.meta.description }}</div>
             </div>
-            <slot name="footer" />
+            <slot />
         </div>
+        <slot name="footer" />
     </dx-scroll-view>
 </template>
 
