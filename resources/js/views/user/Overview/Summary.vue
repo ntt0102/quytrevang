@@ -1,5 +1,6 @@
 <template>
-    <div class="overview-summary content-block">
+    <div class="overview-summary dx-card responsive-paddings content-block">
+        <div class="header">{{ $t("user.overview.summary.title") }}</div>
         <DxDataGrid
             ref="dataGridRef"
             :data-source="state.gridData"
@@ -14,7 +15,9 @@
             :loadPanel="{ enabled: true }"
             :summary="{
                 texts: {
-                    count: '{0} ' + $t('user.overview.userName').toLowerCase(),
+                    count:
+                        '{0} ' +
+                        $t('user.overview.summary.userName').toLowerCase(),
                     sum: '{0}',
                 },
                 totalItems: [
@@ -40,14 +43,14 @@
                 data-field="name"
                 data-type="string"
                 :header-filter="{ allowSearch: true }"
-                :caption="$t('user.overview.userName')"
+                :caption="$t('user.overview.summary.userName')"
             />
             <DxColumn
                 data-field="principal"
                 data-type="number"
                 format="#,##0 ₫"
                 :header-filter="{ allowSearch: true }"
-                :caption="$t('user.overview.asset')"
+                :caption="$t('user.overview.summary.asset')"
             />
         </DxDataGrid>
     </div>
@@ -96,6 +99,11 @@ function onCellDblClick(e) {
     }
     .dx-datagrid-rowsview .dx-row > td {
         cursor: pointer;
+    }
+
+    .dx-datagrid-total-footer {
+        border-bottom: unset !important;
+        border-top: unset !important;
     }
 }
 </style>

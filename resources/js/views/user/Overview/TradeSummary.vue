@@ -190,11 +190,6 @@ function calculateChange() {
 </script>
 <style lang="scss">
 .overview-trading {
-    .header {
-        text-align: left;
-        font-size: 20px;
-        padding-bottom: 10px;
-    }
     .body {
         display: flex;
         justify-content: space-between;

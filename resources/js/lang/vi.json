@@ -49,11 +49,6 @@
     "user": {
         "overview": {
             "title": "Tổng quan",
-            "userName": "Tài khoản",
-            "asset": "Tiền gốc",
-            "principalSum": "Tổng tiền gốc",
-            "interestSum": "Tổng tiền lãi",
-            "assetSum": "Tổng tài sản",
             "levels": {
                 "register": "Tạo tài khoản",
                 "verifyEmail": "Xác thực email",
@@ -69,6 +64,18 @@
             "finbook": {
                 "title": "Sổ tài chính",
                 "subtitle": "Tổng số dư: {0}"
+            },
+            "summary": {
+                "title": "Các tài khoản tiết kiệm",
+                "userName": "Tài khoản",
+                "asset": "Tiền gốc"
+            },
+            "contract": {
+                "sumTitle": "Tài sản tiết kiệm",
+                "principalSum": "Tổng tiền gốc",
+                "interestSum": "Tổng tiền lãi",
+                "assetSum": "Tổng tài sản",
+                "listTitle": "Các sổ tiết kiệm"
             }
         },
         "profile": {

@@ -1,29 +1,49 @@
 <template>
     <div class="overview-contracts">
         <div class="sum dx-card responsive-paddings content-block">
-            <div>
-                <div class="title">{{ $t("user.overview.assetSum") }}</div>
-                <div v-if="state.asset != null" class="currency">
-                    {{ $filters.currency(state.asset.toFixed(0)) }}
-                </div>
-                <div v-else>-</div>
+            <div class="header">
+                {{ $t("user.overview.contract.sumTitle") }}
             </div>
-            <div>
-                <div class="title">{{ $t("user.overview.principalSum") }}</div>
-                <div v-if="state.principal != null" class="currency">
-                    {{ $filters.currency(state.principal.toFixed(0)) }}
+            <div class="body">
+                <div>
+                    <div class="title">
+                        {{ $t("user.overview.contract.assetSum") }}
+                    </div>
+                    <div v-if="state.asset != null" class="currency">
+                        {{ $filters.currency(state.asset.toFixed(0)) }}
+                    </div>
+                    <div v-else>-</div>
                 </div>
-                <div v-else>-</div>
-            </div>
-            <div>
-                <div class="title">{{ $t("user.overview.interestSum") }}</div>
-                <div v-if="state.interest != null" class="currency interest">
-                    {{ $filters.currency(state.interest.toFixed(0), "+ ") }}
+                <div>
+                    <div class="title">
+                        {{ $t("user.overview.contract.principalSum") }}
+                    </div>
+                    <div v-if="state.principal != null" class="currency">
+                        {{ $filters.currency(state.principal.toFixed(0)) }}
+                    </div>
+                    <div v-else>-</div>
                 </div>
-                <div v-else>-</div>
+                <div>
+                    <div class="title">
+                        {{ $t("user.overview.contract.interestSum") }}
+                    </div>
+                    <div
+                        v-if="state.interest != null"
+                        class="currency interest"
+                    >
+                        {{ $filters.currency(state.interest.toFixed(0), "+ ") }}
+                    </div>
+                    <div v-else>-</div>
+                </div>
             </div>
         </div>
-        <div v-show="level >= 6" class="list content-block">
+        <div
+            v-show="level >= 6"
+            class="list dx-card responsive-paddings content-block"
+        >
+            <div class="header">
+                {{ $t("user.overview.contract.listTitle") }}
+            </div>
             <DxDataGrid
                 ref="dataGridRef"
                 :data-source="state.gridData"
@@ -208,29 +228,31 @@ function animatedNumber(type) {
 @import "../../../../sass/variables.scss";
 .overview-contracts {
     .sum {
-        display: flex;
-        -webkit-flex-wrap: wrap;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-
-        > div {
-            text-align: center;
+        .body {
             display: flex;
+            -webkit-flex-wrap: wrap;
+            flex-wrap: wrap;
+            justify-content: space-between;
             align-items: center;
+            margin-bottom: 15px;
 
-            .title {
-                margin-right: 10px;
-                color: darken(white, 30);
+            > div {
+                text-align: center;
+                display: flex;
+                align-items: center;
+
+                .title {
+                    margin-right: 10px;
+                    color: darken(white, 30);
+                }
             }
-        }
 
-        .currency {
-            font-size: 20px;
+            .currency {
+                font-size: 20px;
 
-            &.interest {
-                color: lime;
+                &.interest {
+                    color: lime;
+                }
             }
         }
     }
@@ -240,17 +262,22 @@ function animatedNumber(type) {
             border-bottom: none;
         }
 
-        .item {
-            position: relative;
-
-            td {
-                padding: 0;
-                cursor: pointer;
-                border-bottom: 5px darken($base-bg, 5) solid;
+        .dx-data-row {
+            &:not(:nth-last-child(2)) {
+                border-bottom: 1px $base-border-color solid;
             }
 
-            .responsive-paddings {
-                padding: 10px 15px 10px 25px;
+            .item {
+                position: relative;
+
+                td {
+                    padding: 0;
+                    cursor: pointer;
+                }
+
+                .responsive-paddings {
+                    padding: 10px 15px 10px 25px;
+                }
             }
         }
 
@@ -319,7 +346,7 @@ function animatedNumber(type) {
     }
 
     .screen-x-small & {
-        .sum > div {
+        .sum > .body > div {
             width: 100%;
             justify-content: space-between;
         }

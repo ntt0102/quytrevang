@@ -64,6 +64,12 @@ h2.content-block {
     }
 }
 
+.dx-card .header {
+    text-align: left;
+    font-size: 20px;
+    padding-bottom: 10px;
+}
+
 .link {
     color: rgba($base-text-color, alpha($base-text-color) * 0.7);
     text-decoration: none;
