@@ -1,6 +1,6 @@
 import "../sass/app.scss";
 import "./bootstrap";
-import "./utils/axiosSetting";
+import "./config";
 import { createApp } from "vue";
 import filters from "./filters";
 import properties from "./properties";

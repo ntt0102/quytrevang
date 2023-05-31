@@ -9,7 +9,6 @@ class OrderChartDb {
         return new Promise((resolve, reject) => {
             const request = indexedDB.open("orderChart", 1);
             request.onupgradeneeded = (e) => {
-                console.log("onupgradeneeded");
                 this.store = e.target.result;
                 this.store.createObjectStore("order", { keyPath: "kind" });
                 this.store.createObjectStore("line", { keyPath: "price" });
@@ -17,12 +16,10 @@ class OrderChartDb {
                 resolve();
             };
             request.onsuccess = (e) => {
-                console.log("onsuccess");
                 this.store = e.target.result;
                 resolve();
             };
             request.onerror = () => {
-                console.log("onerror");
                 location.reload();
                 reject();
             };

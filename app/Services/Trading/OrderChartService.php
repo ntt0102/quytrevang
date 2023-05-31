@@ -48,6 +48,29 @@ class OrderChartService extends CoreService
     }
 
     /**
+     * Get Copyist Status
+     *
+     * @param $payload
+     * 
+     */
+    public function getCopyistStatus($payload)
+    {
+        $copyists = Copyist::where('allow_share', 1)->where('allow_copy', 1)->get();
+        $ret = [];
+        foreach ($copyists as $copyist) {
+            $vos = new VpsOrderService($copyist);
+            $status = [
+                'id' => $copyist->id,
+                'vps_code' => $copyist->vps_code,
+                'connection' => $vos->connection,
+                'position' => $vos->position,
+            ];
+            $ret[] = $status;
+        }
+        return $ret;
+    }
+
+    /**
      * Get Config
      *
      * @param $payload
@@ -58,21 +81,6 @@ class OrderChartService extends CoreService
         return [
             'symbol' => get_global_value('vn30f1m'),
         ];
-    }
-
-    /**
-     * Set config
-     *
-     * @param $payload
-     * 
-     */
-    public function setConfig($payload)
-    {
-        return $this->transaction(
-            function () use ($payload) {
-                // $so = request()->user()->smartOrder;
-            }
-        );
     }
 
     /**

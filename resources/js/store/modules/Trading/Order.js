@@ -4,6 +4,7 @@ function initialState() {
         status: { connection: true, position: 0 },
         chartData: [],
         isChartLoading: false,
+        copyists: [],
     };
 }
 
@@ -32,26 +33,22 @@ const actions = {
                 });
         });
     },
+    getCopyistStatus({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("order-chart/get-copyist-status", {}, { noLoading: true })
+                .then((response) => {
+                    commit("setOrderStatuses", response.data);
+                    resolve();
+                });
+        });
+    },
     getConfig({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
                 .post("order-chart/get-config", {}, { noLoading: true })
                 .then((response) => {
                     commit("setConfig", response.data);
-                    resolve();
-                });
-        });
-    },
-    setConfig({ commit, dispatch, getters, state, rootGetters }, chartDate) {
-        return new Promise((resolve, reject) => {
-            axios
-                .post(
-                    "order-chart/set-config",
-                    { date: chartDate },
-                    { noLoading: true }
-                )
-                .then((response) => {
-                    commit("setChartData", response.data);
                     resolve();
                 });
         });
@@ -86,6 +83,9 @@ const mutations = {
     },
     setStatus(state, data) {
         state.status = data;
+    },
+    setOrderStatuses(state, data) {
+        state.copyists = data;
     },
     setConfig(state, data) {
         state.config = data;

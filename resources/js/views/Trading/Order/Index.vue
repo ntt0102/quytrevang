@@ -76,6 +76,13 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
+                        class="command far fa-info"
+                        :title="
+                            $t('trading.orderChart.copyistStatusPopup.title')
+                        "
+                        @click="() => $refs.copyistStatusPopupRef.show()"
+                    ></div>
+                    <div
                         ref="cancelOrderRef"
                         class="cancel-order command far fa-trash-alt"
                         :title="$t('trading.orderChart.cancelTool')"
@@ -105,11 +112,13 @@
             </div>
         </div>
     </div>
+    <CopyistStatusPopup ref="copyistStatusPopupRef" />
 </template>
 
 <script setup>
+import CopyistStatusPopup from "./CopyistStatusPopup.vue";
 import ColorPicker from "./ColorPicker.vue";
-import toolsStore from "../../../utils/orderChartDb.js";
+import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { confirm } from "devextreme/ui/dialog";
 import {
@@ -1238,7 +1247,7 @@ function refreshChart() {
 </script>
 <style lang="scss" scoped>
 .order-chart-container {
-    height: 300px;
+    height: 320px;
     background: #131722;
     border: none;
 

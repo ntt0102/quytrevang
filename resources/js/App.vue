@@ -31,7 +31,7 @@
 <script setup>
 import AppFooter from "./components/Layouts/Partials/AppFooter.vue";
 import Chatbot from "./components/Chatbot.vue";
-import { sizes, subscribe, unsubscribe } from "./utils/media-query";
+import { sizes, subscribe, unsubscribe } from "./plugins/mediaQuery";
 import {
     getCurrentInstance,
     reactive,

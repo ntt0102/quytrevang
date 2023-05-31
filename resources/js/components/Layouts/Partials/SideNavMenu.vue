@@ -33,7 +33,7 @@
 
 <script setup>
 import DxTreeView from "devextreme-vue/ui/tree-view";
-import navigation from "../../../app-navigation";
+import navigation from "../../../config/navigation";
 import { onMounted, ref, inject, watch, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
