@@ -4,10 +4,11 @@
             <div class="chart-wrapper" ref="orderChartRef">
                 <div class="area data-area">
                     <div
-                        :class="`command noaction far fa-${
+                        :class="`command far fa-${
                             status.connection ? 'link' : 'unlink'
                         }`"
                         :title="$t('trading.orderChart.connection')"
+                        @click="() => $store.dispatch('tradingOrder/getStatus')"
                     ></div>
                     <div
                         class="command noaction status"
