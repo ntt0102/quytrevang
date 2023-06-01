@@ -76,7 +76,7 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
-                        class="command far fa-info"
+                        class="command far fa-info-circle"
                         :title="
                             $t('trading.orderChart.copyistStatusPopup.title')
                         "
