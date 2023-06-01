@@ -307,7 +307,6 @@ function eventPriceLineDrag(e) {
                                 action: "entry",
                                 data: {
                                     cmd: "change",
-                                    side: params.order.side,
                                     price: params.order.entry.price,
                                 },
                             })
@@ -336,7 +335,6 @@ function eventPriceLineDrag(e) {
                                 action: "tp",
                                 data: {
                                     cmd: "change",
-                                    side: -params.order.side,
                                     price: params.order.tp.price,
                                 },
                             })
@@ -359,7 +357,6 @@ function eventPriceLineDrag(e) {
                                 action: "sl",
                                 data: {
                                     cmd: "change",
-                                    side: -params.order.side,
                                     price: params.order.sl.price,
                                 },
                             })
@@ -743,15 +740,11 @@ function connectSocket() {
                                                     action: "tpsl",
                                                     tpData: {
                                                         cmd: "new",
-                                                        side: -params.order
-                                                            .side,
                                                         price: params.order.tp
                                                             .price,
                                                     },
                                                     slData: {
                                                         cmd: "new",
-                                                        side: -params.order
-                                                            .side,
                                                         price: params.order.sl
                                                             .price,
                                                     },
@@ -1064,7 +1057,7 @@ function removeRulerTool() {
 function cancelOrderClick() {
     let result = confirm(
         t("trading.orderChart.cancelOrder"),
-        t("trading.orderChart.cancelConfirm")
+        t("titles.confirm")
     );
     result.then((dialogResult) => {
         if (dialogResult) {
@@ -1077,7 +1070,6 @@ function cancelOrderClick() {
                             slData: { cmd: "delete" },
                             exitData: {
                                 cmd: "new",
-                                side: -params.order.side,
                                 price: "MTL",
                             },
                         })
@@ -1126,7 +1118,7 @@ function entryOrderClick() {
         if (CURRENT_SEC < TIME.ATO) {
             let result = confirm(
                 t("trading.orderChart.atoOrder"),
-                t("trading.orderChart.cancelConfirm")
+                t("titles.confirm")
             );
             result.then((dialogResult) => {
                 if (dialogResult) {
@@ -1135,7 +1127,6 @@ function entryOrderClick() {
                             action: "exit",
                             exitData: {
                                 cmd: "new",
-                                side: params.order.side,
                                 price: "ATO",
                             },
                         })
@@ -1168,7 +1159,7 @@ function entryOrderClick() {
         } else {
             let result = confirm(
                 t("trading.orderChart.atcOrder"),
-                t("trading.orderChart.cancelConfirm")
+                t("titles.confirm")
             );
             result.then((dialogResult) => {
                 if (dialogResult) {
@@ -1177,7 +1168,6 @@ function entryOrderClick() {
                             action: "exit",
                             exitData: {
                                 cmd: "new",
-                                side: params.order.side,
                                 price: "ATC",
                             },
                         })
@@ -1199,12 +1189,10 @@ function tpslOrderClick() {
             action: "tpsl",
             tpData: {
                 cmd: "new",
-                side: -params.order.side,
                 price: params.order.tp.price,
             },
             slData: {
                 cmd: "new",
-                side: -params.order.side,
                 price: params.order.sl.price,
             },
         })

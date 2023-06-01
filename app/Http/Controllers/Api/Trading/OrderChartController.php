@@ -43,19 +43,6 @@ class OrderChartController extends CoreController
     }
 
     /**
-     * Get Copyist Status
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function getCopyistStatus(Request $request)
-    {
-        $data = $this->orderChartService->getCopyistStatus($this->payload);
-        return $this->sendResponse($data);
-    }
-
-    /**
      * Get Config
      *
      * @param \Illuminate\Http\Request $request
@@ -78,6 +65,32 @@ class OrderChartController extends CoreController
     public function executeOrder(Request $request)
     {
         $data = $this->orderChartService->executeOrder($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Get Copyist Status
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getCopyistStatus(Request $request)
+    {
+        $data = $this->orderChartService->getCopyistStatus($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Close Position
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function closePosition(Request $request)
+    {
+        $data = $this->orderChartService->closePosition($this->payload);
         return $this->sendResponse($data);
     }
 

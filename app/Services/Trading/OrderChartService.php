@@ -48,29 +48,6 @@ class OrderChartService extends CoreService
     }
 
     /**
-     * Get Copyist Status
-     *
-     * @param $payload
-     * 
-     */
-    public function getCopyistStatus($payload)
-    {
-        $copyists = Copyist::where('allow_share', 1)->where('allow_copy', 1)->get();
-        $ret = [];
-        foreach ($copyists as $copyist) {
-            $vos = new VpsOrderService($copyist);
-            $status = [
-                'id' => $copyist->id,
-                'vps_code' => $copyist->vps_code,
-                'connection' => $vos->connection,
-                'position' => $vos->position,
-            ];
-            $ret[] = $status;
-        }
-        return $ret;
-    }
-
-    /**
      * Get Config
      *
      * @param $payload
@@ -101,6 +78,56 @@ class OrderChartService extends CoreService
                         OrderVpsJob::dispatch($copyist, $payload);
                     });
                 }
+                return $ret;
+            }
+        );
+    }
+
+    /**
+     * Get Copyist Status
+     *
+     * @param $payload
+     * 
+     */
+    public function getCopyistStatus($payload)
+    {
+        $copyists = Copyist::getCopyists();
+        $ret = [];
+        foreach ($copyists as $copyist) {
+            $vos = new VpsOrderService($copyist);
+            $status = [
+                'id' => $copyist->id,
+                'vps_code' => $copyist->vps_code,
+                'connection' => $vos->connection,
+                'position' => $vos->position,
+            ];
+            $ret[] = $status;
+        }
+        return $ret;
+    }
+
+    /**
+     * Close Postion
+     *
+     * @param $payload
+     * 
+     */
+    public function closePosition($payload)
+    {
+        return $this->transaction(
+            function () use ($payload) {
+                $copyist = Copyist::find($payload->id);
+                $vos = new VpsOrderService($copyist);
+                $data = (object)[
+                    "action" => "exit",
+                    "tpData" => ["cmd" => "cancel"],
+                    "slData" => ["cmd" => "delete"],
+                    "exitData" => [
+                        "cmd" => "new",
+                        "price" => "MTL",
+                    ],
+                ];
+                $ret = $vos->execute($data);
                 return $ret;
             }
         );

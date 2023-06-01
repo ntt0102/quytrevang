@@ -48,6 +48,6 @@ class Copyist extends CoreModel
 
     public static function getCopyists()
     {
-        return parent::where('allow_copy', 1)->get();
+        return parent::where('allow_share', 1)->where('allow_copy', 1)->get();
     }
 }

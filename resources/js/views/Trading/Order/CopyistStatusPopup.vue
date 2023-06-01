@@ -2,6 +2,18 @@
     <CorePopup
         ref="popupRef"
         :title="$t('trading.orderChart.copyistStatusPopup.title')"
+        :toolbarItems="[
+            {
+                toolbar: 'bottom',
+                location: 'after',
+                widget: 'dxButton',
+                options: {
+                    text: $t('buttons.reload'),
+                    icon: 'far fa-sync-alt small',
+                    onClick: onShown,
+                },
+            },
+        ]"
         @shown="onShown"
         @hidden="onHidden"
     >
@@ -56,20 +68,21 @@
                     <DxToolbar
                         :items="[
                             {
+                                visible: data.data.position != 0,
                                 locateInMenu: 'auto',
                                 showText: 'inMenu',
                                 location: 'center',
                                 widget: 'dxButton',
                                 options: {
                                     type: 'default',
-                                    icon: 'trash',
-                                    hint: $t('buttons.delete'),
-                                    text: $t('buttons.delete'),
-                                    onClick: () => {
-                                        dataGridRef.instance.deleteRow(
-                                            data.rowIndex
-                                        );
-                                    },
+                                    icon: 'far fa-times small',
+                                    hint: $t(
+                                        'trading.orderChart.copyistStatusPopup.closePosition'
+                                    ),
+                                    text: $t(
+                                        'trading.orderChart.copyistStatusPopup.closePosition'
+                                    ),
+                                    onClick: () => closePosition(data.data),
                                 },
                             },
                         ]"
@@ -82,66 +95,20 @@
 <script setup>
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import CorePopup from "../../../components/Popups/CorePopup.vue";
-import { computed, inject, ref, reactive, watch } from "vue";
+import { confirm } from "devextreme/ui/dialog";
+import { inject, ref, reactive, watch } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 
 const store = useStore();
 const { t } = useI18n();
 const bus = inject("bus");
-const mt = inject("mt");
 const mf = inject("mf");
 const popupRef = ref(null);
 const dataGridRef = ref(null);
 const state = reactive({
     gridData: null,
-    editPermission: "trades@edit",
-    validationRules: {
-        amount: [
-            {
-                type: "required",
-                message: t("trading.trades.amount") + mt.validations.required,
-            },
-        ],
-        scores: [
-            {
-                type: "required",
-                message: t("trading.trades.scores") + mt.validations.required,
-            },
-        ],
-        revenue: [
-            {
-                type: "required",
-                message: t("trading.trades.revenue") + mt.validations.required,
-            },
-        ],
-        loss: [
-            {
-                type: "required",
-                message: t("trading.trades.loss") + mt.validations.required,
-            },
-        ],
-        fees: [
-            {
-                type: "required",
-                message: t("trading.trades.fees") + mt.validations.required,
-            },
-        ],
-        date: [
-            {
-                type: "required",
-                message: t("trading.trades.date") + mt.validations.required,
-            },
-            {
-                type: "async",
-                validationCallback: (e) =>
-                    store.dispatch("tradingStatistic/validateDuplicateDate", e),
-                message: t("trading.trades.validations.date"),
-            },
-        ],
-    },
 });
-const permissions = computed(() => store.state.auth.user.permissions);
 
 watch(
     () => store.state.tradingOrder.copyists,
@@ -153,11 +120,18 @@ watch(
 function show() {
     popupRef.value.show();
 }
-function onSave(formData) {
-    if (!formData.changes.length) return;
-    bus.emit("checkPin", () =>
-        store.dispatch("tradingStatistic/save", formData)
+function closePosition(data) {
+    let result = confirm(
+        `${t("trading.orderChart.copyistStatusPopup.closePosition")} ${
+            data.vps_code
+        }?`,
+        t("titles.confirm")
     );
+    result.then((dialogResult) => {
+        if (dialogResult) {
+            store.dispatch("tradingOrder/closePosition", data.id);
+        }
+    });
 }
 function onShown() {
     store.dispatch("tradingOrder/getCopyistStatus");

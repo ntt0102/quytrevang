@@ -33,16 +33,6 @@ const actions = {
                 });
         });
     },
-    getCopyistStatus({ commit, dispatch, getters, state, rootGetters }) {
-        return new Promise((resolve, reject) => {
-            axios
-                .post("order-chart/get-copyist-status", {}, { noLoading: true })
-                .then((response) => {
-                    commit("setOrderStatuses", response.data);
-                    resolve();
-                });
-        });
-    },
     getConfig({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
@@ -65,6 +55,26 @@ const actions = {
                 })
                 .then((response) => {
                     commit("setChartLoading", false);
+                    resolve(response.data);
+                });
+        });
+    },
+    getCopyistStatus({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("order-chart/get-copyist-status", {}, { noLoading: true })
+                .then((response) => {
+                    commit("setOrderStatuses", response.data);
+                    resolve();
+                });
+        });
+    },
+    closePosition({ commit, dispatch, getters, state, rootGetters }, id) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("order-chart/close-position", { id })
+                .then((response) => {
+                    dispatch("getCopyistStatus");
                     resolve(response.data);
                 });
         });

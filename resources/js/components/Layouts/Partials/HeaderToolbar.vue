@@ -64,7 +64,7 @@
                                 },
                                 {
                                     toolbar: 'top',
-                                    location: 'left',
+                                    location: 'before',
                                     text: $t(
                                         'components.notification.markAllRead'
                                     ),

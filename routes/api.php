@@ -125,9 +125,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::group(['prefix' => 'order-chart', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'OrderChartController@getChartData');
                     Route::post('get-status', 'OrderChartController@getStatus');
-                    Route::post('get-copyist-status', 'OrderChartController@getCopyistStatus');
                     Route::post('get-config', 'OrderChartController@getConfig');
                     Route::post('execute-order', 'OrderChartController@executeOrder');
+                    Route::post('get-copyist-status', 'OrderChartController@getCopyistStatus');
+                    Route::post('close-position', 'OrderChartController@closePosition');
                 });
                 Route::group(['prefix' => 'finbooks', 'middleware' => 'can:finbooks@control'], function () {
                     Route::post('/', 'FinbookController@fetch');

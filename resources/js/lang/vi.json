@@ -195,7 +195,8 @@
                 "account": "Tài khoản",
                 "vpsCode": "Mã VPS",
                 "connection": "Kết nối",
-                "position": "Vị thế"
+                "position": "Vị thế",
+                "closePosition": "Đóng vị thế"
             }
         },
         "trades": {
@@ -611,7 +612,8 @@
         "installApp": "Thêm vào màn hình",
         "chooseFile": "Chọn tệp",
         "backup": "Sao lưu",
-        "restore": "Khôi phục"
+        "restore": "Khôi phục",
+        "reload": "Tải lại"
     },
     "messages": {
         "success": {
@@ -658,6 +660,7 @@
         "commandHeaderTitleShort": "TT",
         "caution": "Chú ý",
         "chooseImage": "Chọn ảnh",
-        "deleteOldImage": "Xoá ảnh cũ"
+        "deleteOldImage": "Xoá ảnh cũ",
+        "confirm": "Xác nhận"
     }
 }
