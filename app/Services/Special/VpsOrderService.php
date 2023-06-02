@@ -118,6 +118,7 @@ class VpsOrderService extends CoreService
             return ['isOk' => false, 'message' => 'unopenedPosition'];
         //
         $isNotDelete = $data->cmd != 'delete';
+        $side = $isSl ? -$this->position : ($isNew ? $data->side : $this->position);
         $payload = [
             "group" => "O",
             "user" => $this->copyist->vps_code,
@@ -131,8 +132,8 @@ class VpsOrderService extends CoreService
                 "channel" => "H",
                 "priceType" => "MTL",
                 "quantity" => strval($isSl ? (abs($this->position)) : $this->copyist->volume),
-                "relation" => $isNotDelete ? $this->formatRelation($isSl ? -$this->position : $data->side) : "",
-                "side" => $isNew ? $this->formatSide($isSl ? -$this->position : $data->side) : "",
+                "relation" => $isNotDelete ? $this->formatRelation($side) : "",
+                "side" => $isNew ? $this->formatSide($side) : "",
                 "stopOrderType" => "stop",
                 "symbol" => $this->symbol,
                 "triggerPrice" => $isNotDelete ?  $this->formatPrice($data->price) : ""
