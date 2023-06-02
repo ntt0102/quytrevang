@@ -111,6 +111,17 @@ const authRoute = [
         },
         component: loadView("User", "Contract", "Index"),
     },
+    {
+        path: "/copyist",
+        name: "copyist",
+        meta: {
+            auth: true,
+            permission: "common@access",
+            title: lang.global.t("user.copyist.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("User", "Copyist", "Index"),
+    },
     // Manager
     {
         path: "/admin-users",

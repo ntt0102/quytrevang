@@ -21,6 +21,13 @@ export default [
         level: 5,
     },
     {
+        text: lang.global.t("user.copyist.title"),
+        name: "copyist",
+        icon: "far fa-bring-forward",
+        permissions: ["common@access"],
+        level: 5,
+    },
+    {
         text: lang.global.t("admin.title"),
         name: "admin",
         icon: "far fa-tools",
