@@ -74,6 +74,11 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('withdrawing', 'ContractController@withdrawingContract');
                     Route::post('contract-users', 'ContractController@getContactUsers');
                 });
+                Route::group(['prefix' => 'copyist'], function () {
+                    Route::post('/', 'CopyistController@fetch');
+                    Route::post('save', 'CopyistController@save');
+                    Route::post('validate-vpscode', 'CopyistController@validateVpsCode');
+                });
                 Route::post('trade', 'TradeController@getMonthChart');
             });
 

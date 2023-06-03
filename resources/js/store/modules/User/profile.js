@@ -8,7 +8,7 @@ const getters = {};
 
 const actions = {
     validateDuplicateEmail({ commit, dispatch, getters, state }, param) {
-        if (param.value == getters.profile.email) return Promise.resolve(true);
+        if (param.value == state.profile.email) return Promise.resolve(true);
         return new Promise((resolve, reject) => {
             axios
                 .post(
@@ -23,7 +23,7 @@ const actions = {
         });
     },
     validateDuplicateIdNumber({ commit, dispatch, getters, state }, param) {
-        if (param.value == getters.profile.identity.number)
+        if (param.value == state.profile.identity.number)
             return Promise.resolve(true);
         return new Promise((resolve, reject) => {
             axios
@@ -39,7 +39,7 @@ const actions = {
         });
     },
     validateDuplicatePhone({ commit, dispatch, getters, state }, param) {
-        if (param.value == getters.profile.phone) return Promise.resolve(true);
+        if (param.value == state.profile.phone) return Promise.resolve(true);
         return new Promise((resolve, reject) => {
             axios
                 .post(

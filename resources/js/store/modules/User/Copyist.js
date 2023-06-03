@@ -8,16 +8,15 @@ const getters = {};
 
 const actions = {
     validateVpsCode({ commit, dispatch, getters, state }, param) {
-        if (param.value == getters.profile.email) return Promise.resolve(true);
+        if (param.value == state.copyist.vps_code) return Promise.resolve(true);
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "user/profile/validate-vpscode",
+                    "user/copyist/validate-vpscode",
                     { vps_code: param.value },
                     { noLoading: true }
                 )
                 .then((response) => {
-                    // console.log(response);
                     resolve(response.data);
                 });
         });
@@ -34,8 +33,6 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios.post("user/copyist/save", param).then((response) => {
                 resolve(response.data.isOk);
-                dispatch("auth/check", true, { root: true });
-                commit("setState", param);
             });
         });
     },
@@ -46,10 +43,7 @@ const actions = {
 
 const mutations = {
     setState(state, data) {
-        state.profile = data;
-    },
-    setAvatar(state, avatar) {
-        state.profile.avatar = avatar;
+        state.copyist = data.copyist;
     },
     resetState(state) {
         state = Object.assign(state, initialState());

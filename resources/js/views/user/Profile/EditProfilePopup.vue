@@ -30,7 +30,6 @@
                 <button ref="submitRef" class="display-none" />
                 <DxForm
                     ref="formRef"
-                    class="profile-form"
                     :form-data="state.formData"
                     labelMode="floating"
                     :col-count="2"
