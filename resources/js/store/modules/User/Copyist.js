@@ -1,23 +1,19 @@
 function initialState() {
     return {
-        permissions: [],
+        copyist: {},
     };
 }
 
 const getters = {};
 
 const actions = {
-    validateDuplicateName({ state, rootGetters }, param) {
-        const oldPermission = state.permissions.find(
-            (x) => x.id === param.data.id
-        );
-        if (!!oldPermission && param.value == oldPermission.name)
-            return Promise.resolve(true);
+    validateVpsCode({ commit, dispatch, getters, state }, param) {
+        if (param.value == getters.profile.email) return Promise.resolve(true);
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "settings/permission/validate-duplicate-name",
-                    { name: param.value },
+                    "user/profile/validate-vpscode",
+                    { vps_code: param.value },
                     { noLoading: true }
                 )
                 .then((response) => {
@@ -26,22 +22,21 @@ const actions = {
                 });
         });
     },
-    getPermissions({ commit, dispatch, getters, state, rootGetters }) {
+    getCopyist({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.post("settings/permission").then((response) => {
+            axios.post("user/copyist").then((response) => {
                 commit("setState", response.data);
-                resolve();
+                resolve(response.data);
             });
         });
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios
-                .post("settings/permission/save", { changes: param.changes })
-                .then((response) => {
-                    resolve();
-                    dispatch("getPermissions");
-                });
+            axios.post("user/copyist/save", param).then((response) => {
+                resolve(response.data.isOk);
+                dispatch("auth/check", true, { root: true });
+                commit("setState", param);
+            });
         });
     },
     resetState({ commit }) {
@@ -51,7 +46,10 @@ const actions = {
 
 const mutations = {
     setState(state, data) {
-        state.permissions = data.permissions;
+        state.profile = data;
+    },
+    setAvatar(state, avatar) {
+        state.profile.avatar = avatar;
     },
     resetState(state) {
         state = Object.assign(state, initialState());
@@ -62,6 +60,6 @@ export default {
     namespaced: true,
     state: initialState,
     getters,
-    actions,
     mutations,
+    actions,
 };

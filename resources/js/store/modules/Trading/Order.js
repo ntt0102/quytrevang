@@ -15,7 +15,7 @@ const actions = {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
-                .post("order-chart", { date: chartDate }, { noLoading: true })
+                .post("trading/order", { date: chartDate }, { noLoading: true })
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
@@ -26,7 +26,7 @@ const actions = {
     getStatus({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("order-chart/get-status", {}, { noLoading: true })
+                .post("trading/order/get-status", {}, { noLoading: true })
                 .then((response) => {
                     commit("setStatus", response.data);
                     resolve();
@@ -36,7 +36,7 @@ const actions = {
     getConfig({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("order-chart/get-config", {}, { noLoading: true })
+                .post("trading/order/get-config", {}, { noLoading: true })
                 .then((response) => {
                     commit("setConfig", response.data);
                     resolve();
@@ -49,7 +49,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             commit("setChartLoading", true);
             axios
-                .post("order-chart/execute-order", data, {
+                .post("trading/order/execute-order", data, {
                     noLoading: true,
                     notify: true,
                 })
@@ -62,7 +62,11 @@ const actions = {
     getCopyistStatus({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("order-chart/get-copyist-status", {}, { noLoading: true })
+                .post(
+                    "trading/order/get-copyist-status",
+                    {},
+                    { noLoading: true }
+                )
                 .then((response) => {
                     commit("setOrderStatuses", response.data);
                     resolve();
@@ -72,7 +76,7 @@ const actions = {
     closePosition({ commit, dispatch, getters, state, rootGetters }, id) {
         return new Promise((resolve, reject) => {
             axios
-                .post("order-chart/close-position", { id })
+                .post("trading/order/close-position", { id })
                 .then((response) => {
                     dispatch("getCopyistStatus");
                     resolve(response.data);

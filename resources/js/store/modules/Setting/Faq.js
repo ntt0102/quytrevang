@@ -9,7 +9,7 @@ const getters = {};
 const actions = {
     getFaqs({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.post("settings/faqs").then((response) => {
+            axios.post("settings/faq").then((response) => {
                 commit("setState", response.data);
                 resolve();
             });
@@ -18,7 +18,7 @@ const actions = {
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("settings/faqs/save", { changes: param.changes })
+                .post("settings/faq/save", { changes: param.changes })
                 .then((response) => {
                     resolve();
                     dispatch("getFaqs");

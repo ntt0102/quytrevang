@@ -16,7 +16,7 @@ const actions = {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         if (isOld == undefined) isOld = state.isOld;
         return new Promise((resolve, reject) => {
-            axios.post("contracts", { isOld: isOld }).then((response) => {
+            axios.post("admin/contract", { isOld: isOld }).then((response) => {
                 response.data.isOld = isOld;
                 commit("setState", response.data);
                 resolve();
@@ -25,7 +25,7 @@ const actions = {
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("contracts/save", param).then((response) => {
+            axios.post("admin/contract/save", param).then((response) => {
                 resolve();
                 if (response.data.isOk) {
                     dispatch("fetch", state.isOld);
@@ -40,7 +40,7 @@ const actions = {
     paidContract({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("contracts/paid", param, {
+                .post("admin/contract/paid", param, {
                     headers: { "Content-Type": "multipart/form-data" },
                 })
                 .then((response) => {
@@ -60,7 +60,7 @@ const actions = {
     ) {
         return new Promise((resolve, reject) => {
             axios
-                .post("contracts/withdrawn", param, {
+                .post("admin/contract/withdrawn", param, {
                     headers: { "Content-Type": "multipart/form-data" },
                 })
                 .then((response) => {
@@ -76,7 +76,7 @@ const actions = {
     },
     getSummary({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.post("contracts/summary").then((response) => {
+            axios.post("admin/contract/summary").then((response) => {
                 resolve(response.data);
             });
         });
@@ -88,7 +88,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "contracts/receipt-info",
+                    "admin/contracts/receipt-info",
                     { userCode: userCode },
                     {
                         noLoading: true,

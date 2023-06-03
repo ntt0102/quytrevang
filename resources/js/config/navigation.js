@@ -40,25 +40,25 @@ export default [
         items: [
             {
                 text: lang.global.t("admin.users.title"),
-                name: "users",
+                name: "admin-user",
                 icon: "far fa-user-cog",
                 permissions: ["users@control"],
             },
             {
                 text: lang.global.t("admin.contracts.title"),
-                name: "contracts",
+                name: "admin-contract",
                 icon: "far fa-file-invoice-dollar",
                 permissions: ["contracts@control"],
             },
             {
                 text: lang.global.t("admin.copyists.title"),
-                name: "copyists",
+                name: "admin-copyist",
                 icon: "far fa-copy",
                 permissions: ["copyists@control"],
             },
             {
                 text: lang.global.t("admin.comments.title"),
-                name: "comments",
+                name: "admin-comment",
                 icon: "far fa-comment",
                 permissions: ["comments@control"],
             },
@@ -76,19 +76,19 @@ export default [
         items: [
             {
                 text: lang.global.t("trading.orderChart.title"),
-                name: "order",
+                name: "trading-order",
                 icon: "far fa-gavel",
                 permissions: ["stock@order"],
             },
             {
                 text: lang.global.t("trading.trades.title"),
-                name: "statistic",
+                name: "trading-statistic",
                 icon: "far fa-analytics",
                 permissions: ["trades@view", "trades@edit"],
             },
             {
                 text: lang.global.t("trading.finbooks.title"),
-                name: "finbooks",
+                name: "trading-finbook",
                 icon: "far fa-book",
                 permissions: ["finbooks@control"],
             },
@@ -123,7 +123,7 @@ export default [
             },
             {
                 text: lang.global.t("settings.files.title"),
-                name: "setting-files",
+                name: "setting-file",
                 icon: "far fa-folder-tree",
                 permissions: ["files@setting"],
             },
@@ -135,13 +135,13 @@ export default [
             },
             {
                 text: lang.global.t("settings.faqs.title"),
-                name: "setting-faqs",
+                name: "setting-faq",
                 icon: "far fa-question-square",
                 permissions: ["faqs@setting"],
             },
             {
                 text: lang.global.t("settings.parameters.title"),
-                name: "setting-parameters",
+                name: "setting-parameter",
                 icon: "far fa-sliders-h",
                 permissions: ["parameters@setting"],
             },
@@ -153,13 +153,13 @@ export default [
             },
             {
                 text: lang.global.t("settings.roles.title"),
-                name: "setting-roles",
+                name: "setting-role",
                 icon: "far fa-user-tag",
                 permissions: ["roles@setting"],
             },
             {
                 text: lang.global.t("settings.permissions.title"),
-                name: "setting-permissions",
+                name: "setting-permission",
                 icon: "far fa-user-shield",
                 permissions: ["permissions@setting"],
             },

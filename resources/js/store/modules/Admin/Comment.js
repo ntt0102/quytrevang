@@ -11,7 +11,7 @@ const actions = {
     getComments({ commit, dispatch, getters, state, rootGetters }, param) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
-            axios.post("comments").then((response) => {
+            axios.post("admin/comment").then((response) => {
                 commit("setState", response.data);
                 resolve();
             });
@@ -20,7 +20,11 @@ const actions = {
     markAsRead({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("comments/mark-read", { id: param }, { noLoading: true })
+                .post(
+                    "admin/comment/mark-read",
+                    { id: param },
+                    { noLoading: true }
+                )
                 .then((response) => {
                     resolve();
                     dispatch("User.layout/initLayout", ["comments"], {
@@ -31,13 +35,15 @@ const actions = {
     },
     delete({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("comments/delete", { ids: param }).then((response) => {
-                commit("setState", response.data);
-                resolve();
-                dispatch("User.layout/initLayout", ["comments"], {
-                    root: true,
+            axios
+                .post("admin/comment/delete", { ids: param })
+                .then((response) => {
+                    commit("setState", response.data);
+                    resolve();
+                    dispatch("User.layout/initLayout", ["comments"], {
+                        root: true,
+                    });
                 });
-            });
         });
     },
     resetState({ commit }) {

@@ -4,9 +4,7 @@ function initialState() {
     };
 }
 
-const getters = {
-    profile: (state) => state.profile,
-};
+const getters = {};
 
 const actions = {
     validateDuplicateEmail({ commit, dispatch, getters, state }, param) {
@@ -14,7 +12,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "profile/validate-duplicate",
+                    "user/profile/validate-duplicate",
                     { field: "email", email: param.value },
                     { noLoading: true }
                 )
@@ -30,7 +28,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "profile/validate-duplicate",
+                    "user/profile/validate-duplicate",
                     { field: "id_number", id_number: param.value },
                     { noLoading: true }
                 )
@@ -45,7 +43,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "profile/validate-duplicate",
+                    "user/profile/validate-duplicate",
                     { field: "phone", phone: param.value },
                     { noLoading: true }
                 )
@@ -57,33 +55,35 @@ const actions = {
     },
     changeAvatar({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("profile/avatar", { avatar: param }).then((response) => {
-                // console.log(response);
-                dispatch("auth/setAvatar", response.data.avatar, {
-                    root: true,
+            axios
+                .post("user/profile/avatar", { avatar: param })
+                .then((response) => {
+                    // console.log(response);
+                    dispatch("auth/setAvatar", response.data.avatar, {
+                        root: true,
+                    });
+                    commit("setAvatar", response.data.avatar);
+                    resolve(response.data.isOk);
                 });
-                commit("setAvatar", response.data.avatar);
-                resolve(response.data.isOk);
-            });
         });
     },
     changePassword({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("profile/password", param).then((response) => {
+            axios.post("user/profile/password", param).then((response) => {
                 resolve(response.data.isOk);
             });
         });
     },
     changePin({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("profile/change-pin", param).then((response) => {
+            axios.post("user/profile/change-pin", param).then((response) => {
                 resolve(response.data.isOk);
             });
         });
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("profile/save", param).then((response) => {
+            axios.post("user/profile/save", param).then((response) => {
                 resolve(response.data.isOk);
                 dispatch("auth/check", true, { root: true });
                 commit("setState", param);
@@ -92,14 +92,14 @@ const actions = {
     },
     delete({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.post("profile/delete").then((response) => {
+            axios.post("user/profile/delete").then((response) => {
                 resolve(response.data.isOk);
             });
         });
     },
     getProfile({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.post("profile").then((response) => {
+            axios.post("user/profile").then((response) => {
                 commit("setState", response.data);
                 resolve(response.data);
             });

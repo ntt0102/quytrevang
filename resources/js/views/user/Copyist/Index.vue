@@ -1,7 +1,23 @@
 <template>
-    <div class="content-block dx-card responsive-paddings"></div>
+    <div class="content-block dx-card responsive-paddings">
+        <DxToolbar
+            :items="[
+                {
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-cog small',
+                        hint: $t('user.copyist.setting'),
+                        onClick: () => $refs.settingPopupRef.show(),
+                    },
+                },
+            ]"
+        />
+    </div>
+    <SettingPopup ref="settingPopupRef" />
 </template>
 <script setup>
+import SettingPopup from "./SettingPopup.vue";
 import { inject, ref, reactive, watch } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";

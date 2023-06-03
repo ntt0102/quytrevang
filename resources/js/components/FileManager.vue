@@ -85,9 +85,10 @@ watch(
 function getItems(parentDirectory) {
     return new Promise((resolve, reject) => {
         axios
-            .get(
-                `settings/files/getItems?clientPath=${props.clientPath}&path=${parentDirectory.path}`
-            )
+            .post("settings/file/getItems", {
+                clientPath: props.clientPath,
+                path: parentDirectory.path,
+            })
             .then((response) => {
                 resolve(response.data);
                 currentFolderItems = response.data;
@@ -97,7 +98,7 @@ function getItems(parentDirectory) {
 function createDirectory(parentDirectory, name) {
     return new Promise((resolve, reject) => {
         axios
-            .post("settings/files/createDirectory", {
+            .post("settings/file/createDirectory", {
                 clientPath: props.clientPath,
                 path: parentDirectory.path,
                 name: name,
@@ -111,7 +112,7 @@ function createDirectory(parentDirectory, name) {
 function renameItem(item, newName) {
     return new Promise((resolve, reject) => {
         axios
-            .post("settings/files/renameItem", {
+            .post("settings/file/renameItem", {
                 clientPath: props.clientPath,
                 path: item.parentPath,
                 oldName: item.name,
@@ -126,7 +127,7 @@ function renameItem(item, newName) {
 function deleteItem(item) {
     return new Promise((resolve, reject) => {
         axios
-            .post("settings/files/deleteItem", {
+            .post("settings/file/deleteItem", {
                 clientPath: props.clientPath,
                 path: item.path,
                 isDirectory: item.isDirectory,
@@ -140,7 +141,7 @@ function deleteItem(item) {
 function copyItem(item, destinationDirectory) {
     return new Promise((resolve, reject) => {
         axios
-            .post("settings/files/copyItem", {
+            .post("settings/file/copyItem", {
                 clientPath: props.clientPath,
                 fromPath: item.parentPath,
                 toPath: destinationDirectory.path,
@@ -156,7 +157,7 @@ function copyItem(item, destinationDirectory) {
 function moveItem(item, destinationDirectory) {
     return new Promise((resolve, reject) => {
         axios
-            .post("settings/files/moveItem", {
+            .post("settings/file/moveItem", {
                 clientPath: props.clientPath,
                 fromPath: item.parentPath,
                 toPath: destinationDirectory.path,
@@ -186,7 +187,7 @@ async function uploadFileChunk(file, uploadInfo, destinationDirectory) {
         formData.append("name", fileName);
         formData.append("path", destinationDirectory.path);
         axios
-            .post("settings/files/uploadFileChunk", formData, {
+            .post("settings/file/uploadFileChunk", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
             })
             .then((response) => {

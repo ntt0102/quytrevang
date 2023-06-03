@@ -10,6 +10,7 @@ import policy from "./modules/Policy";
 // User
 import userProfile from "./modules/User/Profile";
 import userContract from "./modules/User/Contract";
+import userCopyist from "./modules/User/Copyist";
 import userTrade from "./modules/User/Trade";
 // Admin
 import adminUser from "./modules/Admin/User";
@@ -38,6 +39,7 @@ export default createStore({
         // User
         userProfile,
         userContract,
+        userCopyist,
         userTrade,
         // Admin
         adminUser,

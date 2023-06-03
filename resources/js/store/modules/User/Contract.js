@@ -18,7 +18,7 @@ const actions = {
     ) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
-            axios.post("contract", { isOld: isOld }).then((response) => {
+            axios.post("user/contract", { isOld: isOld }).then((response) => {
                 // console.log(response);
                 commit("setState", response.data);
                 resolve();
@@ -27,7 +27,7 @@ const actions = {
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("contract/save", param).then((response) => {
+            axios.post("user/contract/save", param).then((response) => {
                 dispatch("fetch");
                 dispatch("auth/check", true, { root: true });
                 resolve(response.data);
@@ -37,7 +37,7 @@ const actions = {
     payingContract({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("contract/paying", param, {
+                .post("user/contract/paying", param, {
                     headers: { "Content-Type": "multipart/form-data" },
                 })
                 .then((response) => {
@@ -48,7 +48,7 @@ const actions = {
     },
     withdrawingContract({ commit, dispatch, getters, state }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("contract/withdrawing", param).then((response) => {
+            axios.post("user/contract/withdrawing", param).then((response) => {
                 if (response.data.isOk) dispatch("fetch");
                 resolve(response.data.isOk);
             });

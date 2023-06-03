@@ -11,7 +11,7 @@ const getters = {};
 const actions = {
     getCopyists({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios.post("copyists").then((response) => {
+            axios.post("admin/copyist").then((response) => {
                 // console.log(response.data);
                 commit("setState", response.data);
                 resolve();
@@ -25,7 +25,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "copyists/validate-user",
+                    "admin/copyists/validate-user",
                     { userCode: param.value },
                     { noLoading: true }
                 )
@@ -38,30 +38,12 @@ const actions = {
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("copyists/save", { changes: param.changes })
+                .post("admin/copyist/save", { changes: param.changes })
                 .then((response) => {
                     // console.log(response.data);
                     resolve();
                     if (response.data.isOk) dispatch("getCopyists");
                 });
-        });
-    },
-    getPlans({ commit, dispatch, getters, state, rootGetters }) {
-        return new Promise((resolve, reject) => {
-            axios.post("so/plans").then((response) => {
-                // console.log(response.data);
-                commit("setPlans", response.data);
-                resolve();
-            });
-        });
-    },
-    savePlans({ commit, dispatch, getters, state, rootGetters }, param) {
-        return new Promise((resolve, reject) => {
-            axios.post("so/plans", param).then((response) => {
-                // console.log(response.data);
-                resolve();
-                if (response.data.isOk) dispatch("getPlans");
-            });
         });
     },
     resetState({ commit }) {

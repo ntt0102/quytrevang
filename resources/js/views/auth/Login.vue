@@ -111,7 +111,7 @@
                 <template #default>
                     <div class="create-account">
                         {{ $t("auth.login.haveNotAccount") }}
-                        <RouterLink :to="{ name: 'create-account' }">{{
+                        <RouterLink :to="{ name: 'register' }">{{
                             $t("auth.login.createAccount")
                         }}</RouterLink>
                     </div>

@@ -11,7 +11,7 @@ function loadView(name1, name2, name3) {
 }
 const guestRoute = [
     {
-        path: "/login",
+        path: `/${lang.global.t("route.login")}`,
         name: "login",
         meta: {
             auth: false,
@@ -21,12 +21,12 @@ const guestRoute = [
         component: loadView("Auth", "Login"),
     },
     {
-        path: "/login-for-maintenance",
-        redirect: "login",
+        path: `/${lang.global.t("route.loginMaintain")}`,
+        redirect: `/${lang.global.t("route.login")}`,
     },
     {
-        path: "/register",
-        name: "create-account",
+        path: `/${lang.global.t("route.register")}`,
+        name: "register",
         meta: {
             auth: false,
             layout: GuestLayout,
@@ -35,7 +35,7 @@ const guestRoute = [
         component: loadView("Auth", "Register"),
     },
     {
-        path: "/reset-password",
+        path: `/${lang.global.t("route.resetPassword")}`,
         name: "reset-password",
         meta: {
             auth: false,
@@ -45,7 +45,7 @@ const guestRoute = [
         component: loadView("Auth", "ResetPassword"),
     },
     {
-        path: "/change-password",
+        path: `/${lang.global.t("route.changePassword")}`,
         meta: {
             auth: false,
             layout: GuestLayout,
@@ -54,7 +54,7 @@ const guestRoute = [
         component: loadView("Auth", "ChangePassword"),
     },
     {
-        path: "/verify-email",
+        path: `/${lang.global.t("route.verifyEmail")}`,
         name: "verify-email",
         meta: {
             auth: false,
@@ -65,7 +65,7 @@ const guestRoute = [
         component: loadView("Auth", "VerifyEmail"),
     },
     {
-        path: "/policy",
+        path: `/${lang.global.t("route.policy")}`,
         name: "policy",
         meta: { layout: Policy, title: lang.global.t("policy.title") },
         component: {},
@@ -76,10 +76,10 @@ const authRoute = [
     // User
     {
         path: "/",
-        redirect: "/overview",
+        redirect: `/${lang.global.t("route.overview")}`,
     },
     {
-        path: "/overview",
+        path: `/${lang.global.t("route.overview")}`,
         name: "overview",
         meta: {
             auth: true,
@@ -90,7 +90,7 @@ const authRoute = [
         component: loadView("User", "Overview", "Index"),
     },
     {
-        path: "/profile",
+        path: `/${lang.global.t("route.profile")}`,
         name: "profile",
         meta: {
             auth: true,
@@ -101,7 +101,7 @@ const authRoute = [
         component: loadView("User", "Profile", "Index"),
     },
     {
-        path: "/contract",
+        path: `/${lang.global.t("route.contract")}`,
         name: "contract",
         meta: {
             auth: true,
@@ -112,7 +112,7 @@ const authRoute = [
         component: loadView("User", "Contract", "Index"),
     },
     {
-        path: "/copyist",
+        path: `/${lang.global.t("route.copyist")}`,
         name: "copyist",
         meta: {
             auth: true,
@@ -124,8 +124,8 @@ const authRoute = [
     },
     // Manager
     {
-        path: "/admin-users",
-        name: "users",
+        path: `/${lang.global.t("route.adminUser")}`,
+        name: "admin-user",
         meta: {
             auth: true,
             permission: "users@control",
@@ -135,8 +135,8 @@ const authRoute = [
         component: loadView("Admin", "User", "Index"),
     },
     {
-        path: "/admin-contracts",
-        name: "contracts",
+        path: `/${lang.global.t("route.adminContract")}`,
+        name: "admin-contract",
         meta: {
             auth: true,
             permission: "contracts@control",
@@ -146,8 +146,8 @@ const authRoute = [
         component: loadView("Admin", "Contract", "Index"),
     },
     {
-        path: "/admin-copyists",
-        name: "copyists",
+        path: `/${lang.global.t("route.adminCopyist")}`,
+        name: "admin-copyist",
         meta: {
             auth: true,
             permission: "copyists@control",
@@ -157,8 +157,8 @@ const authRoute = [
         component: loadView("Admin", "Copyist", "Index"),
     },
     {
-        path: "/admin-comments",
-        name: "comments",
+        path: `/${lang.global.t("route.adminComment")}`,
+        name: "admin-comment",
         meta: {
             auth: true,
             permission: "comments@control",
@@ -169,8 +169,8 @@ const authRoute = [
     },
     // Trading
     {
-        path: "/trading-order",
-        name: "order",
+        path: `/${lang.global.t("route.tradingOrder")}`,
+        name: "trading-order",
         meta: {
             auth: true,
             permission: "stock@order",
@@ -180,8 +180,8 @@ const authRoute = [
         component: loadView("Trading", "Order", "Index"),
     },
     {
-        path: "/trading-statistic",
-        name: "statistic",
+        path: `/${lang.global.t("route.tradingStatistic")}`,
+        name: "trading-statistic",
         meta: {
             auth: true,
             permission: "stock@order",
@@ -191,8 +191,8 @@ const authRoute = [
         component: loadView("Trading", "Statistic", "Index"),
     },
     {
-        path: "/trading-finbooks",
-        name: "finbooks",
+        path: `/${lang.global.t("route.tradingFinbook")}`,
+        name: "trading-finbook",
         meta: {
             auth: true,
             permission: "finbooks@control",
@@ -203,7 +203,7 @@ const authRoute = [
     },
     // Settings
     {
-        path: "/setting-command",
+        path: `/${lang.global.t("route.settingCommand")}`,
         name: "setting-command",
         meta: {
             auth: true,
@@ -214,7 +214,7 @@ const authRoute = [
         component: loadView("Settings", "Command"),
     },
     {
-        path: "/setting-notification",
+        path: `/${lang.global.t("route.settingNotification")}`,
         name: "setting-notification",
         meta: {
             auth: true,
@@ -225,8 +225,8 @@ const authRoute = [
         component: loadView("Settings", "Notification"),
     },
     {
-        path: "/setting-files",
-        name: "setting-files",
+        path: `/${lang.global.t("route.settingFile")}`,
+        name: "setting-file",
         meta: {
             auth: true,
             permission: "files@setting",
@@ -236,7 +236,7 @@ const authRoute = [
         component: loadView("Settings", "Files"),
     },
     {
-        path: "/setting-log",
+        path: `/${lang.global.t("route.settingLog")}`,
         name: "setting-log",
         meta: {
             auth: true,
@@ -247,8 +247,8 @@ const authRoute = [
         component: loadView("Settings", "Log"),
     },
     {
-        path: "/setting-faqs",
-        name: "setting-faqs",
+        path: `/${lang.global.t("route.settingFaq")}`,
+        name: "setting-faq",
         meta: {
             auth: true,
             permission: "faqs@setting",
@@ -258,8 +258,8 @@ const authRoute = [
         component: loadView("Settings", "Faqs"),
     },
     {
-        path: "/setting-parameters",
-        name: "setting-parameters",
+        path: `/${lang.global.t("route.settingParameter")}`,
+        name: "setting-parameter",
         meta: {
             auth: true,
             permission: "parameters@setting",
@@ -269,7 +269,7 @@ const authRoute = [
         component: loadView("Settings", "Parameters"),
     },
     {
-        path: "/setting-database",
+        path: `/${lang.global.t("route.settingDatabase")}`,
         name: "setting-database",
         meta: {
             auth: true,
@@ -280,8 +280,8 @@ const authRoute = [
         component: loadView("Settings", "Database"),
     },
     {
-        path: "/setting-roles",
-        name: "setting-roles",
+        path: `/${lang.global.t("route.settingRole")}`,
+        name: "setting-role",
         meta: {
             auth: true,
             permission: "roles@setting",
@@ -291,8 +291,8 @@ const authRoute = [
         component: loadView("Settings", "Roles"),
     },
     {
-        path: "/setting-permissions",
-        name: "setting-permissions",
+        path: `/${lang.global.t("route.settingPermission")}`,
+        name: "setting-permission",
         meta: {
             auth: true,
             permission: "permissions@setting",

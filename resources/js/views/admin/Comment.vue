@@ -54,19 +54,18 @@
                             </div>
                             <div>
                                 <i class="dx-icon-tel"></i>
-                                {{ data.data.phone | phone }}
+                                {{ $filters.phone(data.data.phone) }}
                             </div>
                             <RouterLink
                                 v-if="!!data.data.user_code"
                                 :to="{
-                                    name: 'users',
+                                    name: 'admin-user',
                                     query: { code: data.data.user_code },
                                 }"
                                 >{{
-                                    $t("admin.comments.viewUser").replace(
-                                        "{code}",
-                                        data.data.user_code
-                                    )
+                                    $t("admin.comments.viewUser", [
+                                        data.data.user_code,
+                                    ])
                                 }}</RouterLink
                             >
                         </div>

@@ -105,7 +105,8 @@
             "interestFormula": "Công thức tính lãi"
         },
         "copyist": {
-            "title": "Sao chép lệnh"
+            "title": "Sao chép lệnh",
+            "setting": "Cài đặt sao chép"
         }
     },
     "admin": {
@@ -152,7 +153,7 @@
         "comments": {
             "title": "Phản hồi",
             "markAsRead": "Đánh dấu đã đọc",
-            "viewUser": "Xem tài khoản {code}"
+            "viewUser": "Xem tài khoản {0}"
         }
     },
     "trading": {
@@ -665,5 +666,34 @@
         "chooseImage": "Chọn ảnh",
         "deleteOldImage": "Xoá ảnh cũ",
         "confirm": "Xác nhận"
+    },
+    "route": {
+        "login": "dang-nhap",
+        "loginMaintain": "dang-nhap-bao-tri",
+        "register": "dang-ky",
+        "resetPassword": "quen-mat-khau",
+        "changePassword": "dat-lai-mat-khau",
+        "verifyEmail": "xac-thuc-email",
+        "policy": "chinh-sach",
+        "overview": "tong-quan",
+        "profile": "ho-so",
+        "contract": "so-tiet-kiem",
+        "copyist": "sao-chep-lenh",
+        "adminUser": "quan-ly-tai-khoan",
+        "adminContract": "quan-ly-so-tiet-kiem",
+        "adminCopyist": "quan-ly-sao-chep-lenh",
+        "adminComment": "quan-ly-phan-hoi",
+        "tradingOrder": "dat-lenh-dau-tu",
+        "tradingStatistic": "thong-ke-dau-tu",
+        "tradingFinbook": "so-tai-chinh",
+        "settingCommand": "cai-dat-lenh",
+        "settingNotification": "cai-dat-thong-bao",
+        "settingFile": "cai-dat-tap-tin",
+        "settingLog": "cai-dat-nhat-ky",
+        "settingFaq": "cai-dat-hoi-dap",
+        "settingParameter": "cai-dat-tham-so",
+        "settingDatabase": "cai-dat-co-so-du-lieu",
+        "settingRole": "cai-dat-vai-tro",
+        "settingPermission": "cai-dat-quyen"
     }
 }

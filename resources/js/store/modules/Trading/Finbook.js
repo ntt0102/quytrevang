@@ -15,7 +15,7 @@ const actions = {
     getFinbook({ commit, dispatch, getters, state, rootGetters }) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
-            axios.post("finbooks").then((response) => {
+            axios.post("trading/finbook").then((response) => {
                 commit("setState", response.data);
                 resolve();
             });
@@ -23,7 +23,7 @@ const actions = {
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("finbooks/save", param).then((response) => {
+            axios.post("trading/finbook/save", param).then((response) => {
                 resolve();
                 if (response.data.isOk) dispatch("getFinbook");
             });
@@ -32,7 +32,7 @@ const actions = {
     getFinbooksName({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("finbooks/name", null, { noLoading: true })
+                .post("trading/finbook/name", null, { noLoading: true })
                 .then((response) => {
                     resolve(response.data);
                 });
@@ -40,10 +40,12 @@ const actions = {
     },
     updateBalance({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("finbooks/update-balance", param).then((response) => {
-                resolve(response.data.isOk);
-                if (response.data.isOk) dispatch("getFinbook");
-            });
+            axios
+                .post("trading/finbook/update-balance", param)
+                .then((response) => {
+                    resolve(response.data.isOk);
+                    if (response.data.isOk) dispatch("getFinbook");
+                });
         });
     },
     resetState({ commit }) {

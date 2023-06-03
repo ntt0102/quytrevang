@@ -18,7 +18,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "users/validate-duplicate",
+                    "admin/users/validate-duplicate",
                     { field: "email", email: param.value },
                     { noLoading: true }
                 )
@@ -36,7 +36,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "users/validate-duplicate",
+                    "admin/users/validate-duplicate",
                     { field: "id_number", id_number: param.value },
                     { noLoading: true }
                 )
@@ -53,7 +53,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "users/validate-duplicate",
+                    "admin/users/validate-duplicate",
                     { field: "phone", phone: param.value },
                     { noLoading: true }
                 )
@@ -66,7 +66,7 @@ const actions = {
     getUsers({ commit, dispatch, getters, state, rootGetters }) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
-            axios.post("users").then((response) => {
+            axios.post("admin/user").then((response) => {
                 commit("setState", response.data);
                 resolve();
             });
@@ -75,7 +75,7 @@ const actions = {
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("users" + (param.isDeleted ? "/deleted" : "save"), {
+                .post("admin/user" + (param.isDeleted ? "/deleted" : "save"), {
                     changes: param.changes,
                 })
                 .then((response) => {
@@ -90,7 +90,7 @@ const actions = {
     uploadDocuments({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("users/documents", param, {
+                .post("admin/user/documents", param, {
                     headers: { "Content-Type": "multipart/form-data" },
                 })
                 .then((response) => {
@@ -105,7 +105,7 @@ const actions = {
     getContractInfo({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("users/contract-info", null, { noLoading: true })
+                .post("admin/user/contract-info", null, { noLoading: true })
                 .then((response) => {
                     console.log(response.data);
                     resolve(response.data);

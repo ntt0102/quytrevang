@@ -27,7 +27,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "statistic/validate-duplicate-date",
+                    "trading/statistic/validate-duplicate-date",
                     { date: param.value },
                     { nonLoading: true }
                 )
@@ -39,7 +39,7 @@ const actions = {
     },
     getData({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("statistic", null).then((response) => {
+            axios.post("trading/statistic", null).then((response) => {
                 commit("setData", response.data);
                 resolve();
             });
@@ -50,7 +50,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "statistic/chart",
+                    "trading/statistic/chart",
                     { period: period, page: 1 },
                     { noLoading: true }
                 )
@@ -67,7 +67,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "statistic/chart",
+                    "trading/statistic/chart",
                     {
                         period: state.charts.period,
                         page: state.charts.page + 1,
@@ -90,7 +90,7 @@ const actions = {
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("statistic/save", { changes: param.changes })
+                .post("trading/statistic/save", { changes: param.changes })
                 .then((response) => {
                     resolve();
                     dispatch("getData");
@@ -100,7 +100,7 @@ const actions = {
     },
     getSummary({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("statistic/summary", null).then((response) => {
+            axios.post("trading/statistic/summary", null).then((response) => {
                 commit("setSummary", response.data);
                 resolve();
             });
