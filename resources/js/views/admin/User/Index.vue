@@ -372,7 +372,7 @@
                                 text: $t('admin.users.buttons.viewContract'),
                                 onClick: () =>
                                     $router.push({
-                                        name: 'contracts',
+                                        name: 'admin-contract',
                                         query: { userCode: data.data.code },
                                     }),
                             },

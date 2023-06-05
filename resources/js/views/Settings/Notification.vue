@@ -23,7 +23,7 @@
                                         icon: 'far fa-user',
                                         onClick: () =>
                                             $router.push({
-                                                name: 'users',
+                                                name: 'admin-user',
                                                 query: {
                                                     selected:
                                                         state.formData.receiver,

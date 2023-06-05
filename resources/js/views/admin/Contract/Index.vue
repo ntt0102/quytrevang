@@ -492,7 +492,7 @@ function onHidden() {
 function onCellDblClick(e) {
     if (e.rowType == "data" && e.columnIndex == 2)
         router.push({
-            name: "users",
+            name: "admin-user",
             query: { code: e.data.user_code },
         });
 }

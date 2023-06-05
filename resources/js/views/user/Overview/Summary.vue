@@ -76,12 +76,12 @@ function onCellDblClick(e) {
     if (e.rowType == "data") {
         if (e.columnIndex == 0)
             router.push({
-                name: "users",
+                name: "admin-user",
                 query: { code: e.data.code },
             });
         else
             router.push({
-                name: "contracts",
+                name: "admin-contract",
                 query: { userCode: e.data.code },
             });
     }
