@@ -844,31 +844,39 @@ function showOrderButton() {
             }
         } else {
             if (!params.order.entry.hasOwnProperty("line")) {
-                var price = coordinateToPrice(params.crosshair.y);
-                const side =
-                    price >= params.data.price.slice(-1)[0].value ? 1 : -1;
-                params.order.side = side;
-                if (CURRENT_SEC < TIME.ATO) price = "ATO";
-                else if (CURRENT_SEC < TIME.ATC) {
+                var price = null,
+                    side = 0;
+                if (status.value.position == 0) {
+                    price = coordinateToPrice(params.crosshair.y);
+                    side =
+                        price >= params.data.price.slice(-1)[0].value ? 1 : -1;
+                    params.order.side = side;
+                    params.order.entry.price = price;
                     params.order.tp.price = price + side * TP_DEFAULT;
                     params.order.sl.price = price - side * SL_DEFAULT;
-                } else price = "ATC";
-                params.order.entry.price = price;
-                entryOrderRef.value.style.left =
-                    +(
-                        params.crosshair.x +
-                        (params.crosshair.x > innerWidth - 71 ? -71 : 1)
-                    ) + "px";
-                entryOrderRef.value.style.top =
-                    +(
-                        params.crosshair.y +
-                        (params.crosshair.y > innerHeight - 61 ? -61 : 1)
-                    ) + "px";
-                entryOrderRef.value.style.background =
-                    side > 0 ? "green" : "red";
-                entryOrderRef.value.innerText = `${
-                    side > 0 ? "LONG" : "SHORT"
-                } ${price}`;
+                } else {
+                    side = -status.value.position;
+                    if (CURRENT_SEC < TIME.ATO) price = "ATO";
+                    else if (CURRENT_SEC > TIME.ATC) price = "ATC";
+                    params.order.entry.price = price;
+                }
+                if (!!side) {
+                    entryOrderRef.value.style.left =
+                        +(
+                            params.crosshair.x +
+                            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
+                        ) + "px";
+                    entryOrderRef.value.style.top =
+                        +(
+                            params.crosshair.y +
+                            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
+                        ) + "px";
+                    entryOrderRef.value.style.background =
+                        side > 0 ? "green" : "red";
+                    entryOrderRef.value.innerText = `${
+                        side > 0 ? "LONG" : "SHORT"
+                    } ${price}`;
+                }
                 entryOrderRef.value.style.display = "block";
             }
         }
