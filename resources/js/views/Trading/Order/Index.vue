@@ -1069,24 +1069,23 @@ function drawRulerTool() {
         toolsStore.set("ruler", options);
     } else if (params.ruler.pointCount == 1) {
         const l0Price = +params.ruler.l0.options().price;
-        const distance2 = price - l0Price;
 
-        options.point = 2;
-        options.pointName = "l100";
-        options.title = distance2.toFixed(1);
-        params.ruler.l100 = params.series.price.createPriceLine(options);
-        toolsStore.set("ruler", options);
-        params.ruler.pointCount = 2;
-
-        const distance3 = 0.5 * distance2;
+        const distance3 = price - l0Price;
         options.point = 3;
         options.pointName = "l50";
         options.title = distance3.toFixed(1);
-        options.price = +(l0Price + distance3).toFixed(1);
         params.ruler.l50 = params.series.price.createPriceLine(options);
         toolsStore.set("ruler", options);
 
-        const distance4 = 0.75 * distance2;
+        const distance2 = 2 * distance3;
+        options.point = 2;
+        options.pointName = "l100";
+        options.title = distance2.toFixed(1);
+        options.price = +(l0Price + distance2).toFixed(1);
+        params.ruler.l100 = params.series.price.createPriceLine(options);
+        toolsStore.set("ruler", options);
+
+        const distance4 = 1.5 * distance3;
         options.point = 4;
         options.pointName = "l75";
         options.title = distance4.toFixed(1);
@@ -1094,6 +1093,7 @@ function drawRulerTool() {
         params.ruler.l75 = params.series.price.createPriceLine(options);
         toolsStore.set("ruler", options);
 
+        params.ruler.pointCount = 2;
         rulerToolRef.value.classList.remove("selected");
     }
 }
