@@ -55,6 +55,7 @@
                         :style="{ color: state.color }"
                         :title="$t('trading.orderChart.colorTool')"
                         @click="colorToolClick"
+                        @contextmenu="colorToolContextmenu"
                     >
                         <ColorPicker
                             v-show="state.showColorPicker"
@@ -985,6 +986,14 @@ function colorToolClick(e) {
     state.showColorPicker = !state.showColorPicker;
     e.stopPropagation();
 }
+function colorToolContextmenu(e) {
+    if (params.ruler.pointCount > 0) {
+        drawLineTool(+params.ruler.l75.options().price);
+        drawLineTool(+params.ruler.l100.options().price);
+    }
+    e.preventDefault();
+    e.stopPropagation();
+}
 function lineToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
@@ -1000,9 +1009,10 @@ function lineToolContextmenu(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-function drawLineTool() {
+function drawLineTool(price = null) {
     const TYPE = "line";
-    const price = formatPrice(coordinateToPrice(params.crosshair.y));
+    if (price == null)
+        price = formatPrice(coordinateToPrice(params.crosshair.y));
     const oldLength = params.lines.length;
     params.lines = params.lines.filter((line) => {
         const ops = line.options();
