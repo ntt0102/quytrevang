@@ -202,7 +202,7 @@ let params = {
     order: { side: 0, position: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l50: {}, l75: {}, l100: {}, pointCount: 0 },
-    vertical: { v1: {}, v2: {}, v3: {}, pointCount: 0 },
+    vertical: { v1: {}, v2: {}, v3: {}, v4: {}, pointCount: 0 },
     crosshair: {},
     loadWhitespace: true,
     interval: null,
@@ -1095,14 +1095,20 @@ function drawVerticalTool() {
             time: 2 * params.vertical.v2.time - params.vertical.v1.time,
             value: 1,
         };
+        params.vertical.v4 = {
+            time: 3 * params.vertical.v2.time - 2 * params.vertical.v1.time,
+            value: 1,
+        };
 
         params.series.vertical.setData([
             params.vertical.v1,
             params.vertical.v2,
             params.vertical.v3,
+            params.vertical.v4,
         ]);
         toolsStore.set("vertical", params.vertical.v2);
         toolsStore.set("vertical", params.vertical.v3);
+        toolsStore.set("vertical", params.vertical.v4);
         verticalToolRef.value.classList.remove("selected");
     }
 }
