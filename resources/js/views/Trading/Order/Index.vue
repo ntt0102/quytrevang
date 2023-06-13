@@ -77,13 +77,13 @@
                         @click="rulerToolClick"
                         @contextmenu="rulerToolContextmenu"
                     ></div>
-                    <div
+                    <!-- <div
                         ref="verticalToolRef"
                         class="command far fa-arrows-h"
                         :title="$t('trading.orderChart.verticalTool')"
                         @click="verticalToolClick"
                         @contextmenu="verticalToolContextmenu"
-                    ></div>
+                    ></div> -->
                     <div
                         class="command far fa-info-circle"
                         :title="
