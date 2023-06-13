@@ -12,7 +12,6 @@ class OrderChartDb {
                 this.store = e.target.result;
                 this.store.createObjectStore("order", { keyPath: "kind" });
                 this.store.createObjectStore("line", { keyPath: "price" });
-                this.store.createObjectStore("vertical", { keyPath: "time" });
                 this.store.createObjectStore("ruler", { keyPath: "point" });
                 resolve();
             };

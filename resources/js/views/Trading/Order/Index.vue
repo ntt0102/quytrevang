@@ -77,13 +77,6 @@
                         @click="rulerToolClick"
                         @contextmenu="rulerToolContextmenu"
                     ></div>
-                    <!-- <div
-                        ref="verticalToolRef"
-                        class="command far fa-arrows-h"
-                        :title="$t('trading.orderChart.verticalTool')"
-                        @click="verticalToolClick"
-                        @contextmenu="verticalToolContextmenu"
-                    ></div> -->
                     <div
                         class="command far fa-info-circle"
                         :title="
@@ -190,7 +183,6 @@ const fullscreenToolRef = ref(null);
 const reloadToolRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
-const verticalToolRef = ref(null);
 const rulerToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
@@ -202,7 +194,6 @@ let params = {
     order: { side: 0, position: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l50: {}, l75: {}, l100: {}, pointCount: 0 },
-    vertical: { v1: {}, v2: {}, v3: {}, v4: {}, pointCount: 0 },
     crosshair: {},
     loadWhitespace: true,
     interval: null,
@@ -243,13 +234,6 @@ onMounted(() => {
         priceScaleId: "whitespace",
         visible: false,
     });
-    params.series.vertical = params.chart.addHistogramSeries({
-        priceScaleId: "vertical",
-        scaleMargins: { top: 0, bottom: 0 },
-        color: "#26a69a",
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
     params.series.price = params.chart.addLineSeries({
         color: "#CCCCCC",
         priceFormat: { minMove: 0.1 },
@@ -286,8 +270,6 @@ function eventChartContextmenu(e) {
 function eventChartClick() {
     hideOrderButton();
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
-    else if (verticalToolRef.value.classList.contains("selected"))
-        drawVerticalTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
 }
 function eventChartCrosshairMove(e) {
@@ -604,11 +586,6 @@ function loadToolsData() {
             if (!line.removed)
                 params.lines.push(params.series.price.createPriceLine(line));
         });
-        //
-        const verticals = await toolsStore.get("vertical");
-        if (verticals.length > 0) {
-            params.series.vertical.setData(verticals);
-        }
         //
         const rulerLines = await toolsStore.get("ruler");
         if (rulerLines.length > 0) {
@@ -1064,58 +1041,6 @@ function removeLineTool() {
     params.lines.forEach((line) => params.series.price.removePriceLine(line));
     params.lines = [];
     toolsStore.clear("line");
-}
-function verticalToolClick(e) {
-    state.showColorPicker = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-        removeVerticalTool();
-    }
-    e.stopPropagation();
-}
-function verticalToolContextmenu(e) {
-    removeVerticalTool();
-    e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
-}
-function drawVerticalTool() {
-    if (params.vertical.pointCount == 0) {
-        params.vertical.v1 = { time: params.crosshair.time, value: 1 };
-        params.series.vertical.setData([params.vertical.v1]);
-        params.vertical.pointCount = 1;
-        toolsStore.set("vertical", params.vertical.v1);
-    } else {
-        params.vertical.v2 = { time: params.crosshair.time, value: 1 };
-        params.vertical.v3 = {
-            time: 2 * params.vertical.v2.time - params.vertical.v1.time,
-            value: 1,
-        };
-        params.vertical.v4 = {
-            time: 3 * params.vertical.v2.time - 2 * params.vertical.v1.time,
-            value: 1,
-        };
-
-        params.series.vertical.setData([
-            params.vertical.v1,
-            params.vertical.v2,
-            params.vertical.v3,
-            params.vertical.v4,
-        ]);
-        toolsStore.set("vertical", params.vertical.v2);
-        toolsStore.set("vertical", params.vertical.v3);
-        toolsStore.set("vertical", params.vertical.v4);
-        verticalToolRef.value.classList.remove("selected");
-    }
-}
-function removeVerticalTool() {
-    params.vertical = { v1: {}, v2: {}, v3: {}, pointCount: 0 };
-    params.series.vertical.setData([]);
-    toolsStore.clear("vertical");
 }
 function rulerToolClick(e) {
     state.showColorPicker = false;
