@@ -65,14 +65,14 @@
                     </div>
                     <div
                         ref="lineToolRef"
-                        class="command far fa-minus"
+                        class="command far fa-horizontal-rule"
                         :title="$t('trading.orderChart.lineTool')"
                         @click="lineToolClick"
                         @contextmenu="lineToolContextmenu"
                     ></div>
                     <div
                         ref="rulerToolRef"
-                        class="command far fa-arrows-v"
+                        class="command far fa-ruler"
                         :title="$t('trading.orderChart.rulerTool')"
                         @click="rulerToolClick"
                         @contextmenu="rulerToolContextmenu"
@@ -84,13 +84,13 @@
                         @click="alertToolClick"
                         @contextmenu="alertToolContextmenu"
                     ></div>
-                    <div
+                    <!-- <div
                         class="command far fa-info-circle"
                         :title="
                             $t('trading.orderChart.copyistStatusPopup.title')
                         "
                         @click="() => $refs.copyistStatusPopupRef.show()"
-                    ></div>
+                    ></div> -->
                     <div
                         ref="cancelOrderRef"
                         class="cancel-order command far fa-trash-alt"
