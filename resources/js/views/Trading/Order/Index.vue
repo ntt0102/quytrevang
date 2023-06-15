@@ -78,6 +78,13 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
+                        ref="alertToolRef"
+                        class="command far fa-alarm-exclamation"
+                        :title="$t('trading.orderChart.alertTool')"
+                        @click="alertToolClick"
+                        @contextmenu="alertToolContextmenu"
+                    ></div>
+                    <div
                         class="command far fa-info-circle"
                         :title="
                             $t('trading.orderChart.copyistStatusPopup.title')
@@ -123,6 +130,7 @@ import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { confirm } from "devextreme/ui/dialog";
+import alertFile from "../../../../audios/alert.wav";
 import {
     reactive,
     ref,
@@ -184,6 +192,7 @@ const reloadToolRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
+const alertToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
@@ -194,6 +203,7 @@ let params = {
     order: { side: 0, position: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l50: {}, l75: {}, l100: {}, pointCount: 0 },
+    alerts: [],
     crosshair: {},
     loadWhitespace: true,
     interval: null,
@@ -201,7 +211,10 @@ let params = {
     websocket: null,
     isAutoOrdering: false,
     socketStop: false,
+    alertAudio: new Audio(alertFile),
 };
+params.alertAudio.loop = true;
+// params.alertAudio.play();
 const state = reactive({
     chartDate: CURRENT_DATE,
     clock: moment().format("HH:mm:ss"),
@@ -271,6 +284,7 @@ function eventChartClick() {
     hideOrderButton();
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
+    else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
@@ -470,6 +484,18 @@ function eventPriceLineDrag(e) {
                     toolsStore.set("ruler", params.ruler.l50.options());
                     break;
             }
+            break;
+        case "alert":
+            toolsStore.set("alert", {
+                price: oldPrice,
+                removed: true,
+            });
+            const currentPrice = params.data.price.slice(-1)[0].value;
+            var title = newPrice >= currentPrice ? ">" : "<";
+            line.applyOptions({ title: title });
+            toolsStore.set("alert", line.options());
+            alertToolRef.value.classList.remove("selected");
+            params.alertAudio.pause();
             break;
     }
 }
@@ -854,6 +880,19 @@ function intervalHandler() {
             }
         }
         if (CURRENT_SEC == TIME.START) connectSocket();
+        if (params.alertAudio.paused) {
+            params.alerts.forEach((alert) => {
+                const ops = alert.options();
+                if (!ops.removed && !!params.data.price.length) {
+                    const currentPrice = params.data.price.slice(-1)[0].value;
+                    if (
+                        (ops.title == ">" && currentPrice >= ops.price) ||
+                        (ops.title == "<" && currentPrice <= ops.price)
+                    )
+                        params.alertAudio.play();
+                }
+            });
+        }
     }
     state.clock = Intl.DateTimeFormat(navigator.language, {
         hour: "numeric",
@@ -1119,6 +1158,56 @@ function removeRulerTool() {
         params.ruler = { l0: {}, l50: {}, l75: {}, l100: {}, pointCount: 0 };
         toolsStore.clear("ruler");
     }
+}
+function alertToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) e.target.classList.add("selected");
+    e.stopPropagation();
+}
+function alertToolContextmenu(e) {
+    removeAlertTool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawAlertTool() {
+    const TYPE = "alert";
+    const price = formatPrice(coordinateToPrice(params.crosshair.y));
+    const oldLength = params.alerts.length;
+    params.alerts = params.alerts.filter((line) => {
+        const ops = line.options();
+        const isExist = (ops.type = TYPE && price == +ops.price);
+        if (isExist) {
+            params.series.price.removePriceLine(line);
+            toolsStore.set("alert", { price: price, removed: true });
+        }
+        return !isExist;
+    });
+    if (params.alerts.length == oldLength) {
+        const options = {
+            lineType: TYPE,
+            price: price,
+            title: price >= params.data.price.slice(-1)[0].value ? ">" : "<",
+            color: "red",
+            lineWidth: 1,
+            lineStyle: 1,
+            draggable: true,
+        };
+        params.alerts.push(params.series.price.createPriceLine(options));
+        toolsStore.set("alert", options);
+    }
+    alertToolRef.value.classList.remove("selected");
+    params.alertAudio.pause();
+}
+function removeAlertTool() {
+    params.alerts.forEach((line) => params.series.price.removePriceLine(line));
+    params.alerts = [];
+    toolsStore.clear("alert");
+    params.alertAudio.pause();
 }
 function cancelOrderClick() {
     let result = confirm(

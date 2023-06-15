@@ -13,6 +13,7 @@ class OrderChartDb {
                 this.store.createObjectStore("order", { keyPath: "kind" });
                 this.store.createObjectStore("line", { keyPath: "price" });
                 this.store.createObjectStore("ruler", { keyPath: "point" });
+                this.store.createObjectStore("alert", { keyPath: "price" });
                 resolve();
             };
             request.onsuccess = (e) => {
