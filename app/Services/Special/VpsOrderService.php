@@ -75,17 +75,30 @@ class VpsOrderService extends CoreService
         //
         switch ($payload->action) {
             case 'entry':
+                $isNew = $payload->data->cmd == "new";
+                if ($isNew && $this->position != 0)
+                    return ['isOk' => false, 'message' => 'openedPosition'];
                 return $this->conditionOrder($payload->action, $payload->data);
                 break;
             case 'tpsl':
-                $tp = $this->order('tp', $payload->tpData);
-                if (!$tp['isOk']) return $tp;
-                return $this->conditionOrder('sl', $payload->slData);
+                if ($this->position == 0)
+                    return ['isOk' => false, 'message' => 'unopenedPosition'];
+                else {
+                    $tp = $this->order('tp', $payload->tpData);
+                    if (!$tp['isOk']) return $tp;
+                    return $this->conditionOrder('sl', $payload->slData);
+                }
                 break;
             case 'tp':
-                return $this->order($payload->action, $payload->data);
+                $isNew = $payload->data->cmd == "new";
+                if ($isNew && $this->position == 0)
+                    return ['isOk' => false, 'message' => 'unopenedPosition'];
+                else return $this->order($payload->action, $payload->data);
                 break;
             case 'sl':
+                $isNew = $payload->data->cmd == "new";
+                if ($isNew && $this->position == 0)
+                    return ['isOk' => false, 'message' => 'unopenedPosition'];
                 return $this->conditionOrder($payload->action, $payload->data);
                 break;
             case 'cancel':
@@ -102,21 +115,16 @@ class VpsOrderService extends CoreService
                     $sl = $this->conditionOrder('sl', $payload->slData);
                     if (!$sl['isOk']) return $sl;
                 }
-                return $this->order('exit', $payload->exitData);
+                if ($this->position == 0) return ['isOk' => true];
+                else return $this->order('exit', $payload->exitData);
                 break;
         }
     }
 
     public function conditionOrder($type, $data)
     {
-        $isEntry = $type == "entry";
         $isSl = $type == "sl";
         $isNew = $data->cmd == "new";
-        if ($isEntry && $isNew && $this->position != 0)
-            return ['isOk' => false, 'message' => 'openedPosition'];
-        if ($isSl && $isNew && $this->position == 0)
-            return ['isOk' => false, 'message' => 'unopenedPosition'];
-        //
         $isNotDelete = $data->cmd != 'delete';
         $side = $isSl ? -$this->position : ($isNew ? $data->side : $this->position);
         $payload = [
@@ -155,9 +163,6 @@ class VpsOrderService extends CoreService
     public function order($type, $data)
     {
         $isNew = $data->cmd == "new";
-        if ($isNew && $this->position == 0)
-            return ['isOk' => false, 'message' => 'unopenedPosition'];
-        //
         $isNotCancel = $data->cmd != "cancel";
         $price = $isNotCancel ? $this->formatPrice($data->price) : "";
         $side = $isNew ? $this->formatSide(-$this->position) : "";
