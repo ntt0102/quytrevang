@@ -78,7 +78,7 @@ class VpsOrderService extends CoreService
                 $isNew = $payload->data->cmd == "new";
                 if ($isNew && $this->position != 0)
                     return ['isOk' => false, 'message' => 'openedPosition'];
-                return $this->conditionOrder($payload->action, $payload->data);
+                else return $this->conditionOrder($payload->action, $payload->data);
                 break;
             case 'tpsl':
                 if ($this->position == 0)
@@ -99,7 +99,7 @@ class VpsOrderService extends CoreService
                 $isNew = $payload->data->cmd == "new";
                 if ($isNew && $this->position == 0)
                     return ['isOk' => false, 'message' => 'unopenedPosition'];
-                return $this->conditionOrder($payload->action, $payload->data);
+                else return $this->conditionOrder($payload->action, $payload->data);
                 break;
             case 'cancel':
                 $tp = $this->order('tp', $payload->tpData);
