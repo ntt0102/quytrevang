@@ -799,43 +799,45 @@ function connectSocket() {
                                 ) {
                                     if (!params.isAutoOrdering) {
                                         params.isAutoOrdering = true;
-                                        store
-                                            .dispatch(
-                                                "tradingOrder/executeOrder",
-                                                {
-                                                    action: "tpsl",
-                                                    tpData: {
-                                                        cmd: "new",
-                                                        price: params.order.tp
-                                                            .price,
-                                                    },
-                                                    slData: {
-                                                        cmd: "new",
-                                                        price: params.order.sl
-                                                            .price,
-                                                    },
-                                                }
-                                            )
-                                            .then((resp) => {
-                                                if (resp.isOk) {
-                                                    drawOrderLine("tp");
-                                                    drawOrderLine("sl");
-                                                    params.order.entry.line.applyOptions(
-                                                        {
-                                                            draggable: false,
-                                                        }
-                                                    );
-                                                    toast.success(
-                                                        t(
-                                                            "trading.orderChart.autoNewTpSlSuccess"
-                                                        )
-                                                    );
-                                                } else
-                                                    toastOrderError(
-                                                        resp.message
-                                                    );
-                                                params.isAutoOrdering = false;
-                                            });
+                                        setTimeout(() => {
+                                            store
+                                                .dispatch(
+                                                    "tradingOrder/executeOrder",
+                                                    {
+                                                        action: "tpsl",
+                                                        tpData: {
+                                                            cmd: "new",
+                                                            price: params.order
+                                                                .tp.price,
+                                                        },
+                                                        slData: {
+                                                            cmd: "new",
+                                                            price: params.order
+                                                                .sl.price,
+                                                        },
+                                                    }
+                                                )
+                                                .then((resp) => {
+                                                    if (resp.isOk) {
+                                                        drawOrderLine("tp");
+                                                        drawOrderLine("sl");
+                                                        params.order.entry.line.applyOptions(
+                                                            {
+                                                                draggable: false,
+                                                            }
+                                                        );
+                                                        toast.success(
+                                                            t(
+                                                                "trading.orderChart.autoNewTpSlSuccess"
+                                                            )
+                                                        );
+                                                    } else
+                                                        toastOrderError(
+                                                            resp.message
+                                                        );
+                                                    params.isAutoOrdering = false;
+                                                });
+                                        }, 1000);
                                     }
                                 }
                             }
