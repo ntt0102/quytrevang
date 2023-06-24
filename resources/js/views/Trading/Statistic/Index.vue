@@ -34,6 +34,17 @@
                     },
                 },
                 {
+                    visible: permissions.includes('trades@edit'),
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-flag-checkered small',
+                        hint: $t('trading.trades.buttons.report'),
+                        onClick: () =>
+                            $store.dispatch('tradingStatistic/report'),
+                    },
+                },
+                {
                     location: 'after',
                     widget: 'dxSelectBox',
                     options: {
@@ -300,6 +311,7 @@ const visibleSeries = reactive({
 });
 const chartRef = ref(null);
 const charts = computed(() => store.state.tradingStatistic.charts);
+const permissions = computed(() => store.state.auth.user.permissions);
 
 store.dispatch("tradingStatistic/getChart", route.query.period ?? "day");
 bus.on("toggleMenu", () => {

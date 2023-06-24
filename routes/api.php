@@ -117,6 +117,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('chart', 'TradeController@getChart');
                     Route::post('summary', 'TradeController@getSummary');
                     Route::post('save', 'TradeController@save')->middleware('can:trades@edit');
+                    Route::post('report', 'TradeController@report')->middleware('can:trades@edit');
                 });
                 Route::group(['prefix' => 'order', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'OrderChartController@getChartData');
