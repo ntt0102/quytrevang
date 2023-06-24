@@ -245,23 +245,23 @@
                         <rect
                             :x="0"
                             :y="0"
-                            :width="10"
-                            :height="10"
-                            fill="DarkGreen"
+                            :width="20"
+                            :height="2"
+                            fill="DarkOrange"
                         />
                         <rect
-                            :x="10"
-                            :y="0"
-                            :width="7"
-                            :height="10"
+                            :x="0"
+                            :y="2"
+                            :width="20"
+                            :height="4"
                             fill="FireBrick"
                         />
                         <rect
-                            :x="17"
-                            :y="0"
-                            :width="3"
-                            :height="10"
-                            fill="DarkOrange"
+                            :x="0"
+                            :y="5"
+                            :width="20"
+                            :height="4"
+                            fill="DarkGreen"
                         />
                     </g>
                     <g v-else>
