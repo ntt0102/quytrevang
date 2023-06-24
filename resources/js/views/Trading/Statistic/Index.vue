@@ -40,8 +40,7 @@
                     options: {
                         icon: 'far fa-flag-checkered small',
                         hint: $t('trading.trades.buttons.report'),
-                        onClick: () =>
-                            $store.dispatch('tradingStatistic/report'),
+                        onClick: report,
                     },
                 },
                 {
@@ -484,6 +483,9 @@ function setReferenceTime(value) {
         "argumentAxis.constantLines[0].value",
         value
     );
+}
+function report() {
+    bus.emit("checkPin", () => store.dispatch("tradingStatistic/report"));
 }
 </script>
 <style lang="scss">
