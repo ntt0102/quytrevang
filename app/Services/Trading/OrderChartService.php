@@ -55,8 +55,11 @@ class OrderChartService extends CoreService
      */
     public function getConfig($payload)
     {
+        $copyist = request()->user()->copyist;
         return [
             'symbol' => get_global_value('vn30f1m'),
+            'vps_code' => $copyist->vps_code,
+            'vps_session' => $copyist->vps_session,
         ];
     }
 

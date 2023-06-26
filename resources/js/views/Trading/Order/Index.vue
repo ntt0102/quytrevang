@@ -50,6 +50,11 @@
                         @click="refreshChart"
                     ></div>
                     <div
+                        class="command far fa-chart-bar"
+                        :title="$t('trading.orderChart.tradingview')"
+                        @click="tradingviewClick"
+                    ></div>
+                    <div
                         ref="colorToolRef"
                         class="color command far fa-palette"
                         :style="{ color: state.color }"
@@ -125,6 +130,11 @@
                         @click="chartTopClick"
                     ></div>
                 </div>
+                <iframe
+                    v-show="state.showTradingView"
+                    class="tradingview-chart"
+                    :src="tradingViewSrc"
+                ></iframe>
             </div>
         </div>
     </div>
@@ -223,15 +233,18 @@ let params = {
     alertAudio: new Audio(alertFile),
 };
 params.alertAudio.loop = true;
-// params.alertAudio.play();
 const state = reactive({
     chartDate: CURRENT_DATE,
     clock: moment().format("HH:mm:ss"),
     isFullscreen: false,
     color: "#F44336",
     showColorPicker: false,
+    showTradingView: false,
 });
 const status = computed(() => store.state.tradingOrder.status);
+const tradingViewSrc = computed(() => {
+    return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${store.state.tradingOrder.config.vps_code}&s=${store.state.tradingOrder.config.vps_session}&resolution=1`;
+});
 
 store.dispatch("tradingOrder/getConfig").then(connectSocket);
 store.dispatch("tradingOrder/getStatus");
@@ -1046,6 +1059,10 @@ function removeOrderLine(kind) {
         delete params.order[kind].line;
     }
 }
+function tradingviewClick(e) {
+    state.showTradingView = !state.showTradingView;
+    e.stopPropagation();
+}
 function colorToolClick(e) {
     state.showColorPicker = !state.showColorPicker;
     e.stopPropagation();
@@ -1633,6 +1650,15 @@ function refreshChart() {
         width: 25px !important;
         height: 25px !important;
         font-size: 18px;
+    }
+
+    .tradingview-chart {
+        position: absolute;
+        top: 0;
+        left: 32px;
+        width: calc(100% - 32px);
+        height: 100%;
+        z-index: 3;
     }
 }
 </style>
