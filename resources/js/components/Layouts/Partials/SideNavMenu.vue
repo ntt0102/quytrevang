@@ -79,7 +79,7 @@ function forwardClick(...args) {
 
 function handleItemClick(e) {
     if (mf.isSet(e.itemData.items)) return;
-    if (e.itemData.name == "refresh") window.location.reload();
+    if (e.itemData.name == "refresh") window.location.reload(true);
     else router.push({ name: e.itemData.name });
 
     const pointerEvent = e.event;
