@@ -12,10 +12,11 @@ axios.interceptors.request.use(
         console.log("request:" + config.url, config.data);
         const token = store.state.auth.token;
         if (!!token) config.headers["Authorization"] = `Bearer ${token}`;
-        if (config.method === "post" && !config.noLoading) {
-            if (navigator.onLine) store.dispatch("setSyncing", true);
-            else if (moment().diff(shownOfflineAt, "seconds") > 5) {
-                toast.info(lang.global.t("messages.info.offline"));
+        if (config.method === "post") {
+            if (navigator.onLine) {
+                if (!config.noLoading) store.dispatch("setSyncing", true);
+            } else if (moment().diff(shownOfflineAt, "seconds") > 5) {
+                // toast.info(lang.global.t("messages.info.offline"));
                 shownOfflineAt = moment();
             }
         }
