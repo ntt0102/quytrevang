@@ -5,6 +5,8 @@ import { toast } from "vue3-toastify";
 import mf from "../properties/functions";
 import config from "devextreme/core/config";
 
+let shownOfflineAt = moment();
+
 axios.interceptors.request.use(
     (config) => {
         console.log("request:" + config.url, config.data);
@@ -12,7 +14,10 @@ axios.interceptors.request.use(
         if (!!token) config.headers["Authorization"] = `Bearer ${token}`;
         if (config.method === "post" && !config.noLoading) {
             if (navigator.onLine) store.dispatch("setSyncing", true);
-            else toast.info(lang.global.t("messages.info.offline"));
+            else if (moment().diff(shownOfflineAt, "seconds") > 5) {
+                toast.info(lang.global.t("messages.info.offline"));
+                shownOfflineAt = moment();
+            }
         }
         config.data = crypto.encrypt(config.data);
         return config;
@@ -59,9 +64,7 @@ axios.interceptors.response.use(
         console.log("error:");
         console.log(error.response);
         store.dispatch("setSyncing", false);
-        if (navigator.onLine) {
-            if (!!error.response) mf.handleError(error);
-        } else toast.error(lang.global.t("messages.error.offline"));
+        if (navigator.onLine && !!error.response) mf.handleError(error);
         return Promise.reject(error);
     }
 );
