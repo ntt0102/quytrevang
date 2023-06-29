@@ -191,12 +191,18 @@ function initPushNotification() {
 
     navigator.serviceWorker.onmessage = (event) => {
         if (event.data) {
-            if (event.data.type === "OFFLINE") {
-                toast.error(t("messages.error.offline"));
-                store.dispatch("setSyncing", false);
-            }
+            // if (event.data.type === "OFFLINE") {
+            //     toast.error(t("messages.error.offline"));
+            //     store.dispatch("setSyncing", false);
+            // }
         }
     };
+    // axios.get("/user", {
+    //     params: {
+    //         ID: 12345,
+    //     },
+    // });
+    axios.get("/user?ID=12345");
 }
 function connectPusher() {
     pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {

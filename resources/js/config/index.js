@@ -16,7 +16,7 @@ axios.interceptors.request.use(
             if (navigator.onLine) {
                 if (!config.noLoading) store.dispatch("setSyncing", true);
             } else if (moment().diff(shownOfflineAt, "seconds") > 5) {
-                // toast.info(lang.global.t("messages.info.offline"));
+                toast.info(lang.global.t("messages.info.offline"));
                 shownOfflineAt = moment();
             }
         }
