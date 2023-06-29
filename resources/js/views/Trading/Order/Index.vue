@@ -836,6 +836,12 @@ function connectSocket() {
                                     if (!params.isAutoOrdering) {
                                         params.isAutoOrdering = true;
                                         setTimeout(() => {
+                                            params.order.tp.price =
+                                                params.order.entry.price +
+                                                params.order.side * TP_DEFAULT;
+                                            params.order.sl.price =
+                                                params.order.entry.price -
+                                                params.order.side * SL_DEFAULT;
                                             store
                                                 .dispatch(
                                                     "tradingOrder/executeOrder",
@@ -968,8 +974,6 @@ function showOrderButton() {
                         price >= params.data.price.slice(-1)[0].value ? 1 : -1;
                     params.order.side = side;
                     params.order.entry.price = price;
-                    params.order.tp.price = price + side * TP_DEFAULT;
-                    params.order.sl.price = price - side * SL_DEFAULT;
                 } else {
                     side = -status.value.position;
                     if (CURRENT_SEC < TIME.ATO) price = "ATO";
@@ -1450,6 +1454,10 @@ function entryOrderClick() {
     }
 }
 function tpslOrderClick() {
+    params.order.tp.price =
+        params.order.entry.price + params.order.side * TP_DEFAULT;
+    params.order.sl.price =
+        params.order.entry.price - params.order.side * SL_DEFAULT;
     store
         .dispatch("tradingOrder/executeOrder", {
             action: "tpsl",
