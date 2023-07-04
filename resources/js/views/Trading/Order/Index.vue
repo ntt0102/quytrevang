@@ -50,6 +50,7 @@
                         @click="refreshChart"
                     ></div>
                     <div
+                        ref="tradingviewRef"
                         class="command far fa-chart-bar"
                         :title="$t('trading.orderChart.tradingview')"
                         @click="tradingviewClick"
@@ -206,6 +207,7 @@ const orderChartRef = ref(null);
 const spinnerRef = ref(null);
 const fullscreenToolRef = ref(null);
 const reloadToolRef = ref(null);
+const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
@@ -587,6 +589,8 @@ function eventKeyPress(e) {
                 break;
             case 99:
                 fullscreenToolRef.value.click();
+            case 100:
+                tradingviewRef.value.click();
                 break;
         }
     }
