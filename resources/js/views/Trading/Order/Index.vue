@@ -285,7 +285,6 @@ onMounted(() => {
     document.addEventListener("fullscreenchange", eventFullscreenChange);
     store.dispatch("tradingOrder/getChartData", state.chartDate).then(() => {
         loadToolsData();
-        params.loadWhitespace = false;
     });
 });
 onUnmounted(() => {
@@ -667,6 +666,7 @@ function loadChartData() {
             createWhitespaceData()
         );
         params.series.whitespace.setData(params.data.whitespace);
+        params.loadWhitespace = false;
     }
     params.data.price = mergeChartData(
         store.state.tradingOrder.chartData,
@@ -1498,10 +1498,13 @@ function toastOrderError(error) {
     toast.error(t(`trading.orderChart.${error}`));
 }
 function dateSelectChange() {
+    params.loadWhitespace = true;
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 function refreshChart() {
     params.data.price = [];
+    params.data.whitespace = [];
+    params.loadWhitespace = true;
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 </script>
