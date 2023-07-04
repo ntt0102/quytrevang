@@ -138,11 +138,11 @@
             </div>
         </div>
     </div>
-    <CopyistStatusPopup ref="copyistStatusPopupRef" />
+    <!-- <CopyistStatusPopup ref="copyistStatusPopupRef" /> -->
 </template>
 
 <script setup>
-import CopyistStatusPopup from "./CopyistStatusPopup.vue";
+// import CopyistStatusPopup from "./CopyistStatusPopup.vue";
 import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
@@ -218,7 +218,7 @@ let params = {
     chart: {},
     series: {},
     data: { whitespace: [], price: [] },
-    order: { side: 0, position: 0, entry: {}, tp: {}, sl: {} },
+    order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l50: {}, l75: {}, l100: {}, pointCount: 0 },
     vertical: { v1: {}, v2: {}, v3: {}, v4: {}, pointCount: 0 },
@@ -346,7 +346,7 @@ function eventPriceLineDrag(e) {
             if (newPrice != oldPrice) {
                 var isChanged = false;
                 if (lineOptions.kind == "entry") {
-                    if (!params.order.position) {
+                    if (!status.value.position) {
                         isChanged = true;
                         params.order[lineOptions.kind].price = newPrice;
                         store
@@ -631,7 +631,6 @@ function loadToolsData() {
             params.order[item.kind].price = item.price;
             drawOrderLine(item.kind);
             toggleCancelOrderButton(true);
-            if (item.kind == "tp") params.order.position = item.side;
         });
         if (params.order.tp.hasOwnProperty("line"))
             params.order.entry.line.applyOptions({
@@ -947,11 +946,10 @@ function intervalHandler() {
 function showOrderButton() {
     const CURRENT_SEC = moment().unix();
     if (inSession(CURRENT_SEC)) {
-        if (params.order.position) {
-            if (
-                params.order.entry.hasOwnProperty("line") &&
-                !params.order.tp.hasOwnProperty("line")
-            ) {
+        if (!params.order.tp.hasOwnProperty("line")) {
+            if (!!status.value.position) {
+                params.order.entry.price = params.data.price.slice(-1)[0].value;
+                params.order.side = status.value.position;
                 tpslOrderRef.value.style.left =
                     +(
                         params.crosshair.x +
@@ -964,41 +962,41 @@ function showOrderButton() {
                     ) + "px";
                 tpslOrderRef.value.style.display = "block";
             }
-        } else {
-            if (!params.order.entry.hasOwnProperty("line")) {
-                var price = null,
-                    side = 0;
-                if (status.value.position == 0) {
-                    price = coordinateToPrice(params.crosshair.y);
-                    side =
-                        price >= params.data.price.slice(-1)[0].value ? 1 : -1;
-                    params.order.side = side;
+        }
+        if (!params.order.entry.hasOwnProperty("line")) {
+            var price = null,
+                side = 0;
+            if (!status.value.position) {
+                price = coordinateToPrice(params.crosshair.y);
+                side = price >= params.data.price.slice(-1)[0].value ? 1 : -1;
+                params.order.side = side;
+                params.order.entry.price = price;
+            } else {
+                if (CURRENT_SEC < TIME.ATO) price = "ATO";
+                else if (CURRENT_SEC > TIME.ATC) price = "ATC";
+                if (!!price) {
                     params.order.entry.price = price;
-                } else {
                     side = -status.value.position;
-                    if (CURRENT_SEC < TIME.ATO) price = "ATO";
-                    else if (CURRENT_SEC > TIME.ATC) price = "ATC";
-                    params.order.entry.price = price;
                 }
-                if (!!side) {
-                    entryOrderRef.value.style.left =
-                        +(
-                            params.crosshair.x +
-                            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
-                        ) + "px";
-                    entryOrderRef.value.style.top =
-                        +(
-                            params.crosshair.y +
-                            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
-                        ) + "px";
-                    entryOrderRef.value.style.background =
-                        side > 0 ? "green" : "red";
-                    entryOrderRef.value.innerText = `${
-                        side > 0 ? "LONG" : "SHORT"
-                    } ${price}`;
-                }
-                entryOrderRef.value.style.display = "block";
             }
+            if (!!side) {
+                entryOrderRef.value.style.left =
+                    +(
+                        params.crosshair.x +
+                        (params.crosshair.x > innerWidth - 71 ? -71 : 1)
+                    ) + "px";
+                entryOrderRef.value.style.top =
+                    +(
+                        params.crosshair.y +
+                        (params.crosshair.y > innerHeight - 61 ? -61 : 1)
+                    ) + "px";
+                entryOrderRef.value.style.background =
+                    side > 0 ? "green" : "red";
+                entryOrderRef.value.innerText = `${
+                    side > 0 ? "LONG" : "SHORT"
+                } ${price}`;
+            }
+            entryOrderRef.value.style.display = "block";
         }
     }
 }
