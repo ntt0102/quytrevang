@@ -900,7 +900,7 @@ function intervalHandler() {
             if (CURRENT_SEC > TIME.ATC - 5 * 60) {
                 blinkCancelOrderButton();
                 if (
-                    CURRENT_SEC > TIME.ATC - 60 &&
+                    CURRENT_SEC > TIME.ATC - 15 &&
                     params.order.tp.hasOwnProperty("line")
                 ) {
                     store
