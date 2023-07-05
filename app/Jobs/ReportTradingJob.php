@@ -43,6 +43,7 @@ class ReportTradingJob implements ShouldQueue
     public function handle()
     {
         if (get_global_value('openingMarketFlag') == '1') {
+            if (Trade::where('date', date_create()->format('Y-m-d'))->count() > 0) return false;
             $copyist = User::permission('trades@edit')->first()->copyist;
             $vos = new VpsOrderService($copyist);
             if (!$vos->connection) return false;
