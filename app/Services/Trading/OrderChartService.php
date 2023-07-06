@@ -159,7 +159,8 @@ class OrderChartService extends CoreService
         return collect($list)->map(function ($item) {
             return [
                 'time' => strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME,
-                'value' => $item->lastPrice
+                'price' => $item->lastPrice,
+                'volume' => $item->lastVol,
             ];
         });
     }
@@ -172,7 +173,7 @@ class OrderChartService extends CoreService
         $filename = storage_path('app/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
-        $keys = ['time', 'value'];
+        $keys = ['time', 'price', 'volume'];
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {

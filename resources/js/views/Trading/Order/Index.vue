@@ -165,7 +165,7 @@ const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.2, bottom: 0.1 },
+        scaleMargins: { top: 0.2, bottom: 0.2 },
     },
     leftPriceScale: { visible: false },
     layout: {
@@ -219,7 +219,7 @@ const tpslOrderRef = ref(null);
 let params = {
     chart: {},
     series: {},
-    data: { whitespace: [], price: [] },
+    data: { whitespace: [], price: [], volume: [] },
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l50: {}, l100: {}, l150: {}, pointCount: 0 },
@@ -275,6 +275,13 @@ onMounted(() => {
         priceScaleId: "vertical",
         scaleMargins: { top: 0, bottom: 0 },
         color: "#26a69a",
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    params.series.volume = params.chart.addHistogramSeries({
+        priceScaleId: "volume",
+        scaleMargins: { top: 0.8, bottom: 0 },
+        color: "#CCCCCC",
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -673,15 +680,25 @@ function loadChartData() {
         params.loadWhitespace = false;
     }
     params.data.price = mergeChartData(
-        store.state.tradingOrder.chartData,
+        store.state.tradingOrder.chartData.price,
         params.data.price
     );
     params.series.price.setData(params.data.price);
+    //
+    params.data.volume = mergeChartData(
+        store.state.tradingOrder.chartData.volume,
+        params.data.volume
+    );
+    params.series.volume.setData(params.data.volume);
 }
-function updateChartData(data) {
-    params.data.price = mergeChartData([data], params.data.price);
+function updateChartData(price, volume) {
+    params.data.price = mergeChartData([price], params.data.price);
     const lastPrice = params.data.price.slice(-1)[0];
     params.series.price.update(lastPrice);
+    //
+    params.data.volume = mergeChartData([volume], params.data.volume);
+    const lastVolume = params.data.volume.slice(-1)[0];
+    params.series.volume.update(lastVolume);
 }
 function createWhitespaceData() {
     const date = state.chartDate;
@@ -735,12 +752,19 @@ function connectSocket() {
                 if (event[0] == "stockps") {
                     const data = event[1].data;
                     if (data.id == 3220) {
-                        updateChartData({
-                            time:
-                                moment(`${CURRENT_DATE} ${data.time}`).unix() +
-                                7 * 60 * 60,
-                            value: data.lastPrice,
-                        });
+                        const time =
+                            moment(`${CURRENT_DATE} ${data.time}`).unix() +
+                            7 * 60 * 60;
+                        updateChartData(
+                            {
+                                time: time,
+                                value: data.lastPrice,
+                            },
+                            {
+                                time: time,
+                                value: data.lastVol,
+                            }
+                        );
                         if (params.order.entry.hasOwnProperty("line")) {
                             if (params.order.tp.hasOwnProperty("line")) {
                                 if (

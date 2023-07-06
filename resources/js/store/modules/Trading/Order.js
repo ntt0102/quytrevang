@@ -90,7 +90,14 @@ const actions = {
 
 const mutations = {
     setChartData(state, data) {
-        state.chartData = data;
+        state.chartData = data.reduce(
+            (c, item) => {
+                c.price.push({ time: item.time, value: item.price });
+                c.volume.push({ time: item.time, value: item.volume });
+                return c;
+            },
+            { price: [], volume: [] }
+        );
     },
     setChartLoading(state, data) {
         state.isChartLoading = data;

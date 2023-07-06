@@ -40,6 +40,7 @@ class ExportTradingJob implements ShouldQueue
                 $line = [];
                 $line[] = strtotime($date . $item->time) + $this->SHIFT_TIME;
                 $line[] = $item->lastPrice;
+                $line[] = $item->lastVol;
                 fputcsv($fp, $line);
             }
             fclose($fp);
