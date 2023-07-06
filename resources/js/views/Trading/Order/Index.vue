@@ -165,7 +165,7 @@ const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.2, bottom: 0.2 },
+        scaleMargins: { top: 0.1, bottom: 0.2 },
     },
     leftPriceScale: { visible: false },
     layout: {
