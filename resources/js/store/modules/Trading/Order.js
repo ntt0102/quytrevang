@@ -93,7 +93,10 @@ const mutations = {
         state.chartData = data.reduce(
             (c, item) => {
                 c.price.push({ time: item.time, value: item.price });
-                c.volume.push({ time: item.time, value: item.volume });
+                c.volume.push({
+                    time: item.time,
+                    value: item.volume < 1000 ? item.volume : 0,
+                });
                 return c;
             },
             { price: [], volume: [] }
