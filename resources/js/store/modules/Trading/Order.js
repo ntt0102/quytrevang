@@ -92,7 +92,9 @@ const mutations = {
     setChartData(state, data) {
         state.chartData = data.reduce(
             (c, item) => {
-                const prevPrice = c.price.slice(-1)[0].value;
+                const prevPrice = c.price.length
+                    ? c.price.slice(-1)[0].value
+                    : item.price;
                 c.price.push({ time: item.time, value: item.price });
                 c.volume.push({
                     time: item.time,
