@@ -1546,6 +1546,7 @@ function dateSelectChange() {
 }
 function refreshChart() {
     params.data.price = [];
+    params.data.volume = [];
     params.data.whitespace = [];
     params.loadWhitespace = true;
     store.dispatch("tradingOrder/getChartData", state.chartDate);
