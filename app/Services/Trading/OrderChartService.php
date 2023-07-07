@@ -197,4 +197,58 @@ class OrderChartService extends CoreService
         $res = $client->get($url);
         return json_decode($res->getBody());
     }
+
+    /**
+     * Vps data
+     */
+    public function cloneTcbsData()
+    {
+        $data = [];
+        $symbol = get_global_value('vn30f1m');
+        $page = 0;
+        $client = new \GuzzleHttp\Client();
+        do {
+            $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$symbol}/his/paging?size=100&page={$page}";
+            $res = $client->get($url);
+            $rsp = json_decode($res->getBody());
+            $data = array_merge($data, $rsp->data);
+            $page++;
+        } while (count($rsp->data) == 100);
+        return $data;
+    }
+
+    /**
+     * Get data from TCBS website
+     */
+    public function generateDataFromTcbs()
+    {
+        $list = $this->cloneTcbsData();
+        return collect($list)->map(function ($item) {
+            return [
+                'time' => strtotime(date('Y-m-d ') . $item->t) + $this->SHIFT_TIME,
+                'price' => $item->p,
+                'volume' => $item->v,
+                'side' => $item->a == 'BU' ? 1 : -1
+            ];
+        });
+    }
+
+    public function export()
+    {
+        if (get_global_value('openingMarketFlag') == '1') {
+            $date = date('Y-m-d');
+            $filename = storage_path('app/vn30f1m/' . $date . '.csv');
+            $list = $this->cloneTcbsData();
+            $fp = fopen($filename, 'w');
+            foreach ($list as $item) {
+                $line = [];
+                $line[] = strtotime($date . $item->t) + $this->SHIFT_TIME;
+                $line[] = $item->p;
+                $line[] = $item->v;
+                $line[] = $item->a == 'BU' ? 1 : -1;
+                fputcsv($fp, $line);
+            }
+            fclose($fp);
+        }
+    }
 }

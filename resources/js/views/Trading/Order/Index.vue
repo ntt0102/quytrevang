@@ -755,6 +755,7 @@ function connectSocket() {
                         const time =
                             moment(`${CURRENT_DATE} ${data.time}`).unix() +
                             7 * 60 * 60;
+                        const prevPrice = params.data.price.slice(-1)[0].value;
                         updateChartData(
                             {
                                 time: time,
@@ -763,6 +764,12 @@ function connectSocket() {
                             {
                                 time: time,
                                 value: data.lastVol,
+                                color:
+                                    data.lastPrice > prevPrice
+                                        ? "#30A165"
+                                        : data.lastPrice < prevPrice
+                                        ? "#EC3F3F"
+                                        : "#CCCCCC",
                             }
                         );
                         if (params.order.entry.hasOwnProperty("line")) {
