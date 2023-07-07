@@ -285,6 +285,14 @@ onMounted(() => {
         lastValueVisible: false,
         priceLineVisible: false,
     });
+    params.series.volume.createPriceLine({
+        price: 150,
+        color: "yellow",
+        lineWidth: 1,
+        lineStyle: 1,
+        axisLabelVisible: false,
+        draggable: false,
+    });
     params.series.price = params.chart.addLineSeries({
         color: "#CCCCCC",
         priceFormat: { minMove: 0.1 },
