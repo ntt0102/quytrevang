@@ -260,7 +260,7 @@ class TradeService extends CoreService
                 $newDate->modify('first day of this month');
                 break;
             case 'week':
-                $newDate->modify(($newDate->format('w') === '0') ? 'monday last week' : 'monday this week');
+                $newDate->modify('monday this week');
                 break;
         }
 
@@ -303,7 +303,7 @@ class TradeService extends CoreService
                 $newDate->modify('last day of this month');
                 break;
             case 'week':
-                $newDate->modify(($newDate->format('w') === '0') ? 'now' : 'sunday this week');
+                $newDate->modify('sunday this week');
                 break;
         }
 
