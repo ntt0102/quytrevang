@@ -101,7 +101,10 @@ const mutations = {
                     if (
                         state.shark != null &&
                         index - state.shark.index <= 4 &&
-                        item.price >= state.shark.price &&
+                        ((state.shark.side > 0 &&
+                            item.price >= state.shark.price) ||
+                            (state.shark.side < 0 &&
+                                item.price <= state.shark.price)) &&
                         item.volume > state.shark.volume &&
                         state.shark.volume / item.volume > 0.8 &&
                         (item.price - prevPrice) * state.shark.side > 0

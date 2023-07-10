@@ -779,7 +779,11 @@ function connectSocket() {
                                 params.data.volume.length -
                                     params.shark.index <=
                                     4 &&
-                                data.lastPrice >= params.shark.price &&
+                                ((params.shark.side > 0 &&
+                                    data.lastPrice >= params.shark.price) ||
+                                    (params.shark.side < 0 &&
+                                        data.lastPrice <=
+                                            params.shark.price)) &&
                                 data.lastVol > params.shark.volume &&
                                 params.shark.volume / data.lastVol > 0.8 &&
                                 (data.lastPrice - prevPrice) *
