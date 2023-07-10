@@ -202,6 +202,7 @@ const TIME = {
 const store = useStore();
 const { t } = useI18n();
 const devices = inject("devices");
+const mf = inject("mf");
 const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
 const spinnerRef = ref(null);
@@ -226,6 +227,7 @@ let params = {
     vertical: { v1: {}, v2: {}, v3: {}, v4: {}, pointCount: 0 },
     alerts: [],
     crosshair: {},
+    shark: null,
     loadWhitespace: true,
     interval: null,
     interval60: null,
@@ -314,6 +316,12 @@ onUnmounted(() => {
 
 watch(() => store.state.tradingOrder.chartData, loadChartData);
 
+watch(
+    () => store.state.tradingOrder.shark,
+    (value) => {
+        params.shark = mf.cloneDeep(value);
+    }
+);
 watch(
     () => store.state.tradingOrder.isChartLoading,
     (value) => {
@@ -764,6 +772,29 @@ function connectSocket() {
                             moment(`${CURRENT_DATE} ${data.time}`).unix() +
                             7 * 60 * 60;
                         const prevPrice = params.data.price.slice(-1)[0].value;
+                        let isShark = false;
+                        if (data.lastVol >= 150) {
+                            if (
+                                params.shark != null &&
+                                params.data.volume.length -
+                                    params.shark.index <=
+                                    4 &&
+                                data.lastPrice >= params.shark.price &&
+                                data.lastVol > params.shark.volume &&
+                                params.shark.volume / data.lastVol > 0.8 &&
+                                (data.lastPrice - prevPrice) *
+                                    params.shark.side >
+                                    0
+                            )
+                                isShark = true;
+
+                            params.shark = {
+                                side: data.lastPrice - prevPrice,
+                                index: params.data.volume.length,
+                                price: data.lastPrice,
+                                volume: data.lastVol,
+                            };
+                        }
                         updateChartData(
                             {
                                 time: time,
@@ -774,9 +805,13 @@ function connectSocket() {
                                 value: data.lastVol,
                                 color:
                                     data.lastPrice > prevPrice
-                                        ? "#30A165"
+                                        ? isShark
+                                            ? "lime"
+                                            : "green"
                                         : data.lastPrice < prevPrice
-                                        ? "#EC3F3F"
+                                        ? isShark
+                                            ? "red"
+                                            : "darkred"
                                         : "#CCCCCC",
                             }
                         );

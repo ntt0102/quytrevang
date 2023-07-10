@@ -5,6 +5,7 @@ function initialState() {
         chartData: [],
         isChartLoading: false,
         copyists: [],
+        shark: null,
     };
 }
 
@@ -91,19 +92,42 @@ const actions = {
 const mutations = {
     setChartData(state, data) {
         state.chartData = data.reduce(
-            (c, item) => {
+            (c, item, index) => {
                 const prevPrice = c.price.length
                     ? c.price.slice(-1)[0].value
                     : item.price;
+                let isShark = false;
+                if (item.volume >= 150) {
+                    if (
+                        state.shark != null &&
+                        index - state.shark.index <= 4 &&
+                        item.price >= state.shark.price &&
+                        item.volume > state.shark.volume &&
+                        state.shark.volume / item.volume > 0.8 &&
+                        (item.price - prevPrice) * state.shark.side > 0
+                    )
+                        isShark = true;
+
+                    state.shark = {
+                        side: item.price - prevPrice,
+                        index: index,
+                        price: item.price,
+                        volume: item.volume,
+                    };
+                }
                 c.price.push({ time: item.time, value: item.price });
                 c.volume.push({
                     time: item.time,
                     value: item.volume < 1000 ? item.volume : 0,
                     color:
                         item.price > prevPrice
-                            ? "#30A165"
+                            ? isShark
+                                ? "lime"
+                                : "green"
                             : item.price < prevPrice
-                            ? "#EC3F3F"
+                            ? isShark
+                                ? "red"
+                                : "darkred"
                             : "#CCCCCC",
                 });
                 return c;

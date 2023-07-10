@@ -107,8 +107,9 @@ Route::get('test', function () {
     // $s = $s->can('stock@order');
     // $s = $s->roles;
     // $s = event(new App\Events\UpdateFinbookEvent());
-    $s = app(App\Services\Trading\OrderChartService::class)->export();
+    // $s = app(App\Services\Trading\OrderChartService::class)->export();
     // $s = App\Jobs\UpdateOpeningMarketJob::dispatch();
+    $s = app(App\Services\Trading\TradeService::class)->calculateSummary('week');
 
     dd($s);
     return 'ok';
