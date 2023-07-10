@@ -156,13 +156,52 @@ class OrderChartService extends CoreService
     public function generateDataFromVps()
     {
         $list = $this->cloneVpsData();
-        return collect($list)->map(function ($item) {
-            return [
-                'time' => strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME,
-                'price' => $item->lastPrice,
-                'volume' => $item->lastVol,
+        return collect($list)->reduce(function ($c, $item, $index) {
+            $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
+            $price = $item->lastPrice;
+            $volume = $item->lastVol < 1000 ? $item->lastVol : 0;
+            $prevPrice = $index > 0 ? end($c['price'])['value'] : $price;
+            $isShark = false;
+            if ($volume >= 150) {
+                if (
+                    $c['shark'] != null &&
+                    $index - $c['shark']['index'] <= 4 &&
+                    (($c['shark']['side'] > 0 &&
+                        $price >= $c['shark']['price']) ||
+                        ($c['shark']['side'] < 0 &&
+                            $price <= $c['shark']['price'])) &&
+                    $volume > $c['shark']['volume'] &&
+                    $c['shark']['volume'] / $volume > 0.8 &&
+                    ($price - $prevPrice) * $c['shark']['side'] > 0
+                )
+                    $isShark = true;
+
+                $c['shark'] = [
+                    'side' => $price - $prevPrice,
+                    'index' => $index,
+                    'price' => $price,
+                    'volume' => $volume,
+                ];
+            }
+            $c['price'][] = [
+                'time' => $time,
+                'value' => $price
             ];
-        });
+            $c['volume'][] = [
+                'time' => $time,
+                'value' => $volume,
+                'color' => $price > $prevPrice
+                    ? ($isShark
+                        ? "lime"
+                        : "green")
+                    : ($price < $prevPrice
+                        ? ($isShark
+                            ? "red"
+                            : "darkred")
+                        : "#CCCCCC"),
+            ];
+            return $c;
+        }, ['price' => [], 'volume' => [], 'shark' => null]);
     }
 
     /**
@@ -173,18 +212,58 @@ class OrderChartService extends CoreService
         $filename = storage_path('app/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return [];
         $fp = fopen($filename, 'r');
-        $keys = ['time', 'price', 'volume'];
+        $c = ['price' => [], 'volume' => [], 'shark' => null];
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
-                $lines[] = collect($line)->reduce(function ($carry, $item, $index) use ($keys) {
-                    $carry[$keys[$index]] = $item + 0;
-                    return $carry;
-                }, []);
+                $time = $line[0] + 0;
+                $price = $line[1] + 0;
+                $volume = $line[2] + 0 < 1000 ? $line[2] + 0 : 0;
+                $index = count($c['price']);
+                $prevPrice = count($c['price']) ? end($c['price'])['value'] : $price;
+                $isShark = false;
+                if ($volume >= 150) {
+                    if (
+                        $c['shark'] != null &&
+                        $index - $c['shark']['index'] <= 4 &&
+                        (($c['shark']['side'] > 0 &&
+                            $price >= $c['shark']['price']) ||
+                            ($c['shark']['side'] < 0 &&
+                                $price <= $c['shark']['price'])) &&
+                        $volume > $c['shark']['volume'] &&
+                        $c['shark']['volume'] / $volume > 0.8 &&
+                        ($price - $prevPrice) * $c['shark']['side'] > 0
+                    )
+                        $isShark = true;
+
+                    $c['shark'] = [
+                        'side' => $price - $prevPrice,
+                        'index' => $index,
+                        'price' => $price,
+                        'volume' => $volume,
+                    ];
+                }
+                $c['price'][] = [
+                    'time' => $time,
+                    'value' => $price
+                ];
+                $c['volume'][] = [
+                    'time' => $time,
+                    'value' => $volume,
+                    'color' => $price > $prevPrice
+                        ? ($isShark
+                            ? "lime"
+                            : "green")
+                        : ($price < $prevPrice
+                            ? ($isShark
+                                ? "red"
+                                : "darkred")
+                            : "#CCCCCC"),
+                ];
             }
         }
         fclose($fp);
-        return $lines;
+        return $c;
     }
 
     /**

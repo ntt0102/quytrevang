@@ -317,12 +317,6 @@ onUnmounted(() => {
 watch(() => store.state.tradingOrder.chartData, loadChartData);
 
 watch(
-    () => store.state.tradingOrder.shark,
-    (value) => {
-        params.shark = mf.cloneDeep(value);
-    }
-);
-watch(
     () => store.state.tradingOrder.isChartLoading,
     (value) => {
         spinnerRef.value.style.display = value ? "block" : "none";
@@ -706,6 +700,8 @@ function loadChartData() {
         params.data.volume
     );
     params.series.volume.setData(params.data.volume);
+    //
+    params.shark = store.state.tradingOrder.chartData.shark;
 }
 function updateChartData(price, volume) {
     params.data.price = mergeChartData([price], params.data.price);
