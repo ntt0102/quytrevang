@@ -768,10 +768,14 @@ function connectSocket() {
                             moment(`${CURRENT_DATE} ${data.time}`).unix() +
                             7 * 60 * 60;
                         const prevPrice = params.data.price.slice(-1)[0].value;
+                        const side = data.lastPrice - prevPrice;
                         let isShark = false;
                         if (data.lastVol >= 150) {
                             if (
                                 params.shark != null &&
+                                params.shark.recovery &&
+                                params.data.volume.length - params.shark.index >
+                                    1 &&
                                 params.data.volume.length -
                                     params.shark.index <=
                                     4 &&
@@ -782,19 +786,20 @@ function connectSocket() {
                                             params.shark.price)) &&
                                 data.lastVol > params.shark.volume &&
                                 params.shark.volume / data.lastVol > 0.8 &&
-                                (data.lastPrice - prevPrice) *
-                                    params.shark.side >
-                                    0
+                                side * params.shark.side > 0
                             )
                                 isShark = true;
 
                             params.shark = {
-                                side: data.lastPrice - prevPrice,
+                                side: side,
                                 index: params.data.volume.length,
                                 price: data.lastPrice,
                                 volume: data.lastVol,
+                                recovery: true,
                             };
-                        }
+                        } else if (params.shark != null)
+                            params.shark.recovery &=
+                                params.shark.side * side <= 0;
                         updateChartData(
                             {
                                 time: time,

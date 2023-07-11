@@ -161,10 +161,13 @@ class OrderChartService extends CoreService
             $price = $item->lastPrice;
             $volume = $item->lastVol < 1000 ? $item->lastVol : 0;
             $prevPrice = $index > 0 ? end($c['price'])['value'] : $price;
+            $side = $price - $prevPrice;
             $isShark = false;
             if ($volume >= 150) {
                 if (
                     $c['shark'] != null &&
+                    $c['shark']['recovery'] &&
+                    $index - $c['shark']['index'] > 1 &&
                     $index - $c['shark']['index'] <= 4 &&
                     (($c['shark']['side'] > 0 &&
                         $price >= $c['shark']['price']) ||
@@ -172,17 +175,20 @@ class OrderChartService extends CoreService
                             $price <= $c['shark']['price'])) &&
                     $volume > $c['shark']['volume'] &&
                     $c['shark']['volume'] / $volume > 0.8 &&
-                    ($price - $prevPrice) * $c['shark']['side'] > 0
+                    $side * $c['shark']['side'] > 0
                 )
                     $isShark = true;
 
                 $c['shark'] = [
-                    'side' => $price - $prevPrice,
+                    'side' => $side,
                     'index' => $index,
                     'price' => $price,
                     'volume' => $volume,
+                    'recovery' => true
                 ];
-            }
+            } else if ($c['shark'] != null)
+                $c['shark']['recovery'] &= ($c['shark']['side'] * $side) <= 0;
+
             $c['price'][] = [
                 'time' => $time,
                 'value' => $price
@@ -221,10 +227,13 @@ class OrderChartService extends CoreService
                 $volume = $line[2] + 0 < 1000 ? $line[2] + 0 : 0;
                 $index = count($c['price']);
                 $prevPrice = count($c['price']) ? end($c['price'])['value'] : $price;
+                $side = $price - $prevPrice;
                 $isShark = false;
                 if ($volume >= 150) {
                     if (
                         $c['shark'] != null &&
+                        $c['shark']['recovery'] &&
+                        $index - $c['shark']['index'] > 1 &&
                         $index - $c['shark']['index'] <= 4 &&
                         (($c['shark']['side'] > 0 &&
                             $price >= $c['shark']['price']) ||
@@ -232,17 +241,19 @@ class OrderChartService extends CoreService
                                 $price <= $c['shark']['price'])) &&
                         $volume > $c['shark']['volume'] &&
                         $c['shark']['volume'] / $volume > 0.8 &&
-                        ($price - $prevPrice) * $c['shark']['side'] > 0
+                        $side * $c['shark']['side'] > 0
                     )
                         $isShark = true;
 
                     $c['shark'] = [
-                        'side' => $price - $prevPrice,
+                        'side' => $side,
                         'index' => $index,
                         'price' => $price,
                         'volume' => $volume,
+                        'recovery' => true
                     ];
-                }
+                } else if ($c['shark'] != null)
+                    $c['shark']['recovery'] &= ($c['shark']['side'] * $side) <= 0;
                 $c['price'][] = [
                     'time' => $time,
                     'value' => $price
