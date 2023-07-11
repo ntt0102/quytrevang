@@ -201,9 +201,9 @@ class OrderChartService extends CoreService
                 $index - $c['shark']['index'] > 1 &&
                 $index - $c['shark']['index'] <= 4 &&
                 (($c['shark']['side'] > 0 &&
-                    $price >= $c['shark']['price']) ||
+                    $price > $c['shark']['price']) ||
                     ($c['shark']['side'] < 0 &&
-                        $price <= $c['shark']['price'])) &&
+                        $price < $c['shark']['price'])) &&
                 $volume > $c['shark']['volume'] &&
                 $c['shark']['volume'] / $volume > 0.8 &&
                 $side * $c['shark']['side'] > 0
