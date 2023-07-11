@@ -677,6 +677,12 @@ function loadToolsData() {
             });
         }
         //
+        const alerts = await toolsStore.get("alert");
+        alerts.forEach((alert) => {
+            if (!alert.removed)
+                params.alerts.push(params.series.price.createPriceLine(alert));
+        });
+        //
         resolve();
     });
 }
