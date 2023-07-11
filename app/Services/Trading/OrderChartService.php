@@ -160,53 +160,7 @@ class OrderChartService extends CoreService
             $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
             $price = $item->lastPrice;
             $volume = $item->lastVol < 1000 ? $item->lastVol : 0;
-            $prevPrice = $index > 0 ? end($c['price'])['value'] : $price;
-            $side = $price - $prevPrice;
-            $isShark = false;
-            if ($volume >= 150) {
-                if (
-                    $c['shark'] != null &&
-                    $c['shark']['recovery'] &&
-                    $index - $c['shark']['index'] > 1 &&
-                    $index - $c['shark']['index'] <= 4 &&
-                    (($c['shark']['side'] > 0 &&
-                        $price >= $c['shark']['price']) ||
-                        ($c['shark']['side'] < 0 &&
-                            $price <= $c['shark']['price'])) &&
-                    $volume > $c['shark']['volume'] &&
-                    $c['shark']['volume'] / $volume > 0.8 &&
-                    $side * $c['shark']['side'] > 0
-                )
-                    $isShark = true;
-
-                $c['shark'] = [
-                    'side' => $side,
-                    'index' => $index,
-                    'price' => $price,
-                    'volume' => $volume,
-                    'recovery' => true
-                ];
-            } else if ($c['shark'] != null)
-                $c['shark']['recovery'] &= ($c['shark']['side'] * $side) <= 0;
-
-            $c['price'][] = [
-                'time' => $time,
-                'value' => $price
-            ];
-            $c['volume'][] = [
-                'time' => $time,
-                'value' => $volume,
-                'color' => $price > $prevPrice
-                    ? ($isShark
-                        ? "lime"
-                        : "green")
-                    : ($price < $prevPrice
-                        ? ($isShark
-                            ? "red"
-                            : "darkred")
-                        : "#CCCCCC"),
-            ];
-            return $c;
+            return $this->createChartData($c, $time, $price, $volume, $index);
         }, ['price' => [], 'volume' => [], 'shark' => null]);
     }
 
@@ -226,54 +180,62 @@ class OrderChartService extends CoreService
                 $price = $line[1] + 0;
                 $volume = $line[2] + 0 < 1000 ? $line[2] + 0 : 0;
                 $index = count($c['price']);
-                $prevPrice = count($c['price']) ? end($c['price'])['value'] : $price;
-                $side = $price - $prevPrice;
-                $isShark = false;
-                if ($volume >= 150) {
-                    if (
-                        $c['shark'] != null &&
-                        $c['shark']['recovery'] &&
-                        $index - $c['shark']['index'] > 1 &&
-                        $index - $c['shark']['index'] <= 4 &&
-                        (($c['shark']['side'] > 0 &&
-                            $price >= $c['shark']['price']) ||
-                            ($c['shark']['side'] < 0 &&
-                                $price <= $c['shark']['price'])) &&
-                        $volume > $c['shark']['volume'] &&
-                        $c['shark']['volume'] / $volume > 0.8 &&
-                        $side * $c['shark']['side'] > 0
-                    )
-                        $isShark = true;
-
-                    $c['shark'] = [
-                        'side' => $side,
-                        'index' => $index,
-                        'price' => $price,
-                        'volume' => $volume,
-                        'recovery' => true
-                    ];
-                } else if ($c['shark'] != null)
-                    $c['shark']['recovery'] &= ($c['shark']['side'] * $side) <= 0;
-                $c['price'][] = [
-                    'time' => $time,
-                    'value' => $price
-                ];
-                $c['volume'][] = [
-                    'time' => $time,
-                    'value' => $volume,
-                    'color' => $price > $prevPrice
-                        ? ($isShark
-                            ? "lime"
-                            : "green")
-                        : ($price < $prevPrice
-                            ? ($isShark
-                                ? "red"
-                                : "darkred")
-                            : "#CCCCCC"),
-                ];
+                $c = $this->createChartData($c, $time, $price, $volume, $index);
             }
         }
         fclose($fp);
+        return $c;
+    }
+    /**
+     * Create Chart Data
+     */
+    private function createChartData($c, $time, $price, $volume, $index)
+    {
+        $prevPrice = count($c['price']) ? end($c['price'])['value'] : $price;
+        $side = $price - $prevPrice;
+        $isShark = false;
+        if ($volume >= 150) {
+            if (
+                $c['shark'] != null &&
+                $c['shark']['recovery'] &&
+                $index - $c['shark']['index'] > 1 &&
+                $index - $c['shark']['index'] <= 4 &&
+                (($c['shark']['side'] > 0 &&
+                    $price >= $c['shark']['price']) ||
+                    ($c['shark']['side'] < 0 &&
+                        $price <= $c['shark']['price'])) &&
+                $volume > $c['shark']['volume'] &&
+                $c['shark']['volume'] / $volume > 0.8 &&
+                $side * $c['shark']['side'] > 0
+            )
+                $isShark = true;
+
+            $c['shark'] = [
+                'side' => $side,
+                'index' => $index,
+                'price' => $price,
+                'volume' => $volume,
+                'recovery' => true
+            ];
+        } else if ($c['shark'] != null)
+            $c['shark']['recovery'] &= ($c['shark']['side'] * $side) <= 0;
+        $c['price'][] = [
+            'time' => $time,
+            'value' => $price
+        ];
+        $c['volume'][] = [
+            'time' => $time,
+            'value' => $volume,
+            'color' => $price > $prevPrice
+                ? ($isShark
+                    ? "lime"
+                    : "green")
+                : ($price < $prevPrice
+                    ? ($isShark
+                        ? "red"
+                        : "darkred")
+                    : "#CCCCCC"),
+        ];
         return $c;
     }
 
