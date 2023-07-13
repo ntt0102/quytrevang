@@ -201,7 +201,6 @@ const TIME = {
 const store = useStore();
 const { t } = useI18n();
 const devices = inject("devices");
-const mf = inject("mf");
 const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
 const spinnerRef = ref(null);
@@ -235,7 +234,6 @@ let params = {
     socketStop: false,
     alertAudio: new Audio(`${window.baseURL}/audios/alert.mp3`),
 };
-document.body.appendChild(params.alertAudio);
 // params.alertAudio.crossOrigin = "anonymous";
 params.alertAudio.loop = true;
 const state = reactive({
