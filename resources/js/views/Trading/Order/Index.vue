@@ -149,7 +149,7 @@ import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { confirm } from "devextreme/ui/dialog";
 // import alertFile from "../../../../audios/alert.wav";
-import alertFile from "http://soundimage.org/wp-content/uploads/2017/05/Nighttime-Escape.mp3";
+import alertFile from "https://quytrevang.nguyenvanxuanphu.com/audios/alert.wav";
 import {
     reactive,
     ref,
