@@ -148,7 +148,6 @@ import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { confirm } from "devextreme/ui/dialog";
-// import alertFile from "../../../../audios/alert.mp3";
 import {
     reactive,
     ref,
