@@ -234,9 +234,7 @@ let params = {
     websocket: null,
     isAutoOrdering: false,
     socketStop: false,
-    alertAudio: new Audio(
-        "https://quytrevang.nguyenvanxuanphu.com/audios/alert.mp3"
-    ),
+    alertAudio: new Audio(alertFile),
 };
 params.alertAudio.crossOrigin = "anonymous";
 params.alertAudio.loop = true;
