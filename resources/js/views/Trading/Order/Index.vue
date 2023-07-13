@@ -235,7 +235,8 @@ let params = {
     socketStop: false,
     alertAudio: new Audio(`${window.baseURL}/audios/alert.mp3`),
 };
-params.alertAudio.crossOrigin = "anonymous";
+document.body.appendChild(params.alertAudio);
+// params.alertAudio.crossOrigin = "anonymous";
 params.alertAudio.loop = true;
 const state = reactive({
     chartDate: CURRENT_DATE,
