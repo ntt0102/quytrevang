@@ -148,7 +148,7 @@ import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { confirm } from "devextreme/ui/dialog";
-import alertFile from "../../../../audios/alert.mp3";
+// import alertFile from "../../../../audios/alert.mp3";
 import {
     reactive,
     ref,
@@ -234,7 +234,7 @@ let params = {
     websocket: null,
     isAutoOrdering: false,
     socketStop: false,
-    alertAudio: new Audio(alertFile),
+    alertAudio: new Audio(`${window.baseURL}/audios/alert.mp3`),
 };
 params.alertAudio.crossOrigin = "anonymous";
 params.alertAudio.loop = true;
