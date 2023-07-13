@@ -149,7 +149,6 @@ import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { confirm } from "devextreme/ui/dialog";
 // import alertFile from "../../../../audios/alert.wav";
-import alertFile from "https://quytrevang.nguyenvanxuanphu.com/audios/alert.wav";
 import {
     reactive,
     ref,
@@ -235,7 +234,9 @@ let params = {
     websocket: null,
     isAutoOrdering: false,
     socketStop: false,
-    alertAudio: new Audio(alertFile),
+    alertAudio: new Audio(
+        "https://quytrevang.nguyenvanxuanphu.com/audios/alert.wav"
+    ),
 };
 params.alertAudio.crossOrigin = "anonymous";
 params.alertAudio.loop = true;
