@@ -228,12 +228,12 @@ class OrderChartService extends CoreService
             'value' => $volume,
             'color' => $price > $prevPrice
                 ? ($isShark
-                    ? "lime"
-                    : "green")
+                    ? "#00FFFF"
+                    : "#00FF00")
                 : ($price < $prevPrice
                     ? ($isShark
-                        ? "red"
-                        : "darkred")
+                        ? "#FF00FF"
+                        : "#FF0000")
                     : "#CCCCCC"),
         ];
         return $c;

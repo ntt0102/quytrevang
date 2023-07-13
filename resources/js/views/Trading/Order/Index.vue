@@ -853,16 +853,16 @@ function connectSocket() {
                             },
                             {
                                 time: time,
-                                value: data.lastVol,
+                                value: data.lastVol < 1000 ? data.lastVol : 0,
                                 color:
                                     data.lastPrice > prevPrice
                                         ? isShark
-                                            ? "lime"
-                                            : "green"
+                                            ? "#00FFFF"
+                                            : "#00FF00"
                                         : data.lastPrice < prevPrice
                                         ? isShark
-                                            ? "red"
-                                            : "darkred"
+                                            ? "#FF00FF"
+                                            : "#FF0000"
                                         : "#CCCCCC",
                             }
                         );
