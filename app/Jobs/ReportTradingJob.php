@@ -57,7 +57,7 @@ class ReportTradingJob implements ShouldQueue
                 )
             );
             //
-            if (!$info->fee) return false;
+            if (!$info->fee && !$info->vm) return false;
             $revenue = $info->vm > 0 ? $info->vm : 0;
             $loss = $info->vm < 0 ? -$info->vm : 0;
             $trade = Trade::create([
