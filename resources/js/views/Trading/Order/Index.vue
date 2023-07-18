@@ -1576,21 +1576,21 @@ function removePattern1Tool() {
                         params.series.price.removePriceLine(params.pattern1.X);
                         params.series.price.removePriceLine(params.pattern1.Y);
                     }
-                    //
-                    params.pattern1 = {
-                        A: {},
-                        B: {},
-                        C: {},
-                        D: {},
-                        O: {},
-                        Y: {},
-                        X: {},
-                        pointCount: 0,
-                    };
-                    toolsStore.clear("pattern1");
                 }
             }
         }
+        //
+        params.pattern1 = {
+            A: {},
+            B: {},
+            C: {},
+            D: {},
+            O: {},
+            Y: {},
+            X: {},
+            pointCount: 0,
+        };
+        toolsStore.clear("pattern1");
     }
 }
 function alertToolClick(e) {
