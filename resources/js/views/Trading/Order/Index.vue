@@ -1077,19 +1077,22 @@ function showOrderButton() {
     if (inSession(CURRENT_SEC)) {
         if (!params.order.tp.hasOwnProperty("line")) {
             if (!!status.value.position) {
-                params.order.entry.price = params.data.price.slice(-1)[0].value;
-                params.order.side = status.value.position;
-                tpslOrderRef.value.style.left =
-                    +(
-                        params.crosshair.x +
-                        (params.crosshair.x > innerWidth - 61 ? -61 : 1)
-                    ) + "px";
-                tpslOrderRef.value.style.top =
-                    +(
-                        params.crosshair.y +
-                        (params.crosshair.y > innerHeight - 51 ? -51 : 1)
-                    ) + "px";
-                tpslOrderRef.value.style.display = "block";
+                if (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC) {
+                    params.order.entry.price =
+                        params.data.price.slice(-1)[0].value;
+                    params.order.side = status.value.position;
+                    tpslOrderRef.value.style.left =
+                        +(
+                            params.crosshair.x +
+                            (params.crosshair.x > innerWidth - 61 ? -61 : 1)
+                        ) + "px";
+                    tpslOrderRef.value.style.top =
+                        +(
+                            params.crosshair.y +
+                            (params.crosshair.y > innerHeight - 51 ? -51 : 1)
+                        ) + "px";
+                    tpslOrderRef.value.style.display = "block";
+                }
             }
         }
         if (!params.order.entry.hasOwnProperty("line")) {
