@@ -84,6 +84,13 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
+                        ref="pattern1ToolRef"
+                        class="command far fa-star"
+                        :title="$t('trading.orderChart.pattern1Tool')"
+                        @click="pattern1ToolClick"
+                        @contextmenu="pattern1ToolContextmenu"
+                    ></div>
+                    <div
                         ref="verticalToolRef"
                         class="command far fa-grip-lines-vertical"
                         :title="$t('trading.orderChart.verticalTool')"
@@ -210,6 +217,7 @@ const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
+const pattern1ToolRef = ref(null);
 const verticalToolRef = ref(null);
 const alertToolRef = ref(null);
 const cancelOrderRef = ref(null);
@@ -222,6 +230,16 @@ let params = {
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, pointCount: 0 },
+    pattern1: {
+        A: {},
+        B: {},
+        C: {},
+        D: {},
+        O: {},
+        X: {},
+        Y: {},
+        pointCount: 0,
+    },
     vertical: { v1: {}, v2: {}, v3: {}, v4: {}, pointCount: 0 },
     alerts: [],
     crosshair: {},
@@ -332,6 +350,8 @@ function eventChartClick() {
     else if (verticalToolRef.value.classList.contains("selected"))
         drawVerticalTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
+    else if (pattern1ToolRef.value.classList.contains("selected"))
+        drawPattern1Tool();
     else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
 }
 function eventChartCrosshairMove(e) {
@@ -455,7 +475,7 @@ function eventPriceLineDrag(e) {
             break;
         case "ruler":
             switch (lineOptions.point) {
-                case 1:
+                case "l0":
                     toolsStore.set("ruler", lineOptions);
                     if (params.ruler.pointCount == 2) {
                         const distance = +params.ruler.l1.options().title;
@@ -477,7 +497,7 @@ function eventPriceLineDrag(e) {
                         toolsStore.set("ruler", params.ruler.l4.options());
                     }
                     break;
-                case 2:
+                case "l1":
                     const l0Price2 = +params.ruler.l0.options().price;
                     const distance2 = newPrice - l0Price2;
                     line.applyOptions({ title: distance2.toFixed(1) });
@@ -501,7 +521,7 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("ruler", params.ruler.l4.options());
                     break;
-                case 3:
+                case "l2":
                     const l0Price3 = +params.ruler.l0.options().price;
                     const distance3 = newPrice - l0Price3;
                     line.applyOptions({ title: distance3.toFixed(1) });
@@ -525,7 +545,7 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("ruler", params.ruler.l4.options());
                     break;
-                case 4:
+                case "l3":
                     const l0Price4 = +params.ruler.l0.options().price;
                     const distance4 = newPrice - l0Price4;
                     line.applyOptions({ title: distance4.toFixed(1) });
@@ -549,7 +569,7 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("ruler", params.ruler.l4.options());
                     break;
-                case 5:
+                case "l4":
                     const l0Price5 = +params.ruler.l0.options().price;
                     const distance5 = newPrice - l0Price5;
                     line.applyOptions({ title: distance5.toFixed(1) });
@@ -573,6 +593,35 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("ruler", params.ruler.l3.options());
                     break;
+            }
+            break;
+        case "pattern1":
+            const o = +params.pattern1.O.options().price;
+            if (
+                lineOptions.title == "A" ||
+                lineOptions.title == "B" ||
+                lineOptions.title == "O"
+            ) {
+                const ab =
+                    +params.pattern1.A.options().price -
+                    +params.pattern1.B.options().price;
+                params.pattern1.Y.applyOptions({
+                    price: +(o - ab).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.Y.options());
+            }
+            if (
+                lineOptions.title == "C" ||
+                lineOptions.title == "D" ||
+                lineOptions.title == "O"
+            ) {
+                const cd =
+                    +params.pattern1.C.options().price -
+                    +params.pattern1.D.options().price;
+                params.pattern1.X.applyOptions({
+                    price: +(o - cd).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.X.options());
             }
             break;
         case "alert":
@@ -713,7 +762,16 @@ function loadToolsData() {
         if (rulerLines.length > 0) {
             params.ruler.pointCount = rulerLines.length > 1 ? 2 : 1;
             rulerLines.forEach((line) => {
-                params.ruler[line.pointName] =
+                params.ruler[line.point] =
+                    params.series.price.createPriceLine(line);
+            });
+        }
+        //
+        const pattern1Lines = await toolsStore.get("pattern1");
+        if (pattern1Lines.length > 0) {
+            params.pattern1.pointCount = pattern1Lines.length;
+            pattern1Lines.forEach((line) => {
+                params.pattern1[line.title] =
                     params.series.price.createPriceLine(line);
             });
         }
@@ -1350,53 +1408,57 @@ function drawRulerTool() {
     var options = {
         lineType: "ruler",
         price: price,
-        color: "#FF00FF",
         lineWidth: 1,
         lineStyle: 1,
         draggable: true,
     };
     if (params.ruler.pointCount == 0) {
-        options.point = 1;
-        options.pointName = "l0";
+        options.point = "l0";
+        options.color = "#F44336";
         options.title = "0";
-        params.ruler.l0 = params.series.price.createPriceLine(options);
-        params.ruler.pointCount = 1;
+        params.ruler[options.point] =
+            params.series.price.createPriceLine(options);
+        params.ruler.pointCount++;
         toolsStore.set("ruler", options);
-    } else if (params.ruler.pointCount == 1) {
+    } else {
         const l0Price = +params.ruler.l0.options().price;
 
         const distance1 = price - l0Price;
-        options.point = 2;
-        options.pointName = "l1";
+        options.point = "l1";
+        options.color = "#FF9800";
         options.title = distance1.toFixed(1);
-        params.ruler.l1 = params.series.price.createPriceLine(options);
+        params.ruler[options.point] =
+            params.series.price.createPriceLine(options);
         toolsStore.set("ruler", options);
 
         const distance2 = 2 * distance1;
-        options.point = 3;
-        options.pointName = "l2";
+        options.point = "l2";
+        options.color = "#FFEB3B";
         options.title = distance2.toFixed(1);
         options.price = +(l0Price + distance2).toFixed(1);
-        params.ruler.l2 = params.series.price.createPriceLine(options);
+        params.ruler[options.point] =
+            params.series.price.createPriceLine(options);
         toolsStore.set("ruler", options);
 
         const distance3 = 3 * distance1;
-        options.point = 4;
-        options.pointName = "l3";
+        options.point = "l3";
+        options.color = "#4CAF50";
         options.title = distance3.toFixed(1);
         options.price = +(l0Price + distance3).toFixed(1);
-        params.ruler.l3 = params.series.price.createPriceLine(options);
+        params.ruler[options.point] =
+            params.series.price.createPriceLine(options);
         toolsStore.set("ruler", options);
 
         const distance4 = 4 * distance1;
-        options.point = 5;
-        options.pointName = "l4";
+        options.point = "l4";
+        options.color = "#009688";
         options.title = distance4.toFixed(1);
         options.price = +(l0Price + distance4).toFixed(1);
-        params.ruler.l4 = params.series.price.createPriceLine(options);
+        params.ruler[options.point] =
+            params.series.price.createPriceLine(options);
         toolsStore.set("ruler", options);
 
-        params.ruler.pointCount = 2;
+        params.ruler.pointCount++;
         rulerToolRef.value.classList.remove("selected");
     }
 }
@@ -1419,6 +1481,116 @@ function removeRulerTool() {
             pointCount: 0,
         };
         toolsStore.clear("ruler");
+    }
+}
+function pattern1ToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removePattern1Tool();
+    }
+    e.stopPropagation();
+}
+function pattern1ToolContextmenu(e) {
+    removePattern1Tool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawPattern1Tool() {
+    const price = coordinateToPrice(params.crosshair.y);
+    var options = {
+        lineType: "pattern1",
+        price: price,
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: true,
+    };
+    switch (params.pattern1.pointCount) {
+        case 0:
+            options.title = "A";
+            options.color = "#E91E63";
+            break;
+        case 1:
+            options.title = "B";
+            options.color = "#E91E63";
+            break;
+        case 2:
+            options.title = "C";
+            options.color = "#9C27B0";
+            break;
+        case 3:
+            options.title = "D";
+            options.color = "#9C27B0";
+            break;
+        case 4:
+            options.title = "O";
+            options.color = "#673AB7";
+            break;
+    }
+    params.pattern1[options.title] =
+        params.series.price.createPriceLine(options);
+    params.pattern1.pointCount++;
+    toolsStore.set("pattern1", options);
+    if (params.pattern1.pointCount == 5) {
+        const o = +params.pattern1.O.options().price;
+        const ab =
+            +params.pattern1.A.options().price -
+            +params.pattern1.B.options().price;
+        const cd =
+            +params.pattern1.C.options().price -
+            +params.pattern1.D.options().price;
+        //
+        options.color = "#2196F3";
+        options.draggable = false;
+        options.price = o - cd;
+        options.title = "X";
+        params.pattern1[options.title] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("pattern1", options);
+        //
+        options.price = o - ab;
+        options.title = "Y";
+        params.pattern1[options.title] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("pattern1", options);
+        //
+        pattern1ToolRef.value.classList.remove("selected");
+    }
+}
+function removePattern1Tool() {
+    if (params.pattern1.pointCount > 0) {
+        params.series.price.removePriceLine(params.pattern1.A);
+        if (params.pattern1.pointCount > 1) {
+            params.series.price.removePriceLine(params.pattern1.B);
+            if (params.pattern1.pointCount > 2) {
+                params.series.price.removePriceLine(params.pattern1.C);
+                if (params.pattern1.pointCount > 3) {
+                    params.series.price.removePriceLine(params.pattern1.D);
+                    if (params.pattern1.pointCount > 4) {
+                        params.series.price.removePriceLine(params.pattern1.O);
+                        params.series.price.removePriceLine(params.pattern1.X);
+                        params.series.price.removePriceLine(params.pattern1.Y);
+                    }
+                    //
+                    params.pattern1 = {
+                        A: {},
+                        B: {},
+                        C: {},
+                        D: {},
+                        O: {},
+                        Y: {},
+                        X: {},
+                        pointCount: 0,
+                    };
+                    toolsStore.clear("pattern1");
+                }
+            }
+        }
     }
 }
 function alertToolClick(e) {
