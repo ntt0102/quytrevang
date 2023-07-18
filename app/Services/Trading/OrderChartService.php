@@ -26,6 +26,7 @@ class OrderChartService extends CoreService
         else if ($payload->date == $date) {
             if (get_global_value('openingMarketFlag') == '1')
                 $data = $this->generateDataFromVps();
+            // $data = $this->generateDataFromTcbs();
         }
         return $data;
     }
@@ -159,7 +160,7 @@ class OrderChartService extends CoreService
         return collect($list)->reduce(function ($c, $item, $index) {
             $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
             $price = $item->lastPrice;
-            $volume = $item->lastVol < 1000 ? $item->lastVol : 0;
+            $volume = $item->lastVol < 900 ? $item->lastVol : 0;
             return $this->createChartData($c, $time, $price, $volume, $index);
         }, ['price' => [], 'volume' => [], 'shark' => null]);
     }
@@ -178,7 +179,7 @@ class OrderChartService extends CoreService
             if (!!$line) {
                 $time = $line[0] + 0;
                 $price = $line[1] + 0;
-                $volume = $line[2] + 0 < 1000 ? $line[2] + 0 : 0;
+                $volume = $line[2] + 0 < 900 ? $line[2] + 0 : 0;
                 $index = count($c['price']);
                 $c = $this->createChartData($c, $time, $price, $volume, $index);
             }
@@ -189,10 +190,12 @@ class OrderChartService extends CoreService
     /**
      * Create Chart Data
      */
-    private function createChartData($c, $time, $price, $volume, $index)
+    private function createChartData($c, $time, $price, $volume, $index, $dir = null)
     {
         $prevPrice = count($c['price']) ? end($c['price'])['value'] : $price;
         $side = $price - $prevPrice;
+        $upSide = !$dir ? $side > 0 : $dir > 0;
+        $downSide = !$dir ? $side < 0 : $dir < 0;
         $isShark = false;
         if ($volume >= 150) {
             if (
@@ -226,11 +229,11 @@ class OrderChartService extends CoreService
         $c['volume'][] = [
             'time' => $time,
             'value' => $volume,
-            'color' => $price > $prevPrice
+            'color' => $upSide
                 ? ($isShark
                     ? "#00FFFF"
                     : "#00FF00")
-                : ($price < $prevPrice
+                : ($downSide
                     ? ($isShark
                         ? "#FF00FF"
                         : "#FF0000")
@@ -275,14 +278,13 @@ class OrderChartService extends CoreService
     public function generateDataFromTcbs()
     {
         $list = $this->cloneTcbsData();
-        return collect($list)->map(function ($item) {
-            return [
-                'time' => strtotime(date('Y-m-d ') . $item->t) + $this->SHIFT_TIME,
-                'price' => $item->p,
-                'volume' => $item->v,
-                'side' => $item->a == 'BU' ? 1 : -1
-            ];
-        });
+        return collect($list)->reduce(function ($c, $item, $index) {
+            $time = strtotime(date('Y-m-d ') . $item->t) + $this->SHIFT_TIME;
+            $price = $item->p;
+            $volume = $item->v < 900 ? $item->v : 0;
+            $side = $item->a == 'BU' ? 1 : -1;
+            return $this->createChartData($c, $time, $price, $volume, $index, $side);
+        }, ['price' => [], 'volume' => [], 'shark' => null]);
     }
 
     public function export()

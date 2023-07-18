@@ -853,7 +853,7 @@ function connectSocket() {
                             },
                             {
                                 time: time,
-                                value: data.lastVol < 1000 ? data.lastVol : 0,
+                                value: data.lastVol < 900 ? data.lastVol : 0,
                                 color:
                                     data.lastPrice > prevPrice
                                         ? isShark
