@@ -1369,7 +1369,7 @@ function drawVerticalTool() {
         if (params.vertical.pointCount == 0) {
             params.vertical.v1 = { time: params.crosshair.time, value: 1 };
             params.series.vertical.setData([params.vertical.v1]);
-            params.vertical.pointCount = 1;
+            params.vertical.pointCount++;
             toolsStore.set("vertical", params.vertical.v1);
         } else if (params.vertical.pointCount == 1) {
             params.vertical.v2 = { time: params.crosshair.time, value: 1 };
@@ -1378,7 +1378,7 @@ function drawVerticalTool() {
                 params.vertical.v2,
             ]);
             toolsStore.set("vertical", params.vertical.v2);
-            params.vertical.pointCount = 2;
+            params.vertical.pointCount++;
         } else {
             const i1 = params.data.whitespace.findIndex(
                 (x) => x.time === params.vertical.v1.time
@@ -1407,7 +1407,7 @@ function drawVerticalTool() {
             toolsStore.set("vertical", params.vertical.v1);
             toolsStore.set("vertical", params.vertical.v2);
             verticalToolRef.value.classList.remove("selected");
-            params.vertical.pointCount = 3;
+            params.vertical.pointCount++;
         }
     }
 }
@@ -1632,7 +1632,6 @@ function volprofileToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        removeVolprofileTool();
     }
     e.stopPropagation();
 }
@@ -1664,8 +1663,6 @@ function drawVolprofileTool() {
                 params.volprofile.v2,
             ]);
             toolsStore.set("volprofile", params.volprofile.v2);
-            params.volprofile.pointCount++;
-            volprofileToolRef.value.classList.remove("selected");
             //
             const prices = params.data.price.filter(
                 (x) =>
@@ -1683,13 +1680,9 @@ function drawVolprofileTool() {
                     profile[prices[i].value] += volumes[i].value;
                 else profile[prices[i].value] = volumes[i].value;
             }
-
-            console.log("profile", profile);
-
             let priceOfMax = Object.keys(profile).reduce((a, b) =>
                 profile[a] > profile[b] ? a : b
             );
-            console.log("priceOfMax", priceOfMax);
             const options = {
                 key: 3,
                 price: +priceOfMax,
@@ -1699,8 +1692,13 @@ function drawVolprofileTool() {
                 lineStyle: 1,
                 draggable: false,
             };
+            if (params.volprofile.pointCount > 1)
+                params.series.price.removePriceLine(params.volprofile.v3);
             params.volprofile.v3 = params.series.price.createPriceLine(options);
             toolsStore.set("volprofile", options);
+            //
+            params.volprofile.pointCount++;
+            volprofileToolRef.value.classList.remove("selected");
         }
     }
 }
