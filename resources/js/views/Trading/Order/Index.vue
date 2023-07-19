@@ -78,7 +78,7 @@
                     ></div>
                     <div
                         ref="rulerToolRef"
-                        class="command far fa-ruler"
+                        class="command far fa-line-height"
                         :title="$t('trading.orderChart.rulerTool')"
                         @click="rulerToolClick"
                         @contextmenu="rulerToolContextmenu"
@@ -89,6 +89,13 @@
                         :title="$t('trading.orderChart.pattern1Tool')"
                         @click="pattern1ToolClick"
                         @contextmenu="pattern1ToolContextmenu"
+                    ></div>
+                    <div
+                        ref="volprofileToolRef"
+                        class="command far fa-poll-h"
+                        :title="$t('trading.orderChart.volprofileTool')"
+                        @click="volprofileToolClick"
+                        @contextmenu="volprofileToolContextmenu"
                     ></div>
                     <div
                         ref="verticalToolRef"
@@ -218,6 +225,7 @@ const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
 const pattern1ToolRef = ref(null);
+const volprofileToolRef = ref(null);
 const verticalToolRef = ref(null);
 const alertToolRef = ref(null);
 const cancelOrderRef = ref(null);
@@ -240,6 +248,7 @@ let params = {
         Y: {},
         pointCount: 0,
     },
+    volprofile: { v1: {}, v2: {}, pointCount: 0 },
     vertical: { v1: {}, v2: {}, v3: {}, v4: {}, pointCount: 0 },
     alerts: [],
     crosshair: {},
@@ -294,6 +303,13 @@ onMounted(() => {
         priceScaleId: "vertical",
         scaleMargins: { top: 0, bottom: 0 },
         color: "#26a69a",
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    params.series.volprofile = params.chart.addHistogramSeries({
+        priceScaleId: "volprofile",
+        scaleMargins: { top: 0, bottom: 0 },
+        color: "#673AB7",
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -352,6 +368,8 @@ function eventChartClick() {
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
     else if (pattern1ToolRef.value.classList.contains("selected"))
         drawPattern1Tool();
+    else if (volprofileToolRef.value.classList.contains("selected"))
+        drawVolprofileTool();
     else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
 }
 function eventChartCrosshairMove(e) {
@@ -774,6 +792,19 @@ function loadToolsData() {
                 params.pattern1[line.title] =
                     params.series.price.createPriceLine(line);
             });
+        }
+        //
+        const volprofiles = await toolsStore.get("volprofile");
+        if (volprofiles.length > 0) {
+            params.volprofile.v1 = volprofiles[0];
+            params.volprofile.v2 = volprofiles[1];
+            params.volprofile.v3 = params.series.price.createPriceLine(
+                volprofiles[2]
+            );
+            params.series.volprofile.setData([
+                params.volprofile.v1,
+                params.volprofile.v2,
+            ]);
         }
         //
         const alerts = await toolsStore.get("alert");
@@ -1593,6 +1624,93 @@ function removePattern1Tool() {
         toolsStore.clear("pattern1");
     }
 }
+function volprofileToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removeVolprofileTool();
+    }
+    e.stopPropagation();
+}
+function volprofileToolContextmenu(e) {
+    removeVolprofileTool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawVolprofileTool() {
+    if (params.crosshair.time) {
+        if (params.volprofile.pointCount == 0) {
+            params.volprofile.v1 = {
+                key: 1,
+                time: params.crosshair.time,
+                value: 1,
+            };
+            params.series.volprofile.setData([params.volprofile.v1]);
+            params.volprofile.pointCount++;
+            toolsStore.set("volprofile", params.volprofile.v1);
+        } else {
+            params.volprofile.v2 = {
+                key: 2,
+                time: params.crosshair.time,
+                value: 1,
+            };
+            params.series.volprofile.setData([
+                params.volprofile.v1,
+                params.volprofile.v2,
+            ]);
+            toolsStore.set("volprofile", params.volprofile.v2);
+            params.volprofile.pointCount++;
+            volprofileToolRef.value.classList.remove("selected");
+            //
+            const prices = params.data.price.filter(
+                (x) =>
+                    x.time >= params.volprofile.v1.time &&
+                    x.time <= params.volprofile.v2.time
+            );
+            const volumes = params.data.volume.filter(
+                (x) =>
+                    x.time >= params.volprofile.v1.time &&
+                    x.time <= params.volprofile.v2.time
+            );
+            let profile = {};
+            for (let i = 0; i < prices.length; i++) {
+                if (profile.hasOwnProperty(prices[i].value))
+                    profile[prices[i].value] += volumes[i].value;
+                else profile[prices[i].value] = volumes[i].value;
+            }
+
+            console.log("profile", profile);
+
+            let priceOfMax = Object.keys(profile).reduce((a, b) =>
+                profile[a] > profile[b] ? a : b
+            );
+            console.log("priceOfMax", priceOfMax);
+            const options = {
+                key: 3,
+                price: +priceOfMax,
+                title: "POC",
+                color: "#673AB7",
+                lineWidth: 1,
+                lineStyle: 1,
+                draggable: false,
+            };
+            params.volprofile.v3 = params.series.price.createPriceLine(options);
+            toolsStore.set("volprofile", options);
+        }
+    }
+}
+function removeVolprofileTool() {
+    if (params.volprofile.pointCount > 1)
+        params.series.price.removePriceLine(params.volprofile.v3);
+    params.volprofile = { v1: {}, v2: {}, v3: {}, pointCount: 0 };
+    params.series.volprofile.setData([]);
+    toolsStore.clear("volprofile");
+}
 function alertToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
@@ -1832,7 +1950,7 @@ function refreshChart() {
 </script>
 <style lang="scss" scoped>
 .order-chart-container {
-    height: 320px;
+    height: 360px;
     background: #131722;
     border: none;
 
