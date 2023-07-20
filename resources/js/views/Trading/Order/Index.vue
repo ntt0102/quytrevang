@@ -84,11 +84,11 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
-                        ref="pattern1ToolRef"
+                        ref="pattern2ToolRef"
                         class="command far fa-star"
-                        :title="$t('trading.orderChart.pattern1Tool')"
-                        @click="pattern1ToolClick"
-                        @contextmenu="pattern1ToolContextmenu"
+                        :title="$t('trading.orderChart.pattern2Tool')"
+                        @click="pattern2ToolClick"
+                        @contextmenu="pattern2ToolContextmenu"
                     ></div>
                     <div
                         ref="volprofileToolRef"
@@ -224,7 +224,7 @@ const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
-const pattern1ToolRef = ref(null);
+const pattern2ToolRef = ref(null);
 const volprofileToolRef = ref(null);
 const verticalToolRef = ref(null);
 const alertToolRef = ref(null);
@@ -238,7 +238,7 @@ let params = {
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, pointCount: 0 },
-    pattern1: {
+    pattern2: {
         A: {},
         B: {},
         C: {},
@@ -366,8 +366,8 @@ function eventChartClick() {
     else if (verticalToolRef.value.classList.contains("selected"))
         drawVerticalTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
-    else if (pattern1ToolRef.value.classList.contains("selected"))
-        drawPattern1Tool();
+    else if (pattern2ToolRef.value.classList.contains("selected"))
+        drawPattern2Tool();
     else if (volprofileToolRef.value.classList.contains("selected"))
         drawVolprofileTool();
     else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
@@ -613,20 +613,20 @@ function eventPriceLineDrag(e) {
                     break;
             }
             break;
-        case "pattern1":
-            const o = +params.pattern1.O.options().price;
+        case "pattern2":
+            const o = +params.pattern2.O.options().price;
             if (
                 lineOptions.title == "A" ||
                 lineOptions.title == "B" ||
                 lineOptions.title == "O"
             ) {
                 const ab =
-                    +params.pattern1.A.options().price -
-                    +params.pattern1.B.options().price;
-                params.pattern1.Y.applyOptions({
+                    +params.pattern2.A.options().price -
+                    +params.pattern2.B.options().price;
+                params.pattern2.Y.applyOptions({
                     price: +(o - ab).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.Y.options());
+                toolsStore.set("pattern2", params.pattern2.Y.options());
             }
             if (
                 lineOptions.title == "C" ||
@@ -634,12 +634,12 @@ function eventPriceLineDrag(e) {
                 lineOptions.title == "O"
             ) {
                 const cd =
-                    +params.pattern1.C.options().price -
-                    +params.pattern1.D.options().price;
-                params.pattern1.X.applyOptions({
+                    +params.pattern2.C.options().price -
+                    +params.pattern2.D.options().price;
+                params.pattern2.X.applyOptions({
                     price: +(o - cd).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.X.options());
+                toolsStore.set("pattern2", params.pattern2.X.options());
             }
             break;
         case "alert":
@@ -785,11 +785,11 @@ function loadToolsData() {
             });
         }
         //
-        const pattern1Lines = await toolsStore.get("pattern1");
-        if (pattern1Lines.length > 0) {
-            params.pattern1.pointCount = pattern1Lines.length;
-            pattern1Lines.forEach((line) => {
-                params.pattern1[line.title] =
+        const pattern2Lines = await toolsStore.get("pattern2");
+        if (pattern2Lines.length > 0) {
+            params.pattern2.pointCount = pattern2Lines.length;
+            pattern2Lines.forEach((line) => {
+                params.pattern2[line.title] =
                     params.series.price.createPriceLine(line);
             });
         }
@@ -1515,7 +1515,7 @@ function removeRulerTool() {
         toolsStore.clear("ruler");
     }
 }
-function pattern1ToolClick(e) {
+function pattern2ToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
     document
@@ -1523,26 +1523,26 @@ function pattern1ToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        removePattern1Tool();
+        removePattern2Tool();
     }
     e.stopPropagation();
 }
-function pattern1ToolContextmenu(e) {
-    removePattern1Tool();
+function pattern2ToolContextmenu(e) {
+    removePattern2Tool();
     e.target.classList.remove("selected");
     e.preventDefault();
     e.stopPropagation();
 }
-function drawPattern1Tool() {
+function drawPattern2Tool() {
     const price = coordinateToPrice(params.crosshair.y);
     var options = {
-        lineType: "pattern1",
+        lineType: "pattern2",
         price: price,
         lineWidth: 1,
         lineStyle: 1,
         draggable: true,
     };
-    switch (params.pattern1.pointCount) {
+    switch (params.pattern2.pointCount) {
         case 0:
             options.title = "A";
             options.color = "#E91E63";
@@ -1564,55 +1564,55 @@ function drawPattern1Tool() {
             options.color = "#673AB7";
             break;
     }
-    params.pattern1[options.title] =
+    params.pattern2[options.title] =
         params.series.price.createPriceLine(options);
-    params.pattern1.pointCount++;
-    toolsStore.set("pattern1", options);
-    if (params.pattern1.pointCount == 5) {
-        const o = +params.pattern1.O.options().price;
+    params.pattern2.pointCount++;
+    toolsStore.set("pattern2", options);
+    if (params.pattern2.pointCount == 5) {
+        const o = +params.pattern2.O.options().price;
         const ab =
-            +params.pattern1.A.options().price -
-            +params.pattern1.B.options().price;
+            +params.pattern2.A.options().price -
+            +params.pattern2.B.options().price;
         const cd =
-            +params.pattern1.C.options().price -
-            +params.pattern1.D.options().price;
+            +params.pattern2.C.options().price -
+            +params.pattern2.D.options().price;
         //
         options.color = "#2196F3";
         options.draggable = false;
         options.price = o - cd;
         options.title = "X";
-        params.pattern1[options.title] =
+        params.pattern2[options.title] =
             params.series.price.createPriceLine(options);
-        toolsStore.set("pattern1", options);
+        toolsStore.set("pattern2", options);
         //
         options.price = o - ab;
         options.title = "Y";
-        params.pattern1[options.title] =
+        params.pattern2[options.title] =
             params.series.price.createPriceLine(options);
-        toolsStore.set("pattern1", options);
+        toolsStore.set("pattern2", options);
         //
-        pattern1ToolRef.value.classList.remove("selected");
+        pattern2ToolRef.value.classList.remove("selected");
     }
 }
-function removePattern1Tool() {
-    if (params.pattern1.pointCount > 0) {
-        params.series.price.removePriceLine(params.pattern1.A);
-        if (params.pattern1.pointCount > 1) {
-            params.series.price.removePriceLine(params.pattern1.B);
-            if (params.pattern1.pointCount > 2) {
-                params.series.price.removePriceLine(params.pattern1.C);
-                if (params.pattern1.pointCount > 3) {
-                    params.series.price.removePriceLine(params.pattern1.D);
-                    if (params.pattern1.pointCount > 4) {
-                        params.series.price.removePriceLine(params.pattern1.O);
-                        params.series.price.removePriceLine(params.pattern1.X);
-                        params.series.price.removePriceLine(params.pattern1.Y);
+function removePattern2Tool() {
+    if (params.pattern2.pointCount > 0) {
+        params.series.price.removePriceLine(params.pattern2.A);
+        if (params.pattern2.pointCount > 1) {
+            params.series.price.removePriceLine(params.pattern2.B);
+            if (params.pattern2.pointCount > 2) {
+                params.series.price.removePriceLine(params.pattern2.C);
+                if (params.pattern2.pointCount > 3) {
+                    params.series.price.removePriceLine(params.pattern2.D);
+                    if (params.pattern2.pointCount > 4) {
+                        params.series.price.removePriceLine(params.pattern2.O);
+                        params.series.price.removePriceLine(params.pattern2.X);
+                        params.series.price.removePriceLine(params.pattern2.Y);
                     }
                 }
             }
         }
         //
-        params.pattern1 = {
+        params.pattern2 = {
             A: {},
             B: {},
             C: {},
@@ -1622,7 +1622,7 @@ function removePattern1Tool() {
             X: {},
             pointCount: 0,
         };
-        toolsStore.clear("pattern1");
+        toolsStore.clear("pattern2");
     }
 }
 function volprofileToolClick(e) {
