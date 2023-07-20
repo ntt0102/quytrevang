@@ -84,8 +84,15 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
-                        ref="pattern2ToolRef"
+                        ref="pattern1ToolRef"
                         class="command far fa-star"
+                        :title="$t('trading.orderChart.pattern1Tool')"
+                        @click="pattern1ToolClick"
+                        @contextmenu="pattern1ToolContextmenu"
+                    ></div>
+                    <div
+                        ref="pattern2ToolRef"
+                        class="command far fa-star-and-crescent"
                         :title="$t('trading.orderChart.pattern2Tool')"
                         @click="pattern2ToolClick"
                         @contextmenu="pattern2ToolContextmenu"
@@ -224,6 +231,7 @@ const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
+const pattern1ToolRef = ref(null);
 const pattern2ToolRef = ref(null);
 const volprofileToolRef = ref(null);
 const verticalToolRef = ref(null);
@@ -238,6 +246,15 @@ let params = {
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, pointCount: 0 },
+    pattern1: {
+        A: {},
+        B: {},
+        C: {},
+        D: {},
+        X: {},
+        Y: {},
+        pointCount: 0,
+    },
     pattern2: {
         A: {},
         B: {},
@@ -366,6 +383,8 @@ function eventChartClick() {
     else if (verticalToolRef.value.classList.contains("selected"))
         drawVerticalTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
+    else if (pattern1ToolRef.value.classList.contains("selected"))
+        drawPattern1Tool();
     else if (pattern2ToolRef.value.classList.contains("selected"))
         drawPattern2Tool();
     else if (volprofileToolRef.value.classList.contains("selected"))
@@ -613,6 +632,24 @@ function eventPriceLineDrag(e) {
                     break;
             }
             break;
+        case "pattern1":
+            const b = +params.pattern1.B.options().price;
+            if (lineOptions.title == "A" || lineOptions.title == "B") {
+                const a = +params.pattern1.A.options().price;
+                params.pattern1.X.applyOptions({
+                    price: +(2 * b - a).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.X.options());
+            }
+            if (lineOptions.title == "C" || lineOptions.title == "D") {
+                const c = +params.pattern1.C.options().price;
+                const d = +params.pattern1.D.options().price;
+                params.pattern1.Y.applyOptions({
+                    price: +(d - b + c).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.Y.options());
+            }
+            break;
         case "pattern2":
             const o = +params.pattern2.O.options().price;
             if (
@@ -781,6 +818,15 @@ function loadToolsData() {
             params.ruler.pointCount = rulerLines.length > 1 ? 2 : 1;
             rulerLines.forEach((line) => {
                 params.ruler[line.point] =
+                    params.series.price.createPriceLine(line);
+            });
+        }
+        //
+        const pattern1Lines = await toolsStore.get("pattern1");
+        if (pattern1Lines.length > 0) {
+            params.pattern1.pointCount = pattern1Lines.length;
+            pattern1Lines.forEach((line) => {
+                params.pattern1[line.title] =
                     params.series.price.createPriceLine(line);
             });
         }
@@ -1515,6 +1561,108 @@ function removeRulerTool() {
         toolsStore.clear("ruler");
     }
 }
+function pattern1ToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removePattern1Tool();
+    }
+    e.stopPropagation();
+}
+function pattern1ToolContextmenu(e) {
+    removePattern1Tool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawPattern1Tool() {
+    const price = coordinateToPrice(params.crosshair.y);
+    var options = {
+        lineType: "pattern1",
+        price: price,
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: true,
+    };
+    switch (params.pattern1.pointCount) {
+        case 0:
+            options.title = "A";
+            options.color = "#E91E63";
+            break;
+        case 1:
+            options.title = "B";
+            options.color = "#E91E63";
+            break;
+        case 2:
+            options.title = "C";
+            options.color = "#9C27B0";
+            break;
+        case 3:
+            options.title = "D";
+            options.color = "#9C27B0";
+            break;
+    }
+    params.pattern1[options.title] =
+        params.series.price.createPriceLine(options);
+    toolsStore.set("pattern1", options);
+    if (params.pattern1.pointCount == 1) {
+        const a = +params.pattern1.A.options().price;
+        const b = +params.pattern1.B.options().price;
+        options.color = "#2196F3";
+        options.draggable = false;
+        options.price = 2 * b - a;
+        options.title = "X";
+        params.pattern1[options.title] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("pattern1", options);
+    }
+    if (params.pattern1.pointCount == 3) {
+        const b = +params.pattern1.B.options().price;
+        const c = +params.pattern1.C.options().price;
+        const d = +params.pattern1.D.options().price;
+        options.color = "#00BCD4";
+        options.draggable = false;
+        options.price = d - b + c;
+        options.title = "Y";
+        params.pattern1[options.title] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("pattern1", options);
+        //
+        pattern1ToolRef.value.classList.remove("selected");
+    }
+    params.pattern1.pointCount++;
+}
+function removePattern1Tool() {
+    if (params.pattern1.pointCount > 0) {
+        params.series.price.removePriceLine(params.pattern1.A);
+        if (params.pattern1.pointCount > 1) {
+            params.series.price.removePriceLine(params.pattern1.B);
+            params.series.price.removePriceLine(params.pattern1.X);
+            if (params.pattern1.pointCount > 2) {
+                params.series.price.removePriceLine(params.pattern1.C);
+                if (params.pattern1.pointCount > 3) {
+                    params.series.price.removePriceLine(params.pattern1.D);
+                    params.series.price.removePriceLine(params.pattern1.Y);
+                }
+            }
+        }
+        //
+        params.pattern1 = {
+            A: {},
+            B: {},
+            C: {},
+            D: {},
+            Y: {},
+            X: {},
+            pointCount: 0,
+        };
+        toolsStore.clear("pattern1");
+    }
+}
 function pattern2ToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
@@ -1566,9 +1714,8 @@ function drawPattern2Tool() {
     }
     params.pattern2[options.title] =
         params.series.price.createPriceLine(options);
-    params.pattern2.pointCount++;
     toolsStore.set("pattern2", options);
-    if (params.pattern2.pointCount == 5) {
+    if (params.pattern2.pointCount == 4) {
         const o = +params.pattern2.O.options().price;
         const ab =
             +params.pattern2.A.options().price -
@@ -1593,6 +1740,7 @@ function drawPattern2Tool() {
         //
         pattern2ToolRef.value.classList.remove("selected");
     }
+    params.pattern2.pointCount++;
 }
 function removePattern2Tool() {
     if (params.pattern2.pointCount > 0) {
@@ -1949,7 +2097,7 @@ function refreshChart() {
 </script>
 <style lang="scss" scoped>
 .order-chart-container {
-    height: 360px;
+    height: 400px;
     background: #131722;
     border: none;
 
