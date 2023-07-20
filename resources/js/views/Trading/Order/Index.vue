@@ -934,7 +934,8 @@ function connectSocket() {
                             };
                         } else if (params.shark != null)
                             params.shark.recovery &=
-                                params.shark.side * side <= 0;
+                                params.shark.side * side <= 0 ||
+                                data.lastVol > 50;
                         updateChartData(
                             {
                                 time: time,

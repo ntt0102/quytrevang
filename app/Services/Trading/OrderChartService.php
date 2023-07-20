@@ -221,7 +221,7 @@ class OrderChartService extends CoreService
                 'recovery' => true
             ];
         } else if ($c['shark'] != null)
-            $c['shark']['recovery'] &= ($c['shark']['side'] * $side) <= 0;
+            $c['shark']['recovery'] &= ($c['shark']['side'] * $side) <= 0 || $volume > 50;
         $c['price'][] = [
             'time' => $time,
             'value' => $price
