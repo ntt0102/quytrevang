@@ -254,6 +254,7 @@ let params = {
         D: {},
         X: {},
         Y: {},
+        Yi: {},
         Z: {},
         pointCount: 0,
     },
@@ -655,6 +656,12 @@ function eventPriceLineDrag(e) {
                     price: +(d - b + c).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Y.options());
+                //
+                params.pattern1.Yi.applyOptions({
+                    price: +((a + d) / 2).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.Yi.options());
+                //
                 params.pattern1.Z.applyOptions({
                     price: +(2 * d - a).toFixed(1),
                 });
@@ -1624,7 +1631,7 @@ function drawPattern1Tool() {
         const a = +params.pattern1.A.options().price;
         const b = +params.pattern1.B.options().price;
         options.draggable = false;
-        options.color = "#2196F3";
+        options.color = "#9C27B0";
         options.price = +((a + b) / 2).toFixed(1);
         options.title = "Ci";
         params.pattern1[options.title] =
@@ -1650,6 +1657,13 @@ function drawPattern1Tool() {
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
         //
+        options.price = +((a + d) / 2).toFixed(1);
+        options.title = "Yi";
+        params.pattern1[options.title] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("pattern1", options);
+        //
+        options.color = "#009688";
         options.price = 2 * d - a;
         options.title = "Z";
         params.pattern1[options.title] =
@@ -1672,6 +1686,7 @@ function removePattern1Tool() {
                 if (params.pattern1.pointCount > 3) {
                     params.series.price.removePriceLine(params.pattern1.D);
                     params.series.price.removePriceLine(params.pattern1.Y);
+                    params.series.price.removePriceLine(params.pattern1.Yi);
                     params.series.price.removePriceLine(params.pattern1.Z);
                 }
             }
@@ -1684,6 +1699,7 @@ function removePattern1Tool() {
             Ci: {},
             D: {},
             Y: {},
+            Yi: {},
             X: {},
             Z: {},
             pointCount: 0,
