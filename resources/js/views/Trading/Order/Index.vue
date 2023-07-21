@@ -644,9 +644,9 @@ function eventPriceLineDrag(e) {
                 toolsStore.set("pattern1", params.pattern1.X.options());
                 //
                 params.pattern1.Ci.applyOptions({
-                    price: +((b - a) / 2).toFixed(1),
+                    price: +((a + b) / 2).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.X.options());
+                toolsStore.set("pattern1", params.pattern1.Ci.options());
             }
             if (lineOptions.title == "C" || lineOptions.title == "D") {
                 const c = +params.pattern1.C.options().price;
@@ -1624,7 +1624,7 @@ function drawPattern1Tool() {
         const a = +params.pattern1.A.options().price;
         const b = +params.pattern1.B.options().price;
         options.draggable = false;
-        options.price = +((b - a) / 2).toFixed(1);
+        options.price = +((a + b) / 2).toFixed(1);
         options.title = "Ci";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
