@@ -250,12 +250,12 @@ let params = {
         A: {},
         B: {},
         C: {},
-        Ci: {},
+        Cr: {},
         D: {},
-        X: {},
-        Y: {},
-        Yi: {},
-        Z: {},
+        Dt: {},
+        Et: {},
+        Er: {},
+        Ft: {},
         pointCount: 0,
     },
     pattern2: {
@@ -639,33 +639,33 @@ function eventPriceLineDrag(e) {
             const a = +params.pattern1.A.options().price;
             const b = +params.pattern1.B.options().price;
             if (lineOptions.title == "A" || lineOptions.title == "B") {
-                params.pattern1.X.applyOptions({
-                    price: +(2 * b - a).toFixed(1),
-                });
-                toolsStore.set("pattern1", params.pattern1.X.options());
-                //
-                params.pattern1.Ci.applyOptions({
+                params.pattern1.Cr.applyOptions({
                     price: +((a + b) / 2).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.Ci.options());
+                toolsStore.set("pattern1", params.pattern1.Cr.options());
+                //
+                params.pattern1.Dt.applyOptions({
+                    price: +(2 * b - a).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.Dt.options());
             }
             if (lineOptions.title == "C" || lineOptions.title == "D") {
                 const c = +params.pattern1.C.options().price;
                 const d = +params.pattern1.D.options().price;
-                params.pattern1.Y.applyOptions({
+                params.pattern1.Et.applyOptions({
                     price: +(d - b + c).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.Y.options());
+                toolsStore.set("pattern1", params.pattern1.Et.options());
                 //
-                params.pattern1.Yi.applyOptions({
+                params.pattern1.Er.applyOptions({
                     price: +((a + d) / 2).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.Yi.options());
+                toolsStore.set("pattern1", params.pattern1.Er.options());
                 //
-                params.pattern1.Z.applyOptions({
+                params.pattern1.Ft.applyOptions({
                     price: +(2 * d - a).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.Z.options());
+                toolsStore.set("pattern1", params.pattern1.Ft.options());
             }
             break;
         case "pattern2":
@@ -1631,16 +1631,15 @@ function drawPattern1Tool() {
         const a = +params.pattern1.A.options().price;
         const b = +params.pattern1.B.options().price;
         options.draggable = false;
-        options.color = "#9C27B0";
+        options.color = "#2196F3";
         options.price = +((a + b) / 2).toFixed(1);
-        options.title = "Ci";
+        options.title = "Cr";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
         //
-        options.color = "#2196F3";
         options.price = 2 * b - a;
-        options.title = "X";
+        options.title = "Dt";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
@@ -1653,20 +1652,21 @@ function drawPattern1Tool() {
         options.draggable = false;
         options.color = "#00BCD4";
         options.price = d - b + c;
-        options.title = "Y";
-        params.pattern1[options.title] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("pattern1", options);
-        //
-        options.price = +((a + d) / 2).toFixed(1);
-        options.title = "Yi";
+        options.title = "Et";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
         //
         options.color = "#009688";
+        options.price = +((a + d) / 2).toFixed(1);
+        options.title = "Er";
+        params.pattern1[options.title] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("pattern1", options);
+        //
+        options.color = "#4CAF50";
         options.price = 2 * d - a;
-        options.title = "Z";
+        options.title = "Ft";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
@@ -1680,15 +1680,15 @@ function removePattern1Tool() {
         params.series.price.removePriceLine(params.pattern1.A);
         if (params.pattern1.pointCount > 1) {
             params.series.price.removePriceLine(params.pattern1.B);
-            params.series.price.removePriceLine(params.pattern1.Ci);
-            params.series.price.removePriceLine(params.pattern1.X);
+            params.series.price.removePriceLine(params.pattern1.Cr);
+            params.series.price.removePriceLine(params.pattern1.Dt);
             if (params.pattern1.pointCount > 2) {
                 params.series.price.removePriceLine(params.pattern1.C);
                 if (params.pattern1.pointCount > 3) {
                     params.series.price.removePriceLine(params.pattern1.D);
-                    params.series.price.removePriceLine(params.pattern1.Y);
-                    params.series.price.removePriceLine(params.pattern1.Yi);
-                    params.series.price.removePriceLine(params.pattern1.Z);
+                    params.series.price.removePriceLine(params.pattern1.Et);
+                    params.series.price.removePriceLine(params.pattern1.Er);
+                    params.series.price.removePriceLine(params.pattern1.Ft);
                 }
             }
         }
@@ -1697,12 +1697,12 @@ function removePattern1Tool() {
             A: {},
             B: {},
             C: {},
-            Ci: {},
+            Cr: {},
             D: {},
-            Y: {},
-            Yi: {},
-            X: {},
-            Z: {},
+            Dt: {},
+            Et: {},
+            Er: {},
+            Ft: {},
             pointCount: 0,
         };
         toolsStore.clear("pattern1");
