@@ -3,6 +3,6 @@
 return [
 
     'title' => ':userName gửi phản hồi.',
-    'actionUrl' => 'admin-comments',
+    'actionUrl' => 'quan-ly-phan-hoi',
     'actionTitle' => 'Xem phản hồi',
 ];
