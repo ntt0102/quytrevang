@@ -1657,14 +1657,14 @@ function drawPattern1Tool() {
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
         //
-        options.color = "#009688";
+        options.color = "#4CAF50";
         options.price = +((a + d) / 2).toFixed(1);
         options.title = "Er";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
         //
-        options.color = "#4CAF50";
+        options.color = "#009688";
         options.price = 2 * d - a;
         options.title = "Ft";
         params.pattern1[options.title] =
