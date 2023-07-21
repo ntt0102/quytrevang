@@ -250,6 +250,7 @@ let params = {
         A: {},
         B: {},
         C: {},
+        Ci: {},
         D: {},
         X: {},
         Y: {},
@@ -639,6 +640,11 @@ function eventPriceLineDrag(e) {
             if (lineOptions.title == "A" || lineOptions.title == "B") {
                 params.pattern1.X.applyOptions({
                     price: +(2 * b - a).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.X.options());
+                //
+                params.pattern1.Ci.applyOptions({
+                    price: +((b - a) / 2).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.X.options());
             }
@@ -1617,8 +1623,14 @@ function drawPattern1Tool() {
     if (params.pattern1.pointCount == 1) {
         const a = +params.pattern1.A.options().price;
         const b = +params.pattern1.B.options().price;
-        options.color = "#2196F3";
         options.draggable = false;
+        options.price = +((b - a) / 2).toFixed(1);
+        options.title = "Ci";
+        params.pattern1[options.title] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("pattern1", options);
+        //
+        options.color = "#2196F3";
         options.price = 2 * b - a;
         options.title = "X";
         params.pattern1[options.title] =
@@ -1654,6 +1666,7 @@ function removePattern1Tool() {
         params.series.price.removePriceLine(params.pattern1.A);
         if (params.pattern1.pointCount > 1) {
             params.series.price.removePriceLine(params.pattern1.B);
+            params.series.price.removePriceLine(params.pattern1.Ci);
             params.series.price.removePriceLine(params.pattern1.X);
             if (params.pattern1.pointCount > 2) {
                 params.series.price.removePriceLine(params.pattern1.C);
@@ -1669,6 +1682,7 @@ function removePattern1Tool() {
             A: {},
             B: {},
             C: {},
+            Ci: {},
             D: {},
             Y: {},
             X: {},
