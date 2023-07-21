@@ -253,6 +253,7 @@ let params = {
         D: {},
         X: {},
         Y: {},
+        Z: {},
         pointCount: 0,
     },
     pattern2: {
@@ -633,9 +634,9 @@ function eventPriceLineDrag(e) {
             }
             break;
         case "pattern1":
+            const a = +params.pattern1.A.options().price;
             const b = +params.pattern1.B.options().price;
             if (lineOptions.title == "A" || lineOptions.title == "B") {
-                const a = +params.pattern1.A.options().price;
                 params.pattern1.X.applyOptions({
                     price: +(2 * b - a).toFixed(1),
                 });
@@ -648,6 +649,10 @@ function eventPriceLineDrag(e) {
                     price: +(d - b + c).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Y.options());
+                params.pattern1.Z.applyOptions({
+                    price: +(2 * d - a).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.Z.options());
             }
             break;
         case "pattern2":
@@ -1621,13 +1626,21 @@ function drawPattern1Tool() {
         toolsStore.set("pattern1", options);
     }
     if (params.pattern1.pointCount == 3) {
+        const a = +params.pattern1.A.options().price;
         const b = +params.pattern1.B.options().price;
         const c = +params.pattern1.C.options().price;
         const d = +params.pattern1.D.options().price;
-        options.color = "#00BCD4";
         options.draggable = false;
+        options.color = "#00BCD4";
         options.price = d - b + c;
         options.title = "Y";
+        params.pattern1[options.title] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("pattern1", options);
+        //
+        options.color = "#009688";
+        options.price = 2 * d - a;
+        options.title = "Z";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
@@ -1647,6 +1660,7 @@ function removePattern1Tool() {
                 if (params.pattern1.pointCount > 3) {
                     params.series.price.removePriceLine(params.pattern1.D);
                     params.series.price.removePriceLine(params.pattern1.Y);
+                    params.series.price.removePriceLine(params.pattern1.Z);
                 }
             }
         }
@@ -1658,6 +1672,7 @@ function removePattern1Tool() {
             D: {},
             Y: {},
             X: {},
+            Z: {},
             pointCount: 0,
         };
         toolsStore.clear("pattern1");
