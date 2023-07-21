@@ -1624,13 +1624,13 @@ function drawPattern1Tool() {
         const a = +params.pattern1.A.options().price;
         const b = +params.pattern1.B.options().price;
         options.draggable = false;
+        options.color = "#2196F3";
         options.price = +((a + b) / 2).toFixed(1);
         options.title = "Ci";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
         //
-        options.color = "#2196F3";
         options.price = 2 * b - a;
         options.title = "X";
         params.pattern1[options.title] =
@@ -1650,7 +1650,6 @@ function drawPattern1Tool() {
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
         //
-        options.color = "#009688";
         options.price = 2 * d - a;
         options.title = "Z";
         params.pattern1[options.title] =
