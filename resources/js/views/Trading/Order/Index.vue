@@ -969,24 +969,31 @@ function connectSocket() {
                         const time =
                             moment(`${CURRENT_DATE} ${data.time}`).unix() +
                             7 * 60 * 60;
-                        const prevPrice = params.data.price.slice(-1)[0].value;
-                        const side = data.lastPrice - prevPrice;
-                        let isShark = false;
+                        const side =
+                            data.lastPrice -
+                            params.data.price.slice(-1)[0].value;
                         if (mf.isSet(params.volprofile.v3)) {
-                            const poc = params.volprofile.v3.options().price;
+                            const poc = +params.volprofile.v3.options().price;
                             if (
                                 (side > 0 && data.lastPrice > poc) ||
                                 (side < 0 && data.lastPrice < poc)
                             ) {
-                                isShark = true;
+                                let isSignal = true;
                                 for (let i = -1; i > -6; i--) {
                                     if (
                                         params.data.volume.slice(i)[0].value >=
                                         data.lastVol
                                     ) {
-                                        isShark = false;
+                                        isSignal = false;
                                         break;
                                     }
+                                }
+                                if (isSignal) {
+                                    drawLineTool(
+                                        data.lastPrice,
+                                        side > 0 ? "#00BCD4" : "#F44336",
+                                        side > 0 ? "BUY" : "SELL"
+                                    );
                                 }
                             }
                         }
@@ -1001,13 +1008,9 @@ function connectSocket() {
                                 value: data.lastVol < 900 ? data.lastVol : 0,
                                 color:
                                     side > 0
-                                        ? isShark
-                                            ? "#00FFFF"
-                                            : "#00FF00"
+                                        ? "#00FF00"
                                         : side < 0
-                                        ? isShark
-                                            ? "#FF00FF"
-                                            : "#FF0000"
+                                        ? "#FF0000"
                                         : "#CCCCCC",
                             }
                         );
@@ -1375,10 +1378,10 @@ function lineToolContextmenu(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-function drawLineTool(price = null) {
+function drawLineTool(price = null, color = null, title = null) {
     const TYPE = "line";
-    if (price == null)
-        price = formatPrice(coordinateToPrice(params.crosshair.y));
+    if (!price) price = formatPrice(coordinateToPrice(params.crosshair.y));
+    if (!color) color = state.color;
     const oldLength = params.lines.length;
     params.lines = params.lines.filter((line) => {
         const ops = line.options();
@@ -1393,7 +1396,8 @@ function drawLineTool(price = null) {
         const options = {
             lineType: TYPE,
             price: price,
-            color: state.color,
+            color: color,
+            title: title,
             lineWidth: 1,
             lineStyle: 1,
             draggable: true,

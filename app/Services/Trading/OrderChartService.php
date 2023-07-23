@@ -157,7 +157,7 @@ class OrderChartService extends CoreService
             $price = $item->lastPrice;
             $volume = $item->lastVol < 900 ? $item->lastVol : 0;
             return $this->createChartData($c, $time, $price, $volume);
-        }, ['price' => [], 'volume' => [], 'shark' => null]);
+        }, ['price' => [], 'volume' => []]);
     }
 
     /**
@@ -165,7 +165,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $c = ['price' => [], 'volume' => [], 'shark' => null];
+        $c = ['price' => [], 'volume' => []];
         $filename = storage_path('app/vn30f1m/' . $date . '.csv');
         if (!is_file($filename)) return $c;
         $fp = fopen($filename, 'r');
@@ -248,7 +248,7 @@ class OrderChartService extends CoreService
             $volume = $item->v < 900 ? $item->v : 0;
             $side = $item->a == 'BU' ? 1 : -1;
             return $this->createChartData($c, $time, $price, $volume, $side);
-        }, ['price' => [], 'volume' => [], 'shark' => null]);
+        }, ['price' => [], 'volume' => []]);
     }
 
     public function export()
