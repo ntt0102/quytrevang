@@ -155,7 +155,7 @@ class OrderChartService extends CoreService
             $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
             $price = $item->lastPrice;
             $volume = $item->lastVol < 900 ? $item->lastVol : 0;
-            return $this->createChartData($c, $time, $price, $volume, $index);
+            return $this->createChartData($c, $time, $price, $volume);
         }, ['price' => [], 'volume' => [], 'shark' => null]);
     }
 
@@ -174,8 +174,7 @@ class OrderChartService extends CoreService
                 $time = $line[0] + 0;
                 $price = $line[1] + 0;
                 $volume = $line[2] + 0 < 900 ? $line[2] + 0 : 0;
-                $index = count($c['price']);
-                $c = $this->createChartData($c, $time, $price, $volume, $index);
+                $c = $this->createChartData($c, $time, $price, $volume);
             }
         }
         fclose($fp);
@@ -184,38 +183,12 @@ class OrderChartService extends CoreService
     /**
      * Create Chart Data
      */
-    private function createChartData($c, $time, $price, $volume, $index, $dir = null)
+    private function createChartData($c, $time, $price, $volume, $dir = null)
     {
         $prevPrice = count($c['price']) ? end($c['price'])['value'] : $price;
         $side = $price - $prevPrice;
         $upSide = !$dir ? $side > 0 : $dir > 0;
         $downSide = !$dir ? $side < 0 : $dir < 0;
-        $isShark = false;
-        if ($volume >= 150) {
-            if (
-                $c['shark'] != null &&
-                $c['shark']['recovery'] &&
-                $index - $c['shark']['index'] > 1 &&
-                $index - $c['shark']['index'] <= 4 &&
-                (($c['shark']['side'] > 0 &&
-                    $price > $c['shark']['price']) ||
-                    ($c['shark']['side'] < 0 &&
-                        $price < $c['shark']['price'])) &&
-                $volume > $c['shark']['volume'] &&
-                $c['shark']['volume'] / $volume > 0.8 &&
-                $side * $c['shark']['side'] > 0
-            )
-                $isShark = true;
-
-            $c['shark'] = [
-                'side' => $side,
-                'index' => $index,
-                'price' => $price,
-                'volume' => $volume,
-                'recovery' => true
-            ];
-        } else if ($c['shark'] != null)
-            $c['shark']['recovery'] &= ($c['shark']['side'] * $side) <= 0 || $volume > 50;
         $c['price'][] = [
             'time' => $time,
             'value' => $price
@@ -224,13 +197,15 @@ class OrderChartService extends CoreService
             'time' => $time,
             'value' => $volume,
             'color' => $upSide
-                ? ($isShark
-                    ? "#00FFFF"
-                    : "#00FF00")
+                // ? ($isShark
+                //     ? "#00FFFF"
+                //     : "#00FF00")
+                ? "#00FF00"
                 : ($downSide
-                    ? ($isShark
-                        ? "#FF00FF"
-                        : "#FF0000")
+                    // ? ($isShark
+                    //     ? "#FF00FF"
+                    //     : "#FF0000")
+                    ? "#FF0000"
                     : "#CCCCCC"),
         ];
         return $c;
@@ -277,7 +252,7 @@ class OrderChartService extends CoreService
             $price = $item->p;
             $volume = $item->v < 900 ? $item->v : 0;
             $side = $item->a == 'BU' ? 1 : -1;
-            return $this->createChartData($c, $time, $price, $volume, $index, $side);
+            return $this->createChartData($c, $time, $price, $volume, $side);
         }, ['price' => [], 'volume' => [], 'shark' => null]);
     }
 
