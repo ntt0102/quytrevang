@@ -52,9 +52,10 @@ class OrderChartService extends CoreService
     {
         $copyist = request()->user()->copyist;
         return [
+            'openingMarket' => get_global_value('openingMarketFlag') == '1',
             'symbol' => get_global_value('vn30f1m'),
-            'vps_code' => $copyist->vps_code,
-            'vps_session' => $copyist->vps_session,
+            'vpsCode' => $copyist->vps_code,
+            'vpsSession' => $copyist->vps_session,
         ];
     }
 
@@ -164,10 +165,10 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $filename = storage_path('app/vn30f1m/' . $date . '.csv');
-        if (!is_file($filename)) return [];
-        $fp = fopen($filename, 'r');
         $c = ['price' => [], 'volume' => [], 'shark' => null];
+        $filename = storage_path('app/vn30f1m/' . $date . '.csv');
+        if (!is_file($filename)) return $c;
+        $fp = fopen($filename, 'r');
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
@@ -197,14 +198,8 @@ class OrderChartService extends CoreService
             'time' => $time,
             'value' => $volume,
             'color' => $upSide
-                // ? ($isShark
-                //     ? "#00FFFF"
-                //     : "#00FF00")
                 ? "#00FF00"
                 : ($downSide
-                    // ? ($isShark
-                    //     ? "#FF00FF"
-                    //     : "#FF0000")
                     ? "#FF0000"
                     : "#CCCCCC"),
         ];

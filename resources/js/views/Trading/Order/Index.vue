@@ -222,6 +222,7 @@ const TIME = {
 const store = useStore();
 const { t } = useI18n();
 const devices = inject("devices");
+const mf = inject("mf");
 const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
 const spinnerRef = ref(null);
@@ -293,7 +294,7 @@ const state = reactive({
 });
 const status = computed(() => store.state.tradingOrder.status);
 const tradingViewSrc = computed(() => {
-    return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${store.state.tradingOrder.config.vps_code}&s=${store.state.tradingOrder.config.vps_session}&resolution=1`;
+    return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${store.state.tradingOrder.config.vpsCode}&s=${store.state.tradingOrder.config.vpsSession}&resolution=1`;
 });
 
 store.dispatch("tradingOrder/getConfig").then(connectSocket);
@@ -859,12 +860,13 @@ function loadToolsData() {
         }
         //
         const volprofiles = await toolsStore.get("volprofile");
-        if (volprofiles.length > 0) {
+        if (volprofiles.length == 3) {
             params.volprofile.v1 = volprofiles[0];
             params.volprofile.v2 = volprofiles[1];
             params.volprofile.v3 = params.series.price.createPriceLine(
                 volprofiles[2]
             );
+            params.volprofile.pointCount = 2;
             params.series.volprofile.setData([
                 params.volprofile.v1,
                 params.volprofile.v2,
@@ -970,36 +972,25 @@ function connectSocket() {
                         const prevPrice = params.data.price.slice(-1)[0].value;
                         const side = data.lastPrice - prevPrice;
                         let isShark = false;
-                        if (data.lastVol >= 150) {
+                        if (mf.isSet(params.volprofile.v3)) {
+                            const poc = params.volprofile.v3.options().price;
                             if (
-                                params.shark != null &&
-                                params.shark.recovery &&
-                                params.data.volume.length - params.shark.index >
-                                    1 &&
-                                params.data.volume.length -
-                                    params.shark.index <=
-                                    4 &&
-                                ((params.shark.side > 0 &&
-                                    data.lastPrice > params.shark.price) ||
-                                    (params.shark.side < 0 &&
-                                        data.lastPrice < params.shark.price)) &&
-                                data.lastVol > params.shark.volume &&
-                                params.shark.volume / data.lastVol > 0.8 &&
-                                side * params.shark.side > 0
-                            )
+                                (side > 0 && data.lastPrice > poc) ||
+                                (side < 0 && data.lastPrice < poc)
+                            ) {
                                 isShark = true;
-
-                            params.shark = {
-                                side: side,
-                                index: params.data.volume.length,
-                                price: data.lastPrice,
-                                volume: data.lastVol,
-                                recovery: true,
-                            };
-                        } else if (params.shark != null)
-                            params.shark.recovery &=
-                                params.shark.side * side <= 0 ||
-                                data.lastVol > 50;
+                                for (let i = -1; i > -6; i--) {
+                                    if (
+                                        params.data.volume.slice(i)[0].value >=
+                                        data.lastVol
+                                    ) {
+                                        isShark = false;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        //
                         updateChartData(
                             {
                                 time: time,
@@ -1009,11 +1000,11 @@ function connectSocket() {
                                 time: time,
                                 value: data.lastVol < 900 ? data.lastVol : 0,
                                 color:
-                                    data.lastPrice > prevPrice
+                                    side > 0
                                         ? isShark
                                             ? "#00FFFF"
                                             : "#00FF00"
-                                        : data.lastPrice < prevPrice
+                                        : side < 0
                                         ? isShark
                                             ? "#FF00FF"
                                             : "#FF0000"
@@ -1227,62 +1218,67 @@ function intervalHandler() {
     }).format();
 }
 function showOrderButton() {
-    const CURRENT_SEC = moment().unix();
-    if (inSession(CURRENT_SEC)) {
-        if (!params.order.tp.hasOwnProperty("line")) {
-            if (!!status.value.position) {
-                if (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC) {
-                    params.order.entry.price =
-                        params.data.price.slice(-1)[0].value;
-                    params.order.side = status.value.position;
-                    tpslOrderRef.value.style.left =
+    if (store.state.tradingOrder.config.openingMarket) {
+        const CURRENT_SEC = moment().unix();
+        if (inSession(CURRENT_SEC)) {
+            if (!params.order.tp.hasOwnProperty("line")) {
+                if (!!status.value.position) {
+                    if (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC) {
+                        params.order.entry.price =
+                            params.data.price.slice(-1)[0].value;
+                        params.order.side = status.value.position;
+                        tpslOrderRef.value.style.left =
+                            +(
+                                params.crosshair.x +
+                                (params.crosshair.x > innerWidth - 61 ? -61 : 1)
+                            ) + "px";
+                        tpslOrderRef.value.style.top =
+                            +(
+                                params.crosshair.y +
+                                (params.crosshair.y > innerHeight - 51
+                                    ? -51
+                                    : 1)
+                            ) + "px";
+                        tpslOrderRef.value.style.display = "block";
+                    }
+                }
+            }
+            if (!params.order.entry.hasOwnProperty("line")) {
+                var price = null,
+                    side = 0;
+                if (!status.value.position) {
+                    price = coordinateToPrice(params.crosshair.y);
+                    side =
+                        price >= params.data.price.slice(-1)[0].value ? 1 : -1;
+                    params.order.side = side;
+                    params.order.entry.price = price;
+                } else {
+                    if (CURRENT_SEC < TIME.ATO) price = "ATO";
+                    else if (CURRENT_SEC > TIME.ATC) price = "ATC";
+                    if (!!price) {
+                        params.order.entry.price = price;
+                        side = -status.value.position;
+                    }
+                }
+                if (!!side) {
+                    entryOrderRef.value.style.left =
                         +(
                             params.crosshair.x +
-                            (params.crosshair.x > innerWidth - 61 ? -61 : 1)
+                            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
                         ) + "px";
-                    tpslOrderRef.value.style.top =
+                    entryOrderRef.value.style.top =
                         +(
                             params.crosshair.y +
-                            (params.crosshair.y > innerHeight - 51 ? -51 : 1)
+                            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
                         ) + "px";
-                    tpslOrderRef.value.style.display = "block";
+                    entryOrderRef.value.style.background =
+                        side > 0 ? "green" : "red";
+                    entryOrderRef.value.innerText = `${
+                        side > 0 ? "LONG" : "SHORT"
+                    } ${price}`;
                 }
+                entryOrderRef.value.style.display = "block";
             }
-        }
-        if (!params.order.entry.hasOwnProperty("line")) {
-            var price = null,
-                side = 0;
-            if (!status.value.position) {
-                price = coordinateToPrice(params.crosshair.y);
-                side = price >= params.data.price.slice(-1)[0].value ? 1 : -1;
-                params.order.side = side;
-                params.order.entry.price = price;
-            } else {
-                if (CURRENT_SEC < TIME.ATO) price = "ATO";
-                else if (CURRENT_SEC > TIME.ATC) price = "ATC";
-                if (!!price) {
-                    params.order.entry.price = price;
-                    side = -status.value.position;
-                }
-            }
-            if (!!side) {
-                entryOrderRef.value.style.left =
-                    +(
-                        params.crosshair.x +
-                        (params.crosshair.x > innerWidth - 71 ? -71 : 1)
-                    ) + "px";
-                entryOrderRef.value.style.top =
-                    +(
-                        params.crosshair.y +
-                        (params.crosshair.y > innerHeight - 61 ? -61 : 1)
-                    ) + "px";
-                entryOrderRef.value.style.background =
-                    side > 0 ? "green" : "red";
-                entryOrderRef.value.innerText = `${
-                    side > 0 ? "LONG" : "SHORT"
-                } ${price}`;
-            }
-            entryOrderRef.value.style.display = "block";
         }
     }
 }
@@ -1825,6 +1821,7 @@ function volprofileToolClick(e) {
         .querySelectorAll(".tool-area > .command")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
+        if (mf.isSet(params.volprofile.v1)) drawPoC();
         e.target.classList.add("selected");
     }
     e.stopPropagation();
@@ -1858,46 +1855,49 @@ function drawVolprofileTool() {
             ]);
             toolsStore.set("volprofile", params.volprofile.v2);
             //
-            const prices = params.data.price.filter(
-                (x) =>
-                    x.time >= params.volprofile.v1.time &&
-                    x.time <= params.volprofile.v2.time
-            );
-            const volumes = params.data.volume.filter(
-                (x) =>
-                    x.time >= params.volprofile.v1.time &&
-                    x.time <= params.volprofile.v2.time
-            );
-            let profile = {};
-            for (let i = 0; i < prices.length; i++) {
-                if (profile.hasOwnProperty(prices[i].value))
-                    profile[prices[i].value] += volumes[i].value;
-                else profile[prices[i].value] = volumes[i].value;
-            }
-            let priceOfMax = Object.keys(profile).reduce((a, b) =>
-                profile[a] > profile[b] ? a : b
-            );
-            const options = {
-                key: 3,
-                price: +priceOfMax,
-                title: "POC",
-                color: "#673AB7",
-                lineWidth: 1,
-                lineStyle: 1,
-                draggable: false,
-            };
-            if (params.volprofile.pointCount > 1)
-                params.series.price.removePriceLine(params.volprofile.v3);
-            params.volprofile.v3 = params.series.price.createPriceLine(options);
-            toolsStore.set("volprofile", options);
+            drawPoC();
             //
             params.volprofile.pointCount++;
             volprofileToolRef.value.classList.remove("selected");
         }
     }
 }
+function drawPoC() {
+    const v1Time = params.volprofile.v1.time;
+    const v2Time = mf.isSet(params.volprofile.v2)
+        ? params.volprofile.v2.time
+        : moment().unix();
+    const prices = params.data.price.filter(
+        (x) => x.time >= v1Time && x.time <= v2Time
+    );
+    const volumes = params.data.volume.filter(
+        (x) => x.time >= v1Time && x.time <= v2Time
+    );
+    let profile = {};
+    for (let i = 0; i < prices.length; i++) {
+        if (profile.hasOwnProperty(prices[i].value))
+            profile[prices[i].value] += volumes[i].value;
+        else profile[prices[i].value] = volumes[i].value;
+    }
+    let priceOfMax = Object.keys(profile).reduce((a, b) =>
+        profile[a] > profile[b] ? a : b
+    );
+    const options = {
+        key: 3,
+        price: +priceOfMax,
+        title: "POC",
+        color: "#673AB7",
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: false,
+    };
+    if (mf.isSet(params.volprofile.v3))
+        params.series.price.removePriceLine(params.volprofile.v3);
+    params.volprofile.v3 = params.series.price.createPriceLine(options);
+    toolsStore.set("volprofile", options);
+}
 function removeVolprofileTool() {
-    if (params.volprofile.pointCount > 1)
+    if (mf.isSet(params.volprofile.v3))
         params.series.price.removePriceLine(params.volprofile.v3);
     params.volprofile = { v1: {}, v2: {}, v3: {}, pointCount: 0 };
     params.series.volprofile.setData([]);
