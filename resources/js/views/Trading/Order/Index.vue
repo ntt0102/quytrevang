@@ -251,12 +251,9 @@ let params = {
         A: {},
         B: {},
         C: {},
-        Cr: {},
         D: {},
-        Dt: {},
-        Et: {},
-        Er: {},
-        Ft: {},
+        X: {},
+        Y: {},
         pointCount: 0,
     },
     pattern2: {
@@ -398,11 +395,9 @@ function eventChartClick() {
 function eventChartCrosshairMove(e) {
     if (e.time) {
         var price = e.seriesPrices.get(params.series.price);
-        params.hasCrosshair = true;
         params.crosshair.time = e.time;
         params.crosshair.price = price;
     } else {
-        params.hasCrosshair = false;
         if (!devices.phone) {
             params.crosshair.time = null;
             params.crosshair.price = null;
@@ -640,33 +635,18 @@ function eventPriceLineDrag(e) {
             const a = +params.pattern1.A.options().price;
             const b = +params.pattern1.B.options().price;
             if (lineOptions.title == "A" || lineOptions.title == "B") {
-                params.pattern1.Cr.applyOptions({
-                    price: +((a + b) / 2).toFixed(1),
-                });
-                toolsStore.set("pattern1", params.pattern1.Cr.options());
-                //
-                params.pattern1.Dt.applyOptions({
+                params.pattern1.X.applyOptions({
                     price: +(2 * b - a).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.Dt.options());
+                toolsStore.set("pattern1", params.pattern1.X.options());
             }
             if (lineOptions.title == "C" || lineOptions.title == "D") {
                 const c = +params.pattern1.C.options().price;
                 const d = +params.pattern1.D.options().price;
-                params.pattern1.Et.applyOptions({
+                params.pattern1.Y.applyOptions({
                     price: +(d - b + c).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.Et.options());
-                //
-                params.pattern1.Er.applyOptions({
-                    price: +((a + d) / 2).toFixed(1),
-                });
-                toolsStore.set("pattern1", params.pattern1.Er.options());
-                //
-                params.pattern1.Ft.applyOptions({
-                    price: +(2 * d - a).toFixed(1),
-                });
-                toolsStore.set("pattern1", params.pattern1.Ft.options());
+                toolsStore.set("pattern1", params.pattern1.Y.options());
             }
             break;
         case "pattern2":
@@ -1613,14 +1593,8 @@ function drawPattern1Tool() {
         const b = +params.pattern1.B.options().price;
         options.draggable = false;
         options.color = "#2196F3";
-        options.price = +((a + b) / 2).toFixed(1);
-        options.title = "Cr";
-        params.pattern1[options.title] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("pattern1", options);
-        //
         options.price = 2 * b - a;
-        options.title = "Dt";
+        options.title = "X";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
@@ -1633,21 +1607,7 @@ function drawPattern1Tool() {
         options.draggable = false;
         options.color = "#00BCD4";
         options.price = d - b + c;
-        options.title = "Et";
-        params.pattern1[options.title] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("pattern1", options);
-        //
-        options.color = "#4CAF50";
-        options.price = +((a + d) / 2).toFixed(1);
-        options.title = "Er";
-        params.pattern1[options.title] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("pattern1", options);
-        //
-        options.color = "#00BCD4";
-        options.price = 2 * d - a;
-        options.title = "Ft";
+        options.title = "Y";
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
@@ -1661,15 +1621,12 @@ function removePattern1Tool() {
         params.series.price.removePriceLine(params.pattern1.A);
         if (params.pattern1.pointCount > 1) {
             params.series.price.removePriceLine(params.pattern1.B);
-            params.series.price.removePriceLine(params.pattern1.Cr);
-            params.series.price.removePriceLine(params.pattern1.Dt);
+            params.series.price.removePriceLine(params.pattern1.X);
             if (params.pattern1.pointCount > 2) {
                 params.series.price.removePriceLine(params.pattern1.C);
                 if (params.pattern1.pointCount > 3) {
                     params.series.price.removePriceLine(params.pattern1.D);
-                    params.series.price.removePriceLine(params.pattern1.Et);
-                    params.series.price.removePriceLine(params.pattern1.Er);
-                    params.series.price.removePriceLine(params.pattern1.Ft);
+                    params.series.price.removePriceLine(params.pattern1.Y);
                 }
             }
         }
@@ -1678,12 +1635,9 @@ function removePattern1Tool() {
             A: {},
             B: {},
             C: {},
-            Cr: {},
             D: {},
-            Dt: {},
-            Et: {},
-            Er: {},
-            Ft: {},
+            X: {},
+            Y: {},
             pointCount: 0,
         };
         toolsStore.clear("pattern1");
@@ -1889,7 +1843,6 @@ function drawSignal() {
         const poc = +params.volprofile.v3.options().price;
         const side = poc - params.volprofile.v1.price;
         if ((side > 0 && lastPrice > poc) || (side < 0 && lastPrice < poc)) {
-            console.log("side", side);
             let isSignal = true;
             for (let i = -2; i > -22; i--) {
                 if (
@@ -1903,7 +1856,6 @@ function drawSignal() {
                     break;
                 }
             }
-            console.log("isSignal", isSignal);
             if (isSignal) {
                 drawLineTool(
                     lastPrice,
