@@ -860,17 +860,21 @@ function loadToolsData() {
         }
         //
         const volprofiles = await toolsStore.get("volprofile");
-        if (volprofiles.length == 3) {
-            params.volprofile.v1 = volprofiles[0];
-            params.volprofile.v2 = volprofiles[1];
+        if (volprofiles.length > 0) {
             params.volprofile.v3 = params.series.price.createPriceLine(
-                volprofiles[2]
+                volprofiles.pop()
             );
-            params.volprofile.pointCount = 2;
-            params.series.volprofile.setData([
-                params.volprofile.v1,
-                params.volprofile.v2,
-            ]);
+            params.volprofile.v1 = volprofiles[0];
+            params.volprofile.pointCount++;
+            params.series.volprofile.setData([params.volprofile.v1]);
+            if (volprofiles.length == 2) {
+                params.volprofile.v2 = volprofiles[1];
+                params.volprofile.pointCount++;
+                params.series.volprofile.setData([
+                    params.volprofile.v1,
+                    params.volprofile.v2,
+                ]);
+            }
         }
         //
         const alerts = await toolsStore.get("alert");
