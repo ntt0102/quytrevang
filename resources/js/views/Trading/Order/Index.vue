@@ -1891,7 +1891,7 @@ function drawSignal() {
         if ((side > 0 && lastPrice > poc) || (side < 0 && lastPrice < poc)) {
             console.log("side", side);
             let isSignal = true;
-            for (let i = -1; i > -21; i--) {
+            for (let i = -2; i > -22; i--) {
                 if (
                     params.data.volume.slice(i)[0].value >= lastVol ||
                     (side > 0 &&
