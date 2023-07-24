@@ -976,38 +976,6 @@ function connectSocket() {
                         const side =
                             data.lastPrice -
                             params.data.price.slice(-1)[0].value;
-                        if (mf.isSet(params.volprofile.v3)) {
-                            const poc = +params.volprofile.v3.options().price;
-                            if (
-                                (side > 0 && data.lastPrice > poc) ||
-                                (side < 0 && data.lastPrice < poc)
-                            ) {
-                                let isSignal = true;
-                                for (let i = -1; i > -21; i--) {
-                                    if (
-                                        params.data.volume.slice(i)[0].value >=
-                                            data.lastVol ||
-                                        (side > 0 &&
-                                            params.data.price.slice(i)[0]
-                                                .value > data.lastPrice) ||
-                                        (side < 0 &&
-                                            params.data.price.slice(i)[0]
-                                                .value < data.lastPrice)
-                                    ) {
-                                        isSignal = false;
-                                        break;
-                                    }
-                                }
-                                if (isSignal) {
-                                    drawLineTool(
-                                        data.lastPrice,
-                                        side > 0 ? "#00BCD4" : "#F44336",
-                                        side > 0 ? "BUY" : "SELL"
-                                    );
-                                }
-                            }
-                        }
-                        //
                         updateChartData(
                             {
                                 time: time,
@@ -1024,6 +992,7 @@ function connectSocket() {
                                         : "#CCCCCC",
                             }
                         );
+                        drawSignal();
                         if (params.order.entry.hasOwnProperty("line")) {
                             if (params.order.tp.hasOwnProperty("line")) {
                                 if (
@@ -1909,6 +1878,39 @@ function drawPoC() {
         params.series.price.removePriceLine(params.volprofile.v3);
     params.volprofile.v3 = params.series.price.createPriceLine(options);
     toolsStore.set("volprofile", options);
+}
+function drawSignal() {
+    if (mf.isSet(params.volprofile.v3)) {
+        const lastPrice = params.data.price.slice(-1)[0].value;
+        const lastVol = params.data.volume.slice(-1)[0].value;
+        const v1Price = params.data.price.find(
+            (x) => x.time == params.volprofile.v1.time
+        ).value;
+        const poc = +params.volprofile.v3.options().price;
+        const side = poc - v1Price;
+        if ((side > 0 && lastPrice > poc) || (side < 0 && lastPrice < poc)) {
+            let isSignal = true;
+            for (let i = -1; i > -21; i--) {
+                if (
+                    params.data.volume.slice(i)[0].value >= lastVol ||
+                    (side > 0 &&
+                        params.data.price.slice(i)[0].value > lastPrice) ||
+                    (side < 0 &&
+                        params.data.price.slice(i)[0].value < lastPrice)
+                ) {
+                    isSignal = false;
+                    break;
+                }
+            }
+            if (isSignal) {
+                drawLineTool(
+                    lastPrice,
+                    side > 0 ? "#00BCD4" : "#F44336",
+                    side > 0 ? "BUY" : "SELL"
+                );
+            }
+        }
+    }
 }
 function removeVolprofileTool() {
     if (mf.isSet(params.volprofile.v3))
