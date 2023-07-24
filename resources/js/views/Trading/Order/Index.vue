@@ -982,7 +982,13 @@ function connectSocket() {
                                 for (let i = -1; i > -6; i--) {
                                     if (
                                         params.data.volume.slice(i)[0].value >=
-                                        data.lastVol
+                                            data.lastVol ||
+                                        (side > 0 &&
+                                            params.data.price.slice(i)[0]
+                                                .value > data.lastPrice) ||
+                                        (side < 0 &&
+                                            params.data.price.slice(i)[0]
+                                                .value < data.lastPrice)
                                     ) {
                                         isSignal = false;
                                         break;
