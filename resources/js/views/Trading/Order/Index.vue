@@ -974,8 +974,10 @@ function connectSocket() {
                             moment(`${CURRENT_DATE} ${data.time}`).unix() +
                             7 * 60 * 60;
                         const side =
-                            data.lastPrice -
-                            params.data.price.slice(-1)[0].value;
+                            params.data.price.length > 0
+                                ? data.lastPrice -
+                                  params.data.price.slice(-1)[0].value
+                                : 0;
                         updateChartData(
                             {
                                 time: time,
@@ -1887,6 +1889,7 @@ function drawSignal() {
         const poc = +params.volprofile.v3.options().price;
         const side = poc - params.volprofile.v1.price;
         if ((side > 0 && lastPrice > poc) || (side < 0 && lastPrice < poc)) {
+            console.log("side", side);
             let isSignal = true;
             for (let i = -1; i > -21; i--) {
                 if (
@@ -1900,6 +1903,7 @@ function drawSignal() {
                     break;
                 }
             }
+            console.log("isSignal", isSignal);
             if (isSignal) {
                 drawLineTool(
                     lastPrice,
