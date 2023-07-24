@@ -979,7 +979,7 @@ function connectSocket() {
                                 (side < 0 && data.lastPrice < poc)
                             ) {
                                 let isSignal = true;
-                                for (let i = -1; i > -6; i--) {
+                                for (let i = -1; i > -21; i--) {
                                     if (
                                         params.data.volume.slice(i)[0].value >=
                                             data.lastVol ||
