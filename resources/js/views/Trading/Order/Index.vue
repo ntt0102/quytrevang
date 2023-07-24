@@ -1876,7 +1876,7 @@ function drawPoC() {
     const v1Time = params.volprofile.v1.time;
     const v2Time = mf.isSet(params.volprofile.v2)
         ? params.volprofile.v2.time
-        : moment().unix();
+        : moment().unix() + 7 * 60 * 60;
     const prices = params.data.price.filter(
         (x) => x.time >= v1Time && x.time <= v2Time
     );
