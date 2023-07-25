@@ -1839,10 +1839,14 @@ function drawPoC() {
 function drawSignal() {
     if (mf.isSet(params.volprofile.v3)) {
         const lastPrice = params.data.price.slice(-1)[0].value;
+        const prevPrice = params.data.price.slice(-2)[0].value;
         const lastVol = params.data.volume.slice(-1)[0].value;
         const poc = +params.volprofile.v3.options().price;
         const side = poc - params.volprofile.v1.price;
-        if ((side > 0 && lastPrice > poc) || (side < 0 && lastPrice < poc)) {
+        if (
+            (side > 0 && lastPrice > poc && lastPrice > prevPrice) ||
+            (side < 0 && lastPrice < poc && lastPrice < prevPrice)
+        ) {
             let isSignal = true;
             for (let i = -2; i > -22; i--) {
                 if (
