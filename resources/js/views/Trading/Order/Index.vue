@@ -1866,6 +1866,7 @@ function drawSignal() {
                     side > 0 ? "#00BCD4" : "#F44336",
                     side > 0 ? "BUY" : "SELL"
                 );
+                drawPoC();
             }
         }
     }
