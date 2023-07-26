@@ -1768,7 +1768,6 @@ function drawVolprofileTool() {
     if (params.crosshair.time) {
         if (params.volprofile.pointCount == 0) {
             params.volprofile.v1 = {
-                price: coordinateToPrice(params.crosshair.y),
                 time: params.crosshair.time,
                 value: 1,
             };
@@ -1833,13 +1832,13 @@ function drawSignal() {
     if (mf.isSet(params.volprofile.poc)) {
         drawPoC();
         const lastPrice = params.data.price.slice(-1)[0].value;
-        const lastVol = params.data.volume.slice(-1)[0].value;
-        const side = lastPrice - params.volprofile.v2.price;
         const prevPrice = params.data.price.slice(-2)[0].value;
+        const lastVol = params.data.volume.slice(-1)[0].value;
         const poc = +params.volprofile.poc.options().price;
+        const side = lastPrice - poc;
         if (
-            (side > 0 && lastPrice > poc && lastPrice > prevPrice) ||
-            (side < 0 && lastPrice < poc && lastPrice < prevPrice)
+            (side > 0 && lastPrice > prevPrice) ||
+            (side < 0 && lastPrice < prevPrice)
         ) {
             let isSignal = true;
             for (let i = -2; i > -22; i--) {
