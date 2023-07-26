@@ -1857,29 +1857,33 @@ function findPoC(v1Time, v2Time) {
     );
 }
 function drawSignal() {
-    if (mf.isSet(params.volprofile.poc2)) {
+    if (mf.isSet(params.volprofile.poc1)) {
+        drawPoC();
         const lastPrice = params.data.price.slice(-1)[0].value;
         const lastVol = params.data.volume.slice(-1)[0].value;
         const side = lastPrice - params.volprofile.v2.price;
-        let isSignal = true;
-        for (let i = -2; i > -22; i--) {
-            if (
-                params.data.volume.slice(i)[0].value >= lastVol ||
-                (side > 0 && params.data.price.slice(i)[0].value > lastPrice) ||
-                (side < 0 && params.data.price.slice(i)[0].value < lastPrice)
-            ) {
-                isSignal = false;
-                break;
+        const prevPrice = params.data.price.slice(-2)[0].value;
+        const poc = +(mf.isSet(params.volprofile.poc2)
+            ? params.volprofile.poc2.options().price
+            : params.volprofile.poc1.options().price);
+        if (
+            (side > 0 && lastPrice > poc && lastPrice > prevPrice) ||
+            (side < 0 && lastPrice < poc && lastPrice < prevPrice)
+        ) {
+            let isSignal = true;
+            for (let i = -2; i > -22; i--) {
+                if (
+                    params.data.volume.slice(i)[0].value >= lastVol ||
+                    (side > 0 &&
+                        params.data.price.slice(i)[0].value > lastPrice) ||
+                    (side < 0 &&
+                        params.data.price.slice(i)[0].value < lastPrice)
+                ) {
+                    isSignal = false;
+                    break;
+                }
             }
-        }
-        if (isSignal) {
-            drawPoC();
-            const prevPrice = params.data.price.slice(-2)[0].value;
-            const poc = +params.volprofile.poc2.options().price;
-            if (
-                (side > 0 && lastPrice > poc && lastPrice > prevPrice) ||
-                (side < 0 && lastPrice < poc && lastPrice < prevPrice)
-            ) {
+            if (isSignal) {
                 drawLineTool(
                     lastPrice,
                     side > 0 ? "#00BCD4" : "#F44336",
