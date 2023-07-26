@@ -1774,7 +1774,7 @@ function drawVolprofileTool() {
                 time: params.crosshair.time,
                 value: 1,
             };
-            params.series.volprofile.update(params.volprofile.v1);
+            params.series.volprofile.setData([params.volprofile.v1]);
             drawPoC();
             params.volprofile.pointCount++;
             toolsStore.set("volprofile", params.volprofile.v1);
@@ -1786,7 +1786,10 @@ function drawVolprofileTool() {
                     time: params.crosshair.time,
                     value: 1,
                 };
-                params.series.volprofile.update(params.volprofile.v2);
+                params.series.volprofile.setData([
+                    params.volprofile.v1,
+                    params.volprofile.v2,
+                ]);
                 toolsStore.set("volprofile", params.volprofile.v2);
                 drawPoC();
                 params.volprofile.pointCount++;
