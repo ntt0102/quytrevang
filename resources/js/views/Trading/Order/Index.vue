@@ -1809,7 +1809,7 @@ function drawPoC(between = false) {
             if (mf.isSet(params.volprofile.v2)) {
                 const v2Time = params.volprofile.v2.time;
                 options.price = +findPoC(v1Time, v2Time);
-                options.title = "PoC1";
+                options.title = "PoC";
                 if (mf.isSet(params.volprofile.poc1))
                     params.series.price.removePriceLine(params.volprofile.poc1);
                 if (mf.isSet(params.volprofile.poc2))
