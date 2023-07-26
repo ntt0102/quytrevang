@@ -266,7 +266,7 @@ let params = {
         Y: {},
         pointCount: 0,
     },
-    volprofile: { v1: {}, v2: {}, pointCount: 0 },
+    volprofile: { v1: {}, v2: {}, poc1: {}, poc2: {}, pointCount: 0 },
     vertical: { v1: {}, v2: {}, v3: {}, v4: {}, pointCount: 0 },
     alerts: [],
     crosshair: {},
@@ -841,20 +841,15 @@ function loadToolsData() {
         //
         const volprofiles = await toolsStore.get("volprofile");
         if (volprofiles.length > 0) {
-            params.volprofile.v3 = params.series.price.createPriceLine(
-                volprofiles.pop()
-            );
             params.volprofile.v1 = volprofiles[0];
             params.volprofile.pointCount++;
-            params.series.volprofile.setData([params.volprofile.v1]);
+            params.series.volprofile.update(params.volprofile.v1);
             if (volprofiles.length == 2) {
                 params.volprofile.v2 = volprofiles[1];
                 params.volprofile.pointCount++;
-                params.series.volprofile.setData([
-                    params.volprofile.v1,
-                    params.volprofile.v2,
-                ]);
+                params.series.volprofile.update(params.volprofile.v2);
             }
+            drawPoC();
         }
         //
         const alerts = await toolsStore.get("alert");
@@ -1760,7 +1755,7 @@ function volprofileToolClick(e) {
         .querySelectorAll(".tool-area > .command")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
-        if (mf.isSet(params.volprofile.v1)) drawPoC();
+        drawPoC(true);
         e.target.classList.add("selected");
     }
     e.stopPropagation();
@@ -1776,16 +1771,17 @@ function drawVolprofileTool() {
         if (params.volprofile.pointCount == 0) {
             params.volprofile.v1 = {
                 key: 1,
-                price: coordinateToPrice(params.crosshair.y),
                 time: params.crosshair.time,
                 value: 1,
             };
             params.series.volprofile.setData([params.volprofile.v1]);
+            drawPoC();
             params.volprofile.pointCount++;
             toolsStore.set("volprofile", params.volprofile.v1);
         } else {
             params.volprofile.v2 = {
                 key: 2,
+                price: coordinateToPrice(params.crosshair.y),
                 time: params.crosshair.time,
                 value: 1,
             };
@@ -1794,19 +1790,52 @@ function drawVolprofileTool() {
                 params.volprofile.v2,
             ]);
             toolsStore.set("volprofile", params.volprofile.v2);
-            //
             drawPoC();
-            //
             params.volprofile.pointCount++;
             volprofileToolRef.value.classList.remove("selected");
         }
     }
 }
-function drawPoC() {
-    const v1Time = params.volprofile.v1.time;
-    const v2Time = mf.isSet(params.volprofile.v2)
-        ? params.volprofile.v2.time
-        : moment().unix() + 7 * 60 * 60;
+function drawPoC(between = false) {
+    if (mf.isSet(params.volprofile.v1)) {
+        const options = {
+            color: "#673AB7",
+            lineWidth: 1,
+            lineStyle: 1,
+            draggable: false,
+        };
+        const v1Time = params.volprofile.v1.time;
+        if (between) {
+            if (mf.isSet(params.volprofile.v2)) {
+                const v2Time = params.volprofile.v2.time;
+                options.price = +findPoC(v1Time, v2Time);
+                options.title = "PoC1";
+                if (mf.isSet(params.volprofile.poc1))
+                    params.series.price.removePriceLine(params.volprofile.poc1);
+                params.volprofile.poc1 =
+                    params.series.price.createPriceLine(options);
+            }
+        } else {
+            const currTime = moment().unix() + 7 * 60 * 60;
+            options.price = +findPoC(v1Time, currTime);
+            options.title = "PoC1";
+            if (mf.isSet(params.volprofile.poc1))
+                params.series.price.removePriceLine(params.volprofile.poc1);
+            params.volprofile.poc1 =
+                params.series.price.createPriceLine(options);
+            if (mf.isSet(params.volprofile.v2)) {
+                const v2Time = params.volprofile.v2.time;
+                options.price = +findPoC(v2Time, currTime);
+                options.title = "PoC2";
+                if (mf.isSet(params.volprofile.poc2))
+                    params.series.price.removePriceLine(params.volprofile.poc2);
+                params.volprofile.poc2 =
+                    params.series.price.createPriceLine(options);
+            }
+        }
+    }
+}
+function findPoC(v1Time, v2Time) {
     const prices = params.data.price.filter(
         (x) => x.time >= v1Time && x.time <= v2Time
     );
@@ -1819,62 +1848,49 @@ function drawPoC() {
             profile[prices[i].value] += volumes[i].value;
         else profile[prices[i].value] = volumes[i].value;
     }
-    let priceOfMax = Object.keys(profile).reduce((a, b) =>
+    return Object.keys(profile).reduce((a, b) =>
         profile[a] > profile[b] ? a : b
     );
-    const options = {
-        key: 3,
-        price: +priceOfMax,
-        title: "POC",
-        color: "#673AB7",
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: false,
-    };
-    if (mf.isSet(params.volprofile.v3))
-        params.series.price.removePriceLine(params.volprofile.v3);
-    params.volprofile.v3 = params.series.price.createPriceLine(options);
-    toolsStore.set("volprofile", options);
 }
 function drawSignal() {
-    if (mf.isSet(params.volprofile.v3)) {
+    if (mf.isSet(params.volprofile.poc2)) {
         const lastPrice = params.data.price.slice(-1)[0].value;
-        const prevPrice = params.data.price.slice(-2)[0].value;
         const lastVol = params.data.volume.slice(-1)[0].value;
-        const poc = +params.volprofile.v3.options().price;
-        const side = poc - params.volprofile.v1.price;
-        if (
-            (side > 0 && lastPrice > poc && lastPrice > prevPrice) ||
-            (side < 0 && lastPrice < poc && lastPrice < prevPrice)
-        ) {
-            let isSignal = true;
-            for (let i = -2; i > -22; i--) {
-                if (
-                    params.data.volume.slice(i)[0].value >= lastVol ||
-                    (side > 0 &&
-                        params.data.price.slice(i)[0].value > lastPrice) ||
-                    (side < 0 &&
-                        params.data.price.slice(i)[0].value < lastPrice)
-                ) {
-                    isSignal = false;
-                    break;
-                }
+        const side = lastPrice - params.volprofile.v2.price;
+        let isSignal = true;
+        for (let i = -2; i > -22; i--) {
+            if (
+                params.data.volume.slice(i)[0].value >= lastVol ||
+                (side > 0 && params.data.price.slice(i)[0].value > lastPrice) ||
+                (side < 0 && params.data.price.slice(i)[0].value < lastPrice)
+            ) {
+                isSignal = false;
+                break;
             }
-            if (isSignal) {
+        }
+        if (isSignal) {
+            drawPoC();
+            const prevPrice = params.data.price.slice(-2)[0].value;
+            const poc = +params.volprofile.poc2.options().price;
+            if (
+                (side > 0 && lastPrice > poc && lastPrice > prevPrice) ||
+                (side < 0 && lastPrice < poc && lastPrice < prevPrice)
+            ) {
                 drawLineTool(
                     lastPrice,
                     side > 0 ? "#00BCD4" : "#F44336",
                     side > 0 ? "BUY" : "SELL"
                 );
-                drawPoC();
             }
         }
     }
 }
 function removeVolprofileTool() {
-    if (mf.isSet(params.volprofile.v3))
-        params.series.price.removePriceLine(params.volprofile.v3);
-    params.volprofile = { v1: {}, v2: {}, v3: {}, pointCount: 0 };
+    if (mf.isSet(params.volprofile.poc1))
+        params.series.price.removePriceLine(params.volprofile.poc1);
+    if (mf.isSet(params.volprofile.poc2))
+        params.series.price.removePriceLine(params.volprofile.poc2);
+    params.volprofile = { v1: {}, v2: {}, poc1: {}, poc2: {}, pointCount: 0 };
     params.series.volprofile.setData([]);
     toolsStore.clear("volprofile");
 }
