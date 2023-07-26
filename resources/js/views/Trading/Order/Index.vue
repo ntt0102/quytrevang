@@ -1774,25 +1774,24 @@ function drawVolprofileTool() {
                 time: params.crosshair.time,
                 value: 1,
             };
-            params.series.volprofile.setData([params.volprofile.v1]);
+            params.series.volprofile.update(params.volprofile.v1);
             drawPoC();
             params.volprofile.pointCount++;
             toolsStore.set("volprofile", params.volprofile.v1);
         } else {
-            params.volprofile.v2 = {
-                key: 2,
-                price: coordinateToPrice(params.crosshair.y),
-                time: params.crosshair.time,
-                value: 1,
-            };
-            params.series.volprofile.setData([
-                params.volprofile.v1,
-                params.volprofile.v2,
-            ]);
-            toolsStore.set("volprofile", params.volprofile.v2);
-            drawPoC();
-            params.volprofile.pointCount++;
-            volprofileToolRef.value.classList.remove("selected");
+            if (params.crosshair.time > params.volprofile.v1.time) {
+                params.volprofile.v2 = {
+                    key: 2,
+                    price: coordinateToPrice(params.crosshair.y),
+                    time: params.crosshair.time,
+                    value: 1,
+                };
+                params.series.volprofile.update(params.volprofile.v2);
+                toolsStore.set("volprofile", params.volprofile.v2);
+                drawPoC();
+                params.volprofile.pointCount++;
+                volprofileToolRef.value.classList.remove("selected");
+            }
         }
     }
 }
