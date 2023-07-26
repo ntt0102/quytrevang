@@ -155,7 +155,7 @@ class OrderChartService extends CoreService
         return collect($list)->reduce(function ($c, $item, $index) {
             $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
             $price = $item->lastPrice;
-            $volume = $item->lastVol < 900 ? $item->lastVol : 0;
+            $volume = $item->lastVol < 700 ? $item->lastVol : 0;
             return $this->createChartData($c, $time, $price, $volume);
         }, ['price' => [], 'volume' => []]);
     }
@@ -174,7 +174,7 @@ class OrderChartService extends CoreService
             if (!!$line) {
                 $time = $line[0] + 0;
                 $price = $line[1] + 0;
-                $volume = $line[2] + 0 < 900 ? $line[2] + 0 : 0;
+                $volume = $line[2] + 0 < 700 ? $line[2] + 0 : 0;
                 $c = $this->createChartData($c, $time, $price, $volume);
             }
         }
@@ -245,7 +245,7 @@ class OrderChartService extends CoreService
         return collect($list)->reduce(function ($c, $item, $index) {
             $time = strtotime(date('Y-m-d ') . $item->t) + $this->SHIFT_TIME;
             $price = $item->p;
-            $volume = $item->v < 900 ? $item->v : 0;
+            $volume = $item->v < 700 ? $item->v : 0;
             $side = $item->a == 'BU' ? 1 : -1;
             return $this->createChartData($c, $time, $price, $volume, $side);
         }, ['price' => [], 'volume' => []]);

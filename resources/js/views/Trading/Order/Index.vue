@@ -965,7 +965,7 @@ function connectSocket() {
                             },
                             {
                                 time: time,
-                                value: data.lastVol < 900 ? data.lastVol : 0,
+                                value: data.lastVol < 700 ? data.lastVol : 0,
                                 color:
                                     side > 0
                                         ? "#00FF00"
