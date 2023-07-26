@@ -1757,7 +1757,7 @@ function volprofileToolClick(e) {
     if (!selected) {
         drawPoC(true);
         e.target.classList.add("selected");
-    }
+    } else drawPoC();
     e.stopPropagation();
 }
 function volprofileToolContextmenu(e) {
@@ -1812,6 +1812,8 @@ function drawPoC(between = false) {
                 options.title = "PoC1";
                 if (mf.isSet(params.volprofile.poc1))
                     params.series.price.removePriceLine(params.volprofile.poc1);
+                if (mf.isSet(params.volprofile.poc2))
+                    params.series.price.removePriceLine(params.volprofile.poc2);
                 params.volprofile.poc1 =
                     params.series.price.createPriceLine(options);
             }
