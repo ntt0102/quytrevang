@@ -1784,6 +1784,10 @@ function drawVolprofileTool() {
                     params.volprofile.v1,
                     params.volprofile.v2,
                 ]);
+                if (mf.isSet(params.volprofile.v2)) {
+                    toolsStore.clear("volprofile");
+                    toolsStore.set("volprofile", params.volprofile.v1);
+                }
                 toolsStore.set("volprofile", params.volprofile.v2);
                 drawPoC();
                 params.volprofile.pointCount++;
