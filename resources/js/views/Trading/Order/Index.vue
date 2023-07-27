@@ -1802,10 +1802,13 @@ function drawPoC() {
         const v2Time = mf.isSet(params.volprofile.v2)
             ? params.volprofile.v2.time
             : moment().unix() + 7 * 60 * 60;
+        const poc = findPoC(v1Time, v2Time);
         const options = {
-            price: +findPoC(v1Time, v2Time),
-            title: "POC",
-            color: "#673AB7",
+            price: poc.price,
+            buy: poc.buy,
+            sell: poc.sell,
+            title: `POC ${poc.buy} - ${poc.sell}`,
+            color: poc.buy >= poc.sell ? "#2196F3" : "#9C27B0",
             lineWidth: 1,
             lineStyle: 1,
             draggable: false,
@@ -1824,13 +1827,22 @@ function findPoC(v1Time, v2Time) {
     );
     let profile = {};
     for (let i = 0; i < prices.length; i++) {
-        if (profile.hasOwnProperty(prices[i].value))
-            profile[prices[i].value] += volumes[i].value;
-        else profile[prices[i].value] = volumes[i].value;
+        if (!profile[prices[i].value])
+            profile[prices[i].value] = { buy: 0, sell: 0, total: 0 };
+        if (volumes[i].color == "#00FF00")
+            profile[prices[i].value].buy += volumes[i].value;
+        if (volumes[i].color == "#FF0000")
+            profile[prices[i].value].sell += volumes[i].value;
+        profile[prices[i].value].total += volumes[i].value;
     }
-    return Object.keys(profile).reduce((a, b) =>
-        profile[a] > profile[b] ? a : b
+    const maxPrice = Object.keys(profile).reduce((a, b) =>
+        profile[a].total > profile[b].total ? a : b
     );
+    return {
+        price: +maxPrice,
+        buy: profile[maxPrice].buy,
+        sell: profile[maxPrice].sell,
+    };
 }
 function drawSignal() {
     if (mf.isSet(params.volprofile.poc)) {
@@ -1838,11 +1850,11 @@ function drawSignal() {
         const lastPrice = params.data.price.slice(-1)[0].value;
         const prevPrice = params.data.price.slice(-2)[0].value;
         const lastVol = params.data.volume.slice(-1)[0].value;
-        const poc = +params.volprofile.poc.options().price;
-        const side = lastPrice - poc;
+        const poc = params.volprofile.poc.options();
+        const side = poc.buy > poc.sell;
         if (
-            (side > 0 && lastPrice > prevPrice) ||
-            (side < 0 && lastPrice < prevPrice)
+            (side > 0 && lastPrice > poc.price && lastPrice > prevPrice) ||
+            (side < 0 && lastPrice < poc.price && lastPrice < prevPrice)
         ) {
             let isSignal = true;
             for (let i = -2; i > -22; i--) {
@@ -1870,7 +1882,12 @@ function drawSignal() {
 function removeVolprofileTool() {
     if (mf.isSet(params.volprofile.poc))
         params.series.price.removePriceLine(params.volprofile.poc);
-    params.volprofile = { v1: {}, v2: {}, poc: {}, pointCount: 0 };
+    params.volprofile = {
+        v1: {},
+        v2: {},
+        poc: {},
+        pointCount: 0,
+    };
     params.series.volprofile.setData([]);
     toolsStore.clear("volprofile");
 }

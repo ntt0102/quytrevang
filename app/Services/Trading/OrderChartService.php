@@ -21,6 +21,7 @@ class OrderChartService extends CoreService
     {
         $date = date('Y-m-d');
         if ($payload->date == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('14:45:00'))
+            // return $this->generateDataFromTcbs();
             return $this->generateDataFromVps();
         return $this->generateDataFromCsv($payload->date);
     }
@@ -242,7 +243,7 @@ class OrderChartService extends CoreService
     public function generateDataFromTcbs()
     {
         $list = $this->cloneTcbsData();
-        return collect($list)->reduce(function ($c, $item, $index) {
+        return collect($list)->reduce(function ($c, $item) {
             $time = strtotime(date('Y-m-d ') . $item->t) + $this->SHIFT_TIME;
             $price = $item->p;
             $volume = $item->v < 700 ? $item->v : 0;
