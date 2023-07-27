@@ -1638,8 +1638,11 @@ function removeVolprofileTool() {
     toolsStore.clear("volprofile");
 }
 function scanSignal(full = false) {
-    var audio = new Audio(sound);
-    audio.play();
+    var player = new Audio(sound);
+    player.crossOrigin = "anonymous";
+    player.addEventListener("canplaythrough", function () {
+        player.play();
+    });
     const SIZE = 15;
     let signals = [];
     if (params.data.price.length >= 2 * SIZE + 1) {
