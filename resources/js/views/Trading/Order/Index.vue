@@ -94,7 +94,12 @@
                         ref="scanSignalToolRef"
                         class="command far fa-search-location"
                         :title="$t('trading.orderChart.scanSignalTool')"
-                        @click="scanSignal"
+                        @click="
+                            () => {
+                                removeSignal();
+                                scanSignal(true);
+                            }
+                        "
                         @contextmenu="removeSignal"
                     ></div>
                     <div
@@ -169,6 +174,7 @@ import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { confirm } from "devextreme/ui/dialog";
+import sound from "./alert.mp3";
 import {
     reactive,
     ref,
@@ -956,153 +962,8 @@ function connectSocket() {
                                         : "#CCCCCC",
                             }
                         );
-                        drawSignal1();
-                        if (params.order.entry.hasOwnProperty("line")) {
-                            if (params.order.tp.hasOwnProperty("line")) {
-                                if (
-                                    (params.order.side > 0 &&
-                                        data.lastPrice >=
-                                            params.order.tp.price) ||
-                                    (params.order.side < 0 &&
-                                        data.lastPrice <= params.order.tp.price)
-                                ) {
-                                    if (!params.isAutoOrdering) {
-                                        params.isAutoOrdering = true;
-                                        store
-                                            .dispatch(
-                                                "tradingOrder/executeOrder",
-                                                {
-                                                    action: "sl",
-                                                    data: {
-                                                        cmd: "delete",
-                                                    },
-                                                }
-                                            )
-                                            .then((resp) => {
-                                                if (resp.isOk) {
-                                                    removeOrderLine("entry");
-                                                    removeOrderLine("tp");
-                                                    removeOrderLine("sl");
-                                                    toggleCancelOrderButton(
-                                                        false
-                                                    );
-                                                    toolsStore.clear("order");
-                                                    toast.success(
-                                                        t(
-                                                            "trading.orderChart.deleteTpSuccess"
-                                                        )
-                                                    );
-                                                    hideOrderButton();
-                                                } else
-                                                    toastOrderError(
-                                                        resp.message
-                                                    );
-                                                params.isAutoOrdering = false;
-                                            });
-                                    }
-                                }
-                                if (
-                                    (params.order.side > 0 &&
-                                        data.lastPrice <=
-                                            params.order.sl.price) ||
-                                    (params.order.side < 0 &&
-                                        data.lastPrice >= params.order.sl.price)
-                                ) {
-                                    if (!params.isAutoOrdering) {
-                                        params.isAutoOrdering = true;
-                                        store
-                                            .dispatch(
-                                                "tradingOrder/executeOrder",
-                                                {
-                                                    action: "tp",
-                                                    data: {
-                                                        cmd: "cancel",
-                                                    },
-                                                }
-                                            )
-                                            .then((resp) => {
-                                                if (resp.isOk) {
-                                                    removeOrderLine("entry");
-                                                    removeOrderLine("tp");
-                                                    removeOrderLine("sl");
-                                                    toggleCancelOrderButton(
-                                                        false
-                                                    );
-                                                    toolsStore.clear("order");
-                                                    toast.success(
-                                                        t(
-                                                            "trading.orderChart.deleteSlSuccess"
-                                                        )
-                                                    );
-                                                    hideOrderButton();
-                                                } else
-                                                    toastOrderError(
-                                                        resp.message
-                                                    );
-                                                params.isAutoOrdering = false;
-                                            });
-                                    }
-                                }
-                            } else {
-                                if (
-                                    (params.order.side > 0 &&
-                                        data.lastPrice >=
-                                            params.order.entry.price) ||
-                                    (params.order.side < 0 &&
-                                        data.lastPrice <=
-                                            params.order.entry.price)
-                                ) {
-                                    if (!params.isAutoOrdering) {
-                                        params.isAutoOrdering = true;
-                                        setTimeout(() => {
-                                            params.order.tp.price =
-                                                params.order.entry.price +
-                                                params.order.side * TP_DEFAULT;
-                                            params.order.sl.price =
-                                                params.order.entry.price -
-                                                params.order.side * SL_DEFAULT;
-                                            store
-                                                .dispatch(
-                                                    "tradingOrder/executeOrder",
-                                                    {
-                                                        action: "tpsl",
-                                                        tpData: {
-                                                            cmd: "new",
-                                                            price: params.order
-                                                                .tp.price,
-                                                        },
-                                                        slData: {
-                                                            cmd: "new",
-                                                            price: params.order
-                                                                .sl.price,
-                                                        },
-                                                    }
-                                                )
-                                                .then((resp) => {
-                                                    if (resp.isOk) {
-                                                        drawOrderLine("tp");
-                                                        drawOrderLine("sl");
-                                                        params.order.entry.line.applyOptions(
-                                                            {
-                                                                draggable: false,
-                                                            }
-                                                        );
-                                                        toast.success(
-                                                            t(
-                                                                "trading.orderChart.autoNewTpSlSuccess"
-                                                            )
-                                                        );
-                                                    } else
-                                                        toastOrderError(
-                                                            resp.message
-                                                        );
-                                                    params.isAutoOrdering = false;
-                                                });
-                                        }, 1000);
-                                    }
-                                }
-                            }
-                        }
+                        scanSignal();
+                        scanOrder();
                     }
                 }
             }
@@ -1776,42 +1637,50 @@ function removeVolprofileTool() {
     params.series.volprofile.setData([]);
     toolsStore.clear("volprofile");
 }
-function scanSignal() {
-    removeSignal();
+function scanSignal(full = false) {
+    var audio = new Audio(sound);
+    audio.play();
     const SIZE = 15;
-    for (let i = SIZE; i < params.data.price.length - SIZE; i++) {
-        if (
-            params.data.volume[i].value >
-                store.state.tradingOrder.config.volLimit &&
-            params.data.volume[i].color != "#CCCCCC"
-        ) {
-            const upSide = params.data.volume[i].color == "#00FF00";
-            const downSide = params.data.volume[i].color == "#FF0000";
-            let isSignal = true;
-            for (let j = -SIZE; j <= SIZE; j++) {
-                if (j != 0) {
-                    if (
-                        params.data.volume[i + j].value >=
-                            store.state.tradingOrder.config.volLimit ||
-                        (upSide &&
-                            params.data.price[i + j].value >
-                                params.data.price[i].value) ||
-                        (downSide &&
-                            params.data.price[i + j].value <
-                                params.data.price[i].value)
-                    ) {
-                        isSignal = false;
-                        break;
+    let signals = [];
+    if (params.data.price.length >= 2 * SIZE + 1) {
+        const limit = full ? SIZE : params.data.price.length - SIZE - 1;
+        for (let i = params.data.price.length - SIZE - 1; i >= limit; i--) {
+            if (
+                params.data.volume[i].value >
+                    store.state.tradingOrder.config.volLimit &&
+                params.data.volume[i].color != "#CCCCCC"
+            ) {
+                const upSide = params.data.volume[i].color == "#00FF00";
+                const downSide = params.data.volume[i].color == "#FF0000";
+                let isSignal = true;
+                for (let j = -SIZE; j <= SIZE; j++) {
+                    if (j != 0) {
+                        if (
+                            params.data.volume[i + j].value >=
+                                store.state.tradingOrder.config.volLimit ||
+                            (upSide &&
+                                params.data.price[i + j].value >
+                                    params.data.price[i].value) ||
+                            (downSide &&
+                                params.data.price[i + j].value <
+                                    params.data.price[i].value)
+                        ) {
+                            isSignal = false;
+                            break;
+                        }
                     }
                 }
+                if (isSignal)
+                    signals.unshift({
+                        price: params.data.price[i],
+                        color: upSide ? "#00BCD4" : "#F44336",
+                        title: upSide ? "BUY" : "SELL",
+                    });
             }
-            if (isSignal)
-                drawSignal(
-                    params.data.price[i],
-                    upSide ? "#00BCD4" : "#F44336",
-                    upSide ? "BUY" : "SELL"
-                );
         }
+        signals.forEach((signal) =>
+            drawSignal(signal.price, signal.color, signal.title)
+        );
     }
 }
 function drawSignal(price, color, title) {
@@ -2041,6 +1910,116 @@ function tpslOrderClick() {
                 toast.success(t("trading.orderChart.newTpSlSuccess"));
             } else toastOrderError(resp.message);
         });
+}
+function scanOrder() {
+    if (params.order.entry.hasOwnProperty("line")) {
+        const lastPrice = params.data.price.slice(-1)[0].value;
+        if (params.order.tp.hasOwnProperty("line")) {
+            if (
+                (params.order.side > 0 && lastPrice >= params.order.tp.price) ||
+                (params.order.side < 0 && lastPrice <= params.order.tp.price)
+            ) {
+                if (!params.isAutoOrdering) {
+                    params.isAutoOrdering = true;
+                    store
+                        .dispatch("tradingOrder/executeOrder", {
+                            action: "sl",
+                            data: {
+                                cmd: "delete",
+                            },
+                        })
+                        .then((resp) => {
+                            if (resp.isOk) {
+                                removeOrderLine("entry");
+                                removeOrderLine("tp");
+                                removeOrderLine("sl");
+                                toggleCancelOrderButton(false);
+                                toolsStore.clear("order");
+                                toast.success(
+                                    t("trading.orderChart.deleteTpSuccess")
+                                );
+                                hideOrderButton();
+                            } else toastOrderError(resp.message);
+                            params.isAutoOrdering = false;
+                        });
+                }
+            }
+            if (
+                (params.order.side > 0 && lastPrice <= params.order.sl.price) ||
+                (params.order.side < 0 && lastPrice >= params.order.sl.price)
+            ) {
+                if (!params.isAutoOrdering) {
+                    params.isAutoOrdering = true;
+                    store
+                        .dispatch("tradingOrder/executeOrder", {
+                            action: "tp",
+                            data: {
+                                cmd: "cancel",
+                            },
+                        })
+                        .then((resp) => {
+                            if (resp.isOk) {
+                                removeOrderLine("entry");
+                                removeOrderLine("tp");
+                                removeOrderLine("sl");
+                                toggleCancelOrderButton(false);
+                                toolsStore.clear("order");
+                                toast.success(
+                                    t("trading.orderChart.deleteSlSuccess")
+                                );
+                                hideOrderButton();
+                            } else toastOrderError(resp.message);
+                            params.isAutoOrdering = false;
+                        });
+                }
+            }
+        } else {
+            if (
+                (params.order.side > 0 &&
+                    lastPrice >= params.order.entry.price) ||
+                (params.order.side < 0 && lastPrice <= params.order.entry.price)
+            ) {
+                if (!params.isAutoOrdering) {
+                    params.isAutoOrdering = true;
+                    setTimeout(() => {
+                        params.order.tp.price =
+                            params.order.entry.price +
+                            params.order.side * TP_DEFAULT;
+                        params.order.sl.price =
+                            params.order.entry.price -
+                            params.order.side * SL_DEFAULT;
+                        store
+                            .dispatch("tradingOrder/executeOrder", {
+                                action: "tpsl",
+                                tpData: {
+                                    cmd: "new",
+                                    price: params.order.tp.price,
+                                },
+                                slData: {
+                                    cmd: "new",
+                                    price: params.order.sl.price,
+                                },
+                            })
+                            .then((resp) => {
+                                if (resp.isOk) {
+                                    drawOrderLine("tp");
+                                    drawOrderLine("sl");
+                                    params.order.entry.line.applyOptions({
+                                        draggable: false,
+                                    });
+                                    toast.success(
+                                        t(
+                                            "trading.orderChart.autoNewTpSlSuccess"
+                                        )
+                                    );
+                                } else toastOrderError(resp.message);
+                                params.isAutoOrdering = false;
+                            });
+                    }, 1000);
+                }
+            }
+        }
+    }
 }
 function chartTopClick() {
     params.chart.timeScale().scrollToRealTime();
