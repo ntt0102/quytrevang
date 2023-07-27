@@ -174,7 +174,7 @@ import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { confirm } from "devextreme/ui/dialog";
-import sound from "./alert.mp3";
+import sound from "../../../../audios/alert.mp3";
 import {
     reactive,
     ref,
@@ -274,10 +274,7 @@ let params = {
     websocket: null,
     isAutoOrdering: false,
     socketStop: false,
-    alertAudio: new Audio(`${window.baseURL}/audios/alert.mp3`),
 };
-// params.alertAudio.crossOrigin = "anonymous";
-params.alertAudio.loop = true;
 const state = reactive({
     chartDate: CURRENT_DATE,
     clock: moment().format("HH:mm:ss"),
@@ -690,7 +687,6 @@ function eventPriceLineDrag(e) {
             line.applyOptions({ title: title });
             toolsStore.set("alert", line.options());
             alertToolRef.value.classList.remove("selected");
-            params.alertAudio.pause();
             break;
     }
 }
@@ -998,25 +994,25 @@ function intervalHandler() {
                                         "trading.orderChart.autoCancelTpSlSuccess"
                                     )
                                 );
+                                playSound();
                             } else toastOrderError(resp.message);
                         });
                 }
             }
         }
         if (CURRENT_SEC == TIME.START) connectSocket();
-        if (params.alertAudio.paused) {
-            params.alerts.forEach((alert) => {
-                const ops = alert.options();
-                if (!ops.removed && !!params.data.price.length) {
-                    const currentPrice = params.data.price.slice(-1)[0].value;
-                    if (
-                        (ops.title == ">" && currentPrice >= ops.price) ||
-                        (ops.title == "<" && currentPrice <= ops.price)
-                    )
-                        params.alertAudio.play();
-                }
-            });
-        }
+        //
+        params.alerts.forEach((alert) => {
+            const ops = alert.options();
+            if (!ops.removed && !!params.data.price.length) {
+                const currentPrice = params.data.price.slice(-1)[0].value;
+                if (
+                    (ops.title == ">" && currentPrice >= ops.price) ||
+                    (ops.title == "<" && currentPrice <= ops.price)
+                )
+                    playSound();
+            }
+        });
     }
     state.clock = Intl.DateTimeFormat(navigator.language, {
         hour: "numeric",
@@ -1590,41 +1586,6 @@ function findPoC(v1Time, v2Time) {
         sell: profile[maxPrice].sell,
     };
 }
-function drawSignal1() {
-    if (mf.isSet(params.volprofile.poc)) {
-        drawPoC();
-        const lastPrice = params.data.price.slice(-1)[0].value;
-        const prevPrice = params.data.price.slice(-2)[0].value;
-        const lastVol = params.data.volume.slice(-1)[0].value;
-        const poc = params.volprofile.poc.options();
-        const side = poc.buy - poc.sell;
-        if (
-            (side > 0 && lastPrice > poc.price && lastPrice > prevPrice) ||
-            (side < 0 && lastPrice < poc.price && lastPrice < prevPrice)
-        ) {
-            let isSignal = true;
-            for (let i = -2; i > -22; i--) {
-                if (
-                    params.data.volume.slice(i)[0].value >= lastVol ||
-                    (side > 0 &&
-                        params.data.price.slice(i)[0].value > lastPrice) ||
-                    (side < 0 &&
-                        params.data.price.slice(i)[0].value < lastPrice)
-                ) {
-                    isSignal = false;
-                    break;
-                }
-            }
-            if (isSignal) {
-                drawLineTool(
-                    lastPrice,
-                    side > 0 ? "#00BCD4" : "#F44336",
-                    side > 0 ? "BUY" : "SELL"
-                );
-            }
-        }
-    }
-}
 function removeVolprofileTool() {
     if (mf.isSet(params.volprofile.poc))
         params.series.price.removePriceLine(params.volprofile.poc);
@@ -1638,11 +1599,7 @@ function removeVolprofileTool() {
     toolsStore.clear("volprofile");
 }
 function scanSignal(full = false) {
-    var player = new Audio(sound);
-    player.crossOrigin = "anonymous";
-    player.addEventListener("canplaythrough", function () {
-        player.play();
-    });
+    playSound();
     const SIZE = 15;
     let signals = [];
     if (params.data.price.length >= 2 * SIZE + 1) {
@@ -1673,12 +1630,14 @@ function scanSignal(full = false) {
                         }
                     }
                 }
-                if (isSignal)
+                if (isSignal) {
                     signals.unshift({
                         price: params.data.price[i],
                         color: upSide ? "#00BCD4" : "#F44336",
                         title: upSide ? "BUY" : "SELL",
                     });
+                    if (!full) playSound();
+                }
             }
         }
         signals.forEach((signal) =>
@@ -1749,13 +1708,11 @@ function drawAlertTool() {
         toolsStore.set("alert", options);
     }
     alertToolRef.value.classList.remove("selected");
-    params.alertAudio.pause();
 }
 function removeAlertTool() {
     params.alerts.forEach((line) => params.series.price.removePriceLine(line));
     params.alerts = [];
     toolsStore.clear("alert");
-    params.alertAudio.pause();
 }
 function cancelOrderClick() {
     let result = confirm(
@@ -1942,6 +1899,7 @@ function scanOrder() {
                                     t("trading.orderChart.deleteTpSuccess")
                                 );
                                 hideOrderButton();
+                                playSound();
                             } else toastOrderError(resp.message);
                             params.isAutoOrdering = false;
                         });
@@ -1971,6 +1929,7 @@ function scanOrder() {
                                     t("trading.orderChart.deleteSlSuccess")
                                 );
                                 hideOrderButton();
+                                playSound();
                             } else toastOrderError(resp.message);
                             params.isAutoOrdering = false;
                         });
@@ -2015,6 +1974,7 @@ function scanOrder() {
                                             "trading.orderChart.autoNewTpSlSuccess"
                                         )
                                     );
+                                    playSound();
                                 } else toastOrderError(resp.message);
                                 params.isAutoOrdering = false;
                             });
@@ -2052,6 +2012,13 @@ function refreshChart() {
     params.data.whitespace = [];
     params.loadWhitespace = true;
     store.dispatch("tradingOrder/getChartData", state.chartDate);
+}
+function playSound() {
+    let player = new Audio(sound);
+    player.crossOrigin = "anonymous";
+    player.addEventListener("canplaythrough", function () {
+        player.play();
+    });
 }
 </script>
 <style lang="scss" scoped>
