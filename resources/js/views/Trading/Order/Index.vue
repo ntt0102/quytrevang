@@ -645,8 +645,8 @@ function eventPriceLineDrag(e) {
                 lineOptions.title == "B" ||
                 lineOptions.title == "O"
             ) {
-                const a = +params.pattern1.A.options().price;
-                const b = +params.pattern1.B.options().price;
+                const a = +params.pattern2.A.options().price;
+                const b = +params.pattern2.B.options().price;
                 params.pattern2.Y.applyOptions({
                     price: +(o2 - (o2 >= a ? 1 : -1) * Math.abs(a - b)).toFixed(
                         1
@@ -659,8 +659,8 @@ function eventPriceLineDrag(e) {
                 lineOptions.title == "D" ||
                 lineOptions.title == "O"
             ) {
-                const c = +params.pattern1.C.options().price;
-                const d = +params.pattern1.D.options().price;
+                const c = +params.pattern2.C.options().price;
+                const d = +params.pattern2.D.options().price;
                 params.pattern2.X.applyOptions({
                     price: +(o2 - (o2 >= c ? 1 : -1) * Math.abs(c - d)).toFixed(
                         1
@@ -1659,10 +1659,10 @@ function drawPattern2Tool() {
         params.series.price.createPriceLine(options);
     toolsStore.set("pattern2", options);
     if (params.pattern2.pointCount == 4) {
-        const a = +params.pattern1.A.options().price;
-        const b = +params.pattern1.B.options().price;
-        const c = +params.pattern1.C.options().price;
-        const d = +params.pattern1.D.options().price;
+        const a = +params.pattern2.A.options().price;
+        const b = +params.pattern2.B.options().price;
+        const c = +params.pattern2.C.options().price;
+        const d = +params.pattern2.D.options().price;
         const o = +params.pattern2.O.options().price;
         options.color = "#2196F3";
         options.draggable = false;
