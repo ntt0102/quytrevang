@@ -1659,14 +1659,11 @@ function drawPattern2Tool() {
         params.series.price.createPriceLine(options);
     toolsStore.set("pattern2", options);
     if (params.pattern2.pointCount == 4) {
+        const a = +params.pattern1.A.options().price;
+        const b = +params.pattern1.B.options().price;
+        const c = +params.pattern1.C.options().price;
+        const d = +params.pattern1.D.options().price;
         const o = +params.pattern2.O.options().price;
-        const ab =
-            +params.pattern2.A.options().price -
-            +params.pattern2.B.options().price;
-        const cd =
-            +params.pattern2.C.options().price -
-            +params.pattern2.D.options().price;
-        //
         options.color = "#2196F3";
         options.draggable = false;
         options.price = +(o - (o >= c ? 1 : -1) * Math.abs(c - d)).toFixed(1);
