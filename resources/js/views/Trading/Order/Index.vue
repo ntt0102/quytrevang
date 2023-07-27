@@ -1851,7 +1851,7 @@ function drawSignal() {
         const prevPrice = params.data.price.slice(-2)[0].value;
         const lastVol = params.data.volume.slice(-1)[0].value;
         const poc = params.volprofile.poc.options();
-        const side = poc.buy > poc.sell;
+        const side = poc.buy - poc.sell;
         if (
             (side > 0 && lastPrice > poc.price && lastPrice > prevPrice) ||
             (side < 0 && lastPrice < poc.price && lastPrice < prevPrice)
