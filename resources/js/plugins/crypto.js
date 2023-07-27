@@ -28,18 +28,22 @@ class Crypto {
         };
     }
     encrypt(text) {
-        return JSON.parse(
-            CryptoJS.AES.encrypt(JSON.stringify(text), this.key, {
-                format: this.format,
-            }).toString()
-        );
+        try {
+            return JSON.parse(
+                CryptoJS.AES.encrypt(JSON.stringify(text), this.key, {
+                    format: this.format,
+                }).toString()
+            );
+        } catch (error) {}
     }
-    decrypt(encrypted) {
-        return JSON.parse(
-            CryptoJS.AES.decrypt(JSON.stringify(encrypted), this.key, {
-                format: this.format,
-            }).toString(CryptoJS.enc.Utf8)
-        );
+    decrypt(encrypted) { 
+        try {
+            return JSON.parse(
+                CryptoJS.AES.decrypt(JSON.stringify(encrypted), this.key, {
+                    format: this.format,
+                }).toString(CryptoJS.enc.Utf8)
+            );
+        } catch (error) {return {}}
     }
 }
 

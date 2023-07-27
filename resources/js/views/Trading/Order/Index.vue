@@ -1599,7 +1599,6 @@ function removeVolprofileTool() {
     toolsStore.clear("volprofile");
 }
 function scanSignal(full = false) {
-    playSound();
     const SIZE = 15;
     let signals = [];
     if (params.data.price.length >= 2 * SIZE + 1) {
@@ -1633,7 +1632,7 @@ function scanSignal(full = false) {
                 if (isSignal) {
                     signals.unshift({
                         price: params.data.price[i],
-                        color: upSide ? "#00BCD4" : "#F44336",
+                        color: upSide ? "#2196F3" : "#FF9800",
                         title: upSide ? "BUY" : "SELL",
                     });
                     if (!full) playSound();
