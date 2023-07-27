@@ -91,6 +91,13 @@
                         @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
+                        ref="scanSignalToolRef"
+                        class="command far fa-search-location"
+                        :title="$t('trading.orderChart.scanSignalTool')"
+                        @click="scanSignal"
+                        @contextmenu="removeSignal"
+                    ></div>
+                    <div
                         ref="volprofileToolRef"
                         class="command far fa-poll-h"
                         :title="$t('trading.orderChart.volprofileTool')"
@@ -238,6 +245,7 @@ let params = {
     data: { whitespace: [], price: [], volume: [] },
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
+    signals: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, pointCount: 0 },
     pattern1: {
         O: {},
@@ -277,7 +285,17 @@ const tradingViewSrc = computed(() => {
     return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${store.state.tradingOrder.config.vpsCode}&s=${store.state.tradingOrder.config.vpsSession}&resolution=1`;
 });
 
-store.dispatch("tradingOrder/getConfig").then(connectSocket);
+store.dispatch("tradingOrder/getConfig").then(() => {
+    connectSocket();
+    params.series.volume.createPriceLine({
+        price: store.state.tradingOrder.config.volLimit,
+        color: "yellow",
+        lineWidth: 1,
+        lineStyle: 1,
+        axisLabelVisible: false,
+        draggable: false,
+    });
+});
 store.dispatch("tradingOrder/getStatus");
 
 params.interval = setInterval(intervalHandler, 1000);
@@ -300,6 +318,13 @@ onMounted(() => {
         priceScaleId: "whitespace",
         visible: false,
     });
+    params.series.signal = params.chart.addHistogramSeries({
+        priceScaleId: "signal",
+        scaleMargins: { top: 0, bottom: 0 },
+        color: "#673AB7",
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
     params.series.vertical = params.chart.addHistogramSeries({
         priceScaleId: "vertical",
         scaleMargins: { top: 0, bottom: 0 },
@@ -320,14 +345,6 @@ onMounted(() => {
         color: "#CCCCCC",
         lastValueVisible: false,
         priceLineVisible: false,
-    });
-    params.series.volume.createPriceLine({
-        price: 150,
-        color: "yellow",
-        lineWidth: 1,
-        lineStyle: 1,
-        axisLabelVisible: false,
-        draggable: false,
     });
     params.series.price = params.chart.addLineSeries({
         color: "#CCCCCC",
@@ -939,7 +956,7 @@ function connectSocket() {
                                         : "#CCCCCC",
                             }
                         );
-                        drawSignal();
+                        drawSignal1();
                         if (params.order.entry.hasOwnProperty("line")) {
                             if (params.order.tp.hasOwnProperty("line")) {
                                 if (
@@ -1712,7 +1729,7 @@ function findPoC(v1Time, v2Time) {
         sell: profile[maxPrice].sell,
     };
 }
-function drawSignal() {
+function drawSignal1() {
     if (mf.isSet(params.volprofile.poc)) {
         drawPoC();
         const lastPrice = params.data.price.slice(-1)[0].value;
@@ -1758,6 +1775,65 @@ function removeVolprofileTool() {
     };
     params.series.volprofile.setData([]);
     toolsStore.clear("volprofile");
+}
+function scanSignal() {
+    removeSignal();
+    const SIZE = 15;
+    for (let i = SIZE; i < params.data.price.length - SIZE; i++) {
+        if (
+            params.data.volume[i].value >
+                store.state.tradingOrder.config.volLimit &&
+            params.data.volume[i].color != "#CCCCCC"
+        ) {
+            const upSide = params.data.volume[i].color == "#00FF00";
+            const downSide = params.data.volume[i].color == "#FF0000";
+            let isSignal = true;
+            for (let j = -SIZE; j <= SIZE; j++) {
+                if (j != 0) {
+                    if (
+                        params.data.volume[i + j].value >=
+                            store.state.tradingOrder.config.volLimit ||
+                        (upSide &&
+                            params.data.price[i + j].value >
+                                params.data.price[i].value) ||
+                        (downSide &&
+                            params.data.price[i + j].value <
+                                params.data.price[i].value)
+                    ) {
+                        isSignal = false;
+                        break;
+                    }
+                }
+            }
+            if (isSignal)
+                drawSignal(
+                    params.data.price[i],
+                    upSide ? "#00BCD4" : "#F44336",
+                    upSide ? "BUY" : "SELL"
+                );
+        }
+    }
+}
+function drawSignal(price, color, title) {
+    const options = {
+        price: price.value,
+        color: color,
+        title: title,
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: false,
+    };
+    params.signals.push(params.series.price.createPriceLine(options));
+    params.series.signal.update({
+        time: price.time,
+        value: 1,
+        color: color,
+    });
+}
+function removeSignal() {
+    params.signals.forEach((line) => params.series.price.removePriceLine(line));
+    params.signals = [];
+    params.series.signal.setData([]);
 }
 function alertToolClick(e) {
     state.showColorPicker = false;
