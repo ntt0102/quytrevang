@@ -1627,6 +1627,10 @@ function scanSignal(full = false) {
                     signals.unshift({
                         time: params.data.volume[i].time,
                         value: 1,
+                        color:
+                            params.data.volume[i].color == "#00FF00"
+                                ? "#2196F3"
+                                : "#FF9800",
                     });
                     if (!full) playSound();
                 }
