@@ -94,13 +94,8 @@
                         ref="scanSignalToolRef"
                         class="command far fa-search-location"
                         :title="$t('trading.orderChart.scanSignalTool')"
-                        @click="
-                            () => {
-                                removeSignal();
-                                scanSignal(true);
-                            }
-                        "
-                        @contextmenu="removeSignal"
+                        @click="scanSignalToolClick"
+                        @contextmenu="scanSignalToolContextmenu"
                     ></div>
                     <div
                         ref="volprofileToolRef"
@@ -1596,6 +1591,15 @@ function removeVolprofileTool() {
     };
     params.series.volprofile.setData([]);
     toolsStore.clear("volprofile");
+}
+function scanSignalToolClick() {
+    removeSignal();
+    scanSignal(true);
+}
+function scanSignalToolContextmenu(e) {
+    removeSignal();
+    e.preventDefault();
+    e.stopPropagation();
 }
 function scanSignal(full = false) {
     const SIZE = 17;
