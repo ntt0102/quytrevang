@@ -1592,9 +1592,10 @@ function removeVolprofileTool() {
     params.series.volprofile.setData([]);
     toolsStore.clear("volprofile");
 }
-function scanSignalToolClick() {
+function scanSignalToolClick(e) {
     removeSignal();
     scanSignal(true);
+    e.stopPropagation();
 }
 function scanSignalToolContextmenu(e) {
     removeSignal();
@@ -1603,7 +1604,7 @@ function scanSignalToolContextmenu(e) {
 }
 function scanSignal(full = false) {
     const SIZE = 17;
-    let times = [];
+    let signals = [];
     if (params.data.volume.length >= 2 * SIZE + 1) {
         const limit = full ? SIZE : params.data.volume.length - SIZE - 1;
         for (let i = params.data.volume.length - SIZE - 1; i >= limit; i--) {
@@ -1623,19 +1624,18 @@ function scanSignal(full = false) {
                     params.data.volume[i].value == max &&
                     params.data.volume[i].value > (6 * sum) / (2 * SIZE + 1)
                 ) {
-                    console.log("vol", params.data.volume[i].value);
-                    console.log("avg", (6 * sum) / (2 * SIZE + 1));
-                    times.unshift(params.data.volume[i].time);
+                    signals.unshift({
+                        time: params.data.volume[i].time,
+                        value: 1,
+                    });
                     if (!full) playSound();
                 }
             }
         }
-        times.forEach((time) => {
-            params.series.signal.update({
-                time: time,
-                value: 1,
-            });
-        });
+        if (signals.length > 0) {
+            if (full) params.series.signal.setData(signals);
+            else params.series.signal.update(signals[0]);
+        }
     }
 }
 function removeSignal() {
