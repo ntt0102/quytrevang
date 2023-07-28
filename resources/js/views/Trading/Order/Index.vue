@@ -251,7 +251,6 @@ let params = {
     data: { whitespace: [], price: [], volume: [] },
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
-    signals: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, pointCount: 0 },
     pattern1: {
         O: {},
@@ -1599,70 +1598,43 @@ function removeVolprofileTool() {
     toolsStore.clear("volprofile");
 }
 function scanSignal(full = false) {
-    const SIZE = 15;
-    let signals = [];
-    if (params.data.price.length >= 2 * SIZE + 1) {
-        const limit = full ? SIZE : params.data.price.length - SIZE - 1;
-        for (let i = params.data.price.length - SIZE - 1; i >= limit; i--) {
+    const SIZE = 17;
+    let times = [];
+    if (params.data.volume.length >= 2 * SIZE + 1) {
+        const limit = full ? SIZE : params.data.volume.length - SIZE - 1;
+        for (let i = params.data.volume.length - SIZE - 1; i >= limit; i--) {
             if (
                 params.data.volume[i].value >
                     store.state.tradingOrder.config.volLimit &&
                 params.data.volume[i].color != "#CCCCCC"
             ) {
-                const upSide = params.data.volume[i].color == "#00FF00";
-                const downSide = params.data.volume[i].color == "#FF0000";
-                let isSignal = true;
+                let max = 0,
+                    sum = 0;
                 for (let j = -SIZE; j <= SIZE; j++) {
-                    if (j != 0) {
-                        if (
-                            params.data.volume[i + j].value >=
-                                store.state.tradingOrder.config.volLimit ||
-                            (upSide &&
-                                params.data.price[i + j].value >
-                                    params.data.price[i].value) ||
-                            (downSide &&
-                                params.data.price[i + j].value <
-                                    params.data.price[i].value)
-                        ) {
-                            isSignal = false;
-                            break;
-                        }
-                    }
+                    if (params.data.volume[i + j].value > max)
+                        max = params.data.volume[i + j].value;
+                    sum += params.data.volume[i + j].value;
                 }
-                if (isSignal) {
-                    signals.unshift({
-                        price: params.data.price[i],
-                        color: upSide ? "#2196F3" : "#FF9800",
-                        title: upSide ? "BUY" : "SELL",
-                    });
+                if (
+                    params.data.volume[i].value == max &&
+                    params.data.volume[i].value > (6 * sum) / (2 * SIZE + 1)
+                ) {
+                    console.log("vol", params.data.volume[i].value);
+                    console.log("avg", (6 * sum) / (2 * SIZE + 1));
+                    times.unshift(params.data.volume[i].time);
                     if (!full) playSound();
                 }
             }
         }
-        signals.forEach((signal) =>
-            drawSignal(signal.price, signal.color, signal.title)
-        );
+        times.forEach((time) => {
+            params.series.signal.update({
+                time: time,
+                value: 1,
+            });
+        });
     }
 }
-function drawSignal(price, color, title) {
-    const options = {
-        price: price.value,
-        color: color,
-        title: title,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: false,
-    };
-    params.signals.push(params.series.price.createPriceLine(options));
-    params.series.signal.update({
-        time: price.time,
-        value: 1,
-        color: color,
-    });
-}
 function removeSignal() {
-    params.signals.forEach((line) => params.series.price.removePriceLine(line));
-    params.signals = [];
     params.series.signal.setData([]);
 }
 function alertToolClick(e) {
