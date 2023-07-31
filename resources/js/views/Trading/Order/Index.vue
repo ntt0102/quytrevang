@@ -2138,6 +2138,7 @@ function playSound() {
         &.tpsl {
             width: 60px;
             height: 50px;
+            line-height: 40px;
         }
     }
 
