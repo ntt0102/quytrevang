@@ -1073,8 +1073,8 @@ function showOrderButton() {
                     entryOrderRef.value.innerText = `${
                         side > 0 ? "LONG" : "SHORT"
                     } ${price}`;
+                    entryOrderRef.value.style.display = "block";
                 }
-                entryOrderRef.value.style.display = "block";
             }
         }
     }
@@ -1841,6 +1841,7 @@ function tpslOrderClick() {
         })
         .then((resp) => {
             if (resp.isOk) {
+                drawOrderLine("entry");
                 drawOrderLine("tp");
                 drawOrderLine("sl");
                 params.order.entry.line.applyOptions({
