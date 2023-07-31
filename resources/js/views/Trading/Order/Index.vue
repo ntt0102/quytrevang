@@ -1455,16 +1455,16 @@ function drawPattern1Tool() {
 }
 function removePattern1Tool() {
     if (params.pattern1.pointCount > 0) {
-        params.series.price.removePriceLine(params.pattern1.A);
+        params.series.price.removePriceLine(params.pattern1.O);
         if (params.pattern1.pointCount > 1) {
-            params.series.price.removePriceLine(params.pattern1.B);
+            params.series.price.removePriceLine(params.pattern1.A);
             if (params.pattern1.pointCount > 2) {
-                params.series.price.removePriceLine(params.pattern1.C);
+                params.series.price.removePriceLine(params.pattern1.B);
+                params.series.price.removePriceLine(params.pattern1.X);
                 if (params.pattern1.pointCount > 3) {
-                    params.series.price.removePriceLine(params.pattern1.D);
+                    params.series.price.removePriceLine(params.pattern1.C);
                     if (params.pattern1.pointCount > 4) {
-                        params.series.price.removePriceLine(params.pattern1.O);
-                        params.series.price.removePriceLine(params.pattern1.X);
+                        params.series.price.removePriceLine(params.pattern1.D);
                         params.series.price.removePriceLine(params.pattern1.Y);
                     }
                 }
