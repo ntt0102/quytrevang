@@ -815,8 +815,9 @@ function loadToolsData() {
         //
         const pattern1Lines = await toolsStore.get("pattern1");
         if (pattern1Lines.length > 0) {
-            params.pattern1.pointCount = pattern1Lines.length;
             pattern1Lines.forEach((line) => {
+                if (line.title != "X" && line.title != "Y")
+                    params.pattern1.pointCount++;
                 params.pattern1[line.title] =
                     params.series.price.createPriceLine(line);
             });
