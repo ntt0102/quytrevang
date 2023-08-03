@@ -766,9 +766,9 @@ function eventPriceLineDrag(e) {
                 }
                 if (lineOptions.point == "A" || lineOptions.point == "C") {
                     const a = +params.pattern2.A.options().price;
-                    const xa = 5 * (c - b);
+                    const xa = -5 * (c - b);
                     params.pattern2.X.applyOptions({
-                        price: +(a - xa).toFixed(1),
+                        price: +(a + xa).toFixed(1),
                         title: xa.toFixed(1),
                     });
                     toolsStore.set("pattern2", params.pattern2.X.options());
