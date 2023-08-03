@@ -1371,7 +1371,6 @@ function drawBoxTool() {
             //
             removeBoxTool();
             drawBoxPoint(0, option);
-            //
             option.x.time = params.data.whitespace[i4].time;
             option.y.price = y4;
             drawBoxPoint(1, option);
