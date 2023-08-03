@@ -268,6 +268,7 @@ let params = {
     websocket: null,
     isAutoOrdering: false,
     socketStop: false,
+    volumeMax: 0,
 };
 const state = reactive({
     chartDate: CURRENT_DATE,
@@ -292,6 +293,7 @@ store.dispatch("tradingOrder/getConfig").then(() => {
         axisLabelVisible: false,
         draggable: false,
     });
+    params.volumeMax = store.state.tradingOrder.config.volLimit;
 });
 store.dispatch("tradingOrder/getStatus");
 
@@ -1674,46 +1676,23 @@ function scanSignalToolContextmenu(e) {
     e.stopPropagation();
 }
 function scanSignal(full = false) {
-    const SIZE = 17;
-    let signals = [];
-    if (params.data.volume.length >= 2 * SIZE + 1) {
-        const limit = full ? SIZE : params.data.volume.length - SIZE - 1;
-        for (let i = params.data.volume.length - SIZE - 1; i >= limit; i--) {
-            if (
-                params.data.volume[i].value >
-                    store.state.tradingOrder.config.volLimit &&
-                params.data.volume[i].color != "#CCCCCC"
-            ) {
-                let max = 0,
-                    sum = 0;
-                for (let j = -SIZE; j <= SIZE; j++) {
-                    if (params.data.volume[i + j].value > max)
-                        max = params.data.volume[i + j].value;
-                    sum += params.data.volume[i + j].value;
-                }
-                if (
-                    params.data.volume[i].value == max &&
-                    params.data.volume[i].value > (6 * sum) / (2 * SIZE + 1)
-                ) {
-                    signals.unshift({
-                        time: params.data.volume[i].time,
-                        value: 1,
-                        color:
-                            params.data.volume[i].color == "#00FF00"
-                                ? "#2196F3"
-                                : "#FF9800",
-                    });
-                    if (!full) playSound();
-                }
-            }
-        }
-        if (signals.length > 0) {
-            if (full) params.series.signal.setData(signals);
-            else params.series.signal.update(signals[0]);
+    const START = full ? 0 : params.data.volume.length - 1;
+    for (let i = START; i < params.data.volume.length; i++) {
+        if (params.data.volume[i].value > params.volumeMax) {
+            params.volumeMax = params.data.volume[i].value;
+            params.series.signal.update({
+                time: params.data.volume[i].time,
+                value: 1,
+                color:
+                    params.data.volume[i].color == "#00FF00"
+                        ? "#2196F3"
+                        : "#FF9800",
+            });
         }
     }
 }
 function removeSignal() {
+    params.volumeMax = store.state.tradingOrder.config.volLimit;
     params.series.signal.setData([]);
 }
 function alertToolClick(e) {
