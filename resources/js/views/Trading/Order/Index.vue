@@ -105,11 +105,11 @@
                         @contextmenu="volprofileToolContextmenu"
                     ></div>
                     <div
-                        ref="verticalToolRef"
-                        class="command far fa-grip-lines-vertical"
-                        :title="$t('trading.orderChart.verticalTool')"
-                        @click="verticalToolClick"
-                        @contextmenu="verticalToolContextmenu"
+                        ref="boxToolRef"
+                        class="command far fa-expand-alt"
+                        :title="$t('trading.orderChart.boxTool')"
+                        @click="boxToolClick"
+                        @contextmenu="boxToolContextmenu"
                     ></div>
                     <div
                         ref="alertToolRef"
@@ -235,7 +235,7 @@ const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
 const pattern1ToolRef = ref(null);
 const volprofileToolRef = ref(null);
-const verticalToolRef = ref(null);
+const boxToolRef = ref(null);
 const alertToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
@@ -258,7 +258,7 @@ let params = {
         pointCount: 0,
     },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
-    vertical: { v1: {}, v2: {}, v3: {}, v4: {}, pointCount: 0 },
+    box: [],
     alerts: [],
     crosshair: {},
     shark: null,
@@ -324,8 +324,8 @@ onMounted(() => {
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    params.series.vertical = params.chart.addHistogramSeries({
-        priceScaleId: "vertical",
+    params.series.box = params.chart.addHistogramSeries({
+        priceScaleId: "box",
         scaleMargins: { top: 0, bottom: 0 },
         color: "#26a69a",
         lastValueVisible: false,
@@ -380,8 +380,7 @@ function eventChartContextmenu(e) {
 function eventChartClick() {
     hideOrderButton();
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
-    else if (verticalToolRef.value.classList.contains("selected"))
-        drawVerticalTool();
+    else if (boxToolRef.value.classList.contains("selected")) drawBoxTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
     else if (pattern1ToolRef.value.classList.contains("selected"))
         drawPattern1Tool();
@@ -859,9 +858,9 @@ function loadToolsData() {
                 params.lines.push(params.series.price.createPriceLine(line));
         });
         //
-        const verticals = await toolsStore.get("vertical");
-        if (verticals.length > 0) {
-            params.series.vertical.setData(verticals);
+        const boxs = await toolsStore.get("box");
+        if (boxs.length > 0) {
+            params.series.box.setData(boxs);
         }
         //
         const rulerLines = await toolsStore.get("ruler");
@@ -1268,7 +1267,7 @@ function removeLineTool() {
     params.lines = [];
     toolsStore.clear("line");
 }
-function verticalToolClick(e) {
+function boxToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
     document
@@ -1279,63 +1278,70 @@ function verticalToolClick(e) {
     }
     e.stopPropagation();
 }
-function verticalToolContextmenu(e) {
-    removeVerticalTool();
+function boxToolContextmenu(e) {
+    removeBoxTool();
     e.target.classList.remove("selected");
     e.preventDefault();
     e.stopPropagation();
 }
-function drawVerticalTool() {
+function drawBoxTool() {
     if (params.crosshair.time) {
-        if (params.vertical.pointCount == 0) {
-            params.vertical.v1 = { time: params.crosshair.time, value: 1 };
-            params.series.vertical.setData([params.vertical.v1]);
-            params.vertical.pointCount++;
-            toolsStore.set("vertical", params.vertical.v1);
-        } else if (params.vertical.pointCount == 1) {
-            params.vertical.v2 = { time: params.crosshair.time, value: 1 };
-            params.series.vertical.setData([
-                params.vertical.v1,
-                params.vertical.v2,
-            ]);
-            toolsStore.set("vertical", params.vertical.v2);
-            params.vertical.pointCount++;
-        } else {
+        let option = {
+            y: {
+                price: coordinateToPrice(params.crosshair.y),
+                color: "#26a69a",
+                lineWidth: 1,
+                lineStyle: 1,
+                draggable: false,
+            },
+            x: { time: params.crosshair.time, value: 1 },
+        };
+        let id = params.box.length;
+        if (id > 1) {
             const i1 = params.data.whitespace.findIndex(
-                (x) => x.time === params.vertical.v1.time
+                (x) => x.time === params.box[0].x.time
             );
-            if (i1 < 0) return false;
             const i2 = params.data.whitespace.findIndex(
-                (x) => x.time === params.vertical.v2.time
+                (x) => x.time === params.box[1].x.time
             );
-            if (i2 < 0) return false;
             const i3 = params.data.whitespace.findIndex(
-                (x) => x.time === params.crosshair.time
+                (x) => x.time === option.x.time
             );
-            if (i3 < 0) return false;
             const i4 = i3 + i2 - i1;
-            if (i4 < 0 || i4 >= params.data.whitespace.length) return false;
-            params.vertical.v1 = { time: params.crosshair.time, value: 1 };
-            params.vertical.v2 = {
-                time: params.data.whitespace[i4].time,
-                value: 1,
-            };
-            params.series.vertical.setData([
-                params.vertical.v1,
-                params.vertical.v2,
-            ]);
-            toolsStore.clear("vertical");
-            toolsStore.set("vertical", params.vertical.v1);
-            toolsStore.set("vertical", params.vertical.v2);
-            verticalToolRef.value.classList.remove("selected");
-            params.vertical.pointCount++;
-        }
+            if (i4 >= params.data.whitespace.length) return false;
+            //
+            const y1 = +params.box[0].y.options().price;
+            const y2 = +params.box[1].y.options().price;
+            const y3 = option.y.price;
+            const y4 = y3 + y2 - y1;
+            //
+            removeBoxTool();
+            drawBoxPoint(0, option);
+            //
+            option.x.time = params.data.whitespace[i4].time;
+            option.y.price = y4;
+            drawBoxPoint(1, option);
+            boxToolRef.value.classList.remove("selected");
+        } else drawBoxPoint(id, option);
     }
 }
-function removeVerticalTool() {
-    params.vertical = { v1: {}, v2: {}, v3: {}, pointCount: 0 };
-    params.series.vertical.setData([]);
-    toolsStore.clear("vertical");
+function drawBoxPoint(id, option) {
+    option.point = id;
+    option.y.title = `B${id + 1}`;
+    params.box.push(mf.cloneDeep(option));
+    toolsStore.set("box", params.box[id]);
+    params.series.box.update(params.box[id].x);
+    params.box[id].y = params.series.price.createPriceLine(params.box[id].y);
+}
+function removeBoxTool() {
+    if (params.box.length > 0) {
+        params.series.price.removePriceLine(params.box[0].y);
+        if (params.box.length > 1)
+            params.series.price.removePriceLine(params.box[1].y);
+    }
+    params.series.box.setData([]);
+    params.box = [];
+    toolsStore.clear("box");
 }
 function rulerToolClick(e) {
     state.showColorPicker = false;
@@ -1509,6 +1515,7 @@ function drawPattern1Tool() {
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
+        pattern1ToolRef.value.classList.remove("selected");
     }
     if (params.pattern1.pointCount == 4) {
         const o = +params.pattern1.O.options().price;
@@ -1521,8 +1528,6 @@ function drawPattern1Tool() {
         params.pattern1[options.title] =
             params.series.price.createPriceLine(options);
         toolsStore.set("pattern1", options);
-        //
-        pattern1ToolRef.value.classList.remove("selected");
     }
     params.pattern1.pointCount++;
 }
