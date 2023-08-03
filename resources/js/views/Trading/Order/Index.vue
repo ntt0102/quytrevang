@@ -91,6 +91,13 @@
                         @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
+                        ref="pattern2ToolRef"
+                        class="command far fa-star"
+                        :title="$t('trading.orderChart.pattern2Tool')"
+                        @click="pattern2ToolClick"
+                        @contextmenu="pattern2ToolContextmenu"
+                    ></div>
+                    <div
                         ref="scanSignalToolRef"
                         class="command far fa-search-location"
                         :title="$t('trading.orderChart.scanSignalTool')"
@@ -234,6 +241,7 @@ const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
 const pattern1ToolRef = ref(null);
+const pattern2ToolRef = ref(null);
 const volprofileToolRef = ref(null);
 const boxToolRef = ref(null);
 const alertToolRef = ref(null);
@@ -255,6 +263,13 @@ let params = {
         D: {},
         X: {},
         Y: {},
+        pointCount: 0,
+    },
+    pattern2: {
+        A: {},
+        B: {},
+        C: {},
+        X: {},
         pointCount: 0,
     },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
@@ -384,6 +399,8 @@ function eventChartClick() {
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
     else if (pattern1ToolRef.value.classList.contains("selected"))
         drawPattern1Tool();
+    else if (pattern2ToolRef.value.classList.contains("selected"))
+        drawPattern2Tool();
     else if (volprofileToolRef.value.classList.contains("selected"))
         drawVolprofileTool();
     else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
@@ -730,6 +747,34 @@ function eventPriceLineDrag(e) {
                 }
             }
             break;
+        case "pattern2":
+            if (mf.isSet(params.pattern2.X)) {
+                const b = +params.pattern2.B.options().price;
+                if (lineOptions.point == "B") {
+                    const cb = +params.pattern2.C.options().title;
+                    params.pattern2.C.applyOptions({
+                        price: +(b + cb).toFixed(1),
+                    });
+                    toolsStore.set("pattern2", params.pattern2.C.options());
+                }
+                const c = +params.pattern2.C.options().price;
+                if (lineOptions.point == "C") {
+                    params.pattern2.C.applyOptions({
+                        title: +(c - b).toFixed(1),
+                    });
+                    toolsStore.set("pattern2", params.pattern2.C.options());
+                }
+                if (lineOptions.point == "A" || lineOptions.point == "C") {
+                    const a = +params.pattern2.A.options().price;
+                    const xa = 5 * (c - b);
+                    params.pattern2.X.applyOptions({
+                        price: +(a - xa).toFixed(1),
+                        title: xa.toFixed(1),
+                    });
+                    toolsStore.set("pattern2", params.pattern2.X.options());
+                }
+            }
+            break;
         case "alert":
             toolsStore.set("alert", {
                 price: oldPrice,
@@ -878,6 +923,15 @@ function loadToolsData() {
                 if (line.title != "X" && line.title != "Y")
                     params.pattern1.pointCount++;
                 params.pattern1[line.title] =
+                    params.series.price.createPriceLine(line);
+            });
+        }
+        //
+        const pattern2Lines = await toolsStore.get("pattern2");
+        if (pattern2Lines.length > 0) {
+            pattern2Lines.forEach((line) => {
+                if (line.point != "X") params.pattern2.pointCount++;
+                params.pattern2[line.point] =
                     params.series.price.createPriceLine(line);
             });
         }
@@ -1550,16 +1604,100 @@ function removePattern1Tool() {
         }
         //
         params.pattern1 = {
+            O: {},
             A: {},
             B: {},
             C: {},
             D: {},
-            O: {},
-            Y: {},
             X: {},
+            Y: {},
             pointCount: 0,
         };
         toolsStore.clear("pattern1");
+    }
+}
+function pattern2ToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removePattern2Tool();
+    }
+    e.stopPropagation();
+}
+function pattern2ToolContextmenu(e) {
+    removePattern2Tool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawPattern2Tool() {
+    const price = coordinateToPrice(params.crosshair.y);
+    var options = {
+        lineType: "pattern2",
+        price: price,
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: true,
+    };
+    switch (params.pattern2.pointCount) {
+        case 0:
+            options.point = "A";
+            options.title = "A";
+            options.color = "#E91E63";
+            break;
+        case 1:
+            options.point = "B";
+            options.title = "B";
+            options.color = "#E91E63";
+            break;
+        case 2:
+            const b = +params.pattern2.B.options().price;
+            options.point = "C";
+            options.title = (price - b).toFixed(1);
+            options.color = "#9C27B0";
+            break;
+    }
+    params.pattern2[options.point] =
+        params.series.price.createPriceLine(options);
+    toolsStore.set("pattern2", options);
+    if (params.pattern2.pointCount == 2) {
+        const a = +params.pattern2.A.options().price;
+        const b = +params.pattern2.B.options().price;
+        const xa = -5 * (price - b);
+        options.point = "X";
+        options.price = +(a + xa).toFixed(1);
+        options.title = xa.toFixed(1);
+        options.color = "#2196F3";
+        options.draggable = false;
+        params.pattern2.X = params.series.price.createPriceLine(options);
+        toolsStore.set("pattern2", options);
+        pattern2ToolRef.value.classList.remove("selected");
+    }
+    params.pattern2.pointCount++;
+}
+function removePattern2Tool() {
+    if (params.pattern2.pointCount > 0) {
+        params.series.price.removePriceLine(params.pattern2.A);
+        if (params.pattern2.pointCount > 1) {
+            params.series.price.removePriceLine(params.pattern2.B);
+            if (params.pattern2.pointCount > 2) {
+                params.series.price.removePriceLine(params.pattern2.C);
+                params.series.price.removePriceLine(params.pattern2.X);
+            }
+        }
+        //
+        params.pattern2 = {
+            A: {},
+            B: {},
+            C: {},
+            X: {},
+            pointCount: 0,
+        };
+        toolsStore.clear("pattern2");
     }
 }
 function volprofileToolClick(e) {
