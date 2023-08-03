@@ -92,14 +92,14 @@
                     ></div>
                     <div
                         ref="pattern2ToolRef"
-                        class="command far fa-star"
+                        class="command far fa-search-dollar"
                         :title="$t('trading.orderChart.pattern2Tool')"
                         @click="pattern2ToolClick"
                         @contextmenu="pattern2ToolContextmenu"
                     ></div>
                     <div
                         ref="scanSignalToolRef"
-                        class="command far fa-search-location"
+                        class="command far fa-signal"
                         :title="$t('trading.orderChart.scanSignalTool')"
                         @click="scanSignalToolClick"
                         @contextmenu="scanSignalToolContextmenu"
