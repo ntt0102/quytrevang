@@ -1683,10 +1683,6 @@ function scanSignal(full = false) {
             params.series.signal.update({
                 time: params.data.volume[i].time,
                 value: 1,
-                color:
-                    params.data.volume[i].color == "#00FF00"
-                        ? "#2196F3"
-                        : "#FF9800",
             });
         }
     }
