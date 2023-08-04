@@ -115,7 +115,7 @@ class FilesService extends CoreService
     public function uploadFileChunk($payload)
     {
         $rootPath = FilesService::ROOT_PATH . $payload->clientPath . (!!$payload->clientPath ? '/' : '');
-        $path = $rootPath . $payload->path;
+        $path = $rootPath . $payload->path . (!!$payload->path ? '/' : '');
         $img = str_replace('data:image/jpeg;base64,', '', $payload->file);
         $img = str_replace(' ', '+', $img);
         $imageData = base64_decode($img);
