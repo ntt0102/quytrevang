@@ -119,7 +119,7 @@ class FilesService extends CoreService
         $img = str_replace('data:image/jpeg;base64,', '', $payload->file);
         $img = str_replace(' ', '+', $img);
         $imageData = base64_decode($img);
-        return ['isOk' => Storage::put($path . $payload->name, $imageData)];
+        return Storage::put($path . $payload->name, $imageData);
     }
 
     /**

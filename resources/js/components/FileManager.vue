@@ -178,7 +178,6 @@ async function uploadFileChunk(file, uploadInfo, destinationDirectory) {
             maxSize: mc.MAX_SIZE_IMAGE_UPLOAD,
         };
         file = await mf.resizeImage(config);
-        console.log("file", file);
     }
 
     return new Promise((resolve, reject) => {
@@ -189,8 +188,7 @@ async function uploadFileChunk(file, uploadInfo, destinationDirectory) {
             path: destinationDirectory.path,
         };
         axios.post("settings/file/uploadFileChunk", data).then((response) => {
-            console.log("upload", response.data);
-            if (response.data.isOk) resolve();
+            if (response.data) resolve();
             else reject();
         });
     });
