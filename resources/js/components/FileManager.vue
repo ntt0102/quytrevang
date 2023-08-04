@@ -73,7 +73,6 @@ const fileSystemProvider = ref(
         uploadFileChunk: uploadFileChunk,
     })
 );
-let currentFolderItems = [];
 
 watch(
     () => props.clientPath,
@@ -91,7 +90,13 @@ function getItems(parentDirectory) {
             })
             .then((response) => {
                 resolve(response.data);
-                currentFolderItems = response.data;
+                selectedImages.value = response.data.reduce((imgs, f) => {
+                    if (!f.isDirectory && f.name.match(/.(jpg|jpeg|png|gif)$/i))
+                        imgs.push(
+                            `${window.baseURL}/storage/${props.clientPath}/${parentDirectory.path}/${f.name}`
+                        );
+                    return imgs;
+                }, []);
             });
     });
 }
@@ -181,16 +186,26 @@ async function uploadFileChunk(file, uploadInfo, destinationDirectory) {
     }
 
     return new Promise((resolve, reject) => {
-        const data = {
-            clientPath: props.clientPath,
-            file: file,
-            name: fileName,
-            path: destinationDirectory.path,
-        };
-        axios.post("settings/file/uploadFileChunk", data).then((response) => {
-            if (response.data) resolve();
-            else reject();
-        });
+        let formData = new FormData();
+        formData.append("clientPath", props.clientPath);
+        formData.append("file", file);
+        formData.append("name", fileName);
+        formData.append("path", destinationDirectory.path);
+        axios
+            .post("settings/file/uploadFileChunk", formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                noCrypt: true,
+            })
+            .then((response) => {
+                if (response.data) {
+                    if (fileName.match(/.(jpg|jpeg|png|gif)$/i)) {
+                        selectedImages.value.push(
+                            `${window.baseURL}/storage/${props.clientPath}/${destinationDirectory.path}/${fileName}`
+                        );
+                    }
+                    resolve();
+                } else reject();
+            });
     });
 }
 function copyUrl() {
@@ -216,13 +231,6 @@ function copyUrl() {
 }
 function onSelectedFileOpened({ file }) {
     if (file.name.match(/.(jpg|jpeg|png|gif)$/i)) {
-        selectedImages.value = currentFolderItems.reduce((imgs, f) => {
-            if (!f.isDirectory)
-                imgs.push(
-                    `${window.baseURL}/storage/${props.clientPath}/${file.parentPath}/${f.name}`
-                );
-            return imgs;
-        }, []);
         photoswipeRef.value.openSlide(file.name);
     } else toast.info(t("settings.files.messages.notIsImage"));
 }

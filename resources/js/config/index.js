@@ -20,7 +20,7 @@ axios.interceptors.request.use(
                 shownOfflineAt = moment();
             }
         }
-        config.data = crypto.encrypt(config.data);
+        if (!config.noCrypt) config.data = crypto.encrypt(config.data);
         return config;
     },
     (error) => {
