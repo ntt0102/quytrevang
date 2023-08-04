@@ -394,7 +394,8 @@ export default {
             canvas.height = height;
             canvas.getContext("2d").drawImage(image, 0, 0, width, height);
             var dataUrl = canvas.toDataURL("image/jpeg");
-            return dataURItoBlob(dataUrl);
+            // return dataURItoBlob(dataUrl);
+            return dataUrl;
         };
         return new Promise(function (ok, no) {
             if (!file.type.match(/image.*/)) {

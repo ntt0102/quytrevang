@@ -31,8 +31,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
     (response) => {
         store.dispatch("setSyncing", false);
-        if (!response.config.noCrypt)
-            response.data = crypto.decrypt(response.data);
+        response.data = crypto.decrypt(response.data);
         console.log("response:" + response.config.url, response.data);
         if (!response.config.notify && response.data.hasOwnProperty("isOk")) {
             if (response.data.isOk) {

@@ -178,23 +178,21 @@ async function uploadFileChunk(file, uploadInfo, destinationDirectory) {
             maxSize: mc.MAX_SIZE_IMAGE_UPLOAD,
         };
         file = await mf.resizeImage(config);
+        console.log("file", file);
     }
 
     return new Promise((resolve, reject) => {
-        let formData = new FormData();
-        formData.append("clientPath", props.clientPath);
-        formData.append("file", file);
-        formData.append("name", fileName);
-        formData.append("path", destinationDirectory.path);
-        axios
-            .post("settings/file/uploadFileChunk", formData, {
-                headers: { "Content-Type": "multipart/form-data" },
-                noCrypt: true,
-            })
-            .then((response) => {
-                if (response.data) resolve();
-                else reject();
-            });
+        const data = {
+            clientPath: props.clientPath,
+            file: file,
+            name: fileName,
+            path: destinationDirectory.path,
+        };
+        axios.post("settings/file/uploadFileChunk", data).then((response) => {
+            console.log("upload", response.data);
+            if (response.data.isOk) resolve();
+            else reject();
+        });
     });
 }
 function copyUrl() {
