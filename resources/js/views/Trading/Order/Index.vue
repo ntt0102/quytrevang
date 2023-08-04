@@ -760,18 +760,25 @@ function eventPriceLineDrag(e) {
                 const c = +params.pattern2.C.options().price;
                 if (lineOptions.point == "C") {
                     params.pattern2.C.applyOptions({
-                        title: +(c - b).toFixed(1),
+                        title: (c - b).toFixed(1),
                     });
                     toolsStore.set("pattern2", params.pattern2.C.options());
                 }
+                const a = +params.pattern2.A.options().price;
+                const xa = -5 * (c - b);
                 if (lineOptions.point == "A" || lineOptions.point == "C") {
-                    const a = +params.pattern2.A.options().price;
-                    const xa = -5 * (c - b);
                     params.pattern2.X.applyOptions({
                         price: +(a + xa).toFixed(1),
                         title: xa.toFixed(1),
                     });
                     toolsStore.set("pattern2", params.pattern2.X.options());
+                }
+                if (lineOptions.point == "A" || lineOptions.point == "B") {
+                    const ba = b - a;
+                    params.pattern2.B.applyOptions({
+                        title: `${(100 * (ba / xa)).toFixed(1)}%`,
+                    });
+                    toolsStore.set("pattern2", params.pattern2.B.options());
                 }
             }
             break;
@@ -1666,7 +1673,12 @@ function drawPattern2Tool() {
     if (params.pattern2.pointCount == 2) {
         const a = +params.pattern2.A.options().price;
         const b = +params.pattern2.B.options().price;
+        const ba = b - a;
         const xa = -5 * (price - b);
+        params.pattern2.B.applyOptions({
+            title: `${(100 * (ba / xa)).toFixed(1)}%`,
+        });
+        toolsStore.set("pattern2", params.pattern2.B.options());
         options.point = "X";
         options.price = +(a + xa).toFixed(1);
         options.title = xa.toFixed(1);
