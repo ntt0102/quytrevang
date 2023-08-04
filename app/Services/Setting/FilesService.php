@@ -114,9 +114,9 @@ class FilesService extends CoreService
      */
     public function uploadFileChunk($payload)
     {
+        if (!$payload->hasFile('file')) return false;
         $rootPath = FilesService::ROOT_PATH . $payload->clientPath . (!!$payload->clientPath ? '/' : '');
         $path = $rootPath . $payload->path;
-        if (!$payload->hasFile('file')) return false;
         $path = $payload->file('file')->storeAs($path, $payload->name);
         return !!$path;
     }
