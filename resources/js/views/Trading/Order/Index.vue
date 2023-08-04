@@ -773,13 +773,11 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("pattern2", params.pattern2.X.options());
                 }
-                if (lineOptions.point == "A" || lineOptions.point == "B") {
-                    const ba = b - a;
-                    params.pattern2.B.applyOptions({
-                        title: `${(100 * (ba / xa)).toFixed(1)}%`,
-                    });
-                    toolsStore.set("pattern2", params.pattern2.B.options());
-                }
+                const ba = b - a;
+                params.pattern2.B.applyOptions({
+                    title: `${(100 * (ba / xa)).toFixed(0)} %`,
+                });
+                toolsStore.set("pattern2", params.pattern2.B.options());
             }
             break;
         case "alert":
@@ -1676,7 +1674,7 @@ function drawPattern2Tool() {
         const ba = b - a;
         const xa = -5 * (price - b);
         params.pattern2.B.applyOptions({
-            title: `${(100 * (ba / xa)).toFixed(1)}%`,
+            title: `${(100 * (ba / xa)).toFixed(0)} %`,
         });
         toolsStore.set("pattern2", params.pattern2.B.options());
         options.point = "X";
