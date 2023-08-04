@@ -237,7 +237,7 @@ class SettingController extends CoreController
      */
     public function uploadFileChunk(Request $request)
     {
-        $isOk = $this->filesService->uploadFileChunk($this->payload);
+        $isOk = $this->filesService->uploadFileChunk($request);
         return $this->sendResponse($isOk);
     }
 

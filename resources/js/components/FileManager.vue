@@ -189,6 +189,7 @@ async function uploadFileChunk(file, uploadInfo, destinationDirectory) {
         axios
             .post("settings/file/uploadFileChunk", formData, {
                 headers: { "Content-Type": "multipart/form-data" },
+                noCrypt: true,
             })
             .then((response) => {
                 if (response.data) resolve();
