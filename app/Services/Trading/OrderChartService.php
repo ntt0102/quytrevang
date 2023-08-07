@@ -54,7 +54,7 @@ class OrderChartService extends CoreService
         return [
             'openingMarket' => get_global_value('openingMarketFlag') == '1',
             'symbol' => get_global_value('vn30f1m'),
-            'volLimit' => 400,
+            'volLimit' => 450,
             'vpsCode' => $copyist->vps_code,
             'vpsSession' => $copyist->vps_session,
         ];
