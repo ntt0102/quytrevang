@@ -910,7 +910,10 @@ function loadToolsData() {
         //
         const boxs = await toolsStore.get("box");
         if (boxs.length > 0) {
-            params.series.box.setData(boxs);
+            params.box = boxs;
+            params.series.box.setData([boxs[0].x, boxs[1].x]);
+            params.box[0].y = params.series.price.createPriceLine(boxs[0].y);
+            params.box[1].y = params.series.price.createPriceLine(boxs[1].y);
         }
         //
         const rulerLines = await toolsStore.get("ruler");
