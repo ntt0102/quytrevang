@@ -84,32 +84,11 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
-                        ref="pattern1ToolRef"
-                        class="command far fa-star"
-                        :title="$t('trading.orderChart.pattern1Tool')"
-                        @click="pattern1ToolClick"
-                        @contextmenu="pattern1ToolContextmenu"
-                    ></div>
-                    <div
                         ref="pattern2ToolRef"
-                        class="command far fa-search-dollar"
+                        class="command far fa-bullseye-arrow"
                         :title="$t('trading.orderChart.pattern2Tool')"
                         @click="pattern2ToolClick"
                         @contextmenu="pattern2ToolContextmenu"
-                    ></div>
-                    <div
-                        ref="scanSignalToolRef"
-                        class="command far fa-signal"
-                        :title="$t('trading.orderChart.scanSignalTool')"
-                        @click="scanSignalToolClick"
-                        @contextmenu="scanSignalToolContextmenu"
-                    ></div>
-                    <div
-                        ref="volprofileToolRef"
-                        class="command far fa-poll-h"
-                        :title="$t('trading.orderChart.volprofileTool')"
-                        @click="volprofileToolClick"
-                        @contextmenu="volprofileToolContextmenu"
                     ></div>
                     <div
                         ref="boxToolRef"
@@ -119,19 +98,43 @@
                         @contextmenu="boxToolContextmenu"
                     ></div>
                     <div
+                        ref="scanSignalToolRef"
+                        class="command far fa-search-location"
+                        :title="$t('trading.orderChart.scanSignalTool')"
+                        @click="scanSignalToolClick"
+                        @contextmenu="scanSignalToolContextmenu"
+                    ></div>
+                    <div
+                        v-show="false"
+                        ref="pattern1ToolRef"
+                        class="command far fa-star"
+                        :title="$t('trading.orderChart.pattern1Tool')"
+                        @click="pattern1ToolClick"
+                        @contextmenu="pattern1ToolContextmenu"
+                    ></div>
+                    <div
+                        v-show="false"
+                        ref="volprofileToolRef"
+                        class="command far fa-poll-h"
+                        :title="$t('trading.orderChart.volprofileTool')"
+                        @click="volprofileToolClick"
+                        @contextmenu="volprofileToolContextmenu"
+                    ></div>
+                    <div
                         ref="alertToolRef"
                         class="command far fa-alarm-exclamation"
                         :title="$t('trading.orderChart.alertTool')"
                         @click="alertToolClick"
                         @contextmenu="alertToolContextmenu"
                     ></div>
-                    <!-- <div
+                    <div
+                        v-show="false"
                         class="command far fa-info-circle"
                         :title="
                             $t('trading.orderChart.copyistStatusPopup.title')
                         "
                         @click="() => $refs.copyistStatusPopupRef.show()"
-                    ></div> -->
+                    ></div>
                     <div
                         ref="cancelOrderRef"
                         class="cancel-order command far fa-trash-alt"
@@ -167,11 +170,11 @@
             </div>
         </div>
     </div>
-    <!-- <CopyistStatusPopup ref="copyistStatusPopupRef" /> -->
+    <CopyistStatusPopup ref="copyistStatusPopupRef" />
 </template>
 
 <script setup>
-// import CopyistStatusPopup from "./CopyistStatusPopup.vue";
+import CopyistStatusPopup from "./CopyistStatusPopup.vue";
 import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
@@ -909,7 +912,7 @@ function loadToolsData() {
         });
         //
         const boxs = await toolsStore.get("box");
-        if (boxs.length > 0) {
+        if (boxs.length == 2) {
             params.box = boxs;
             params.series.box.setData([boxs[0].x, boxs[1].x]);
             params.box[0].y = params.series.price.createPriceLine(boxs[0].y);
@@ -1337,7 +1340,7 @@ function boxToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-    }
+    } else if (params.box.length == 1) drawBoxTool(true);
     e.stopPropagation();
 }
 function boxToolContextmenu(e) {
@@ -1346,17 +1349,21 @@ function boxToolContextmenu(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-function drawBoxTool() {
-    if (params.crosshair.time) {
+function drawBoxTool(auto = false) {
+    let point = {};
+    point.price = coordinateToPrice(params.crosshair.y);
+    point.time = params.crosshair.time;
+    if (auto) point = findBoxPoint2();
+    if (mf.isSet(point)) {
         let option = {
             y: {
-                price: coordinateToPrice(params.crosshair.y),
+                price: point.price,
                 color: "#26a69a",
                 lineWidth: 1,
                 lineStyle: 1,
                 draggable: false,
             },
-            x: { time: params.crosshair.time, value: 1 },
+            x: { time: point.time, value: 1 },
         };
         let id = params.box.length;
         if (id > 1) {
@@ -1385,6 +1392,32 @@ function drawBoxTool() {
             boxToolRef.value.classList.remove("selected");
         } else drawBoxPoint(id, option);
     }
+}
+function findBoxPoint2() {
+    const point1Price = +params.box[0].y.options().price;
+    let min = point1Price,
+        max = point1Price,
+        point = {};
+    for (let i of params.data.price) {
+        if (i.time >= params.box[0].x.time) {
+            if (min != max) {
+                if (i.value < point1Price && min == point1Price) {
+                    point.price = max;
+                    point.time = i.time;
+                    break;
+                }
+                if (i.value > point1Price && max == point1Price) {
+                    point.price = min;
+                    point.time = i.time;
+                    break;
+                }
+            }
+            if (i.value < min) min = i.value;
+            if (i.value > max) max = i.value;
+        }
+    }
+
+    return point;
 }
 function drawBoxPoint(id, option) {
     option.point = id;
