@@ -273,7 +273,6 @@ let params = {
         B: {},
         C: {},
         X: {},
-        pointCount: 0,
     },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
     box: [],
@@ -941,7 +940,6 @@ function loadToolsData() {
         const pattern2Lines = await toolsStore.get("pattern2");
         if (pattern2Lines.length > 0) {
             pattern2Lines.forEach((line) => {
-                if (line.point != "X") params.pattern2.pointCount++;
                 params.pattern2[line.point] =
                     params.series.price.createPriceLine(line);
             });
@@ -1340,7 +1338,7 @@ function boxToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-    } else if (params.box.length == 1) drawBoxTool(true);
+    }
     e.stopPropagation();
 }
 function boxToolContextmenu(e) {
@@ -1349,24 +1347,25 @@ function boxToolContextmenu(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-function drawBoxTool(auto = false) {
-    let point = {};
-    point.price = coordinateToPrice(params.crosshair.y);
-    point.time = params.crosshair.time;
-    if (auto) point = findBoxPoint2();
-    if (mf.isSet(point)) {
+function drawBoxTool() {
+    if (params.crosshair.time) {
         let option = {
             y: {
-                price: point.price,
+                price: coordinateToPrice(params.crosshair.y),
                 color: "#26a69a",
                 lineWidth: 1,
                 lineStyle: 1,
                 draggable: false,
             },
-            x: { time: point.time, value: 1 },
+            x: { time: params.crosshair.time, value: 1 },
         };
-        let id = params.box.length;
-        if (id > 1) {
+        if (params.box.length <= 1) {
+            drawBoxPoint(0, option);
+            const point = findBoxPoint2(option);
+            option.y.price = point.price;
+            option.x.time = point.time;
+            drawBoxPoint(1, option);
+        } else {
             const i1 = params.data.whitespace.findIndex(
                 (x) => x.time === params.box[0].x.time
             );
@@ -1390,33 +1389,31 @@ function drawBoxTool(auto = false) {
             option.y.price = y4;
             drawBoxPoint(1, option);
             boxToolRef.value.classList.remove("selected");
-        } else drawBoxPoint(id, option);
+        }
     }
 }
-function findBoxPoint2() {
-    const point1Price = +params.box[0].y.options().price;
-    let min = point1Price,
-        max = point1Price,
+function findBoxPoint2(point1) {
+    let low = point1.y.price,
+        high = point1.y.price,
         point = {};
     for (let i of params.data.price) {
-        if (i.time >= params.box[0].x.time) {
-            if (min != max) {
-                if (i.value < point1Price && min == point1Price) {
-                    point.price = max;
+        if (i.time >= point1.x.time) {
+            if (low != high) {
+                if (i.value < point1.y.price && low == point1.y.price) {
+                    point.price = high;
                     point.time = i.time;
                     break;
                 }
-                if (i.value > point1Price && max == point1Price) {
-                    point.price = min;
+                if (i.value > point1.y.price && high == point1.y.price) {
+                    point.price = low;
                     point.time = i.time;
                     break;
                 }
             }
-            if (i.value < min) min = i.value;
-            if (i.value > max) max = i.value;
+            if (i.value < low) low = i.value;
+            if (i.value > high) high = i.value;
         }
     }
-
     return point;
 }
 function drawBoxPoint(id, option) {
@@ -1676,6 +1673,10 @@ function pattern2ToolContextmenu(e) {
 }
 function drawPattern2Tool() {
     const price = coordinateToPrice(params.crosshair.y);
+    const time = params.crosshair.time;
+    const point = findPattern2Points({ price, time });
+    const ba = point.p2 - price;
+    const xa = -5 * (point.p3 - point.p2);
     var options = {
         lineType: "pattern2",
         price: price,
@@ -1683,57 +1684,91 @@ function drawPattern2Tool() {
         lineStyle: 1,
         draggable: true,
     };
-    switch (params.pattern2.pointCount) {
-        case 0:
-            options.point = "A";
-            options.title = "A";
-            options.color = "#E91E63";
-            break;
-        case 1:
-            options.point = "B";
-            options.title = "B";
-            options.color = "#E91E63";
-            break;
-        case 2:
-            const b = +params.pattern2.B.options().price;
-            options.point = "C";
-            options.title = (price - b).toFixed(1);
-            options.color = "#9C27B0";
-            break;
-    }
+    options.point = "A";
+    options.title = "A";
+    options.color = "#E91E63";
     params.pattern2[options.point] =
         params.series.price.createPriceLine(options);
     toolsStore.set("pattern2", options);
-    if (params.pattern2.pointCount == 2) {
-        const a = +params.pattern2.A.options().price;
-        const b = +params.pattern2.B.options().price;
-        const ba = b - a;
-        const xa = -5 * (price - b);
-        params.pattern2.B.applyOptions({
-            title: `${(100 * (ba / xa)).toFixed(0)} %`,
-        });
-        toolsStore.set("pattern2", params.pattern2.B.options());
-        options.point = "X";
-        options.price = +(a + xa).toFixed(1);
-        options.title = xa.toFixed(1);
-        options.color = "#2196F3";
-        options.draggable = false;
-        params.pattern2.X = params.series.price.createPriceLine(options);
-        toolsStore.set("pattern2", options);
-        pattern2ToolRef.value.classList.remove("selected");
-    }
-    params.pattern2.pointCount++;
+    //
+    options.price = point.p2;
+    options.point = "B";
+    options.title = `${(100 * (ba / xa)).toFixed(0)} %`;
+    options.color = "#E91E63";
+    params.pattern2[options.point] =
+        params.series.price.createPriceLine(options);
+    toolsStore.set("pattern2", options);
+    //
+    options.price = point.p3;
+    options.point = "C";
+    options.title = (point.p3 - point.p2).toFixed(1);
+    options.color = "#9C27B0";
+    params.pattern2[options.point] =
+        params.series.price.createPriceLine(options);
+    toolsStore.set("pattern2", options);
+    //
+    options.point = "X";
+    options.price = +(price + xa).toFixed(1);
+    options.title = xa.toFixed(1);
+    options.color = "#2196F3";
+    options.draggable = false;
+    params.pattern2[options.point] =
+        params.series.price.createPriceLine(options);
+    toolsStore.set("pattern2", options);
+    pattern2ToolRef.value.classList.remove("selected");
 }
-function removePattern2Tool() {
-    if (params.pattern2.pointCount > 0) {
-        params.series.price.removePriceLine(params.pattern2.A);
-        if (params.pattern2.pointCount > 1) {
-            params.series.price.removePriceLine(params.pattern2.B);
-            if (params.pattern2.pointCount > 2) {
-                params.series.price.removePriceLine(params.pattern2.C);
-                params.series.price.removePriceLine(params.pattern2.X);
+function findPattern2Points(point1) {
+    let price2 = point1.price,
+        price3 = price2,
+        d23Max = 0,
+        ret = { p2: price2, p3: price3, d: d23Max };
+    for (let i of params.data.price) {
+        if (i.time >= point1.time) {
+            if (i.value < point1.price) {
+                if (price2 > point1.price) break;
+                if (i.value < price2) {
+                    if (d23Max > ret.d) {
+                        ret.p2 = price2;
+                        ret.p3 = price3;
+                        ret.d = d23Max;
+                    }
+                    price2 = i.value;
+                    price3 = price2;
+                    d23Max = 0;
+                } else if (i.value > price2) {
+                    if (i.value > price3) {
+                        price3 = i.value;
+                        d23Max = +Math.abs(price3 - price2).toFixed(1);
+                    }
+                }
+            } else if (i.value > point1.price) {
+                if (price2 < point1.price) break;
+                if (i.value > price2) {
+                    if (d23Max > ret.d) {
+                        ret.p2 = price2;
+                        ret.p3 = price3;
+                        ret.d = d23Max;
+                    }
+                    price2 = i.value;
+                    price3 = price2;
+                    d23Max = 0;
+                } else if (i.value < price2) {
+                    if (i.value < price3) {
+                        price3 = i.value;
+                        d23Max = +Math.abs(price3 - price2).toFixed(1);
+                    }
+                }
             }
         }
+    }
+    return ret;
+}
+function removePattern2Tool() {
+    if (mf.isSet(params.pattern2.X)) {
+        params.series.price.removePriceLine(params.pattern2.A);
+        params.series.price.removePriceLine(params.pattern2.B);
+        params.series.price.removePriceLine(params.pattern2.C);
+        params.series.price.removePriceLine(params.pattern2.X);
         //
         params.pattern2 = {
             A: {},
