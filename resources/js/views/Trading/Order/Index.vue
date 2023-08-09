@@ -1661,107 +1661,152 @@ function pattern2ToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        removePattern2Tool();
     }
     e.stopPropagation();
 }
 function pattern2ToolContextmenu(e) {
     removePattern2Tool();
+    removeBoxTool();
     e.target.classList.remove("selected");
     e.preventDefault();
     e.stopPropagation();
 }
 function drawPattern2Tool() {
-    const price = coordinateToPrice(params.crosshair.y);
-    const time = params.crosshair.time;
-    const point = findPattern2Points({ price, time });
-    const ba = point.p2 - price;
-    const xa = -5 * (point.p3 - point.p2);
-    var options = {
-        lineType: "pattern2",
-        price: price,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: true,
+    const point1 = {
+        time: params.crosshair.time,
+        value: coordinateToPrice(params.crosshair.y),
     };
-    options.point = "A";
-    options.title = "A";
-    options.color = "#E91E63";
-    params.pattern2[options.point] =
-        params.series.price.createPriceLine(options);
-    toolsStore.set("pattern2", options);
+    if (params.box.length <= 1) {
+        const { point2, point3, point4 } = findPattern2Points(point1);
+        if (point2.value == point1.value) return false;
+        const d21 = point2.value - point1.value;
+        const d32 = point3.value - point2.value;
+        const dx1 = -5 * (point3.value - point2.value);
+        var option = {
+            lineType: "pattern2",
+            lineWidth: 1,
+            lineStyle: 1,
+            draggable: true,
+        };
+        option.price = point1.value;
+        option.point = "A";
+        option.title = "A";
+        option.color = "#E91E63";
+        params.pattern2[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern2", option);
+        //
+        option.price = point2.value;
+        option.point = "B";
+        option.title = `${(100 * (d21 / dx1)).toFixed(0)} %`;
+        option.color = "#E91E63";
+        params.pattern2[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern2", option);
+        //
+        option.price = point3.value;
+        option.point = "C";
+        option.title = d32.toFixed(1);
+        option.color = "#9C27B0";
+        params.pattern2[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern2", option);
+        //
+        option.point = "X";
+        option.price = +(point1.value + dx1).toFixed(1);
+        option.title = dx1.toFixed(1);
+        option.color = "#2196F3";
+        option.draggable = false;
+        params.pattern2[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern2", option);
+        //
+        drawBox({ point2, point3, point4 });
+    } else {
+        const point2 = {
+            value: +params.box[0].y.options().price,
+            time: params.box[0].x.time,
+        };
+        const point3 = {
+            value: +params.box[1].y.options().price,
+            time: params.box[1].x.time,
+        };
+        drawBox({ point2, point3, point4: point1 });
+    }
     //
-    options.price = point.p2;
-    options.point = "B";
-    options.title = `${(100 * (ba / xa)).toFixed(0)} %`;
-    options.color = "#E91E63";
-    params.pattern2[options.point] =
-        params.series.price.createPriceLine(options);
-    toolsStore.set("pattern2", options);
-    //
-    options.price = point.p3;
-    options.point = "C";
-    options.title = (point.p3 - point.p2).toFixed(1);
-    options.color = "#9C27B0";
-    params.pattern2[options.point] =
-        params.series.price.createPriceLine(options);
-    toolsStore.set("pattern2", options);
-    //
-    options.point = "X";
-    options.price = +(price + xa).toFixed(1);
-    options.title = xa.toFixed(1);
-    options.color = "#2196F3";
-    options.draggable = false;
-    params.pattern2[options.point] =
-        params.series.price.createPriceLine(options);
-    toolsStore.set("pattern2", options);
     pattern2ToolRef.value.classList.remove("selected");
 }
 function findPattern2Points(point1) {
-    let price2 = point1.price,
-        price3 = price2,
-        d23Max = 0,
-        ret = { p2: price2, p3: price3, d: d23Max };
+    let d = 0,
+        dMax = 0,
+        price3 = point1.value,
+        point2 = point1,
+        point3 = point1,
+        point4 = point1;
     for (let i of params.data.price) {
         if (i.time >= point1.time) {
-            if (i.value < point1.price) {
-                if (price2 > point1.price) break;
-                if (i.value < price2) {
-                    if (d23Max > ret.d) {
-                        ret.p2 = price2;
-                        ret.p3 = price3;
-                        ret.d = d23Max;
+            if (i.value < point1.value) {
+                if (point4.value > point1.value) break;
+                if (i.value < point4.value) {
+                    if (d > dMax) {
+                        point2 = point4;
+                        point3 = { time: i.time, value: price3 };
+                        dMax = d;
                     }
-                    price2 = i.value;
-                    price3 = price2;
-                    d23Max = 0;
-                } else if (i.value > price2) {
+                    point4 = i;
+                    price3 = point4.value;
+                    d = 0;
+                } else if (i.value > point4.value) {
                     if (i.value > price3) {
                         price3 = i.value;
-                        d23Max = +Math.abs(price3 - price2).toFixed(1);
+                        d = +Math.abs(price3 - point4.value).toFixed(1);
                     }
                 }
-            } else if (i.value > point1.price) {
-                if (price2 < point1.price) break;
-                if (i.value > price2) {
-                    if (d23Max > ret.d) {
-                        ret.p2 = price2;
-                        ret.p3 = price3;
-                        ret.d = d23Max;
+            } else if (i.value > point1.value) {
+                if (point4.price < point1.value) break;
+                if (i.value > point4.value) {
+                    if (d > dMax) {
+                        point2 = point4;
+                        point3 = { time: i.time, value: price3 };
+                        dMax = d;
                     }
-                    price2 = i.value;
-                    price3 = price2;
-                    d23Max = 0;
-                } else if (i.value < price2) {
+                    point4 = i;
+                    price3 = point4.value;
+                    d = 0;
+                } else if (i.value < point4.value) {
                     if (i.value < price3) {
                         price3 = i.value;
-                        d23Max = +Math.abs(price3 - price2).toFixed(1);
+                        d = +Math.abs(price3 - point4.value).toFixed(1);
                     }
                 }
             }
         }
     }
-    return ret;
+    return { point2, point3, point4 };
+}
+function drawBox({ point2, point3, point4 }) {
+    removeBoxTool();
+    let option = {
+        y: {
+            color: "#26a69a",
+            lineWidth: 1,
+            lineStyle: 1,
+            draggable: false,
+        },
+        x: { value: 1 },
+    };
+    option.y.price = point4.value;
+    option.x.time = point4.time;
+    drawBoxPoint(0, option);
+    //
+    const i2 = params.data.whitespace.findIndex((x) => x.time === point2.time);
+    const i3 = params.data.whitespace.findIndex((x) => x.time === point3.time);
+    const i4 = params.data.whitespace.findIndex((x) => x.time === point4.time);
+    const i5 = i4 + i3 - i2;
+    if (i5 >= params.data.whitespace.length) return false;
+    option.y.price = point4.value + point3.value - point2.value;
+    option.x.time = params.data.whitespace[i5].time;
+    drawBoxPoint(1, option);
 }
 function removePattern2Tool() {
     if (mf.isSet(params.pattern2.X)) {
