@@ -1791,15 +1791,16 @@ function drawBox({ point2, point3, point4 }) {
         },
         x: { value: 1 },
     };
-    option.y.price = point4.value;
-    option.x.time = point4.time;
-    drawBoxPoint(0, option);
-    //
     const i2 = params.data.whitespace.findIndex((x) => x.time === point2.time);
     const i3 = params.data.whitespace.findIndex((x) => x.time === point3.time);
     const i4 = params.data.whitespace.findIndex((x) => x.time === point4.time);
     const i5 = i4 + i3 - i2;
     if (i5 >= params.data.whitespace.length) return false;
+    //
+    option.y.price = point4.value;
+    option.x.time = point4.time;
+    drawBoxPoint(0, option);
+    //
     option.y.price = point4.value + point3.value - point2.value;
     option.x.time = params.data.whitespace[i5].time;
     drawBoxPoint(1, option);

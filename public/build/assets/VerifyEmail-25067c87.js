@@ -1,1 +1,0 @@
-import{u,a,b as i}from"./app-d6f97dd1.js";const f={__name:"VerifyEmail",setup(n){const t=u(),s=a(),r=i(),{url:e}=r.query;return e!=""&&t.dispatch("auth/verifyEmail",e).then(o=>{o&&s.push({name:"overview"})}),()=>{}}};export{f as default};
