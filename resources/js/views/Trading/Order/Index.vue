@@ -1680,6 +1680,8 @@ function drawPattern2Tool(fix = false) {
             time: opsA.time,
             value: opsA.price,
         };
+        removePattern2Tool();
+        removeBoxTool();
     } else {
         if (fix) return false;
         point1 = {
@@ -1729,7 +1731,6 @@ function drawPattern2Tool(fix = false) {
     toolsStore.set("pattern2", option);
     //
     drawBox({ point2, point3, point4 });
-    //
     pattern2ToolRef.value.classList.remove("selected");
 }
 function findPattern2Points(point1) {
@@ -1781,7 +1782,6 @@ function findPattern2Points(point1) {
     return { point2, point3, point4 };
 }
 function drawBox({ point2, point3, point4 }) {
-    removeBoxTool();
     let option = {
         y: {
             color: "#26a69a",
