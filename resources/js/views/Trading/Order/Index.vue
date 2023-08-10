@@ -1746,7 +1746,7 @@ function findPattern2Points(point1) {
     for (let i of params.data.price) {
         if (i.time >= point1.time) {
             if (i.value < point1.value) {
-                if (point4.value > point1.value) break;
+                if (point2.value > point3.value) break;
                 if (i.value < point4.value) {
                     if (d > dMax) {
                         point2 = point4;
@@ -1763,7 +1763,7 @@ function findPattern2Points(point1) {
                     }
                 }
             } else if (i.value > point1.value) {
-                if (point4.price < point1.value) break;
+                if (point2.value < point3.value) break;
                 if (i.value > point4.value) {
                     if (d > dMax) {
                         point2 = point4;
