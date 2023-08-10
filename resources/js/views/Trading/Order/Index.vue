@@ -1349,64 +1349,40 @@ function boxToolContextmenu(e) {
 }
 function drawBoxTool() {
     if (params.crosshair.time) {
-        let option = {
-            y: {
-                price: coordinateToPrice(params.crosshair.y),
-                color: "#26a69a",
-                lineWidth: 1,
-                lineStyle: 1,
-                draggable: false,
-            },
-            x: { time: params.crosshair.time, value: 1 },
+        const point = {
+            value: coordinateToPrice(params.crosshair.y),
+            time: params.crosshair.time,
         };
-        if (params.box.length <= 1) {
-            drawBoxPoint(0, option);
-            const point = findBoxPoint2(option);
-            option.y.price = point.price;
-            option.x.time = point.time;
-            drawBoxPoint(1, option);
-        } else {
-            const i1 = params.data.whitespace.findIndex(
-                (x) => x.time === params.box[0].x.time
-            );
-            const i2 = params.data.whitespace.findIndex(
-                (x) => x.time === params.box[1].x.time
-            );
-            const i3 = params.data.whitespace.findIndex(
-                (x) => x.time === option.x.time
-            );
-            const i4 = i3 + i2 - i1;
-            if (i4 >= params.data.whitespace.length) return false;
-            //
-            const y1 = +params.box[0].y.options().price;
-            const y2 = +params.box[1].y.options().price;
-            const y3 = option.y.price;
-            const y4 = y3 + y2 - y1;
-            //
+        if (params.box.length <= 1)
+            drawBox({ point2: point, point3: findBoxPoint2(point) });
+        else {
+            const point2 = {
+                value: +params.box[0].y.options().price,
+                time: params.box[0].x.time,
+            };
+            const point3 = {
+                value: +params.box[1].y.options().price,
+                time: params.box[1].x.time,
+            };
             removeBoxTool();
-            drawBoxPoint(0, option);
-            option.x.time = params.data.whitespace[i4].time;
-            option.y.price = y4;
-            drawBoxPoint(1, option);
+            drawBox({ point2, point3, point4: point });
             boxToolRef.value.classList.remove("selected");
         }
     }
 }
-function findBoxPoint2(point1) {
-    let low = point1.y.price,
-        high = point1.y.price,
-        point = {};
+function findBoxPoint2(point2) {
+    let low = point2.value,
+        high = point2.value,
+        point3 = {};
     for (let i of params.data.price) {
-        if (i.time >= point1.x.time) {
+        if (i.time >= point2.time) {
             if (low != high) {
-                if (i.value < point1.y.price && low == point1.y.price) {
-                    point.price = high;
-                    point.time = i.time;
+                if (i.value < point2.value && low == point2.value) {
+                    point3 = { value: high, time: i.time };
                     break;
                 }
-                if (i.value > point1.y.price && high == point1.y.price) {
-                    point.price = low;
-                    point.time = i.time;
+                if (i.value > point2.value && high == point2.value) {
+                    point3 = { value: low, time: i.time };
                     break;
                 }
             }
@@ -1414,7 +1390,49 @@ function findBoxPoint2(point1) {
             if (i.value > high) high = i.value;
         }
     }
-    return point;
+    return point3;
+}
+function drawBox({ point2, point3, point4 }) {
+    if (!params.box.length) {
+        let option = {
+            y: {
+                color: "#26a69a",
+                lineWidth: 1,
+                lineStyle: 1,
+                draggable: false,
+            },
+            x: { value: 1 },
+        };
+        if (mf.isSet(point4)) {
+            const i2 = params.data.whitespace.findIndex(
+                (x) => x.time === point2.time
+            );
+            const i3 = params.data.whitespace.findIndex(
+                (x) => x.time === point3.time
+            );
+            const i4 = params.data.whitespace.findIndex(
+                (x) => x.time === point4.time
+            );
+            const i5 = i4 + i3 - i2;
+            if (i5 >= params.data.whitespace.length) return false;
+            //
+            option.y.price = point4.value;
+            option.x.time = point4.time;
+            drawBoxPoint(0, option);
+            //
+            option.y.price = point4.value + point3.value - point2.value;
+            option.x.time = params.data.whitespace[i5].time;
+            drawBoxPoint(1, option);
+        } else {
+            option.y.price = point2.value;
+            option.x.time = point2.time;
+            drawBoxPoint(0, option);
+            //
+            option.y.price = point3.value;
+            option.x.time = point3.time;
+            drawBoxPoint(1, option);
+        }
+    }
 }
 function drawBoxPoint(id, option) {
     option.point = id;
@@ -1667,7 +1685,6 @@ function pattern2ToolClick(e) {
 }
 function pattern2ToolContextmenu(e) {
     removePattern2Tool();
-    removeBoxTool();
     e.target.classList.remove("selected");
     e.preventDefault();
     e.stopPropagation();
@@ -1780,38 +1797,6 @@ function findPattern2Points(point1) {
         }
     }
     return { point2, point3, point4 };
-}
-function drawBox({ point2, point3, point4 }) {
-    if (!params.box.length) {
-        let option = {
-            y: {
-                color: "#26a69a",
-                lineWidth: 1,
-                lineStyle: 1,
-                draggable: false,
-            },
-            x: { value: 1 },
-        };
-        const i2 = params.data.whitespace.findIndex(
-            (x) => x.time === point2.time
-        );
-        const i3 = params.data.whitespace.findIndex(
-            (x) => x.time === point3.time
-        );
-        const i4 = params.data.whitespace.findIndex(
-            (x) => x.time === point4.time
-        );
-        const i5 = i4 + i3 - i2;
-        if (i5 >= params.data.whitespace.length) return false;
-        //
-        option.y.price = point4.value;
-        option.x.time = point4.time;
-        drawBoxPoint(0, option);
-        //
-        option.y.price = point4.value + point3.value - point2.value;
-        option.x.time = params.data.whitespace[i5].time;
-        drawBoxPoint(1, option);
-    }
 }
 function removePattern2Tool() {
     if (mf.isSet(params.pattern2.X)) {
