@@ -1687,6 +1687,7 @@ function pattern2ToolClick(e) {
 }
 function pattern2ToolContextmenu(e) {
     removePattern2Tool();
+    removeBoxTool();
     e.target.classList.remove("selected");
     e.preventDefault();
     e.stopPropagation();
