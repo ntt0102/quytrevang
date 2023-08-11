@@ -164,6 +164,7 @@
                 </div>
                 <iframe
                     v-show="state.showTradingView"
+                    ref="tradingviewChartRef"
                     class="tradingview-chart"
                     :src="tradingViewSrc"
                 ></iframe>
@@ -251,6 +252,7 @@ const alertToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
+const tradingviewChartRef = ref(null);
 let params = {
     chart: {},
     series: {},
@@ -367,7 +369,17 @@ onMounted(() => {
         priceFormat: { minMove: 0.1 },
     });
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
-    window.addEventListener("keydown", eventKeyPress);
+    document.addEventListener("keydown", eventKeyPress);
+    setTimeout(() => {
+        console.log(
+            "tradingview",
+            tradingviewChartRef.value.contentWindow.document
+        );
+        tradingviewChartRef.value.contentWindow.document.addEventListener(
+            "keydown",
+            eventTradingView
+        );
+    }, 2000);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
     store.dispatch("tradingOrder/getChartData", state.chartDate).then(() => {
         loadToolsData();
@@ -857,6 +869,12 @@ function eventKeyPress(e) {
                 tradingviewRef.value.click();
                 break;
         }
+    }
+}
+function eventTradingView(e) {
+    console.log("tradingview-E", e);
+    if (e.ctrlKey || e.metaKey) {
+        if (e.keyCode == 99) fullscreenToolRef.value.click();
     }
 }
 function eventFullscreenChange() {
