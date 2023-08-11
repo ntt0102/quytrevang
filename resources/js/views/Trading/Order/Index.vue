@@ -370,16 +370,6 @@ onMounted(() => {
     });
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
-    setTimeout(() => {
-        console.log(
-            "tradingview",
-            tradingviewChartRef.value.contentWindow.document
-        );
-        tradingviewChartRef.value.contentWindow.document.addEventListener(
-            "keydown",
-            eventTradingView
-        );
-    }, 2000);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
     store.dispatch("tradingOrder/getChartData", state.chartDate).then(() => {
         loadToolsData();
@@ -869,12 +859,6 @@ function eventKeyPress(e) {
                 tradingviewRef.value.click();
                 break;
         }
-    }
-}
-function eventTradingView(e) {
-    console.log("tradingview-E", e);
-    if (e.ctrlKey || e.metaKey) {
-        if (e.keyCode == 99) fullscreenToolRef.value.click();
     }
 }
 function eventFullscreenChange() {
