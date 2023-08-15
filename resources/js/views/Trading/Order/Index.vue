@@ -1355,8 +1355,10 @@ function drawBoxTool() {
             value: coordinateToPrice(params.crosshair.y),
             time: params.crosshair.time,
         };
-        if (params.box.length <= 1)
-            drawBox({ point2: point, point3: findBoxPoint2(point) });
+        // if (params.box.length <= 1)
+        //     drawBox({ point2: point, point3: findBoxPoint2(point) });
+        if (params.box.length == 0) drawBox({ point2: point });
+        else if (params.box.length == 1) drawBox({ point3: point });
         else {
             const point2 = {
                 value: +params.box[0].y.options().price,
@@ -1395,41 +1397,42 @@ function findBoxPoint2(point2) {
     return point3;
 }
 function drawBox({ point2, point3, point4 }) {
-    if (!params.box.length) {
-        let option = {
-            y: {
-                color: "#26a69a",
-                lineWidth: 1,
-                lineStyle: 1,
-                draggable: false,
-            },
-            x: { value: 1 },
-        };
-        if (mf.isSet(point4)) {
-            const i2 = params.data.whitespace.findIndex(
-                (x) => x.time === point2.time
-            );
-            const i3 = params.data.whitespace.findIndex(
-                (x) => x.time === point3.time
-            );
-            const i4 = params.data.whitespace.findIndex(
-                (x) => x.time === point4.time
-            );
-            const i5 = i4 + i3 - i2;
-            if (i5 >= params.data.whitespace.length) return false;
-            //
-            option.y.price = point4.value;
-            option.x.time = point4.time;
-            drawBoxPoint(0, option);
-            //
-            option.y.price = point4.value + point3.value - point2.value;
-            option.x.time = params.data.whitespace[i5].time;
-            drawBoxPoint(1, option);
-        } else {
+    let option = {
+        y: {
+            color: "#26a69a",
+            lineWidth: 1,
+            lineStyle: 1,
+            draggable: false,
+        },
+        x: { value: 1 },
+    };
+    if (mf.isSet(point4)) {
+        const i2 = params.data.whitespace.findIndex(
+            (x) => x.time === point2.time
+        );
+        const i3 = params.data.whitespace.findIndex(
+            (x) => x.time === point3.time
+        );
+        const i4 = params.data.whitespace.findIndex(
+            (x) => x.time === point4.time
+        );
+        const i5 = i4 + i3 - i2;
+        if (i5 >= params.data.whitespace.length) return false;
+        //
+        option.y.price = point4.value;
+        option.x.time = point4.time;
+        drawBoxPoint(0, option);
+        //
+        option.y.price = point4.value + point3.value - point2.value;
+        option.x.time = params.data.whitespace[i5].time;
+        drawBoxPoint(1, option);
+    } else {
+        if (mf.isSet(point2)) {
             option.y.price = point2.value;
             option.x.time = point2.time;
             drawBoxPoint(0, option);
-            //
+        }
+        if (mf.isSet(point3)) {
             option.y.price = point3.value;
             option.x.time = point3.time;
             drawBoxPoint(1, option);
@@ -1750,7 +1753,7 @@ function drawPattern2Tool(fix = false) {
     params.pattern2[option.point] = params.series.price.createPriceLine(option);
     toolsStore.set("pattern2", option);
     //
-    drawBox({ point2, point3, point4 });
+    if (!params.box.length) drawBox({ point2, point3, point4 });
     pattern2ToolRef.value.classList.remove("selected");
 }
 function findPattern2Points(point1) {
