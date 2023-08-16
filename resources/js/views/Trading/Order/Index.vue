@@ -768,7 +768,7 @@ function eventPriceLineDrag(e) {
                     toolsStore.set("pattern2", params.pattern2.C.options());
                 }
                 const c = +params.pattern2.C.options().price;
-                const dcb = c-b;
+                const dcb = c - b;
                 if (lineOptions.point == "C") {
                     params.pattern2.C.applyOptions({
                         title: dcb.toFixed(1),
@@ -1704,7 +1704,7 @@ function pattern2ToolClick(e) {
 }
 function pattern2ToolContextmenu(e) {
     removePattern2Tool();
-    removeBoxTool();
+    // removeBoxTool();
     e.target.classList.remove("selected");
     e.preventDefault();
     e.stopPropagation();
@@ -1718,7 +1718,7 @@ function drawPattern2Tool(fix = false) {
             value: opsA.price,
         };
         removePattern2Tool();
-        removeBoxTool();
+        // removeBoxTool();
     } else {
         if (fix) return false;
         point1 = {
@@ -1776,7 +1776,7 @@ function drawPattern2Tool(fix = false) {
     params.pattern2[option.point] = params.series.price.createPriceLine(option);
     toolsStore.set("pattern2", option);
     //
-    if (!params.box.length) drawBox({ point2, point3, point4 });
+    // if (!params.box.length) drawBox({ point2, point3, point4 });
     pattern2ToolRef.value.classList.remove("selected");
 }
 function findPattern2Points(point1) {
