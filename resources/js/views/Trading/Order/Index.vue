@@ -246,6 +246,7 @@ const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
 const pattern1ToolRef = ref(null);
 const pattern2ToolRef = ref(null);
+const scanSignalToolRef = ref(null);
 const volprofileToolRef = ref(null);
 const boxToolRef = ref(null);
 const alertToolRef = ref(null);
@@ -407,7 +408,11 @@ function eventChartClick() {
         drawPattern2Tool();
     else if (volprofileToolRef.value.classList.contains("selected"))
         drawVolprofileTool();
-    else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
+    else if (scanSignalToolRef.value.classList.contains("selected")) {
+        removeSignal();
+        scanSignal();
+    } else if (alertToolRef.value.classList.contains("selected"))
+        drawAlertTool();
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
@@ -1077,7 +1082,7 @@ function connectSocket() {
                                         : "#CCCCCC",
                             }
                         );
-                        scanSignal();
+                        scanSignal(params.data.volume.length - 1);
                         scanOrder();
                     }
                 }
@@ -1930,18 +1935,32 @@ function removeVolprofileTool() {
     toolsStore.clear("volprofile");
 }
 function scanSignalToolClick(e) {
-    removeSignal();
-    scanSignal(true);
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removeSignal();
+    } else scanSignal(0);
     e.stopPropagation();
 }
 function scanSignalToolContextmenu(e) {
     removeSignal();
+    e.target.classList.remove("selected");
     e.preventDefault();
     e.stopPropagation();
 }
-function scanSignal(full = false) {
-    const START = full ? 0 : params.data.volume.length - 1;
-    for (let i = START; i < params.data.volume.length; i++) {
+function scanSignal(start = -1) {
+    if (start == -1) {
+        start = params.data.volume.findIndex(
+            (x) => x.time >= params.crosshair.time
+        );
+        params.volumeMax = params.data.volume[start].value - 1;
+        scanSignalToolRef.value.classList.remove("selected");
+    }
+    for (let i = start; i < params.data.volume.length; i++) {
         if (params.data.volume[i].value > params.volumeMax) {
             params.volumeMax = params.data.volume[i].value;
             params.series.signal.update({
