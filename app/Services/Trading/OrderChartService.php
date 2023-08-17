@@ -156,13 +156,13 @@ class OrderChartService extends CoreService
         return collect($list)->reduce(function ($c, $item) {
             $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
             $price = $item->lastPrice;
-            $volume = $item->time > '09:00:05' && $item->time < '14:45:00' ? $item->lastVol : 0;
+            $volume = $this->inContinueTime($item->time) ? $item->lastVol : 0;
             return $this->createChartData($c, $time, $price, $volume);
         }, ['price' => [], 'volume' => []]);
     }
 
     /**
-     * 
+     * generate Data From Csv
      */
     public function generateDataFromCsv($date)
     {
@@ -175,14 +175,22 @@ class OrderChartService extends CoreService
             if (!!$line) {
                 $time = $line[0] + $this->SHIFT_TIME;
                 $price = $line[1] + 0;
-                $t = date('H:i:s', $line[0]);
-                $volume = $t > '09:00:05' && $t < '14:45:00' ? $line[2] + 0 : 0;
+                $volume = $this->inContinueTime(date('H:i:s', $line[0])) ? $line[2] + 0 : 0;
                 $c = $this->createChartData($c, $time, $price, $volume);
             }
         }
         fclose($fp);
         return $c;
     }
+
+    /**
+     * Check continue time
+     */
+    private function inContinueTime($time)
+    {
+        return $time > '09:00:05' && $time < '14:45:00';
+    }
+
     /**
      * Create Chart Data
      */
@@ -247,7 +255,7 @@ class OrderChartService extends CoreService
         return collect($list)->reduce(function ($c, $item) {
             $time = strtotime(date('Y-m-d ') . $item->t) + $this->SHIFT_TIME;
             $price = $item->p;
-            $volume = $item->t > '09:00:05' && $item->t < '14:45:00' ? $item->v : 0;
+            $volume = $this->inContinueTime($item->t) ? $item->v : 0;
             $side = $item->a == 'BU' ? 1 : -1;
             return $this->createChartData($c, $time, $price, $volume, $side);
         }, ['price' => [], 'volume' => []]);
