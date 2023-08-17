@@ -173,9 +173,9 @@ class OrderChartService extends CoreService
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
-                $time = $line[0] + 0;
+                $time = $line[0] + $this->SHIFT_TIME;
                 $price = $line[1] + 0;
-                $t = date('H:i:s', $time);
+                $t = date('H:i:s', $line[0]);
                 $volume = $t > '09:00:05' && $t < '14:45:00' ? $line[2] + 0 : 0;
                 $c = $this->createChartData($c, $time, $price, $volume);
             }

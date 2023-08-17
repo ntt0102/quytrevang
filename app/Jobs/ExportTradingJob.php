@@ -13,8 +13,6 @@ class ExportTradingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $SHIFT_TIME = 7 * 60 * 60;
-
     /**
      * Create a new job instance.
      *
@@ -38,7 +36,7 @@ class ExportTradingJob implements ShouldQueue
             $fp = fopen($filename, 'w');
             foreach ($list as $item) {
                 $line = [];
-                $line[] = strtotime($date . $item->time) + $this->SHIFT_TIME;
+                $line[] = strtotime($date . ' ' . $item->time);
                 $line[] = $item->lastPrice;
                 $line[] = $item->lastVol;
                 fputcsv($fp, $line);

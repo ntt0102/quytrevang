@@ -109,8 +109,41 @@ Route::get('test', function () {
     // $s = event(new App\Events\UpdateFinbookEvent());
     // $s = app(App\Services\Trading\OrderChartService::class)->export();
     // $s = App\Jobs\UpdateOpeningMarketJob::dispatch();
-    $s = app(App\Services\Trading\TradeService::class)->calculateSummary('week');
+    // $s = app(App\Services\Trading\TradeService::class)->calculateSummary('week');
 
-    dd($s);
+    // dd($s);
+    $old = storage_path('old');
+    $new = storage_path('new');
+    if ($handle = opendir($old)) {
+        while (false !== ($file = readdir($handle))) {
+            if ($file != "." && $file != "..") {
+                $fr = fopen($old . '/' . $file, 'r');
+                $fw = fopen($new . '/' . $file, 'w');
+                while (!feof($fr)) {
+                    $line = fgetcsv($fr);
+                    if (!!$line) {
+                        $line[0] = $line[0] - 7 * 60 * 60;
+                        fputcsv($fw, $line);
+                    }
+                }
+                fclose($fr);
+                fclose($fw);
+            }
+        }
+
+        closedir($handle);
+    }
+    // $fp = fopen($filename, 'r');
+    // while (!feof($fp)) {
+    //     $line = fgetcsv($fp);
+    //     if (!!$line) {
+    //         $time = $line[0] + 0;
+    //         $price = $line[1] + 0;
+    //         $t = date('H:i:s', $time - $this->SHIFT_TIME);
+    //         $volume = $t > '09:00:05' && $t < '14:45:00' ? $line[2] + 0 : 0;
+    //         $c = $this->createChartData($c, $time, $price, $volume);
+    //     }
+    // }
+    // fclose($fp);
     return 'ok';
 });
