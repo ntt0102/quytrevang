@@ -156,7 +156,7 @@ class OrderChartService extends CoreService
         return collect($list)->reduce(function ($c, $item) {
             $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
             $price = $item->lastPrice;
-            $volume = $item->time <= '09:00:05' || $item->time >= '14:45:00' ? $item->lastVol : 0;
+            $volume = $item->time > '09:00:05' && $item->time < '14:45:00' ? $item->lastVol : 0;
             return $this->createChartData($c, $time, $price, $volume);
         }, ['price' => [], 'volume' => []]);
     }
@@ -176,7 +176,7 @@ class OrderChartService extends CoreService
                 $time = $line[0] + 0;
                 $price = $line[1] + 0;
                 $t = date('H:i:s', $time);
-                $volume = $t <= '09:00:05' || $t >= '14:45:00' ? $line[2] + 0 : 0;
+                $volume = $t > '09:00:05' && $t < '14:45:00' ? $line[2] + 0 : 0;
                 $c = $this->createChartData($c, $time, $price, $volume);
             }
         }
@@ -247,7 +247,7 @@ class OrderChartService extends CoreService
         return collect($list)->reduce(function ($c, $item) {
             $time = strtotime(date('Y-m-d ') . $item->t) + $this->SHIFT_TIME;
             $price = $item->p;
-            $volume = $item->t <= '09:00:05' || $item->t >= '14:45:00' ? $item->v : 0;
+            $volume = $item->t > '09:00:05' && $item->t < '14:45:00' ? $item->v : 0;
             $side = $item->a == 'BU' ? 1 : -1;
             return $this->createChartData($c, $time, $price, $volume, $side);
         }, ['price' => [], 'volume' => []]);
