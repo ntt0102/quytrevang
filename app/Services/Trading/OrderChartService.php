@@ -168,7 +168,7 @@ class OrderChartService extends CoreService
     {
         $c = ['price' => [], 'volume' => []];
         $filename = storage_path('app/vn30f1m/' . $date . '.csv');
-        if (!is_file($filename)) return $c;
+        if (!file_exists($filename)) return $c;
         $fp = fopen($filename, 'r');
         while (!feof($fp)) {
             $line = fgetcsv($fp);
