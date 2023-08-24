@@ -188,7 +188,7 @@ class OrderChartService extends CoreService
      */
     private function inContinueTime($time)
     {
-        return $time > '09:00:15' && $time < '14:45:00';
+        return $time > '09:00:45' && $time < '14:45:00';
     }
 
     /**
