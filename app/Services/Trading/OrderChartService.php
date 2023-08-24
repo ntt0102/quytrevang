@@ -153,10 +153,10 @@ class OrderChartService extends CoreService
     public function generateDataFromVps()
     {
         $list = $this->cloneVpsData();
-        return collect($list)->reduce(function ($c, $item) {
+        return collect($list)->reduce(function ($c, $item, $index) {
             $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
             $price = $item->lastPrice;
-            $volume = $this->inContinueTime($item->time) ? $item->lastVol : 0;
+            $volume = $this->filterVolume($item->lastVol, $index, $item->time);
             return $this->createChartData($c, $time, $price, $volume);
         }, ['price' => [], 'volume' => []]);
     }
@@ -170,13 +170,15 @@ class OrderChartService extends CoreService
         $filename = storage_path('app/vn30f1m/' . $date . '.csv');
         if (!file_exists($filename)) return $c;
         $fp = fopen($filename, 'r');
+        $index = 0;
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
                 $time = $line[0] + $this->SHIFT_TIME;
                 $price = $line[1] + 0;
-                $volume = $this->inContinueTime(date('H:i:s', $line[0])) ? $line[2] + 0 : 0;
+                $volume = $this->filterVolume($line[2] + 0, $index, date('H:i:s', $line[0]));
                 $c = $this->createChartData($c, $time, $price, $volume);
+                $index++;
             }
         }
         fclose($fp);
@@ -186,9 +188,9 @@ class OrderChartService extends CoreService
     /**
      * Check continue time
      */
-    private function inContinueTime($time)
+    private function filterVolume($volume, $index, $time)
     {
-        return $time > '09:00:45' && $time < '14:45:00';
+        return $index > 1 && $time < '14:45:00' ? $volume : 0;
     }
 
     /**
@@ -252,10 +254,10 @@ class OrderChartService extends CoreService
     public function generateDataFromTcbs()
     {
         $list = $this->cloneTcbsData();
-        return collect($list)->reduce(function ($c, $item) {
+        return collect($list)->reduce(function ($c, $item, $index) {
             $time = strtotime(date('Y-m-d ') . $item->t) + $this->SHIFT_TIME;
             $price = $item->p;
-            $volume = $this->inContinueTime($item->t) ? $item->v : 0;
+            $volume = $this->filterVolume($item->v, $index, $item->t);
             $side = $item->a == 'BU' ? 1 : -1;
             return $this->createChartData($c, $time, $price, $volume, $side);
         }, ['price' => [], 'volume' => []]);
