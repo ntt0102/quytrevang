@@ -1183,11 +1183,15 @@ function showOrderButton() {
                 var price = null,
                     side = 0;
                 if (!status.value.position) {
-                    price = coordinateToPrice(params.crosshair.y);
-                    side =
-                        price >= params.data.price.slice(-1)[0].value ? 1 : -1;
-                    params.order.side = side;
-                    params.order.entry.price = price;
+                    if (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC) {
+                        price = coordinateToPrice(params.crosshair.y);
+                        side =
+                            price >= params.data.price.slice(-1)[0].value
+                                ? 1
+                                : -1;
+                        params.order.side = side;
+                        params.order.entry.price = price;
+                    }
                 } else {
                     if (CURRENT_SEC < TIME.ATO) price = "ATO";
                     else if (CURRENT_SEC > TIME.ATC) price = "ATC";
