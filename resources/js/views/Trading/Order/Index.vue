@@ -776,8 +776,8 @@ function eventPriceLineDrag(e) {
                     toolsStore.set("pattern2", params.pattern2.C.options());
                 }
                 const a = +params.pattern2.A.options().price;
-                const xa = -4.382 * dcb;
-                const ya = -5.236 * dcb;
+                const xa = -4 * dcb;
+                const ya = -4.382 * dcb;
                 if (lineOptions.point == "A" || lineOptions.point == "C") {
                     params.pattern2.X.applyOptions({
                         price: +(a + xa).toFixed(1),
@@ -1734,8 +1734,8 @@ function drawPattern2Tool(fix = false) {
     if (point2.value == point1.value) return false;
     const d21 = point2.value - point1.value;
     const d32 = point3.value - point2.value;
-    const dx1 = -4.382 * d32;
-    const dy1 = -5.236 * d32;
+    const dx1 = -4 * d32;
+    const dy1 = -4.382 * d32;
     var option = {
         lineType: "pattern2",
         lineWidth: 1,
