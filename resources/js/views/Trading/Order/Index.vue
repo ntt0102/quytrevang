@@ -91,18 +91,18 @@
                         @contextmenu="pattern2ToolContextmenu"
                     ></div>
                     <div
-                        ref="boxToolRef"
-                        class="command far fa-expand-alt"
-                        :title="$t('trading.orderChart.boxTool')"
-                        @click="boxToolClick"
-                        @contextmenu="boxToolContextmenu"
-                    ></div>
-                    <div
                         ref="scanSignalToolRef"
                         class="command far fa-search-location"
                         :title="$t('trading.orderChart.scanSignalTool')"
                         @click="scanSignalToolClick"
                         @contextmenu="scanSignalToolContextmenu"
+                    ></div>
+                    <div
+                        ref="boxToolRef"
+                        class="command far fa-expand-alt"
+                        :title="$t('trading.orderChart.boxTool')"
+                        @click="boxToolClick"
+                        @contextmenu="boxToolContextmenu"
                     ></div>
                     <div
                         v-show="false"
@@ -1708,7 +1708,6 @@ function pattern2ToolClick(e) {
 }
 function pattern2ToolContextmenu(e) {
     removePattern2Tool();
-    // removeBoxTool();
     e.target.classList.remove("selected");
     e.preventDefault();
     e.stopPropagation();
@@ -1722,7 +1721,6 @@ function drawPattern2Tool(fix = false) {
             value: opsA.price,
         };
         removePattern2Tool();
-        // removeBoxTool();
     } else {
         if (fix) return false;
         point1 = {
@@ -1780,7 +1778,6 @@ function drawPattern2Tool(fix = false) {
     params.pattern2[option.point] = params.series.price.createPriceLine(option);
     toolsStore.set("pattern2", option);
     //
-    // if (!params.box.length) drawBox({ point2, point3, point4 });
     pattern2ToolRef.value.classList.remove("selected");
 }
 function findPattern2Points(point1) {
