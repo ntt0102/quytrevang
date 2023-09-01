@@ -1147,11 +1147,7 @@ function intervalHandler() {
             }
         });
     }
-    state.clock = Intl.DateTimeFormat(navigator.language, {
-        hour: "numeric",
-        minute: "numeric",
-        second: "numeric",
-    }).format();
+    state.clock = moment().format("HH:mm:ss");
 }
 function showOrderButton() {
     if (store.state.tradingOrder.config.openingMarket) {
