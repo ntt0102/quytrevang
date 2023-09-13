@@ -1315,7 +1315,7 @@ function colorToolClick(e) {
     e.stopPropagation();
 }
 function colorToolContextmenu(e) {
-    if (params.ruler.pointCount > 0) {
+    if (mf.isSet(params.pattern2.X)) {
         drawLineTool(+params.pattern2.X.options().price);
         drawLineTool(+params.pattern2.Y.options().price);
     }
