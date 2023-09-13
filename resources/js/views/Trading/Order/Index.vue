@@ -197,7 +197,7 @@ const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.1, bottom: 0.21 },
+        scaleMargins: { top: 0.11, bottom: 0.21 },
     },
     leftPriceScale: { visible: false },
     layout: {
@@ -257,7 +257,7 @@ const tradingviewChartRef = ref(null);
 let params = {
     chart: {},
     series: {},
-    data: { whitespace: [], price: [], volume: [] },
+    data: { whitespace: [], price: [], volume: [], spread: [] },
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, l5: {}, pointCount: 0 },
@@ -362,6 +362,13 @@ onMounted(() => {
     params.series.volume = params.chart.addHistogramSeries({
         priceScaleId: "volume",
         scaleMargins: { top: 0.8, bottom: 0 },
+        color: "#CCCCCC",
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    params.series.spread = params.chart.addHistogramSeries({
+        priceScaleId: "spread",
+        scaleMargins: { top: 0, bottom: 0.9 },
         color: "#CCCCCC",
         lastValueVisible: false,
         priceLineVisible: false,
@@ -1004,9 +1011,15 @@ function loadChartData() {
     );
     params.series.volume.setData(params.data.volume);
     //
+    params.data.spread = mergeChartData(
+        store.state.tradingOrder.chartData.spread,
+        params.data.spread
+    );
+    params.series.spread.setData(params.data.spread);
+    //
     params.shark = store.state.tradingOrder.chartData.shark;
 }
-function updateChartData(price, volume) {
+function updateChartData(price, volume, spread) {
     params.data.price = mergeChartData([price], params.data.price);
     const lastPrice = params.data.price.slice(-1)[0];
     params.series.price.update(lastPrice);
@@ -1014,6 +1027,10 @@ function updateChartData(price, volume) {
     params.data.volume = mergeChartData([volume], params.data.volume);
     const lastVolume = params.data.volume.slice(-1)[0];
     params.series.volume.update(lastVolume);
+    //
+    params.data.spread = mergeChartData([spread], params.data.spread);
+    const lastSpread = params.data.spread.slice(-1)[0];
+    params.series.spread.update(lastSpread);
 }
 function createWhitespaceData() {
     const date = state.chartDate;
@@ -1082,7 +1099,17 @@ function connectSocket() {
                             },
                             {
                                 time: time,
-                                value: data.lastVol < 700 ? data.lastVol : 0,
+                                value: data.lastVol,
+                                color:
+                                    side > 0
+                                        ? "#00FF00"
+                                        : side < 0
+                                        ? "#FF0000"
+                                        : "#CCCCCC",
+                            },
+                            {
+                                time: time,
+                                value: -Math.abs(side),
                                 color:
                                     side > 0
                                         ? "#00FF00"

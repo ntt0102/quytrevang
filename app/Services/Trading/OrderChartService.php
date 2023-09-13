@@ -206,9 +206,22 @@ class OrderChartService extends CoreService
             'time' => $time,
             'value' => $price
         ];
+        $c['spread'][] = [
+            'time' => $time,
+            'value' => -abs($side)
+        ];
         $c['volume'][] = [
             'time' => $time,
             'value' => $volume,
+            'color' => $upSide
+                ? "#00FF00"
+                : ($downSide
+                    ? "#FF0000"
+                    : "#CCCCCC"),
+        ];
+        $c['spread'][] = [
+            'time' => $time,
+            'value' => -abs($side),
             'color' => $upSide
                 ? "#00FF00"
                 : ($downSide
