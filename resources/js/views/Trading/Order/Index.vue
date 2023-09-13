@@ -1316,10 +1316,8 @@ function colorToolClick(e) {
 }
 function colorToolContextmenu(e) {
     if (params.ruler.pointCount > 0) {
-        drawLineTool(+params.ruler.l2.options().price);
-        drawLineTool(+params.ruler.l3.options().price);
-        drawLineTool(+params.ruler.l4.options().price);
-        drawLineTool(+params.ruler.l5.options().price);
+        drawLineTool(+params.pattern2.X.options().price);
+        drawLineTool(+params.pattern2.Y.options().price);
     }
     e.preventDefault();
     e.stopPropagation();
