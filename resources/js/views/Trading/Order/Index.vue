@@ -197,7 +197,7 @@ const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.11, bottom: 0.21 },
+        scaleMargins: { top: 0.21, bottom: 0.21 },
     },
     leftPriceScale: { visible: false },
     layout: {
@@ -368,7 +368,7 @@ onMounted(() => {
     });
     params.series.spread = params.chart.addHistogramSeries({
         priceScaleId: "spread",
-        scaleMargins: { top: 0, bottom: 0.9 },
+        scaleMargins: { top: 0, bottom: 0.8 },
         color: "#CCCCCC",
         lastValueVisible: false,
         priceLineVisible: false,
