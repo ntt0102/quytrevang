@@ -290,6 +290,7 @@ let params = {
     isAutoOrdering: false,
     socketStop: false,
     volumeMax: 0,
+    socketRefreshTime: moment()
 };
 const state = reactive({
     chartDate: CURRENT_DATE,
@@ -1074,7 +1075,10 @@ function connectSocket() {
         if (params.socketStop) return false;
         if (inSession()) {
             connectSocket();
-            store.dispatch("tradingOrder/getChartData", state.chartDate);
+            if (moment().diff(params.socketRefreshTime, "seconds") > 60) {
+                store.dispatch("tradingOrder/getChartData", state.chartDate);
+                params.socketRefreshTime = moment();
+            }
         }
     };
     params.websocket.onmessage = (e) => {
