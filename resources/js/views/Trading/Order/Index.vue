@@ -84,6 +84,13 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
+                        ref="pattern1ToolRef"
+                        class="command far fa-star"
+                        :title="$t('trading.orderChart.pattern1Tool')"
+                        @click="pattern1ToolClick"
+                        @contextmenu="pattern1ToolContextmenu"
+                    ></div>
+                    <div
                         ref="pattern2ToolRef"
                         class="command far fa-bullseye-arrow"
                         :title="$t('trading.orderChart.pattern2Tool')"
@@ -103,14 +110,6 @@
                         :title="$t('trading.orderChart.boxTool')"
                         @click="boxToolClick"
                         @contextmenu="boxToolContextmenu"
-                    ></div>
-                    <div
-                        v-show="false"
-                        ref="pattern1ToolRef"
-                        class="command far fa-star"
-                        :title="$t('trading.orderChart.pattern1Tool')"
-                        @click="pattern1ToolClick"
-                        @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
                         v-show="false"
@@ -262,14 +261,10 @@ let params = {
     lines: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, l5: {}, pointCount: 0 },
     pattern1: {
-        O: {},
         A: {},
         B: {},
         C: {},
-        D: {},
         X: {},
-        Y: {},
-        pointCount: 0,
     },
     pattern2: {
         A: {},
@@ -290,7 +285,7 @@ let params = {
     isAutoOrdering: false,
     socketStop: false,
     volumeMax: 0,
-    socketRefreshTime: moment()
+    socketRefreshTime: moment(),
 };
 const state = reactive({
     chartDate: CURRENT_DATE,
@@ -721,48 +716,16 @@ function eventPriceLineDrag(e) {
             }
             break;
         case "pattern1":
-            if (mf.isSet(params.pattern1.O)) {
-                const o2 = +params.pattern1.O.options().price;
-                if (
-                    mf.isSet(params.pattern1.A) &&
-                    mf.isSet(params.pattern1.B)
-                ) {
-                    if (
-                        lineOptions.title == "A" ||
-                        lineOptions.title == "B" ||
-                        lineOptions.title == "O"
-                    ) {
-                        const a = +params.pattern1.A.options().price;
-                        const b = +params.pattern1.B.options().price;
-                        params.pattern1.X.applyOptions({
-                            price: +(
-                                o2 -
-                                (o2 >= a ? 1 : -1) * Math.abs(a - b)
-                            ).toFixed(1),
-                        });
-                        toolsStore.set("pattern1", params.pattern1.X.options());
-                    }
-                }
-                if (
-                    mf.isSet(params.pattern1.C) &&
-                    mf.isSet(params.pattern1.D)
-                ) {
-                    if (
-                        lineOptions.title == "C" ||
-                        lineOptions.title == "D" ||
-                        lineOptions.title == "O"
-                    ) {
-                        const c = +params.pattern1.C.options().price;
-                        const d = +params.pattern1.D.options().price;
-                        params.pattern1.Y.applyOptions({
-                            price: +(
-                                o2 -
-                                (o2 >= c ? 1 : -1) * Math.abs(c - d)
-                            ).toFixed(1),
-                        });
-                        toolsStore.set("pattern1", params.pattern1.Y.options());
-                    }
-                }
+            if (mf.isSet(params.pattern1.X)) {
+                const a = +params.pattern1.A.options().price;
+                const b = +params.pattern1.B.options().price;
+                const c = +params.pattern1.C.options().price;
+                const ba = b - a;
+                params.pattern1.X.applyOptions({
+                    price: +(c + ba).toFixed(1),
+                    title: ba.toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.X.options());
             }
             break;
         case "pattern2":
@@ -954,9 +917,7 @@ function loadToolsData() {
         const pattern1Lines = await toolsStore.get("pattern1");
         if (pattern1Lines.length > 0) {
             pattern1Lines.forEach((line) => {
-                if (line.title != "X" && line.title != "Y")
-                    params.pattern1.pointCount++;
-                params.pattern1[line.title] =
+                params.pattern1[line.point] =
                     params.series.price.createPriceLine(line);
             });
         }
@@ -1629,92 +1590,63 @@ function pattern1ToolContextmenu(e) {
 }
 function drawPattern1Tool() {
     const price = coordinateToPrice(params.crosshair.y);
-    var options = {
+    var option = {
         lineType: "pattern1",
         price: price,
         lineWidth: 1,
         lineStyle: 1,
         draggable: true,
     };
-    switch (params.pattern1.pointCount) {
-        case 0:
-            options.title = "O";
-            options.color = "#673AB7";
-            break;
-        case 1:
-            options.title = "A";
-            options.color = "#E91E63";
-            break;
-        case 2:
-            options.title = "B";
-            options.color = "#E91E63";
-            break;
-        case 3:
-            options.title = "C";
-            options.color = "#9C27B0";
-            break;
-        case 4:
-            options.title = "D";
-            options.color = "#9C27B0";
-            break;
+    if (mf.isSet(params.pattern1.A)) {
+        if (mf.isSet(params.pattern1.B)) {
+            if (!mf.isSet(params.pattern1.C)) {
+                option.point = "C";
+                option.title = "C";
+                option.color = "#9C27B0";
+            }
+        } else {
+            option.point = "B";
+            option.title = "B";
+            option.color = "#E91E63";
+        }
+    } else {
+        option.point = "A";
+        option.title = "A";
+        option.color = "#E91E63";
     }
-    params.pattern1[options.title] =
-        params.series.price.createPriceLine(options);
-    toolsStore.set("pattern1", options);
-    if (params.pattern1.pointCount == 2) {
-        const o = +params.pattern1.O.options().price;
+    params.pattern1[option.point] = params.series.price.createPriceLine(option);
+    toolsStore.set("pattern1", option);
+    if (option.point == "C") {
         const a = +params.pattern1.A.options().price;
         const b = +params.pattern1.B.options().price;
-        options.color = "#2196F3";
-        options.draggable = false;
-        options.price = +(o - (o >= a ? 1 : -1) * Math.abs(a - b)).toFixed(1);
-        options.title = "X";
-        params.pattern1[options.title] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("pattern1", options);
+        const c = +params.pattern1.C.options().price;
+        const ba = b - a;
+        option.point = "X";
+        option.price = +(c + ba).toFixed(1);
+        option.title = ba.toFixed(1);
+        option.color = "#2196F3";
+        option.draggable = false;
+        params.pattern1[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern1", option);
         pattern1ToolRef.value.classList.remove("selected");
     }
-    if (params.pattern1.pointCount == 4) {
-        const o = +params.pattern1.O.options().price;
-        const c = +params.pattern1.C.options().price;
-        const d = +params.pattern1.D.options().price;
-        options.color = "#2196F3";
-        options.draggable = false;
-        options.price = +(o - (o >= c ? 1 : -1) * Math.abs(c - d)).toFixed(1);
-        options.title = "Y";
-        params.pattern1[options.title] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("pattern1", options);
-    }
-    params.pattern1.pointCount++;
 }
 function removePattern1Tool() {
-    if (params.pattern1.pointCount > 0) {
-        params.series.price.removePriceLine(params.pattern1.O);
-        if (params.pattern1.pointCount > 1) {
-            params.series.price.removePriceLine(params.pattern1.A);
-            if (params.pattern1.pointCount > 2) {
-                params.series.price.removePriceLine(params.pattern1.B);
+    if (mf.isSet(params.pattern1.A)) {
+        params.series.price.removePriceLine(params.pattern1.A);
+        if (mf.isSet(params.pattern1.B)) {
+            params.series.price.removePriceLine(params.pattern1.B);
+            if (mf.isSet(params.pattern1.C)) {
+                params.series.price.removePriceLine(params.pattern1.C);
                 params.series.price.removePriceLine(params.pattern1.X);
-                if (params.pattern1.pointCount > 3) {
-                    params.series.price.removePriceLine(params.pattern1.C);
-                    if (params.pattern1.pointCount > 4) {
-                        params.series.price.removePriceLine(params.pattern1.D);
-                        params.series.price.removePriceLine(params.pattern1.Y);
-                    }
-                }
             }
         }
-        //
         params.pattern1 = {
-            O: {},
             A: {},
             B: {},
             C: {},
-            D: {},
             X: {},
-            Y: {},
-            pointCount: 0,
         };
         toolsStore.clear("pattern1");
     }
