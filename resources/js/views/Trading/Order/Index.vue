@@ -1602,17 +1602,17 @@ function drawPattern1Tool() {
             if (!mf.isSet(params.pattern1.C)) {
                 option.point = "C";
                 option.title = "C";
-                option.color = "#9C27B0";
+                option.color = "#4CAF50";
             }
         } else {
             option.point = "B";
             option.title = "B";
-            option.color = "#E91E63";
+            option.color = "#009688";
         }
     } else {
         option.point = "A";
         option.title = "A";
-        option.color = "#E91E63";
+        option.color = "#009688";
     }
     params.pattern1[option.point] = params.series.price.createPriceLine(option);
     toolsStore.set("pattern1", option);
@@ -1624,7 +1624,7 @@ function drawPattern1Tool() {
         option.point = "X";
         option.price = +(c + ba).toFixed(1);
         option.title = ba.toFixed(1);
-        option.color = "#2196F3";
+        option.color = "#FF9800";
         option.draggable = false;
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
