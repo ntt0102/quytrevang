@@ -156,8 +156,9 @@ class OrderChartService extends CoreService
         return collect($list)->reduce(function ($c, $item, $index) {
             $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
             $price = $item->lastPrice;
-            $volume = $this->filterVolume($item->lastVol, $index, $item->time);
-            return $this->createChartData($c, $time, $price, $volume);
+            $volume = $item->lastVol;
+            $isFilter = $this->isFilter($index, $item->time);
+            return $this->createChartData($c, $time, $price, $volume, $isFilter);
         }, ['price' => [], 'volume' => []]);
     }
 
@@ -176,8 +177,9 @@ class OrderChartService extends CoreService
             if (!!$line) {
                 $time = $line[0] + $this->SHIFT_TIME;
                 $price = $line[1] + 0;
-                $volume = $this->filterVolume($line[2] + 0, $index, date('H:i:s', $line[0]));
-                $c = $this->createChartData($c, $time, $price, $volume);
+                $volume = $line[2] + 0;
+                $isFilter = $this->isFilter($index, date('H:i:s', $line[0]));
+                $c = $this->createChartData($c, $time, $price, $volume, $isFilter);
                 $index++;
             }
         }
@@ -188,45 +190,32 @@ class OrderChartService extends CoreService
     /**
      * Check continue time
      */
-    private function filterVolume($volume, $index, $time)
+    private function isFilter($index, $time)
     {
-        return $index > 1 && $time < '14:45:00' ? $volume : 0;
+        return $index <= 1 || $time >= '14:45:00';
     }
 
     /**
      * Create Chart Data
      */
-    private function createChartData($c, $time, $price, $volume, $dir = null)
+    private function createChartData($c, $time, $price, $volume, $isFilter)
     {
         $prevPrice = count($c['price']) ? end($c['price'])['value'] : $price;
-        $side = $price - $prevPrice;
-        $upSide = !$dir ? $side > 0 : $dir > 0;
-        $downSide = !$dir ? $side < 0 : $dir < 0;
+        $change = $price - $prevPrice;
+        $color = $change == 0 ? "#CCCCCC" : ($change > 0 ? "#00FF00" : "#FF0000");
         $c['price'][] = [
             'time' => $time,
             'value' => $price
         ];
-        $c['spread'][] = [
-            'time' => $time,
-            'value' => -abs($side)
-        ];
         $c['volume'][] = [
             'time' => $time,
-            'value' => $volume,
-            'color' => $upSide
-                ? "#00FF00"
-                : ($downSide
-                    ? "#FF0000"
-                    : "#CCCCCC"),
+            'value' => $isFilter ? 0 : $volume,
+            'color' => $color,
         ];
         $c['spread'][] = [
             'time' => $time,
-            'value' => -abs($side),
-            'color' => $upSide
-                ? "#00FF00"
-                : ($downSide
-                    ? "#FF0000"
-                    : "#CCCCCC"),
+            'value' => $isFilter ? 0 : -abs($change),
+            'color' => $color,
         ];
         return $c;
     }
@@ -240,58 +229,5 @@ class OrderChartService extends CoreService
         $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
         $res = $client->get($url);
         return json_decode($res->getBody());
-    }
-
-    /**
-     * Vps data
-     */
-    public function cloneTcbsData()
-    {
-        $data = [];
-        $symbol = get_global_value('vn30f1m');
-        $page = 0;
-        $client = new \GuzzleHttp\Client();
-        do {
-            $url = "https://apipubaws.tcbs.com.vn/futures-insight/v1/intraday/{$symbol}/his/paging?size=100&page={$page}";
-            $res = $client->get($url);
-            $rsp = json_decode($res->getBody());
-            $data = array_merge($data, $rsp->data);
-            $page++;
-        } while (count($rsp->data) == 100);
-        return $data;
-    }
-
-    /**
-     * Get data from TCBS website
-     */
-    public function generateDataFromTcbs()
-    {
-        $list = $this->cloneTcbsData();
-        return collect($list)->reduce(function ($c, $item, $index) {
-            $time = strtotime(date('Y-m-d ') . $item->t) + $this->SHIFT_TIME;
-            $price = $item->p;
-            $volume = $this->filterVolume($item->v, $index, $item->t);
-            $side = $item->a == 'BU' ? 1 : -1;
-            return $this->createChartData($c, $time, $price, $volume, $side);
-        }, ['price' => [], 'volume' => []]);
-    }
-
-    public function export()
-    {
-        if (get_global_value('openingMarketFlag') == '1') {
-            $date = date('Y-m-d');
-            $filename = storage_path('app/vn30f1m/' . $date . '.csv');
-            $list = $this->cloneTcbsData();
-            $fp = fopen($filename, 'w');
-            foreach ($list as $item) {
-                $line = [];
-                $line[] = strtotime($date . $item->t) + $this->SHIFT_TIME;
-                $line[] = $item->p;
-                $line[] = $item->v;
-                $line[] = $item->a == 'BU' ? 1 : -1;
-                fputcsv($fp, $line);
-            }
-            fclose($fp);
-        }
     }
 }
