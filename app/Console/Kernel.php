@@ -31,7 +31,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new BackupDatabaseJob)->daily();
         $schedule->job(new CleanSubscriptionJob)->yearly();
         $schedule->job(new UpdateOpeningMarketJob)->dailyAt('06:30');
-        $schedule->job(new UpdateVn30f1mSymbolJob)->fridays()->at('09:00');
+        $schedule->job(new UpdateVn30f1mSymbolJob)->dailyAt('09:00');
         $schedule->job(new ReportTradingJob)->dailyAt('14:46');
         $schedule->job(new ExportTradingJob)->dailyAt('14:46');
 
