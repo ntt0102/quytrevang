@@ -1616,7 +1616,6 @@ function drawPattern1Tool() {
     }
     params.pattern1[option.point] = params.series.price.createPriceLine(option);
     toolsStore.set("pattern1", option);
-    //
     if (option.point == "C") {
         const a = +params.pattern1.A.options().price;
         const b = +params.pattern1.B.options().price;
