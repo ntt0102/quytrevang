@@ -265,6 +265,7 @@ let params = {
         B: {},
         C: {},
         X: {},
+        Y: {},
     },
     pattern2: {
         A: {},
@@ -726,6 +727,12 @@ function eventPriceLineDrag(e) {
                     title: ba.toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.X.options());
+                //
+                params.pattern1.Y.applyOptions({
+                    price: +(c + 2 * ba).toFixed(1),
+                    title: 2 * ba.toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.Y.options());
             }
             break;
         case "pattern2":
@@ -1629,6 +1636,14 @@ function drawPattern1Tool() {
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
         toolsStore.set("pattern1", option);
+        //
+        option.point = "Y";
+        option.price = +(c + 2 * ba).toFixed(1);
+        option.title = 2 * ba.toFixed(1);
+        params.pattern1[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern1", option);
+        //
         pattern1ToolRef.value.classList.remove("selected");
     }
 }
