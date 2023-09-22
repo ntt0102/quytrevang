@@ -1655,6 +1655,7 @@ function removePattern1Tool() {
             if (mf.isSet(params.pattern1.C)) {
                 params.series.price.removePriceLine(params.pattern1.C);
                 params.series.price.removePriceLine(params.pattern1.X);
+                params.series.price.removePriceLine(params.pattern1.Y);
             }
         }
         params.pattern1 = {
@@ -1662,6 +1663,7 @@ function removePattern1Tool() {
             B: {},
             C: {},
             X: {},
+            Y: {},
         };
         toolsStore.clear("pattern1");
     }
