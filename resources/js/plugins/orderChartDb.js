@@ -14,7 +14,7 @@ class OrderChartDb {
                 this.store.createObjectStore("line", { keyPath: "price" });
                 this.store.createObjectStore("box", { keyPath: "point" });
                 this.store.createObjectStore("ruler", { keyPath: "point" });
-                this.store.createObjectStore("pattern1", { keyPath: "title" });
+                this.store.createObjectStore("pattern1", { keyPath: "point" });
                 this.store.createObjectStore("pattern2", { keyPath: "point" });
                 this.store.createObjectStore("volprofile", { keyPath: "time" });
                 this.store.createObjectStore("alert", { keyPath: "price" });
