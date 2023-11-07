@@ -229,6 +229,7 @@ const TIME = {
     ATC: moment(CURRENT_DATE + " 14:30:00").unix(),
     END: moment(CURRENT_DATE + " 14:45:00").unix(),
 };
+const SOCKET_REFRESH_PERIOD = 120;
 
 const store = useStore();
 const { t } = useI18n();
@@ -1043,7 +1044,10 @@ function connectSocket() {
         if (params.socketStop) return false;
         if (inSession()) {
             connectSocket();
-            if (moment().diff(params.socketRefreshTime, "seconds") > 60) {
+            if (
+                moment().diff(params.socketRefreshTime, "seconds") >
+                SOCKET_REFRESH_PERIOD
+            ) {
                 store.dispatch("tradingOrder/getChartData", state.chartDate);
                 params.socketRefreshTime = moment();
             }
