@@ -77,18 +77,18 @@
                         @contextmenu="lineToolContextmenu"
                     ></div>
                     <div
-                        ref="rulerToolRef"
-                        class="command far fa-line-height"
-                        :title="$t('trading.orderChart.rulerTool')"
-                        @click="rulerToolClick"
-                        @contextmenu="rulerToolContextmenu"
-                    ></div>
-                    <div
                         ref="pattern1ToolRef"
                         class="command far fa-star"
                         :title="$t('trading.orderChart.pattern1Tool')"
                         @click="pattern1ToolClick"
                         @contextmenu="pattern1ToolContextmenu"
+                    ></div>
+                    <div
+                        ref="rulerToolRef"
+                        class="command far fa-line-height"
+                        :title="$t('trading.orderChart.rulerTool')"
+                        @click="rulerToolClick"
+                        @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
                         v-show="false"
@@ -1616,7 +1616,7 @@ function drawPattern1Tool() {
             if (!mf.isSet(params.pattern1.C)) {
                 option.point = "C";
                 option.title = "C";
-                option.color = "#4CAF50";
+                option.color = "#E91E63";
             }
         } else {
             option.point = "B";
