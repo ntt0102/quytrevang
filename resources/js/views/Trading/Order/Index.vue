@@ -1294,9 +1294,9 @@ function colorToolClick(e) {
     e.stopPropagation();
 }
 function colorToolContextmenu(e) {
-    if (mf.isSet(params.pattern2.X)) {
-        drawLineTool(+params.pattern2.X.options().price);
-        drawLineTool(+params.pattern2.Y.options().price);
+    if (mf.isSet(params.pattern1.X)) {
+        drawLineTool(+params.pattern1.X.options().price);
+        drawLineTool(+params.pattern1.Y.options().price);
     }
     e.preventDefault();
     e.stopPropagation();
