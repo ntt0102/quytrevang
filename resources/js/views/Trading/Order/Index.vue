@@ -91,6 +91,7 @@
                         @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="pattern2ToolRef"
                         class="command far fa-bullseye-arrow"
                         :title="$t('trading.orderChart.pattern2Tool')"
@@ -98,6 +99,7 @@
                         @contextmenu="pattern2ToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="scanSignalToolRef"
                         class="command far fa-search-location"
                         :title="$t('trading.orderChart.scanSignalTool')"
@@ -105,6 +107,7 @@
                         @contextmenu="scanSignalToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="boxToolRef"
                         class="command far fa-expand-alt"
                         :title="$t('trading.orderChart.boxTool')"
