@@ -1099,7 +1099,7 @@ function connectSocket() {
                                         : "#CCCCCC",
                             }
                         );
-                        scanSignal(params.data.volume.length - 1);
+                        // scanSignal(params.data.volume.length - 1);
                         scanOrder();
                     }
                 }
