@@ -965,10 +965,12 @@ function loadToolsData() {
 }
 function loadChartData() {
     if (params.loadWhitespace) {
-        params.data.whitespace = mergeChartData(
-            params.data.whitespace,
-            createWhitespaceData()
-        );
+        if (store.state.tradingOrder.chartData.price.length > 0) {
+            params.data.whitespace = mergeChartData(
+                params.data.whitespace,
+                createWhitespaceData()
+            );
+        }
         params.series.whitespace.setData(params.data.whitespace);
         params.loadWhitespace = false;
     }
