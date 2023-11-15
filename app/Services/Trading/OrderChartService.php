@@ -39,6 +39,7 @@ class OrderChartService extends CoreService
         return [
             'connection' => $vos->connection,
             'position' => $vos->position,
+            'pending' => $vos->hasOrder() || $vos->hasConditionOrder()
         ];
     }
 

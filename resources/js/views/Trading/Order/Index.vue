@@ -15,6 +15,7 @@
                         :class="{
                             green: status.position > 0,
                             red: status.position < 0,
+                            pending: status.pending,
                         }"
                         :title="$t('trading.orderChart.position')"
                     >
@@ -2387,6 +2388,9 @@ function playSound() {
                 }
                 &.red {
                     color: red !important;
+                }
+                &.pending {
+                    background: gold !important;
                 }
             }
 

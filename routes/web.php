@@ -112,27 +112,27 @@ Route::get('test', function () {
     // $s = app(App\Services\Trading\TradeService::class)->calculateSummary('week');
 
     // dd($s);
-    $old = storage_path('old');
-    $new = storage_path('new');
-    if ($handle = opendir($old)) {
-        while (false !== ($file = readdir($handle))) {
-            if ($file != "." && $file != "..") {
-                $fr = fopen($old . '/' . $file, 'r');
-                $fw = fopen($new . '/' . $file, 'w');
-                while (!feof($fr)) {
-                    $line = fgetcsv($fr);
-                    if (!!$line) {
-                        $line[0] = $line[0] - 7 * 60 * 60;
-                        fputcsv($fw, $line);
-                    }
-                }
-                fclose($fr);
-                fclose($fw);
-            }
-        }
+    // $old = storage_path('old');
+    // $new = storage_path('new');
+    // if ($handle = opendir($old)) {
+    //     while (false !== ($file = readdir($handle))) {
+    //         if ($file != "." && $file != "..") {
+    //             $fr = fopen($old . '/' . $file, 'r');
+    //             $fw = fopen($new . '/' . $file, 'w');
+    //             while (!feof($fr)) {
+    //                 $line = fgetcsv($fr);
+    //                 if (!!$line) {
+    //                     $line[0] = $line[0] - 7 * 60 * 60;
+    //                     fputcsv($fw, $line);
+    //                 }
+    //             }
+    //             fclose($fr);
+    //             fclose($fw);
+    //         }
+    //     }
 
-        closedir($handle);
-    }
+    //     closedir($handle);
+    // }
     // $fp = fopen($filename, 'r');
     // while (!feof($fp)) {
     //     $line = fgetcsv($fp);
@@ -145,5 +145,9 @@ Route::get('test', function () {
     //     }
     // }
     // fclose($fp);
+    $copyist = \App\Models\User::find(1)->copyist;
+    $vos = new \App\Services\Special\VpsOrderService($copyist);
+    // dd($vos->hasOrder());
+    dd($vos->hasOrder() || $vos->hasConditionOrder());
     return 'ok';
 });

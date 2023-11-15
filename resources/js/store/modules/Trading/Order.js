@@ -1,7 +1,7 @@
 function initialState() {
     return {
         config: {},
-        status: { connection: true, position: 0 },
+        status: { connection: true, position: 0, pending: false },
         chartData: [],
         isChartLoading: false,
         copyists: [],
@@ -55,6 +55,7 @@ const actions = {
                 })
                 .then((response) => {
                     commit("setChartLoading", false);
+                    dispatch("getStatus");
                     resolve(response.data);
                 });
         });

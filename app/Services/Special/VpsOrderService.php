@@ -44,6 +44,56 @@ class VpsOrderService extends CoreService
             $this->position = intval($rsp->data[0]->net);
     }
 
+    public function hasOrder()
+    {
+        $payload = [
+            "group" => "Q",
+            "user" => $this->copyist->vps_code,
+            "session" => $this->copyist->vps_session,
+            "c" => "H",
+            "data" => [
+                "type" => "string",
+                "cmd" => "Web.Order.FullAllOrder",
+                "p1" => "1",
+                "p2" => "1",
+                "p3" => $this->formatAccount() . ",ALL,ALL",
+                "p4" => "PENDING"
+            ]
+        ];
+        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        if ($rsp->rc != 1) return false;
+        return count($rsp->data) > 0;
+    }
+
+    public function hasConditionOrder()
+    {
+        $payload = [
+            "group" => "B",
+            "user" => $this->copyist->vps_code,
+            "session" => $this->copyist->vps_session,
+            "data" => [
+                "type" => "cursor",
+                "cmd" => "list_condition_order",
+                "p1" => $this->formatAccount(),
+                "p2" => "",
+                "p3" => $this->todayFormat(),
+                "p4" => $this->todayFormat(),
+                "p5" => "PENDING_TRIGGER",
+                "p6" => "",
+                "p7" => "",
+                "p8" => "1",
+                "p9" => "1"
+            ]
+        ];
+        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        if ($rsp->rc != 1) return false;
+        return count($rsp->data) > 0;
+    }
+
     public function getAccountInfo()
     {
         $payload = [
@@ -252,5 +302,10 @@ class VpsOrderService extends CoreService
         }
         $checkSum .= $refId;
         return md5($checkSum);
+    }
+
+    private function todayFormat()
+    {
+        return now()->format('d/m/Y');
     }
 }
