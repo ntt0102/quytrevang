@@ -23,6 +23,16 @@ const actions = {
                 });
         });
     },
+    getConfig({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/order/get-config", {}, { noLoading: true })
+                .then((response) => {
+                    commit("setConfig", response.data);
+                    resolve();
+                });
+        });
+    },
     getStatus({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
@@ -33,13 +43,12 @@ const actions = {
                 });
         });
     },
-    getConfig({ commit, dispatch, getters, state, rootGetters }) {
+    getAccountInfo({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/order/get-config", {}, { noLoading: true })
+                .post("trading/order/get-account-info", {}, { noLoading: true })
                 .then((response) => {
-                    commit("setConfig", response.data);
-                    resolve();
+                    resolve(response.data);
                 });
         });
     },

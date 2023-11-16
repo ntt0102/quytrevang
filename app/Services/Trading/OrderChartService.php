@@ -25,6 +25,23 @@ class OrderChartService extends CoreService
         return $this->generateDataFromCsv($payload->date);
     }
 
+    /**
+     * Get Config
+     *
+     * @param $payload
+     * 
+     */
+    public function getConfig($payload)
+    {
+        $copyist = request()->user()->copyist;
+        return [
+            'openingMarket' => get_global_value('openingMarketFlag') == '1',
+            'symbol' => get_global_value('vn30f1m'),
+            'volLimit' => 300,
+            'vpsCode' => $copyist->vps_code,
+            'vpsSession' => $copyist->vps_session,
+        ];
+    }
 
     /**
      * Get Status
@@ -44,21 +61,20 @@ class OrderChartService extends CoreService
     }
 
     /**
-     * Get Config
+     * Get Account Info
      *
      * @param $payload
      * 
      */
-    public function getConfig($payload)
+    public function getAccountInfo($payload)
     {
         $copyist = request()->user()->copyist;
-        return [
-            'openingMarket' => get_global_value('openingMarketFlag') == '1',
-            'symbol' => get_global_value('vn30f1m'),
-            'volLimit' => 300,
-            'vpsCode' => $copyist->vps_code,
-            'vpsSession' => $copyist->vps_session,
-        ];
+        $vos = new VpsOrderService($copyist);
+        return $vos->getAccountInfo();
+        // $info = $vos->getAccountInfo();
+        // if (!$info) return ['isOk' => false];
+        // $info['isOk'] = true;
+        // return $info;
     }
 
     /**

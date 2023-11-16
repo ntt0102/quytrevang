@@ -30,6 +30,19 @@ class OrderChartController extends CoreController
     }
 
     /**
+     * Get Config
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getConfig(Request $request)
+    {
+        $data = $this->orderChartService->getConfig($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Get Status
      *
      * @param \Illuminate\Http\Request $request
@@ -43,15 +56,15 @@ class OrderChartController extends CoreController
     }
 
     /**
-     * Get Config
+     * Get Account Info
      *
      * @param \Illuminate\Http\Request $request
      * 
      * @return \Illuminate\Http\Response
      */
-    public function getConfig(Request $request)
+    public function getAccountInfo(Request $request)
     {
-        $data = $this->orderChartService->getConfig($this->payload);
+        $data = $this->orderChartService->getAccountInfo($this->payload);
         return $this->sendResponse($data);
     }
 

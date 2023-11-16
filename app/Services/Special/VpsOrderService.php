@@ -110,12 +110,13 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc == 1)
-            return (object)[
-                'maxVol' => intval($rsp->data->max_vol),
-                'fee' => intval($rsp->data->others),
-                'vm' => intval($rsp->data->vm)
-            ];
+        if ($rsp->rc != 1) return false;
+        return [
+            'maxVol' => intval($rsp->data->max_vol),
+            'fee' => intval($rsp->data->others),
+            'vm' => intval($rsp->data->vm),
+            'nav' => intval($rsp->data->nav),
+        ];
     }
 
     public function execute($payload)

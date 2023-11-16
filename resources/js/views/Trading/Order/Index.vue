@@ -11,13 +11,14 @@
                         @click="() => $store.dispatch('tradingOrder/getStatus')"
                     ></div>
                     <div
-                        class="command noaction status"
+                        class="command status"
                         :class="{
                             green: status.position > 0,
                             red: status.position < 0,
                             pending: status.pending,
                         }"
                         :title="$t('trading.orderChart.position')"
+                        @click="getAccountInfo"
                     >
                         {{ status.position }}
                     </div>
@@ -182,6 +183,7 @@ import CopyistStatusPopup from "./CopyistStatusPopup.vue";
 import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
+import { alert } from "devextreme/ui/dialog";
 import { confirm } from "devextreme/ui/dialog";
 import sound from "../../../../audios/alert.mp3";
 import {
@@ -239,6 +241,7 @@ const store = useStore();
 const { t } = useI18n();
 const devices = inject("devices");
 const mf = inject("mf");
+const filters = inject("filters");
 const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
 const spinnerRef = ref(null);
@@ -2332,6 +2335,26 @@ function playSound() {
     player.crossOrigin = "anonymous";
     player.addEventListener("canplaythrough", function () {
         player.play();
+    });
+}
+function getAccountInfo() {
+    store.dispatch("tradingOrder/getAccountInfo").then((data) => {
+        let html = "";
+        html += '<div style="width: 200px;">';
+        html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
+            "trading.orderChart.nav"
+        )}</div><div>: ${filters.currency(data.nav)}</div></div>`;
+        html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
+            "trading.orderChart.maxVol"
+        )}</div><div>: ${filters.numberVnFormat(data.maxVol)}</div></div>`;
+        html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
+            "trading.orderChart.vm"
+        )}</div><div>: ${filters.currency(data.vm)}</div></div>`;
+        html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
+            "trading.orderChart.fee"
+        )}</div><div>: ${filters.currency(data.fee)}</div></div>`;
+        html += "</div>";
+        alert(html, t("trading.orderChart.accountInfo"));
     });
 }
 </script>

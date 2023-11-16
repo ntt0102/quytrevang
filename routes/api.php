@@ -121,8 +121,9 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 });
                 Route::group(['prefix' => 'order', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'OrderChartController@getChartData');
-                    Route::post('get-status', 'OrderChartController@getStatus');
                     Route::post('get-config', 'OrderChartController@getConfig');
+                    Route::post('get-status', 'OrderChartController@getStatus');
+                    Route::post('get-account-info', 'OrderChartController@getAccountInfo');
                     Route::post('execute-order', 'OrderChartController@executeOrder');
                     Route::post('get-copyist-status', 'OrderChartController@getCopyistStatus');
                     Route::post('close-position', 'OrderChartController@closePosition');
