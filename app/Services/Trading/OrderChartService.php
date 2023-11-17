@@ -71,10 +71,6 @@ class OrderChartService extends CoreService
         $copyist = request()->user()->copyist;
         $vos = new VpsOrderService($copyist);
         return $vos->getAccountInfo();
-        // $info = $vos->getAccountInfo();
-        // if (!$info) return ['isOk' => false];
-        // $info['isOk'] = true;
-        // return $info;
     }
 
     /**

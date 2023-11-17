@@ -49,6 +49,7 @@ class ReportTradingJob implements ShouldQueue
             if (!$vos->connection) return false;
             $info = $vos->getAccountInfo();
             //
+            if (!$info) return false;
             Notification::send(
                 User::permission('trades@view')->get(),
                 new UpdatedTradesNotification(

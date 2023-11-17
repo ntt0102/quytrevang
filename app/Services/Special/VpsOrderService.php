@@ -111,7 +111,7 @@ class VpsOrderService extends CoreService
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
         if ($rsp->rc != 1) return false;
-        return [
+        return (object)[
             'maxVol' => intval($rsp->data->max_vol),
             'fee' => intval($rsp->data->others),
             'vm' => intval($rsp->data->vm),
