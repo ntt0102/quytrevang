@@ -46,6 +46,7 @@ class VpsOrderService extends CoreService
 
     public function hasOrder()
     {
+        if (!$this->connection) return false;
         $payload = [
             "group" => "Q",
             "user" => $this->copyist->vps_code,
@@ -69,6 +70,7 @@ class VpsOrderService extends CoreService
 
     public function hasConditionOrder()
     {
+        if (!$this->connection) return false;
         $payload = [
             "group" => "B",
             "user" => $this->copyist->vps_code,
