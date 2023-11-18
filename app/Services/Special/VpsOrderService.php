@@ -98,6 +98,7 @@ class VpsOrderService extends CoreService
 
     public function getAccountInfo()
     {
+        if (!$this->connection) return false;
         $payload = [
             "group" => "Q",
             "user" => $this->copyist->vps_code,
