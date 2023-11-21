@@ -245,7 +245,7 @@ const CHART_OPTIONS = {
     timeScale: {
         timeVisible: true,
         rightOffset: 20,
-        minBarSpacing: 0.05,
+        minBarSpacing: 0.01,
     },
 };
 const TP_DEFAULT = 3;
@@ -917,17 +917,19 @@ function toggleFullscreen() {
 }
 function loadToolsData() {
     return new Promise(async (resolve) => {
-        const order = await toolsStore.get("order");
-        order.map((item) => {
-            params.order.side = item.side;
-            params.order[item.kind].price = item.price;
-            drawOrderLine(item.kind);
-            toggleCancelOrderButton(true);
-        });
-        if (params.order.tp.hasOwnProperty("line"))
-            params.order.entry.line.applyOptions({
-                draggable: false,
+        if (status.value.pending) {
+            const order = await toolsStore.get("order");
+            order.map((item) => {
+                params.order.side = item.side;
+                params.order[item.kind].price = item.price;
+                drawOrderLine(item.kind);
+                toggleCancelOrderButton(true);
             });
+            if (params.order.tp.hasOwnProperty("line"))
+                params.order.entry.line.applyOptions({
+                    draggable: false,
+                });
+        }
         //
         const lines = await toolsStore.get("line");
         lines.forEach((line) => {
