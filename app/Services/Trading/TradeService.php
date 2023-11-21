@@ -6,7 +6,6 @@ use App\Services\CoreService;
 use App\Models\Parameter;
 use App\Models\Trade;
 use App\Events\UpdateStatisticEvent;
-use App\Jobs\ReportTradingJob;
 
 
 class TradeService extends CoreService
@@ -208,20 +207,6 @@ class TradeService extends CoreService
             }
             if ($isOk) event(new UpdateStatisticEvent());
             return ['isOk' => $isOk];
-        });
-    }
-
-    /**
-     * Report
-     * 
-     * @param $payload
-     * 
-     */
-    public function report($payload)
-    {
-        return $this->transaction(function () {
-            ReportTradingJob::dispatch();
-            return ['isOk' => true];
         });
     }
 

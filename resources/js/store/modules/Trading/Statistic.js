@@ -98,15 +98,6 @@ const actions = {
                 });
         });
     },
-    report({ commit, dispatch, getters, state, rootGetters }) {
-        return new Promise((resolve, reject) => {
-            axios.post("trading/statistic/report", null).then((response) => {
-                resolve();
-                dispatch("getData");
-                dispatch("getChart", state.charts.period);
-            });
-        });
-    },
     getSummary({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios.post("trading/statistic/summary", null).then((response) => {

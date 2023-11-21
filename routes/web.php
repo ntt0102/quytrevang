@@ -145,9 +145,10 @@ Route::get('test', function () {
     //     }
     // }
     // fclose($fp);
-    $copyist = \App\Models\User::find(1)->copyist;
-    $vos = new \App\Services\Special\VpsOrderService($copyist);
-    // dd($vos->hasOrder());
-    dd($vos->hasOrder() || $vos->hasConditionOrder());
+    // $copyist = \App\Models\User::find(1)->copyist;
+    // $vos = new \App\Services\Special\VpsOrderService($copyist);
+    // // dd($vos->hasOrder());
+    // dd($vos->hasOrder() || $vos->hasConditionOrder());
+    $s = \App\Jobs\ExportTradingJob::dispatch();
     return 'ok';
 });

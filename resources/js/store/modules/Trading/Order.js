@@ -93,6 +93,20 @@ const actions = {
                 });
         });
     },
+    report({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios.post("trading/order/report", null).then((response) => {
+                resolve();
+            });
+        });
+    },
+    export({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios.post("trading/order/export", null).then((response) => {
+                resolve();
+            });
+        });
+    },
     resetState({ commit }) {
         commit("resetState");
     },

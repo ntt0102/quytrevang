@@ -119,4 +119,30 @@ class OrderChartController extends CoreController
         $data = $this->orderChartService->setCopyistSession($request);
         return $this->sendResponseWithoutEncrypt($data);
     }
+
+    /**
+     * Report.
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function report(Request $request)
+    {
+        $data = $this->orderChartService->report($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Export.
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function export(Request $request)
+    {
+        $data = $this->orderChartService->export($this->payload);
+        return $this->sendResponse($data);
+    }
 }

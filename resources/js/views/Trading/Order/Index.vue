@@ -1,5 +1,27 @@
 <template>
     <div class="content-block dx-card responsive-paddings">
+        <DxToolbar
+            :items="[
+                {
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-flag-checkered small',
+                        hint: $t('trading.orderChart.buttons.report'),
+                        onClick: report,
+                    },
+                },
+                {
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-file-export small',
+                        hint: $t('trading.orderChart.buttons.export'),
+                        onClick: exportCsv,
+                    },
+                },
+            ]"
+        />
         <div class="order-chart-container" ref="chartContainerRef">
             <div class="chart-wrapper" ref="orderChartRef">
                 <div class="area data-area">
@@ -241,6 +263,7 @@ const store = useStore();
 const { t } = useI18n();
 const devices = inject("devices");
 const mf = inject("mf");
+const bus = inject("bus");
 const filters = inject("filters");
 const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
@@ -2356,6 +2379,12 @@ function getAccountInfo() {
         html += "</div>";
         alert(html, t("trading.orderChart.accountInfo"));
     });
+}
+function report() {
+    bus.emit("checkPin", () => store.dispatch("tradingOrder/report"));
+}
+function exportCsv() {
+    bus.emit("checkPin", () => store.dispatch("tradingOrder/export"));
 }
 </script>
 <style lang="scss" scoped>

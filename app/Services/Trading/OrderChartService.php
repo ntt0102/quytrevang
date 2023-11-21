@@ -6,6 +6,8 @@ use App\Services\CoreService;
 use App\Models\Copyist;
 use App\Services\Special\VpsOrderService;
 use App\Jobs\OrderVpsJob;
+use App\Jobs\ReportTradingJob;
+use App\Jobs\ExportTradingJob;
 
 class OrderChartService extends CoreService
 {
@@ -172,7 +174,7 @@ class OrderChartService extends CoreService
             $volume = $item->lastVol;
             $isFilter = $this->isFilter($index, $item->time);
             return $this->createChartData($c, $time, $price, $volume, $isFilter);
-        }, ['price' => [], 'volume' => []]);
+        }, ['price' => [], 'volume' => [], 'spread' => []]);
     }
 
     /**
@@ -180,7 +182,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $c = ['price' => [], 'volume' => []];
+        $c = ['price' => [], 'volume' => [], 'spread' => []];
         $filename = storage_path('app/vn30f1m/' . $date . '.csv');
         if (!file_exists($filename)) return $c;
         $fp = fopen($filename, 'r');
@@ -242,5 +244,33 @@ class OrderChartService extends CoreService
         $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
         $res = $client->get($url);
         return json_decode($res->getBody());
+    }
+
+    /**
+     * Report
+     * 
+     * @param $payload
+     * 
+     */
+    public function report($payload)
+    {
+        return $this->transaction(function () {
+            ReportTradingJob::dispatch();
+            return ['isOk' => true];
+        });
+    }
+
+    /**
+     * Export
+     * 
+     * @param $payload
+     * 
+     */
+    public function export($payload)
+    {
+        return $this->transaction(function () {
+            ExportTradingJob::dispatch();
+            return ['isOk' => true];
+        });
     }
 }

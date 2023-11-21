@@ -69,19 +69,6 @@ class TradeController extends CoreController
     }
 
     /**
-     * Report.
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function report(Request $request)
-    {
-        $data = $this->tradeService->report($this->payload);
-        return $this->sendResponse($data);
-    }
-
-    /**
      * validate Duplicate Date
      *
      * @param Illuminate\Http\Request $request

@@ -34,16 +34,6 @@
                     },
                 },
                 {
-                    visible: permissions.includes('trades@edit'),
-                    location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-flag-checkered small',
-                        hint: $t('trading.trades.buttons.report'),
-                        onClick: report,
-                    },
-                },
-                {
                     location: 'after',
                     widget: 'dxSelectBox',
                     options: {
@@ -483,9 +473,6 @@ function setReferenceTime(value) {
         "argumentAxis.constantLines[0].value",
         value
     );
-}
-function report() {
-    bus.emit("checkPin", () => store.dispatch("tradingStatistic/report"));
 }
 </script>
 <style lang="scss">
