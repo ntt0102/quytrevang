@@ -32,6 +32,7 @@ class ExportTradingJob implements ShouldQueue
         if (get_global_value('openingMarketFlag') == '1') {
             $date = date('Y-m-d');
             $filename = storage_path('app/vn30f1m/' . $date . '.csv');
+            if (file_exists($filename)) return false;
             $list = $this->cloneVpsData();
             $fp = fopen($filename, 'w');
             foreach ($list as $item) {
