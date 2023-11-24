@@ -762,13 +762,13 @@ function eventPriceLineDrag(e) {
                 //
                 params.pattern1.Y.applyOptions({
                     price: +(c + 1.5 * ba).toFixed(1),
-                    title: 1.5 * ba.toFixed(1),
+                    title: (1.5 * ba).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Y.options());
                 //
                 params.pattern1.Z.applyOptions({
                     price: +(c + 2 * ba).toFixed(1),
-                    title: 2 * ba.toFixed(1),
+                    title: (2 * ba).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Z.options());
             }
@@ -1685,7 +1685,7 @@ function drawPattern1Tool() {
         //
         option.point = "Y";
         option.price = +(c + 1.5 * ba).toFixed(1);
-        option.title = 1.5 * ba.toFixed(1);
+        option.title = (1.5 * ba).toFixed(1);
         option.color = "#673AB7";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
@@ -1693,7 +1693,7 @@ function drawPattern1Tool() {
         //
         option.point = "Z";
         option.price = +(c + 2 * ba).toFixed(1);
-        option.title = 2 * ba.toFixed(1);
+        option.title = (2 * ba).toFixed(1);
         option.color = "#2196F3";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
