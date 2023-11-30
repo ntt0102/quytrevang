@@ -103,7 +103,7 @@
                     <div
                         v-show="true"
                         ref="pattern2ToolRef"
-                        class="command far fa-chevron-up"
+                        class="command far fa-heart"
                         :title="$t('trading.orderChart.pattern2Tool')"
                         @click="pattern2ToolClick"
                         @contextmenu="pattern2ToolContextmenu"
@@ -300,10 +300,9 @@ let params = {
         Z: {},
     },
     pattern2: {
-        A: {},
-        B: {},
-        C: {},
-        X: {},
+        E: {},
+        S: {},
+        T: {},
     },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
     box: [],
@@ -773,22 +772,46 @@ function eventPriceLineDrag(e) {
             }
             break;
         case "pattern2":
-            if (mf.isSet(params.pattern2.X)) {
-                const price3 = +params.pattern2.A.options().price3;
-                const price4 = +params.pattern2.A.options().price;
-                const price5 = +params.pattern2.B.options().price;
-                const price6 = +params.pattern2.C.options().price;
+            if (mf.isSet(params.pattern2.T)) {
+                const opsE = params.pattern2.E.options();
+                const price2 = +opsE.price2;
+                const price3 = +opsE.price3;
+                const price4 = +opsE.price4;
+                const price5 = +opsE.price;
 
+                const d32 = price3 - price2;
                 const d34 = price3 - price4;
                 const d54 = price5 - price4;
+                let d56, price6;
+                if (lineOptions.point == "S") {
+                    price6 = +params.pattern2.S.options().price;
+                    d56 = price5 - price6;
+                } else {
+                    d56 = Math.abs(d32) > Math.abs(d54 / 2) ? d32 : d54 / 2;
+                    price6 = price5 - d56;
+                    params.pattern2.S.applyOptions({
+                        price: +price6.toFixed(1),
+                    });
+                }
                 const price7 =
                     price6 + (Math.abs(d54) < Math.abs(d34) ? 2 : 1.5) * d54;
                 const d75 = price7 - price5;
-                params.pattern2.X.applyOptions({
-                    price: +price7.toFixed(1),
-                    title: d75.toFixed(1),
+
+                params.pattern2.S.applyOptions({
+                    title: `ST=${(-d56).toFixed(1)}`,
                 });
-                toolsStore.set("pattern2", params.pattern2.X.options());
+                toolsStore.set("pattern2", params.pattern2.S.options());
+                //
+                params.pattern2.E.applyOptions({
+                    title: `RR=${(d75 / d56).toFixed(1)}`,
+                });
+                toolsStore.set("pattern2", params.pattern2.E.options());
+                //
+                params.pattern2.T.applyOptions({
+                    price: +price7.toFixed(1),
+                    title: `TP=${d75.toFixed(1)}`,
+                });
+                toolsStore.set("pattern2", params.pattern2.T.options());
             }
             break;
         case "alert":
@@ -1722,11 +1745,11 @@ function pattern2ToolContextmenu(e) {
 }
 function drawPattern2Tool(fix = false) {
     let point1 = {};
-    if (mf.isSet(params.pattern2.A)) {
-        const opsA = params.pattern2.A.options();
+    if (mf.isSet(params.pattern2.E)) {
+        const opsE = params.pattern2.E.options();
         point1 = {
-            time: opsA.time0,
-            value: opsA.price0,
+            time: opsE.time1,
+            value: opsE.price1,
         };
         removePattern2Tool();
     } else {
@@ -1741,8 +1764,8 @@ function drawPattern2Tool(fix = false) {
     const d32 = point3.value - point2.value;
     const d34 = point3.value - point4.value;
     const d54 = point5.value - point4.value;
-    const price6 =
-        point5.value - (Math.abs(d32) > Math.abs(d54 / 2) ? d32 : d54 / 2);
+    const d56 = Math.abs(d32) > Math.abs(d54 / 2) ? d32 : d54 / 2;
+    const price6 = point5.value - d56;
     const price7 = price6 + (Math.abs(d54) < Math.abs(d34) ? 2 : 1.5) * d54;
     const d75 = price7 - point5.value;
     var option = {
@@ -1750,36 +1773,31 @@ function drawPattern2Tool(fix = false) {
         lineWidth: 1,
         lineStyle: 1,
     };
-    option.price = point4.value;
-    option.time0 = point1.time;
-    option.price0 = point1.value;
-    option.price3 = point3.value;
-    option.point = "A";
-    option.title = "A";
-    option.color = "#E91E63";
-    option.draggable = false;
-    params.pattern2[option.point] = params.series.price.createPriceLine(option);
-    toolsStore.set("pattern2", option);
     //
     option.price = point5.value;
-    option.point = "B";
-    option.title = "B";
-    option.color = "#E91E63";
+    option.time1 = point1.time;
+    option.price1 = point1.value;
+    option.price2 = point2.value;
+    option.price3 = point3.value;
+    option.price4 = point4.value;
+    option.point = "E";
+    option.title = `RR=${(d75 / d56).toFixed(1)}`;
+    option.color = "#FF9800";
     option.draggable = true;
     params.pattern2[option.point] = params.series.price.createPriceLine(option);
     toolsStore.set("pattern2", option);
     //
     option.price = +price6.toFixed(1);
-    option.point = "C";
-    option.title = "C";
-    option.color = "#9C27B0";
+    option.point = "S";
+    option.title = `ST=${(-d56).toFixed(1)}`;
+    option.color = "#E91E63";
     option.draggable = true;
     params.pattern2[option.point] = params.series.price.createPriceLine(option);
     toolsStore.set("pattern2", option);
     //
-    option.point = "X";
+    option.point = "T";
     option.price = +price7.toFixed(1);
-    option.title = d75.toFixed(1);
+    option.title = `TP=${d75.toFixed(1)}`;
     option.color = "#2196F3";
     option.draggable = false;
     params.pattern2[option.point] = params.series.price.createPriceLine(option);
@@ -1838,17 +1856,15 @@ function findPattern2Points(point1) {
     return { point2, point3, point4, point5 };
 }
 function removePattern2Tool() {
-    if (mf.isSet(params.pattern2.A)) {
-        params.series.price.removePriceLine(params.pattern2.A);
-        params.series.price.removePriceLine(params.pattern2.B);
-        params.series.price.removePriceLine(params.pattern2.C);
-        params.series.price.removePriceLine(params.pattern2.X);
+    if (mf.isSet(params.pattern2.T)) {
+        params.series.price.removePriceLine(params.pattern2.E);
+        params.series.price.removePriceLine(params.pattern2.S);
+        params.series.price.removePriceLine(params.pattern2.T);
         //
         params.pattern2 = {
-            A: {},
-            B: {},
-            C: {},
-            X: {},
+            E: {},
+            S: {},
+            T: {},
         };
         toolsStore.clear("pattern2");
     }
