@@ -774,12 +774,14 @@ function eventPriceLineDrag(e) {
         case "pattern2":
             if (mf.isSet(params.pattern2.T)) {
                 const opsE = params.pattern2.E.options();
+                const price1 = +opsE.price1;
                 const price2 = +opsE.price2;
                 const price3 = +opsE.price3;
                 const price4 = +opsE.price4;
                 const price5 = +opsE.price;
 
                 const d32 = price3 - price2;
+                const d14 = price1 - price4;
                 const d34 = price3 - price4;
                 const d54 = price5 - price4;
                 let d56, price6;
@@ -794,11 +796,17 @@ function eventPriceLineDrag(e) {
                     });
                 }
                 const price7 =
-                    price6 + (Math.abs(d54) < Math.abs(d34) ? 2 : 1.5) * d54;
+                    price6 +
+                    (Math.abs(d54) > Math.abs(d34)
+                        ? Math.abs(d54) > Math.abs(d14)
+                            ? 1
+                            : 1.5
+                        : 2) *
+                        d54;
                 const d75 = price7 - price5;
 
                 params.pattern2.S.applyOptions({
-                    title: `ST=${(-d56).toFixed(1)}`,
+                    title: `SL=${(-d56).toFixed(1)}`,
                 });
                 toolsStore.set("pattern2", params.pattern2.S.options());
                 //
@@ -1766,7 +1774,7 @@ function drawPattern2Tool(fix = false) {
     const d54 = point5.value - point4.value;
     const d56 = Math.abs(d32) > Math.abs(d54 / 2) ? d32 : d54 / 2;
     const price6 = point5.value - d56;
-    const price7 = price6 + (Math.abs(d54) < Math.abs(d34) ? 2 : 1.5) * d54;
+    const price7 = price6 + (Math.abs(d54) > Math.abs(d34) ? 1.5 : 2) * d54;
     const d75 = price7 - point5.value;
     var option = {
         lineType: "pattern2",
@@ -1789,7 +1797,7 @@ function drawPattern2Tool(fix = false) {
     //
     option.price = +price6.toFixed(1);
     option.point = "S";
-    option.title = `ST=${(-d56).toFixed(1)}`;
+    option.title = `SL=${(-d56).toFixed(1)}`;
     option.color = "#E91E63";
     option.draggable = true;
     params.pattern2[option.point] = params.series.price.createPriceLine(option);
