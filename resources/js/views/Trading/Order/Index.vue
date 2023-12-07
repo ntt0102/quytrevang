@@ -1052,7 +1052,7 @@ function loadChartData() {
     //
     params.shark = store.state.tradingOrder.chartData.shark;
 }
-function updateChartData(price, volume, spread) {
+function updateChartData(price, volume, spread, cash) {
     params.data.price = mergeChartData([price], params.data.price);
     const lastPrice = params.data.price.slice(-1)[0];
     params.series.price.update(lastPrice);
@@ -1064,6 +1064,10 @@ function updateChartData(price, volume, spread) {
     params.data.spread = mergeChartData([spread], params.data.spread);
     const lastSpread = params.data.spread.slice(-1)[0];
     params.series.spread.update(lastSpread);
+    //
+    params.data.cash = mergeChartData([cash], params.data.cash);
+    const lastCash = params.data.cash.slice(-1)[0];
+    params.series.cash.update(lastCash);
 }
 function createWhitespaceData() {
     const date = state.chartDate;
@@ -1155,6 +1159,12 @@ function connectSocket() {
                                         : side < 0
                                         ? "#FF0000"
                                         : "#CCCCCC",
+                            },
+                            {
+                                time: time,
+                                value:
+                                    params.data.cash.slice(-1)[0].value +
+                                    side * data.lastVol,
                             }
                         );
                         // scanSignal(params.data.volume.length - 1);
