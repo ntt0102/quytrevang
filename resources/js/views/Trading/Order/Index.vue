@@ -2383,6 +2383,7 @@ function refreshChart() {
     params.data.price = [];
     params.data.volume = [];
     params.data.spread = [];
+    params.data.cash = [];
     params.data.whitespace = [];
     params.loadWhitespace = true;
     store.dispatch("tradingOrder/getChartData", state.chartDate);
