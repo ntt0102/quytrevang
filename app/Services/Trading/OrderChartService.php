@@ -215,7 +215,6 @@ class OrderChartService extends CoreService
      */
     private function createChartData($c, $time, $price, $volume, $isFilter)
     {
-        $isFilter = false;
         $UP_COLOR = "#00FF00";
         $DOWN_COLOR = "#FF0000";
         $NONE_COLOR = "#CCCCCC";
