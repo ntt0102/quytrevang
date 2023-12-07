@@ -174,7 +174,7 @@ class OrderChartService extends CoreService
             $volume = $item->lastVol;
             $isFilter = $this->isFilter($index, $item->time);
             return $this->createChartData($c, $time, $price, $volume, $isFilter);
-        }, ['price' => [], 'volume' => [], 'spread' => []]);
+        }, ['price' => [], 'volume' => [], 'spread' => [], 'cash' => []]);
     }
 
     /**
@@ -182,7 +182,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $c = ['price' => [], 'volume' => [], 'spread' => []];
+        $c = ['price' => [], 'volume' => [], 'spread' => [], 'cash' => []];
         $filename = storage_path('app/vn30f1m/' . $date . '.csv');
         if (!file_exists($filename)) return $c;
         $fp = fopen($filename, 'r');
@@ -215,22 +215,32 @@ class OrderChartService extends CoreService
      */
     private function createChartData($c, $time, $price, $volume, $isFilter)
     {
+        $UP_COLOR = "#00FF00";
+        $DOWN_COLOR = "#FF0000";
+        $NONE_COLOR = "#CCCCCC";
+        $volume = $isFilter ? 0 : $volume;
         $prevPrice = count($c['price']) ? end($c['price'])['value'] : $price;
-        $change = $price - $prevPrice;
-        $color = $change == 0 ? "#CCCCCC" : ($change > 0 ? "#00FF00" : "#FF0000");
+        $change = $isFilter ? 0 : ($price - $prevPrice);
+        $color = $change == 0 ? $NONE_COLOR : ($change > 0 ? $UP_COLOR : $DOWN_COLOR);
+        $prevCash = count($c['cash']) ? end($c['cash'])['value'] : 0;
+        $cash = $prevCash + $change * $volume;
         $c['price'][] = [
             'time' => $time,
             'value' => $price
         ];
         $c['volume'][] = [
             'time' => $time,
-            'value' => $isFilter ? 0 : $volume,
+            'value' => $volume,
             'color' => $color,
         ];
         $c['spread'][] = [
             'time' => $time,
-            'value' => $isFilter ? 0 : -abs($change),
+            'value' => -abs($change),
             'color' => $color,
+        ];
+        $c['cash'][] = [
+            'time' => $time,
+            'value' => $cash,
         ];
         return $c;
     }

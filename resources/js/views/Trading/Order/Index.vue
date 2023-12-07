@@ -147,6 +147,7 @@
                         @contextmenu="volprofileToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="alertToolRef"
                         class="command far fa-alarm-exclamation"
                         :title="$t('trading.orderChart.alertTool')"
@@ -224,7 +225,7 @@ const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.21, bottom: 0.21 },
+        scaleMargins: { top: 0.51, bottom: 0.06 },
     },
     leftPriceScale: { visible: false },
     layout: {
@@ -287,7 +288,7 @@ const tradingviewChartRef = ref(null);
 let params = {
     chart: {},
     series: {},
-    data: { whitespace: [], price: [], volume: [], spread: [] },
+    data: { whitespace: [], price: [], volume: [], spread: [], cash: [] },
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, l5: {}, pointCount: 0 },
@@ -388,15 +389,22 @@ onMounted(() => {
     });
     params.series.volume = params.chart.addHistogramSeries({
         priceScaleId: "volume",
-        scaleMargins: { top: 0.8, bottom: 0 },
+        scaleMargins: { top: 0.95, bottom: 0 },
         color: "#CCCCCC",
         lastValueVisible: false,
         priceLineVisible: false,
     });
     params.series.spread = params.chart.addHistogramSeries({
         priceScaleId: "spread",
-        scaleMargins: { top: 0, bottom: 0.8 },
+        scaleMargins: { top: 0, bottom: 0.95 },
         color: "#CCCCCC",
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    params.series.cash = params.chart.addLineSeries({
+        priceScaleId: "cash",
+        scaleMargins: { top: 0.06, bottom: 0.5 },
+        color: "yellow",
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -1023,6 +1031,12 @@ function loadChartData() {
         params.data.price
     );
     params.series.price.setData(params.data.price);
+    //
+    params.data.cash = mergeChartData(
+        store.state.tradingOrder.chartData.cash,
+        params.data.cash
+    );
+    params.series.cash.setData(params.data.cash);
     //
     params.data.volume = mergeChartData(
         store.state.tradingOrder.chartData.volume,
@@ -2073,63 +2087,62 @@ function removeAlertTool() {
     params.alerts = [];
     toolsStore.clear("alert");
 }
-function cancelOrderClick() {
-    let result = confirm(
-        t("trading.orderChart.cancelOrder"),
-        t("titles.confirm")
-    );
-    result.then((dialogResult) => {
-        if (dialogResult) {
-            if (params.order.entry.hasOwnProperty("line")) {
-                if (params.order.tp.hasOwnProperty("line")) {
-                    store
-                        .dispatch("tradingOrder/executeOrder", {
-                            action: "exit",
-                            tpData: { cmd: "cancel" },
-                            slData: { cmd: "delete" },
-                            exitData: {
-                                cmd: "new",
-                                price: "MTL",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderLine("entry");
-                                removeOrderLine("tp");
-                                removeOrderLine("sl");
-                                toggleCancelOrderButton(false);
-                                toolsStore.clear("order");
-                                toast.success(
-                                    t("trading.orderChart.exitSuccess")
-                                );
-                            } else {
-                                toggleCancelOrderButton(true);
-                                toastOrderError(resp.message);
-                            }
-                        });
-                } else {
-                    store
-                        .dispatch("tradingOrder/executeOrder", {
-                            action: "entry",
-                            data: { cmd: "delete" },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderLine("entry");
-                                toggleCancelOrderButton(false);
-                                toolsStore.clear("order");
-                                toast.success(
-                                    t("trading.orderChart.deleteEntrySuccess")
-                                );
-                            } else {
-                                toggleCancelOrderButton(true);
-                                toastOrderError(resp.message);
-                            }
-                        });
-                }
+async function cancelOrderClick() {
+    let result = true;
+    if (!result) {
+        result = await confirm(
+            t("trading.orderChart.cancelOrder"),
+            t("titles.confirm")
+        );
+    }
+    if (result) {
+        if (params.order.entry.hasOwnProperty("line")) {
+            if (params.order.tp.hasOwnProperty("line")) {
+                store
+                    .dispatch("tradingOrder/executeOrder", {
+                        action: "exit",
+                        tpData: { cmd: "cancel" },
+                        slData: { cmd: "delete" },
+                        exitData: {
+                            cmd: "new",
+                            price: "MTL",
+                        },
+                    })
+                    .then((resp) => {
+                        if (resp.isOk) {
+                            removeOrderLine("entry");
+                            removeOrderLine("tp");
+                            removeOrderLine("sl");
+                            toggleCancelOrderButton(false);
+                            toolsStore.clear("order");
+                            toast.success(t("trading.orderChart.exitSuccess"));
+                        } else {
+                            toggleCancelOrderButton(true);
+                            toastOrderError(resp.message);
+                        }
+                    });
+            } else {
+                store
+                    .dispatch("tradingOrder/executeOrder", {
+                        action: "entry",
+                        data: { cmd: "delete" },
+                    })
+                    .then((resp) => {
+                        if (resp.isOk) {
+                            removeOrderLine("entry");
+                            toggleCancelOrderButton(false);
+                            toolsStore.clear("order");
+                            toast.success(
+                                t("trading.orderChart.deleteEntrySuccess")
+                            );
+                        } else {
+                            toggleCancelOrderButton(true);
+                            toastOrderError(resp.message);
+                        }
+                    });
             }
         }
-    });
+    }
 }
 function entryOrderClick() {
     const CURRENT_SEC = moment().unix();
