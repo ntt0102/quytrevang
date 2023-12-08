@@ -406,7 +406,6 @@ onMounted(() => {
         scaleMargins: { top: 0.06, bottom: 0.5 },
         color: "yellow",
         lastValueVisible: false,
-        priceLineVisible: false,
     });
     params.series.price = params.chart.addLineSeries({
         color: "#CCCCCC",
