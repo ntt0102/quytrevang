@@ -225,7 +225,7 @@ const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.51, bottom: 0.06 },
+        scaleMargins: { top: 0.05, bottom: 0.4 },
     },
     leftPriceScale: { visible: false },
     layout: {
@@ -334,15 +334,15 @@ const tradingViewSrc = computed(() => {
 
 store.dispatch("tradingOrder/getConfig").then(() => {
     connectSocket();
-    params.series.volume.createPriceLine({
-        price: store.state.tradingOrder.config.volLimit,
-        color: "yellow",
-        lineWidth: 1,
-        lineStyle: 1,
-        axisLabelVisible: false,
-        draggable: false,
-    });
-    params.volumeMax = store.state.tradingOrder.config.volLimit;
+    // params.series.volume.createPriceLine({
+    //     price: store.state.tradingOrder.config.volLimit,
+    //     color: "yellow",
+    //     lineWidth: 1,
+    //     lineStyle: 1,
+    //     axisLabelVisible: false,
+    //     draggable: false,
+    // });
+    // params.volumeMax = store.state.tradingOrder.config.volLimit;
 });
 store.dispatch("tradingOrder/getStatus");
 
@@ -372,6 +372,7 @@ onMounted(() => {
         color: "#673AB7",
         lastValueVisible: false,
         priceLineVisible: false,
+        visible: false,
     });
     params.series.box = params.chart.addHistogramSeries({
         priceScaleId: "box",
@@ -379,6 +380,7 @@ onMounted(() => {
         color: "#26a69a",
         lastValueVisible: false,
         priceLineVisible: false,
+        visible: false,
     });
     params.series.volprofile = params.chart.addHistogramSeries({
         priceScaleId: "volprofile",
@@ -386,6 +388,7 @@ onMounted(() => {
         color: "#673AB7",
         lastValueVisible: false,
         priceLineVisible: false,
+        visible: false,
     });
     params.series.volume = params.chart.addHistogramSeries({
         priceScaleId: "volume",
@@ -393,6 +396,7 @@ onMounted(() => {
         color: "#CCCCCC",
         lastValueVisible: false,
         priceLineVisible: false,
+        visible: false,
     });
     params.series.spread = params.chart.addHistogramSeries({
         priceScaleId: "spread",
@@ -400,10 +404,11 @@ onMounted(() => {
         color: "#CCCCCC",
         lastValueVisible: false,
         priceLineVisible: false,
+        visible: false,
     });
     params.series.cash = params.chart.addLineSeries({
         priceScaleId: "cash",
-        scaleMargins: { top: 0.06, bottom: 0.5 },
+        scaleMargins: { top: 0.61, bottom: 0.01 },
         color: "yellow",
         lastValueVisible: false,
     });
