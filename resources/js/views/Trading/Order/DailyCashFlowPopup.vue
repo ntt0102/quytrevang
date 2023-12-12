@@ -18,7 +18,7 @@
 <script setup>
 import CorePopup from "../../../components/Popups/CorePopup.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
-import { inject, ref, reactive, onMounted, watch } from "vue";
+import { inject, ref } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 
@@ -52,27 +52,11 @@ const CHART_OPTIONS = {
 };
 
 const store = useStore();
-const { t } = useI18n();
-const mf = inject("mf");
 const popupRef = ref(null);
 const orderChartRef = ref(null);
-const state = reactive({
-    gridData: null,
-});
 let params = {
     chart: {},
 };
-
-// onMounted(() => {
-
-// });
-
-watch(
-    () => store.state.tradingOrder.copyists,
-    (value) => {
-        state.gridData = mf.cloneDeep(value);
-    }
-);
 
 function show() {
     popupRef.value.show();
@@ -89,23 +73,20 @@ function onShown() {
             wickDownColor: "#ef5350",
             priceFormat: { minMove: 0.1 },
         });
-
         candlestickSeries.setData(data.data.price);
-
+        //
         const lineSeries = params.chart.addLineSeries({
             color: "#2962FF",
             priceScaleId: "cash",
             scaleMargins: { top: 0.61, bottom: 0.01 },
             lastValueVisible: false,
         });
-
         lineSeries.setData(data.data.cash);
-
         params.chart.timeScale().fitContent();
     });
 }
 function onHidden() {
-    state.gridData = null;
+    orderChartRef.value.removeChild(orderChartRef.value.firstElementChild);
 }
 
 defineExpose({ show });
