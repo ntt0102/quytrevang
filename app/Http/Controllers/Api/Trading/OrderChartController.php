@@ -145,4 +145,17 @@ class OrderChartController extends CoreController
         $data = $this->orderChartService->export($this->payload);
         return $this->sendResponse($data);
     }
+
+    /**
+     * Cashflow.
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function cashflow(Request $request)
+    {
+        $data = $this->orderChartService->cashflow($this->payload);
+        return $this->sendResponse($data);
+    }
 }

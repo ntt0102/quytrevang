@@ -20,6 +20,15 @@
                         onClick: exportCsv,
                     },
                 },
+                {
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-chart-line small',
+                        hint: $t('trading.orderChart.buttons.cashflow'),
+                        onClick: () => $refs.dailyCashFlowPopupRef.show(),
+                    },
+                },
             ]"
         />
         <div class="order-chart-container" ref="chartContainerRef">
@@ -199,10 +208,12 @@
         </div>
     </div>
     <CopyistStatusPopup ref="copyistStatusPopupRef" />
+    <DailyCashFlowPopup ref="dailyCashFlowPopupRef" />
 </template>
 
 <script setup>
 import CopyistStatusPopup from "./CopyistStatusPopup.vue";
+import DailyCashFlowPopup from "./DailyCashFlowPopup.vue";
 import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";

@@ -13,6 +13,10 @@
 import { getCurrentInstance, inject, ref, onMounted } from "vue";
 
 const props = defineProps({
+    fullScreen: {
+        type: Boolean,
+        default: false,
+    },
     width: {
         type: Number,
         default: null,
@@ -47,7 +51,10 @@ onMounted(() => {
     if (!!props.width) popupInstance.option("width", props.width);
     if (!!props.height) popupInstance.option("height", props.height);
     if (!props.width)
-        popupInstance.option("fullScreen", screenSize.isXSmall ? true : false);
+        popupInstance.option(
+            "fullScreen",
+            props.fullScreen || screenSize.isXSmall ? true : false
+        );
     if (!!props.title) popupInstance.option("title", props.title);
     if (!!props.class)
         popupInstance.option("wrapperAttr", {

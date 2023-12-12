@@ -107,6 +107,13 @@ const actions = {
             });
         });
     },
+    cashflow({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios.post("trading/order/cashflow", null).then((response) => {
+                resolve(response);
+            });
+        });
+    },
     resetState({ commit }) {
         commit("resetState");
     },

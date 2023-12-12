@@ -128,6 +128,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('close-position', 'OrderChartController@closePosition');
                     Route::post('report', 'OrderChartController@report');
                     Route::post('export', 'OrderChartController@export');
+                    Route::post('cashflow', 'OrderChartController@cashflow');
                 });
                 Route::group(['prefix' => 'finbook', 'middleware' => 'can:finbooks@control'], function () {
                     Route::post('/', 'FinbookController@fetch');
