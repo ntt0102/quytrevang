@@ -299,7 +299,7 @@ class OrderChartService extends CoreService
         $rsp = json_decode($res->getBody());
         if ($rsp->s != 'ok') return $r;
         $acc = 0;
-        // $prevAvg = ($rsp->h[0] + $rsp->l[0] + $rsp->c[0]) / 3;
+        $prevAvg = ($rsp->h[0] + $rsp->l[0] + $rsp->c[0]) / 3;
         for ($i = 0; $i < count($rsp->t); $i++) {
             $r['price'][] = [
                 'time' => $rsp->t[$i],
@@ -308,17 +308,13 @@ class OrderChartService extends CoreService
                 'low' => $rsp->l[$i],
                 'close' => $rsp->c[$i]
             ];
-            // // $prevClose = $i > 0 ? $rsp->c[$i - 1] : $rsp->c[0];
-            // // $change = $rsp->c[$i] - $prevClose;
-            // $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
-            // $change = $avg - $prevAvg;
-            // $prevAvg = $avg;
-            // $cash = $rsp->v[$i] * $change;
-            // // $acc = $acc + ($change >= 0 ? 1 : -1) * $cash;
+            $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
+            $change = ($avg - $prevAvg) / $prevAvg;
+            $prevAvg = $avg;
+            $cash = $rsp->v[$i] * $change;
 
-
-            $prevClose = $i > 0 ? $rsp->c[$i - 1] : $rsp->c[0];
-            $cash = ($rsp->c[$i] - $prevClose) * $rsp->v[$i];
+            // $prevClose = $i > 0 ? $rsp->c[$i - 1] : $rsp->c[0];
+            // $cash = ($rsp->c[$i] - $prevClose) / $prevClose * $rsp->v[$i];
             $acc += $cash;
             $r['cash'][] = [
                 'time' => $rsp->t[$i],
