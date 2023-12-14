@@ -149,6 +149,10 @@ Route::get('test', function () {
     // $vos = new \App\Services\Special\VpsOrderService($copyist);
     // // dd($vos->hasOrder());
     // dd($vos->hasOrder() || $vos->hasConditionOrder());
-    $s = \App\Jobs\ExportTradingJob::dispatch();
+    $client = new \GuzzleHttp\Client();
+    $url = "https://iboard.ssi.com.vn/dchart/api/history?resolution=D&symbol=VN30F1M&from=" . strtotime("-1 year") . "&to=" . time();
+    $res = $client->get($url);
+    $rsp = json_decode($res->getBody());
+    dd($rsp);
     return 'ok';
 });

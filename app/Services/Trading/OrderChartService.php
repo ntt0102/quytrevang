@@ -294,7 +294,7 @@ class OrderChartService extends CoreService
     {
         $r = ['price' => [], 'cash' => []];
         $client = new \GuzzleHttp\Client();
-        $url = "https://histdatafeed.vps.com.vn/tradingview/history?symbol=" . $payload->symbol . "&resolution=1D";
+        $url = "https://iboard.ssi.com.vn/dchart/api/history?resolution=D&symbol=" . $payload->symbol . "&from=" . strtotime("-3 year") . "&to=" . time();
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if ($rsp->s != 'ok') return $r;
@@ -303,10 +303,10 @@ class OrderChartService extends CoreService
         for ($i = 0; $i < count($rsp->t); $i++) {
             $r['price'][] = [
                 'time' => $rsp->t[$i],
-                'open' => $rsp->o[$i],
-                'high' => $rsp->h[$i],
-                'low' => $rsp->l[$i],
-                'close' => $rsp->c[$i]
+                'open' => +$rsp->o[$i],
+                'high' => +$rsp->h[$i],
+                'low' => +$rsp->l[$i],
+                'close' => +$rsp->c[$i]
             ];
             $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
             $change = ($avg - $prevAvg) / $prevAvg;
