@@ -294,7 +294,7 @@ class OrderChartService extends CoreService
     {
         $r = ['price' => [], 'cash' => []];
         $client = new \GuzzleHttp\Client();
-        $url = "https://histdatafeed.vps.com.vn/tradingview/history?symbol=VN30F1M&resolution=1D";
+        $url = "https://histdatafeed.vps.com.vn/tradingview/history?symbol=" . $payload->symbol . "&resolution=1D";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if ($rsp->s != 'ok') return $r;

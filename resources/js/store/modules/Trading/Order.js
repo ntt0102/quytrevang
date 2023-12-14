@@ -107,11 +107,13 @@ const actions = {
             });
         });
     },
-    cashflow({ commit, dispatch, getters, state, rootGetters }) {
+    cashflow({ commit, dispatch, getters, state, rootGetters }, symbol) {
         return new Promise((resolve, reject) => {
-            axios.post("trading/order/cashflow", null).then((response) => {
-                resolve(response);
-            });
+            axios
+                .post("trading/order/cashflow", { symbol })
+                .then((response) => {
+                    resolve(response);
+                });
         });
     },
     resetState({ commit }) {
