@@ -19,6 +19,7 @@
                     :title="$t('trading.orderChart.DailyCashFlowPopup.symbol')"
                     v-model="state.symbol"
                     @change="symbolChange"
+                    @focus="symbolFocus"
                 />
             </div>
         </DxScrollView>
@@ -80,13 +81,17 @@ let params = {
 function show() {
     popupRef.value.show();
 }
-function symbolChange(e) {
+function symbolChange() {
+    if (state.symbol == "") return false;
     state.symbol = state.symbol.toUpperCase();
     store.dispatch("tradingOrder/cashflow", state.symbol).then((data) => {
         params.series.price.setData(data.data.price);
         params.series.cash.setData(data.data.cash);
         params.chart.applyOptions({ watermark: { text: state.symbol } });
     });
+}
+function symbolFocus(e) {
+    e.target.select();
 }
 function onShown() {
     params.chart = createChart(orderChartRef.value, CHART_OPTIONS);
@@ -113,7 +118,7 @@ function onShown() {
     });
 }
 function onHidden() {
-    orderChartRef.value.removeChild(orderChartRef.value.firstElementChild);
+    orderChartRef.value.removeChild(orderChartRef.value.lastChild);
 }
 
 defineExpose({ show });
