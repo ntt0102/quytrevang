@@ -35,6 +35,7 @@
             <div class="chart-wrapper" ref="orderChartRef">
                 <div class="area data-area">
                     <div
+                        ref="connectionRef"
                         :class="`command far fa-${
                             status.connection ? 'link' : 'unlink'
                         }`"
@@ -269,6 +270,8 @@ const TIME = {
     ATC: moment(CURRENT_DATE + " 14:30:00").unix(),
     END: moment(CURRENT_DATE + " 14:45:00").unix(),
 };
+const SOCKET_ENDPOINT =
+    "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
 const SOCKET_REFRESH_PERIOD = 120;
 
 const store = useStore();
@@ -279,6 +282,7 @@ const bus = inject("bus");
 const filters = inject("filters");
 const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
+const connectionRef = ref(null);
 const spinnerRef = ref(null);
 const fullscreenToolRef = ref(null);
 const reloadToolRef = ref(null);
@@ -1110,9 +1114,7 @@ function mergeChartData(data1, data2) {
     );
 }
 function connectSocket() {
-    const endpoint =
-        "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
-    params.websocket = new WebSocket(endpoint);
+    params.websocket = new WebSocket(SOCKET_ENDPOINT);
     params.websocket.onopen = (e) => {
         var msg = {
             action: "join",
@@ -1125,6 +1127,7 @@ function connectSocket() {
     params.websocket.onclose = (e) => {
         if (params.socketStop) return false;
         if (inSession()) {
+            blinkSocketStatus(false);
             connectSocket();
             if (
                 moment().diff(params.socketRefreshTime, "seconds") >
@@ -1136,6 +1139,7 @@ function connectSocket() {
         }
     };
     params.websocket.onmessage = (e) => {
+        blinkSocketStatus(true);
         if (e.data.substr(0, 1) == 4) {
             if (e.data.substr(1, 1) == 2) {
                 const event = JSON.parse(e.data.substr(2));
@@ -1317,9 +1321,17 @@ function toggleCancelOrderButton(visible) {
     cancelOrderRef.value.style.display = visible ? "block" : "none";
 }
 function blinkCancelOrderButton() {
-    if (cancelOrderRef.value.classList.contains("warning"))
-        cancelOrderRef.value.classList.remove("warning");
-    else cancelOrderRef.value.classList.add("warning");
+    if (!cancelOrderRef.value.classList.contains("blink"))
+        cancelOrderRef.value.classList.add("blink");
+}
+function blinkSocketStatus(status) {
+    if (!status) {
+        if (!connectionRef.value.classList.contains("blink"))
+            connectionRef.value.classList.add("blink");
+    } else {
+        if (connectionRef.value.classList.contains("blink"))
+            connectionRef.value.classList.remove("blink");
+    }
 }
 function drawOrderLine(kind) {
     var color, title;
@@ -2564,6 +2576,14 @@ function exportCsv() {
         }
         &.noaction {
             cursor: unset !important;
+        }
+        &.blink {
+            animation: blinker 0.5s linear infinite;
+        }
+        @keyframes blinker {
+            50% {
+                color: transparent;
+            }
         }
     }
 
