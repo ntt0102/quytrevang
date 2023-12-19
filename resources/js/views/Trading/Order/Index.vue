@@ -111,19 +111,19 @@
                         @contextmenu="lineToolContextmenu"
                     ></div>
                     <div
-                        v-show="true"
-                        ref="pattern2ToolRef"
-                        class="command far fa-heart"
-                        :title="$t('trading.orderChart.pattern2Tool')"
-                        @click="pattern2ToolClick"
-                        @contextmenu="pattern2ToolContextmenu"
-                    ></div>
-                    <div
                         ref="pattern1ToolRef"
                         class="command far fa-star"
                         :title="$t('trading.orderChart.pattern1Tool')"
                         @click="pattern1ToolClick"
                         @contextmenu="pattern1ToolContextmenu"
+                    ></div>
+                    <div
+                        v-show="false"
+                        ref="pattern2ToolRef"
+                        class="command far fa-heart"
+                        :title="$t('trading.orderChart.pattern2Tool')"
+                        @click="pattern2ToolClick"
+                        @contextmenu="pattern2ToolContextmenu"
                     ></div>
                     <div
                         ref="rulerToolRef"
