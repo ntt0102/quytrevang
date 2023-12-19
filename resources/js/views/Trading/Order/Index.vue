@@ -314,6 +314,7 @@ let params = {
         X: {},
         Y: {},
         Z: {},
+        T: {},
     },
     pattern2: {
         E: {},
@@ -786,16 +787,22 @@ function eventPriceLineDrag(e) {
                 toolsStore.set("pattern1", params.pattern1.X.options());
                 //
                 params.pattern1.Y.applyOptions({
-                    price: +(c + 1.5 * ba).toFixed(1),
-                    title: (1.5 * ba).toFixed(1),
+                    price: +(c + 1.236 * ba).toFixed(1),
+                    title: (1.236 * ba).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Y.options());
                 //
                 params.pattern1.Z.applyOptions({
-                    price: +(c + 2 * ba).toFixed(1),
-                    title: (2 * ba).toFixed(1),
+                    price: +(c + 1.618 * ba).toFixed(1),
+                    title: (1.618 * ba).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Z.options());
+                //
+                params.pattern1.T.applyOptions({
+                    price: +(c + 2.618 * ba).toFixed(1),
+                    title: (2.618 * ba).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.T.options());
             }
             break;
         case "pattern2":
@@ -1146,46 +1153,46 @@ function connectSocket() {
                 if (event[0] == "stockps") {
                     const data = event[1].data;
                     if (data.id == 3220) {
-                        const time =
-                            moment(`${CURRENT_DATE} ${data.time}`).unix() +
-                            7 * 60 * 60;
-                        const side =
-                            params.data.price.length > 0
-                                ? data.lastPrice -
-                                  params.data.price.slice(-1)[0].value
-                                : 0;
-                        updateChartData(
-                            {
-                                time: time,
-                                value: data.lastPrice,
-                            },
-                            {
-                                time: time,
-                                value: data.lastVol,
-                                color:
-                                    side > 0
-                                        ? "#00FF00"
-                                        : side < 0
-                                        ? "#FF0000"
-                                        : "#CCCCCC",
-                            },
-                            {
-                                time: time,
-                                value: -Math.abs(side),
-                                color:
-                                    side > 0
-                                        ? "#00FF00"
-                                        : side < 0
-                                        ? "#FF0000"
-                                        : "#CCCCCC",
-                            },
-                            {
-                                time: time,
-                                value:
-                                    params.data.cash.slice(-1)[0].value +
-                                    side * data.lastVol,
-                            }
-                        );
+                        if (params.data.price.length > 0) {
+                            const time =
+                                moment(`${CURRENT_DATE} ${data.time}`).unix() +
+                                7 * 60 * 60;
+                            const side =
+                                data.lastPrice -
+                                params.data.price.slice(-1)[0].value;
+                            updateChartData(
+                                {
+                                    time: time,
+                                    value: data.lastPrice,
+                                },
+                                {
+                                    time: time,
+                                    value: data.lastVol,
+                                    color:
+                                        side > 0
+                                            ? "#00FF00"
+                                            : side < 0
+                                            ? "#FF0000"
+                                            : "#CCCCCC",
+                                },
+                                {
+                                    time: time,
+                                    value: -Math.abs(side),
+                                    color:
+                                        side > 0
+                                            ? "#00FF00"
+                                            : side < 0
+                                            ? "#FF0000"
+                                            : "#CCCCCC",
+                                },
+                                {
+                                    time: time,
+                                    value:
+                                        params.data.cash.slice(-1)[0].value +
+                                        side * data.lastVol,
+                                }
+                            );
+                        }
                         // scanSignal(params.data.volume.length - 1);
                         scanOrder();
                     }
@@ -1395,6 +1402,7 @@ function colorToolContextmenu(e) {
         drawLineTool(+params.pattern1.X.options().price);
         drawLineTool(+params.pattern1.Y.options().price);
         drawLineTool(+params.pattern1.Z.options().price);
+        drawLineTool(+params.pattern1.T.options().price);
     }
     e.preventDefault();
     e.stopPropagation();
@@ -1743,17 +1751,25 @@ function drawPattern1Tool() {
         toolsStore.set("pattern1", option);
         //
         option.point = "Y";
-        option.price = +(c + 1.5 * ba).toFixed(1);
-        option.title = (1.5 * ba).toFixed(1);
+        option.price = +(c + 1.236 * ba).toFixed(1);
+        option.title = (1.236 * ba).toFixed(1);
         option.color = "#673AB7";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
         toolsStore.set("pattern1", option);
         //
         option.point = "Z";
-        option.price = +(c + 2 * ba).toFixed(1);
-        option.title = (2 * ba).toFixed(1);
+        option.price = +(c + 1.618 * ba).toFixed(1);
+        option.title = (1.618 * ba).toFixed(1);
         option.color = "#2196F3";
+        params.pattern1[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern1", option);
+        //
+        option.point = "T";
+        option.price = +(c + 2.618 * ba).toFixed(1);
+        option.title = (2.618 * ba).toFixed(1);
+        option.color = "#00BCD4";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
         toolsStore.set("pattern1", option);
@@ -1771,6 +1787,7 @@ function removePattern1Tool() {
                 params.series.price.removePriceLine(params.pattern1.X);
                 params.series.price.removePriceLine(params.pattern1.Y);
                 params.series.price.removePriceLine(params.pattern1.Z);
+                params.series.price.removePriceLine(params.pattern1.T);
             }
         }
         params.pattern1 = {
@@ -1780,6 +1797,7 @@ function removePattern1Tool() {
             X: {},
             Y: {},
             Z: {},
+            T: {},
         };
         toolsStore.clear("pattern1");
     }
