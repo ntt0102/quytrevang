@@ -305,7 +305,14 @@ const tradingviewChartRef = ref(null);
 let params = {
     chart: {},
     series: {},
-    data: { whitespace: [], price: [], volume: [], spread: [], cash: [] },
+    data: {
+        whitespace: [],
+        original: [],
+        price: [],
+        cash: [],
+        // volume: [],
+        // spread: [],
+    },
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, l5: {}, pointCount: 0 },
@@ -1045,7 +1052,7 @@ function loadToolsData() {
 }
 function loadChartData() {
     if (params.loadWhitespace) {
-        if (store.state.tradingOrder.chartData.price.length > 0) {
+        if (store.state.tradingOrder.chartData.length > 0) {
             params.data.whitespace = mergeChartData(
                 params.data.whitespace,
                 createWhitespaceData()
@@ -1054,50 +1061,59 @@ function loadChartData() {
         params.series.whitespace.setData(params.data.whitespace);
         params.loadWhitespace = false;
     }
-    params.data.price = mergeChartData(
-        store.state.tradingOrder.chartData.price,
-        params.data.price
+
+    params.data.original = mergeChartData(
+        store.state.tradingOrder.chartData,
+        params.data.original
     );
-    params.series.price.setData(params.data.price);
-    //
-    params.data.cash = mergeChartData(
-        store.state.tradingOrder.chartData.cash,
-        params.data.cash
+
+    let data = params.data.original.reduce(
+        (c, d) => {
+            let lastPrice = d.price,
+                lastCash = 0;
+            if (c.price.length > 0) {
+                lastPrice = c.price.slice(-1)[0].value;
+                lastCash = c.cash.slice(-1)[0].value;
+            }
+            c.price.push({ time: d.time, value: d.price });
+            c.cash.push({
+                time: d.time,
+                value: lastCash + (d.price - lastPrice) * d.volume,
+            });
+            return c;
+        },
+        {
+            price: [],
+            cash: [],
+        }
     );
-    params.series.cash.setData(params.data.cash);
+
+    params.data.price = data.price;
+    params.series.price.setData(data.price);
     //
-    // params.data.volume = mergeChartData(
-    //     store.state.tradingOrder.chartData.volume,
-    //     params.data.volume
-    // );
-    // params.series.volume.setData(params.data.volume);
-    // //
-    // params.data.spread = mergeChartData(
-    //     store.state.tradingOrder.chartData.spread,
-    //     params.data.spread
-    // );
-    // params.series.spread.setData(params.data.spread);
-    // //
-    // params.shark = store.state.tradingOrder.chartData.shark;
+    params.data.cash = data.cash;
+    params.series.cash.setData(data.cash);
+
+    console.log(
+        "load: ",
+        moment().diff(params.socketRefreshTime, "miliseconds")
+    );
 }
-function updateChartData(price, cash, volume, spread) {
-    params.data.price = mergeChartData(params.data.price, [price]);
-    params.series.price.setData(params.data.price);
-    // const lastPrice = params.data.price.slice(-1)[0];
-    // params.series.price.update(lastPrice);
-    //
-    params.data.cash = mergeChartData(params.data.cash, [cash]);
-    params.series.cash.setData(params.data.cash);
-    // const lastCash = params.data.cash.slice(-1)[0];
-    // params.series.cash.update(lastCash);
-    // //
-    // params.data.volume = mergeChartData(params.data.volume, [volume]);
-    // const lastVolume = params.data.volume.slice(-1)[0];
-    // params.series.volume.update(lastVolume);
-    // //
-    // params.data.spread = mergeChartData(params.data.spread, [spread]);
-    // const lastSpread = params.data.spread.slice(-1)[0];
-    // params.series.spread.update(lastSpread);
+function updateChartData(d) {
+    const prevLength = params.data.original.length;
+    params.data.original = mergeChartData(params.data.original, [d]);
+    if (params.data.original.length > prevLength) {
+        params.data.price.push({ time: d.time, value: d.price });
+        params.series.price.setData(params.data.price);
+        //
+        const lastPrice = params.data.price.slice(-1)[0].value;
+        const lastCash = params.data.cash.slice(-1)[0].value;
+        params.data.cash.push({
+            time: d.time,
+            value: lastCash + (d.price - lastPrice) * d.volume,
+        });
+        params.series.cash.setData(params.data.cash);
+    }
 }
 function createWhitespaceData() {
     const date = state.chartDate;
@@ -1116,17 +1132,17 @@ function createWhitespaceData() {
     return data;
 }
 function mergeChartData(data1, data2) {
-    let times = new Set(data1.map((d) => d.time));
-    return [...data1, ...data2.filter((d) => !times.has(d.time))].sort(
-        (a, b) => a.time - b.time
-    );
-    // return Array.from(
-    //     new Map(
-    //         [...data1, ...data2]
-    //             .sort((a, b) => a.time - b.time)
-    //             .map((d) => [d.time, d])
-    //     ).values()
+    // let times = new Set(data1.map((d) => d.time));
+    // return [...data1, ...data2.filter((d) => !times.has(d.time))].sort(
+    //     (a, b) => a.time - b.time
     // );
+    return Array.from(
+        new Map(
+            [...data1, ...data2]
+                .sort((a, b) => a.time - b.time)
+                .map((d) => [d.time, d])
+        ).values()
+    );
 }
 function connectSocket() {
     params.websocket = new WebSocket(SOCKET_ENDPOINT);
@@ -1159,45 +1175,16 @@ function connectSocket() {
                 if (event[0] == "stockps") {
                     const data = event[1].data;
                     if (data.id == 3220) {
-                        if (params.data.price.length > 0) {
-                            const time =
-                                moment(`${CURRENT_DATE} ${data.time}`).unix() +
-                                7 * 60 * 60;
-                            const change =
-                                data.lastPrice -
-                                params.data.price.slice(-1)[0].value;
-                            updateChartData(
-                                {
-                                    time: time,
-                                    value: data.lastPrice,
-                                },
-                                {
-                                    time: time,
-                                    value:
-                                        params.data.cash.slice(-1)[0].value +
-                                        change * data.lastVol,
-                                }
-                                // {
-                                //     time: time,
-                                //     value: data.lastVol,
-                                //     color:
-                                //         change > 0
-                                //             ? "#00FF00"
-                                //             : change < 0
-                                //             ? "#FF0000"
-                                //             : "#CCCCCC",
-                                // },
-                                // {
-                                //     time: time,
-                                //     value: -Math.abs(change),
-                                //     color:
-                                //         change > 0
-                                //             ? "#00FF00"
-                                //             : change < 0
-                                //             ? "#FF0000"
-                                //             : "#CCCCCC",
-                                // },
-                            );
+                        if (params.data.original.length > 0) {
+                            updateChartData({
+                                time:
+                                    moment(
+                                        `${CURRENT_DATE} ${data.time}`
+                                    ).unix() +
+                                    7 * 60 * 60,
+                                price: data.lastPrice,
+                                volume: data.lastVol,
+                            });
                         }
                         // scanSignal(params.data.volume.length - 1);
                         scanOrder();
@@ -2441,9 +2428,9 @@ function dateSelectChange() {
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 function refreshChart() {
+    params.socketRefreshTime = moment();
     params.loadWhitespace = true;
     store.dispatch("tradingOrder/getChartData", state.chartDate);
-    params.socketRefreshTime = moment();
 }
 function resetChart() {
     params.data.price = [];

@@ -169,12 +169,12 @@ class OrderChartService extends CoreService
     {
         $list = $this->cloneVpsData();
         return collect($list)->reduce(function ($c, $item, $index) {
-            $time = strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME;
-            $price = $item->lastPrice;
-            $volume = $item->lastVol;
-            $isFilter = $this->isFilter($index, $item->time);
-            return $this->createChartData($c, $time, $price, $volume, $isFilter);
-        }, ['price' => [], 'volume' => [], 'spread' => [], 'cash' => []]);
+            $c[] = [
+                'time' => strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME,
+                'price' => $item->lastPrice,
+                'volume' => $this->filterVolume($index, $item->time, $item->lastVol),
+            ];
+        }, []);
     }
 
     /**
@@ -182,7 +182,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $c = ['price' => [], 'volume' => [], 'spread' => [], 'cash' => []];
+        $c = [];
         $filename = storage_path('app/vn30f1m/' . $date . '.csv');
         if (!file_exists($filename)) return $c;
         $fp = fopen($filename, 'r');
@@ -190,12 +190,11 @@ class OrderChartService extends CoreService
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
-                $time = $line[0] + $this->SHIFT_TIME;
-                $price = $line[1] + 0;
-                $volume = $line[2] + 0;
-                $isFilter = $this->isFilter($index, date('H:i:s', $line[0]));
-                $c = $this->createChartData($c, $time, $price, $volume, $isFilter);
-                $index++;
+                $c[] = [
+                    'time' => $line[0] + $this->SHIFT_TIME,
+                    'price' => $line[1] + 0,
+                    'volume' => $this->filterVolume($index, date('H:i:s', $line[0]), $line[2] + 0),
+                ];
             }
         }
         fclose($fp);
@@ -205,44 +204,9 @@ class OrderChartService extends CoreService
     /**
      * Check continue time
      */
-    private function isFilter($index, $time)
+    private function filterVolume($index, $time, $volume)
     {
-        return $index <= 1 || $time >= '14:45:00';
-    }
-
-    /**
-     * Create Chart Data
-     */
-    private function createChartData($c, $time, $price, $volume, $isFilter)
-    {
-        $UP_COLOR = "#00FF00";
-        $DOWN_COLOR = "#FF0000";
-        $NONE_COLOR = "#CCCCCC";
-        $volume = $isFilter ? 0 : $volume;
-        $prevPrice = count($c['price']) ? end($c['price'])['value'] : $price;
-        $change = $isFilter ? 0 : ($price - $prevPrice);
-        $color = $change == 0 ? $NONE_COLOR : ($change > 0 ? $UP_COLOR : $DOWN_COLOR);
-        $prevCash = count($c['cash']) ? end($c['cash'])['value'] : 0;
-        $cash = $prevCash + $change * $volume;
-        $c['price'][] = [
-            'time' => $time,
-            'value' => $price
-        ];
-        $c['volume'][] = [
-            'time' => $time,
-            'value' => $volume,
-            'color' => $color,
-        ];
-        $c['spread'][] = [
-            'time' => $time,
-            'value' => -abs($change),
-            'color' => $color,
-        ];
-        $c['cash'][] = [
-            'time' => $time,
-            'value' => $cash,
-        ];
-        return $c;
+        return $index <= 1 || $time >= '14:45:00' ? $volume : 0;
     }
 
     /**
