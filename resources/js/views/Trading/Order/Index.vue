@@ -54,7 +54,9 @@
                     >
                         {{ status.position }}
                     </div>
-                    <div class="command noaction clock">{{ state.clock }}</div>
+                    <div class="command clock" @click="refreshChart">
+                        {{ state.clock }}
+                    </div>
                     <input
                         type="date"
                         class="chart-date command"
@@ -81,7 +83,7 @@
                         ref="reloadToolRef"
                         class="command far fa-sync-alt"
                         :title="$t('trading.orderChart.reload')"
-                        @click="refreshChart"
+                        @click="resetChart"
                     ></div>
                     <div
                         ref="tradingviewRef"
@@ -382,46 +384,46 @@ onMounted(() => {
         priceScaleId: "whitespace",
         visible: false,
     });
-    params.series.signal = params.chart.addHistogramSeries({
-        priceScaleId: "signal",
-        scaleMargins: { top: 0, bottom: 0 },
-        color: "#673AB7",
-        lastValueVisible: false,
-        priceLineVisible: false,
-        visible: false,
-    });
-    params.series.box = params.chart.addHistogramSeries({
-        priceScaleId: "box",
-        scaleMargins: { top: 0, bottom: 0 },
-        color: "#26a69a",
-        lastValueVisible: false,
-        priceLineVisible: false,
-        visible: false,
-    });
-    params.series.volprofile = params.chart.addHistogramSeries({
-        priceScaleId: "volprofile",
-        scaleMargins: { top: 0, bottom: 0 },
-        color: "#673AB7",
-        lastValueVisible: false,
-        priceLineVisible: false,
-        visible: false,
-    });
-    params.series.volume = params.chart.addHistogramSeries({
-        priceScaleId: "volume",
-        scaleMargins: { top: 0.95, bottom: 0 },
-        color: "#CCCCCC",
-        lastValueVisible: false,
-        priceLineVisible: false,
-        visible: false,
-    });
-    params.series.spread = params.chart.addHistogramSeries({
-        priceScaleId: "spread",
-        scaleMargins: { top: 0, bottom: 0.95 },
-        color: "#CCCCCC",
-        lastValueVisible: false,
-        priceLineVisible: false,
-        visible: false,
-    });
+    // params.series.signal = params.chart.addHistogramSeries({
+    //     priceScaleId: "signal",
+    //     scaleMargins: { top: 0, bottom: 0 },
+    //     color: "#673AB7",
+    //     lastValueVisible: false,
+    //     priceLineVisible: false,
+    //     visible: false,
+    // });
+    // params.series.box = params.chart.addHistogramSeries({
+    //     priceScaleId: "box",
+    //     scaleMargins: { top: 0, bottom: 0 },
+    //     color: "#26a69a",
+    //     lastValueVisible: false,
+    //     priceLineVisible: false,
+    //     visible: false,
+    // });
+    // params.series.volprofile = params.chart.addHistogramSeries({
+    //     priceScaleId: "volprofile",
+    //     scaleMargins: { top: 0, bottom: 0 },
+    //     color: "#673AB7",
+    //     lastValueVisible: false,
+    //     priceLineVisible: false,
+    //     visible: false,
+    // });
+    // params.series.volume = params.chart.addHistogramSeries({
+    //     priceScaleId: "volume",
+    //     scaleMargins: { top: 0.95, bottom: 0 },
+    //     color: "#CCCCCC",
+    //     lastValueVisible: false,
+    //     priceLineVisible: false,
+    //     visible: false,
+    // });
+    // params.series.spread = params.chart.addHistogramSeries({
+    //     priceScaleId: "spread",
+    //     scaleMargins: { top: 0, bottom: 0.95 },
+    //     color: "#CCCCCC",
+    //     lastValueVisible: false,
+    //     priceLineVisible: false,
+    //     visible: false,
+    // });
     params.series.cash = params.chart.addLineSeries({
         priceScaleId: "cash",
         scaleMargins: { top: 0.61, bottom: 0.01 },
@@ -479,7 +481,7 @@ function eventChartClick() {
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
-        var price = e.seriesPrices.get(params.series.price);
+        let price = e.seriesPrices.get(params.series.price);
         params.crosshair.time = e.time;
         params.crosshair.price = price;
     } else {
@@ -494,15 +496,15 @@ function eventChartCrosshairMove(e) {
     }
 }
 function eventPriceLineDrag(e) {
-    var line = e.customPriceLine;
-    var lineOptions = line.options();
+    let line = e.customPriceLine;
+    let lineOptions = line.options();
     lineOptions.price = formatPrice(lineOptions.price);
     const oldPrice = +e.fromPriceString;
     const newPrice = lineOptions.price;
     switch (lineOptions.lineType) {
         case "order":
             if (newPrice != oldPrice) {
-                var isChanged = false;
+                let isChanged = false;
                 if (lineOptions.kind == "entry") {
                     if (!status.value.position) {
                         isChanged = true;
@@ -862,7 +864,7 @@ function eventPriceLineDrag(e) {
                 removed: true,
             });
             const currentPrice = params.data.price.slice(-1)[0].value;
-            var title = newPrice >= currentPrice ? ">" : "<";
+            let title = newPrice >= currentPrice ? ">" : "<";
             line.applyOptions({ title: title });
             toolsStore.set("alert", line.options());
             alertToolRef.value.classList.remove("selected");
@@ -1064,36 +1066,38 @@ function loadChartData() {
     );
     params.series.cash.setData(params.data.cash);
     //
-    params.data.volume = mergeChartData(
-        store.state.tradingOrder.chartData.volume,
-        params.data.volume
-    );
-    params.series.volume.setData(params.data.volume);
-    //
-    params.data.spread = mergeChartData(
-        store.state.tradingOrder.chartData.spread,
-        params.data.spread
-    );
-    params.series.spread.setData(params.data.spread);
-    //
-    params.shark = store.state.tradingOrder.chartData.shark;
+    // params.data.volume = mergeChartData(
+    //     store.state.tradingOrder.chartData.volume,
+    //     params.data.volume
+    // );
+    // params.series.volume.setData(params.data.volume);
+    // //
+    // params.data.spread = mergeChartData(
+    //     store.state.tradingOrder.chartData.spread,
+    //     params.data.spread
+    // );
+    // params.series.spread.setData(params.data.spread);
+    // //
+    // params.shark = store.state.tradingOrder.chartData.shark;
 }
-function updateChartData(price, volume, spread, cash) {
-    params.data.price = mergeChartData([price], params.data.price);
-    const lastPrice = params.data.price.slice(-1)[0];
-    params.series.price.update(lastPrice);
+function updateChartData(price, cash, volume, spread) {
+    params.data.price = mergeChartData(params.data.price, [price]);
+    params.series.price.setData(params.data.price);
+    // const lastPrice = params.data.price.slice(-1)[0];
+    // params.series.price.update(lastPrice);
     //
-    params.data.volume = mergeChartData([volume], params.data.volume);
-    const lastVolume = params.data.volume.slice(-1)[0];
-    params.series.volume.update(lastVolume);
-    //
-    params.data.spread = mergeChartData([spread], params.data.spread);
-    const lastSpread = params.data.spread.slice(-1)[0];
-    params.series.spread.update(lastSpread);
-    //
-    params.data.cash = mergeChartData([cash], params.data.cash);
-    const lastCash = params.data.cash.slice(-1)[0];
-    params.series.cash.update(lastCash);
+    params.data.cash = mergeChartData(params.data.cash, [cash]);
+    params.series.cash.setData(params.data.cash);
+    // const lastCash = params.data.cash.slice(-1)[0];
+    // params.series.cash.update(lastCash);
+    // //
+    // params.data.volume = mergeChartData(params.data.volume, [volume]);
+    // const lastVolume = params.data.volume.slice(-1)[0];
+    // params.series.volume.update(lastVolume);
+    // //
+    // params.data.spread = mergeChartData(params.data.spread, [spread]);
+    // const lastSpread = params.data.spread.slice(-1)[0];
+    // params.series.spread.update(lastSpread);
 }
 function createWhitespaceData() {
     const date = state.chartDate;
@@ -1101,7 +1105,7 @@ function createWhitespaceData() {
     const amEnd = moment(`${date} 11:30:00`).unix();
     const pmStart = moment(`${date} 13:00:00`).unix();
     const pmEnd = moment(`${date} 14:30:00`).unix();
-    var data = [],
+    let data = [],
         sec;
     for (sec = amStart; sec <= amEnd; sec++) {
         data.push({ time: sec + 7 * 60 * 60 });
@@ -1112,18 +1116,22 @@ function createWhitespaceData() {
     return data;
 }
 function mergeChartData(data1, data2) {
-    return Array.from(
-        new Map(
-            [...data1, ...data2]
-                .sort((a, b) => a.time - b.time)
-                .map((d) => [d.time, d])
-        ).values()
+    let times = new Set(data1.map((d) => d.time));
+    return [...data1, ...data2.filter((d) => !times.has(d.time))].sort(
+        (a, b) => a.time - b.time
     );
+    // return Array.from(
+    //     new Map(
+    //         [...data1, ...data2]
+    //             .sort((a, b) => a.time - b.time)
+    //             .map((d) => [d.time, d])
+    //     ).values()
+    // );
 }
 function connectSocket() {
     params.websocket = new WebSocket(SOCKET_ENDPOINT);
     params.websocket.onopen = (e) => {
-        var msg = {
+        let msg = {
             action: "join",
             list: store.state.tradingOrder.config.symbol,
         };
@@ -1157,7 +1165,7 @@ function connectSocket() {
                             const time =
                                 moment(`${CURRENT_DATE} ${data.time}`).unix() +
                                 7 * 60 * 60;
-                            const side =
+                            const change =
                                 data.lastPrice -
                                 params.data.price.slice(-1)[0].value;
                             updateChartData(
@@ -1167,30 +1175,30 @@ function connectSocket() {
                                 },
                                 {
                                     time: time,
-                                    value: data.lastVol,
-                                    color:
-                                        side > 0
-                                            ? "#00FF00"
-                                            : side < 0
-                                            ? "#FF0000"
-                                            : "#CCCCCC",
-                                },
-                                {
-                                    time: time,
-                                    value: -Math.abs(side),
-                                    color:
-                                        side > 0
-                                            ? "#00FF00"
-                                            : side < 0
-                                            ? "#FF0000"
-                                            : "#CCCCCC",
-                                },
-                                {
-                                    time: time,
                                     value:
                                         params.data.cash.slice(-1)[0].value +
-                                        side * data.lastVol,
+                                        change * data.lastVol,
                                 }
+                                // {
+                                //     time: time,
+                                //     value: data.lastVol,
+                                //     color:
+                                //         change > 0
+                                //             ? "#00FF00"
+                                //             : change < 0
+                                //             ? "#FF0000"
+                                //             : "#CCCCCC",
+                                // },
+                                // {
+                                //     time: time,
+                                //     value: -Math.abs(change),
+                                //     color:
+                                //         change > 0
+                                //             ? "#00FF00"
+                                //             : change < 0
+                                //             ? "#FF0000"
+                                //             : "#CCCCCC",
+                                // },
                             );
                         }
                         // scanSignal(params.data.volume.length - 1);
@@ -1278,7 +1286,7 @@ function showOrderButton() {
                 }
             }
             if (!params.order.entry.hasOwnProperty("line")) {
-                var price = null,
+                let price = null,
                     side = 0;
                 if (!status.value.position) {
                     if (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC) {
@@ -1341,7 +1349,7 @@ function blinkSocketStatus(status) {
     }
 }
 function drawOrderLine(kind) {
-    var color, title;
+    let color, title;
     switch (kind) {
         case "entry":
             color = "yellow";
@@ -1601,7 +1609,7 @@ function rulerToolContextmenu(e) {
 }
 function drawRulerTool() {
     const price = coordinateToPrice(params.crosshair.y);
-    var options = {
+    let options = {
         lineType: "ruler",
         price: price,
         lineWidth: 1,
@@ -1710,7 +1718,7 @@ function pattern1ToolContextmenu(e) {
 }
 function drawPattern1Tool() {
     const price = coordinateToPrice(params.crosshair.y);
-    var option = {
+    let option = {
         lineType: "pattern1",
         price: price,
         lineWidth: 1,
@@ -1845,7 +1853,7 @@ function drawPattern2Tool(fix = false) {
     const price6 = point5.value - d56;
     const price7 = price6 + (Math.abs(d54) > Math.abs(d34) ? 1.5 : 2) * d54;
     const d75 = price7 - point5.value;
-    var option = {
+    let option = {
         lineType: "pattern2",
         lineWidth: 1,
         lineStyle: 1,
@@ -2435,13 +2443,16 @@ function dateSelectChange() {
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 function refreshChart() {
+    params.loadWhitespace = true;
+    store.dispatch("tradingOrder/getChartData", state.chartDate);
+}
+function resetChart() {
     params.data.price = [];
     params.data.volume = [];
     params.data.spread = [];
     params.data.cash = [];
     params.data.whitespace = [];
-    params.loadWhitespace = true;
-    store.dispatch("tradingOrder/getChartData", state.chartDate);
+    refreshChart();
 }
 function playSound() {
     let player = new Audio(sound);
