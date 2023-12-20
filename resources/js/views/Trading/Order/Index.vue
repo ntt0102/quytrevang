@@ -1142,19 +1142,17 @@ function connectSocket() {
     params.websocket.onclose = (e) => {
         if (params.socketStop) return false;
         if (inSession()) {
-            blinkSocketStatus(false);
+            blinkSocketStatus(true);
             connectSocket();
             if (
                 moment().diff(params.socketRefreshTime, "seconds") >
                 SOCKET_REFRESH_PERIOD
-            ) {
-                store.dispatch("tradingOrder/getChartData", state.chartDate);
-                params.socketRefreshTime = moment();
-            }
+            )
+                refreshChart();
         }
     };
     params.websocket.onmessage = (e) => {
-        blinkSocketStatus(true);
+        blinkSocketStatus(false);
         if (e.data.substr(0, 1) == 4) {
             if (e.data.substr(1, 1) == 2) {
                 const event = JSON.parse(e.data.substr(2));
@@ -1340,7 +1338,7 @@ function blinkCancelOrderButton() {
         cancelOrderRef.value.classList.add("blink");
 }
 function blinkSocketStatus(status) {
-    if (!status) {
+    if (status) {
         if (!connectionRef.value.classList.contains("blink"))
             connectionRef.value.classList.add("blink");
     } else {
@@ -2445,6 +2443,7 @@ function dateSelectChange() {
 function refreshChart() {
     params.loadWhitespace = true;
     store.dispatch("tradingOrder/getChartData", state.chartDate);
+    params.socketRefreshTime = moment();
 }
 function resetChart() {
     params.data.price = [];
