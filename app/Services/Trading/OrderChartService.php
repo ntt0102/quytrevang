@@ -195,6 +195,7 @@ class OrderChartService extends CoreService
                     'price' => +$line[1],
                     'volume' => $this->filterVolume(+$line[2], $index, date('H:i:s', $line[0])),
                 ];
+                $index++;
             }
         }
         fclose($fp);
