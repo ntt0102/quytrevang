@@ -258,7 +258,7 @@ class OrderChartService extends CoreService
      */
     public function cashflow($payload)
     {
-        $r = ['price' => [], 'cash' => []];
+        $r = ['price' => [], 'avg' => [], 'cash' => []];
         $client = new \GuzzleHttp\Client();
         $url = "https://iboard.ssi.com.vn/dchart/api/history?resolution=D&symbol=" . $payload->symbol . "&from=" . strtotime("-3 year") . "&to=" . time();
         $res = $client->get($url);
@@ -275,6 +275,10 @@ class OrderChartService extends CoreService
                 'close' => +$rsp->c[$i]
             ];
             $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
+            $r['avg'][] = [
+                'time' => $rsp->t[$i],
+                'value' => $avg
+            ];
             $change = ($avg - $prevAvg) / $prevAvg;
             $prevAvg = $avg;
             $cash = $rsp->v[$i] * $change;

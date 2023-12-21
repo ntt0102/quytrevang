@@ -75,7 +75,7 @@ const state = reactive({
 });
 let params = {
     chart: {},
-    series: { price: {}, cash: {} },
+    series: { price: {}, avg: {}, cash: {} },
 };
 
 function show() {
@@ -85,8 +85,9 @@ function symbolChange() {
     if (state.symbol == "") return false;
     state.symbol = state.symbol.toUpperCase();
     store.dispatch("tradingOrder/cashflow", state.symbol).then((data) => {
-        params.series.price.setData(data.data.price);
-        params.series.cash.setData(data.data.cash);
+        params.series.price.setData(data.price);
+        params.series.avg.setData(data.avg);
+        params.series.cash.setData(data.cash);
         params.chart.applyOptions({ watermark: { text: state.symbol } });
     });
 }
@@ -104,7 +105,15 @@ function onShown() {
             wickDownColor: "#ef5350",
             priceFormat: { minMove: 0.1 },
         });
-        params.series.price.setData(data.data.price);
+        params.series.price.setData(data.price);
+        //
+        params.series.avg = params.chart.addLineSeries({
+            color: "#CCCCCC",
+            priceFormat: { minMove: 0.1 },
+            lastValueVisible: false,
+            priceLineVisible: false,
+        });
+        params.series.avg.setData(data.avg);
         //
         params.series.cash = params.chart.addLineSeries({
             color: "#2962FF",
@@ -112,7 +121,8 @@ function onShown() {
             scaleMargins: { top: 0.61, bottom: 0.01 },
             lastValueVisible: false,
         });
-        params.series.cash.setData(data.data.cash);
+        params.series.cash.setData(data.cash);
+        //
         params.chart.timeScale().fitContent();
         params.chart.applyOptions({ watermark: { text: state.symbol } });
     });

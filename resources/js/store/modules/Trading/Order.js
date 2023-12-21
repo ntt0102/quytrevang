@@ -112,7 +112,7 @@ const actions = {
             axios
                 .post("trading/order/cashflow", { symbol })
                 .then((response) => {
-                    resolve(response);
+                    resolve(response.data);
                 });
         });
     },
