@@ -1103,11 +1103,10 @@ function updateChartData(d) {
     const prevLength = params.data.original.length;
     params.data.original = mergeChartData(params.data.original, [d]);
     if (params.data.original.length > prevLength) {
-        params.data.price.push({ time: d.time, value: d.price });
-        params.series.price.setData(params.data.price);
-        //
         const lastPrice = params.data.price.slice(-1)[0].value;
         const lastCash = params.data.cash.slice(-1)[0].value;
+        params.data.price.push({ time: d.time, value: d.price });
+        params.series.price.setData(params.data.price);
         params.data.cash.push({
             time: d.time,
             value: lastCash + (d.price - lastPrice) * d.volume,

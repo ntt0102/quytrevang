@@ -168,13 +168,13 @@ class OrderChartService extends CoreService
     public function generateDataFromVps()
     {
         $list = $this->cloneVpsData();
-        return collect($list)->reduce(function ($c, $item, $index) {
-            $c[] = [
+        return collect($list)->map(function ($item, $index) {
+            return [
                 'time' => strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME,
                 'price' => $item->lastPrice,
-                'volume' => $this->filterVolume($index, $item->time, $item->lastVol),
+                'volume' => $this->filterVolume($item->lastVol, $index, $item->time),
             ];
-        }, []);
+        });
     }
 
     /**
@@ -192,8 +192,8 @@ class OrderChartService extends CoreService
             if (!!$line) {
                 $c[] = [
                     'time' => $line[0] + $this->SHIFT_TIME,
-                    'price' => $line[1] + 0,
-                    'volume' => $this->filterVolume($index, date('H:i:s', $line[0]), $line[2] + 0),
+                    'price' => +$line[1],
+                    'volume' => $this->filterVolume(+$line[2], $index, date('H:i:s', $line[0])),
                 ];
             }
         }
@@ -204,9 +204,10 @@ class OrderChartService extends CoreService
     /**
      * Check continue time
      */
-    private function filterVolume($index, $time, $volume)
+    private function filterVolume($volume, $index, $time)
     {
-        return $index <= 1 || $time >= '14:45:00' ? $volume : 0;
+        if ($index <= 1 || $time >= '14:45:00') return 0;
+        return $volume;
     }
 
     /**
