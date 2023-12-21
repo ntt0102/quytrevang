@@ -136,30 +136,6 @@
                     ></div>
                     <div
                         v-show="false"
-                        ref="scanSignalToolRef"
-                        class="command far fa-search-location"
-                        :title="$t('trading.orderChart.scanSignalTool')"
-                        @click="scanSignalToolClick"
-                        @contextmenu="scanSignalToolContextmenu"
-                    ></div>
-                    <div
-                        v-show="false"
-                        ref="boxToolRef"
-                        class="command far fa-expand-alt"
-                        :title="$t('trading.orderChart.boxTool')"
-                        @click="boxToolClick"
-                        @contextmenu="boxToolContextmenu"
-                    ></div>
-                    <div
-                        v-show="false"
-                        ref="volprofileToolRef"
-                        class="command far fa-poll-h"
-                        :title="$t('trading.orderChart.volprofileTool')"
-                        @click="volprofileToolClick"
-                        @contextmenu="volprofileToolContextmenu"
-                    ></div>
-                    <div
-                        v-show="false"
                         ref="alertToolRef"
                         class="command far fa-alarm-exclamation"
                         :title="$t('trading.orderChart.alertTool')"
@@ -294,9 +270,6 @@ const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
 const pattern1ToolRef = ref(null);
 const pattern2ToolRef = ref(null);
-const scanSignalToolRef = ref(null);
-const volprofileToolRef = ref(null);
-const boxToolRef = ref(null);
 const alertToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
@@ -472,19 +445,12 @@ function eventChartContextmenu(e) {
 function eventChartClick() {
     hideOrderButton();
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
-    else if (boxToolRef.value.classList.contains("selected")) drawBoxTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
     else if (pattern1ToolRef.value.classList.contains("selected"))
         drawPattern1Tool();
     else if (pattern2ToolRef.value.classList.contains("selected"))
         drawPattern2Tool();
-    else if (volprofileToolRef.value.classList.contains("selected"))
-        drawVolprofileTool();
-    else if (scanSignalToolRef.value.classList.contains("selected")) {
-        removeSignal();
-        scanSignal();
-    } else if (alertToolRef.value.classList.contains("selected"))
-        drawAlertTool();
+    else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
@@ -1028,19 +994,6 @@ function loadToolsData() {
             });
         }
         //
-        const volprofiles = await toolsStore.get("volprofile");
-        if (volprofiles.length > 0) {
-            params.volprofile.v1 = volprofiles[0];
-            params.volprofile.pointCount++;
-            params.series.volprofile.update(params.volprofile.v1);
-            if (volprofiles.length == 2) {
-                params.volprofile.v2 = volprofiles[1];
-                params.volprofile.pointCount++;
-                params.series.volprofile.update(params.volprofile.v2);
-            }
-            drawPoC();
-        }
-        //
         const alerts = await toolsStore.get("alert");
         alerts.forEach((alert) => {
             if (!alert.removed)
@@ -1093,11 +1046,6 @@ function loadChartData() {
     //
     params.data.cash = data.cash;
     params.series.cash.setData(data.cash);
-
-    console.log(
-        "load: ",
-        moment().diff(params.socketRefreshTime, "miliseconds")
-    );
 }
 function updateChartData(d) {
     const prevLength = params.data.original.length;
@@ -1185,7 +1133,6 @@ function connectSocket() {
                                 volume: data.lastVol,
                             });
                         }
-                        // scanSignal(params.data.volume.length - 1);
                         scanOrder();
                     }
                 }
@@ -1447,131 +1394,6 @@ function removeLineTool() {
     params.lines.forEach((line) => params.series.price.removePriceLine(line));
     params.lines = [];
     toolsStore.clear("line");
-}
-function boxToolClick(e) {
-    state.showColorPicker = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-    }
-    e.stopPropagation();
-}
-function boxToolContextmenu(e) {
-    removeBoxTool();
-    e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
-}
-function drawBoxTool() {
-    if (params.crosshair.time) {
-        const point = {
-            value: coordinateToPrice(params.crosshair.y),
-            time: params.crosshair.time,
-        };
-        // if (params.box.length <= 1)
-        //     drawBox({ point2: point, point3: findBoxPoint2(point) });
-        if (params.box.length == 0) drawBox({ point2: point });
-        else if (params.box.length == 1) drawBox({ point3: point });
-        else {
-            const point2 = {
-                value: +params.box[0].y.options().price,
-                time: params.box[0].x.time,
-            };
-            const point3 = {
-                value: +params.box[1].y.options().price,
-                time: params.box[1].x.time,
-            };
-            removeBoxTool();
-            drawBox({ point2, point3, point4: point });
-            boxToolRef.value.classList.remove("selected");
-        }
-    }
-}
-function findBoxPoint2(point2) {
-    let low = point2.value,
-        high = point2.value,
-        point3 = {};
-    for (let i of params.data.price) {
-        if (i.time >= point2.time) {
-            if (low != high) {
-                if (i.value < point2.value && low == point2.value) {
-                    point3 = { value: high, time: i.time };
-                    break;
-                }
-                if (i.value > point2.value && high == point2.value) {
-                    point3 = { value: low, time: i.time };
-                    break;
-                }
-            }
-            if (i.value < low) low = i.value;
-            if (i.value > high) high = i.value;
-        }
-    }
-    return point3;
-}
-function drawBox({ point2, point3, point4 }) {
-    let option = {
-        y: {
-            color: "#26a69a",
-            lineWidth: 1,
-            lineStyle: 1,
-            draggable: false,
-        },
-        x: { value: 1 },
-    };
-    if (mf.isSet(point4)) {
-        const i2 = params.data.whitespace.findIndex(
-            (x) => x.time === point2.time
-        );
-        const i3 = params.data.whitespace.findIndex(
-            (x) => x.time === point3.time
-        );
-        const i4 = params.data.whitespace.findIndex(
-            (x) => x.time === point4.time
-        );
-        const i5 = i4 + i3 - i2;
-        if (i5 >= params.data.whitespace.length) return false;
-        //
-        option.y.price = point4.value;
-        option.x.time = point4.time;
-        drawBoxPoint(0, option);
-        //
-        option.y.price = point4.value + point3.value - point2.value;
-        option.x.time = params.data.whitespace[i5].time;
-        drawBoxPoint(1, option);
-    } else {
-        if (mf.isSet(point2)) {
-            option.y.price = point2.value;
-            option.x.time = point2.time;
-            drawBoxPoint(0, option);
-        }
-        if (mf.isSet(point3)) {
-            option.y.price = point3.value;
-            option.x.time = point3.time;
-            drawBoxPoint(1, option);
-        }
-    }
-}
-function drawBoxPoint(id, option) {
-    option.point = id;
-    option.y.title = `B${id + 1}`;
-    params.box.push(mf.cloneDeep(option));
-    toolsStore.set("box", params.box[id]);
-    params.series.box.update(params.box[id].x);
-    params.box[id].y = params.series.price.createPriceLine(params.box[id].y);
-}
-function removeBoxTool() {
-    if (params.box.length > 0) {
-        params.series.price.removePriceLine(params.box[0].y);
-        if (params.box.length > 1)
-            params.series.price.removePriceLine(params.box[1].y);
-    }
-    params.series.box.setData([]);
-    params.box = [];
-    toolsStore.clear("box");
 }
 function rulerToolClick(e) {
     state.showColorPicker = false;
@@ -1938,154 +1760,6 @@ function removePattern2Tool() {
         toolsStore.clear("pattern2");
     }
 }
-function volprofileToolClick(e) {
-    state.showColorPicker = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) e.target.classList.add("selected");
-    else drawPoC();
-    e.stopPropagation();
-}
-function volprofileToolContextmenu(e) {
-    removeVolprofileTool();
-    e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
-}
-function drawVolprofileTool() {
-    if (params.crosshair.time) {
-        if (params.volprofile.pointCount == 0) {
-            params.volprofile.v1 = {
-                time: params.crosshair.time,
-                value: 1,
-            };
-            params.series.volprofile.setData([params.volprofile.v1]);
-            params.volprofile.pointCount++;
-            toolsStore.set("volprofile", params.volprofile.v1);
-        } else {
-            if (params.crosshair.time > params.volprofile.v1.time) {
-                params.volprofile.v2 = {
-                    time: params.crosshair.time,
-                    value: 1,
-                };
-                params.series.volprofile.setData([
-                    params.volprofile.v1,
-                    params.volprofile.v2,
-                ]);
-                if (mf.isSet(params.volprofile.v2)) {
-                    toolsStore.clear("volprofile");
-                    toolsStore.set("volprofile", params.volprofile.v1);
-                }
-                toolsStore.set("volprofile", params.volprofile.v2);
-                drawPoC();
-                params.volprofile.pointCount++;
-                volprofileToolRef.value.classList.remove("selected");
-            }
-        }
-    }
-}
-function drawPoC() {
-    if (mf.isSet(params.volprofile.v1)) {
-        const v1Time = params.volprofile.v1.time;
-        const v2Time = mf.isSet(params.volprofile.v2)
-            ? params.volprofile.v2.time
-            : moment().unix() + 7 * 60 * 60;
-        const poc = findPoC(v1Time, v2Time);
-        const options = {
-            price: poc.price,
-            buy: poc.buy,
-            sell: poc.sell,
-            title: `POC ${poc.buy} - ${poc.sell}`,
-            color: poc.buy >= poc.sell ? "#2196F3" : "#9C27B0",
-            lineWidth: 1,
-            lineStyle: 1,
-            draggable: false,
-        };
-        if (mf.isSet(params.volprofile.poc))
-            params.series.price.removePriceLine(params.volprofile.poc);
-        params.volprofile.poc = params.series.price.createPriceLine(options);
-    }
-}
-function findPoC(v1Time, v2Time) {
-    const prices = params.data.price.filter(
-        (x) => x.time >= v1Time && x.time <= v2Time
-    );
-    const volumes = params.data.volume.filter(
-        (x) => x.time >= v1Time && x.time <= v2Time
-    );
-    let profile = {};
-    for (let i = 0; i < prices.length; i++) {
-        if (!profile[prices[i].value])
-            profile[prices[i].value] = { buy: 0, sell: 0, total: 0 };
-        if (volumes[i].color == "#00FF00")
-            profile[prices[i].value].buy += volumes[i].value;
-        if (volumes[i].color == "#FF0000")
-            profile[prices[i].value].sell += volumes[i].value;
-        profile[prices[i].value].total += volumes[i].value;
-    }
-    const maxPrice = Object.keys(profile).reduce((a, b) =>
-        profile[a].total > profile[b].total ? a : b
-    );
-    return {
-        price: +maxPrice,
-        buy: profile[maxPrice].buy,
-        sell: profile[maxPrice].sell,
-    };
-}
-function removeVolprofileTool() {
-    if (mf.isSet(params.volprofile.poc))
-        params.series.price.removePriceLine(params.volprofile.poc);
-    params.volprofile = {
-        v1: {},
-        v2: {},
-        poc: {},
-        pointCount: 0,
-    };
-    params.series.volprofile.setData([]);
-    toolsStore.clear("volprofile");
-}
-function scanSignalToolClick(e) {
-    state.showColorPicker = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-        removeSignal();
-    } else scanSignal(0);
-    e.stopPropagation();
-}
-function scanSignalToolContextmenu(e) {
-    removeSignal();
-    e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
-}
-function scanSignal(start = -1) {
-    if (start == -1) {
-        start = params.data.volume.findIndex(
-            (x) => x.time >= params.crosshair.time
-        );
-        params.volumeMax = params.data.volume[start].value - 1;
-        scanSignalToolRef.value.classList.remove("selected");
-    }
-    for (let i = start; i < params.data.volume.length; i++) {
-        if (params.data.volume[i].value > params.volumeMax) {
-            params.volumeMax = params.data.volume[i].value;
-            params.series.signal.update({
-                time: params.data.volume[i].time,
-                value: 1,
-            });
-        }
-    }
-}
-function removeSignal() {
-    params.volumeMax = store.state.tradingOrder.config.volLimit;
-    params.series.signal.setData([]);
-}
 function alertToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
@@ -2432,9 +2106,8 @@ function refreshChart() {
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 function resetChart() {
+    params.data.original = [];
     params.data.price = [];
-    params.data.volume = [];
-    params.data.spread = [];
     params.data.cash = [];
     params.data.whitespace = [];
     refreshChart();
