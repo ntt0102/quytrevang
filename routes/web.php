@@ -149,6 +149,8 @@ Route::get('test', function () {
     // $vos = new \App\Services\Special\VpsOrderService($copyist);
     // // dd($vos->hasOrder());
     // dd($vos->hasOrder() || $vos->hasConditionOrder());
+    $date = date('Y-m-d');
+    dd('2023-12-25' == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'));
     $client = new \GuzzleHttp\Client();
     $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
     $res = $client->get($url);
