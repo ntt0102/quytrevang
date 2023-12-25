@@ -150,7 +150,7 @@ Route::get('test', function () {
     // // dd($vos->hasOrder());
     // dd($vos->hasOrder() || $vos->hasConditionOrder());
     $date = date('Y-m-d');
-    dd(get_global_value('openingMarketFlag1'));
+    dd(get_global_value('openingMarketFlag'));
     dd('2023-12-25' == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'));
     $client = new \GuzzleHttp\Client();
     $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
