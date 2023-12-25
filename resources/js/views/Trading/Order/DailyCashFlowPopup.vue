@@ -81,7 +81,7 @@ let params = {
 function show() {
     popupRef.value.show();
 }
-function symbolChange() {
+function symbolChange(e) {
     if (state.symbol == "") return false;
     state.symbol = state.symbol.toUpperCase();
     store.dispatch("tradingOrder/cashflow", state.symbol).then((data) => {
@@ -89,6 +89,7 @@ function symbolChange() {
         params.series.avg.setData(data.avg);
         params.series.cash.setData(data.cash);
         params.chart.applyOptions({ watermark: { text: state.symbol } });
+        e.target.blur();
     });
 }
 function symbolFocus(e) {
