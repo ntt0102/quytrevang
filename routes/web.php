@@ -150,7 +150,7 @@ Route::get('test', function () {
     // // dd($vos->hasOrder());
     // dd($vos->hasOrder() || $vos->hasConditionOrder());
     $client = new \GuzzleHttp\Client();
-    $url = "https://iboard.ssi.com.vn/dchart/api/history?resolution=D&symbol=VN30F1M&from=" . strtotime("-1 year") . "&to=" . time();
+    $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
     $res = $client->get($url);
     $rsp = json_decode($res->getBody());
     dd($rsp);
