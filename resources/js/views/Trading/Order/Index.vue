@@ -135,6 +135,13 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
+                        ref="targetToolRef"
+                        class="command far fa-dot-circle"
+                        :title="$t('trading.orderChart.targetTool')"
+                        @click="targetToolClick"
+                        @contextmenu="targetToolContextmenu"
+                    ></div>
+                    <div
                         v-show="false"
                         ref="alertToolRef"
                         class="command far fa-alarm-exclamation"
@@ -268,6 +275,7 @@ const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
+const targetToolRef = ref(null);
 const pattern1ToolRef = ref(null);
 const pattern2ToolRef = ref(null);
 const alertToolRef = ref(null);
@@ -289,20 +297,9 @@ let params = {
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, l5: {}, pointCount: 0 },
-    pattern1: {
-        A: {},
-        B: {},
-        C: {},
-        X: {},
-        Y: {},
-        Z: {},
-        T: {},
-    },
-    pattern2: {
-        E: {},
-        S: {},
-        T: {},
-    },
+    target: {},
+    pattern1: { A: {}, B: {}, C: {}, X: {}, Y: {}, Z: {}, T: {} },
+    pattern2: { E: {}, S: {}, T: {} },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
     box: [],
     alerts: [],
@@ -446,6 +443,8 @@ function eventChartClick() {
     hideOrderButton();
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
+    else if (targetToolRef.value.classList.contains("selected"))
+        drawTargetTool();
     else if (pattern1ToolRef.value.classList.contains("selected"))
         drawPattern1Tool();
     else if (pattern2ToolRef.value.classList.contains("selected"))
@@ -978,6 +977,11 @@ function loadToolsData() {
             });
         }
         //
+        const targetLine = await toolsStore.get("target");
+        if (targetLine.length > 0) {
+            params.target = params.series.cash.createPriceLine(targetLine[0]);
+        }
+        //
         const pattern1Lines = await toolsStore.get("pattern1");
         if (pattern1Lines.length > 0) {
             pattern1Lines.forEach((line) => {
@@ -1502,6 +1506,45 @@ function removeRulerTool() {
             pointCount: 0,
         };
         toolsStore.clear("ruler");
+    }
+}
+function targetToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removeTargetTool();
+    }
+    e.stopPropagation();
+}
+function targetToolContextmenu(e) {
+    removeTargetTool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawTargetTool() {
+    const cash = coordinateToPrice(params.crosshair.y, "cash");
+    let option = {
+        lineType: "target",
+        price: cash,
+        color: "#E91E63",
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: false,
+    };
+    params.target = params.series.cash.createPriceLine(option);
+    toolsStore.set("target", option);
+    targetToolRef.value.classList.remove("selected");
+}
+function removeTargetTool() {
+    if (mf.isSet(params.target)) {
+        params.series.cash.removePriceLine(params.target);
+        params.target = {};
+        toolsStore.clear("target");
     }
 }
 function pattern1ToolClick(e) {
@@ -2085,8 +2128,8 @@ function inSession(currentSec = null) {
     if (!currentSec) currentSec = moment().unix();
     return currentSec >= TIME.START && currentSec <= TIME.END;
 }
-function coordinateToPrice(y) {
-    return formatPrice(params.series.price.coordinateToPrice(y));
+function coordinateToPrice(y, name = "price") {
+    return formatPrice(params.series[name].coordinateToPrice(y));
 }
 function formatPrice(price) {
     if (!price) return 0;
