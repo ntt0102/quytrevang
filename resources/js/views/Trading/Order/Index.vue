@@ -297,7 +297,7 @@ let params = {
     order: { side: 0, entry: {}, tp: {}, sl: {} },
     lines: [],
     ruler: { l0: {}, l1: {}, l2: {}, l3: {}, l4: {}, l5: {}, pointCount: 0 },
-    target: {},
+    target: { A: {}, B: {}, X: {} },
     pattern1: { A: {}, B: {}, C: {}, X: {}, Y: {}, Z: {}, T: {} },
     pattern2: { E: {}, S: {}, T: {} },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
@@ -977,9 +977,12 @@ function loadToolsData() {
             });
         }
         //
-        const targetLine = await toolsStore.get("target");
-        if (targetLine.length > 0) {
-            params.target = params.series.cash.createPriceLine(targetLine[0]);
+        const targetLines = await toolsStore.get("target");
+        if (targetLines.length > 0) {
+            targetLines.forEach((line) => {
+                params.target[line.point] =
+                    params.series.cash.createPriceLine(line);
+            });
         }
         //
         const pattern1Lines = await toolsStore.get("pattern1");
@@ -1137,6 +1140,7 @@ function connectSocket() {
                                 volume: data.lastVol,
                             });
                         }
+                        takeProfitAuto();
                         scanOrder();
                     }
                 }
@@ -1180,17 +1184,17 @@ function intervalHandler() {
         }
         if (CURRENT_SEC == TIME.START) connectSocket();
         //
-        params.alerts.forEach((alert) => {
-            const ops = alert.options();
-            if (!ops.removed && !!params.data.price.length) {
-                const currentPrice = params.data.price.slice(-1)[0].value;
-                if (
-                    (ops.title == ">" && currentPrice >= ops.price) ||
-                    (ops.title == "<" && currentPrice <= ops.price)
-                )
-                    playSound();
-            }
-        });
+        // params.alerts.forEach((alert) => {
+        //     const ops = alert.options();
+        //     if (!ops.removed && !!params.data.price.length) {
+        //         const currentPrice = params.data.price.slice(-1)[0].value;
+        //         if (
+        //             (ops.title == ">" && currentPrice >= ops.price) ||
+        //             (ops.title == "<" && currentPrice <= ops.price)
+        //         )
+        //             playSound();
+        //     }
+        // });
     }
     state.clock = moment().format("HH:mm:ss");
 }
@@ -1531,19 +1535,47 @@ function drawTargetTool() {
     let option = {
         lineType: "target",
         price: cash,
-        color: "#E91E63",
-        lineWidth: 1,
-        lineStyle: 1,
+        lineWidth: 2,
+        lineStyle: 0,
         draggable: false,
     };
-    params.target = params.series.cash.createPriceLine(option);
+    if (mf.isSet(params.target.A)) {
+        option.point = "B";
+        option.title = "B";
+        option.color = "#009688";
+    } else {
+        option.point = "A";
+        option.title = "A";
+        option.color = "#009688";
+    }
+    params.target[option.point] = params.series.cash.createPriceLine(option);
     toolsStore.set("target", option);
-    targetToolRef.value.classList.remove("selected");
+    if (option.point == "B") {
+        const a = +params.target.A.options().price;
+        const b = +params.target.B.options().price;
+        option.point = "X";
+        option.price = +(a + 2 * (b - a)).toFixed(1);
+        option.title = "X";
+        option.color = "#9C27B0";
+        params.target[option.point] =
+            params.series.cash.createPriceLine(option);
+        toolsStore.set("target", option);
+        //
+        targetToolRef.value.classList.remove("selected");
+    }
 }
 function removeTargetTool() {
-    if (mf.isSet(params.target)) {
-        params.series.cash.removePriceLine(params.target);
-        params.target = {};
+    if (mf.isSet(params.target.A)) {
+        params.series.cash.removePriceLine(params.target.A);
+        if (mf.isSet(params.target.B)) {
+            params.series.cash.removePriceLine(params.target.B);
+            params.series.cash.removePriceLine(params.target.X);
+        }
+        params.target = {
+            A: {},
+            B: {},
+            X: {},
+        };
         toolsStore.clear("target");
     }
 }
@@ -2117,6 +2149,19 @@ function scanOrder() {
                             });
                     }, 1000);
                 }
+            }
+        }
+    }
+}
+function takeProfitAuto() {
+    if (!!status.value.position) {
+        if (mf.isSet(params.target.X)) {
+            const lastCash = params.data.cash.slice(-1)[0].value;
+            const b = +params.target.B.options().price;
+            const x = +params.target.X.options().price;
+            const xb = x - b;
+            if ((xb > 0 && lastCash >= x) || (xb < 0 && lastCash <= x)) {
+                cancelOrderRef.value.click();
             }
         }
     }
