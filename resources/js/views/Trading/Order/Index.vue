@@ -790,8 +790,8 @@ function eventPriceLineDrag(e) {
                 toolsStore.set("pattern1", params.pattern1.X.options());
                 //
                 params.pattern1.Y.applyOptions({
-                    price: +(c + 1.272 * ba).toFixed(1),
-                    title: (1.272 * ba).toFixed(1),
+                    price: +(c + 1.5 * ba).toFixed(1),
+                    title: (1.5 * ba).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Y.options());
                 //
@@ -800,12 +800,6 @@ function eventPriceLineDrag(e) {
                     title: (1.618 * ba).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Z.options());
-                //
-                params.pattern1.T.applyOptions({
-                    price: +(c + 2.618 * ba).toFixed(1),
-                    title: (2.618 * ba).toFixed(1),
-                });
-                toolsStore.set("pattern1", params.pattern1.T.options());
             }
             break;
         case "pattern2":
@@ -1676,8 +1670,8 @@ function drawPattern1Tool() {
         toolsStore.set("pattern1", option);
         //
         option.point = "Y";
-        option.price = +(c + 1.272 * ba).toFixed(1);
-        option.title = (1.272 * ba).toFixed(1);
+        option.price = +(c + 1.5 * ba).toFixed(1);
+        option.title = (1.5 * ba).toFixed(1);
         option.color = "#673AB7";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
