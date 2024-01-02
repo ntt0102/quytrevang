@@ -120,7 +120,6 @@
                         @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
-                        v-show="false"
                         ref="pattern2ToolRef"
                         class="command far fa-heart"
                         :title="$t('trading.orderChart.pattern2Tool')"
@@ -216,6 +215,7 @@ import {
     computed,
 } from "vue";
 import { useStore } from "vuex";
+import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
 const CHART_OPTIONS = {
@@ -260,6 +260,7 @@ const SOCKET_ENDPOINT =
 const SOCKET_REFRESH_PERIOD = 120;
 
 const store = useStore();
+const route = useRoute();
 const { t } = useI18n();
 const devices = inject("devices");
 const mf = inject("mf");
@@ -306,7 +307,7 @@ let params = {
     },
     target: { A: {}, B: {}, X: {} },
     pattern1: { A: {}, B: {}, C: {}, X: {} },
-    pattern2: { E: {}, S: {}, T: {} },
+    pattern2: { O: {} },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
     box: [],
     alerts: [],
@@ -322,7 +323,7 @@ let params = {
     socketRefreshTime: moment(),
 };
 const state = reactive({
-    chartDate: CURRENT_DATE,
+    chartDate: route.query.date ?? CURRENT_DATE,
     clock: moment().format("HH:mm:ss"),
     isFullscreen: false,
     color: "#F44336",
@@ -1042,15 +1043,19 @@ function loadChartData() {
     let data = params.data.original.reduce(
         (c, d) => {
             let lastPrice = d.price,
-                lastCash = 0;
+                lastCash = 0,
+                side = 0;
             if (c.price.length > 0) {
                 lastPrice = c.price.slice(-1)[0].value;
                 lastCash = c.cash.slice(-1)[0].value;
             }
+            const change = d.price - lastPrice;
+            if (change > 0) side = 1;
+            else if (change < 0) side = -1;
             c.price.push({ time: d.time, value: d.price });
             c.cash.push({
                 time: d.time,
-                value: lastCash + (d.price - lastPrice) * d.volume,
+                value: lastCash + side * d.price * d.volume,
             });
             return c;
         },
@@ -1070,13 +1075,17 @@ function updateChartData(d) {
     const prevLength = params.data.original.length;
     params.data.original = mergeChartData(params.data.original, [d]);
     if (params.data.original.length > prevLength) {
+        let side = 0;
         const lastPrice = params.data.price.slice(-1)[0].value;
         const lastCash = params.data.cash.slice(-1)[0].value;
+        const change = d.price - lastPrice;
+        if (change > 0) side = 1;
+        else if (change < 0) side = -1;
         params.data.price.push({ time: d.time, value: d.price });
         params.series.price.setData(params.data.price);
         params.data.cash.push({
             time: d.time,
-            value: lastCash + (d.price - lastPrice) * d.volume,
+            value: lastCash + side * d.price * d.volume,
         });
         params.series.cash.setData(params.data.cash);
     }
@@ -1377,10 +1386,9 @@ function lineToolContextmenu(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-function drawLineTool(price = null, color = null, title = null) {
+function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
     const TYPE = "line";
     if (!price) price = formatPrice(coordinateToPrice(params.crosshair.y));
-    if (!color) color = state.color;
     const oldLength = params.lines.length;
     params.lines = params.lines.filter((line) => {
         const ops = line.options();
@@ -1391,12 +1399,11 @@ function drawLineTool(price = null, color = null, title = null) {
         }
         return !isExist;
     });
-    if (params.lines.length == oldLength) {
+    if ((params.lines.length == oldLength && !forceRemove) || forceDraw) {
         const options = {
             lineType: TYPE,
             price: price,
-            color: color,
-            title: title,
+            color: state.color,
             lineWidth: 1,
             lineStyle: 1,
             draggable: true,
@@ -1700,11 +1707,11 @@ function pattern2ToolContextmenu(e) {
 }
 function drawPattern2Tool(fix = false) {
     let point1 = {};
-    if (mf.isSet(params.pattern2.E)) {
-        const opsE = params.pattern2.E.options();
+    if (mf.isSet(params.pattern2.O)) {
+        const ops = params.pattern2.O.options();
         point1 = {
-            time: opsE.time1,
-            value: opsE.price1,
+            time: ops.time0,
+            value: ops.price0,
         };
         removePattern2Tool();
     } else {
@@ -1714,45 +1721,24 @@ function drawPattern2Tool(fix = false) {
             value: coordinateToPrice(params.crosshair.y),
         };
     }
-    const { point2, point3, point4, point5 } = findPattern2Points(point1);
-    if (point2.value == point1.value) return false;
-    const d32 = point3.value - point2.value;
-    const d34 = point3.value - point4.value;
-    const d54 = point5.value - point4.value;
-    const d56 = Math.abs(d32) > Math.abs(d54 / 2) ? d32 : d54 / 2;
-    const price6 = point5.value - d56;
-    const price7 = price6 + (Math.abs(d54) > Math.abs(d34) ? 1.5 : 2) * d54;
-    const d75 = price7 - point5.value;
+
+    const { price2, price3, price4, isAcc } = findPattern2Points(point1);
+    console.log("price2", price2);
+    console.log("price3", price3);
+    console.log("price4", price4);
     let option = {
         lineType: "pattern2",
         lineWidth: 1,
         lineStyle: 1,
     };
+    console.log("isAcc", isAcc);
+    drawLineTool(point1.value, !isAcc, isAcc);
     //
-    option.price = point5.value;
-    option.time1 = point1.time;
-    option.price1 = point1.value;
-    option.price2 = point2.value;
-    option.price3 = point3.value;
-    option.price4 = point4.value;
-    option.point = "E";
-    option.title = `RR=${(d75 / d56).toFixed(1)}`;
-    option.color = "#FF9800";
-    option.draggable = true;
-    params.pattern2[option.point] = params.series.price.createPriceLine(option);
-    toolsStore.set("pattern2", option);
-    //
-    option.price = +price6.toFixed(1);
-    option.point = "S";
-    option.title = `SL=${(-d56).toFixed(1)}`;
-    option.color = "#E91E63";
-    option.draggable = true;
-    params.pattern2[option.point] = params.series.price.createPriceLine(option);
-    toolsStore.set("pattern2", option);
-    //
-    option.point = "T";
-    option.price = +price7.toFixed(1);
-    option.title = `TP=${d75.toFixed(1)}`;
+    option.time0 = point1.time;
+    option.price0 = point1.value;
+    option.point = "O";
+    option.price = price4;
+    option.title = "O";
     option.color = "#2196F3";
     option.draggable = false;
     params.pattern2[option.point] = params.series.price.createPriceLine(option);
@@ -1761,65 +1747,65 @@ function drawPattern2Tool(fix = false) {
     pattern2ToolRef.value.classList.remove("selected");
 }
 function findPattern2Points(point1) {
-    let d = 0,
-        dMax = 0,
-        point2 = point1,
-        point3 = point1,
-        point4 = point1,
-        point5 = point1;
+    let price2 = point1.value,
+        price3 = point1.value,
+        price4 = point1.value,
+        isAcc = false;
     for (let i of params.data.price) {
         if (i.time >= point1.time) {
             if (i.value < point1.value) {
-                if (point2.value > point3.value) break;
-                if (i.value < point4.value) {
-                    if (d > dMax) {
-                        point2 = point4;
-                        point3 = point5;
-                        dMax = d;
-                    }
-                    point4 = i;
-                    point5 = i;
-                    d = 0;
-                } else if (i.value > point4.value) {
-                    if (i.value > point1.value) break;
-                    if (i.value > point5.value) {
-                        point5 = i;
-                        d = +Math.abs(point5.value - point4.value).toFixed(1);
-                    }
+                if (price2 <= point1.value && i.value < price2) {
+                    // if (price3 > point1.value) break;
+                    price2 = i.value;
+                }
+                //
+                if (
+                    price3 <= point1.value &&
+                    price2 > point1.value &&
+                    i.value < price3
+                ) {
+                    price3 = i.value;
                 }
             } else if (i.value > point1.value) {
-                if (point2.value < point3.value) break;
-                if (i.value > point4.value) {
-                    if (d > dMax) {
-                        point2 = point4;
-                        point3 = point5;
-                        dMax = d;
-                    }
-                    point4 = i;
-                    point5 = i;
-                    d = 0;
-                } else if (i.value < point4.value) {
-                    if (i.value < point1.value) break;
-                    if (i.value < point5.value) {
-                        point5 = i;
-                        d = +Math.abs(point5.value - point4.value).toFixed(1);
-                    }
+                if (price2 >= point1.value && i.value > price2) {
+                    // if (price3 < point1.value) break;
+                    price2 = i.value;
+                }
+                //
+                if (
+                    price3 >= point1.value &&
+                    price2 < point1.value &&
+                    i.value > price3
+                ) {
+                    price3 = i.value;
+                }
+            }
+            const d = i.value - price3;
+            const d13 = point1.value - price3;
+            const d23 = price2 - price3;
+            const d43 =
+                Math.abs(d13 * 2) > Math.abs(d23 / 2) ? d13 * 2 : d23 / 2;
+            price4 = +(price3 + d43).toFixed(1);
+            if (price2 != point1.value && price3 != point1.value) {
+                if (Math.abs(d) > Math.abs(d43)) {
+                    isAcc = true;
+                    break;
+                }
+
+                if (Math.abs(d) > Math.abs(d13) * 3) {
+                    break;
                 }
             }
         }
     }
-    return { point2, point3, point4, point5 };
+    return { price2, price3, price4, isAcc };
 }
 function removePattern2Tool() {
-    if (mf.isSet(params.pattern2.T)) {
-        params.series.price.removePriceLine(params.pattern2.E);
-        params.series.price.removePriceLine(params.pattern2.S);
-        params.series.price.removePriceLine(params.pattern2.T);
+    if (mf.isSet(params.pattern2.O)) {
+        params.series.price.removePriceLine(params.pattern2.O);
         //
         params.pattern2 = {
-            E: {},
-            S: {},
-            T: {},
+            O: {},
         };
         toolsStore.clear("pattern2");
     }
