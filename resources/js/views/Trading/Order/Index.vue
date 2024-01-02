@@ -1055,7 +1055,7 @@ function loadChartData() {
             c.price.push({ time: d.time, value: d.price });
             c.cash.push({
                 time: d.time,
-                value: lastCash + side * d.price * d.volume,
+                value: lastCash + side * d.volume,
             });
             return c;
         },
@@ -1085,7 +1085,7 @@ function updateChartData(d) {
         params.series.price.setData(params.data.price);
         params.data.cash.push({
             time: d.time,
-            value: lastCash + side * d.price * d.volume,
+            value: lastCash + side * d.volume,
         });
         params.series.cash.setData(params.data.cash);
     }
