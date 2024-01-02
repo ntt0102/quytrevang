@@ -279,12 +279,12 @@ class OrderChartService extends CoreService
                 'time' => $rsp->t[$i],
                 'value' => $avg
             ];
-            $change = ($avg - $prevAvg) / $prevAvg;
+            $change = $avg - $prevAvg;
+            $side = 0;
+            if ($change > 0) $side = 1;
+            else if ($change < 0) $side = -1;
             $prevAvg = $avg;
-            $cash = $rsp->v[$i] * $change;
-
-            // $prevClose = $i > 0 ? $rsp->c[$i - 1] : $rsp->c[0];
-            // $cash = ($rsp->c[$i] - $prevClose) / $prevClose * $rsp->v[$i];
+            $cash = $side * $avg * $rsp->v[$i];
             $acc += $cash;
             $r['cash'][] = [
                 'time' => $rsp->t[$i],
