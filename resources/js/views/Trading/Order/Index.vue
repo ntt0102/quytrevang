@@ -299,7 +299,7 @@ let params = {
         l0: {},
         ln1: {},
         l1: {},
-        // l2: {},
+        l2: {},
         // l3: {},
         // l4: {},
         // l5: {},
@@ -1540,7 +1540,7 @@ function removeRulerTool() {
         if (params.ruler.pointCount > 1) {
             params.series.price.removePriceLine(params.ruler.ln1);
             params.series.price.removePriceLine(params.ruler.l1);
-            // params.series.price.removePriceLine(params.ruler.l2);
+            params.series.price.removePriceLine(params.ruler.l2);
             // params.series.price.removePriceLine(params.ruler.l3);
             // params.series.price.removePriceLine(params.ruler.l4);
             // params.series.price.removePriceLine(params.ruler.l5);
@@ -1550,7 +1550,7 @@ function removeRulerTool() {
             l0: {},
             ln1: {},
             l1: {},
-            // l2: {},
+            l2: {},
             // l3: {},
             // l4: {},
             // l5: {},
