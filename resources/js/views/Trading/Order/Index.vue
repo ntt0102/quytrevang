@@ -590,10 +590,10 @@ function eventPriceLineDrag(e) {
                         const l1Price = +(newPrice + distance).toFixed(1);
                         params.ruler.l1.applyOptions({ price: l1Price });
                         toolsStore.set("ruler", params.ruler.l1.options());
-
-                        // const l2Price = +(newPrice + distance * 2).toFixed(1);
-                        // params.ruler.l2.applyOptions({ price: l2Price });
-                        // toolsStore.set("ruler", params.ruler.l2.options());
+                        //
+                        const l2Price = +(newPrice + distance * 2).toFixed(1);
+                        params.ruler.l2.applyOptions({ price: l2Price });
+                        toolsStore.set("ruler", params.ruler.l2.options());
 
                         // const l3Price = +(newPrice + distance * 3).toFixed(1);
                         // params.ruler.l3.applyOptions({ price: l3Price });
@@ -619,6 +619,12 @@ function eventPriceLineDrag(e) {
                         price: +(l0PriceN1 - distanceN1).toFixed(1),
                     });
                     toolsStore.set("ruler", params.ruler.l1.options());
+                    //
+                    params.ruler.l2.applyOptions({
+                        title: (-distanceN1 * 2).toFixed(1),
+                        price: +(l0PriceN1 - distanceN1 * 2).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.l2.options());
                     break;
                 case "l1":
                     const l0Price1 = +params.ruler.l0.options().price;
@@ -632,12 +638,12 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("ruler", params.ruler.ln1.options());
                     //
-                    // params.ruler.l2.applyOptions({
-                    //     title: (distance1 * 2).toFixed(1),
-                    //     price: +(l0Price1 + distance1 * 2).toFixed(1),
-                    // });
-                    // toolsStore.set("ruler", params.ruler.l2.options());
-                    // //
+                    params.ruler.l2.applyOptions({
+                        title: (distance1 * 2).toFixed(1),
+                        price: +(l0Price1 + distance1 * 2).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.l2.options());
+                    //
                     // params.ruler.l3.applyOptions({
                     //     title: (distance1 * 3).toFixed(1),
                     //     price: +(l0Price1 + distance1 * 3).toFixed(1),
@@ -656,36 +662,42 @@ function eventPriceLineDrag(e) {
                     // });
                     // toolsStore.set("ruler", params.ruler.l5.options());
                     break;
-                // case "l2":
-                //     const l0Price2 = +params.ruler.l0.options().price;
-                //     const distance2 = newPrice - l0Price2;
-                //     line.applyOptions({ title: distance2.toFixed(1) });
-                //     toolsStore.set("ruler", line.options());
-                //     //
-                //     params.ruler.l1.applyOptions({
-                //         title: (distance2 * 0.5).toFixed(1),
-                //         price: +(l0Price2 + distance2 * 0.5).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l1.options());
-                //     //
-                //     params.ruler.l3.applyOptions({
-                //         title: (distance2 * 1.5).toFixed(1),
-                //         price: +(l0Price2 + distance2 * 1.5).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l3.options());
-                //     //
-                //     params.ruler.l4.applyOptions({
-                //         title: (distance2 * 2).toFixed(1),
-                //         price: +(l0Price2 + distance2 * 2).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l4.options());
-                //     //
-                //     params.ruler.l5.applyOptions({
-                //         title: (distance2 * 2.5).toFixed(1),
-                //         price: +(l0Price2 + distance2 * 2.5).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l5.options());
-                //     break;
+                case "l2":
+                    const l0Price2 = +params.ruler.l0.options().price;
+                    const distance2 = newPrice - l0Price2;
+                    line.applyOptions({ title: distance2.toFixed(1) });
+                    toolsStore.set("ruler", line.options());
+                    //
+                    params.ruler.ln1.applyOptions({
+                        title: (-distance2 * 0.5).toFixed(1),
+                        price: +(l0Price2 - distance2 * 0.5).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.ln1.options());
+                    //
+                    params.ruler.l1.applyOptions({
+                        title: (distance2 * 0.5).toFixed(1),
+                        price: +(l0Price2 + distance2 * 0.5).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.l1.options());
+                    //     //
+                    //     params.ruler.l3.applyOptions({
+                    //         title: (distance2 * 1.5).toFixed(1),
+                    //         price: +(l0Price2 + distance2 * 1.5).toFixed(1),
+                    //     });
+                    //     toolsStore.set("ruler", params.ruler.l3.options());
+                    //     //
+                    //     params.ruler.l4.applyOptions({
+                    //         title: (distance2 * 2).toFixed(1),
+                    //         price: +(l0Price2 + distance2 * 2).toFixed(1),
+                    //     });
+                    //     toolsStore.set("ruler", params.ruler.l4.options());
+                    //     //
+                    //     params.ruler.l5.applyOptions({
+                    //         title: (distance2 * 2.5).toFixed(1),
+                    //         price: +(l0Price2 + distance2 * 2.5).toFixed(1),
+                    //     });
+                    //     toolsStore.set("ruler", params.ruler.l5.options());
+                    break;
                 // case "l3":
                 //     const l0Price3 = +params.ruler.l0.options().price;
                 //     const distance3 = newPrice - l0Price3;
@@ -1043,28 +1055,24 @@ function loadChartData() {
     let data = params.data.original.reduce(
         (c, d) => {
             let lastPrice = d.price,
+                prevPrice = d.price,
                 lastCash = 0,
+                change = 0,
                 side = 0;
-            if (c.price.length > 0) {
-                lastPrice = c.price.slice(-1)[0].value;
-                lastCash = c.cash.slice(-1)[0].value;
-            }
-            let change = d.price - lastPrice;
-            if (change > 0) side = 1;
-            else if (change < 0) side = -1;
-            else {
-                let i = -1;
-                do {
-                    if (c.price.length > -i) {
-                        change =
-                            c.price.slice(i)[0].value -
-                            c.price.slice(i - 1)[0].value;
-                        if (change > 0) side = 1;
-                        else if (change < 0) side = -1;
-                        i--;
-                    } else change = 1;
-                } while (change == 0);
-            }
+
+            let i = -1;
+            do {
+                if (c.price.length >= -i) {
+                    prevPrice = c.price.slice(i)[0].value;
+                    change = lastPrice - prevPrice;
+                    if (change > 0) side = 1;
+                    else if (change < 0) side = -1;
+                    lastPrice = prevPrice;
+                    i--;
+                } else change = 1;
+            } while (change == 0);
+
+            if (c.price.length > 0) lastCash = c.cash.slice(-1)[0].value;
             c.price.push({ time: d.time, value: d.price });
             c.cash.push({
                 time: d.time,
@@ -1485,15 +1493,15 @@ function drawRulerTool() {
         params.ruler[options.point] =
             params.series.price.createPriceLine(options);
         toolsStore.set("ruler", options);
-
-        // const distance2 = 2 * distance1;
-        // options.point = "l2";
-        // options.color = "#FFEB3B";
-        // options.title = distance2.toFixed(1);
-        // options.price = +(l0Price + distance2).toFixed(1);
-        // params.ruler[options.point] =
-        //     params.series.price.createPriceLine(options);
-        // toolsStore.set("ruler", options);
+        //
+        const distance2 = 2 * distance1;
+        options.point = "l2";
+        options.color = "#FFEB3B";
+        options.title = distance2.toFixed(1);
+        options.price = +(l0Price + distance2).toFixed(1);
+        params.ruler[options.point] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("ruler", options);
 
         // const distance3 = 3 * distance1;
         // options.point = "l3";
