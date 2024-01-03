@@ -1049,9 +1049,22 @@ function loadChartData() {
                 lastPrice = c.price.slice(-1)[0].value;
                 lastCash = c.cash.slice(-1)[0].value;
             }
-            const change = d.price - lastPrice;
+            let change = d.price - lastPrice;
             if (change > 0) side = 1;
             else if (change < 0) side = -1;
+            else {
+                let i = -1;
+                do {
+                    if (c.price.length > -i) {
+                        change =
+                            c.price.slice(i)[0].value -
+                            c.price.slice(i - 1)[0].value;
+                        if (change > 0) side = 1;
+                        else if (change < 0) side = -1;
+                        i--;
+                    } else change = 1;
+                } while (change == 0);
+            }
             c.price.push({ time: d.time, value: d.price });
             c.cash.push({
                 time: d.time,
