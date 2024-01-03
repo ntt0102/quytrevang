@@ -1055,24 +1055,13 @@ function loadChartData() {
     let data = params.data.original.reduce(
         (c, d) => {
             let lastPrice = d.price,
-                prevPrice = d.price,
-                lastCash = 0,
-                change = 0,
-                side = 0;
-
-            let i = -1;
-            do {
-                if (c.price.length >= -i) {
-                    prevPrice = c.price.slice(i)[0].value;
-                    change = lastPrice - prevPrice;
-                    if (change > 0) side = 1;
-                    else if (change < 0) side = -1;
-                    lastPrice = prevPrice;
-                    i--;
-                } else change = 1;
-            } while (change == 0);
-
-            if (c.price.length > 0) lastCash = c.cash.slice(-1)[0].value;
+                lastCash = 0;
+            if (c.price.length > 0) {
+                lastPrice = c.price.slice(-1)[0].value;
+                lastCash = c.cash.slice(-1)[0].value;
+            }
+            const change = d.price - lastPrice;
+            const side = change > 0 ? 1 : change < 0 ? -1 : 0;
             c.price.push({ time: d.time, value: d.price });
             c.cash.push({
                 time: d.time,
@@ -1096,12 +1085,10 @@ function updateChartData(d) {
     const prevLength = params.data.original.length;
     params.data.original = mergeChartData(params.data.original, [d]);
     if (params.data.original.length > prevLength) {
-        let side = 0;
         const lastPrice = params.data.price.slice(-1)[0].value;
         const lastCash = params.data.cash.slice(-1)[0].value;
         const change = d.price - lastPrice;
-        if (change > 0) side = 1;
-        else if (change < 0) side = -1;
+        const side = change > 0 ? 1 : change < 0 ? -1 : 0;
         params.data.price.push({ time: d.time, value: d.price });
         params.series.price.setData(params.data.price);
         params.data.cash.push({
