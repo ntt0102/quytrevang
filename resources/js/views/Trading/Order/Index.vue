@@ -120,6 +120,7 @@
                         @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="pattern2ToolRef"
                         class="command far fa-heart"
                         :title="$t('trading.orderChart.pattern2Tool')"
@@ -305,7 +306,7 @@ let params = {
         // l5: {},
         pointCount: 0,
     },
-    target: { A: {}, B: {}, X: {} },
+    target: { A: {}, B: {}, C: {}, D: {} },
     pattern1: { A: {}, B: {}, C: {}, X: {} },
     pattern2: { O: {} },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
@@ -802,6 +803,13 @@ function eventPriceLineDrag(e) {
                     title: (1.5 * ba).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.X.options());
+                //
+                if (["A", "B"].includes(lineOptions.point)) {
+                    params.pattern1.B.applyOptions({
+                        title: ba.toFixed(1),
+                    });
+                    toolsStore.set("pattern1", params.pattern1.B.options());
+                }
             }
             break;
         case "pattern2":
@@ -1569,14 +1577,21 @@ function drawTargetTool() {
     let option = {
         lineType: "target",
         price: cash,
-        lineWidth: 2,
+        lineWidth: 1,
         lineStyle: 0,
         draggable: false,
+        axisLabelVisible: false,
     };
     if (mf.isSet(params.target.A)) {
-        option.point = "B";
-        option.title = "B";
-        option.color = "#009688";
+        if (mf.isSet(params.target.B)) {
+            option.point = "C";
+            option.title = "C";
+            option.color = "#9C27B0";
+        } else {
+            option.point = "B";
+            option.title = "B";
+            option.color = "#009688";
+        }
     } else {
         option.point = "A";
         option.title = "A";
@@ -1584,12 +1599,13 @@ function drawTargetTool() {
     }
     params.target[option.point] = params.series.cash.createPriceLine(option);
     toolsStore.set("target", option);
-    if (option.point == "B") {
+    if (option.point == "C") {
         const a = +params.target.A.options().price;
         const b = +params.target.B.options().price;
-        option.point = "X";
-        option.price = +(a + 2 * (b - a)).toFixed(1);
-        option.title = "X";
+        const c = +params.target.C.options().price;
+        option.point = "D";
+        option.price = +(c + b - a).toFixed(1);
+        option.title = "D";
         option.color = "#9C27B0";
         params.target[option.point] =
             params.series.cash.createPriceLine(option);
@@ -1603,12 +1619,16 @@ function removeTargetTool() {
         params.series.cash.removePriceLine(params.target.A);
         if (mf.isSet(params.target.B)) {
             params.series.cash.removePriceLine(params.target.B);
-            params.series.cash.removePriceLine(params.target.X);
+            if (mf.isSet(params.target.C)) {
+                params.series.cash.removePriceLine(params.target.C);
+                params.series.cash.removePriceLine(params.target.D);
+            }
         }
         params.target = {
             A: {},
             B: {},
-            X: {},
+            C: {},
+            D: {},
         };
         toolsStore.clear("target");
     }
@@ -1648,8 +1668,9 @@ function drawPattern1Tool() {
                 option.color = "#E91E63";
             }
         } else {
+            const a = +params.pattern1.A.options().price;
             option.point = "B";
-            option.title = "B";
+            option.title = (price - a).toFixed(1);
             option.color = "#009688";
         }
     } else {
