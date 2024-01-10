@@ -114,7 +114,7 @@
                     ></div>
                     <div
                         ref="pattern1ToolRef"
-                        class="command far fa-star"
+                        class="command far fa-dot-circle"
                         :title="$t('trading.orderChart.pattern1Tool')"
                         @click="pattern1ToolClick"
                         @contextmenu="pattern1ToolContextmenu"
@@ -136,7 +136,7 @@
                     ></div>
                     <div
                         ref="targetToolRef"
-                        class="command far fa-dot-circle"
+                        class="command far fa-grip-lines"
                         :title="$t('trading.orderChart.targetTool')"
                         @click="targetToolClick"
                         @contextmenu="targetToolContextmenu"
