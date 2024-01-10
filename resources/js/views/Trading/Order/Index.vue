@@ -307,7 +307,7 @@ let params = {
         pointCount: 0,
     },
     target: { A: {}, B: {}, C: {}, D: {} },
-    pattern1: { A: {}, B: {}, C: {}, X: {}, Y: {} },
+    pattern1: { A: {}, B: {}, C: {}, X1: {}, X2: {}, Y1: {}, Y2: {} },
     pattern2: { O: {} },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
     box: [],
@@ -804,7 +804,7 @@ function eventPriceLineDrag(e) {
             }
             break;
         case "pattern1":
-            if (mf.isSet(params.pattern1.X)) {
+            if (mf.isSet(params.pattern1.C)) {
                 const a = +params.pattern1.A.options().price;
                 const b = +params.pattern1.B.options().price;
                 const ba = b - a;
@@ -820,17 +820,30 @@ function eventPriceLineDrag(e) {
                 });
                 toolsStore.set("pattern1", params.pattern1.C.options());
                 //
-                params.pattern1.X.applyOptions({
+                params.pattern1.X1.applyOptions({
+                    price: +(a - 0.375 * ba).toFixed(1),
+                    title: (-0.375 * ba).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.X1.options());
+                //
+                params.pattern1.X2.applyOptions({
                     price: +(a - 0.5 * ba).toFixed(1),
                     title: (-0.5 * ba).toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.X.options());
+                toolsStore.set("pattern1", params.pattern1.X2.options());
                 //
-                params.pattern1.Y.applyOptions({
-                    price: +(a - ba).toFixed(1),
+                params.pattern1.Y1.applyOptions({
+                   price: +(a - ba).toFixed(1),
                     title: -ba.toFixed(1),
                 });
-                toolsStore.set("pattern1", params.pattern1.Y.options());
+                toolsStore.set("pattern1", params.pattern1.Y1.options());
+                //
+                params.pattern1.Y2.applyOptions({
+                     price: +(a - 2 * ba).toFixed(1),
+                    title: (-2 * ba).toFixed(1),
+                    
+                });
+                toolsStore.set("pattern1", params.pattern1.Y2.options());
             }
             break;
         case "pattern2":
@@ -1700,7 +1713,15 @@ function drawPattern1Tool() {
             params.series.price.createPriceLine(option);
         toolsStore.set("pattern1", option);
         //
-        option.point = "X";
+        option.point = "X1";
+        option.price = +(a - 0.375 * ba).toFixed(1);
+        option.title = (-0.375 * ba).toFixed(1);
+        option.color = "#2196F3";
+        params.pattern1[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern1", option);
+        //
+        option.point = "X2";
         option.price = +(a - 0.5 * ba).toFixed(1);
         option.title = (-0.5 * ba).toFixed(1);
         option.color = "#2196F3";
@@ -1708,9 +1729,17 @@ function drawPattern1Tool() {
             params.series.price.createPriceLine(option);
         toolsStore.set("pattern1", option);
         //
-        option.point = "Y";
+        option.point = "Y1";
         option.price = +(a - ba).toFixed(1);
         option.title = -ba.toFixed(1);
+        option.color = "#673AB7";
+        params.pattern1[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern1", option);
+        //
+        option.point = "Y2";
+        option.price = +(a - 2 * ba).toFixed(1);
+        option.title = (-2 * ba).toFixed(1);
         option.color = "#673AB7";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
@@ -1732,15 +1761,19 @@ function removePattern1Tool() {
         if (mf.isSet(params.pattern1.B)) {
             params.series.price.removePriceLine(params.pattern1.B);
             params.series.price.removePriceLine(params.pattern1.C);
-            params.series.price.removePriceLine(params.pattern1.X);
-            params.series.price.removePriceLine(params.pattern1.Y);
+            params.series.price.removePriceLine(params.pattern1.X1);
+            params.series.price.removePriceLine(params.pattern1.X2);
+            params.series.price.removePriceLine(params.pattern1.Y1);
+            params.series.price.removePriceLine(params.pattern1.Y2);
         }
         params.pattern1 = {
             A: {},
             B: {},
             C: {},
-            X: {},
-            Y: {},
+            X1: {},
+            X2: {},
+            Y1: {},
+            Y2: {},
         };
         toolsStore.clear("pattern1");
     }
