@@ -307,7 +307,7 @@ let params = {
         pointCount: 0,
     },
     target: { A: {}, B: {}, C: {}, D: {} },
-    pattern1: { A: {}, B: {}, X: {}, Y: {} },
+    pattern1: { A: {}, B: {}, C: {}, X: {}, Y: {} },
     pattern2: { O: {} },
     volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
     box: [],
@@ -814,15 +814,21 @@ function eventPriceLineDrag(e) {
                 });
                 toolsStore.set("pattern1", params.pattern1.B.options());
                 //
-                params.pattern1.X.applyOptions({
-                    price: +(b + 0.5 * ba).toFixed(1),
+                params.pattern1.C.applyOptions({
+                    price: +(a + 0.5 * ba).toFixed(1),
                     title: (0.5 * ba).toFixed(1),
+                });
+                toolsStore.set("pattern1", params.pattern1.C.options());
+                //
+                params.pattern1.X.applyOptions({
+                    price: +(a - 0.5 * ba).toFixed(1),
+                    title: (-0.5 * ba).toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.X.options());
                 //
                 params.pattern1.Y.applyOptions({
-                    price: +(b + ba).toFixed(1),
-                    title: ba.toFixed(1),
+                    price: +(a - ba).toFixed(1),
+                    title: -ba.toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Y.options());
             }
@@ -1685,17 +1691,26 @@ function drawPattern1Tool() {
             params.series.price.createPriceLine(option);
         toolsStore.set("pattern1", option);
         //
-        option.point = "X";
-        option.price = +(price + 0.5 * ba).toFixed(1);
+        option.point = "C";
+        option.price = +(a + 0.5 * ba).toFixed(1);
         option.title = (0.5 * ba).toFixed(1);
+        option.color = "#009688";
+        option.draggable = false;
+        params.pattern1[option.point] =
+            params.series.price.createPriceLine(option);
+        toolsStore.set("pattern1", option);
+        //
+        option.point = "X";
+        option.price = +(a - 0.5 * ba).toFixed(1);
+        option.title = (-0.5 * ba).toFixed(1);
         option.color = "#2196F3";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
         toolsStore.set("pattern1", option);
         //
         option.point = "Y";
-        option.price = +(price + ba).toFixed(1);
-        option.title = ba.toFixed(1);
+        option.price = +(a - ba).toFixed(1);
+        option.title = -ba.toFixed(1);
         option.color = "#673AB7";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
@@ -1704,7 +1719,7 @@ function drawPattern1Tool() {
         pattern1ToolRef.value.classList.remove("selected");
     } else {
         option.point = "A";
-        option.title = "O";
+        option.title = "0";
         option.color = "#009688";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
@@ -1716,12 +1731,14 @@ function removePattern1Tool() {
         params.series.price.removePriceLine(params.pattern1.A);
         if (mf.isSet(params.pattern1.B)) {
             params.series.price.removePriceLine(params.pattern1.B);
+            params.series.price.removePriceLine(params.pattern1.C);
             params.series.price.removePriceLine(params.pattern1.X);
             params.series.price.removePriceLine(params.pattern1.Y);
         }
         params.pattern1 = {
             A: {},
             B: {},
+            C: {},
             X: {},
             Y: {},
         };
