@@ -302,7 +302,7 @@ let params = {
         l1: {},
         l2: {},
         l3: {},
-        // l4: {},
+        l4: {},
         // l5: {},
         pointCount: 0,
     },
@@ -595,14 +595,14 @@ function eventPriceLineDrag(e) {
                         const l2Price = +(newPrice + distance * 2).toFixed(1);
                         params.ruler.l2.applyOptions({ price: l2Price });
                         toolsStore.set("ruler", params.ruler.l2.options());
-
+                        //
                         const l3Price = +(newPrice + distance * 3).toFixed(1);
                         params.ruler.l3.applyOptions({ price: l3Price });
                         toolsStore.set("ruler", params.ruler.l3.options());
-
-                        // const l4Price = +(newPrice + distance * 4).toFixed(1);
-                        // params.ruler.l4.applyOptions({ price: l4Price });
-                        // toolsStore.set("ruler", params.ruler.l4.options());
+                        //
+                        const l4Price = +(newPrice + distance * 4).toFixed(1);
+                        params.ruler.l4.applyOptions({ price: l4Price });
+                        toolsStore.set("ruler", params.ruler.l4.options());
 
                         // const l5Price = +(newPrice + distance * 5).toFixed(1);
                         // params.ruler.l5.applyOptions({ price: l5Price });
@@ -632,6 +632,12 @@ function eventPriceLineDrag(e) {
                         price: +(l0PriceN1 - distanceN1 * 3).toFixed(1),
                     });
                     toolsStore.set("ruler", params.ruler.l3.options());
+                    //
+                    params.ruler.l4.applyOptions({
+                        title: (-distanceN1 * 4).toFixed(1),
+                        price: +(l0PriceN1 - distanceN1 * 4).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.l4.options());
                     break;
                 case "l1":
                     const l0Price1 = +params.ruler.l0.options().price;
@@ -657,12 +663,12 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("ruler", params.ruler.l3.options());
                     //
-                    // params.ruler.l4.applyOptions({
-                    //     title: (distance1 * 4).toFixed(1),
-                    //     price: +(l0Price1 + distance1 * 4).toFixed(1),
-                    // });
-                    // toolsStore.set("ruler", params.ruler.l4.options());
-                    // //
+                    params.ruler.l4.applyOptions({
+                        title: (distance1 * 4).toFixed(1),
+                        price: +(l0Price1 + distance1 * 4).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.l4.options());
+                    //
                     // params.ruler.l5.applyOptions({
                     //     title: (distance1 * 5).toFixed(1),
                     //     price: +(l0Price1 + distance1 * 5).toFixed(1),
@@ -693,12 +699,12 @@ function eventPriceLineDrag(e) {
                     });
                     toolsStore.set("ruler", params.ruler.l3.options());
                     //
-                    //     params.ruler.l4.applyOptions({
-                    //         title: (distance2 * 2).toFixed(1),
-                    //         price: +(l0Price2 + distance2 * 2).toFixed(1),
-                    //     });
-                    //     toolsStore.set("ruler", params.ruler.l4.options());
-                    //     //
+                    params.ruler.l4.applyOptions({
+                        title: (distance2 * 2).toFixed(1),
+                        price: +(l0Price2 + distance2 * 2).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.l4.options());
+                    //
                     //     params.ruler.l5.applyOptions({
                     //         title: (distance2 * 2.5).toFixed(1),
                     //         price: +(l0Price2 + distance2 * 2.5).toFixed(1),
@@ -741,36 +747,42 @@ function eventPriceLineDrag(e) {
                     // });
                     // toolsStore.set("ruler", params.ruler.l5.options());
                     break;
-                // case "l4":
-                //     const l0Price4 = +params.ruler.l0.options().price;
-                //     const distance4 = newPrice - l0Price4;
-                //     line.applyOptions({ title: distance4.toFixed(1) });
-                //     toolsStore.set("ruler", line.options());
-                //     //
-                //     params.ruler.l1.applyOptions({
-                //         title: (distance4 / 4).toFixed(1),
-                //         price: +(l0Price4 + distance4 / 4).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l1.options());
-                //     //
-                //     params.ruler.l2.applyOptions({
-                //         title: (distance4 / 2).toFixed(1),
-                //         price: +(l0Price4 + distance4 / 2).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l2.options());
-                //     //
-                //     params.ruler.l3.applyOptions({
-                //         title: ((distance4 * 3) / 4).toFixed(1),
-                //         price: +(l0Price4 + (distance4 * 3) / 4).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l3.options());
-                //     //
-                //     params.ruler.l5.applyOptions({
-                //         title: ((distance4 * 5) / 4).toFixed(1),
-                //         price: +(l0Price4 + (distance4 * 5) / 4).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l5.options());
-                //     break;
+                case "l4":
+                    const l0Price4 = +params.ruler.l0.options().price;
+                    const distance4 = newPrice - l0Price4;
+                    line.applyOptions({ title: distance4.toFixed(1) });
+                    toolsStore.set("ruler", line.options());
+                    //
+                    params.ruler.ln1.applyOptions({
+                        title: (-distance4 / 4).toFixed(1),
+                        price: +(l0Price4 - distance4 / 4).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.ln1.options());
+                    //
+                    params.ruler.l1.applyOptions({
+                        title: (distance4 / 4).toFixed(1),
+                        price: +(l0Price4 + distance4 / 4).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.l1.options());
+                    //
+                    params.ruler.l2.applyOptions({
+                        title: (distance4 / 2).toFixed(1),
+                        price: +(l0Price4 + distance4 / 2).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.l2.options());
+                    //
+                    params.ruler.l3.applyOptions({
+                        title: ((distance4 * 3) / 4).toFixed(1),
+                        price: +(l0Price4 + (distance4 * 3) / 4).toFixed(1),
+                    });
+                    toolsStore.set("ruler", params.ruler.l3.options());
+                    //
+                    // params.ruler.l5.applyOptions({
+                    //     title: ((distance4 * 5) / 4).toFixed(1),
+                    //     price: +(l0Price4 + (distance4 * 5) / 4).toFixed(1),
+                    // });
+                    // toolsStore.set("ruler", params.ruler.l5.options());
+                    break;
                 // case "l5":
                 //     const l0Price5 = +params.ruler.l0.options().price;
                 //     const distance5 = newPrice - l0Price5;
@@ -833,15 +845,14 @@ function eventPriceLineDrag(e) {
                 toolsStore.set("pattern1", params.pattern1.X2.options());
                 //
                 params.pattern1.Y1.applyOptions({
-                   price: +(a - ba).toFixed(1),
+                    price: +(a - ba).toFixed(1),
                     title: -ba.toFixed(1),
                 });
                 toolsStore.set("pattern1", params.pattern1.Y1.options());
                 //
                 params.pattern1.Y2.applyOptions({
-                     price: +(a - 2 * ba).toFixed(1),
+                    price: +(a - 2 * ba).toFixed(1),
                     title: (-2 * ba).toFixed(1),
-                    
                 });
                 toolsStore.set("pattern1", params.pattern1.Y2.options());
             }
@@ -1541,14 +1552,14 @@ function drawRulerTool() {
             params.series.price.createPriceLine(options);
         toolsStore.set("ruler", options);
 
-        // const distance4 = 4 * distance1;
-        // options.point = "l4";
-        // options.color = "#009688";
-        // options.title = distance4.toFixed(1);
-        // options.price = +(l0Price + distance4).toFixed(1);
-        // params.ruler[options.point] =
-        //     params.series.price.createPriceLine(options);
-        // toolsStore.set("ruler", options);
+        const distance4 = 4 * distance1;
+        options.point = "l4";
+        options.color = "#009688";
+        options.title = distance4.toFixed(1);
+        options.price = +(l0Price + distance4).toFixed(1);
+        params.ruler[options.point] =
+            params.series.price.createPriceLine(options);
+        toolsStore.set("ruler", options);
 
         // const distance5 = 5 * distance1;
         // options.point = "l5";
@@ -1571,7 +1582,7 @@ function removeRulerTool() {
             params.series.price.removePriceLine(params.ruler.l1);
             params.series.price.removePriceLine(params.ruler.l2);
             params.series.price.removePriceLine(params.ruler.l3);
-            // params.series.price.removePriceLine(params.ruler.l4);
+            params.series.price.removePriceLine(params.ruler.l4);
             // params.series.price.removePriceLine(params.ruler.l5);
         }
         //
@@ -1581,7 +1592,7 @@ function removeRulerTool() {
             l1: {},
             l2: {},
             l3: {},
-            // l4: {},
+            l4: {},
             // l5: {},
             pointCount: 0,
         };
