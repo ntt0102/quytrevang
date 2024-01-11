@@ -1635,12 +1635,12 @@ function drawTargetTool() {
         } else {
             option.point = "B";
             option.title = "B";
-            option.color = "#009688";
+            option.color = "#E91E63";
         }
     } else {
         option.point = "A";
         option.title = "A";
-        option.color = "#009688";
+        option.color = "#E91E63";
     }
     params.target[option.point] = params.series.cash.createPriceLine(option);
     toolsStore.set("target", option);
