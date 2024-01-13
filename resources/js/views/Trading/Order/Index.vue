@@ -120,7 +120,7 @@
                         @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
-                        v-show="false"
+                        v-show="true"
                         ref="pattern2ToolRef"
                         class="command far fa-heart"
                         :title="$t('trading.orderChart.pattern2Tool')"
@@ -140,6 +140,13 @@
                         :title="$t('trading.orderChart.targetTool')"
                         @click="targetToolClick"
                         @contextmenu="targetToolContextmenu"
+                    ></div>
+                    <div
+                        ref="boxToolRef"
+                        class="command far fa-expand-alt"
+                        :title="$t('trading.orderChart.boxTool')"
+                        @click="boxToolClick"
+                        @contextmenu="boxToolContextmenu"
                     ></div>
                     <div
                         v-show="false"
@@ -281,6 +288,7 @@ const targetToolRef = ref(null);
 const pattern1ToolRef = ref(null);
 const pattern2ToolRef = ref(null);
 const alertToolRef = ref(null);
+const boxToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
@@ -309,7 +317,7 @@ let params = {
     target: { A: {}, B: {}, C: {}, D: {} },
     pattern1: { A: {}, B: {}, C: {}, X1: {}, X2: {}, Y1: {}, Y2: {} },
     pattern2: { O: {} },
-    volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
+    // volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
     box: [],
     alerts: [],
     crosshair: {},
@@ -378,14 +386,13 @@ onMounted(() => {
     //     priceLineVisible: false,
     //     visible: false,
     // });
-    // params.series.box = params.chart.addHistogramSeries({
-    //     priceScaleId: "box",
-    //     scaleMargins: { top: 0, bottom: 0 },
-    //     color: "#26a69a",
-    //     lastValueVisible: false,
-    //     priceLineVisible: false,
-    //     visible: false,
-    // });
+    params.series.box = params.chart.addHistogramSeries({
+        priceScaleId: "box",
+        scaleMargins: { top: 0, bottom: 0 },
+        color: "#2196F3",
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
     // params.series.volprofile = params.chart.addHistogramSeries({
     //     priceScaleId: "volprofile",
     //     scaleMargins: { top: 0, bottom: 0 },
@@ -454,6 +461,7 @@ function eventChartClick() {
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
     else if (targetToolRef.value.classList.contains("selected"))
         drawTargetTool();
+    else if (boxToolRef.value.classList.contains("selected")) drawBoxTool();
     else if (pattern1ToolRef.value.classList.contains("selected"))
         drawPattern1Tool();
     else if (pattern2ToolRef.value.classList.contains("selected"))
@@ -1039,11 +1047,12 @@ function loadToolsData() {
         });
         //
         const boxs = await toolsStore.get("box");
-        if (boxs.length == 2) {
+        if (boxs.length == 4) {
             params.box = boxs;
-            params.series.box.setData([boxs[0].x, boxs[1].x]);
-            params.box[0].y = params.series.price.createPriceLine(boxs[0].y);
-            params.box[1].y = params.series.price.createPriceLine(boxs[1].y);
+            boxs.forEach((box, i) => {
+                params.series.box.update(box.x);
+                params.box[i].y = params.series.cash.createPriceLine(box.y);
+            });
         }
         //
         const rulerLines = await toolsStore.get("ruler");
@@ -1959,6 +1968,136 @@ function removeAlertTool() {
     params.alerts.forEach((line) => params.series.price.removePriceLine(line));
     params.alerts = [];
     toolsStore.clear("alert");
+}
+function boxToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        drawBoxTool(true);
+    }
+    e.stopPropagation();
+}
+function boxToolContextmenu(e) {
+    removeBoxTool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawBoxTool(fix = false) {
+    let point1 = {};
+    if (fix) {
+        if (params.box.length == 0) return false;
+        point1 = {
+            time: +params.box[0].x.time,
+            value: +params.box[0].y.options().price,
+        };
+        removeBoxTool();
+    } else
+        point1 = {
+            time: params.crosshair.time,
+            value: coordinateToPrice(params.crosshair.y, "cash"),
+        };
+
+    const { point2, point3, point4 } = findCashPoints(point1);
+    let option = {
+        y: {
+            lineWidth: 1,
+            lineStyle: 0,
+            draggable: false,
+            axisLabelVisible: false,
+        },
+        x: { value: 1 },
+    };
+    option.y.color = "#2196F3";
+    option.y.price = point1.value;
+    option.x.time = point1.time;
+    drawBoxPoint(0, option);
+    option.y.price = point2.value;
+    option.x.time = point2.time;
+    drawBoxPoint(1, option);
+    option.y.color = "#9C27B0";
+    option.y.price = point3.value;
+    option.x.time = point3.time;
+    drawBoxPoint(2, option);
+    option.y.price = point4.value;
+    option.x.time = point4.time;
+    drawBoxPoint(3, option);
+    boxToolRef.value.classList.remove("selected");
+}
+function findCashPoints(point1) {
+    const p1 = mf.cloneDeep(point1);
+    let point2 = p1,
+        point3 = p1,
+        point4 = p1;
+    for (let i of params.data.cash) {
+        if (i.time >= point1.time) {
+            if (i.value < point1.value) {
+                if (point2.value <= point1.value && i.value < point2.value) {
+                    if (point3.value > point1.value) break;
+                    point2 = i;
+                }
+                //
+                if (
+                    point3.value <= point1.value &&
+                    point2.value > point1.value &&
+                    i.value < point3.value
+                ) {
+                    if (point3.value == point1.value) point2.time = i.time;
+                    point3 = i;
+                }
+            } else if (i.value > point1.value) {
+                if (point2.value >= point1.value && i.value > point2.value) {
+                    if (point3.value < point1.value) break;
+                    point2 = i;
+                }
+                //
+                if (
+                    point3.value >= point1.value &&
+                    point2.value < point1.value &&
+                    i.value > point3.value
+                ) {
+                    if (point3.value == point1.value) point2.time = i.time;
+                    point3 = i;
+                }
+            }
+            if (point3.value != point1.value) {
+                const i1 = params.data.whitespace.findIndex(
+                    (x) => x.time === point1.time
+                );
+                const i2 = params.data.whitespace.findIndex(
+                    (x) => x.time === point2.time
+                );
+                const i3 = params.data.whitespace.findIndex(
+                    (x) => x.time === point3.time
+                );
+                const ic = params.data.whitespace.findIndex(
+                    (x) => x.time === i.time
+                );
+                const i4 = i3 + i2 - i1;
+                point4.time = params.data.whitespace[i4].time;
+                point4.value = point3.value + point2.value - point1.value;
+                if (ic > i4) break;
+            }
+        }
+    }
+    return { point2, point3, point4 };
+}
+function drawBoxPoint(id, option) {
+    option.point = id;
+    params.box.push(mf.cloneDeep(option));
+    toolsStore.set("box", params.box[id]);
+    params.series.box.update(params.box[id].x);
+    params.box[id].y = params.series.cash.createPriceLine(params.box[id].y);
+}
+function removeBoxTool() {
+    params.box.forEach((item) => params.series.cash.removePriceLine(item.y));
+    params.series.box.setData([]);
+    params.box = [];
+    toolsStore.clear("box");
 }
 async function cancelOrderClick() {
     let result = true;
