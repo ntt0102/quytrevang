@@ -120,7 +120,7 @@
                         @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
-                        v-show="true"
+                        v-show="false"
                         ref="pattern2ToolRef"
                         class="command far fa-heart"
                         :title="$t('trading.orderChart.pattern2Tool')"
@@ -389,7 +389,7 @@ onMounted(() => {
     params.series.box = params.chart.addHistogramSeries({
         priceScaleId: "box",
         scaleMargins: { top: 0, bottom: 0 },
-        color: "#2196F3",
+        color: "yellow",
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -2012,7 +2012,7 @@ function drawBoxTool(fix = false) {
         },
         x: { value: 1 },
     };
-    option.y.color = "#2196F3";
+    option.y.color = "#E91E63";
     option.y.price = point1.value;
     option.x.time = point1.time;
     drawBoxPoint(0, option);
