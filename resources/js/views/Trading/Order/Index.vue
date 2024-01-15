@@ -2034,7 +2034,7 @@ function findCashPoints(point1) {
         point3 = p1,
         point4 = p1;
     for (let i of params.data.cash) {
-        if (i.time >= point1.time) {
+        if (i.time > point1.time) {
             if (i.value < point1.value) {
                 if (point2.value <= point1.value && i.value < point2.value) {
                     if (point3.value > point1.value) break;
