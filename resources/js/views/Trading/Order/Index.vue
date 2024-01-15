@@ -2039,6 +2039,8 @@ function findCashPoints(point1) {
                 if (point2.value <= point1.value && i.value < point2.value) {
                     if (point3.value > point1.value) break;
                     point2 = i;
+                    point3.time = i.time;
+                    point4.time = i.time;
                 }
                 //
                 if (point2.value > point1.value) {
@@ -2049,12 +2051,17 @@ function findCashPoints(point1) {
                         if (point3.value == point1.value) point2.time = i.time;
                         point3 = i;
                     }
-                    if (i.value < point2.value) point3.time = i.time;
+                    if (i.value < point2.value) {
+                        point3.time = i.time;
+                        point4.time = i.time;
+                    }
                 }
             } else if (i.value > point1.value) {
                 if (point2.value >= point1.value && i.value > point2.value) {
                     if (point3.value < point1.value) break;
                     point2 = i;
+                    point3.time = i.time;
+                    point4.time = i.time;
                 }
                 //
                 if (point2.value < point1.value) {
@@ -2065,26 +2072,30 @@ function findCashPoints(point1) {
                         if (point3.value == point1.value) point2.time = i.time;
                         point3 = i;
                     }
-                    if (i.value > point2.value) point3.time = i.time;
+                    if (i.value > point2.value) {
+                        point3.time = i.time;
+                        point4.time = i.time;
+                    }
                 }
             }
-            //
-            const i1 = params.data.whitespace.findIndex(
-                (x) => x.time === point1.time
-            );
-            const i2 = params.data.whitespace.findIndex(
-                (x) => x.time === point2.time
-            );
-            const i3 = params.data.whitespace.findIndex(
-                (x) => x.time === point3.time
-            );
-            const ic = params.data.whitespace.findIndex(
-                (x) => x.time === i.time
-            );
-            const i4 = i3 + i2 - i1;
-            point4.time = params.data.whitespace[i4].time;
-            point4.value = point3.value + point2.value - point1.value;
-            if (ic > i4) break;
+            if (point3.value != point1.value) {
+                const i1 = params.data.whitespace.findIndex(
+                    (x) => x.time === point1.time
+                );
+                const i2 = params.data.whitespace.findIndex(
+                    (x) => x.time === point2.time
+                );
+                const i3 = params.data.whitespace.findIndex(
+                    (x) => x.time === point3.time
+                );
+                const ic = params.data.whitespace.findIndex(
+                    (x) => x.time === i.time
+                );
+                const i4 = i3 + i2 - i1;
+                point4.time = params.data.whitespace[i4].time;
+                point4.value = point3.value + point2.value - point1.value;
+                if (ic > i4) break;
+            }
         }
     }
     return { point2, point3, point4 };
