@@ -75,7 +75,7 @@ const state = reactive({
 });
 let params = {
     chart: {},
-    series: { price: {}, avg: {}, cash: {} },
+    series: { price: {}, avg: {}, volume: {} },
 };
 
 function show() {
@@ -87,7 +87,7 @@ function symbolChange(e) {
     store.dispatch("tradingOrder/cashflow", state.symbol).then((data) => {
         params.series.price.setData(data.price);
         params.series.avg.setData(data.avg);
-        params.series.cash.setData(data.cash);
+        params.series.volume.setData(data.volume);
         params.chart.applyOptions({ watermark: { text: state.symbol } });
         e.target.blur();
     });
@@ -116,13 +116,13 @@ function onShown() {
         });
         params.series.avg.setData(data.avg);
         //
-        params.series.cash = params.chart.addLineSeries({
+        params.series.volume = params.chart.addLineSeries({
             color: "#2962FF",
-            priceScaleId: "cash",
+            priceScaleId: "volume",
             scaleMargins: { top: 0.61, bottom: 0.01 },
             lastValueVisible: false,
         });
-        params.series.cash.setData(data.cash);
+        params.series.volume.setData(data.volume);
         //
         params.chart.timeScale().fitContent();
         params.chart.applyOptions({ watermark: { text: state.symbol } });
