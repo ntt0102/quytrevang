@@ -291,7 +291,7 @@ class OrderChartService extends CoreService
             // $prevClose = $close;
             $cash = $side * $rsp->v[$i];
             $acc += $cash;
-            $r['volume'][] = [
+            $r['cash'][] = [
                 'time' => $rsp->t[$i],
                 'value' => $acc
             ];

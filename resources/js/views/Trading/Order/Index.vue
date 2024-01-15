@@ -1151,13 +1151,12 @@ function updateChartData(d) {
         const lastCash = params.data.cash.slice(-1)[0].value;
         const change = d.price - lastPrice;
         const side = change > 0 ? 1 : change < 0 ? -1 : 0;
-        params.data.price.push({ time: d.time, value: d.price });
-        params.series.price.setData(params.data.price);
-        params.data.cash.push({
-            time: d.time,
-            value: lastCash + side * d.volume,
-        });
-        params.series.cash.setData(params.data.cash);
+        const price = { time: d.time, value: d.price };
+        const cash = { time: d.time, value: lastCash + side * d.volume };
+        params.data.price.push(price);
+        params.series.price.update(price);
+        params.data.cash.push(cash);
+        params.series.cash.update(cash);
     }
 }
 function createWhitespaceData() {
