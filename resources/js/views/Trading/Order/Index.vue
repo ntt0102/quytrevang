@@ -2039,6 +2039,7 @@ function findCashPoints(point1) {
                 if (point2.value <= point1.value && i.value < point2.value) {
                     if (point3.value > point1.value) break;
                     point2 = i;
+                    point3.time = i.time;
                 }
                 //
                 if (
@@ -2053,6 +2054,7 @@ function findCashPoints(point1) {
                 if (point2.value >= point1.value && i.value > point2.value) {
                     if (point3.value < point1.value) break;
                     point2 = i;
+                    point3.time = i.time;
                 }
                 //
                 if (
