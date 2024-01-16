@@ -1048,7 +1048,7 @@ function loadToolsData() {
         });
         //
         const boxs = await toolsStore.get("box");
-        if (boxs.length == 4) {
+        if (boxs.length == 5) {
             params.box = boxs;
             boxs.forEach((box, i) => {
                 params.series.box.update(box.x);
