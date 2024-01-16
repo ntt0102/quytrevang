@@ -2002,7 +2002,7 @@ function drawBoxTool(fix = false) {
             value: coordinateToPrice(params.crosshair.y, "cash"),
         };
 
-    const { point2, point3, point4 } = findCashPoints(point1);
+    const { point2, point3, point4, point5 } = findCashPoints(point1);
     let option = {
         y: {
             lineWidth: 1,
@@ -2026,21 +2026,25 @@ function drawBoxTool(fix = false) {
     option.y.price = point4.value;
     option.x.time = point4.time;
     drawBoxPoint(3, option);
+    option.y.price = point5.value;
+    option.x.time = point5.time;
+    drawBoxPoint(4, option);
     boxToolRef.value.classList.remove("selected");
 }
 function findCashPoints(point1) {
-    const p1 = mf.cloneDeep(point1);
-    let point2 = p1,
-        point3 = p1,
-        point4 = p1;
+    let point2 = { ...point1 },
+        point3 = { ...point1 },
+        point4 = { ...point1 },
+        point5 = { ...point1 };
     for (let i of params.data.cash) {
         if (i.time > point1.time) {
             if (i.value < point1.value) {
                 if (point2.value <= point1.value && i.value < point2.value) {
-                    if (point3.value > point1.value) break;
+                    // if (point3.value > point1.value) break;
                     point2 = i;
                     point3.time = i.time;
                     point4.time = i.time;
+                    point5.time = i.time;
                 }
                 //
                 if (point2.value > point1.value) {
@@ -2057,14 +2061,16 @@ function findCashPoints(point1) {
                     ) {
                         point3.time = i.time;
                         point4.time = i.time;
+                        point5.time = i.time;
                     }
                 }
             } else if (i.value > point1.value) {
                 if (point2.value >= point1.value && i.value > point2.value) {
-                    if (point3.value < point1.value) break;
+                    // if (point3.value < point1.value) break;
                     point2 = i;
                     point3.time = i.time;
                     point4.time = i.time;
+                    point5.time = i.time;
                 }
                 //
                 if (point2.value < point1.value) {
@@ -2081,6 +2087,7 @@ function findCashPoints(point1) {
                     ) {
                         point3.time = i.time;
                         point4.time = i.time;
+                        point5.time = i.time;
                     }
                 }
             }
@@ -2098,17 +2105,24 @@ function findCashPoints(point1) {
                     (x) => x.time === i.time
                 );
                 const i4 = i3 + i2 - i1;
-                point4.time = params.data.whitespace[i4].time;
-                point4.value = point3.value + point2.value - point1.value;
+                const i5 = i3 + 2 * (i2 - i1);
+                if (i4 < params.data.whitespace.length) {
+                    point4.time = params.data.whitespace[i4].time;
+                    point4.value = point3.value + point2.value - point1.value;
+                }
+                if (i5 < params.data.whitespace.length) {
+                    point5.time = params.data.whitespace[i5].time;
+                    point5.value = point3.value + point2.value - point1.value;
+                }
                 if (ic > i4) break;
             }
         }
     }
-    return { point2, point3, point4 };
+    return { point2, point3, point4, point5 };
 }
 function drawBoxPoint(id, option) {
     option.point = id;
-    params.box.push(mf.cloneDeep(option));
+    params.box.push({ ...option });
     toolsStore.set("box", params.box[id]);
     params.series.box.update(params.box[id].x);
     params.box[id].y = params.series.cash.createPriceLine(params.box[id].y);
