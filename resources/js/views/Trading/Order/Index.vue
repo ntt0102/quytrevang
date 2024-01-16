@@ -2032,10 +2032,11 @@ function drawBoxTool(fix = false) {
     boxToolRef.value.classList.remove("selected");
 }
 function findCashPoints(point1) {
-    let point2 = { ...point1 },
-        point3 = { ...point1 },
-        point4 = { ...point1 },
-        point5 = { ...point1 };
+    const p1 = mf.cloneDeep(point1);
+    let point2 = { ...p1 },
+        point3 = { ...p1 },
+        point4 = { ...p1 },
+        point5 = { ...p1 };
     for (let i of params.data.cash) {
         if (i.time > point1.time) {
             if (i.value < point1.value) {
@@ -2122,7 +2123,7 @@ function findCashPoints(point1) {
 }
 function drawBoxPoint(id, option) {
     option.point = id;
-    params.box.push({ ...option });
+    params.box.push(mf.cloneDeep(option));
     toolsStore.set("box", params.box[id]);
     params.series.box.update(params.box[id].x);
     params.box[id].y = params.series.cash.createPriceLine(params.box[id].y);
