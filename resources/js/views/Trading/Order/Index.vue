@@ -135,6 +135,7 @@
                         @contextmenu="rulerToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="targetToolRef"
                         class="command far fa-grip-lines"
                         :title="$t('trading.orderChart.targetTool')"
