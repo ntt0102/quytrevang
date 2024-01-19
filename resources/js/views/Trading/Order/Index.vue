@@ -390,7 +390,7 @@ onMounted(() => {
     params.series.box = params.chart.addHistogramSeries({
         priceScaleId: "box",
         scaleMargins: { top: 0, bottom: 0 },
-        color: "yellow",
+        color: "#667b68",
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -928,6 +928,37 @@ function eventPriceLineDrag(e) {
             toolsStore.set("alert", line.options());
             alertToolRef.value.classList.remove("selected");
             break;
+        case "box":
+            if (lineOptions.point == 1) drawBoxTool(true);
+            else if (lineOptions.point == 5) {
+                const p3 = +params.box[2].z.options().price;
+                const p5 = +params.box[4].z.options().price;
+                const d35 = p3 - p5;
+                params.box[5].z.applyOptions({
+                    price: +(p3 + 0.375 * d35).toFixed(1),
+                    title: (0.375 * d35).toFixed(1),
+                });
+                params.box[6].z.applyOptions({
+                    price: +(p3 + d35).toFixed(1),
+                    title: d35.toFixed(1),
+                });
+                params.box[7].z.applyOptions({
+                    price: +(p3 + 2 * d35).toFixed(1),
+                    title: (2 * d35).toFixed(1),
+                });
+
+                toolsStore.get("box").then((boxs) => {
+                    boxs[4].z = params.box[4].z.options();
+                    toolsStore.set("box", boxs[4]);
+                    boxs[5].z = params.box[5].z.options();
+                    toolsStore.set("box", boxs[5]);
+                    boxs[6].z = params.box[6].z.options();
+                    toolsStore.set("box", boxs[6]);
+                    boxs[7].z = params.box[7].z.options();
+                    toolsStore.set("box", boxs[7]);
+                });
+            }
+            break;
     }
 }
 function eventChartResize() {
@@ -1048,11 +1079,16 @@ function loadToolsData() {
         });
         //
         const boxs = await toolsStore.get("box");
-        if (boxs.length == 5) {
+        if (boxs.length > 0) {
             params.box = boxs;
             boxs.forEach((box, i) => {
-                params.series.box.update(box.x);
-                params.box[i].y = params.series.cash.createPriceLine(box.y);
+                if (mf.isSet(box.x)) params.series.box.update(box.x);
+                if (mf.isSet(box.y))
+                    params.box[i].y = params.series.cash.createPriceLine(box.y);
+                if (mf.isSet(box.z))
+                    params.box[i].z = params.series.price.createPriceLine(
+                        box.z
+                    );
             });
         }
         //
@@ -1834,9 +1870,6 @@ function drawPattern2Tool(fix = false) {
     }
 
     const { price2, price3, price4, isAcc } = findPattern2Points(point1);
-    console.log("price2", price2);
-    console.log("price3", price3);
-    console.log("price4", price4);
     let option = {
         lineType: "pattern2",
         lineWidth: 1,
@@ -1988,148 +2021,249 @@ function boxToolContextmenu(e) {
     e.stopPropagation();
 }
 function drawBoxTool(fix = false) {
-    let point1 = {};
+    let point0 = {};
     if (fix) {
         if (params.box.length == 0) return false;
-        point1 = {
+        point0 = {
             time: +params.box[0].x.time,
-            value: +params.box[0].y.options().price,
+            cash: +params.box[0].y.options().price,
+            price: +params.box[0].z.options().price,
         };
         removeBoxTool();
-    } else
-        point1 = {
+    } else {
+        if (!params.crosshair.price) return false;
+        point0 = {
             time: params.crosshair.time,
-            value: coordinateToPrice(params.crosshair.y, "cash"),
+            cash: coordinateToPrice(params.crosshair.y, "cash"),
+            price: params.crosshair.price,
         };
+    }
 
-    const { point2, point3, point4, point5 } = findCashPoints(point1);
-    let option = {
+    const { point1, point2, point3, point4, point5 } = findCashPoints(point0);
+    let option = {};
+    const OPTION = {
+        x: { value: 1 },
         y: {
             lineWidth: 1,
             lineStyle: 0,
             draggable: false,
             axisLabelVisible: false,
         },
-        x: { value: 1 },
+        z: {
+            lineType: "box",
+            lineWidth: 1,
+            lineStyle: 0,
+            draggable: false,
+        },
     };
-    option.y.color = "#E91E63";
-    option.y.price = point1.value;
+    option = mf.cloneDeep(OPTION);
+    option.point = 1;
     option.x.time = point1.time;
-    drawBoxPoint(0, option);
-    option.y.price = point2.value;
+    option.y.price = point1.cash;
+    option.y.color = "#6a3c07";
+    option.z.point = 1;
+    option.z.price = point1.price;
+    option.z.color = "#ff9966";
+    option.z.draggable = true;
+    drawBoxPoint(option);
+    //
+    option = mf.cloneDeep(OPTION);
+    option.point = 2;
     option.x.time = point2.time;
-    drawBoxPoint(1, option);
-    option.y.color = "#9C27B0";
-    option.y.price = point3.value;
+    delete option.y;
+    delete option.z;
+    drawBoxPoint(option);
+    //
+    option = mf.cloneDeep(OPTION);
+    option.point = 3;
     option.x.time = point3.time;
-    drawBoxPoint(2, option);
-    option.y.price = point4.value;
+    delete option.y;
+    option.z.price = point3.price;
+    option.z.title = "0";
+    option.z.color = "#ff9966";
+    drawBoxPoint(option);
+    //
+    option = mf.cloneDeep(OPTION);
+    option.point = 4;
     option.x.time = point4.time;
-    drawBoxPoint(3, option);
-    option.y.price = point5.value;
+    option.y.price = point4.cash;
+    option.y.color = "#6a3c07";
+    option.z.price = point4.price;
+    option.z.title = "TH";
+    option.z.color = "#ff9966";
+    drawBoxPoint(option);
+    //
+    option = mf.cloneDeep(OPTION);
+    option.point = 5;
     option.x.time = point5.time;
-    drawBoxPoint(4, option);
+    delete option.y;
+    option.z.point = 5;
+    option.z.price = point5.price;
+    option.z.color = "#ff9966";
+    option.z.draggable = true;
+    drawBoxPoint(option);
+    //
+    const d35 = point3.price - point5.price;
+    option = mf.cloneDeep(OPTION);
+    option.point = 6;
+    delete option.x;
+    delete option.y;
+    option.z.price = +(point3.price + 0.375 * d35).toFixed(1);
+    option.z.title = (0.375 * d35).toFixed(1);
+    option.z.color = "#009688";
+    drawBoxPoint(option);
+    //
+    option = mf.cloneDeep(OPTION);
+    option.point = 7;
+    delete option.x;
+    delete option.y;
+    option.z.price = +(point3.price + d35).toFixed(1);
+    option.z.title = d35.toFixed(1);
+    option.z.color = "#00BCD4";
+    drawBoxPoint(option);
+    //
+    option = mf.cloneDeep(OPTION);
+    option.point = 8;
+    delete option.x;
+    delete option.y;
+    option.z.price = +(point3.price + 2 * d35).toFixed(1);
+    option.z.title = (2 * d35).toFixed(1);
+    option.z.color = "#2196F3";
+    drawBoxPoint(option);
+    //
+
     boxToolRef.value.classList.remove("selected");
 }
-function findCashPoints(point1) {
-    const p1 = mf.cloneDeep(point1);
-    let point2 = { ...p1 },
-        point3 = { ...p1 },
-        point4 = { ...p1 },
-        point5 = { ...p1 };
-    for (let i of params.data.cash) {
-        if (i.time > point1.time) {
-            if (i.value < point1.value) {
-                if (point2.value <= point1.value && i.value < point2.value) {
-                    // if (point3.value > point1.value) break;
-                    point2 = i;
-                    point3.time = i.time;
-                    point4.time = i.time;
-                    point5.time = i.time;
+function findCashPoints(point0) {
+    const p0 = mf.cloneDeep(point0);
+    let point1 = { ...p0 },
+        point2 = { ...p0 },
+        point3 = { ...p0 },
+        point4 = { ...p0 },
+        point5 = { ...p0 };
+    for (let i = 0; i < params.data.price.length; i++) {
+        const time = params.data.price[i].time;
+        if (time <= point1.time) continue;
+        const price = params.data.price[i].value;
+        const cash = params.data.cash[i].value;
+        if (cash < point1.cash) {
+            if (point2.cash <= point1.cash && cash < point2.cash) {
+                point2.time = time;
+                point2.cash = cash;
+                point3.time = time;
+                point4.time = time;
+                point5.time = time;
+            }
+            //
+            if (point2.cash > point1.cash) {
+                if (point3.cash <= point1.cash && cash < point3.cash) {
+                    if (point3.cash == point1.cash) point2.time = time;
+                    point3.time = time;
+                    point3.cash = cash;
                 }
-                //
-                if (point2.value > point1.value) {
-                    if (
-                        point3.value <= point1.value &&
-                        i.value < point3.value
-                    ) {
-                        if (point3.value == point1.value) point2.time = i.time;
-                        point3 = i;
-                    }
-                    if (
-                        i.value < point2.value &&
-                        point3.value == point1.value
-                    ) {
-                        point3.time = i.time;
-                        point4.time = i.time;
-                        point5.time = i.time;
-                    }
-                }
-            } else if (i.value > point1.value) {
-                if (point2.value >= point1.value && i.value > point2.value) {
-                    // if (point3.value < point1.value) break;
-                    point2 = i;
-                    point3.time = i.time;
-                    point4.time = i.time;
-                    point5.time = i.time;
-                }
-                //
-                if (point2.value < point1.value) {
-                    if (
-                        point3.value >= point1.value &&
-                        i.value > point3.value
-                    ) {
-                        if (point3.value == point1.value) point2.time = i.time;
-                        point3 = i;
-                    }
-                    if (
-                        i.value > point2.value &&
-                        point3.value == point1.value
-                    ) {
-                        point3.time = i.time;
-                        point4.time = i.time;
-                        point5.time = i.time;
-                    }
+                if (cash < point2.cash && point3.cash == point1.cash) {
+                    point3.time = time;
+                    point4.time = time;
+                    point5.time = time;
                 }
             }
-            if (point3.value != point1.value) {
-                const i1 = params.data.whitespace.findIndex(
-                    (x) => x.time === point1.time
-                );
-                const i2 = params.data.whitespace.findIndex(
-                    (x) => x.time === point2.time
-                );
-                const i3 = params.data.whitespace.findIndex(
-                    (x) => x.time === point3.time
-                );
-                const ic = params.data.whitespace.findIndex(
-                    (x) => x.time === i.time
-                );
-                const i4 = i3 + i2 - i1;
-                const i5 = i3 + 2 * (i2 - i1);
-                if (i4 < params.data.whitespace.length) {
-                    point4.time = params.data.whitespace[i4].time;
-                    point4.value = point3.value + point2.value - point1.value;
+        } else if (cash > point1.cash) {
+            if (point2.cash >= point1.cash && cash > point2.cash) {
+                point2.time = time;
+                point2.cash = cash;
+                point3.time = time;
+                point4.time = time;
+                point5.time = time;
+            }
+            //
+            if (point2.cash < point1.cash) {
+                if (point3.cash >= point1.cash && cash > point3.cash) {
+                    if (point3.cash == point1.cash) point2.time = time;
+                    point3.time = time;
+                    point3.cash = cash;
                 }
-                if (i5 < params.data.whitespace.length) {
-                    point5.time = params.data.whitespace[i5].time;
-                    point5.value = point3.value + point2.value - point1.value;
+                if (cash > point2.cash && point3.cash == point1.cash) {
+                    point3.time = time;
+                    point4.time = time;
+                    point5.time = time;
                 }
-                if (ic > i4) break;
             }
         }
+        //
+        if (point2.cash < point3.cash) {
+            if (point2.price == point0.price && price > point1.price)
+                point1.price = price;
+            if (point2.price <= point5.price && price < point2.price)
+                point2.price = price;
+            if (price > point3.price) {
+                point3.price = price;
+                point5.price = price;
+            }
+            if (price < point5.price) point5.price = price;
+        } else if (point2.cash > point3.cash) {
+            if (point3.price == point0.price && price < point1.price)
+                point1.price = price;
+            if (point2.price >= point5.price && price > point2.price)
+                point2.price = price;
+            if (price < point3.price) {
+                point3.price = price;
+                point5.price = price;
+            }
+            if (price > point5.price) point5.price = price;
+        }
+        if (point3.cash != point1.cash) {
+            const i1 = params.data.whitespace.findIndex(
+                (x) => x.time === point1.time
+            );
+            const i2 = params.data.whitespace.findIndex(
+                (x) => x.time === point2.time
+            );
+            const i3 = params.data.whitespace.findIndex(
+                (x) => x.time === point3.time
+            );
+            const ic = params.data.whitespace.findIndex((x) => x.time === time);
+            const i4 = i3 + i2 - i1;
+            const i5 = i3 + 2 * (i2 - i1);
+            if (i4 < params.data.whitespace.length) {
+                point4.time = params.data.whitespace[i4].time;
+                point4.cash = +(
+                    point3.cash +
+                    point2.cash -
+                    point1.cash
+                ).toFixed(1);
+                point4.price = +(
+                    point3.price +
+                    point2.price -
+                    point1.price
+                ).toFixed(1);
+            }
+            if (i5 < params.data.whitespace.length) {
+                point5.time = params.data.whitespace[i5].time;
+                point5.cash = +(
+                    point3.cash +
+                    point2.cash -
+                    point1.cash
+                ).toFixed(1);
+            }
+            if (ic > i4) break;
+        }
     }
-    return { point2, point3, point4, point5 };
+    return { point1, point2, point3, point4, point5 };
 }
-function drawBoxPoint(id, option) {
-    option.point = id;
-    params.box.push(mf.cloneDeep(option));
-    toolsStore.set("box", params.box[id]);
-    params.series.box.update(params.box[id].x);
-    params.box[id].y = params.series.cash.createPriceLine(params.box[id].y);
+function drawBoxPoint(option) {
+    toolsStore.set("box", option);
+    if (mf.isSet(option.x)) params.series.box.update(option.x);
+    if (mf.isSet(option.y))
+        option.y = params.series.cash.createPriceLine(option.y);
+    if (mf.isSet(option.z))
+        option.z = params.series.price.createPriceLine(option.z);
+    params.box.push(option);
 }
 function removeBoxTool() {
-    params.box.forEach((item) => params.series.cash.removePriceLine(item.y));
+    params.box.forEach((item) => {
+        if (mf.isSet(item.y)) params.series.cash.removePriceLine(item.y);
+        if (mf.isSet(item.z)) params.series.price.removePriceLine(item.z);
+    });
     params.series.box.setData([]);
     params.box = [];
     toolsStore.clear("box");
