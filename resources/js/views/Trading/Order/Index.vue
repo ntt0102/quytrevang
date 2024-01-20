@@ -2052,7 +2052,7 @@ function drawBoxTool(fix = false) {
         z: {
             lineType: "box",
             lineWidth: 1,
-            lineStyle: 0,
+            lineStyle: 1,
             draggable: false,
         },
     };
@@ -2088,10 +2088,10 @@ function drawBoxTool(fix = false) {
     option.point = 4;
     option.x.time = point4.time;
     option.y.price = point4.cash;
-    option.y.color = "#6a3c07";
+    option.y.color = "#600844";
     option.z.price = point4.price;
     option.z.title = "◀";
-    option.z.color = "#ff9966";
+    option.z.color = "#600844";
     drawBoxPoint(option);
     //
     option = mf.cloneDeep(OPTION);
