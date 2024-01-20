@@ -2063,13 +2063,14 @@ function drawBoxTool(fix = false) {
     option.y.color = "#6a3c07";
     option.z.point = 1;
     option.z.price = point1.price;
+    option.z.title = "◕";
     option.z.color = "#ff9966";
     option.z.draggable = true;
     drawBoxPoint(option);
     //
     option = mf.cloneDeep(OPTION);
     option.point = 2;
-    option.x.time = point2.time;
+    delete option.x;
     delete option.y;
     delete option.z;
     drawBoxPoint(option);
@@ -2089,7 +2090,7 @@ function drawBoxTool(fix = false) {
     option.y.price = point4.cash;
     option.y.color = "#6a3c07";
     option.z.price = point4.price;
-    option.z.title = "TH";
+    option.z.title = "◀";
     option.z.color = "#ff9966";
     drawBoxPoint(option);
     //
@@ -2157,7 +2158,6 @@ function findCashPoints(point0) {
             //
             if (point2.cash > point1.cash) {
                 if (point3.cash <= point1.cash && cash < point3.cash) {
-                    if (point3.cash == point1.cash) point2.time = time;
                     point3.time = time;
                     point3.cash = cash;
                 }
@@ -2178,7 +2178,6 @@ function findCashPoints(point0) {
             //
             if (point2.cash < point1.cash) {
                 if (point3.cash >= point1.cash && cash > point3.cash) {
-                    if (point3.cash == point1.cash) point2.time = time;
                     point3.time = time;
                     point3.cash = cash;
                 }
@@ -2215,15 +2214,15 @@ function findCashPoints(point0) {
             const i1 = params.data.whitespace.findIndex(
                 (x) => x.time === point1.time
             );
-            const i2 = params.data.whitespace.findIndex(
-                (x) => x.time === point2.time
-            );
+            // const i2 = params.data.whitespace.findIndex(
+            //     (x) => x.time === point2.time
+            // );
             const i3 = params.data.whitespace.findIndex(
                 (x) => x.time === point3.time
             );
             const ic = params.data.whitespace.findIndex((x) => x.time === time);
-            const i4 = i3 + i2 - i1;
-            const i5 = i3 + 2 * (i2 - i1);
+            const i4 = 2 * i3 - i1;
+            const i5 = 3 * i3 - 2 * i1;
             if (i4 < params.data.whitespace.length) {
                 point4.time = params.data.whitespace[i4].time;
                 point4.cash = +(
