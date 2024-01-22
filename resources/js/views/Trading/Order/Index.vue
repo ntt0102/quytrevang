@@ -2190,8 +2190,8 @@ function findCashPoints(point0) {
         }
         //
         if (point2.cash < point3.cash) {
-            if (point2.price == point0.price && price > point1.price)
-                point1.price = price;
+            // if (point2.price == point0.price && price > point1.price)
+            //     point1.price = price;
             if (point2.price <= point5.price && price < point2.price)
                 point2.price = price;
             if (price > point3.price) {
@@ -2200,8 +2200,8 @@ function findCashPoints(point0) {
             }
             if (price < point5.price) point5.price = price;
         } else if (point2.cash > point3.cash) {
-            if (point3.price == point0.price && price < point1.price)
-                point1.price = price;
+            // if (point3.price == point0.price && price < point1.price)
+            //     point1.price = price;
             if (point2.price >= point5.price && price > point2.price)
                 point2.price = price;
             if (price < point3.price) {
