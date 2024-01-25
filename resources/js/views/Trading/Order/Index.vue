@@ -2100,7 +2100,7 @@ function drawBoxTool(fix = false) {
     delete option.y;
     option.z.point = 5;
     option.z.price = point5.price;
-    option.z.title = "■";
+    option.z.title = "⬛";
     option.z.color = "#ff9966";
     option.z.draggable = true;
     drawBoxPoint(option);
