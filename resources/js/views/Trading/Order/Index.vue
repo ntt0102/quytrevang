@@ -120,6 +120,13 @@
                         @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
+                        ref="uplpsToolRef"
+                        class="command far fa-arrow-up"
+                        :title="$t('trading.orderChart.pattern1Tool')"
+                        @click="uplpsToolClick"
+                        @contextmenu="uplpsToolContextmenu"
+                    ></div>
+                    <div
                         v-show="false"
                         ref="pattern2ToolRef"
                         class="command far fa-heart"
@@ -287,6 +294,7 @@ const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
 const targetToolRef = ref(null);
 const pattern1ToolRef = ref(null);
+const uplpsToolRef = ref(null);
 const pattern2ToolRef = ref(null);
 const alertToolRef = ref(null);
 const boxToolRef = ref(null);
@@ -318,6 +326,12 @@ let params = {
     target: { A: {}, B: {}, C: {}, D: {} },
     pattern1: { A: {}, B: {}, C: {}, X1: {}, X2: {}, Y1: {}, Y2: {} },
     pattern2: { O: {} },
+    uplps: {
+        P1: {},
+        P2: {},
+        C1: {},
+        C2: {},
+    },
     // volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
     box: [],
     alerts: [],
@@ -465,6 +479,7 @@ function eventChartClick() {
     else if (boxToolRef.value.classList.contains("selected")) drawBoxTool();
     else if (pattern1ToolRef.value.classList.contains("selected"))
         drawPattern1Tool();
+    else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
     else if (pattern2ToolRef.value.classList.contains("selected"))
         drawPattern2Tool();
     else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
@@ -1833,6 +1848,140 @@ function removePattern1Tool() {
         };
         toolsStore.clear("pattern1");
     }
+}
+function uplpsToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        drawUplpsTool(true);
+    }
+    e.stopPropagation();
+}
+function uplpsToolContextmenu(e) {
+    removeUplpsTool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawUplpsTool(fix = false) {
+    let startTime;
+    if (fix) {
+        if (!mf.isSet(params.uplps.P1)) return false;
+        startTime = +params.uplps.P1.options().startTime;
+        removeUplpsTool();
+    } else startTime = params.crosshair.time;
+    const { price1, price2, cash1, cash2 } = findUplps(startTime);
+    let option = {
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: false,
+    };
+    option.startTime = startTime;
+    option.point = "P1";
+    option.price = price1;
+    option.title = "P1";
+    option.color = "#2196F3";
+    params.uplps[option.point] = params.series.price.createPriceLine(option);
+    toolsStore.set("uplps", option);
+    //
+    option.point = "P2";
+    option.price = price2;
+    option.title = "P2";
+    option.color = "#2196F3";
+    params.uplps[option.point] = params.series.price.createPriceLine(option);
+    toolsStore.set("uplps", option);
+    //
+    option.point = "C1";
+    option.price = cash1;
+    option.title = "C1";
+    option.color = "#2196F3";
+    params.uplps[option.point] = params.series.cash.createPriceLine(option);
+    toolsStore.set("uplps", option);
+    //
+    option.point = "C2";
+    option.price = cash2;
+    option.title = "C2";
+    option.color = "#2196F3";
+    params.uplps[option.point] = params.series.cash.createPriceLine(option);
+    toolsStore.set("uplps", option);
+    uplpsToolRef.value.classList.remove("selected");
+}
+function findUplps(startTime) {
+    let p1,
+        p2,
+        p3,
+        dP = 0,
+        dpMax = 0,
+        c1,
+        c2,
+        c3,
+        dC = 0,
+        dcMax = 0;
+    for (let i = 0; i < params.data.price.length; i++) {
+        const time = params.data.price[i].time;
+        if (time < startTime) continue;
+        const price = params.data.price[i].value;
+        const cash = params.data.cash[i].value;
+        if (p1 == undefined) {
+            p1 = price;
+            p2 = price;
+            p3 = price;
+            c1 = cash;
+            c2 = cash;
+            c3 = cash;
+        }
+        if (price > p3) {
+            if (dP > dpMax) {
+                p2 = p3;
+                dpMax = dP;
+            }
+            p3 = price;
+            dP = 0;
+        } else if (price < p3) {
+            const _dP = (p3 - price).toFixed(1);
+            if (_dP > dP) dP = _dP;
+        }
+        if (price < p1 && dpMax > 0) break;
+        //
+        if (cash > c3) {
+            if (dC > dcMax) {
+                c2 = c3;
+                dcMax = dC;
+            }
+            c3 = cash;
+            dC = 0;
+        } else if (cash < c3) {
+            const _dC = (c3 - cash).toFixed(1);
+            if (_dC > dC) dC = _dC;
+        }
+    }
+    return {
+        price1: +(p2 - dpMax).toFixed(1),
+        price2: +(p3 - dpMax).toFixed(1),
+        cash1: +(c2 - dcMax).toFixed(1),
+        cash2: +(c3 - dcMax).toFixed(1),
+    };
+}
+function removeUplpsTool() {
+    if (mf.isSet(params.uplps.P1)) {
+        params.series.price.removePriceLine(params.uplps.P1);
+        params.series.price.removePriceLine(params.uplps.P2);
+    }
+    if (mf.isSet(params.uplps.C1)) {
+        params.series.cash.removePriceLine(params.uplps.C1);
+        params.series.cash.removePriceLine(params.uplps.C2);
+    }
+    params.uplps = {
+        P1: {},
+        P2: {},
+        C1: {},
+        C2: {},
+    };
+    toolsStore.clear("uplps");
 }
 function pattern2ToolClick(e) {
     state.showColorPicker = false;
