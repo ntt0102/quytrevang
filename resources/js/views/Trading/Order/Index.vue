@@ -1806,7 +1806,7 @@ function drawPattern1Tool() {
         const ba = price - a;
         option.point = "B";
         option.title = ba.toFixed(1);
-        option.color = "#009688";
+        option.color = "#FF9800";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
         toolsStore.set("pattern1", option);
@@ -1814,7 +1814,7 @@ function drawPattern1Tool() {
         option.point = "C";
         option.price = +(a + 0.5 * ba).toFixed(1);
         option.title = (0.5 * ba).toFixed(1);
-        option.color = "#009688";
+        option.color = "#FF9800";
         option.draggable = false;
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
@@ -1856,7 +1856,7 @@ function drawPattern1Tool() {
     } else {
         option.point = "A";
         option.title = "0";
-        option.color = "#009688";
+        option.color = "#FF9800";
         params.pattern1[option.point] =
             params.series.price.createPriceLine(option);
         toolsStore.set("pattern1", option);
@@ -1893,7 +1893,6 @@ function uplpsToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        drawUplpsTool(true);
     }
     e.stopPropagation();
 }
@@ -1903,14 +1902,14 @@ function uplpsToolContextmenu(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-function drawUplpsTool(fix = false) {
-    let startTime;
-    if (fix) {
-        if (!mf.isSet(params.uplps.P1)) return false;
+function drawUplpsTool() {
+    let startTime, endTime;
+    if (mf.isSet(params.uplps.P1)) {
         startTime = +params.uplps.P1.options().startTime;
+        endTime = params.crosshair.time;
         removeUplpsTool();
     } else startTime = params.crosshair.time;
-    const { price1, price2, cash1, cash2 } = findUplps(startTime);
+    const { price1, price2, cash1, cash2 } = findUplps(startTime, endTime);
     let option = {
         lineWidth: 1,
         lineStyle: 1,
@@ -1939,7 +1938,7 @@ function drawUplpsTool(fix = false) {
     toolsStore.set("uplps", option);
     uplpsToolRef.value.classList.remove("selected");
 }
-function findUplps(startTime) {
+function findUplps(startTime, endTime) {
     let p1,
         p2,
         p3,
@@ -1953,6 +1952,7 @@ function findUplps(startTime) {
     for (let i = 0; i < params.data.price.length; i++) {
         const time = params.data.price[i].time;
         if (time < startTime) continue;
+        if (!!endTime && time > endTime) break;
         const price = params.data.price[i].value;
         const cash = params.data.cash[i].value;
         if (p1 == undefined) {
@@ -2020,7 +2020,6 @@ function downlpsToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        drawDownlpsTool(true);
     }
     e.stopPropagation();
 }
@@ -2030,14 +2029,14 @@ function downlpsToolContextmenu(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-function drawDownlpsTool(fix = false) {
-    let startTime;
-    if (fix) {
-        if (!mf.isSet(params.downlps.P1)) return false;
+function drawDownlpsTool() {
+    let startTime, endTime;
+    if (mf.isSet(params.downlps.P1)) {
         startTime = +params.downlps.P1.options().startTime;
+        endTime = params.crosshair.time;
         removeDownlpsTool();
     } else startTime = params.crosshair.time;
-    const { price1, price2, cash1, cash2 } = findDownlps(startTime);
+    const { price1, price2, cash1, cash2 } = findDownlps(startTime, endTime);
     let option = {
         lineWidth: 1,
         lineStyle: 1,
@@ -2066,7 +2065,7 @@ function drawDownlpsTool(fix = false) {
     toolsStore.set("downlps", option);
     downlpsToolRef.value.classList.remove("selected");
 }
-function findDownlps(startTime) {
+function findDownlps(startTime, endTime) {
     let p1,
         p2,
         p3,
@@ -2080,6 +2079,7 @@ function findDownlps(startTime) {
     for (let i = 0; i < params.data.price.length; i++) {
         const time = params.data.price[i].time;
         if (time < startTime) continue;
+        if (!!endTime && time > endTime) break;
         const price = params.data.price[i].value;
         const cash = params.data.cash[i].value;
         if (p1 == undefined) {
