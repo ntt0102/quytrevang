@@ -122,14 +122,14 @@
                     <div
                         ref="uplpsToolRef"
                         class="command far fa-arrow-up"
-                        :title="$t('trading.orderChart.pattern1Tool')"
+                        :title="$t('trading.orderChart.uplpsTool')"
                         @click="uplpsToolClick"
                         @contextmenu="uplpsToolContextmenu"
                     ></div>
                     <div
                         ref="downlpsToolRef"
                         class="command far fa-arrow-down"
-                        :title="$t('trading.orderChart.pattern1Tool')"
+                        :title="$t('trading.orderChart.downlpsTool')"
                         @click="downlpsToolClick"
                         @contextmenu="downlpsToolContextmenu"
                     ></div>
