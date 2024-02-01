@@ -127,6 +127,13 @@
                         @contextmenu="uplpsToolContextmenu"
                     ></div>
                     <div
+                        ref="downlpsToolRef"
+                        class="command far fa-arrow-down"
+                        :title="$t('trading.orderChart.pattern1Tool')"
+                        @click="downlpsToolClick"
+                        @contextmenu="downlpsToolContextmenu"
+                    ></div>
+                    <div
                         v-show="false"
                         ref="pattern2ToolRef"
                         class="command far fa-heart"
@@ -295,6 +302,7 @@ const rulerToolRef = ref(null);
 const targetToolRef = ref(null);
 const pattern1ToolRef = ref(null);
 const uplpsToolRef = ref(null);
+const downlpsToolRef = ref(null);
 const pattern2ToolRef = ref(null);
 const alertToolRef = ref(null);
 const boxToolRef = ref(null);
@@ -327,6 +335,12 @@ let params = {
     pattern1: { A: {}, B: {}, C: {}, X1: {}, X2: {}, Y1: {}, Y2: {} },
     pattern2: { O: {} },
     uplps: {
+        P1: {},
+        P2: {},
+        C1: {},
+        C2: {},
+    },
+    downlps: {
         P1: {},
         P2: {},
         C1: {},
@@ -480,6 +494,8 @@ function eventChartClick() {
     else if (pattern1ToolRef.value.classList.contains("selected"))
         drawPattern1Tool();
     else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
+    else if (downlpsToolRef.value.classList.contains("selected"))
+        drawDownlpsTool();
     else if (pattern2ToolRef.value.classList.contains("selected"))
         drawPattern2Tool();
     else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
@@ -1129,6 +1145,26 @@ function loadToolsData() {
             pattern1Lines.forEach((line) => {
                 params.pattern1[line.point] =
                     params.series.price.createPriceLine(line);
+            });
+        }
+        //
+        const uplpsLines = await toolsStore.get("uplps");
+        if (uplpsLines.length > 0) {
+            uplpsLines.forEach((line) => {
+                params.uplps[line.title] =
+                    params.series[
+                        line.title.includes("P") ? "price" : "cash"
+                    ].createPriceLine(line);
+            });
+        }
+        //
+        const downlpsLines = await toolsStore.get("downlps");
+        if (downlpsLines.length > 0) {
+            downlpsLines.forEach((line) => {
+                params.downlps[line.title] =
+                    params.series[
+                        line.title.includes("P") ? "price" : "cash"
+                    ].createPriceLine(line);
             });
         }
         //
@@ -1878,35 +1914,28 @@ function drawUplpsTool(fix = false) {
     let option = {
         lineWidth: 1,
         lineStyle: 1,
+        color: "#009688",
         draggable: false,
     };
     option.startTime = startTime;
-    option.point = "P1";
     option.price = price1;
     option.title = "P1";
-    option.color = "#2196F3";
-    params.uplps[option.point] = params.series.price.createPriceLine(option);
+    params.uplps[option.title] = params.series.price.createPriceLine(option);
     toolsStore.set("uplps", option);
     //
-    option.point = "P2";
     option.price = price2;
     option.title = "P2";
-    option.color = "#2196F3";
-    params.uplps[option.point] = params.series.price.createPriceLine(option);
+    params.uplps[option.title] = params.series.price.createPriceLine(option);
     toolsStore.set("uplps", option);
     //
-    option.point = "C1";
     option.price = cash1;
     option.title = "C1";
-    option.color = "#2196F3";
-    params.uplps[option.point] = params.series.cash.createPriceLine(option);
+    params.uplps[option.title] = params.series.cash.createPriceLine(option);
     toolsStore.set("uplps", option);
     //
-    option.point = "C2";
     option.price = cash2;
     option.title = "C2";
-    option.color = "#2196F3";
-    params.uplps[option.point] = params.series.cash.createPriceLine(option);
+    params.uplps[option.title] = params.series.cash.createPriceLine(option);
     toolsStore.set("uplps", option);
     uplpsToolRef.value.classList.remove("selected");
 }
@@ -1942,7 +1971,7 @@ function findUplps(startTime) {
             p3 = price;
             dP = 0;
         } else if (price < p3) {
-            const _dP = (p3 - price).toFixed(1);
+            const _dP = +(p3 - price).toFixed(1);
             if (_dP > dP) dP = _dP;
         }
         if (price < p1 && dpMax > 0) break;
@@ -1955,7 +1984,7 @@ function findUplps(startTime) {
             c3 = cash;
             dC = 0;
         } else if (cash < c3) {
-            const _dC = (c3 - cash).toFixed(1);
+            const _dC = +(c3 - cash).toFixed(1);
             if (_dC > dC) dC = _dC;
         }
     }
@@ -1982,6 +2011,133 @@ function removeUplpsTool() {
         C2: {},
     };
     toolsStore.clear("uplps");
+}
+function downlpsToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        drawDownlpsTool(true);
+    }
+    e.stopPropagation();
+}
+function downlpsToolContextmenu(e) {
+    removeDownlpsTool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawDownlpsTool(fix = false) {
+    let startTime;
+    if (fix) {
+        if (!mf.isSet(params.downlps.P1)) return false;
+        startTime = +params.downlps.P1.options().startTime;
+        removeDownlpsTool();
+    } else startTime = params.crosshair.time;
+    const { price1, price2, cash1, cash2 } = findDownlps(startTime);
+    let option = {
+        lineWidth: 1,
+        lineStyle: 1,
+        color: "#E91E63",
+        draggable: false,
+    };
+    option.startTime = startTime;
+    option.price = price1;
+    option.title = "P1";
+    params.downlps[option.title] = params.series.price.createPriceLine(option);
+    toolsStore.set("downlps", option);
+    //
+    option.price = price2;
+    option.title = "P2";
+    params.downlps[option.title] = params.series.price.createPriceLine(option);
+    toolsStore.set("downlps", option);
+    //
+    option.price = cash1;
+    option.title = "C1";
+    params.downlps[option.title] = params.series.cash.createPriceLine(option);
+    toolsStore.set("downlps", option);
+    //
+    option.price = cash2;
+    option.title = "C2";
+    params.downlps[option.title] = params.series.cash.createPriceLine(option);
+    toolsStore.set("downlps", option);
+    downlpsToolRef.value.classList.remove("selected");
+}
+function findDownlps(startTime) {
+    let p1,
+        p2,
+        p3,
+        dP = 0,
+        dpMax = 0,
+        c1,
+        c2,
+        c3,
+        dC = 0,
+        dcMax = 0;
+    for (let i = 0; i < params.data.price.length; i++) {
+        const time = params.data.price[i].time;
+        if (time < startTime) continue;
+        const price = params.data.price[i].value;
+        const cash = params.data.cash[i].value;
+        if (p1 == undefined) {
+            p1 = price;
+            p2 = price;
+            p3 = price;
+            c1 = cash;
+            c2 = cash;
+            c3 = cash;
+        }
+        if (price < p3) {
+            if (dP < dpMax) {
+                p2 = p3;
+                dpMax = dP;
+            }
+            p3 = price;
+            dP = 0;
+        } else if (price > p3) {
+            const _dP = +(p3 - price).toFixed(1);
+            if (_dP < dP) dP = _dP;
+        }
+        if (price > p1 && dpMax < 0) break;
+        //
+        if (cash < c3) {
+            if (dC < dcMax) {
+                c2 = c3;
+                dcMax = dC;
+            }
+            c3 = cash;
+            dC = 0;
+        } else if (cash > c3) {
+            const _dC = +(c3 - cash).toFixed(1);
+            if (_dC < dC) dC = _dC;
+        }
+    }
+    return {
+        price1: +(p2 - dpMax).toFixed(1),
+        price2: +(p3 - dpMax).toFixed(1),
+        cash1: +(c2 - dcMax).toFixed(1),
+        cash2: +(c3 - dcMax).toFixed(1),
+    };
+}
+function removeDownlpsTool() {
+    if (mf.isSet(params.downlps.P1)) {
+        params.series.price.removePriceLine(params.downlps.P1);
+        params.series.price.removePriceLine(params.downlps.P2);
+    }
+    if (mf.isSet(params.downlps.C1)) {
+        params.series.cash.removePriceLine(params.downlps.C1);
+        params.series.cash.removePriceLine(params.downlps.C2);
+    }
+    params.downlps = {
+        P1: {},
+        P2: {},
+        C1: {},
+        C2: {},
+    };
+    toolsStore.clear("downlps");
 }
 function pattern2ToolClick(e) {
     state.showColorPicker = false;
