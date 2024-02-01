@@ -1891,9 +1891,8 @@ function uplpsToolClick(e) {
     document
         .querySelectorAll(".tool-area > .command")
         .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-    }
+    if (!selected) e.target.classList.add("selected");
+    else drawUplpsTool();
     e.stopPropagation();
 }
 function uplpsToolContextmenu(e) {
@@ -2018,9 +2017,8 @@ function downlpsToolClick(e) {
     document
         .querySelectorAll(".tool-area > .command")
         .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-    }
+    if (!selected) e.target.classList.add("selected");
+    else drawDownlpsTool();
     e.stopPropagation();
 }
 function downlpsToolContextmenu(e) {
