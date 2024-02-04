@@ -1,76 +1,16 @@
 <template>
     <div class="content-block dx-card responsive-paddings">
-        <DxToolbar
-            :items="[
-                {
-                    location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-flag-checkered small',
-                        hint: $t('trading.orderChart.buttons.report'),
-                        onClick: report,
-                    },
-                },
-                {
-                    location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-file-export small',
-                        hint: $t('trading.orderChart.buttons.export'),
-                        onClick: exportCsv,
-                    },
-                },
-                {
-                    location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-chart-line small',
-                        hint: $t('trading.orderChart.buttons.cashflow'),
-                        onClick: () => $refs.dailyCashFlowPopupRef.show(),
-                    },
-                },
-            ]"
-        />
         <div class="order-chart-container" ref="chartContainerRef">
-            <div class="chart-wrapper" ref="orderChartRef">
+            <div class="chart-wrapper" ref="chartRef">
                 <div class="area data-area">
-                    <div
-                        ref="connectionRef"
-                        :class="`command far fa-${
-                            status.connection ? 'link' : 'unlink'
-                        }`"
-                        :title="$t('trading.orderChart.connection')"
-                        @click="() => $store.dispatch('tradingOrder/getStatus')"
-                    ></div>
                     <input
+                        ref="symbolRef"
                         type="text"
                         class="command symbol-input"
                         :title="$t('trading.stock.symbol')"
                         v-model="state.symbol"
                         @change="symbolChange"
                         @focus="symbolFocus"
-                    />
-                    <div
-                        class="command status"
-                        :class="{
-                            green: status.position > 0,
-                            red: status.position < 0,
-                            pending: status.pending,
-                        }"
-                        :title="$t('trading.orderChart.position')"
-                        @click="getAccountInfo"
-                    >
-                        {{ status.position }}
-                    </div>
-                    <div class="command clock" @click="refreshChart">
-                        {{ state.clock }}
-                    </div>
-                    <input
-                        type="date"
-                        class="chart-date command"
-                        :title="$t('trading.orderChart.date')"
-                        v-model="state.chartDate"
-                        @change="dateSelectChange"
                     />
                     <img
                         ref="spinnerRef"
@@ -86,12 +26,6 @@
                         }`"
                         :title="$t('trading.orderChart.fullscreen')"
                         @click="toggleFullscreen"
-                    ></div>
-                    <div
-                        ref="reloadToolRef"
-                        class="command far fa-sync-alt"
-                        :title="$t('trading.orderChart.reload')"
-                        @click="resetChart"
                     ></div>
                     <div
                         ref="tradingviewRef"
@@ -142,76 +76,11 @@
                         @contextmenu="downlpsToolContextmenu"
                     ></div>
                     <div
-                        v-show="false"
-                        ref="pattern2ToolRef"
-                        class="command far fa-heart"
-                        :title="$t('trading.orderChart.pattern2Tool')"
-                        @click="pattern2ToolClick"
-                        @contextmenu="pattern2ToolContextmenu"
-                    ></div>
-                    <div
                         ref="rulerToolRef"
                         class="command far fa-line-height"
                         :title="$t('trading.orderChart.rulerTool')"
                         @click="rulerToolClick"
                         @contextmenu="rulerToolContextmenu"
-                    ></div>
-                    <div
-                        v-show="false"
-                        ref="targetToolRef"
-                        class="command far fa-grip-lines"
-                        :title="$t('trading.orderChart.targetTool')"
-                        @click="targetToolClick"
-                        @contextmenu="targetToolContextmenu"
-                    ></div>
-                    <div
-                        ref="boxToolRef"
-                        class="command far fa-expand-alt"
-                        :title="$t('trading.orderChart.boxTool')"
-                        @click="boxToolClick"
-                        @contextmenu="boxToolContextmenu"
-                    ></div>
-                    <div
-                        v-show="false"
-                        ref="alertToolRef"
-                        class="command far fa-alarm-exclamation"
-                        :title="$t('trading.orderChart.alertTool')"
-                        @click="alertToolClick"
-                        @contextmenu="alertToolContextmenu"
-                    ></div>
-                    <div
-                        v-show="false"
-                        class="command far fa-info-circle"
-                        :title="
-                            $t('trading.orderChart.copyistStatusPopup.title')
-                        "
-                        @click="() => $refs.copyistStatusPopupRef.show()"
-                    ></div>
-                    <div
-                        ref="cancelOrderRef"
-                        class="cancel-order command far fa-trash-alt"
-                        :title="$t('trading.orderChart.cancelTool')"
-                        @click="cancelOrderClick"
-                    ></div>
-                </div>
-                <div>
-                    <div
-                        ref="entryOrderRef"
-                        class="order-button entry"
-                        @click="entryOrderClick"
-                    >
-                        Entry
-                    </div>
-                    <div
-                        ref="tpslOrderRef"
-                        class="order-button tpsl"
-                        @click="tpslOrderClick"
-                    >
-                        TP/SL
-                    </div>
-                    <div
-                        class="chart-top command far fa-angle-double-right"
-                        @click="chartTopClick"
                     ></div>
                 </div>
                 <iframe
@@ -227,11 +96,10 @@
 
 <script setup>
 import ColorPicker from "./ColorPicker.vue";
-import toolsStore from "../../../plugins/orderChartDb.js";
+import toolsStore from "../../../plugins/stockDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
 import { confirm } from "devextreme/ui/dialog";
-import sound from "../../../../audios/alert.mp3";
 import {
     reactive,
     ref,
@@ -280,46 +148,24 @@ const CHART_OPTIONS = {
         color: "rgba(171, 71, 188, 0.2)",
     },
 };
-const TP_DEFAULT = 3;
-const SL_DEFAULT = 2;
-const CURRENT_DATE = moment().format("YYYY-MM-DD");
-const TIME = {
-    START: moment(CURRENT_DATE + " 08:45:00").unix(),
-    ATO: moment(CURRENT_DATE + " 09:00:00").unix(),
-    ATC: moment(CURRENT_DATE + " 14:30:00").unix(),
-    END: moment(CURRENT_DATE + " 14:45:00").unix(),
-};
-const SOCKET_ENDPOINT =
-    "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
-const SOCKET_REFRESH_PERIOD = 120;
 
 const store = useStore();
 const route = useRoute();
 const { t } = useI18n();
 const devices = inject("devices");
 const mf = inject("mf");
-const bus = inject("bus");
-const filters = inject("filters");
 const chartContainerRef = ref(null);
-const orderChartRef = ref(null);
-const connectionRef = ref(null);
+const chartRef = ref(null);
+const symbolRef = ref(null);
 const spinnerRef = ref(null);
 const fullscreenToolRef = ref(null);
-const reloadToolRef = ref(null);
 const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
-const targetToolRef = ref(null);
 const pattern1ToolRef = ref(null);
 const uplpsToolRef = ref(null);
 const downlpsToolRef = ref(null);
-const pattern2ToolRef = ref(null);
-const alertToolRef = ref(null);
-const boxToolRef = ref(null);
-const cancelOrderRef = ref(null);
-const entryOrderRef = ref(null);
-const tpslOrderRef = ref(null);
 const tradingviewChartRef = ref(null);
 let params = {
     chart: {},
@@ -373,42 +219,18 @@ let params = {
 };
 const state = reactive({
     symbol: "VNINDEX",
-    chartDate: route.query.date ?? CURRENT_DATE,
-    clock: moment().format("HH:mm:ss"),
     isFullscreen: false,
     color: "#F44336",
     showColorPicker: false,
     showTradingView: false,
 });
-const status = computed(() => store.state.tradingOrder.status);
-const tradingViewSrc = computed(() => {
-    // return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${store.state.tradingOrder.config.vpsCode}&s=${store.state.tradingOrder.config.vpsSession}&resolution=1`;
-    return `https://iboard.ssi.com.vn/chart/?language=vi&theme=dark&symbol=${state.symbol}`;
-});
-
-store.dispatch("tradingOrder/getConfig").then(() => {
-    connectSocket();
-    // params.series.volume.createPriceLine({
-    //     price: store.state.tradingOrder.config.volLimit,
-    //     color: "yellow",
-    //     lineWidth: 1,
-    //     lineStyle: 1,
-    //     axisLabelVisible: false,
-    //     draggable: false,
-    // });
-    // params.volumeMax = store.state.tradingOrder.config.volLimit;
-});
-store.dispatch("tradingOrder/getStatus");
-
-params.interval = setInterval(intervalHandler, 1000);
-params.interval60 = setInterval(
-    () => store.dispatch("tradingOrder/getStatus"),
-    60000
+const tradingViewSrc = computed(
+    () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
 toolsStore.create();
 
 onMounted(() => {
-    params.chart = createChart(orderChartRef.value, CHART_OPTIONS);
+    params.chart = createChart(chartRef.value, CHART_OPTIONS);
     chartContainerRef.value.addEventListener("click", eventChartClick);
     chartContainerRef.value.addEventListener(
         "contextmenu",
@@ -416,49 +238,6 @@ onMounted(() => {
     );
     params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(eventPriceLineDrag);
-    params.series.whitespace = params.chart.addLineSeries({
-        priceScaleId: "whitespace",
-        visible: false,
-    });
-    // params.series.signal = params.chart.addHistogramSeries({
-    //     priceScaleId: "signal",
-    //     scaleMargins: { top: 0, bottom: 0 },
-    //     color: "#673AB7",
-    //     lastValueVisible: false,
-    //     priceLineVisible: false,
-    //     visible: false,
-    // });
-    params.series.box = params.chart.addHistogramSeries({
-        priceScaleId: "box",
-        scaleMargins: { top: 0, bottom: 0 },
-        color: "#667b68",
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
-    // params.series.volprofile = params.chart.addHistogramSeries({
-    //     priceScaleId: "volprofile",
-    //     scaleMargins: { top: 0, bottom: 0 },
-    //     color: "#673AB7",
-    //     lastValueVisible: false,
-    //     priceLineVisible: false,
-    //     visible: false,
-    // });
-    // params.series.volume = params.chart.addHistogramSeries({
-    //     priceScaleId: "volume",
-    //     scaleMargins: { top: 0.95, bottom: 0 },
-    //     color: "#CCCCCC",
-    //     lastValueVisible: false,
-    //     priceLineVisible: false,
-    //     visible: false,
-    // });
-    // params.series.spread = params.chart.addHistogramSeries({
-    //     priceScaleId: "spread",
-    //     scaleMargins: { top: 0, bottom: 0.95 },
-    //     color: "#CCCCCC",
-    //     lastValueVisible: false,
-    //     priceLineVisible: false,
-    //     visible: false,
-    // });
     params.series.cash = params.chart.addLineSeries({
         priceScaleId: "cash",
         scaleMargins: { top: 0.61, bottom: 0.01 },
@@ -466,63 +245,46 @@ onMounted(() => {
         priceFormat: { minMove: 1 },
         lastValueVisible: false,
     });
-    params.series.price = params.chart.addCandlestickSeries({
+    params.series.ohlc = params.chart.addCandlestickSeries({
         upColor: "#26a69a",
         downColor: "#ef5350",
         borderVisible: false,
         wickUpColor: "#26a69a",
         wickDownColor: "#ef5350",
-        priceFormat: { minMove: 0.1 },
+        priceFormat: { minMove: 0.01 },
     });
-    params.series.avg = params.chart.addLineSeries({
+    params.series.price = params.chart.addLineSeries({
         color: "#CCCCCC",
-        priceFormat: { minMove: 0.1 },
+        priceFormat: { minMove: 0.01 },
         lastValueVisible: false,
         priceLineVisible: false,
     });
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
-    document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
     store.dispatch("tradingStock/getChartData", state.symbol).then(() => {
         loadToolsData();
     });
 });
-onUnmounted(() => {
-    clearInterval(params.interval);
-    clearInterval(params.interval60);
-    params.socketStop = true;
-    params.websocket.close();
-    params.websocket = null;
-});
 
 watch(() => store.state.tradingStock.chartData, loadChartData);
 
 watch(
-    () => store.state.tradingOrder.isChartLoading,
+    () => store.state.tradingStock.isChartLoading,
     (value) => {
         spinnerRef.value.style.display = value ? "block" : "none";
     }
 );
-
 function eventChartContextmenu(e) {
-    showOrderButton();
     e.preventDefault();
 }
 function eventChartClick() {
-    hideOrderButton();
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
-    else if (targetToolRef.value.classList.contains("selected"))
-        drawTargetTool();
-    else if (boxToolRef.value.classList.contains("selected")) drawBoxTool();
     else if (pattern1ToolRef.value.classList.contains("selected"))
         drawPattern1Tool();
     else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
     else if (downlpsToolRef.value.classList.contains("selected"))
         drawDownlpsTool();
-    else if (pattern2ToolRef.value.classList.contains("selected"))
-        drawPattern2Tool();
-    else if (alertToolRef.value.classList.contains("selected")) drawAlertTool();
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
@@ -547,92 +309,6 @@ function eventPriceLineDrag(e) {
     const oldPrice = +e.fromPriceString;
     const newPrice = lineOptions.price;
     switch (lineOptions.lineType) {
-        case "order":
-            if (newPrice != oldPrice) {
-                let isChanged = false;
-                if (lineOptions.kind == "entry") {
-                    if (!status.value.position) {
-                        isChanged = true;
-                        params.order[lineOptions.kind].price = newPrice;
-                        store
-                            .dispatch("tradingOrder/executeOrder", {
-                                action: "entry",
-                                data: {
-                                    cmd: "change",
-                                    price: params.order.entry.price,
-                                },
-                            })
-                            .then((resp) => {
-                                if (resp.isOk) {
-                                    drawOrderLine(lineOptions.kind);
-                                    toast.success(
-                                        t(
-                                            "trading.orderChart.changeEntrySuccess"
-                                        )
-                                    );
-                                } else {
-                                    line.applyOptions({
-                                        price: oldPrice,
-                                    });
-                                    toastOrderError(resp.message);
-                                }
-                            });
-                    }
-                } else {
-                    isChanged = true;
-                    params.order[lineOptions.kind].price = newPrice;
-                    if (lineOptions.kind == "tp")
-                        store
-                            .dispatch("tradingOrder/executeOrder", {
-                                action: "tp",
-                                data: {
-                                    cmd: "change",
-                                    price: params.order.tp.price,
-                                },
-                            })
-                            .then((resp) => {
-                                if (resp.isOk) {
-                                    drawOrderLine(lineOptions.kind);
-                                    toast.success(
-                                        t("trading.orderChart.changeTpSuccess")
-                                    );
-                                } else {
-                                    line.applyOptions({
-                                        price: oldPrice,
-                                    });
-                                    toastOrderError(resp.message);
-                                }
-                            });
-                    else
-                        store
-                            .dispatch("tradingOrder/executeOrder", {
-                                action: "sl",
-                                data: {
-                                    cmd: "change",
-                                    price: params.order.sl.price,
-                                },
-                            })
-                            .then((resp) => {
-                                if (resp.isOk) {
-                                    drawOrderLine(lineOptions.kind);
-                                    toast.success(
-                                        t("trading.orderChart.changeSlSuccess")
-                                    );
-                                } else {
-                                    line.applyOptions({
-                                        price: oldPrice,
-                                    });
-                                    toastOrderError(resp.message);
-                                }
-                            });
-                }
-                //
-                if (!isChanged) {
-                    line.applyOptions({ price: oldPrice });
-                    toast.show(t("trading.orderChart.noChangeOrderLine"));
-                }
-            }
-            break;
         case "line":
             toolsStore.set("line", {
                 price: oldPrice,
@@ -921,99 +597,6 @@ function eventPriceLineDrag(e) {
                 toolsStore.set("pattern1", params.pattern1.Y2.options());
             }
             break;
-        case "pattern2":
-            if (mf.isSet(params.pattern2.T)) {
-                const opsE = params.pattern2.E.options();
-                const price1 = +opsE.price1;
-                const price2 = +opsE.price2;
-                const price3 = +opsE.price3;
-                const price4 = +opsE.price4;
-                const price5 = +opsE.price;
-
-                const d32 = price3 - price2;
-                const d14 = price1 - price4;
-                const d34 = price3 - price4;
-                const d54 = price5 - price4;
-                let d56, price6;
-                if (lineOptions.point == "S") {
-                    price6 = +params.pattern2.S.options().price;
-                    d56 = price5 - price6;
-                } else {
-                    d56 = Math.abs(d32) > Math.abs(d54 / 2) ? d32 : d54 / 2;
-                    price6 = price5 - d56;
-                    params.pattern2.S.applyOptions({
-                        price: +price6.toFixed(1),
-                    });
-                }
-                const price7 =
-                    price6 +
-                    (Math.abs(d54) > Math.abs(d34)
-                        ? Math.abs(d54) > Math.abs(d14)
-                            ? 1
-                            : 1.5
-                        : 2) *
-                        d54;
-                const d75 = price7 - price5;
-
-                params.pattern2.S.applyOptions({
-                    title: `SL=${(-d56).toFixed(1)}`,
-                });
-                toolsStore.set("pattern2", params.pattern2.S.options());
-                //
-                params.pattern2.E.applyOptions({
-                    title: `RR=${(d75 / d56).toFixed(1)}`,
-                });
-                toolsStore.set("pattern2", params.pattern2.E.options());
-                //
-                params.pattern2.T.applyOptions({
-                    price: +price7.toFixed(1),
-                    title: `TP=${d75.toFixed(1)}`,
-                });
-                toolsStore.set("pattern2", params.pattern2.T.options());
-            }
-            break;
-        case "alert":
-            toolsStore.set("alert", {
-                price: oldPrice,
-                removed: true,
-            });
-            const currentPrice = params.data.price.slice(-1)[0].value;
-            let title = newPrice >= currentPrice ? ">" : "<";
-            line.applyOptions({ title: title });
-            toolsStore.set("alert", line.options());
-            alertToolRef.value.classList.remove("selected");
-            break;
-        case "box":
-            if (lineOptions.point == 1) drawBoxTool(true);
-            else if (lineOptions.point == 5) {
-                const p3 = +params.box[2].z.options().price;
-                const p5 = +params.box[4].z.options().price;
-                const d35 = p3 - p5;
-                params.box[5].z.applyOptions({
-                    price: +(p3 + 0.375 * d35).toFixed(1),
-                    title: (0.375 * d35).toFixed(1),
-                });
-                params.box[6].z.applyOptions({
-                    price: +(p3 + d35).toFixed(1),
-                    title: d35.toFixed(1),
-                });
-                params.box[7].z.applyOptions({
-                    price: +(p3 + 2 * d35).toFixed(1),
-                    title: (2 * d35).toFixed(1),
-                });
-
-                toolsStore.get("box").then((boxs) => {
-                    boxs[4].z = params.box[4].z.options();
-                    toolsStore.set("box", boxs[4]);
-                    boxs[5].z = params.box[5].z.options();
-                    toolsStore.set("box", boxs[5]);
-                    boxs[6].z = params.box[6].z.options();
-                    toolsStore.set("box", boxs[6]);
-                    boxs[7].z = params.box[7].z.options();
-                    toolsStore.set("box", boxs[7]);
-                });
-            }
-            break;
     }
 }
 function eventChartResize() {
@@ -1031,52 +614,6 @@ function eventChartResize() {
             document.querySelector(".sc-launcher").style.visibility = "hidden";
             document.querySelector(".dx-drawer-content").style.transform =
                 "unset";
-        }
-    }
-}
-function eventKeyPress(e) {
-    if (e.ctrlKey || e.metaKey) {
-        switch (e.keyCode) {
-            case 38:
-                params.chart.timeScale().applyOptions({
-                    barSpacing:
-                        params.chart.options().timeScale.barSpacing + 0.05,
-                });
-                break;
-            case 40:
-                params.chart.timeScale().applyOptions({
-                    barSpacing:
-                        params.chart.options().timeScale.barSpacing - 0.05,
-                });
-                break;
-            case 37:
-                params.chart
-                    .timeScale()
-                    .scrollToPosition(
-                        params.chart.timeScale().scrollPosition() - 10
-                    );
-                break;
-            case 39:
-                params.chart
-                    .timeScale()
-                    .scrollToPosition(
-                        params.chart.timeScale().scrollPosition() + 10
-                    );
-                break;
-            case 96:
-                rulerToolRef.value.click();
-                break;
-            case 97:
-                lineToolRef.value.click();
-                break;
-            case 98:
-                reloadToolRef.value.click();
-                break;
-            case 99:
-                fullscreenToolRef.value.click();
-            case 100:
-                tradingviewRef.value.click();
-                break;
         }
     }
 }
@@ -1113,39 +650,11 @@ function toggleFullscreen() {
 }
 function loadToolsData() {
     return new Promise(async (resolve) => {
-        if (status.value.pending) {
-            const order = await toolsStore.get("order");
-            order.map((item) => {
-                params.order.side = item.side;
-                params.order[item.kind].price = item.price;
-                drawOrderLine(item.kind);
-                toggleCancelOrderButton(true);
-            });
-            if (params.order.tp.hasOwnProperty("line"))
-                params.order.entry.line.applyOptions({
-                    draggable: false,
-                });
-        }
-        //
         const lines = await toolsStore.get("line");
         lines.forEach((line) => {
             if (!line.removed)
                 params.lines.push(params.series.price.createPriceLine(line));
         });
-        //
-        const boxs = await toolsStore.get("box");
-        if (boxs.length > 0) {
-            params.box = boxs;
-            boxs.forEach((box, i) => {
-                if (mf.isSet(box.x)) params.series.box.update(box.x);
-                if (mf.isSet(box.y))
-                    params.box[i].y = params.series.cash.createPriceLine(box.y);
-                if (mf.isSet(box.z))
-                    params.box[i].z = params.series.price.createPriceLine(
-                        box.z
-                    );
-            });
-        }
         //
         const rulerLines = await toolsStore.get("ruler");
         if (rulerLines.length > 0) {
@@ -1153,14 +662,6 @@ function loadToolsData() {
             rulerLines.forEach((line) => {
                 params.ruler[line.point] =
                     params.series.price.createPriceLine(line);
-            });
-        }
-        //
-        const targetLines = await toolsStore.get("target");
-        if (targetLines.length > 0) {
-            targetLines.forEach((line) => {
-                params.target[line.point] =
-                    params.series.cash.createPriceLine(line);
             });
         }
         //
@@ -1191,353 +692,16 @@ function loadToolsData() {
                     ].createPriceLine(line);
             });
         }
-        //
-        const pattern2Lines = await toolsStore.get("pattern2");
-        if (pattern2Lines.length > 0) {
-            pattern2Lines.forEach((line) => {
-                params.pattern2[line.point] =
-                    params.series.price.createPriceLine(line);
-            });
-        }
-        //
-        const alerts = await toolsStore.get("alert");
-        alerts.forEach((alert) => {
-            if (!alert.removed)
-                params.alerts.push(params.series.price.createPriceLine(alert));
-        });
-        //
         resolve();
     });
 }
 function loadChartData() {
-    // if (params.loadWhitespace) {
-    //     if (store.state.tradingOrder.chartData.length > 0) {
-    //         params.data.whitespace = mergeChartData(
-    //             params.data.whitespace,
-    //             createWhitespaceData()
-    //         );
-    //     }
-    //     params.series.whitespace.setData(params.data.whitespace);
-    //     params.loadWhitespace = false;
-    // }
-
-    // params.data.original = mergeChartData(
-    //     store.state.tradingOrder.chartData,
-    //     params.data.original
-    // );
-
-    // let data = params.data.original.reduce(
-    //     (c, d) => {
-    //         let lastPrice = d.price,
-    //             lastCash = 0;
-    //         if (c.price.length > 0) {
-    //             lastPrice = c.price.slice(-1)[0].value;
-    //             lastCash = c.cash.slice(-1)[0].value;
-    //         }
-    //         const change = d.price - lastPrice;
-    //         const side = change > 0 ? 1 : change < 0 ? -1 : 0;
-    //         c.price.push({ time: d.time, value: d.price });
-    //         c.cash.push({
-    //             time: d.time,
-    //             value: lastCash + side * d.volume,
-    //         });
-    //         return c;
-    //     },
-    //     {
-    //         price: [],
-    //         cash: [],
-    //     }
-    // );
-
-    // params.data.price = data.price;
-    // params.series.price.setData(data.price);
-    // //
-    // params.data.cash = data.cash;
-    // params.series.cash.setData(data.cash);
-    const data = store.state.tradingStock.chartData;
-    params.series.price.setData(data.price);
-    params.series.avg.setData(data.avg);
-    params.series.cash.setData(data.cash);
+    params.data = store.state.tradingStock.chartData;
+    params.series.ohlc.setData(params.data.ohlc);
+    params.series.price.setData(params.data.price);
+    params.series.cash.setData(params.data.cash);
     params.chart.applyOptions({ watermark: { text: state.symbol } });
-}
-function updateChartData(d) {
-    const prevLength = params.data.original.length;
-    params.data.original = mergeChartData(params.data.original, [d]);
-    if (params.data.original.length > prevLength) {
-        const lastPrice = params.data.price.slice(-1)[0].value;
-        const lastCash = params.data.cash.slice(-1)[0].value;
-        const change = d.price - lastPrice;
-        const side = change > 0 ? 1 : change < 0 ? -1 : 0;
-        const price = { time: d.time, value: d.price };
-        const cash = { time: d.time, value: lastCash + side * d.volume };
-        params.data.price.push(price);
-        params.series.price.update(price);
-        params.data.cash.push(cash);
-        params.series.cash.update(cash);
-    }
-}
-function createWhitespaceData() {
-    const date = state.chartDate;
-    const amStart = moment(`${date} 09:00:00`).unix();
-    const amEnd = moment(`${date} 11:30:00`).unix();
-    const pmStart = moment(`${date} 13:00:00`).unix();
-    const pmEnd = moment(`${date} 14:30:00`).unix();
-    let data = [],
-        sec;
-    for (sec = amStart; sec <= amEnd; sec++) {
-        data.push({ time: sec + 7 * 60 * 60 });
-    }
-    for (sec = pmStart; sec <= pmEnd; sec++) {
-        data.push({ time: sec + 7 * 60 * 60 });
-    }
-    return data;
-}
-function mergeChartData(data1, data2) {
-    return Array.from(
-        new Map(
-            [...data1, ...data2]
-                .sort((a, b) => a.time - b.time)
-                .map((d) => [d.time, d])
-        ).values()
-    );
-}
-function connectSocket() {
-    params.websocket = new WebSocket(SOCKET_ENDPOINT);
-    params.websocket.onopen = (e) => {
-        let msg = {
-            action: "join",
-            list: store.state.tradingOrder.config.symbol,
-        };
-        params.websocket.send(
-            `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
-        );
-    };
-    params.websocket.onclose = (e) => {
-        if (params.socketStop) return false;
-        if (inSession()) {
-            blinkSocketStatus(true);
-            connectSocket();
-            if (
-                moment().diff(params.socketRefreshTime, "seconds") >
-                SOCKET_REFRESH_PERIOD
-            )
-                refreshChart();
-        }
-    };
-    params.websocket.onmessage = (e) => {
-        blinkSocketStatus(false);
-        if (e.data.substr(0, 1) == 4) {
-            if (e.data.substr(1, 1) == 2) {
-                const event = JSON.parse(e.data.substr(2));
-                if (event[0] == "stockps") {
-                    const data = event[1].data;
-                    if (data.id == 3220) {
-                        if (params.data.original.length > 0) {
-                            updateChartData({
-                                time:
-                                    moment(
-                                        `${CURRENT_DATE} ${data.time}`
-                                    ).unix() +
-                                    7 * 60 * 60,
-                                price: data.lastPrice,
-                                volume: data.lastVol,
-                            });
-                        }
-                        takeProfitAuto();
-                        scanOrder();
-                    }
-                }
-            }
-        }
-    };
-}
-function intervalHandler() {
-    const CURRENT_SEC = moment().unix();
-    if (inSession(CURRENT_SEC)) {
-        if (!!status.value.position) {
-            if (CURRENT_SEC > TIME.ATC - 5 * 60) {
-                blinkCancelOrderButton();
-                if (
-                    CURRENT_SEC > TIME.ATC - 15 &&
-                    params.order.tp.hasOwnProperty("line")
-                ) {
-                    store
-                        .dispatch("tradingOrder/executeOrder", {
-                            action: "cancel",
-                            tpData: { cmd: "cancel" },
-                            slData: { cmd: "delete" },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderLine("entry");
-                                removeOrderLine("tp");
-                                removeOrderLine("sl");
-                                toggleCancelOrderButton(false);
-                                toolsStore.clear("order");
-                                toast.success(
-                                    t(
-                                        "trading.orderChart.autoCancelTpSlSuccess"
-                                    )
-                                );
-                                playSound();
-                            } else toastOrderError(resp.message);
-                        });
-                }
-            }
-        }
-        if (CURRENT_SEC == TIME.START) connectSocket();
-        //
-        // params.alerts.forEach((alert) => {
-        //     const ops = alert.options();
-        //     if (!ops.removed && !!params.data.price.length) {
-        //         const currentPrice = params.data.price.slice(-1)[0].value;
-        //         if (
-        //             (ops.title == ">" && currentPrice >= ops.price) ||
-        //             (ops.title == "<" && currentPrice <= ops.price)
-        //         )
-        //             playSound();
-        //     }
-        // });
-    }
-    state.clock = moment().format("HH:mm:ss");
-}
-function showOrderButton() {
-    if (store.state.tradingOrder.config.openingMarket) {
-        const CURRENT_SEC = moment().unix();
-        if (inSession(CURRENT_SEC)) {
-            if (!params.order.tp.hasOwnProperty("line")) {
-                if (!!status.value.position) {
-                    if (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC) {
-                        params.order.entry.price =
-                            params.data.price.slice(-1)[0].value;
-                        params.order.side = status.value.position;
-                        tpslOrderRef.value.style.left =
-                            +(
-                                params.crosshair.x +
-                                (params.crosshair.x > innerWidth - 61 ? -61 : 1)
-                            ) + "px";
-                        tpslOrderRef.value.style.top =
-                            +(
-                                params.crosshair.y +
-                                (params.crosshair.y > innerHeight - 51
-                                    ? -51
-                                    : 1)
-                            ) + "px";
-                        tpslOrderRef.value.style.display = "block";
-                    }
-                }
-            }
-            if (!params.order.entry.hasOwnProperty("line")) {
-                let price = null,
-                    side = 0;
-                if (!status.value.position) {
-                    if (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC) {
-                        price = coordinateToPrice(params.crosshair.y);
-                        side =
-                            price >= params.data.price.slice(-1)[0].value
-                                ? 1
-                                : -1;
-                        params.order.side = side;
-                        params.order.entry.price = price;
-                    }
-                } else {
-                    if (CURRENT_SEC < TIME.ATO) price = "ATO";
-                    else if (CURRENT_SEC > TIME.ATC) price = "ATC";
-                    if (!!price) {
-                        params.order.entry.price = price;
-                        side = -status.value.position;
-                    }
-                }
-                if (!!side) {
-                    entryOrderRef.value.style.left =
-                        +(
-                            params.crosshair.x +
-                            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
-                        ) + "px";
-                    entryOrderRef.value.style.top =
-                        +(
-                            params.crosshair.y +
-                            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
-                        ) + "px";
-                    entryOrderRef.value.style.background =
-                        side > 0 ? "green" : "red";
-                    entryOrderRef.value.innerText = `${
-                        side > 0 ? "LONG" : "SHORT"
-                    } ${price}`;
-                    entryOrderRef.value.style.display = "block";
-                }
-            }
-        }
-    }
-}
-function hideOrderButton() {
-    entryOrderRef.value.style.display = "none";
-    tpslOrderRef.value.style.display = "none";
-}
-function toggleCancelOrderButton(visible) {
-    cancelOrderRef.value.style.display = visible ? "block" : "none";
-}
-function blinkCancelOrderButton() {
-    if (!cancelOrderRef.value.classList.contains("blink"))
-        cancelOrderRef.value.classList.add("blink");
-}
-function blinkSocketStatus(status) {
-    if (status) {
-        if (!connectionRef.value.classList.contains("blink"))
-            connectionRef.value.classList.add("blink");
-    } else {
-        if (connectionRef.value.classList.contains("blink"))
-            connectionRef.value.classList.remove("blink");
-    }
-}
-function drawOrderLine(kind) {
-    let color, title;
-    switch (kind) {
-        case "entry":
-            color = "yellow";
-            title = params.order.side > 0 ? "LONG" : "SHORT";
-            break;
-        case "tp":
-            color = "lime";
-            title = Math.abs(
-                params.order.tp.price - params.order.entry.price
-            ).toFixed(1);
-            break;
-        case "sl":
-            color = "red";
-            title = Math.abs(
-                params.order.sl.price - params.order.entry.price
-            ).toFixed(1);
-            break;
-    }
-    if (params.order[kind].hasOwnProperty("line")) {
-        params.order[kind].line.applyOptions({
-            price: params.order[kind].price,
-            title: title,
-        });
-    } else {
-        params.order[kind].line = params.series.price.createPriceLine({
-            lineType: "order",
-            kind: kind,
-            price: params.order[kind].price,
-            color: color,
-            lineWidth: 1,
-            lineStyle: 0,
-            title: title,
-            draggable: true,
-        });
-    }
-    toolsStore.set("order", {
-        kind: kind,
-        price: +params.order[kind].price,
-        side: params.order.side,
-    });
-}
-function removeOrderLine(kind) {
-    if (params.order[kind].hasOwnProperty("line")) {
-        params.series.price.removePriceLine(params.order[kind].line);
-        delete params.order[kind].line;
-    }
+    symbolRef.value.blur();
 }
 function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
@@ -1722,85 +886,6 @@ function removeRulerTool() {
             pointCount: 0,
         };
         toolsStore.clear("ruler");
-    }
-}
-function targetToolClick(e) {
-    state.showColorPicker = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-        removeTargetTool();
-    }
-    e.stopPropagation();
-}
-function targetToolContextmenu(e) {
-    removeTargetTool();
-    e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
-}
-function drawTargetTool() {
-    const cash = coordinateToPrice(params.crosshair.y, "cash");
-    let option = {
-        lineType: "target",
-        price: cash,
-        lineWidth: 1,
-        lineStyle: 0,
-        draggable: false,
-        axisLabelVisible: false,
-    };
-    if (mf.isSet(params.target.A)) {
-        if (mf.isSet(params.target.B)) {
-            option.point = "C";
-            option.title = "C";
-            option.color = "#9C27B0";
-        } else {
-            option.point = "B";
-            option.title = "B";
-            option.color = "#E91E63";
-        }
-    } else {
-        option.point = "A";
-        option.title = "A";
-        option.color = "#E91E63";
-    }
-    params.target[option.point] = params.series.cash.createPriceLine(option);
-    toolsStore.set("target", option);
-    if (option.point == "C") {
-        const a = +params.target.A.options().price;
-        const b = +params.target.B.options().price;
-        const c = +params.target.C.options().price;
-        option.point = "D";
-        option.price = +(c + b - a).toFixed(1);
-        option.title = "D";
-        option.color = "#9C27B0";
-        params.target[option.point] =
-            params.series.cash.createPriceLine(option);
-        toolsStore.set("target", option);
-        //
-        targetToolRef.value.classList.remove("selected");
-    }
-}
-function removeTargetTool() {
-    if (mf.isSet(params.target.A)) {
-        params.series.cash.removePriceLine(params.target.A);
-        if (mf.isSet(params.target.B)) {
-            params.series.cash.removePriceLine(params.target.B);
-            if (mf.isSet(params.target.C)) {
-                params.series.cash.removePriceLine(params.target.C);
-                params.series.cash.removePriceLine(params.target.D);
-            }
-        }
-        params.target = {
-            A: {},
-            B: {},
-            C: {},
-            D: {},
-        };
-        toolsStore.clear("target");
     }
 }
 function pattern1ToolClick(e) {
@@ -2017,10 +1102,10 @@ function findUplps(startTime, endTime) {
         }
     }
     return {
-        price1: +(p2 - dpMax).toFixed(1),
-        price2: +(p3 - dpMax).toFixed(1),
-        cash1: +(c2 - dcMax).toFixed(1),
-        cash2: +(c3 - dcMax).toFixed(1),
+        price1: +(p2 - dpMax).toFixed(2),
+        price2: +(p3 - dpMax).toFixed(2),
+        cash1: +(c2 - dcMax).toFixed(0),
+        cash2: +(c3 - dcMax).toFixed(0),
     };
 }
 function removeUplpsTool() {
@@ -2166,730 +1251,6 @@ function removeDownlpsTool() {
     };
     toolsStore.clear("downlps");
 }
-function pattern2ToolClick(e) {
-    state.showColorPicker = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-        drawPattern2Tool(true);
-    }
-    e.stopPropagation();
-}
-function pattern2ToolContextmenu(e) {
-    removePattern2Tool();
-    e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
-}
-function drawPattern2Tool(fix = false) {
-    let point1 = {};
-    if (mf.isSet(params.pattern2.O)) {
-        const ops = params.pattern2.O.options();
-        point1 = {
-            time: ops.time0,
-            value: ops.price0,
-        };
-        removePattern2Tool();
-    } else {
-        if (fix) return false;
-        point1 = {
-            time: params.crosshair.time,
-            value: coordinateToPrice(params.crosshair.y),
-        };
-    }
-
-    const { price2, price3, price4, isAcc } = findPattern2Points(point1);
-    let option = {
-        lineType: "pattern2",
-        lineWidth: 1,
-        lineStyle: 1,
-    };
-    console.log("isAcc", isAcc);
-    drawLineTool(point1.value, !isAcc, isAcc);
-    //
-    option.time0 = point1.time;
-    option.price0 = point1.value;
-    option.point = "O";
-    option.price = price4;
-    option.title = "O";
-    option.color = "#2196F3";
-    option.draggable = false;
-    params.pattern2[option.point] = params.series.price.createPriceLine(option);
-    toolsStore.set("pattern2", option);
-    //
-    pattern2ToolRef.value.classList.remove("selected");
-}
-function findPattern2Points(point1) {
-    let price2 = point1.value,
-        price3 = point1.value,
-        price4 = point1.value,
-        isAcc = false;
-    for (let i of params.data.price) {
-        if (i.time >= point1.time) {
-            if (i.value < point1.value) {
-                if (price2 <= point1.value && i.value < price2) {
-                    // if (price3 > point1.value) break;
-                    price2 = i.value;
-                }
-                //
-                if (
-                    price3 <= point1.value &&
-                    price2 > point1.value &&
-                    i.value < price3
-                ) {
-                    price3 = i.value;
-                }
-            } else if (i.value > point1.value) {
-                if (price2 >= point1.value && i.value > price2) {
-                    // if (price3 < point1.value) break;
-                    price2 = i.value;
-                }
-                //
-                if (
-                    price3 >= point1.value &&
-                    price2 < point1.value &&
-                    i.value > price3
-                ) {
-                    price3 = i.value;
-                }
-            }
-            const d = i.value - price3;
-            const d13 = point1.value - price3;
-            const d23 = price2 - price3;
-            const d43 =
-                Math.abs(d13 * 2) > Math.abs(d23 / 2) ? d13 * 2 : d23 / 2;
-            price4 = +(price3 + d43).toFixed(1);
-            if (price2 != point1.value && price3 != point1.value) {
-                if (Math.abs(d) > Math.abs(d43)) {
-                    isAcc = true;
-                    break;
-                }
-
-                if (Math.abs(d) > Math.abs(d13) * 3) {
-                    break;
-                }
-            }
-        }
-    }
-    return { price2, price3, price4, isAcc };
-}
-function removePattern2Tool() {
-    if (mf.isSet(params.pattern2.O)) {
-        params.series.price.removePriceLine(params.pattern2.O);
-        //
-        params.pattern2 = {
-            O: {},
-        };
-        toolsStore.clear("pattern2");
-    }
-}
-function alertToolClick(e) {
-    state.showColorPicker = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) e.target.classList.add("selected");
-    e.stopPropagation();
-}
-function alertToolContextmenu(e) {
-    removeAlertTool();
-    e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
-}
-function drawAlertTool() {
-    const TYPE = "alert";
-    const price = formatPrice(coordinateToPrice(params.crosshair.y));
-    const oldLength = params.alerts.length;
-    params.alerts = params.alerts.filter((line) => {
-        const ops = line.options();
-        const isExist = (ops.type = TYPE && price == +ops.price);
-        if (isExist) {
-            params.series.price.removePriceLine(line);
-            toolsStore.set("alert", { price: price, removed: true });
-        }
-        return !isExist;
-    });
-    if (params.alerts.length == oldLength) {
-        const options = {
-            lineType: TYPE,
-            price: price,
-            title: price >= params.data.price.slice(-1)[0].value ? ">" : "<",
-            color: "red",
-            lineWidth: 1,
-            lineStyle: 1,
-            draggable: true,
-        };
-        params.alerts.push(params.series.price.createPriceLine(options));
-        toolsStore.set("alert", options);
-    }
-    alertToolRef.value.classList.remove("selected");
-}
-function removeAlertTool() {
-    params.alerts.forEach((line) => params.series.price.removePriceLine(line));
-    params.alerts = [];
-    toolsStore.clear("alert");
-}
-function boxToolClick(e) {
-    state.showColorPicker = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-        drawBoxTool(true);
-    }
-    e.stopPropagation();
-}
-function boxToolContextmenu(e) {
-    removeBoxTool();
-    e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
-}
-function drawBoxTool(fix = false) {
-    let point0 = {};
-    if (fix) {
-        if (params.box.length == 0) return false;
-        point0 = {
-            time: +params.box[0].x.time,
-            cash: +params.box[0].y.options().price,
-            price: +params.box[0].z.options().price,
-        };
-        removeBoxTool();
-    } else {
-        if (!params.crosshair.price) return false;
-        point0 = {
-            time: params.crosshair.time,
-            cash: coordinateToPrice(params.crosshair.y, "cash"),
-            price: params.crosshair.price,
-        };
-    }
-
-    const { point1, point2, point3, point4, point5 } = findCashPoints(point0);
-    let option = {};
-    const OPTION = {
-        x: { value: 1 },
-        y: {
-            lineWidth: 1,
-            lineStyle: 0,
-            draggable: false,
-            axisLabelVisible: false,
-        },
-        z: {
-            lineType: "box",
-            lineWidth: 1,
-            lineStyle: 1,
-            draggable: false,
-        },
-    };
-    option = mf.cloneDeep(OPTION);
-    option.point = 1;
-    option.x.time = point1.time;
-    option.y.price = point1.cash;
-    option.y.color = "#6a3c07";
-    option.z.point = 1;
-    option.z.price = point1.price;
-    option.z.title = "⬤";
-    option.z.color = "#ff9966";
-    option.z.draggable = true;
-    drawBoxPoint(option);
-    //
-    option = mf.cloneDeep(OPTION);
-    option.point = 2;
-    delete option.x;
-    delete option.y;
-    delete option.z;
-    drawBoxPoint(option);
-    //
-    option = mf.cloneDeep(OPTION);
-    option.point = 3;
-    option.x.time = point3.time;
-    delete option.y;
-    option.z.price = point3.price;
-    option.z.title = "0";
-    option.z.color = "#ff9966";
-    drawBoxPoint(option);
-    //
-    option = mf.cloneDeep(OPTION);
-    option.point = 4;
-    option.x.time = point4.time;
-    option.y.price = point4.cash;
-    option.y.color = "#600844";
-    option.z.price = point4.price;
-    option.z.title = "◀";
-    option.z.color = "#600844";
-    drawBoxPoint(option);
-    //
-    option = mf.cloneDeep(OPTION);
-    option.point = 5;
-    option.x.time = point5.time;
-    delete option.y;
-    option.z.point = 5;
-    option.z.price = point5.price;
-    option.z.title = "⬛";
-    option.z.color = "#ff9966";
-    option.z.draggable = true;
-    drawBoxPoint(option);
-    //
-    const d35 = point3.price - point5.price;
-    option = mf.cloneDeep(OPTION);
-    option.point = 6;
-    delete option.x;
-    delete option.y;
-    option.z.price = +(point3.price + 0.375 * d35).toFixed(1);
-    option.z.title = (0.375 * d35).toFixed(1);
-    option.z.color = "#009688";
-    drawBoxPoint(option);
-    //
-    option = mf.cloneDeep(OPTION);
-    option.point = 7;
-    delete option.x;
-    delete option.y;
-    option.z.price = +(point3.price + d35).toFixed(1);
-    option.z.title = d35.toFixed(1);
-    option.z.color = "#00BCD4";
-    drawBoxPoint(option);
-    //
-    option = mf.cloneDeep(OPTION);
-    option.point = 8;
-    delete option.x;
-    delete option.y;
-    option.z.price = +(point3.price + 2 * d35).toFixed(1);
-    option.z.title = (2 * d35).toFixed(1);
-    option.z.color = "#2196F3";
-    drawBoxPoint(option);
-    //
-
-    boxToolRef.value.classList.remove("selected");
-}
-function findCashPoints(point0) {
-    const p0 = mf.cloneDeep(point0);
-    let point1 = { ...p0 },
-        point2 = { ...p0 },
-        point3 = { ...p0 },
-        point4 = { ...p0 },
-        point5 = { ...p0 };
-    for (let i = 0; i < params.data.price.length; i++) {
-        const time = params.data.price[i].time;
-        if (time <= point1.time) continue;
-        const price = params.data.price[i].value;
-        const cash = params.data.cash[i].value;
-        if (cash < point1.cash) {
-            if (point2.cash <= point1.cash && cash < point2.cash) {
-                point2.time = time;
-                point2.cash = cash;
-                point3.time = time;
-                point4.time = time;
-                point5.time = time;
-            }
-            //
-            if (point2.cash > point1.cash) {
-                if (point3.cash <= point1.cash && cash < point3.cash) {
-                    point3.time = time;
-                    point3.cash = cash;
-                }
-                if (cash < point2.cash && point3.cash == point1.cash) {
-                    point3.time = time;
-                    point4.time = time;
-                    point5.time = time;
-                }
-            }
-        } else if (cash > point1.cash) {
-            if (point2.cash >= point1.cash && cash > point2.cash) {
-                point2.time = time;
-                point2.cash = cash;
-                point3.time = time;
-                point4.time = time;
-                point5.time = time;
-            }
-            //
-            if (point2.cash < point1.cash) {
-                if (point3.cash >= point1.cash && cash > point3.cash) {
-                    point3.time = time;
-                    point3.cash = cash;
-                }
-                if (cash > point2.cash && point3.cash == point1.cash) {
-                    point3.time = time;
-                    point4.time = time;
-                    point5.time = time;
-                }
-            }
-        }
-        //
-        if (point2.cash < point3.cash) {
-            // if (point2.price == point0.price && price > point1.price)
-            //     point1.price = price;
-            if (point2.price <= point5.price && price < point2.price)
-                point2.price = price;
-            if (price > point3.price) {
-                point3.price = price;
-                point5.price = price;
-            }
-            if (price < point5.price) point5.price = price;
-        } else if (point2.cash > point3.cash) {
-            // if (point3.price == point0.price && price < point1.price)
-            //     point1.price = price;
-            if (point2.price >= point5.price && price > point2.price)
-                point2.price = price;
-            if (price < point3.price) {
-                point3.price = price;
-                point5.price = price;
-            }
-            if (price > point5.price) point5.price = price;
-        }
-        if (point3.cash != point1.cash) {
-            const i1 = params.data.whitespace.findIndex(
-                (x) => x.time === point1.time
-            );
-            // const i2 = params.data.whitespace.findIndex(
-            //     (x) => x.time === point2.time
-            // );
-            const i3 = params.data.whitespace.findIndex(
-                (x) => x.time === point3.time
-            );
-            const ic = params.data.whitespace.findIndex((x) => x.time === time);
-            const i4 = 2 * i3 - i1;
-            const i5 = 3 * i3 - 2 * i1;
-            if (i4 < params.data.whitespace.length) {
-                point4.time = params.data.whitespace[i4].time;
-                point4.cash = +(
-                    point3.cash +
-                    point2.cash -
-                    point1.cash
-                ).toFixed(1);
-                point4.price = +(
-                    point3.price +
-                    point2.price -
-                    point1.price
-                ).toFixed(1);
-            }
-            if (i5 < params.data.whitespace.length) {
-                point5.time = params.data.whitespace[i5].time;
-                point5.cash = +(
-                    point3.cash +
-                    point2.cash -
-                    point1.cash
-                ).toFixed(1);
-            }
-            if (ic > i4) break;
-        }
-    }
-    return { point1, point2, point3, point4, point5 };
-}
-function drawBoxPoint(option) {
-    toolsStore.set("box", option);
-    if (mf.isSet(option.x)) params.series.box.update(option.x);
-    if (mf.isSet(option.y))
-        option.y = params.series.cash.createPriceLine(option.y);
-    if (mf.isSet(option.z))
-        option.z = params.series.price.createPriceLine(option.z);
-    params.box.push(option);
-}
-function removeBoxTool() {
-    params.box.forEach((item) => {
-        if (mf.isSet(item.y)) params.series.cash.removePriceLine(item.y);
-        if (mf.isSet(item.z)) params.series.price.removePriceLine(item.z);
-    });
-    params.series.box.setData([]);
-    params.box = [];
-    toolsStore.clear("box");
-}
-async function cancelOrderClick() {
-    let result = true;
-    if (!result) {
-        result = await confirm(
-            t("trading.orderChart.cancelOrder"),
-            t("titles.confirm")
-        );
-    }
-    if (result) {
-        if (params.order.entry.hasOwnProperty("line")) {
-            if (params.order.tp.hasOwnProperty("line")) {
-                store
-                    .dispatch("tradingOrder/executeOrder", {
-                        action: "exit",
-                        tpData: { cmd: "cancel" },
-                        slData: { cmd: "delete" },
-                        exitData: {
-                            cmd: "new",
-                            price: "MTL",
-                        },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            removeOrderLine("entry");
-                            removeOrderLine("tp");
-                            removeOrderLine("sl");
-                            toggleCancelOrderButton(false);
-                            toolsStore.clear("order");
-                            toast.success(t("trading.orderChart.exitSuccess"));
-                        } else {
-                            toggleCancelOrderButton(true);
-                            toastOrderError(resp.message);
-                        }
-                    });
-            } else {
-                store
-                    .dispatch("tradingOrder/executeOrder", {
-                        action: "entry",
-                        data: { cmd: "delete" },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            removeOrderLine("entry");
-                            toggleCancelOrderButton(false);
-                            toolsStore.clear("order");
-                            toast.success(
-                                t("trading.orderChart.deleteEntrySuccess")
-                            );
-                        } else {
-                            toggleCancelOrderButton(true);
-                            toastOrderError(resp.message);
-                        }
-                    });
-            }
-        }
-    }
-}
-function entryOrderClick() {
-    const CURRENT_SEC = moment().unix();
-    if (inSession(CURRENT_SEC)) {
-        if (CURRENT_SEC < TIME.ATO) {
-            let result = confirm(
-                t("trading.orderChart.atoOrder"),
-                t("titles.confirm")
-            );
-            result.then((dialogResult) => {
-                if (dialogResult) {
-                    store
-                        .dispatch("tradingOrder/executeOrder", {
-                            action: "exit",
-                            exitData: {
-                                cmd: "new",
-                                price: "ATO",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk)
-                                toast.success(
-                                    t("trading.orderChart.atoOrderSuccess")
-                                );
-                            else toastOrderError(resp.message);
-                        });
-                }
-            });
-        } else if (CURRENT_SEC < TIME.ATC) {
-            store
-                .dispatch("tradingOrder/executeOrder", {
-                    action: "entry",
-                    data: {
-                        cmd: "new",
-                        side: params.order.side,
-                        price: params.order.entry.price,
-                    },
-                })
-                .then((resp) => {
-                    if (resp.isOk) {
-                        drawOrderLine("entry");
-                        toggleCancelOrderButton(true);
-                        toast.success(t("trading.orderChart.newEntrySuccess"));
-                    } else toastOrderError(resp.message);
-                });
-        } else {
-            let result = confirm(
-                t("trading.orderChart.atcOrder"),
-                t("titles.confirm")
-            );
-            result.then((dialogResult) => {
-                if (dialogResult) {
-                    store
-                        .dispatch("tradingOrder/executeOrder", {
-                            action: "exit",
-                            exitData: {
-                                cmd: "new",
-                                price: "ATC",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk)
-                                toast.success(
-                                    t("trading.orderChart.atcOrderSuccess")
-                                );
-                            else toastOrderError(resp.message);
-                        });
-                }
-            });
-        }
-    }
-}
-function tpslOrderClick() {
-    params.order.tp.price =
-        params.order.entry.price + params.order.side * TP_DEFAULT;
-    params.order.sl.price =
-        params.order.entry.price - params.order.side * SL_DEFAULT;
-    store
-        .dispatch("tradingOrder/executeOrder", {
-            action: "tpsl",
-            tpData: {
-                cmd: "new",
-                price: params.order.tp.price,
-            },
-            slData: {
-                cmd: "new",
-                price: params.order.sl.price,
-            },
-        })
-        .then((resp) => {
-            if (resp.isOk) {
-                drawOrderLine("entry");
-                drawOrderLine("tp");
-                drawOrderLine("sl");
-                params.order.entry.line.applyOptions({
-                    draggable: false,
-                });
-                toast.success(t("trading.orderChart.newTpSlSuccess"));
-            } else toastOrderError(resp.message);
-        });
-}
-function scanOrder() {
-    if (params.order.entry.hasOwnProperty("line")) {
-        const lastPrice = params.data.price.slice(-1)[0].value;
-        if (params.order.tp.hasOwnProperty("line")) {
-            if (
-                (params.order.side > 0 && lastPrice >= params.order.tp.price) ||
-                (params.order.side < 0 && lastPrice <= params.order.tp.price)
-            ) {
-                if (!params.isAutoOrdering) {
-                    params.isAutoOrdering = true;
-                    store
-                        .dispatch("tradingOrder/executeOrder", {
-                            action: "sl",
-                            data: {
-                                cmd: "delete",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderLine("entry");
-                                removeOrderLine("tp");
-                                removeOrderLine("sl");
-                                toggleCancelOrderButton(false);
-                                toolsStore.clear("order");
-                                toast.success(
-                                    t("trading.orderChart.deleteTpSuccess")
-                                );
-                                hideOrderButton();
-                                playSound();
-                            } else toastOrderError(resp.message);
-                            params.isAutoOrdering = false;
-                        });
-                }
-            }
-            if (
-                (params.order.side > 0 && lastPrice <= params.order.sl.price) ||
-                (params.order.side < 0 && lastPrice >= params.order.sl.price)
-            ) {
-                if (!params.isAutoOrdering) {
-                    params.isAutoOrdering = true;
-                    store
-                        .dispatch("tradingOrder/executeOrder", {
-                            action: "tp",
-                            data: {
-                                cmd: "cancel",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderLine("entry");
-                                removeOrderLine("tp");
-                                removeOrderLine("sl");
-                                toggleCancelOrderButton(false);
-                                toolsStore.clear("order");
-                                toast.success(
-                                    t("trading.orderChart.deleteSlSuccess")
-                                );
-                                hideOrderButton();
-                                playSound();
-                            } else toastOrderError(resp.message);
-                            params.isAutoOrdering = false;
-                        });
-                }
-            }
-        } else {
-            if (
-                (params.order.side > 0 &&
-                    lastPrice >= params.order.entry.price) ||
-                (params.order.side < 0 && lastPrice <= params.order.entry.price)
-            ) {
-                if (!params.isAutoOrdering) {
-                    params.isAutoOrdering = true;
-                    setTimeout(() => {
-                        params.order.tp.price =
-                            params.order.entry.price +
-                            params.order.side * TP_DEFAULT;
-                        params.order.sl.price =
-                            params.order.entry.price -
-                            params.order.side * SL_DEFAULT;
-                        store
-                            .dispatch("tradingOrder/executeOrder", {
-                                action: "tpsl",
-                                tpData: {
-                                    cmd: "new",
-                                    price: params.order.tp.price,
-                                },
-                                slData: {
-                                    cmd: "new",
-                                    price: params.order.sl.price,
-                                },
-                            })
-                            .then((resp) => {
-                                if (resp.isOk) {
-                                    drawOrderLine("tp");
-                                    drawOrderLine("sl");
-                                    params.order.entry.line.applyOptions({
-                                        draggable: false,
-                                    });
-                                    toast.success(
-                                        t(
-                                            "trading.orderChart.autoNewTpSlSuccess"
-                                        )
-                                    );
-                                    playSound();
-                                } else toastOrderError(resp.message);
-                                params.isAutoOrdering = false;
-                            });
-                    }, 1000);
-                }
-            }
-        }
-    }
-}
-function takeProfitAuto() {
-    if (!!status.value.position) {
-        if (mf.isSet(params.target.X)) {
-            const lastCash = params.data.cash.slice(-1)[0].value;
-            const b = +params.target.B.options().price;
-            const x = +params.target.X.options().price;
-            const xb = x - b;
-            if ((xb > 0 && lastCash >= x) || (xb < 0 && lastCash <= x)) {
-                cancelOrderRef.value.click();
-            }
-        }
-    }
-}
-function chartTopClick() {
-    params.chart.timeScale().scrollToRealTime();
-}
-function inSession(currentSec = null) {
-    if (!currentSec) currentSec = moment().unix();
-    return currentSec >= TIME.START && currentSec <= TIME.END;
-}
 function coordinateToPrice(y, name = "price") {
     return formatPrice(params.series[name].coordinateToPrice(y));
 }
@@ -2897,69 +1258,10 @@ function formatPrice(price) {
     if (!price) return 0;
     return +(+price.toFixed(1));
 }
-function toastOrderError(error) {
-    if (!error) error = "unknown";
-    toast.error(t(`trading.orderChart.${error}`));
-}
-function dateSelectChange() {
-    params.loadWhitespace = true;
-    store.dispatch("tradingOrder/getChartData", state.chartDate);
-}
-function refreshChart() {
-    params.socketRefreshTime = moment();
-    params.loadWhitespace = true;
-    store.dispatch("tradingOrder/getChartData", state.chartDate);
-}
-function resetChart() {
-    params.data.original = [];
-    params.data.price = [];
-    params.data.cash = [];
-    params.data.whitespace = [];
-    refreshChart();
-}
-function playSound() {
-    let player = new Audio(sound);
-    player.crossOrigin = "anonymous";
-    player.addEventListener("canplaythrough", function () {
-        player.play();
-    });
-}
-function getAccountInfo() {
-    store.dispatch("tradingOrder/getAccountInfo").then((data) => {
-        let html = "";
-        html += '<div style="width: 200px;">';
-        html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.orderChart.nav"
-        )}</div><div>: ${filters.currency(data.nav)}</div></div>`;
-        html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.orderChart.maxVol"
-        )}</div><div>: ${filters.numberVnFormat(data.maxVol)}</div></div>`;
-        html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.orderChart.vm"
-        )}</div><div>: ${filters.currency(data.vm)}</div></div>`;
-        html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.orderChart.fee"
-        )}</div><div>: ${filters.currency(data.fee)}</div></div>`;
-        html += "</div>";
-        alert(html, t("trading.orderChart.accountInfo"));
-    });
-}
-function report() {
-    bus.emit("checkPin", () => store.dispatch("tradingOrder/report"));
-}
-function exportCsv() {
-    bus.emit("checkPin", () => store.dispatch("tradingOrder/export"));
-}
 function symbolChange(e) {
     if (state.symbol == "") return false;
     state.symbol = state.symbol.toUpperCase();
-    store.dispatch("tradingStock/getChartData", state.symbol).then((data) => {
-        params.series.price.setData(data.price);
-        params.series.avg.setData(data.avg);
-        params.series.cash.setData(data.cash);
-        params.chart.applyOptions({ watermark: { text: state.symbol } });
-        e.target.blur();
-    });
+    store.dispatch("tradingStock/getChartData", state.symbol);
 }
 function symbolFocus(e) {
     e.target.select();
@@ -2995,37 +1297,15 @@ function symbolFocus(e) {
 
         &.data-area {
             top: 0px;
-            left: 0px;
+            left: 32px;
+            z-index: 4 !important;
 
             .command:not(:first-child) {
                 border-left: solid 2px #2a2e39 !important;
             }
 
-            .clock {
-                width: 80px;
-            }
-
-            .chart-date {
-                width: 125px;
-            }
-
             .symbol-input {
                 width: 80px;
-            }
-
-            .status {
-                width: unset !important;
-                padding: 0 10px !important;
-
-                &.green {
-                    color: lime !important;
-                }
-                &.red {
-                    color: red !important;
-                }
-                &.pending {
-                    background: gold !important;
-                }
             }
 
             .spinner {
@@ -3036,7 +1316,7 @@ function symbolFocus(e) {
         }
 
         &.tool-area {
-            top: 32px;
+            top: 0px;
             left: 0px;
             flex-direction: column;
 
@@ -3048,10 +1328,6 @@ function symbolFocus(e) {
                 color: #1f62ff !important;
             }
 
-            .warning {
-                color: yellow !important;
-            }
-
             .color {
                 position: relative;
 
@@ -3060,11 +1336,6 @@ function symbolFocus(e) {
                     top: 0;
                     left: 40px;
                 }
-            }
-
-            .cancel-order {
-                display: none;
-                color: red;
             }
         }
     }
@@ -3080,58 +1351,6 @@ function symbolFocus(e) {
         border: none;
         cursor: pointer;
         z-index: 3;
-
-        &:not(.noaction):hover {
-            background: #2a2e39 !important;
-        }
-        &.noaction {
-            cursor: unset !important;
-        }
-        &.blink {
-            animation: blinker 0.5s linear infinite;
-        }
-        @keyframes blinker {
-            50% {
-                color: transparent;
-            }
-        }
-    }
-
-    .order-button {
-        position: absolute;
-        display: none;
-        padding: 5px;
-        text-align: center;
-        border-radius: 7px;
-        color: black;
-        background: silver;
-        z-index: 3;
-        cursor: pointer;
-
-        &.entry {
-            width: 70px;
-            height: 55px;
-            color: white !important;
-        }
-
-        &.tpsl {
-            width: 60px;
-            height: 50px;
-            line-height: 40px;
-        }
-    }
-
-    .chart-top {
-        position: absolute;
-        bottom: 29px;
-        right: 55px;
-        border-radius: 50%;
-        border: 1px solid gray;
-        padding-left: 1px;
-        line-height: 22px !important;
-        width: 25px !important;
-        height: 25px !important;
-        font-size: 18px;
     }
 
     .tradingview-chart {
@@ -3140,7 +1359,7 @@ function symbolFocus(e) {
         left: 32px;
         width: calc(100% - 32px);
         height: 100%;
-        z-index: 3;
+        z-index: 5;
     }
 }
 </style>
