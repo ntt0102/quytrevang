@@ -20,6 +20,7 @@ import adminComment from "./modules/Admin/Comment";
 // Trading
 import tradingStatistic from "./modules/Trading/Statistic";
 import tradingOrder from "./modules/Trading/Order";
+import tradingStock from "./modules/Trading/Stock";
 import tradingFinbook from "./modules/Trading/Finbook";
 // Setting
 import setting from "./modules/Setting/Index";
@@ -49,6 +50,7 @@ export default createStore({
         // Trading
         tradingStatistic,
         tradingOrder,
+        tradingStock,
         tradingFinbook,
         // Setting
         setting,

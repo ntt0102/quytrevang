@@ -81,6 +81,12 @@ export default [
                 permissions: ["stock@order"],
             },
             {
+                text: lang.global.t("trading.stock.title"),
+                name: "trading-stock",
+                icon: "far fa-gavel",
+                permissions: ["stock@order"],
+            },
+            {
                 text: lang.global.t("trading.trades.title"),
                 name: "trading-statistic",
                 icon: "far fa-analytics",

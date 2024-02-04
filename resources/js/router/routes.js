@@ -180,6 +180,17 @@ const authRoute = [
         component: loadView("Trading", "Order", "Index"),
     },
     {
+        path: `/${lang.global.t("route.tradingStock")}`,
+        name: "trading-stock",
+        meta: {
+            auth: true,
+            permission: "stock@order",
+            title: lang.global.t("trading.stock.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Trading", "Stock", "Index"),
+    },
+    {
         path: `/${lang.global.t("route.tradingStatistic")}`,
         name: "trading-statistic",
         meta: {

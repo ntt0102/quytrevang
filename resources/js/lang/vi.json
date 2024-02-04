@@ -227,6 +227,10 @@
                 "cashflow": "Biểu đồ ngày"
             }
         },
+        "stock": {
+            "title": "Chứng khoán",
+            "symbol": "Mã chứng khoán"
+        },
         "trades": {
             "title": "Thống kê",
             "amount": "Số HĐ",
@@ -711,6 +715,7 @@
         "adminCopyist": "quan-ly-sao-chep-lenh",
         "adminComment": "quan-ly-phan-hoi",
         "tradingOrder": "dat-lenh-dau-tu",
+        "tradingStock": "chung-khoan-dau-tu",
         "tradingStatistic": "thong-ke-dau-tu",
         "tradingFinbook": "so-tai-chinh",
         "settingCommand": "cai-dat-lenh",
