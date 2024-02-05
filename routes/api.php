@@ -132,6 +132,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 });
                 Route::group(['prefix' => 'stock', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'StockController@getChartData');
+                    Route::post('get-symbols', 'StockController@getSymbols');
                 });
                 Route::group(['prefix' => 'finbook', 'middleware' => 'can:finbooks@control'], function () {
                     Route::post('/', 'FinbookController@fetch');

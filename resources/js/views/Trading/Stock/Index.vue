@@ -3,22 +3,14 @@
         <div class="stock-container" ref="chartContainerRef">
             <div class="chart-wrapper" ref="chartRef">
                 <div class="area data-area">
-                    <input
-                        ref="symbolRef"
-                        type="text"
-                        class="command symbol-input"
-                        :title="$t('trading.stock.symbol')"
-                        v-model="state.symbol"
-                        @change="symbolChange"
-                        @focus="symbolFocus"
-                    />
                     <DxSelectBox
-                        :data-source="['AAA', 'BBB', 'CCC']"
-                        :input-attr="{ class: 'command' }"
-                        value="AAA"
-                        @optionChanged="optionChanged"
-                        @keyUp="keyUp"
-                        @keyDown="keyDown"
+                        width="110px"
+                        :data-source="state.symbols"
+                        :search-enabled="true"
+                        :input-attr="{ class: 'symbol-select' }"
+                        :element-attr="{ class: 'symbol-select' }"
+                        v-model="state.symbol"
+                        @valueChanged="symbolChanged"
                     />
                     <img
                         ref="spinnerRef"
@@ -163,7 +155,6 @@ const devices = inject("devices");
 const mf = inject("mf");
 const chartContainerRef = ref(null);
 const chartRef = ref(null);
-const symbolRef = ref(null);
 const spinnerRef = ref(null);
 const fullscreenToolRef = ref(null);
 const tradingviewRef = ref(null);
@@ -226,6 +217,7 @@ let params = {
 };
 const state = reactive({
     symbol: "VNINDEX",
+    symbols: [],
     isFullscreen: false,
     color: "#F44336",
     showColorPicker: false,
@@ -234,6 +226,9 @@ const state = reactive({
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
+store
+    .dispatch("tradingStock/getSymbols")
+    .then((symbols) => (state.symbols = symbols));
 toolsStore.create();
 
 onMounted(() => {
@@ -708,7 +703,6 @@ function loadChartData() {
     params.series.price.setData(params.data.price);
     params.series.cash.setData(params.data.cash);
     params.chart.applyOptions({ watermark: { text: state.symbol } });
-    symbolRef.value.blur();
 }
 function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
@@ -1265,25 +1259,12 @@ function formatPrice(price) {
     if (!price) return 0;
     return +(+price.toFixed(1));
 }
-function symbolChange(e) {
-    if (state.symbol == "") return false;
-    state.symbol = state.symbol.toUpperCase();
+function symbolChanged(e) {
+    if (!state.symbol) return false;
     store.dispatch("tradingStock/getChartData", state.symbol);
 }
-function symbolFocus(e) {
-    e.target.select();
-}
-function optionChanged() {
-    console.log("optionChanged");
-}
-function keyDown() {
-    console.log("keyDown");
-}
-function keyUp() {
-    console.log("keyUp");
-}
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .stock-container {
     height: 400px;
     background: #131722;
@@ -1320,8 +1301,8 @@ function keyUp() {
                 border-left: solid 2px #2a2e39 !important;
             }
 
-            .symbol-input {
-                width: 80px;
+            .symbol-select {
+                text-indent: 10px;
             }
 
             .spinner {

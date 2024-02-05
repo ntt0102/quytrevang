@@ -15,6 +15,7 @@ class StockService extends CoreService
     public function getChartData($payload)
     {
         $r = ['ohlc' => [], 'price' => [], 'cash' => []];
+        if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
         $url = "https://iboard.ssi.com.vn/dchart/api/history?resolution=D&symbol=" . $payload->symbol . "&from=" . strtotime("-3 year") . "&to=" . time();
         $res = $client->get($url);
@@ -53,5 +54,20 @@ class StockService extends CoreService
             ];
         }
         return $r;
+    }
+    /**
+     * Get Symbols
+     *
+     * @param $payload
+     * 
+     */
+    public function getSymbols($payload)
+    {
+        $client = new \GuzzleHttp\Client();
+        $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/hose";
+        $res = $client->get($url);
+        $hose = json_decode($res->getBody());
+        $index = ['VNINDEX', 'VN30'];
+        return array_merge($index, $hose);
     }
 }

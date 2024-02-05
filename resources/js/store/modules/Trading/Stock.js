@@ -23,13 +23,12 @@ const actions = {
                 });
         });
     },
-    getConfig({ commit, dispatch, getters, state, rootGetters }) {
+    getSymbols({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/order/get-config", {}, { noLoading: true })
+                .post("trading/stock/get-symbols", {}, { noLoading: true })
                 .then((response) => {
-                    commit("setConfig", response.data);
-                    resolve();
+                    resolve(response.data);
                 });
         });
     },

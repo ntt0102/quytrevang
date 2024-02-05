@@ -28,4 +28,16 @@ class StockController extends CoreController
         $data = $this->stockService->getChartData($this->payload);
         return $this->sendResponse($data);
     }
+    /**
+     * Get the symbols
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getSymbols(Request $request)
+    {
+        $data = $this->stockService->getSymbols($this->payload);
+        return $this->sendResponse($data);
+    }
 }

@@ -2922,7 +2922,7 @@ function exportCsv() {
     bus.emit("checkPin", () => store.dispatch("tradingOrder/export"));
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .order-chart-container {
     height: 400px;
     background: #131722;
