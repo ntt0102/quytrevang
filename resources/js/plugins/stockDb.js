@@ -7,7 +7,7 @@ class StockDb {
     // Các phương thức
     create() {
         return new Promise((resolve, reject) => {
-            const request = indexedDB.open("orderChart", 1);
+            const request = indexedDB.open("stockChart", 1);
             request.onupgradeneeded = (e) => {
                 this.store = e.target.result;
                 this.store.createObjectStore("line", { keyPath: "price" });
