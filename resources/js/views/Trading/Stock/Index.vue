@@ -1,6 +1,6 @@
 <template>
     <div class="content-block dx-card responsive-paddings">
-        <div class="order-chart-container" ref="chartContainerRef">
+        <div class="stock-container" ref="chartContainerRef">
             <div class="chart-wrapper" ref="chartRef">
                 <div class="area data-area">
                     <input
@@ -11,6 +11,14 @@
                         v-model="state.symbol"
                         @change="symbolChange"
                         @focus="symbolFocus"
+                    />
+                    <DxSelectBox
+                        :data-source="['AAA', 'BBB', 'CCC']"
+                        :input-attr="{ class: 'command' }"
+                        value="AAA"
+                        @optionChanged="optionChanged"
+                        @keyUp="keyUp"
+                        @keyDown="keyDown"
                     />
                     <img
                         ref="spinnerRef"
@@ -98,8 +106,7 @@
 import ColorPicker from "./ColorPicker.vue";
 import toolsStore from "../../../plugins/stockDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
-import { alert } from "devextreme/ui/dialog";
-import { confirm } from "devextreme/ui/dialog";
+import DxSelectBox from "devextreme-vue/select-box";
 import {
     reactive,
     ref,
@@ -1266,9 +1273,18 @@ function symbolChange(e) {
 function symbolFocus(e) {
     e.target.select();
 }
+function optionChanged() {
+    console.log("optionChanged");
+}
+function keyDown() {
+    console.log("keyDown");
+}
+function keyUp() {
+    console.log("keyUp");
+}
 </script>
 <style lang="scss" scoped>
-.order-chart-container {
+.stock-container {
     height: 400px;
     background: #131722;
     border: none;
