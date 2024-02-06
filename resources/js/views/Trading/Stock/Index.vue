@@ -4,11 +4,15 @@
             <div class="chart-wrapper" ref="chartRef">
                 <div class="area data-area">
                     <DxSelectBox
-                        width="110px"
+                        :width="
+                            $screen.getScreenSizeInfo.isXSmall
+                                ? '140px'
+                                : '130px'
+                        "
                         :data-source="state.symbols"
                         :search-enabled="true"
+                        :show-clear-button="true"
                         :input-attr="{ class: 'symbol-select' }"
-                        :element-attr="{ class: 'symbol-select' }"
                         v-model="state.symbol"
                         @valueChanged="symbolChanged"
                     />
@@ -1302,7 +1306,7 @@ function symbolChanged(e) {
             }
 
             .symbol-select {
-                text-indent: 10px;
+                text-align: center;
             }
 
             .spinner {
