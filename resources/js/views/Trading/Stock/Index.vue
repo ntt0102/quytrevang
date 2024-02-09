@@ -1,5 +1,27 @@
 <template>
     <div class="content-block dx-card responsive-paddings">
+        <DxToolbar
+            :items="[
+                {
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-cloud-download-alt small',
+                        hint: $t('trading.stock.buttons.cloneSymbols'),
+                        onClick: cloneSymbols,
+                    },
+                },
+                {
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-filter small',
+                        hint: $t('trading.stock.buttons.filterCash'),
+                        onClick: () => $refs.settingPopupRef.show(),
+                    },
+                },
+            ]"
+        />
         <div class="stock-container" ref="chartContainerRef">
             <div class="chart-wrapper" ref="chartRef">
                 <div class="area data-area">
@@ -9,10 +31,11 @@
                                 ? '140px'
                                 : '130px'
                         "
+                        height="30px"
                         :data-source="state.symbols"
                         :search-enabled="true"
                         :show-clear-button="true"
-                        :input-attr="{ class: 'symbol-select' }"
+                        :element-attr="{ class: 'symbol-select' }"
                         v-model="state.symbol"
                         @valueChanged="symbolChanged"
                     />
@@ -96,10 +119,12 @@
             </div>
         </div>
     </div>
+    <SettingPopup ref="settingPopupRef" />
 </template>
 
 <script setup>
 import ColorPicker from "./ColorPicker.vue";
+import SettingPopup from "./SettingPopup.vue";
 import toolsStore from "../../../plugins/stockDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
@@ -1267,6 +1292,30 @@ function symbolChanged(e) {
     if (!state.symbol) return false;
     store.dispatch("tradingStock/getChartData", state.symbol);
 }
+function cloneSymbols() {
+    store.dispatch("tradingStock/cloneSymbols");
+}
+function filterCash() {
+    const param = {
+        from: moment("2022-04-04").unix(),
+        to: moment("2023-09-07").unix(),
+    };
+    store.dispatch("tradingStock/filterCash", param);
+}
+function filterIndex() {
+    const param = {
+        from: moment("2022-04-04").unix(),
+        to: moment("2023-09-07").unix(),
+    };
+    store.dispatch("tradingStock/filterIndex", param);
+}
+function filterMix() {
+    const param = {
+        from: moment("2022-04-04").unix(),
+        to: moment("2023-09-07").unix(),
+    };
+    store.dispatch("tradingStock/filterMix", param);
+}
 </script>
 <style lang="scss">
 .stock-container {
@@ -1306,7 +1355,13 @@ function symbolChanged(e) {
             }
 
             .symbol-select {
-                text-align: center;
+                .dx-texteditor-input {
+                    text-align: center;
+                    padding: 5.7px 0;
+                }
+                .dx-placeholder {
+                    line-height: 3px;
+                }
             }
 
             .spinner {

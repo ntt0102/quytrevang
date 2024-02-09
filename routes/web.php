@@ -149,6 +149,14 @@ Route::get('test', function () {
     // $vos = new \App\Services\Special\VpsOrderService($copyist);
     // // dd($vos->hasOrder());
     // dd($vos->hasOrder() || $vos->hasConditionOrder());
+    // dd(strtotime("2022-04-04"));
+    set_time_limit(300);
+    $payload = (object)['from' => strtotime("2022-04-04"), 'to' => strtotime("2023-09-07"), 'type' => 'cash'];
+    // $s = App\Jobs\FilterStockJob::dispatch($payload);
+
+    // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
+    $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
+    dd($filter);
     $date = date('Y-m-d');
     dd(get_global_value('openingMarketFlag'));
     dd('2023-12-25' == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'));

@@ -229,7 +229,21 @@
         },
         "stock": {
             "title": "Chứng khoán",
-            "symbol": "Mã chứng khoán"
+            "symbol": "Mã chứng khoán",
+            "settingPopup": {
+                "title": "Lọc cổ phiếu",
+                "dateRange": "Khoảng thời gian",
+                "filterModel": "Mô hình lọc",
+                "filterCash": "Lọc theo dòng tiền",
+                "filterIndex": "Lọc theo chỉ số",
+                "filterMix": "Lọc kết hợp"
+            },
+            "buttons": {
+                "cloneSymbols": "Lấy mã HOSE",
+                "filterCash": "Lọc dòng tiền",
+                "filterIndex": "Lọc chỉ số",
+                "filterMix": "Lọc kết hợp"
+            }
         },
         "trades": {
             "title": "Thống kê",

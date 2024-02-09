@@ -29,6 +29,18 @@ class StockController extends CoreController
         return $this->sendResponse($data);
     }
     /**
+     * Clone the symbols
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function cloneSymbols(Request $request)
+    {
+        $data = $this->stockService->cloneSymbols();
+        return $this->sendResponse($data);
+    }
+    /**
      * Get the symbols
      *
      * @param \Illuminate\Http\Request $request
@@ -37,7 +49,19 @@ class StockController extends CoreController
      */
     public function getSymbols(Request $request)
     {
-        $data = $this->stockService->getSymbols($this->payload);
+        $data = $this->stockService->getSymbols();
+        return $this->sendResponse($data);
+    }
+    /**
+     * Filter Symbols
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function filterSymbols(Request $request)
+    {
+        $data = $this->stockService->filterSymbols($this->payload);
         return $this->sendResponse($data);
     }
 }

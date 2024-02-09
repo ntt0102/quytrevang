@@ -14,8 +14,14 @@ const actions = {
     getChartData({ commit, dispatch, getters, state, rootGetters }, symbol) {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
+            const from = moment().subtract(3, "years").unix();
+            const to = moment().unix();
             axios
-                .post("trading/stock", { symbol }, { noLoading: true })
+                .post(
+                    "trading/stock",
+                    { symbol, from, to },
+                    { noLoading: true }
+                )
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
@@ -23,10 +29,28 @@ const actions = {
                 });
         });
     },
+    cloneSymbols({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/stock/clone-symbols", {}, { noLoading: true })
+                .then((response) => {
+                    resolve(response.data);
+                });
+        });
+    },
     getSymbols({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
                 .post("trading/stock/get-symbols", {}, { noLoading: true })
+                .then((response) => {
+                    resolve(response.data);
+                });
+        });
+    },
+    filterSymbols({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/stock/filter", param, { noLoading: true })
                 .then((response) => {
                     resolve(response.data);
                 });

@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import DxTreeView from "devextreme-vue/ui/tree-view";
+import { DxTreeView } from "devextreme-vue/tree-view";
 import navigation from "../../../config/navigation";
 import { onMounted, ref, inject, watch, computed } from "vue";
 import { useStore } from "vuex";
@@ -175,6 +175,7 @@ function getCount(routeName) {
             .dx-treeview-item {
                 padding-left: 0;
                 padding-right: 0;
+                flex-direction: row-reverse;
 
                 .dx-icon {
                     width: $side-panel-min-width !important;

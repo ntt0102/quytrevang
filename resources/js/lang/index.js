@@ -1,6 +1,6 @@
 import { createI18n } from "vue-i18n";
 import { locale, loadMessages } from "devextreme/localization";
-import viDevextreme from "./devextreme/vi.json";
+import viDevextreme from "./devextreme/vi_.json";
 import vi from "./vi.json";
 const devextremeMessages = { vi: viDevextreme };
 loadMessages(devextremeMessages[window.lang]);
