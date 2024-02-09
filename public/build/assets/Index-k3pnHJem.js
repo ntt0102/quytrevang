@@ -1,1 +1,0 @@
-import{u as i,r as t,d as l}from"./app-yhzx4Rdz.js";const p={__name:"Index",setup(u,{expose:o}){const s=i();t(null);const r=t(null),n=l({componentName:null,filename:null,isPreview:!1});function c(e){s.dispatch("setSyncing",!0),n.componentName=e.component,n.isPreview=e.isPreview,setTimeout(()=>r.value.create(e),0)}return o({download:c}),(e,a)=>null}};export{p as _};

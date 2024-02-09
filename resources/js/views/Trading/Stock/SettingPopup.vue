@@ -13,7 +13,21 @@
                             {{ $t("trading.stock.settingPopup.dateRange") }}
                         </div>
                         <div class="dx-field-value">
-                            <DxDateRangeBox v-model="state.dateRange" />
+                            <DxDateBox
+                                v-model="state.fromDate"
+                                :input-attr="{ 'aria-label': 'Date' }"
+                                type="date"
+                            />
+                        </div>
+                    </div>
+                    <div class="dx-field">
+                        <div class="dx-field-label"></div>
+                        <div class="dx-field-value">
+                            <DxDateBox
+                                v-model="state.toDate"
+                                :input-attr="{ 'aria-label': 'Date' }"
+                                type="date"
+                            />
                         </div>
                     </div>
                     <div class="dx-field">
@@ -22,8 +36,6 @@
                         </div>
                         <div class="dx-field-value">
                             <DxSelectBox
-                                :width="'130px'"
-                                height="30px"
                                 :data-source="state.filterTypes"
                                 keyExpr="value"
                                 displayExpr="text"
@@ -47,7 +59,7 @@
     </CorePopup>
 </template>
 <script setup>
-import DxDateRangeBox from "devextreme-vue/date-range-box";
+import DxDateBox from "devextreme-vue/date-box";
 import DxSelectBox from "devextreme-vue/select-box";
 import CorePopup from "../../../components/Popups/CorePopup.vue";
 import { inject, ref, reactive, watch } from "vue";
@@ -59,24 +71,25 @@ const { t } = useI18n();
 const mf = inject("mf");
 const popupRef = ref(null);
 const state = reactive({
-    dateRange: [],
-    type: "cash",
+    fromDate: null,
+    toDate: null,
+    type: null,
     filterTypes: [
         { text: t("trading.stock.settingPopup.filterCash"), value: "cash" },
         { text: t("trading.stock.settingPopup.filterIndex"), value: "index" },
         { text: t("trading.stock.settingPopup.filterMix"), value: "mix" },
     ],
 });
-
 function show() {
     popupRef.value.show();
 }
-function filterSymbols(e) {
+function filterSymbols() {
     const param = {
-        from: moment(state.dateRange[0]).unix(),
-        to: moment(state.dateRange[1]).unix(),
-        type: e.itemData.value,
+        from: moment(state.fromDate).unix(),
+        to: moment(state.toDate).unix(),
+        type: state.type.value,
     };
+    console.log(param);
     store.dispatch("tradingStock/filterSymbols", param);
 }
 function onShown() {
