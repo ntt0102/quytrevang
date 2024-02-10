@@ -64,4 +64,16 @@ class StockController extends CoreController
         $data = $this->stockService->filterSymbols($this->payload);
         return $this->sendResponse($data);
     }
+    /**
+     * Add Watchlist
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function addWatchlist(Request $request)
+    {
+        $data = $this->stockService->addWatchlist($this->payload);
+        return $this->sendResponse($data);
+    }
 }

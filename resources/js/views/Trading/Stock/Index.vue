@@ -6,8 +6,8 @@
                     location: 'before',
                     widget: 'dxButton',
                     options: {
-                        icon: 'far fa-cloud-download-alt small',
-                        hint: $t('trading.stock.buttons.cloneSymbols'),
+                        icon: 'far fa-list small',
+                        hint: $t('trading.stock.cloneSymbols'),
                         onClick: cloneSymbols,
                     },
                 },
@@ -16,16 +16,20 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-filter small',
-                        hint: $t('trading.stock.buttons.filterCash'),
-                        onClick: () => $refs.settingPopupRef.show(),
+                        hint: $t('trading.stock.filterPopup.title'),
+                        onClick: () => $refs.filterPopupRef.show(),
                     },
                 },
                 {
                     location: 'before',
                     widget: 'dxSelectBox',
                     options: {
-                        dataSource: ['hose', 'cash', 'index', 'mix', 'watch'],
+                        width: '170px',
+                        dataSource: state.symbolsKinds,
+                        keyExpr: 'value',
+                        displayExpr: 'text',
                         value: state.symbolsKind,
+                        hint: $t('trading.stock.symbolsKind'),
                         onValueChanged: listChanged,
                     },
                 },
@@ -42,7 +46,9 @@
                         "
                         height="30px"
                         :data-source="
-                            $store.state.tradingStock.symbols[state.symbolsKind]
+                            $store.state.tradingStock.symbols[
+                                state.symbolsKind.value
+                            ]
                         "
                         :search-enabled="true"
                         :show-clear-button="true"
@@ -50,6 +56,14 @@
                         v-model="state.symbol"
                         @valueChanged="symbolChanged"
                     />
+                    <div
+                        ref="addWatchlistToolRef"
+                        :class="`command far fa-${
+                            inWatchlist ? 'minus-circle' : 'plus-circle'
+                        }`"
+                        :title="$t('trading.stock.addWatchlist')"
+                        @click="addWatchlist"
+                    ></div>
                     <img
                         ref="spinnerRef"
                         class="command spinner"
@@ -62,20 +76,20 @@
                         :class="`command far fa-${
                             state.isFullscreen ? 'compress' : 'expand'
                         }`"
-                        :title="$t('trading.orderChart.fullscreen')"
+                        :title="$t('trading.stock.fullscreen')"
                         @click="toggleFullscreen"
                     ></div>
                     <div
                         ref="tradingviewRef"
                         class="command far fa-chart-bar"
-                        :title="$t('trading.orderChart.tradingview')"
+                        :title="$t('trading.stock.tradingview')"
                         @click="tradingviewClick"
                     ></div>
                     <div
                         ref="colorToolRef"
                         class="color command far fa-palette"
                         :style="{ color: state.color }"
-                        :title="$t('trading.orderChart.colorTool')"
+                        :title="$t('trading.stock.colorTool')"
                         @click="colorToolClick"
                         @contextmenu="colorToolContextmenu"
                     >
@@ -88,35 +102,35 @@
                     <div
                         ref="lineToolRef"
                         class="command far fa-horizontal-rule"
-                        :title="$t('trading.orderChart.lineTool')"
+                        :title="$t('trading.stock.lineTool')"
                         @click="lineToolClick"
                         @contextmenu="lineToolContextmenu"
                     ></div>
                     <div
                         ref="pattern1ToolRef"
                         class="command far fa-dot-circle"
-                        :title="$t('trading.orderChart.pattern1Tool')"
+                        :title="$t('trading.stock.pattern1Tool')"
                         @click="pattern1ToolClick"
                         @contextmenu="pattern1ToolContextmenu"
                     ></div>
                     <div
                         ref="uplpsToolRef"
                         class="command far fa-arrow-up"
-                        :title="$t('trading.orderChart.uplpsTool')"
+                        :title="$t('trading.stock.uplpsTool')"
                         @click="uplpsToolClick"
                         @contextmenu="uplpsToolContextmenu"
                     ></div>
                     <div
                         ref="downlpsToolRef"
                         class="command far fa-arrow-down"
-                        :title="$t('trading.orderChart.downlpsTool')"
+                        :title="$t('trading.stock.downlpsTool')"
                         @click="downlpsToolClick"
                         @contextmenu="downlpsToolContextmenu"
                     ></div>
                     <div
                         ref="rulerToolRef"
                         class="command far fa-line-height"
-                        :title="$t('trading.orderChart.rulerTool')"
+                        :title="$t('trading.stock.rulerTool')"
                         @click="rulerToolClick"
                         @contextmenu="rulerToolContextmenu"
                     ></div>
@@ -130,12 +144,12 @@
             </div>
         </div>
     </div>
-    <SettingPopup ref="settingPopupRef" />
+    <FilterPopup ref="filterPopupRef" />
 </template>
 
 <script setup>
 import ColorPicker from "./ColorPicker.vue";
-import SettingPopup from "./SettingPopup.vue";
+import FilterPopup from "./filterPopup.vue";
 import toolsStore from "../../../plugins/stockDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
@@ -258,14 +272,25 @@ let params = {
 const state = reactive({
     symbol: "VNINDEX",
     symbols: [],
-    symbolsKind: "hose",
+    symbolsKind: null,
+    symbolsKinds: [
+        { text: t("trading.stock.hoseList"), value: "hose" },
+        { text: t("trading.stock.filterCash"), value: "cash" },
+        { text: t("trading.stock.filterIndex"), value: "index" },
+        { text: t("trading.stock.filterMix"), value: "mix" },
+        { text: t("trading.stock.watchList"), value: "watch" },
+    ],
     isFullscreen: false,
     color: "#F44336",
     showColorPicker: false,
     showTradingView: false,
 });
+state.symbolsKind = state.symbolsKinds[0];
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
+);
+const inWatchlist = computed(() =>
+    store.state.tradingStock.symbols.watch.includes(state.symbol)
 );
 store.dispatch("tradingStock/getSymbols");
 toolsStore.create();
@@ -684,6 +709,13 @@ function eventFullscreenChange() {
                 "translate(0px, 0px)";
         }
     }
+}
+function addWatchlist() {
+    const param = {
+        symbol: state.symbol,
+        add: !inWatchlist.value,
+    };
+    store.dispatch("tradingStock/addWatchlist", param);
 }
 function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();

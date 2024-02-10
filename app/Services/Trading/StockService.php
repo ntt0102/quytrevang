@@ -74,9 +74,7 @@ class StockService extends CoreService
     public function getSymbols()
     {
 
-        // return StockSymbol::where('name', 'hose')->get(['name', 'symbols']);
-        return StockSymbol::select(array('name', 'symbols'))
-            ->get()
+        return StockSymbol::get(array('name', 'symbols'))
             ->pluck('symbols', 'name');
     }
 
@@ -90,5 +88,25 @@ class StockService extends CoreService
     {
         FilterStockJob::dispatch($payload);
         return ['isOk' => true];
+    }
+
+    /**
+     * Add Watchlist
+     *
+     * @param $payload
+     * 
+     */
+    public function addWatchlist($payload)
+    {
+        $watch = StockSymbol::where('name', 'watch')->first();
+        if (!$watch) $stt = StockSymbol::create(['name' => 'watch', 'symbols' => [$payload->symbol]]);
+        else {
+            $symbols = $watch->symbols;
+            if ($payload->add) array_push($symbols, $payload->symbol);
+            else $symbols = array_values(array_diff($symbols, [$payload->symbol]));
+            $watch->symbols = $symbols;
+            $stt = $watch->save();
+        }
+        return ['isOk' => !!$stt];
     }
 }

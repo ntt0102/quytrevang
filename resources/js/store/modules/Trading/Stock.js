@@ -60,6 +60,16 @@ const actions = {
                 });
         });
     },
+    addWatchlist({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/stock/add-watchlist", param, { noLoading: true })
+                .then((response) => {
+                    dispatch("getSymbols");
+                    resolve();
+                });
+        });
+    },
     getStatus({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
@@ -156,7 +166,6 @@ const mutations = {
         state.isChartLoading = data;
     },
     setSymbols(state, data) {
-        console.log("setSymbols", data);
         state.symbols = data;
     },
     setOrderStatuses(state, data) {

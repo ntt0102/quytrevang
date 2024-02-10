@@ -230,19 +230,26 @@
         "stock": {
             "title": "Chứng khoán",
             "symbol": "Mã chứng khoán",
-            "settingPopup": {
+            "cloneSymbols": "Lấy mã HOSE",
+            "symbolsKind": "Danh sách mã",
+            "hoseList": "Sàn HOSE",
+            "filterCash": "Lọc theo dòng tiền",
+            "filterIndex": "Lọc theo chỉ số",
+            "filterMix": "Lọc kết hợp",
+            "addWatchlist": "Thêm theo dõi",
+            "watchList": "Theo dõi",
+            "fullscreen": "Bật tắt toàn màn hình",
+            "tradingview": "TradingView",
+            "colorTool": "Bảng chọn màu",
+            "lineTool": "Vẽ đường giá",
+            "pattern1Tool": "Mẫu hình số 1",
+            "uplpsTool": "Đo LPS tăng",
+            "downlpsTool": "Đo LPS giảm",
+            "rulerTool": "Thước đo giá",
+            "filterPopup": {
                 "title": "Lọc cổ phiếu",
                 "dateRange": "Khoảng thời gian",
-                "filterModel": "Mô hình lọc",
-                "filterCash": "Lọc theo dòng tiền",
-                "filterIndex": "Lọc theo chỉ số",
-                "filterMix": "Lọc kết hợp"
-            },
-            "buttons": {
-                "cloneSymbols": "Lấy mã HOSE",
-                "filterCash": "Lọc dòng tiền",
-                "filterIndex": "Lọc chỉ số",
-                "filterMix": "Lọc kết hợp"
+                "filterModel": "Mô hình lọc"
             }
         },
         "trades": {

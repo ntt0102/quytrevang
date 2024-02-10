@@ -135,6 +135,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('clone-symbols', 'StockController@cloneSymbols');
                     Route::post('get-symbols', 'StockController@getSymbols');
                     Route::post('filter', 'StockController@filterSymbols');
+                    Route::post('add-watchlist', 'StockController@addWatchlist');
                 });
                 Route::group(['prefix' => 'finbook', 'middleware' => 'can:finbooks@control'], function () {
                     Route::post('/', 'FinbookController@fetch');
