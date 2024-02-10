@@ -62,6 +62,6 @@ class FilterStockJob implements ShouldQueue
                 ($this->payload->type == 'mix' && $isCash && $isIndex)
             ) $r[] = $symbol;
         }
-        $ss = StockSymbol::updateOrCreate(['name' => 'filter-' . $this->payload->type], ['symbols' => $r]);
+        $ss = StockSymbol::updateOrCreate(['name' => $this->payload->type], ['symbols' => $r]);
     }
 }

@@ -20,6 +20,15 @@
                         onClick: () => $refs.settingPopupRef.show(),
                     },
                 },
+                {
+                    location: 'before',
+                    widget: 'dxSelectBox',
+                    options: {
+                        dataSource: ['hose', 'cash', 'index', 'mix', 'watch'],
+                        value: state.symbolsKind,
+                        onValueChanged: listChanged,
+                    },
+                },
             ]"
         />
         <div class="stock-container" ref="chartContainerRef">
@@ -32,7 +41,9 @@
                                 : '130px'
                         "
                         height="30px"
-                        :data-source="state.symbols"
+                        :data-source="
+                            $store.state.tradingStock.symbols[state.symbolsKind]
+                        "
                         :search-enabled="true"
                         :show-clear-button="true"
                         :element-attr="{ class: 'symbol-select' }"
@@ -247,6 +258,7 @@ let params = {
 const state = reactive({
     symbol: "VNINDEX",
     symbols: [],
+    symbolsKind: "hose",
     isFullscreen: false,
     color: "#F44336",
     showColorPicker: false,
@@ -255,9 +267,7 @@ const state = reactive({
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
-store
-    .dispatch("tradingStock/getSymbols")
-    .then((symbols) => (state.symbols = symbols));
+store.dispatch("tradingStock/getSymbols");
 toolsStore.create();
 
 onMounted(() => {
@@ -1292,29 +1302,11 @@ function symbolChanged(e) {
     if (!state.symbol) return false;
     store.dispatch("tradingStock/getChartData", state.symbol);
 }
+function listChanged(e) {
+    state.symbolsKind = e.value;
+}
 function cloneSymbols() {
     store.dispatch("tradingStock/cloneSymbols");
-}
-function filterCash() {
-    const param = {
-        from: moment("2022-04-04").unix(),
-        to: moment("2023-09-07").unix(),
-    };
-    store.dispatch("tradingStock/filterCash", param);
-}
-function filterIndex() {
-    const param = {
-        from: moment("2022-04-04").unix(),
-        to: moment("2023-09-07").unix(),
-    };
-    store.dispatch("tradingStock/filterIndex", param);
-}
-function filterMix() {
-    const param = {
-        from: moment("2022-04-04").unix(),
-        to: moment("2023-09-07").unix(),
-    };
-    store.dispatch("tradingStock/filterMix", param);
 }
 </script>
 <style lang="scss">

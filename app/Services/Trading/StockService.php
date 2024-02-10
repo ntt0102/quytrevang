@@ -63,7 +63,7 @@ class StockService extends CoreService
         $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/hose";
         $res = $client->get($url);
         $hose = json_decode($res->getBody());
-        $ss = StockSymbol::updateOrCreate(['name' => 'hose'], ['symbols' => $hose]);
+        $ss = StockSymbol::updateOrCreate(['name' => 'hose'], ['symbols' => array_merge(['VNINDEX', 'VN30'], $hose)]);
         return ['isOk' => !!$ss];
     }
 
@@ -73,10 +73,11 @@ class StockService extends CoreService
      */
     public function getSymbols()
     {
-        $index = ['VNINDEX', 'VN30'];
-        $ss = StockSymbol::where('name', 'hose')->first();
-        if (!$ss) return $index;
-        return array_merge($index, $ss->symbols);
+
+        // return StockSymbol::where('name', 'hose')->get(['name', 'symbols']);
+        return StockSymbol::select(array('name', 'symbols'))
+            ->get()
+            ->pluck('symbols', 'name');
     }
 
     /**

@@ -1,6 +1,6 @@
 function initialState() {
     return {
-        config: {},
+        symbols: { hose: [], cash: [], index: [], mix: [], watch: [] },
         status: { connection: true, position: 0, pending: false },
         chartData: [],
         isChartLoading: false,
@@ -43,7 +43,11 @@ const actions = {
             axios
                 .post("trading/stock/get-symbols", {}, { noLoading: true })
                 .then((response) => {
-                    resolve(response.data);
+                    commit("setSymbols", {
+                        ...state.symbols,
+                        ...response.data,
+                    });
+                    resolve();
                 });
         });
     },
@@ -151,8 +155,9 @@ const mutations = {
     setChartLoading(state, data) {
         state.isChartLoading = data;
     },
-    setStatus(state, data) {
-        state.status = data;
+    setSymbols(state, data) {
+        console.log("setSymbols", data);
+        state.symbols = data;
     },
     setOrderStatuses(state, data) {
         state.copyists = data;
