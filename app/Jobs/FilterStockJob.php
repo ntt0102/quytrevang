@@ -48,10 +48,10 @@ class FilterStockJob implements ShouldQueue
         $symbols = !!$ss ? $ss->symbols : [];
         $stockService = app(StockService::class);
         $this->payload->symbol = 'VNINDEX';
-        $vnindex = $stockService->getChartData($this->payload)['price'];
+        $vnindex = $stockService->getData($this->payload)['price'];
         foreach ($symbols as $symbol) {
             $this->payload->symbol = $symbol;
-            $data = $stockService->getChartData($this->payload);
+            $data = $stockService->getData($this->payload);
             if (count($data['price']) == 0) continue;
             $isCash = current($data['price'])['value'] > end($data['price'])['value'] &&
                 current($data['cash'])['value'] < end($data['cash'])['value'];

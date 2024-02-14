@@ -76,4 +76,16 @@ class StockController extends CoreController
         $data = $this->stockService->addWatchlist($this->payload);
         return $this->sendResponse($data);
     }
+    /**
+     * Draw Tools
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function drawTools(Request $request)
+    {
+        $data = $this->stockService->drawTools($this->payload);
+        return $this->sendResponse($data);
+    }
 }

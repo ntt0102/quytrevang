@@ -107,18 +107,18 @@
                         @contextmenu="lineToolContextmenu"
                     ></div>
                     <div
-                        ref="pattern1ToolRef"
-                        class="command far fa-dot-circle"
-                        :title="$t('trading.stock.pattern1Tool')"
-                        @click="pattern1ToolClick"
-                        @contextmenu="pattern1ToolContextmenu"
-                    ></div>
-                    <div
                         ref="uplpsToolRef"
                         class="command far fa-arrow-up"
                         :title="$t('trading.stock.uplpsTool')"
                         @click="uplpsToolClick"
                         @contextmenu="uplpsToolContextmenu"
+                    ></div>
+                    <div
+                        ref="targetToolRef"
+                        class="command far fa-dot-circle"
+                        :title="$t('trading.stock.targetTool')"
+                        @click="targetToolClick"
+                        @contextmenu="targetToolContextmenu"
                     ></div>
                     <div
                         ref="downlpsToolRef"
@@ -128,6 +128,7 @@
                         @contextmenu="downlpsToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="rulerToolRef"
                         class="command far fa-line-height"
                         :title="$t('trading.stock.rulerTool')"
@@ -215,7 +216,7 @@ const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const rulerToolRef = ref(null);
-const pattern1ToolRef = ref(null);
+const targetToolRef = ref(null);
 const uplpsToolRef = ref(null);
 const downlpsToolRef = ref(null);
 const tradingviewChartRef = ref(null);
@@ -223,51 +224,37 @@ let params = {
     chart: {},
     series: {},
     data: {
-        whitespace: [],
         original: [],
         price: [],
         cash: [],
     },
-    order: { side: 0, entry: {}, tp: {}, sl: {} },
-    lines: [],
-    ruler: {
-        l0: {},
-        ln1: {},
-        l1: {},
-        l2: {},
-        l3: {},
-        l4: {},
-        // l5: {},
-        pointCount: 0,
+    tools: {
+        lines: [],
+        ruler: {
+            l0: {},
+            ln1: {},
+            l1: {},
+            l2: {},
+            l3: {},
+            l4: {},
+            // l5: {},
+            pointCount: 0,
+        },
+        target: { A: {}, B: {}, X: {}, Y: {}, Z: {} },
+        uplps: {
+            P1: {},
+            P2: {},
+            C1: {},
+            C2: {},
+        },
+        downlps: {
+            P1: {},
+            P2: {},
+            C1: {},
+            C2: {},
+        },
     },
-    target: { A: {}, B: {}, C: {}, D: {} },
-    pattern1: { A: {}, B: {}, C: {}, X1: {}, X2: {}, Y1: {}, Y2: {} },
-    pattern2: { O: {} },
-    uplps: {
-        P1: {},
-        P2: {},
-        C1: {},
-        C2: {},
-    },
-    downlps: {
-        P1: {},
-        P2: {},
-        C1: {},
-        C2: {},
-    },
-    // volprofile: { v1: {}, v2: {}, poc: {}, pointCount: 0 },
-    box: [],
-    alerts: [],
     crosshair: {},
-    shark: null,
-    loadWhitespace: true,
-    interval: null,
-    interval60: null,
-    websocket: null,
-    isAutoOrdering: false,
-    socketStop: false,
-    volumeMax: 0,
-    socketRefreshTime: moment(),
 };
 const state = reactive({
     symbol: "VNINDEX",
@@ -327,12 +314,16 @@ onMounted(() => {
     });
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    store.dispatch("tradingStock/getChartData", state.symbol).then(() => {
-        loadToolsData();
-    });
+    store.dispatch("tradingStock/getChartData", state.symbol);
 });
 
-watch(() => store.state.tradingStock.chartData, loadChartData);
+watch(
+    () => store.state.tradingStock.chart,
+    () => {
+        loadchartTools();
+        loadChartData();
+    }
+);
 
 watch(
     () => store.state.tradingStock.isChartLoading,
@@ -346,8 +337,8 @@ function eventChartContextmenu(e) {
 function eventChartClick() {
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
-    else if (pattern1ToolRef.value.classList.contains("selected"))
-        drawPattern1Tool();
+    else if (targetToolRef.value.classList.contains("selected"))
+        drawTargetTool();
     else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
     else if (downlpsToolRef.value.classList.contains("selected"))
         drawDownlpsTool();
@@ -380,7 +371,13 @@ function eventPriceLineDrag(e) {
                 price: oldPrice,
                 removed: true,
             });
-            toolsStore.set("line", lineOptions);
+            store.dispatch("tradingStock/drawTools", {
+                isRemove: false,
+                symbol: state.symbol,
+                name: lineOptions.lineType,
+                points: [oldPrice],
+                data: [lineOptions],
+            });
             lineToolRef.value.classList.remove("selected");
             break;
         case "ruler":
@@ -621,46 +618,52 @@ function eventPriceLineDrag(e) {
                 //     break;
             }
             break;
-        case "pattern1":
-            if (mf.isSet(params.pattern1.C)) {
-                const a = +params.pattern1.A.options().price;
-                const b = +params.pattern1.B.options().price;
+        case "target":
+            if (mf.isSet(params.tools.target.B)) {
+                let param = {
+                    isRemove: false,
+                    symbol: state.symbol,
+                    name: "target",
+                    points: [],
+                    data: [],
+                };
+                let point;
+                const a = +params.tools.target.A.options().price;
+                const b = +params.tools.target.B.options().price;
                 const ba = b - a;
                 //
-                params.pattern1.B.applyOptions({
-                    title: ba.toFixed(1),
+                point = "B";
+                params.tools.target[point].applyOptions({
+                    title: ((100 * ba) / a).toFixed(1) + "%",
                 });
-                toolsStore.set("pattern1", params.pattern1.B.options());
+                param.points.push(point);
+                param.data.push(params.tools.target[point].options());
                 //
-                params.pattern1.C.applyOptions({
-                    price: +(a + 0.5 * ba).toFixed(1),
-                    title: (0.5 * ba).toFixed(1),
-                });
-                toolsStore.set("pattern1", params.pattern1.C.options());
-                //
-                params.pattern1.X1.applyOptions({
-                    price: +(a - 0.375 * ba).toFixed(1),
-                    title: (-0.375 * ba).toFixed(1),
-                });
-                toolsStore.set("pattern1", params.pattern1.X1.options());
-                //
-                params.pattern1.X2.applyOptions({
+                point = "X";
+                params.tools.target[point].applyOptions({
                     price: +(a - 0.5 * ba).toFixed(1),
-                    title: (-0.5 * ba).toFixed(1),
+                    title: ((100 * -0.5 * ba) / a).toFixed(1) + "%",
                 });
-                toolsStore.set("pattern1", params.pattern1.X2.options());
+                param.points.push(point);
+                param.data.push(params.tools.target[point].options());
                 //
-                params.pattern1.Y1.applyOptions({
+                point = "Y";
+                params.tools.target[point].applyOptions({
                     price: +(a - ba).toFixed(1),
-                    title: -ba.toFixed(1),
+                    title: ((100 * -ba) / a).toFixed(1) + "%",
                 });
-                toolsStore.set("pattern1", params.pattern1.Y1.options());
+                param.points.push(point);
+                param.data.push(params.tools.target[point].options());
                 //
-                params.pattern1.Y2.applyOptions({
+                point = "Z";
+                params.tools.target[point].applyOptions({
                     price: +(a - 2 * ba).toFixed(1),
-                    title: (-2 * ba).toFixed(1),
+                    title: ((100 * -2 * ba) / a).toFixed(1) + "%",
                 });
-                toolsStore.set("pattern1", params.pattern1.Y2.options());
+                param.points.push(point);
+                param.data.push(params.tools.target[point].options());
+                //
+                store.dispatch("tradingStock/drawTools", param);
             }
             break;
     }
@@ -721,55 +724,52 @@ function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
 }
-function loadToolsData() {
-    return new Promise(async (resolve) => {
-        const lines = await toolsStore.get("line");
-        lines.forEach((line) => {
-            if (!line.removed)
-                params.lines.push(params.series.price.createPriceLine(line));
-        });
-        //
-        const rulerLines = await toolsStore.get("ruler");
-        if (rulerLines.length > 0) {
-            params.ruler.pointCount = rulerLines.length > 1 ? 2 : 1;
-            rulerLines.forEach((line) => {
-                params.ruler[line.point] =
-                    params.series.price.createPriceLine(line);
-            });
+function loadchartTools() {
+    removeLineTool(false);
+    removeUplpsTool(false);
+    removeDownlpsTool(false);
+    removeTargetTool(false);
+
+    const tools = store.state.tradingStock.chart.tools;
+    for (const [name, tool] of Object.entries(tools)) {
+        switch (name) {
+            case "line":
+                Object.values(tool).forEach((line) =>
+                    params.tools.lines.push(
+                        params.series.price.createPriceLine(line)
+                    )
+                );
+                break;
+            case "uplps":
+                Object.entries(tool).forEach(
+                    ([point, line]) =>
+                        (params.tools.uplps[point] =
+                            params.series[
+                                point.includes("P") ? "price" : "cash"
+                            ].createPriceLine(line))
+                );
+                break;
+            case "downlps":
+                Object.entries(tool).forEach(
+                    ([point, line]) =>
+                        (params.tools.downlps[point] =
+                            params.series[
+                                point.includes("P") ? "price" : "cash"
+                            ].createPriceLine(line))
+                );
+                break;
+            case "target":
+                Object.entries(tool).forEach(
+                    ([point, line]) =>
+                        (params.tools.target[point] =
+                            params.series.price.createPriceLine(line))
+                );
+                break;
         }
-        //
-        const pattern1Lines = await toolsStore.get("pattern1");
-        if (pattern1Lines.length > 0) {
-            pattern1Lines.forEach((line) => {
-                params.pattern1[line.point] =
-                    params.series.price.createPriceLine(line);
-            });
-        }
-        //
-        const uplpsLines = await toolsStore.get("uplps");
-        if (uplpsLines.length > 0) {
-            uplpsLines.forEach((line) => {
-                params.uplps[line.title] =
-                    params.series[
-                        line.title.includes("P") ? "price" : "cash"
-                    ].createPriceLine(line);
-            });
-        }
-        //
-        const downlpsLines = await toolsStore.get("downlps");
-        if (downlpsLines.length > 0) {
-            downlpsLines.forEach((line) => {
-                params.downlps[line.title] =
-                    params.series[
-                        line.title.includes("P") ? "price" : "cash"
-                    ].createPriceLine(line);
-            });
-        }
-        resolve();
-    });
+    }
 }
 function loadChartData() {
-    params.data = store.state.tradingStock.chartData;
+    params.data = store.state.tradingStock.chart.data;
     params.series.ohlc.setData(params.data.ohlc);
     params.series.price.setData(params.data.price);
     params.series.cash.setData(params.data.cash);
@@ -784,12 +784,12 @@ function colorToolClick(e) {
     e.stopPropagation();
 }
 function colorToolContextmenu(e) {
-    if (mf.isSet(params.pattern1.X)) {
-        drawLineTool(+params.pattern1.X.options().price);
-        drawLineTool(+params.pattern1.Y.options().price);
-        drawLineTool(+params.pattern1.Z.options().price);
-        drawLineTool(+params.pattern1.T.options().price);
-    }
+    // if (mf.isSet(params.tools.target.X)) {
+    //     drawLineTool(+params.tools.target.X.options().price);
+    //     drawLineTool(+params.tools.target.Y.options().price);
+    //     drawLineTool(+params.tools.target.Z.options().price);
+    //     drawLineTool(+params.tools.target.T.options().price);
+    // }
     e.preventDefault();
     e.stopPropagation();
 }
@@ -811,17 +811,22 @@ function lineToolContextmenu(e) {
 function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
     const TYPE = "line";
     if (!price) price = formatPrice(coordinateToPrice(params.crosshair.y));
-    const oldLength = params.lines.length;
-    params.lines = params.lines.filter((line) => {
+    const oldLength = params.tools.lines.length;
+    params.tools.lines = params.tools.lines.filter((line) => {
         const ops = line.options();
         const isExist = (ops.type = TYPE && price == +ops.price);
         if (isExist) {
             params.series.price.removePriceLine(line);
-            toolsStore.set("line", { price: price, removed: true });
+            store.dispatch("tradingStock/drawTools", {
+                isRemove: true,
+                symbol: state.symbol,
+                name: TYPE,
+                point: price,
+            });
         }
         return !isExist;
     });
-    if ((params.lines.length == oldLength && !forceRemove) || forceDraw) {
+    if ((params.tools.lines.length == oldLength && !forceRemove) || forceDraw) {
         const options = {
             lineType: TYPE,
             price: price,
@@ -830,15 +835,32 @@ function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
             lineStyle: 1,
             draggable: true,
         };
-        params.lines.push(params.series.price.createPriceLine(options));
-        toolsStore.set("line", options);
+        params.tools.lines.push(params.series.price.createPriceLine(options));
+        store.dispatch("tradingStock/drawTools", {
+            isRemove: false,
+            symbol: state.symbol,
+            name: TYPE,
+            points: [price],
+            data: [options],
+        });
     }
     lineToolRef.value.classList.remove("selected");
 }
-function removeLineTool() {
-    params.lines.forEach((line) => params.series.price.removePriceLine(line));
-    params.lines = [];
-    toolsStore.clear("line");
+function removeLineTool(server = true) {
+    if (params.tools.lines.length > 0) {
+        console.log("removeLineTool");
+        params.tools.lines.forEach((line) =>
+            params.series.price.removePriceLine(line)
+        );
+        params.tools.lines = [];
+        if (server)
+            store.dispatch("tradingStock/drawTools", {
+                isRemove: true,
+                symbol: state.symbol,
+                name: "line",
+                point: null,
+            });
+    }
 }
 function rulerToolClick(e) {
     state.showColorPicker = false;
@@ -960,7 +982,7 @@ function removeRulerTool() {
         toolsStore.clear("ruler");
     }
 }
-function pattern1ToolClick(e) {
+function targetToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
     document
@@ -968,108 +990,106 @@ function pattern1ToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        removePattern1Tool();
+        removeTargetTool();
     }
     e.stopPropagation();
 }
-function pattern1ToolContextmenu(e) {
-    removePattern1Tool();
+function targetToolContextmenu(e) {
+    removeTargetTool();
     e.target.classList.remove("selected");
     e.preventDefault();
     e.stopPropagation();
 }
-function drawPattern1Tool() {
+function drawTargetTool() {
+    const TYPE = "target";
     const price = coordinateToPrice(params.crosshair.y);
     let option = {
-        lineType: "pattern1",
+        lineType: TYPE,
         price: price,
         lineWidth: 1,
         lineStyle: 1,
         draggable: true,
     };
-    if (mf.isSet(params.pattern1.A)) {
-        const a = +params.pattern1.A.options().price;
+    let param = {
+        isRemove: false,
+        symbol: state.symbol,
+        name: TYPE,
+        points: [],
+        data: [],
+    };
+    if (mf.isSet(params.tools.target.A)) {
+        const a = +params.tools.target.A.options().price;
         const ba = price - a;
         option.point = "B";
-        option.title = ba.toFixed(1);
+        option.title = ((100 * ba) / a).toFixed(1) + "%";
         option.color = "#FF9800";
-        params.pattern1[option.point] =
+        params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
-        toolsStore.set("pattern1", option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
         //
-        option.point = "C";
-        option.price = +(a + 0.5 * ba).toFixed(1);
-        option.title = (0.5 * ba).toFixed(1);
-        option.color = "#FF9800";
-        option.draggable = false;
-        params.pattern1[option.point] =
-            params.series.price.createPriceLine(option);
-        toolsStore.set("pattern1", option);
-        //
-        option.point = "X1";
-        option.price = +(a - 0.375 * ba).toFixed(1);
-        option.title = (-0.375 * ba).toFixed(1);
-        option.color = "#2196F3";
-        params.pattern1[option.point] =
-            params.series.price.createPriceLine(option);
-        toolsStore.set("pattern1", option);
-        //
-        option.point = "X2";
+        option.point = "X";
         option.price = +(a - 0.5 * ba).toFixed(1);
-        option.title = (-0.5 * ba).toFixed(1);
+        option.title = ((100 * -0.5 * ba) / a).toFixed(1) + "%";
         option.color = "#2196F3";
-        params.pattern1[option.point] =
+        params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
-        toolsStore.set("pattern1", option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
         //
-        option.point = "Y1";
+        option.point = "Y";
         option.price = +(a - ba).toFixed(1);
-        option.title = -ba.toFixed(1);
+        option.title = ((100 * -ba) / a).toFixed(1) + "%";
         option.color = "#673AB7";
-        params.pattern1[option.point] =
+        params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
-        toolsStore.set("pattern1", option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
         //
-        option.point = "Y2";
+        option.point = "Z";
         option.price = +(a - 2 * ba).toFixed(1);
-        option.title = (-2 * ba).toFixed(1);
+        option.title = ((100 * -2 * ba) / a).toFixed(1) + "%";
         option.color = "#673AB7";
-        params.pattern1[option.point] =
+        params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
-        toolsStore.set("pattern1", option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
         //
-        pattern1ToolRef.value.classList.remove("selected");
+        targetToolRef.value.classList.remove("selected");
     } else {
         option.point = "A";
         option.title = "0";
         option.color = "#FF9800";
-        params.pattern1[option.point] =
+        params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
-        toolsStore.set("pattern1", option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
     }
+    store.dispatch("tradingStock/drawTools", param);
 }
-function removePattern1Tool() {
-    if (mf.isSet(params.pattern1.A)) {
-        params.series.price.removePriceLine(params.pattern1.A);
-        if (mf.isSet(params.pattern1.B)) {
-            params.series.price.removePriceLine(params.pattern1.B);
-            params.series.price.removePriceLine(params.pattern1.C);
-            params.series.price.removePriceLine(params.pattern1.X1);
-            params.series.price.removePriceLine(params.pattern1.X2);
-            params.series.price.removePriceLine(params.pattern1.Y1);
-            params.series.price.removePriceLine(params.pattern1.Y2);
+function removeTargetTool(server = true) {
+    if (mf.isSet(params.tools.target.A)) {
+        params.series.price.removePriceLine(params.tools.target.A);
+        if (mf.isSet(params.tools.target.B)) {
+            params.series.price.removePriceLine(params.tools.target.B);
+            params.series.price.removePriceLine(params.tools.target.X);
+            params.series.price.removePriceLine(params.tools.target.Y);
+            params.series.price.removePriceLine(params.tools.target.Z);
         }
-        params.pattern1 = {
+        params.tools.target = {
             A: {},
             B: {},
-            C: {},
-            X1: {},
-            X2: {},
-            Y1: {},
-            Y2: {},
+            X: {},
+            Y: {},
+            Z: {},
         };
-        toolsStore.clear("pattern1");
     }
+    if (server)
+        store.dispatch("tradingStock/drawTools", {
+            isRemove: true,
+            symbol: state.symbol,
+            name: "target",
+        });
 }
 function uplpsToolClick(e) {
     state.showColorPicker = false;
@@ -1089,10 +1109,10 @@ function uplpsToolContextmenu(e) {
 }
 function drawUplpsTool() {
     let startTime, endTime;
-    if (mf.isSet(params.uplps.P1)) {
-        startTime = +params.uplps.P1.options().startTime;
+    if (mf.isSet(params.tools.uplps.P1)) {
+        startTime = +params.tools.uplps.P1.options().startTime;
         endTime = params.crosshair.time;
-        removeUplpsTool();
+        removeUplpsTool(false);
     } else startTime = params.crosshair.time;
     const { price1, price2, cash1, cash2 } = findUplps(startTime, endTime);
     let option = {
@@ -1101,26 +1121,43 @@ function drawUplpsTool() {
         color: "#009688",
         draggable: false,
     };
+    let param = {
+        isRemove: false,
+        symbol: state.symbol,
+        name: "uplps",
+        points: [],
+        data: [],
+    };
     option.startTime = startTime;
     option.price = price1;
     option.title = "P1";
-    params.uplps[option.title] = params.series.price.createPriceLine(option);
-    toolsStore.set("uplps", option);
+    params.tools.uplps[option.title] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.title);
+    param.data.push(mf.cloneDeep(option));
     //
     option.price = price2;
     option.title = "P2";
-    params.uplps[option.title] = params.series.price.createPriceLine(option);
-    toolsStore.set("uplps", option);
+    params.tools.uplps[option.title] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.title);
+    param.data.push(mf.cloneDeep(option));
     //
     option.price = cash1;
     option.title = "C1";
-    params.uplps[option.title] = params.series.cash.createPriceLine(option);
-    toolsStore.set("uplps", option);
+    params.tools.uplps[option.title] =
+        params.series.cash.createPriceLine(option);
+    param.points.push(option.title);
+    param.data.push(mf.cloneDeep(option));
     //
     option.price = cash2;
     option.title = "C2";
-    params.uplps[option.title] = params.series.cash.createPriceLine(option);
-    toolsStore.set("uplps", option);
+    params.tools.uplps[option.title] =
+        params.series.cash.createPriceLine(option);
+    param.points.push(option.title);
+    param.data.push(mf.cloneDeep(option));
+
+    store.dispatch("tradingStock/drawTools", param);
     uplpsToolRef.value.classList.remove("selected");
 }
 function findUplps(startTime, endTime) {
@@ -1180,22 +1217,27 @@ function findUplps(startTime, endTime) {
         cash2: +(c3 - dcMax).toFixed(0),
     };
 }
-function removeUplpsTool() {
-    if (mf.isSet(params.uplps.P1)) {
-        params.series.price.removePriceLine(params.uplps.P1);
-        params.series.price.removePriceLine(params.uplps.P2);
+function removeUplpsTool(server = true) {
+    if (mf.isSet(params.tools.uplps.P1)) {
+        params.series.price.removePriceLine(params.tools.uplps.P1);
+        params.series.price.removePriceLine(params.tools.uplps.P2);
     }
-    if (mf.isSet(params.uplps.C1)) {
-        params.series.cash.removePriceLine(params.uplps.C1);
-        params.series.cash.removePriceLine(params.uplps.C2);
+    if (mf.isSet(params.tools.uplps.C1)) {
+        params.series.cash.removePriceLine(params.tools.uplps.C1);
+        params.series.cash.removePriceLine(params.tools.uplps.C2);
     }
-    params.uplps = {
+    params.tools.uplps = {
         P1: {},
         P2: {},
         C1: {},
         C2: {},
     };
-    toolsStore.clear("uplps");
+    if (server)
+        store.dispatch("tradingStock/drawTools", {
+            isRemove: true,
+            symbol: state.symbol,
+            name: "uplps",
+        });
 }
 function downlpsToolClick(e) {
     state.showColorPicker = false;
@@ -1215,8 +1257,8 @@ function downlpsToolContextmenu(e) {
 }
 function drawDownlpsTool() {
     let startTime, endTime;
-    if (mf.isSet(params.downlps.P1)) {
-        startTime = +params.downlps.P1.options().startTime;
+    if (mf.isSet(params.tools.downlps.P1)) {
+        startTime = +params.tools.downlps.P1.options().startTime;
         endTime = params.crosshair.time;
         removeDownlpsTool();
     } else startTime = params.crosshair.time;
@@ -1227,26 +1269,43 @@ function drawDownlpsTool() {
         color: "#E91E63",
         draggable: false,
     };
+    let param = {
+        isRemove: false,
+        symbol: state.symbol,
+        name: "uplps",
+        points: [],
+        data: [],
+    };
     option.startTime = startTime;
     option.price = price1;
     option.title = "P1";
-    params.downlps[option.title] = params.series.price.createPriceLine(option);
-    toolsStore.set("downlps", option);
+    params.tools.downlps[option.title] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.title);
+    param.data.push(mf.cloneDeep(option));
     //
     option.price = price2;
     option.title = "P2";
-    params.downlps[option.title] = params.series.price.createPriceLine(option);
-    toolsStore.set("downlps", option);
+    params.tools.downlps[option.title] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.title);
+    param.data.push(mf.cloneDeep(option));
     //
     option.price = cash1;
     option.title = "C1";
-    params.downlps[option.title] = params.series.cash.createPriceLine(option);
-    toolsStore.set("downlps", option);
+    params.tools.downlps[option.title] =
+        params.series.cash.createPriceLine(option);
+    param.points.push(option.title);
+    param.data.push(mf.cloneDeep(option));
     //
     option.price = cash2;
     option.title = "C2";
-    params.downlps[option.title] = params.series.cash.createPriceLine(option);
-    toolsStore.set("downlps", option);
+    params.tools.downlps[option.title] =
+        params.series.cash.createPriceLine(option);
+    param.points.push(option.title);
+    param.data.push(mf.cloneDeep(option));
+
+    store.dispatch("tradingStock/drawTools", param);
     downlpsToolRef.value.classList.remove("selected");
 }
 function findDownlps(startTime, endTime) {
@@ -1306,22 +1365,27 @@ function findDownlps(startTime, endTime) {
         cash2: +(c3 - dcMax).toFixed(1),
     };
 }
-function removeDownlpsTool() {
-    if (mf.isSet(params.downlps.P1)) {
-        params.series.price.removePriceLine(params.downlps.P1);
-        params.series.price.removePriceLine(params.downlps.P2);
+function removeDownlpsTool(server = true) {
+    if (mf.isSet(params.tools.downlps.P1)) {
+        params.series.price.removePriceLine(params.tools.downlps.P1);
+        params.series.price.removePriceLine(params.tools.downlps.P2);
     }
-    if (mf.isSet(params.downlps.C1)) {
-        params.series.cash.removePriceLine(params.downlps.C1);
-        params.series.cash.removePriceLine(params.downlps.C2);
+    if (mf.isSet(params.tools.downlps.C1)) {
+        params.series.cash.removePriceLine(params.tools.downlps.C1);
+        params.series.cash.removePriceLine(params.tools.downlps.C2);
     }
-    params.downlps = {
+    params.tools.downlps = {
         P1: {},
         P2: {},
         C1: {},
         C2: {},
     };
-    toolsStore.clear("downlps");
+    if (server)
+        store.dispatch("tradingStock/drawTools", {
+            isRemove: true,
+            symbol: state.symbol,
+            name: "downlps",
+        });
 }
 function coordinateToPrice(y, name = "price") {
     return formatPrice(params.series[name].coordinateToPrice(y));

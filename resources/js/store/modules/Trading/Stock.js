@@ -1,7 +1,7 @@
 function initialState() {
     return {
         symbols: { hose: [], cash: [], index: [], mix: [], watch: [] },
-        chartData: [],
+        chart: [],
         isChartLoading: false,
     };
 }
@@ -69,6 +69,17 @@ const actions = {
                 });
         });
     },
+    drawTools({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/stock/draw-tools", param, { noLoading: true })
+                .then((response) => {
+                    // dispatch("getSymbols");
+                    resolve();
+                });
+        });
+    },
+
     resetState({ commit }) {
         commit("resetState");
     },
@@ -76,7 +87,7 @@ const actions = {
 
 const mutations = {
     setChartData(state, data) {
-        state.chartData = data;
+        state.chart = data;
     },
     setChartLoading(state, data) {
         state.isChartLoading = data;

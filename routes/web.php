@@ -150,12 +150,23 @@ Route::get('test', function () {
     // // dd($vos->hasOrder());
     // dd($vos->hasOrder() || $vos->hasConditionOrder());
     // dd(strtotime("2022-04-04"));
+    // $result = array();
+    // $ss = \App\Models\DrawTool::where('symbol', 'VNINDEX')->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
+    // foreach ($ss as $d) {
+    //     if (!isset($result[$d->name])) $result[$d->name] = array();
+    //     $result[$d->name][$d->point] = $d->data;
+    // }
+    // $s->each(function ($d) {
+    //     if (!isset($result[$d->name])) $result[$d->name] = array();
+    //     $result[$d->name][$d->point] = $d;
+    // });
+    // dd($result);
     set_time_limit(300);
     $payload = (object)['from' => strtotime("2022-04-04"), 'to' => strtotime("2023-09-07"), 'type' => 'cash'];
-    // $s = App\Jobs\FilterStockJob::dispatch($payload);
+    $filter = App\Jobs\FilterStockJob::dispatch($payload);
 
     // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
-    $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
+    // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
     dd($filter);
     $date = date('Y-m-d');
     dd(get_global_value('openingMarketFlag'));

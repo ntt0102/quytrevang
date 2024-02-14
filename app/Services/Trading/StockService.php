@@ -4,6 +4,7 @@ namespace App\Services\Trading;
 
 use App\Services\CoreService;
 use App\Models\StockSymbol;
+use App\Models\DrawTool;
 use App\Jobs\FilterStockJob;
 
 class StockService extends CoreService
@@ -15,6 +16,19 @@ class StockService extends CoreService
      * 
      */
     public function getChartData($payload)
+    {
+        return [
+            'data' => $this->getData($payload),
+            'tools' => $this->getTools($payload)
+        ];
+    }
+    /**
+     * Get chart data
+     *
+     * @param $payload
+     * 
+     */
+    public function getData($payload)
     {
         $r = ['ohlc' => [], 'price' => [], 'cash' => []];
         if (!$payload->symbol) return $r;
@@ -52,6 +66,22 @@ class StockService extends CoreService
             ];
         }
         return $r;
+    }
+    /**
+     * Get chart tool
+     *
+     * @param $payload
+     * 
+     */
+    public function getTools($payload)
+    {
+        $result = array();
+        $ss = DrawTool::where('symbol', $payload->symbol)->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
+        foreach ($ss as $d) {
+            if (!isset($result[$d->name])) $result[$d->name] = array();
+            $result[$d->name][$d->point] = $d->data;
+        }
+        return $result;
     }
     /**
      * Clone Symbols
@@ -108,5 +138,29 @@ class StockService extends CoreService
             $stt = $watch->save();
         }
         return ['isOk' => !!$stt];
+    }
+
+    /**
+     * Draw Tools
+     *
+     * @param $payload
+     * 
+     */
+    public function drawTools($payload)
+    {
+        if ($payload->isRemove) {
+            $dt = DrawTool::where('symbol', $payload->symbol)->where('name', $payload->name);
+            if ($payload->name == 'line' && !!$payload->point)
+                $dt = $dt->where('point', $payload->point);
+            $dt->delete();
+        } else {
+            for ($i = 0; $i < count($payload->points); $i++) {
+                $key = ['symbol' => $payload->symbol, 'name' => $payload->name, 'point' => $payload->points[$i]];
+                $data = ['data' => $payload->data[$i]];
+                if ($payload->name == 'line') $data['point'] = $payload->data[$i]->price;
+                DrawTool::updateOrCreate($key, $data);
+            }
+        }
+        return (object)[];
     }
 }
