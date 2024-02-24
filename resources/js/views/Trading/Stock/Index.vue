@@ -257,14 +257,15 @@ let params = {
     crosshair: {},
 };
 const state = reactive({
-    symbol: "VNINDEX",
+    symbol: "SSI",
     symbols: [],
     symbolsKind: null,
     symbolsKinds: [
         { text: t("trading.stock.hoseList"), value: "hose" },
-        { text: t("trading.stock.filterCash"), value: "cash" },
-        { text: t("trading.stock.filterIndex"), value: "index" },
-        { text: t("trading.stock.filterMix"), value: "mix" },
+        { text: t("trading.stock.indexList"), value: "index" },
+        { text: t("trading.stock.filterCash"), value: "fcash" },
+        { text: t("trading.stock.filterIndex"), value: "findex" },
+        { text: t("trading.stock.filterMix"), value: "fmix" },
         { text: t("trading.stock.watchList"), value: "watch" },
     ],
     isFullscreen: false,
@@ -295,7 +296,7 @@ onMounted(() => {
         priceScaleId: "cash",
         scaleMargins: { top: 0.61, bottom: 0.01 },
         color: "yellow",
-        priceFormat: { minMove: 1 },
+        priceFormat: { type: "volume", minMove: 1 },
         lastValueVisible: false,
     });
     params.series.ohlc = params.chart.addCandlestickSeries({

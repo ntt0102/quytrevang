@@ -30,6 +30,17 @@ class StockService extends CoreService
      */
     public function getData($payload)
     {
+        if (str_contains($payload->symbol, '^')) return $this->getDataFromCophieu68($payload);
+        return $this->getDataFromSsi($payload);
+    }
+    /**
+     * Get chart data
+     *
+     * @param $payload
+     * 
+     */
+    public function getDataFromSsi($payload)
+    {
         $r = ['ohlc' => [], 'price' => [], 'cash' => []];
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
@@ -68,6 +79,55 @@ class StockService extends CoreService
         return $r;
     }
     /**
+     * Get chart data
+     *
+     * @param $payload
+     * 
+     */
+    public function getDataFromCophieu68($payload)
+    {
+        $r = ['ohlc' => [], 'price' => [], 'cash' => []];
+        if (!$payload->symbol) return $r;
+        $client = new \GuzzleHttp\Client();
+        $url = "https://www.cophieu68.vn/chart/chart_data.php?parameters=%7B%7D&dateby=1&stockname=" . $payload->symbol;
+        $res = $client->get($url);
+        $rsp = json_decode($res->getBody());
+        if (!is_object($rsp)) return $r;
+        if (count($rsp->candle) == 0) return $r;
+        $acc = 0;
+        $prevAvg = 0;
+        foreach ($rsp->candle as $candle) {
+            $date = strtotime($candle->date);
+            if ($date < $payload->from) continue;
+            if ($date > $payload->to) break;
+            $r['ohlc'][] = [
+                'time' => $date,
+                'open' => +$candle->open,
+                'high' => +$candle->high,
+                'low' => +$candle->low,
+                'close' => +$candle->close
+            ];
+            $avg = ($candle->high + $candle->low + $candle->close) / 3;
+            $r['price'][] = [
+                'time' => $date,
+                'value' => $avg
+            ];
+            if (!$prevAvg) $prevAvg = $avg;
+            $change = $avg - $prevAvg;
+            $side = 0;
+            if ($change > 0) $side = 1;
+            else if ($change < 0) $side = -1;
+            $prevAvg = $avg;
+            $cash = $side * $candle->volume;
+            $acc += $cash;
+            $r['cash'][] = [
+                'time' => $date,
+                'value' => $acc
+            ];
+        }
+        return $r;
+    }
+    /**
      * Get chart tool
      *
      * @param $payload
@@ -93,7 +153,9 @@ class StockService extends CoreService
         $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/hose";
         $res = $client->get($url);
         $hose = json_decode($res->getBody());
-        $ss = StockSymbol::updateOrCreate(['name' => 'hose'], ['symbols' => array_merge(['VNINDEX', 'VN30'], $hose)]);
+        $index = ['VNINDEX', 'VN30', '^CK', '^NH'];
+        $ss = StockSymbol::updateOrCreate(['name' => 'index'], ['symbols' => $index]);
+        $ss = StockSymbol::updateOrCreate(['name' => 'hose'], ['symbols' => $hose]);
         return ['isOk' => !!$ss];
     }
 
