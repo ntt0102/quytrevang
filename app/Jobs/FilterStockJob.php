@@ -44,23 +44,30 @@ class FilterStockJob implements ShouldQueue
         $r = [];
         $isCash = false;
         $isIndex = false;
-        $ss = StockSymbol::where('name', 'hose')->first();
-        $symbols = !!$ss ? $ss->symbols : [];
         $stockService = app(StockService::class);
         $this->payload->symbol = 'VNINDEX';
         $vnindex = $stockService->getData($this->payload)['price'];
-        foreach ($symbols as $symbol) {
-            $this->payload->symbol = $symbol;
-            $data = $stockService->getData($this->payload);
-            if (count($data['price']) == 0) continue;
-            $isCash = current($data['price'])['value'] > end($data['price'])['value'] &&
-                current($data['cash'])['value'] < end($data['cash'])['value'];
-            $isIndex = current($vnindex)['value'] > end($vnindex)['value'] &&
-                current($data['price'])['value'] < end($data['price'])['value'];
-            if (($this->payload->type == 'cash' && $isCash) ||
-                ($this->payload->type == 'index' && $isIndex) ||
-                ($this->payload->type == 'mix' && $isCash && $isIndex)
-            ) $r[] = $symbol;
+        $strVni = current($vnindex)['value'];
+        $endVni = current($vnindex)['value'];
+        $stocks = StockSymbol::whereIn('name', ['hose', 'index'])->get();
+        foreach ($stocks as $stock) {
+            foreach ($stock->symbols as $symbol) {
+                $this->payload->symbol = $symbol;
+                $data = $stockService->getData($this->payload);
+                $price = $data['price'];
+                $strPr = current($price)['value'];
+                $endPr = end($price)['value'];
+                $cash = $data['cash'];
+                $strCh = current($cash)['value'];
+                $endCh = end($cash)['value'];
+                if (count($price) == 0) continue;
+                $isCash = $endPr < $strPr && $endCh > $strCh;
+                $isIndex = $endVni < $strVni && $endPr > $strPr;
+                if (($this->payload->type == 'fcash' && $isCash) ||
+                    ($this->payload->type == 'findex' && $isIndex) ||
+                    ($this->payload->type == 'fmix' && $isCash && $isIndex)
+                ) $r[] = $symbol;
+            }
         }
         $ss = StockSymbol::updateOrCreate(['name' => $this->payload->type], ['symbols' => $r]);
     }

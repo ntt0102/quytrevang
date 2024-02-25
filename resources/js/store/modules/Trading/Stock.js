@@ -52,11 +52,9 @@ const actions = {
     },
     filterSymbols({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios
-                .post("trading/stock/filter", param, { noLoading: true })
-                .then((response) => {
-                    resolve(response.data);
-                });
+            axios.post("trading/stock/filter", param).then((response) => {
+                resolve(response.data);
+            });
         });
     },
     addWatchlist({ commit, dispatch, getters, state, rootGetters }, param) {

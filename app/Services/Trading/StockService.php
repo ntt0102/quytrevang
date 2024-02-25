@@ -5,7 +5,6 @@ namespace App\Services\Trading;
 use App\Services\CoreService;
 use App\Models\StockSymbol;
 use App\Models\DrawTool;
-use App\Jobs\FilterStockJob;
 
 class StockService extends CoreService
 {
@@ -178,8 +177,35 @@ class StockService extends CoreService
      */
     public function filterSymbols($payload)
     {
-        FilterStockJob::dispatch($payload);
-        return ['isOk' => true];
+        $r = [];
+        $isCash = false;
+        $isIndex = false;
+        $payload->symbol = 'VNINDEX';
+        $vnindex = $this->getData($payload)['price'];
+        $strVni = current($vnindex)['value'];
+        $endVni = end($vnindex)['value'];
+        $stocks = StockSymbol::whereIn('name', ['hose', 'index'])->get();
+        foreach ($stocks as $stock) {
+            foreach ($stock->symbols as $symbol) {
+                $payload->symbol = $symbol;
+                $data = $this->getData($payload);
+                $price = $data['price'];
+                if (count($price) == 0) continue;
+                $strPr = current($price)['value'];
+                $endPr = end($price)['value'];
+                $cash = $data['cash'];
+                $strCh = current($cash)['value'];
+                $endCh = end($cash)['value'];
+                $isCash = $endPr < $strPr && $endCh > $strCh;
+                $isIndex = $endVni < $strVni && $endPr > $strPr;
+                if (($payload->type == 'fcash' && $isCash) ||
+                    ($payload->type == 'findex' && $isIndex) ||
+                    ($payload->type == 'fmix' && $isCash && $isIndex)
+                ) $r[] = $symbol;
+            }
+        }
+        $stt = StockSymbol::updateOrCreate(['name' => $payload->type], ['symbols' => $r]);
+        return ['isOk' => !!$stt];
     }
 
     /**

@@ -10,10 +10,11 @@
                 <div class="dx-fieldset">
                     <div class="dx-field">
                         <div class="dx-field-label">
-                            {{ $t("trading.stock.filterPopup.dateRange") }}
+                            {{ $t("trading.stock.filterPopup.fromDate") }}
                         </div>
                         <div class="dx-field-value">
                             <DxDateBox
+                                ref="fromDateRef"
                                 v-model="state.fromDate"
                                 :input-attr="{ 'aria-label': 'Date' }"
                                 type="date"
@@ -21,7 +22,9 @@
                         </div>
                     </div>
                     <div class="dx-field">
-                        <div class="dx-field-label"></div>
+                        <div class="dx-field-label">
+                            {{ $t("trading.stock.filterPopup.toDate") }}
+                        </div>
                         <div class="dx-field-value">
                             <DxDateBox
                                 v-model="state.toDate"
@@ -70,17 +73,19 @@ const store = useStore();
 const { t } = useI18n();
 const mf = inject("mf");
 const popupRef = ref(null);
+const fromDateRef = ref(null);
 const state = reactive({
     fromDate: null,
     toDate: null,
     type: null,
     filterTypes: [
-        { text: t("trading.stock.filterCash"), value: "cash" },
-        { text: t("trading.stock.filterIndex"), value: "index" },
-        { text: t("trading.stock.filterMix"), value: "mix" },
+        { text: t("trading.stock.filterCash"), value: "fcash" },
+        { text: t("trading.stock.filterIndex"), value: "findex" },
+        { text: t("trading.stock.filterMix"), value: "fmix" },
     ],
 });
 function show() {
+    state.type = state.filterTypes[0];
     popupRef.value.show();
 }
 function filterSymbols() {
@@ -89,11 +94,11 @@ function filterSymbols() {
         to: moment(state.toDate).unix(),
         type: state.type.value,
     };
-    console.log(param);
     store.dispatch("tradingStock/filterSymbols", param);
 }
 function onShown() {
     store.dispatch("tradingOrder/getCopyistStatus");
+    fromDateRef.value.instance.focus();
 }
 function onHidden() {}
 

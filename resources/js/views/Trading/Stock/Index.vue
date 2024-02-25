@@ -257,7 +257,7 @@ let params = {
     crosshair: {},
 };
 const state = reactive({
-    symbol: "SSI",
+    symbol: "VNINDEX",
     symbols: [],
     symbolsKind: null,
     symbolsKinds: [
@@ -273,7 +273,7 @@ const state = reactive({
     showColorPicker: false,
     showTradingView: false,
 });
-state.symbolsKind = state.symbolsKinds[0];
+state.symbolsKind = state.symbolsKinds[1];
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
