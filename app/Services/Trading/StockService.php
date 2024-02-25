@@ -180,6 +180,7 @@ class StockService extends CoreService
         $r = [];
         $isCash = false;
         $isIndex = false;
+        $isMix = false;
         $payload->symbol = 'VNINDEX';
         $vnindex = $this->getData($payload)['price'];
         $strVni = current($vnindex)['value'];
@@ -198,9 +199,10 @@ class StockService extends CoreService
                 $endCh = end($cash)['value'];
                 $isCash = $endPr < $strPr && $endCh > $strCh;
                 $isIndex = $endVni < $strVni && $endPr > $strPr;
+                $isMix = $endVni < $strVni && $endPr > $strPr && $endCh > $strCh;
                 if (($payload->type == 'fcash' && $isCash) ||
                     ($payload->type == 'findex' && $isIndex) ||
-                    ($payload->type == 'fmix' && $isCash && $isIndex)
+                    ($payload->type == 'fmix' && $isMix)
                 ) $r[] = $symbol;
             }
         }
@@ -225,6 +227,18 @@ class StockService extends CoreService
             $watch->symbols = $symbols;
             $stt = $watch->save();
         }
+        return (object)[];
+    }
+
+    /**
+     * Delete Watchlist
+     *
+     * @param $payload
+     * 
+     */
+    public function deleteWatchlist($payload)
+    {
+        $stt = StockSymbol::updateOrCreate(['name' => 'watch'], ['symbols' => []]);
         return ['isOk' => !!$stt];
     }
 

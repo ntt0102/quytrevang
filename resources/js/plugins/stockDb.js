@@ -10,11 +10,7 @@ class StockDb {
             const request = indexedDB.open("stockChart", 1);
             request.onupgradeneeded = (e) => {
                 this.store = e.target.result;
-                this.store.createObjectStore("line", { keyPath: "price" });
-                this.store.createObjectStore("ruler", { keyPath: "point" });
-                this.store.createObjectStore("pattern1", { keyPath: "point" });
-                this.store.createObjectStore("uplps", { keyPath: "title" });
-                this.store.createObjectStore("downlps", { keyPath: "title" });
+                this.store.createObjectStore("range", { keyPath: "color" });
                 resolve();
             };
             request.onsuccess = (e) => {

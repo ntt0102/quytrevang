@@ -5,25 +5,24 @@ function initialState() {
         isChartLoading: false,
     };
 }
-
+const FROM_DATE = moment().subtract(3, "years").unix();
+const TO_DATE = moment().unix();
 const getters = {};
 
 const actions = {
     getChartData({ commit, dispatch, getters, state, rootGetters }, symbol) {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
-            const from = moment().subtract(3, "years").unix();
-            const to = moment().unix();
             axios
                 .post(
                     "trading/stock",
-                    { symbol, from, to },
+                    { symbol, from: FROM_DATE, to: TO_DATE },
                     { noLoading: true }
                 )
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
-                    resolve();
+                    resolve(response.data.data.price);
                 });
         });
     },
@@ -52,7 +51,10 @@ const actions = {
     },
     filterSymbols({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
+            if (!param.from) param.from = FROM_DATE;
+            if (!param.to) param.to = TO_DATE;
             axios.post("trading/stock/filter", param).then((response) => {
+                dispatch("getSymbols");
                 resolve(response.data);
             });
         });
@@ -61,6 +63,18 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post("trading/stock/add-watchlist", param, { noLoading: true })
+                .then((response) => {
+                    dispatch("getSymbols");
+                    resolve();
+                });
+        });
+    },
+    deleteWatchlist({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/stock/delete-watchlist", param, {
+                    noLoading: true,
+                })
                 .then((response) => {
                     dispatch("getSymbols");
                     resolve();

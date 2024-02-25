@@ -4,15 +4,29 @@
             :items="[
                 {
                     location: 'before',
+                    widget: 'dxSelectBox',
+                    options: {
+                        width: '130px',
+                        dataSource: state.symbolsKinds,
+                        keyExpr: 'value',
+                        displayExpr: 'text',
+                        value: state.symbolsKind,
+                        hint: $t('trading.stock.symbolsKind'),
+                        onValueChanged: listChanged,
+                    },
+                },
+                {
+                    location: 'after',
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-list small',
                         hint: $t('trading.stock.cloneSymbols'),
-                        onClick: cloneSymbols,
+                        onClick: () =>
+                            $store.dispatch('tradingStock/cloneSymbols'),
                     },
                 },
                 {
-                    location: 'before',
+                    location: 'after',
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-filter small',
@@ -21,16 +35,12 @@
                     },
                 },
                 {
-                    location: 'before',
-                    widget: 'dxSelectBox',
+                    location: 'after',
+                    widget: 'dxButton',
                     options: {
-                        width: '170px',
-                        dataSource: state.symbolsKinds,
-                        keyExpr: 'value',
-                        displayExpr: 'text',
-                        value: state.symbolsKind,
-                        hint: $t('trading.stock.symbolsKind'),
-                        onValueChanged: listChanged,
+                        icon: 'far fa-folder-times small',
+                        hint: $t('trading.stock.deleteWatchList'),
+                        onClick: deleteWatchlist,
                     },
                 },
             ]"
@@ -128,12 +138,11 @@
                         @contextmenu="downlpsToolContextmenu"
                     ></div>
                     <div
-                        v-show="false"
-                        ref="rulerToolRef"
-                        class="command far fa-line-height"
-                        :title="$t('trading.stock.rulerTool')"
-                        @click="rulerToolClick"
-                        @contextmenu="rulerToolContextmenu"
+                        ref="rangeToolRef"
+                        class="command far fa-grip-lines-vertical"
+                        :title="$t('trading.stock.rangeTool')"
+                        @click="rangeToolClick"
+                        @contextmenu="rangeToolContextmenu"
                     ></div>
                 </div>
                 <iframe
@@ -151,27 +160,19 @@
 <script setup>
 import ColorPicker from "./ColorPicker.vue";
 import FilterPopup from "./filterPopup.vue";
-import toolsStore from "../../../plugins/stockDb.js";
+import stockDb from "../../../plugins/stockDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
-import {
-    reactive,
-    ref,
-    inject,
-    watch,
-    onMounted,
-    onUnmounted,
-    computed,
-} from "vue";
+import { confirm } from "devextreme/ui/dialog";
+import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { toast } from "vue3-toastify";
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.05, bottom: 0.4 },
+        scaleMargins: { top: 0.25, bottom: 0.35 },
     },
     leftPriceScale: { visible: false },
     layout: {
@@ -215,31 +216,21 @@ const fullscreenToolRef = ref(null);
 const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
 const lineToolRef = ref(null);
-const rulerToolRef = ref(null);
 const targetToolRef = ref(null);
 const uplpsToolRef = ref(null);
 const downlpsToolRef = ref(null);
+const rangeToolRef = ref(null);
 const tradingviewChartRef = ref(null);
 let params = {
     chart: {},
     series: {},
     data: {
-        original: [],
+        ohlc: [],
         price: [],
         cash: [],
     },
     tools: {
         lines: [],
-        ruler: {
-            l0: {},
-            ln1: {},
-            l1: {},
-            l2: {},
-            l3: {},
-            l4: {},
-            // l5: {},
-            pointCount: 0,
-        },
         target: { A: {}, B: {}, X: {}, Y: {}, Z: {} },
         uplps: {
             P1: {},
@@ -253,6 +244,7 @@ let params = {
             C1: {},
             C2: {},
         },
+        range: [],
     },
     crosshair: {},
 };
@@ -281,7 +273,7 @@ const inWatchlist = computed(() =>
     store.state.tradingStock.symbols.watch.includes(state.symbol)
 );
 store.dispatch("tradingStock/getSymbols");
-toolsStore.create();
+stockDb.create();
 
 onMounted(() => {
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
@@ -292,19 +284,33 @@ onMounted(() => {
     );
     params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(eventPriceLineDrag);
+    params.series.range = params.chart.addHistogramSeries({
+        priceScaleId: "range",
+        scaleMargins: { top: 0, bottom: 0 },
+        color: "#667b68",
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    params.series.vnindex = params.chart.addLineSeries({
+        priceScaleId: "vnindex",
+        scaleMargins: { top: 0.05, bottom: 0.76 },
+        color: "aqua",
+        priceFormat: { minMove: 0.01 },
+        lastValueVisible: false,
+    });
     params.series.cash = params.chart.addLineSeries({
         priceScaleId: "cash",
-        scaleMargins: { top: 0.61, bottom: 0.01 },
+        scaleMargins: { top: 0.66, bottom: 0.01 },
         color: "yellow",
         priceFormat: { type: "volume", minMove: 1 },
         lastValueVisible: false,
     });
     params.series.ohlc = params.chart.addCandlestickSeries({
-        upColor: "#26a69a",
-        downColor: "#ef5350",
+        upColor: "#42946C",
+        downColor: "#BC3E4A",
         borderVisible: false,
-        wickUpColor: "#26a69a",
-        wickDownColor: "#ef5350",
+        wickUpColor: "#42946C",
+        wickDownColor: "#BC3E4A",
         priceFormat: { minMove: 0.01 },
     });
     params.series.price = params.chart.addLineSeries({
@@ -315,7 +321,13 @@ onMounted(() => {
     });
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    store.dispatch("tradingStock/getChartData", state.symbol);
+    store
+        .dispatch("tradingStock/getChartData", state.symbol)
+        .then(async (vnindex) => {
+            params.series.vnindex.setData(vnindex);
+            const range = await stockDb.get("range");
+            if (range.length == 2) params.series.range.setData(range);
+        });
 });
 
 watch(
@@ -337,12 +349,12 @@ function eventChartContextmenu(e) {
 }
 function eventChartClick() {
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
-    else if (rulerToolRef.value.classList.contains("selected")) drawRulerTool();
     else if (targetToolRef.value.classList.contains("selected"))
         drawTargetTool();
     else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
     else if (downlpsToolRef.value.classList.contains("selected"))
         drawDownlpsTool();
+    else if (rangeToolRef.value.classList.contains("selected")) drawRangeTool();
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
@@ -368,10 +380,6 @@ function eventPriceLineDrag(e) {
     const newPrice = lineOptions.price;
     switch (lineOptions.lineType) {
         case "line":
-            toolsStore.set("line", {
-                price: oldPrice,
-                removed: true,
-            });
             store.dispatch("tradingStock/drawTools", {
                 isRemove: false,
                 symbol: state.symbol,
@@ -380,244 +388,6 @@ function eventPriceLineDrag(e) {
                 data: [lineOptions],
             });
             lineToolRef.value.classList.remove("selected");
-            break;
-        case "ruler":
-            switch (lineOptions.point) {
-                case "l0":
-                    toolsStore.set("ruler", lineOptions);
-                    if (params.ruler.pointCount == 2) {
-                        const distance = +params.ruler.l1.options().title;
-
-                        const ln1Price = +(newPrice - distance).toFixed(1);
-                        params.ruler.ln1.applyOptions({ price: ln1Price });
-                        toolsStore.set("ruler", params.ruler.ln1.options());
-                        //
-                        const l1Price = +(newPrice + distance).toFixed(1);
-                        params.ruler.l1.applyOptions({ price: l1Price });
-                        toolsStore.set("ruler", params.ruler.l1.options());
-                        //
-                        const l2Price = +(newPrice + distance * 2).toFixed(1);
-                        params.ruler.l2.applyOptions({ price: l2Price });
-                        toolsStore.set("ruler", params.ruler.l2.options());
-                        //
-                        const l3Price = +(newPrice + distance * 3).toFixed(1);
-                        params.ruler.l3.applyOptions({ price: l3Price });
-                        toolsStore.set("ruler", params.ruler.l3.options());
-                        //
-                        const l4Price = +(newPrice + distance * 4).toFixed(1);
-                        params.ruler.l4.applyOptions({ price: l4Price });
-                        toolsStore.set("ruler", params.ruler.l4.options());
-
-                        // const l5Price = +(newPrice + distance * 5).toFixed(1);
-                        // params.ruler.l5.applyOptions({ price: l5Price });
-                        // toolsStore.set("ruler", params.ruler.l5.options());
-                    }
-                    break;
-                case "ln1":
-                    const l0PriceN1 = +params.ruler.l0.options().price;
-                    const distanceN1 = newPrice - l0PriceN1;
-                    line.applyOptions({ title: distanceN1.toFixed(1) });
-                    toolsStore.set("ruler", line.options());
-                    //
-                    params.ruler.l1.applyOptions({
-                        title: (-distanceN1).toFixed(1),
-                        price: +(l0PriceN1 - distanceN1).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l1.options());
-                    //
-                    params.ruler.l2.applyOptions({
-                        title: (-distanceN1 * 2).toFixed(1),
-                        price: +(l0PriceN1 - distanceN1 * 2).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l2.options());
-                    //
-                    params.ruler.l3.applyOptions({
-                        title: (-distanceN1 * 3).toFixed(1),
-                        price: +(l0PriceN1 - distanceN1 * 3).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l3.options());
-                    //
-                    params.ruler.l4.applyOptions({
-                        title: (-distanceN1 * 4).toFixed(1),
-                        price: +(l0PriceN1 - distanceN1 * 4).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l4.options());
-                    break;
-                case "l1":
-                    const l0Price1 = +params.ruler.l0.options().price;
-                    const distance1 = newPrice - l0Price1;
-                    line.applyOptions({ title: distance1.toFixed(1) });
-                    toolsStore.set("ruler", line.options());
-                    //
-                    params.ruler.ln1.applyOptions({
-                        title: (-distance1).toFixed(1),
-                        price: +(l0Price1 - distance1).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.ln1.options());
-                    //
-                    params.ruler.l2.applyOptions({
-                        title: (distance1 * 2).toFixed(1),
-                        price: +(l0Price1 + distance1 * 2).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l2.options());
-                    //
-                    params.ruler.l3.applyOptions({
-                        title: (distance1 * 3).toFixed(1),
-                        price: +(l0Price1 + distance1 * 3).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l3.options());
-                    //
-                    params.ruler.l4.applyOptions({
-                        title: (distance1 * 4).toFixed(1),
-                        price: +(l0Price1 + distance1 * 4).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l4.options());
-                    //
-                    // params.ruler.l5.applyOptions({
-                    //     title: (distance1 * 5).toFixed(1),
-                    //     price: +(l0Price1 + distance1 * 5).toFixed(1),
-                    // });
-                    // toolsStore.set("ruler", params.ruler.l5.options());
-                    break;
-                case "l2":
-                    const l0Price2 = +params.ruler.l0.options().price;
-                    const distance2 = newPrice - l0Price2;
-                    line.applyOptions({ title: distance2.toFixed(1) });
-                    toolsStore.set("ruler", line.options());
-                    //
-                    params.ruler.ln1.applyOptions({
-                        title: (-distance2 * 0.5).toFixed(1),
-                        price: +(l0Price2 - distance2 * 0.5).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.ln1.options());
-                    //
-                    params.ruler.l1.applyOptions({
-                        title: (distance2 * 0.5).toFixed(1),
-                        price: +(l0Price2 + distance2 * 0.5).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l1.options());
-                    //
-                    params.ruler.l3.applyOptions({
-                        title: (distance2 * 1.5).toFixed(1),
-                        price: +(l0Price2 + distance2 * 1.5).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l3.options());
-                    //
-                    params.ruler.l4.applyOptions({
-                        title: (distance2 * 2).toFixed(1),
-                        price: +(l0Price2 + distance2 * 2).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l4.options());
-                    //
-                    //     params.ruler.l5.applyOptions({
-                    //         title: (distance2 * 2.5).toFixed(1),
-                    //         price: +(l0Price2 + distance2 * 2.5).toFixed(1),
-                    //     });
-                    //     toolsStore.set("ruler", params.ruler.l5.options());
-                    break;
-                case "l3":
-                    const l0Price3 = +params.ruler.l0.options().price;
-                    const distance3 = newPrice - l0Price3;
-                    line.applyOptions({ title: distance3.toFixed(1) });
-                    toolsStore.set("ruler", line.options());
-                    //
-                    params.ruler.ln1.applyOptions({
-                        title: (-distance3 / 3).toFixed(1),
-                        price: +(l0Price3 - distance3 / 3).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.ln1.options());
-                    //
-                    params.ruler.l1.applyOptions({
-                        title: (distance3 / 3).toFixed(1),
-                        price: +(l0Price3 + distance3 / 3).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l1.options());
-                    //
-                    params.ruler.l2.applyOptions({
-                        title: ((distance3 * 2) / 3).toFixed(1),
-                        price: +(l0Price3 + (distance3 * 2) / 3).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l2.options());
-                    //
-                    // params.ruler.l4.applyOptions({
-                    //     title: ((distance3 * 4) / 3).toFixed(1),
-                    //     price: +(l0Price3 + (distance3 * 4) / 3).toFixed(1),
-                    // });
-                    // toolsStore.set("ruler", params.ruler.l4.options());
-                    // //
-                    // params.ruler.l5.applyOptions({
-                    //     title: ((distance3 * 5) / 3).toFixed(1),
-                    //     price: +(l0Price3 + (distance3 * 5) / 3).toFixed(1),
-                    // });
-                    // toolsStore.set("ruler", params.ruler.l5.options());
-                    break;
-                case "l4":
-                    const l0Price4 = +params.ruler.l0.options().price;
-                    const distance4 = newPrice - l0Price4;
-                    line.applyOptions({ title: distance4.toFixed(1) });
-                    toolsStore.set("ruler", line.options());
-                    //
-                    params.ruler.ln1.applyOptions({
-                        title: (-distance4 / 4).toFixed(1),
-                        price: +(l0Price4 - distance4 / 4).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.ln1.options());
-                    //
-                    params.ruler.l1.applyOptions({
-                        title: (distance4 / 4).toFixed(1),
-                        price: +(l0Price4 + distance4 / 4).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l1.options());
-                    //
-                    params.ruler.l2.applyOptions({
-                        title: (distance4 / 2).toFixed(1),
-                        price: +(l0Price4 + distance4 / 2).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l2.options());
-                    //
-                    params.ruler.l3.applyOptions({
-                        title: ((distance4 * 3) / 4).toFixed(1),
-                        price: +(l0Price4 + (distance4 * 3) / 4).toFixed(1),
-                    });
-                    toolsStore.set("ruler", params.ruler.l3.options());
-                    //
-                    // params.ruler.l5.applyOptions({
-                    //     title: ((distance4 * 5) / 4).toFixed(1),
-                    //     price: +(l0Price4 + (distance4 * 5) / 4).toFixed(1),
-                    // });
-                    // toolsStore.set("ruler", params.ruler.l5.options());
-                    break;
-                // case "l5":
-                //     const l0Price5 = +params.ruler.l0.options().price;
-                //     const distance5 = newPrice - l0Price5;
-                //     line.applyOptions({ title: distance5.toFixed(1) });
-                //     toolsStore.set("ruler", line.options());
-                //     //
-                //     params.ruler.l1.applyOptions({
-                //         title: (distance5 / 5).toFixed(1),
-                //         price: +(l0Price5 + distance5 / 5).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l1.options());
-                //     //
-                //     params.ruler.l2.applyOptions({
-                //         title: ((distance5 * 2) / 5).toFixed(1),
-                //         price: +(l0Price5 + (distance5 * 2) / 5).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l2.options());
-                //     //
-                //     params.ruler.l3.applyOptions({
-                //         title: ((distance5 * 3) / 5).toFixed(1),
-                //         price: +(l0Price5 + (distance5 * 3) / 5).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l3.options());
-                //     //
-                //     params.ruler.l4.applyOptions({
-                //         title: ((distance5 * 4) / 5).toFixed(1),
-                //         price: +(l0Price5 + (distance5 * 4) / 5).toFixed(1),
-                //     });
-                //     toolsStore.set("ruler", params.ruler.l4.options());
-                //     break;
-            }
             break;
         case "target":
             if (mf.isSet(params.tools.target.B)) {
@@ -861,126 +631,6 @@ function removeLineTool(server = true) {
                 name: "line",
                 point: null,
             });
-    }
-}
-function rulerToolClick(e) {
-    state.showColorPicker = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-        removeRulerTool();
-    }
-    e.stopPropagation();
-}
-function rulerToolContextmenu(e) {
-    removeRulerTool();
-    e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
-}
-function drawRulerTool() {
-    const price = coordinateToPrice(params.crosshair.y);
-    let options = {
-        lineType: "ruler",
-        price: price,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: true,
-    };
-    if (params.ruler.pointCount == 0) {
-        options.point = "l0";
-        options.color = "#F44336";
-        options.title = "0";
-        params.ruler[options.point] =
-            params.series.price.createPriceLine(options);
-        params.ruler.pointCount++;
-        toolsStore.set("ruler", options);
-    } else {
-        const l0Price = +params.ruler.l0.options().price;
-
-        const distance1 = price - l0Price;
-        options.point = "l1";
-        options.color = "#FF9800";
-        options.title = distance1.toFixed(1);
-        params.ruler[options.point] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("ruler", options);
-        //
-        const distanceN1 = -distance1;
-        options.point = "ln1";
-        options.color = "#FF9800";
-        options.title = distanceN1.toFixed(1);
-        options.price = +(l0Price + distanceN1).toFixed(1);
-        params.ruler[options.point] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("ruler", options);
-        //
-        const distance2 = 2 * distance1;
-        options.point = "l2";
-        options.color = "#FFEB3B";
-        options.title = distance2.toFixed(1);
-        options.price = +(l0Price + distance2).toFixed(1);
-        params.ruler[options.point] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("ruler", options);
-
-        const distance3 = 3 * distance1;
-        options.point = "l3";
-        options.color = "#4CAF50";
-        options.title = distance3.toFixed(1);
-        options.price = +(l0Price + distance3).toFixed(1);
-        params.ruler[options.point] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("ruler", options);
-
-        const distance4 = 4 * distance1;
-        options.point = "l4";
-        options.color = "#009688";
-        options.title = distance4.toFixed(1);
-        options.price = +(l0Price + distance4).toFixed(1);
-        params.ruler[options.point] =
-            params.series.price.createPriceLine(options);
-        toolsStore.set("ruler", options);
-
-        // const distance5 = 5 * distance1;
-        // options.point = "l5";
-        // options.color = "#00BCD4";
-        // options.title = distance5.toFixed(1);
-        // options.price = +(l0Price + distance5).toFixed(1);
-        // params.ruler[options.point] =
-        //     params.series.price.createPriceLine(options);
-        // toolsStore.set("ruler", options);
-
-        params.ruler.pointCount++;
-        rulerToolRef.value.classList.remove("selected");
-    }
-}
-function removeRulerTool() {
-    if (params.ruler.pointCount > 0) {
-        params.series.price.removePriceLine(params.ruler.l0);
-        if (params.ruler.pointCount > 1) {
-            params.series.price.removePriceLine(params.ruler.ln1);
-            params.series.price.removePriceLine(params.ruler.l1);
-            params.series.price.removePriceLine(params.ruler.l2);
-            params.series.price.removePriceLine(params.ruler.l3);
-            params.series.price.removePriceLine(params.ruler.l4);
-            // params.series.price.removePriceLine(params.ruler.l5);
-        }
-        //
-        params.ruler = {
-            l0: {},
-            ln1: {},
-            l1: {},
-            l2: {},
-            l3: {},
-            l4: {},
-            // l5: {},
-            pointCount: 0,
-        };
-        toolsStore.clear("ruler");
     }
 }
 function targetToolClick(e) {
@@ -1388,6 +1038,39 @@ function removeDownlpsTool(server = true) {
             name: "downlps",
         });
 }
+function rangeToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removeRangeTool();
+    }
+    e.stopPropagation();
+}
+function rangeToolContextmenu(e) {
+    removeRangeTool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawRangeTool() {
+    let option = { time: params.crosshair.time, value: 1, color: "lime" };
+    if (params.tools.range.length > 0) {
+        option.color = "red";
+        rangeToolRef.value.classList.remove("selected");
+    }
+    params.series.range.update(option);
+    params.tools.range.push(option);
+    stockDb.set("range", option);
+}
+function removeRangeTool() {
+    params.tools.range = [];
+    params.series.range.setData([]);
+    stockDb.clear("range");
+}
 function coordinateToPrice(y, name = "price") {
     return formatPrice(params.series[name].coordinateToPrice(y));
 }
@@ -1402,8 +1085,12 @@ function symbolChanged(e) {
 function listChanged(e) {
     state.symbolsKind = e.value;
 }
-function cloneSymbols() {
-    store.dispatch("tradingStock/cloneSymbols");
+function deleteWatchlist() {
+    confirm(`${t("trading.stock.deleteWatchList")}?`, t("titles.confirm")).then(
+        (result) => {
+            if (result) store.dispatch("tradingStock/deleteWatchlist");
+        }
+    );
 }
 </script>
 <style lang="scss">

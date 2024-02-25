@@ -78,6 +78,18 @@ class StockController extends CoreController
         return $this->sendResponse($data);
     }
     /**
+     * Delete Watchlist
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteWatchlist(Request $request)
+    {
+        $data = $this->stockService->deleteWatchlist($this->payload);
+        return $this->sendResponse($data);
+    }
+    /**
      * Draw Tools
      *
      * @param \Illuminate\Http\Request $request
