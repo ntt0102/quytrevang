@@ -17,12 +17,8 @@ class FilterStockJob implements ShouldQueue
 
     private $payload;
 
-    /**
-     * The number of times the job may be attempted.
-     *
-     * @var int
-     */
-    public $tries = 3;
+    public $tries = 1;
+    public $timeout = 3600;
 
     /**
      * Create a new job instance.
