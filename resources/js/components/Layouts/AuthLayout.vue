@@ -321,7 +321,7 @@ function connectPusher() {
             setTimeout(() => {
                 if (route.name == "trading-stock") {
                     store.dispatch("tradingStock/getSymbols");
-                    toast.info(t("trading.stock.symbolFiltered"));
+                    toast.success(t("trading.stock.symbolFiltered"));
                 }
             }, 2000);
         });

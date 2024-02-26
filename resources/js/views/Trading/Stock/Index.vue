@@ -40,7 +40,7 @@
                     options: {
                         icon: 'far fa-filter small',
                         hint: $t('trading.stock.filterPopup.title'),
-                        onClick: showFilterPopup,
+                        onClick: filterSymbols,
                     },
                 },
             ]"
@@ -168,6 +168,7 @@ import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { toast } from "vue3-toastify";
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
@@ -1088,13 +1089,14 @@ function symbolChanged(e) {
 function listChanged(e) {
     state.symbolsKind = e.value;
 }
-function showFilterPopup() {
-    let option = { from: null, to: null };
+function filterSymbols() {
     if (params.tools.range.length == 2) {
-        option.from = params.tools.range[0].time;
-        option.to = params.tools.range[1].time;
-    }
-    filterPopupRef.value.show(option);
+        const param = {
+            from: params.tools.range[0].time,
+            to: params.tools.range[1].time,
+        };
+        store.dispatch("tradingStock/filterSymbols", param);
+    } else toast.error(t("trading.stock.rangeWarning"));
 }
 function deleteWatchlist() {
     confirm(`${t("trading.stock.deleteWatchList")}?`, t("titles.confirm")).then(
