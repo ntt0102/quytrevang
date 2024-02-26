@@ -39,7 +39,9 @@ class FilterStockJob implements ShouldQueue
     public function handle()
     {
         // \Log::info('Begin filter');
-        $r = [];
+        $rCash = [];
+        $rIndex = [];
+        $rMix = [];
         $isCash = false;
         $isIndex = false;
         $isMix = false;
@@ -63,13 +65,14 @@ class FilterStockJob implements ShouldQueue
                 $isCash = $endPr < $strPr && $endCh > $strCh;
                 $isIndex = $endVni < $strVni && $endPr > $strPr;
                 $isMix = $endVni < $strVni && $endPr > $strPr && $endCh > $strCh;
-                if (($this->payload->type == 'fcash' && $isCash) ||
-                    ($this->payload->type == 'findex' && $isIndex) ||
-                    ($this->payload->type == 'fmix' && $isMix)
-                ) $r[] = $symbol;
+                if ($isCash) $rCash[] = $symbol;
+                if ($isIndex) $rIndex[] = $symbol;
+                if ($isMix) $rMix[] = $symbol;
             }
         }
-        StockSymbol::updateOrCreate(['name' => $this->payload->type], ['symbols' => $r]);
+        StockSymbol::updateOrCreate(['name' => 'fcash'], ['symbols' => $rCash]);
+        StockSymbol::updateOrCreate(['name' => 'findex'], ['symbols' => $rIndex]);
+        StockSymbol::updateOrCreate(['name' => 'fmix'], ['symbols' => $rMix]);
         event(new FilterStockEvent());
         // \Log::info('End filter');
     }
