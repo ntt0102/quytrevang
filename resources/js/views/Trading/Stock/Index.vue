@@ -29,18 +29,18 @@
                     location: 'after',
                     widget: 'dxButton',
                     options: {
-                        icon: 'far fa-filter small',
-                        hint: $t('trading.stock.filterPopup.title'),
-                        onClick: () => $refs.filterPopupRef.show(),
+                        icon: 'far fa-folder-times small',
+                        hint: $t('trading.stock.deleteWatchList'),
+                        onClick: deleteWatchlist,
                     },
                 },
                 {
                     location: 'after',
                     widget: 'dxButton',
                     options: {
-                        icon: 'far fa-folder-times small',
-                        hint: $t('trading.stock.deleteWatchList'),
-                        onClick: deleteWatchlist,
+                        icon: 'far fa-filter small',
+                        hint: $t('trading.stock.filterPopup.title'),
+                        onClick: showFilterPopup,
                     },
                 },
             ]"
@@ -220,6 +220,7 @@ const targetToolRef = ref(null);
 const uplpsToolRef = ref(null);
 const downlpsToolRef = ref(null);
 const rangeToolRef = ref(null);
+const filterPopupRef = ref(null);
 const tradingviewChartRef = ref(null);
 let params = {
     chart: {},
@@ -264,7 +265,7 @@ const state = reactive({
     showColorPicker: false,
     showTradingView: false,
 });
-state.symbolsKind = state.symbolsKinds[1];
+state.symbolsKind = state.symbolsKinds[0];
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
@@ -325,7 +326,10 @@ onMounted(() => {
         .then(async (vnindex) => {
             params.series.vnindex.setData(vnindex);
             const range = await stockDb.get("range");
-            if (range.length == 2) params.series.range.setData(range);
+            if (range.length == 2) {
+                params.tools.range = range;
+                params.series.range.setData(range);
+            }
         });
 });
 
@@ -1083,6 +1087,14 @@ function symbolChanged(e) {
 }
 function listChanged(e) {
     state.symbolsKind = e.value;
+}
+function showFilterPopup() {
+    let option = { from: null, to: null };
+    if (params.tools.range.length == 2) {
+        option.from = params.tools.range[0].time;
+        option.to = params.tools.range[1].time;
+    }
+    filterPopupRef.value.show(option);
 }
 function deleteWatchlist() {
     confirm(`${t("trading.stock.deleteWatchList")}?`, t("titles.confirm")).then(

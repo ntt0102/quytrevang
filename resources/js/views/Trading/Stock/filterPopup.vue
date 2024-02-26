@@ -84,7 +84,9 @@ const state = reactive({
         { text: t("trading.stock.filterMix"), value: "fmix" },
     ],
 });
-function show() {
+function show(option) {
+    if (!!option.from) state.fromDate = moment.unix(option.from);
+    if (!!option.to) state.toDate = moment.unix(option.to);
     state.type = state.filterTypes[0];
     popupRef.value.show();
 }
