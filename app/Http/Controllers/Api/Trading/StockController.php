@@ -61,7 +61,7 @@ class StockController extends CoreController
      */
     public function filterSymbols(Request $request)
     {
-        set_time_limit(500);
+        set_time_limit(0);
         $data = $this->stockService->filterSymbols($this->payload);
         return $this->sendResponse($data);
     }
