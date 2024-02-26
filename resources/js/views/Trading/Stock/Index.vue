@@ -254,7 +254,6 @@ const state = reactive({
     symbolsKind: null,
     symbolsKinds: [
         { text: t("trading.stock.hoseList"), value: "hose" },
-        { text: t("trading.stock.indexList"), value: "index" },
         { text: t("trading.stock.filterCash"), value: "fcash" },
         { text: t("trading.stock.filterIndex"), value: "findex" },
         { text: t("trading.stock.filterMix"), value: "fmix" },
