@@ -6,6 +6,7 @@ use App\Services\CoreService;
 use App\Models\StockSymbol;
 use App\Models\DrawTool;
 use App\Jobs\TestJob;
+use App\Jobs\FilterStockJob;
 
 class StockService extends CoreService
 {
@@ -179,6 +180,7 @@ class StockService extends CoreService
     public function filterSymbols($payload)
     {
         TestJob::dispatch('web');
+        FilterStockJob::dispatch($payload);
         return ['isOk' => true];
         // $r = [];
         // $isCash = false;

@@ -44,31 +44,33 @@ class FilterStockJob implements ShouldQueue
         $r = [];
         $isCash = false;
         $isIndex = false;
+        $isMix = false;
         $stockService = app(StockService::class);
         $this->payload->symbol = 'VNINDEX';
         $vnindex = $stockService->getData($this->payload)['price'];
         $strVni = current($vnindex)['value'];
-        $endVni = current($vnindex)['value'];
+        $endVni = end($vnindex)['value'];
         $stocks = StockSymbol::whereIn('name', ['hose', 'index'])->get();
         foreach ($stocks as $stock) {
             foreach ($stock->symbols as $symbol) {
                 $this->payload->symbol = $symbol;
                 $data = $stockService->getData($this->payload);
                 $price = $data['price'];
+                if (count($price) == 0) continue;
                 $strPr = current($price)['value'];
                 $endPr = end($price)['value'];
                 $cash = $data['cash'];
                 $strCh = current($cash)['value'];
                 $endCh = end($cash)['value'];
-                if (count($price) == 0) continue;
                 $isCash = $endPr < $strPr && $endCh > $strCh;
                 $isIndex = $endVni < $strVni && $endPr > $strPr;
+                $isMix = $endVni < $strVni && $endPr > $strPr && $endCh > $strCh;
                 if (($this->payload->type == 'fcash' && $isCash) ||
                     ($this->payload->type == 'findex' && $isIndex) ||
-                    ($this->payload->type == 'fmix' && $isCash && $isIndex)
+                    ($this->payload->type == 'fmix' && $isMix)
                 ) $r[] = $symbol;
             }
         }
-        $ss = StockSymbol::updateOrCreate(['name' => $this->payload->type], ['symbols' => $r]);
+        StockSymbol::updateOrCreate(['name' => $this->payload->type], ['symbols' => $r]);
     }
 }
