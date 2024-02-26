@@ -155,9 +155,8 @@ class StockService extends CoreService
         $res = $client->get($url);
         $hose = json_decode($res->getBody());
         $index = ['VNINDEX', 'VN30', '^CK', '^NH'];
-        $ss = StockSymbol::updateOrCreate(['name' => 'index'], ['symbols' => $index]);
-        $ss = StockSymbol::updateOrCreate(['name' => 'hose'], ['symbols' => $hose]);
-        return ['isOk' => !!$ss];
+        $stt = StockSymbol::updateOrCreate(['name' => 'hose'], ['symbols' => array_merge($index, $hose)]);
+        return ['isOk' => !!$stt];
     }
 
     /**
