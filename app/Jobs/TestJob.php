@@ -15,7 +15,7 @@ class TestJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-
+    public $key = 'auto';
     /**
      * The number of times the job may be attempted.
      *
@@ -28,8 +28,9 @@ class TestJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($key = 'auto')
     {
+        $this->key = $key;
     }
 
     /**
@@ -39,6 +40,6 @@ class TestJob implements ShouldQueue
      */
     public function handle()
     {
-        StockSymbol::updateOrCreate(['name' => 'test'], ['symbols' => [date("Y/m/d H:i:s")]]);
+        StockSymbol::updateOrCreate(['name' => $this->key], ['symbols' => [date("Y/m/d H:i:s")]]);
     }
 }

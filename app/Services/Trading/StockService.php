@@ -178,7 +178,7 @@ class StockService extends CoreService
      */
     public function filterSymbols($payload)
     {
-        TestJob::dispatch();
+        TestJob::dispatch('web');
         return ['isOk' => true];
         // $r = [];
         // $isCash = false;
