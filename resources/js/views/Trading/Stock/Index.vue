@@ -416,7 +416,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "X";
                 params.tools.target[point].applyOptions({
-                    price: +(a - 0.5 * ba).toFixed(1),
+                    price: +(a - 0.5 * ba).toFixed(2),
                     title: ((100 * -0.5 * ba) / a).toFixed(1) + "%",
                 });
                 param.points.push(point);
@@ -424,7 +424,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "Y";
                 params.tools.target[point].applyOptions({
-                    price: +(a - ba).toFixed(1),
+                    price: +(a - ba).toFixed(2),
                     title: ((100 * -ba) / a).toFixed(1) + "%",
                 });
                 param.points.push(point);
@@ -432,7 +432,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "Z";
                 params.tools.target[point].applyOptions({
-                    price: +(a - 2 * ba).toFixed(1),
+                    price: +(a - 2 * ba).toFixed(2),
                     title: ((100 * -2 * ba) / a).toFixed(1) + "%",
                 });
                 param.points.push(point);
@@ -684,7 +684,7 @@ function drawTargetTool() {
         param.data.push(mf.cloneDeep(option));
         //
         option.point = "X";
-        option.price = +(a - 0.5 * ba).toFixed(1);
+        option.price = +(a - 0.5 * ba).toFixed(2);
         option.title = ((100 * -0.5 * ba) / a).toFixed(1) + "%";
         option.color = "#2196F3";
         params.tools.target[option.point] =
@@ -693,7 +693,7 @@ function drawTargetTool() {
         param.data.push(mf.cloneDeep(option));
         //
         option.point = "Y";
-        option.price = +(a - ba).toFixed(1);
+        option.price = +(a - ba).toFixed(2);
         option.title = ((100 * -ba) / a).toFixed(1) + "%";
         option.color = "#673AB7";
         params.tools.target[option.point] =
@@ -702,7 +702,7 @@ function drawTargetTool() {
         param.data.push(mf.cloneDeep(option));
         //
         option.point = "Z";
-        option.price = +(a - 2 * ba).toFixed(1);
+        option.price = +(a - 2 * ba).toFixed(2);
         option.title = ((100 * -2 * ba) / a).toFixed(1) + "%";
         option.color = "#673AB7";
         params.tools.target[option.point] =
@@ -848,7 +848,7 @@ function findUplps(startTime, endTime) {
             p3 = price;
             dP = 0;
         } else if (price < p3) {
-            const _dP = +(p3 - price).toFixed(1);
+            const _dP = +(p3 - price).toFixed(2);
             if (_dP > dP) dP = _dP;
         }
         if (price < p1 && dpMax > 0) break;
@@ -861,7 +861,7 @@ function findUplps(startTime, endTime) {
             c3 = cash;
             dC = 0;
         } else if (cash < c3) {
-            const _dC = +(c3 - cash).toFixed(1);
+            const _dC = +(c3 - cash).toFixed(2);
             if (_dC > dC) dC = _dC;
         }
     }
@@ -996,7 +996,7 @@ function findDownlps(startTime, endTime) {
             p3 = price;
             dP = 0;
         } else if (price > p3) {
-            const _dP = +(p3 - price).toFixed(1);
+            const _dP = +(p3 - price).toFixed(2);
             if (_dP < dP) dP = _dP;
         }
         if (price > p1 && dpMax < 0) break;
@@ -1009,13 +1009,13 @@ function findDownlps(startTime, endTime) {
             c3 = cash;
             dC = 0;
         } else if (cash > c3) {
-            const _dC = +(c3 - cash).toFixed(1);
+            const _dC = +(c3 - cash).toFixed(2);
             if (_dC < dC) dC = _dC;
         }
     }
     return {
-        price1: +(p2 - dpMax).toFixed(1),
-        price2: +(p3 - dpMax).toFixed(1),
+        price1: +(p2 - dpMax).toFixed(2),
+        price2: +(p3 - dpMax).toFixed(2),
         cash1: +(c2 - dcMax).toFixed(1),
         cash2: +(c3 - dcMax).toFixed(1),
     };
@@ -1080,7 +1080,7 @@ function coordinateToPrice(y, name = "price") {
 }
 function formatPrice(price) {
     if (!price) return 0;
-    return +(+price.toFixed(1));
+    return +(+price.toFixed(2));
 }
 function symbolChanged(e) {
     if (!state.symbol) return false;
