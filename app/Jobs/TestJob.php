@@ -40,6 +40,6 @@ class TestJob implements ShouldQueue
      */
     public function handle()
     {
-        StockSymbol::updateOrCreate(['name' => $this->key], ['symbols' => [date("Y/m/d H:i:s")]]);
+        StockSymbol::updateOrCreate(['name' => $this->key], ['symbols' => [date("Y-m-d H:i:s")]]);
     }
 }
