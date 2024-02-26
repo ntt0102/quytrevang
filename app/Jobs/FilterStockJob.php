@@ -41,6 +41,7 @@ class FilterStockJob implements ShouldQueue
      */
     public function handle()
     {
+        \Log::info('Begin filter');
         $r = [];
         $isCash = false;
         $isIndex = false;
@@ -52,7 +53,9 @@ class FilterStockJob implements ShouldQueue
         $endVni = end($vnindex)['value'];
         $stocks = StockSymbol::whereIn('name', ['hose', 'index'])->get();
         foreach ($stocks as $stock) {
+            \Log::info($stock->name . '-------------------');
             foreach ($stock->symbols as $symbol) {
+                \Log::info($symbol);
                 $this->payload->symbol = $symbol;
                 $data = $stockService->getData($this->payload);
                 $price = $data['price'];
@@ -72,5 +75,6 @@ class FilterStockJob implements ShouldQueue
             }
         }
         StockSymbol::updateOrCreate(['name' => $this->payload->type], ['symbols' => $r]);
+        \Log::info('End filter');
     }
 }

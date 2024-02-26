@@ -180,39 +180,39 @@ class StockService extends CoreService
     public function filterSymbols($payload)
     {
         TestJob::dispatch('web1');
-        // FilterStockJob::dispatch($payload);
-        // return ['isOk' => true];
-        $r = [];
-        $isCash = false;
-        $isIndex = false;
-        $isMix = false;
-        $payload->symbol = 'VNINDEX';
-        $vnindex = $this->getData($payload)['price'];
-        $strVni = current($vnindex)['value'];
-        $endVni = end($vnindex)['value'];
-        $stocks = StockSymbol::whereIn('name', ['hose', 'index'])->get();
-        foreach ($stocks as $stock) {
-            foreach ($stock->symbols as $symbol) {
-                $payload->symbol = $symbol;
-                $data = $this->getData($payload);
-                $price = $data['price'];
-                if (count($price) == 0) continue;
-                $strPr = current($price)['value'];
-                $endPr = end($price)['value'];
-                $cash = $data['cash'];
-                $strCh = current($cash)['value'];
-                $endCh = end($cash)['value'];
-                $isCash = $endPr < $strPr && $endCh > $strCh;
-                $isIndex = $endVni < $strVni && $endPr > $strPr;
-                $isMix = $endVni < $strVni && $endPr > $strPr && $endCh > $strCh;
-                if (($payload->type == 'fcash' && $isCash) ||
-                    ($payload->type == 'findex' && $isIndex) ||
-                    ($payload->type == 'fmix' && $isMix)
-                ) $r[] = $symbol;
-            }
-        }
-        $stt = StockSymbol::updateOrCreate(['name' => $payload->type], ['symbols' => $r]);
-        return ['isOk' => !!$stt];
+        FilterStockJob::dispatch($payload);
+        return ['isOk' => true];
+        // $r = [];
+        // $isCash = false;
+        // $isIndex = false;
+        // $isMix = false;
+        // $payload->symbol = 'VNINDEX';
+        // $vnindex = $this->getData($payload)['price'];
+        // $strVni = current($vnindex)['value'];
+        // $endVni = end($vnindex)['value'];
+        // $stocks = StockSymbol::whereIn('name', ['hose', 'index'])->get();
+        // foreach ($stocks as $stock) {
+        //     foreach ($stock->symbols as $symbol) {
+        //         $payload->symbol = $symbol;
+        //         $data = $this->getData($payload);
+        //         $price = $data['price'];
+        //         if (count($price) == 0) continue;
+        //         $strPr = current($price)['value'];
+        //         $endPr = end($price)['value'];
+        //         $cash = $data['cash'];
+        //         $strCh = current($cash)['value'];
+        //         $endCh = end($cash)['value'];
+        //         $isCash = $endPr < $strPr && $endCh > $strCh;
+        //         $isIndex = $endVni < $strVni && $endPr > $strPr;
+        //         $isMix = $endVni < $strVni && $endPr > $strPr && $endCh > $strCh;
+        //         if (($payload->type == 'fcash' && $isCash) ||
+        //             ($payload->type == 'findex' && $isIndex) ||
+        //             ($payload->type == 'fmix' && $isMix)
+        //         ) $r[] = $symbol;
+        //     }
+        // }
+        // $stt = StockSymbol::updateOrCreate(['name' => $payload->type], ['symbols' => $r]);
+        // return ['isOk' => !!$stt];
     }
 
     /**
