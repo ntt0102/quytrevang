@@ -10,6 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\StockSymbol;
 use App\Services\Trading\StockService;
+use App\Events\FilterStockEvent;
 
 class FilterStockJob implements ShouldQueue
 {
@@ -69,6 +70,7 @@ class FilterStockJob implements ShouldQueue
             }
         }
         StockSymbol::updateOrCreate(['name' => $this->payload->type], ['symbols' => $r]);
+        event(new FilterStockEvent());
         // \Log::info('End filter');
     }
 }

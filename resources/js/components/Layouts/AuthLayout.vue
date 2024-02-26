@@ -202,7 +202,7 @@ function initPushNotification() {
     //         ID: 12345,
     //     },
     // });
-    axios.get("/user?ID=12345");
+    // axios.get("/user?ID=12345");
 }
 function connectPusher() {
     pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
@@ -224,13 +224,13 @@ function connectPusher() {
                     let notify = ["notification"];
                     switch (e.event) {
                         case "registered-user":
-                            if (route.name == "users")
+                            if (route.name == "admin-user")
                                 store.dispatch("adminUser/getUsers");
                             break;
 
                         case "confirming-user":
                             notify.push("adminUser");
-                            if (route.name == "users")
+                            if (route.name == "admin-user")
                                 store.dispatch("adminUser/getUsers");
                             break;
 
@@ -242,7 +242,7 @@ function connectPusher() {
                         case "paying-contract":
                         case "withdrawing-contract":
                             notify.push("adminContract");
-                            if (route.name == "contracts")
+                            if (route.name == "admin-contract")
                                 store.dispatch("adminContract/getContracts");
                             break;
 
@@ -258,7 +258,7 @@ function connectPusher() {
 
                         case "sent-comment":
                             notify.push("adminComment");
-                            if (route.name == "comments")
+                            if (route.name == "admin-comment")
                                 store.dispatch("adminComment/getComments");
                             break;
                     }
@@ -275,7 +275,7 @@ function connectPusher() {
         pusher.subscribe("private-admin-user").bind("update-user", () => {
             setTimeout(() => {
                 store.dispatch("getNotify", ["adminUser"]);
-                if (route.name == "users")
+                if (route.name == "admin-user")
                     store.dispatch("adminUser/getUsers"), 2000;
             });
         });
@@ -286,7 +286,7 @@ function connectPusher() {
             .bind("update-contract", () => {
                 setTimeout(() => {
                     store.dispatch("getNotify", ["adminContract"]);
-                    if (route.name == "contracts")
+                    if (route.name == "admin-contract")
                         store.dispatch("adminContract/getContracts"), 2000;
                 });
             });
@@ -295,7 +295,7 @@ function connectPusher() {
         pusher.subscribe("private-admin-comment").bind("update-comment", () => {
             setTimeout(() => {
                 store.dispatch("getNotify", ["adminComment"]);
-                if (route.name == "comments")
+                if (route.name == "admin-comment")
                     store.dispatch("adminComment/getComments"), 2000;
             });
         });
@@ -305,7 +305,7 @@ function connectPusher() {
             .subscribe("private-trading-statistic")
             .bind("update-statistic", () => {
                 setTimeout(() => {
-                    if (route.name == "trades") {
+                    if (route.name == "trading-statistic") {
                         store.dispatch("tradingStatistic/getData");
                         store.dispatch(
                             "tradingStatistic/getChart",
@@ -315,6 +315,16 @@ function connectPusher() {
                         store.dispatch("tradingStatistic/getSummary");
                 }, 2000);
             });
+    }
+    if (user.value.permissions.includes("trades@edit")) {
+        pusher.subscribe("private-trading-stock").bind("filter-stock", () => {
+            setTimeout(() => {
+                if (route.name == "trading-stock") {
+                    store.dispatch("tradingStock/getSymbols");
+                    toast.info(t("trading.stock.symbolFiltered"));
+                }
+            }, 2000);
+        });
     }
     if (user.value.permissions.includes("finbooks@control")) {
         pusher

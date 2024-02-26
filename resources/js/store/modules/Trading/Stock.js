@@ -54,7 +54,6 @@ const actions = {
             if (!param.from) param.from = FROM_DATE;
             if (!param.to) param.to = TO_DATE;
             axios.post("trading/stock/filter", param).then((response) => {
-                dispatch("getSymbols");
                 resolve(response.data);
             });
         });

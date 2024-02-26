@@ -31,6 +31,9 @@ Broadcast::channel('admin-comment', function ($user) {
 Broadcast::channel('trading-statistic', function ($user) {
     return $user->hasAnyPermission(['trades@view', 'trades@edit']);
 });
+Broadcast::channel('trading-stock', function ($user) {
+    return $user->can('trades@edit');
+});
 Broadcast::channel('trading-finbook', function ($user) {
     return $user->can('finbooks@control');
 });
