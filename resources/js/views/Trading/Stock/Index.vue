@@ -927,7 +927,7 @@ function drawDownlpsTool() {
     let param = {
         isRemove: false,
         symbol: state.symbol,
-        name: "uplps",
+        name: "downlps",
         points: [],
         data: [],
     };
