@@ -67,6 +67,7 @@
                         @valueChanged="symbolChanged"
                     />
                     <div
+                        v-show="!!state.symbol"
                         ref="addWatchlistToolRef"
                         :class="`command far fa-${
                             inWatchlist ? 'minus-circle' : 'plus-circle'
@@ -491,6 +492,7 @@ function eventFullscreenChange() {
     }
 }
 function addWatchlist() {
+    if (!state.symbol) return false;
     const param = {
         symbol: state.symbol,
         add: !inWatchlist.value,
