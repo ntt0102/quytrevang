@@ -150,13 +150,25 @@ class StockService extends CoreService
      */
     public function cloneSymbols()
     {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/hose";
-        $res = $client->get($url);
-        $hose = json_decode($res->getBody());
-        $index = ['VNINDEX', 'VN30', '^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
-        $stt = StockSymbol::updateOrCreate(['name' => 'hose'], ['symbols' => array_merge($index, $hose)]);
-        return ['isOk' => !!$stt];
+        return $this->transaction(function () {
+            $client = new \GuzzleHttp\Client();
+            $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/hose";
+            $res = $client->get($url);
+            $hose = json_decode($res->getBody());
+            $index = ['VNINDEX', 'VN30', '^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
+            $nh = ['VCB', 'BID', 'CTG', 'VPB', 'MBB', 'ACB', 'STB', 'HDB', 'VIB', 'SSB', 'SHB', 'MSB', 'TPB', 'LPB', 'EIB', 'OCB'];
+            $ck = ['SSI', 'VND', 'VCI', 'SHS', 'HCM', 'VIX', 'MBS', 'FTS', 'BSI', 'CTS', 'VDS'];
+            $list = [
+                (object)['name' => 'hose', 'symbols' => array_merge($index, $hose)],
+                (object)['name' => 'nh', 'symbols' => $nh],
+                (object)['name' => 'ck', 'symbols' => $ck],
+            ];
+            $stt = true;
+            foreach ($list as $item) {
+                $stt &= !!StockSymbol::updateOrCreate(['name' => $item->name], ['symbols' => $item->symbols]);
+            }
+            return ['isOk' => $stt];
+        });
     }
 
     /**

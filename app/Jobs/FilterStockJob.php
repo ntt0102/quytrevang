@@ -50,7 +50,7 @@ class FilterStockJob implements ShouldQueue
         $vnindex = $stockService->getData($this->payload)['price'];
         $strVni = current($vnindex)['value'];
         $endVni = end($vnindex)['value'];
-        $stocks = StockSymbol::whereIn('name', ['hose'])->get();
+        $stocks = StockSymbol::where('name', $this->payload->name)->get();
         foreach ($stocks as $stock) {
             foreach ($stock->symbols as $symbol) {
                 $this->payload->symbol = $symbol;

@@ -7,11 +7,11 @@
                     widget: 'dxSelectBox',
                     options: {
                         width: '130px',
-                        dataSource: state.symbolsKinds,
+                        dataSource: state.symbolKinds,
                         keyExpr: 'value',
                         displayExpr: 'text',
-                        value: state.symbolsKind,
-                        hint: $t('trading.stock.symbolsKind'),
+                        value: state.symbolKind,
+                        hint: $t('trading.stock.symbolKind'),
                         onValueChanged: listChanged,
                     },
                 },
@@ -57,7 +57,7 @@
                         height="30px"
                         :data-source="
                             $store.state.tradingStock.symbols[
-                                state.symbolsKind.value
+                                state.symbolKind.value
                             ]
                         "
                         :search-enabled="true"
@@ -253,9 +253,11 @@ let params = {
 const state = reactive({
     symbol: "VNINDEX",
     symbols: [],
-    symbolsKind: null,
-    symbolsKinds: [
+    symbolKind: null,
+    symbolKinds: [
         { text: t("trading.stock.hoseList"), value: "hose" },
+        { text: t("trading.stock.nhList"), value: "nh" },
+        { text: t("trading.stock.ckList"), value: "ck" },
         { text: t("trading.stock.filterCash"), value: "fcash" },
         { text: t("trading.stock.filterIndex"), value: "findex" },
         { text: t("trading.stock.filterMix"), value: "fmix" },
@@ -266,7 +268,7 @@ const state = reactive({
     showColorPicker: false,
     showTradingView: false,
 });
-state.symbolsKind = state.symbolsKinds[0];
+state.symbolKind = state.symbolKinds[0];
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
@@ -1087,13 +1089,14 @@ function symbolChanged(e) {
     store.dispatch("tradingStock/getChartData", state.symbol);
 }
 function listChanged(e) {
-    state.symbolsKind = e.value;
+    state.symbolKind = e.value;
 }
 function filterSymbols() {
     if (params.tools.range.length == 2) {
         const param = {
             from: params.tools.range[0].time,
             to: params.tools.range[1].time,
+            name: state.symbolKind.value,
         };
         store.dispatch("tradingStock/filterSymbols", param);
     } else toast.error(t("trading.stock.rangeWarning"));
