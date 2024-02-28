@@ -111,13 +111,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 });
             });
             Route::group(['namespace' => 'Trading', 'prefix' => 'trading'], function () {
-                Route::group(['prefix' => 'statistic', 'middleware' => 'can:trades@view'], function () {
-                    Route::post('/', 'TradeController@fetch');
-                    Route::post('validate-duplicate-date', 'TradeController@validateDuplicateDate');
-                    Route::post('chart', 'TradeController@getChart');
-                    Route::post('summary', 'TradeController@getSummary');
-                    Route::post('save', 'TradeController@save')->middleware('can:trades@edit');
-                });
                 Route::group(['prefix' => 'order', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'OrderChartController@getChartData');
                     Route::post('get-config', 'OrderChartController@getConfig');
@@ -138,6 +131,20 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('add-watchlist', 'StockController@addWatchlist');
                     Route::post('delete-watchlist', 'StockController@deleteWatchlist');
                     Route::post('draw-tools', 'StockController@drawTools');
+                });
+                Route::group(['prefix' => 'statistic', 'middleware' => 'can:trades@view'], function () {
+                    Route::post('/', 'StatisticController@getData');
+                    Route::post('validate-duplicate-date', 'StatisticController@validateDuplicateDate');
+                    Route::post('chart', 'StatisticController@getChart');
+                    Route::post('summary', 'StatisticController@getSummary');
+                    Route::post('save', 'StatisticController@save')->middleware('can:trades@edit');
+                });
+                Route::group(['prefix' => 'statistic1', 'middleware' => 'can:trades@view'], function () {
+                    Route::post('/', 'TradeController@fetch');
+                    Route::post('validate-duplicate-date', 'TradeController@validateDuplicateDate');
+                    Route::post('chart', 'TradeController@getChart');
+                    Route::post('summary', 'TradeController@getSummary');
+                    Route::post('save', 'TradeController@save')->middleware('can:trades@edit');
                 });
                 Route::group(['prefix' => 'finbook', 'middleware' => 'can:finbooks@control'], function () {
                     Route::post('/', 'FinbookController@fetch');

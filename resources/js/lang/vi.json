@@ -258,8 +258,25 @@
                 "filterModel": "Mô hình lọc"
             }
         },
-        "trades": {
+        "statistic": {
             "title": "Thống kê",
+            "symbol": "Mã",
+            "buy": "Mua",
+            "sell": "Bán",
+            "date": "Ngày",
+            "volume": "KL",
+            "price": "Giá",
+            "fee": "Phí",
+            "validations": {
+                "sellDate": "Ngày bán phải sau ngày mua",
+                "array": "Phải chứa trong cặp dấu [ ]"
+            },
+            "buttons": {
+                "addData": "Dữ liệu"
+            }
+        },
+        "trades": {
+            "title": "Thống kê *",
             "amount": "Số HĐ",
             "scores": "Điểm TT",
             "revenue": "Lãi",
@@ -744,6 +761,7 @@
         "tradingOrder": "dat-lenh-dau-tu",
         "tradingStock": "chung-khoan-dau-tu",
         "tradingStatistic": "thong-ke-dau-tu",
+        "tradingStatistic1": "thong-ke-dau-tu1",
         "tradingFinbook": "so-tai-chinh",
         "settingCommand": "cai-dat-lenh",
         "settingNotification": "cai-dat-thong-bao",

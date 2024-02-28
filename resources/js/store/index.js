@@ -18,9 +18,10 @@ import adminContract from "./modules/Admin/Contract";
 import adminCopyist from "./modules/Admin/Copyist";
 import adminComment from "./modules/Admin/Comment";
 // Trading
-import tradingStatistic from "./modules/Trading/Statistic";
 import tradingOrder from "./modules/Trading/Order";
 import tradingStock from "./modules/Trading/Stock";
+import tradingStatistic from "./modules/Trading/Statistic";
+import tradingStatistic1 from "./modules/Trading/Statistic1";
 import tradingFinbook from "./modules/Trading/Finbook";
 // Setting
 import setting from "./modules/Setting/Index";
@@ -48,9 +49,10 @@ export default createStore({
         adminCopyist,
         adminComment,
         // Trading
-        tradingStatistic,
         tradingOrder,
         tradingStock,
+        tradingStatistic,
+        tradingStatistic1,
         tradingFinbook,
         // Setting
         setting,

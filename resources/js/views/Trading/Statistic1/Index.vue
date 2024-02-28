@@ -21,7 +21,7 @@
                         hint: $t('trading.trades.buttons.more'),
                         elementAttr: { 'data-page': charts.page },
                         onClick: () =>
-                            $store.dispatch('tradingStatistic/lazyLoad'),
+                            $store.dispatch('tradingStatistic1/lazyLoad'),
                     },
                 },
                 {
@@ -29,7 +29,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-database small',
-                        hint: $t('trading.statistic.buttons.addData'),
+                        hint: $t('trading.trades.buttons.addData'),
                         onClick: () => $refs.trackStatisticPopupRef.show(),
                     },
                 },
@@ -302,7 +302,7 @@ const chartRef = ref(null);
 const charts = computed(() => store.state.tradingStatistic.charts);
 const permissions = computed(() => store.state.auth.user.permissions);
 
-store.dispatch("tradingStatistic/getChart", route.query.period ?? "day");
+store.dispatch("tradingStatistic1/getChart", route.query.period ?? "day");
 bus.on("toggleMenu", () => {
     setTimeout(() => chartRef.value.instance.render(), 300);
 });

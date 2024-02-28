@@ -19,14 +19,30 @@ function createAccumulatedProfit(data) {
 const getters = {};
 
 const actions = {
-    getData({ commit, dispatch, getters, state, rootGetters }, param) {
+    validateDuplicateDate({ state }, param) {
+        const oldDate = state.data.find((x) => x.id === param.data.id);
+        if (oldDate != undefined) {
+            if (param.value == oldDate.date) return Promise.resolve(true);
+        }
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/statistic", null, { noLoading: true })
+                .post(
+                    "trading/statistic1/validate-duplicate-date",
+                    { date: param.value },
+                    { nonLoading: true }
+                )
                 .then((response) => {
-                    commit("setData", response.data);
-                    resolve();
+                    // console.log(response);
+                    resolve(response.data);
                 });
+        });
+    },
+    getData({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios.post("trading/statistic1", null).then((response) => {
+                commit("setData", response.data);
+                resolve();
+            });
         });
     },
     getChart({ commit, dispatch, getters, state, rootGetters }, period) {
@@ -34,7 +50,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "trading/statistic/chart",
+                    "trading/statistic1/chart",
                     { period: period, page: 1 },
                     { noLoading: true }
                 )
@@ -51,7 +67,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "trading/statistic/chart",
+                    "trading/statistic1/chart",
                     {
                         period: state.charts.period,
                         page: state.charts.page + 1,
@@ -74,17 +90,17 @@ const actions = {
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/statistic/save", { changes: param.changes })
+                .post("trading/statistic1/save", { changes: param.changes })
                 .then((response) => {
                     resolve();
                     dispatch("getData");
-                    // dispatch("getChart", state.charts.period);
+                    dispatch("getChart", state.charts.period);
                 });
         });
     },
     getSummary({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios.post("trading/statistic/summary", null).then((response) => {
+            axios.post("trading/statistic1/summary", null).then((response) => {
                 commit("setSummary", response.data);
                 resolve();
             });

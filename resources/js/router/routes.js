@@ -196,10 +196,21 @@ const authRoute = [
         meta: {
             auth: true,
             permission: "stock@order",
-            title: lang.global.t("trading.trades.title"),
+            title: lang.global.t("trading.statistic.title"),
             layout: AuthLayout,
         },
         component: loadView("Trading", "Statistic", "Index"),
+    },
+    {
+        path: `/${lang.global.t("route.tradingStatistic1")}`,
+        name: "trading-statistic1",
+        meta: {
+            auth: true,
+            permission: "stock@order",
+            title: lang.global.t("trading.trades.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Trading", "Statistic1", "Index"),
     },
     {
         path: `/${lang.global.t("route.tradingFinbook")}`,

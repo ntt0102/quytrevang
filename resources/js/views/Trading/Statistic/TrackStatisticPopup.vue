@@ -1,7 +1,7 @@
 <template>
     <CorePopup
         ref="popupRef"
-        :title="$t('trading.trades.buttons.addData')"
+        :title="$t('trading.statistic.buttons.addData')"
         @shown="onShown"
         @hidden="onHidden"
     >
@@ -41,68 +41,85 @@
                     :caption="$t(`titles.commandHeaderTitleShort`)"
                 />
                 <DxColumn
-                    data-field="date"
-                    data-type="date"
-                    :editor-options="{
-                        dateSerializationFormat: $mc.DX_SERVER_DATE_FORMAT,
-                        showClearButton: 'true',
-                        useMaskBehavior: 'true',
-                        applyValueMode: 'useButtons',
-                    }"
-                    :caption="$t('trading.trades.date')"
-                    :validation-rules="state.validationRules.date"
+                    data-field="symbol"
+                    data-type="string"
+                    :width="80"
+                    :caption="$t('trading.statistic.symbol')"
+                    :validation-rules="state.validationRules.symbol"
                 />
                 <DxColumn
-                    data-field="amount"
-                    data-type="number"
-                    :width="100"
-                    :caption="$t('trading.trades.amount')"
-                    :validation-rules="state.validationRules.amount"
-                />
+                    alignment="center"
+                    :caption="$t('trading.statistic.buy')"
+                >
+                    <DxColumn
+                        data-field="buy_date"
+                        data-type="date"
+                        :width="110"
+                        :editor-options="{
+                            dateSerializationFormat: $mc.DX_SERVER_DATE_FORMAT,
+                            showClearButton: 'true',
+                            useMaskBehavior: 'true',
+                            applyValueMode: 'useButtons',
+                        }"
+                        :caption="$t('trading.statistic.date')"
+                        :validation-rules="state.validationRules.buyDate"
+                    />
+                    <DxColumn
+                        data-field="buy_volume"
+                        data-type="string"
+                        :caption="$t('trading.statistic.volume')"
+                        :validation-rules="state.validationRules.buyVolume"
+                    />
+                    <DxColumn
+                        data-field="buy_price"
+                        data-type="string"
+                        :caption="$t('trading.statistic.price')"
+                        :validation-rules="state.validationRules.buyPrice"
+                    />
+                    <DxColumn
+                        data-field="buy_fee"
+                        data-type="string"
+                        :caption="$t('trading.statistic.fee')"
+                        :validation-rules="state.validationRules.buyFee"
+                    />
+                </DxColumn>
                 <DxColumn
-                    data-field="scores"
-                    data-type="number"
-                    format="#0.#"
-                    :editor-options="{
-                        step: '0.1',
-                        format: '#0.#',
-                    }"
-                    :caption="$t('trading.trades.scores')"
-                    :validation-rules="state.validationRules.scores"
-                />
-                <DxColumn
-                    data-field="revenue"
-                    data-type="number"
-                    format="#,##0"
-                    :editor-options="{
-                        step: '1',
-                        format: '#,##0',
-                    }"
-                    :caption="$t('trading.trades.revenue')"
-                    :validation-rules="state.validationRules.revenue"
-                />
-                <DxColumn
-                    data-field="loss"
-                    data-type="number"
-                    format="#,##0"
-                    :editor-options="{
-                        step: '1',
-                        format: '#,##0',
-                    }"
-                    :caption="$t('trading.trades.loss')"
-                    :validation-rules="state.validationRules.loss"
-                />
-                <DxColumn
-                    data-field="fees"
-                    data-type="number"
-                    format="#,##0"
-                    :editor-options="{
-                        step: '1',
-                        format: '#,##0',
-                    }"
-                    :caption="$t('trading.trades.fees')"
-                    :validation-rules="state.validationRules.fees"
-                />
+                    alignment="center"
+                    :caption="$t('trading.statistic.sell')"
+                >
+                    <DxColumn
+                        data-field="sell_date"
+                        data-type="date"
+                        :width="110"
+                        :editor-options="{
+                            dateSerializationFormat: $mc.DX_SERVER_DATE_FORMAT,
+                            showClearButton: 'true',
+                            useMaskBehavior: 'true',
+                            applyValueMode: 'useButtons',
+                        }"
+                        :caption="$t('trading.statistic.date')"
+                        :validation-rules="state.validationRules.sellDate"
+                    />
+                    <DxColumn
+                        data-field="sell_volume"
+                        data-type="string"
+                        :caption="$t('trading.statistic.volume')"
+                        :validation-rules="state.validationRules.sellVolume"
+                    />
+                    <DxColumn
+                        data-field="sell_price"
+                        data-type="string"
+                        :caption="$t('trading.statistic.price')"
+                        :validation-rules="state.validationRules.sellPrice"
+                    />
+                    <DxColumn
+                        data-field="sell_fee"
+                        data-type="string"
+                        :caption="$t('trading.statistic.fee')"
+                        :validation-rules="state.validationRules.sellFee"
+                    />
+                </DxColumn>
+
                 <template #commandCellTemplate="{ data }">
                     <DxToolbar
                         :items="[
@@ -148,46 +165,79 @@ const state = reactive({
     gridData: null,
     editPermission: "trades@edit",
     validationRules: {
-        amount: [
+        symbol: [
             {
                 type: "required",
-                message: t("trading.trades.amount") + mt.validations.required,
+                message:
+                    t("trading.statistic.symbol") + mt.validations.required,
             },
         ],
-        scores: [
+        buyDate: [
             {
                 type: "required",
-                message: t("trading.trades.scores") + mt.validations.required,
+                message: t("trading.statistic.date") + mt.validations.required,
             },
         ],
-        revenue: [
+        buyVolume: [
             {
                 type: "required",
-                message: t("trading.trades.revenue") + mt.validations.required,
+                message:
+                    t("trading.statistic.volume") + mt.validations.required,
+            },
+            {
+                type: "custom",
+                validationCallback: validateArray,
+                message: t("trading.statistic.validations.array"),
             },
         ],
-        loss: [
+        buyPrice: [
             {
                 type: "required",
-                message: t("trading.trades.loss") + mt.validations.required,
+                message: t("trading.statistic.price") + mt.validations.required,
+            },
+            {
+                type: "custom",
+                validationCallback: validateArray,
+                message: t("trading.statistic.validations.array"),
             },
         ],
-        fees: [
+        buyFee: [
             {
                 type: "required",
-                message: t("trading.trades.fees") + mt.validations.required,
+                message: t("trading.statistic.fee") + mt.validations.required,
+            },
+            {
+                type: "custom",
+                validationCallback: validateArray,
+                message: t("trading.statistic.validations.array"),
             },
         ],
-        date: [
+        sellDate: [
             {
-                type: "required",
-                message: t("trading.trades.date") + mt.validations.required,
+                type: "custom",
+                validationCallback: validateSellDate,
+                message: t("trading.statistic.validations.sellDate"),
             },
+        ],
+        sellVolume: [
             {
-                type: "async",
-                validationCallback: (e) =>
-                    store.dispatch("tradingStatistic/validateDuplicateDate", e),
-                message: t("trading.trades.validations.date"),
+                type: "custom",
+                validationCallback: validateArray,
+                message: t("trading.statistic.validations.array"),
+            },
+        ],
+        sellPrice: [
+            {
+                type: "custom",
+                validationCallback: validateArray,
+                message: t("trading.statistic.validations.array"),
+            },
+        ],
+        sellFee: [
+            {
+                type: "custom",
+                validationCallback: validateArray,
+                message: t("trading.statistic.validations.array"),
             },
         ],
     },
@@ -209,6 +259,14 @@ function onSave(formData) {
     bus.emit("checkPin", () =>
         store.dispatch("tradingStatistic/save", formData)
     );
+}
+function validateSellDate(e) {
+    if (!e.value) return true;
+    return moment(e.value).isAfter(moment(e.data.buy_date));
+}
+function validateArray(e) {
+    const regex = /^\[.*\]$/;
+    return regex.test(e.value);
 }
 function onShown() {
     store.dispatch("tradingStatistic/getData");

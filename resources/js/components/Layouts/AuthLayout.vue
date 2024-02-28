@@ -302,17 +302,17 @@ function connectPusher() {
     }
     if (user.value.permissions.includes("trades@view")) {
         pusher
-            .subscribe("private-trading-statistic")
-            .bind("update-statistic", () => {
+            .subscribe("private-trading-statistic1")
+            .bind("update-statistic1", () => {
                 setTimeout(() => {
-                    if (route.name == "trading-statistic") {
-                        store.dispatch("tradingStatistic/getData");
+                    if (route.name == "trading-statistic1") {
+                        store.dispatch("tradingStatistic1/getData");
                         store.dispatch(
                             "tradingStatistic/getChart",
                             store.tradingStatistic.charts.period
                         );
                     } else if (route.name == "overview")
-                        store.dispatch("tradingStatistic/getSummary");
+                        store.dispatch("tradingStatistic1/getSummary");
                 }, 2000);
             });
     }

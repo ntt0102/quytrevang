@@ -139,7 +139,7 @@ let params = {
     doneFlag: false,
 };
 
-store.dispatch("tradingStatistic/getSummary");
+store.dispatch("tradingStatistic1/getSummary");
 
 watch(
     () => store.state.tradingStatistic.summary,
@@ -164,7 +164,7 @@ watch(
     }
 );
 function viewDetail(period) {
-    router.push({ name: "trading-statistic", query: { period } });
+    router.push({ name: "trading-statistic1", query: { period } });
 }
 function animatedNumber(type) {
     if (
