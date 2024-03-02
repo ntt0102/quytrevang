@@ -3,6 +3,7 @@ import numberVnFormat from "./numberVnFormat";
 import formatTime from "./formatTime";
 import formatDate from "./formatDate";
 import currency from "./currency";
+import shorten from "./shorten";
 import readCurrency from "./readCurrency";
 import phone from "./phone";
 import atmNumber from "./atmNumber";
@@ -16,6 +17,7 @@ export default {
             formatTime,
             formatDate,
             currency,
+            shorten,
             readCurrency,
             phone,
             atmNumber,

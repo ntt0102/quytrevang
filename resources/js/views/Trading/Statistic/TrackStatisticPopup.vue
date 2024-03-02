@@ -29,6 +29,7 @@
                 @contentReady="
                     $mf.dataGridPreload(state.gridData, dataGridRef.instance)
                 "
+                @init-new-row="onInitNewRow"
                 @saved="onSave"
             >
                 <DxColumn
@@ -158,6 +159,7 @@ const store = useStore();
 const { t } = useI18n();
 const bus = inject("bus");
 const mt = inject("mt");
+const mc = inject("mc");
 const mf = inject("mf");
 const popupRef = ref(null);
 const dataGridRef = ref(null);
@@ -259,6 +261,15 @@ function onSave(formData) {
     bus.emit("checkPin", () =>
         store.dispatch("tradingStatistic/save", formData)
     );
+}
+function onInitNewRow(e) {
+    e.data.buy_date = moment().format(mc.SERVER_DATE_FORMAT);
+    e.data.buy_volume = "[]";
+    e.data.buy_price = "[]";
+    e.data.buy_fee = "[]";
+    e.data.sell_volume = "[]";
+    e.data.sell_price = "[]";
+    e.data.sell_fee = "[]";
 }
 function validateSellDate(e) {
     if (!e.value) return true;

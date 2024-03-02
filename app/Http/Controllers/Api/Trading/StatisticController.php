@@ -30,19 +30,6 @@ class StatisticController extends CoreController
     }
 
     /**
-     * Get the chart
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function getChart(Request $request)
-    {
-        $data = $this->statisticService->getChart($this->payload);
-        return $this->sendResponse($data);
-    }
-
-    /**
      * Get the summary
      *
      * @param \Illuminate\Http\Request $request
@@ -52,6 +39,19 @@ class StatisticController extends CoreController
     public function getSummary(Request $request)
     {
         $data = $this->statisticService->getSummary($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Get the chart
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getChart(Request $request)
+    {
+        $data = $this->statisticService->getChart($this->payload);
         return $this->sendResponse($data);
     }
 

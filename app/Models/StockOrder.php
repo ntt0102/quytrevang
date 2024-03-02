@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Models\CoreModel;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class StockOrder extends CoreModel
 {
@@ -51,4 +53,21 @@ class StockOrder extends CoreModel
         // 'sell_price' => 'array',
         // 'sell_fee' => 'array',
     ];
+
+    public function scopeClosed(Builder $query): void
+    {
+        $query->whereRaw('CHECK_CLOSED(buy_volume, sell_volume)');
+    }
+
+    public function scopeOpening(Builder $query): void
+    {
+        $query->whereRaw('NOT CHECK_CLOSED(buy_volume, sell_volume)');
+    }
+
+    public static function getWinRate($date)
+    {
+        $expression = DB::raw("CALL WIN_RATE('{$date}')");
+        $string = $expression->getValue(DB::connection()->getQueryGrammar());
+        return DB::select($string)[0];
+    }
 }

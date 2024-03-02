@@ -273,6 +273,17 @@
             },
             "buttons": {
                 "addData": "Dữ liệu"
+            },
+            "summary": {
+                "title": "Tổng kết",
+                "rr": "RR",
+                "winrate": "WR",
+                "profit": "LN",
+                "period": {
+                    "quarter": "Quý",
+                    "year": "Năm",
+                    "all": "Tất cả"
+                }
             }
         },
         "trades": {

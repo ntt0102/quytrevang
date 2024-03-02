@@ -176,6 +176,8 @@ Route::get('test', function () {
     // $res = $client->get($url);
     // $rsp = json_decode($res->getBody());
     // dd($rsp);
-    \Log::info('Hello world!!');
+    // \Log::info('Hello world!!');
+    $s = \App\Models\StockOrder::getWinRate('2020-01-01');
+    dd($s);
     return 'ok';
 });

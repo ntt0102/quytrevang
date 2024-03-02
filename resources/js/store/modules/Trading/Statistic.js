@@ -29,6 +29,14 @@ const actions = {
                 });
         });
     },
+    getSummary({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios.post("trading/statistic/summary", null).then((response) => {
+                commit("setSummary", response.data);
+                resolve();
+            });
+        });
+    },
     getChart({ commit, dispatch, getters, state, rootGetters }, period) {
         // if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
@@ -80,14 +88,6 @@ const actions = {
                     dispatch("getData");
                     // dispatch("getChart", state.charts.period);
                 });
-        });
-    },
-    getSummary({ commit, dispatch, getters, state, rootGetters }, param) {
-        return new Promise((resolve, reject) => {
-            axios.post("trading/statistic/summary", null).then((response) => {
-                commit("setSummary", response.data);
-                resolve();
-            });
         });
     },
     resetState({ commit }) {
