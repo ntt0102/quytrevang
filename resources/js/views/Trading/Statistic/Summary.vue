@@ -31,14 +31,16 @@
                         >&nbsp;
                         <span
                             :class="`quality ${
-                                summary.quarter.rr == null ||
+                                (summary.quarter.rr == null &&
+                                    summary.quarter.winrate == 100) ||
                                 summary.quarter.rr >= 1
                                     ? 'good'
                                     : 'bad'
                             }`"
                         >
                             {{
-                                summary.quarter.rr == null
+                                summary.quarter.rr == null &&
+                                summary.quarter.winrate == 100
                                     ? "+∞"
                                     : $filters.numberVnFormat(
                                           summary.quarter.rr,
@@ -89,13 +91,16 @@
                         >&nbsp;
                         <span
                             :class="`quality ${
-                                summary.year.rr == null || summary.year.rr >= 1
+                                (summary.year.rr == null &&
+                                    summary.year.winrate == 100) ||
+                                summary.year.rr >= 1
                                     ? 'good'
                                     : 'bad'
                             }`"
                         >
                             {{
-                                summary.year.rr == null
+                                summary.year.rr == null &&
+                                summary.year.winrate == 100
                                     ? "+∞"
                                     : $filters.numberVnFormat(
                                           summary.year.rr,
@@ -143,13 +148,16 @@
                         >&nbsp;
                         <span
                             :class="`quality ${
-                                summary.all.rr == null || summary.all.rr >= 1
+                                (summary.all.rr == null &&
+                                    summary.all.winrate == 100) ||
+                                summary.all.rr >= 1
                                     ? 'good'
                                     : 'bad'
                             }`"
                         >
                             {{
-                                summary.all.rr == null
+                                summary.all.rr == null &&
+                                summary.all.winrate == 100
                                     ? "+∞"
                                     : $filters.numberVnFormat(
                                           summary.all.rr,
