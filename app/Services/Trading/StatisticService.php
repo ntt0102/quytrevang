@@ -34,10 +34,6 @@ class StatisticService extends CoreService
             'quarter' => StockOrder::getWinRate($firstDayQuarter),
             'year' => StockOrder::getWinRate($firstDayYear),
             'all' => StockOrder::getWinRate($firstDayAll),
-            'n1' => $firstDayQuarter,
-            'n2' => $firstDayYear,
-            'n3' => $firstDayAll
-
         ];
     }
 
