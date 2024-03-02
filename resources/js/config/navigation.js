@@ -20,13 +20,13 @@ export default [
         permissions: ["common@access"],
         level: 5,
     },
-    {
-        text: lang.global.t("user.copyist.title"),
-        name: "copyist",
-        icon: "far fa-bring-forward",
-        permissions: ["common@access"],
-        level: 5,
-    },
+    // {
+    //     text: lang.global.t("user.copyist.title"),
+    //     name: "copyist",
+    //     icon: "far fa-bring-forward",
+    //     permissions: ["common@access"],
+    //     level: 5,
+    // },
     {
         text: lang.global.t("admin.title"),
         name: "admin",
@@ -50,12 +50,12 @@ export default [
                 icon: "far fa-file-invoice-dollar",
                 permissions: ["contracts@control"],
             },
-            {
-                text: lang.global.t("admin.copyists.title"),
-                name: "admin-copyist",
-                icon: "far fa-copy",
-                permissions: ["copyists@control"],
-            },
+            // {
+            //     text: lang.global.t("admin.copyists.title"),
+            //     name: "admin-copyist",
+            //     icon: "far fa-copy",
+            //     permissions: ["copyists@control"],
+            // },
             {
                 text: lang.global.t("admin.comments.title"),
                 name: "admin-comment",
@@ -74,12 +74,12 @@ export default [
             "finbooks@control",
         ],
         items: [
-            {
-                text: lang.global.t("trading.orderChart.title"),
-                name: "trading-order",
-                icon: "far fa-gavel",
-                permissions: ["stock@order"],
-            },
+            // {
+            //     text: lang.global.t("trading.orderChart.title"),
+            //     name: "trading-order",
+            //     icon: "far fa-gavel",
+            //     permissions: ["stock@order"],
+            // },
             {
                 text: lang.global.t("trading.stock.title"),
                 name: "trading-stock",
@@ -92,12 +92,12 @@ export default [
                 icon: "far fa-analytics",
                 permissions: ["trades@view", "trades@edit"],
             },
-            {
-                text: lang.global.t("trading.trades.title"),
-                name: "trading-statistic1",
-                icon: "far fa-analytics",
-                permissions: ["trades@view", "trades@edit"],
-            },
+            // {
+            //     text: lang.global.t("trading.trades.title"),
+            //     name: "trading-statistic1",
+            //     icon: "far fa-analytics",
+            //     permissions: ["trades@view", "trades@edit"],
+            // },
             {
                 text: lang.global.t("trading.finbooks.title"),
                 name: "trading-finbook",
