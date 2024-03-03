@@ -19,10 +19,10 @@ return new class extends Migration
                 DECLARE buy INT DEFAULT 0;
                 DECLARE sell INT DEFAULT 0;
                 
-                SELECT SUM(volume) INTO buy 
+                SELECT IFNULL(SUM(volume), 0) INTO buy  
                 FROM json_table(buy_volume, '$[*]' columns (volume int path '$')) v;
 
-                SELECT SUM(volume) INTO sell 
+                SELECT IFNULL(SUM(volume), 0) INTO sell 
                 FROM json_table(sell_volume, '$[*]' columns (volume int path '$')) v;
                 
                 RETURN buy = sell;
