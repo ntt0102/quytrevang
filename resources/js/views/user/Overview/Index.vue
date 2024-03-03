@@ -1,8 +1,8 @@
 <template>
     <div class="overview-page">
-        <TradeSummary v-if="user.permissions.includes('trades@view')" />
+        <!-- <TradeSummary v-if="user.permissions.includes('trades@view')" /> -->
         <LevelBar v-if="user.level < 6" />
-        <MonthTrade v-if="user.level > 1" />
+        <!-- <MonthTrade v-if="user.level > 1" /> -->
         <Finbook v-if="user.permissions.includes('finbooks@control')" />
         <Summary v-if="user.permissions.includes('contracts@control')" />
         <Contracts v-if="user.level >= 6" />

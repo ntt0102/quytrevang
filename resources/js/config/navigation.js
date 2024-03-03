@@ -90,7 +90,7 @@ export default [
                 text: lang.global.t("trading.statistic.title"),
                 name: "trading-statistic",
                 icon: "far fa-analytics",
-                permissions: ["trades@view", "trades@edit"],
+                permissions: ["trades@edit"],
             },
             // {
             //     text: lang.global.t("trading.trades.title"),

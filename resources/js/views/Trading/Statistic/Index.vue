@@ -1,4 +1,5 @@
 <template>
+    <OpeningSummary :hasTitle="false" />
     <Summary :hasTitle="false" />
     <div class="trades-page content-block dx-card responsive-paddings">
         <DxToolbar
@@ -272,6 +273,7 @@
 </template>
 <script setup>
 import DxChart from "devextreme-vue/chart";
+import OpeningSummary from "./OpeningSummary.vue";
 import Summary from "./Summary.vue";
 import TrackStatisticPopup from "./TrackStatisticPopup.vue";
 import { ref, reactive, inject, computed, onUnmounted } from "vue";
