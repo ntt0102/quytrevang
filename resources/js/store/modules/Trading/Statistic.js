@@ -3,6 +3,7 @@ function initialState() {
         charts: { page: 0, period: "day" },
         data: [],
         summary: {},
+        opening: {},
         updatedAt: null,
     };
 }
@@ -33,6 +34,14 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios.post("trading/statistic/summary", null).then((response) => {
                 commit("setSummary", response.data);
+                resolve();
+            });
+        });
+    },
+    getOpening({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios.post("trading/statistic/opening", null).then((response) => {
+                commit("setOpening", response.data);
                 resolve();
             });
         });
@@ -105,6 +114,9 @@ const mutations = {
     },
     setSummary(state, data) {
         state.summary = data;
+    },
+    setOpening(state, data) {
+        state.opening = data;
     },
     resetState(state) {
         state = Object.assign(state, initialState());

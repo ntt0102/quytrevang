@@ -1,185 +1,53 @@
 <template>
-    <div class="statistic-summary dx-card responsive-paddings content-block">
-        <div v-if="props.hasTitle" class="header">
-            {{ $t("trading.statistic.summary.title") }}
+    <div class="statistic-opening dx-card responsive-paddings content-block">
+        <div class="header">
+            <div v-if="props.hasTitle">
+                {{ $t("trading.statistic.opening.title") }}
+            </div>
+            <div>
+                <span>{{ $t("trading.statistic.opening.totalProfit") }}</span
+                >&nbsp;
+                <span
+                    :class="`quality ${
+                        opening.totalProfit > 0 ? 'good' : 'bad'
+                    }`"
+                    >{{ $filters.shorten(opening.totalProfit, "₫") }}</span
+                >
+            </div>
         </div>
         <div class="body">
-            <div>
+            <div v-for="order in opening.orders" :key="order.symbol">
                 <div class="period">
-                    {{ $t("trading.statistic.summary.period.quarter") }}
+                    {{ order.symbol }}
                 </div>
-                <div v-if="$mf.isSet(summary)" class="detail">
+                <div class="detail">
                     <div>
-                        <span>{{
-                            $t("trading.statistic.summary.winrate")
-                        }}</span
+                        <span>{{ $t("trading.statistic.opening.price") }}</span
                         >&nbsp;
-                        <span
-                            :class="`quality ${
-                                summary.quarter.winrate >= 50 ? 'good' : 'bad'
-                            }`"
-                            >{{
-                                $filters.numberVnFormat(
-                                    summary.quarter.winrate,
-                                    0
-                                )
-                            }}%</span
-                        >
+                        <span class="quality orange">{{
+                            order.lastPrice
+                        }}</span>
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.summary.rr") }}</span
+                        <span>{{ $t("trading.statistic.opening.volume") }}</span
                         >&nbsp;
-                        <span
-                            :class="`quality ${
-                                (summary.quarter.rr == null &&
-                                    summary.quarter.winrate == 100) ||
-                                summary.quarter.rr >= 1
-                                    ? 'good'
-                                    : 'bad'
-                            }`"
-                        >
-                            {{
-                                summary.quarter.rr == null &&
-                                summary.quarter.winrate == 100
-                                    ? "+∞"
-                                    : $filters.numberVnFormat(
-                                          summary.quarter.rr,
-                                          summary.quarter.rr > 2 ? 0 : 1
-                                      )
-                            }}
+                        <span class="quality orange"
+                            >{{ order.openingVol }}
                         </span>
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.summary.profit") }}</span
+                        <span>{{ $t("trading.statistic.opening.profit") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
-                                summary.quarter.profit > 0 ? 'good' : 'bad'
+                                order.profit > 0 ? 'good' : 'bad'
                             }`"
-                            >{{
-                                $filters.shorten(summary.quarter.profit, "₫")
-                            }}</span
+                            >{{ $filters.shorten(order.profit, "₫") }} ({{
+                                order.percent.toFixed(1)
+                            }}%)</span
                         >
                     </div>
                 </div>
-                <div v-else>-</div>
-            </div>
-            <div>
-                <div class="period">
-                    {{ $t("trading.statistic.summary.period.year") }}
-                </div>
-                <div v-if="$mf.isSet(summary)" class="detail">
-                    <div>
-                        <span>{{
-                            $t("trading.statistic.summary.winrate")
-                        }}</span
-                        >&nbsp;
-                        <span
-                            :class="`quality ${
-                                summary.year.winrate >= 50 ? 'good' : 'bad'
-                            }`"
-                            >{{
-                                $filters.numberVnFormat(
-                                    summary.year.winrate,
-                                    0
-                                )
-                            }}%</span
-                        >
-                    </div>
-                    <div>
-                        <span>{{ $t("trading.statistic.summary.rr") }}</span
-                        >&nbsp;
-                        <span
-                            :class="`quality ${
-                                (summary.year.rr == null &&
-                                    summary.year.winrate == 100) ||
-                                summary.year.rr >= 1
-                                    ? 'good'
-                                    : 'bad'
-                            }`"
-                        >
-                            {{
-                                summary.year.rr == null &&
-                                summary.year.winrate == 100
-                                    ? "+∞"
-                                    : $filters.numberVnFormat(
-                                          summary.year.rr,
-                                          summary.year.rr > 2 ? 0 : 1
-                                      )
-                            }}
-                        </span>
-                    </div>
-                    <div>
-                        <span>{{ $t("trading.statistic.summary.profit") }}</span
-                        >&nbsp;
-                        <span
-                            :class="`quality ${
-                                summary.year.profit > 0 ? 'good' : 'bad'
-                            }`"
-                            >{{
-                                $filters.shorten(summary.year.profit, "₫")
-                            }}</span
-                        >
-                    </div>
-                </div>
-                <div v-else>-</div>
-            </div>
-            <div>
-                <div class="period">
-                    {{ $t("trading.statistic.summary.period.all") }}
-                </div>
-                <div v-if="$mf.isSet(summary)" class="detail">
-                    <div>
-                        <span>{{
-                            $t("trading.statistic.summary.winrate")
-                        }}</span
-                        >&nbsp;
-                        <span
-                            :class="`quality ${
-                                summary.all.winrate >= 50 ? 'good' : 'bad'
-                            }`"
-                            >{{
-                                $filters.numberVnFormat(summary.all.winrate, 0)
-                            }}%</span
-                        >
-                    </div>
-                    <div>
-                        <span>{{ $t("trading.statistic.summary.rr") }}</span
-                        >&nbsp;
-                        <span
-                            :class="`quality ${
-                                (summary.all.rr == null &&
-                                    summary.all.winrate == 100) ||
-                                summary.all.rr >= 1
-                                    ? 'good'
-                                    : 'bad'
-                            }`"
-                        >
-                            {{
-                                summary.all.rr == null &&
-                                summary.all.winrate == 100
-                                    ? "+∞"
-                                    : $filters.numberVnFormat(
-                                          summary.all.rr,
-                                          summary.all.rr > 2 ? 0 : 1
-                                      )
-                            }}
-                        </span>
-                    </div>
-                    <div>
-                        <span>{{ $t("trading.statistic.summary.profit") }}</span
-                        >&nbsp;
-                        <span
-                            :class="`quality ${
-                                summary.all.profit > 0 ? 'good' : 'bad'
-                            }`"
-                            >{{
-                                $filters.shorten(summary.all.profit, "₫")
-                            }}</span
-                        >
-                    </div>
-                </div>
-                <div v-else>-</div>
             </div>
         </div>
     </div>
@@ -195,7 +63,7 @@ const INTERVAL = 4; // 4ms
 const store = useStore();
 const router = useRouter();
 const mf = inject("mf");
-const summary = computed(() => store.state.tradingStatistic.summary);
+const opening = computed(() => store.state.tradingStatistic.opening);
 const state = reactive({
     day: 0,
     week: 0,
@@ -217,57 +85,10 @@ const props = defineProps({
     },
 });
 
-store.dispatch("tradingStatistic/getSummary");
-
-watch(
-    () => store.state.tradingStatistic.summary,
-    (value) => {
-        if (mf.isSet(value)) {
-            calculateChange();
-            if (!params.interval) {
-                params.interval = setInterval(() => {
-                    animatedNumber("day");
-                    animatedNumber("week");
-                    animatedNumber("month");
-                    animatedNumber("quarter");
-                    animatedNumber("year");
-                    animatedNumber("all");
-                    if (params.doneFlag) {
-                        clearInterval(params.interval);
-                        params.interval = null;
-                    }
-                }, INTERVAL);
-            }
-        }
-    }
-);
-function viewDetail(period) {
-    router.push({ name: "trading-statistic1", query: { period } });
-}
-function animatedNumber(type) {
-    if (
-        Math.abs(state[type]) <
-        Math.abs(summary.value[type] - params.change[type])
-    ) {
-        state[type] += params.change[type];
-        params.doneFlag = false;
-    } else {
-        state[type] = summary.value[type];
-        params.doneFlag = true;
-    }
-}
-function calculateChange() {
-    let counterTimes = DURATION / INTERVAL;
-    params.change.day = summary.value.day / counterTimes;
-    params.change.week = summary.value.week / counterTimes;
-    params.change.month = summary.value.month / counterTimes;
-    params.change.quarter = summary.value.quarter / counterTimes;
-    params.change.year = summary.value.year / counterTimes;
-    params.change.all = summary.value.all / counterTimes;
-}
+store.dispatch("tradingStatistic/getOpening");
 </script>
 <style lang="scss">
-.statistic-summary {
+.statistic-opening {
     .body {
         display: flex;
         justify-content: space-between;
@@ -289,16 +110,6 @@ function calculateChange() {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 10px;
-
-                .quality {
-                    font-size: 16px;
-                    &.good {
-                        color: lime;
-                    }
-                    &.bad {
-                        color: red;
-                    }
-                }
             }
         }
 
@@ -313,6 +124,18 @@ function calculateChange() {
                     padding-right: 0;
                 }
             }
+        }
+    }
+    .quality {
+        font-size: 16px;
+        &.good {
+            color: lime;
+        }
+        &.bad {
+            color: red;
+        }
+        &.orange {
+            color: orange;
         }
     }
 }

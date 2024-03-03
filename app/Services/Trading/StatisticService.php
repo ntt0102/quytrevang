@@ -38,6 +38,71 @@ class StatisticService extends CoreService
     }
 
     /**
+     * Return the summary.
+     *
+     * @return array
+     */
+    public function getOpening($payload)
+    {
+        $ret = [];
+        $totalProfit = 0;
+        $client = new \GuzzleHttp\Client();
+        $url = "https://bgapidatafeed.vps.com.vn/getliststockdata/";
+        $orders = StockOrder::opening()->get();
+        foreach ($orders as $order) {
+            $res = $client->get($url . $order->symbol);
+            $lastPrice = json_decode($res->getBody())[0]->lastPrice;
+            $temp = $this->calculateProfit($order);
+            $openingCash = $temp->openingVol * $lastPrice * 1000;
+            $profit = $temp->closedCash + $openingCash;
+            $ret['orders'][] = [
+                'symbol' => $order->symbol,
+                'lastPrice' => $lastPrice,
+                'openingVol' => $temp->openingVol,
+                'profit' => $profit,
+                'percent' => $profit / -$temp->totalCost * 100
+            ];
+            $totalProfit += $profit;
+        }
+        $ret['totalProfit'] = $totalProfit;
+        return $ret;
+    }
+
+    /**
+     *  Calculate Temp Profit
+     * @param $order
+     * @return Object
+     */
+    public function calculateProfit($order)
+    {
+        $buyCash = 0;
+        $sellCash = 0;
+        $totalBuyVol = 0;
+        $totalSellVol = 0;
+        $buyVolume = json_decode($order->buy_volume);
+        $buyPrice = json_decode($order->buy_price);
+        $buyFee = json_decode($order->buy_fee);
+        $sellVolume = json_decode($order->sell_volume);
+        $sellPrice = json_decode($order->sell_price);
+        $sellFee = json_decode($order->sell_fee);
+        for ($i = 0; $i < count($buyVolume); $i++) {
+            $buyCash += -$buyVolume[$i] * $buyPrice[$i] - $buyFee[$i];
+            $totalBuyVol += $buyVolume[$i];
+        }
+        $totalCost = $buyCash;
+        for ($i = 0; $i < count($sellVolume); $i++) {
+            $sellCash += $sellVolume[$i] * $sellPrice[$i] - $sellFee[$i];
+            $totalSellVol += $sellVolume[$i];
+            $totalCost += -$sellFee[$i];
+        }
+        return (object)[
+            'openingVol' => $totalBuyVol - $totalSellVol,
+            'closedCash' => $buyCash + $sellCash,
+            'totalCost' => $totalCost,
+        ];
+    }
+
+    /**
      * Return the chart.
      *
      * @return array

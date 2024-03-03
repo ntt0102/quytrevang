@@ -41,6 +41,18 @@ class StatisticController extends CoreController
         $data = $this->statisticService->getSummary($this->payload);
         return $this->sendResponse($data);
     }
+    /**
+     * Get the opening
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getOpening(Request $request)
+    {
+        $data = $this->statisticService->getOpening($this->payload);
+        return $this->sendResponse($data);
+    }
 
     /**
      * Get the chart
@@ -65,19 +77,6 @@ class StatisticController extends CoreController
     public function save(Request $request)
     {
         $data = $this->statisticService->save($this->payload);
-        return $this->sendResponse($data);
-    }
-
-    /**
-     * validate Duplicate Date
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function validateDuplicateDate(Request $request)
-    {
-        $data = $this->statisticService->validateDuplicateDate($this->payload);
         return $this->sendResponse($data);
     }
 }

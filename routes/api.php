@@ -135,6 +135,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::group(['prefix' => 'statistic', 'middleware' => 'can:trades@view'], function () {
                     Route::post('/', 'StatisticController@getData');
                     Route::post('summary', 'StatisticController@getSummary');
+                    Route::post('opening', 'StatisticController@getOpening');
                     Route::post('validate-duplicate-date', 'StatisticController@validateDuplicateDate');
                     Route::post('chart', 'StatisticController@getChart');
                     Route::post('save', 'StatisticController@save')->middleware('can:trades@edit');
