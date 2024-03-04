@@ -26,7 +26,7 @@ return new class extends Migration
             
                 DROP TEMPORARY TABLE IF EXISTS t1;
                 CREATE TEMPORARY TABLE t1 AS
-                    SELECT GET_PROFIT(`buy_volume`,`buy_price`,`buy_fee`,`sell_volume`,`sell_price`,`sell_fee`) AS p
+                    SELECT GET_PROFIT(1,`buy_volume`,`buy_price`,`buy_fee`,`sell_volume`,`sell_price`,`sell_fee`) AS p
                     FROM `stock_orders` 
                     WHERE CHECK_CLOSED(`buy_volume`,`sell_volume`) AND `sell_date` >= `in_date`;
                 

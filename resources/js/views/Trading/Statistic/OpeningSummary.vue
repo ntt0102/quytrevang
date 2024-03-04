@@ -11,7 +11,11 @@
                     :class="`quality ${
                         opening.totalProfit > 0 ? 'good' : 'bad'
                     }`"
-                    >{{ $filters.shorten(opening.totalProfit, "₫") }}</span
+                    >{{ $filters.shorten(opening.totalProfit, "₫") }} ({{
+                        $mf.isSet(opening)
+                            ? opening.totalPercent.toFixed(1)
+                            : 0
+                    }}%)</span
                 >
             </div>
         </div>

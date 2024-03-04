@@ -27,13 +27,39 @@ class StatisticService extends CoreService
      */
     public function getSummary($payload)
     {
-        $firstDayQuarter = first_day_of('quarter')->format('Y-m-d');
-        $firstDayYear = first_day_of('year')->format('Y-m-d');
-        $firstDayAll = '2020-01-01';
+        $quarterPeriod = 'quarter';
+        $yearPeriod = 'year';
+        $allPeriod = 'all';
+        $quarterFromDate = first_day_of('quarter')->format('Y-m-d');
+        $yearFromDate = first_day_of('year')->format('Y-m-d');
+        $allFromDate = '2020-01-01';
         return [
-            'quarter' => StockOrder::getWinRate($firstDayQuarter),
-            'year' => StockOrder::getWinRate($firstDayYear),
-            'all' => StockOrder::getWinRate($firstDayAll),
+            $quarterPeriod => $this->calculateSummary($quarterPeriod, $quarterFromDate),
+            $yearPeriod => $this->calculateSummary($yearPeriod, $yearFromDate),
+            $allPeriod => $this->calculateSummary($allPeriod, $allFromDate),
+        ];
+    }
+
+    private function calculateSummary($period, $fromDate)
+    {
+        $pPos = 0;
+        $pNeg = 0;
+        $oPos = 0;
+        $oNeg = 0;
+        $data = StockOrder::getProfitChart($period, $fromDate, date('Y-m-d'));
+        foreach ($data as $item) {
+            if ($item->profit > 0) {
+                $pPos = $item->profit;
+                $oPos = $item->order;
+            } else if ($item->profit < 0) {
+                $pNeg = $item->profit;
+                $oNeg = $item->order;
+            }
+        }
+        return [
+            'rr' => $pPos / (-$pNeg),
+            'winrate' => $oPos / ($oPos + $oNeg) * 100,
+            'profit' => $pPos + $pNeg,
         ];
     }
 
@@ -46,6 +72,7 @@ class StatisticService extends CoreService
     {
         $ret = [];
         $totalProfit = 0;
+        $totalCost = 0;
         $client = new \GuzzleHttp\Client();
         $url = "https://bgapidatafeed.vps.com.vn/getliststockdata/";
         $orders = StockOrder::opening()->get();
@@ -66,8 +93,10 @@ class StatisticService extends CoreService
                 'percent' => $profit / -$temp->totalCost * 100
             ];
             $totalProfit += $profit;
+            $totalCost += $temp->totalCost;
         }
         $ret['totalProfit'] = $totalProfit;
+        $ret['totalPercent'] = $totalProfit / -$totalCost * 100;
         return $ret;
     }
 
@@ -112,7 +141,14 @@ class StatisticService extends CoreService
      */
     public function getChart($payload)
     {
-        return false;
+        $period = $payload->period;
+        $page = (int) $payload->page;
+        // $charts = $this->createChartData($period, $page);
+        return [
+            'period' => $period,
+            'page' => $page,
+            // 'data' => $charts
+        ];
     }
 
     /**

@@ -14,22 +14,17 @@ return new class extends Migration
     {
         DB::unprepared(
             "
-            CREATE FUNCTION `GET_PROFIT`(`buy_volume` VARCHAR(255), `buy_price` VARCHAR(255), `buy_fee` VARCHAR(255), `sell_volume` VARCHAR(255), `sell_price` VARCHAR(255), `sell_fee` VARCHAR(255)) RETURNS int(11)
+            CREATE FUNCTION `GET_PROFIT`(`buy_volume` VARCHAR(255), `buy_price` VARCHAR(255), `buy_fee` VARCHAR(255), `sell_volume` VARCHAR(255), `sell_price` VARCHAR(255), `sell_fee` VARCHAR(255)) RETURNS decimal(11,1)
             BEGIN
                 DECLARE buy INT DEFAULT 0;
                 DECLARE sell INT DEFAULT 0;
+                DECLARE sellFee INT DEFAULT 0;
                 
-                SELECT SUM(-volume*price - fee) INTO buy 
-                FROM json_table(buy_volume, '$[*]' columns (id FOR ORDINALITY,volume int path '$')) v
-                JOIN json_table(buy_price, '$[*]' columns (id FOR ORDINALITY,price int path '$')) p
-                JOIN json_table(buy_fee, '$[*]' columns (id FOR ORDINALITY,fee int path '$')) f
-                WHERE v.id = p.id AND v.id = f.id;
+                CALL SPLIT_ORDER(buy_volume, buy_price, buy_fee);
+                SELECT SUM(-volume*price - fee) INTO buy FROM split_order;
 
-                SELECT SUM(volume*price - fee) INTO sell 
-                FROM json_table(sell_volume, '$[*]' columns (id FOR ORDINALITY,volume int path '$')) v
-                JOIN json_table(sell_price, '$[*]' columns (id FOR ORDINALITY,price int path '$')) p
-                JOIN json_table(sell_fee, '$[*]' columns (id FOR ORDINALITY,fee int path '$')) f
-                WHERE v.id = p.id AND v.id = f.id;
+                CALL SPLIT_ORDER(sell_volume, sell_price, sell_fee);
+                SELECT SUM(volume*price - fee) INTO sell FROM split_order;
                 
                 RETURN buy + sell;
             END

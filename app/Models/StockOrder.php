@@ -64,10 +64,16 @@ class StockOrder extends CoreModel
         $query->whereRaw('NOT CHECK_CLOSED(buy_volume, sell_volume)');
     }
 
-    public static function getWinRate($date)
+    public static function getProfitChart($period, $fromDate, $toDate)
     {
-        $expression = DB::raw("CALL WIN_RATE('{$date}')");
+        $expression = DB::raw("CALL PROFIT_CHART('{$period}', '{$fromDate}', '{$toDate}')");
         $string = $expression->getValue(DB::connection()->getQueryGrammar());
-        return DB::select($string)[0];
+        return DB::select($string);
     }
+    // public static function getWinRate($date)
+    // {
+    //     $expression = DB::raw("CALL WIN_RATE('{$date}')");
+    //     $string = $expression->getValue(DB::connection()->getQueryGrammar());
+    //     return DB::select($string)[0];
+    // }
 }

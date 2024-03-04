@@ -177,9 +177,9 @@ Route::get('test', function () {
     // $rsp = json_decode($res->getBody());
     // dd($rsp);
     // \Log::info('Hello world!!');
-    // $s = \App\Models\StockOrder::getWinRate('2020-01-01');
-    $o = \App\Models\StockOrder::find(1);
-    $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
+    $s = \App\Models\StockOrder::getProfitChart('quarter', '2023-03-04', '2024-03-04');
+    // $o = \App\Models\StockOrder::find(1);
+    // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
     // $s = app(\App\Services\Trading\StatisticService::class)->calculateProfit($o);
     dd($s);
     return 'ok';
