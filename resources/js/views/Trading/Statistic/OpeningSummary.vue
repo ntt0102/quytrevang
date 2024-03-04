@@ -24,9 +24,10 @@
                     <div>
                         <span>{{ $t("trading.statistic.opening.price") }}</span
                         >&nbsp;
-                        <span class="quality orange">{{
-                            order.lastPrice
-                        }}</span>
+                        <span
+                            :class="`quality ${getChangeClass(order.change)}`"
+                            >{{ order.lastPrice }}</span
+                        >
                     </div>
                     <div>
                         <span>{{ $t("trading.statistic.opening.volume") }}</span
@@ -86,6 +87,12 @@ const props = defineProps({
 });
 
 store.dispatch("tradingStatistic/getOpening");
+function getChangeClass(change) {
+    let cls = "orange";
+    if (change < 0) cls = "bad";
+    else if (change > 0) cls = "good";
+    return cls;
+}
 </script>
 <style lang="scss">
 .statistic-opening {

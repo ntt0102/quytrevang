@@ -51,13 +51,16 @@ class StatisticService extends CoreService
         $orders = StockOrder::opening()->get();
         foreach ($orders as $order) {
             $res = $client->get($url . $order->symbol);
-            $lastPrice = json_decode($res->getBody())[0]->lastPrice;
+            $info = json_decode($res->getBody())[0];
+            $lastPrice = $info->lastPrice;
+            $change = $lastPrice - $info->r;
             $temp = $this->calculateProfit($order);
             $openingCash = $temp->openingVol * $lastPrice * 1000;
             $profit = $temp->closedCash + $openingCash;
             $ret['orders'][] = [
                 'symbol' => $order->symbol,
                 'lastPrice' => $lastPrice,
+                'change' => $change,
                 'openingVol' => $temp->openingVol,
                 'profit' => $profit,
                 'percent' => $profit / -$temp->totalCost * 100
