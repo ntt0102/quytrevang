@@ -58,31 +58,11 @@
     </div>
 </template>
 <script setup>
-import { computed, inject, reactive, watch } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
-import { useRouter } from "vue-router";
-
-const DURATION = 200;
-const INTERVAL = 4; // 4ms
 
 const store = useStore();
-const router = useRouter();
-const mf = inject("mf");
 const opening = computed(() => store.state.tradingStatistic.opening);
-const state = reactive({
-    day: 0,
-    week: 0,
-    month: 0,
-    quarter: 0,
-    year: 0,
-    all: 0,
-});
-let params = {
-    interval: null,
-    change: {},
-    doneFlag: false,
-};
-
 const props = defineProps({
     hasTitle: {
         type: Boolean,

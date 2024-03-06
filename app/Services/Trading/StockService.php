@@ -4,8 +4,8 @@ namespace App\Services\Trading;
 
 use App\Services\CoreService;
 use App\Models\StockSymbol;
+use App\Models\StockOrder;
 use App\Models\DrawTool;
-use App\Jobs\TestJob;
 use App\Jobs\FilterStockJob;
 
 class StockService extends CoreService
@@ -177,9 +177,10 @@ class StockService extends CoreService
      */
     public function getSymbols()
     {
-
-        return StockSymbol::get(array('name', 'symbols'))
+        $symbols = StockSymbol::get(array('name', 'symbols'))
             ->pluck('symbols', 'name');
+        $symbols['hold'] = StockOrder::opening()->get('symbol')->pluck('symbol');
+        return $symbols;
     }
 
     /**

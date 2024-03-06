@@ -338,23 +338,23 @@ export default {
     getChartPeriodList: () => {
         return [
             {
-                name: lang.global.t("trading.trades.selects.period.day"),
+                name: lang.global.t("trading.statistic.periods.day"),
                 value: "day",
             },
             {
-                name: lang.global.t("trading.trades.selects.period.week"),
+                name: lang.global.t("trading.statistic.periods.week"),
                 value: "week",
             },
             {
-                name: lang.global.t("trading.trades.selects.period.month"),
+                name: lang.global.t("trading.statistic.periods.month"),
                 value: "month",
             },
             {
-                name: lang.global.t("trading.trades.selects.period.quarter"),
+                name: lang.global.t("trading.statistic.periods.quarter"),
                 value: "quarter",
             },
             {
-                name: lang.global.t("trading.trades.selects.period.year"),
+                name: lang.global.t("trading.statistic.periods.year"),
                 value: "year",
             },
         ];

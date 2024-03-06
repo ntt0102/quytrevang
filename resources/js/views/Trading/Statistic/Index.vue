@@ -20,7 +20,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-backward small',
-                        hint: $t('trading.trades.buttons.more'),
+                        hint: $t('trading.statistic.buttons.more'),
                         elementAttr: { 'data-page': charts.page },
                         onClick: () =>
                             $store.dispatch('tradingStatistic/lazyLoad'),
@@ -83,21 +83,19 @@
             :series="[
                 {
                     name: $t('trading.statistic.profitSum'),
-                    tag: 'money',
+                    tag: 'profit',
                     valueField: 'profit',
-                    axis: 'money',
-                    type: 'stackedbar',
-                    stack: 'money',
+                    axis: 'profit',
+                    type: 'bar',
                     color: 'DarkGreen',
-                    visible: visibleSeries.money,
+                    visible: visibleSeries.profit,
                 },
                 {
                     name: $t('trading.statistic.rr'),
                     tag: 'rr',
                     valueField: 'rr',
                     axis: 'rr',
-                    type: 'stackedbar',
-                    stack: 'rr',
+                    type: 'bar',
                     color: 'Teal',
                     visible: visibleSeries.rr,
                 },
@@ -106,8 +104,7 @@
                     tag: 'winrate',
                     valueField: 'winrate',
                     axis: 'winrate',
-                    type: 'stackedbar',
-                    stack: 'winrate',
+                    type: 'bar',
                     color: 'Purple',
                     visible: visibleSeries.winrate,
                 },
@@ -123,7 +120,7 @@
             ]"
             :valueAxis="[
                 {
-                    name: 'money',
+                    name: 'profit',
                     synchronizedValue: 0,
                     label: { customizeText: customizeText },
                     constantLines: [
@@ -191,29 +188,6 @@
                             :fill="data.marker.fill"
                         ></path>
                     </g>
-                    <g v-else-if="data.series.tag === 'money'">
-                        <rect
-                            :x="0"
-                            :y="0"
-                            :width="20"
-                            :height="2"
-                            fill="DarkOrange"
-                        />
-                        <rect
-                            :x="0"
-                            :y="2"
-                            :width="20"
-                            :height="4"
-                            fill="FireBrick"
-                        />
-                        <rect
-                            :x="0"
-                            :y="5"
-                            :width="20"
-                            :height="4"
-                            fill="DarkGreen"
-                        />
-                    </g>
                     <g v-else>
                         <rect
                             :x="0"
@@ -245,17 +219,14 @@ const { t } = useI18n();
 const bus = inject("bus");
 const filters = inject("filters");
 let params = {
-    principalTargetThreshold: {
-        day: 1,
-        week: 5,
-        month: 22,
-        quarter: 65,
-        year: 260,
+    targetThreshold: {
+        profit: 0,
+        rr: 1,
+        winrate: 50,
     },
-    feesTargetThreshold: 5,
 };
 const visibleSeries = reactive({
-    money: true,
+    profit: true,
     rr: false,
     winrate: false,
     accProfit: true,
@@ -272,30 +243,35 @@ bus.on("toggleMenu", () => {
 onUnmounted(() => bus.off("toggleMenu"));
 
 function customizePoint({ value, series }) {
-    if (
-        series.tag === "rr" &&
-        value >= params.principalTargetThreshold[charts.value.period]
-    )
-        return { color: "Aqua", hoverStyle: { color: "Aqua" } };
-    else if (series.tag === "winrate" && value >= params.feesTargetThreshold)
-        return { color: "Fuchsia", hoverStyle: { color: "Fuchsia" } };
-    else
-        return {
-            color: series.color,
-            hoverStyle: { color: series.color },
-        };
+    switch (series.tag) {
+        case "profit":
+            if (value <= params.targetThreshold.profit)
+                return {
+                    color: "FireBrick",
+                    hoverStyle: { color: "FireBrick" },
+                };
+            break;
+        case "rr":
+            if (value > params.targetThreshold.rr)
+                return { color: "Aqua", hoverStyle: { color: "Aqua" } };
+            break;
+        case "winrate":
+            if (value > params.targetThreshold.winrate)
+                return { color: "Fuchsia", hoverStyle: { color: "Fuchsia" } };
+            break;
+    }
 }
 function customizeText({ valueText }) {
     return `${valueText.replace(",0", "").replace("M", " Tr")}`;
 }
 function customizeTooltip(pointInfo) {
     let accProfit = pointInfo.point.data.accProfit;
-    let referenceTime = getReferenceTime();
-    if (referenceTime !== null) {
-        let referenceAccumulatedProfit = charts.value.data.find(
-            (c) => c.time === referenceTime
+    let refDate = getReferenceDate();
+    if (refDate !== null) {
+        let refAccProfit = charts.value.data.find(
+            (c) => c.date === refDate
         ).accProfit;
-        accProfit = accProfit - referenceAccumulatedProfit;
+        accProfit = accProfit - refAccProfit;
     }
     return {
         html: `<div class='trade-chart-tooltip'>
@@ -305,94 +281,50 @@ function customizeTooltip(pointInfo) {
                 <div class='tooltip-body'>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.principalAvg")}
-                    </span>:
-                  </div>
-                  <div class='value-text'>
-                    <span class='bottom-series-value'>
-                      ${filters.currency(pointInfo.point.data.principal)}
-                    </span>
-                  </div>
-                  <div class='series-name'>
-                    <span class='bottom-series-name'>
-                      ${t("trading.trades.revenueSum")}
-                    </span>:
-                  </div>
-                  <div class='value-text'>
-                    <span class='bottom-series-value'>
-                      ${filters.currency(pointInfo.point.data.revenue)}
-                    </span>
-                  </div>
-                  <div class='series-name'>
-                    <span class='bottom-series-name'>
-                      ${t("trading.trades.lossSum")}
-                    </span>:
-                  </div>
-                  <div class='value-text'>
-                    <span class='bottom-series-value'>
-                      ${filters.currency(pointInfo.point.data.loss)}
-                    </span>
-                  </div>
-                  <div class='series-name'>
-                    <span class='bottom-series-name'>
-                      ${t("trading.trades.feesSum")}
-                    </span>:
-                  </div>
-                  <div class='value-text'>
-                    <span class='bottom-series-value'>
-                      ${filters.currency(pointInfo.point.data.fees)}
-                    </span>
-                  </div>
-                  <div class='series-name'>
-                    <span class='bottom-series-name'>
-                      ${t("trading.trades.profitSum")}
+                      ${t("trading.statistic.profitSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
                     <span class='bottom-series-value' style='font-weight: bold; color:${
                         pointInfo.point.data.profit >= 0 ? "green" : "red"
                     }'>
-                      ${filters.currency(pointInfo.point.data.profit)}
-                    </span>
-                  </div>
-                  <div class='series-name'>
-                    <span class='top-series-name'>
-                      ${t("trading.trades.rr")}
-                    </span>:
-                  </div>
-                  <div class='value-text'>
-                    <span class='top-series-value'>
-                      ${filters.numberVnFormat(pointInfo.point.data.rr, 1)}%
-                      (${(
-                          (100 * pointInfo.point.data.rr) /
-                          params.principalTargetThreshold[charts.value.period]
-                      ).toFixed(0)}%
-                      ${t("trading.trades.kpi")})
+                      ${filters.shorten(pointInfo.point.data.profit, "₫")}
                     </span>
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.winrate")}
+                      ${t("trading.statistic.rr")}
                     </span>:
                   </div>
                   <div class='value-text'>
                     <span class='bottom-series-value'>
-                      ${filters.numberVnFormat(pointInfo.point.data.winrate, 1)}
-                      (${(
-                          (100 * pointInfo.point.data.winrate) /
-                          params.feesTargetThreshold
-                      ).toFixed(0)}%
-                      ${t("trading.trades.kpi")})
+                      ${filters.numberVnFormat(
+                          pointInfo.point.data.rr,
+                          pointInfo.point.data.rr > 2 ? 0 : 1
+                      )}
                     </span>
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.accProfit")}
+                      ${t("trading.statistic.winrate")}
                     </span>:
                   </div>
                   <div class='value-text'>
                     <span class='bottom-series-value'>
-                      ${filters.currency(accProfit)}
+                      ${filters.numberVnFormat(
+                          pointInfo.point.data.winrate,
+                          0
+                      )}%
+                    </span>
+                  </div>
+                  <div class='series-name'>
+                    <span class='bottom-series-name'>
+                      ${t("trading.statistic.accProfit")}
+                    </span>:
+                  </div>
+                  <div class='value-text'>
+                    <span class='bottom-series-value'>
+                      ${filters.shorten(accProfit, "₫")}
                     </span>
                   </div>
                 </div>
@@ -400,13 +332,13 @@ function customizeTooltip(pointInfo) {
     };
 }
 function onPointClick({ target }) {
-    let referenceTime =
-        getReferenceTime() === target.argument ? null : target.argument;
-    setReferenceTime(referenceTime);
+    let refDate =
+        getReferenceDate() === target.argument ? null : target.argument;
+    setReferenceDate(refDate);
 }
 function onLegendClick(e) {
     const series = e.target;
-    let referenceTime = getReferenceTime();
+    let refDate = getReferenceDate();
     if (series.isVisible()) {
         series.hide();
         visibleSeries[series.tag] = false;
@@ -414,14 +346,14 @@ function onLegendClick(e) {
         series.show();
         visibleSeries[series.tag] = true;
     }
-    setTimeout(() => setReferenceTime(referenceTime), 0);
+    setTimeout(() => setReferenceDate(refDate), 0);
 }
-function getReferenceTime() {
+function getReferenceDate() {
     return chartRef.value.instance.option(
         "argumentAxis.constantLines[0].value"
     );
 }
-function setReferenceTime(value) {
+function setReferenceDate(value) {
     return chartRef.value.instance.option(
         "argumentAxis.constantLines[0].value",
         value

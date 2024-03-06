@@ -28,7 +28,7 @@ class UpdateStatisticEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return [new PrivateChannel("trading-statistic1")];
+        return [new PrivateChannel("trading-statistic")];
     }
 
     /**
@@ -38,6 +38,6 @@ class UpdateStatisticEvent implements ShouldBroadcastNow
      */
     public function broadcastAs()
     {
-        return 'update-statistic1';
+        return 'update-statistic';
     }
 }

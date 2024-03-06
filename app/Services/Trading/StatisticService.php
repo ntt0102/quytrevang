@@ -190,7 +190,7 @@ class StatisticService extends CoreService
             $ret[$order->date]['accProfit'] = $accProfit;
             $ret[$order->date]['date'] = $this->createChartDate($period, $order->date);
         }
-        return $ret;
+        return empty($ret) ? $ret : array_values($ret);
     }
     /**
      * create Chart Date

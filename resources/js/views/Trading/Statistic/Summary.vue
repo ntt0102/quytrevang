@@ -6,7 +6,7 @@
         <div class="body">
             <div>
                 <div class="period">
-                    {{ $t("trading.statistic.summary.period.quarter") }}
+                    {{ $t("trading.statistic.periods.quarter") }}
                 </div>
                 <div v-if="$mf.isSet(summary)" class="detail">
                     <div>
@@ -66,7 +66,7 @@
             </div>
             <div>
                 <div class="period">
-                    {{ $t("trading.statistic.summary.period.year") }}
+                    {{ $t("trading.statistic.periods.year") }}
                 </div>
                 <div v-if="$mf.isSet(summary)" class="detail">
                     <div>
@@ -126,7 +126,7 @@
             </div>
             <div>
                 <div class="period">
-                    {{ $t("trading.statistic.summary.period.all") }}
+                    {{ $t("trading.statistic.periods.all") }}
                 </div>
                 <div v-if="$mf.isSet(summary)" class="detail">
                     <div>
@@ -185,30 +185,11 @@
     </div>
 </template>
 <script setup>
-import { computed, inject, reactive, watch } from "vue";
+import { computed } from "vue";
 import { useStore } from "vuex";
-import { useRouter } from "vue-router";
-
-const DURATION = 200;
-const INTERVAL = 4; // 4ms
 
 const store = useStore();
-const router = useRouter();
-const mf = inject("mf");
 const summary = computed(() => store.state.tradingStatistic.summary);
-const state = reactive({
-    day: 0,
-    week: 0,
-    month: 0,
-    quarter: 0,
-    year: 0,
-    all: 0,
-});
-let params = {
-    interval: null,
-    change: {},
-    doneFlag: false,
-};
 
 const props = defineProps({
     hasTitle: {
@@ -218,53 +199,6 @@ const props = defineProps({
 });
 
 store.dispatch("tradingStatistic/getSummary");
-
-watch(
-    () => store.state.tradingStatistic.summary,
-    (value) => {
-        if (mf.isSet(value)) {
-            calculateChange();
-            if (!params.interval) {
-                params.interval = setInterval(() => {
-                    animatedNumber("day");
-                    animatedNumber("week");
-                    animatedNumber("month");
-                    animatedNumber("quarter");
-                    animatedNumber("year");
-                    animatedNumber("all");
-                    if (params.doneFlag) {
-                        clearInterval(params.interval);
-                        params.interval = null;
-                    }
-                }, INTERVAL);
-            }
-        }
-    }
-);
-function viewDetail(period) {
-    router.push({ name: "trading-statistic1", query: { period } });
-}
-function animatedNumber(type) {
-    if (
-        Math.abs(state[type]) <
-        Math.abs(summary.value[type] - params.change[type])
-    ) {
-        state[type] += params.change[type];
-        params.doneFlag = false;
-    } else {
-        state[type] = summary.value[type];
-        params.doneFlag = true;
-    }
-}
-function calculateChange() {
-    let counterTimes = DURATION / INTERVAL;
-    params.change.day = summary.value.day / counterTimes;
-    params.change.week = summary.value.week / counterTimes;
-    params.change.month = summary.value.month / counterTimes;
-    params.change.quarter = summary.value.quarter / counterTimes;
-    params.change.year = summary.value.year / counterTimes;
-    params.change.all = summary.value.all / counterTimes;
-}
 </script>
 <style lang="scss">
 .statistic-summary {

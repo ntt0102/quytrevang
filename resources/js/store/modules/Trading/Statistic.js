@@ -4,14 +4,13 @@ function initialState() {
         data: [],
         summary: {},
         opening: {},
-        updatedAt: null,
     };
 }
 
-function createAccumulatedProfit(data) {
+function createAccProfit(data) {
     return data.reduce((carry, item) => {
-        item.accumulatedProfit =
-            item.profit + (!!carry.length ? carry.at(-1).accumulatedProfit : 0);
+        item.accProfit =
+            item.profit + (!!carry.length ? carry.at(-1).accProfit : 0);
         carry.push(item);
         return carry;
     }, []);
@@ -47,7 +46,6 @@ const actions = {
         });
     },
     getProfitChart({ commit, dispatch, getters, state, rootGetters }, period) {
-        // if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
             axios
                 .post(
@@ -56,9 +54,7 @@ const actions = {
                     { noLoading: true }
                 )
                 .then((response) => {
-                    // response.data.data = createAccumulatedProfit(
-                    //     response.data.data
-                    // );
+                    response.data.data = createAccProfit(response.data.data);
                     commit("setChart", response.data);
                     resolve();
                 });
@@ -68,7 +64,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "trading/statistic/chart",
+                    "trading/statistic/profit-chart",
                     {
                         period: state.charts.period,
                         page: state.charts.page + 1,
@@ -81,7 +77,7 @@ const actions = {
                             ...response.data.data,
                             ...JSON.parse(JSON.stringify(state.charts.data)),
                         ];
-                        response.data.data = createAccumulatedProfit(chartData);
+                        response.data.data = createAccProfit(chartData);
                         commit("setChart", response.data);
                     }
                     resolve();
@@ -109,10 +105,7 @@ const mutations = {
         state.data = data;
     },
     setChart(state, data) {
-        data.data = Object.values(data.data);
-        console.log("setChart", data);
         state.charts = data;
-        state.updatedAt = moment();
     },
     setSummary(state, data) {
         state.summary = data;

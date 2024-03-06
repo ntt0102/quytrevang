@@ -256,13 +256,14 @@ const state = reactive({
     symbols: [],
     symbolKind: null,
     symbolKinds: [
-        { text: t("trading.stock.hoseList"), value: "hose" },
-        { text: t("trading.stock.nhList"), value: "nh" },
-        { text: t("trading.stock.ckList"), value: "ck" },
-        { text: t("trading.stock.filterCash"), value: "fcash" },
-        { text: t("trading.stock.filterIndex"), value: "findex" },
-        { text: t("trading.stock.filterMix"), value: "fmix" },
-        { text: t("trading.stock.watchList"), value: "watch" },
+        { text: t("trading.stock.symbolList.hoseList"), value: "hose" },
+        { text: t("trading.stock.symbolList.nhList"), value: "nh" },
+        { text: t("trading.stock.symbolList.ckList"), value: "ck" },
+        { text: t("trading.stock.symbolList.filterCash"), value: "fcash" },
+        { text: t("trading.stock.symbolList.filterIndex"), value: "findex" },
+        { text: t("trading.stock.symbolList.filterMix"), value: "fmix" },
+        { text: t("trading.stock.symbolList.watchList"), value: "watch" },
+        { text: t("trading.stock.symbolList.hold"), value: "hold" },
     ],
     isFullscreen: false,
     color: "#F44336",
@@ -409,6 +410,12 @@ function eventPriceLineDrag(e) {
                 const a = +params.tools.target.A.options().price;
                 const b = +params.tools.target.B.options().price;
                 const ba = b - a;
+                //
+                if (lineOptions.point == "A") {
+                    point = "A";
+                    param.points.push(point);
+                    param.data.push(params.tools.target[point].options());
+                }
                 //
                 point = "B";
                 params.tools.target[point].applyOptions({

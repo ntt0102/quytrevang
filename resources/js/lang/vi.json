@@ -233,13 +233,16 @@
             "cloneSymbols": "Tạo danh sách mã",
             "symbolKind": "Danh sách mã",
             "deleteWatchList": "Xoá tất cả các mã theo dõi",
-            "hoseList": "Sàn HOSE",
-            "nhList": "Ngân hàng",
-            "ckList": "Chứng khoán",
-            "filterCash": "Lọc dòng tiền",
-            "filterIndex": "Lọc chỉ số",
-            "filterMix": "Lọc kết hợp",
-            "watchList": "Theo dõi",
+            "symbolList": {
+                "hoseList": "Sàn HOSE",
+                "nhList": "Ngân hàng",
+                "ckList": "Chứng khoán",
+                "filterCash": "Lọc dòng tiền",
+                "filterIndex": "Lọc chỉ số",
+                "filterMix": "Lọc kết hợp",
+                "watchList": "Theo dõi",
+                "hold": "Nắm giữ"
+            },
             "addWatchlist": "Thêm theo dõi",
             "fullscreen": "Bật tắt toàn màn hình",
             "tradingview": "TradingView",
@@ -272,23 +275,27 @@
             "rr": "Tỷ lệ lãi/lỗ",
             "winrate": "Tỷ lệ lệnh thắng",
             "accProfit": "Lợi nhuận lũy kế",
+            "periods": {
+                "day": "Ngày",
+                "week": "Tuần",
+                "month": "Tháng",
+                "quarter": "Quý",
+                "year": "Năm",
+                "all": "Tất cả"
+            },
             "validations": {
                 "sellDate": "Ngày bán phải sau ngày mua",
                 "array": "Phải chứa trong cặp dấu [ ]"
             },
             "buttons": {
+                "more": "Xem nhiều hơn",
                 "addData": "Dữ liệu"
             },
             "summary": {
                 "title": "Tổng kết",
                 "rr": "RR",
                 "winrate": "WR",
-                "profit": "LN",
-                "period": {
-                    "quarter": "Quý",
-                    "year": "Năm",
-                    "all": "Tất cả"
-                }
+                "profit": "LN"
             },
             "opening": {
                 "title": "Tổng kết",
