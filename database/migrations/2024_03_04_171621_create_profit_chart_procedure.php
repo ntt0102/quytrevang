@@ -33,9 +33,13 @@ return new class extends Migration
                 
                 DROP TEMPORARY TABLE IF EXISTS t2;
                 CREATE TEMPORARY TABLE t2 AS
-                    SELECT `date`,p , p > 0 AS c FROM t1;
-                    
+                    SELECT `date`, p, p > 0 AS c FROM t1;
+                
+                DROP TEMPORARY TABLE IF EXISTS t3;
+                CREATE TEMPORARY TABLE t3 AS
                 SELECT `date`, SUM(p) AS `profit`, COUNT(c) AS `order` FROM t2 GROUP BY `date`, c;
+
+                SELECT * FROM t3  ORDER BY `date` ASC;
             END
             "
         );

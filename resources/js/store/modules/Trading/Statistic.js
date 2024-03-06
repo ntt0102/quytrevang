@@ -46,19 +46,19 @@ const actions = {
             });
         });
     },
-    getChart({ commit, dispatch, getters, state, rootGetters }, period) {
+    getProfitChart({ commit, dispatch, getters, state, rootGetters }, period) {
         // if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "trading/statistic/chart",
+                    "trading/statistic/profit-chart",
                     { period: period, page: 1 },
                     { noLoading: true }
                 )
                 .then((response) => {
-                    response.data.data = createAccumulatedProfit(
-                        response.data.data
-                    );
+                    // response.data.data = createAccumulatedProfit(
+                    //     response.data.data
+                    // );
                     commit("setChart", response.data);
                     resolve();
                 });
@@ -109,6 +109,8 @@ const mutations = {
         state.data = data;
     },
     setChart(state, data) {
+        data.data = Object.values(data.data);
+        console.log("setChart", data);
         state.charts = data;
         state.updatedAt = moment();
     },

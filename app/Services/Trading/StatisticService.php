@@ -135,20 +135,83 @@ class StatisticService extends CoreService
     }
 
     /**
-     * Return the chart.
+     * getProfitChart
      *
      * @return array
      */
-    public function getChart($payload)
+    public function getProfitChart($payload)
     {
         $period = $payload->period;
         $page = (int) $payload->page;
-        // $charts = $this->createChartData($period, $page);
+        $charts = $this->createChartData($period, $page);
         return [
             'period' => $period,
             'page' => $page,
-            // 'data' => $charts
+            'data' => $charts
         ];
+    }
+
+    /**
+     * Create Chart Data
+     * @param int $period
+     * @param int $page
+     */
+    public function createChartData($period = 'day', $page = 1)
+    {
+        $ret = [];
+        $accProfit = 0;
+        $barsPerPage = $period == 'day' ? 30 : 10;
+        $multiplier = $period == 'quarter' ? 3 : 1;
+        $unit = $period == 'quarter' ? 'month' : $period;
+        $startOfPage = date_create()->modify('-' . ($multiplier * ($page * $barsPerPage - 1)) . ' ' . $unit);
+        $endOfPage = date_create()->modify('-' . (($page - 1) * $multiplier * $barsPerPage) . ' ' . $unit);
+        $startDate = first_day_of($period, $startOfPage)->format('Y-m-d');
+        $endDate = last_day_of($period, $endOfPage)->format('Y-m-d');
+        $orders = StockOrder::getProfitChart($period, $startDate, $endDate);
+        foreach ($orders as $order) {
+            if (!array_key_exists($order->date, $ret)) {
+                $pPos = 0;
+                $pNeg = 0;
+                $oPos = 0;
+                $oNeg = 0;
+            }
+            if ($order->profit > 0) {
+                $pPos = $order->profit;
+                $oPos = $order->order;
+            } else if ($order->profit < 0) {
+                $pNeg = $order->profit;
+                $oNeg = $order->order;
+            }
+            $profit = $pPos + $pNeg;
+            $accProfit += $profit;
+            $ret[$order->date]['rr'] = !!$pNeg ? $pPos / (-$pNeg) : 0;
+            $ret[$order->date]['winrate'] = $oPos / ($oPos + $oNeg) * 100;
+            $ret[$order->date]['profit'] = $profit;
+            $ret[$order->date]['accProfit'] = $accProfit;
+            $ret[$order->date]['date'] = $this->createChartDate($period, $order->date);
+        }
+        return $ret;
+    }
+    /**
+     * create Chart Date
+     */
+    private function createChartDate($period, $date)
+    {
+        if ($period != 'year') {
+            if ($period == 'day') {
+                [$y, $m, $d] = explode("/", $date);
+                $t = $d;
+                if ($y != date("Y")) $t .= '/' . $m . '/' . $y;
+                else if ($m != date("m")) $t .= '/' . $m;
+            } else {
+                [$y, $x] = explode("/", $date);
+                $t = $x;
+                if ($y != date("Y")) $t .= '/' . $y;
+            }
+        } else $t = $date;
+        $t = trans('custom.chart.period.' . $period) . ' ' . $t;
+        $t = str_replace(' 0', ' ', $t);
+        return str_replace('/0', '/', $t);
     }
 
     /**

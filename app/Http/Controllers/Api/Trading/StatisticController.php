@@ -61,9 +61,9 @@ class StatisticController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function getChart(Request $request)
+    public function getProfitChart(Request $request)
     {
-        $data = $this->statisticService->getChart($this->payload);
+        $data = $this->statisticService->getProfitChart($this->payload);
         return $this->sendResponse($data);
     }
 

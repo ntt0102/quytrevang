@@ -51,7 +51,7 @@
                         },
                         onValueChanged: (e) =>
                             $store.dispatch(
-                                'tradingStatistic/getChart',
+                                'tradingStatistic/getProfitChart',
                                 e.value
                             ),
                     },
@@ -63,7 +63,7 @@
             :data-source="charts.data"
             :customize-point="customizePoint"
             :title="{
-                text: $t('trading.trades.charTitle'),
+                text: $t('trading.statistic.charTitle'),
                 horizontalAlignment: 'center',
             }"
             :size="{ width: '100%' }"
@@ -79,12 +79,12 @@
                 fileName: 'chart',
                 printingEnabled: false,
             }"
-            :commonSeriesSettings="{ argumentField: 'time', barPadding: 0 }"
+            :commonSeriesSettings="{ argumentField: 'date', barPadding: 0 }"
             :series="[
                 {
-                    name: $t('trading.trades.profitSum'),
+                    name: $t('trading.statistic.profitSum'),
                     tag: 'money',
-                    valueField: 's3',
+                    valueField: 'profit',
                     axis: 'money',
                     type: 'stackedbar',
                     stack: 'money',
@@ -92,75 +92,33 @@
                     visible: visibleSeries.money,
                 },
                 {
-                    name: $t('trading.trades.lossSum'),
-                    valueField: 's4',
-                    axis: 'money',
+                    name: $t('trading.statistic.rr'),
+                    tag: 'rr',
+                    valueField: 'rr',
+                    axis: 'rr',
                     type: 'stackedbar',
-                    stack: 'money',
-                    color: 'FireBrick',
-                    showInLegend: false,
-                    visible: visibleSeries.money,
-                },
-                {
-                    name: $t('trading.trades.feesSum'),
-                    valueField: 's5',
-                    axis: 'money',
-                    type: 'stackedbar',
-                    stack: 'money',
-                    color: 'DarkOrange',
-                    showInLegend: false,
-                    visible: visibleSeries.money,
-                },
-
-                {
-                    name: $t('trading.trades.feesSum'),
-                    valueField: 's2',
-                    axis: 'money',
-                    type: 'stackedbar',
-                    stack: 'money',
-                    color: 'DarkOrange',
-                    showInLegend: false,
-                    visible: visibleSeries.money,
-                },
-                {
-                    name: $t('trading.trades.lossSum'),
-                    valueField: 's1',
-                    axis: 'money',
-                    type: 'stackedbar',
-                    stack: 'money',
-                    color: 'FireBrick',
-                    showInLegend: false,
-                    visible: visibleSeries.money,
-                },
-
-                {
-                    name: $t('trading.trades.profitPerPrincipal'),
-                    tag: 'profitPerPrincipal',
-                    valueField: 'profitPerPrincipal',
-                    axis: 'profitPerPrincipal',
-                    type: 'stackedbar',
-                    stack: 'profitPerPrincipal',
+                    stack: 'rr',
                     color: 'Teal',
-                    visible: visibleSeries.profitPerPrincipal,
+                    visible: visibleSeries.rr,
                 },
                 {
-                    name: $t('trading.trades.profitPerFees'),
-                    tag: 'profitPerFees',
-                    valueField: 'profitPerFees',
-                    axis: 'profitPerFees',
+                    name: $t('trading.statistic.winrate'),
+                    tag: 'winrate',
+                    valueField: 'winrate',
+                    axis: 'winrate',
                     type: 'stackedbar',
-                    stack: 'profitPerFees',
+                    stack: 'winrate',
                     color: 'Purple',
-                    visible: visibleSeries.profitPerFees,
+                    visible: visibleSeries.winrate,
                 },
                 {
-                    name: $t('trading.trades.accumulatedProfit'),
-                    tag: 'accumulatedProfit',
-                    valueField: 'accumulatedProfit',
-                    axis: 'accumulatedProfit',
+                    name: $t('trading.statistic.accProfit'),
+                    tag: 'accProfit',
+                    valueField: 'accProfit',
+                    axis: 'accProfit',
                     type: 'spline',
                     color: 'White',
-                    visible: visibleSeries.accumulatedProfit,
+                    visible: visibleSeries.accProfit,
                 },
             ]"
             :valueAxis="[
@@ -178,7 +136,7 @@
                     ],
                 },
                 {
-                    name: 'profitPerPrincipal',
+                    name: 'rr',
                     synchronizedValue: 0,
                     label: { visible: false },
                     tick: { visible: false },
@@ -186,7 +144,7 @@
                     visible: false,
                 },
                 {
-                    name: 'profitPerFees',
+                    name: 'winrate',
                     synchronizedValue: 0,
                     label: { visible: false },
                     tick: { visible: false },
@@ -194,7 +152,7 @@
                     visible: false,
                 },
                 {
-                    name: 'accumulatedProfit',
+                    name: 'accProfit',
                     label: { visible: false },
                     tick: { visible: false },
                     grid: { visible: false },
@@ -227,7 +185,7 @@
         >
             <template #markerTemplate="{ data }">
                 <svg>
-                    <g v-if="data.series.tag === 'accumulatedProfit'">
+                    <g v-if="data.series.tag === 'accProfit'">
                         <path
                             d="M 0 8 C 2 4 7 4 9.5 8 C 11 12 16 12 18 8 L 18 10 C 16 14 11 14 8.5 10 C 7 6 2 6 0 10 Z"
                             :fill="data.marker.fill"
@@ -298,15 +256,15 @@ let params = {
 };
 const visibleSeries = reactive({
     money: true,
-    profitPerPrincipal: false,
-    profitPerFees: false,
-    accumulatedProfit: true,
+    rr: false,
+    winrate: false,
+    accProfit: true,
 });
 const chartRef = ref(null);
 const charts = computed(() => store.state.tradingStatistic.charts);
 const permissions = computed(() => store.state.auth.user.permissions);
 
-store.dispatch("tradingStatistic/getChart", route.query.period ?? "day");
+store.dispatch("tradingStatistic/getProfitChart", route.query.period ?? "day");
 bus.on("toggleMenu", () => {
     setTimeout(() => chartRef.value.instance.render(), 300);
 });
@@ -315,14 +273,11 @@ onUnmounted(() => bus.off("toggleMenu"));
 
 function customizePoint({ value, series }) {
     if (
-        series.tag === "profitPerPrincipal" &&
+        series.tag === "rr" &&
         value >= params.principalTargetThreshold[charts.value.period]
     )
         return { color: "Aqua", hoverStyle: { color: "Aqua" } };
-    else if (
-        series.tag === "profitPerFees" &&
-        value >= params.feesTargetThreshold
-    )
+    else if (series.tag === "winrate" && value >= params.feesTargetThreshold)
         return { color: "Fuchsia", hoverStyle: { color: "Fuchsia" } };
     else
         return {
@@ -334,13 +289,13 @@ function customizeText({ valueText }) {
     return `${valueText.replace(",0", "").replace("M", " Tr")}`;
 }
 function customizeTooltip(pointInfo) {
-    let accumulatedProfit = pointInfo.point.data.accumulatedProfit;
+    let accProfit = pointInfo.point.data.accProfit;
     let referenceTime = getReferenceTime();
     if (referenceTime !== null) {
         let referenceAccumulatedProfit = charts.value.data.find(
             (c) => c.time === referenceTime
-        ).accumulatedProfit;
-        accumulatedProfit = accumulatedProfit - referenceAccumulatedProfit;
+        ).accProfit;
+        accProfit = accProfit - referenceAccumulatedProfit;
     }
     return {
         html: `<div class='trade-chart-tooltip'>
@@ -402,17 +357,14 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='top-series-name'>
-                      ${t("trading.trades.profitPerPrincipal")}
+                      ${t("trading.trades.rr")}
                     </span>:
                   </div>
                   <div class='value-text'>
                     <span class='top-series-value'>
-                      ${filters.numberVnFormat(
-                          pointInfo.point.data.profitPerPrincipal,
-                          1
-                      )}%
+                      ${filters.numberVnFormat(pointInfo.point.data.rr, 1)}%
                       (${(
-                          (100 * pointInfo.point.data.profitPerPrincipal) /
+                          (100 * pointInfo.point.data.rr) /
                           params.principalTargetThreshold[charts.value.period]
                       ).toFixed(0)}%
                       ${t("trading.trades.kpi")})
@@ -420,17 +372,14 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.profitPerFees")}
+                      ${t("trading.trades.winrate")}
                     </span>:
                   </div>
                   <div class='value-text'>
                     <span class='bottom-series-value'>
-                      ${filters.numberVnFormat(
-                          pointInfo.point.data.profitPerFees,
-                          1
-                      )}
+                      ${filters.numberVnFormat(pointInfo.point.data.winrate, 1)}
                       (${(
-                          (100 * pointInfo.point.data.profitPerFees) /
+                          (100 * pointInfo.point.data.winrate) /
                           params.feesTargetThreshold
                       ).toFixed(0)}%
                       ${t("trading.trades.kpi")})
@@ -438,12 +387,12 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.accumulatedProfit")}
+                      ${t("trading.trades.accProfit")}
                     </span>:
                   </div>
                   <div class='value-text'>
                     <span class='bottom-series-value'>
-                      ${filters.currency(accumulatedProfit)}
+                      ${filters.currency(accProfit)}
                     </span>
                   </div>
                 </div>
