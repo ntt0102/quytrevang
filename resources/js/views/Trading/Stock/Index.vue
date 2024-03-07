@@ -260,7 +260,7 @@ const state = reactive({
         { text: t("trading.stock.symbolList.nhList"), value: "nh" },
         { text: t("trading.stock.symbolList.ckList"), value: "ck" },
         { text: t("trading.stock.symbolList.filterCash"), value: "fcash" },
-        { text: t("trading.stock.symbolList.filterIndex"), value: "findex" },
+        // { text: t("trading.stock.symbolList.filterIndex"), value: "findex" },
         { text: t("trading.stock.symbolList.filterMix"), value: "fmix" },
         { text: t("trading.stock.symbolList.watchList"), value: "watch" },
         { text: t("trading.stock.symbolList.hold"), value: "hold" },
