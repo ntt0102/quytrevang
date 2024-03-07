@@ -57,7 +57,7 @@ class StatisticService extends CoreService
             }
         }
         return [
-            'rr' => $pPos / (-$pNeg),
+            'rr' => !!$pNeg ? $pPos / (-$pNeg) : 0,
             'winrate' => $oPos / ($oPos + $oNeg) * 100,
             'profit' => $pPos + $pNeg,
         ];
