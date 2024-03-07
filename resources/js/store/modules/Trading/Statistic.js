@@ -91,7 +91,9 @@ const actions = {
                 .then((response) => {
                     resolve();
                     dispatch("getData");
-                    // dispatch("getChart", state.charts.period);
+                    dispatch("getOpening");
+                    dispatch("getSummary");
+                    dispatch("getProfitChart", state.charts.period);
                 });
         });
     },

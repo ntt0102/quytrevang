@@ -261,8 +261,8 @@ function customizePoint({ value, series }) {
             break;
     }
 }
-function customizeText({ valueText }) {
-    return `${valueText.replace(",0", "").replace("M", " Tr")}`;
+function customizeText({ value }) {
+    return filters.shorten(value);
 }
 function customizeTooltip(pointInfo) {
     let accProfit = pointInfo.point.data.accProfit;
