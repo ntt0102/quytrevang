@@ -184,8 +184,8 @@ class StatisticService extends CoreService
             }
             $profit = $pPos + $pNeg;
             $accProfit += $profit;
-            $ret[$order->date]['rr'] = !!$pNeg ? $pPos / (-$pNeg) : 0;
-            $ret[$order->date]['winrate'] = $oPos / ($oPos + $oNeg) * 100;
+            $ret[$order->date]['rr'] = !$pNeg ? 0 : $pPos / (-$pNeg);
+            $ret[$order->date]['winrate'] = !($oPos + $oNeg) ? 0 : $oPos / ($oPos + $oNeg) * 100;
             $ret[$order->date]['profit'] = $profit;
             $ret[$order->date]['accProfit'] = $accProfit;
             $ret[$order->date]['date'] = $this->createChartDate($period, $order->date);
