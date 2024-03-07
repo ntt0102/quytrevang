@@ -158,12 +158,15 @@ class StockService extends CoreService
             $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/hnx";
             $res = $client->get($url);
             $hnx = json_decode($res->getBody());
+            $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/upcom";
+            $res = $client->get($url);
+            $upcom = json_decode($res->getBody());
             $index = ['VNINDEX', 'VN30', '^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
             $nh = ['VCB', 'BID', 'CTG', 'VPB', 'MBB', 'ACB', 'STB', 'HDB', 'VIB', 'SSB', 'SHB', 'MSB', 'TPB', 'LPB', 'EIB', 'OCB'];
             $ck = ['SSI', 'VND', 'VCI', 'SHS', 'HCM', 'VIX', 'MBS', 'FTS', 'BSI', 'CTS', 'VDS'];
             $list = [
                 (object)['name' => 'hose', 'symbols' => array_merge($index, $hose)],
-                (object)['name' => 'hnx', 'symbols' => $hnx],
+                (object)['name' => 'hnx', 'symbols' => array_merge($hnx, $upcom)],
                 (object)['name' => 'nh', 'symbols' => $nh],
                 (object)['name' => 'ck', 'symbols' => $ck],
             ];
