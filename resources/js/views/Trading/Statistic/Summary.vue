@@ -31,21 +31,14 @@
                         >&nbsp;
                         <span
                             :class="`quality ${
-                                (summary.quarter.rr == null &&
-                                    summary.quarter.winrate == 100) ||
-                                summary.quarter.rr >= 1
-                                    ? 'good'
-                                    : 'bad'
+                                summary.quarter.rr >= 1 ? 'good' : 'bad'
                             }`"
                         >
                             {{
-                                summary.quarter.rr == null &&
-                                summary.quarter.winrate == 100
-                                    ? "+∞"
-                                    : $filters.numberVnFormat(
-                                          summary.quarter.rr,
-                                          summary.quarter.rr > 2 ? 0 : 1
-                                      )
+                                $filters.numberVnFormat(
+                                    summary.quarter.rr,
+                                    summary.quarter.rr > 2 ? 0 : 1
+                                )
                             }}
                         </span>
                     </div>
@@ -91,21 +84,14 @@
                         >&nbsp;
                         <span
                             :class="`quality ${
-                                (summary.year.rr == null &&
-                                    summary.year.winrate == 100) ||
-                                summary.year.rr >= 1
-                                    ? 'good'
-                                    : 'bad'
+                                summary.year.rr >= 1 ? 'good' : 'bad'
                             }`"
                         >
                             {{
-                                summary.year.rr == null &&
-                                summary.year.winrate == 100
-                                    ? "+∞"
-                                    : $filters.numberVnFormat(
-                                          summary.year.rr,
-                                          summary.year.rr > 2 ? 0 : 1
-                                      )
+                                $filters.numberVnFormat(
+                                    summary.year.rr,
+                                    summary.year.rr > 2 ? 0 : 1
+                                )
                             }}
                         </span>
                     </div>
@@ -148,21 +134,14 @@
                         >&nbsp;
                         <span
                             :class="`quality ${
-                                (summary.all.rr == null &&
-                                    summary.all.winrate == 100) ||
-                                summary.all.rr >= 1
-                                    ? 'good'
-                                    : 'bad'
+                                summary.all.rr >= 1 ? 'good' : 'bad'
                             }`"
                         >
                             {{
-                                summary.all.rr == null &&
-                                summary.all.winrate == 100
-                                    ? "+∞"
-                                    : $filters.numberVnFormat(
-                                          summary.all.rr,
-                                          summary.all.rr > 2 ? 0 : 1
-                                      )
+                                $filters.numberVnFormat(
+                                    summary.all.rr,
+                                    summary.all.rr > 2 ? 0 : 1
+                                )
                             }}
                         </span>
                     </div>
