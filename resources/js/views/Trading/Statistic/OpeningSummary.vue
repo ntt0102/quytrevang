@@ -21,7 +21,7 @@
         </div>
         <div class="body">
             <div v-for="order in opening.orders" :key="order.symbol">
-                <div class="period">
+                <div class="period" @click="gotoChart(order.symbol)">
                     {{ order.symbol }}
                 </div>
                 <div class="detail">
@@ -60,8 +60,10 @@
 <script setup>
 import { computed } from "vue";
 import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 const store = useStore();
+const router = useRouter();
 const opening = computed(() => store.state.tradingStatistic.opening);
 const props = defineProps({
     hasTitle: {
@@ -76,6 +78,9 @@ function getChangeClass(change) {
     if (change < 0) cls = "bad";
     else if (change > 0) cls = "good";
     return cls;
+}
+function gotoChart(symbol) {
+    router.push({ name: "trading-stock", query: { symbol, list: "hold" } });
 }
 </script>
 <style lang="scss">

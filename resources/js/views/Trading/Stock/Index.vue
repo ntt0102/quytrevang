@@ -155,12 +155,10 @@
             </div>
         </div>
     </div>
-    <FilterPopup ref="filterPopupRef" />
 </template>
 
 <script setup>
 import ColorPicker from "./ColorPicker.vue";
-import FilterPopup from "./filterPopup.vue";
 import stockDb from "../../../plugins/stockDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
@@ -252,7 +250,7 @@ let params = {
     crosshair: {},
 };
 const state = reactive({
-    symbol: "VNINDEX",
+    symbol: route.query.symbol ?? "VNINDEX",
     symbols: [],
     symbolKind: null,
     symbolKinds: [
@@ -260,7 +258,6 @@ const state = reactive({
         { text: t("trading.stock.symbolList.nh"), value: "nh" },
         { text: t("trading.stock.symbolList.ck"), value: "ck" },
         { text: t("trading.stock.symbolList.filterCash"), value: "fcash" },
-        // { text: t("trading.stock.symbolList.filterIndex"), value: "findex" },
         { text: t("trading.stock.symbolList.filterMix"), value: "fmix" },
         { text: t("trading.stock.symbolList.watch"), value: "watch" },
         { text: t("trading.stock.symbolList.hold"), value: "hold" },
@@ -271,7 +268,9 @@ const state = reactive({
     showColorPicker: false,
     showTradingView: false,
 });
-state.symbolKind = state.symbolKinds[0];
+state.symbolKind = state.symbolKinds.find(
+    (i) => i.value === route.query.list ?? "hose"
+);
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
