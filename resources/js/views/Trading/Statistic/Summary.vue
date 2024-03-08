@@ -5,7 +5,7 @@
         </div>
         <div class="body">
             <div>
-                <div class="period">
+                <div class="period" @click="periodClick('quarter')">
                     {{ $t("trading.statistic.periods.quarter") }}
                 </div>
                 <div v-if="$mf.isSet(summary)" class="detail">
@@ -58,7 +58,7 @@
                 <div v-else>-</div>
             </div>
             <div>
-                <div class="period">
+                <div class="period" @click="periodClick('year')">
                     {{ $t("trading.statistic.periods.year") }}
                 </div>
                 <div v-if="$mf.isSet(summary)" class="detail">
@@ -176,8 +176,12 @@ const props = defineProps({
         default: false,
     },
 });
+const emit = defineEmits(["period"]);
 
 store.dispatch("tradingStatistic/getSummary");
+function periodClick(period) {
+    emit("period", period);
+}
 </script>
 <style lang="scss">
 .statistic-summary {

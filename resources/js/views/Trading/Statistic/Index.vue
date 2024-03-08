@@ -1,6 +1,6 @@
 <template>
     <OpeningSummary :hasTitle="false" />
-    <Summary :hasTitle="false" />
+    <Summary :hasTitle="false" @period="periodEmit" />
     <div class="trades-page content-block dx-card responsive-paddings">
         <DxToolbar
             :items="[
@@ -233,7 +233,6 @@ const visibleSeries = reactive({
 });
 const chartRef = ref(null);
 const charts = computed(() => store.state.tradingStatistic.charts);
-const permissions = computed(() => store.state.auth.user.permissions);
 
 store.dispatch("tradingStatistic/getProfitChart", route.query.period ?? "day");
 bus.on("toggleMenu", () => {
@@ -241,6 +240,10 @@ bus.on("toggleMenu", () => {
 });
 
 onUnmounted(() => bus.off("toggleMenu"));
+
+function periodEmit(period) {
+    store.dispatch("tradingStatistic/getProfitChart", period);
+}
 
 function customizePoint({ value, series }) {
     switch (series.tag) {

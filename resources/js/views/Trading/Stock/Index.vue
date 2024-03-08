@@ -3,12 +3,22 @@
         <DxToolbar
             :items="[
                 {
+                    visible: $mf.isSet($route.query),
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-arrow-left small',
+                        hint: $t('buttons.back'),
+                        onClick: () => $router.go(-1),
+                    },
+                },
+                {
                     location: 'before',
                     widget: 'dxSelectBox',
                     options: {
                         width: '130px',
                         dataSource: state.symbolKinds,
-                        keyExpr: 'value',
+                        valueExpr: 'value',
                         displayExpr: 'text',
                         value: state.symbolKind,
                         hint: $t('trading.stock.symbolKind'),
@@ -56,9 +66,7 @@
                         "
                         height="30px"
                         :data-source="
-                            $store.state.tradingStock.symbols[
-                                state.symbolKind.value
-                            ]
+                            $store.state.tradingStock.symbols[state.symbolKind]
                         "
                         :search-enabled="true"
                         :show-clear-button="true"
@@ -268,9 +276,7 @@ const state = reactive({
     showColorPicker: false,
     showTradingView: false,
 });
-state.symbolKind = state.symbolKinds.find(
-    (i) => i.value === route.query.list ?? "hose"
-);
+state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
@@ -1105,7 +1111,7 @@ function filterSymbols() {
         const param = {
             from: params.tools.range[0].time,
             to: params.tools.range[1].time,
-            name: state.symbolKind.value,
+            name: state.symbolKind,
         };
         store.dispatch("tradingStock/filterSymbols", param);
     } else toast.error(t("trading.stock.rangeWarning"));
