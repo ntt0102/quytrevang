@@ -333,7 +333,10 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
     store
-        .dispatch("tradingStock/getChartData", state.symbol)
+        .dispatch("tradingStock/getChartData", {
+            symbol: state.symbol,
+            vnindex: true,
+        })
         .then(async (vnindex) => {
             params.series.vnindex.setData(vnindex);
             const range = await stockDb.get("range");
@@ -1101,7 +1104,10 @@ function formatPrice(price) {
 }
 function symbolChanged(e) {
     if (!state.symbol) return false;
-    store.dispatch("tradingStock/getChartData", state.symbol);
+    store.dispatch("tradingStock/getChartData", {
+        symbol: state.symbol,
+        vnindex: false,
+    });
 }
 function listChanged(e) {
     state.symbolKind = e.value;

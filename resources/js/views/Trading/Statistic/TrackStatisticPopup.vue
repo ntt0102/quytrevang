@@ -120,6 +120,21 @@
                         :validation-rules="state.validationRules.sellFee"
                     />
                 </DxColumn>
+                <DxColumn
+                    alignment="center"
+                    :caption="$t('trading.statistic.profit')"
+                >
+                    <DxColumn
+                        data-type="string"
+                        :calculate-cell-value="calculateMoneyProfit"
+                        :caption="$t('trading.statistic.moneyProfit')"
+                    />
+                    <DxColumn
+                        data-type="string"
+                        :calculate-cell-value="calculatePercentProfit"
+                        :caption="$t('trading.statistic.percentProfit')"
+                    />
+                </DxColumn>
 
                 <template #commandCellTemplate="{ data }">
                     <DxToolbar
@@ -161,6 +176,7 @@ const bus = inject("bus");
 const mt = inject("mt");
 const mc = inject("mc");
 const mf = inject("mf");
+const filters = inject("filters");
 const popupRef = ref(null);
 const dataGridRef = ref(null);
 const state = reactive({
@@ -278,6 +294,45 @@ function validateSellDate(e) {
 function validateArray(e) {
     const regex = /^\[.*\]$/;
     return regex.test(e.value);
+}
+function calculateMoneyProfit(rowData) {
+    try {
+        const profit = calcutateProfit(rowData);
+        return profit.percent == -100 ? "-" : filters.shorten(profit.money);
+    } catch (error) {
+        return "-";
+    }
+}
+function calculatePercentProfit(rowData) {
+    try {
+        const profit = calcutateProfit(rowData);
+        return profit.percent == -100
+            ? "-"
+            : filters.numberVnFormat(profit.percent, 1);
+    } catch (error) {
+        return "-";
+    }
+}
+function calcutateProfit(rowData) {
+    const buyVolume = JSON.parse(rowData.buy_volume);
+    const buyPrice = JSON.parse(rowData.buy_price);
+    const buyFee = JSON.parse(rowData.buy_fee);
+    const sellVolume = JSON.parse(rowData.sell_volume);
+    const sellPrice = JSON.parse(rowData.sell_price);
+    const sellFee = JSON.parse(rowData.sell_fee);
+    let buyCash = 0,
+        sellCash = 0,
+        totalCost = 0;
+    for (let i = 0; i < buyVolume.length; i++) {
+        buyCash = -buyVolume[i] * buyPrice[i] - buyFee[i];
+    }
+    totalCost = buyCash;
+    for (let i = 0; i < sellVolume.length; i++) {
+        sellCash = sellVolume[i] * sellPrice[i] - sellFee[i];
+        totalCost += -sellFee[i];
+    }
+    const profit = buyCash + sellCash;
+    return { money: profit, percent: (profit / -totalCost) * 100 };
 }
 function onShown() {
     store.dispatch("tradingStatistic/getData");

@@ -18,10 +18,15 @@ class StockService extends CoreService
      */
     public function getChartData($payload)
     {
-        return [
+        $ret = [
             'data' => $this->getData($payload),
-            'tools' => $this->getTools($payload)
+            'tools' => $this->getTools($payload),
         ];
+        if ($payload->vnindex) {
+            $payload->symbol = 'VNINDEX';
+            $ret['vnindex'] = $this->getDataFromSsi($payload, true)['price'];
+        }
+        return $ret;
     }
     /**
      * Get chart data
@@ -40,7 +45,7 @@ class StockService extends CoreService
      * @param $payload
      * 
      */
-    public function getDataFromSsi($payload)
+    public function getDataFromSsi($payload, $onlyPrice = false)
     {
         $r = ['ohlc' => [], 'price' => [], 'cash' => []];
         if (!$payload->symbol) return $r;
@@ -53,29 +58,33 @@ class StockService extends CoreService
         $acc = 0;
         $prevAvg = ($rsp->h[0] + $rsp->l[0] + $rsp->c[0]) / 3;
         for ($i = 0; $i < count($rsp->t); $i++) {
-            $r['ohlc'][] = [
-                'time' => $rsp->t[$i],
-                'open' => +$rsp->o[$i],
-                'high' => +$rsp->h[$i],
-                'low' => +$rsp->l[$i],
-                'close' => +$rsp->c[$i]
-            ];
+            if (!$onlyPrice) {
+                $r['ohlc'][] = [
+                    'time' => $rsp->t[$i],
+                    'open' => +$rsp->o[$i],
+                    'high' => +$rsp->h[$i],
+                    'low' => +$rsp->l[$i],
+                    'close' => +$rsp->c[$i]
+                ];
+            }
             $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
             $r['price'][] = [
                 'time' => $rsp->t[$i],
                 'value' => $avg
             ];
-            $change = $avg - $prevAvg;
-            $side = 0;
-            if ($change > 0) $side = 1;
-            else if ($change < 0) $side = -1;
-            $prevAvg = $avg;
-            $cash = $side * $rsp->v[$i];
-            $acc += $cash;
-            $r['cash'][] = [
-                'time' => $rsp->t[$i],
-                'value' => $acc
-            ];
+            if (!$onlyPrice) {
+                $change = $avg - $prevAvg;
+                $side = 0;
+                if ($change > 0) $side = 1;
+                else if ($change < 0) $side = -1;
+                $prevAvg = $avg;
+                $cash = $side * $rsp->v[$i];
+                $acc += $cash;
+                $r['cash'][] = [
+                    'time' => $rsp->t[$i],
+                    'value' => $acc
+                ];
+            }
         }
         return $r;
     }

@@ -5,24 +5,24 @@ function initialState() {
         isChartLoading: false,
     };
 }
-const FROM_DATE = moment().subtract(3, "years").unix();
+const FROM_DATE = moment().subtract(4, "years").unix();
 const TO_DATE = moment().unix();
 const getters = {};
 
 const actions = {
-    getChartData({ commit, dispatch, getters, state, rootGetters }, symbol) {
+    getChartData({ commit, dispatch, getters, state, rootGetters }, param) {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .post(
                     "trading/stock",
-                    { symbol, from: FROM_DATE, to: TO_DATE },
+                    { ...param, ...{ from: FROM_DATE, to: TO_DATE } },
                     { noLoading: true }
                 )
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
-                    resolve(response.data.data.price);
+                    resolve(response.data.vnindex);
                 });
         });
     },
