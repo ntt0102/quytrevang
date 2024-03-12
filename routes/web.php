@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use PhpParser\Node\Expr\Cast\Object_;
 
 /*
 |--------------------------------------------------------------------------
@@ -167,6 +168,8 @@ Route::get('test', function () {
 
     // // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
+    $payload = (object)['symbol' => ''];
+    $s = app(\App\Services\Trading\StockService::class)->getEvents($payload);
     // dd($filter);
     // $date = date('Y-m-d');
     // dd(get_global_value('openingMarketFlag'));
@@ -177,7 +180,7 @@ Route::get('test', function () {
     // $rsp = json_decode($res->getBody());
     // dd($rsp);
     // \Log::info('Hello world!!');
-    $s = \App\Models\StockOrder::getProfitChart('quarter', '2023-03-04', '2024-03-04');
+    // $s = \App\Models\StockOrder::getProfitChart('quarter', '2023-03-04', '2024-03-04');
     // $o = \App\Models\StockOrder::find(1);
     // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
     // $s = app(\App\Services\Trading\StatisticService::class)->calculateProfit($o);

@@ -21,6 +21,7 @@ class StockService extends CoreService
         $ret = [
             'data' => $this->getData($payload),
             'tools' => $this->getTools($payload),
+            'events' => $this->getEvents($payload),
         ];
         if ($payload->vnindex) {
             $payload->symbol = 'VNINDEX';
@@ -152,6 +153,22 @@ class StockService extends CoreService
             $result[$d->name][$d->point] = $d->data;
         }
         return $result;
+    }
+    /**
+     * Get chart tool
+     *
+     * @param $payload
+     * 
+     */
+    public function getEvents($payload)
+    {
+        $startDate = date("Y-m-d");
+        $endDate = date('Y-m-d', strtotime('+1 year'));
+        $client = new \GuzzleHttp\Client();
+        $url = "https://finfo-api.vndirect.com.vn/v4/events?q=locale:VN~type:stockdiv,dividend~code:{$payload->symbol}~effectiveDate:gte:{$startDate}~effectiveDate:lte:{$endDate}&sort=effectiveDate:asc&size=50&page=1";
+        $res = $client->get($url);
+        $rsp = json_decode($res->getBody());
+        return $rsp->totalElements;
     }
     /**
      * Clone Symbols

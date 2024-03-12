@@ -70,7 +70,7 @@
                         "
                         :search-enabled="true"
                         :show-clear-button="true"
-                        :element-attr="{ class: 'symbol-select' }"
+                        :element-attr="{ class: `symbol-select ${eventClass}` }"
                         v-model="state.symbol"
                         @valueChanged="symbolChanged"
                     />
@@ -228,7 +228,6 @@ const targetToolRef = ref(null);
 const uplpsToolRef = ref(null);
 const downlpsToolRef = ref(null);
 const rangeToolRef = ref(null);
-const filterPopupRef = ref(null);
 const tradingviewChartRef = ref(null);
 let params = {
     chart: {},
@@ -278,10 +277,14 @@ const state = reactive({
 });
 state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
-    () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
+    () =>
+        `https://iboard.ssi.com.vn/chart/?symbol=${state.symbol}&language=vi&theme=dark`
 );
 const inWatchlist = computed(() =>
     store.state.tradingStock.symbols.watch.includes(state.symbol)
+);
+const eventClass = computed(() =>
+    !!store.state.tradingStock.chart.events ? " events" : ""
 );
 store.dispatch("tradingStock/getSymbols");
 stockDb.create();
@@ -1174,6 +1177,11 @@ function deleteWatchlist() {
                 }
                 .dx-placeholder {
                     line-height: 3px;
+                }
+                &.events {
+                    .dx-icon-clear {
+                        background: red;
+                    }
                 }
             }
 
