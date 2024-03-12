@@ -277,8 +277,7 @@ const state = reactive({
 });
 state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
-    () =>
-        `https://dchart.vndirect.com.vn/?language=vi&timeframe=D&theme=dark&symbol=${state.symbol}`
+    () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
 const inWatchlist = computed(() =>
     store.state.tradingStock.symbols.watch.includes(state.symbol)
