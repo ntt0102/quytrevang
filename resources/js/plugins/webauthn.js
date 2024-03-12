@@ -69,7 +69,7 @@ function webauthnRegister(key, callback) {
     key.publicKey.challenge = new Uint8Array(key.publicKey.challenge); // convert type for use by key
     key.publicKey.user.id = new Uint8Array(key.publicKey.user.id);
 
-    console.log(key);
+    // console.log(key);
     navigator.credentials
         .create({ publicKey: key.publicKey })
         .then(function (aNewCredentialInfo) {

@@ -129,13 +129,13 @@ import { getCurrentInstance, inject, onMounted, reactive, ref } from "vue";
 import { useStore } from "vuex";
 import { useRoute, useRouter } from "vue-router";
 import { useI18n } from "vue-i18n";
-const { cookies } = useCookies();
 import { useCookies } from "vue3-cookies";
 import { toast } from "vue3-toastify";
 
 const store = useStore();
 const route = useRoute();
 const router = useRouter();
+const { cookies } = useCookies();
 const { t } = useI18n();
 const mc = inject("mc");
 const mt = inject("mt");
