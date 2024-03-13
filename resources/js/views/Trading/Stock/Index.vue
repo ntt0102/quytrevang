@@ -134,7 +134,7 @@
                     ></div>
                     <div
                         ref="cashToolRef"
-                        class="command far fa-dot-circle"
+                        class="command drawless far fa-dot-circle"
                         :title="$t('trading.stock.tools.cash')"
                         @click="cashToolClick"
                         @contextmenu="cashToolContextmenu"
@@ -601,30 +601,31 @@ function loadchartTools() {
                             params.series.price.createPriceLine(line))
                 );
                 break;
-            case "uplps":
-                Object.entries(tool).forEach(
-                    ([point, line]) =>
-                        (params.tools.uplps[point] =
-                            params.series[
-                                point.includes("P") ? "price" : "cash"
-                            ].createPriceLine(line))
-                );
-                break;
-            case "downlps":
-                Object.entries(tool).forEach(
-                    ([point, line]) =>
-                        (params.tools.downlps[point] =
-                            params.series[
-                                point.includes("P") ? "price" : "cash"
-                            ].createPriceLine(line))
-                );
-                break;
             case "rr":
                 Object.entries(tool).forEach(
                     ([point, line]) =>
                         (params.tools.rr[point] =
                             params.series.price.createPriceLine(line))
                 );
+                break;
+            default:
+                if (name.includes("uplps")) {
+                    Object.entries(tool).forEach(
+                        ([point, line]) =>
+                            (params.tools.uplps[point] =
+                                params.series[
+                                    point.includes("P") ? "price" : "cash"
+                                ].createPriceLine(line))
+                    );
+                } else if (name.includes("downlps")) {
+                    Object.entries(tool).forEach(
+                        ([point, line]) =>
+                            (params.tools.downlps[point] =
+                                params.series[
+                                    point.includes("P") ? "price" : "cash"
+                                ].createPriceLine(line))
+                    );
+                }
                 break;
         }
     }
@@ -652,7 +653,7 @@ function lineToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
     document
-        .querySelectorAll(".tool-area > .command")
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
     e.stopPropagation();
@@ -721,7 +722,7 @@ function targetToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
     document
-        .querySelectorAll(".tool-area > .command")
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
@@ -830,7 +831,7 @@ function uplpsToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
     document
-        .querySelectorAll(".tool-area > .command")
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
     else drawUplpsTool();
@@ -844,12 +845,14 @@ function uplpsToolContextmenu(e) {
 }
 function drawUplpsTool() {
     let startTime, endTime;
-    if (mf.isSet(params.tools.uplps.P1)) {
-        startTime = +params.tools.uplps.P1.options().startTime;
+    const name = state.isCashDraw ? "cash" : "price";
+    const char = state.isCashDraw ? "C" : "P";
+    if (mf.isSet(params.tools.uplps[`${char}1`])) {
+        startTime = +params.tools.uplps[`${char}1`].options().startTime;
         endTime = params.crosshair.time;
         removeUplpsTool(false);
     } else startTime = params.crosshair.time;
-    const { price1, price2, cash1, cash2 } = findUplps(startTime, endTime);
+    const { value1, value2 } = findUplps(startTime, endTime);
     let option = {
         lineWidth: 1,
         lineStyle: 1,
@@ -859,36 +862,22 @@ function drawUplpsTool() {
     let param = {
         isRemove: false,
         symbol: state.symbol,
-        name: "uplps",
+        name: `${name}uplps`,
         points: [],
         data: [],
     };
     option.startTime = startTime;
-    option.price = price1;
-    option.title = "P1";
+    option.price = value1;
+    option.title = `${char}1`;
     params.tools.uplps[option.title] =
-        params.series.price.createPriceLine(option);
+        params.series[name].createPriceLine(option);
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
     //
-    option.price = price2;
-    option.title = "P2";
+    option.price = value2;
+    option.title = `${char}2`;
     params.tools.uplps[option.title] =
-        params.series.price.createPriceLine(option);
-    param.points.push(option.title);
-    param.data.push(mf.cloneDeep(option));
-    //
-    option.price = cash1;
-    option.title = "C1";
-    params.tools.uplps[option.title] =
-        params.series.cash.createPriceLine(option);
-    param.points.push(option.title);
-    param.data.push(mf.cloneDeep(option));
-    //
-    option.price = cash2;
-    option.title = "C2";
-    params.tools.uplps[option.title] =
-        params.series.cash.createPriceLine(option);
+        params.series[name].createPriceLine(option);
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
 
@@ -896,89 +885,63 @@ function drawUplpsTool() {
     uplpsToolRef.value.classList.remove("selected");
 }
 function findUplps(startTime, endTime) {
-    let p1,
-        p2,
-        p3,
-        dP = 0,
-        dpMax = 0,
-        c1,
-        c2,
-        c3,
-        dC = 0,
-        dcMax = 0;
-    for (let i = 0; i < params.data.price.length; i++) {
-        const time = params.data.price[i].time;
+    let v1,
+        v2,
+        v3,
+        d = 0,
+        dMax = 0;
+    const data = params.data[state.isCashDraw ? "cash" : "price"];
+    for (let i = 0; i < data.length; i++) {
+        const time = data[i].time;
         if (time < startTime) continue;
         if (!!endTime && time > endTime) break;
-        const price = params.data.price[i].value;
-        const cash = params.data.cash[i].value;
-        if (p1 == undefined) {
-            p1 = price;
-            p2 = price;
-            p3 = price;
-            c1 = cash;
-            c2 = cash;
-            c3 = cash;
+        const value = data[i].value;
+        if (v1 == undefined) {
+            v1 = value;
+            v2 = value;
+            v3 = value;
         }
-        if (price > p3) {
-            if (dP > dpMax) {
-                p2 = p3;
-                dpMax = dP;
+        if (value > v3) {
+            if (d > dMax) {
+                v2 = v3;
+                dMax = d;
             }
-            p3 = price;
-            dP = 0;
-        } else if (price < p3) {
-            const _dP = +(p3 - price).toFixed(2);
-            if (_dP > dP) dP = _dP;
+            v3 = value;
+            d = 0;
+        } else if (value < v3) {
+            const _d = +(v3 - value).toFixed(2);
+            if (_d > d) d = _d;
         }
-        if (price < p1 && dpMax > 0) break;
-        //
-        if (cash > c3) {
-            if (dC > dcMax) {
-                c2 = c3;
-                dcMax = dC;
-            }
-            c3 = cash;
-            dC = 0;
-        } else if (cash < c3) {
-            const _dC = +(c3 - cash).toFixed(2);
-            if (_dC > dC) dC = _dC;
-        }
+        if (value < v1 && dMax > 0) break;
     }
     return {
-        price1: +(p2 - dpMax).toFixed(2),
-        price2: +(p3 - dpMax).toFixed(2),
-        cash1: +(c2 - dcMax).toFixed(0),
-        cash2: +(c3 - dcMax).toFixed(0),
+        value1: +(v2 - dMax).toFixed(2),
+        value2: +(v3 - dMax).toFixed(2),
     };
 }
 function removeUplpsTool(server = true) {
-    if (mf.isSet(params.tools.uplps.P1)) {
-        params.series.price.removePriceLine(params.tools.uplps.P1);
-        params.series.price.removePriceLine(params.tools.uplps.P2);
+    const name = state.isCashDraw ? "cash" : "price";
+    const char = state.isCashDraw ? "C" : "P";
+    const point1 = `${char}1`;
+    const point2 = `${char}2`;
+    if (mf.isSet(params.tools.uplps[point1])) {
+        params.series[name].removePriceLine(params.tools.uplps[point1]);
+        params.series[name].removePriceLine(params.tools.uplps[point2]);
     }
-    if (mf.isSet(params.tools.uplps.C1)) {
-        params.series.cash.removePriceLine(params.tools.uplps.C1);
-        params.series.cash.removePriceLine(params.tools.uplps.C2);
-    }
-    params.tools.uplps = {
-        P1: {},
-        P2: {},
-        C1: {},
-        C2: {},
-    };
+    params.tools.uplps[point1] = {};
+    params.tools.uplps[point2] = {};
     if (server)
         store.dispatch("tradingStock/drawTools", {
             isRemove: true,
             symbol: state.symbol,
-            name: "uplps",
+            name: `${name}uplps`,
         });
 }
 function downlpsToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
     document
-        .querySelectorAll(".tool-area > .command")
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
     else drawDownlpsTool();
@@ -992,12 +955,14 @@ function downlpsToolContextmenu(e) {
 }
 function drawDownlpsTool() {
     let startTime, endTime;
-    if (mf.isSet(params.tools.downlps.P1)) {
-        startTime = +params.tools.downlps.P1.options().startTime;
+    const name = state.isCashDraw ? "cash" : "price";
+    const char = state.isCashDraw ? "C" : "P";
+    if (mf.isSet(params.tools.downlps[`${char}1`])) {
+        startTime = +params.tools.downlps[`${char}1`].options().startTime;
         endTime = params.crosshair.time;
         removeDownlpsTool();
     } else startTime = params.crosshair.time;
-    const { price1, price2, cash1, cash2 } = findDownlps(startTime, endTime);
+    const { value1, value2 } = findDownlps(startTime, endTime);
     let option = {
         lineWidth: 1,
         lineStyle: 1,
@@ -1007,36 +972,22 @@ function drawDownlpsTool() {
     let param = {
         isRemove: false,
         symbol: state.symbol,
-        name: "downlps",
+        name: `${name}downlps`,
         points: [],
         data: [],
     };
     option.startTime = startTime;
-    option.price = price1;
-    option.title = "P1";
+    option.price = value1;
+    option.title = `${char}1`;
     params.tools.downlps[option.title] =
-        params.series.price.createPriceLine(option);
+        params.series[name].createPriceLine(option);
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
     //
-    option.price = price2;
-    option.title = "P2";
+    option.price = value2;
+    option.title = `${char}2`;
     params.tools.downlps[option.title] =
-        params.series.price.createPriceLine(option);
-    param.points.push(option.title);
-    param.data.push(mf.cloneDeep(option));
-    //
-    option.price = cash1;
-    option.title = "C1";
-    params.tools.downlps[option.title] =
-        params.series.cash.createPriceLine(option);
-    param.points.push(option.title);
-    param.data.push(mf.cloneDeep(option));
-    //
-    option.price = cash2;
-    option.title = "C2";
-    params.tools.downlps[option.title] =
-        params.series.cash.createPriceLine(option);
+        params.series[name].createPriceLine(option);
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
 
@@ -1044,92 +995,67 @@ function drawDownlpsTool() {
     downlpsToolRef.value.classList.remove("selected");
 }
 function findDownlps(startTime, endTime) {
-    let p1,
-        p2,
-        p3,
-        dP = 0,
-        dpMax = 0,
-        c1,
-        c2,
-        c3,
-        dC = 0,
-        dcMax = 0;
-    for (let i = 0; i < params.data.price.length; i++) {
-        const time = params.data.price[i].time;
+    let v1,
+        v2,
+        v3,
+        d = 0,
+        dMax = 0;
+    const data = params.data[state.isCashDraw ? "cash" : "price"];
+    for (let i = 0; i < data.length; i++) {
+        const time = data[i].time;
         if (time < startTime) continue;
         if (!!endTime && time > endTime) break;
-        const price = params.data.price[i].value;
-        const cash = params.data.cash[i].value;
-        if (p1 == undefined) {
-            p1 = price;
-            p2 = price;
-            p3 = price;
-            c1 = cash;
-            c2 = cash;
-            c3 = cash;
+        const value = data[i].value;
+        if (v1 == undefined) {
+            v1 = value;
+            v2 = value;
+            v3 = value;
         }
-        if (price < p3) {
-            if (dP < dpMax) {
-                p2 = p3;
-                dpMax = dP;
+        if (value < v3) {
+            if (d < dMax) {
+                v2 = v3;
+                dMax = d;
             }
-            p3 = price;
-            dP = 0;
-        } else if (price > p3) {
-            const _dP = +(p3 - price).toFixed(2);
-            if (_dP < dP) dP = _dP;
+            v3 = value;
+            d = 0;
+        } else if (value > v3) {
+            const _d = +(v3 - value).toFixed(2);
+            if (_d < d) d = _d;
         }
-        if (price > p1 && dpMax < 0) break;
-        //
-        if (cash < c3) {
-            if (dC < dcMax) {
-                c2 = c3;
-                dcMax = dC;
-            }
-            c3 = cash;
-            dC = 0;
-        } else if (cash > c3) {
-            const _dC = +(c3 - cash).toFixed(2);
-            if (_dC < dC) dC = _dC;
-        }
+        if (value > v1 && dMax < 0) break;
     }
     return {
-        price1: +(p2 - dpMax).toFixed(2),
-        price2: +(p3 - dpMax).toFixed(2),
-        cash1: +(c2 - dcMax).toFixed(1),
-        cash2: +(c3 - dcMax).toFixed(1),
+        value1: +(v2 - dMax).toFixed(2),
+        value2: +(v3 - dMax).toFixed(2),
     };
 }
 function removeDownlpsTool(server = true) {
-    if (mf.isSet(params.tools.downlps.P1)) {
-        params.series.price.removePriceLine(params.tools.downlps.P1);
-        params.series.price.removePriceLine(params.tools.downlps.P2);
+    const name = state.isCashDraw ? "cash" : "price";
+    const char = state.isCashDraw ? "C" : "P";
+    const point1 = `${char}1`;
+    const point2 = `${char}2`;
+    if (mf.isSet(params.tools.downlps[point1])) {
+        params.series[name].removePriceLine(params.tools.downlps[point1]);
+        params.series[name].removePriceLine(params.tools.downlps[point2]);
     }
-    if (mf.isSet(params.tools.downlps.C1)) {
-        params.series.cash.removePriceLine(params.tools.downlps.C1);
-        params.series.cash.removePriceLine(params.tools.downlps.C2);
-    }
-    params.tools.downlps = {
-        P1: {},
-        P2: {},
-        C1: {},
-        C2: {},
-    };
+    params.tools.downlps[point1] = {};
+    params.tools.downlps[point2] = {};
     if (server)
         store.dispatch("tradingStock/drawTools", {
             isRemove: true,
             symbol: state.symbol,
-            name: "downlps",
+            name: `${name}downlps`,
         });
 }
 function cashToolClick(e) {
-    state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) e.target.classList.add("selected");
-    state.isCashDraw = !selected;
+    if (!selected) {
+        e.target.classList.add("selected");
+        state.isCashDraw = true;
+    } else {
+        e.target.classList.remove("selected");
+        state.isCashDraw = false;
+    }
     e.stopPropagation();
 }
 function cashToolContextmenu(e) {
@@ -1142,7 +1068,7 @@ function rrToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
     document
-        .querySelectorAll(".tool-area > .command")
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
@@ -1242,7 +1168,7 @@ function rangeToolClick(e) {
     state.showColorPicker = false;
     const selected = e.target.classList.contains("selected");
     document
-        .querySelectorAll(".tool-area > .command")
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
