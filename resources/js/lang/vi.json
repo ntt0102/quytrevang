@@ -246,12 +246,16 @@
             "addWatchlist": "Thêm theo dõi",
             "fullscreen": "Bật tắt toàn màn hình",
             "tradingview": "TradingView",
-            "colorTool": "Bảng chọn màu",
-            "lineTool": "Vẽ đường giá",
-            "targetTool": "Xác định mục tiêu",
-            "uplpsTool": "Đo LPS tăng",
-            "downlpsTool": "Đo LPS giảm",
-            "rangeTool": "Khoảng cách ngày",
+            "tools": {
+                "color": "Bảng chọn màu",
+                "line": "Vẽ đường giá",
+                "target": "Xác định mục tiêu",
+                "uplps": "Đo LPS tăng",
+                "cash": "Vẽ trên dòng tiền",
+                "downlps": "Đo LPS giảm",
+                "rr": "Xác định RR",
+                "range": "Khoảng cách ngày"
+            },
             "symbolFiltered": "Đã lọc mã chứng khoán",
             "rangeWarning": "Chưa chọn khoảng thời gian lọc",
             "filterPopup": {

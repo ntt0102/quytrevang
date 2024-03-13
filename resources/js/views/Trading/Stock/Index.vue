@@ -108,7 +108,7 @@
                         ref="colorToolRef"
                         class="color command far fa-palette"
                         :style="{ color: state.color }"
-                        :title="$t('trading.stock.colorTool')"
+                        :title="$t('trading.stock.tools.color')"
                         @click="colorToolClick"
                         @contextmenu="colorToolContextmenu"
                     >
@@ -121,35 +121,49 @@
                     <div
                         ref="lineToolRef"
                         class="command far fa-horizontal-rule"
-                        :title="$t('trading.stock.lineTool')"
+                        :title="$t('trading.stock.tools.line')"
                         @click="lineToolClick"
                         @contextmenu="lineToolContextmenu"
                     ></div>
                     <div
                         ref="uplpsToolRef"
                         class="command far fa-arrow-up"
-                        :title="$t('trading.stock.uplpsTool')"
+                        :title="$t('trading.stock.tools.uplps')"
                         @click="uplpsToolClick"
                         @contextmenu="uplpsToolContextmenu"
                     ></div>
                     <div
-                        ref="targetToolRef"
+                        ref="cashToolRef"
                         class="command far fa-dot-circle"
-                        :title="$t('trading.stock.targetTool')"
-                        @click="targetToolClick"
-                        @contextmenu="targetToolContextmenu"
+                        :title="$t('trading.stock.tools.cash')"
+                        @click="cashToolClick"
+                        @contextmenu="cashToolContextmenu"
                     ></div>
                     <div
                         ref="downlpsToolRef"
                         class="command far fa-arrow-down"
-                        :title="$t('trading.stock.downlpsTool')"
+                        :title="$t('trading.stock.tools.downlps')"
                         @click="downlpsToolClick"
                         @contextmenu="downlpsToolContextmenu"
                     ></div>
                     <div
+                        ref="targetToolRef"
+                        class="command far fa-flag-checkered"
+                        :title="$t('trading.stock.tools.target')"
+                        @click="targetToolClick"
+                        @contextmenu="targetToolContextmenu"
+                    ></div>
+                    <div
+                        ref="rrToolRef"
+                        class="command far fa-line-height"
+                        :title="$t('trading.stock.tools.rr')"
+                        @click="rrToolClick"
+                        @contextmenu="rrToolContextmenu"
+                    ></div>
+                    <div
                         ref="rangeToolRef"
                         class="command far fa-grip-lines-vertical"
-                        :title="$t('trading.stock.rangeTool')"
+                        :title="$t('trading.stock.tools.range')"
                         @click="rangeToolClick"
                         @contextmenu="rangeToolContextmenu"
                     ></div>
@@ -227,6 +241,7 @@ const lineToolRef = ref(null);
 const targetToolRef = ref(null);
 const uplpsToolRef = ref(null);
 const downlpsToolRef = ref(null);
+const rrToolRef = ref(null);
 const rangeToolRef = ref(null);
 const tradingviewChartRef = ref(null);
 let params = {
@@ -240,18 +255,9 @@ let params = {
     tools: {
         lines: [],
         target: { A: {}, B: {}, X: {}, Y: {}, Z: {} },
-        uplps: {
-            P1: {},
-            P2: {},
-            C1: {},
-            C2: {},
-        },
-        downlps: {
-            P1: {},
-            P2: {},
-            C1: {},
-            C2: {},
-        },
+        uplps: { P1: {}, P2: {}, C1: {}, C2: {} },
+        downlps: { P1: {}, P2: {}, C1: {}, C2: {} },
+        rr: { EP: {}, SL: {}, TP: {} },
         range: [],
     },
     crosshair: {},
@@ -273,6 +279,7 @@ const state = reactive({
     isFullscreen: false,
     color: "#F44336",
     showColorPicker: false,
+    isCashDraw: false,
     showTradingView: false,
 });
 state.symbolKind = route.query.list ?? "hose";
@@ -373,6 +380,7 @@ function eventChartClick() {
     else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
     else if (downlpsToolRef.value.classList.contains("selected"))
         drawDownlpsTool();
+    else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
     else if (rangeToolRef.value.classList.contains("selected")) drawRangeTool();
 }
 function eventChartCrosshairMove(e) {
@@ -396,7 +404,7 @@ function eventPriceLineDrag(e) {
     let lineOptions = line.options();
     lineOptions.price = formatPrice(lineOptions.price);
     const oldPrice = +e.fromPriceString;
-    const newPrice = lineOptions.price;
+    const newPrice = +lineOptions.price;
     switch (lineOptions.lineType) {
         case "line":
             store.dispatch("tradingStock/drawTools", {
@@ -462,6 +470,54 @@ function eventPriceLineDrag(e) {
                 store.dispatch("tradingStock/drawTools", param);
             }
             break;
+        case "rr":
+            if (mf.isSet(params.tools.rr.TP)) {
+                let param = {
+                    isRemove: false,
+                    symbol: state.symbol,
+                    name: "rr",
+                    points: [],
+                    data: [],
+                };
+                let point;
+                const epPrice = +params.tools.rr.EP.options().price;
+                const slPrice = +params.tools.rr.SL.options().price;
+                const tpPrice = +params.tools.rr.TP.options().price;
+                const rSl = slPrice - epPrice;
+                const rTp = tpPrice - epPrice;
+                if (rTp / rSl > 0) {
+                    line.applyOptions({ price: oldPrice });
+                    return false;
+                }
+                const rr =
+                    Math.abs(tpPrice - epPrice) / Math.abs(slPrice - epPrice);
+                const sl = ((slPrice - epPrice) / epPrice) * 100;
+                const tp = ((tpPrice - epPrice) / epPrice) * 100;
+                //
+                point = "EP";
+                params.tools.rr[point].applyOptions({
+                    title: `RR=${rr.toFixed(1)}`,
+                });
+                param.points.push(point);
+                param.data.push(params.tools.rr[point].options());
+                //
+                point = "SL";
+                params.tools.rr[point].applyOptions({
+                    title: `SL=${sl.toFixed(1)}%`,
+                });
+                param.points.push(point);
+                param.data.push(params.tools.rr[point].options());
+                //
+                point = "TP";
+                params.tools.rr[point].applyOptions({
+                    title: `TP=${tp.toFixed(1)}%`,
+                });
+                param.points.push(point);
+                param.data.push(params.tools.rr[point].options());
+                //
+                store.dispatch("tradingStock/drawTools", param);
+            }
+            break;
     }
 }
 function eventChartResize() {
@@ -523,9 +579,10 @@ function toggleFullscreen() {
 }
 function loadchartTools() {
     removeLineTool(false);
+    removeTargetTool(false);
     removeUplpsTool(false);
     removeDownlpsTool(false);
-    removeTargetTool(false);
+    removeRrTool(false);
 
     const tools = store.state.tradingStock.chart.tools;
     for (const [name, tool] of Object.entries(tools)) {
@@ -535,6 +592,13 @@ function loadchartTools() {
                     params.tools.lines.push(
                         params.series.price.createPriceLine(line)
                     )
+                );
+                break;
+            case "target":
+                Object.entries(tool).forEach(
+                    ([point, line]) =>
+                        (params.tools.target[point] =
+                            params.series.price.createPriceLine(line))
                 );
                 break;
             case "uplps":
@@ -555,10 +619,10 @@ function loadchartTools() {
                             ].createPriceLine(line))
                 );
                 break;
-            case "target":
+            case "rr":
                 Object.entries(tool).forEach(
                     ([point, line]) =>
-                        (params.tools.target[point] =
+                        (params.tools.rr[point] =
                             params.series.price.createPriceLine(line))
                 );
                 break;
@@ -581,12 +645,6 @@ function colorToolClick(e) {
     e.stopPropagation();
 }
 function colorToolContextmenu(e) {
-    // if (mf.isSet(params.tools.target.X)) {
-    //     drawLineTool(+params.tools.target.X.options().price);
-    //     drawLineTool(+params.tools.target.Y.options().price);
-    //     drawLineTool(+params.tools.target.Z.options().price);
-    //     drawLineTool(+params.tools.target.T.options().price);
-    // }
     e.preventDefault();
     e.stopPropagation();
 }
@@ -1062,6 +1120,122 @@ function removeDownlpsTool(server = true) {
             isRemove: true,
             symbol: state.symbol,
             name: "downlps",
+        });
+}
+function cashToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) e.target.classList.add("selected");
+    state.isCashDraw = !selected;
+    e.stopPropagation();
+}
+function cashToolContextmenu(e) {
+    state.isCashDraw = false;
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function rrToolClick(e) {
+    state.showColorPicker = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removeRrTool();
+    }
+    e.stopPropagation();
+}
+function rrToolContextmenu(e) {
+    removeRrTool();
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function drawRrTool() {
+    const TYPE = "rr";
+    const price = coordinateToPrice(params.crosshair.y);
+    let option = {
+        lineType: TYPE,
+        price: price,
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: true,
+    };
+    let param = {
+        isRemove: false,
+        symbol: state.symbol,
+        name: TYPE,
+        points: [],
+        data: [],
+    };
+    if (mf.isSet(params.tools.rr.EP)) {
+        const epPrice = +params.tools.rr.EP.options().price;
+        if (mf.isSet(params.tools.rr.SL)) {
+            const slPrice = +params.tools.rr.SL.options().price;
+            const rSl = slPrice - epPrice;
+            const rTp = price - epPrice;
+            if (rTp / rSl > 0) return false;
+            const tp = ((price - epPrice) / epPrice) * 100;
+            option.point = "TP";
+            option.title = `TP=${tp.toFixed(1)}%`;
+            option.color = "lime";
+            params.tools.rr[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+            //
+
+            const rr = Math.abs(rTp) / Math.abs(rSl);
+            const EP_POINT = "EP";
+            params.tools.rr[EP_POINT].applyOptions({
+                title: `RR=${rr.toFixed(1)}`,
+            });
+            param.points.push(EP_POINT);
+            param.data.push(params.tools.rr[EP_POINT].options());
+            //
+            rrToolRef.value.classList.remove("selected");
+        } else {
+            const sl = ((price - epPrice) / epPrice) * 100;
+            option.point = "SL";
+            option.title = `SL=${sl.toFixed(1)}%`;
+            option.color = "red";
+            params.tools.rr[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+        }
+    } else {
+        option.point = "EP";
+        option.title = "RR=";
+        option.color = "yellow";
+        params.tools.rr[option.point] =
+            params.series.price.createPriceLine(option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
+    }
+    store.dispatch("tradingStock/drawTools", param);
+}
+function removeRrTool(server = true) {
+    if (mf.isSet(params.tools.rr.EP)) {
+        params.series.price.removePriceLine(params.tools.rr.EP);
+        if (mf.isSet(params.tools.rr.SL)) {
+            params.series.price.removePriceLine(params.tools.rr.SL);
+            if (mf.isSet(params.tools.rr.TP)) {
+                params.series.price.removePriceLine(params.tools.rr.TP);
+            }
+        }
+    }
+    params.tools.rr = { EP: {}, SL: {}, TP: {} };
+    if (server)
+        store.dispatch("tradingStock/drawTools", {
+            isRemove: true,
+            symbol: state.symbol,
+            name: "rr",
         });
 }
 function rangeToolClick(e) {
