@@ -168,8 +168,14 @@ Route::get('test', function () {
 
     // // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
-    $payload = (object)['symbol' => ''];
-    $s = app(\App\Services\Trading\StockService::class)->getEvents($payload);
+    $payload = (object)['symbol' => 'VNINDEX', 'from' => 1584189509, 'to' => 1710419909, 'timeframe' => 'W'];
+    // $s = app(\App\Services\Trading\StockService::class)->getDataFromSsi($payload);
+    // $client = new \GuzzleHttp\Client();
+    // $url = "https://iboard.ssi.com.vn/dchart/api/history?resolution=D&symbol=" . $payload->symbol . "&from=" . $payload->from . "&to=" . $payload->to;
+    // $res = $client->get($url);
+    // $rsp = json_decode($res->getBody());
+    // $s = app(\App\Services\Trading\StockService::class)->getDataSsiWithTimeframe($rsp, 'W');
+    $s = app(\App\Services\Trading\StockService::class)->getDataFromSsi($payload);
     // dd($filter);
     // $date = date('Y-m-d');
     // dd(get_global_value('openingMarketFlag'));

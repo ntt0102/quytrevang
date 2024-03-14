@@ -25,7 +25,7 @@ class StockService extends CoreService
         ];
         if ($payload->vnindex) {
             $payload->symbol = 'VNINDEX';
-            $ret['vnindex'] = $this->getDataFromSsi($payload, true)['price'];
+            // $ret['vnindex'] = $this->getDataFromSsi($payload, true)['price'];
         }
         return $ret;
     }
@@ -55,6 +55,7 @@ class StockService extends CoreService
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if ($rsp->s != 'ok') return $r;
+        if ($payload->timeframe != 'D')  $rsp = $this->getDataSsiWithTimeframe($rsp, $payload->timeframe);
         if (count($rsp->t) == 0) return $r;
         $acc = 0;
         $prevAvg = ($rsp->h[0] + $rsp->l[0] + $rsp->c[0]) / 3;
@@ -88,6 +89,38 @@ class StockService extends CoreService
             }
         }
         return $r;
+    }
+    public function getDataSsiWithTimeframe($data, $tf)
+    {
+        $t = [];
+        $o = [];
+        $h = [];
+        $l = [];
+        $c = [];
+        $v = [];
+        for ($i = 0; $i < count($data->t); $i++) {
+            $key = date('Y-' . $tf, +$data->t[$i]);
+            if (!array_key_exists($key, $t)) {
+                $t[$key] = $data->t[$i];
+                $o[$key] = $data->o[$i];
+                $h[$key] = $data->h[$i];
+                $l[$key] = $data->l[$i];
+                $v[$key] = 0;
+            } else {
+                if ($data->h[$i] > $h[$key]) $h[$key] = $data->h[$i];
+                if ($data->l[$i] < $l[$key]) $l[$key] = $data->l[$i];
+            }
+            $c[$key] = $data->c[$i];
+            $v[$key] += $data->v[$i];
+        }
+        return (object)[
+            't' => array_values($t),
+            'o' => array_values($o),
+            'h' => array_values($h),
+            'l' => array_values($l),
+            'c' => array_values($c),
+            'v' => array_values($v),
+        ];
     }
     /**
      * Get chart data

@@ -64,14 +64,22 @@
                                 ? '140px'
                                 : '130px'
                         "
-                        height="30px"
                         :data-source="
                             $store.state.tradingStock.symbols[state.symbolKind]
                         "
                         :search-enabled="true"
                         :show-clear-button="true"
-                        :element-attr="{ class: `symbol-select ${eventClass}` }"
+                        :element-attr="{
+                            class: `command symbol-select ${eventClass}`,
+                        }"
                         v-model="state.symbol"
+                        @valueChanged="symbolChanged"
+                    />
+                    <DxSelectBox
+                        width="60px"
+                        :data-source="['D', 'W', 'M']"
+                        :element-attr="{ class: 'command timeframe-select' }"
+                        v-model="state.timeframe"
                         @valueChanged="symbolChanged"
                     />
                     <div
@@ -264,6 +272,7 @@ let params = {
 };
 const state = reactive({
     symbol: route.query.symbol ?? "VNINDEX",
+    timeframe: "D",
     symbols: [],
     symbolKind: null,
     symbolKinds: [
@@ -344,6 +353,7 @@ onMounted(() => {
     store
         .dispatch("tradingStock/getChartData", {
             symbol: state.symbol,
+            timeframe: state.timeframe,
             vnindex: true,
         })
         .then(async (vnindex) => {
@@ -1208,6 +1218,7 @@ function symbolChanged(e) {
     if (!state.symbol) return false;
     store.dispatch("tradingStock/getChartData", {
         symbol: state.symbol,
+        timeframe: state.timeframe,
         vnindex: false,
     });
 }
@@ -1281,6 +1292,12 @@ function deleteWatchlist() {
                     .dx-icon-clear {
                         background: red;
                     }
+                }
+            }
+            .timeframe-select {
+                .dx-texteditor-input {
+                    text-align: center;
+                    padding: 5.7px 0;
                 }
             }
 
