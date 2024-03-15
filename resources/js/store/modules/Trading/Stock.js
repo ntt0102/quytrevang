@@ -1,7 +1,7 @@
 function initialState() {
     return {
         symbols: { hose: [], cash: [], index: [], mix: [], watch: [] },
-        chart: [],
+        chart: { data: [], tools: [], dividend: 0, news: [] },
         isChartLoading: false,
     };
 }

@@ -183,6 +183,13 @@
                         @click="rangeToolClick"
                         @contextmenu="rangeToolContextmenu"
                     ></div>
+                    <div
+                        ref="eventsToolRef"
+                        class="command drawless far fa-map-marker-exclamation"
+                        :title="$t('trading.stock.tools.events')"
+                        @click="eventsToolClick"
+                        @contextmenu="eventsToolContextmenu"
+                    ></div>
                 </div>
                 <iframe
                     v-show="state.showTradingView"
@@ -200,7 +207,7 @@ import ColorPicker from "./ColorPicker.vue";
 import stockDb from "../../../plugins/stockDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
-import { confirm } from "devextreme/ui/dialog";
+import { confirm, alert } from "devextreme/ui/dialog";
 import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
@@ -276,7 +283,8 @@ let params = {
         range: [],
     },
     crosshair: {},
-    isLoadTool: true,
+    isOnlyLoadData: false,
+    showNewsInfo: false,
 };
 const state = reactive({
     symbol: route.query.symbol ?? "VNINDEX",
@@ -307,7 +315,7 @@ const inWatchlist = computed(() =>
     store.state.tradingStock.symbols.watch.includes(state.symbol)
 );
 const eventClass = computed(() =>
-    !!store.state.tradingStock.chart.events ? " events" : ""
+    store.state.tradingStock.chart.dividend ? " dividend" : ""
 );
 store.dispatch("tradingStock/getSymbols");
 stockDb.create();
@@ -321,10 +329,16 @@ onMounted(() => {
     );
     params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(eventPriceLineDrag);
+    params.series.events = params.chart.addHistogramSeries({
+        priceScaleId: "events",
+        scaleMargins: { top: 0.96, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
     params.series.range = params.chart.addHistogramSeries({
         priceScaleId: "range",
         scaleMargins: { top: 0, bottom: 0 },
-        color: "#667b68",
+        // color: "#667b68",
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -337,7 +351,7 @@ onMounted(() => {
     });
     params.series.cash = params.chart.addLineSeries({
         priceScaleId: "cash",
-        scaleMargins: { top: 0.66, bottom: 0.01 },
+        scaleMargins: { top: 0.66, bottom: 0.05 },
         color: "yellow",
         priceFormat: { type: "volume", minMove: 1 },
         lastValueVisible: false,
@@ -377,7 +391,10 @@ onMounted(() => {
 watch(
     () => store.state.tradingStock.chart,
     () => {
-        if (params.isLoadTool) loadChartTools();
+        if (!params.isOnlyLoadData) {
+            loadChartTools();
+            loadChartNews();
+        }
         loadChartData();
     }
 );
@@ -394,6 +411,8 @@ function eventChartClick() {
         drawDownlpsTool();
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
     else if (rangeToolRef.value.classList.contains("selected")) drawRangeTool();
+    //
+    showNewsInfo();
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
@@ -645,6 +664,9 @@ function loadTools() {
                 break;
         }
     }
+}
+function loadChartNews() {
+    params.series.events.setData(store.state.tradingStock.chart.events);
 }
 function loadChartData() {
     params.data = store.state.tradingStock.chart.data;
@@ -1215,6 +1237,39 @@ function removeRangeTool() {
     params.series.range.setData([]);
     stockDb.clear("range");
 }
+function eventsToolClick(e) {
+    const selected = e.target.classList.contains("selected");
+    if (!selected) {
+        e.target.classList.add("selected");
+        params.showNewsInfo = true;
+    } else {
+        e.target.classList.remove("selected");
+        params.showNewsInfo = false;
+    }
+    e.stopPropagation();
+}
+function eventsToolContextmenu(e) {
+    params.showNewsInfo = false;
+    e.target.classList.remove("selected");
+    e.preventDefault();
+    e.stopPropagation();
+}
+function showNewsInfo() {
+    if (params.showNewsInfo) {
+        const event = store.state.tradingStock.chart.events.find(
+            (e) => e.time == params.crosshair.time
+        );
+        if (mf.isSet(event)) {
+            alert(
+                `
+                <div>Ngày ${moment.unix(event.time).format("MM/DD/YYYY")}</div>
+                <div>${event.title}</div>
+                `,
+                t("trading.stock.event")
+            );
+        }
+    }
+}
 function coordinateToPrice(y, name = "price") {
     return formatPrice(params.series[name].coordinateToPrice(y));
 }
@@ -1224,7 +1279,7 @@ function formatPrice(price) {
 }
 function symbolChanged(e) {
     if (!state.symbol) return false;
-    params.isLoadTool = true;
+    params.isOnlyLoadData = false;
     store.dispatch("tradingStock/getChartData", {
         symbol: state.symbol,
         timeframe: state.timeframe,
@@ -1232,7 +1287,7 @@ function symbolChanged(e) {
     });
 }
 function reloadChartData() {
-    params.isLoadTool = false;
+    params.isOnlyLoadData = true;
     store.dispatch("tradingStock/getChartData", {
         symbol: state.symbol,
         timeframe: state.timeframe,
@@ -1305,7 +1360,7 @@ function deleteWatchlist() {
                 .dx-placeholder {
                     line-height: 3px;
                 }
-                &.events {
+                &.dividend {
                     .dx-icon-clear {
                         background: red;
                     }
