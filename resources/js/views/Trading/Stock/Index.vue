@@ -80,8 +80,21 @@
                         :data-source="['D', 'W', 'M']"
                         :element-attr="{ class: 'command timeframe-select' }"
                         v-model="state.timeframe"
-                        @valueChanged="symbolChanged"
+                        @valueChanged="reloadChartData"
                     />
+                    <div
+                        class="command"
+                        :title="$t('trading.stock.reload')"
+                        @click="reloadChartData"
+                    >
+                        <i
+                            :class="`far fa-sync-alt ${
+                                $store.state.tradingStock.isChartLoading
+                                    ? 'fa-spin'
+                                    : ''
+                            }`"
+                        ></i>
+                    </div>
                     <div
                         v-show="!!state.symbol"
                         ref="addWatchlistToolRef"
@@ -91,11 +104,6 @@
                         :title="$t('trading.stock.addWatchlist')"
                         @click="addWatchlist"
                     ></div>
-                    <img
-                        ref="spinnerRef"
-                        class="command spinner"
-                        src="../../../../images/spinner.gif"
-                    />
                 </div>
                 <div class="area tool-area">
                     <div
@@ -241,7 +249,6 @@ const devices = inject("devices");
 const mf = inject("mf");
 const chartContainerRef = ref(null);
 const chartRef = ref(null);
-const spinnerRef = ref(null);
 const fullscreenToolRef = ref(null);
 const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
@@ -269,6 +276,7 @@ let params = {
         range: [],
     },
     crosshair: {},
+    isLoadTool: true,
 };
 const state = reactive({
     symbol: route.query.symbol ?? "VNINDEX",
@@ -369,17 +377,11 @@ onMounted(() => {
 watch(
     () => store.state.tradingStock.chart,
     () => {
-        loadchartTools();
+        if (params.isLoadTool) loadChartTools();
         loadChartData();
     }
 );
 
-watch(
-    () => store.state.tradingStock.isChartLoading,
-    (value) => {
-        spinnerRef.value.style.display = value ? "block" : "none";
-    }
-);
 function eventChartContextmenu(e) {
     e.preventDefault();
 }
@@ -587,13 +589,17 @@ function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
 }
-function loadchartTools() {
+function loadChartTools() {
     removeLineTool(false);
     removeTargetTool(false);
     removeUplpsTool(false);
+    removeUplpsTool(false, true);
     removeDownlpsTool(false);
+    removeDownlpsTool(false, true);
     removeRrTool(false);
-
+    loadTools();
+}
+function loadTools() {
     const tools = store.state.tradingStock.chart.tools;
     for (const [name, tool] of Object.entries(tools)) {
         switch (name) {
@@ -929,9 +935,10 @@ function findUplps(startTime, endTime) {
         value2: +(v3 - dMax).toFixed(2),
     };
 }
-function removeUplpsTool(server = true) {
-    const name = state.isCashDraw ? "cash" : "price";
-    const char = state.isCashDraw ? "C" : "P";
+function removeUplpsTool(server = true, forceCash = false) {
+    const isCashDraw = state.isCashDraw || forceCash;
+    const name = isCashDraw ? "cash" : "price";
+    const char = isCashDraw ? "C" : "P";
     const point1 = `${char}1`;
     const point2 = `${char}2`;
     if (mf.isSet(params.tools.uplps[point1])) {
@@ -1039,9 +1046,10 @@ function findDownlps(startTime, endTime) {
         value2: +(v3 - dMax).toFixed(2),
     };
 }
-function removeDownlpsTool(server = true) {
-    const name = state.isCashDraw ? "cash" : "price";
-    const char = state.isCashDraw ? "C" : "P";
+function removeDownlpsTool(server = true, forceCash = false) {
+    const isCashDraw = state.isCashDraw || forceCash;
+    const name = isCashDraw ? "cash" : "price";
+    const char = isCashDraw ? "C" : "P";
     const point1 = `${char}1`;
     const point2 = `${char}2`;
     if (mf.isSet(params.tools.downlps[point1])) {
@@ -1216,6 +1224,15 @@ function formatPrice(price) {
 }
 function symbolChanged(e) {
     if (!state.symbol) return false;
+    params.isLoadTool = true;
+    store.dispatch("tradingStock/getChartData", {
+        symbol: state.symbol,
+        timeframe: state.timeframe,
+        vnindex: false,
+    });
+}
+function reloadChartData() {
+    params.isLoadTool = false;
     store.dispatch("tradingStock/getChartData", {
         symbol: state.symbol,
         timeframe: state.timeframe,

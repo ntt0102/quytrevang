@@ -23,9 +23,9 @@ class StockController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function getChartData(Request $request)
+    public function getChart(Request $request)
     {
-        $data = $this->stockService->getChartData($this->payload);
+        $data = $this->stockService->getChart($this->payload);
         return $this->sendResponse($data);
     }
     /**

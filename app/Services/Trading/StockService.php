@@ -7,6 +7,7 @@ use App\Models\StockSymbol;
 use App\Models\StockOrder;
 use App\Models\DrawTool;
 use App\Jobs\FilterStockJob;
+use stdClass;
 
 class StockService extends CoreService
 {
@@ -16,7 +17,7 @@ class StockService extends CoreService
      * @param $payload
      * 
      */
-    public function getChartData($payload)
+    public function getChart($payload)
     {
         $ret = [
             'data' => $this->getData($payload),
@@ -25,7 +26,7 @@ class StockService extends CoreService
         ];
         if ($payload->vnindex) {
             $payload->symbol = 'VNINDEX';
-            // $ret['vnindex'] = $this->getDataFromSsi($payload, true)['price'];
+            $ret['vnindex'] = $this->getDataFromSsi($payload, true)['price'];
         }
         return $ret;
     }
@@ -55,8 +56,8 @@ class StockService extends CoreService
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if ($rsp->s != 'ok') return $r;
-        if ($payload->timeframe != 'D')  $rsp = $this->getDataSsiWithTimeframe($rsp, $payload->timeframe);
         if (count($rsp->t) == 0) return $r;
+        if ($payload->timeframe != 'D')  $rsp = $this->getDataSsiWithTimeframe($rsp, $payload->timeframe);
         $acc = 0;
         $prevAvg = ($rsp->h[0] + $rsp->l[0] + $rsp->c[0]) / 3;
         for ($i = 0; $i < count($rsp->t); $i++) {
@@ -138,6 +139,7 @@ class StockService extends CoreService
         $rsp = json_decode($res->getBody());
         if (!is_object($rsp)) return $r;
         if (count($rsp->candle) == 0) return $r;
+        if ($payload->timeframe != 'D')  $rsp = $this->getDataCp68WithTimeframe($rsp, $payload->timeframe);
         $acc = 0;
         $prevAvg = 0;
         foreach ($rsp->candle as $candle) {
@@ -170,6 +172,27 @@ class StockService extends CoreService
             ];
         }
         return $r;
+    }
+    public function getDataCp68WithTimeframe($data, $tf)
+    {
+        $candles = [];
+        foreach ($data->candle as $candle) {
+            $key = date('Y-' . $tf, strtotime($candle->date));
+            if (!array_key_exists($key, $candles)) {
+                $candles[$key] = new stdClass();
+                $candles[$key]->date = $candle->date;
+                $candles[$key]->open = $candle->open;
+                $candles[$key]->high = $candle->high;
+                $candles[$key]->low = $candle->low;
+                $candles[$key]->volume = 0;
+            } else {
+                if ($candle->high > $candles[$key]->high) $candles[$key]->high = $candle->high;
+                if ($candle->low < $candles[$key]->low) $candles[$key]->low = $candle->low;
+            }
+            $candles[$key]->close = $candle->close;
+            $candles[$key]->volume += $candle->volume;
+        }
+        return (object)['candle' => array_values($candles)];
     }
     /**
      * Get chart tool
