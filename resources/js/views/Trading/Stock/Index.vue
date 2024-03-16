@@ -329,16 +329,15 @@ onMounted(() => {
     );
     params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(eventPriceLineDrag);
-    params.series.events = params.chart.addHistogramSeries({
-        priceScaleId: "events",
-        scaleMargins: { top: 0.96, bottom: 0 },
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
     params.series.range = params.chart.addHistogramSeries({
         priceScaleId: "range",
         scaleMargins: { top: 0, bottom: 0 },
-        // color: "#667b68",
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    params.series.events = params.chart.addHistogramSeries({
+        priceScaleId: "events",
+        scaleMargins: { top: 0.96, bottom: 0 },
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -1212,7 +1211,7 @@ function rangeToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        removeRangeTool();
+        // removeRangeTool();
     }
     e.stopPropagation();
 }
@@ -1223,13 +1222,16 @@ function rangeToolContextmenu(e) {
     e.stopPropagation();
 }
 function drawRangeTool() {
-    let option = { time: params.crosshair.time, value: 1, color: "lime" };
+    let option = { time: params.crosshair.time, value: 1 };
     if (params.tools.range.length > 0) {
         option.color = "red";
+        params.tools.range[1] = option;
         rangeToolRef.value.classList.remove("selected");
+    } else {
+        option.color = "aqua";
+        params.tools.range[0] = option;
     }
-    params.series.range.update(option);
-    params.tools.range.push(option);
+    params.series.range.setData(params.tools.range);
     stockDb.set("range", option);
 }
 function removeRangeTool() {
