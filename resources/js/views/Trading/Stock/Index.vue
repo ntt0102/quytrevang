@@ -1262,7 +1262,7 @@ function showNewsInfo() {
         if (mf.isSet(event)) {
             alert(
                 `
-                <div>Ngày ${moment.unix(event.time).format("MM/DD/YYYY")}</div>
+                <div>Ngày ${moment.unix(event.time).format("DD/MM/YYYY")}</div>
                 <div>${event.title}</div>
                 `,
                 t("trading.stock.event")
