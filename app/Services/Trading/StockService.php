@@ -246,7 +246,7 @@ class StockService extends CoreService
         $rsp = json_decode($res->getBody());
         foreach ($rsp as $news) {
             $ret[] = [
-                'time' => strtotime($news->date),
+                'time' => strtotime($news->date) + 7 * 60 * 60,
                 'value' => 1,
                 'color' => $news->color,
                 'title' => $news->title
