@@ -1261,13 +1261,17 @@ function showNewsInfo() {
             (e) => e.time == params.crosshair.time
         );
         if (mf.isSet(event)) {
-            alert(
-                `
-                <div>Ngày ${moment.unix(event.time).format("DD/MM/YYYY")}</div>
-                <div>${event.title}</div>
-                `,
-                t("trading.stock.event")
-            );
+            const text = event.title.split("|");
+            let html = `
+                <div>${t("trading.stock.date")} ${moment
+                .unix(event.time)
+                .format("DD/MM/YYYY")}:</div>
+                <div>&nbsp;</div>
+                `;
+            text.forEach((t) => {
+                html += `<div>${t}</div>`;
+            });
+            alert(html, t("trading.stock.event"));
         }
     }
 }
