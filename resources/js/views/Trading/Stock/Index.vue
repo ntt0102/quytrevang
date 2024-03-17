@@ -410,8 +410,7 @@ function eventChartClick() {
         drawDownlpsTool();
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
     else if (rangeToolRef.value.classList.contains("selected")) drawRangeTool();
-    //
-    showNewsInfo();
+    else showNewsInfo();
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
