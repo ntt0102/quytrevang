@@ -1307,6 +1307,7 @@ function filterSymbols() {
         const param = {
             from: params.tools.range[0].time,
             to: params.tools.range[1].time,
+            timeframe: state.timeframe,
             name: state.symbolKind,
         };
         store.dispatch("tradingStock/filterSymbols", param);

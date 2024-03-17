@@ -197,12 +197,6 @@ function initPushNotification() {
             // }
         }
     };
-    // axios.get("/user", {
-    //     params: {
-    //         ID: 12345,
-    //     },
-    // });
-    // axios.get("/user?ID=12345");
 }
 function connectPusher() {
     pusher = new Pusher(import.meta.env.VITE_PUSHER_APP_KEY, {
@@ -261,6 +255,11 @@ function connectPusher() {
                             if (route.name == "admin-comment")
                                 store.dispatch("adminComment/getComments");
                             break;
+                        case "filtered-stock":
+                            if (route.name == "trading-stock") {
+                                store.dispatch("tradingStock/getSymbols");
+                            }
+                            break;
                     }
                     store.dispatch("getNotify", notify);
                     store.dispatch("getNotifications");
@@ -316,16 +315,6 @@ function connectPusher() {
                     }
                 }, 2000);
             });
-    }
-    if (user.value.permissions.includes("trades@edit")) {
-        pusher.subscribe("private-trading-stock").bind("filter-stock", () => {
-            setTimeout(() => {
-                if (route.name == "trading-stock") {
-                    store.dispatch("tradingStock/getSymbols");
-                    toast.success(t("trading.stock.symbolFiltered"));
-                }
-            }, 2000);
-        });
     }
     if (user.value.permissions.includes("finbooks@control")) {
         pusher

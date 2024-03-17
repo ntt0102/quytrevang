@@ -10,7 +10,9 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\StockSymbol;
 use App\Services\Trading\StockService;
-use App\Events\FilterStockEvent;
+use App\Notifications\FilteredStockNotification;
+use Illuminate\Support\Facades\Notification;
+use App\Models\User;
 
 class FilterStockJob implements ShouldQueue
 {
@@ -73,7 +75,10 @@ class FilterStockJob implements ShouldQueue
         StockSymbol::updateOrCreate(['name' => 'fcash'], ['symbols' => $rCash]);
         StockSymbol::updateOrCreate(['name' => 'findex'], ['symbols' => $rIndex]);
         StockSymbol::updateOrCreate(['name' => 'fmix'], ['symbols' => $rMix]);
-        event(new FilterStockEvent());
+        Notification::send(
+            User::permission('trades@edit')->get(),
+            new FilteredStockNotification()
+        );
         // \Log::info('End filter');
     }
 }
