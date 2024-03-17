@@ -96,6 +96,12 @@
                         ></i>
                     </div>
                     <div
+                        v-show="state.symbolKind.includes('f_')"
+                        :class="`command far fa-times`"
+                        :title="$t('trading.stock.removeFilterList')"
+                        @click="removeFilterList"
+                    ></div>
+                    <div
                         v-show="!!state.symbol"
                         ref="addWatchlistToolRef"
                         :class="`command far fa-${
@@ -295,8 +301,8 @@ const state = reactive({
         { text: t("trading.stock.symbolList.hose"), value: "hose" },
         { text: t("trading.stock.symbolList.nh"), value: "nh" },
         { text: t("trading.stock.symbolList.ck"), value: "ck" },
-        { text: t("trading.stock.symbolList.filterCash"), value: "fcash" },
-        { text: t("trading.stock.symbolList.filterMix"), value: "fmix" },
+        { text: t("trading.stock.symbolList.filterCash"), value: "f_cash" },
+        { text: t("trading.stock.symbolList.filterMix"), value: "f_mix" },
         { text: t("trading.stock.symbolList.watch"), value: "watch" },
         { text: t("trading.stock.symbolList.hold"), value: "hold" },
         { text: t("trading.stock.symbolList.hnx"), value: "hnx" },
@@ -593,6 +599,13 @@ function eventFullscreenChange() {
                 "translate(0px, 0px)";
         }
     }
+}
+function removeFilterList() {
+    const param = {
+        symbol: state.symbol,
+        name: state.symbolKind,
+    };
+    store.dispatch("tradingStock/removeFilterList", param);
 }
 function addWatchlist() {
     if (!state.symbol) return false;

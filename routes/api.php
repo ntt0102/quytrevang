@@ -128,6 +128,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('clone-symbols', 'StockController@cloneSymbols');
                     Route::post('get-symbols', 'StockController@getSymbols');
                     Route::post('filter', 'StockController@filterSymbols');
+                    Route::post('remove-filter-list', 'StockController@removeFilterList');
                     Route::post('add-watchlist', 'StockController@addWatchlist');
                     Route::post('delete-watchlist', 'StockController@deleteWatchlist');
                     Route::post('draw-tools', 'StockController@drawTools');

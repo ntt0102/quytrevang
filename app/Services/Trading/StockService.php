@@ -313,6 +313,20 @@ class StockService extends CoreService
     }
 
     /**
+     * Remove Filter List
+     *
+     * @param $payload
+     * 
+     */
+    public function removeFilterList($payload)
+    {
+        $list = StockSymbol::where('name', $payload->name)->first();
+        $list->symbols = array_values(array_diff($list->symbols, [$payload->symbol]));
+        $list->save();
+        return (object)[];
+    }
+
+    /**
      * Add Watchlist
      *
      * @param $payload

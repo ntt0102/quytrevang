@@ -58,6 +58,18 @@ const actions = {
             });
         });
     },
+    removeFilterList({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/stock/remove-filter-list", param, {
+                    noLoading: true,
+                })
+                .then((response) => {
+                    dispatch("getSymbols");
+                    resolve();
+                });
+        });
+    },
     addWatchlist({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
