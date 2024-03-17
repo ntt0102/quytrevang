@@ -295,7 +295,6 @@ let params = {
 const state = reactive({
     symbol: route.query.symbol ?? "VNINDEX",
     timeframe: "D",
-    symbols: [],
     symbolKind: null,
     symbolKinds: [
         { text: t("trading.stock.symbolList.hose"), value: "hose" },
@@ -601,11 +600,15 @@ function eventFullscreenChange() {
     }
 }
 function removeFilterList() {
+    const symbols = store.state.tradingStock.symbols[state.symbolKind];
+    const nextSymbol = symbols[symbols.findIndex((e) => e == state.symbol) + 1];
     const param = {
         symbol: state.symbol,
         name: state.symbolKind,
     };
-    store.dispatch("tradingStock/removeFilterList", param);
+    store
+        .dispatch("tradingStock/removeFilterList", param)
+        .then(() => (state.symbol = nextSymbol));
 }
 function addWatchlist() {
     if (!state.symbol) return false;
