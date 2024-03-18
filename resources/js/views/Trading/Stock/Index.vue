@@ -607,15 +607,15 @@ function removeFilterList() {
     ).then((result) => {
         if (result) {
             const symbols = store.state.tradingStock.symbols[state.symbolKind];
-            const nextSymbol =
-                symbols[symbols.findIndex((e) => e == state.symbol) + 1];
+            let idx = symbols.findIndex((e) => e == state.symbol);
+            idx = idx == symbols.length - 1 ? 0 : idx + 1;
             const param = {
                 symbol: state.symbol,
                 name: state.symbolKind,
             };
             store
                 .dispatch("tradingStock/removeFilterList", param)
-                .then(() => (state.symbol = nextSymbol));
+                .then(() => (state.symbol = symbols[idx]));
         }
     });
 }
@@ -1329,8 +1329,9 @@ function reloadChartData() {
 }
 function loadNextSymbol(e) {
     const symbols = store.state.tradingStock.symbols[state.symbolKind];
-    const nextSymbol = symbols[symbols.findIndex((e) => e == state.symbol) + 1];
-    state.symbol = nextSymbol;
+    let idx = symbols.findIndex((e) => e == state.symbol);
+    idx = idx == symbols.length - 1 ? 0 : idx + 1;
+    state.symbol = symbols[idx];
     e.preventDefault();
     e.stopPropagation();
 }
