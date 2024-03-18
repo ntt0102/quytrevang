@@ -55,9 +55,14 @@
                 },
             ]"
         />
-        <div class="stock-container" ref="chartContainerRef">
+        <div
+            class="stock-container"
+            ref="chartContainerRef"
+            @click="eventChartClick"
+            @contextmenu="eventChartContextmenu"
+        >
             <div class="chart-wrapper" ref="chartRef">
-                <div class="area data-area">
+                <div class="area data-area" @click="dataAreaClick">
                     <DxSelectBox
                         :width="
                             $screen.getScreenSizeInfo.isXSmall
@@ -86,6 +91,7 @@
                         class="command"
                         :title="$t('trading.stock.reload')"
                         @click="reloadChartData"
+                        @contextmenu="loadNextSymbol"
                     >
                         <i
                             :class="`far fa-sync-alt ${
@@ -327,11 +333,6 @@ stockDb.create();
 
 onMounted(() => {
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
-    chartContainerRef.value.addEventListener("click", eventChartClick);
-    chartContainerRef.value.addEventListener(
-        "contextmenu",
-        eventChartContextmenu
-    );
     params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(eventPriceLineDrag);
     params.series.range = params.chart.addHistogramSeries({
@@ -406,7 +407,7 @@ watch(
 function eventChartContextmenu(e) {
     e.preventDefault();
 }
-function eventChartClick() {
+function eventChartClick(e) {
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (targetToolRef.value.classList.contains("selected"))
         drawTargetTool();
@@ -600,15 +601,23 @@ function eventFullscreenChange() {
     }
 }
 function removeFilterList() {
-    const symbols = store.state.tradingStock.symbols[state.symbolKind];
-    const nextSymbol = symbols[symbols.findIndex((e) => e == state.symbol) + 1];
-    const param = {
-        symbol: state.symbol,
-        name: state.symbolKind,
-    };
-    store
-        .dispatch("tradingStock/removeFilterList", param)
-        .then(() => (state.symbol = nextSymbol));
+    confirm(
+        `${t("trading.stock.removeFilterList")}?`,
+        t("titles.confirm")
+    ).then((result) => {
+        if (result) {
+            const symbols = store.state.tradingStock.symbols[state.symbolKind];
+            const nextSymbol =
+                symbols[symbols.findIndex((e) => e == state.symbol) + 1];
+            const param = {
+                symbol: state.symbol,
+                name: state.symbolKind,
+            };
+            store
+                .dispatch("tradingStock/removeFilterList", param)
+                .then(() => (state.symbol = nextSymbol));
+        }
+    });
 }
 function addWatchlist() {
     if (!state.symbol) return false;
@@ -1298,6 +1307,9 @@ function formatPrice(price) {
     if (!price) return 0;
     return +(+price.toFixed(2));
 }
+function dataAreaClick(e) {
+    e.stopPropagation();
+}
 function symbolChanged(e) {
     if (!state.symbol) return false;
     params.isOnlyLoadData = false;
@@ -1314,6 +1326,13 @@ function reloadChartData() {
         timeframe: state.timeframe,
         vnindex: false,
     });
+}
+function loadNextSymbol(e) {
+    const symbols = store.state.tradingStock.symbols[state.symbolKind];
+    const nextSymbol = symbols[symbols.findIndex((e) => e == state.symbol) + 1];
+    state.symbol = nextSymbol;
+    e.preventDefault();
+    e.stopPropagation();
 }
 function listChanged(e) {
     state.symbolKind = e.value;
