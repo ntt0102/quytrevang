@@ -91,11 +91,11 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            if ($i < ($size / 3) && $avg > $r['filter']['price'][0]) {
+            if ($i < ($size / 2) && $avg > $r['filter']['price'][0]) {
                 $r['filter']['price'][0] = $avg;
                 $r['filter']['cash'][0] = $accCash;
             }
-            if ($i > (2 * $size / 3) && $avg > $r['filter']['price'][0]) {
+            if ($i > ($size / 2) && $avg > $r['filter']['price'][1]) {
                 $r['filter']['price'][1] = $avg;
                 $r['filter']['cash'][1] = $accCash;
             }
@@ -187,11 +187,11 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            if ($i < ($size / 3) && $avg > $r['filter']['price'][0]) {
+            if ($i < ($size / 2) && $avg > $r['filter']['price'][0]) {
                 $r['filter']['price'][0] = $avg;
                 $r['filter']['cash'][0] = $accCash;
             }
-            if ($i > (2 * $size / 3) && $avg > $r['filter']['price'][0]) {
+            if ($i > ($size / 2) && $avg > $r['filter']['price'][1]) {
                 $r['filter']['price'][1] = $avg;
                 $r['filter']['cash'][1] = $accCash;
             }
