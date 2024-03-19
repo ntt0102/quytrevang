@@ -90,7 +90,7 @@ class StockService extends CoreService
                 'value' => $acc
             ];
             //
-            if ($i < $size / 2 && $avg > $priceTop) {
+            if ($i < ($size / 2) && $avg > $priceTop) {
                 $priceTop = $avg;
                 $cashTop = $acc;
             }
@@ -98,7 +98,7 @@ class StockService extends CoreService
         return [
             'chart' => $r,
             'range' => [
-                'price' => [$priceTop, end($r['price'])],
+                'price' => [$priceTop, $prevAvg],
                 'cash' => [$cashTop, $acc],
             ]
         ];
@@ -187,7 +187,7 @@ class StockService extends CoreService
                 'value' => $acc
             ];
             //
-            if ($i < $size / 2 && $avg > $priceTop) {
+            if ($i < ($size / 2) && $avg > $priceTop) {
                 $priceTop = $avg;
                 $cashTop = $acc;
             }
@@ -195,7 +195,7 @@ class StockService extends CoreService
         return [
             'chart' => $r,
             'range' => [
-                'price' => [$priceTop, end($r['price'])],
+                'price' => [$priceTop, $prevAvg],
                 'cash' => [$cashTop, $acc],
             ]
         ];
