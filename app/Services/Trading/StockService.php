@@ -20,14 +20,14 @@ class StockService extends CoreService
     public function getChart($payload)
     {
         $ret = [
-            'data' => $this->getData($payload),
+            'data' => $this->getData($payload)['chart'],
             'tools' => $this->getTools($payload),
             'dividend' => $this->hasDividend($payload),
             'events' => $this->getEvents($payload),
         ];
         if ($payload->vnindex) {
             $payload->symbol = 'VNINDEX';
-            $ret['vnindex'] = $this->getDataFromSsi($payload, true)['price'];
+            $ret['vnindex'] = $this->getDataFromSsi($payload)['chart']['price'];
         }
         return $ret;
     }
@@ -48,7 +48,7 @@ class StockService extends CoreService
      * @param $payload
      * 
      */
-    public function getDataFromSsi($payload, $onlyPrice = false)
+    public function getDataFromSsi($payload)
     {
         $r = ['ohlc' => [], 'price' => [], 'cash' => []];
         if (!$payload->symbol) return $r;
@@ -60,37 +60,44 @@ class StockService extends CoreService
         if (count($rsp->t) == 0) return $r;
         if ($payload->timeframe != 'D')  $rsp = $this->getDataSsiWithTimeframe($rsp, $payload->timeframe);
         $acc = 0;
-        $prevAvg = ($rsp->h[0] + $rsp->l[0] + $rsp->c[0]) / 3;
+        $priceTop = 0;
+        $cashTop = 0;
+        $prevAvg = 0;
         for ($i = 0; $i < count($rsp->t); $i++) {
-            if (!$onlyPrice) {
-                $r['ohlc'][] = [
-                    'time' => $rsp->t[$i],
-                    'open' => +$rsp->o[$i],
-                    'high' => +$rsp->h[$i],
-                    'low' => +$rsp->l[$i],
-                    'close' => +$rsp->c[$i]
-                ];
-            }
+            $r['ohlc'][] = [
+                'time' => $rsp->t[$i],
+                'open' => +$rsp->o[$i],
+                'high' => +$rsp->h[$i],
+                'low' => +$rsp->l[$i],
+                'close' => +$rsp->c[$i]
+            ];
             $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
+            if ($avg > $priceTop) $priceTop = $avg;
             $r['price'][] = [
                 'time' => $rsp->t[$i],
                 'value' => $avg
             ];
-            if (!$onlyPrice) {
-                $change = $avg - $prevAvg;
-                $side = 0;
-                if ($change > 0) $side = 1;
-                else if ($change < 0) $side = -1;
-                $prevAvg = $avg;
-                $cash = $side * $rsp->v[$i];
-                $acc += $cash;
-                $r['cash'][] = [
-                    'time' => $rsp->t[$i],
-                    'value' => $acc
-                ];
-            }
+            if (!$prevAvg) $prevAvg = $avg;
+            $change = $avg - $prevAvg;
+            $side = 0;
+            if ($change > 0) $side = 1;
+            else if ($change < 0) $side = -1;
+            $prevAvg = $avg;
+            $cash = $side * $rsp->v[$i];
+            $acc += $cash;
+            if ($acc > $cashTop) $cashTop = $acc;
+            $r['cash'][] = [
+                'time' => $rsp->t[$i],
+                'value' => $acc
+            ];
         }
-        return $r;
+        return [
+            'chart' => $r,
+            'range' => [
+                'price' => [$priceTop, end($r['price'])],
+                'cash' => [$cashTop, $acc],
+            ]
+        ];
     }
     public function getDataSsiWithTimeframe($data, $tf)
     {
@@ -142,6 +149,8 @@ class StockService extends CoreService
         if (count($rsp->candle) == 0) return $r;
         if ($payload->timeframe != 'D')  $rsp = $this->getDataCp68WithTimeframe($rsp, $payload->timeframe);
         $acc = 0;
+        $priceTop = 0;
+        $cashTop = 0;
         $prevAvg = 0;
         foreach ($rsp->candle as $candle) {
             $date = strtotime($candle->date);
@@ -155,6 +164,7 @@ class StockService extends CoreService
                 'close' => +$candle->close
             ];
             $avg = ($candle->high + $candle->low + $candle->close) / 3;
+            if ($avg > $priceTop) $priceTop = $avg;
             $r['price'][] = [
                 'time' => $date,
                 'value' => $avg
@@ -167,12 +177,19 @@ class StockService extends CoreService
             $prevAvg = $avg;
             $cash = $side * $candle->volume;
             $acc += $cash;
+            if ($acc > $cashTop) $cashTop = $acc;
             $r['cash'][] = [
                 'time' => $date,
                 'value' => $acc
             ];
         }
-        return $r;
+        return [
+            'chart' => $r,
+            'range' => [
+                'price' => [$priceTop, end($r['price'])],
+                'cash' => [$cashTop, $acc],
+            ]
+        ];
     }
     public function getDataCp68WithTimeframe($data, $tf)
     {

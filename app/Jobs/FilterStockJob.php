@@ -49,21 +49,19 @@ class FilterStockJob implements ShouldQueue
         $isMix = false;
         $stockService = app(StockService::class);
         $this->payload->symbol = 'VNINDEX';
-        $vnindex = $stockService->getData($this->payload)['price'];
-        $strVni = current($vnindex)['value'];
-        $endVni = end($vnindex)['value'];
+        $vnindex = $stockService->getDataFromSsi($this->payload)['range']['price'];
+        $strVni = $vnindex[0];
+        $endVni = $vnindex[1];
         $stocks = StockSymbol::where('name', $this->payload->name)->get();
         foreach ($stocks as $stock) {
             foreach ($stock->symbols as $symbol) {
                 $this->payload->symbol = $symbol;
-                $data = $stockService->getData($this->payload);
-                $price = $data['price'];
-                if (count($price) == 0) continue;
-                $strPr = current($price)['value'];
-                $endPr = end($price)['value'];
-                $cash = $data['cash'];
-                $strCh = current($cash)['value'];
-                $endCh = end($cash)['value'];
+                $data = $stockService->getData($this->payload)['range'];
+                if (count($data['price']) == 0) continue;
+                $strPr = $data['price'][0];
+                $endPr = $data['price'][1];
+                $strCh = $data['cash'][0];
+                $endCh = $data['cash'][1];
                 $isCash = $endPr < $strPr && $endCh > $strCh;
                 $isIndex = $endVni < $strVni && $endPr > $strPr;
                 $isMix = $endVni < $strVni && $endPr > $strPr && $endCh > $strCh;
