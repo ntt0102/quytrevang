@@ -59,10 +59,10 @@
             class="stock-container"
             ref="chartContainerRef"
             @click="eventChartClick"
-            @contextmenu="eventChartContextmenu"
+            @contextmenu="stopPropagationEvent"
         >
             <div class="chart-wrapper" ref="chartRef">
-                <div class="area data-area" @click="dataAreaClick">
+                <div class="area data-area" @click="stopPropagationEvent">
                     <DxSelectBox
                         :width="
                             $screen.getScreenSizeInfo.isXSmall
@@ -117,7 +117,7 @@
                         @click="addWatchlist"
                     ></div>
                 </div>
-                <div class="area tool-area">
+                <div class="area tool-area" @click="stopPropagationEvent">
                     <div
                         ref="fullscreenToolRef"
                         :class="`command far fa-${
@@ -138,7 +138,6 @@
                         :style="{ color: state.color }"
                         :title="$t('trading.stock.tools.color')"
                         @click="colorToolClick"
-                        @contextmenu="colorToolContextmenu"
                     >
                         <ColorPicker
                             v-show="state.showColorPicker"
@@ -404,8 +403,9 @@ watch(
     }
 );
 
-function eventChartContextmenu(e) {
+function stopPropagationEvent(e) {
     e.preventDefault();
+    e.stopPropagation();
 }
 function eventChartClick(e) {
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
@@ -417,6 +417,8 @@ function eventChartClick(e) {
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
     else if (rangeToolRef.value.classList.contains("selected")) drawRangeTool();
     else showNewsInfo();
+    //
+    stopPropagationEvent(e);
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
@@ -700,15 +702,9 @@ function loadChartData() {
 }
 function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
-    e.stopPropagation();
 }
 function colorToolClick(e) {
     state.showColorPicker = !state.showColorPicker;
-    e.stopPropagation();
-}
-function colorToolContextmenu(e) {
-    e.preventDefault();
-    e.stopPropagation();
 }
 function lineToolClick(e) {
     state.showColorPicker = false;
@@ -717,13 +713,10 @@ function lineToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
-    e.stopPropagation();
 }
 function lineToolContextmenu(e) {
     removeLineTool();
     e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
 }
 function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
     const TYPE = "line";
@@ -789,13 +782,10 @@ function targetToolClick(e) {
         e.target.classList.add("selected");
         removeTargetTool();
     }
-    e.stopPropagation();
 }
 function targetToolContextmenu(e) {
     removeTargetTool();
     e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
 }
 function drawTargetTool() {
     const TYPE = "target";
@@ -896,13 +886,10 @@ function uplpsToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
     else drawUplpsTool();
-    e.stopPropagation();
 }
 function uplpsToolContextmenu(e) {
     removeUplpsTool();
     e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
 }
 function drawUplpsTool() {
     let startTime, endTime;
@@ -1007,13 +994,10 @@ function downlpsToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
     else drawDownlpsTool();
-    e.stopPropagation();
 }
 function downlpsToolContextmenu(e) {
     removeDownlpsTool();
     e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
 }
 function drawDownlpsTool() {
     let startTime, endTime;
@@ -1119,13 +1103,10 @@ function cashToolClick(e) {
         e.target.classList.remove("selected");
         state.isCashDraw = false;
     }
-    e.stopPropagation();
 }
 function cashToolContextmenu(e) {
     state.isCashDraw = false;
     e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
 }
 function rrToolClick(e) {
     state.showColorPicker = false;
@@ -1137,13 +1118,10 @@ function rrToolClick(e) {
         e.target.classList.add("selected");
         removeRrTool();
     }
-    e.stopPropagation();
 }
 function rrToolContextmenu(e) {
     removeRrTool();
     e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
 }
 function drawRrTool() {
     const TYPE = "rr";
@@ -1235,15 +1213,11 @@ function rangeToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        // removeRangeTool();
     }
-    e.stopPropagation();
 }
 function rangeToolContextmenu(e) {
     removeRangeTool();
     e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
 }
 function drawRangeTool() {
     let option = { time: params.crosshair.time, value: 1 };
@@ -1272,13 +1246,10 @@ function eventsToolClick(e) {
         e.target.classList.remove("selected");
         params.showNewsInfo = false;
     }
-    e.stopPropagation();
 }
 function eventsToolContextmenu(e) {
     params.showNewsInfo = false;
     e.target.classList.remove("selected");
-    e.preventDefault();
-    e.stopPropagation();
 }
 function showNewsInfo() {
     if (params.showNewsInfo) {
@@ -1307,9 +1278,6 @@ function formatPrice(price) {
     if (!price) return 0;
     return +(+price.toFixed(2));
 }
-function dataAreaClick(e) {
-    e.stopPropagation();
-}
 function symbolChanged(e) {
     if (!state.symbol) return false;
     params.isOnlyLoadData = false;
@@ -1332,8 +1300,6 @@ function loadNextSymbol(e) {
     let idx = symbols.findIndex((e) => e == state.symbol);
     idx = idx == symbols.length - 1 ? 0 : idx + 1;
     state.symbol = symbols[idx];
-    e.preventDefault();
-    e.stopPropagation();
 }
 function listChanged(e) {
     state.symbolKind = e.value;
