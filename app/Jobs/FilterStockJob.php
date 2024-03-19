@@ -49,14 +49,14 @@ class FilterStockJob implements ShouldQueue
         $isMix = false;
         $stockService = app(StockService::class);
         $this->payload->symbol = 'VNINDEX';
-        $vnindex = $stockService->getDataFromSsi($this->payload)['range']['price'];
+        $vnindex = $stockService->getDataFromSsi($this->payload)['filter']['price'];
         $strVni = $vnindex[0];
         $endVni = $vnindex[1];
         $stocks = StockSymbol::where('name', $this->payload->name)->get();
         foreach ($stocks as $stock) {
             foreach ($stock->symbols as $symbol) {
                 $this->payload->symbol = $symbol;
-                $data = $stockService->getData($this->payload)['range'];
+                $data = $stockService->getData($this->payload)['filter'];
                 if (count($data['price']) == 0) continue;
                 $strPr = $data['price'][0];
                 $endPr = $data['price'][1];
