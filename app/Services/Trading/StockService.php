@@ -72,7 +72,6 @@ class StockService extends CoreService
                 'close' => +$rsp->c[$i]
             ];
             $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
-            if ($avg > $priceTop) $priceTop = $avg;
             $r['price'][] = [
                 'time' => $rsp->t[$i],
                 'value' => $avg
@@ -85,7 +84,10 @@ class StockService extends CoreService
             $prevAvg = $avg;
             $cash = $side * $rsp->v[$i];
             $acc += $cash;
-            if ($acc > $cashTop) $cashTop = $acc;
+            if ($avg > $priceTop) {
+                $priceTop = $avg;
+                $cashTop = $acc;
+            }
             $r['cash'][] = [
                 'time' => $rsp->t[$i],
                 'value' => $acc
@@ -164,7 +166,6 @@ class StockService extends CoreService
                 'close' => +$candle->close
             ];
             $avg = ($candle->high + $candle->low + $candle->close) / 3;
-            if ($avg > $priceTop) $priceTop = $avg;
             $r['price'][] = [
                 'time' => $date,
                 'value' => $avg
@@ -177,7 +178,10 @@ class StockService extends CoreService
             $prevAvg = $avg;
             $cash = $side * $candle->volume;
             $acc += $cash;
-            if ($acc > $cashTop) $cashTop = $acc;
+            if ($avg > $priceTop) {
+                $priceTop = $avg;
+                $cashTop = $acc;
+            }
             $r['cash'][] = [
                 'time' => $date,
                 'value' => $acc
