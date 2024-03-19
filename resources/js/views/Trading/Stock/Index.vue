@@ -31,8 +31,7 @@
                     options: {
                         icon: 'far fa-list small',
                         hint: $t('trading.stock.cloneSymbols'),
-                        onClick: () =>
-                            $store.dispatch('tradingStock/cloneSymbols'),
+                        onClick: cloneSymbols,
                     },
                 },
                 {
@@ -49,7 +48,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-filter small',
-                        hint: $t('trading.stock.filterPopup.title'),
+                        hint: $t('trading.stock.filterSymbols'),
                         onClick: filterSymbols,
                     },
                 },
@@ -1304,16 +1303,12 @@ function loadNextSymbol(e) {
 function listChanged(e) {
     state.symbolKind = e.value;
 }
-function filterSymbols() {
-    if (params.tools.range.length == 2) {
-        const param = {
-            from: params.tools.range[0].time,
-            to: params.tools.range[1].time,
-            timeframe: state.timeframe,
-            name: state.symbolKind,
-        };
-        store.dispatch("tradingStock/filterSymbols", param);
-    } else toast.error(t("trading.stock.rangeWarning"));
+function cloneSymbols() {
+    confirm(`${t("trading.stock.cloneSymbols")}?`, t("titles.confirm")).then(
+        (result) => {
+            if (result) store.dispatch("tradingStock/cloneSymbols");
+        }
+    );
 }
 function deleteWatchlist() {
     confirm(`${t("trading.stock.deleteWatchList")}?`, t("titles.confirm")).then(
@@ -1321,6 +1316,24 @@ function deleteWatchlist() {
             if (result) store.dispatch("tradingStock/deleteWatchlist");
         }
     );
+}
+function filterSymbols() {
+    if (params.tools.range.length == 2) {
+        confirm(
+            `${t("trading.stock.filterSymbols")}?`,
+            t("titles.confirm")
+        ).then((result) => {
+            if (result) {
+                const param = {
+                    from: params.tools.range[0].time,
+                    to: params.tools.range[1].time,
+                    timeframe: state.timeframe,
+                    name: state.symbolKind,
+                };
+                store.dispatch("tradingStock/filterSymbols", param);
+            }
+        });
+    } else toast.error(t("trading.stock.rangeWarning"));
 }
 </script>
 <style lang="scss">

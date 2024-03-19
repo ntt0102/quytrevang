@@ -233,6 +233,7 @@
             "cloneSymbols": "Tạo danh sách mã",
             "symbolKind": "Danh sách mã",
             "deleteWatchList": "Xoá tất cả các mã theo dõi",
+            "filterSymbols": "Lọc cổ phiếu",
             "symbolList": {
                 "hose": "Sàn HOSE",
                 "hnx": "Sàn HNX",
@@ -262,13 +263,7 @@
             "symbolFiltered": "Đã lọc mã chứng khoán",
             "rangeWarning": "Chưa chọn khoảng thời gian lọc",
             "event": "Sự kiện",
-            "date": "Ngày {date}",
-            "filterPopup": {
-                "title": "Lọc cổ phiếu",
-                "fromDate": "Từ ngày",
-                "toDate": "Đến ngày",
-                "filterModel": "Mô hình lọc"
-            }
+            "date": "Ngày {date}"
         },
         "statistic": {
             "title": "Thống kê",
