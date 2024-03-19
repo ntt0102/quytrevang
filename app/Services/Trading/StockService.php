@@ -57,13 +57,14 @@ class StockService extends CoreService
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if ($rsp->s != 'ok') return $r;
-        if (count($rsp->t) == 0) return $r;
+        $size = count($rsp->t);
+        if ($size == 0) return $r;
         if ($payload->timeframe != 'D')  $rsp = $this->getDataSsiWithTimeframe($rsp, $payload->timeframe);
         $acc = 0;
         $priceTop = 0;
         $cashTop = 0;
         $prevAvg = 0;
-        for ($i = 0; $i < count($rsp->t); $i++) {
+        for ($i = 0; $i < $size; $i++) {
             $r['ohlc'][] = [
                 'time' => $rsp->t[$i],
                 'open' => +$rsp->o[$i],
@@ -84,14 +85,15 @@ class StockService extends CoreService
             $prevAvg = $avg;
             $cash = $side * $rsp->v[$i];
             $acc += $cash;
-            if ($avg > $priceTop) {
-                $priceTop = $avg;
-                $cashTop = $acc;
-            }
             $r['cash'][] = [
                 'time' => $rsp->t[$i],
                 'value' => $acc
             ];
+            //
+            if ($i < $size / 2 && $avg > $priceTop) {
+                $priceTop = $avg;
+                $cashTop = $acc;
+            }
         }
         return [
             'chart' => $r,
@@ -148,13 +150,15 @@ class StockService extends CoreService
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if (!is_object($rsp)) return $r;
-        if (count($rsp->candle) == 0) return $r;
+        $size = count($rsp->candle);
+        if ($size == 0) return $r;
         if ($payload->timeframe != 'D')  $rsp = $this->getDataCp68WithTimeframe($rsp, $payload->timeframe);
         $acc = 0;
         $priceTop = 0;
         $cashTop = 0;
         $prevAvg = 0;
-        foreach ($rsp->candle as $candle) {
+        for ($i = 0; $i < $size; $i++) {
+            $candle = $rsp->candle[$i];
             $date = strtotime($candle->date);
             if ($date < $payload->from) continue;
             if ($date > $payload->to) break;
@@ -178,14 +182,15 @@ class StockService extends CoreService
             $prevAvg = $avg;
             $cash = $side * $candle->volume;
             $acc += $cash;
-            if ($avg > $priceTop) {
-                $priceTop = $avg;
-                $cashTop = $acc;
-            }
             $r['cash'][] = [
                 'time' => $date,
                 'value' => $acc
             ];
+            //
+            if ($i < $size / 2 && $avg > $priceTop) {
+                $priceTop = $avg;
+                $cashTop = $acc;
+            }
         }
         return [
             'chart' => $r,
