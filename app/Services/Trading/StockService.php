@@ -91,13 +91,13 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            if ($i < ($size / 2) && $avg > $r['filter']['price'][0]) {
-                $r['filter']['price'][0] = $avg;
-                $r['filter']['cash'][0] = $accCash;
+            if ($i < ($size / 2)) {
+                if ($avg > $r['filter']['price'][0]) $r['filter']['price'][0] = $avg;
+                if ($accCash > $r['filter']['cash'][0]) $r['filter']['cash'][0] = $accCash;
             }
-            if ($i > ($size / 2) && $avg > $r['filter']['price'][1]) {
-                $r['filter']['price'][1] = $avg;
-                $r['filter']['cash'][1] = $accCash;
+            if ($i > ($size / 2)) {
+                if ($avg > $r['filter']['price'][1]) $r['filter']['price'][1] = $avg;
+                if ($accCash > $r['filter']['cash'][1]) $r['filter']['cash'][1] = $accCash;
             }
         }
         return $r;
@@ -187,13 +187,13 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            if ($i < ($size / 2) && $avg > $r['filter']['price'][0]) {
-                $r['filter']['price'][0] = $avg;
-                $r['filter']['cash'][0] = $accCash;
+            if ($i < ($size / 2)) {
+                if ($avg > $r['filter']['price'][0]) $r['filter']['price'][0] = $avg;
+                if ($accCash > $r['filter']['cash'][0]) $r['filter']['cash'][0] = $accCash;
             }
-            if ($i > ($size / 2) && $avg > $r['filter']['price'][1]) {
-                $r['filter']['price'][1] = $avg;
-                $r['filter']['cash'][1] = $accCash;
+            if ($i > ($size / 2)) {
+                if ($avg > $r['filter']['price'][1]) $r['filter']['price'][1] = $avg;
+                if ($accCash > $r['filter']['cash'][1]) $r['filter']['cash'][1] = $accCash;
             }
         }
         return $r;
