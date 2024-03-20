@@ -68,9 +68,7 @@
                                 ? '140px'
                                 : '130px'
                         "
-                        :data-source="
-                            $store.state.tradingStock.symbols[state.symbolKind]
-                        "
+                        :data-source="symbols"
                         :search-enabled="true"
                         :show-clear-button="true"
                         :element-attr="{
@@ -322,6 +320,9 @@ const tradingViewSrc = computed(
 );
 const inWatchlist = computed(() =>
     store.state.tradingStock.symbols.watch.includes(state.symbol)
+);
+const symbols = computed(
+    () => store.state.tradingStock.symbols[state.symbolKind]
 );
 const eventClass = computed(() =>
     store.state.tradingStock.chart.dividend ? " dividend" : ""
