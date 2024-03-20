@@ -52,23 +52,22 @@ class FilterStockJob implements ShouldQueue
         $vnindex = $stockService->getDataFromSsi($this->payload)['filter']['price'];
         $strVni = $vnindex[0];
         $endVni = $vnindex[1];
-        $stocks = StockSymbol::where('name', $this->payload->name)->get();
-        foreach ($stocks as $stock) {
-            foreach ($stock->symbols as $symbol) {
-                $this->payload->symbol = $symbol;
-                $data = $stockService->getData($this->payload)['filter'];
-                if (count($data['price']) == 0) continue;
-                $strPr = $data['price'][0];
-                $endPr = $data['price'][1];
-                $strCh = $data['cash'][0];
-                $endCh = $data['cash'][1];
-                $isCash = $endPr < $strPr && $endCh > $strCh;
-                $isIndex = $endVni < $strVni && $endPr > $strPr;
-                $isMix = $endVni < $strVni && $endPr > $strPr && $endCh > $strCh;
-                if ($isCash) $rCash[] = $symbol;
-                if ($isIndex) $rIndex[] = $symbol;
-                if ($isMix) $rMix[] = $symbol;
-            }
+        $stock = StockSymbol::where('name', $this->payload->name)->first();
+        if (!$stock) return false;
+        foreach ($stock->symbols as $symbol) {
+            $this->payload->symbol = $symbol;
+            $data = $stockService->getData($this->payload);
+            if (count($data['chart']['price']) == 0) continue;
+            $strPr = $data['filter']['price'][0];
+            $endPr = $data['filter']['price'][1];
+            $strCh = $data['filter']['cash'][0];
+            $endCh = $data['filter']['cash'][1];
+            $isCash = $endPr < $strPr && $endCh > $strCh;
+            $isIndex = $endVni < $strVni && $endPr > $strPr;
+            $isMix = $endVni < $strVni && $endPr > $strPr && $endCh > $strCh;
+            if ($isCash) $rCash[] = $symbol;
+            if ($isIndex) $rIndex[] = $symbol;
+            if ($isMix) $rMix[] = $symbol;
         }
         StockSymbol::updateOrCreate(['name' => 'f_cash'], ['symbols' => $rCash]);
         StockSymbol::updateOrCreate(['name' => 'f_index'], ['symbols' => $rIndex]);
@@ -78,5 +77,6 @@ class FilterStockJob implements ShouldQueue
             new FilteredStockNotification()
         );
         // \Log::info('End filter');
+        return true;
     }
 }

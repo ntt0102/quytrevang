@@ -91,11 +91,11 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            if ($i < ($size / 2)) {
+            if ($i < $size / 2) {
                 if ($avg > $r['filter']['price'][0]) $r['filter']['price'][0] = $avg;
                 if ($accCash > $r['filter']['cash'][0]) $r['filter']['cash'][0] = $accCash;
             }
-            if ($i > ($size / 2)) {
+            if ($i > $size / 2) {
                 if ($avg > $r['filter']['price'][1]) $r['filter']['price'][1] = $avg;
                 if ($accCash > $r['filter']['cash'][1]) $r['filter']['cash'][1] = $accCash;
             }
@@ -157,10 +157,14 @@ class StockService extends CoreService
         if ($payload->timeframe != 'D')  $rsp = $this->getDataCp68WithTimeframe($rsp, $payload->timeframe);
         $accCash = 0;
         $prevAvg = 0;
+        $strI = 0;
         for ($i = 0; $i < $size; $i++) {
             $candle = $rsp->candle[$i];
             $date = strtotime($candle->date);
-            if ($date < $payload->from) continue;
+            if ($date < $payload->from) {
+                $strI = $i;
+                continue;
+            }
             if ($date > $payload->to) break;
             $r['chart']['ohlc'][] = [
                 'time' => $date,
@@ -187,11 +191,11 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            if ($i < ($size / 2)) {
+            if ($i - $strI < ($size - $strI) / 2) {
                 if ($avg > $r['filter']['price'][0]) $r['filter']['price'][0] = $avg;
                 if ($accCash > $r['filter']['cash'][0]) $r['filter']['cash'][0] = $accCash;
             }
-            if ($i > ($size / 2)) {
+            if ($i - $strI > ($size - $strI) / 2) {
                 if ($avg > $r['filter']['price'][1]) $r['filter']['price'][1] = $avg;
                 if ($accCash > $r['filter']['cash'][1]) $r['filter']['cash'][1] = $accCash;
             }

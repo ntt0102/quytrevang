@@ -62,7 +62,7 @@ class CoreNotification extends Notification
 
     public function toBroadcast($notifiable)
     {
-        return (new BroadcastMessage([$this->params]))->onConnection('sync');
+        return (new BroadcastMessage($this->params))->onConnection('sync');
     }
 
     /**
