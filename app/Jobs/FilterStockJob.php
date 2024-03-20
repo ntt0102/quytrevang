@@ -40,7 +40,7 @@ class FilterStockJob implements ShouldQueue
      */
     public function handle()
     {
-        // \Log::info('Begin filter');
+        \Log::info('Start filter');
         $rCash = [];
         $rIndex = [];
         $rMix = [];
@@ -58,13 +58,19 @@ class FilterStockJob implements ShouldQueue
             $this->payload->symbol = $symbol;
             $data = $stockService->getData($this->payload);
             if (count($data['chart']['price']) == 0) continue;
-            $strPr = $data['filter']['price'][0];
-            $endPr = $data['filter']['price'][1];
-            $strCh = $data['filter']['cash'][0];
-            $endCh = $data['filter']['cash'][1];
-            $isCash = $endPr < $strPr && $endCh > $strCh;
-            $isIndex = $endVni < $strVni && $endPr > $strPr;
-            $isMix = $endVni < $strVni && $endPr > $strPr && $endCh > $strCh;
+            $t1Pr = $data['filter']['price'][0];
+            $t2Pr = $data['filter']['price'][1];
+            $bPr = $data['filter']['price'][2];
+            if ($t1Pr - $bPr == 0) continue;
+            $rPr = ($t2Pr - $bPr) / ($t1Pr - $bPr);
+            $t1Ch = $data['filter']['cash'][0];
+            $t2Ch = $data['filter']['cash'][1];
+            $bCh = $data['filter']['cash'][2];
+            if ($t1Ch - $bCh == 0) continue;
+            $rCh = ($t2Ch - $bCh) / ($t1Ch - $bCh);
+            $isCash = $t2Pr < $t1Pr && $rPr > 0.382 && $t2Ch > $t1Ch && $rCh > 1.618;
+            $isIndex = $endVni < $strVni && $t2Pr > $t1Pr;
+            $isMix = $endVni < $strVni && $t2Pr > $t1Pr && $t2Ch > $t1Ch && $rCh > 1.618;
             if ($isCash) $rCash[] = $symbol;
             if ($isIndex) $rIndex[] = $symbol;
             if ($isMix) $rMix[] = $symbol;
@@ -77,6 +83,5 @@ class FilterStockJob implements ShouldQueue
             new FilteredStockNotification()
         );
         // \Log::info('End filter');
-        return true;
     }
 }

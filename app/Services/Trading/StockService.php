@@ -52,7 +52,7 @@ class StockService extends CoreService
     {
         $r = [
             'chart' => ['ohlc' => [], 'price' => [], 'cash' => []],
-            'filter' => ['price' => [0, 0], 'cash' => [0, 0]]
+            'filter' => ['price' => [0, 0, 0], 'cash' => [0, 0, 0]]
         ];
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
@@ -99,6 +99,14 @@ class StockService extends CoreService
                 if ($avg > $r['filter']['price'][1]) $r['filter']['price'][1] = $avg;
                 if ($accCash > $r['filter']['cash'][1]) $r['filter']['cash'][1] = $accCash;
             }
+            if ($i >= $size / 3) {
+                if ($i == ceil($size / 3)) {
+                    $r['filter']['price'][2] = $avg;
+                    $r['filter']['cash'][2] = $accCash;
+                }
+                if ($avg < $r['filter']['price'][2]) $r['filter']['price'][2] = $avg;
+                if ($accCash < $r['filter']['cash'][2]) $r['filter']['cash'][2] = $accCash;
+            }
         }
         return $r;
     }
@@ -144,7 +152,7 @@ class StockService extends CoreService
     {
         $r = [
             'chart' => ['ohlc' => [], 'price' => [], 'cash' => []],
-            'filter' => ['price' => [0, 0], 'cash' => [0, 0]]
+            'filter' => ['price' => [0, 0, 0], 'cash' => [0, 0, 0]]
         ];
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
@@ -152,20 +160,21 @@ class StockService extends CoreService
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if (!is_object($rsp)) return $r;
-        $size = count($rsp->candle);
+        $candles = array_values(array_filter(
+            $rsp->candle,
+            function ($i) use ($payload) {
+                $date = strtotime($i->date);
+                return $date >= $payload->from && $date <= $payload->to;
+            }
+        ));
+        $size = count($candles);
         if ($size == 0) return $r;
-        if ($payload->timeframe != 'D')  $rsp = $this->getDataCp68WithTimeframe($rsp, $payload->timeframe);
+        if ($payload->timeframe != 'D')  $candles = $this->getDataCp68WithTimeframe($candles, $payload->timeframe);
         $accCash = 0;
         $prevAvg = 0;
-        $strI = 0;
         for ($i = 0; $i < $size; $i++) {
-            $candle = $rsp->candle[$i];
+            $candle = $candles[$i];
             $date = strtotime($candle->date);
-            if ($date < $payload->from) {
-                $strI = $i;
-                continue;
-            }
-            if ($date > $payload->to) break;
             $r['chart']['ohlc'][] = [
                 'time' => $date,
                 'open' => +$candle->open,
@@ -191,13 +200,21 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            if ($i - $strI < ($size - $strI) / 2) {
+            if ($i < $size / 2) {
                 if ($avg > $r['filter']['price'][0]) $r['filter']['price'][0] = $avg;
                 if ($accCash > $r['filter']['cash'][0]) $r['filter']['cash'][0] = $accCash;
             }
-            if ($i - $strI > ($size - $strI) / 2) {
+            if ($i > $size / 2) {
                 if ($avg > $r['filter']['price'][1]) $r['filter']['price'][1] = $avg;
                 if ($accCash > $r['filter']['cash'][1]) $r['filter']['cash'][1] = $accCash;
+            }
+            if ($i >= $size / 3) {
+                if ($i == ceil($size / 3)) {
+                    $r['filter']['price'][2] = $avg;
+                    $r['filter']['cash'][2] = $accCash;
+                }
+                if ($avg < $r['filter']['price'][2]) $r['filter']['price'][2] = $avg;
+                if ($accCash < $r['filter']['cash'][2]) $r['filter']['cash'][2] = $accCash;
             }
         }
         return $r;
@@ -205,7 +222,7 @@ class StockService extends CoreService
     public function getDataCp68WithTimeframe($data, $tf)
     {
         $candles = [];
-        foreach ($data->candle as $candle) {
+        foreach ($data as $candle) {
             $key = date('Y-' . $tf, strtotime($candle->date));
             if (!array_key_exists($key, $candles)) {
                 $candles[$key] = new stdClass();
@@ -221,7 +238,7 @@ class StockService extends CoreService
             $candles[$key]->close = $candle->close;
             $candles[$key]->volume += $candle->volume;
         }
-        return (object)['candle' => array_values($candles)];
+        return array_values($candles);
     }
     /**
      * Get chart tool
