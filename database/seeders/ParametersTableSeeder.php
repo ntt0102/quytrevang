@@ -44,5 +44,15 @@ class ParametersTableSeeder extends Seeder
             'value' => "0.2",
             'description' => "Tỷ lệ sao chép",
         ]);
+        Parameter::create([
+            'slug' => "fundSize",
+            'value' => "50000000",
+            'description' => "Vốn tài khoản",
+        ]);
+        Parameter::create([
+            'slug' => "losePerOrder",
+            'value' => "2",
+            'description' => "Tỷ lệ (%) lỗ mỗi lệnh",
+        ]);
     }
 }
