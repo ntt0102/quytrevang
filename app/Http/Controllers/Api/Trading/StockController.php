@@ -17,6 +17,18 @@ class StockController extends CoreController
     }
 
     /**
+     * Init Chart
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function initChart(Request $request)
+    {
+        $data = $this->stockService->initChart($this->payload);
+        return $this->sendResponse($data);
+    }
+    /**
      * Get the Chart data
      *
      * @param \Illuminate\Http\Request $request

@@ -328,7 +328,7 @@ const eventClass = computed(() =>
     store.state.tradingStock.chart.dividend ? " dividend" : ""
 );
 store.dispatch("tradingStock/getSymbols");
-stockDb.create();
+// stockDb.create();
 
 onMounted(() => {
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
@@ -377,18 +377,14 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
     store
-        .dispatch("tradingStock/getChartData", {
+        .dispatch("tradingStock/initChart", {
             symbol: state.symbol,
             timeframe: state.timeframe,
-            vnindex: true,
         })
-        .then(async (vnindex) => {
-            params.series.vnindex.setData(vnindex);
-            const range = await stockDb.get("range");
-            if (range.length == 2) {
-                params.tools.range = range;
-                params.series.range.setData(range);
-            }
+        .then((data) => {
+            params.series.vnindex.setData(data.vnindex);
+            params.tools.range = data.range;
+            params.series.range.setData(data.range);
         });
 });
 
@@ -1220,22 +1216,38 @@ function rangeToolContextmenu(e) {
     e.target.classList.remove("selected");
 }
 function drawRangeTool() {
+    let param = {
+        isRemove: false,
+        symbol: "ALL",
+        name: "range",
+        points: [],
+        data: [],
+    };
     let option = { time: params.crosshair.time, value: 1 };
     if (params.tools.range.length > 0) {
         option.color = "red";
         params.tools.range[1] = option;
+        param.points.push(1);
         rangeToolRef.value.classList.remove("selected");
     } else {
         option.color = "aqua";
         params.tools.range[0] = option;
+        param.points.push(0);
     }
     params.series.range.setData(params.tools.range);
-    stockDb.set("range", option);
+    // stockDb.set("range", option);
+    param.data.push(option);
+    store.dispatch("tradingStock/drawTools", param);
 }
 function removeRangeTool() {
     params.tools.range = [];
     params.series.range.setData([]);
-    stockDb.clear("range");
+    // stockDb.clear("range");
+    store.dispatch("tradingStock/drawTools", {
+        isRemove: true,
+        symbol: "ALL",
+        name: "range",
+    });
 }
 function eventsToolClick(e) {
     const selected = e.target.classList.contains("selected");
@@ -1284,7 +1296,6 @@ function symbolChanged(e) {
     store.dispatch("tradingStock/getChartData", {
         symbol: state.symbol,
         timeframe: state.timeframe,
-        vnindex: false,
     });
 }
 function reloadChartData() {
@@ -1292,7 +1303,6 @@ function reloadChartData() {
     store.dispatch("tradingStock/getChartData", {
         symbol: state.symbol,
         timeframe: state.timeframe,
-        vnindex: false,
     });
 }
 function loadNextSymbol(e) {

@@ -26,6 +26,22 @@ const actions = {
                 });
         });
     },
+    initChart({ commit, dispatch, getters, state, rootGetters }, param) {
+        commit("setChartLoading", true);
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "trading/stock/init-chart",
+                    { ...param, ...{ from: FROM_DATE, to: TO_DATE } },
+                    { noLoading: true }
+                )
+                .then((response) => {
+                    commit("setChartData", response.data.chart);
+                    commit("setChartLoading", false);
+                    resolve(response.data);
+                });
+        });
+    },
     cloneSymbols({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios

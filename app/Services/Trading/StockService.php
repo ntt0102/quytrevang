@@ -12,6 +12,22 @@ use stdClass;
 class StockService extends CoreService
 {
     /**
+     * Init Chart
+     *
+     * @param $payload
+     * 
+     */
+    public function initChart($payload)
+    {
+        $ret = [
+            'chart' => $this->getChart($payload),
+        ];
+        $payload->symbol = 'VNINDEX';
+        $ret['vnindex'] = $this->getDataFromSsi($payload)['chart']['price'];
+        $ret['range'] = DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
+        return $ret;
+    }
+    /**
      * Get chart data
      *
      * @param $payload
@@ -25,10 +41,6 @@ class StockService extends CoreService
             'dividend' => $this->hasDividend($payload),
             'events' => $this->getEvents($payload),
         ];
-        if ($payload->vnindex) {
-            $payload->symbol = 'VNINDEX';
-            $ret['vnindex'] = $this->getDataFromSsi($payload)['chart']['price'];
-        }
         return $ret;
     }
     /**
@@ -420,7 +432,7 @@ class StockService extends CoreService
             for ($i = 0; $i < count($payload->points); $i++) {
                 $key = ['symbol' => $payload->symbol, 'name' => $payload->name, 'point' => $payload->points[$i]];
                 $data = ['data' => $payload->data[$i]];
-                if ($payload->name == 'line') $data['point'] = $payload->data[$i]->price;
+                // if ($payload->name == 'line') $data['point'] = $payload->data[$i]->price;
                 DrawTool::updateOrCreate($key, $data);
             }
         }
