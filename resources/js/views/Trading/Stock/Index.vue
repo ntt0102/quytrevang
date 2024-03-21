@@ -290,6 +290,7 @@ let params = {
         range: [],
     },
     crosshair: {},
+    isCashDraw: false,
     isOnlyLoadData: false,
     showNewsInfo: false,
 };
@@ -307,10 +308,9 @@ const state = reactive({
         { text: t("trading.stock.symbolList.hold"), value: "hold" },
         { text: t("trading.stock.symbolList.hnx"), value: "hnx" },
     ],
-    isFullscreen: false,
     color: "#F44336",
     showColorPicker: false,
-    isCashDraw: false,
+    isFullscreen: false,
     showTradingView: false,
 });
 state.symbolKind = route.query.list ?? "hose";
@@ -887,8 +887,8 @@ function uplpsToolContextmenu(e) {
 }
 function drawUplpsTool() {
     let startTime, endTime;
-    const name = state.isCashDraw ? "cash" : "price";
-    const char = state.isCashDraw ? "C" : "P";
+    const name = params.isCashDraw ? "cash" : "price";
+    const char = params.isCashDraw ? "C" : "P";
     if (mf.isSet(params.tools.uplps[`${char}1`])) {
         startTime = +params.tools.uplps[`${char}1`].options().startTime;
         endTime = params.crosshair.time;
@@ -932,7 +932,7 @@ function findUplps(startTime, endTime) {
         v3,
         d = 0,
         dMax = 0;
-    const data = params.data[state.isCashDraw ? "cash" : "price"];
+    const data = params.data[params.isCashDraw ? "cash" : "price"];
     for (let i = 0; i < data.length; i++) {
         const time = data[i].time;
         if (time < startTime) continue;
@@ -962,7 +962,7 @@ function findUplps(startTime, endTime) {
     };
 }
 function removeUplpsTool(server = true, forceCash = false) {
-    const isCashDraw = state.isCashDraw || forceCash;
+    const isCashDraw = params.isCashDraw || forceCash;
     const name = isCashDraw ? "cash" : "price";
     const char = isCashDraw ? "C" : "P";
     const point1 = `${char}1`;
@@ -995,8 +995,8 @@ function downlpsToolContextmenu(e) {
 }
 function drawDownlpsTool() {
     let startTime, endTime;
-    const name = state.isCashDraw ? "cash" : "price";
-    const char = state.isCashDraw ? "C" : "P";
+    const name = params.isCashDraw ? "cash" : "price";
+    const char = params.isCashDraw ? "C" : "P";
     if (mf.isSet(params.tools.downlps[`${char}1`])) {
         startTime = +params.tools.downlps[`${char}1`].options().startTime;
         endTime = params.crosshair.time;
@@ -1040,7 +1040,7 @@ function findDownlps(startTime, endTime) {
         v3,
         d = 0,
         dMax = 0;
-    const data = params.data[state.isCashDraw ? "cash" : "price"];
+    const data = params.data[params.isCashDraw ? "cash" : "price"];
     for (let i = 0; i < data.length; i++) {
         const time = data[i].time;
         if (time < startTime) continue;
@@ -1070,7 +1070,7 @@ function findDownlps(startTime, endTime) {
     };
 }
 function removeDownlpsTool(server = true, forceCash = false) {
-    const isCashDraw = state.isCashDraw || forceCash;
+    const isCashDraw = params.isCashDraw || forceCash;
     const name = isCashDraw ? "cash" : "price";
     const char = isCashDraw ? "C" : "P";
     const point1 = `${char}1`;
@@ -1092,14 +1092,14 @@ function cashToolClick(e) {
     const selected = e.target.classList.contains("selected");
     if (!selected) {
         e.target.classList.add("selected");
-        state.isCashDraw = true;
+        params.isCashDraw = true;
     } else {
         e.target.classList.remove("selected");
-        state.isCashDraw = false;
+        params.isCashDraw = false;
     }
 }
 function cashToolContextmenu(e) {
-    state.isCashDraw = false;
+    params.isCashDraw = false;
     e.target.classList.remove("selected");
 }
 function rrToolClick(e) {
