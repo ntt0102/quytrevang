@@ -212,7 +212,6 @@
 
 <script setup>
 import ColorPicker from "./ColorPicker.vue";
-import stockDb from "../../../plugins/stockDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
 import { confirm, alert } from "devextreme/ui/dialog";
@@ -328,7 +327,6 @@ const eventClass = computed(() =>
     store.state.tradingStock.chart.dividend ? " dividend" : ""
 );
 store.dispatch("tradingStock/getSymbols");
-// stockDb.create();
 
 onMounted(() => {
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
@@ -1235,14 +1233,12 @@ function drawRangeTool() {
         param.points.push(0);
     }
     params.series.range.setData(params.tools.range);
-    // stockDb.set("range", option);
     param.data.push(option);
     store.dispatch("tradingStock/drawTools", param);
 }
 function removeRangeTool() {
     params.tools.range = [];
     params.series.range.setData([]);
-    // stockDb.clear("range");
     store.dispatch("tradingStock/drawTools", {
         isRemove: true,
         symbol: "ALL",
