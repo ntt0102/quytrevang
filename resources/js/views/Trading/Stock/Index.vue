@@ -45,15 +45,6 @@
                 },
                 {
                     location: 'after',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-filter small',
-                        hint: $t('trading.stock.filterSymbols'),
-                        onClick: filterSymbols,
-                    },
-                },
-                {
-                    location: 'after',
                     widget: 'dxDropDownButton',
                     options: {
                         splitButton: true,
