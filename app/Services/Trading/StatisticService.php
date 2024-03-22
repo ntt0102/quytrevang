@@ -160,7 +160,7 @@ class StatisticService extends CoreService
     {
         $ret = [];
         $accProfit = 0;
-        $barsPerPage = $period == 'day' ? 30 : 10;
+        $barsPerPage = $period == 'day' ? 90 : 10;
         $multiplier = $period == 'quarter' ? 3 : 1;
         $unit = $period == 'quarter' ? 'month' : $period;
         $startOfPage = date_create()->modify('-' . ($multiplier * ($page * $barsPerPage - 1)) . ' ' . $unit);
