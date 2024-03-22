@@ -52,6 +52,22 @@
                         onClick: filterSymbols,
                     },
                 },
+                {
+                    location: 'after',
+                    widget: 'dxDropDownButton',
+                    options: {
+                        splitButton: true,
+                        useSelectMode: false,
+                        items: state.filterItems,
+                        displayExpr: 'text',
+                        keyExpr: 'value',
+                        icon: 'far fa-filter small',
+                        hint: $t('trading.stock.filterSymbols'),
+                        dropDownOptions: { width: '130px' },
+                        onButtonClick: filterButtonClick,
+                        onItemClick: filterItemClick,
+                    },
+                },
             ]"
         />
         <div
@@ -309,6 +325,11 @@ const state = reactive({
         { text: t("trading.stock.symbolList.watch"), value: "watch" },
         { text: t("trading.stock.symbolList.hold"), value: "hold" },
         { text: t("trading.stock.symbolList.hnx"), value: "hnx" },
+    ],
+    filterItems: [
+        { text: t("trading.stock.symbolList.filterCash"), value: "f_cash" },
+        { text: t("trading.stock.symbolList.filterIndex"), value: "f_index" },
+        { text: t("trading.stock.symbolList.filterMix"), value: "f_mix" },
     ],
     color: "#F44336",
     showColorPicker: false,
@@ -1350,7 +1371,7 @@ function deleteWatchlist() {
         }
     );
 }
-function filterSymbols() {
+function filterSymbols(kinds) {
     if (params.tools.range.length == 2) {
         confirm(
             `${t("trading.stock.filterSymbols")}?`,
@@ -1362,11 +1383,18 @@ function filterSymbols() {
                     to: params.tools.range[1].time,
                     timeframe: state.timeframe,
                     name: state.symbolKind,
+                    kinds: kinds,
                 };
                 store.dispatch("tradingStock/filterSymbols", param);
             }
         });
     } else toast.error(t("trading.stock.rangeWarning"));
+}
+function filterButtonClick() {
+    filterSymbols(["f_cash", "f_index", "f_mix"]);
+}
+function filterItemClick({ itemData }) {
+    filterSymbols([itemData.value]);
 }
 </script>
 <style lang="scss">

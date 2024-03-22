@@ -77,12 +77,15 @@ class FilterStockJob implements ShouldQueue
             if ($isIndex) $rIndex[] = $symbol;
             if ($isMix) $rMix[] = $symbol;
         }
-        StockSymbol::updateOrCreate(['name' => 'f_cash'], ['symbols' => $rCash]);
-        StockSymbol::updateOrCreate(['name' => 'f_index'], ['symbols' => $rIndex]);
-        StockSymbol::updateOrCreate(['name' => 'f_mix'], ['symbols' => $rMix]);
+        if (in_array('f_cash', $this->payload->kinds))
+            StockSymbol::updateOrCreate(['name' => 'f_cash'], ['symbols' => $rCash]);
+        if (in_array('f_index', $this->payload->kinds))
+            StockSymbol::updateOrCreate(['name' => 'f_index'], ['symbols' => $rIndex]);
+        if (in_array('f_mix', $this->payload->kinds))
+            StockSymbol::updateOrCreate(['name' => 'f_mix'], ['symbols' => $rMix]);
         Notification::send(
             User::permission('trades@edit')->get(),
-            new FilteredStockNotification()
+            new FilteredStockNotification($this->payload->kinds)
         );
         // \Log::info('End filter');
     }

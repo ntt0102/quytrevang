@@ -11,13 +11,14 @@ class FilteredStockNotification extends CoreNotification
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($kinds)
     {
+        $kind = count($kinds) == 1 ? $kinds[0] : 'all';
         $path = 'Notifications/FilteredStock.';
         $params = [
             'event' => 'filtered-stock',
             'title' => trans($path . 'title'),
-            'body' => trans($path . 'body'),
+            'body' => trans($path . 'body', ['kind' => trans($path . $kind)]),
             'actions' => [
                 [
                     'action' =>  trans($path . 'actionUrl'),
