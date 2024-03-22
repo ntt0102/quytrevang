@@ -75,9 +75,9 @@ class StockService extends CoreService
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if ($rsp->s != 'ok') return $r;
+        if ($payload->timeframe != 'D')  $rsp = $this->getDataSsiWithTimeframe($rsp, $payload->timeframe);
         $size = count($rsp->t);
         if ($size == 0) return $r;
-        if ($payload->timeframe != 'D')  $rsp = $this->getDataSsiWithTimeframe($rsp, $payload->timeframe);
         $accCash = 0;
         $prevAvg = 0;
         for ($i = 0; $i < $size; $i++) {
@@ -182,9 +182,9 @@ class StockService extends CoreService
                 return $date >= $payload->from && $date <= $payload->to;
             }
         ));
+        if ($payload->timeframe != 'D')  $candles = $this->getDataCp68WithTimeframe($candles, $payload->timeframe);
         $size = count($candles);
         if ($size == 0) return $r;
-        if ($payload->timeframe != 'D')  $candles = $this->getDataCp68WithTimeframe($candles, $payload->timeframe);
         $accCash = 0;
         $prevAvg = 0;
         for ($i = 0; $i < $size; $i++) {
