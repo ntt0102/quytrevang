@@ -18,6 +18,8 @@ class FilterStockJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    private $PRICE_RATIO = 0.382;
+    private $CASH_RATIO = 2.618;
     private $payload;
 
     public $tries = 1;
@@ -68,9 +70,9 @@ class FilterStockJob implements ShouldQueue
             $bCh = $data['filter']['cash'][2];
             if ($t1Ch - $bCh == 0) continue;
             $rCh = ($t2Ch - $bCh) / ($t1Ch - $bCh);
-            $isCash = $t2Pr < $t1Pr && $rPr > 0.4 && $t2Ch > $t1Ch && $rCh > 2;
+            $isCash = $t2Pr < $t1Pr && $rPr > $this->PRICE_RATIO && $t2Ch > $t1Ch && $rCh > $this->CASH_RATIO;
             $isIndex = $endVni < $strVni && $t2Pr > $t1Pr;
-            $isMix = $endVni < $strVni && $t2Pr > $t1Pr && $t2Ch > $t1Ch && $rCh > 2;
+            $isMix = $endVni < $strVni && $t2Pr > $t1Pr && $t2Ch > $t1Ch && $rCh > $this->CASH_RATIO;
             if ($isCash) $rCash[] = $symbol;
             if ($isIndex) $rIndex[] = $symbol;
             if ($isMix) $rMix[] = $symbol;
