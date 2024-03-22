@@ -23,8 +23,6 @@ class StockService extends CoreService
         $ret = [
             'chart' => $this->getChart($payload),
         ];
-        $payload->symbol = 'VNINDEX';
-        $ret['vnindex'] = $this->getDataFromSsi($payload)['chart']['price'];
         $ret['range'] = DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
         $ret['fundSize'] = (int) Parameter::getValue('fundSize', 0);
         $ret['losePerOrder'] = (float) Parameter::getValue('losePerOrder', 0);
@@ -44,6 +42,10 @@ class StockService extends CoreService
             'dividend' => $this->hasDividend($payload),
             'events' => $this->getEvents($payload),
         ];
+        if ($payload->vnindex) {
+            $payload->symbol = 'VNINDEX';
+            $ret['vnindex'] = $this->getDataFromSsi($payload)['chart']['price'];
+        }
         return $ret;
     }
     /**

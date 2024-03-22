@@ -82,7 +82,7 @@
                         :data-source="['D', 'W', 'M']"
                         :element-attr="{ class: 'command timeframe-select' }"
                         v-model="state.timeframe"
-                        @valueChanged="reloadChartData"
+                        @valueChanged="timeframeChanged"
                     />
                     <div
                         class="command"
@@ -380,9 +380,10 @@ onMounted(() => {
         .dispatch("tradingStock/initChart", {
             symbol: state.symbol,
             timeframe: state.timeframe,
+            vnindex: true,
         })
         .then((data) => {
-            params.series.vnindex.setData(data.vnindex);
+            params.series.vnindex.setData(data.chart.vnindex);
             params.tools.range = data.range;
             params.series.range.setData(data.range);
             params.fundSize = data.fundSize;
@@ -1305,13 +1306,25 @@ function symbolChanged(e) {
     store.dispatch("tradingStock/getChartData", {
         symbol: state.symbol,
         timeframe: state.timeframe,
+        vnindex: false,
     });
+}
+function timeframeChanged() {
+    params.isOnlyLoadData = true;
+    store
+        .dispatch("tradingStock/getChartData", {
+            symbol: state.symbol,
+            timeframe: state.timeframe,
+            vnindex: true,
+        })
+        .then((vnindex) => params.series.vnindex.setData(vnindex));
 }
 function reloadChartData() {
     params.isOnlyLoadData = true;
     store.dispatch("tradingStock/getChartData", {
         symbol: state.symbol,
         timeframe: state.timeframe,
+        vnindex: false,
     });
 }
 function loadNextSymbol(e) {
