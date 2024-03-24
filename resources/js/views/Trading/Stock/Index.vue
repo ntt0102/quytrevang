@@ -79,7 +79,9 @@
                         :search-enabled="true"
                         :show-clear-button="true"
                         :element-attr="{
-                            class: `command symbol-select ${eventClass}`,
+                            class: `command symbol-select ${dividendClass} ${
+                                state.dividendEnable ? 'dividend-enable' : ''
+                            }`,
                         }"
                         v-model="state.symbol"
                         @valueChanged="symbolChanged"
@@ -129,6 +131,7 @@
                         }`"
                         :title="$t('trading.stock.fullscreen')"
                         @click="toggleFullscreen"
+                        @contextmenu="dividendTrigger"
                     ></div>
                     <div
                         ref="tradingviewRef"
@@ -326,6 +329,7 @@ const state = reactive({
     showColorPicker: false,
     isFullscreen: false,
     showTradingView: false,
+    dividendEnable: true,
 });
 state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
@@ -337,7 +341,7 @@ const inWatchlist = computed(() =>
 const symbols = computed(
     () => store.state.tradingStock.symbols[state.symbolKind]
 );
-const eventClass = computed(() =>
+const dividendClass = computed(() =>
     store.state.tradingStock.chart.dividend ? " dividend" : ""
 );
 store.dispatch("tradingStock/getSymbols");
@@ -393,6 +397,7 @@ onMounted(() => {
             symbol: state.symbol,
             timeframe: state.timeframe,
             vnindex: true,
+            dividend: state.dividendEnable,
         })
         .then((data) => {
             params.series.vnindex.setData(data.chart.vnindex);
@@ -1314,30 +1319,30 @@ function formatPrice(price) {
 }
 function symbolChanged(e) {
     if (!state.symbol) return false;
-    params.isOnlyLoadData = false;
-    store.dispatch("tradingStock/getChartData", {
-        symbol: state.symbol,
-        timeframe: state.timeframe,
-        vnindex: false,
-    });
+    reloadChart();
+}
+function dividendTrigger() {
+    state.dividendEnable = !state.dividendEnable;
+    reloadChart(false, true);
 }
 function timeframeChanged() {
-    params.isOnlyLoadData = true;
+    reloadChart(true, true);
+}
+function reloadChartData() {
+    reloadChart(true);
+}
+function reloadChart(onlyData = false, withVnindex = false) {
+    params.isOnlyLoadData = onlyData;
     store
         .dispatch("tradingStock/getChartData", {
             symbol: state.symbol,
             timeframe: state.timeframe,
-            vnindex: true,
+            vnindex: withVnindex,
+            dividend: state.dividendEnable,
         })
-        .then((vnindex) => params.series.vnindex.setData(vnindex));
-}
-function reloadChartData() {
-    params.isOnlyLoadData = true;
-    store.dispatch("tradingStock/getChartData", {
-        symbol: state.symbol,
-        timeframe: state.timeframe,
-        vnindex: false,
-    });
+        .then((vnindex) => {
+            if (withVnindex) params.series.vnindex.setData(vnindex);
+        });
 }
 function loadNextSymbol(e) {
     const symbols = store.state.tradingStock.symbols[state.symbolKind];
@@ -1436,6 +1441,11 @@ function filterItemClick({ itemData }) {
                 &.dividend {
                     .dx-icon-clear {
                         background: red;
+                    }
+                }
+                &.dividend-enable {
+                    .dx-icon-clear {
+                        color: lime;
                     }
                 }
             }

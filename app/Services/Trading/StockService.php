@@ -281,6 +281,7 @@ class StockService extends CoreService
      */
     public function hasDividend($payload)
     {
+        if (!$payload->dividend) return false;
         $startDate = date("Y-m-d");
         $endDate = date('Y-m-d', strtotime('+1 year'));
         $client = new \GuzzleHttp\Client();
