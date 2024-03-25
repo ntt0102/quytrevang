@@ -18,10 +18,14 @@ class FilterStockJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $PRICE_RATIO = 0.382;
-    private $CASH_RATIO = 2.618;
-    private $payload;
+    const F_TOP = "f_top";
+    const F_BOTTOM = "f_bottom";
+    const F_BREAK = "f_break";
+    const PRICE_RATIO = 0.382;
+    const CASH_RATIO = 2.618;
+    const DIFF_DAYS = 30;
 
+    private $payload;
     public $tries = 1;
     public $timeout = 3600;
 
@@ -43,46 +47,49 @@ class FilterStockJob implements ShouldQueue
     public function handle()
     {
         // \Log::info('Start filter');
-        $rCash = [];
-        $rIndex = [];
-        $rMix = [];
-        $isCash = false;
-        $isIndex = false;
-        $isMix = false;
+        $rTop = [];
+        $rBottom = [];
+        $rBreak = [];
+        $isTop = false;
+        $isBottom = false;
+        $isBreak = false;
         $stockService = app(StockService::class);
         $this->payload->symbol = 'VNINDEX';
-        $vnindex = $stockService->getDataFromSsi($this->payload)['filter']['price'];
-        $strVni = $vnindex[0];
-        $endVni = $vnindex[1];
+        $vnindex = $stockService->getDataFromSsi($this->payload)['f']['p'];
+        $t1Vni = $vnindex['t1'];
+        $t2Vni = $vnindex['t2'];
         $stock = StockSymbol::where('name', $this->payload->name)->first();
         if (!$stock) return false;
         foreach ($stock->symbols as $symbol) {
             $this->payload->symbol = $symbol;
             $data = $stockService->getData($this->payload);
-            if (count($data['chart']['price']) == 0) continue;
-            $t1Pr = $data['filter']['price'][0];
-            $t2Pr = $data['filter']['price'][1];
-            $bPr = $data['filter']['price'][2];
-            if ($t1Pr - $bPr == 0) continue;
-            $rPr = ($t2Pr - $bPr) / ($t1Pr - $bPr);
-            $t1Ch = $data['filter']['cash'][0];
-            $t2Ch = $data['filter']['cash'][1];
-            $bCh = $data['filter']['cash'][2];
-            if ($t1Ch - $bCh == 0) continue;
-            $rCh = ($t2Ch - $bCh) / ($t1Ch - $bCh);
-            $isCash = $t2Pr < $t1Pr && $rPr > $this->PRICE_RATIO && $t2Ch > $t1Ch && $rCh > $this->CASH_RATIO;
-            $isIndex = $endVni < $strVni && $t2Pr > $t1Pr;
-            $isMix = $endVni < $strVni && $t2Pr > $t1Pr && $t2Ch > $t1Ch && $rCh > $this->CASH_RATIO;
-            if ($isCash) $rCash[] = $symbol;
-            if ($isIndex) $rIndex[] = $symbol;
-            if ($isMix) $rMix[] = $symbol;
+            if (count($data['c']['price']) == 0) continue;
+            $t1Pr = $data['f']['p']['t1'];
+            $t2Pr = $data['f']['p']['t2'];
+            $bPr = $data['f']['p']['b'];
+            if ($t1Pr['v'] - $bPr['v'] == 0) continue;
+            $rPr = ($t2Pr['v'] - $bPr['v']) / ($t1Pr['v'] - $bPr['v']);
+            $t1Ch = $data['f']['c']['t1'];
+            $t2Ch = $data['f']['c']['t2'];
+            $bCh = $data['f']['c']['b'];
+            if ($t1Ch['v'] - $bCh['v'] == 0) continue;
+            $rCh = ($t2Ch['v'] - $bCh['v']) / ($t1Ch['v'] - $bCh['v']);
+            $dPr = date_create('@' . $bPr['t']);
+            $dCh = date_create('@' . $bCh['t']);
+            $diff = +date_diff($dCh, $dPr)->format("%R%a");
+            $isTop = $rPr > self::PRICE_RATIO && $rPr < 1 && $rCh > self::CASH_RATIO;
+            $isBottom = $rPr < 1 && $rCh > 1 && $diff > self::DIFF_DAYS;
+            $isBreak = $t2Vni['v'] < $t1Vni['v'] && $rPr > 1 && $rCh > self::CASH_RATIO;
+            if ($isTop) $rTop[] = $symbol;
+            if ($isBottom) $rBottom[] = $symbol;
+            if ($isBreak) $rBreak[] = $symbol;
         }
-        if (in_array('f_cash', $this->payload->kinds))
-            StockSymbol::updateOrCreate(['name' => 'f_cash'], ['symbols' => $rCash]);
-        if (in_array('f_index', $this->payload->kinds))
-            StockSymbol::updateOrCreate(['name' => 'f_index'], ['symbols' => $rIndex]);
-        if (in_array('f_mix', $this->payload->kinds))
-            StockSymbol::updateOrCreate(['name' => 'f_mix'], ['symbols' => $rMix]);
+        if (in_array(self::F_TOP, $this->payload->kinds))
+            StockSymbol::updateOrCreate(['name' => self::F_TOP], ['symbols' => $rTop]);
+        if (in_array(self::F_BOTTOM, $this->payload->kinds))
+            StockSymbol::updateOrCreate(['name' => self::F_BOTTOM], ['symbols' => $rBottom]);
+        if (in_array(self::F_BREAK, $this->payload->kinds))
+            StockSymbol::updateOrCreate(['name' => self::F_BREAK], ['symbols' => $rBreak]);
         Notification::send(
             User::permission('trades@edit')->get(),
             new FilteredStockNotification($this->payload->kinds)

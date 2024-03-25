@@ -37,14 +37,14 @@ class StockService extends CoreService
     public function getChart($payload)
     {
         $ret = [
-            'data' => $this->getData($payload)['chart'],
+            'data' => $this->getData($payload)['c'],
             'tools' => $this->getTools($payload),
             'dividend' => $this->hasDividend($payload),
             'events' => $this->getEvents($payload),
         ];
         if ($payload->vnindex) {
             $payload->symbol = 'VNINDEX';
-            $ret['vnindex'] = $this->getDataFromSsi($payload)['chart']['price'];
+            $ret['vnindex'] = $this->getDataFromSsi($payload)['c']['price'];
         }
         return $ret;
     }
@@ -67,10 +67,7 @@ class StockService extends CoreService
      */
     public function getDataFromSsi($payload)
     {
-        $r = [
-            'chart' => ['ohlc' => [], 'price' => [], 'cash' => []],
-            'filter' => ['price' => [0, 0, 0], 'cash' => [0, 0, 0]]
-        ];
+        $r = $this->initData();
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
         $url = "https://iboard.ssi.com.vn/dchart/api/history?resolution=D&symbol=" . $payload->symbol . "&from=" . $payload->from . "&to=" . $payload->to;
@@ -83,16 +80,17 @@ class StockService extends CoreService
         $accCash = 0;
         $prevAvg = 0;
         for ($i = 0; $i < $size; $i++) {
-            $r['chart']['ohlc'][] = [
-                'time' => $rsp->t[$i],
+            $date = $rsp->t[$i];
+            $r['c']['ohlc'][] = [
+                'time' => $date,
                 'open' => +$rsp->o[$i],
                 'high' => +$rsp->h[$i],
                 'low' => +$rsp->l[$i],
                 'close' => +$rsp->c[$i]
             ];
             $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
-            $r['chart']['price'][] = [
-                'time' => $rsp->t[$i],
+            $r['c']['price'][] = [
+                'time' => $date,
                 'value' => $avg
             ];
             if (!$prevAvg) $prevAvg = $avg;
@@ -103,26 +101,29 @@ class StockService extends CoreService
             $prevAvg = $avg;
             $cash = $side * $rsp->v[$i];
             $accCash += $cash;
-            $r['chart']['cash'][] = [
-                'time' => $rsp->t[$i],
+            $r['c']['cash'][] = [
+                'time' => $date,
                 'value' => $accCash
             ];
             //
             if ($i < $size / 2) {
-                if ($avg > $r['filter']['price'][0]) $r['filter']['price'][0] = $avg;
-                if ($accCash > $r['filter']['cash'][0]) $r['filter']['cash'][0] = $accCash;
+                if ($avg > $r['f']['p']['t1']['v'])
+                    $r['f']['p']['t1'] = ['t' => $date, 'v' => $avg];
+                if ($accCash > $r['f']['c']['t1']['v'])
+                    $r['f']['c']['t1'] = ['t' => $date, 'v' => $accCash];;
             }
             if ($i > $size / 2) {
-                if ($avg > $r['filter']['price'][1]) $r['filter']['price'][1] = $avg;
-                if ($accCash > $r['filter']['cash'][1]) $r['filter']['cash'][1] = $accCash;
+                if ($avg > $r['f']['p']['t2']['v'])
+                    $r['f']['p']['t2'] = ['t' => $date, 'v' => $avg];
+                if ($accCash > $r['f']['c']['t2']['v'])
+                    $r['f']['c']['t2'] = ['t' => $date, 'v' => $accCash];;
             }
             if ($i >= $size / 3) {
-                if ($i == ceil($size / 3)) {
-                    $r['filter']['price'][2] = $avg;
-                    $r['filter']['cash'][2] = $accCash;
-                }
-                if ($avg < $r['filter']['price'][2]) $r['filter']['price'][2] = $avg;
-                if ($accCash < $r['filter']['cash'][2]) $r['filter']['cash'][2] = $accCash;
+                $strI = ceil($size / 3);
+                if ($i == $strI || $avg < $r['f']['p']['b']['v'])
+                    $r['f']['p']['b'] = ['t' => $date, 'v' => $avg];
+                if ($i == $strI || $accCash < $r['f']['c']['b']['v'])
+                    $r['f']['c']['b'] = ['t' => $date, 'v' => $accCash];
             }
         }
         return $r;
@@ -167,10 +168,7 @@ class StockService extends CoreService
      */
     public function getDataFromCophieu68($payload)
     {
-        $r = [
-            'chart' => ['ohlc' => [], 'price' => [], 'cash' => []],
-            'filter' => ['price' => [0, 0, 0], 'cash' => [0, 0, 0]]
-        ];
+        $r = $this->initData();
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
         $url = "https://www.cophieu68.vn/chart/chart_data.php?parameters=%7B%7D&dateby=1&stockname=" . $payload->symbol;
@@ -192,7 +190,7 @@ class StockService extends CoreService
         for ($i = 0; $i < $size; $i++) {
             $candle = $candles[$i];
             $date = strtotime($candle->date);
-            $r['chart']['ohlc'][] = [
+            $r['c']['ohlc'][] = [
                 'time' => $date,
                 'open' => +$candle->open,
                 'high' => +$candle->high,
@@ -200,7 +198,7 @@ class StockService extends CoreService
                 'close' => +$candle->close
             ];
             $avg = ($candle->high + $candle->low + $candle->close) / 3;
-            $r['chart']['price'][] = [
+            $r['c']['price'][] = [
                 'time' => $date,
                 'value' => $avg
             ];
@@ -212,26 +210,29 @@ class StockService extends CoreService
             $prevAvg = $avg;
             $cash = $side * $candle->volume;
             $accCash += $cash;
-            $r['chart']['cash'][] = [
+            $r['c']['cash'][] = [
                 'time' => $date,
                 'value' => $accCash
             ];
             //
             if ($i < $size / 2) {
-                if ($avg > $r['filter']['price'][0]) $r['filter']['price'][0] = $avg;
-                if ($accCash > $r['filter']['cash'][0]) $r['filter']['cash'][0] = $accCash;
+                if ($avg > $r['f']['p']['t1']['v'])
+                    $r['f']['p']['t1'] = ['t' => $date, 'v' => $avg];
+                if ($accCash > $r['f']['c']['t1']['v'])
+                    $r['f']['c']['t1'] = ['t' => $date, 'v' => $accCash];;
             }
             if ($i > $size / 2) {
-                if ($avg > $r['filter']['price'][1]) $r['filter']['price'][1] = $avg;
-                if ($accCash > $r['filter']['cash'][1]) $r['filter']['cash'][1] = $accCash;
+                if ($avg > $r['f']['p']['t2']['v'])
+                    $r['f']['p']['t2'] = ['t' => $date, 'v' => $avg];
+                if ($accCash > $r['f']['c']['t2']['v'])
+                    $r['f']['c']['t2'] = ['t' => $date, 'v' => $accCash];;
             }
             if ($i >= $size / 3) {
-                if ($i == ceil($size / 3)) {
-                    $r['filter']['price'][2] = $avg;
-                    $r['filter']['cash'][2] = $accCash;
-                }
-                if ($avg < $r['filter']['price'][2]) $r['filter']['price'][2] = $avg;
-                if ($accCash < $r['filter']['cash'][2]) $r['filter']['cash'][2] = $accCash;
+                $strI = ceil($size / 3);
+                if ($i == $strI || $avg < $r['f']['p']['b']['v'])
+                    $r['f']['p']['b'] = ['t' => $date, 'v' => $avg];
+                if ($i == $strI || $accCash < $r['f']['c']['b']['v'])
+                    $r['f']['c']['b'] = ['t' => $date, 'v' => $accCash];
             }
         }
         return $r;
@@ -256,6 +257,42 @@ class StockService extends CoreService
             $candles[$key]->volume += $candle->volume;
         }
         return array_values($candles);
+    }
+    private function initData()
+    {
+        return [
+            'c' => ['ohlc' => [], 'price' => [], 'cash' => []],
+            'f' => [
+                'p' => [
+                    't1' => [
+                        't' => 0,
+                        'v' => 0,
+                    ],
+                    't2' => [
+                        't' => 0,
+                        'v' => 0,
+                    ],
+                    'b' => [
+                        't' => 0,
+                        'v' => 0,
+                    ]
+                ],
+                'c' => [
+                    't1' => [
+                        't' => 0,
+                        'v' => 0,
+                    ],
+                    't2' => [
+                        't' => 0,
+                        'v' => 0,
+                    ],
+                    'b' => [
+                        't' => 0,
+                        'v' => 0,
+                    ]
+                ]
+            ]
+        ];
     }
     /**
      * Get chart tool

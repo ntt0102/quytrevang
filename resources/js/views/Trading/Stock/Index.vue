@@ -314,16 +314,17 @@ const state = reactive({
         { text: t("trading.stock.symbolList.hose"), value: "hose" },
         { text: t("trading.stock.symbolList.nh"), value: "nh" },
         { text: t("trading.stock.symbolList.ck"), value: "ck" },
-        { text: t("trading.stock.symbolList.filterCash"), value: "f_cash" },
-        { text: t("trading.stock.symbolList.filterMix"), value: "f_mix" },
+        { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
+        { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
+        { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
         { text: t("trading.stock.symbolList.watch"), value: "watch" },
         { text: t("trading.stock.symbolList.hold"), value: "hold" },
         { text: t("trading.stock.symbolList.hnx"), value: "hnx" },
     ],
     filterItems: [
-        { text: t("trading.stock.symbolList.filterCash"), value: "f_cash" },
-        { text: t("trading.stock.symbolList.filterIndex"), value: "f_index" },
-        { text: t("trading.stock.symbolList.filterMix"), value: "f_mix" },
+        { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
+        { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
+        { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
     ],
     color: "#F44336",
     showColorPicker: false,
@@ -1323,13 +1324,29 @@ function symbolChanged(e) {
 }
 function dividendTrigger() {
     state.dividendEnable = !state.dividendEnable;
-    reloadChart(false, true);
+    initChart();
 }
 function timeframeChanged() {
     reloadChart(true, true);
 }
 function reloadChartData() {
     reloadChart(true);
+}
+function initChart() {
+    store
+        .dispatch("tradingStock/initChart", {
+            symbol: state.symbol,
+            timeframe: state.timeframe,
+            vnindex: true,
+            dividend: state.dividendEnable,
+        })
+        .then((data) => {
+            params.series.vnindex.setData(data.chart.vnindex);
+            params.tools.range = data.range;
+            params.series.range.setData(data.range);
+            params.fundSize = data.fundSize;
+            params.losePerOrder = data.losePerOrder;
+        });
 }
 function reloadChart(onlyData = false, withVnindex = false) {
     params.isOnlyLoadData = onlyData;
@@ -1387,7 +1404,7 @@ function filterSymbols(kinds) {
     } else toast.error(t("trading.stock.rangeWarning"));
 }
 function filterButtonClick() {
-    filterSymbols(["f_cash", "f_index", "f_mix"]);
+    filterSymbols(["f_top", "f_bottom", "f_break"]);
 }
 function filterItemClick({ itemData }) {
     filterSymbols([itemData.value]);

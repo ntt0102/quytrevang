@@ -79,9 +79,9 @@ const state = reactive({
     toDate: null,
     type: null,
     filterTypes: [
-        { text: t("trading.stock.symbolList.filterCash"), value: "fcash" },
-        { text: t("trading.stock.symbolList.filterIndex"), value: "findex" },
-        { text: t("trading.stock.symbolList.filterMix"), value: "fmix" },
+        { text: t("trading.stock.symbolList.filterTop"), value: "fcash" },
+        { text: t("trading.stock.symbolList.filterBottom"), value: "findex" },
+        { text: t("trading.stock.symbolList.filterBreak"), value: "fmix" },
     ],
 });
 function show(option) {

@@ -7,7 +7,7 @@ return [
     'actionUrl' => 'chung-khoan-dau-tu',
     'actionTitle' => 'Xem biều đồ',
     'all' => 'Tất cả',
-    'f_cash' => 'Lọc dòng tiền',
-    'f_index' => 'Lọc chỉ số',
-    'f_mix' => 'Lọc kết hợp',
+    'f_top' => 'Lọc CP đỉnh',
+    'f_bottom' => 'Lọc CP đáy',
+    'f_break' => 'Lọc CP break',
 ];

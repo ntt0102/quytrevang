@@ -170,7 +170,7 @@ Route::get('test', function () {
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
     // $payload = (object)['symbol' => 'VNINDEX', 'from' => 1626566400, 'to' => 1710806400, 'timeframe' => 'D'];
     // $payload = (object)['symbol' => '^CK', 'from' => 1626652800, 'to' => 1696464000, 'timeframe' => 'D', 'name' => 'hose'];
-    // $payload = (object)['symbol' => 'AAV', 'name' => 'f_cash'];
+    // $payload = (object)['symbol' => 'AAV', 'name' => 'f_top'];
     // $s = app(\App\Services\Trading\StockService::class)->getDataFromSsi($payload);
     // $s = app(\App\Services\Trading\StockService::class)->getDataFromCophieu68($payload);
     // $s = \App\Jobs\FilterStockJob::dispatch($payload);
