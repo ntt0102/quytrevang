@@ -5,7 +5,7 @@ function initialState() {
         isChartLoading: false,
     };
 }
-const FROM_DATE = moment().subtract(4, "years").unix();
+const FROM_DATE = moment().subtract(3, "years").unix();
 const TO_DATE = moment().unix();
 const getters = {};
 
