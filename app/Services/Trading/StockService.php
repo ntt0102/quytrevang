@@ -44,7 +44,7 @@ class StockService extends CoreService
         ];
         if ($payload->vnindex) {
             $payload->symbol = 'VNINDEX';
-            $ret['vnindex'] = $this->getDataFromSsi($payload)['c']['price'];
+            $ret['vnindex'] = $this->getDataFromDnse($payload)['c']['price'];
         }
         return $ret;
     }
@@ -57,7 +57,7 @@ class StockService extends CoreService
     public function getData($payload)
     {
         if (str_contains($payload->symbol, '^')) return $this->getDataFromCophieu68($payload);
-        return $this->getDataFromSsi($payload);
+        return $this->getDataFromDnse($payload);
     }
     /**
      * Get chart data
@@ -65,15 +65,15 @@ class StockService extends CoreService
      * @param $payload
      * 
      */
-    public function getDataFromSsi($payload)
+    public function getDataFromDnse($payload)
     {
         $r = $this->initData();
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
-        $url = "https://iboard.ssi.com.vn/dchart/api/history?resolution=D&symbol=" . $payload->symbol . "&from=" . $payload->from . "&to=" . $payload->to;
+        $symbolType = in_array($payload->symbol, ['VNINDEX', 'VN30']) ? 'index' : 'stock';
+        $url = "https://services.entrade.com.vn/chart-api/v2/ohlcs/{$symbolType}?resolution=1D&symbol={$payload->symbol}&from={$payload->from}&to={$payload->to}";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
-        if ($rsp->s != 'ok') return $r;
         if ($payload->timeframe != 'D')  $rsp = $this->getDataSsiWithTimeframe($rsp, $payload->timeframe);
         $size = count($rsp->t);
         if ($size == 0) return $r;

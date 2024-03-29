@@ -55,7 +55,7 @@ class FilterStockJob implements ShouldQueue
         $isBreak = false;
         $stockService = app(StockService::class);
         $this->payload->symbol = 'VNINDEX';
-        $vnindex = $stockService->getDataFromSsi($this->payload)['f']['p'];
+        $vnindex = $stockService->getDataFromDnse($this->payload)['f']['p'];
         $t1Vni = $vnindex['t1'];
         $t2Vni = $vnindex['t2'];
         $stock = StockSymbol::where('name', $this->payload->name)->first();
