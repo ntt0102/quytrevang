@@ -56,7 +56,7 @@ class StockService extends CoreService
      */
     public function getData($payload)
     {
-        if (str_contains($payload->symbol, '^')) return $this->getDataFromCophieu68($payload);
+        if (str_contains($payload->symbol, '^')) return $this->getDataFromCp68($payload);
         return $this->getDataFromDnse($payload);
     }
     /**
@@ -166,12 +166,12 @@ class StockService extends CoreService
      * @param $payload
      * 
      */
-    public function getDataFromCophieu68($payload)
+    public function getDataFromCp68($payload)
     {
         $r = $this->initData();
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
-        $url = "https://www.cophieu68.vn/chart/chart_data.php?parameters=%7B%7D&dateby=1&stockname=" . $payload->symbol;
+        $url = "https://www.cophieu68.vn/chart/chart_data.php?parameters=%7B%7D&dateby=1&stockname={$payload->symbol}";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if (!is_object($rsp)) return $r;
