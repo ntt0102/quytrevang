@@ -20,13 +20,12 @@ class StockService extends CoreService
      */
     public function initChart($payload)
     {
-        $ret = [
+        return [
             'chart' => $this->getChart($payload),
+            'range' => DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point'),
+            'fundSize' => (int) Parameter::getValue('fundSize', 0),
+            'losePerOrder' => (float) Parameter::getValue('losePerOrder', 0)
         ];
-        $ret['range'] = DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
-        $ret['fundSize'] = (int) Parameter::getValue('fundSize', 0);
-        $ret['losePerOrder'] = (float) Parameter::getValue('losePerOrder', 0);
-        return $ret;
     }
     /**
      * Get chart data
@@ -106,29 +105,11 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            if ($i < $size / 2) {
-                if ($avg > $r['f']['p']['t1']['v'])
-                    $r['f']['p']['t1'] = ['t' => $date, 'v' => $avg];
-                if ($accCash > $r['f']['c']['t1']['v'])
-                    $r['f']['c']['t1'] = ['t' => $date, 'v' => $accCash];;
-            }
-            if ($i > $size / 2) {
-                if ($avg > $r['f']['p']['t2']['v'])
-                    $r['f']['p']['t2'] = ['t' => $date, 'v' => $avg];
-                if ($accCash > $r['f']['c']['t2']['v'])
-                    $r['f']['c']['t2'] = ['t' => $date, 'v' => $accCash];;
-            }
-            if ($i >= $size / 3) {
-                $strI = ceil($size / 3);
-                if ($i == $strI || $avg < $r['f']['p']['b']['v'])
-                    $r['f']['p']['b'] = ['t' => $date, 'v' => $avg];
-                if ($i == $strI || $accCash < $r['f']['c']['b']['v'])
-                    $r['f']['c']['b'] = ['t' => $date, 'v' => $accCash];
-            }
+            $this->creataFilterData($r, $i, $size, $date, $avg, $accCash);
         }
         return $r;
     }
-    public function getDataSsiWithTimeframe($data, $tf)
+    private function getDataSsiWithTimeframe($data, $tf)
     {
         $t = [];
         $o = [];
@@ -215,29 +196,11 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            if ($i < $size / 2) {
-                if ($avg > $r['f']['p']['t1']['v'])
-                    $r['f']['p']['t1'] = ['t' => $date, 'v' => $avg];
-                if ($accCash > $r['f']['c']['t1']['v'])
-                    $r['f']['c']['t1'] = ['t' => $date, 'v' => $accCash];;
-            }
-            if ($i > $size / 2) {
-                if ($avg > $r['f']['p']['t2']['v'])
-                    $r['f']['p']['t2'] = ['t' => $date, 'v' => $avg];
-                if ($accCash > $r['f']['c']['t2']['v'])
-                    $r['f']['c']['t2'] = ['t' => $date, 'v' => $accCash];;
-            }
-            if ($i >= $size / 3) {
-                $strI = ceil($size / 3);
-                if ($i == $strI || $avg < $r['f']['p']['b']['v'])
-                    $r['f']['p']['b'] = ['t' => $date, 'v' => $avg];
-                if ($i == $strI || $accCash < $r['f']['c']['b']['v'])
-                    $r['f']['c']['b'] = ['t' => $date, 'v' => $accCash];
-            }
+            $this->creataFilterData($r, $i, $size, $date, $avg, $accCash);
         }
         return $r;
     }
-    public function getDataCp68WithTimeframe($data, $tf)
+    private function getDataCp68WithTimeframe($data, $tf)
     {
         $candles = [];
         foreach ($data as $candle) {
@@ -293,6 +256,28 @@ class StockService extends CoreService
                 ]
             ]
         ];
+    }
+    private function creataFilterData(&$r, $i, $size, $date, $avg, $accCash)
+    {
+        if ($i < $size / 2) {
+            if ($avg > $r['f']['p']['t1']['v'])
+                $r['f']['p']['t1'] = ['t' => $date, 'v' => $avg];
+            if ($accCash > $r['f']['c']['t1']['v'])
+                $r['f']['c']['t1'] = ['t' => $date, 'v' => $accCash];;
+        }
+        if ($i > $size / 2) {
+            if ($avg > $r['f']['p']['t2']['v'])
+                $r['f']['p']['t2'] = ['t' => $date, 'v' => $avg];
+            if ($accCash > $r['f']['c']['t2']['v'])
+                $r['f']['c']['t2'] = ['t' => $date, 'v' => $accCash];;
+        }
+        if ($i >= $size / 3) {
+            $strI = ceil($size / 3);
+            if ($i == $strI || $avg < $r['f']['p']['b']['v'])
+                $r['f']['p']['b'] = ['t' => $date, 'v' => $avg];
+            if ($i == $strI || $accCash < $r['f']['c']['b']['v'])
+                $r['f']['c']['b'] = ['t' => $date, 'v' => $accCash];
+        }
     }
     /**
      * Get chart tool
