@@ -56,16 +56,35 @@ class StockService extends CoreService
      */
     public function getData($payload)
     {
-        $r = [];
-        if (!str_contains($payload->symbol, '^')) {
-            $r = $this->getDataFromDnse($payload);
-            $r['c']['foreign'] = $this->getDataForeign($payload);
-        } else $r = $this->getDataFromCp68($payload);
-        return $r;
+        if (str_contains($payload->symbol, '^')) {
+            return $this->getDataFromCp68($payload);
+        }
+        return array_merge_recursive(
+            $this->getDataFromDnse($payload),
+            $this->getDataForeign($payload)
+        );
     }
     public function getDataForeign($payload)
     {
-        $r = [];
+        $r = [
+            'c' => ['foreign' => []],
+            'f' => [
+                'f' => [
+                    't1' => [
+                        't' => 0,
+                        'v' => 0,
+                    ],
+                    't2' => [
+                        't' => 0,
+                        'v' => 0,
+                    ],
+                    'b' => [
+                        't' => 0,
+                        'v' => 0,
+                    ]
+                ]
+            ]
+        ];
         if (!$payload->foreign) return $r;
         $startDate = date('m/d/Y', $payload->from);
         $endDate = date("m/d/Y", $payload->to);
@@ -91,10 +110,24 @@ class StockService extends CoreService
                 if ($date == $preDate) continue;
             }
             $accCash += $data[$i]->KLGDRong;
-            $r[] = [
+            $r['c']['foreign'][] = [
                 'time' => $date,
                 'value' => $accCash
             ];
+            //
+            if ($i < $size / 3) {
+                if ($accCash > $r['f']['f']['t1']['v'])
+                    $r['f']['f']['t1'] = ['t' => $date, 'v' => $accCash];;
+            }
+            if ($i > $size / 2) {
+                if ($accCash > $r['f']['f']['t2']['v'])
+                    $r['f']['f']['t2'] = ['t' => $date, 'v' => $accCash];;
+            }
+            if ($i >= $size / 3) {
+                $strI = ceil($size / 3);
+                if ($i == $strI || $accCash < $r['f']['f']['b']['v'])
+                    $r['f']['f']['b'] = ['t' => $date, 'v' => $accCash];
+            }
         }
         return $r;
     }
@@ -321,7 +354,7 @@ class StockService extends CoreService
     }
     private function creataFilterData(&$r, $i, $size, $date, $avg, $accCash)
     {
-        if ($i < $size / 2) {
+        if ($i < $size / 3) {
             if ($avg > $r['f']['p']['t1']['v'])
                 $r['f']['p']['t1'] = ['t' => $date, 'v' => $avg];
             if ($accCash > $r['f']['c']['t1']['v'])
@@ -418,12 +451,12 @@ class StockService extends CoreService
             $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/upcom";
             $res = $client->get($url);
             $upcom = json_decode($res->getBody());
-            $index = ['VNINDEX', 'VN30', '^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
+            $index = ['^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
             $nh = ['VCB', 'BID', 'CTG', 'VPB', 'MBB', 'ACB', 'STB', 'HDB', 'VIB', 'SSB', 'SHB', 'MSB', 'TPB', 'LPB', 'EIB', 'OCB'];
             $ck = ['SSI', 'VND', 'VCI', 'SHS', 'HCM', 'VIX', 'MBS', 'FTS', 'BSI', 'CTS', 'VDS'];
             $list = [
-                (object)['name' => 'hose', 'symbols' => array_merge($index, $hose)],
-                (object)['name' => 'hnx', 'symbols' => array_merge($hnx, $upcom)],
+                (object)['name' => 'hose', 'symbols' => array_merge(['VNINDEX', 'VN30'], $hose)],
+                (object)['name' => 'hnx', 'symbols' => array_merge($index, $hnx, $upcom)],
                 (object)['name' => 'nh', 'symbols' => $nh],
                 (object)['name' => 'ck', 'symbols' => $ck],
             ];

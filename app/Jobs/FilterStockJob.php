@@ -27,7 +27,7 @@ class FilterStockJob implements ShouldQueue
 
     private $payload;
     public $tries = 1;
-    public $timeout = 3600;
+    public $timeout = 10000;
 
     /**
      * Create a new job instance.
@@ -62,25 +62,31 @@ class FilterStockJob implements ShouldQueue
         if (!$stock) return false;
         foreach ($stock->symbols as $symbol) {
             $this->payload->symbol = $symbol;
-            $this->payload->foreign = false;
+            $this->payload->foreign = true;
             $data = $stockService->getData($this->payload);
             if (count($data['c']['price']) == 0) continue;
-            $t1Pr = $data['f']['p']['t1'];
-            $t2Pr = $data['f']['p']['t2'];
-            $bPr = $data['f']['p']['b'];
-            if ($t1Pr['v'] - $bPr['v'] == 0) continue;
-            $rPr = ($t2Pr['v'] - $bPr['v']) / ($t1Pr['v'] - $bPr['v']);
-            $t1Ch = $data['f']['c']['t1'];
-            $t2Ch = $data['f']['c']['t2'];
-            $bCh = $data['f']['c']['b'];
-            if ($t1Ch['v'] - $bCh['v'] == 0) continue;
-            $rCh = ($t2Ch['v'] - $bCh['v']) / ($t1Ch['v'] - $bCh['v']);
-            $dPr = date_create('@' . $bPr['t']);
-            $dCh = date_create('@' . $bCh['t']);
-            $diff = +date_diff($dCh, $dPr)->format("%R%a");
-            $isTop = $rPr > self::PRICE_RATIO && $rPr < 1 && $rCh > self::CASH_RATIO;
-            $isBottom = $rPr < 1 && $rCh > 1 && $diff > self::DIFF_DAYS;
-            $isBreak = $t2Vni['v'] < $t1Vni['v'] && $rPr > 1 && $rCh > self::CASH_RATIO;
+            $t1P = $data['f']['p']['t1'];
+            $t2P = $data['f']['p']['t2'];
+            $bP = $data['f']['p']['b'];
+            if ($t1P['v'] - $bP['v'] == 0) continue;
+            $rP = ($t2P['v'] - $bP['v']) / ($t1P['v'] - $bP['v']);
+            $t1C = $data['f']['c']['t1'];
+            $t2C = $data['f']['c']['t2'];
+            $bC = $data['f']['c']['b'];
+            if ($t1C['v'] - $bC['v'] == 0) continue;
+            $rC = ($t2C['v'] - $bC['v']) / ($t1C['v'] - $bC['v']);
+            $t1F = $data['f']['f']['t1'];
+            $t2F = $data['f']['f']['t2'];
+            $bF = $data['f']['f']['b'];
+            if ($t1F['v'] - $bF['v'] == 0) continue;
+            $rF = ($t2F['v'] - $bF['v']) / ($t1F['v'] - $bF['v']);
+            $dP = date_create('@' . $bP['t']);
+            $dC = date_create('@' . $bC['t']);
+            $diff = +date_diff($dC, $dP)->format("%R%a");
+            $isTop = $rP < 1 && $rP > self::PRICE_RATIO && $rC > self::CASH_RATIO;
+            $isBottom = $rF > $rC;
+            // $isBottom = $rP < 1 && $rC > 1 && $diff > self::DIFF_DAYS;
+            $isBreak = $t2Vni['v'] < $t1Vni['v'] && $rP > 1 && $rC > self::CASH_RATIO;
             if ($isTop) $rTop[] = $symbol;
             if ($isBottom) $rBottom[] = $symbol;
             if ($isBreak) $rBreak[] = $symbol;
