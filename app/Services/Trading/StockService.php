@@ -12,6 +12,7 @@ use stdClass;
 
 class StockService extends CoreService
 {
+    const TIME_ZONE = 7 * 60 * 60;
     /**
      * Init Chart
      *
@@ -36,7 +37,7 @@ class StockService extends CoreService
     public function getChart($payload)
     {
         $ret = [
-            'data' => $this->getData($payload)['c'],
+            'data' => $this->getData($payload, true)['c'],
             'tools' => $this->getTools($payload),
             'dividend' => $this->hasDividend($payload),
             'events' => $this->getEvents($payload),
@@ -48,15 +49,68 @@ class StockService extends CoreService
         return $ret;
     }
     /**
-     * Get chart data
+     * Get data
      *
      * @param $payload
      * 
      */
     public function getData($payload)
     {
-        if (str_contains($payload->symbol, '^')) return $this->getDataFromCp68($payload);
-        return $this->getDataFromDnse($payload);
+        $r = [];
+        if (!str_contains($payload->symbol, '^')) {
+            $r = $this->getDataFromDnse($payload);
+            $r['c']['foreign'] = $this->getDataForeign($payload);
+        } else $r = $this->getDataFromCp68($payload);
+        return $r;
+    }
+    public function getDataForeign($payload)
+    {
+        $r = [];
+        if ($payload->foreign) return $r;
+        $startDate = date('m/d/Y', $payload->from);
+        $endDate = date("m/d/Y", $payload->to);
+        if (!$payload->symbol) return $r;
+        $client = new \GuzzleHttp\Client();
+        $url = "https://s.cafef.vn/Ajax/PageNew/DataHistory/GDKhoiNgoai.ashx?Symbol={$payload->symbol}&StartDate={$startDate}&EndDate={$endDate}&PageIndex=1&PageSize=1000000";
+        $res = $client->get($url);
+        $rsp = json_decode($res->getBody())->Data;
+        usort($rsp->Data, function ($a, $b) {
+            $at = strtotime(str_replace('/', '-', $a->Ngay));
+            $bt = strtotime(str_replace('/', '-', $b->Ngay));
+            return strcmp($at, $bt);
+        });
+        $data = $rsp->Data;
+        if ($payload->timeframe != 'D')  $this->getDataForeignTimeframe($data, $payload->timeframe);
+        $size = count($data);
+        if ($size == 0) return $r;
+        $accCash = 0;
+        for ($i = 0; $i < $size; $i++) {
+            $date = strtotime(str_replace('/', '-', $data[$i]->Ngay)) + self::TIME_ZONE;
+            if ($i > 0) {
+                $preDate = strtotime(str_replace('/', '-', $data[$i - 1]->Ngay)) + self::TIME_ZONE;
+                if ($date == $preDate) continue;
+            }
+            $accCash += $data[$i]->KLGDRong;
+            $r[] = [
+                'time' => $date,
+                'value' => $accCash
+            ];
+        }
+        return $r;
+    }
+    private function getDataForeignTimeframe(&$data, $tf)
+    {
+        $candles = [];
+        foreach ($data as $candle) {
+            $key = date('Y-' . $tf, strtotime(str_replace('/', '-', $candle->Ngay)) + self::TIME_ZONE);
+            if (!array_key_exists($key, $candles)) {
+                $candles[$key] = new stdClass();
+                $candles[$key]->Ngay = $candle->Ngay;
+                $candles[$key]->KLGDRong = 0;
+            }
+            $candles[$key]->KLGDRong += $candle->KLGDRong;
+        }
+        $data = array_values($candles);
     }
     /**
      * Get chart data
@@ -73,13 +127,17 @@ class StockService extends CoreService
         $url = "https://services.entrade.com.vn/chart-api/v2/ohlcs/{$symbolType}?resolution=1D&symbol={$payload->symbol}&from={$payload->from}&to={$payload->to}";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
-        if ($payload->timeframe != 'D')  $rsp = $this->getDataSsiWithTimeframe($rsp, $payload->timeframe);
+        if ($payload->timeframe != 'D')  $this->getDataDnseTimeframe($rsp, $payload->timeframe);
         $size = count($rsp->t);
         if ($size == 0) return $r;
         $accCash = 0;
         $prevAvg = 0;
         for ($i = 0; $i < $size; $i++) {
-            $date = $rsp->t[$i];
+            $date = strtotime(date("Y-m-d", $rsp->t[$i])) + self::TIME_ZONE;
+            if ($i > 0) {
+                $preDate = strtotime(date("Y-m-d", $rsp->t[$i - 1])) + self::TIME_ZONE;
+                if ($date == $preDate) continue;
+            }
             $r['c']['ohlc'][] = [
                 'time' => $date,
                 'open' => +$rsp->o[$i],
@@ -109,7 +167,7 @@ class StockService extends CoreService
         }
         return $r;
     }
-    private function getDataSsiWithTimeframe($data, $tf)
+    private function getDataDnseTimeframe(&$data, $tf)
     {
         $t = [];
         $o = [];
@@ -118,7 +176,7 @@ class StockService extends CoreService
         $c = [];
         $v = [];
         for ($i = 0; $i < count($data->t); $i++) {
-            $key = date('Y-' . $tf, +$data->t[$i]);
+            $key = date('Y-' . $tf, +$data->t[$i] + self::TIME_ZONE);
             if (!array_key_exists($key, $t)) {
                 $t[$key] = $data->t[$i];
                 $o[$key] = $data->o[$i];
@@ -132,7 +190,7 @@ class StockService extends CoreService
             $c[$key] = $data->c[$i];
             $v[$key] += $data->v[$i];
         }
-        return (object)[
+        $data = (object)[
             't' => array_values($t),
             'o' => array_values($o),
             'h' => array_values($h),
@@ -163,14 +221,18 @@ class StockService extends CoreService
                 return $date >= $payload->from && $date <= $payload->to;
             }
         ));
-        if ($payload->timeframe != 'D')  $candles = $this->getDataCp68WithTimeframe($candles, $payload->timeframe);
+        if ($payload->timeframe != 'D') $this->getDataCp68Timeframe($candles, $payload->timeframe);
         $size = count($candles);
         if ($size == 0) return $r;
         $accCash = 0;
         $prevAvg = 0;
         for ($i = 0; $i < $size; $i++) {
             $candle = $candles[$i];
-            $date = strtotime($candle->date);
+            $date = strtotime($candle->date) + self::TIME_ZONE;
+            if ($i > 0) {
+                $preDate = strtotime($candles[$i - 1]->date) + self::TIME_ZONE;
+                if ($date == $preDate) continue;
+            }
             $r['c']['ohlc'][] = [
                 'time' => $date,
                 'open' => +$candle->open,
@@ -200,11 +262,11 @@ class StockService extends CoreService
         }
         return $r;
     }
-    private function getDataCp68WithTimeframe($data, $tf)
+    private function getDataCp68Timeframe(&$data, $tf)
     {
         $candles = [];
         foreach ($data as $candle) {
-            $key = date('Y-' . $tf, strtotime($candle->date));
+            $key = date('Y-' . $tf, strtotime($candle->date) + self::TIME_ZONE);
             if (!array_key_exists($key, $candles)) {
                 $candles[$key] = new stdClass();
                 $candles[$key]->date = $candle->date;
@@ -219,7 +281,7 @@ class StockService extends CoreService
             $candles[$key]->close = $candle->close;
             $candles[$key]->volume += $candle->volume;
         }
-        return array_values($candles);
+        $data = array_values($candles);
     }
     private function initData()
     {
@@ -331,7 +393,7 @@ class StockService extends CoreService
         $rsp = json_decode($res->getBody());
         foreach ($rsp as $news) {
             $ret[] = [
-                'time' => strtotime($news->date) + 7 * 60 * 60,
+                'time' => strtotime($news->date) + self::TIME_ZONE,
                 'value' => 1,
                 'color' => $news->color,
                 'title' => $news->title

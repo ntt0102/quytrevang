@@ -138,6 +138,7 @@
                         class="command far fa-chart-bar"
                         :title="$t('trading.stock.tradingview')"
                         @click="tradingviewClick"
+                        @contextmenu="foreignTrigger"
                     ></div>
                     <div
                         ref="colorToolRef"
@@ -290,6 +291,7 @@ let params = {
         ohlc: [],
         price: [],
         cash: [],
+        foreign: [],
     },
     tools: {
         lines: [],
@@ -331,6 +333,7 @@ const state = reactive({
     isFullscreen: false,
     showTradingView: false,
     dividendEnable: true,
+    foreignEnable: false,
 });
 state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
@@ -370,6 +373,13 @@ onMounted(() => {
         priceFormat: { minMove: 0.01 },
         lastValueVisible: false,
     });
+    params.series.foreign = params.chart.addLineSeries({
+        priceScaleId: "foreign",
+        scaleMargins: { top: 0.66, bottom: 0.05 },
+        color: "blue",
+        priceFormat: { type: "volume", minMove: 1 },
+        lastValueVisible: false,
+    });
     params.series.cash = params.chart.addLineSeries({
         priceScaleId: "cash",
         scaleMargins: { top: 0.66, bottom: 0.05 },
@@ -399,6 +409,7 @@ onMounted(() => {
             timeframe: state.timeframe,
             vnindex: true,
             dividend: state.dividendEnable,
+            foreign: state.foreignEnable,
         })
         .then((data) => {
             params.series.vnindex.setData(data.chart.vnindex);
@@ -719,6 +730,7 @@ function loadChartData() {
     params.series.ohlc.setData(params.data.ohlc);
     params.series.price.setData(params.data.price);
     params.series.cash.setData(params.data.cash);
+    params.series.foreign.setData(params.data.foreign);
     params.chart.applyOptions({ watermark: { text: state.symbol } });
 }
 function tradingviewClick(e) {
@@ -1326,6 +1338,10 @@ function dividendTrigger() {
     state.dividendEnable = !state.dividendEnable;
     initChart();
 }
+function foreignTrigger() {
+    state.foreignEnable = !state.foreignEnable;
+    reloadChart(true);
+}
 function timeframeChanged() {
     reloadChart(true, true);
 }
@@ -1339,6 +1355,7 @@ function initChart() {
             timeframe: state.timeframe,
             vnindex: true,
             dividend: state.dividendEnable,
+            foreign: state.foreignEnable,
         })
         .then((data) => {
             params.series.vnindex.setData(data.chart.vnindex);
@@ -1356,6 +1373,7 @@ function reloadChart(onlyData = false, withVnindex = false) {
             timeframe: state.timeframe,
             vnindex: withVnindex,
             dividend: state.dividendEnable,
+            foreign: state.foreignEnable,
         })
         .then((vnindex) => {
             if (withVnindex) params.series.vnindex.setData(vnindex);

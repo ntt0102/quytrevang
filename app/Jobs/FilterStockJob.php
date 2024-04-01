@@ -62,6 +62,7 @@ class FilterStockJob implements ShouldQueue
         if (!$stock) return false;
         foreach ($stock->symbols as $symbol) {
             $this->payload->symbol = $symbol;
+            $this->payload->foreign = false;
             $data = $stockService->getData($this->payload);
             if (count($data['c']['price']) == 0) continue;
             $t1Pr = $data['f']['p']['t1'];

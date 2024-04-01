@@ -165,13 +165,13 @@ Route::get('test', function () {
     // set_time_limit(500);
     // $payload = (object)['from' => strtotime("2022-04-04"), 'to' => strtotime("2023-09-07"), 'type' => 'cash'];
     // $filter = App\Jobs\FilterStockJob::dispatch($payload);
-
+    dd(date('Y-m-d H:i:s', strtotime('2024-04-01 00:00:00 Asia/Bangkok')));
     // // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
     $payload = (object)['symbol' => 'VNINDEX', 'from' => 1626566400, 'to' => 1710806400, 'timeframe' => 'D'];
     // $payload = (object)['symbol' => '^CK', 'from' => 1626652800, 'to' => 1696464000, 'timeframe' => 'D', 'name' => 'hose'];
     // $payload = (object)['symbol' => 'AAV', 'name' => 'f_top'];
-    $s = app(\App\Services\Trading\StockService::class)->getDataFromDnse($payload)['f'];
+    $s = app(\App\Services\Trading\StockService::class)->getDataForeign($payload);
     // $s = app(\App\Services\Trading\StockService::class)->getDataFromCp68($payload);
     // $s = \App\Jobs\FilterStockJob::dispatch($payload);
     // $s = app(\App\Services\Trading\StockService::class)->getData($payload);
