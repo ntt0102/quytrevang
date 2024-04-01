@@ -37,7 +37,7 @@ class StockService extends CoreService
     public function getChart($payload)
     {
         $ret = [
-            'data' => $this->getData($payload, true)['c'],
+            'data' => $this->getData($payload)['c'],
             'tools' => $this->getTools($payload),
             'dividend' => $this->hasDividend($payload),
             'events' => $this->getEvents($payload),
@@ -66,7 +66,7 @@ class StockService extends CoreService
     public function getDataForeign($payload)
     {
         $r = [];
-        if ($payload->foreign) return $r;
+        if (!$payload->foreign) return $r;
         $startDate = date('m/d/Y', $payload->from);
         $endDate = date("m/d/Y", $payload->to);
         if (!$payload->symbol) return $r;

@@ -307,6 +307,7 @@ let params = {
     isCashDraw: false,
     isOnlyLoadData: false,
     showNewsInfo: false,
+    foreignEnable: false,
 };
 const state = reactive({
     symbol: route.query.symbol ?? "VNINDEX",
@@ -333,7 +334,6 @@ const state = reactive({
     isFullscreen: false,
     showTradingView: false,
     dividendEnable: true,
-    foreignEnable: false,
 });
 state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
@@ -403,13 +403,14 @@ onMounted(() => {
     });
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
+    console.log("params.foreignEnable", params.foreignEnable);
     store
         .dispatch("tradingStock/initChart", {
             symbol: state.symbol,
             timeframe: state.timeframe,
             vnindex: true,
             dividend: state.dividendEnable,
-            foreign: state.foreignEnable,
+            foreign: params.foreignEnable,
         })
         .then((data) => {
             params.series.vnindex.setData(data.chart.vnindex);
@@ -1339,7 +1340,7 @@ function dividendTrigger() {
     initChart();
 }
 function foreignTrigger() {
-    state.foreignEnable = !state.foreignEnable;
+    params.foreignEnable = !params.foreignEnable;
     reloadChart(true);
 }
 function timeframeChanged() {
@@ -1355,7 +1356,7 @@ function initChart() {
             timeframe: state.timeframe,
             vnindex: true,
             dividend: state.dividendEnable,
-            foreign: state.foreignEnable,
+            foreign: params.foreignEnable,
         })
         .then((data) => {
             params.series.vnindex.setData(data.chart.vnindex);
@@ -1373,7 +1374,7 @@ function reloadChart(onlyData = false, withVnindex = false) {
             timeframe: state.timeframe,
             vnindex: withVnindex,
             dividend: state.dividendEnable,
-            foreign: state.foreignEnable,
+            foreign: params.foreignEnable,
         })
         .then((vnindex) => {
             if (withVnindex) params.series.vnindex.setData(vnindex);
