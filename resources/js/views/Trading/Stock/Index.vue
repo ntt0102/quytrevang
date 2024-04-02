@@ -47,15 +47,13 @@
                     location: 'after',
                     widget: 'dxDropDownButton',
                     options: {
-                        splitButton: true,
-                        useSelectMode: false,
+                        showArrowIcon: false,
                         items: state.filterItems,
                         displayExpr: 'text',
                         keyExpr: 'value',
                         icon: 'far fa-filter small',
                         hint: $t('trading.stock.filterSymbols'),
                         dropDownOptions: { width: '130px' },
-                        onButtonClick: filterButtonClick,
                         onItemClick: filterItemClick,
                     },
                 },
@@ -315,19 +313,19 @@ const state = reactive({
     symbolKind: null,
     symbolKinds: [
         { text: t("trading.stock.symbolList.hose"), value: "hose" },
-        { text: t("trading.stock.symbolList.nh"), value: "nh" },
-        { text: t("trading.stock.symbolList.ck"), value: "ck" },
         { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
         { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
-        { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
+        // { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
         { text: t("trading.stock.symbolList.watch"), value: "watch" },
         { text: t("trading.stock.symbolList.hold"), value: "hold" },
+        { text: t("trading.stock.symbolList.nh"), value: "nh" },
+        { text: t("trading.stock.symbolList.ck"), value: "ck" },
         { text: t("trading.stock.symbolList.hnx"), value: "hnx" },
     ],
     filterItems: [
-        { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
         { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
-        { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
+        { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
+        // { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
     ],
     color: "#F44336",
     showColorPicker: false,
@@ -403,6 +401,7 @@ onMounted(() => {
         priceLineVisible: false,
     });
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
+    document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
     console.log("params.foreignEnable", params.foreignEnable);
     store
@@ -606,6 +605,18 @@ function eventChartResize() {
             document.querySelector(".sc-launcher").style.visibility = "hidden";
             document.querySelector(".dx-drawer-content").style.transform =
                 "unset";
+        }
+    }
+}
+function eventKeyPress(e) {
+    if (e.ctrlKey || e.metaKey) {
+        switch (e.keyCode) {
+            case 96:
+                loadNextSymbol();
+                break;
+            case 110:
+                addWatchlist();
+                break;
         }
     }
 }
@@ -1405,7 +1416,7 @@ function deleteWatchlist() {
         }
     );
 }
-function filterSymbols(kinds) {
+function filterSymbols(kind) {
     if (params.tools.range.length == 2) {
         confirm(
             `${t("trading.stock.filterSymbols")}?`,
@@ -1417,18 +1428,15 @@ function filterSymbols(kinds) {
                     to: params.tools.range[1].time,
                     timeframe: state.timeframe,
                     name: state.symbolKind,
-                    kinds: kinds,
+                    kind: kind,
                 };
                 store.dispatch("tradingStock/filterSymbols", param);
             }
         });
     } else toast.error(t("trading.stock.rangeWarning"));
 }
-function filterButtonClick() {
-    filterSymbols(["f_top", "f_bottom", "f_break"]);
-}
 function filterItemClick({ itemData }) {
-    filterSymbols([itemData.value]);
+    filterSymbols(itemData.value);
 }
 </script>
 <style lang="scss">

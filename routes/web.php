@@ -169,12 +169,11 @@ Route::get('test', function () {
     // dd(date('Y-m-d H:i:s', 1712028936));
     // // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
-    $payload = (object)['symbol' => 'VNINDEX', 'from' => 1626566400, 'to' => 1710806400, 'timeframe' => 'D', 'foreign' => true];
-    // $payload = (object)['symbol' => '^CK', 'from' => 1626652800, 'to' => 1696464000, 'timeframe' => 'D', 'name' => 'hose'];
-    // $payload = (object)['symbol' => 'AAV', 'name' => 'f_top'];
-    $s = app(\App\Services\Trading\StockService::class)->getDataFromCfF($payload);
+    // $payload = (object)['symbol' => 'ACB', 'from' => 1637798400, 'to' => 1683158400, 'timeframe' => 'D', 'foreign' => true];
+    $payload = (object)['symbol' => 'ACB', 'from' => 1637798400, 'to' => 1683158400, 'timeframe' => 'D', 'name' => 'hose', 'kind' => 'f_bottom'];
+    // $s = app(\App\Services\Trading\StockService::class)->getDataForeign($payload)['f'];
     // $s = app(\App\Services\Trading\StockService::class)->getDataFromCp68($payload);
-    // $s = \App\Jobs\FilterStockJob::dispatch($payload);
+    $s = \App\Jobs\FilterStockJob::dispatch($payload);
     // $s = app(\App\Services\Trading\StockService::class)->getData($payload);
     // $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
     // $client = new \GuzzleHttp\Client(['headers' => ['authorization' => "Bearer {$token}"]]);

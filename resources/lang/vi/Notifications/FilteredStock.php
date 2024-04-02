@@ -6,8 +6,7 @@ return [
     'body' => 'Mô hình lọc: :kind',
     'actionUrl' => 'chung-khoan-dau-tu',
     'actionTitle' => 'Xem biều đồ',
-    'all' => 'Tất cả',
     'f_top' => 'Lọc CP đỉnh',
     'f_bottom' => 'Lọc CP đáy',
-    'f_break' => 'Lọc CP break',
+    // 'f_break' => 'Lọc CP break',
 ];

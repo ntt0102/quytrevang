@@ -68,22 +68,7 @@ class StockService extends CoreService
     {
         $r = [
             'c' => ['foreign' => []],
-            'f' => [
-                'f' => [
-                    't1' => [
-                        't' => 0,
-                        'v' => 0,
-                    ],
-                    't2' => [
-                        't' => 0,
-                        'v' => 0,
-                    ],
-                    'b' => [
-                        't' => 0,
-                        'v' => 0,
-                    ]
-                ]
-            ]
+            'f' => ['f' => ['t1' => 0, 't2' => 0, 'b' => 0]]
         ];
         if (!$payload->foreign) return $r;
         $startDate = date('m/d/Y', $payload->from);
@@ -118,18 +103,20 @@ class StockService extends CoreService
                 // 'color' => $data[$i]->KLGDRong > 0 ? 'green' : 'red'
             ];
             //
-            if ($i < $size / 2) {
-                if ($accCash > $r['f']['f']['t1']['v'])
-                    $r['f']['f']['t1'] = ['t' => $date, 'v' => $accCash];
+            if ($i <= $size / 2) {
+                $strI = 0;
+                if ($i == $strI || $accCash > $r['f']['f']['t1'])
+                    $r['f']['f']['t1'] = $accCash;
             }
-            if ($i > $size / 2) {
-                if ($accCash > $r['f']['f']['t2']['v'])
-                    $r['f']['f']['t2'] = ['t' => $date, 'v' => $accCash];
+            if ($i >= $size / 2) {
+                $strI = ceil($size / 2);
+                if ($i == $strI || $accCash > $r['f']['f']['t2'])
+                    $r['f']['f']['t2'] = $accCash;
             }
             if ($i >= $size / 3) {
                 $strI = ceil($size / 3);
-                if ($i == $strI || $accCash < $r['f']['f']['b']['v'])
-                    $r['f']['f']['b'] = ['t' => $date, 'v' => $accCash];
+                if ($i == $strI || $accCash < $r['f']['f']['b'])
+                    $r['f']['f']['b'] = $accCash;
             }
         }
         return $r;
@@ -188,7 +175,7 @@ class StockService extends CoreService
                 'time' => $date,
                 'value' => $accCash
             ];
-            $this->createFilterData($r, $i, $size, $date, $avg, $accCash);
+            $this->createFilterData($r, $i, $size, $avg, $accCash);
         }
         return $r;
     }
@@ -277,7 +264,7 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
             //
-            $this->createFilterData($r, $i, $size, $date, $avg, $accCash);
+            $this->createFilterData($r, $i, $size, $avg, $accCash);
         }
         return $r;
     }
@@ -307,57 +294,33 @@ class StockService extends CoreService
         return [
             'c' => ['ohlc' => [], 'price' => [], 'cash' => []],
             'f' => [
-                'p' => [
-                    't1' => [
-                        't' => 0,
-                        'v' => 0,
-                    ],
-                    't2' => [
-                        't' => 0,
-                        'v' => 0,
-                    ],
-                    'b' => [
-                        't' => 0,
-                        'v' => 0,
-                    ]
-                ],
-                'c' => [
-                    't1' => [
-                        't' => 0,
-                        'v' => 0,
-                    ],
-                    't2' => [
-                        't' => 0,
-                        'v' => 0,
-                    ],
-                    'b' => [
-                        't' => 0,
-                        'v' => 0,
-                    ]
-                ]
+                'p' => ['t1' => 0, 't2' => 0, 'b' => 0],
+                'c' => ['t1' => 0, 't2' => 0, 'b' => 0]
             ]
         ];
     }
-    private function createFilterData(&$r, $i, $size, $date, $avg, $accCash)
+    private function createFilterData(&$r, $i, $size, $avg, $accCash)
     {
-        if ($i < $size / 2) {
-            if ($avg > $r['f']['p']['t1']['v'])
-                $r['f']['p']['t1'] = ['t' => $date, 'v' => $avg];
-            if ($accCash > $r['f']['c']['t1']['v'])
-                $r['f']['c']['t1'] = ['t' => $date, 'v' => $accCash];
+        if ($i <= $size / 2) {
+            $strI = 0;
+            if ($i == $strI || $avg > $r['f']['p']['t1'])
+                $r['f']['p']['t1'] = $avg;
+            if ($i == $strI || $accCash > $r['f']['c']['t1'])
+                $r['f']['c']['t1'] = $accCash;
         }
-        if ($i > $size / 2) {
-            if ($avg > $r['f']['p']['t2']['v'])
-                $r['f']['p']['t2'] = ['t' => $date, 'v' => $avg];
-            if ($accCash > $r['f']['c']['t2']['v'])
-                $r['f']['c']['t2'] = ['t' => $date, 'v' => $accCash];
+        if ($i >= $size / 2) {
+            $strI = ceil($size / 2);
+            if ($i == $strI || $avg > $r['f']['p']['t2'])
+                $r['f']['p']['t2'] = $avg;
+            if ($i == $strI || $accCash > $r['f']['c']['t2'])
+                $r['f']['c']['t2'] = $accCash;
         }
         if ($i >= $size / 3) {
             $strI = ceil($size / 3);
-            if ($i == $strI || $avg < $r['f']['p']['b']['v'])
-                $r['f']['p']['b'] = ['t' => $date, 'v' => $avg];
-            if ($i == $strI || $accCash < $r['f']['c']['b']['v'])
-                $r['f']['c']['b'] = ['t' => $date, 'v' => $accCash];
+            if ($i == $strI || $avg < $r['f']['p']['b'])
+                $r['f']['p']['b'] = $avg;
+            if ($i == $strI || $accCash < $r['f']['c']['b'])
+                $r['f']['c']['b'] = $accCash;
         }
     }
     private function unix($str)
@@ -445,7 +408,7 @@ class StockService extends CoreService
             $nh = ['VCB', 'BID', 'CTG', 'VPB', 'MBB', 'ACB', 'STB', 'HDB', 'VIB', 'SSB', 'SHB', 'MSB', 'TPB', 'LPB', 'EIB', 'OCB'];
             $ck = ['SSI', 'VND', 'VCI', 'SHS', 'HCM', 'VIX', 'MBS', 'FTS', 'BSI', 'CTS', 'VDS'];
             $list = [
-                (object)['name' => 'hose', 'symbols' => array_merge(['VNINDEX', 'VN30'], $hose)],
+                (object)['name' => 'hose', 'symbols' => array_merge(['VNINDEX'], $hose)],
                 (object)['name' => 'hnx', 'symbols' => array_merge($index, $hnx, $upcom)],
                 (object)['name' => 'nh', 'symbols' => $nh],
                 (object)['name' => 'ck', 'symbols' => $ck],
