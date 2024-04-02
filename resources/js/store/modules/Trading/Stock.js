@@ -14,11 +14,7 @@ const actions = {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
-                .post(
-                    "trading/stock",
-                    { ...param, ...{ from: FROM_DATE, to: TO_DATE } },
-                    { noLoading: true }
-                )
+                .post("trading/stock", param, { noLoading: true })
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
@@ -30,11 +26,7 @@ const actions = {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
-                .post(
-                    "trading/stock/init-chart",
-                    { ...param, ...{ from: FROM_DATE, to: TO_DATE } },
-                    { noLoading: true }
-                )
+                .post("trading/stock/init-chart", param, { noLoading: true })
                 .then((response) => {
                     commit("setChartData", response.data.chart);
                     commit("setChartLoading", false);
@@ -67,8 +59,6 @@ const actions = {
     },
     filterSymbols({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            if (!param.from) param.from = FROM_DATE;
-            if (!param.to) param.to = TO_DATE;
             axios.post("trading/stock/filter", param).then((response) => {
                 resolve(response.data);
             });

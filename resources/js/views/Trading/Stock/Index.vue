@@ -1,5 +1,5 @@
 <template>
-    <div class="content-block dx-card responsive-paddings">
+    <div class="stock-page content-block dx-card responsive-paddings">
         <DxToolbar
             :items="[
                 {
@@ -23,6 +23,21 @@
                         value: state.symbolKind,
                         hint: $t('trading.stock.symbolKind'),
                         onValueChanged: listChanged,
+                    },
+                },
+                {
+                    location: 'after',
+                    widget: 'dxSlider',
+                    options: {
+                        width: '100px',
+                        min: 0,
+                        max: 5,
+                        value: state.chartShift,
+                        rtlEnabled: true,
+                        showRange: false,
+                        tooltip: { enabled: true },
+                        hint: $t('trading.stock.chartShift'),
+                        onValueChanged: chartShiftChanged,
                     },
                 },
                 {
@@ -223,6 +238,7 @@
 import ColorPicker from "./ColorPicker.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
+import { DxSlider } from "devextreme-vue/slider";
 import { confirm, alert } from "devextreme/ui/dialog";
 import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
@@ -311,6 +327,7 @@ const state = reactive({
     symbol: route.query.symbol ?? "VNINDEX",
     timeframe: "D",
     symbolKind: null,
+    chartShift: 0,
     symbolKinds: [
         { text: t("trading.stock.symbolList.hose"), value: "hose" },
         { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
@@ -336,6 +353,14 @@ const state = reactive({
 state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
+);
+const chartFrom = computed(() =>
+    moment()
+        .subtract(state.chartShift + 3, "years")
+        .unix()
+);
+const chartTo = computed(() =>
+    moment().subtract(state.chartShift, "years").unix()
 );
 const inWatchlist = computed(() =>
     store.state.tradingStock.symbols.watch.includes(state.symbol)
@@ -407,6 +432,8 @@ onMounted(() => {
     store
         .dispatch("tradingStock/initChart", {
             symbol: state.symbol,
+            from: chartFrom.value,
+            to: chartTo.value,
             timeframe: state.timeframe,
             vnindex: true,
             dividend: state.dividendEnable,
@@ -1366,6 +1393,8 @@ function initChart() {
     store
         .dispatch("tradingStock/initChart", {
             symbol: state.symbol,
+            from: chartFrom.value,
+            to: chartTo.value,
             timeframe: state.timeframe,
             vnindex: true,
             dividend: state.dividendEnable,
@@ -1384,6 +1413,8 @@ function reloadChart(onlyData = false, withVnindex = false) {
     store
         .dispatch("tradingStock/getChartData", {
             symbol: state.symbol,
+            from: chartFrom.value,
+            to: chartTo.value,
             timeframe: state.timeframe,
             vnindex: withVnindex,
             dividend: state.dividendEnable,
@@ -1401,6 +1432,10 @@ function loadNextSymbol(e) {
 }
 function listChanged(e) {
     state.symbolKind = e.value;
+}
+function chartShiftChanged(e) {
+    state.chartShift = e.value;
+    reloadChart(false, true);
 }
 function cloneSymbols() {
     confirm(`${t("trading.stock.cloneSymbols")}?`, t("titles.confirm")).then(
@@ -1440,120 +1475,125 @@ function filterItemClick({ itemData }) {
 }
 </script>
 <style lang="scss">
-.stock-container {
-    height: 400px;
-    background: #131722;
-    border: none;
-
-    &.fullscreen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        z-index: 1501;
-    }
-    .chart-wrapper {
-        position: relative;
-        height: 100%;
-    }
-    .area {
-        position: absolute;
-        display: flex;
-        justify-content: space-between;
-        font-size: 17px;
+.stock-page {
+    .stock-container {
+        height: 400px;
         background: #131722;
-        border: solid 2px #2a2e39;
-        border-bottom-right-radius: 5px;
-        z-index: 3;
-
-        &.data-area {
-            top: 0px;
-            left: 32px;
-            z-index: 4 !important;
-
-            .command:not(:first-child) {
-                border-left: solid 2px #2a2e39 !important;
-            }
-
-            .symbol-select {
-                .dx-texteditor-input {
-                    text-align: center;
-                    padding: 5.7px 0;
-                }
-                .dx-placeholder {
-                    line-height: 3px;
-                }
-                &.dividend {
-                    .dx-icon-clear {
-                        background: red;
-                    }
-                }
-                &.dividend-enable {
-                    .dx-icon-clear {
-                        color: lime;
-                    }
-                }
-            }
-            .timeframe-select {
-                .dx-texteditor-input {
-                    text-align: center;
-                    padding: 5.7px 0;
-                }
-            }
-
-            .spinner {
-                width: 30px;
-                height: 30px;
-                display: none;
-            }
-        }
-
-        &.tool-area {
-            top: 0px;
-            left: 0px;
-            flex-direction: column;
-
-            .command:not(:first-child) {
-                border-top: solid 2px #2a2e39 !important;
-            }
-
-            .selected:not(.color) {
-                color: #1f62ff !important;
-            }
-
-            .color {
-                position: relative;
-
-                .color-picker {
-                    position: absolute;
-                    top: 0;
-                    left: 40px;
-                }
-            }
-        }
-    }
-    .command {
-        width: 30px;
-        height: 30px;
-        flex: 1 1 auto;
-        text-align: center;
-        color: #bbbbbb;
-        background: transparent !important;
-        line-height: 30px;
-        font-size: 16px;
         border: none;
-        cursor: pointer;
-        z-index: 3;
-    }
 
-    .tradingview-chart {
-        position: absolute;
-        top: 0;
-        left: 32px;
-        width: calc(100% - 32px);
-        height: 100%;
-        z-index: 5;
+        &.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 1501;
+        }
+        .chart-wrapper {
+            position: relative;
+            height: 100%;
+        }
+        .area {
+            position: absolute;
+            display: flex;
+            justify-content: space-between;
+            font-size: 17px;
+            background: #131722;
+            border: solid 2px #2a2e39;
+            border-bottom-right-radius: 5px;
+            z-index: 3;
+
+            &.data-area {
+                top: 0px;
+                left: 32px;
+                z-index: 4 !important;
+
+                .command:not(:first-child) {
+                    border-left: solid 2px #2a2e39 !important;
+                }
+
+                .symbol-select {
+                    .dx-texteditor-input {
+                        text-align: center;
+                        padding: 5.7px 0;
+                    }
+                    .dx-placeholder {
+                        line-height: 3px;
+                    }
+                    &.dividend {
+                        .dx-icon-clear {
+                            background: red;
+                        }
+                    }
+                    &.dividend-enable {
+                        .dx-icon-clear {
+                            color: lime;
+                        }
+                    }
+                }
+                .timeframe-select {
+                    .dx-texteditor-input {
+                        text-align: center;
+                        padding: 5.7px 0;
+                    }
+                }
+
+                .spinner {
+                    width: 30px;
+                    height: 30px;
+                    display: none;
+                }
+            }
+
+            &.tool-area {
+                top: 0px;
+                left: 0px;
+                flex-direction: column;
+
+                .command:not(:first-child) {
+                    border-top: solid 2px #2a2e39 !important;
+                }
+
+                .selected:not(.color) {
+                    color: #1f62ff !important;
+                }
+
+                .color {
+                    position: relative;
+
+                    .color-picker {
+                        position: absolute;
+                        top: 0;
+                        left: 40px;
+                    }
+                }
+            }
+        }
+        .command {
+            width: 30px;
+            height: 30px;
+            flex: 1 1 auto;
+            text-align: center;
+            color: #bbbbbb;
+            background: transparent !important;
+            line-height: 30px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            z-index: 3;
+        }
+
+        .tradingview-chart {
+            position: absolute;
+            top: 0;
+            left: 32px;
+            width: calc(100% - 32px);
+            height: 100%;
+            z-index: 5;
+        }
+    }
+    .dx-slider-tooltip-position-top {
+        padding-top: 0px !important;
     }
 }
 </style>
