@@ -362,6 +362,7 @@ onMounted(() => {
     });
     params.series.events = params.chart.addHistogramSeries({
         priceScaleId: "events",
+        // scaleMargins: { top: 0.66, bottom: 0 },
         scaleMargins: { top: 0.96, bottom: 0 },
         lastValueVisible: false,
         priceLineVisible: false,
@@ -732,6 +733,7 @@ function loadChartData() {
     params.series.price.setData(params.data.price);
     params.series.cash.setData(params.data.cash);
     params.series.foreign.setData(params.data.foreign);
+    // params.series.events.setData(params.data.foreign);
     params.chart.applyOptions({ watermark: { text: state.symbol } });
 }
 function tradingviewClick(e) {

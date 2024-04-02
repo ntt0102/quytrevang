@@ -6,7 +6,7 @@ function initialState() {
     };
 }
 const FROM_DATE = moment().subtract(3, "years").unix();
-const TO_DATE = moment().unix();
+const TO_DATE = moment().add(1, "day").unix();
 const getters = {};
 
 const actions = {
