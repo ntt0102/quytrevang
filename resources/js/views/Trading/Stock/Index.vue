@@ -340,8 +340,8 @@ const state = reactive({
         { text: t("trading.stock.symbolList.hnx"), value: "hnx" },
     ],
     filterItems: [
-        { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
         { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
+        { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
         // { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
     ],
     color: "#F44336",
@@ -354,13 +354,15 @@ state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
-const chartFrom = computed(() =>
-    moment()
-        .subtract(state.chartShift + 3, "years")
-        .unix()
+const chartFrom = computed(
+    () =>
+        route.query.from ??
+        moment()
+            .subtract(state.chartShift + 3, "years")
+            .unix()
 );
-const chartTo = computed(() =>
-    moment().subtract(state.chartShift, "years").unix()
+const chartTo = computed(
+    () => route.query.to ?? moment().subtract(state.chartShift, "years").unix()
 );
 const inWatchlist = computed(() =>
     store.state.tradingStock.symbols.watch.includes(state.symbol)

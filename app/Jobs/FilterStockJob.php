@@ -45,25 +45,38 @@ class FilterStockJob implements ShouldQueue
     public function handle()
     {
         // \Log::info('Start filter');
+        $stock = StockSymbol::where('name', $this->payload->name)->first();
+        if (!$stock) return false;
         $rTop = [];
         $rBottom = [];
         $stockService = app(StockService::class);
-        $stock = StockSymbol::where('name', $this->payload->name)->first();
-        if (!$stock) return false;
+        $this->payload->foreign = true;
         foreach ($stock->symbols as $symbol) {
             $this->payload->symbol = $symbol;
+            $filter = $stockService->getDataFromVps($this->payload)['f'];
+            $price = $filter['p'];
+            if ($price['t1'] - $price['b'] == 0) continue;
+            $rP = ($price['t2'] - $price['b']) / ($price['t1'] - $price['b']);
+            $cash = $filter['c'];
+            if ($cash['t1'] - $cash['b'] == 0) continue;
+            $rC = ($cash['t2'] - $cash['b']) / ($cash['t1'] - $cash['b']);
+            $foreign = $stockService->getDataForeign($this->payload)['f']['f'];
+            if ($foreign['t1'] - $foreign['b'] == 0) continue;
+            $rF = ($foreign['t2'] - $foreign['b']) / ($foreign['t1'] - $foreign['b']);
+
             if ($this->payload->kind == self::F_TOP) {
-                $cash = $stockService->getDataFromVps($this->payload)['f']['c'];
-                if ($cash['t1'] - $cash['b'] == 0) continue;
-                $rC = ($cash['t2'] - $cash['b']) / ($cash['t1'] - $cash['b']);
-                if ($rC > self::CASH_RATIO) $rTop[] = $symbol;
+                if (
+                    $rP > 0.3 && $rP < 1 &&
+                    $rC > 2 &&
+                    $rF > 2
+                ) $rTop[] = $symbol;
             }
             if ($this->payload->kind == self::F_BOTTOM) {
-                $this->payload->foreign = true;
-                $foreign = $stockService->getDataForeign($this->payload)['f']['f'];
-                if ($foreign['t1'] - $foreign['b'] == 0) continue;
-                $rF = ($foreign['t2'] - $foreign['b']) / ($foreign['t1'] - $foreign['b']);
-                if ($rF > self::FOREIGN_RATIO) $rBottom[] = $symbol;
+                if (
+                    $rP < 1 &&
+                    $rC > 1 &&
+                    $rF > 2
+                ) $rBottom[] = $symbol;
             }
         }
         if ($this->payload->kind == self::F_TOP)

@@ -1,1 +1,0 @@
-import{_ as e}from"./FileManager-5695742e.js";import{d as a,g as s,j as c,o as n}from"./app-ff2b8f99.js";import"./track_bar-ecbebff9.js";const o={class:"content-block dx-card responsive-paddings"},m={__name:"Files",setup(i){const t=a({clientPath:"files"});return(r,l)=>(n(),s("div",o,[c(e,{clientPath:t.clientPath},null,8,["clientPath"])]))}};export{m as default};
