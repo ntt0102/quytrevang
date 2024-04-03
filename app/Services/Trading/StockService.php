@@ -44,23 +44,17 @@ class StockService extends CoreService
         ];
         if ($payload->vnindex) {
             $payload->symbol = 'VNINDEX';
-            $ret['vnindex'] = $this->getDataFromVps($payload)['c']['price'];
+            $ret['vnindex'] = $this->getDataTradingview($payload)['c']['price'];
         }
         return $ret;
     }
-    /**
-     * Get data
-     *
-     * @param $payload
-     * 
-     */
     public function getData($payload)
     {
         if (str_contains($payload->symbol, '^')) {
             return $this->getDataFromCp68($payload);
         }
         return array_merge_recursive(
-            $this->getDataFromVps($payload),
+            $this->getDataTradingview($payload),
             $this->getDataForeign($payload)
         );
     }
@@ -134,82 +128,6 @@ class StockService extends CoreService
             $candles[$key]->KLGDRong += $candle->KLGDRong;
         }
         $data = array_values($candles);
-    }
-    public function getDataFromVps($payload)
-    {
-        $r = $this->initData();
-        if (!$payload->symbol) return $r;
-        $client = new \GuzzleHttp\Client();
-        $url = "https://histdatafeed.vps.com.vn/tradingview/history?symbol={$payload->symbol}&resolution=1D&from={$payload->from}&to={$payload->to}";
-        $res = $client->get($url);
-        $rsp = json_decode($res->getBody());
-        if ($rsp->s != 'ok') return $r;
-        if ($payload->timeframe != 'D')  $this->getDataVpsTimeframe($rsp, $payload->timeframe);
-        $size = count($rsp->t);
-        if ($size == 0) return $r;
-        $accCash = 0;
-        $prevAvg = 0;
-        for ($i = 0; $i < $size; $i++) {
-            $date = $rsp->t[$i];
-            $r['c']['ohlc'][] = [
-                'time' => $date,
-                'open' => +$rsp->o[$i],
-                'high' => +$rsp->h[$i],
-                'low' => +$rsp->l[$i],
-                'close' => +$rsp->c[$i]
-            ];
-            $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
-            $r['c']['price'][] = [
-                'time' => $date,
-                'value' => $avg
-            ];
-            if (!$prevAvg) $prevAvg = $avg;
-            $change = $avg - $prevAvg;
-            $side = 0;
-            if ($change > 0) $side = 1;
-            else if ($change < 0) $side = -1;
-            $prevAvg = $avg;
-            $cash = $side * $rsp->v[$i];
-            $accCash += $cash;
-            $r['c']['cash'][] = [
-                'time' => $date,
-                'value' => $accCash
-            ];
-            $this->createFilterData($r, $i, $size, $avg, $accCash);
-        }
-        return $r;
-    }
-    private function getDataVpsTimeframe(&$data, $tf)
-    {
-        $t = [];
-        $o = [];
-        $h = [];
-        $l = [];
-        $c = [];
-        $v = [];
-        for ($i = 0; $i < count($data->t); $i++) {
-            $key = date('Y-' . $tf, +$data->t[$i] + self::TIME_ZONE);
-            if (!array_key_exists($key, $t)) {
-                $t[$key] = $data->t[$i];
-                $o[$key] = $data->o[$i];
-                $h[$key] = $data->h[$i];
-                $l[$key] = $data->l[$i];
-                $v[$key] = 0;
-            } else {
-                if ($data->h[$i] > $h[$key]) $h[$key] = $data->h[$i];
-                if ($data->l[$i] < $l[$key]) $l[$key] = $data->l[$i];
-            }
-            $c[$key] = $data->c[$i];
-            $v[$key] += $data->v[$i];
-        }
-        $data = (object)[
-            't' => array_values($t),
-            'o' => array_values($o),
-            'h' => array_values($h),
-            'l' => array_values($l),
-            'c' => array_values($c),
-            'v' => array_values($v),
-        ];
     }
     public function getDataFromCp68($payload)
     {
@@ -288,6 +206,82 @@ class StockService extends CoreService
             $candles[$key]->volume += $candle->volume;
         }
         $data = array_values($candles);
+    }
+    public function getDataTradingview($payload)
+    {
+        $r = $this->initData();
+        if (!$payload->symbol) return $r;
+        $client = new \GuzzleHttp\Client();
+        $url = "https://sbboard.sbsi.vn/datafeed/history?symbol={$payload->symbol}&resolution=D&from={$payload->from}&to={$payload->to}";
+        $res = $client->get($url);
+        $rsp = json_decode($res->getBody());
+        if ($rsp->s != 'ok') return $r;
+        if ($payload->timeframe != 'D')  $this->getDataTimeframe($rsp, $payload->timeframe);
+        $size = count($rsp->t);
+        if ($size == 0) return $r;
+        $accCash = 0;
+        $prevAvg = 0;
+        for ($i = 0; $i < $size; $i++) {
+            $date = $rsp->t[$i];
+            $r['c']['ohlc'][] = [
+                'time' => $date,
+                'open' => +$rsp->o[$i],
+                'high' => +$rsp->h[$i],
+                'low' => +$rsp->l[$i],
+                'close' => +$rsp->c[$i]
+            ];
+            $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
+            $r['c']['price'][] = [
+                'time' => $date,
+                'value' => $avg
+            ];
+            if (!$prevAvg) $prevAvg = $avg;
+            $change = $avg - $prevAvg;
+            $side = 0;
+            if ($change > 0) $side = 1;
+            else if ($change < 0) $side = -1;
+            $prevAvg = $avg;
+            $cash = $side * +$rsp->v[$i];
+            $accCash += $cash;
+            $r['c']['cash'][] = [
+                'time' => $date,
+                'value' => $accCash
+            ];
+            $this->createFilterData($r, $i, $size, $avg, $accCash);
+        }
+        return $r;
+    }
+    private function getDataTimeframe(&$data, $tf)
+    {
+        $t = [];
+        $o = [];
+        $h = [];
+        $l = [];
+        $c = [];
+        $v = [];
+        for ($i = 0; $i < count($data->t); $i++) {
+            $key = date('Y-' . $tf, +$data->t[$i] + self::TIME_ZONE);
+            if (!array_key_exists($key, $t)) {
+                $t[$key] = $data->t[$i];
+                $o[$key] = $data->o[$i];
+                $h[$key] = $data->h[$i];
+                $l[$key] = $data->l[$i];
+                $v[$key] = 0;
+            } else {
+                if ($data->h[$i] > $h[$key]) $h[$key] = $data->h[$i];
+                if ($data->l[$i] < $l[$key]) $l[$key] = $data->l[$i];
+            }
+            $c[$key] = $data->c[$i];
+            $v[$key] += $data->v[$i];
+        }
+        $data = (object)[
+            't' => array_values($t),
+            'o' => array_values($o),
+            'h' => array_values($h),
+            'l' => array_values($l),
+            'c' => array_values($c),
+            'v' => array_values($v),
+        ];
     }
     private function initData()
     {
@@ -371,18 +365,19 @@ class StockService extends CoreService
         $ret = [];
         $startDate = date('Y-m-d', $payload->from);
         $endDate = date("Y-m-d", $payload->to);
-        $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
-        $client = new \GuzzleHttp\Client(['headers' => ['authorization' => "Bearer {$token}"]]);
-        // $url = "https://svr5.fireant.vn/api/Data/Companies/TimescaleMarks?symbol={$payload->symbol}&startDate={$startDate}&endDate={$endDate}";
-        $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/timescale-marks?startDate={$startDate}&endDate={$endDate}";
+        // $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
+        // $client = new \GuzzleHttp\Client(['headers' => ['authorization' => "Bearer {$token}"]]);
+        // $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/timescale-marks?startDate={$startDate}&endDate={$endDate}";
+        $client = new \GuzzleHttp\Client();
+        $url = "https://svr5.fireant.vn/api/Data/Companies/TimescaleMarks?symbol={$payload->symbol}&startDate={$startDate}&endDate={$endDate}";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         foreach ($rsp as $news) {
             $ret[] = [
-                'time' => $this->unix($news->date),
+                'time' => $this->unix($news->Date),
                 'value' => 1,
-                'color' => $news->color,
-                'title' => $news->title
+                'color' => $news->Color,
+                'title' => $news->Title
             ];
         }
         return $ret;

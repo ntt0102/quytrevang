@@ -321,7 +321,7 @@ let params = {
     isCashDraw: false,
     isOnlyLoadData: false,
     showNewsInfo: false,
-    foreignEnable: false,
+    foreignEnable: true,
 };
 const state = reactive({
     symbol: route.query.symbol ?? "VNINDEX",
@@ -348,11 +348,14 @@ const state = reactive({
     showColorPicker: false,
     isFullscreen: false,
     showTradingView: false,
-    dividendEnable: true,
+    dividendEnable: false,
 });
 state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
-    () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
+    () =>
+        `https://sbboard.sbsi.vn/chart/?language=vi&theme=dark&symbol=${state.symbol}`
+    // () => `https://banggia.dag.vn/stock-chart?symbol=${state.symbol}`
+    // () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
 const chartFrom = computed(
     () =>

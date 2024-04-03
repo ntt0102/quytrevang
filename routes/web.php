@@ -170,10 +170,10 @@ Route::get('test', function () {
     // // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
     // $payload = (object)['symbol' => 'ACB', 'from' => 1637798400, 'to' => 1683158400, 'timeframe' => 'D', 'foreign' => true];
-    $payload = (object)['symbol' => 'ACG', 'from' => 1641254400, 'to' => 1680566400, 'timeframe' => 'D', 'name' => 'hose', 'kind' => 'f_bottom', 'foreign' => true];
+    $payload = (object)['symbol' => 'VIX', 'from' => 1641254400, 'to' => 1680566400, 'timeframe' => 'D', 'name' => 'hose', 'kind' => 'f_bottom', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
     // $s = app(\App\Services\Trading\StockService::class)->getDataForeign($payload);
-    // $s = app(\App\Services\Trading\StockService::class)->getDataFromCp68($payload);
-    $s = \App\Jobs\FilterStockJob::dispatch($payload);
+    $s = app(\App\Services\Trading\StockService::class)->getDataTradingview($payload);
+    // $s = \App\Jobs\FilterStockJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
     // $s = new \App\Jobs\FilterStockJob($payload);
     // $s = $s->getForeignRatio($payload);
