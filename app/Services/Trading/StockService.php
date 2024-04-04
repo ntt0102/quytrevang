@@ -212,7 +212,8 @@ class StockService extends CoreService
         $r = $this->initData();
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
-        $url = "https://sbboard.sbsi.vn/datafeed/history?symbol={$payload->symbol}&resolution=D&from={$payload->from}&to={$payload->to}";
+        $url = "https://histdatafeed.vps.com.vn/tradingview/history?symbol={$payload->symbol}&resolution=D&from={$payload->from}&to={$payload->to}";
+        // $url = "https://sbboard.sbsi.vn/datafeed/history?symbol={$payload->symbol}&resolution=D&from={$payload->from}&to={$payload->to}";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         if ($rsp->s != 'ok') return $r;

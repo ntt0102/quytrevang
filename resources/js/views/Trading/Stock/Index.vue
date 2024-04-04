@@ -16,7 +16,8 @@
                     location: 'before',
                     widget: 'dxSelectBox',
                     options: {
-                        width: '130px',
+                        width: '110px',
+                        showDropDownButton: false,
                         dataSource: state.symbolKinds,
                         valueExpr: 'value',
                         displayExpr: 'text',
@@ -26,16 +27,16 @@
                     },
                 },
                 {
-                    location: 'after',
-                    widget: 'dxSlider',
+                    location: 'before',
+                    widget: 'dxSelectBox',
                     options: {
-                        width: '100px',
-                        min: 0,
-                        max: 5,
+                        width: '30px',
+                        showDropDownButton: false,
+                        dataSource: [0, 1, 2, 3, 4, 5],
                         value: state.chartShift,
-                        rtlEnabled: true,
-                        showRange: false,
-                        tooltip: { enabled: true },
+                        dropDownOptions: {
+                            wrapperAttr: { class: 'stock-min-select-dropdown' },
+                        },
                         hint: $t('trading.stock.chartShift'),
                         onValueChanged: chartShiftChanged,
                     },
@@ -83,12 +84,8 @@
             <div class="chart-wrapper" ref="chartRef">
                 <div class="area data-area" @click="stopPropagationEvent">
                     <DxSelectBox
-                        :width="
-                            $screen.getScreenSizeInfo.isXSmall
-                                ? '140px'
-                                : '130px'
-                        "
                         :data-source="symbols"
+                        :showDropDownButton="false"
                         :search-enabled="true"
                         :show-clear-button="true"
                         :element-attr="{
@@ -100,9 +97,12 @@
                         @valueChanged="symbolChanged"
                     />
                     <DxSelectBox
-                        width="60px"
                         :data-source="['D', 'W', 'M']"
-                        :element-attr="{ class: 'command timeframe-select' }"
+                        :showDropDownButton="false"
+                        :element-attr="{ class: 'command' }"
+                        :dropDownOptions="{
+                            wrapperAttr: { class: 'stock-min-select-dropdown' },
+                        }"
                         v-model="state.timeframe"
                         @valueChanged="timeframeChanged"
                     />
@@ -238,7 +238,6 @@
 import ColorPicker from "./ColorPicker.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
-import { DxSlider } from "devextreme-vue/slider";
 import { confirm, alert } from "devextreme/ui/dialog";
 import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
@@ -349,6 +348,9 @@ const state = reactive({
     isFullscreen: false,
     showTradingView: false,
     dividendEnable: false,
+    trainEnable: false,
+    totalEpochs: 10,
+    currentEpoch: 0,
 });
 state.symbolKind = route.query.list ?? "hose";
 const tradingViewSrc = computed(
@@ -433,7 +435,6 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    console.log("params.foreignEnable", params.foreignEnable);
     store
         .dispatch("tradingStock/initChart", {
             symbol: state.symbol,
@@ -1518,6 +1519,8 @@ function filterItemClick({ itemData }) {
                 }
 
                 .symbol-select {
+                    width: 97px;
+
                     .dx-texteditor-input {
                         text-align: center;
                         padding: 5.7px 0;
@@ -1535,11 +1538,8 @@ function filterItemClick({ itemData }) {
                             color: lime;
                         }
                     }
-                }
-                .timeframe-select {
-                    .dx-texteditor-input {
-                        text-align: center;
-                        padding: 5.7px 0;
+                    .dx-texteditor-buttons-container {
+                        width: 23px;
                     }
                 }
 
@@ -1599,6 +1599,17 @@ function filterItemClick({ itemData }) {
     }
     .dx-slider-tooltip-position-top {
         padding-top: 0px !important;
+    }
+    .dx-textbox {
+        .dx-texteditor-input {
+            text-align: center;
+        }
+    }
+}
+.stock-min-select-dropdown {
+    .dx-list-item-content {
+        padding: 5px 8px !important;
+        text-align: center;
     }
 }
 </style>
