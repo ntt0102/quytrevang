@@ -54,7 +54,11 @@ class FilterStockJob implements ShouldQueue
         foreach ($stock->symbols as $symbol) {
             $this->payload->symbol = $symbol;
             $fRSI = $stockService->getDataForeign($this->payload)['rsi']['foreign'];
-            if ($fRSI[1] > 70 && $fRSI[0] < 50) {
+            if (
+                $fRSI[1] > 70 &&
+                $fRSI[1] + $fRSI[0] > 100 &&
+                $fRSI[0] < 50
+            ) {
                 $rsi = $stockService->getDataTradingview($this->payload)['rsi'];
                 $pRSI = $rsi['price'];
                 $cRSI = $rsi['cash'];
