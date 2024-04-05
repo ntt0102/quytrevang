@@ -124,7 +124,7 @@ class StockService extends CoreService
     {
         $r = [
             'chart' => ['ohlc' => [], 'price' => [], 'cash' => []],
-            'rsi' => ['price' => [100, 0]]
+            'rsi' => ['price' => [100, 0], 'cash' => [0, 0]]
         ];
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
@@ -140,8 +140,10 @@ class StockService extends CoreService
         $prevAvg = 0;
         $topAvg = 0;
         $bottomAvg = 0;
-        $gains = [0, 0];
-        $losses = [0, 0];
+        $priceGains = [0, 0];
+        $priceLosses = [0, 0];
+        $cashGains = [0, 0];
+        $cashLosses = [0, 0];
         for ($i = 0; $i < $size; $i++) {
             $date = $rsp->t[$i];
             $r['chart']['ohlc'][] = [
@@ -161,13 +163,17 @@ class StockService extends CoreService
             if ($i < $size / 4) {
                 if ($avg > $topAvg) {
                     $topAvg = $avg;
-                    $gains[0] = 0;
-                    $losses[0] = 0;
+                    $priceGains[0] = 0;
+                    $priceLosses[0] = 0;
+                    $cashGains[0] = 0;
+                    $cashLosses[0] = 0;
                 }
                 if ($avg < $bottomAvg) {
                     $bottomAvg = $avg;
-                    $gains[1] = 0;
-                    $losses[1] = 0;
+                    $priceGains[1] = 0;
+                    $priceLosses[1] = 0;
+                    $cashGains[1] = 0;
+                    $cashLosses[1] = 0;
                 }
             }
             if (!$prevAvg) $prevAvg = $avg;
@@ -176,14 +182,18 @@ class StockService extends CoreService
             $side = 0;
             if ($change > 0) {
                 $side = 1;
-                $gains[0] += $change;
-                $gains[1] += $change;
+                $priceGains[0] += $change;
+                $priceGains[1] += $change;
+                $cashGains[0] += $rsp->v[$i];
+                $cashGains[1] += $rsp->v[$i];
             } else if ($change < 0) {
                 $side = -1;
-                $losses[0] -= $change;
-                $losses[1] -= $change;
+                $priceLosses[0] -= $change;
+                $priceLosses[1] -= $change;
+                $cashLosses[0] += $rsp->v[$i];
+                $cashLosses[1] += $rsp->v[$i];
             }
-            $cash = $side * +$rsp->v[$i];
+            $cash = $side * $rsp->v[$i];
             $accCash += $cash;
             $r['chart']['cash'][] = [
                 'time' => $date,
@@ -191,8 +201,10 @@ class StockService extends CoreService
             ];
         }
         for ($i = 0; $i < 2; $i++) {
-            if ($losses[$i] > 0)
-                $r['rsi']['price'][$i] = 100 - (100 / (1 + ($gains[$i] / $losses[$i])));
+            if ($priceLosses[$i] > 0)
+                $r['rsi']['price'][$i] = 100 - (100 / (1 + ($priceGains[$i] / $priceLosses[$i])));
+            if ($cashLosses[$i] > 0)
+                $r['rsi']['cash'][$i] = 100 - (100 / (1 + ($cashGains[$i] / $cashLosses[$i])));
         }
         return $r;
     }
