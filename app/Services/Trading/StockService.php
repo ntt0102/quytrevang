@@ -37,14 +37,14 @@ class StockService extends CoreService
     public function getChart($payload)
     {
         $ret = [
-            'data' => $this->getData($payload)['c'],
+            'data' => $this->getData($payload)['chart'],
             'tools' => $this->getTools($payload),
             'dividend' => $this->hasDividend($payload),
             'events' => $this->getEvents($payload),
         ];
         if ($payload->vnindex) {
             $payload->symbol = 'VNINDEX';
-            $ret['vnindex'] = $this->getDataTradingview($payload)['c']['price'];
+            $ret['vnindex'] = $this->getDataTradingview($payload)['chart']['price'];
         }
         return $ret;
     }
@@ -60,10 +60,7 @@ class StockService extends CoreService
     }
     public function getDataForeign($payload)
     {
-        $r = [
-            'c' => ['foreign' => []],
-            'f' => ['f' => ['t1' => 0, 't2' => 0, 'b' => 0]]
-        ];
+        $r = ['chart' => ['foreign' => []], 'rsi' => ['foreign' => [0, 0]]];
         if (!$payload->foreign) return $r;
         $startDate = date('m/d/Y', $payload->from);
         $endDate = date("m/d/Y", $payload->to);
@@ -81,37 +78,31 @@ class StockService extends CoreService
         if ($payload->timeframe != 'D')  $this->getDataForeignTimeframe($data, $payload->timeframe);
         $size = count($data);
         if ($size == 0) return $r;
-        $accCash = 0;
+        $acc = 0;
+        $gains = [0, 0];
+        $losses = [0, 0];
         for ($i = 0; $i < $size; $i++) {
             $date = $this->unix($data[$i]->Ngay);
             if ($i > 0) {
                 $preDate = $this->unix($data[$i - 1]->Ngay);
                 if ($date == $preDate) continue;
             }
-            $accCash += $data[$i]->KLGDRong;
-            $r['c']['foreign'][] = [
+            $acc += $data[$i]->KLGDRong;
+            $r['chart']['foreign'][] = [
                 'time' => $date,
-                'value' => $accCash
+                'value' => $acc
                 // 'value' => abs($data[$i]->KLGDRong),
                 // 'value' => $data[$i]->KLMua + $data[$i]->KLBan,
                 // 'color' => $data[$i]->KLGDRong > 0 ? 'green' : 'red'
             ];
             //
-            if ($i <= $size / 2) {
-                $strI = 0;
-                if ($i == $strI || $accCash > $r['f']['f']['t1'])
-                    $r['f']['f']['t1'] = $accCash;
-            }
-            if ($i >= $size / 2) {
-                $strI = ceil($size / 2);
-                if ($i == $strI || $accCash > $r['f']['f']['t2'])
-                    $r['f']['f']['t2'] = $accCash;
-            }
-            if ($i >= $size / 3) {
-                $strI = ceil($size / 3);
-                if ($i == $strI || $accCash < $r['f']['f']['b'])
-                    $r['f']['f']['b'] = $accCash;
-            }
+            $j = $i < $size / 2 ? 0 : 1;
+            if ($data[$i]->KLGDRong > 0) $gains[$j] += $data[$i]->KLGDRong;
+            else $losses[$j] -= $data[$i]->KLGDRong;
+        }
+        for ($i = 0; $i < 2; $i++) {
+            if ($losses[$i] > 0)
+                $r['rsi']['foreign'][$i] = 100 - (100 / (1 + ($gains[$i] / $losses[$i])));
         }
         return $r;
     }
@@ -129,87 +120,12 @@ class StockService extends CoreService
         }
         $data = array_values($candles);
     }
-    public function getDataFromCp68($payload)
-    {
-        $r = $this->initData();
-        if (!$payload->symbol) return $r;
-        $client = new \GuzzleHttp\Client();
-        $url = "https://www.cophieu68.vn/chart/chart_data.php?parameters=%7B%7D&dateby=1&stockname={$payload->symbol}";
-        $res = $client->get($url);
-        $rsp = json_decode($res->getBody());
-        if (!is_object($rsp)) return $r;
-        $candles = array_values(array_filter(
-            $rsp->candle,
-            function ($i) use ($payload) {
-                $date = $this->unix($i->date);
-                return $date >= $payload->from && $date <= $payload->to;
-            }
-        ));
-        if ($payload->timeframe != 'D') $this->getDataCp68Timeframe($candles, $payload->timeframe);
-        $size = count($candles);
-        if ($size == 0) return $r;
-        $accCash = 0;
-        $prevAvg = 0;
-        for ($i = 0; $i < $size; $i++) {
-            $candle = $candles[$i];
-            $date = $this->unix($candle->date);
-            if ($i > 0) {
-                $preDate = $this->unix($candles[$i - 1]->date);
-                if ($date == $preDate) continue;
-            }
-            $r['c']['ohlc'][] = [
-                'time' => $date,
-                'open' => +$candle->open,
-                'high' => +$candle->high,
-                'low' => +$candle->low,
-                'close' => +$candle->close
-            ];
-            $avg = ($candle->high + $candle->low + $candle->close) / 3;
-            $r['c']['price'][] = [
-                'time' => $date,
-                'value' => $avg
-            ];
-            if (!$prevAvg) $prevAvg = $avg;
-            $change = $avg - $prevAvg;
-            $side = 0;
-            if ($change > 0) $side = 1;
-            else if ($change < 0) $side = -1;
-            $prevAvg = $avg;
-            $cash = $side * $candle->volume;
-            $accCash += $cash;
-            $r['c']['cash'][] = [
-                'time' => $date,
-                'value' => $accCash
-            ];
-            //
-            $this->createFilterData($r, $i, $size, $avg, $accCash);
-        }
-        return $r;
-    }
-    private function getDataCp68Timeframe(&$data, $tf)
-    {
-        $candles = [];
-        foreach ($data as $candle) {
-            $key = date('Y-' . $tf, $this->unix($candle->date));
-            if (!array_key_exists($key, $candles)) {
-                $candles[$key] = new stdClass();
-                $candles[$key]->date = $candle->date;
-                $candles[$key]->open = $candle->open;
-                $candles[$key]->high = $candle->high;
-                $candles[$key]->low = $candle->low;
-                $candles[$key]->volume = 0;
-            } else {
-                if ($candle->high > $candles[$key]->high) $candles[$key]->high = $candle->high;
-                if ($candle->low < $candles[$key]->low) $candles[$key]->low = $candle->low;
-            }
-            $candles[$key]->close = $candle->close;
-            $candles[$key]->volume += $candle->volume;
-        }
-        $data = array_values($candles);
-    }
     public function getDataTradingview($payload)
     {
-        $r = $this->initData();
+        $r = [
+            'chart' => ['ohlc' => [], 'price' => [], 'cash' => []],
+            'rsi' => ['price' => 100, 'cash' => 0]
+        ];
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
         $url = "https://histdatafeed.vps.com.vn/tradingview/history?symbol={$payload->symbol}&resolution=D&from={$payload->from}&to={$payload->to}";
@@ -222,9 +138,14 @@ class StockService extends CoreService
         if ($size == 0) return $r;
         $accCash = 0;
         $prevAvg = 0;
+        $topAvg = 0;
+        $priceGains = 0;
+        $priceLosses = 0;
+        $cashGains = 0;
+        $cashLosses = 0;
         for ($i = 0; $i < $size; $i++) {
             $date = $rsp->t[$i];
-            $r['c']['ohlc'][] = [
+            $r['chart']['ohlc'][] = [
                 'time' => $date,
                 'open' => +$rsp->o[$i],
                 'high' => +$rsp->h[$i],
@@ -232,24 +153,42 @@ class StockService extends CoreService
                 'close' => +$rsp->c[$i]
             ];
             $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
-            $r['c']['price'][] = [
+            $r['chart']['price'][] = [
                 'time' => $date,
                 'value' => $avg
             ];
+            if (!$topAvg) $topAvg = $avg;
+            if ($i < $size / 4 && $avg > $topAvg) {
+                $topAvg = $avg;
+                $priceGains = 0;
+                $priceLosses = 0;
+                $cashGains = 0;
+                $cashLosses = 0;
+            }
             if (!$prevAvg) $prevAvg = $avg;
             $change = $avg - $prevAvg;
-            $side = 0;
-            if ($change > 0) $side = 1;
-            else if ($change < 0) $side = -1;
             $prevAvg = $avg;
+            $side = 0;
+            if ($change > 0) {
+                $side = 1;
+                $priceGains += $change;
+                $cashGains += +$rsp->v[$i];
+            } else if ($change < 0) {
+                $side = -1;
+                $priceLosses -= $change;
+                $cashLosses += +$rsp->v[$i];
+            }
             $cash = $side * +$rsp->v[$i];
             $accCash += $cash;
-            $r['c']['cash'][] = [
+            $r['chart']['cash'][] = [
                 'time' => $date,
                 'value' => $accCash
             ];
-            $this->createFilterData($r, $i, $size, $avg, $accCash);
         }
+        if ($priceLosses > 0)
+            $r['rsi']['price'] = 100 - (100 / (1 + ($priceGains / $priceLosses)));
+        if ($cashLosses > 0)
+            $r['rsi']['cash'] = 100 - (100 / (1 + ($cashGains / $cashLosses)));
         return $r;
     }
     private function getDataTimeframe(&$data, $tf)
@@ -284,39 +223,82 @@ class StockService extends CoreService
             'v' => array_values($v),
         ];
     }
-    private function initData()
+    public function getDataFromCp68($payload)
     {
-        return [
-            'c' => ['ohlc' => [], 'price' => [], 'cash' => []],
-            'f' => [
-                'p' => ['t1' => 0, 't2' => 0, 'b' => 0],
-                'c' => ['t1' => 0, 't2' => 0, 'b' => 0]
-            ]
-        ];
+        $r = ['chart' => ['ohlc' => [], 'price' => [], 'cash' => []]];
+        if (!$payload->symbol) return $r;
+        $client = new \GuzzleHttp\Client();
+        $url = "https://www.cophieu68.vn/chart/chart_data.php?parameters=%7B%7D&dateby=1&stockname={$payload->symbol}";
+        $res = $client->get($url);
+        $rsp = json_decode($res->getBody());
+        if (!is_object($rsp)) return $r;
+        $candles = array_values(array_filter(
+            $rsp->candle,
+            function ($i) use ($payload) {
+                $date = $this->unix($i->date);
+                return $date >= $payload->from && $date <= $payload->to;
+            }
+        ));
+        if ($payload->timeframe != 'D') $this->getDataCp68Timeframe($candles, $payload->timeframe);
+        $size = count($candles);
+        if ($size == 0) return $r;
+        $accCash = 0;
+        $prevAvg = 0;
+        for ($i = 0; $i < $size; $i++) {
+            $candle = $candles[$i];
+            $date = $this->unix($candle->date);
+            if ($i > 0) {
+                $preDate = $this->unix($candles[$i - 1]->date);
+                if ($date == $preDate) continue;
+            }
+            $r['chart']['ohlc'][] = [
+                'time' => $date,
+                'open' => +$candle->open,
+                'high' => +$candle->high,
+                'low' => +$candle->low,
+                'close' => +$candle->close
+            ];
+            $avg = ($candle->high + $candle->low + $candle->close) / 3;
+            $r['chart']['price'][] = [
+                'time' => $date,
+                'value' => $avg
+            ];
+            if (!$prevAvg) $prevAvg = $avg;
+            $change = $avg - $prevAvg;
+            $side = 0;
+            if ($change > 0) $side = 1;
+            else if ($change < 0) $side = -1;
+            $prevAvg = $avg;
+            $cash = $side * $candle->volume;
+            $accCash += $cash;
+            $r['chart']['cash'][] = [
+                'time' => $date,
+                'value' => $accCash
+            ];
+            //
+        }
+        return $r;
     }
-    private function createFilterData(&$r, $i, $size, $avg, $accCash)
+    private function getDataCp68Timeframe(&$data, $tf)
     {
-        if ($i <= $size / 2) {
-            $strI = 0;
-            if ($i == $strI || $avg > $r['f']['p']['t1'])
-                $r['f']['p']['t1'] = $avg;
-            if ($i == $strI || $accCash > $r['f']['c']['t1'])
-                $r['f']['c']['t1'] = $accCash;
+        $candles = [];
+        foreach ($data as $candle) {
+            $key = date('Y-' . $tf, $this->unix($candle->date));
+            if (!array_key_exists($key, $candles)) {
+                $candles[$key] = new stdClass();
+                $candles[$key]->date = $candle->date;
+                $candles[$key]->open = $candle->open;
+                $candles[$key]->high = $candle->high;
+                $candles[$key]->low = $candle->low;
+                $candles[$key]->volume = 0;
+            } else {
+                if ($candle->high > $candles[$key]->high) $candles[$key]->high = $candle->high;
+                if ($candle->low < $candles[$key]->low) $candles[$key]->low = $candle->low;
+            }
+            $candles[$key]->close = $candle->close;
+            $candles[$key]->volume += $candle->volume;
         }
-        if ($i >= $size / 2) {
-            $strI = ceil($size / 2);
-            if ($i == $strI || $avg > $r['f']['p']['t2'])
-                $r['f']['p']['t2'] = $avg;
-            if ($i == $strI || $accCash > $r['f']['c']['t2'])
-                $r['f']['c']['t2'] = $accCash;
-        }
-        if ($i >= $size / 3) {
-            $strI = ceil($size / 3);
-            if ($i == $strI || $avg < $r['f']['p']['b'])
-                $r['f']['p']['b'] = $avg;
-            if ($i == $strI || $accCash < $r['f']['c']['b'])
-                $r['f']['c']['b'] = $accCash;
-        }
+        $data = array_values($candles);
     }
     private function unix($str)
     {

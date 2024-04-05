@@ -169,10 +169,10 @@ Route::get('test', function () {
     // dd(date('Y-m-d H:i:s', 1712028936));
     // // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
-    // $payload = (object)['symbol' => 'ACB', 'from' => 1637798400, 'to' => 1683158400, 'timeframe' => 'D', 'foreign' => true];
-    $payload = (object)['symbol' => 'VIX', 'from' => 1641254400, 'to' => 1680566400, 'timeframe' => 'D', 'name' => 'hose', 'kind' => 'f_bottom', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
+    $payload = (object)['symbol' => 'VIX', 'from' => 1649030400, 'to' => 1674777600, 'timeframe' => 'D', 'name' => 'hose', 'kind' => 'f_bottom', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
+    // $payload = (object)['symbol' => 'AAA', 'from' => 1668470400, 'to' => 1698796800, 'timeframe' => 'D', 'name' => 'hose', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
     // $s = app(\App\Services\Trading\StockService::class)->getDataForeign($payload);
-    $s = app(\App\Services\Trading\StockService::class)->getDataTradingview($payload);
+    $s = app(\App\Services\Trading\StockService::class)->getData($payload)['rsi'];
     // $s = \App\Jobs\FilterStockJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
     // $s = new \App\Jobs\FilterStockJob($payload);
