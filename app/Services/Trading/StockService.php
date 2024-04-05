@@ -139,10 +139,9 @@ class StockService extends CoreService
         $accCash = 0;
         $prevAvg = 0;
         $topAvg = 0;
-        $priceGains = 0;
-        $priceLosses = 0;
-        $cashGains = 0;
-        $cashLosses = 0;
+        $bottomAvg = 0;
+        $gains = [0, 0];
+        $losses = [0, 0];
         for ($i = 0; $i < $size; $i++) {
             $date = $rsp->t[$i];
             $r['chart']['ohlc'][] = [
@@ -158,12 +157,18 @@ class StockService extends CoreService
                 'value' => $avg
             ];
             if (!$topAvg) $topAvg = $avg;
-            if ($i < $size / 4 && $avg > $topAvg) {
-                $topAvg = $avg;
-                $priceGains = 0;
-                $priceLosses = 0;
-                $cashGains = 0;
-                $cashLosses = 0;
+            if (!$bottomAvg) $bottomAvg = $avg;
+            if ($i < $size / 4) {
+                if ($avg > $topAvg) {
+                    $topAvg = $avg;
+                    $gains[0] = 0;
+                    $losses[0] = 0;
+                }
+                if ($avg < $bottomAvg) {
+                    $bottomAvg = $avg;
+                    $gains[1] = 0;
+                    $losses[1] = 0;
+                }
             }
             if (!$prevAvg) $prevAvg = $avg;
             $change = $avg - $prevAvg;
@@ -171,12 +176,12 @@ class StockService extends CoreService
             $side = 0;
             if ($change > 0) {
                 $side = 1;
-                $priceGains += $change;
-                $cashGains += +$rsp->v[$i];
+                $gains[0] += $change;
+                $gains[1] += $change;
             } else if ($change < 0) {
                 $side = -1;
-                $priceLosses -= $change;
-                $cashLosses += +$rsp->v[$i];
+                $losses[0] -= $change;
+                $losses[1] -= $change;
             }
             $cash = $side * +$rsp->v[$i];
             $accCash += $cash;
@@ -185,10 +190,10 @@ class StockService extends CoreService
                 'value' => $accCash
             ];
         }
-        if ($priceLosses > 0)
-            $r['rsi']['price'] = 100 - (100 / (1 + ($priceGains / $priceLosses)));
-        if ($cashLosses > 0)
-            $r['rsi']['cash'] = 100 - (100 / (1 + ($cashGains / $cashLosses)));
+        for ($i = 0; $i < 2; $i++) {
+            if ($losses[$i] > 0)
+                $r['rsi']['price'][$i] = 100 - (100 / (1 + ($gains[$i] / $losses[$i])));
+        }
         return $r;
     }
     private function getDataTimeframe(&$data, $tf)
