@@ -124,7 +124,7 @@ class StockService extends CoreService
     {
         $r = [
             'chart' => ['ohlc' => [], 'price' => [], 'cash' => []],
-            'rsi' => ['price' => 100, 'cash' => 0]
+            'rsi' => ['price' => [100, 0]]
         ];
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
