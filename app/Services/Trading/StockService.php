@@ -60,7 +60,7 @@ class StockService extends CoreService
     }
     public function getDataForeign($payload)
     {
-        $r = ['chart' => ['foreign' => []], 'rsi' => ['foreign' => [0, 0]]];
+        $r = ['chart' => ['foreign' => []], 'rsi' => ['foreign' => [0, 0, 0]]];
         if (!$payload->foreign) return $r;
         $startDate = date('m/d/Y', $payload->from);
         $endDate = date("m/d/Y", $payload->to);
@@ -79,8 +79,8 @@ class StockService extends CoreService
         $size = count($data);
         if ($size == 0) return $r;
         $acc = 0;
-        $gains = [0, 0];
-        $losses = [0, 0];
+        $gains = [0, 0, 0];
+        $losses = [0, 0, 0];
         for ($i = 0; $i < $size; $i++) {
             $date = $this->unix($data[$i]->Ngay);
             if ($i > 0) {
@@ -96,11 +96,16 @@ class StockService extends CoreService
                 // 'color' => $data[$i]->KLGDRong > 0 ? 'green' : 'red'
             ];
             //
-            $j = $i < $size / 2 ? 0 : 1;
-            if ($data[$i]->KLGDRong > 0) $gains[$j] += $data[$i]->KLGDRong;
-            else $losses[$j] -= $data[$i]->KLGDRong;
+            $j = $i < $size / 2 ? 1 : 2;
+            if ($data[$i]->KLGDRong > 0) {
+                $gains[0] += $data[$i]->KLGDRong;
+                $gains[$j] += $data[$i]->KLGDRong;
+            } else {
+                $losses[0] -= $data[$i]->KLGDRong;
+                $losses[$j] -= $data[$i]->KLGDRong;
+            }
         }
-        for ($i = 0; $i < 2; $i++) {
+        for ($i = 0; $i < 3; $i++) {
             if ($losses[$i] > 0)
                 $r['rsi']['foreign'][$i] = 100 - (100 / (1 + ($gains[$i] / $losses[$i])));
         }
