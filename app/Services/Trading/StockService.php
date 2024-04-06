@@ -50,13 +50,52 @@ class StockService extends CoreService
     }
     public function getData($payload)
     {
-        if (str_contains($payload->symbol, '^')) {
-            return $this->getDataFromCp68($payload);
-        }
+        $data = str_contains($payload->symbol, '^') ?
+            $this->getDataFromCp68($payload) :
+            $this->getDataTradingview($payload);
         return array_merge_recursive(
-            $this->getDataTradingview($payload),
+            $data,
+            // $this->getDataCC($payload)
             $this->getDataForeign($payload)
         );
+    }
+    public function getDataCC($payload)
+    {
+        $r = ['chart' => ['foreign' => []]];
+        if (!$payload->foreign) return $r;
+        $startDate = date('m/d/Y', $payload->from);
+        $endDate = date("m/d/Y", $payload->to);
+        if (!$payload->symbol) return $r;
+        $client = new \GuzzleHttp\Client();
+        $url = "https://s.cafef.vn/Ajax/PageNew/DataHistory/ThongKeDL.ashx?Symbol={$payload->symbol}&StartDate={$startDate}&EndDate={$endDate}&PageIndex=1&PageSize=1000000";
+        $res = $client->get($url);
+        $rsp = json_decode($res->getBody())->Data;
+        usort($rsp->Data, function ($a, $b) {
+            $at = $this->unix($a->Date);
+            $bt = $this->unix($b->Date);
+            return strcmp($at, $bt);
+        });
+        $data = $rsp->Data;
+        $size = count($data);
+        if ($size == 0) return $r;
+        $acc = 0;
+        for ($i = 0; $i < $size; $i++) {
+            $date = $this->unix($data[$i]->Date);
+            if ($i > 0) {
+                $preDate = $this->unix($data[$i - 1]->Date);
+                if ($date == $preDate) continue;
+            }
+            $acc += $data[$i]->SoLenhMua * $data[$i]->KLDatMua - $data[$i]->SoLenhDatBan * $data[$i]->KLDatBan;
+            // $acc += $data[$i]->KLDatMua;
+            // $acc += $data[$i]->KLDatMua - $data[$i]->KLDatBan;
+            // $acc += $data[$i]->KLTB1LenhMua - $data[$i]->KLTB1LenhBan;
+            // $acc += +str_replace(',', '', $data[$i]->ChenhLechKL);
+            $r['chart']['foreign'][] = [
+                'time' => $date,
+                'value' => $acc
+            ];
+        }
+        return $r;
     }
     public function getDataForeign($payload)
     {
@@ -395,21 +434,19 @@ class StockService extends CoreService
     {
         return $this->transaction(function () {
             $client = new \GuzzleHttp\Client();
-            $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/hose";
+            $url = "https://www.hsx.vn/Modules/Listed/Web/StockIndex/188803177?rows=1&page=1";
             $res = $client->get($url);
-            $hose = json_decode($res->getBody());
-            $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/hnx";
-            $res = $client->get($url);
-            $hnx = json_decode($res->getBody());
-            $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/upcom";
-            $res = $client->get($url);
-            $upcom = json_decode($res->getBody());
+            $rows = json_decode($res->getBody())->rows;
+            $vn100 = array_map(function ($item) {
+                return ' ' . str_replace(' ', '', $item->cell[2]);
+            }, $rows);
+
             $index = ['^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
-            $nh = ['VCB', 'BID', 'CTG', 'VPB', 'MBB', 'ACB', 'STB', 'HDB', 'VIB', 'SSB', 'SHB', 'MSB', 'TPB', 'LPB', 'EIB', 'OCB'];
-            $ck = ['SSI', 'VND', 'VCI', 'SHS', 'HCM', 'VIX', 'MBS', 'FTS', 'BSI', 'CTS', 'VDS'];
+            $nh = [' VCB', ' BID', ' CTG', ' VPB', ' MBB', ' ACB', ' STB', ' HDB', ' VIB', ' SSB', ' SHB', ' MSB', ' TPB', ' LPB', ' EIB', ' OCB'];
+            $ck = [' SSI', ' VND', ' VCI', ' SHS', ' HCM', ' VIX', ' MBS', ' FTS', ' BSI', ' CTS', ' VDS'];
             $list = [
-                (object)['name' => 'hose', 'symbols' => array_merge(['VNINDEX'], $hose)],
-                (object)['name' => 'hnx', 'symbols' => array_merge($index, $hnx, $upcom)],
+                (object)['name' => 'vn100', 'symbols' => $vn100],
+                (object)['name' => 'index', 'symbols' => $index],
                 (object)['name' => 'nh', 'symbols' => $nh],
                 (object)['name' => 'ck', 'symbols' => $ck],
             ];
@@ -454,7 +491,7 @@ class StockService extends CoreService
     public function removeFilterList($payload)
     {
         $list = StockSymbol::where('name', $payload->name)->first();
-        $list->symbols = array_values(array_diff($list->symbols, [$payload->symbol]));
+        $list->symbols = array_values(array_diff($list->symbols, [' ' . $payload->symbol]));
         $list->save();
         return (object)[];
     }
@@ -467,14 +504,15 @@ class StockService extends CoreService
      */
     public function addWatchlist($payload)
     {
+        $symbol = ' ' . $payload->symbol;
         $watch = StockSymbol::where('name', 'watch')->first();
-        if (!$watch) $stt = StockSymbol::create(['name' => 'watch', 'symbols' => [$payload->symbol]]);
+        if (!$watch) StockSymbol::create(['name' => 'watch', 'symbols' => [$symbol]]);
         else {
             $symbols = $watch->symbols;
-            if ($payload->add) array_push($symbols, $payload->symbol);
-            else $symbols = array_values(array_diff($symbols, [$payload->symbol]));
+            if ($payload->add) array_push($symbols, $symbol);
+            else $symbols = array_values(array_diff($symbols, [$symbol]));
             $watch->symbols = $symbols;
-            $stt = $watch->save();
+            $watch->save();
         }
         return (object)[];
     }

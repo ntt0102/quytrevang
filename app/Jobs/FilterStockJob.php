@@ -52,7 +52,7 @@ class FilterStockJob implements ShouldQueue
         $stockService = app(StockService::class);
         $this->payload->foreign = true;
         foreach ($stock->symbols as $symbol) {
-            $this->payload->symbol = $symbol;
+            $this->payload->symbol = trim($symbol);
             $fRSI = $stockService->getDataForeign($this->payload)['rsi']['foreign'];
             if (
                 $fRSI[0] > 50 &&

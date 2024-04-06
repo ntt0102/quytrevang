@@ -83,29 +83,36 @@
         >
             <div class="chart-wrapper" ref="chartRef">
                 <div class="area data-area" @click="stopPropagationEvent">
-                    <DxSelectBox
-                        :data-source="symbols"
-                        :showDropDownButton="false"
-                        :search-enabled="true"
-                        :show-clear-button="true"
-                        :element-attr="{
-                            class: `command symbol-select ${dividendClass} ${
-                                state.dividendEnable ? 'dividend-enable' : ''
-                            }`,
-                        }"
-                        v-model="state.symbol"
-                        @valueChanged="symbolChanged"
-                    />
-                    <DxSelectBox
-                        :data-source="['D', 'W', 'M']"
-                        :showDropDownButton="false"
-                        :element-attr="{ class: 'command' }"
-                        :dropDownOptions="{
-                            wrapperAttr: { class: 'stock-min-select-dropdown' },
-                        }"
-                        v-model="state.timeframe"
-                        @valueChanged="timeframeChanged"
-                    />
+                    <div class="command symbol-input">
+                        <DxAutocomplete
+                            :data-source="symbols"
+                            :show-clear-button="true"
+                            :maxItemCount="100"
+                            :element-attr="{
+                                class: ` ${dividendClass} ${
+                                    state.dividendEnable
+                                        ? 'dividend-enable'
+                                        : ''
+                                }`,
+                            }"
+                            v-model="state.inputSymbol"
+                            @change="symbolChanged"
+                            @itemClick="symbolChanged"
+                        />
+                    </div>
+                    <div class="command timframe-select">
+                        <DxSelectBox
+                            :data-source="['D', 'W', 'M']"
+                            :showDropDownButton="false"
+                            :dropDownOptions="{
+                                wrapperAttr: {
+                                    class: 'stock-min-select-dropdown',
+                                },
+                            }"
+                            v-model="state.timeframe"
+                            @valueChanged="timeframeChanged"
+                        />
+                    </div>
                     <div
                         class="command"
                         :title="$t('trading.stock.reload')"
@@ -121,13 +128,13 @@
                         ></i>
                     </div>
                     <div
-                        v-show="state.symbolKind.includes('f_')"
+                        v-show="showRemoveFilterSymbol"
                         :class="`command far fa-times`"
                         :title="$t('trading.stock.removeFilterList')"
                         @click="removeFilterList"
                     ></div>
                     <div
-                        v-show="!!state.symbol"
+                        v-show="showWatchlist"
                         ref="addWatchlistToolRef"
                         :class="`command far fa-${
                             inWatchlist ? 'minus-circle' : 'plus-circle'
@@ -238,6 +245,7 @@
 import ColorPicker from "./ColorPicker.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
+import { DxAutocomplete } from "devextreme-vue/autocomplete";
 import { confirm, alert } from "devextreme/ui/dialog";
 import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
@@ -324,11 +332,12 @@ let params = {
 };
 const state = reactive({
     symbol: route.query.symbol ?? "VNINDEX",
+    inputSymbol: route.query.symbol ?? "VNINDEX",
     timeframe: "D",
     symbolKind: null,
     chartShift: 0,
     symbolKinds: [
-        { text: t("trading.stock.symbolList.hose"), value: "hose" },
+        { text: t("trading.stock.symbolList.vn100"), value: "vn100" },
         { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
         { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
         // { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
@@ -336,7 +345,7 @@ const state = reactive({
         { text: t("trading.stock.symbolList.hold"), value: "hold" },
         { text: t("trading.stock.symbolList.nh"), value: "nh" },
         { text: t("trading.stock.symbolList.ck"), value: "ck" },
-        { text: t("trading.stock.symbolList.hnx"), value: "hnx" },
+        { text: t("trading.stock.symbolList.index"), value: "index" },
     ],
     filterItems: [
         { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
@@ -352,7 +361,7 @@ const state = reactive({
     totalEpochs: 10,
     currentEpoch: 0,
 });
-state.symbolKind = route.query.list ?? "hose";
+state.symbolKind = route.query.list ?? "vn100";
 const tradingViewSrc = computed(
     () =>
         `https://sbboard.sbsi.vn/chart/?language=vi&theme=dark&symbol=${state.symbol}`
@@ -369,8 +378,18 @@ const chartFrom = computed(
 const chartTo = computed(
     () => route.query.to ?? moment().subtract(state.chartShift, "years").unix()
 );
+const showRemoveFilterSymbol = computed(
+    () =>
+        state.symbolKind.includes("f_") &&
+        store.state.tradingStock.symbols[state.symbolKind].includes(
+            " " + state.symbol
+        )
+);
+const showWatchlist = computed(
+    () => !!state.symbol && !!state.symbol.trim() && !state.symbol.includes("^")
+);
 const inWatchlist = computed(() =>
-    store.state.tradingStock.symbols.watch.includes(state.symbol)
+    store.state.tradingStock.symbols.watch.includes(" " + state.symbol)
 );
 const symbols = computed(
     () => store.state.tradingStock.symbols[state.symbolKind]
@@ -687,15 +706,18 @@ function removeFilterList() {
     ).then((result) => {
         if (result) {
             const symbols = store.state.tradingStock.symbols[state.symbolKind];
-            let idx = symbols.findIndex((e) => e == state.symbol);
+            let idx = symbols.findIndex((e) => e.trim() == state.symbol);
             idx = idx == symbols.length - 1 ? 0 : idx + 1;
+            const nextSymbol = symbols[idx].trim();
             const param = {
                 symbol: state.symbol,
                 name: state.symbolKind,
             };
-            store
-                .dispatch("tradingStock/removeFilterList", param)
-                .then(() => (state.symbol = symbols[idx]));
+            store.dispatch("tradingStock/removeFilterList", param).then(() => {
+                state.inputSymbol = nextSymbol;
+                state.symbol = nextSymbol;
+                reloadChart(true);
+            });
         }
     });
 }
@@ -1377,8 +1399,11 @@ function formatPrice(price) {
     if (!price) return 0;
     return +(+price.toFixed(2));
 }
-function symbolChanged(e) {
-    if (!state.symbol) return false;
+function symbolChanged() {
+    if (!state.inputSymbol || !state.inputSymbol.trim()) return false;
+    state.inputSymbol = state.inputSymbol.trim().toUpperCase();
+    if (state.symbol == state.inputSymbol) return false;
+    state.symbol = state.inputSymbol;
     reloadChart();
 }
 function dividendTrigger() {
@@ -1432,9 +1457,11 @@ function reloadChart(onlyData = false, withVnindex = false) {
 }
 function loadNextSymbol(e) {
     const symbols = store.state.tradingStock.symbols[state.symbolKind];
-    let idx = symbols.findIndex((e) => e == state.symbol);
+    let idx = symbols.findIndex((e) => e.trim() == state.symbol);
     idx = idx == symbols.length - 1 ? 0 : idx + 1;
-    state.symbol = symbols[idx];
+    state.inputSymbol = symbols[idx];
+    state.symbol = state.inputSymbol.trim();
+    reloadChart(true);
 }
 function listChanged(e) {
     state.symbolKind = e.value;
@@ -1518,28 +1545,38 @@ function filterItemClick({ itemData }) {
                     border-left: solid 2px #2a2e39 !important;
                 }
 
-                .symbol-select {
+                .symbol-input {
                     width: 97px;
 
                     .dx-texteditor-input {
                         text-align: center;
+                        text-transform: uppercase;
                         padding: 5.7px 0;
                     }
                     .dx-placeholder {
                         line-height: 3px;
                     }
-                    &.dividend {
+                    .dividend {
                         .dx-icon-clear {
                             background: red;
                         }
                     }
-                    &.dividend-enable {
+                    .dividend-enable {
                         .dx-icon-clear {
                             color: lime;
                         }
                     }
                     .dx-texteditor-buttons-container {
-                        width: 23px;
+                        width: 25px;
+                    }
+                    .dx-editor-underlined::after {
+                        border-bottom: none !important;
+                    }
+                }
+
+                .timframe-select {
+                    .dx-editor-underlined::after {
+                        border-bottom: none !important;
                     }
                 }
 
@@ -1597,9 +1634,6 @@ function filterItemClick({ itemData }) {
             z-index: 5;
         }
     }
-    .dx-slider-tooltip-position-top {
-        padding-top: 0px !important;
-    }
     .dx-textbox {
         .dx-texteditor-input {
             text-align: center;
@@ -1608,7 +1642,7 @@ function filterItemClick({ itemData }) {
 }
 .stock-min-select-dropdown {
     .dx-list-item-content {
-        padding: 5px 8px !important;
+        padding: 5px 5px !important;
         text-align: center;
     }
 }

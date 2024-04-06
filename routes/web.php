@@ -169,10 +169,10 @@ Route::get('test', function () {
     // dd(date('Y-m-d H:i:s', 1712028936));
     // // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
-    // $payload = (object)['symbol' => 'COM', 'from' => 1648080000, 'to' => 1674777600, 'timeframe' => 'D', 'name' => 'hose', 'kind' => 'f_bottom', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
-    $payload = (object)['symbol' => 'FTS', 'from' => 1666656000, 'to' => 1698796800, 'timeframe' => 'D', 'name' => 'hose', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
+    // $payload = (object)['symbol' => 'COM', 'from' => 1648080000, 'to' => 1674777600, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_bottom', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
+    // $payload = (object)['symbol' => 'FTS', 'from' => 1666656000, 'to' => 1698796800, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
     // $s = app(\App\Services\Trading\StockService::class)->getDataForeign($payload);
-    $s = app(\App\Services\Trading\StockService::class)->getData($payload)['rsi'];
+    // $s = app(\App\Services\Trading\StockService::class)->getData($payload)['rsi'];
     // $s = \App\Jobs\FilterStockJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
     // $s = new \App\Jobs\FilterStockJob($payload);
@@ -191,11 +191,14 @@ Route::get('test', function () {
     // $date = date('Y-m-d');
     // dd(get_global_value('openingMarketFlag'));
     // dd('2023-12-25' == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'));
-    // $client = new \GuzzleHttp\Client();
-    // $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-    // $res = $client->get($url);
-    // $rsp = json_decode($res->getBody());
-    // dd($rsp);
+    $client = new \GuzzleHttp\Client();
+    $url = "https://www.hsx.vn/Modules/Listed/Web/StockIndex/188803177?rows=1&page=1";
+    $res = $client->get($url);
+    $rsp = json_decode($res->getBody())->rows;
+    $s = array_map(function ($item) {
+        return ' ' . str_replace(' ', '', $item->cell[2]);
+    }, $rsp);
+    // $s = $rsp;
     // \Log::info('Hello world!!');
     // $s = \App\Models\StockOrder::getProfitChart('quarter', '2023-03-04', '2024-03-04');
     // $o = \App\Models\StockOrder::find(1);
