@@ -35,10 +35,10 @@ Route::get('migrate', function () {
 
 Route::get('test', function () {
     // $s = \App\Models\DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
-    $s = \App\Models\StockOrder::opening()->get('symbol')->pluck('symbol');
-    $s = $s->map(function ($s) {
-        return ' ' . $s;
-    })->toArray();
+    // $s = \App\Models\StockOrder::opening()->get('symbol')->pluck('symbol');
+    // $s = $s->map(function ($s) {
+    //     return ' ' . $s;
+    // })->toArray();
     // $copyist = \App\Models\User::find(1)->copyist;
     // $vos = new \App\Services\Special\VpsOrderService($copyist);
     // // dd($vos->hasOrder());
@@ -63,9 +63,10 @@ Route::get('test', function () {
     // // $filter = app(\App\Services\Trading\StockService::class)->getSymbols(false);
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
     // $payload = (object)['symbol' => 'NKG', 'from' => 1648080000, 'to' => 1674777600, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_bottom', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
-    // $payload = (object)['symbol' => 'FTS', 'from' => 1666656000, 'to' => 1698796800, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
+    // $payload = (object)['symbol' => 'AAA', 'from' => 1666656000, 'to' => 1698796800, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
+    $payload = (object)['symbol' => 'AAA', 'from' => 1698710400, 'to' => 1712275200, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
     // $s = app(\App\Services\Trading\StockService::class)->getDataForeign($payload);
-    // $s = app(\App\Services\Trading\StockService::class)->getData($payload)['rsi'];
+    $s = app(\App\Services\Trading\StockService::class)->getData($payload)['rsi'];
     // $s = \App\Jobs\FilterStockJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
     // $s = new \App\Jobs\FilterStockJob($payload);

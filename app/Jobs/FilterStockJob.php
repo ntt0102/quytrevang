@@ -56,8 +56,8 @@ class FilterStockJob implements ShouldQueue
             $fRSI = $stockService->getDataForeign($this->payload)['rsi']['foreign'];
             if (
                 $fRSI[0] > 50 &&
-                $fRSI[1] < 50 &&
-                $fRSI[2] > 60
+                $fRSI[2] > 60 &&
+                $fRSI[1] < $fRSI[2]
             ) {
                 $rsi = $stockService->getDataTradingview($this->payload)['rsi'];
                 $pRSI = $rsi['price'];
