@@ -34,9 +34,10 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
-    $s = \App\Models\DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
-    $s = $s->map(function ($t) {
-        return $t->time;
+    // $s = \App\Models\DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
+    $s = \App\Models\StockOrder::opening()->get('symbol')->pluck('symbol');
+    $s = $s->map(function ($s) {
+        return ' ' . $s;
     })->toArray();
     // $copyist = \App\Models\User::find(1)->copyist;
     // $vos = new \App\Services\Special\VpsOrderService($copyist);

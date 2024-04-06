@@ -24,7 +24,7 @@ class StockService extends CoreService
         $range = DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
         $payload->window = $range->map(function ($t) {
             return $t->time;
-        })->toArray();
+        });
         return [
             'chart' => $this->getChart($payload),
             'range' => $range,
@@ -100,9 +100,6 @@ class StockService extends CoreService
             $r['chart']['foreign'][] = [
                 'time' => $date,
                 'value' => $acc
-                // 'value' => abs($data[$i]->KLGDRong),
-                // 'value' => $data[$i]->KLMua + $data[$i]->KLBan,
-                // 'color' => $data[$i]->KLGDRong > 0 ? 'green' : 'red'
             ];
             //
             $j = $i < $size / 2 ? 1 : 2;
@@ -436,7 +433,11 @@ class StockService extends CoreService
     {
         $symbols = StockSymbol::get(array('name', 'symbols'))
             ->pluck('symbols', 'name');
-        $symbols['hold'] = StockOrder::opening()->get('symbol')->pluck('symbol');
+        $holdSymbols = StockOrder::opening()->get('symbol')->pluck('symbol');
+        $holdSymbols = $holdSymbols->map(function ($s) {
+            return ' ' . $s;
+        });
+        $symbols['hold'] = $holdSymbols;
         return $symbols;
     }
 
