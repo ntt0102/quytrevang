@@ -21,9 +21,13 @@ class StockService extends CoreService
      */
     public function initChart($payload)
     {
+        $range = DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
+        $payload->window = $range->map(function ($t) {
+            return $t->time;
+        })->toArray();
         return [
             'chart' => $this->getChart($payload),
-            'range' => DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point'),
+            'range' => $range,
             'fundSize' => (int) Parameter::getValue('fundSize', 0),
             'losePerOrder' => (float) Parameter::getValue('losePerOrder', 0)
         ];
@@ -46,6 +50,11 @@ class StockService extends CoreService
             $payload->symbol = 'VNINDEX';
             $ret['vnindex'] = $this->getDataTradingview($payload)['chart']['price'];
         }
+        if (count($payload->window) == 2) {
+            $payload->from = $payload->window[0];
+            $payload->to = $payload->window[1];
+            $ret['foreignRSI'] = round($this->getDataForeign($payload)['rsi']['foreign'][2]);
+        }
         return $ret;
     }
     public function getData($payload)
@@ -55,47 +64,8 @@ class StockService extends CoreService
             $this->getDataTradingview($payload);
         return array_merge_recursive(
             $data,
-            // $this->getDataCC($payload)
             $this->getDataForeign($payload)
         );
-    }
-    public function getDataCC($payload)
-    {
-        $r = ['chart' => ['foreign' => []]];
-        if (!$payload->foreign) return $r;
-        $startDate = date('m/d/Y', $payload->from);
-        $endDate = date("m/d/Y", $payload->to);
-        if (!$payload->symbol) return $r;
-        $client = new \GuzzleHttp\Client();
-        $url = "https://s.cafef.vn/Ajax/PageNew/DataHistory/ThongKeDL.ashx?Symbol={$payload->symbol}&StartDate={$startDate}&EndDate={$endDate}&PageIndex=1&PageSize=1000000";
-        $res = $client->get($url);
-        $rsp = json_decode($res->getBody())->Data;
-        usort($rsp->Data, function ($a, $b) {
-            $at = $this->unix($a->Date);
-            $bt = $this->unix($b->Date);
-            return strcmp($at, $bt);
-        });
-        $data = $rsp->Data;
-        $size = count($data);
-        if ($size == 0) return $r;
-        $acc = 0;
-        for ($i = 0; $i < $size; $i++) {
-            $date = $this->unix($data[$i]->Date);
-            if ($i > 0) {
-                $preDate = $this->unix($data[$i - 1]->Date);
-                if ($date == $preDate) continue;
-            }
-            $acc += $data[$i]->SoLenhMua * $data[$i]->KLDatMua - $data[$i]->SoLenhDatBan * $data[$i]->KLDatBan;
-            // $acc += $data[$i]->KLDatMua;
-            // $acc += $data[$i]->KLDatMua - $data[$i]->KLDatBan;
-            // $acc += $data[$i]->KLTB1LenhMua - $data[$i]->KLTB1LenhBan;
-            // $acc += +str_replace(',', '', $data[$i]->ChenhLechKL);
-            $r['chart']['foreign'][] = [
-                'time' => $date,
-                'value' => $acc
-            ];
-        }
-        return $r;
     }
     public function getDataForeign($payload)
     {

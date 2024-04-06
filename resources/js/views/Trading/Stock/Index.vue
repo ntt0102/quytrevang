@@ -142,6 +142,13 @@
                         :title="$t('trading.stock.addWatchlist')"
                         @click="addWatchlist"
                     ></div>
+                    <div
+                        v-show="true"
+                        class="command"
+                        :title="$t('trading.stock.foreignRSI')"
+                    >
+                        {{ $store.state.tradingStock.chart.foreignRSI }}
+                    </div>
                 </div>
                 <div class="area tool-area" @click="stopPropagationEvent">
                     <div
@@ -340,7 +347,6 @@ const state = reactive({
         { text: t("trading.stock.symbolList.vn100"), value: "vn100" },
         { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
         { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
-        // { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
         { text: t("trading.stock.symbolList.watch"), value: "watch" },
         { text: t("trading.stock.symbolList.hold"), value: "hold" },
         { text: t("trading.stock.symbolList.nh"), value: "nh" },
@@ -350,7 +356,6 @@ const state = reactive({
     filterItems: [
         { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
         { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
-        // { text: t("trading.stock.symbolList.filterBreak"), value: "f_break" },
     ],
     color: "#F44336",
     showColorPicker: false,
@@ -411,7 +416,6 @@ onMounted(() => {
     });
     params.series.events = params.chart.addHistogramSeries({
         priceScaleId: "events",
-        // scaleMargins: { top: 0.66, bottom: 0 },
         scaleMargins: { top: 0.96, bottom: 0 },
         lastValueVisible: false,
         priceLineVisible: false,
@@ -426,14 +430,14 @@ onMounted(() => {
     params.series.foreign = params.chart.addLineSeries({
         priceScaleId: "foreign",
         scaleMargins: { top: 0.66, bottom: 0.05 },
-        color: "blue",
+        color: "yellow",
         priceFormat: { type: "volume", minMove: 1 },
         lastValueVisible: false,
     });
     params.series.cash = params.chart.addLineSeries({
         priceScaleId: "cash",
         scaleMargins: { top: 0.66, bottom: 0.05 },
-        color: "yellow",
+        color: "blue",
         priceFormat: { type: "volume", minMove: 1 },
         lastValueVisible: false,
     });
@@ -454,23 +458,7 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    store
-        .dispatch("tradingStock/initChart", {
-            symbol: state.symbol,
-            from: chartFrom.value,
-            to: chartTo.value,
-            timeframe: state.timeframe,
-            vnindex: true,
-            dividend: state.dividendEnable,
-            foreign: params.foreignEnable,
-        })
-        .then((data) => {
-            params.series.vnindex.setData(data.chart.vnindex);
-            params.tools.range = data.range;
-            params.series.range.setData(data.range);
-            params.fundSize = data.fundSize;
-            params.losePerOrder = data.losePerOrder;
-        });
+    initChart();
 });
 
 watch(
@@ -1447,6 +1435,7 @@ function reloadChart(onlyData = false, withVnindex = false) {
             from: chartFrom.value,
             to: chartTo.value,
             timeframe: state.timeframe,
+            window: params.tools.range.map((i) => i.time),
             vnindex: withVnindex,
             dividend: state.dividendEnable,
             foreign: params.foreignEnable,
