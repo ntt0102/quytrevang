@@ -85,6 +85,7 @@
                 <div class="area data-area" @click="stopPropagationEvent">
                     <div class="command symbol-input">
                         <DxAutocomplete
+                            ref="symbolAutocompleteRef"
                             :data-source="symbols"
                             :show-clear-button="true"
                             :maxItemCount="100"
@@ -98,6 +99,8 @@
                             v-model="state.inputSymbol"
                             @change="symbolChanged"
                             @itemClick="symbolChanged"
+                            @focusIn="() => (state.isSymbolFocus = true)"
+                            @focusOut="() => (state.isSymbolFocus = false)"
                         />
                     </div>
                     <div class="command timframe-select">
@@ -302,6 +305,7 @@ const devices = inject("devices");
 const mf = inject("mf");
 const chartContainerRef = ref(null);
 const chartRef = ref(null);
+const symbolAutocompleteRef = ref(null);
 const fullscreenToolRef = ref(null);
 const tradingviewRef = ref(null);
 const colorToolRef = ref(null);
@@ -362,9 +366,7 @@ const state = reactive({
     isFullscreen: false,
     showTradingView: false,
     dividendEnable: false,
-    trainEnable: false,
-    totalEpochs: 10,
-    currentEpoch: 0,
+    isSymbolFocus: false,
 });
 state.symbolKind = route.query.list ?? "vn100";
 const tradingViewSrc = computed(
@@ -657,6 +659,11 @@ function eventKeyPress(e) {
             case 110:
                 addWatchlist();
                 break;
+        }
+    } else if (!state.isSymbolFocus) {
+        if (e.keyCode >= 65 && e.keyCode <= 90) {
+            state.inputSymbol = "";
+            symbolAutocompleteRef.value.instance.focus();
         }
     }
 }
@@ -1392,6 +1399,7 @@ function symbolChanged() {
     state.inputSymbol = state.inputSymbol.trim().toUpperCase();
     if (state.symbol == state.inputSymbol) return false;
     state.symbol = state.inputSymbol;
+    symbolAutocompleteRef.value.instance.blur();
     reloadChart();
 }
 function dividendTrigger() {
