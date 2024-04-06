@@ -64,6 +64,7 @@ class FilterStockJob implements ShouldQueue
                 $cRSI = $rsi['cash'];
                 if (
                     $this->payload->kind == self::F_BOTTOM &&
+                    $fRSI[1] < 50 &&
                     $pRSI[0] < 50 && $cRSI[0] > 45
                 )
                     $rBottom[] = $symbol;
