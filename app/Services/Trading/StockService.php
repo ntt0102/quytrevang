@@ -13,6 +13,9 @@ use stdClass;
 class StockService extends CoreService
 {
     const TIME_ZONE = 7 * 60 * 60;
+    const FA_AUTH = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
+    // const FA_AUTH = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
+
     /**
      * Init Chart
      *
@@ -43,29 +46,172 @@ class StockService extends CoreService
         $ret = [
             'data' => $this->getData($payload)['chart'],
             'tools' => $this->getTools($payload),
-            'dividend' => $this->hasDividend($payload),
             'events' => $this->getEvents($payload),
         ];
         if ($payload->vnindex) {
             $payload->symbol = 'VNINDEX';
-            $ret['vnindex'] = $this->getDataTradingview($payload)['chart']['price'];
+            $ret['vnindex'] = $this->getDataFireAnt($payload)['chart']['price'];
         }
         if (count($payload->window) == 2) {
             $payload->from = $payload->window[0];
             $payload->to = $payload->window[1];
-            $ret['foreignRSI'] = round($this->getDataForeign($payload)['rsi']['foreign'][2]);
+            $ret['foreignRSI'] = round($this->getDataFireAnt($payload)['rsi']['foreign'][2]);
         }
         return $ret;
     }
     public function getData($payload)
     {
-        $data = str_contains($payload->symbol, '^') ?
+        // $data = str_contains($payload->symbol, '^') ?
+        //     $this->getDataFromCp68($payload) :
+        //     $this->getDataTradingview($payload);
+        // return array_merge_recursive(
+        //     $data,
+        //     $this->getDataForeign($payload)
+        // );
+        return str_contains($payload->symbol, '^') ?
             $this->getDataFromCp68($payload) :
-            $this->getDataTradingview($payload);
-        return array_merge_recursive(
-            $data,
-            $this->getDataForeign($payload)
-        );
+            $this->getDataFireAnt($payload);
+    }
+    public function getDataFireAnt($payload)
+    {
+        $r = [
+            'chart' => ['ohlc' => [], 'price' => [], 'cash' => [], 'foreign' => []],
+            'rsi' => ['price' => [100, 0], 'cash' => [0, 0], 'foreign' => [0, 0, 0]]
+        ];
+        if (!$payload->symbol) return $r;
+        $startDate = date('Y-m-d', $payload->from);
+        $endDate = date("Y-m-d", $payload->to);
+        $client = new \GuzzleHttp\Client(['headers' => ['authorization' => self::FA_AUTH]]);
+        $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/historical-quotes?startDate={$startDate}&endDate={$endDate}&offset=0&limit=1000000";
+        $res = $client->get($url);
+        $data = json_decode($res->getBody());
+        if ($payload->timeframe != 'D')  $this->getDataFireAntTimeframe($data, $payload->timeframe);
+        $size = count($data);
+        if ($size == 0) return $r;
+        $prevAvg = 0;
+        $topAvg = 0;
+        $bottomAvg = 0;
+        $priceGains = [0, 0];
+        $priceLosses = [0, 0];
+        $cashAcc = 0;
+        $cashGains = [0, 0];
+        $cashLosses = [0, 0];
+        $frgnAcc = 0;
+        $frgnGains = [0, 0, 0];
+        $frgnLosses = [0, 0, 0];
+        for ($i = $size - 1; $i >= 0; $i--) {
+            $date = $this->unix($data[$i]->date);
+            // if ($i < $size - 1) {
+            //     $preDate = $this->unix($data[$i - 1]->date);
+            //     if ($date == $preDate) continue;
+            // }
+            $r['chart']['ohlc'][] = [
+                'time' => $date,
+                'open' => $data[$i]->priceOpen,
+                'high' => $data[$i]->priceHigh,
+                'low' => $data[$i]->priceLow,
+                'close' => $data[$i]->priceClose
+            ];
+            $avg = ($data[$i]->priceHigh + $data[$i]->priceLow + $data[$i]->priceClose) / 3;
+            $r['chart']['price'][] = [
+                'time' => $date,
+                'value' => $avg
+            ];
+            if (!$topAvg) $topAvg = $avg;
+            if (!$bottomAvg) $bottomAvg = $avg;
+            if ($i > 3 * $size / 4) {
+                if ($avg > $topAvg) {
+                    $topAvg = $avg;
+                    $priceGains[0] = 0;
+                    $priceLosses[0] = 0;
+                    $cashGains[0] = 0;
+                    $cashLosses[0] = 0;
+                }
+                if ($avg < $bottomAvg) {
+                    $bottomAvg = $avg;
+                    $priceGains[1] = 0;
+                    $priceLosses[1] = 0;
+                    $cashGains[1] = 0;
+                    $cashLosses[1] = 0;
+                }
+            }
+            if (!$prevAvg) $prevAvg = $avg;
+            $change = $avg - $prevAvg;
+            $prevAvg = $avg;
+            $side = 0;
+            if ($change > 0) {
+                $side = 1;
+                $priceGains[0] += $change;
+                $priceGains[1] += $change;
+                $cashGains[0] += $data[$i]->totalVolume;
+                $cashGains[1] += $data[$i]->totalVolume;
+            } else if ($change < 0) {
+                $side = -1;
+                $priceLosses[0] -= $change;
+                $priceLosses[1] -= $change;
+                $cashLosses[0] += $data[$i]->totalVolume;
+                $cashLosses[1] += $data[$i]->totalVolume;
+            }
+            $cash = $side * $data[$i]->totalVolume;
+            $cashAcc += $cash;
+            $r['chart']['cash'][] = [
+                'time' => $date,
+                'value' => $cashAcc
+            ];
+            //
+            $frgnQuantity = $data[$i]->buyForeignQuantity - $data[$i]->sellForeignQuantity;
+            $frgnAcc += $frgnQuantity;
+            $r['chart']['foreign'][] = [
+                'time' => $date,
+                'value' => $frgnAcc
+            ];
+            $j = $i > $size / 2 ? 1 : 2;
+            if ($frgnQuantity > 0) {
+                $frgnGains[0] += $frgnQuantity;
+                $frgnGains[$j] += $frgnQuantity;
+            } else {
+                $frgnLosses[0] -= $frgnQuantity;
+                $frgnLosses[$j] -= $frgnQuantity;
+            }
+        }
+        for ($i = 0; $i < 3; $i++) {
+            if ($i < 2) {
+                if ($priceLosses[$i] > 0)
+                    $r['rsi']['price'][$i] = 100 - (100 / (1 + ($priceGains[$i] / $priceLosses[$i])));
+                if ($cashLosses[$i] > 0)
+                    $r['rsi']['cash'][$i] = 100 - (100 / (1 + ($cashGains[$i] / $cashLosses[$i])));
+            }
+            if ($frgnLosses[$i] > 0)
+                $r['rsi']['foreign'][$i] = 100 - (100 / (1 + ($frgnGains[$i] / $frgnLosses[$i])));
+        }
+        return $r;
+    }
+    private function getDataFireAntTimeframe(&$data, $tf)
+    {
+        $bars = [];
+        foreach ($data as $bar) {
+            $key = date('Y-' . $tf, $this->unix($bar->date));
+            if (!array_key_exists($key, $bars)) {
+                $bars[$key] = new stdClass();
+                $bars[$key]->date = $bar->date;
+                $bars[$key]->priceOpen = $bar->priceOpen;
+                $bars[$key]->priceHigh = $bar->priceHigh;
+                $bars[$key]->priceLow = $bar->priceLow;
+                $bars[$key]->totalVolume = 0;
+                $bars[$key]->buyForeignQuantity = 0;
+                $bars[$key]->sellForeignQuantity = 0;
+            } else {
+                if ($bar->priceHigh > $bars[$key]->priceHigh)
+                    $bars[$key]->priceHigh = $bar->priceHigh;
+                if ($bar->priceLow < $bars[$key]->priceLow)
+                    $bars[$key]->priceLow = $bar->priceLow;
+            }
+            $bars[$key]->priceClose = $bar->priceClose;
+            $bars[$key]->totalVolume += $bar->totalVolume;
+            $bars[$key]->buyForeignQuantity += $bar->buyForeignQuantity;
+            $bars[$key]->sellForeignQuantity += $bar->sellForeignQuantity;
+        }
+        $data = array_values($bars);
     }
     public function getDataForeign($payload)
     {
@@ -253,7 +399,7 @@ class StockService extends CoreService
     }
     public function getDataFromCp68($payload)
     {
-        $r = ['chart' => ['ohlc' => [], 'price' => [], 'cash' => []]];
+        $r = ['chart' => ['ohlc' => [], 'price' => [], 'cash' => [], 'foreign' => []]];
         if (!$payload->symbol) return $r;
         $client = new \GuzzleHttp\Client();
         $url = "https://www.cophieu68.vn/chart/chart_data.php?parameters=%7B%7D&dateby=1&stockname={$payload->symbol}";
@@ -348,23 +494,7 @@ class StockService extends CoreService
         }
         return $result;
     }
-    /**
-     * Get events
-     *
-     * @param $payload
-     * 
-     */
-    public function hasDividend($payload)
-    {
-        if (!$payload->dividend) return false;
-        $startDate = date("Y-m-d");
-        $endDate = date('Y-m-d', $this->unix('+1 year'));
-        $client = new \GuzzleHttp\Client();
-        $url = "https://finfo-api.vndirect.com.vn/v4/events?q=locale:VN~type:stockdiv,dividend~code:{$payload->symbol}~effectiveDate:gte:{$startDate}~effectiveDate:lte:{$endDate}&sort=effectiveDate:asc&size=50&page=1";
-        $res = $client->get($url);
-        $rsp = json_decode($res->getBody());
-        return $rsp->totalElements > 0;
-    }
+
     /**
      * Get news
      *
@@ -376,19 +506,29 @@ class StockService extends CoreService
         $ret = [];
         $startDate = date('Y-m-d', $payload->from);
         $endDate = date("Y-m-d", $payload->to);
-        // $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
-        // $client = new \GuzzleHttp\Client(['headers' => ['authorization' => "Bearer {$token}"]]);
-        // $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/timescale-marks?startDate={$startDate}&endDate={$endDate}";
-        $client = new \GuzzleHttp\Client();
-        $url = "https://svr5.fireant.vn/api/Data/Companies/TimescaleMarks?symbol={$payload->symbol}&startDate={$startDate}&endDate={$endDate}";
+        $client = new \GuzzleHttp\Client(['headers' => ['authorization' => self::FA_AUTH]]);
+        $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/timescale-marks?startDate={$startDate}&endDate={$endDate}";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         foreach ($rsp as $news) {
             $ret[] = [
-                'time' => $this->unix($news->Date),
+                'time' => $this->unix($news->date),
                 'value' => 1,
-                'color' => $news->Color,
-                'title' => $news->Title
+                'color' => $news->color,
+                'title' => $news->title
+            ];
+        }
+        $startDate = date("Y-m-d", $this->unix('+1 day'));
+        $endDate = date('Y-m-d', $this->unix('+1 year'));
+        $url = "https://restv2.fireant.vn/events/search?symbol={$payload->symbol}&orderBy=1&type=0&startDate={$startDate}&endDate={$endDate}&offset=0&limit=20";
+        $res = $client->get($url);
+        $rsp = json_decode($res->getBody());
+        foreach ($rsp as $news) {
+            $ret[] = [
+                'time' => $this->unix($news->recordDate),
+                'value' => 1,
+                'color' => $news->type == 1 ? '#A0248B' : ($news->type == 2 ? '#FF8040' : '#1D14D6'),
+                'title' => $news->title
             ];
         }
         return $ret;

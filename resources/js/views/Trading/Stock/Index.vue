@@ -89,13 +89,6 @@
                             :data-source="symbols"
                             :show-clear-button="true"
                             :maxItemCount="100"
-                            :element-attr="{
-                                class: ` ${dividendClass} ${
-                                    state.dividendEnable
-                                        ? 'dividend-enable'
-                                        : ''
-                                }`,
-                            }"
                             v-model="state.inputSymbol"
                             @change="symbolChanged"
                             @itemClick="symbolChanged"
@@ -161,14 +154,12 @@
                         }`"
                         :title="$t('trading.stock.fullscreen')"
                         @click="toggleFullscreen"
-                        @contextmenu="dividendTrigger"
                     ></div>
                     <div
                         ref="tradingviewRef"
                         class="command far fa-chart-bar"
                         :title="$t('trading.stock.tradingview')"
                         @click="tradingviewClick"
-                        @contextmenu="foreignTrigger"
                     ></div>
                     <div
                         ref="colorToolRef"
@@ -339,7 +330,6 @@ let params = {
     isCashDraw: false,
     isOnlyLoadData: false,
     showNewsInfo: false,
-    foreignEnable: true,
 };
 const state = reactive({
     symbol: route.query.symbol ?? "VNINDEX",
@@ -365,7 +355,6 @@ const state = reactive({
     showColorPicker: false,
     isFullscreen: false,
     showTradingView: false,
-    dividendEnable: false,
     isSymbolFocus: false,
 });
 state.symbolKind = route.query.list ?? "vn100";
@@ -400,9 +389,6 @@ const inWatchlist = computed(() =>
 );
 const symbols = computed(
     () => store.state.tradingStock.symbols[state.symbolKind]
-);
-const dividendClass = computed(() =>
-    store.state.tradingStock.chart.dividend ? " dividend" : ""
 );
 store.dispatch("tradingStock/getSymbols");
 
@@ -1402,14 +1388,6 @@ function symbolChanged() {
     symbolAutocompleteRef.value.instance.blur();
     reloadChart();
 }
-function dividendTrigger() {
-    state.dividendEnable = !state.dividendEnable;
-    initChart();
-}
-function foreignTrigger() {
-    params.foreignEnable = !params.foreignEnable;
-    reloadChart(true);
-}
 function timeframeChanged() {
     reloadChart(true, true);
 }
@@ -1424,8 +1402,6 @@ function initChart() {
             to: chartTo.value,
             timeframe: state.timeframe,
             vnindex: true,
-            dividend: state.dividendEnable,
-            foreign: params.foreignEnable,
         })
         .then((data) => {
             params.series.vnindex.setData(data.chart.vnindex);
@@ -1445,8 +1421,6 @@ function reloadChart(onlyData = false, withVnindex = false) {
             timeframe: state.timeframe,
             window: params.tools.range.map((i) => i.time),
             vnindex: withVnindex,
-            dividend: state.dividendEnable,
-            foreign: params.foreignEnable,
         })
         .then((vnindex) => {
             if (withVnindex) params.series.vnindex.setData(vnindex);
@@ -1552,16 +1526,6 @@ function filterItemClick({ itemData }) {
                     }
                     .dx-placeholder {
                         line-height: 3px;
-                    }
-                    .dividend {
-                        .dx-icon-clear {
-                            background: red;
-                        }
-                    }
-                    .dividend-enable {
-                        .dx-icon-clear {
-                            color: lime;
-                        }
                     }
                     .dx-texteditor-buttons-container {
                         width: 25px;
