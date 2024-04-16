@@ -69,7 +69,7 @@ class FilterStockJob implements ShouldQueue
                     $rBottom[] = $symbol;
                 if (
                     $this->payload->kind == self::F_TOP &&
-                    $pRSI[1] > 50 && $cRSI[0] > 55
+                    $pRSI[1] > 50 && $cRSI[1] > 55
                 )
                     $rTop[] = $symbol;
             }
