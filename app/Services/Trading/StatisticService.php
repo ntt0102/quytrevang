@@ -96,7 +96,7 @@ class StatisticService extends CoreService
             $totalCost += $temp->totalCost;
         }
         $ret['totalProfit'] = $totalProfit;
-        $ret['totalPercent'] = $totalProfit / -$totalCost * 100;
+        $ret['totalPercent'] = !$totalCost ? 0 : $totalProfit / -$totalCost * 100;
         return $ret;
     }
 
