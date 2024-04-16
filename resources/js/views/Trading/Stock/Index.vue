@@ -370,10 +370,10 @@ const state = reactive({
 });
 state.symbolKind = route.query.list ?? "vn100";
 const tradingViewSrc = computed(
-    () =>
-        `https://sbboard.sbsi.vn/chart/?language=vi&theme=dark&symbol=${state.symbol}`
+    // () =>
+    //     `https://sbboard.sbsi.vn/chart/?language=vi&theme=dark&symbol=${state.symbol}`
     // () => `https://banggia.dag.vn/stock-chart?symbol=${state.symbol}`
-    // () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
+    () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
 const chartFrom = computed(
     () =>
