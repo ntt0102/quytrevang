@@ -101,18 +101,18 @@ class StockService extends CoreService
         $frgnLosses = [0, 0, 0];
         for ($i = $size - 1; $i >= 0; $i--) {
             $date = $this->unix($data[$i]->date);
-            // if ($i < $size - 1) {
-            //     $preDate = $this->unix($data[$i - 1]->date);
-            //     if ($date == $preDate) continue;
-            // }
+            $priceOpen = $data[$i]->priceOpen / $data[$i]->adjRatio;
+            $priceHigh = $data[$i]->priceHigh / $data[$i]->adjRatio;
+            $priceLow = $data[$i]->priceLow / $data[$i]->adjRatio;
+            $priceClose = $data[$i]->priceClose / $data[$i]->adjRatio;
             $r['chart']['ohlc'][] = [
                 'time' => $date,
-                'open' => $data[$i]->priceOpen,
-                'high' => $data[$i]->priceHigh,
-                'low' => $data[$i]->priceLow,
-                'close' => $data[$i]->priceClose
+                'open' => $priceOpen,
+                'high' => $priceHigh,
+                'low' => $priceLow,
+                'close' => $priceClose
             ];
-            $avg = ($data[$i]->priceHigh + $data[$i]->priceLow + $data[$i]->priceClose) / 3;
+            $avg = ($priceHigh + $priceLow + $priceClose) / 3;
             $r['chart']['price'][] = [
                 'time' => $date,
                 'value' => $avg
@@ -191,22 +191,27 @@ class StockService extends CoreService
         $bars = [];
         foreach ($data as $bar) {
             $key = date('Y-' . $tf, $this->unix($bar->date));
+            $priceOpen = $bar->priceOpen / $bar->adjRatio;
+            $priceHigh = $bar->priceHigh / $bar->adjRatio;
+            $priceLow = $bar->priceLow / $bar->adjRatio;
+            $priceClose = $bar->priceClose / $bar->adjRatio;
             if (!array_key_exists($key, $bars)) {
                 $bars[$key] = new stdClass();
                 $bars[$key]->date = $bar->date;
-                $bars[$key]->priceOpen = $bar->priceOpen;
-                $bars[$key]->priceHigh = $bar->priceHigh;
-                $bars[$key]->priceLow = $bar->priceLow;
+                $bars[$key]->adjRatio = 1;
+                $bars[$key]->priceHigh = $priceHigh;
+                $bars[$key]->priceLow = $priceLow;
+                $bars[$key]->priceClose = $priceClose;
                 $bars[$key]->totalVolume = 0;
                 $bars[$key]->buyForeignQuantity = 0;
                 $bars[$key]->sellForeignQuantity = 0;
             } else {
-                if ($bar->priceHigh > $bars[$key]->priceHigh)
-                    $bars[$key]->priceHigh = $bar->priceHigh;
-                if ($bar->priceLow < $bars[$key]->priceLow)
-                    $bars[$key]->priceLow = $bar->priceLow;
+                if ($priceHigh > $bars[$key]->priceHigh)
+                    $bars[$key]->priceHigh = $priceHigh;
+                if ($priceLow < $bars[$key]->priceLow)
+                    $bars[$key]->priceLow = $priceLow;
             }
-            $bars[$key]->priceClose = $bar->priceClose;
+            $bars[$key]->priceOpen = $priceOpen;
             $bars[$key]->totalVolume += $bar->totalVolume;
             $bars[$key]->buyForeignQuantity += $bar->buyForeignQuantity;
             $bars[$key]->sellForeignQuantity += $bar->sellForeignQuantity;
@@ -510,22 +515,27 @@ class StockService extends CoreService
         $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/timescale-marks?startDate={$startDate}&endDate={$endDate}";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
+        $lastestDate = time();
         foreach ($rsp as $news) {
+            $eventDate = $this->unix($news->date);
             $ret[] = [
-                'time' => $this->unix($news->date),
+                'time' => $eventDate,
                 'value' => 1,
                 'color' => $news->color,
                 'title' => $news->title
             ];
+            $lastestDate = $eventDate;
         }
-        $startDate = date("Y-m-d", $this->unix('+1 day'));
+        $startDate = date("Y-m-d");
         $endDate = date('Y-m-d', $this->unix('+1 year'));
         $url = "https://restv2.fireant.vn/events/search?symbol={$payload->symbol}&orderBy=1&type=0&startDate={$startDate}&endDate={$endDate}&offset=0&limit=20";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
         foreach ($rsp as $news) {
+            $eventDate = $this->unix($news->recordDate);
+            if ($eventDate == $lastestDate) continue;
             $ret[] = [
-                'time' => $this->unix($news->recordDate),
+                'time' => $eventDate,
                 'value' => 1,
                 'color' => $news->type == 1 ? '#A0248B' : ($news->type == 2 ? '#FF8040' : '#1D14D6'),
                 'title' => $news->title
