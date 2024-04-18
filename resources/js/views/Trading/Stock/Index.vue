@@ -404,7 +404,13 @@ onMounted(() => {
     });
     params.series.events = params.chart.addHistogramSeries({
         priceScaleId: "events",
-        scaleMargins: { top: 0.96, bottom: 0 },
+        scaleMargins: { top: 0.98, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    params.series.signal = params.chart.addHistogramSeries({
+        priceScaleId: "signal",
+        scaleMargins: { top: 0.66, bottom: 0.33 },
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -417,14 +423,14 @@ onMounted(() => {
     });
     params.series.foreign = params.chart.addLineSeries({
         priceScaleId: "foreign",
-        scaleMargins: { top: 0.66, bottom: 0.05 },
+        scaleMargins: { top: 0.68, bottom: 0.03 },
         color: "yellow",
         priceFormat: { type: "volume", minMove: 1 },
         lastValueVisible: false,
     });
     params.series.cash = params.chart.addLineSeries({
         priceScaleId: "cash",
-        scaleMargins: { top: 0.66, bottom: 0.05 },
+        scaleMargins: { top: 0.68, bottom: 0.03 },
         color: "blue",
         priceFormat: { type: "volume", minMove: 1 },
         lastValueVisible: false,
@@ -780,7 +786,7 @@ function loadChartData() {
     params.series.price.setData(params.data.price);
     params.series.cash.setData(params.data.cash);
     params.series.foreign.setData(params.data.foreign);
-    // params.series.events.setData(params.data.foreign);
+    params.series.signal.setData(params.data.signal);
     params.chart.applyOptions({ watermark: { text: state.symbol } });
 }
 function tradingviewClick(e) {

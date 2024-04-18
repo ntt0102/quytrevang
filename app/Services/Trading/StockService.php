@@ -173,6 +173,16 @@ class StockService extends CoreService
                 $frgnLosses[0] -= $frgnQuantity;
                 $frgnLosses[$j] -= $frgnQuantity;
             }
+            //
+            $buySignal = $data[$i]->buyQuantity > $data[$i]->sellQuantity && $data[$i]->buyCount < $data[$i]->sellCount;
+            $sellSignal = 1.5 * $data[$i]->buyQuantity < $data[$i]->sellQuantity && $data[$i]->buyCount > $data[$i]->sellCount;
+            if ($buySignal || $sellSignal) {
+                $r['chart']['signal'][] = [
+                    'time' => $date,
+                    'value' => 1,
+                    'color' => $buySignal ? 'green' : 'red'
+                ];
+            }
         }
         for ($i = 0; $i < 3; $i++) {
             if ($i < 2) {
