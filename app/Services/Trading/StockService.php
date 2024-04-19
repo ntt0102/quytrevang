@@ -180,7 +180,7 @@ class StockService extends CoreService
                 $r['chart']['signal'][] = [
                     'time' => $date,
                     'value' => 1,
-                    'color' => $buySignal ? 'green' : 'red'
+                    'color' => $buySignal ? 'lime' : 'red'
                 ];
             }
         }
