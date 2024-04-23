@@ -215,6 +215,10 @@ class StockService extends CoreService
                 $bars[$key]->totalVolume = 0;
                 $bars[$key]->buyForeignQuantity = 0;
                 $bars[$key]->sellForeignQuantity = 0;
+                $bars[$key]->buyCount = 0;
+                $bars[$key]->sellCount = 0;
+                $bars[$key]->buyQuantity = 0;
+                $bars[$key]->sellQuantity = 0;
             } else {
                 if ($priceHigh > $bars[$key]->priceHigh)
                     $bars[$key]->priceHigh = $priceHigh;
@@ -225,6 +229,10 @@ class StockService extends CoreService
             $bars[$key]->totalVolume += $bar->totalVolume;
             $bars[$key]->buyForeignQuantity += $bar->buyForeignQuantity;
             $bars[$key]->sellForeignQuantity += $bar->sellForeignQuantity;
+            $bars[$key]->buyCount += $bar->buyCount;
+            $bars[$key]->sellCount += $bar->sellCount;
+            $bars[$key]->buyQuantity += $bar->buyQuantity;
+            $bars[$key]->sellQuantity += $bar->sellQuantity;
         }
         $data = array_values($bars);
     }

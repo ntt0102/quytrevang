@@ -368,7 +368,15 @@ const chartFrom = computed(
     () =>
         route.query.from ??
         moment()
-            .subtract(state.chartShift + 3, "years")
+            .subtract(
+                state.chartShift +
+                    (state.timeframe == "M"
+                        ? 7
+                        : state.timeframe == "W"
+                        ? 5
+                        : 3),
+                "years"
+            )
             .unix()
 );
 const chartTo = computed(
