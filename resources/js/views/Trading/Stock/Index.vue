@@ -449,11 +449,11 @@ onMounted(() => {
         borderVisible: false,
         wickUpColor: "#42946C",
         wickDownColor: "#BC3E4A",
-        priceFormat: { minMove: 0.01 },
+        priceFormat: { minMove: 0.05 },
     });
     params.series.price = params.chart.addLineSeries({
         color: "#CCCCCC",
-        priceFormat: { minMove: 0.01 },
+        priceFormat: { minMove: 0.05 },
         lastValueVisible: false,
         priceLineVisible: false,
     });
