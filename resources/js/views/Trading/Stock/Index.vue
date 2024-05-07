@@ -1440,13 +1440,13 @@ function reloadChart(onlyData = false, withVnindex = false) {
             if (withVnindex) params.series.vnindex.setData(vnindex);
         });
 }
-function loadNextSymbol(e) {
+function loadNextSymbol() {
     const symbols = store.state.tradingStock.symbols[state.symbolKind];
     let idx = symbols.findIndex((e) => e.trim() == state.symbol);
     idx = idx == symbols.length - 1 ? 0 : idx + 1;
     state.inputSymbol = symbols[idx];
     state.symbol = state.inputSymbol.trim();
-    reloadChart(true);
+    reloadChart();
 }
 function listChanged(e) {
     state.symbolKind = e.value;
