@@ -569,16 +569,10 @@ class StockService extends CoreService
     {
         return $this->transaction(function () {
             $client = new \GuzzleHttp\Client();
-            $url = "https://www.hsx.vn/Modules/Listed/Web/StockIndex/188803177?rows=1&page=1";
+            $url = "https://priceapi.bsc.com.vn/datafeed/instruments/100";
             $res = $client->get($url);
-            $rows = json_decode($res->getBody())->rows;
-            $vn100 = array_map(function ($item) {
-                return ' ' . str_replace(' ', '', $item->cell[2]);
-            }, $rows);
-            // $url = "https://priceapi.bsc.com.vn/datafeed/instruments/100";
-            // $res = $client->get($url);
-            // $rsp = json_decode($res->getBody());
-            // $vn100 = $rsp->s == 'ok' ? $rsp->d : [];
+            $rsp = json_decode($res->getBody());
+            $vn100 = $rsp->s == 'ok' ? $rsp->d : [];
 
             $index = ['^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
             $nh = [' VCB', ' BID', ' CTG', ' VPB', ' MBB', ' ACB', ' STB', ' HDB', ' VIB', ' SSB', ' SHB', ' MSB', ' TPB', ' LPB', ' EIB', ' OCB'];
