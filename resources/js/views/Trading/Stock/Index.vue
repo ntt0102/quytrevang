@@ -600,11 +600,8 @@ function eventPriceLineDrag(e) {
                 const rr = Math.abs(rTp) / Math.abs(rSl);
                 const sl = (rSl / epPrice) * 100;
                 const tp = (rTp / epPrice) * 100;
-                const volume = (
-                    (params.fundSize * params.losePerOrder) /
-                    Math.abs(sl) /
-                    (epPrice * 1000)
-                ).toFixed(0);
+                let volume = params.fundSize / (epPrice * 1000);
+                volume = Math.floor(volume / 100) * 100;
                 //
                 point = "EP";
                 params.tools.rr[point].applyOptions({

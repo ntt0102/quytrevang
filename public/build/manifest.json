@@ -19,88 +19,88 @@
     "file": "assets/TradeSummary-b5db1f75.css",
     "src": "TradeSummary.css"
   },
-  "_ContractDetailPopup-c0b309ef.js": {
+  "_ContractDetailPopup-86ffc4a2.js": {
     "css": [
       "assets/ContractDetailPopup-2d100705.css"
     ],
-    "file": "assets/ContractDetailPopup-c0b309ef.js",
+    "file": "assets/ContractDetailPopup-86ffc4a2.js",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_FileManager-8eadf9a0.js": {
+  "_FileManager-ea31c7e0.js": {
     "css": [
       "assets/FileManager-081d583b.css"
     ],
-    "file": "assets/FileManager-8eadf9a0.js",
+    "file": "assets/FileManager-ea31c7e0.js",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_Index-e23cf377.js": {
+  "_Index-4d80b1c2.js": {
     "css": [
       "assets/Index-efa0915d.css"
     ],
-    "file": "assets/Index-e23cf377.js",
+    "file": "assets/Index-4d80b1c2.js",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_ListTagBox-093c32cf.js": {
-    "file": "assets/ListTagBox-093c32cf.js",
+  "_ListTagBox-1d75185d.js": {
+    "file": "assets/ListTagBox-1d75185d.js",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_PickImagePopup-f103534d.js": {
-    "file": "assets/PickImagePopup-f103534d.js",
+  "_PickImagePopup-aa35df5e.js": {
+    "file": "assets/PickImagePopup-aa35df5e.js",
     "imports": [
-      "_FileManager-8eadf9a0.js",
+      "_FileManager-ea31c7e0.js",
       "resources/js/app.js"
     ]
   },
-  "_UserDetailPopup-ebe914b0.js": {
-    "file": "assets/UserDetailPopup-ebe914b0.js",
-    "imports": [
-      "resources/js/app.js"
-    ]
-  },
-  "_accordion-ea7f64a6.js": {
-    "file": "assets/accordion-ea7f64a6.js",
+  "_UserDetailPopup-a8343f7a.js": {
+    "file": "assets/UserDetailPopup-a8343f7a.js",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_chart-a5057395.js": {
-    "file": "assets/chart-a5057395.js",
+  "_accordion-34d4bb6a.js": {
+    "file": "assets/accordion-34d4bb6a.js",
+    "imports": [
+      "resources/js/app.js"
+    ]
+  },
+  "_chart-0ebe36f5.js": {
+    "file": "assets/chart-0ebe36f5.js",
     "imports": [
       "resources/js/app.js",
-      "_m_base_chart-730dc683.js"
+      "_m_base_chart-a882bcc9.js"
     ]
   },
   "_lightweight-charts.esm.development-03366bac.js": {
     "file": "assets/lightweight-charts.esm.development-03366bac.js"
   },
-  "_load-indicator-41e757fa.js": {
-    "file": "assets/load-indicator-41e757fa.js",
+  "_load-indicator-72d2592d.js": {
+    "file": "assets/load-indicator-72d2592d.js",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_m_base_chart-730dc683.js": {
-    "file": "assets/m_base_chart-730dc683.js",
+  "_m_base_chart-a882bcc9.js": {
+    "file": "assets/m_base_chart-a882bcc9.js",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_radio-group-f0ab7eed.js": {
-    "file": "assets/radio-group-f0ab7eed.js",
+  "_radio-group-de7e907a.js": {
+    "file": "assets/radio-group-de7e907a.js",
     "imports": [
       "resources/js/app.js"
     ]
   },
-  "_select-box-92c4eb18.js": {
-    "file": "assets/select-box-92c4eb18.js",
+  "_select-box-d0e71168.js": {
+    "file": "assets/select-box-d0e71168.js",
     "imports": [
       "resources/js/app.js"
     ]
@@ -290,7 +290,7 @@
       "resources/js/views/NotFound.vue",
       "resources/js/lang/chatbot/vi.js"
     ],
-    "file": "assets/app-27a6e9e6.js",
+    "file": "assets/app-a38d91d1.js",
     "isEntry": true,
     "src": "resources/js/app.js"
   },
@@ -307,7 +307,7 @@
     "css": [
       "assets/Comment-aa9f82dd.css"
     ],
-    "file": "assets/Comment-17359b8a.js",
+    "file": "assets/Comment-0738181a.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -322,15 +322,15 @@
     "css": [
       "assets/Index-7a8f833d.css"
     ],
-    "file": "assets/Index-636f46e5.js",
+    "file": "assets/Index-326a03de.js",
     "imports": [
       "resources/js/app.js",
       "resources/js/views/Admin/Contract/PaidContractPopup.vue",
       "resources/js/views/Admin/Contract/WithdrawnContractPopup.vue",
-      "_ContractDetailPopup-c0b309ef.js",
-      "_accordion-ea7f64a6.js",
-      "_Index-e23cf377.js",
-      "_load-indicator-41e757fa.js"
+      "_ContractDetailPopup-86ffc4a2.js",
+      "_accordion-34d4bb6a.js",
+      "_Index-4d80b1c2.js",
+      "_load-indicator-72d2592d.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Admin/Contract/Index.vue"
@@ -343,11 +343,11 @@
     "css": [
       "assets/PaidContractPopup-6fb6e18d.css"
     ],
-    "file": "assets/PaidContractPopup-f58dc8be.js",
+    "file": "assets/PaidContractPopup-e3779ca4.js",
     "imports": [
       "resources/js/app.js",
-      "_accordion-ea7f64a6.js",
-      "_Index-e23cf377.js"
+      "_accordion-34d4bb6a.js",
+      "_Index-4d80b1c2.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Admin/Contract/PaidContractPopup.vue"
@@ -360,18 +360,18 @@
     "css": [
       "assets/WithdrawnContractPopup-23c1269b.css"
     ],
-    "file": "assets/WithdrawnContractPopup-21d0febe.js",
+    "file": "assets/WithdrawnContractPopup-f280cf9b.js",
     "imports": [
       "resources/js/app.js",
-      "_accordion-ea7f64a6.js",
-      "_load-indicator-41e757fa.js",
-      "_Index-e23cf377.js"
+      "_accordion-34d4bb6a.js",
+      "_load-indicator-72d2592d.js",
+      "_Index-4d80b1c2.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Admin/Contract/WithdrawnContractPopup.vue"
   },
   "resources/js/views/Admin/Copyist/Index.vue": {
-    "file": "assets/Index-283f4f9a.js",
+    "file": "assets/Index-ac226254.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -386,17 +386,17 @@
     "css": [
       "assets/ConfirmUserPopup-486b90f5.css"
     ],
-    "file": "assets/ConfirmUserPopup-708423bb.js",
+    "file": "assets/ConfirmUserPopup-099313cd.js",
     "imports": [
       "resources/js/app.js",
-      "_accordion-ea7f64a6.js",
-      "_Index-e23cf377.js"
+      "_accordion-34d4bb6a.js",
+      "_Index-4d80b1c2.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Admin/User/ConfirmUserPopup.vue"
   },
   "resources/js/views/Admin/User/DeletedUsersPopup.vue": {
-    "file": "assets/DeletedUsersPopup-1249c4e0.js",
+    "file": "assets/DeletedUsersPopup-68644d3e.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -411,21 +411,21 @@
     "css": [
       "assets/Index-853e5cdb.css"
     ],
-    "file": "assets/Index-b6d51b70.js",
+    "file": "assets/Index-255c898a.js",
     "imports": [
       "resources/js/app.js",
-      "_ListTagBox-093c32cf.js",
+      "_ListTagBox-1d75185d.js",
       "resources/js/views/Admin/User/DeletedUsersPopup.vue",
       "resources/js/views/Admin/User/ConfirmUserPopup.vue",
-      "_UserDetailPopup-ebe914b0.js",
-      "_accordion-ea7f64a6.js",
-      "_Index-e23cf377.js"
+      "_UserDetailPopup-a8343f7a.js",
+      "_accordion-34d4bb6a.js",
+      "_Index-4d80b1c2.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Admin/User/Index.vue"
   },
   "resources/js/views/Auth/ChangePassword.vue": {
-    "file": "assets/ChangePassword-a35042b3.js",
+    "file": "assets/ChangePassword-cacc2c0e.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -440,7 +440,7 @@
     "css": [
       "assets/Login-fa10138e.css"
     ],
-    "file": "assets/Login-c5060822.js",
+    "file": "assets/Login-14bbee00.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -455,7 +455,7 @@
     "css": [
       "assets/Register-c7ba7112.css"
     ],
-    "file": "assets/Register-9535b3b2.js",
+    "file": "assets/Register-2d552d3c.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -470,7 +470,7 @@
     "css": [
       "assets/ResetPassword-4eaa6142.css"
     ],
-    "file": "assets/ResetPassword-d0a838f0.js",
+    "file": "assets/ResetPassword-24c6ae83.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -478,7 +478,7 @@
     "src": "resources/js/views/Auth/ResetPassword.vue"
   },
   "resources/js/views/Auth/VerifyEmail.vue": {
-    "file": "assets/VerifyEmail-0962cd3d.js",
+    "file": "assets/VerifyEmail-433cb1c1.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -493,7 +493,7 @@
     "css": [
       "assets/NotFound-e088cdad.css"
     ],
-    "file": "assets/NotFound-56aac498.js",
+    "file": "assets/NotFound-30c788ac.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -508,10 +508,10 @@
     "css": [
       "assets/Command-97ae2e1c.css"
     ],
-    "file": "assets/Command-594fed65.js",
+    "file": "assets/Command-50e2e77f.js",
     "imports": [
       "resources/js/app.js",
-      "_radio-group-f0ab7eed.js"
+      "_radio-group-de7e907a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Settings/Command.vue"
@@ -524,28 +524,28 @@
     "css": [
       "assets/Database-219f0152.css"
     ],
-    "file": "assets/Database-a91116b6.js",
+    "file": "assets/Database-764521af.js",
     "imports": [
       "resources/js/app.js",
-      "_accordion-ea7f64a6.js"
+      "_accordion-34d4bb6a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Settings/Database.vue"
   },
   "resources/js/views/Settings/Faqs.vue": {
-    "file": "assets/Faqs-9a0a871a.js",
+    "file": "assets/Faqs-50878c02.js",
     "imports": [
       "resources/js/app.js",
-      "_FileManager-8eadf9a0.js",
-      "_PickImagePopup-f103534d.js"
+      "_FileManager-ea31c7e0.js",
+      "_PickImagePopup-aa35df5e.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Settings/Faqs.vue"
   },
   "resources/js/views/Settings/Files.vue": {
-    "file": "assets/Files-3727e82c.js",
+    "file": "assets/Files-ccb6c222.js",
     "imports": [
-      "_FileManager-8eadf9a0.js",
+      "_FileManager-ea31c7e0.js",
       "resources/js/app.js"
     ],
     "isDynamicEntry": true,
@@ -559,7 +559,7 @@
     "css": [
       "assets/Log-f92af27f.css"
     ],
-    "file": "assets/Log-008417ad.js",
+    "file": "assets/Log-52993a4c.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -574,17 +574,17 @@
     "css": [
       "assets/Notification-0b423ebf.css"
     ],
-    "file": "assets/Notification-ee450332.js",
+    "file": "assets/Notification-34802f80.js",
     "imports": [
       "resources/js/app.js",
-      "_PickImagePopup-f103534d.js",
-      "_FileManager-8eadf9a0.js"
+      "_PickImagePopup-aa35df5e.js",
+      "_FileManager-ea31c7e0.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Settings/Notification.vue"
   },
   "resources/js/views/Settings/Parameters.vue": {
-    "file": "assets/Parameters-198b78b0.js",
+    "file": "assets/Parameters-5b0b2612.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -592,7 +592,7 @@
     "src": "resources/js/views/Settings/Parameters.vue"
   },
   "resources/js/views/Settings/Permissions.vue": {
-    "file": "assets/Permissions-26684354.js",
+    "file": "assets/Permissions-fca0f9ef.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -600,16 +600,16 @@
     "src": "resources/js/views/Settings/Permissions.vue"
   },
   "resources/js/views/Settings/Roles.vue": {
-    "file": "assets/Roles-6b0d5b1c.js",
+    "file": "assets/Roles-022a00d2.js",
     "imports": [
-      "_ListTagBox-093c32cf.js",
+      "_ListTagBox-1d75185d.js",
       "resources/js/app.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Settings/Roles.vue"
   },
   "resources/js/views/Trading/Finbook/Index.vue": {
-    "file": "assets/Index-13a7c7b8.js",
+    "file": "assets/Index-e809cb07.js",
     "imports": [
       "resources/js/app.js",
       "resources/js/views/Trading/Finbook/TransactionFinbookPopup.vue"
@@ -625,7 +625,7 @@
     "css": [
       "assets/TransactionFinbookPopup-82180991.css"
     ],
-    "file": "assets/TransactionFinbookPopup-42b911c5.js",
+    "file": "assets/TransactionFinbookPopup-f09d8163.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -640,7 +640,7 @@
     "css": [
       "assets/ColorPicker-185510d1.css"
     ],
-    "file": "assets/ColorPicker-c90e3e92.js",
+    "file": "assets/ColorPicker-22129585.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -648,7 +648,7 @@
     "src": "resources/js/views/Trading/Order/ColorPicker.vue"
   },
   "resources/js/views/Trading/Order/CopyistStatusPopup.vue": {
-    "file": "assets/CopyistStatusPopup-e353c098.js",
+    "file": "assets/CopyistStatusPopup-b926b048.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -663,7 +663,7 @@
     "css": [
       "assets/DailyCashFlowPopup-2f3c9916.css"
     ],
-    "file": "assets/DailyCashFlowPopup-5ecdbced.js",
+    "file": "assets/DailyCashFlowPopup-6315af72.js",
     "imports": [
       "resources/js/app.js",
       "_lightweight-charts.esm.development-03366bac.js"
@@ -683,7 +683,7 @@
     "css": [
       "assets/Index-1b17aaf8.css"
     ],
-    "file": "assets/Index-b5c28506.js",
+    "file": "assets/Index-3df3a4a6.js",
     "imports": [
       "resources/js/app.js",
       "resources/js/views/Trading/Order/CopyistStatusPopup.vue",
@@ -702,14 +702,14 @@
     "css": [
       "assets/Index-067585a2.css"
     ],
-    "file": "assets/Index-05a06252.js",
+    "file": "assets/Index-f11a0f92.js",
     "imports": [
-      "_chart-a5057395.js",
+      "_chart-0ebe36f5.js",
       "resources/js/views/Trading/Statistic/OpeningSummary.vue",
       "resources/js/views/Trading/Statistic/Summary.vue",
       "resources/js/views/Trading/Statistic/TrackStatisticPopup.vue",
       "resources/js/app.js",
-      "_m_base_chart-730dc683.js"
+      "_m_base_chart-a882bcc9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Trading/Statistic/Index.vue"
@@ -722,7 +722,7 @@
     "css": [
       "assets/OpeningSummary-9998dfd4.css"
     ],
-    "file": "assets/OpeningSummary-9015bd1e.js",
+    "file": "assets/OpeningSummary-45b43b15.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -737,7 +737,7 @@
     "css": [
       "assets/Summary-913ff62f.css"
     ],
-    "file": "assets/Summary-da3c6dbb.js",
+    "file": "assets/Summary-5166ad58.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -745,7 +745,7 @@
     "src": "resources/js/views/Trading/Statistic/Summary.vue"
   },
   "resources/js/views/Trading/Statistic/TrackStatisticPopup.vue": {
-    "file": "assets/TrackStatisticPopup-e2ed54a3.js",
+    "file": "assets/TrackStatisticPopup-1209e9e4.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -760,18 +760,18 @@
     "css": [
       "assets/Index-067585a2.css"
     ],
-    "file": "assets/Index-212b25a4.js",
+    "file": "assets/Index-f9912d7a.js",
     "imports": [
-      "_chart-a5057395.js",
+      "_chart-0ebe36f5.js",
       "resources/js/views/Trading/Statistic1/TrackStatisticPopup.vue",
       "resources/js/app.js",
-      "_m_base_chart-730dc683.js"
+      "_m_base_chart-a882bcc9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Trading/Statistic1/Index.vue"
   },
   "resources/js/views/Trading/Statistic1/TrackStatisticPopup.vue": {
-    "file": "assets/TrackStatisticPopup-445b8fc3.js",
+    "file": "assets/TrackStatisticPopup-b384089d.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -786,7 +786,7 @@
     "css": [
       "assets/ColorPicker-185510d1.css"
     ],
-    "file": "assets/ColorPicker-7291744d.js",
+    "file": "assets/ColorPicker-f117da54.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -794,10 +794,10 @@
     "src": "resources/js/views/Trading/Stock/ColorPicker.vue"
   },
   "resources/js/views/Trading/Stock/FilterPopup.vue": {
-    "file": "assets/FilterPopup-5f8a71a7.js",
+    "file": "assets/FilterPopup-b5076755.js",
     "imports": [
       "resources/js/app.js",
-      "_select-box-92c4eb18.js"
+      "_select-box-d0e71168.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Trading/Stock/FilterPopup.vue"
@@ -810,12 +810,12 @@
     "css": [
       "assets/Index-05de49fd.css"
     ],
-    "file": "assets/Index-087ffe2f.js",
+    "file": "assets/Index-b2f9d1af.js",
     "imports": [
       "resources/js/app.js",
       "resources/js/views/Trading/Stock/ColorPicker.vue",
       "_lightweight-charts.esm.development-03366bac.js",
-      "_select-box-92c4eb18.js"
+      "_select-box-d0e71168.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/Trading/Stock/Index.vue"
@@ -828,7 +828,7 @@
     "css": [
       "assets/ContractConditionsPopup-3c6ca790.css"
     ],
-    "file": "assets/ContractConditionsPopup-61a1ade9.js",
+    "file": "assets/ContractConditionsPopup-ed65a8ec.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -843,16 +843,16 @@
     "css": [
       "assets/Index-6245bb07.css"
     ],
-    "file": "assets/Index-5e7b9951.js",
+    "file": "assets/Index-6ff1a37a.js",
     "imports": [
       "resources/js/app.js",
       "resources/js/views/User/Contract/ContractConditionsPopup.vue",
       "resources/js/views/User/Contract/PayingContractPopup.vue",
       "resources/js/views/User/Contract/WithdrawingContractPopup.vue",
-      "_ContractDetailPopup-c0b309ef.js",
-      "_accordion-ea7f64a6.js",
-      "_load-indicator-41e757fa.js",
-      "_radio-group-f0ab7eed.js"
+      "_ContractDetailPopup-86ffc4a2.js",
+      "_accordion-34d4bb6a.js",
+      "_load-indicator-72d2592d.js",
+      "_radio-group-de7e907a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/User/Contract/Index.vue"
@@ -865,11 +865,11 @@
     "css": [
       "assets/PayingContractPopup-20cd08f1.css"
     ],
-    "file": "assets/PayingContractPopup-0ce7d70f.js",
+    "file": "assets/PayingContractPopup-a10aa94c.js",
     "imports": [
       "resources/js/app.js",
-      "_accordion-ea7f64a6.js",
-      "_load-indicator-41e757fa.js"
+      "_accordion-34d4bb6a.js",
+      "_load-indicator-72d2592d.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/User/Contract/PayingContractPopup.vue"
@@ -882,10 +882,10 @@
     "css": [
       "assets/WithdrawingContractPopup-84a0eea0.css"
     ],
-    "file": "assets/WithdrawingContractPopup-52f68909.js",
+    "file": "assets/WithdrawingContractPopup-2ec0d108.js",
     "imports": [
       "resources/js/app.js",
-      "_radio-group-f0ab7eed.js"
+      "_radio-group-de7e907a.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/User/Contract/WithdrawingContractPopup.vue"
@@ -898,7 +898,7 @@
     "css": [
       "assets/Index-084f2ce2.css"
     ],
-    "file": "assets/Index-065259e0.js",
+    "file": "assets/Index-cd422b58.js",
     "imports": [
       "resources/js/views/User/Copyist/SettingPopup.vue",
       "resources/js/app.js"
@@ -907,7 +907,7 @@
     "src": "resources/js/views/User/Copyist/Index.vue"
   },
   "resources/js/views/User/Copyist/SettingPopup.vue": {
-    "file": "assets/SettingPopup-e58ef1f3.js",
+    "file": "assets/SettingPopup-a765abcd.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -922,19 +922,19 @@
     "css": [
       "assets/Contracts-3e424c35.css"
     ],
-    "file": "assets/Contracts-eebafda1.js",
+    "file": "assets/Contracts-a9d08ed0.js",
     "imports": [
       "resources/js/app.js",
-      "_ContractDetailPopup-c0b309ef.js"
+      "_ContractDetailPopup-86ffc4a2.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/User/Overview/Contracts.vue"
   },
   "resources/js/views/User/Overview/Finbook.vue": {
-    "file": "assets/Finbook-eb3c42b4.js",
+    "file": "assets/Finbook-a78a463d.js",
     "imports": [
       "resources/js/app.js",
-      "_m_base_chart-730dc683.js",
+      "_m_base_chart-a882bcc9.js",
       "resources/js/views/Trading/Finbook/TransactionFinbookPopup.vue"
     ],
     "isDynamicEntry": true,
@@ -950,18 +950,18 @@
       "assets/MonthTrade-0f2ad1cc.css",
       "assets/TradeSummary-b5db1f75.css"
     ],
-    "file": "assets/Index-5e2851bd.js",
+    "file": "assets/Index-c4abf4b4.js",
     "imports": [
-      "_chart-a5057395.js",
+      "_chart-0ebe36f5.js",
       "resources/js/app.js",
       "resources/js/views/User/Overview/Finbook.vue",
       "resources/js/views/User/Overview/Summary.vue",
       "resources/js/views/User/Overview/LevelBar.vue",
       "resources/js/views/User/Overview/Contracts.vue",
-      "_m_base_chart-730dc683.js",
+      "_m_base_chart-a882bcc9.js",
       "resources/js/views/Trading/Finbook/TransactionFinbookPopup.vue",
       "resources/js/views/User/Profile/EditProfilePopup.vue",
-      "_ContractDetailPopup-c0b309ef.js"
+      "_ContractDetailPopup-86ffc4a2.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/User/Overview/Index.vue"
@@ -974,7 +974,7 @@
     "css": [
       "assets/LevelBar-56c57efa.css"
     ],
-    "file": "assets/LevelBar-c1461d3e.js",
+    "file": "assets/LevelBar-cb470c27.js",
     "imports": [
       "resources/js/app.js",
       "resources/js/views/User/Profile/EditProfilePopup.vue"
@@ -986,11 +986,11 @@
     "css": [
       "assets/MonthTrade-0f2ad1cc.css"
     ],
-    "file": "assets/MonthTrade-186731ff.js",
+    "file": "assets/MonthTrade-b7056a80.js",
     "imports": [
-      "_chart-a5057395.js",
+      "_chart-0ebe36f5.js",
       "resources/js/app.js",
-      "_m_base_chart-730dc683.js"
+      "_m_base_chart-a882bcc9.js"
     ],
     "isDynamicEntry": true,
     "src": "resources/js/views/User/Overview/MonthTrade.vue"
@@ -1003,7 +1003,7 @@
     "css": [
       "assets/Summary-fa31470d.css"
     ],
-    "file": "assets/Summary-d3c19839.js",
+    "file": "assets/Summary-dcec7ccb.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -1014,7 +1014,7 @@
     "css": [
       "assets/TradeSummary-b5db1f75.css"
     ],
-    "file": "assets/TradeSummary-ef5df732.js",
+    "file": "assets/TradeSummary-90869133.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -1022,7 +1022,7 @@
     "src": "resources/js/views/User/Overview/TradeSummary.vue"
   },
   "resources/js/views/User/Profile/EditProfilePopup.vue": {
-    "file": "assets/EditProfilePopup-d6001535.js",
+    "file": "assets/EditProfilePopup-026bce6d.js",
     "imports": [
       "resources/js/app.js"
     ],
@@ -1037,10 +1037,10 @@
     "css": [
       "assets/Index-86101465.css"
     ],
-    "file": "assets/Index-9b78529c.js",
+    "file": "assets/Index-fd54f2b3.js",
     "imports": [
       "resources/js/app.js",
-      "_UserDetailPopup-ebe914b0.js",
+      "_UserDetailPopup-a8343f7a.js",
       "resources/js/views/User/Profile/EditProfilePopup.vue"
     ],
     "isDynamicEntry": true,
