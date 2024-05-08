@@ -572,7 +572,11 @@ class StockService extends CoreService
             $url = "https://priceapi.bsc.com.vn/datafeed/instruments/100";
             $res = $client->get($url);
             $rsp = json_decode($res->getBody());
-            $vn100 = $rsp->s == 'ok' ? $rsp->d : [];
+            $vn100 = [];
+            if ($rsp->s == 'ok') {
+                $vn100 = explode(",", implode(", ", $rsp->d));
+                $vn100[0] = ' ' . $vn100[0];
+            }
 
             $index = ['^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
             $nh = [' VCB', ' BID', ' CTG', ' VPB', ' MBB', ' ACB', ' STB', ' HDB', ' VIB', ' SSB', ' SHB', ' MSB', ' TPB', ' LPB', ' EIB', ' OCB'];
