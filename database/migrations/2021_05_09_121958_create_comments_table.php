@@ -20,7 +20,7 @@ class CreateCommentsTable extends Migration
             $table->string('phone')->nullable();
             $table->string('subject');
             $table->text('content');
-            $table->json('images')->default('[]');
+            $table->json('images');
             $table->boolean('read')->default(0);
             $table->timestamps();
         });

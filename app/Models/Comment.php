@@ -41,6 +41,10 @@ class Comment extends CoreModel
         'images' => 'array',
     ];
 
+    protected $attributes = [
+        'images' => '[]',
+    ];
+
     /**
      * The attributes that it available in the json response.
      *
