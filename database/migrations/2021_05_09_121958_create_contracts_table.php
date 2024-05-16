@@ -22,8 +22,8 @@ class CreateContractsTable extends Migration
             $table->unsignedBigInteger('advance')->nullable();
             $table->date('paid_at');
             $table->date('withdrawn_at')->nullable();
-            $table->json('paid_docs')->default('[]');
-            $table->json('withdrawn_docs')->default('[]');
+            $table->json('paid_docs');
+            $table->json('withdrawn_docs');
             $table->unsignedBigInteger('confirmed_by')->nullable();
             $table->timestamps();
             $table->foreign('user_code')->references('code')->on('users')->onDelete('cascade');

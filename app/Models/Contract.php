@@ -61,6 +61,11 @@ class Contract extends CoreModel
         'withdrawn_docs' => 'array',
     ];
 
+    protected $attributes = [
+        'paid_docs' => '[]',
+        'withdrawn_docs' => '[]',
+    ];
+
     /**
      * The attributes that it available in the json response.
      *
