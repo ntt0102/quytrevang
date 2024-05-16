@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('stock_symbols', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->json('symbols')->default('[]');
+            $table->json('symbols');
             $table->timestamps();
         });
     }

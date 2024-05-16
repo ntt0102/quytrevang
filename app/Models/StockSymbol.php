@@ -25,4 +25,8 @@ class StockSymbol extends CoreModel
     ];
 
     protected $casts = ['symbols' => 'array'];
+
+    protected $attributes = [
+        'symbols' => '[]',
+    ];
 }
