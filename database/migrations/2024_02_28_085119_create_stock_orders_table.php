@@ -19,9 +19,9 @@ return new class extends Migration
             $table->json('buy_price');
             $table->json('buy_fee');
             $table->date('sell_date')->nullable();
-            $table->json('sell_volume')->default('[]');
-            $table->json('sell_price')->default('[]');
-            $table->json('sell_fee')->default('[]');
+            $table->json('sell_volume');
+            $table->json('sell_price');
+            $table->json('sell_fee');
             $table->timestamps();
         });
     }

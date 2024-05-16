@@ -54,6 +54,12 @@ class StockOrder extends CoreModel
         // 'sell_fee' => 'array',
     ];
 
+    protected $attributes = [
+        'sell_volume' => '[]',
+        'sell_price' => '[]',
+        'sell_fee' => '[]',
+    ];
+
     public function scopeClosed(Builder $query): void
     {
         $query->whereRaw('CHECK_CLOSED(buy_volume, sell_volume)');
