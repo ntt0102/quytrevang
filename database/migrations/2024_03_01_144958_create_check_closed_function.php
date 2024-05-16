@@ -12,23 +12,23 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::unprepared(
-            "
-            CREATE FUNCTION `CHECK_CLOSED`(`buy_volume` VARCHAR(255), `sell_volume` VARCHAR(255)) RETURNS tinyint(1)
-            BEGIN
-                DECLARE buy INT DEFAULT 0;
-                DECLARE sell INT DEFAULT 0;
-                
-                SELECT IFNULL(SUM(volume), 0) INTO buy  
-                FROM json_table(buy_volume, '$[*]' columns (volume int path '$')) v;
+        // DB::unprepared(
+        //     "
+        //     CREATE FUNCTION `CHECK_CLOSED`(`buy_volume` VARCHAR(255), `sell_volume` VARCHAR(255)) RETURNS tinyint(1)
+        //     BEGIN
+        //         DECLARE buy INT DEFAULT 0;
+        //         DECLARE sell INT DEFAULT 0;
 
-                SELECT IFNULL(SUM(volume), 0) INTO sell 
-                FROM json_table(sell_volume, '$[*]' columns (volume int path '$')) v;
-                
-                RETURN buy = sell;
-            END
-            "
-        );
+        //         SELECT IFNULL(SUM(volume), 0) INTO buy  
+        //         FROM json_table(buy_volume, '$[*]' columns (volume int path '$')) v;
+
+        //         SELECT IFNULL(SUM(volume), 0) INTO sell 
+        //         FROM json_table(sell_volume, '$[*]' columns (volume int path '$')) v;
+
+        //         RETURN buy = sell;
+        //     END
+        //     "
+        // );
     }
 
     /**
@@ -36,6 +36,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::unprepared('DROP FUNCTION IF EXISTS `CHECK_CLOSED`');
+        // DB::unprepared('DROP FUNCTION IF EXISTS `CHECK_CLOSED`');
     }
 };
