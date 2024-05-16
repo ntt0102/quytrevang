@@ -26,9 +26,9 @@ class CreateUsersTable extends Migration
             $table->boolean('sex')->nullable();
             $table->date('birthday')->nullable();
             $table->string('address')->nullable();
-            $table->json('identity')->default('{}');
-            $table->json('documents')->default('[]');
-            $table->json('bank_account')->default('{}');
+            $table->json('identity');
+            $table->json('documents');
+            $table->json('bank_account');
             $table->string('avatar')->nullable();
             $table->timestamps();
             $table->softDeletes();

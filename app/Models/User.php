@@ -101,6 +101,12 @@ class User extends Authenticatable implements MustVerifyEmail
         'identity' => 'array',
     ];
 
+    protected $attributes = [
+        'identity' => '{}',
+        'documents' => '[]',
+        'bank_account' => '{}',
+    ];
+
     /**
      * The attributes that it available in the json response.
      *
