@@ -89,6 +89,8 @@ class StockService extends CoreService
         $size = count($data);
         if ($size == 0) return $r;
         $prevAvg = 0;
+        $prevHigh = 0;
+        $prevLow = 0;
         $topAvg = 0;
         $bottomAvg = 0;
         $priceGains = [0, 0];
@@ -112,11 +114,27 @@ class StockService extends CoreService
                 'low' => $priceLow,
                 'close' => $priceClose
             ];
+            //
             $avg = ($priceHigh + $priceLow + $priceClose) / 3;
             $r['chart']['price'][] = [
                 'time' => $date,
                 'value' => $avg
             ];
+            //
+            if (!$prevHigh) $prevHigh = $priceHigh;
+            $buyGap = $priceLow > $prevHigh;
+            $prevHigh = $priceHigh;
+            if (!$prevLow) $prevLow = $priceLow;
+            $sellGap = $priceHigh < $prevLow;
+            $prevLow = $priceLow;
+            if ($buyGap || $sellGap) {
+                $r['chart']['gap'][] = [
+                    'time' => $date,
+                    'value' => 1,
+                    'color' => $buyGap ? 'purple' : 'orange'
+                ];
+            }
+            //
             if (!$topAvg) $topAvg = $avg;
             if (!$bottomAvg) $bottomAvg = $avg;
             if ($i > 3 * $size / 4) {
@@ -165,6 +183,7 @@ class StockService extends CoreService
                 'time' => $date,
                 'value' => $frgnAcc
             ];
+            //
             $j = $i > $size / 2 ? 1 : 2;
             if ($frgnQuantity > 0) {
                 $frgnGains[0] += $frgnQuantity;
