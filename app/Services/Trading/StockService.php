@@ -192,7 +192,7 @@ class StockService extends CoreService
             }
             //
             $buySignal = $data[$i]->buyQuantity > $data[$i]->sellQuantity && $data[$i]->buyCount < $data[$i]->sellCount;
-            $sellSignal = $data[$i]->buyQuantity < $data[$i]->sellQuantity && $data[$i]->buyCount > $data[$i]->sellCount;
+            $sellSignal = 1.5 * $data[$i]->buyQuantity < $data[$i]->sellQuantity && $data[$i]->buyCount > $data[$i]->sellCount;
             if ($buySignal || $sellSignal) {
                 $r['chart']['signal'][] = [
                     'time' => $date,
