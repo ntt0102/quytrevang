@@ -31,8 +31,6 @@ class StockService extends CoreService
         return [
             'chart' => $this->getChart($payload),
             'range' => $range,
-            'fundSize' => (int) Parameter::getValue('fundSize', 0),
-            'losePerOrder' => (float) Parameter::getValue('losePerOrder', 0)
         ];
     }
     /**

@@ -324,8 +324,6 @@ let params = {
         rr: { EP: {}, SL: {}, TP: {} },
         range: [],
     },
-    fundSize: 0,
-    losePerOrder: 0,
     crosshair: {},
     isCashDraw: false,
     isOnlyLoadData: false,
@@ -606,12 +604,10 @@ function eventPriceLineDrag(e) {
                 const rr = Math.abs(rTp) / Math.abs(rSl);
                 const sl = (rSl / epPrice) * 100;
                 const tp = (rTp / epPrice) * 100;
-                let volume = params.fundSize / (epPrice * 1000);
-                volume = Math.floor(volume / 100) * 100;
                 //
                 point = "EP";
                 params.tools.rr[point].applyOptions({
-                    title: `[V=${volume}] RR=${rr.toFixed(1)}`,
+                    title: `RR=${rr.toFixed(1)}`,
                 });
                 param.points.push(point);
                 param.data.push(params.tools.rr[point].options());
@@ -1258,15 +1254,10 @@ function drawRrTool() {
             param.data.push(mf.cloneDeep(option));
             //
             const sl = (rSl / epPrice) * 100;
-            const volume = (
-                (params.fundSize * params.losePerOrder) /
-                Math.abs(sl) /
-                (epPrice * 1000)
-            ).toFixed(0);
             const rr = Math.abs(rTp) / Math.abs(rSl);
             const EP_POINT = "EP";
             params.tools.rr[EP_POINT].applyOptions({
-                title: `[V=${volume}] RR=${rr.toFixed(1)}`,
+                title: `RR=${rr.toFixed(1)}`,
             });
             param.points.push(EP_POINT);
             param.data.push(params.tools.rr[EP_POINT].options());
@@ -1425,8 +1416,6 @@ function initChart() {
             params.series.vnindex.setData(data.chart.vnindex);
             params.tools.range = data.range;
             params.series.range.setData(data.range);
-            params.fundSize = data.fundSize;
-            params.losePerOrder = data.losePerOrder;
         });
 }
 function reloadChart(onlyData = false, withVnindex = false) {
