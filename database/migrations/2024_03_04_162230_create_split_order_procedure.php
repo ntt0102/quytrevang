@@ -12,20 +12,20 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // DB::unprepared(
-        //     "
-        //     CREATE PROCEDURE `SPLIT_ORDER`(IN `volume` VARCHAR(255), IN `price` VARCHAR(255), IN `fee` VARCHAR(255))
-        //     BEGIN
-        //         DROP TEMPORARY TABLE IF EXISTS split_order;
-        //         CREATE TEMPORARY TABLE split_order AS
-        //             SELECT v.volume, p.price, f.fee
-        //             FROM json_table(volume, '$[*]' columns (id FOR ORDINALITY,volume int path '$')) v
-        //             JOIN json_table(price, '$[*]' columns (id FOR ORDINALITY,price int path '$')) p
-        //             JOIN json_table(fee, '$[*]' columns (id FOR ORDINALITY,fee int path '$')) f
-        //             WHERE v.id = p.id AND v.id = f.id;
-        //     END
-        //     "
-        // );
+        DB::unprepared(
+            "
+            CREATE PROCEDURE `SPLIT_ORDER`(IN `volume` VARCHAR(255), IN `price` VARCHAR(255), IN `fee` VARCHAR(255))
+            BEGIN
+                DROP TEMPORARY TABLE IF EXISTS split_order;
+                CREATE TEMPORARY TABLE split_order AS
+                    SELECT v.volume, p.price, f.fee
+                    FROM json_table(volume, '$[*]' COLUMNS(id FOR ORDINALITY,volume int path '$')) v
+                    JOIN json_table(price, '$[*]' COLUMNS(id FOR ORDINALITY,price int path '$')) p
+                    JOIN json_table(fee, '$[*]' COLUMNS(id FOR ORDINALITY,fee int path '$')) f
+                    WHERE v.id = p.id AND v.id = f.id;
+            END
+            "
+        );
     }
 
     /**
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        // DB::unprepared('DROP PROCEDURE IF EXISTS `SPLIT_ORDER`');
+        DB::unprepared('DROP PROCEDURE IF EXISTS `SPLIT_ORDER`');
     }
 };
