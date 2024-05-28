@@ -59,6 +59,7 @@ class StockService extends CoreService
     }
     public function getData($payload)
     {
+        //
         // $data = str_contains($payload->symbol, '^') ?
         //     $this->getDataFromCp68($payload) :
         //     $this->getDataTradingview($payload);
