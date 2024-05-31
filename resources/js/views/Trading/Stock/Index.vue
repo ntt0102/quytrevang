@@ -139,7 +139,7 @@
                         @click="addWatchlist"
                     ></div>
                     <div
-                        v-show="true"
+                        v-show="!!$store.state.tradingStock.chart.foreignRSI"
                         class="command"
                         :title="$t('trading.stock.foreignRSI')"
                     >
@@ -162,25 +162,21 @@
                         @click="tradingviewClick"
                     ></div>
                     <div
-                        ref="colorToolRef"
-                        class="color command far fa-palette"
-                        :style="{ color: state.color }"
-                        :title="$t('trading.stock.tools.color')"
-                        @click="colorToolClick"
-                    >
-                        <ColorPicker
-                            v-show="state.showColorPicker"
-                            class="color-picker"
-                            v-model="state.color"
-                        ></ColorPicker>
-                    </div>
-                    <div
                         ref="lineToolRef"
-                        class="command far fa-horizontal-rule"
+                        class="line command far fa-horizontal-rule"
                         :title="$t('trading.stock.tools.line')"
                         @click="lineToolClick"
                         @contextmenu="lineToolContextmenu"
-                    ></div>
+                    >
+                        <LineContextMenu
+                            v-show="state.showLineContextMenu"
+                            class="line-contextmenu"
+                            :enable="state.showLineContextMenu"
+                            v-model:title="state.lineTitle"
+                            v-model:color="state.lineColor"
+                            @deleteAllLine="removeLineTool"
+                        ></LineContextMenu>
+                    </div>
                     <div
                         ref="uplpsToolRef"
                         class="command far fa-arrow-up"
@@ -243,7 +239,7 @@
 </template>
 
 <script setup>
-import ColorPicker from "./ColorPicker.vue";
+import LineContextMenu from "./LineContextMenu.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import DxSelectBox from "devextreme-vue/select-box";
 import { DxAutocomplete } from "devextreme-vue/autocomplete";
@@ -299,7 +295,6 @@ const chartRef = ref(null);
 const symbolAutocompleteRef = ref(null);
 const fullscreenToolRef = ref(null);
 const tradingviewRef = ref(null);
-const colorToolRef = ref(null);
 const lineToolRef = ref(null);
 const targetToolRef = ref(null);
 const uplpsToolRef = ref(null);
@@ -349,8 +344,9 @@ const state = reactive({
         { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
         { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
     ],
-    color: "#F44336",
-    showColorPicker: false,
+    lineTitle: "",
+    lineColor: "#F44336",
+    showLineContextMenu: false,
     isFullscreen: false,
     showTradingView: false,
     isSymbolFocus: false,
@@ -483,6 +479,8 @@ function stopPropagationEvent(e) {
     e.stopPropagation();
 }
 function eventChartClick(e) {
+    state.showLineContextMenu = false;
+    //
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (targetToolRef.value.classList.contains("selected"))
         drawTargetTool();
@@ -660,9 +658,11 @@ function eventKeyPress(e) {
                 break;
         }
     } else if (!state.isSymbolFocus) {
-        if (e.keyCode >= 65 && e.keyCode <= 90) {
-            state.inputSymbol = "";
-            symbolAutocompleteRef.value.instance.focus();
+        if (!state.showLineContextMenu) {
+            if (e.keyCode >= 65 && e.keyCode <= 90) {
+                state.inputSymbol = "";
+                symbolAutocompleteRef.value.instance.focus();
+            }
         }
     }
 }
@@ -800,11 +800,8 @@ function loadChartData() {
 function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
 }
-function colorToolClick(e) {
-    state.showColorPicker = !state.showColorPicker;
-}
 function lineToolClick(e) {
-    state.showColorPicker = false;
+    state.showLineContextMenu = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -812,8 +809,7 @@ function lineToolClick(e) {
     if (!selected) e.target.classList.add("selected");
 }
 function lineToolContextmenu(e) {
-    removeLineTool();
-    e.target.classList.remove("selected");
+    state.showLineContextMenu = !state.showLineContextMenu;
 }
 function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
     const TYPE = "line";
@@ -837,7 +833,8 @@ function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
         const options = {
             lineType: TYPE,
             price: price,
-            color: state.color,
+            color: state.lineColor,
+            title: state.lineTitle,
             lineWidth: 1,
             lineStyle: 1,
             draggable: true,
@@ -855,7 +852,6 @@ function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
 }
 function removeLineTool(server = true) {
     if (params.tools.lines.length > 0) {
-        console.log("removeLineTool");
         params.tools.lines.forEach((line) =>
             params.series.price.removePriceLine(line)
         );
@@ -870,7 +866,7 @@ function removeLineTool(server = true) {
     }
 }
 function targetToolClick(e) {
-    state.showColorPicker = false;
+    state.showLineContextMenu = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -976,7 +972,7 @@ function removeTargetTool(server = true) {
         });
 }
 function uplpsToolClick(e) {
-    state.showColorPicker = false;
+    state.showLineContextMenu = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -1084,7 +1080,7 @@ function removeUplpsTool(server = true, forceCash = false) {
         });
 }
 function downlpsToolClick(e) {
-    state.showColorPicker = false;
+    state.showLineContextMenu = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -1206,7 +1202,7 @@ function cashToolContextmenu(e) {
     e.target.classList.remove("selected");
 }
 function rrToolClick(e) {
-    state.showColorPicker = false;
+    state.showLineContextMenu = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -1303,7 +1299,7 @@ function removeRrTool(server = true) {
         });
 }
 function rangeToolClick(e) {
-    state.showColorPicker = false;
+    state.showLineContextMenu = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -1564,14 +1560,14 @@ function filterItemClick({ itemData }) {
                     border-top: solid 2px #2a2e39 !important;
                 }
 
-                .selected:not(.color) {
+                .selected {
                     color: #1f62ff !important;
                 }
 
-                .color {
+                .line {
                     position: relative;
 
-                    .color-picker {
+                    .line-contextmenu {
                         position: absolute;
                         top: 0;
                         left: 40px;
