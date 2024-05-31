@@ -84,6 +84,9 @@ class StockService extends CoreService
         $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/historical-quotes?startDate={$startDate}&endDate={$endDate}&offset=0&limit=1000000";
         $res = $client->get($url);
         $data = json_decode($res->getBody());
+        // usort($data, function ($a, $b) {
+        //     return $a->date < $b->date;
+        // });
         if ($payload->timeframe != 'D')  $this->getDataFireAntTimeframe($data, $payload->timeframe);
         $size = count($data);
         if ($size == 0) return $r;
@@ -102,6 +105,10 @@ class StockService extends CoreService
         $frgnLosses = [0, 0, 0];
         for ($i = $size - 1; $i >= 0; $i--) {
             $date = $this->unix($data[$i]->date);
+            if ($i < $size - 1) {
+                $preDate = $this->unix($data[$i + 1]->date);
+                if ($date == $preDate) continue;
+            }
             $priceOpen = $data[$i]->priceOpen / $data[$i]->adjRatio;
             $priceHigh = $data[$i]->priceHigh / $data[$i]->adjRatio;
             $priceLow = $data[$i]->priceLow / $data[$i]->adjRatio;
