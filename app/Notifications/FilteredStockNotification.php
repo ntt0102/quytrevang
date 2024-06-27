@@ -20,7 +20,7 @@ class FilteredStockNotification extends CoreNotification
             'body' => trans($path . 'body', ['kind' => trans($path . $kind)]),
             'actions' => [
                 [
-                    'action' =>  trans($path . 'actionUrl'),
+                    'action' =>  trans($path . 'actionUrl', ['kind' => $kind]),
                     'title' => trans($path . 'actionTitle'),
                 ],
             ],

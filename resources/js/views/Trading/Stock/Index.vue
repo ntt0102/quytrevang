@@ -379,6 +379,7 @@ const chartTo = computed(
 const showRemoveFilterSymbol = computed(
     () =>
         state.symbolKind.includes("f_") &&
+        store.state.tradingStock.symbols[state.symbolKind] &&
         store.state.tradingStock.symbols[state.symbolKind].includes(
             " " + state.symbol
         )
