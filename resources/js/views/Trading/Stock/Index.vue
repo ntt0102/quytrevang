@@ -379,7 +379,7 @@ const chartTo = computed(
 const showRemoveFilterSymbol = computed(
     () =>
         state.symbolKind.includes("f_") &&
-        store.state.tradingStock.symbols[state.symbolKind] &&
+        mf.isSet(store.state.tradingStock.symbols[state.symbolKind]) &&
         store.state.tradingStock.symbols[state.symbolKind].includes(
             " " + state.symbol
         )
@@ -387,8 +387,10 @@ const showRemoveFilterSymbol = computed(
 const showWatchlist = computed(
     () => !!state.symbol && !!state.symbol.trim() && !state.symbol.includes("^")
 );
-const inWatchlist = computed(() =>
-    store.state.tradingStock.symbols.watch.includes(" " + state.symbol)
+const inWatchlist = computed(
+    () =>
+        mf.isSet(store.state.tradingStock.symbols.watch) &&
+        store.state.tradingStock.symbols.watch.includes(" " + state.symbol)
 );
 const symbols = computed(
     () => store.state.tradingStock.symbols[state.symbolKind]
