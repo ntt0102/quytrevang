@@ -598,7 +598,7 @@ class StockService extends CoreService
             $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/VN100";
             $res = $client->get($url);
             $vn100 = json_decode($res->getBody());
-            $vn100 = explode(",", " ", implode(", ", $vn100));
+            $vn100 = explode(",", " " . implode(", ", $vn100));
             // $vn100[0] = ' ' . $vn100[0];
             // $vn100 = [];
             // if ($rsp->s == 'ok') {
