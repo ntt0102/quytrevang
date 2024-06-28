@@ -74,12 +74,12 @@ export default [
             "finbooks@control",
         ],
         items: [
-            // {
-            //     text: lang.global.t("trading.orderChart.title"),
-            //     name: "trading-order",
-            //     icon: "far fa-gavel",
-            //     permissions: ["stock@order"],
-            // },
+            {
+                text: lang.global.t("trading.orderChart.title"),
+                name: "trading-order",
+                icon: "far fa-bolt",
+                permissions: ["stock@order"],
+            },
             {
                 text: lang.global.t("trading.stock.title"),
                 name: "trading-stock",

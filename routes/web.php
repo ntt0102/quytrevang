@@ -64,17 +64,19 @@ Route::get('test', function () {
     // // $filter = app(\App\Services\Trading\StockService::class)->filterSymbols($payload);
     // $payload = (object)['symbol' => 'HAS', 'from' => 1618576947, 'to' => 1713271767, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_bottom', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
     // $payload = (object)['symbol' => 'NKG', 'from' => 1648080000, 'to' => 1674777600, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_bottom', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
-    $payload = (object)['symbol' => 'AAA', 'from' => 1698710400, 'to' => 1713225600, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
+    // $payload = (object)['symbol' => 'AAA', 'from' => 1698710400, 'to' => 1713225600, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
     // $payload = (object)['symbol' => 'AAA', 'from' => 1618557594, 'to' => 1713251994, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
     // $s = app(\App\Services\Trading\StockService::class)->getEvents($payload);
-    $s = app(\App\Services\Trading\StockService::class)->getDataFireAnt($payload);
+    // $s = app(\App\Services\Trading\StockService::class)->getDataFireAnt($payload);
     // $s = app(\App\Services\Trading\StockService::class)->getData($payload)['rsi'];
     // $s = \App\Jobs\FilterStockJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
     // $s = new \App\Jobs\FilterStockJob($payload);
     // $s = $s->getForeignRatio($payload);
     // $s = $s->getRatio($payload);
-    // $s = app(\App\Services\Trading\StockService::class)->getData($payload);
+    // $s = app(\App\Services\Trading\OrderChartService::class)->cloneVn30f1mData();
+    // $s = app(\App\Services\Trading\OrderChartService::class)->cloneVn30Data()[2626];
+    // $s = file_exists(storage_path('app'));
     // $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
     // $client = new \GuzzleHttp\Client(['headers' => ['authorization' => "Bearer {$token}"]]);
     // $client = new \GuzzleHttp\Client();
@@ -100,6 +102,36 @@ Route::get('test', function () {
     // $o = \App\Models\StockOrder::find(1);
     // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
     // $s = app(\App\Services\Trading\StatisticService::class)->calculateProfit($o);
-    dd($s);
+    // dd($s);
+    if (get_global_value('openingMarketFlag') == '1') {
+        $orderChartService = app(\App\Services\Trading\OrderChartService::class);
+        $date = date('Y-m-d');
+        $path = storage_path('app/phaisinh/' . $date);
+        if (is_dir($path)) return false;
+        if (!mkdir($path, 0777, true)) return false;
+        $vn30f1mFile = $path . '/vn30f1m.csv';
+        // dd($vn30f1mFile);
+        $vn30File = $path . '/vn30.csv';
+        $vn30f1mData = $orderChartService->cloneVn30f1mData();
+        $vn30Data = $orderChartService->cloneVn30Data();
+        $fp = fopen($vn30f1mFile, 'w');
+        foreach ($vn30f1mData as $item) {
+            $line = [];
+            $line[] = strtotime($date . 'T' . $item->time . '.000Z');
+            $line[] = $item->lastPrice;
+            fputcsv($fp, $line);
+        }
+        fclose($fp);
+        $fp = fopen($vn30File, 'w');
+        foreach ($vn30Data as $item) {
+            $line = [];
+            $line[] = strtotime($item->Date);
+            $line[] = $item->IndexCurrent;
+            $line[] = $item->BuyForeignQuantity - $item->SellForeignQuantity;
+            $line[] = $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume;
+            fputcsv($fp, $line);
+        }
+        fclose($fp);
+    }
     return 'ok';
 });

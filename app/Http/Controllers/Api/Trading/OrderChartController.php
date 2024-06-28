@@ -30,15 +30,15 @@ class OrderChartController extends CoreController
     }
 
     /**
-     * Get Config
+     * Init Chart
      *
      * @param \Illuminate\Http\Request $request
      * 
      * @return \Illuminate\Http\Response
      */
-    public function getConfig(Request $request)
+    public function initChart(Request $request)
     {
-        $data = $this->orderChartService->getConfig($this->payload);
+        $data = $this->orderChartService->initChart($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -156,6 +156,19 @@ class OrderChartController extends CoreController
     public function cashflow(Request $request)
     {
         $data = $this->orderChartService->cashflow($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Draw Tools
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function drawTools(Request $request)
+    {
+        $data = $this->orderChartService->drawTools($this->payload);
         return $this->sendResponse($data);
     }
 }

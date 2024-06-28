@@ -113,7 +113,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             Route::group(['namespace' => 'Trading', 'prefix' => 'trading'], function () {
                 Route::group(['prefix' => 'order', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'OrderChartController@getChartData');
-                    Route::post('get-config', 'OrderChartController@getConfig');
+                    Route::post('init-chart', 'OrderChartController@initChart');
                     Route::post('get-status', 'OrderChartController@getStatus');
                     Route::post('get-account-info', 'OrderChartController@getAccountInfo');
                     Route::post('execute-order', 'OrderChartController@executeOrder');
@@ -122,6 +122,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('report', 'OrderChartController@report');
                     Route::post('export', 'OrderChartController@export');
                     Route::post('cashflow', 'OrderChartController@cashflow');
+                    Route::post('draw-tools', 'OrderChartController@drawTools');
                 });
                 Route::group(['prefix' => 'stock', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'StockController@getChart');

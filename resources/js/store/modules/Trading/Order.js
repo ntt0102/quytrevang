@@ -1,10 +1,10 @@
 function initialState() {
     return {
-        config: {},
         status: { connection: true, position: 0, pending: false },
+        config: {},
+        tools: [],
         chartData: [],
         isChartLoading: false,
-        copyists: [],
     };
 }
 
@@ -23,12 +23,12 @@ const actions = {
                 });
         });
     },
-    getConfig({ commit, dispatch, getters, state, rootGetters }) {
+    initChart({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/order/get-config", {}, { noLoading: true })
+                .post("trading/order/init-chart", {}, { noLoading: true })
                 .then((response) => {
-                    commit("setConfig", response.data);
+                    commit("setInitChart", response.data);
                     resolve();
                 });
         });
@@ -116,6 +116,15 @@ const actions = {
                 });
         });
     },
+    drawTools({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/order/draw-tools", param, { noLoading: true })
+                .then((response) => {
+                    resolve();
+                });
+        });
+    },
     resetState({ commit }) {
         commit("resetState");
     },
@@ -134,8 +143,9 @@ const mutations = {
     setOrderStatuses(state, data) {
         state.copyists = data;
     },
-    setConfig(state, data) {
-        state.config = data;
+    setInitChart(state, data) {
+        state.config = data.config;
+        state.tools = data.tools;
     },
     resetState(state) {
         state = Object.assign(state, initialState());

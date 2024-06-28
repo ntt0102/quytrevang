@@ -8,6 +8,7 @@ use App\Services\Special\VpsOrderService;
 use App\Jobs\OrderVpsJob;
 use App\Jobs\ReportTradingJob;
 use App\Jobs\ExportTradingJob;
+use App\Models\DrawTool;
 
 class OrderChartService extends CoreService
 {
@@ -22,27 +23,47 @@ class OrderChartService extends CoreService
     public function getChartData($payload)
     {
         $date = date('Y-m-d');
-        if ($payload->date == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'))
-            return $this->generateDataFromVps();
-        return $this->generateDataFromCsv($payload->date);
+        // if ($payload->date == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'))
+        return $this->generateDataFromApi();
+        // return $this->generateDataFromCsv($payload->date);
     }
 
     /**
-     * Get Config
+     * Init Chart
      *
      * @param $payload
      * 
      */
-    public function getConfig($payload)
+    public function initChart($payload)
     {
         $copyist = request()->user()->copyist;
         return [
-            'openingMarket' => get_global_value('openingMarketFlag') == '1',
-            'symbol' => get_global_value('vn30f1m'),
-            'volLimit' => 300,
-            'vpsCode' => $copyist->vps_code,
-            'vpsSession' => $copyist->vps_session,
+            'config' => [
+                'openingMarket' => get_global_value('openingMarketFlag') == '1',
+                'symbol' => get_global_value('vn30f1m'),
+                'volLimit' => 300,
+                'vpsCode' => $copyist->vps_code,
+                'vpsSession' => $copyist->vps_session
+            ],
+            'tools' => $this->getTools()
         ];
+    }
+
+    /**
+     * Get chart tool
+     *
+     * @param $payload
+     * 
+     */
+    public function getTools()
+    {
+        $result = array();
+        $ss = DrawTool::where('symbol', 'VN30F1M')->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
+        foreach ($ss as $d) {
+            if (!isset($result[$d->name])) $result[$d->name] = array();
+            $result[$d->name][$d->point] = $d->data;
+        }
+        return $result;
     }
 
     /**
@@ -165,16 +186,38 @@ class OrderChartService extends CoreService
     /**
      * Get data from VPS website
      */
-    public function generateDataFromVps()
+    public function generateDataFromApi()
     {
-        $list = $this->cloneVpsData();
-        return collect($list)->map(function ($item, $index) {
+        $vn30Data = $this->cloneVn30Data();
+        $data =  collect($vn30Data)->reduce(function ($c, $item, $index) use ($vn30Data) {
+            if ($index > 0) {
+                $time = strtotime($item->Date);
+                $prevTime = strtotime($vn30Data[$index - 1]->Date);
+                if ($time > $prevTime) {
+                    $c['vn30'][] =  [
+                        'time' => $time + $this->SHIFT_TIME,
+                        'value' => $item->IndexCurrent,
+                    ];
+                    $c['foreign'][] =  [
+                        'time' => $time + $this->SHIFT_TIME,
+                        'value' => $item->BuyForeignQuantity - $item->SellForeignQuantity,
+                    ];
+                    $c['active'][] =  [
+                        'time' => $time + $this->SHIFT_TIME,
+                        'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
+                    ];
+                }
+            }
+            return $c;
+        }, []);
+        $vn30f1mData = $this->cloneVn30f1mData();
+        $data['price'] =  collect($vn30f1mData)->map(function ($item) {
             return [
                 'time' => strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME,
-                'price' => $item->lastPrice,
-                'volume' => $this->filterVolume($item->lastVol, $index, $item->time),
+                'value' => $item->lastPrice,
             ];
         });
+        return $data;
     }
 
     /**
@@ -193,7 +236,6 @@ class OrderChartService extends CoreService
                 $c[] = [
                     'time' => $line[0] + $this->SHIFT_TIME,
                     'price' => +$line[1],
-                    'volume' => $this->filterVolume(+$line[2], $index, date('H:i:s', $line[0])),
                 ];
                 $index++;
             }
@@ -203,21 +245,23 @@ class OrderChartService extends CoreService
     }
 
     /**
-     * Check continue time
+     * Vps data
      */
-    private function filterVolume($volume, $index, $time)
+    public function cloneVn30f1mData()
     {
-        if ($index <= 1 || $time >= '14:45:00') return 0;
-        return $volume;
+        $client = new \GuzzleHttp\Client();
+        $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+        $res = $client->get($url);
+        return json_decode($res->getBody());
     }
 
     /**
      * Vps data
      */
-    private function cloneVpsData()
+    public function cloneVn30Data()
     {
         $client = new \GuzzleHttp\Client();
-        $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+        $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayMarketStatistic?symbol=VN30";
         $res = $client->get($url);
         return json_decode($res->getBody());
     }
@@ -297,5 +341,30 @@ class OrderChartService extends CoreService
             ];
         }
         return $r;
+    }
+
+    /**
+     * Draw Tools
+     *
+     * @param $payload
+     * 
+     */
+    public function drawTools($payload)
+    {
+        $symbol = 'VN30F1M';
+        if ($payload->isRemove) {
+            $dt = DrawTool::where('symbol', $symbol)->where('name', $payload->name);
+            if ($payload->name == 'line' && !!$payload->point)
+                $dt = $dt->where('point', $payload->point);
+            $dt->delete();
+        } else {
+            for ($i = 0; $i < count($payload->points); $i++) {
+                $key = ['symbol' => $symbol, 'name' => $payload->name, 'point' => $payload->points[$i]];
+                $data = ['data' => $payload->data[$i]];
+                // if ($payload->name == 'line') $data['point'] = $payload->data[$i]->price;
+                DrawTool::updateOrCreate($key, $data);
+            }
+        }
+        return (object)[];
     }
 }

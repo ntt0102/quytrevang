@@ -30,30 +30,33 @@ class ExportTradingJob implements ShouldQueue
     public function handle()
     {
         if (get_global_value('openingMarketFlag') == '1') {
+            $orderChartService = app(\App\Services\Trading\OrderChartService::class);
             $date = date('Y-m-d');
-            $filename = storage_path('app/vn30f1m/' . $date . '.csv');
-            if (file_exists($filename)) return false;
-            $list = $this->cloneVpsData();
-            $fp = fopen($filename, 'w');
-            foreach ($list as $item) {
+            $path = storage_path('app/phaisinh/' . $date);
+            if (is_dir($path)) return false;
+            if (!mkdir($path, 0777, true)) return false;
+            $vn30f1mFile = $path . '/vn30f1m.csv';
+            $vn30File = $path . '/vn30.csv';
+            $vn30f1mData = $orderChartService->cloneVn30f1mData();
+            $vn30Data = $orderChartService->cloneVn30Data();
+            $fp = fopen($vn30f1mFile, 'w');
+            foreach ($vn30f1mData as $item) {
                 $line = [];
-                $line[] = strtotime($date . ' ' . $item->time);
+                $line[] = strtotime($date . 'T' . $item->time . '.000Z');
                 $line[] = $item->lastPrice;
-                $line[] = $item->lastVol;
+                fputcsv($fp, $line);
+            }
+            fclose($fp);
+            $fp = fopen($vn30File, 'w');
+            foreach ($vn30Data as $item) {
+                $line = [];
+                $line[] = strtotime($item->Date);
+                $line[] = $item->IndexCurrent;
+                $line[] = $item->BuyForeignQuantity - $item->SellForeignQuantity;
+                $line[] = $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume;
                 fputcsv($fp, $line);
             }
             fclose($fp);
         }
-    }
-
-    /**
-     * Vps data
-     */
-    private function cloneVpsData()
-    {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-        $res = $client->get($url);
-        return json_decode($res->getBody());
     }
 }
