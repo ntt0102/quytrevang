@@ -1557,10 +1557,6 @@ function filterItemClick({ itemData }) {
                     border-top: solid 2px #2a2e39 !important;
                 }
 
-                .selected {
-                    color: #1f62ff !important;
-                }
-
                 .line {
                     position: relative;
 
@@ -1584,6 +1580,10 @@ function filterItemClick({ itemData }) {
             border: none;
             cursor: pointer;
             z-index: 3;
+
+            &.selected {
+                color: #1f62ff !important;
+            }
         }
 
         .tradingview-chart {

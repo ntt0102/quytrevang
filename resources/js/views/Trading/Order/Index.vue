@@ -2066,12 +2066,6 @@ function exportCsv() {
                     background: gold !important;
                 }
             }
-
-            .spinner {
-                width: 30px;
-                height: 30px;
-                display: none;
-            }
         }
 
         &.tool-area {
@@ -2115,6 +2109,10 @@ function exportCsv() {
         border: none;
         cursor: pointer;
         z-index: 3;
+
+        &.selected {
+            color: #1f62ff !important;
+        }
 
         &:not(.noaction):hover {
             background: #2a2e39 !important;
