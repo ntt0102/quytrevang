@@ -6,7 +6,7 @@
                     location: 'before',
                     widget: 'dxButton',
                     options: {
-                        icon: 'far fa-flag-checkered small',
+                        icon: 'far fa-poll small',
                         hint: $t('trading.orderChart.buttons.report'),
                         onClick: report,
                     },
@@ -122,7 +122,7 @@
                     ></div>
                     <div
                         ref="targetToolRef"
-                        class="command far fa-grip-lines"
+                        class="command far fa-flag-checkered"
                         :title="$t('trading.orderChart.targetTool')"
                         @click="targetToolClick"
                         @contextmenu="targetToolContextmenu"
@@ -300,7 +300,7 @@ const state = reactive({
 });
 const status = computed(() => store.state.tradingOrder.status);
 const tradingViewSrc = computed(() => {
-    return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${store.state.tradingOrder.config.vpsCode}&s=${store.state.tradingOrder.config.vpsSession}&resolution=1`;
+    return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${store.state.tradingOrder.config.vpsUser}&s=${store.state.tradingOrder.config.vpsSession}&resolution=1`;
 });
 
 store.dispatch("tradingOrder/initChart").then(connectSocket);
@@ -501,7 +501,6 @@ function eventPriceLineDrag(e) {
             if (mf.isSet(params.tools.target.B)) {
                 let param = {
                     isRemove: false,
-                    symbol: state.symbol,
                     name: "target",
                     points: [],
                     data: [],
@@ -555,7 +554,6 @@ function eventPriceLineDrag(e) {
             if (mf.isSet(params.tools.target.B)) {
                 let param = {
                     isRemove: false,
-                    symbol: state.symbol,
                     name: "target",
                     points: [],
                     data: [],
@@ -951,7 +949,7 @@ function connectSocket() {
     params.websocket.onopen = (e) => {
         let msg = {
             action: "join",
-            list: store.state.tradingOrder.config.symbol,
+            list: store.state.tradingOrder.config.vn30f1m,
         };
         params.websocket.send(
             `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
@@ -2040,7 +2038,7 @@ function exportCsv() {
 
         &.data-area {
             top: 0px;
-            left: 0px;
+            left: 32px;
 
             .command:not(:first-child) {
                 border-left: solid 2px #2a2e39 !important;
@@ -2077,16 +2075,12 @@ function exportCsv() {
         }
 
         &.tool-area {
-            top: 32px;
+            top: 0px;
             left: 0px;
             flex-direction: column;
 
             .command:not(:first-child) {
                 border-top: solid 2px #2a2e39 !important;
-            }
-
-            .selected:not(.color) {
-                color: #1f62ff !important;
             }
 
             .warning {

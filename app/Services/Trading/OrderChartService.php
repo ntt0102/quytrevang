@@ -36,14 +36,12 @@ class OrderChartService extends CoreService
      */
     public function initChart($payload)
     {
-        $copyist = request()->user()->copyist;
         return [
             'config' => [
                 'openingMarket' => get_global_value('openingMarketFlag') == '1',
-                'symbol' => get_global_value('vn30f1m'),
-                'volLimit' => 300,
-                'vpsCode' => $copyist->vps_code,
-                'vpsSession' => $copyist->vps_session
+                'vn30f1m' => get_global_value('vn30f1m'),
+                'vpsUser' => get_global_value('vpsUser'),
+                'vpsSession' => get_global_value('vpsSession'),
             ],
             'tools' => $this->getTools()
         ];
@@ -120,29 +118,6 @@ class OrderChartService extends CoreService
     }
 
     /**
-     * Get Copyist Status
-     *
-     * @param $payload
-     * 
-     */
-    public function getCopyistStatus($payload)
-    {
-        $copyists = Copyist::getCopyists();
-        $ret = [];
-        foreach ($copyists as $copyist) {
-            $vos = new VpsOrderService($copyist);
-            $status = [
-                'id' => $copyist->id,
-                'vps_code' => $copyist->vps_code,
-                'connection' => $vos->connection,
-                'position' => $vos->position,
-            ];
-            $ret[] = $status;
-        }
-        return $ret;
-    }
-
-    /**
      * Close Postion
      *
      * @param $payload
@@ -175,12 +150,10 @@ class OrderChartService extends CoreService
      * @param $payload
      * 
      */
-    public function setCopyistSession($payload)
+    public function setVpsSession($payload)
     {
-        $user = Copyist::where('vps_code', $payload->user)->first();
-        if (!$user) false;
-        $user->vps_session = $payload->session;
-        return !!$user->save();
+        return set_global_value('vpsUser', $payload->user) &&
+            set_global_value('vpsSession', $payload->session);
     }
 
     /**
@@ -225,9 +198,9 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $data = [];
+        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => []];
         $path = storage_path('app/phaisinh/' . $date);
-        if (!is_dir($path)) return false;
+        if (!is_dir($path)) return $data;
         $vn30f1mFile = $path . '/vn30f1m.csv';
         $vn30File = $path . '/vn30.csv';
         $fp = fopen($vn30f1mFile, 'r');

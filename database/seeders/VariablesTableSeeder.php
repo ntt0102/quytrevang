@@ -26,5 +26,13 @@ class VariablesTableSeeder extends Seeder
             'name' => "vn30f1m",
             'value' => "VN30F2305",
         ]);
+        Variable::create([
+            'name' => "vpsUser",
+            'value' => "",
+        ]);
+        Variable::create([
+            'name' => "vpsSession",
+            'value' => "",
+        ]);
     }
 }

@@ -82,19 +82,6 @@ class OrderChartController extends CoreController
     }
 
     /**
-     * Get Copyist Status
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function getCopyistStatus(Request $request)
-    {
-        $data = $this->orderChartService->getCopyistStatus($this->payload);
-        return $this->sendResponse($data);
-    }
-
-    /**
      * Close Position
      *
      * @param \Illuminate\Http\Request $request
@@ -114,9 +101,9 @@ class OrderChartController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function setCopyistSession(Request $request)
+    public function setVpsSession(Request $request)
     {
-        $data = $this->orderChartService->setCopyistSession($request);
+        $data = $this->orderChartService->setVpsSession($request);
         return $this->sendResponseWithoutEncrypt($data);
     }
 

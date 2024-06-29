@@ -69,26 +69,11 @@ const actions = {
                 });
         });
     },
-    getCopyistStatus({ commit, dispatch, getters, state, rootGetters }) {
-        return new Promise((resolve, reject) => {
-            axios
-                .post(
-                    "trading/order/get-copyist-status",
-                    {},
-                    { noLoading: true }
-                )
-                .then((response) => {
-                    commit("setOrderStatuses", response.data);
-                    resolve();
-                });
-        });
-    },
     closePosition({ commit, dispatch, getters, state, rootGetters }, id) {
         return new Promise((resolve, reject) => {
             axios
                 .post("trading/order/close-position", { id })
                 .then((response) => {
-                    dispatch("getCopyistStatus");
                     resolve(response.data);
                 });
         });

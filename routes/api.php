@@ -19,7 +19,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('send-comment', 'AppController@sendComment');
     Route::post('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
-    Route::post('core.vpbs', 'Trading\OrderChartController@setCopyistSession');
+    Route::post('core.vpbs', 'Trading\OrderChartController@setVpsSession');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login')->name('login');
@@ -117,7 +117,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('get-status', 'OrderChartController@getStatus');
                     Route::post('get-account-info', 'OrderChartController@getAccountInfo');
                     Route::post('execute-order', 'OrderChartController@executeOrder');
-                    Route::post('get-copyist-status', 'OrderChartController@getCopyistStatus');
                     Route::post('close-position', 'OrderChartController@closePosition');
                     Route::post('report', 'OrderChartController@report');
                     Route::post('export', 'OrderChartController@export');
