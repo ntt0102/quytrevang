@@ -72,8 +72,7 @@ class OrderChartService extends CoreService
      */
     public function getStatus($payload)
     {
-        $copyist = request()->user()->copyist;
-        $vos = new VpsOrderService($copyist);
+        $vos = new VpsOrderService();
         return [
             'connection' => $vos->connection,
             'position' => $vos->position,
@@ -89,8 +88,7 @@ class OrderChartService extends CoreService
      */
     public function getAccountInfo($payload)
     {
-        $copyist = request()->user()->copyist;
-        $vos = new VpsOrderService($copyist);
+        $vos = new VpsOrderService();
         return $vos->getAccountInfo();
     }
 
@@ -104,14 +102,8 @@ class OrderChartService extends CoreService
     {
         return $this->transaction(
             function () use ($payload) {
-                $copyist = request()->user()->copyist;
-                $vos = new VpsOrderService($copyist);
+                $vos = new VpsOrderService();
                 $ret = $vos->execute($payload);
-                if ($copyist->share && $ret['isOk']) {
-                    Copyist::getCopyists()->each(function ($copyist) use ($payload) {
-                        OrderVpsJob::dispatch($copyist, $payload);
-                    });
-                }
                 return $ret;
             }
         );
@@ -127,8 +119,7 @@ class OrderChartService extends CoreService
     {
         return $this->transaction(
             function () use ($payload) {
-                $copyist = Copyist::find($payload->id);
-                $vos = new VpsOrderService($copyist);
+                $vos = new VpsOrderService();
                 $data = (object)[
                     "action" => "exit",
                     "tpData" => ["cmd" => "cancel"],
