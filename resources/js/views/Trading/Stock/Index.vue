@@ -981,7 +981,6 @@ function uplpsToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
-    else drawUplpsTool();
 }
 function uplpsToolContextmenu(e) {
     removeUplpsTool();
@@ -1089,7 +1088,6 @@ function downlpsToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
-    else drawDownlpsTool();
 }
 function downlpsToolContextmenu(e) {
     removeDownlpsTool();

@@ -102,36 +102,7 @@ Route::get('test', function () {
     // $o = \App\Models\StockOrder::find(1);
     // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
     // $s = app(\App\Services\Trading\StatisticService::class)->calculateProfit($o);
-    // dd($s);
-    if (get_global_value('openingMarketFlag') == '1') {
-        $orderChartService = app(\App\Services\Trading\OrderChartService::class);
-        $date = date('Y-m-d');
-        $path = storage_path('app/phaisinh/' . $date);
-        if (is_dir($path)) return false;
-        if (!mkdir($path, 0777, true)) return false;
-        $vn30f1mFile = $path . '/vn30f1m.csv';
-        // dd($vn30f1mFile);
-        $vn30File = $path . '/vn30.csv';
-        $vn30f1mData = $orderChartService->cloneVn30f1mData();
-        $vn30Data = $orderChartService->cloneVn30Data();
-        $fp = fopen($vn30f1mFile, 'w');
-        foreach ($vn30f1mData as $item) {
-            $line = [];
-            $line[] = strtotime($date . 'T' . $item->time . '.000Z');
-            $line[] = $item->lastPrice;
-            fputcsv($fp, $line);
-        }
-        fclose($fp);
-        $fp = fopen($vn30File, 'w');
-        foreach ($vn30Data as $item) {
-            $line = [];
-            $line[] = strtotime($item->Date);
-            $line[] = $item->IndexCurrent;
-            $line[] = $item->BuyForeignQuantity - $item->SellForeignQuantity;
-            $line[] = $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume;
-            fputcsv($fp, $line);
-        }
-        fclose($fp);
-    }
+    $s = new \App\Services\Special\VpsOrderService();
+    dd($s);
     return 'ok';
 });
