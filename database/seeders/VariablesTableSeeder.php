@@ -34,5 +34,21 @@ class VariablesTableSeeder extends Seeder
             'name' => "vpsSession",
             'value' => "",
         ]);
+        Variable::create([
+            'name' => "entryOrderId",
+            'value' => "",
+        ]);
+        Variable::create([
+            'name' => "tpOrderId",
+            'value' => "",
+        ]);
+        Variable::create([
+            'name' => "slOrderId",
+            'value' => "",
+        ]);
+        Variable::create([
+            'name' => "exitOrderId",
+            'value' => "",
+        ]);
     }
 }

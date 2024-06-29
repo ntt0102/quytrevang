@@ -3,22 +3,33 @@
 namespace App\Services\Special;
 
 use App\Services\CoreService;
-use App\Models\Copyist;
+use App\Models\Parameter;
 use GuzzleHttp\Client;
 
 class VpsOrderService extends CoreService
 {
     private $client;
-    private $copyist;
+    public $orderVolume;
     public $symbol;
+    public $vpsUser;
+    public $vpsSession;
+    public $orderId;
     public $connection = false;
     public $position = 0;
 
-    public function __construct(Copyist $copyist)
+    public function __construct()
     {
         $this->client = new Client();
-        $this->copyist = $copyist;
+        $this->orderVolume = (int) Parameter::getValue('orderVolume');
         $this->symbol = get_global_value('vn30f1m');
+        $this->vpsUser = get_global_value('vpsUser');
+        $this->vpsSession = get_global_value('vpsSession');
+        $this->orderId = [
+            'entry' => get_global_value('entryOrderId'),
+            'tp' => get_global_value('tpOrderId'),
+            'sl' => get_global_value('slOrderId'),
+            'exit' => get_global_value('exitOrderId'),
+        ];
         $this->getPosition();
     }
 
@@ -26,8 +37,8 @@ class VpsOrderService extends CoreService
     {
         $payload = [
             "group" => "Q",
-            "user" => $this->copyist->vps_code,
-            "session" => $this->copyist->vps_session,
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
             "c" => "H",
             "data" => [
                 "type" => "string",
@@ -49,8 +60,8 @@ class VpsOrderService extends CoreService
         if (!$this->connection) return false;
         $payload = [
             "group" => "Q",
-            "user" => $this->copyist->vps_code,
-            "session" => $this->copyist->vps_session,
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
             "c" => "H",
             "data" => [
                 "type" => "string",
@@ -73,8 +84,8 @@ class VpsOrderService extends CoreService
         if (!$this->connection) return false;
         $payload = [
             "group" => "B",
-            "user" => $this->copyist->vps_code,
-            "session" => $this->copyist->vps_session,
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
             "data" => [
                 "type" => "cursor",
                 "cmd" => "list_condition_order",
@@ -101,8 +112,8 @@ class VpsOrderService extends CoreService
         if (!$this->connection) return false;
         $payload = [
             "group" => "Q",
-            "user" => $this->copyist->vps_code,
-            "session" => $this->copyist->vps_session,
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
             "c" => "H",
             "data" => [
                 "type" => "string",
@@ -183,17 +194,17 @@ class VpsOrderService extends CoreService
         $side = $isSl ? -$this->position : ($isNew ? $data->side : $this->position);
         $payload = [
             "group" => "O",
-            "user" => $this->copyist->vps_code,
-            "session" => $this->copyist->vps_session,
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
             "language" => "vi",
             "data" => [
                 "cmd" => "co.stop.order." . $data->cmd,
                 "accountNo" => $this->formatAccount(),
                 "pin" => "",
-                "orderId" => $this->copyist->{$type . '_order_id'},
+                "orderId" => $this->orderId[$type],
                 "channel" => "H",
                 "priceType" => "MTL",
-                "quantity" => strval($isSl ? (abs($this->position)) : $this->copyist->volume),
+                "quantity" => strval($isSl ? (abs($this->position)) : $this->orderVolume),
                 "relation" => $isNotDelete ? $this->formatRelation($side) : "",
                 "side" => $isNew ? $this->formatSide($side) : "",
                 "stopOrderType" => "stop",
@@ -209,7 +220,7 @@ class VpsOrderService extends CoreService
                 return ['isOk' => false, 'message' => 'failOrder'];
             else return ['isOk' => true];
         }
-        $isOk = $this->copyist->update([$type . '_order_id' => $rsp->data->stopOrderID]);
+        $isOk = set_global_value($type . 'OrderId', $rsp->data->stopOrderID);
         if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
         return ['isOk' => true];
     }
@@ -225,8 +236,8 @@ class VpsOrderService extends CoreService
         $volume = abs($this->position);
         $payload = [
             "group" => "FD",
-            "user" => $this->copyist->vps_code,
-            "session" => $this->copyist->vps_session,
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
             "c" => "H",
             "checksum" => $isNotCancel ? $this->createCheckSum($isNew, $price, $side, $account, $refId) : "",
             "language" => "vi",
@@ -235,7 +246,7 @@ class VpsOrderService extends CoreService
                 "cmd" => "Web." . $data->cmd . "Order",
                 "account" => $account,
                 "pin" => "",
-                "orderNo" => $this->copyist->{$type . '_order_id'},
+                "orderNo" => $this->orderId[$type],
                 "price" => $price,
                 "nprice" => $price,
                 "side" => $side,
@@ -256,14 +267,14 @@ class VpsOrderService extends CoreService
                 return ['isOk' => false, 'message' => 'failOrder'];
             else return ['isOk' => true];
         }
-        $isOk = $this->copyist->update([$type . '_order_id' => $rsp->data[0]->orderNo]);
+        $isOk = set_global_value($type . 'OrderId', $rsp->data[0]->orderNo);
         if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
         return ['isOk' => true];
     }
 
     public function formatAccount()
     {
-        return $this->copyist->vps_code . "8";
+        return $this->vpsUser . "8";
     }
 
     public function formatPrice($price)
@@ -291,15 +302,15 @@ class VpsOrderService extends CoreService
         for ($i = 0; $i < 23; $i++)
             $text .= substr($str, floor(strlen($str) * rand() / getrandmax()), 1);
 
-        return $this->copyist->vps_code . ".H." . $text;
+        return $this->vpsUser . ".H." . $text;
     }
 
     public function createCheckSum($isNew, $price, $side, $account, $refId)
     {
-        $checkSum = $this->copyist->vps_session;
+        $checkSum = $this->vpsSession;
         $checkSum .= $isNew ? $price : "undefined";
         if ($isNew) $checkSum .= $side;
-        $checkSum .= ($isNew ? $this->copyist->volume * 100 : 0) . "vpbs@456";
+        $checkSum .= ($isNew ? $this->orderVolume * 100 : 0) . "vpbs@456";
         if ($isNew) {
             $checkSum .= $account;
             $checkSum .= $this->symbol;

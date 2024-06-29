@@ -40,9 +40,9 @@ class ParametersTableSeeder extends Seeder
             'description' => "Tỷ lệ ký quỹ",
         ]);
         Parameter::create([
-            'slug' => "copyRate",
-            'value' => "0.2",
-            'description' => "Tỷ lệ sao chép",
+            'slug' => "orderVolume",
+            'value' => "1",
+            'description' => "Khối lượng đặt lệnh PS",
         ]);
     }
 }
