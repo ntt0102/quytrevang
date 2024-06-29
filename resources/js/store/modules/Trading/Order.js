@@ -107,15 +107,6 @@ const actions = {
             });
         });
     },
-    cashflow({ commit, dispatch, getters, state, rootGetters }, symbol) {
-        return new Promise((resolve, reject) => {
-            axios
-                .post("trading/order/cashflow", { symbol })
-                .then((response) => {
-                    resolve(response.data);
-                });
-        });
-    },
     drawTools({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios

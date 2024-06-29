@@ -23,9 +23,9 @@ class OrderChartService extends CoreService
     public function getChartData($payload)
     {
         $date = date('Y-m-d');
-        // if ($payload->date == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'))
-        return $this->generateDataFromApi();
-        // return $this->generateDataFromCsv($payload->date);
+        if ($payload->date == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'))
+            return $this->generateDataFromApi();
+        return $this->generateDataFromCsv($payload->date);
     }
 
     /**
@@ -191,19 +191,19 @@ class OrderChartService extends CoreService
         $vn30Data = $this->cloneVn30Data();
         $data =  collect($vn30Data)->reduce(function ($c, $item, $index) use ($vn30Data) {
             if ($index > 0) {
-                $time = strtotime($item->Date);
-                $prevTime = strtotime($vn30Data[$index - 1]->Date);
+                $time = strtotime($item->Date) + $this->SHIFT_TIME;
+                $prevTime = strtotime($vn30Data[$index - 1]->Date) + $this->SHIFT_TIME;
                 if ($time > $prevTime) {
                     $c['vn30'][] =  [
-                        'time' => $time + $this->SHIFT_TIME,
+                        'time' => $time,
                         'value' => $item->IndexCurrent,
                     ];
                     $c['foreign'][] =  [
-                        'time' => $time + $this->SHIFT_TIME,
+                        'time' => $time,
                         'value' => $item->BuyForeignQuantity - $item->SellForeignQuantity,
                     ];
                     $c['active'][] =  [
-                        'time' => $time + $this->SHIFT_TIME,
+                        'time' => $time,
                         'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
                     ];
                 }
@@ -213,7 +213,7 @@ class OrderChartService extends CoreService
         $vn30f1mData = $this->cloneVn30f1mData();
         $data['price'] =  collect($vn30f1mData)->map(function ($item) {
             return [
-                'time' => strtotime(date('Y-m-d ') . $item->time) + $this->SHIFT_TIME,
+                'time' => strtotime(date('Y-m-d') . 'T' . $item->time . 'Z'),
                 'value' => $item->lastPrice,
             ];
         });
@@ -225,23 +225,44 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $c = [];
-        $filename = storage_path('app/vn30f1m/' . $date . '.csv');
-        if (!file_exists($filename)) return $c;
-        $fp = fopen($filename, 'r');
-        $index = 0;
+        $data = [];
+        $path = storage_path('app/phaisinh/' . $date);
+        if (!is_dir($path)) return false;
+        $vn30f1mFile = $path . '/vn30f1m.csv';
+        $vn30File = $path . '/vn30.csv';
+        $fp = fopen($vn30f1mFile, 'r');
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
-                $c[] = [
-                    'time' => $line[0] + $this->SHIFT_TIME,
-                    'price' => +$line[1],
+                $data['price'][] = [
+                    'time' => +$line[0],
+                    'value' => +$line[1],
                 ];
-                $index++;
             }
         }
         fclose($fp);
-        return $c;
+        //
+        $fp = fopen($vn30File, 'r');
+        while (!feof($fp)) {
+            $line = fgetcsv($fp);
+            if (!!$line) {
+                $time = +$line[0] + $this->SHIFT_TIME;
+                $data['vn30'][] = [
+                    'time' => $time,
+                    'value' => +$line[1],
+                ];
+                $data['foreign'][] = [
+                    'time' => $time,
+                    'value' => +$line[2],
+                ];
+                $data['active'][] = [
+                    'time' => $time,
+                    'value' => +$line[3],
+                ];
+            }
+        }
+        fclose($fp);
+        return $data;
     }
 
     /**
@@ -295,55 +316,6 @@ class OrderChartService extends CoreService
     }
 
     /**
-     * Cashflow
-     * 
-     * @param $payload
-     * 
-     */
-    public function cashflow($payload)
-    {
-        $r = ['price' => [], 'avg' => [], 'cash' => []];
-        $client = new \GuzzleHttp\Client();
-        $url = "https://iboard.ssi.com.vn/dchart/api/history?resolution=D&symbol=" . $payload->symbol . "&from=" . strtotime("-3 year") . "&to=" . time();
-        $res = $client->get($url);
-        $rsp = json_decode($res->getBody());
-        if ($rsp->s != 'ok') return $r;
-        $acc = 0;
-        $prevAvg = ($rsp->h[0] + $rsp->l[0] + $rsp->c[0]) / 3;
-        // $prevClose = $rsp->c[0];
-        for ($i = 0; $i < count($rsp->t); $i++) {
-            $r['price'][] = [
-                'time' => $rsp->t[$i],
-                'open' => +$rsp->o[$i],
-                'high' => +$rsp->h[$i],
-                'low' => +$rsp->l[$i],
-                'close' => +$rsp->c[$i]
-            ];
-            $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
-            // $close = +$rsp->c[$i];
-            $r['avg'][] = [
-                'time' => $rsp->t[$i],
-                'value' => $avg
-                // 'value' => $close
-            ];
-            $change = $avg - $prevAvg;
-            // $change = $close - $prevClose;
-            $side = 0;
-            if ($change > 0) $side = 1;
-            else if ($change < 0) $side = -1;
-            $prevAvg = $avg;
-            // $prevClose = $close;
-            $cash = $side * $rsp->v[$i];
-            $acc += $cash;
-            $r['cash'][] = [
-                'time' => $rsp->t[$i],
-                'value' => $acc
-            ];
-        }
-        return $r;
-    }
-
-    /**
      * Draw Tools
      *
      * @param $payload
@@ -361,7 +333,6 @@ class OrderChartService extends CoreService
             for ($i = 0; $i < count($payload->points); $i++) {
                 $key = ['symbol' => $symbol, 'name' => $payload->name, 'point' => $payload->points[$i]];
                 $data = ['data' => $payload->data[$i]];
-                // if ($payload->name == 'line') $data['point'] = $payload->data[$i]->price;
                 DrawTool::updateOrCreate($key, $data);
             }
         }

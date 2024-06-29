@@ -20,15 +20,6 @@
                         onClick: exportCsv,
                     },
                 },
-                {
-                    location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-chart-line small',
-                        hint: $t('trading.orderChart.buttons.cashflow'),
-                        onClick: () => $refs.dailyCashFlowPopupRef.show(),
-                    },
-                },
             ]"
         />
         <div

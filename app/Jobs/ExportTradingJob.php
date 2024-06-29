@@ -42,7 +42,7 @@ class ExportTradingJob implements ShouldQueue
             $fp = fopen($vn30f1mFile, 'w');
             foreach ($vn30f1mData as $item) {
                 $line = [];
-                $line[] = strtotime($date . 'T' . $item->time . '.000Z');
+                $line[] = strtotime($date . 'T' . $item->time . 'Z');
                 $line[] = $item->lastPrice;
                 fputcsv($fp, $line);
             }

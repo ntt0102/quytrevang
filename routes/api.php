@@ -121,7 +121,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('close-position', 'OrderChartController@closePosition');
                     Route::post('report', 'OrderChartController@report');
                     Route::post('export', 'OrderChartController@export');
-                    Route::post('cashflow', 'OrderChartController@cashflow');
                     Route::post('draw-tools', 'OrderChartController@drawTools');
                 });
                 Route::group(['prefix' => 'stock', 'middleware' => ['can:stock@order']], function () {

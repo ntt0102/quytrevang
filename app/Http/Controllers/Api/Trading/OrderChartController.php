@@ -147,19 +147,6 @@ class OrderChartController extends CoreController
     }
 
     /**
-     * Cashflow.
-     *
-     * @param Illuminate\Http\Request $request
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function cashflow(Request $request)
-    {
-        $data = $this->orderChartService->cashflow($this->payload);
-        return $this->sendResponse($data);
-    }
-
-    /**
      * Draw Tools
      *
      * @param \Illuminate\Http\Request $request
