@@ -96,7 +96,7 @@
                             @focusOut="() => (state.isSymbolFocus = false)"
                         />
                     </div>
-                    <div class="command timframe-select">
+                    <div class="command timeframe-select">
                         <DxSelectBox
                             :data-source="['D', 'W', 'M']"
                             :showDropDownButton="false"
@@ -1541,16 +1541,10 @@ function filterItemClick({ itemData }) {
                     }
                 }
 
-                .timframe-select {
+                .timeframe-select {
                     .dx-editor-underlined::after {
                         border-bottom: none !important;
                     }
-                }
-
-                .spinner {
-                    width: 30px;
-                    height: 30px;
-                    display: none;
                 }
             }
 
