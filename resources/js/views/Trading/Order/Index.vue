@@ -178,7 +178,6 @@
 
 <script setup>
 import LineContextMenu from "./LineContextMenu.vue";
-import toolsStore from "../../../plugins/orderChartDb.js";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
 import { confirm } from "devextreme/ui/dialog";
@@ -315,7 +314,6 @@ params.interval60 = setInterval(
     () => store.dispatch("tradingOrder/getStatus"),
     60000
 );
-toolsStore.create();
 
 onMounted(() => {
     params.chart = createChart(orderChartRef.value, CHART_OPTIONS);
@@ -424,7 +422,7 @@ function eventPriceLineDrag(e) {
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
-                                    drawOrderLine(lineOptions.kind);
+                                    drawOrderLine([lineOptions.kind]);
                                     toast.success(
                                         t(
                                             "trading.orderChart.changeEntrySuccess"
@@ -452,7 +450,7 @@ function eventPriceLineDrag(e) {
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
-                                    drawOrderLine(lineOptions.kind);
+                                    drawOrderLine([lineOptions.kind]);
                                     toast.success(
                                         t("trading.orderChart.changeTpSuccess")
                                     );
@@ -474,7 +472,7 @@ function eventPriceLineDrag(e) {
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
-                                    drawOrderLine(lineOptions.kind);
+                                    drawOrderLine([lineOptions.kind]);
                                     toast.success(
                                         t("trading.orderChart.changeSlSuccess")
                                     );
@@ -699,24 +697,35 @@ function toggleFullscreen() {
 }
 function loadToolsData() {
     const tools = store.state.tradingOrder.tools;
-    for (const [name, tool] of Object.entries(tools)) {
+    for (const [name, points] of Object.entries(tools)) {
         switch (name) {
+            case "order":
+                if (status.value.pending) {
+                    Object.entries(points).forEach(([point, line]) => {
+                        params.order.side = line.side;
+                        params.order[point].price = line.price;
+                        params.order[point].line =
+                            params.series.price.createPriceLine(line);
+                        toggleCancelOrderButton(true);
+                    });
+                }
+                break;
             case "line":
-                Object.values(tool).forEach((line) =>
+                Object.values(points).forEach((line) =>
                     params.tools.lines.push(
                         params.series.price.createPriceLine(line)
                     )
                 );
                 break;
             case "target":
-                Object.entries(tool).forEach(
+                Object.entries(points).forEach(
                     ([point, line]) =>
                         (params.tools.target[point] =
                             params.series.price.createPriceLine(line))
                 );
                 break;
             case "rr":
-                Object.entries(tool).forEach(
+                Object.entries(points).forEach(
                     ([point, line]) =>
                         (params.tools.rr[point] =
                             params.series.price.createPriceLine(line))
@@ -724,13 +733,13 @@ function loadToolsData() {
                 break;
             default:
                 if (name.includes("uplps")) {
-                    Object.entries(tool).forEach(
+                    Object.entries(points).forEach(
                         ([point, line]) =>
                             (params.tools.uplps[point] =
                                 params.series.price.createPriceLine(line))
                     );
                 } else if (name.includes("downlps")) {
-                    Object.entries(tool).forEach(
+                    Object.entries(points).forEach(
                         ([point, line]) =>
                             (params.tools.downlps[point] =
                                 params.series.price.createPriceLine(line))
@@ -739,102 +748,6 @@ function loadToolsData() {
                 break;
         }
     }
-    // return new Promise(async (resolve) => {
-    //     if (status.value.pending) {
-    //         const order = await toolsStore.get("order");
-    //         order.map((item) => {
-    //             params.order.side = item.side;
-    //             params.order[item.kind].price = item.price;
-    //             drawOrderLine(item.kind);
-    //             toggleCancelOrderButton(true);
-    //         });
-    //         if (params.order.tp.hasOwnProperty("line"))
-    //             params.order.entry.line.applyOptions({
-    //                 draggable: false,
-    //             });
-    //     }
-    //     //
-    //     const lines = await toolsStore.get("line");
-    //     lines.forEach((line) => {
-    //         if (!line.removed)
-    //             params.lines.push(params.series.price.createPriceLine(line));
-    //     });
-    //     //
-    //     const boxs = await toolsStore.get("box");
-    //     if (boxs.length > 0) {
-    //         params.box = boxs;
-    //         boxs.forEach((box, i) => {
-    //             if (mf.isSet(box.x)) params.series.box.update(box.x);
-    //             if (mf.isSet(box.y))
-    //                 params.box[i].y = params.series.cash.createPriceLine(box.y);
-    //             if (mf.isSet(box.z))
-    //                 params.box[i].z = params.series.price.createPriceLine(
-    //                     box.z
-    //                 );
-    //         });
-    //     }
-    //     //
-    //     const rulerLines = await toolsStore.get("ruler");
-    //     if (rulerLines.length > 0) {
-    //         params.ruler.pointCount = rulerLines.length > 1 ? 2 : 1;
-    //         rulerLines.forEach((line) => {
-    //             params.ruler[line.point] =
-    //                 params.series.price.createPriceLine(line);
-    //         });
-    //     }
-    //     //
-    //     const targetLines = await toolsStore.get("target");
-    //     if (targetLines.length > 0) {
-    //         targetLines.forEach((line) => {
-    //             params.target[line.point] =
-    //                 params.series.cash.createPriceLine(line);
-    //         });
-    //     }
-    //     //
-    //     const pattern1Lines = await toolsStore.get("pattern1");
-    //     if (pattern1Lines.length > 0) {
-    //         pattern1Lines.forEach((line) => {
-    //             params.pattern1[line.point] =
-    //                 params.series.price.createPriceLine(line);
-    //         });
-    //     }
-    //     //
-    //     const uplpsLines = await toolsStore.get("uplps");
-    //     if (uplpsLines.length > 0) {
-    //         uplpsLines.forEach((line) => {
-    //             params.uplps[line.title] =
-    //                 params.series[
-    //                     line.title.includes("P") ? "price" : "cash"
-    //                 ].createPriceLine(line);
-    //         });
-    //     }
-    //     //
-    //     const downlpsLines = await toolsStore.get("downlps");
-    //     if (downlpsLines.length > 0) {
-    //         downlpsLines.forEach((line) => {
-    //             params.downlps[line.title] =
-    //                 params.series[
-    //                     line.title.includes("P") ? "price" : "cash"
-    //                 ].createPriceLine(line);
-    //         });
-    //     }
-    //     //
-    //     const pattern2Lines = await toolsStore.get("pattern2");
-    //     if (pattern2Lines.length > 0) {
-    //         pattern2Lines.forEach((line) => {
-    //             params.pattern2[line.point] =
-    //                 params.series.price.createPriceLine(line);
-    //         });
-    //     }
-    //     //
-    //     const alerts = await toolsStore.get("alert");
-    //     alerts.forEach((alert) => {
-    //         if (!alert.removed)
-    //             params.alerts.push(params.series.price.createPriceLine(alert));
-    //     });
-    //     //
-    //     resolve();
-    // });
 }
 function loadChartData() {
     if (params.loadWhitespace) {
@@ -1002,11 +915,8 @@ function intervalHandler() {
                         })
                         .then((resp) => {
                             if (resp.isOk) {
-                                removeOrderLine("entry");
-                                removeOrderLine("tp");
-                                removeOrderLine("sl");
+                                removeOrderLine(["entry", "tp", "sl"]);
                                 toggleCancelOrderButton(false);
-                                toolsStore.clear("order");
                                 toast.success(
                                     t(
                                         "trading.orderChart.autoCancelTpSlSuccess"
@@ -1123,54 +1033,71 @@ function blinkSocketStatus(status) {
             connectionRef.value.classList.remove("blink");
     }
 }
-function drawOrderLine(kind) {
+function drawOrderLine(kinds) {
+    const TYPE = "order";
+    let param = {
+        isRemove: false,
+        name: TYPE,
+        points: [],
+        data: [],
+    };
     let color, title;
-    switch (kind) {
-        case "entry":
-            color = "yellow";
-            title = params.order.side > 0 ? "LONG" : "SHORT";
-            break;
-        case "tp":
-            color = "lime";
-            title = Math.abs(
-                params.order.tp.price - params.order.entry.price
-            ).toFixed(1);
-            break;
-        case "sl":
-            color = "red";
-            title = Math.abs(
-                params.order.sl.price - params.order.entry.price
-            ).toFixed(1);
-            break;
-    }
-    if (params.order[kind].hasOwnProperty("line")) {
-        params.order[kind].line.applyOptions({
-            price: params.order[kind].price,
-            title: title,
-        });
-    } else {
-        params.order[kind].line = params.series.price.createPriceLine({
-            lineType: "order",
-            kind: kind,
-            price: params.order[kind].price,
-            color: color,
-            lineWidth: 1,
-            lineStyle: 0,
-            title: title,
-            draggable: true,
-        });
-    }
-    toolsStore.set("order", {
-        kind: kind,
-        price: +params.order[kind].price,
-        side: params.order.side,
+    kinds.forEach((kind) => {
+        switch (kind) {
+            case "entry":
+                color = "yellow";
+                title = params.order.side > 0 ? "LONG" : "SHORT";
+                break;
+            case "tp":
+                color = "lime";
+                title = Math.abs(
+                    params.order.tp.price - params.order.entry.price
+                ).toFixed(1);
+                break;
+            case "sl":
+                color = "red";
+                title = Math.abs(
+                    params.order.sl.price - params.order.entry.price
+                ).toFixed(1);
+                break;
+        }
+        param.points.push(kind);
+        if (params.order[kind].hasOwnProperty("line")) {
+            params.order[kind].line.applyOptions({
+                price: params.order[kind].price,
+                title: title,
+            });
+            param.data.push(params.order[kind].line.options());
+        } else {
+            const options = {
+                lineType: TYPE,
+                kind: kind,
+                side: params.order.side,
+                price: params.order[kind].price,
+                color: color,
+                lineWidth: 1,
+                lineStyle: 0,
+                title: title,
+                draggable: true,
+            };
+            params.order[kind].line =
+                params.series.price.createPriceLine(options);
+            param.data.push(options);
+        }
     });
+    store.dispatch("tradingOrder/drawTools", param);
 }
-function removeOrderLine(kind) {
-    if (params.order[kind].hasOwnProperty("line")) {
-        params.series.price.removePriceLine(params.order[kind].line);
-        delete params.order[kind].line;
-    }
+function removeOrderLine(kinds) {
+    kinds.forEach((kind) => {
+        if (params.order[kind].hasOwnProperty("line")) {
+            params.series.price.removePriceLine(params.order[kind].line);
+            delete params.order[kind].line;
+        }
+        store.dispatch("tradingOrder/drawTools", {
+            isRemove: true,
+            name: "order",
+        });
+    });
 }
 function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
@@ -1224,18 +1151,16 @@ function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
     }
     lineToolRef.value.classList.remove("selected");
 }
-function removeLineTool(server = true) {
+function removeLineTool() {
     if (params.tools.lines.length > 0) {
         params.tools.lines.forEach((line) =>
             params.series.price.removePriceLine(line)
         );
         params.tools.lines = [];
-        if (server)
-            store.dispatch("tradingOrder/drawTools", {
-                isRemove: true,
-                name: "line",
-                point: null,
-            });
+        store.dispatch("tradingOrder/drawTools", {
+            isRemove: true,
+            name: "line",
+        });
     }
 }
 function uplpsToolClick(e) {
@@ -1257,7 +1182,7 @@ function drawUplpsTool() {
     if (mf.isSet(params.tools.uplps[`${char}1`])) {
         startTime = +params.tools.uplps[`${char}1`].options().startTime;
         endTime = params.crosshair.time;
-        removeUplpsTool(false);
+        removeUplpsTool();
     } else startTime = params.crosshair.time;
     const { value1, value2 } = findUplps(startTime, endTime);
     let option = {
@@ -1325,7 +1250,7 @@ function findUplps(startTime, endTime) {
         value2: +(v3 - dMax).toFixed(2),
     };
 }
-function removeUplpsTool(server = true) {
+function removeUplpsTool() {
     const name = "price";
     const char = "P";
     const point1 = `${char}1`;
@@ -1336,11 +1261,10 @@ function removeUplpsTool(server = true) {
     }
     params.tools.uplps[point1] = {};
     params.tools.uplps[point2] = {};
-    if (server)
-        store.dispatch("tradingOrder/drawTools", {
-            isRemove: true,
-            name: `${name}uplps`,
-        });
+    store.dispatch("tradingOrder/drawTools", {
+        isRemove: true,
+        name: `${name}uplps`,
+    });
 }
 function downlpsToolClick(e) {
     state.showLineContext = false;
@@ -1429,7 +1353,7 @@ function findDownlps(startTime, endTime) {
         value2: +(v3 - dMax).toFixed(2),
     };
 }
-function removeDownlpsTool(server = true) {
+function removeDownlpsTool() {
     const name = "price";
     const char = "P";
     const point1 = `${char}1`;
@@ -1440,11 +1364,10 @@ function removeDownlpsTool(server = true) {
     }
     params.tools.downlps[point1] = {};
     params.tools.downlps[point2] = {};
-    if (server)
-        store.dispatch("tradingOrder/drawTools", {
-            isRemove: true,
-            name: `${name}downlps`,
-        });
+    store.dispatch("tradingOrder/drawTools", {
+        isRemove: true,
+        name: `${name}downlps`,
+    });
 }
 function targetToolClick(e) {
     state.showLineContext = false;
@@ -1527,7 +1450,7 @@ function drawTargetTool() {
     }
     store.dispatch("tradingOrder/drawTools", param);
 }
-function removeTargetTool(server = true) {
+function removeTargetTool() {
     if (mf.isSet(params.tools.target.A)) {
         params.series.price.removePriceLine(params.tools.target.A);
         if (mf.isSet(params.tools.target.B)) {
@@ -1538,11 +1461,10 @@ function removeTargetTool(server = true) {
         }
         params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
     }
-    if (server)
-        store.dispatch("tradingOrder/drawTools", {
-            isRemove: true,
-            name: "target",
-        });
+    store.dispatch("tradingOrder/drawTools", {
+        isRemove: true,
+        name: "target",
+    });
 }
 function rrToolClick(e) {
     state.showLineContext = false;
@@ -1620,7 +1542,7 @@ function drawRrTool() {
     }
     store.dispatch("tradingOrder/drawTools", param);
 }
-function removeRrTool(server = true) {
+function removeRrTool() {
     if (mf.isSet(params.tools.rr.EP)) {
         params.series.price.removePriceLine(params.tools.rr.EP);
         if (mf.isSet(params.tools.rr.SL)) {
@@ -1631,11 +1553,10 @@ function removeRrTool(server = true) {
         }
     }
     params.tools.rr = { EP: {}, SL: {}, TP: {} };
-    if (server)
-        store.dispatch("tradingOrder/drawTools", {
-            isRemove: true,
-            name: "rr",
-        });
+    store.dispatch("tradingOrder/drawTools", {
+        isRemove: true,
+        name: "rr",
+    });
 }
 async function cancelOrderClick() {
     let result = true;
@@ -1660,11 +1581,8 @@ async function cancelOrderClick() {
                     })
                     .then((resp) => {
                         if (resp.isOk) {
-                            removeOrderLine("entry");
-                            removeOrderLine("tp");
-                            removeOrderLine("sl");
+                            removeOrderLine(["entry", "tp", "sl"]);
                             toggleCancelOrderButton(false);
-                            toolsStore.clear("order");
                             toast.success(t("trading.orderChart.exitSuccess"));
                         } else {
                             toggleCancelOrderButton(true);
@@ -1679,9 +1597,8 @@ async function cancelOrderClick() {
                     })
                     .then((resp) => {
                         if (resp.isOk) {
-                            removeOrderLine("entry");
+                            removeOrderLine(["entry"]);
                             toggleCancelOrderButton(false);
-                            toolsStore.clear("order");
                             toast.success(
                                 t("trading.orderChart.deleteEntrySuccess")
                             );
@@ -1733,7 +1650,7 @@ function entryOrderClick() {
                 })
                 .then((resp) => {
                     if (resp.isOk) {
-                        drawOrderLine("entry");
+                        drawOrderLine(["entry"]);
                         toggleCancelOrderButton(true);
                         toast.success(t("trading.orderChart.newEntrySuccess"));
                     } else toastOrderError(resp.message);
@@ -1784,12 +1701,10 @@ function tpslOrderClick() {
         })
         .then((resp) => {
             if (resp.isOk) {
-                drawOrderLine("entry");
-                drawOrderLine("tp");
-                drawOrderLine("sl");
                 params.order.entry.line.applyOptions({
                     draggable: false,
                 });
+                drawOrderLine(["entry", "tp", "sl"]);
                 toast.success(t("trading.orderChart.newTpSlSuccess"));
             } else toastOrderError(resp.message);
         });
@@ -1813,11 +1728,8 @@ function scanOrder() {
                         })
                         .then((resp) => {
                             if (resp.isOk) {
-                                removeOrderLine("entry");
-                                removeOrderLine("tp");
-                                removeOrderLine("sl");
+                                removeOrderLine(["entry", "tp", "sl"]);
                                 toggleCancelOrderButton(false);
-                                toolsStore.clear("order");
                                 toast.success(
                                     t("trading.orderChart.deleteTpSuccess")
                                 );
@@ -1843,11 +1755,8 @@ function scanOrder() {
                         })
                         .then((resp) => {
                             if (resp.isOk) {
-                                removeOrderLine("entry");
-                                removeOrderLine("tp");
-                                removeOrderLine("sl");
+                                removeOrderLine(["entry", "tp", "sl"]);
                                 toggleCancelOrderButton(false);
-                                toolsStore.clear("order");
                                 toast.success(
                                     t("trading.orderChart.deleteSlSuccess")
                                 );
@@ -1887,11 +1796,10 @@ function scanOrder() {
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
-                                    drawOrderLine("tp");
-                                    drawOrderLine("sl");
                                     params.order.entry.line.applyOptions({
                                         draggable: false,
                                     });
+                                    drawOrderLine(["entry", "tp", "sl"]);
                                     toast.success(
                                         t(
                                             "trading.orderChart.autoNewTpSlSuccess"

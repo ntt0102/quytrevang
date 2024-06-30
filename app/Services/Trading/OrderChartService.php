@@ -290,7 +290,7 @@ class OrderChartService extends CoreService
         $symbol = 'VN30F1M';
         if ($payload->isRemove) {
             $dt = DrawTool::where('symbol', $symbol)->where('name', $payload->name);
-            if ($payload->name == 'line' && !!$payload->point)
+            if (isset($payload, $payload->point))
                 $dt = $dt->where('point', $payload->point);
             $dt->delete();
         } else {
