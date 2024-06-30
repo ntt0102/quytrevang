@@ -279,7 +279,6 @@ let params = {
         downlps: { P1: {}, P2: {} },
         rr: { EP: {}, SL: {}, TP: {} },
     },
-    order: { side: 0, entry: {}, tp: {}, sl: {} },
     crosshair: {},
     shark: null,
     loadWhitespace: true,
@@ -411,13 +410,13 @@ function eventPriceLineDrag(e) {
                 if (lineOptions.kind == "entry") {
                     if (!status.value.position) {
                         isChanged = true;
-                        params.order[lineOptions.kind].price = newPrice;
+                        params.tools.order[lineOptions.kind].price = newPrice;
                         store
                             .dispatch("tradingOrder/executeOrder", {
                                 action: "entry",
-                                data: {
+                                etData: {
                                     cmd: "change",
-                                    price: params.order.entry.price,
+                                    price: params.tools.order.entry.price,
                                 },
                             })
                             .then((resp) => {
@@ -438,14 +437,14 @@ function eventPriceLineDrag(e) {
                     }
                 } else {
                     isChanged = true;
-                    params.order[lineOptions.kind].price = newPrice;
+                    params.tools.order[lineOptions.kind].price = newPrice;
                     if (lineOptions.kind == "tp")
                         store
                             .dispatch("tradingOrder/executeOrder", {
                                 action: "tp",
                                 data: {
                                     cmd: "change",
-                                    price: params.order.tp.price,
+                                    price: params.tools.order.tp.price,
                                 },
                             })
                             .then((resp) => {
@@ -467,7 +466,7 @@ function eventPriceLineDrag(e) {
                                 action: "sl",
                                 data: {
                                     cmd: "change",
-                                    price: params.order.sl.price,
+                                    price: params.tools.order.sl.price,
                                 },
                             })
                             .then((resp) => {
@@ -702,9 +701,9 @@ function loadToolsData() {
             case "order":
                 if (status.value.pending) {
                     Object.entries(points).forEach(([point, line]) => {
-                        params.order.side = line.side;
-                        params.order[point].price = line.price;
-                        params.order[point].line =
+                        params.tools.order.side = line.side;
+                        params.tools.order[point].price = line.price;
+                        params.tools.order[point].line =
                             params.series.price.createPriceLine(line);
                         toggleCancelOrderButton(true);
                     });
@@ -889,7 +888,6 @@ function connectSocket() {
                                 volume: data.lastVol,
                             });
                         }
-                        takeProfitAuto();
                         scanOrder();
                     }
                 }
@@ -905,7 +903,7 @@ function intervalHandler() {
                 blinkCancelOrderButton();
                 if (
                     CURRENT_SEC > TIME.ATC - 15 &&
-                    params.order.tp.hasOwnProperty("line")
+                    params.tools.order.tp.hasOwnProperty("line")
                 ) {
                     store
                         .dispatch("tradingOrder/executeOrder", {
@@ -944,79 +942,6 @@ function intervalHandler() {
     }
     state.clock = moment().format("HH:mm:ss");
 }
-function showOrderButton() {
-    if (store.state.tradingOrder.config.openingMarket) {
-        const CURRENT_SEC = moment().unix();
-        if (inSession(CURRENT_SEC)) {
-            if (!params.order.tp.hasOwnProperty("line")) {
-                if (!!status.value.position) {
-                    if (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC) {
-                        params.order.entry.price =
-                            params.data.price.slice(-1)[0].value;
-                        params.order.side = status.value.position;
-                        tpslOrderRef.value.style.left =
-                            +(
-                                params.crosshair.x +
-                                (params.crosshair.x > innerWidth - 61 ? -61 : 1)
-                            ) + "px";
-                        tpslOrderRef.value.style.top =
-                            +(
-                                params.crosshair.y +
-                                (params.crosshair.y > innerHeight - 51
-                                    ? -51
-                                    : 1)
-                            ) + "px";
-                        tpslOrderRef.value.style.display = "block";
-                    }
-                }
-            }
-            if (!params.order.entry.hasOwnProperty("line")) {
-                let price = null,
-                    side = 0;
-                if (!status.value.position) {
-                    if (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC) {
-                        price = coordinateToPrice(params.crosshair.y);
-                        side =
-                            price >= params.data.price.slice(-1)[0].value
-                                ? 1
-                                : -1;
-                        params.order.side = side;
-                        params.order.entry.price = price;
-                    }
-                } else {
-                    if (CURRENT_SEC < TIME.ATO) price = "ATO";
-                    else if (CURRENT_SEC > TIME.ATC) price = "ATC";
-                    if (!!price) {
-                        params.order.entry.price = price;
-                        side = -status.value.position;
-                    }
-                }
-                if (!!side) {
-                    entryOrderRef.value.style.left =
-                        +(
-                            params.crosshair.x +
-                            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
-                        ) + "px";
-                    entryOrderRef.value.style.top =
-                        +(
-                            params.crosshair.y +
-                            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
-                        ) + "px";
-                    entryOrderRef.value.style.background =
-                        side > 0 ? "green" : "red";
-                    entryOrderRef.value.innerText = `${
-                        side > 0 ? "LONG" : "SHORT"
-                    } ${price}`;
-                    entryOrderRef.value.style.display = "block";
-                }
-            }
-        }
-    }
-}
-function hideOrderButton() {
-    entryOrderRef.value.style.display = "none";
-    tpslOrderRef.value.style.display = "none";
-}
 function toggleCancelOrderButton(visible) {
     cancelOrderRef.value.style.display = visible ? "block" : "none";
 }
@@ -1046,41 +971,41 @@ function drawOrderLine(kinds) {
         switch (kind) {
             case "entry":
                 color = "yellow";
-                title = params.order.side > 0 ? "LONG" : "SHORT";
+                title = params.tools.order.side > 0 ? "LONG" : "SHORT";
                 break;
             case "tp":
                 color = "lime";
                 title = Math.abs(
-                    params.order.tp.price - params.order.entry.price
+                    params.tools.order.tp.price - params.tools.order.entry.price
                 ).toFixed(1);
                 break;
             case "sl":
                 color = "red";
                 title = Math.abs(
-                    params.order.sl.price - params.order.entry.price
+                    params.tools.order.sl.price - params.tools.order.entry.price
                 ).toFixed(1);
                 break;
         }
         param.points.push(kind);
-        if (params.order[kind].hasOwnProperty("line")) {
-            params.order[kind].line.applyOptions({
-                price: params.order[kind].price,
+        if (params.tools.order[kind].hasOwnProperty("line")) {
+            params.tools.order[kind].line.applyOptions({
+                price: params.tools.order[kind].price,
                 title: title,
             });
-            param.data.push(params.order[kind].line.options());
+            param.data.push(params.tools.order[kind].line.options());
         } else {
             const options = {
                 lineType: TYPE,
                 kind: kind,
-                side: params.order.side,
-                price: params.order[kind].price,
+                side: params.tools.order.side,
+                price: params.tools.order[kind].price,
                 color: color,
                 lineWidth: 1,
                 lineStyle: 0,
                 title: title,
                 draggable: true,
             };
-            params.order[kind].line =
+            params.tools.order[kind].line =
                 params.series.price.createPriceLine(options);
             param.data.push(options);
         }
@@ -1089,14 +1014,14 @@ function drawOrderLine(kinds) {
 }
 function removeOrderLine(kinds) {
     kinds.forEach((kind) => {
-        if (params.order[kind].hasOwnProperty("line")) {
-            params.series.price.removePriceLine(params.order[kind].line);
-            delete params.order[kind].line;
+        if (params.tools.order[kind].hasOwnProperty("line")) {
+            params.series.price.removePriceLine(params.tools.order[kind].line);
+            delete params.tools.order[kind].line;
         }
-        store.dispatch("tradingOrder/drawTools", {
-            isRemove: true,
-            name: "order",
-        });
+    });
+    store.dispatch("tradingOrder/drawTools", {
+        isRemove: true,
+        name: "order",
     });
 }
 function tradingviewClick(e) {
@@ -1558,58 +1483,81 @@ function removeRrTool() {
         name: "rr",
     });
 }
-async function cancelOrderClick() {
-    let result = true;
-    if (!result) {
-        result = await confirm(
-            t("trading.orderChart.cancelOrder"),
-            t("titles.confirm")
-        );
-    }
-    if (result) {
-        if (params.order.entry.hasOwnProperty("line")) {
-            if (params.order.tp.hasOwnProperty("line")) {
-                store
-                    .dispatch("tradingOrder/executeOrder", {
-                        action: "exit",
-                        tpData: { cmd: "cancel" },
-                        slData: { cmd: "delete" },
-                        exitData: {
-                            cmd: "new",
-                            price: "MTL",
-                        },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            removeOrderLine(["entry", "tp", "sl"]);
-                            toggleCancelOrderButton(false);
-                            toast.success(t("trading.orderChart.exitSuccess"));
-                        } else {
-                            toggleCancelOrderButton(true);
-                            toastOrderError(resp.message);
-                        }
-                    });
-            } else {
-                store
-                    .dispatch("tradingOrder/executeOrder", {
-                        action: "entry",
-                        data: { cmd: "delete" },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            removeOrderLine(["entry"]);
-                            toggleCancelOrderButton(false);
-                            toast.success(
-                                t("trading.orderChart.deleteEntrySuccess")
-                            );
-                        } else {
-                            toggleCancelOrderButton(true);
-                            toastOrderError(resp.message);
-                        }
-                    });
+function showOrderButton() {
+    if (store.state.tradingOrder.config.openingMarket) {
+        const CURRENT_SEC = moment().unix();
+        if (inSession(CURRENT_SEC)) {
+            if (!params.tools.order.tp.hasOwnProperty("line")) {
+                if (!!status.value.position) {
+                    if (
+                        true ||
+                        (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC)
+                    ) {
+                        tpslOrderRef.value.style.left =
+                            +(
+                                params.crosshair.x +
+                                (params.crosshair.x > innerWidth - 61 ? -61 : 1)
+                            ) + "px";
+                        tpslOrderRef.value.style.top =
+                            +(
+                                params.crosshair.y +
+                                (params.crosshair.y > innerHeight - 51
+                                    ? -51
+                                    : 1)
+                            ) + "px";
+                        tpslOrderRef.value.style.display = "block";
+                    }
+                }
+            }
+            if (!params.tools.order.entry.hasOwnProperty("line")) {
+                let price = null,
+                    side = 0;
+                if (!status.value.position) {
+                    if (
+                        true ||
+                        (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC)
+                    ) {
+                        price = coordinateToPrice(params.crosshair.y);
+                        side =
+                            price >= params.data.price.slice(-1)[0].value
+                                ? 1
+                                : -1;
+                        params.tools.order.side = side;
+                        params.tools.order.entry.price = price;
+                    }
+                } else {
+                    if (CURRENT_SEC < TIME.ATO) price = "ATO";
+                    else if (CURRENT_SEC > TIME.ATC) price = "ATC";
+                    if (!!price) {
+                        params.tools.order.entry.price = price;
+                        side = -status.value.position;
+                    }
+                }
+                if (!!side) {
+                    entryOrderRef.value.style.left =
+                        +(
+                            params.crosshair.x +
+                            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
+                        ) + "px";
+                    entryOrderRef.value.style.top =
+                        +(
+                            params.crosshair.y +
+                            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
+                        ) + "px";
+                    entryOrderRef.value.style.background =
+                        side > 0 ? "green" : "red";
+                    entryOrderRef.value.innerText = `${
+                        side > 0 ? "LONG" : "SHORT"
+                    } ${price}`;
+                    entryOrderRef.value.style.display = "block";
+                }
             }
         }
     }
+}
+function hideOrderButton() {
+    entryOrderRef.value.style.display = "none";
+    tpslOrderRef.value.style.display = "none";
 }
 function entryOrderClick() {
     const CURRENT_SEC = moment().unix();
@@ -1642,10 +1590,10 @@ function entryOrderClick() {
             store
                 .dispatch("tradingOrder/executeOrder", {
                     action: "entry",
-                    data: {
+                    etData: {
                         cmd: "new",
-                        side: params.order.side,
-                        price: params.order.entry.price,
+                        side: params.tools.order.side,
+                        price: params.tools.order.entry.price,
                     },
                 })
                 .then((resp) => {
@@ -1683,25 +1631,25 @@ function entryOrderClick() {
     }
 }
 function tpslOrderClick() {
-    params.order.tp.price =
-        params.order.entry.price + params.order.side * TP_DEFAULT;
-    params.order.sl.price =
-        params.order.entry.price - params.order.side * SL_DEFAULT;
+    params.tools.order.tp.price =
+        params.tools.order.entry.price + params.tools.order.side * TP_DEFAULT;
+    params.tools.order.sl.price =
+        params.tools.order.entry.price - params.tools.order.side * SL_DEFAULT;
     store
         .dispatch("tradingOrder/executeOrder", {
             action: "tpsl",
             tpData: {
                 cmd: "new",
-                price: params.order.tp.price,
+                price: params.tools.order.tp.price,
             },
             slData: {
                 cmd: "new",
-                price: params.order.sl.price,
+                price: params.tools.order.sl.price,
             },
         })
         .then((resp) => {
             if (resp.isOk) {
-                params.order.entry.line.applyOptions({
+                params.tools.order.entry.line.applyOptions({
                     draggable: false,
                 });
                 drawOrderLine(["entry", "tp", "sl"]);
@@ -1709,13 +1657,68 @@ function tpslOrderClick() {
             } else toastOrderError(resp.message);
         });
 }
+async function cancelOrderClick() {
+    let result = true;
+    if (!result) {
+        result = await confirm(
+            t("trading.orderChart.cancelOrder"),
+            t("titles.confirm")
+        );
+    }
+    if (result) {
+        if (params.tools.order.entry.hasOwnProperty("line")) {
+            if (params.tools.order.tp.hasOwnProperty("line")) {
+                store
+                    .dispatch("tradingOrder/executeOrder", {
+                        action: "exit",
+                        tpData: { cmd: "cancel" },
+                        slData: { cmd: "delete" },
+                        exitData: {
+                            cmd: "new",
+                            price: "MTL",
+                        },
+                    })
+                    .then((resp) => {
+                        if (resp.isOk) {
+                            removeOrderLine(["entry", "tp", "sl"]);
+                            toggleCancelOrderButton(false);
+                            toast.success(t("trading.orderChart.exitSuccess"));
+                        } else {
+                            toggleCancelOrderButton(true);
+                            toastOrderError(resp.message);
+                        }
+                    });
+            } else {
+                store
+                    .dispatch("tradingOrder/executeOrder", {
+                        action: "entry",
+                        etData: { cmd: "delete" },
+                    })
+                    .then((resp) => {
+                        if (resp.isOk) {
+                            removeOrderLine(["entry"]);
+                            toggleCancelOrderButton(false);
+                            toast.success(
+                                t("trading.orderChart.deleteEntrySuccess")
+                            );
+                        } else {
+                            toggleCancelOrderButton(true);
+                            toastOrderError(resp.message);
+                        }
+                    });
+            }
+        }
+    }
+}
 function scanOrder() {
-    if (params.order.entry.hasOwnProperty("line")) {
+    if (params.tools.order.entry.hasOwnProperty("line")) {
         const lastPrice = params.data.price.slice(-1)[0].value;
-        if (params.order.tp.hasOwnProperty("line")) {
+        if (params.tools.order.tp.hasOwnProperty("line")) {
             if (
-                (params.order.side > 0 && lastPrice >= params.order.tp.price) ||
-                (params.order.side < 0 && lastPrice <= params.order.tp.price)
+                (params.tools.order.side > 0 &&
+                    lastPrice >= params.tools.order.tp.price) ||
+                (params.tools.order.side < 0 &&
+                    lastPrice <= params.tools.order.tp.price)
             ) {
                 if (!params.isAutoOrdering) {
                     params.isAutoOrdering = true;
@@ -1741,8 +1744,10 @@ function scanOrder() {
                 }
             }
             if (
-                (params.order.side > 0 && lastPrice <= params.order.sl.price) ||
-                (params.order.side < 0 && lastPrice >= params.order.sl.price)
+                (params.tools.order.side > 0 &&
+                    lastPrice <= params.tools.order.sl.price) ||
+                (params.tools.order.side < 0 &&
+                    lastPrice >= params.tools.order.sl.price)
             ) {
                 if (!params.isAutoOrdering) {
                     params.isAutoOrdering = true;
@@ -1769,34 +1774,35 @@ function scanOrder() {
             }
         } else {
             if (
-                (params.order.side > 0 &&
-                    lastPrice >= params.order.entry.price) ||
-                (params.order.side < 0 && lastPrice <= params.order.entry.price)
+                (params.tools.order.side > 0 &&
+                    lastPrice >= params.tools.order.entry.price) ||
+                (params.tools.order.side < 0 &&
+                    lastPrice <= params.tools.order.entry.price)
             ) {
                 if (!params.isAutoOrdering) {
                     params.isAutoOrdering = true;
                     setTimeout(() => {
-                        params.order.tp.price =
-                            params.order.entry.price +
-                            params.order.side * TP_DEFAULT;
-                        params.order.sl.price =
-                            params.order.entry.price -
-                            params.order.side * SL_DEFAULT;
+                        params.tools.order.tp.price =
+                            params.tools.order.entry.price +
+                            params.tools.order.side * TP_DEFAULT;
+                        params.tools.order.sl.price =
+                            params.tools.order.entry.price -
+                            params.tools.order.side * SL_DEFAULT;
                         store
                             .dispatch("tradingOrder/executeOrder", {
                                 action: "tpsl",
                                 tpData: {
                                     cmd: "new",
-                                    price: params.order.tp.price,
+                                    price: params.tools.order.tp.price,
                                 },
                                 slData: {
                                     cmd: "new",
-                                    price: params.order.sl.price,
+                                    price: params.tools.order.sl.price,
                                 },
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
-                                    params.order.entry.line.applyOptions({
+                                    params.tools.order.entry.line.applyOptions({
                                         draggable: false,
                                     });
                                     drawOrderLine(["entry", "tp", "sl"]);
@@ -1811,19 +1817,6 @@ function scanOrder() {
                             });
                     }, 1000);
                 }
-            }
-        }
-    }
-}
-function takeProfitAuto() {
-    if (!!status.value.position) {
-        if (mf.isSet(params.target.X)) {
-            const lastCash = params.data.cash.slice(-1)[0].value;
-            const b = +params.target.B.options().price;
-            const x = +params.target.X.options().price;
-            const xb = x - b;
-            if ((xb > 0 && lastCash >= x) || (xb < 0 && lastCash <= x)) {
-                cancelOrderRef.value.click();
             }
         }
     }
@@ -1856,10 +1849,11 @@ function refreshChart() {
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 function resetChart() {
-    params.data.original = [];
-    params.data.price = [];
-    params.data.cash = [];
     params.data.whitespace = [];
+    params.data.price = [];
+    params.data.vn30 = [];
+    params.data.foreign = [];
+    params.data.active = [];
     refreshChart();
 }
 function playSound() {
@@ -2039,6 +2033,7 @@ function exportCsv() {
             width: 60px;
             height: 50px;
             line-height: 40px;
+            background: yellow;
         }
     }
 

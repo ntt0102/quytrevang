@@ -140,10 +140,10 @@ class VpsOrderService extends CoreService
         //
         switch ($payload->action) {
             case 'entry':
-                $isNew = $payload->data->cmd == "new";
+                $isNew = $payload->etData->cmd == "new";
                 if ($isNew && $this->position != 0)
                     return ['isOk' => false, 'message' => 'openedPosition'];
-                else return $this->conditionOrder($payload->action, $payload->data);
+                else return $this->conditionOrder($payload->action, $payload->etData);
                 break;
             case 'tpsl':
                 if ($this->position == 0)
@@ -155,16 +155,16 @@ class VpsOrderService extends CoreService
                 }
                 break;
             case 'tp':
-                $isNew = $payload->data->cmd == "new";
+                $isNew = $payload->etData->cmd == "new";
                 if ($isNew && $this->position == 0)
                     return ['isOk' => false, 'message' => 'unopenedPosition'];
-                else return $this->order($payload->action, $payload->data);
+                else return $this->order($payload->action, $payload->etData);
                 break;
             case 'sl':
-                $isNew = $payload->data->cmd == "new";
+                $isNew = $payload->etData->cmd == "new";
                 if ($isNew && $this->position == 0)
                     return ['isOk' => false, 'message' => 'unopenedPosition'];
-                else return $this->conditionOrder($payload->action, $payload->data);
+                else return $this->conditionOrder($payload->action, $payload->etData);
                 break;
             case 'cancel':
                 $tp = $this->order('tp', $payload->tpData);
