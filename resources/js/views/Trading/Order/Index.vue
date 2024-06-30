@@ -29,7 +29,7 @@
             @contextmenu="eventChartContextmenu"
         >
             <div class="chart-wrapper" ref="orderChartRef">
-                <div class="area data-area" @click="stopPropagationEvent">
+                <div class="area data-area" @click="toolAreaClick">
                     <div
                         ref="connectionRef"
                         :class="`command far fa-${
@@ -75,7 +75,11 @@
                         ></i>
                     </div>
                 </div>
-                <div class="area tool-area" @click="stopPropagationEvent">
+                <div
+                    class="area tool-area"
+                    @click="toolAreaClick"
+                    @contextmenu="toolAreaContextmenu"
+                >
                     <div
                         ref="fullscreenToolRef"
                         :class="`command far fa-${
@@ -98,9 +102,9 @@
                         @contextmenu="lineToolContextmenu"
                     >
                         <LineContextMenu
-                            v-show="state.showLineContextMenu"
+                            v-show="state.showLineContext"
                             class="line-contextmenu"
-                            :enable="state.showLineContextMenu"
+                            :enable="state.showLineContext"
                             v-model:title="state.lineTitle"
                             v-model:color="state.lineColor"
                             @deleteAllLine="removeLineTool"
@@ -295,7 +299,7 @@ const state = reactive({
     color: "#F44336",
     lineTitle: "",
     lineColor: "#F44336",
-    showLineContextMenu: false,
+    showLineContext: false,
     showTradingView: false,
 });
 const status = computed(() => store.state.tradingOrder.status);
@@ -358,17 +362,8 @@ onUnmounted(() => {
 
 watch(() => store.state.tradingOrder.chartData, loadChartData);
 
-function eventChartContextmenu(e) {
-    showOrderButton();
-    stopPropagationEvent(e);
-}
-function stopPropagationEvent(e) {
-    e.preventDefault();
-    e.stopPropagation();
-}
 function eventChartClick(e) {
-    state.showLineContextMenu = false;
-    //
+    state.showLineContext = false;
     hideOrderButton();
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (targetToolRef.value.classList.contains("selected"))
@@ -377,7 +372,17 @@ function eventChartClick(e) {
     else if (downlpsToolRef.value.classList.contains("selected"))
         drawDownlpsTool();
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
-    stopPropagationEvent(e);
+}
+function eventChartContextmenu(e) {
+    showOrderButton();
+    e.preventDefault();
+}
+function toolAreaClick(e) {
+    e.stopPropagation();
+}
+function toolAreaContextmenu(e) {
+    e.preventDefault();
+    e.stopPropagation();
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
@@ -1187,7 +1192,7 @@ function tradingviewClick(e) {
     e.stopPropagation();
 }
 function lineToolClick(e) {
-    state.showLineContextMenu = false;
+    state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -1195,7 +1200,7 @@ function lineToolClick(e) {
     if (!selected) e.target.classList.add("selected");
 }
 function lineToolContextmenu(e) {
-    state.showLineContextMenu = !state.showLineContextMenu;
+    state.showLineContext = !state.showLineContext;
 }
 function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
     const TYPE = "line";
@@ -1249,7 +1254,7 @@ function removeLineTool(server = true) {
     }
 }
 function targetToolClick(e) {
-    state.showLineContextMenu = false;
+    state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -1353,7 +1358,7 @@ function removeTargetTool(server = true) {
         });
 }
 function uplpsToolClick(e) {
-    state.showLineContextMenu = false;
+    state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -1457,7 +1462,7 @@ function removeUplpsTool(server = true) {
         });
 }
 function downlpsToolClick(e) {
-    state.showLineContextMenu = false;
+    state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -1561,7 +1566,7 @@ function removeDownlpsTool(server = true) {
         });
 }
 function rrToolClick(e) {
-    state.showLineContextMenu = false;
+    state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
