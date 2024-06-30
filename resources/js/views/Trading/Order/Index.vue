@@ -181,7 +181,6 @@ import LineContextMenu from "./LineContextMenu.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
 import { confirm } from "devextreme/ui/dialog";
-import sound from "../../../../audios/alert.mp3";
 import {
     reactive,
     ref,
@@ -195,6 +194,8 @@ import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
+import moment from "moment";
+
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
@@ -227,10 +228,10 @@ const TP_DEFAULT = 3;
 const SL_DEFAULT = 2;
 const CURRENT_DATE = moment().format("YYYY-MM-DD");
 const TIME = {
-    START: moment(CURRENT_DATE + " 08:45:00").unix(),
-    ATO: moment(CURRENT_DATE + " 09:00:00").unix(),
-    ATC: moment(CURRENT_DATE + " 14:30:00").unix(),
-    END: moment(CURRENT_DATE + " 14:45:00").unix(),
+    START: moment(CURRENT_DATE + "T08:45:00Z").unix(),
+    ATO: moment(CURRENT_DATE + "T09:00:00Z").unix(),
+    ATC: moment(CURRENT_DATE + "T14:30:00Z").unix(),
+    END: moment(CURRENT_DATE + "T14:45:00Z").unix(),
 };
 const SOCKET_ENDPOINT =
     "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
@@ -247,18 +248,17 @@ const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
 const connectionRef = ref(null);
 const fullscreenToolRef = ref(null);
+const tradingviewChartRef = ref(null);
 const reloadToolRef = ref(null);
 const tradingviewRef = ref(null);
 const lineToolRef = ref(null);
-const rulerToolRef = ref(null);
-const targetToolRef = ref(null);
-const rrToolRef = ref(null);
 const uplpsToolRef = ref(null);
 const downlpsToolRef = ref(null);
+const targetToolRef = ref(null);
+const rrToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
-const tradingviewChartRef = ref(null);
 let params = {
     chart: {},
     series: {},
@@ -268,8 +268,6 @@ let params = {
         vn30: [],
         foreign: [],
         active: [],
-        original: [],
-        cash: [],
     },
     tools: {
         order: { side: 0, entry: {}, tp: {}, sl: {} },
@@ -280,21 +278,18 @@ let params = {
         rr: { EP: {}, SL: {}, TP: {} },
     },
     crosshair: {},
-    shark: null,
     loadWhitespace: true,
     interval: null,
     interval60: null,
     websocket: null,
     isAutoOrdering: false,
     socketStop: false,
-    volumeMax: 0,
     socketRefreshTime: moment(),
 };
 const state = reactive({
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: moment().format("HH:mm:ss"),
     isFullscreen: false,
-    color: "#F44336",
     lineTitle: "",
     lineColor: "#F44336",
     showLineContext: false,
@@ -400,7 +395,7 @@ function eventChartCrosshairMove(e) {
 function eventPriceLineDrag(e) {
     let line = e.customPriceLine;
     let lineOptions = line.options();
-    lineOptions.price = formatPrice(lineOptions.price);
+    lineOptions.price = +lineOptions.price.toFixed(1);
     const oldPrice = +e.fromPriceString;
     const newPrice = lineOptions.price;
     switch (lineOptions.lineType) {
@@ -646,20 +641,6 @@ function eventKeyPress(e) {
                         params.chart.timeScale().scrollPosition() + 10
                     );
                 break;
-            case 96:
-                rulerToolRef.value.click();
-                break;
-            case 97:
-                lineToolRef.value.click();
-                break;
-            case 98:
-                reloadToolRef.value.click();
-                break;
-            case 99:
-                fullscreenToolRef.value.click();
-            case 100:
-                tradingviewRef.value.click();
-                break;
         }
     }
 }
@@ -750,12 +731,11 @@ function loadToolsData() {
 }
 function loadChartData() {
     if (params.loadWhitespace) {
-        if (store.state.tradingOrder.chartData.price.length > 0) {
+        if (store.state.tradingOrder.chartData.price.length > 0)
             params.data.whitespace = mergeChartData(
                 params.data.whitespace,
                 createWhitespaceData()
             );
-        }
         params.series.whitespace.setData(params.data.whitespace);
         params.loadWhitespace = false;
     }
@@ -764,64 +744,28 @@ function loadChartData() {
         store.state.tradingOrder.chartData.price,
         params.data.price
     );
+    params.series.price.setData(params.data.price);
     params.data.vn30 = mergeChartData(
         store.state.tradingOrder.chartData.vn30,
         params.data.vn30
     );
+    params.series.vn30.setData(params.data.vn30);
     params.data.foreign = mergeChartData(
         store.state.tradingOrder.chartData.foreign,
         params.data.foreign
     );
+    params.series.foreign.setData(params.data.foreign);
     params.data.active = mergeChartData(
         store.state.tradingOrder.chartData.active,
         params.data.active
     );
-
-    // let data = params.data.original.reduce(
-    //     (c, d) => {
-    //         let lastPrice = d.price,
-    //             lastCash = 0;
-    //         if (c.price.length > 0) {
-    //             lastPrice = c.price.slice(-1)[0].value;
-    //             lastCash = c.cash.slice(-1)[0].value;
-    //         }
-    //         const change = d.price - lastPrice;
-    //         const side = change > 0 ? 1 : change < 0 ? -1 : 0;
-    //         c.price.push({ time: d.time, value: d.price });
-    //         c.cash.push({
-    //             time: d.time,
-    //             value: lastCash + side * d.volume,
-    //         });
-    //         return c;
-    //     },
-    //     {
-    //         price: [],
-    //         cash: [],
-    //     }
-    // );
-
-    params.series.price.setData(params.data.price);
-    params.series.vn30.setData(params.data.vn30);
-    params.series.foreign.setData(params.data.foreign);
     params.series.active.setData(params.data.active);
-    //
-    // params.data.cash = data.cash;
-    // params.series.cash.setData(data.cash);
 }
-function updateChartData(d) {
-    const prevLength = params.data.original.length;
-    params.data.original = mergeChartData(params.data.original, [d]);
-    if (params.data.original.length > prevLength) {
-        const lastPrice = params.data.price.slice(-1)[0].value;
-        const lastCash = params.data.cash.slice(-1)[0].value;
-        const change = d.price - lastPrice;
-        const side = change > 0 ? 1 : change < 0 ? -1 : 0;
-        const price = { time: d.time, value: d.price };
-        const cash = { time: d.time, value: lastCash + side * d.volume };
-        params.data.price.push(price);
+function updateChartData(price) {
+    const prevLength = params.data.price.length;
+    params.data.price = mergeChartData(params.data.price, [price]);
+    if (params.data.price.length > prevLength) {
         params.series.price.update(price);
-        params.data.cash.push(cash);
-        params.series.cash.update(cash);
     }
 }
 function createWhitespaceData() {
@@ -877,16 +821,14 @@ function connectSocket() {
                 if (event[0] == "stockps") {
                     const data = event[1].data;
                     if (data.id == 3220) {
-                        if (params.data.original.length > 0) {
-                            updateChartData({
-                                time:
-                                    moment(
-                                        `${CURRENT_DATE} ${data.time}`
-                                    ).unix() +
-                                    7 * 60 * 60,
-                                price: data.lastPrice,
-                                volume: data.lastVol,
-                            });
+                        if (params.data.price.length > 0) {
+                            const price = {
+                                time: moment(
+                                    `${CURRENT_DATE}T${data.time}Z`
+                                ).unix(),
+                                value: data.lastPrice,
+                            };
+                            updateChartData(price);
                         }
                         scanOrder();
                     }
@@ -920,25 +862,12 @@ function intervalHandler() {
                                         "trading.orderChart.autoCancelTpSlSuccess"
                                     )
                                 );
-                                playSound();
                             } else toastOrderError(resp.message);
                         });
                 }
             }
         }
         if (CURRENT_SEC == TIME.START) connectSocket();
-        //
-        // params.alerts.forEach((alert) => {
-        //     const ops = alert.options();
-        //     if (!ops.removed && !!params.data.price.length) {
-        //         const currentPrice = params.data.price.slice(-1)[0].value;
-        //         if (
-        //             (ops.title == ">" && currentPrice >= ops.price) ||
-        //             (ops.title == "<" && currentPrice <= ops.price)
-        //         )
-        //             playSound();
-        //     }
-        // });
     }
     state.clock = moment().format("HH:mm:ss");
 }
@@ -1039,9 +968,9 @@ function lineToolClick(e) {
 function lineToolContextmenu(e) {
     state.showLineContext = !state.showLineContext;
 }
-function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
+function drawLineTool() {
     const TYPE = "line";
-    if (!price) price = formatPrice(coordinateToPrice(params.crosshair.y));
+    const price = coordinateToPrice(params.crosshair.y);
     const oldLength = params.tools.lines.length;
     params.tools.lines = params.tools.lines.filter((line) => {
         const ops = line.options();
@@ -1056,7 +985,7 @@ function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
         }
         return !isExist;
     });
-    if ((params.tools.lines.length == oldLength && !forceRemove) || forceDraw) {
+    if (params.tools.lines.length == oldLength) {
         const options = {
             lineType: TYPE,
             price: price,
@@ -1657,56 +1586,47 @@ function tpslOrderClick() {
             } else toastOrderError(resp.message);
         });
 }
-async function cancelOrderClick() {
-    let result = true;
-    if (!result) {
-        result = await confirm(
-            t("trading.orderChart.cancelOrder"),
-            t("titles.confirm")
-        );
-    }
-    if (result) {
-        if (params.tools.order.entry.hasOwnProperty("line")) {
-            if (params.tools.order.tp.hasOwnProperty("line")) {
-                store
-                    .dispatch("tradingOrder/executeOrder", {
-                        action: "exit",
-                        tpData: { cmd: "cancel" },
-                        slData: { cmd: "delete" },
-                        exitData: {
-                            cmd: "new",
-                            price: "MTL",
-                        },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            removeOrderLine(["entry", "tp", "sl"]);
-                            toggleCancelOrderButton(false);
-                            toast.success(t("trading.orderChart.exitSuccess"));
-                        } else {
-                            toggleCancelOrderButton(true);
-                            toastOrderError(resp.message);
-                        }
-                    });
-            } else {
-                store
-                    .dispatch("tradingOrder/executeOrder", {
-                        action: "entry",
-                        etData: { cmd: "delete" },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            removeOrderLine(["entry"]);
-                            toggleCancelOrderButton(false);
-                            toast.success(
-                                t("trading.orderChart.deleteEntrySuccess")
-                            );
-                        } else {
-                            toggleCancelOrderButton(true);
-                            toastOrderError(resp.message);
-                        }
-                    });
-            }
+function cancelOrderClick() {
+    if (params.tools.order.entry.hasOwnProperty("line")) {
+        if (params.tools.order.tp.hasOwnProperty("line")) {
+            store
+                .dispatch("tradingOrder/executeOrder", {
+                    action: "exit",
+                    tpData: { cmd: "cancel" },
+                    slData: { cmd: "delete" },
+                    exitData: {
+                        cmd: "new",
+                        price: "MTL",
+                    },
+                })
+                .then((resp) => {
+                    if (resp.isOk) {
+                        removeOrderLine(["entry", "tp", "sl"]);
+                        toggleCancelOrderButton(false);
+                        toast.success(t("trading.orderChart.exitSuccess"));
+                    } else {
+                        toggleCancelOrderButton(true);
+                        toastOrderError(resp.message);
+                    }
+                });
+        } else {
+            store
+                .dispatch("tradingOrder/executeOrder", {
+                    action: "entry",
+                    etData: { cmd: "delete" },
+                })
+                .then((resp) => {
+                    if (resp.isOk) {
+                        removeOrderLine(["entry"]);
+                        toggleCancelOrderButton(false);
+                        toast.success(
+                            t("trading.orderChart.deleteEntrySuccess")
+                        );
+                    } else {
+                        toggleCancelOrderButton(true);
+                        toastOrderError(resp.message);
+                    }
+                });
         }
     }
 }
@@ -1737,7 +1657,6 @@ function scanOrder() {
                                     t("trading.orderChart.deleteTpSuccess")
                                 );
                                 hideOrderButton();
-                                playSound();
                             } else toastOrderError(resp.message);
                             params.isAutoOrdering = false;
                         });
@@ -1766,7 +1685,6 @@ function scanOrder() {
                                     t("trading.orderChart.deleteSlSuccess")
                                 );
                                 hideOrderButton();
-                                playSound();
                             } else toastOrderError(resp.message);
                             params.isAutoOrdering = false;
                         });
@@ -1811,7 +1729,6 @@ function scanOrder() {
                                             "trading.orderChart.autoNewTpSlSuccess"
                                         )
                                     );
-                                    playSound();
                                 } else toastOrderError(resp.message);
                                 params.isAutoOrdering = false;
                             });
@@ -1828,12 +1745,8 @@ function inSession(currentSec = null) {
     if (!currentSec) currentSec = moment().unix();
     return currentSec >= TIME.START && currentSec <= TIME.END;
 }
-function coordinateToPrice(y, name = "price") {
-    return formatPrice(params.series[name].coordinateToPrice(y));
-}
-function formatPrice(price) {
-    if (!price) return 0;
-    return +(+price.toFixed(1));
+function coordinateToPrice(y) {
+    return +params.series.price.coordinateToPrice(y).toFixed(1);
 }
 function toastOrderError(error) {
     if (!error) error = "unknown";
@@ -1855,13 +1768,6 @@ function resetChart() {
     params.data.foreign = [];
     params.data.active = [];
     refreshChart();
-}
-function playSound() {
-    let player = new Audio(sound);
-    player.crossOrigin = "anonymous";
-    player.addEventListener("canplaythrough", function () {
-        player.play();
-    });
 }
 function getAccountInfo() {
     store.dispatch("tradingOrder/getAccountInfo").then((data) => {
