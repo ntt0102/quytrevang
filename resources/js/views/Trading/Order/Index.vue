@@ -290,8 +290,8 @@ const state = reactive({
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: moment().format("HH:mm:ss"),
     isFullscreen: false,
-    lineTitle: "",
     lineColor: "#F44336",
+    lineTitle: "",
     showLineContext: false,
     showTradingView: false,
 });
@@ -340,11 +340,13 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    store.dispatch("tradingOrder/getChartData", state.chartDate).then(() => {
-        loadToolsData();
-    });
+    store
+        .dispatch("tradingOrder/getChartData", state.chartDate)
+        .then(loadToolsData);
 });
 onUnmounted(() => {
+    document.removeEventListener("keydown", eventKeyPress);
+    document.removeEventListener("fullscreenchange", eventFullscreenChange);
     clearInterval(params.interval);
     clearInterval(params.interval60);
     params.socketStop = true;
@@ -795,7 +797,7 @@ function connectSocket() {
     params.websocket.onopen = (e) => {
         let msg = {
             action: "join",
-            list: store.state.tradingOrder.config.vn30f1m,
+            list: store.state.tradingOrder.config.vn30f1m + ",VN30",
         };
         params.websocket.send(
             `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
@@ -1753,6 +1755,7 @@ function toastOrderError(error) {
     toast.error(t(`trading.orderChart.${error}`));
 }
 function dateSelectChange() {
+    if (!state.chartDate) return false;
     params.loadWhitespace = true;
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
