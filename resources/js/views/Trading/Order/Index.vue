@@ -763,11 +763,18 @@ function loadChartData() {
     );
     params.series.active.setData(params.data.active);
 }
-function updateChartData(price) {
+function updatePriceData(price) {
     const prevLength = params.data.price.length;
     params.data.price = mergeChartData(params.data.price, [price]);
     if (params.data.price.length > prevLength) {
         params.series.price.update(price);
+    }
+}
+function updateVn30Data(price) {
+    const prevLength = params.data.vn30.length;
+    params.data.vn30 = mergeChartData(params.data.vn30, [price]);
+    if (params.data.vn30.length > prevLength) {
+        params.series.vn30.update(price);
     }
 }
 function createWhitespaceData() {
@@ -797,7 +804,7 @@ function connectSocket() {
     params.websocket.onopen = (e) => {
         let msg = {
             action: "join",
-            list: store.state.tradingOrder.config.vn30f1m + ",VN30",
+            list: store.state.tradingOrder.config.vn30f1m,
         };
         params.websocket.send(
             `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
@@ -824,15 +831,27 @@ function connectSocket() {
                     const data = event[1].data;
                     if (data.id == 3220) {
                         if (params.data.price.length > 0) {
-                            const price = {
+                            updatePriceData({
                                 time: moment(
                                     `${CURRENT_DATE}T${data.time}Z`
                                 ).unix(),
                                 value: data.lastPrice,
-                            };
-                            updateChartData(price);
+                            });
                         }
                         scanOrder();
+                    }
+                } else if (event[0] == "index") {
+                    const data = event[1].data;
+                    if (data.id == 1101 && data.mc == "11") {
+                        console.log("socket", data);
+                        if (params.data.vn30.length > 0) {
+                            updateVn30Data({
+                                time: moment(
+                                    `${CURRENT_DATE}T${data.time}Z`
+                                ).unix(),
+                                value: data.cIndex,
+                            });
+                        }
                     }
                 }
             }
