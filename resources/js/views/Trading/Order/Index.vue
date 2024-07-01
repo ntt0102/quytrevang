@@ -843,7 +843,6 @@ function connectSocket() {
                 } else if (event[0] == "index") {
                     const data = event[1].data;
                     if (data.id == 1101 && data.mc == "11") {
-                        console.log("socket", data);
                         if (params.data.vn30.length > 0) {
                             updateVn30Data({
                                 time: moment(
