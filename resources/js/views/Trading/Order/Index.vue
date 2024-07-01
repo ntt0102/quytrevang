@@ -321,7 +321,7 @@ onMounted(() => {
     params.series.fgnf1m = params.chart.addLineSeries({
         priceScaleId: "fgnf1m",
         scaleMargins: { top: 0.61, bottom: 0.01 },
-        color: "lime",
+        color: "purple",
         lastValueVisible: false,
     });
     params.series.active = params.chart.addLineSeries({
