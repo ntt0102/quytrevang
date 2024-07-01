@@ -81,6 +81,12 @@ export default [
                 permissions: ["stock@order"],
             },
             {
+                text: lang.global.t("trading.trades.title"),
+                name: "trading-statistic1",
+                icon: "far fa-analytics",
+                permissions: ["trades@view", "trades@edit"],
+            },
+            {
                 text: lang.global.t("trading.stock.title"),
                 name: "trading-stock",
                 icon: "far fa-gavel",
@@ -92,12 +98,6 @@ export default [
                 icon: "far fa-analytics",
                 permissions: ["trades@edit"],
             },
-            // {
-            //     text: lang.global.t("trading.trades.title"),
-            //     name: "trading-statistic1",
-            //     icon: "far fa-analytics",
-            //     permissions: ["trades@view", "trades@edit"],
-            // },
             {
                 text: lang.global.t("trading.finbooks.title"),
                 name: "trading-finbook",
