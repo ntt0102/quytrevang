@@ -228,10 +228,10 @@ const TP_DEFAULT = 3;
 const SL_DEFAULT = 2;
 const CURRENT_DATE = moment().format("YYYY-MM-DD");
 const TIME = {
-    START: moment(CURRENT_DATE + "T08:45:00Z").unix(),
-    ATO: moment(CURRENT_DATE + "T09:00:00Z").unix(),
-    ATC: moment(CURRENT_DATE + "T14:30:00Z").unix(),
-    END: moment(CURRENT_DATE + "T14:45:00Z").unix(),
+    START: moment(CURRENT_DATE + "T08:45:00").unix(),
+    ATO: moment(CURRENT_DATE + "T09:00:00").unix(),
+    ATC: moment(CURRENT_DATE + "T14:30:00").unix(),
+    END: moment(CURRENT_DATE + "T14:45:00").unix(),
 };
 const SOCKET_ENDPOINT =
     "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
