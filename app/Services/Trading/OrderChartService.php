@@ -240,10 +240,10 @@ class OrderChartService extends CoreService
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
-                $data['fgnf1m'][] = [
+                array_unshift($data['fgnf1m'], [
                     'time' => +$line[0],
                     'value' => +$line[1],
-                ];
+                ]);
             }
         }
         fclose($fp);
