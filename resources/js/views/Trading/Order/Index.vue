@@ -235,7 +235,7 @@ const TIME = {
 };
 const SOCKET_ENDPOINT =
     "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
-const SOCKET_REFRESH_PERIOD = 120;
+const SOCKET_REFRESH_PERIOD = 60;
 
 const store = useStore();
 const route = useRoute();
@@ -304,10 +304,10 @@ store.dispatch("tradingOrder/initChart").then(connectSocket);
 store.dispatch("tradingOrder/getStatus");
 
 params.interval = setInterval(intervalHandler, 1000);
-params.interval60 = setInterval(
-    () => store.dispatch("tradingOrder/getStatus"),
-    60000
-);
+params.interval60 = setInterval(() => {
+    store.dispatch("tradingOrder/getStatus");
+    refreshChart();
+}, 60000);
 
 onMounted(() => {
     params.chart = createChart(orderChartRef.value, CHART_OPTIONS);
