@@ -35,10 +35,9 @@ class ExportTradingJob implements ShouldQueue
             $path = storage_path('app/phaisinh/' . $date);
             if (is_dir($path)) return false;
             if (!mkdir($path, 0777, true)) return false;
+            //
             $vn30f1mFile = $path . '/vn30f1m.csv';
-            $vn30File = $path . '/vn30.csv';
             $vn30f1mData = $orderChartService->cloneVn30f1mData();
-            $vn30Data = $orderChartService->cloneVn30Data();
             $fp = fopen($vn30f1mFile, 'w');
             foreach ($vn30f1mData as $item) {
                 $line = [];
@@ -47,6 +46,9 @@ class ExportTradingJob implements ShouldQueue
                 fputcsv($fp, $line);
             }
             fclose($fp);
+            //
+            $vn30File = $path . '/vn30.csv';
+            $vn30Data = $orderChartService->cloneVn30Data();
             $fp = fopen($vn30File, 'w');
             foreach ($vn30Data as $item) {
                 $line = [];
@@ -54,6 +56,17 @@ class ExportTradingJob implements ShouldQueue
                 $line[] = $item->IndexCurrent;
                 $line[] = $item->BuyForeignQuantity - $item->SellForeignQuantity;
                 $line[] = $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume;
+                fputcsv($fp, $line);
+            }
+            fclose($fp);
+            //
+            $fgnf1mFile = $path . '/fgnf1m.csv';
+            $fgnf1mData = $orderChartService->cloneFgnf1mData();
+            $fp = fopen($fgnf1mFile, 'w');
+            foreach ($fgnf1mData as $item) {
+                $line = [];
+                $line[] = strtotime($item->dateTime . 'Z');
+                $line[] = $item->value;
                 fputcsv($fp, $line);
             }
             fclose($fp);

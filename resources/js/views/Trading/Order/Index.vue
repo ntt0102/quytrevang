@@ -268,6 +268,7 @@ let params = {
         vn30: [],
         foreign: [],
         active: [],
+        fgnf1m: [],
     },
     tools: {
         order: { side: 0, entry: {}, tp: {}, sl: {} },
@@ -316,6 +317,12 @@ onMounted(() => {
     params.series.whitespace = params.chart.addLineSeries({
         priceScaleId: "whitespace",
         visible: false,
+    });
+    params.series.fgnf1m = params.chart.addLineSeries({
+        priceScaleId: "fgnf1m",
+        scaleMargins: { top: 0.61, bottom: 0.01 },
+        color: "lime",
+        lastValueVisible: false,
     });
     params.series.active = params.chart.addLineSeries({
         priceScaleId: "volume",
@@ -762,6 +769,11 @@ function loadChartData() {
         params.data.active
     );
     params.series.active.setData(params.data.active);
+    params.data.fgnf1m = mergeChartData(
+        store.state.tradingOrder.chartData.fgnf1m,
+        params.data.fgnf1m
+    );
+    params.series.fgnf1m.setData(params.data.fgnf1m);
 }
 function updatePriceData(price) {
     const prevLength = params.data.price.length;
@@ -1788,6 +1800,7 @@ function resetChart() {
     params.data.vn30 = [];
     params.data.foreign = [];
     params.data.active = [];
+    params.data.fgnf1m = [];
     refreshChart();
 }
 function getAccountInfo() {

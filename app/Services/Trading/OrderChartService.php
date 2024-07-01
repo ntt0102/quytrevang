@@ -181,6 +181,14 @@ class OrderChartService extends CoreService
                 'value' => $item->lastPrice,
             ];
         });
+        $fgnf1mData = $this->cloneFgnf1mData();
+        $data['fgnf1m'] =   collect($fgnf1mData)->reduce(function ($c, $item) {
+            array_unshift($c, [
+                'time' => strtotime($item->dateTime . 'Z'),
+                'value' => $item->value,
+            ]);
+            return $c;
+        }, []);
         return $data;
     }
 
@@ -193,7 +201,6 @@ class OrderChartService extends CoreService
         $path = storage_path('app/phaisinh/' . $date);
         if (!is_dir($path)) return $data;
         $vn30f1mFile = $path . '/vn30f1m.csv';
-        $vn30File = $path . '/vn30.csv';
         $fp = fopen($vn30f1mFile, 'r');
         while (!feof($fp)) {
             $line = fgetcsv($fp);
@@ -206,6 +213,7 @@ class OrderChartService extends CoreService
         }
         fclose($fp);
         //
+        $vn30File = $path . '/vn30.csv';
         $fp = fopen($vn30File, 'r');
         while (!feof($fp)) {
             $line = fgetcsv($fp);
@@ -226,6 +234,19 @@ class OrderChartService extends CoreService
             }
         }
         fclose($fp);
+        //
+        $fgnf1mFile = $path . '/fgnf1m.csv';
+        $fp = fopen($fgnf1mFile, 'r');
+        while (!feof($fp)) {
+            $line = fgetcsv($fp);
+            if (!!$line) {
+                $data['price'][] = [
+                    'time' => +$line[0],
+                    'value' => +$line[1],
+                ];
+            }
+        }
+        fclose($fp);
         return $data;
     }
 
@@ -234,10 +255,14 @@ class OrderChartService extends CoreService
      */
     public function cloneVn30f1mData()
     {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-        $res = $client->get($url);
-        return json_decode($res->getBody());
+        try {
+            $client = new \GuzzleHttp\Client();
+            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+            $res = $client->get($url);
+            return json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            return [];
+        }
     }
 
     /**
@@ -245,10 +270,29 @@ class OrderChartService extends CoreService
      */
     public function cloneVn30Data()
     {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayMarketStatistic?symbol=VN30";
-        $res = $client->get($url);
-        return json_decode($res->getBody());
+        try {
+            $client = new \GuzzleHttp\Client();
+            $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayMarketStatistic?symbol=VN30";
+            $res = $client->get($url);
+            return json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            return [];
+        }
+    }
+
+    /**
+     * Vps data
+     */
+    public function cloneFgnf1mData()
+    {
+        try {
+            $client = new \GuzzleHttp\Client();
+            $url = "https://fwtapi2.fialda.com/api/services/app/Home/GetForeignerTradingChart?indexCode=VN30F1M&chartPedirod=oneDay";
+            $res = $client->get($url);
+            return json_decode($res->getBody())->result->tradingVolumeChart;
+        } catch (\Throwable $th) {
+            return [];
+        }
     }
 
     /**
