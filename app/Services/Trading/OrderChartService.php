@@ -197,7 +197,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => []];
+        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
         $path = storage_path('app/phaisinh/' . $date);
         if (!is_dir($path)) return $data;
         $vn30f1mFile = $path . '/vn30f1m.csv';
@@ -240,7 +240,7 @@ class OrderChartService extends CoreService
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
-                $data['price'][] = [
+                $data['fgnf1m'][] = [
                     'time' => +$line[0],
                     'value' => +$line[1],
                 ];
