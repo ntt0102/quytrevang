@@ -446,7 +446,7 @@ function eventPriceLineDrag(e) {
                         store
                             .dispatch("tradingOrder/executeOrder", {
                                 action: "tp",
-                                data: {
+                                tpData: {
                                     cmd: "change",
                                     price: params.tools.order.tp.price,
                                 },
@@ -468,7 +468,7 @@ function eventPriceLineDrag(e) {
                         store
                             .dispatch("tradingOrder/executeOrder", {
                                 action: "sl",
-                                data: {
+                                slData: {
                                     cmd: "change",
                                     price: params.tools.order.sl.price,
                                 },
@@ -1682,7 +1682,7 @@ function scanOrder() {
                     store
                         .dispatch("tradingOrder/executeOrder", {
                             action: "sl",
-                            data: {
+                            slData: {
                                 cmd: "delete",
                             },
                         })
@@ -1710,7 +1710,7 @@ function scanOrder() {
                     store
                         .dispatch("tradingOrder/executeOrder", {
                             action: "tp",
-                            data: {
+                            tpData: {
                                 cmd: "cancel",
                             },
                         })
