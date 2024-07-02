@@ -155,18 +155,6 @@ class OrderChartService extends CoreService
         $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
         $vn30f1mData = $this->cloneVn30f1mData();
         $volume = 0;
-        // foreach ($vn30f1mData as $item) {
-        //     $time = strtotime(date('Y-m-d') . 'T' . $item->time . 'Z');
-        //     $data['price'][] = [
-        //         'time' => $time,
-        //         'value' => $item->lastPrice,
-        //     ];
-        //     $volume += ($item->side == 'B' ? 1 : ($item->side == 'S' ? -1 : 0)) * $item->lastVol;
-        //     $data['fgnf1m'][] = [
-        //         'time' => $time,
-        //         'value' => $volume,
-        //     ];
-        // }
         foreach ($vn30f1mData as $item) {
             $time = strtotime($item->Date) + $this->SHIFT_TIME;
             $data['price'][] = [
@@ -195,13 +183,13 @@ class OrderChartService extends CoreService
                 'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
             ];
         }
-        $fgnf1mData = $this->cloneFgnf1mData();
-        foreach ($fgnf1mData as $item) {
-            array_unshift($data['fgnf1m'], [
-                'time' => strtotime($item->dateTime . 'Z'),
-                'value' => $item->value,
-            ]);
-        }
+        // $fgnf1mData = $this->cloneFgnf1mData();
+        // foreach ($fgnf1mData as $item) {
+        //     array_unshift($data['fgnf1m'], [
+        //         'time' => strtotime($item->dateTime . 'Z'),
+        //         'value' => $item->value,
+        //     ]);
+        // }
         return $data;
     }
 
