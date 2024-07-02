@@ -325,13 +325,13 @@ onMounted(() => {
         lastValueVisible: false,
     });
     params.series.active = params.chart.addLineSeries({
-        priceScaleId: "volume",
+        priceScaleId: "active",
         scaleMargins: { top: 0.61, bottom: 0.01 },
         color: "blue",
         lastValueVisible: false,
     });
     params.series.foreign = params.chart.addLineSeries({
-        priceScaleId: "volume",
+        priceScaleId: "foreign",
         scaleMargins: { top: 0.61, bottom: 0.01 },
         color: "yellow",
         lastValueVisible: false,
