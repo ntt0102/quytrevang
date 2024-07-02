@@ -152,7 +152,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromApi()
     {
-        return ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
+        // return ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
         $vn30Data = $this->cloneVn30Data();
         $data =  collect($vn30Data)->reduce(function ($c, $item, $index) use ($vn30Data) {
             if ($index > 0) {
@@ -198,7 +198,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
+        // $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
         $path = storage_path('app/phaisinh/' . $date);
         if (!is_dir($path)) return $data;
         $vn30f1mFile = $path . '/vn30f1m.csv';
@@ -286,7 +286,7 @@ class OrderChartService extends CoreService
      */
     public function cloneFgnf1mData()
     {
-        // return [];
+        return [];
         try {
             $client = new \GuzzleHttp\Client();
             $url = "https://fwtapi2.fialda.com/api/services/app/Home/GetForeignerTradingChart?indexCode=VN30F1M&chartPedirod=oneDay";
