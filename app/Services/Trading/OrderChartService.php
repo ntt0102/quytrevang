@@ -287,14 +287,14 @@ class OrderChartService extends CoreService
     public function cloneFgnf1mData()
     {
         return [];
-        try {
-            $client = new \GuzzleHttp\Client();
-            $url = "https://fwtapi2.fialda.com/api/services/app/Home/GetForeignerTradingChart?indexCode=VN30F1M&chartPedirod=oneDay";
-            $res = $client->get($url);
-            return json_decode($res->getBody())->result->tradingVolumeChart;
-        } catch (\Throwable $th) {
-            return [];
-        }
+        // try {
+        //     $client = new \GuzzleHttp\Client();
+        //     $url = "https://fwtapi2.fialda.com/api/services/app/Home/GetForeignerTradingChart?indexCode=VN30F1M&chartPedirod=oneDay";
+        //     $res = $client->get($url);
+        //     return json_decode($res->getBody())->result->tradingVolumeChart;
+        // } catch (\Throwable $th) {
+        //     return [];
+        // }
     }
 
     /**
