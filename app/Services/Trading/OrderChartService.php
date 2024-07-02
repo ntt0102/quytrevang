@@ -285,6 +285,7 @@ class OrderChartService extends CoreService
      */
     public function cloneFgnf1mData()
     {
+        return [];
         try {
             $client = new \GuzzleHttp\Client();
             $url = "https://fwtapi2.fialda.com/api/services/app/Home/GetForeignerTradingChart?indexCode=VN30F1M&chartPedirod=oneDay";
