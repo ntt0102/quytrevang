@@ -152,7 +152,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromApi()
     {
-        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
+        // $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
         $vn30Data = $this->cloneVn30Data();
         $data =  collect($vn30Data)->reduce(function ($c, $item, $index) use ($vn30Data) {
             if ($index > 0) {
@@ -178,8 +178,8 @@ class OrderChartService extends CoreService
         $vn30f1mData = $this->cloneVn30f1mData();
         $data['price'] =  collect($vn30f1mData)->map(function ($item) {
             return [
-                'time' => strtotime(date('Y-m-d') . 'T' . $item->time . 'Z'),
-                'value' => $item->lastPrice,
+                'time' => strtotime($item->Date) + $this->SHIFT_TIME,
+                'value' => $item->Price,
             ];
         });
         $fgnf1mData = $this->cloneFgnf1mData();
@@ -258,7 +258,8 @@ class OrderChartService extends CoreService
     {
         try {
             $client = new \GuzzleHttp\Client();
-            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+            // $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+            $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayQuotes?symbol=VN30F1M";
             $res = $client->get($url);
             return json_decode($res->getBody());
         } catch (\Throwable $th) {
