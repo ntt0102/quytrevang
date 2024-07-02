@@ -153,28 +153,29 @@ class OrderChartService extends CoreService
     public function generateDataFromApi()
     {
         // return ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
-        $vn30Data = $this->cloneVn30Data();
-        $data =  collect($vn30Data)->reduce(function ($c, $item, $index) use ($vn30Data) {
-            if ($index > 0) {
-                $time = strtotime($item->Date) + $this->SHIFT_TIME;
-                $prevTime = strtotime($vn30Data[$index - 1]->Date) + $this->SHIFT_TIME;
-                if ($time > $prevTime) {
-                    $c['vn30'][] =  [
-                        'time' => $time,
-                        'value' => $item->IndexCurrent,
-                    ];
-                    $c['foreign'][] =  [
-                        'time' => $time,
-                        'value' => $item->BuyForeignQuantity - $item->SellForeignQuantity,
-                    ];
-                    $c['active'][] =  [
-                        'time' => $time,
-                        'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
-                    ];
-                }
-            }
-            return $c;
-        }, []);
+        $data = [];
+        // $vn30Data = $this->cloneVn30Data();
+        // $data =  collect($vn30Data)->reduce(function ($c, $item, $index) use ($vn30Data) {
+        //     if ($index > 0) {
+        //         $time = strtotime($item->Date) + $this->SHIFT_TIME;
+        //         $prevTime = strtotime($vn30Data[$index - 1]->Date) + $this->SHIFT_TIME;
+        //         if ($time > $prevTime) {
+        //             $c['vn30'][] =  [
+        //                 'time' => $time,
+        //                 'value' => $item->IndexCurrent,
+        //             ];
+        //             $c['foreign'][] =  [
+        //                 'time' => $time,
+        //                 'value' => $item->BuyForeignQuantity - $item->SellForeignQuantity,
+        //             ];
+        //             $c['active'][] =  [
+        //                 'time' => $time,
+        //                 'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
+        //             ];
+        //         }
+        //     }
+        //     return $c;
+        // }, []);
         $vn30f1mData = $this->cloneVn30f1mData();
         $data['price'] =  collect($vn30f1mData)->map(function ($item) {
             return [
@@ -182,14 +183,14 @@ class OrderChartService extends CoreService
                 'value' => $item->lastPrice,
             ];
         });
-        $fgnf1mData = $this->cloneFgnf1mData();
-        $data['fgnf1m'] =   collect($fgnf1mData)->reduce(function ($c, $item) {
-            array_unshift($c, [
-                'time' => strtotime($item->dateTime . 'Z'),
-                'value' => $item->value,
-            ]);
-            return $c;
-        }, []);
+        // $fgnf1mData = $this->cloneFgnf1mData();
+        // $data['fgnf1m'] =   collect($fgnf1mData)->reduce(function ($c, $item) {
+        //     array_unshift($c, [
+        //         'time' => strtotime($item->dateTime . 'Z'),
+        //         'value' => $item->value,
+        //     ]);
+        //     return $c;
+        // }, []);
         return $data;
     }
 
