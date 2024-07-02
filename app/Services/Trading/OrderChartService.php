@@ -152,8 +152,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromApi()
     {
-        // return ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
-        $data = [];
+        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
         // $vn30Data = $this->cloneVn30Data();
         // $data =  collect($vn30Data)->reduce(function ($c, $item, $index) use ($vn30Data) {
         //     if ($index > 0) {
@@ -176,13 +175,13 @@ class OrderChartService extends CoreService
         //     }
         //     return $c;
         // }, []);
-        $vn30f1mData = $this->cloneVn30f1mData();
-        $data['price'] =  collect($vn30f1mData)->map(function ($item) {
-            return [
-                'time' => strtotime(date('Y-m-d') . 'T' . $item->time . 'Z'),
-                'value' => $item->lastPrice,
-            ];
-        });
+        // $vn30f1mData = $this->cloneVn30f1mData();
+        // $data['price'] =  collect($vn30f1mData)->map(function ($item) {
+        //     return [
+        //         'time' => strtotime(date('Y-m-d') . 'T' . $item->time . 'Z'),
+        //         'value' => $item->lastPrice,
+        //     ];
+        // });
         // $fgnf1mData = $this->cloneFgnf1mData();
         // $data['fgnf1m'] =   collect($fgnf1mData)->reduce(function ($c, $item) {
         //     array_unshift($c, [
