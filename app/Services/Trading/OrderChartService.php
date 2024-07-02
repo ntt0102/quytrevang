@@ -154,10 +154,29 @@ class OrderChartService extends CoreService
     {
         $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
         $vn30f1mData = $this->cloneVn30f1mData();
+        $volume = 0;
+        // foreach ($vn30f1mData as $item) {
+        //     $time = strtotime(date('Y-m-d') . 'T' . $item->time . 'Z');
+        //     $data['price'][] = [
+        //         'time' => $time,
+        //         'value' => $item->lastPrice,
+        //     ];
+        //     $volume += ($item->side == 'B' ? 1 : ($item->side == 'S' ? -1 : 0)) * $item->lastVol;
+        //     $data['fgnf1m'][] = [
+        //         'time' => $time,
+        //         'value' => $volume,
+        //     ];
+        // }
         foreach ($vn30f1mData as $item) {
+            $time = strtotime($item->Date) + $this->SHIFT_TIME;
             $data['price'][] = [
-                'time' => strtotime($item->Date) + $this->SHIFT_TIME,
+                'time' => $time,
                 'value' => $item->Price,
+            ];
+            $volume += ($item->Side == 'B' ? 1 : ($item->Side == 'S' ? -1 : 0)) * $item->Volume;
+            $data['fgnf1m'][] = [
+                'time' => $time,
+                'value' => $volume,
             ];
         }
         $vn30Data = $this->cloneVn30Data();
@@ -196,12 +215,18 @@ class OrderChartService extends CoreService
         if (!is_dir($path)) return $data;
         $vn30f1mFile = $path . '/vn30f1m.csv';
         $fp = fopen($vn30f1mFile, 'r');
+        $volume = 0;
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
                 $data['price'][] = [
                     'time' => +$line[0],
                     'value' => +$line[1],
+                ];
+                $volume += +$line[3] * +$line[2];
+                $data['fgnf1m'][] = [
+                    'time' => +$line[0],
+                    'value' => $volume,
                 ];
             }
         }
@@ -229,18 +254,18 @@ class OrderChartService extends CoreService
         }
         fclose($fp);
         //
-        $fgnf1mFile = $path . '/fgnf1m.csv';
-        $fp = fopen($fgnf1mFile, 'r');
-        while (!feof($fp)) {
-            $line = fgetcsv($fp);
-            if (!!$line) {
-                array_unshift($data['fgnf1m'], [
-                    'time' => +$line[0],
-                    'value' => +$line[1],
-                ]);
-            }
-        }
-        fclose($fp);
+        // $fgnf1mFile = $path . '/fgnf1m.csv';
+        // $fp = fopen($fgnf1mFile, 'r');
+        // while (!feof($fp)) {
+        //     $line = fgetcsv($fp);
+        //     if (!!$line) {
+        //         array_unshift($data['fgnf1m'], [
+        //             'time' => +$line[0],
+        //             'value' => +$line[1],
+        //         ]);
+        //     }
+        // }
+        // fclose($fp);
         return $data;
     }
 
