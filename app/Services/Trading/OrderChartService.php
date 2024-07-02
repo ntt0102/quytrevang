@@ -152,43 +152,37 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromApi()
     {
-        $vn30Data = $this->cloneVn30Data();
-        $data =  collect($vn30Data)->reduce(function ($c, $item, $index) use ($vn30Data) {
-            if ($index > 0) {
-                $time = strtotime($item->Date) + $this->SHIFT_TIME;
-                $prevTime = strtotime($vn30Data[$index - 1]->Date) + $this->SHIFT_TIME;
-                if ($time > $prevTime) {
-                    $c['vn30'][] =  [
-                        'time' => $time,
-                        'value' => $item->IndexCurrent,
-                    ];
-                    $c['foreign'][] =  [
-                        'time' => $time,
-                        'value' => $item->BuyForeignQuantity - $item->SellForeignQuantity,
-                    ];
-                    $c['active'][] =  [
-                        'time' => $time,
-                        'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
-                    ];
-                }
-            }
-            return $c;
-        }, []);
+        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
         $vn30f1mData = $this->cloneVn30f1mData();
-        $data['price'] =  collect($vn30f1mData)->map(function ($item) {
-            return [
+        foreach ($vn30f1mData as $item) {
+            $data['price'][] = [
                 'time' => strtotime($item->Date) + $this->SHIFT_TIME,
                 'value' => $item->Price,
             ];
-        });
+        }
+        $vn30Data = $this->cloneVn30Data();
+        foreach ($vn30Data as $item) {
+            $time = strtotime($item->Date) + $this->SHIFT_TIME;
+            $data['vn30'][] = [
+                'time' => $time,
+                'value' => $item->IndexCurrent,
+            ];
+            $data['foreign'][] = [
+                'time' => $time,
+                'value' => $item->BuyForeignQuantity - $item->SellForeignQuantity,
+            ];
+            $data['active'][] = [
+                'time' => $time,
+                'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
+            ];
+        }
         $fgnf1mData = $this->cloneFgnf1mData();
-        $data['fgnf1m'] =   collect($fgnf1mData)->reduce(function ($c, $item) {
-            array_unshift($c, [
+        foreach ($fgnf1mData as $item) {
+            array_unshift($data['fgnf1m'], [
                 'time' => strtotime($item->dateTime . 'Z'),
                 'value' => $item->value,
             ]);
-            return $c;
-        }, []);
+        }
         return $data;
     }
 
@@ -218,7 +212,7 @@ class OrderChartService extends CoreService
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
-                $time = +$line[0] + $this->SHIFT_TIME;
+                $time = +$line[0];
                 $data['vn30'][] = [
                     'time' => $time,
                     'value' => +$line[1],
