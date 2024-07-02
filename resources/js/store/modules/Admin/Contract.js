@@ -29,7 +29,7 @@ const actions = {
                 resolve();
                 if (response.data.isOk) {
                     dispatch("fetch", state.isOld);
-                    dispatch("User.layout/initLayout", ["contracts"], {
+                    dispatch("getNotify", ["adminContract"], {
                         root: true,
                     });
                     // dispatch("auth/check", true, { root: true });
@@ -47,7 +47,7 @@ const actions = {
                     resolve(response.data.isOk);
                     if (response.data.isOk) {
                         dispatch("fetch", state.isOld);
-                        dispatch("User.layout/initLayout", ["contracts"], {
+                        dispatch("getNotify", ["adminContract"], {
                             root: true,
                         });
                     }
@@ -67,7 +67,7 @@ const actions = {
                     resolve(response.data.isOk);
                     if (response.data.isOk) {
                         dispatch("fetch", state.isOld);
-                        dispatch("User.layout/initLayout", ["contracts"], {
+                        dispatch("getNotify", ["adminContract"], {
                             root: true,
                         });
                     }

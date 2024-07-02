@@ -66,22 +66,27 @@ const actions = {
     getUsers({ commit, dispatch, getters, state, rootGetters }) {
         if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
-            axios.post("admin/user").then((response) => {
-                commit("setState", response.data);
-                resolve();
-            });
+            axios
+                .post("admin/user", {}, { noLoading: true })
+                .then((response) => {
+                    commit("setState", response.data);
+                    resolve();
+                });
         });
     },
     save({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("admin/user" + (param.isDeleted ? "/deleted" : "save"), {
-                    changes: param.changes,
-                })
+                .post(
+                    "admin/user/" + (param.isDeleted ? "savedeleted" : "save"),
+                    {
+                        changes: param.changes,
+                    }
+                )
                 .then((response) => {
                     resolve();
-                    dispatch("fetch");
-                    dispatch("User.layout/initLayout", ["users"], {
+                    dispatch("getUsers");
+                    dispatch("getNotify", ["adminUser"], {
                         root: true,
                     });
                 });
@@ -95,8 +100,8 @@ const actions = {
                 })
                 .then((response) => {
                     resolve(response.data.isOk);
-                    dispatch("fetch");
-                    dispatch("User.layout/initLayout", ["users"], {
+                    dispatch("getUsers");
+                    dispatch("getNotify", ["adminUser"], {
                         root: true,
                     });
                 });

@@ -27,7 +27,7 @@ const actions = {
                 )
                 .then((response) => {
                     resolve();
-                    dispatch("User.layout/initLayout", ["comments"], {
+                    dispatch("getNotify", ["adminComment"], {
                         root: true,
                     });
                 });
@@ -40,7 +40,7 @@ const actions = {
                 .then((response) => {
                     commit("setState", response.data);
                     resolve();
-                    dispatch("User.layout/initLayout", ["comments"], {
+                    dispatch("getNotify", ["adminComment"], {
                         root: true,
                     });
                 });

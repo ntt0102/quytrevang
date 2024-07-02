@@ -60,18 +60,18 @@ export default {
         }
     },
     checkPinDataGrid(e, dataGridInstance) {
-        let items = e.component.option("toolbarItems");
-        items[0].options.onClick = () => {
-            if (dataGridInstance.hasEditData()) {
-                mitt().emit("checkPin", () => {
-                    dataGridInstance.saveEditData();
-                });
-            } else {
-                toast.info(mt.messages.info.noChangedData);
-                dataGridInstance.cancelEditData();
-            }
-        };
-        e.component.option("toolbarItems", items);
+        // let items = e.component.option("toolbarItems");
+        // items[0].options.onClick = () => {
+        //     if (dataGridInstance.hasEditData()) {
+        //         mitt().emit("checkPin", () => {
+        //             dataGridInstance.saveEditData();
+        //         });
+        //     } else {
+        //         toast.info(mt.messages.info.noChangedData);
+        //         dataGridInstance.cancelEditData();
+        //     }
+        // };
+        // e.component.option("toolbarItems", items);
     },
     getBanks() {
         let vietQR = new VietQR({

@@ -87,7 +87,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('validate-duplicate', 'UserController@validateDuplicate');
                     Route::post('/', 'UserController@fetch');
                     Route::post('save', 'UserController@save');
-                    Route::post('deleted', 'UserController@saveDeletedUser');
+                    Route::post('savedeleted', 'UserController@saveDeletedUser');
                     Route::post('documents', 'UserController@uploadDocuments');
                     Route::post('contract-info', 'UserController@getContractInfo');
                 });

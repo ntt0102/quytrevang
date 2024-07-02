@@ -46,8 +46,8 @@ class UserService extends CoreService
     public function save($payload)
     {
         return $this->transaction(function () use ($payload) {
+            $response = [];
             foreach ($payload->changes as $change) {
-                $response = [];
                 if (in_array($change->type, ["insert", "update"])) {
                     $data = [
                         "name" => $change->data->name,

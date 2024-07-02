@@ -27,7 +27,7 @@
                 popup: {
                     showTitle: true,
                     onShown: onShown,
-                    onHiding: onHidden,
+                    onHidden: onHidden,
                 },
                 form: {
                     colCount: 2,
@@ -609,8 +609,12 @@ watch(
 );
 
 function onSaved(e) {
-    e.isDeleted = false;
-    store.dispatch("adminUser/save", e);
+    if (e.changes.length) {
+        bus.emit("checkPin", () => {
+            e.isDeleted = false;
+            store.dispatch("adminUser/save", e);
+        });
+    }
 }
 function onToolbarPreparing(e) {
     e.toolbarOptions.items.unshift(
@@ -753,7 +757,6 @@ function cloneDeepData(users) {
     }
 }
 function onShown(e) {
-    mf.checkPinDataGrid(e, dataGridRef.value.instance);
     mf.pushPopupToHistoryState(routeHistoryState, () =>
         dataGridRef.value.instance.cancelEditData()
     );
