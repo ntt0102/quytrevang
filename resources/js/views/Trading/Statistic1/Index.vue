@@ -49,7 +49,7 @@
                         },
                         onValueChanged: (e) =>
                             $store.dispatch(
-                                'tradingStatistic/getChart',
+                                'tradingStatistic1/getChart',
                                 e.value
                             ),
                     },
@@ -299,7 +299,7 @@ const visibleSeries = reactive({
     accumulatedProfit: true,
 });
 const chartRef = ref(null);
-const charts = computed(() => store.state.tradingStatistic.charts);
+const charts = computed(() => store.state.tradingStatistic1.charts);
 const permissions = computed(() => store.state.auth.user.permissions);
 
 store.dispatch("tradingStatistic1/getChart", route.query.period ?? "day");

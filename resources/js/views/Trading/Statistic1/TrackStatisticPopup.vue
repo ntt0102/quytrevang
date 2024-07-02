@@ -198,7 +198,7 @@ const state = reactive({
 const permissions = computed(() => store.state.auth.user.permissions);
 
 watch(
-    () => store.state.tradingStatistic.data,
+    () => store.state.tradingStatistic1.data,
     (data) => {
         state.gridData = mf.cloneDeep(data);
     }
