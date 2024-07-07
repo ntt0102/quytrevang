@@ -268,7 +268,7 @@ let params = {
         vn30: [],
         foreign: [],
         active: [],
-        fgnf1m: [],
+        volume: [],
     },
     tools: {
         order: { side: 0, entry: {}, tp: {}, sl: {} },
@@ -318,12 +318,6 @@ onMounted(() => {
         priceScaleId: "whitespace",
         visible: false,
     });
-    params.series.fgnf1m = params.chart.addLineSeries({
-        priceScaleId: "fgnf1m",
-        scaleMargins: { top: 0.61, bottom: 0.01 },
-        color: "purple",
-        lastValueVisible: false,
-    });
     params.series.active = params.chart.addLineSeries({
         priceScaleId: "active",
         scaleMargins: { top: 0.61, bottom: 0.01 },
@@ -333,12 +327,18 @@ onMounted(() => {
     params.series.foreign = params.chart.addLineSeries({
         priceScaleId: "foreign",
         scaleMargins: { top: 0.61, bottom: 0.01 },
-        color: "yellow",
+        color: "purple",
         lastValueVisible: false,
     });
     params.series.vn30 = params.chart.addLineSeries({
         color: "red",
         priceFormat: { minMove: 0.1 },
+    });
+    params.series.volume = params.chart.addLineSeries({
+        priceScaleId: "volume",
+        scaleMargins: { top: 0.61, bottom: 0.01 },
+        color: "yellow",
+        lastValueVisible: false,
     });
     params.series.price = params.chart.addLineSeries({
         color: "white",
@@ -754,26 +754,26 @@ function loadChartData() {
         params.data.price
     );
     params.series.price.setData(params.data.price);
-    params.data.vn30 = mergeChartData(
-        store.state.tradingOrder.chartData.vn30,
-        params.data.vn30
+    params.data.volume = mergeChartData(
+        store.state.tradingOrder.chartData.volume,
+        params.data.volume
     );
-    params.series.vn30.setData(params.data.vn30);
-    params.data.foreign = mergeChartData(
-        store.state.tradingOrder.chartData.foreign,
-        params.data.foreign
-    );
-    params.series.foreign.setData(params.data.foreign);
-    params.data.active = mergeChartData(
-        store.state.tradingOrder.chartData.active,
-        params.data.active
-    );
-    params.series.active.setData(params.data.active);
-    params.data.fgnf1m = mergeChartData(
-        store.state.tradingOrder.chartData.fgnf1m,
-        params.data.fgnf1m
-    );
-    params.series.fgnf1m.setData(params.data.fgnf1m);
+    params.series.volume.setData(params.data.volume);
+    // params.data.vn30 = mergeChartData(
+    //     store.state.tradingOrder.chartData.vn30,
+    //     params.data.vn30
+    // );
+    // params.series.vn30.setData(params.data.vn30);
+    // params.data.foreign = mergeChartData(
+    //     store.state.tradingOrder.chartData.foreign,
+    //     params.data.foreign
+    // );
+    // params.series.foreign.setData(params.data.foreign);
+    // params.data.active = mergeChartData(
+    //     store.state.tradingOrder.chartData.active,
+    //     params.data.active
+    // );
+    // params.series.active.setData(params.data.active);
 }
 function updatePriceData(price) {
     const prevLength = params.data.price.length;
@@ -852,19 +852,20 @@ function connectSocket() {
                         }
                         scanOrder();
                     }
-                } else if (event[0] == "index") {
-                    const data = event[1].data;
-                    if (data.id == 1101 && data.mc == "11") {
-                        if (params.data.vn30.length > 0) {
-                            updateVn30Data({
-                                time: moment(
-                                    `${CURRENT_DATE}T${data.time}Z`
-                                ).unix(),
-                                value: data.cIndex,
-                            });
-                        }
-                    }
                 }
+                // else if (event[0] == "index") {
+                //     const data = event[1].data;
+                //     if (data.id == 1101 && data.mc == "11") {
+                //         if (params.data.vn30.length > 0) {
+                //             updateVn30Data({
+                //                 time: moment(
+                //                     `${CURRENT_DATE}T${data.time}Z`
+                //                 ).unix(),
+                //                 value: data.cIndex,
+                //             });
+                //         }
+                //     }
+                // }
             }
         }
     };
@@ -1805,7 +1806,7 @@ function resetChart() {
     params.data.vn30 = [];
     params.data.foreign = [];
     params.data.active = [];
-    params.data.fgnf1m = [];
+    params.data.volume = [];
     refreshChart();
 }
 function getAccountInfo() {

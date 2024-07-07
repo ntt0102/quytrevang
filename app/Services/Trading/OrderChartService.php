@@ -152,7 +152,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromApi()
     {
-        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
+        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'volume' => []];
         $vn30f1mData = $this->cloneVn30f1mData();
         $volume = 0;
         foreach ($vn30f1mData as $item) {
@@ -162,30 +162,30 @@ class OrderChartService extends CoreService
                 'value' => $item->Price,
             ];
             $volume += ($item->Side == 'B' ? 1 : ($item->Side == 'S' ? -1 : 0)) * $item->Volume;
-            $data['fgnf1m'][] = [
+            $data['volume'][] = [
                 'time' => $time,
                 'value' => $volume,
             ];
         }
-        $vn30Data = $this->cloneVn30Data();
-        foreach ($vn30Data as $item) {
-            $time = strtotime($item->Date) + $this->SHIFT_TIME;
-            $data['vn30'][] = [
-                'time' => $time,
-                'value' => $item->IndexCurrent,
-            ];
-            $data['foreign'][] = [
-                'time' => $time,
-                'value' => $item->BuyForeignQuantity - $item->SellForeignQuantity,
-            ];
-            $data['active'][] = [
-                'time' => $time,
-                'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
-            ];
-        }
-        // $fgnf1mData = $this->cloneFgnf1mData();
-        // foreach ($fgnf1mData as $item) {
-        //     array_unshift($data['fgnf1m'], [
+        // $vn30Data = $this->cloneVn30Data();
+        // foreach ($vn30Data as $item) {
+        //     $time = strtotime($item->Date) + $this->SHIFT_TIME;
+        //     $data['vn30'][] = [
+        //         'time' => $time,
+        //         'value' => $item->IndexCurrent,
+        //     ];
+        //     $data['foreign'][] = [
+        //         'time' => $time,
+        //         'value' => $item->BuyForeignQuantity - $item->SellForeignQuantity,
+        //     ];
+        //     $data['active'][] = [
+        //         'time' => $time,
+        //         'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
+        //     ];
+        // }
+        // $volumeData = $this->clonevolumeData();
+        // foreach ($volumeData as $item) {
+        //     array_unshift($data['volume'], [
         //         'time' => strtotime($item->dateTime . 'Z'),
         //         'value' => $item->value,
         //     ]);
@@ -198,7 +198,7 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'fgnf1m' => []];
+        $data = ['price' => [], 'volume' => [], 'vn30' => [], 'foreign' => [], 'active' => []];
         $path = storage_path('app/phaisinh/' . $date);
         if (!is_dir($path)) return $data;
         $vn30f1mFile = $path . '/vn30f1m.csv';
@@ -212,7 +212,7 @@ class OrderChartService extends CoreService
                     'value' => +$line[1],
                 ];
                 $volume += +$line[3] * +$line[2];
-                $data['fgnf1m'][] = [
+                $data['volume'][] = [
                     'time' => +$line[0],
                     'value' => $volume,
                 ];
@@ -220,34 +220,34 @@ class OrderChartService extends CoreService
         }
         fclose($fp);
         //
-        $vn30File = $path . '/vn30.csv';
-        $fp = fopen($vn30File, 'r');
-        while (!feof($fp)) {
-            $line = fgetcsv($fp);
-            if (!!$line) {
-                $time = +$line[0];
-                $data['vn30'][] = [
-                    'time' => $time,
-                    'value' => +$line[1],
-                ];
-                $data['foreign'][] = [
-                    'time' => $time,
-                    'value' => +$line[2],
-                ];
-                $data['active'][] = [
-                    'time' => $time,
-                    'value' => +$line[3],
-                ];
-            }
-        }
-        fclose($fp);
-        //
-        // $fgnf1mFile = $path . '/fgnf1m.csv';
-        // $fp = fopen($fgnf1mFile, 'r');
+        // $vn30File = $path . '/vn30.csv';
+        // $fp = fopen($vn30File, 'r');
         // while (!feof($fp)) {
         //     $line = fgetcsv($fp);
         //     if (!!$line) {
-        //         array_unshift($data['fgnf1m'], [
+        //         $time = +$line[0];
+        //         $data['vn30'][] = [
+        //             'time' => $time,
+        //             'value' => +$line[1],
+        //         ];
+        //         $data['foreign'][] = [
+        //             'time' => $time,
+        //             'value' => +$line[2],
+        //         ];
+        //         $data['active'][] = [
+        //             'time' => $time,
+        //             'value' => +$line[3],
+        //         ];
+        //     }
+        // }
+        // fclose($fp);
+        //
+        // $volumeFile = $path . '/volume.csv';
+        // $fp = fopen($volumeFile, 'r');
+        // while (!feof($fp)) {
+        //     $line = fgetcsv($fp);
+        //     if (!!$line) {
+        //         array_unshift($data['volume'], [
         //             'time' => +$line[0],
         //             'value' => +$line[1],
         //         ]);
@@ -265,6 +265,7 @@ class OrderChartService extends CoreService
         try {
             $client = new \GuzzleHttp\Client();
             // $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+            // $url = "https://fwtapi3.fialda.com/api/services/app/Stock/GetIntraday?symbol=VN30F2407";
             $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayQuotes?symbol=VN30F1M";
             $res = $client->get($url);
             return json_decode($res->getBody());
@@ -291,9 +292,8 @@ class OrderChartService extends CoreService
     /**
      * Vps data
      */
-    public function cloneFgnf1mData()
+    public function clonevolumeData()
     {
-        return [];
         try {
             $client = new \GuzzleHttp\Client();
             $url = "https://fwtapi2.fialda.com/api/services/app/Home/GetForeignerTradingChart?indexCode=VN30F1M&chartPedirod=oneDay";
