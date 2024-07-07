@@ -33,6 +33,16 @@ const actions = {
                 });
         });
     },
+    getTools({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/order/get-tools", {}, { noLoading: true })
+                .then((response) => {
+                    commit("setTools", response.data);
+                    resolve();
+                });
+        });
+    },
     getStatus({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
@@ -122,6 +132,9 @@ const mutations = {
     setInitChart(state, data) {
         state.config = data.config;
         state.tools = data.tools;
+    },
+    setTools(state, data) {
+        state.tools = data;
     },
     resetState(state) {
         state = Object.assign(state, initialState());

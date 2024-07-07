@@ -43,6 +43,19 @@ class OrderChartController extends CoreController
     }
 
     /**
+     * Get Tools
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getTools(Request $request)
+    {
+        $data = $this->orderChartService->getTools(false);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Get Status
      *
      * @param \Illuminate\Http\Request $request

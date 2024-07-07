@@ -65,6 +65,7 @@
                         class="command"
                         :title="$t('trading.orderChart.reload')"
                         @click="resetChart"
+                        @contextmenu="resetTools"
                     >
                         <i
                             :class="`far fa-sync-alt ${
@@ -1043,16 +1044,17 @@ function drawLineTool() {
     }
     lineToolRef.value.classList.remove("selected");
 }
-function removeLineTool() {
+function removeLineTool(withServer = true) {
     if (params.tools.lines.length > 0) {
         params.tools.lines.forEach((line) =>
             params.series.price.removePriceLine(line)
         );
         params.tools.lines = [];
-        store.dispatch("tradingOrder/drawTools", {
-            isRemove: true,
-            name: "line",
-        });
+        if (withServer)
+            store.dispatch("tradingOrder/drawTools", {
+                isRemove: true,
+                name: "line",
+            });
     }
 }
 function uplpsToolClick(e) {
@@ -1142,7 +1144,7 @@ function findUplps(startTime, endTime) {
         value2: +(v3 - dMax).toFixed(2),
     };
 }
-function removeUplpsTool() {
+function removeUplpsTool(withServer = true) {
     const name = "price";
     const char = "P";
     const point1 = `${char}1`;
@@ -1153,10 +1155,11 @@ function removeUplpsTool() {
     }
     params.tools.uplps[point1] = {};
     params.tools.uplps[point2] = {};
-    store.dispatch("tradingOrder/drawTools", {
-        isRemove: true,
-        name: `${name}uplps`,
-    });
+    if (withServer)
+        store.dispatch("tradingOrder/drawTools", {
+            isRemove: true,
+            name: `${name}uplps`,
+        });
 }
 function downlpsToolClick(e) {
     state.showLineContext = false;
@@ -1245,7 +1248,7 @@ function findDownlps(startTime, endTime) {
         value2: +(v3 - dMax).toFixed(2),
     };
 }
-function removeDownlpsTool() {
+function removeDownlpsTool(withServer = true) {
     const name = "price";
     const char = "P";
     const point1 = `${char}1`;
@@ -1256,10 +1259,11 @@ function removeDownlpsTool() {
     }
     params.tools.downlps[point1] = {};
     params.tools.downlps[point2] = {};
-    store.dispatch("tradingOrder/drawTools", {
-        isRemove: true,
-        name: `${name}downlps`,
-    });
+    if (withServer)
+        store.dispatch("tradingOrder/drawTools", {
+            isRemove: true,
+            name: `${name}downlps`,
+        });
 }
 function targetToolClick(e) {
     state.showLineContext = false;
@@ -1342,7 +1346,7 @@ function drawTargetTool() {
     }
     store.dispatch("tradingOrder/drawTools", param);
 }
-function removeTargetTool() {
+function removeTargetTool(withServer = true) {
     if (mf.isSet(params.tools.target.A)) {
         params.series.price.removePriceLine(params.tools.target.A);
         if (mf.isSet(params.tools.target.B)) {
@@ -1353,10 +1357,11 @@ function removeTargetTool() {
         }
         params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
     }
-    store.dispatch("tradingOrder/drawTools", {
-        isRemove: true,
-        name: "target",
-    });
+    if (withServer)
+        store.dispatch("tradingOrder/drawTools", {
+            isRemove: true,
+            name: "target",
+        });
 }
 function rrToolClick(e) {
     state.showLineContext = false;
@@ -1434,7 +1439,7 @@ function drawRrTool() {
     }
     store.dispatch("tradingOrder/drawTools", param);
 }
-function removeRrTool() {
+function removeRrTool(withServer = true) {
     if (mf.isSet(params.tools.rr.EP)) {
         params.series.price.removePriceLine(params.tools.rr.EP);
         if (mf.isSet(params.tools.rr.SL)) {
@@ -1445,10 +1450,11 @@ function removeRrTool() {
         }
     }
     params.tools.rr = { EP: {}, SL: {}, TP: {} };
-    store.dispatch("tradingOrder/drawTools", {
-        isRemove: true,
-        name: "rr",
-    });
+    if (withServer)
+        store.dispatch("tradingOrder/drawTools", {
+            isRemove: true,
+            name: "rr",
+        });
 }
 function showOrderButton() {
     if (store.state.tradingOrder.config.openingMarket) {
@@ -1808,6 +1814,14 @@ function resetChart() {
     params.data.active = [];
     params.data.volume = [];
     refreshChart();
+}
+function resetTools() {
+    removeLineTool(false);
+    removeUplpsTool(false);
+    removeDownlpsTool(false);
+    removeTargetTool(false);
+    removeRrTool(false);
+    store.dispatch("tradingOrder/getTools").then(loadToolsData);
 }
 function getAccountInfo() {
     store.dispatch("tradingOrder/getAccountInfo").then((data) => {

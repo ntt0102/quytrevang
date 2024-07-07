@@ -43,7 +43,7 @@ class OrderChartService extends CoreService
                 'vpsUser' => get_global_value('vpsUser'),
                 'vpsSession' => get_global_value('vpsSession'),
             ],
-            'tools' => $this->getTools()
+            'tools' => $this->getTools(true)
         ];
     }
 
@@ -53,10 +53,12 @@ class OrderChartService extends CoreService
      * @param $payload
      * 
      */
-    public function getTools()
+    public function getTools($withOrder)
     {
         $result = array();
-        $ss = DrawTool::where('symbol', 'VN30F1M')->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
+        $ss = DrawTool::where('symbol', 'VN30F1M');
+        if (!$withOrder) $ss = $ss->where('name', '<>', 'order');
+        $ss = $ss->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
         foreach ($ss as $d) {
             if (!isset($result[$d->name])) $result[$d->name] = array();
             $result[$d->name][$d->point] = $d->data;
