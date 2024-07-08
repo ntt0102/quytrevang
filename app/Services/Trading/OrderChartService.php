@@ -22,9 +22,9 @@ class OrderChartService extends CoreService
      */
     public function getChartData($payload)
     {
-        $date = date('Y-m-d');
-        if ($payload->date == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'))
-            return $this->generateDataFromApi();
+        // $date = date('Y-m-d');
+        // if ($payload->date == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'))
+        //     return $this->generateDataFromApi();
         return $this->generateDataFromCsv($payload->date);
     }
 

@@ -196,6 +196,12 @@ import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
 import moment from "moment";
+import {
+    bufferEncode,
+    bufferDecode,
+    bufferWrite,
+    bufferParse,
+} from "../../../plugins/fireant";
 
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
@@ -236,6 +242,8 @@ const TIME = {
 };
 const SOCKET_ENDPOINT =
     "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
+const FIREANT_SOCKET_ENDPOINT =
+    "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
 const SOCKET_REFRESH_PERIOD = 120;
 
 const store = useStore();
@@ -302,7 +310,15 @@ const tradingViewSrc = computed(() => {
     return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${store.state.tradingOrder.config.vpsUser}&s=${store.state.tradingOrder.config.vpsSession}&resolution=1`;
 });
 
-store.dispatch("tradingOrder/initChart").then(connectSocket);
+store.dispatch("tradingOrder/initChart").then(() => {
+    const CURRENT_SEC = moment().unix();
+    if (
+        store.state.tradingOrder.config.openingMarket &&
+        CURRENT_SEC >= TIME.START &&
+        CURRENT_SEC <= TIME.END
+    )
+        connectSocket();
+});
 store.dispatch("tradingOrder/getStatus");
 
 params.interval = setInterval(intervalHandler, 1000);
@@ -362,7 +378,17 @@ onUnmounted(() => {
     params.websocket = null;
 });
 
-watch(() => store.state.tradingOrder.chartData, loadChartData);
+watch(
+    () => store.state.tradingOrder.chartData,
+    () => {
+        if (
+            state.chartDate != CURRENT_DATE ||
+            !store.state.tradingOrder.config.openingMarket ||
+            moment().unix() > TIME.END
+        )
+            loadChartData();
+    }
+);
 
 function eventChartClick(e) {
     state.showLineContext = false;
@@ -812,63 +838,103 @@ function mergeChartData(data1, data2) {
         ).values()
     );
 }
+// function connectSocket() {
+//     params.websocket = new WebSocket(SOCKET_ENDPOINT);
+//     params.websocket.onopen = (e) => {
+//         let msg = {
+//             action: "join",
+//             list: store.state.tradingOrder.config.vn30f1m,
+//         };
+//         params.websocket.send(
+//             `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
+//         );
+//     };
+//     params.websocket.onclose = (e) => {
+//         if (params.socketStop) return false;
+//         if (inSession()) {
+//             blinkSocketStatus(true);
+//             connectSocket();
+//             if (
+//                 moment().diff(params.socketRefreshTime, "seconds") >
+//                 SOCKET_REFRESH_PERIOD
+//             )
+//                 refreshChart();
+//         }
+//     };
+//     params.websocket.onmessage = (e) => {
+//         blinkSocketStatus(false);
+//         if (e.data.substr(0, 1) == 4) {
+//             if (e.data.substr(1, 1) == 2) {
+//                 const event = JSON.parse(e.data.substr(2));
+//                 if (event[0] == "stockps") {
+//                     const data = event[1].data;
+//                     if (data.id == 3220) {
+//                         if (params.data.price.length > 0) {
+//                             updatePriceData({
+//                                 time: moment(
+//                                     `${CURRENT_DATE}T${data.time}Z`
+//                                 ).unix(),
+//                                 value: data.lastPrice,
+//                             });
+//                         }
+//                         scanOrder();
+//                     }
+//                 }
+//                 // else if (event[0] == "index") {
+//                 //     const data = event[1].data;
+//                 //     if (data.id == 1101 && data.mc == "11") {
+//                 //         if (params.data.vn30.length > 0) {
+//                 //             updateVn30Data({
+//                 //                 time: moment(
+//                 //                     `${CURRENT_DATE}T${data.time}Z`
+//                 //                 ).unix(),
+//                 //                 value: data.cIndex,
+//                 //             });
+//                 //         }
+//                 //     }
+//                 // }
+//             }
+//         }
+//     };
+// }
 function connectSocket() {
-    params.websocket = new WebSocket(SOCKET_ENDPOINT);
+    params.websocket = new WebSocket(FIREANT_SOCKET_ENDPOINT);
     params.websocket.onopen = (e) => {
-        let msg = {
-            action: "join",
-            list: store.state.tradingOrder.config.vn30f1m,
-        };
-        params.websocket.send(
-            `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
-        );
+        let data = '{"protocol":"messagepack","version":1}';
+        params.websocket.send(data);
+        data = [1, {}, "VN30F1MHistory", "SubscribeTrades", ["VN30F1M"]];
+        const encoded = bufferEncode(data);
+        const writed = bufferWrite(encoded.slice());
+        params.websocket.send(writed);
     };
     params.websocket.onclose = (e) => {
-        if (params.socketStop) return false;
-        if (inSession()) {
-            blinkSocketStatus(true);
-            connectSocket();
-            if (
-                moment().diff(params.socketRefreshTime, "seconds") >
-                SOCKET_REFRESH_PERIOD
-            )
-                refreshChart();
-        }
+        computed.log("websocket-close");
     };
     params.websocket.onmessage = (e) => {
-        blinkSocketStatus(false);
-        if (e.data.substr(0, 1) == 4) {
-            if (e.data.substr(1, 1) == 2) {
-                const event = JSON.parse(e.data.substr(2));
-                if (event[0] == "stockps") {
-                    const data = event[1].data;
-                    if (data.id == 3220) {
-                        if (params.data.price.length > 0) {
-                            updatePriceData({
-                                time: moment(
-                                    `${CURRENT_DATE}T${data.time}Z`
-                                ).unix(),
-                                value: data.lastPrice,
-                            });
-                        }
-                        scanOrder();
-                    }
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+            const arrayBuffer = evt.target.result;
+            const parsedMessages = bufferParse(arrayBuffer);
+            parsedMessages.forEach((e) => {
+                const r = bufferDecode(e);
+                if (r[2] == "VN30F1MHistory") {
+                    let prices = [],
+                        volumes = [],
+                        lastVolume = 0;
+                    r[4].forEach((item) => {
+                        const time = moment(item[1]).unix();
+                        prices.push({ time, value: +item[2].toFixed(1) });
+                        lastVolume +=
+                            (item[4] == "B" ? 1 : item[4] == "S" ? -1 : 0) *
+                            item[3];
+                        volumes.push({ time, value: lastVolume });
+                    });
+                    params.series.price.setData(prices);
+                    params.series.volume.setData(volumes);
                 }
-                // else if (event[0] == "index") {
-                //     const data = event[1].data;
-                //     if (data.id == 1101 && data.mc == "11") {
-                //         if (params.data.vn30.length > 0) {
-                //             updateVn30Data({
-                //                 time: moment(
-                //                     `${CURRENT_DATE}T${data.time}Z`
-                //                 ).unix(),
-                //                 value: data.cIndex,
-                //             });
-                //         }
-                //     }
-                // }
-            }
-        }
+            });
+        };
+        reader.readAsArrayBuffer(e.data);
     };
 }
 function intervalHandler() {
@@ -901,14 +967,18 @@ function intervalHandler() {
                 }
             }
         }
-        if (CURRENT_SEC == TIME.START) connectSocket();
+        if (
+            store.state.tradingOrder.config.openingMarket &&
+            CURRENT_SEC == TIME.START
+        )
+            connectSocket();
     }
     state.clock = moment().format("HH:mm:ss");
-    if (
-        moment().diff(params.socketRefreshTime, "seconds") >
-        SOCKET_REFRESH_PERIOD
-    )
-        refreshChart();
+    // if (
+    //     moment().diff(params.socketRefreshTime, "seconds") >
+    //     SOCKET_REFRESH_PERIOD
+    // )
+    //     refreshChart();
 }
 function toggleCancelOrderButton(visible) {
     cancelOrderRef.value.style.display = visible ? "block" : "none";
