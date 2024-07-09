@@ -874,11 +874,6 @@ function intervalHandler() {
             connectSocket();
     }
     state.clock = moment().format("HH:mm:ss");
-    // if (
-    //     moment().diff(params.socketRefreshTime, "seconds") >
-    //     SOCKET_REFRESH_PERIOD
-    // )
-    //     refreshChart();
 }
 function toggleCancelOrderButton(visible) {
     cancelOrderRef.value.style.display = visible ? "block" : "none";
@@ -954,7 +949,9 @@ function removeOrderLine(kinds, withServer = true) {
     kinds.forEach((kind) => {
         if (params.tools.order[kind].hasOwnProperty("line")) {
             params.series.price.removePriceLine(params.tools.order[kind].line);
-            delete params.tools.order[kind].line;
+            setTimeout(() => {
+                delete params.tools.order[kind].line;
+            }, 1000);
         }
     });
     if (withServer)
@@ -1020,7 +1017,9 @@ function removeLineTool(withServer = true) {
         params.tools.lines.forEach((line) =>
             params.series.price.removePriceLine(line)
         );
-        params.tools.lines = [];
+        setTimeout(() => {
+            params.tools.lines = [];
+        }, 1000);
         if (withServer)
             store.dispatch("tradingOrder/drawTools", {
                 isRemove: true,
@@ -1124,8 +1123,10 @@ function removeUplpsTool(withServer = true) {
         params.series[name].removePriceLine(params.tools.uplps[point1]);
         params.series[name].removePriceLine(params.tools.uplps[point2]);
     }
-    params.tools.uplps[point1] = {};
-    params.tools.uplps[point2] = {};
+    setTimeout(() => {
+        params.tools.uplps[point1] = {};
+        params.tools.uplps[point2] = {};
+    }, 1000);
     if (withServer)
         store.dispatch("tradingOrder/drawTools", {
             isRemove: true,
@@ -1228,8 +1229,10 @@ function removeDownlpsTool(withServer = true) {
         params.series[name].removePriceLine(params.tools.downlps[point1]);
         params.series[name].removePriceLine(params.tools.downlps[point2]);
     }
-    params.tools.downlps[point1] = {};
-    params.tools.downlps[point2] = {};
+    setTimeout(() => {
+        params.tools.downlps[point1] = {};
+        params.tools.downlps[point2] = {};
+    }, 1000);
     if (withServer)
         store.dispatch("tradingOrder/drawTools", {
             isRemove: true,
@@ -1326,7 +1329,9 @@ function removeTargetTool(withServer = true) {
             params.series.price.removePriceLine(params.tools.target.Y);
             params.series.price.removePriceLine(params.tools.target.Z);
         }
-        params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
+        setTimeout(() => {
+            params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
+        }, 1000);
     }
     if (withServer)
         store.dispatch("tradingOrder/drawTools", {
@@ -1420,7 +1425,9 @@ function removeRrTool(withServer = true) {
             }
         }
     }
-    params.tools.rr = { EP: {}, SL: {}, TP: {} };
+    setTimeout(() => {
+        params.tools.rr = { EP: {}, SL: {}, TP: {} };
+    }, 1000);
     if (withServer)
         store.dispatch("tradingOrder/drawTools", {
             isRemove: true,
