@@ -767,7 +767,7 @@ function updateChartData(data) {
                 ? params.data.volume.slice(-1)[0].value
                 : 0;
     data.forEach((item) => {
-        const time = moment(item[1] + "Z").unix();
+        const time = moment(item[1].toLocaleString("sv-SE") + "Z").unix();
         prices.push({ time, value: +item[2].toFixed(1) });
         lastVolume += (item[4] == "B" ? 1 : item[4] == "S" ? -1 : 0) * item[3];
         volumes.push({ time, value: lastVolume });
