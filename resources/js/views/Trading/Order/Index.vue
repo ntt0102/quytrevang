@@ -1786,6 +1786,7 @@ function resetChart() {
 }
 function resetTools() {
     removeOrderLine(["entry", "tp", "sl"], false);
+    toggleCancelOrderButton(false);
     removeLineTool(false);
     removeUplpsTool(false);
     removeDownlpsTool(false);
