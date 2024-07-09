@@ -34,7 +34,8 @@ class Kernel extends ConsoleKernel
         $schedule->job(new UpdateOpeningMarketJob)->dailyAt('08:45');
         $schedule->job(new UpdateVn30f1mSymbolJob)->fridays()->at('09:00');
         $schedule->job(new ReportTradingJob)->dailyAt('14:46');
-        $schedule->job(new ExportTradingJob)->twiceDaily(15, 16);
+        $schedule->job(new ExportTradingJob)->dailyAt('14:46');
+        $schedule->job(new ExportTradingJob)->dailyAt('14:50');
 
         $schedule->command('queue:work --stop-when-empty')->everyMinute();
     }
