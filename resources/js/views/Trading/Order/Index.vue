@@ -295,6 +295,7 @@ let params = {
     isAutoOrdering: false,
     socketStop: false,
     socketRefreshTime: moment(),
+    socketSendData: null,
 };
 const state = reactive({
     chartDate: route.query.date ?? CURRENT_DATE,
@@ -312,12 +313,12 @@ const tradingViewSrc = computed(() => {
 
 store.dispatch("tradingOrder/initChart").then(() => {
     const CURRENT_SEC = moment().unix();
-    if (
-        store.state.tradingOrder.config.openingMarket &&
-        CURRENT_SEC >= TIME.START &&
-        CURRENT_SEC <= TIME.END
-    )
-        connectSocket();
+    // if (
+    //     store.state.tradingOrder.config.openingMarket &&
+    //     CURRENT_SEC >= TIME.START &&
+    //     CURRENT_SEC <= TIME.END
+    // )
+    connectSocket();
 });
 store.dispatch("tradingOrder/getStatus");
 
@@ -770,20 +771,20 @@ function loadChartData() {
         if (store.state.tradingOrder.chartData.price.length > 0)
             params.data.whitespace = mergeChartData(
                 params.data.whitespace,
-                createWhitespaceData()
+                createWhitespaceData(state.chartDate)
             );
         params.series.whitespace.setData(params.data.whitespace);
         params.loadWhitespace = false;
     }
 
     params.data.price = mergeChartData(
-        store.state.tradingOrder.chartData.price,
-        params.data.price
+        params.data.price,
+        store.state.tradingOrder.chartData.price
     );
     params.series.price.setData(params.data.price);
     params.data.volume = mergeChartData(
-        store.state.tradingOrder.chartData.volume,
-        params.data.volume
+        params.data.volume,
+        store.state.tradingOrder.chartData.volume
     );
     params.series.volume.setData(params.data.volume);
     // params.data.vn30 = mergeChartData(
@@ -802,6 +803,24 @@ function loadChartData() {
     // );
     // params.series.active.setData(params.data.active);
 }
+function updateChartData(data) {
+    let prices = [],
+        volumes = [],
+        lastVolume =
+            params.data.volume.length > 0
+                ? params.data.volume.slice(-1)[0].value
+                : 0;
+    data.forEach((item) => {
+        const time = moment(item[1].toString() + "Z").unix();
+        prices.push({ time, value: +item[2].toFixed(1) });
+        lastVolume += (item[4] == "B" ? 1 : item[4] == "S" ? -1 : 0) * item[3];
+        volumes.push({ time, value: lastVolume });
+    });
+    params.data.price = mergeChartData(params.data.price, prices);
+    params.series.price.setData(params.data.price);
+    params.data.volume = mergeChartData(params.data.volume, volumes);
+    params.series.volume.setData(params.data.volume);
+}
 function updatePriceData(price) {
     const prevLength = params.data.price.length;
     params.data.price = mergeChartData(params.data.price, [price]);
@@ -816,8 +835,7 @@ function updateVn30Data(price) {
         params.series.vn30.update(price);
     }
 }
-function createWhitespaceData() {
-    const date = state.chartDate;
+function createWhitespaceData(date) {
     const amStart = moment(`${date}T09:00:00Z`).unix();
     const amEnd = moment(`${date}T11:30:00Z`).unix();
     const pmStart = moment(`${date}T13:00:00Z`).unix();
@@ -902,35 +920,37 @@ function connectSocket() {
     params.websocket.onopen = (e) => {
         let data = '{"protocol":"messagepack","version":1}';
         params.websocket.send(data);
-        data = [1, {}, "VN30F1MHistory", "SubscribeTrades", ["VN30F1M"]];
+        data = [1, {}, "UpdateTrades_VN30F1M", "SubscribeTrades", ["VN30F1M"]];
         const encoded = bufferEncode(data);
-        const writed = bufferWrite(encoded.slice());
-        params.websocket.send(writed);
+        params.socketSendData = bufferWrite(encoded.slice());
+        params.websocket.send(params.socketSendData);
     };
     params.websocket.onclose = (e) => {
-        computed.log("websocket-close");
+        console.log("websocket-close");
+        if (!params.socketStop && inSession()) connectSocket();
     };
     params.websocket.onmessage = (e) => {
+        blinkSocketStatus(false);
         const reader = new FileReader();
         reader.onload = function (evt) {
             const arrayBuffer = evt.target.result;
             const parsedMessages = bufferParse(arrayBuffer);
             parsedMessages.forEach((e) => {
                 const r = bufferDecode(e);
-                if (r[2] == "VN30F1MHistory") {
-                    let prices = [],
-                        volumes = [],
-                        lastVolume = 0;
-                    r[4].forEach((item) => {
-                        const time = moment(item[1]).unix();
-                        prices.push({ time, value: +item[2].toFixed(1) });
-                        lastVolume +=
-                            (item[4] == "B" ? 1 : item[4] == "S" ? -1 : 0) *
-                            item[3];
-                        volumes.push({ time, value: lastVolume });
-                    });
-                    params.series.price.setData(prices);
-                    params.series.volume.setData(volumes);
+                if (r[2] == "UpdateTrades_VN30F1M") {
+                    if (!params.data.price.length) {
+                        params.data.whitespace = mergeChartData(
+                            params.data.whitespace,
+                            createWhitespaceData(CURRENT_DATE)
+                        );
+                        params.series.whitespace.setData(
+                            params.data.whitespace
+                        );
+                    }
+                    updateChartData(r[4]);
+                } else if (r[3] == "UpdateTrades" && r[4][0] == "VN30F1M") {
+                    scanOrder(+r[4][1].slice(-1)[0][2].toFixed(1));
+                    updateChartData(r[4][1]);
                 }
             });
         };
@@ -1744,9 +1764,8 @@ function cancelOrderClick() {
         }
     }
 }
-function scanOrder() {
+function scanOrder(lastPrice) {
     if (params.tools.order.entry.hasOwnProperty("line")) {
-        const lastPrice = params.data.price.slice(-1)[0].value;
         if (params.tools.order.tp.hasOwnProperty("line")) {
             if (
                 (params.tools.order.side > 0 &&
@@ -1874,15 +1893,16 @@ function dateSelectChange() {
 function refreshChart() {
     params.socketRefreshTime = moment();
     params.loadWhitespace = true;
-    store.dispatch("tradingOrder/getChartData", state.chartDate);
+    // store.dispatch("tradingOrder/getChartData", state.chartDate);
+    params.websocket.send(params.socketSendData);
 }
 function resetChart() {
     params.data.whitespace = [];
     params.data.price = [];
-    params.data.vn30 = [];
-    params.data.foreign = [];
-    params.data.active = [];
     params.data.volume = [];
+    // params.data.vn30 = [];
+    // params.data.foreign = [];
+    // params.data.active = [];
     refreshChart();
 }
 function resetTools() {

@@ -1,47 +1,6 @@
-class BufferEncoder {
-    static write(e) {
-        let t = e.byteLength || e.length;
-        const n = [];
-        do {
-            let e = 127 & t;
-            (t >>= 7), t > 0 && (e |= 128), n.push(e);
-        } while (t > 0);
-        t = e.byteLength || e.length;
-        const r = new Uint8Array(n.length + t);
-        return r.set(n, 0), r.set(e, n.length), r.buffer;
-    }
-    static parse(e) {
-        const t = [],
-            n = new Uint8Array(e),
-            r = [0, 7, 14, 21, 28];
-        for (let o = 0; o < e.byteLength; ) {
-            let i,
-                s = 0,
-                a = 0;
-            do {
-                (i = n[o + s]), (a |= (127 & i) << r[s]), s++;
-            } while (s < Math.min(5, e.byteLength - o) && 0 !== (128 & i));
-            if (0 !== (128 & i) && s < 5)
-                throw new Error("Cannot read message size.");
-            if (5 === s && i > 7)
-                throw new Error("Messages bigger than 2GB are not supported.");
-            if (!(n.byteLength >= o + s + a))
-                // throw new Error("Incomplete message.");
-                return [];
-            t.push(
-                n.slice
-                    ? n.slice(o + s, o + s + a)
-                    : n.subarray(o + s, o + s + a)
-            ),
-                (o = o + s + a);
-        }
-        return t;
-    }
-}
-
 class Encoder {
     constructor(e, t, n, r, o, i, s, a) {
-        void 0 === e && (e = new Extension()),
+        void 0 === e && (e = new E()),
             void 0 === t && (t = void 0),
             void 0 === n && (n = 100),
             void 0 === r && (r = 2048),
@@ -145,7 +104,7 @@ class Encoder {
         }
     }
     encodeString(e) {
-        if (e.length > 0) {
+        if (e.length > d) {
             var t = l(e);
             this.ensureBufferSizeToWrite(5 + t),
                 this.writeStringHeader(t),
@@ -332,7 +291,7 @@ class Encoder {
 
 class Decoder {
     constructor(e, t, n, r, o, i, a, c) {
-        void 0 === e && (e = new Extension()),
+        void 0 === e && (e = new E()),
             void 0 === t && (t = undefined),
             void 0 === n && (n = 4294967295),
             void 0 === r && (r = 4294967295),
@@ -758,10 +717,9 @@ class Decoder {
                     ? void 0
                     : n.canBeCached(e))
                     ? this.keyDecoder.decode(this.bytes, o, e)
-                    : e > 0
+                    : e > d
                     ? (function (e, t, n) {
                           var r = e.subarray(t, t + n);
-                          var g = new TextDecoder();
                           return g.decode(r);
                       })(this.bytes, o, e)
                     : p(this.bytes, o, e)),
@@ -854,7 +812,7 @@ class Decoder {
     }
 }
 
-class Extension {
+class E {
     constructor() {
         (this.builtInEncoders = []),
             (this.builtInDecoders = []),
@@ -892,6 +850,47 @@ class Extension {
     }
 }
 
+class q {
+    static write(e) {
+        let t = e.byteLength || e.length;
+        const n = [];
+        do {
+            let e = 127 & t;
+            (t >>= 7), t > 0 && (e |= 128), n.push(e);
+        } while (t > 0);
+        t = e.byteLength || e.length;
+        const r = new Uint8Array(n.length + t);
+        return r.set(n, 0), r.set(e, n.length), r.buffer;
+    }
+    static parse(e) {
+        const t = [],
+            n = new Uint8Array(e),
+            r = [0, 7, 14, 21, 28];
+        for (let o = 0; o < e.byteLength; ) {
+            let i,
+                s = 0,
+                a = 0;
+            do {
+                (i = n[o + s]), (a |= (127 & i) << r[s]), s++;
+            } while (s < Math.min(5, e.byteLength - o) && 0 !== (128 & i));
+            if (0 !== (128 & i) && s < 5)
+                throw new Error("Cannot read message size.");
+            if (5 === s && i > 7)
+                throw new Error("Messages bigger than 2GB are not supported.");
+            if (!(n.byteLength >= o + s + a))
+                // throw new Error("Incomplete message.");
+                return [];
+            t.push(
+                n.slice
+                    ? n.slice(o + s, o + s + a)
+                    : n.subarray(o + s, o + s + a)
+            ),
+                (o = o + s + a);
+        }
+        return t;
+    }
+}
+
 function _(e, t) {
     (this.type = e), (this.data = t);
 }
@@ -915,7 +914,6 @@ function l(e) {
 }
 
 function f(e, t, n) {
-    var u = new TextEncoder();
     t.set(u.encode(e), n);
 }
 
@@ -929,7 +927,7 @@ function I(e) {
         : Uint8Array.from(e);
 }
 
-var S = {
+const S = {
     type: -1,
     encode: function (e) {
         return e instanceof Date
@@ -1008,9 +1006,15 @@ var S = {
     },
 };
 
+const d = 0;
+
+const u = new TextEncoder();
+
+const g = new TextDecoder();
+
 const encoderInstance = new Encoder();
 const decoderInstance = new Decoder();
 
 export const bufferEncode = encoderInstance.encode.bind(encoderInstance);
 export const bufferDecode = decoderInstance.decode.bind(decoderInstance);
-export const { write: bufferWrite, parse: bufferParse } = BufferEncoder;
+export const { write: bufferWrite, parse: bufferParse } = q;
