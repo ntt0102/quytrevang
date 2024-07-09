@@ -29,7 +29,11 @@
             @contextmenu="eventChartContextmenu"
         >
             <div class="chart-wrapper" ref="orderChartRef">
-                <div class="area data-area" @click="toolAreaClick">
+                <div
+                    class="area data-area"
+                    @click="toolAreaClick"
+                    @contextmenu="toolAreaContextmenu"
+                >
                     <div
                         ref="connectionRef"
                         :class="`command far fa-${
@@ -240,11 +244,10 @@ const TIME = {
     ATC: moment(CURRENT_DATE + "T14:30:00").unix(),
     END: moment(CURRENT_DATE + "T14:45:00").unix(),
 };
-const SOCKET_ENDPOINT =
-    "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
+// const SOCKET_ENDPOINT =
+//     "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
 const FIREANT_SOCKET_ENDPOINT =
     "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
-const SOCKET_REFRESH_PERIOD = 120;
 
 const store = useStore();
 const route = useRoute();
@@ -274,9 +277,6 @@ let params = {
     data: {
         whitespace: [],
         price: [],
-        vn30: [],
-        foreign: [],
-        active: [],
         volume: [],
     },
     tools: {
@@ -294,8 +294,8 @@ let params = {
     websocket: null,
     isAutoOrdering: false,
     socketStop: false,
-    socketRefreshTime: moment(),
     socketSendData: null,
+    currentSeconds: moment().unix(),
 };
 const state = reactive({
     chartDate: route.query.date ?? CURRENT_DATE,
@@ -313,13 +313,7 @@ const tradingViewSrc = computed(() => {
 });
 
 store.dispatch("tradingOrder/initChart").then(() => {
-    const CURRENT_SEC = moment().unix();
-    if (
-        config.value.openingMarket &&
-        CURRENT_SEC >= TIME.START &&
-        CURRENT_SEC <= TIME.END
-    )
-        connectSocket();
+    if (inSession()) connectSocket();
 });
 store.dispatch("tradingOrder/getStatus");
 
@@ -336,22 +330,6 @@ onMounted(() => {
     params.series.whitespace = params.chart.addLineSeries({
         priceScaleId: "whitespace",
         visible: false,
-    });
-    params.series.active = params.chart.addLineSeries({
-        priceScaleId: "active",
-        scaleMargins: { top: 0.61, bottom: 0.01 },
-        color: "blue",
-        lastValueVisible: false,
-    });
-    params.series.foreign = params.chart.addLineSeries({
-        priceScaleId: "foreign",
-        scaleMargins: { top: 0.61, bottom: 0.01 },
-        color: "purple",
-        lastValueVisible: false,
-    });
-    params.series.vn30 = params.chart.addLineSeries({
-        color: "red",
-        priceFormat: { minMove: 0.1 },
     });
     params.series.volume = params.chart.addLineSeries({
         priceScaleId: "volume",
@@ -380,17 +358,7 @@ onUnmounted(() => {
     params.websocket = null;
 });
 
-watch(
-    () => store.state.tradingOrder.chartData,
-    () => {
-        if (
-            state.chartDate != CURRENT_DATE ||
-            !config.value.openingMarket ||
-            moment().unix() > TIME.END
-        )
-            loadChartData();
-    }
-);
+watch(() => store.state.tradingOrder.chartData, loadChartData);
 
 function eventChartClick(e) {
     state.showLineContext = false;
@@ -768,41 +736,28 @@ function loadToolsData() {
     }
 }
 function loadChartData() {
-    if (params.loadWhitespace) {
-        if (store.state.tradingOrder.chartData.price.length > 0)
-            params.data.whitespace = mergeChartData(
-                params.data.whitespace,
-                createWhitespaceData(state.chartDate)
-            );
-        params.series.whitespace.setData(params.data.whitespace);
-        params.loadWhitespace = false;
-    }
+    if (!(state.chartDate == CURRENT_DATE && inSession())) {
+        if (params.loadWhitespace) {
+            if (store.state.tradingOrder.chartData.price.length > 0)
+                params.data.whitespace = mergeChartData(
+                    params.data.whitespace,
+                    createWhitespaceData(state.chartDate)
+                );
+            params.series.whitespace.setData(params.data.whitespace);
+            params.loadWhitespace = false;
+        }
 
-    params.data.price = mergeChartData(
-        params.data.price,
-        store.state.tradingOrder.chartData.price
-    );
-    params.series.price.setData(params.data.price);
-    params.data.volume = mergeChartData(
-        params.data.volume,
-        store.state.tradingOrder.chartData.volume
-    );
-    params.series.volume.setData(params.data.volume);
-    // params.data.vn30 = mergeChartData(
-    //     store.state.tradingOrder.chartData.vn30,
-    //     params.data.vn30
-    // );
-    // params.series.vn30.setData(params.data.vn30);
-    // params.data.foreign = mergeChartData(
-    //     store.state.tradingOrder.chartData.foreign,
-    //     params.data.foreign
-    // );
-    // params.series.foreign.setData(params.data.foreign);
-    // params.data.active = mergeChartData(
-    //     store.state.tradingOrder.chartData.active,
-    //     params.data.active
-    // );
-    // params.series.active.setData(params.data.active);
+        params.data.price = mergeChartData(
+            params.data.price,
+            store.state.tradingOrder.chartData.price
+        );
+        params.series.price.setData(params.data.price);
+        params.data.volume = mergeChartData(
+            params.data.volume,
+            store.state.tradingOrder.chartData.volume
+        );
+        params.series.volume.setData(params.data.volume);
+    }
 }
 function updateChartData(data) {
     let prices = [],
@@ -821,20 +776,6 @@ function updateChartData(data) {
     params.series.price.setData(params.data.price);
     params.data.volume = mergeChartData(params.data.volume, volumes);
     params.series.volume.setData(params.data.volume);
-}
-function updatePriceData(price) {
-    const prevLength = params.data.price.length;
-    params.data.price = mergeChartData(params.data.price, [price]);
-    if (params.data.price.length > prevLength) {
-        params.series.price.update(price);
-    }
-}
-function updateVn30Data(price) {
-    const prevLength = params.data.vn30.length;
-    params.data.vn30 = mergeChartData(params.data.vn30, [price]);
-    if (params.data.vn30.length > prevLength) {
-        params.series.vn30.update(price);
-    }
 }
 function createWhitespaceData(date) {
     const amStart = moment(`${date}T09:00:00Z`).unix();
@@ -857,65 +798,6 @@ function mergeChartData(data1, data2) {
         ).values()
     );
 }
-// function connectSocket() {
-//     params.websocket = new WebSocket(SOCKET_ENDPOINT);
-//     params.websocket.onopen = (e) => {
-//         let msg = {
-//             action: "join",
-//             list: config.value.vn30f1m,
-//         };
-//         params.websocket.send(
-//             `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
-//         );
-//     };
-//     params.websocket.onclose = (e) => {
-//         if (params.socketStop) return false;
-//         if (inSession()) {
-//             blinkSocketStatus(true);
-//             connectSocket();
-//             if (
-//                 moment().diff(params.socketRefreshTime, "seconds") >
-//                 SOCKET_REFRESH_PERIOD
-//             )
-//                 refreshChart();
-//         }
-//     };
-//     params.websocket.onmessage = (e) => {
-//         blinkSocketStatus(false);
-//         if (e.data.substr(0, 1) == 4) {
-//             if (e.data.substr(1, 1) == 2) {
-//                 const event = JSON.parse(e.data.substr(2));
-//                 if (event[0] == "stockps") {
-//                     const data = event[1].data;
-//                     if (data.id == 3220) {
-//                         if (params.data.price.length > 0) {
-//                             updatePriceData({
-//                                 time: moment(
-//                                     `${CURRENT_DATE}T${data.time}Z`
-//                                 ).unix(),
-//                                 value: data.lastPrice,
-//                             });
-//                         }
-//                         scanOrder();
-//                     }
-//                 }
-//                 // else if (event[0] == "index") {
-//                 //     const data = event[1].data;
-//                 //     if (data.id == 1101 && data.mc == "11") {
-//                 //         if (params.data.vn30.length > 0) {
-//                 //             updateVn30Data({
-//                 //                 time: moment(
-//                 //                     `${CURRENT_DATE}T${data.time}Z`
-//                 //                 ).unix(),
-//                 //                 value: data.cIndex,
-//                 //             });
-//                 //         }
-//                 //     }
-//                 // }
-//             }
-//         }
-//     };
-// }
 function connectSocket() {
     params.websocket = new WebSocket(FIREANT_SOCKET_ENDPOINT);
     params.websocket.onopen = (e) => {
@@ -959,13 +841,13 @@ function connectSocket() {
     };
 }
 function intervalHandler() {
-    const CURRENT_SEC = moment().unix();
-    if (inSession(CURRENT_SEC)) {
+    params.currentSeconds = moment().unix();
+    if (inSession()) {
         if (!!status.value.position) {
-            if (CURRENT_SEC > TIME.ATC - 5 * 60) {
+            if (params.currentSeconds > TIME.ATC - 5 * 60) {
                 blinkCancelOrderButton();
                 if (
-                    CURRENT_SEC > TIME.ATC - 15 &&
+                    params.currentSeconds > TIME.ATC - 15 &&
                     params.tools.order.tp.hasOwnProperty("line")
                 ) {
                     store
@@ -988,7 +870,7 @@ function intervalHandler() {
                 }
             }
         }
-        if (config.value.openingMarket && CURRENT_SEC == TIME.START)
+        if (config.value.openingMarket && params.currentSeconds == TIME.START)
             connectSocket();
     }
     state.clock = moment().format("HH:mm:ss");
@@ -1068,17 +950,18 @@ function drawOrderLine(kinds) {
     });
     store.dispatch("tradingOrder/drawTools", param);
 }
-function removeOrderLine(kinds) {
+function removeOrderLine(kinds, withServer = true) {
     kinds.forEach((kind) => {
         if (params.tools.order[kind].hasOwnProperty("line")) {
             params.series.price.removePriceLine(params.tools.order[kind].line);
             delete params.tools.order[kind].line;
         }
     });
-    store.dispatch("tradingOrder/drawTools", {
-        isRemove: true,
-        name: "order",
-    });
+    if (withServer)
+        store.dispatch("tradingOrder/drawTools", {
+            isRemove: true,
+            name: "order",
+        });
 }
 function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
@@ -1546,13 +1429,13 @@ function removeRrTool(withServer = true) {
 }
 function showOrderButton() {
     if (config.value.openingMarket) {
-        const CURRENT_SEC = moment().unix();
-        if (inSession(CURRENT_SEC)) {
+        if (inSession()) {
             if (!params.tools.order.tp.hasOwnProperty("line")) {
                 if (!!status.value.position) {
                     if (
                         true ||
-                        (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC)
+                        (params.currentSeconds > TIME.ATO &&
+                            params.currentSeconds < TIME.ATC)
                     ) {
                         tpslOrderRef.value.style.left =
                             +(
@@ -1576,7 +1459,8 @@ function showOrderButton() {
                 if (!status.value.position) {
                     if (
                         true ||
-                        (CURRENT_SEC > TIME.ATO && CURRENT_SEC < TIME.ATC)
+                        (params.currentSeconds > TIME.ATO &&
+                            params.currentSeconds < TIME.ATC)
                     ) {
                         price = coordinateToPrice(params.crosshair.y);
                         side =
@@ -1587,8 +1471,8 @@ function showOrderButton() {
                         params.tools.order.entry.price = price;
                     }
                 } else {
-                    if (CURRENT_SEC < TIME.ATO) price = "ATO";
-                    else if (CURRENT_SEC > TIME.ATC) price = "ATC";
+                    if (params.currentSeconds < TIME.ATO) price = "ATO";
+                    else if (params.currentSeconds > TIME.ATC) price = "ATC";
                     if (!!price) {
                         params.tools.order.entry.price = price;
                         side = -status.value.position;
@@ -1621,9 +1505,8 @@ function hideOrderButton() {
     tpslOrderRef.value.style.display = "none";
 }
 function entryOrderClick() {
-    const CURRENT_SEC = moment().unix();
-    if (inSession(CURRENT_SEC)) {
-        if (CURRENT_SEC < TIME.ATO) {
+    if (inSession()) {
+        if (params.currentSeconds < TIME.ATO) {
             let result = confirm(
                 t("trading.orderChart.atoOrder"),
                 t("titles.confirm")
@@ -1647,7 +1530,7 @@ function entryOrderClick() {
                         });
                 }
             });
-        } else if (CURRENT_SEC < TIME.ATC) {
+        } else if (params.currentSeconds < TIME.ATC) {
             store
                 .dispatch("tradingOrder/executeOrder", {
                     action: "entry",
@@ -1872,9 +1755,12 @@ function scanOrder(lastPrice) {
 function chartTopClick() {
     params.chart.timeScale().scrollToRealTime();
 }
-function inSession(currentSec = null) {
-    if (!currentSec) currentSec = moment().unix();
-    return currentSec >= TIME.START && currentSec <= TIME.END;
+function inSession() {
+    return (
+        config.value.openingMarket &&
+        params.currentSeconds >= TIME.START &&
+        params.currentSeconds <= TIME.END
+    );
 }
 function coordinateToPrice(y) {
     return +params.series.price.coordinateToPrice(y).toFixed(1);
@@ -1889,21 +1775,17 @@ function dateSelectChange() {
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 function refreshChart() {
-    params.socketRefreshTime = moment();
-    params.loadWhitespace = true;
-    // store.dispatch("tradingOrder/getChartData", state.chartDate);
-    params.websocket.send(params.socketSendData);
+    if (inSession()) params.websocket.send(params.socketSendData);
 }
 function resetChart() {
     params.data.whitespace = [];
     params.data.price = [];
     params.data.volume = [];
-    // params.data.vn30 = [];
-    // params.data.foreign = [];
-    // params.data.active = [];
     refreshChart();
+    store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 function resetTools() {
+    removeOrderLine(["entry", "tp", "sl"], false);
     removeLineTool(false);
     removeUplpsTool(false);
     removeDownlpsTool(false);
