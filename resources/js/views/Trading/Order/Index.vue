@@ -307,18 +307,19 @@ const state = reactive({
     showTradingView: false,
 });
 const status = computed(() => store.state.tradingOrder.status);
+const config = computed(() => store.state.tradingOrder.config);
 const tradingViewSrc = computed(() => {
-    return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${store.state.tradingOrder.config.vpsUser}&s=${store.state.tradingOrder.config.vpsSession}&resolution=1`;
+    return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${config.value.vpsUser}&s=${config.value.vpsSession}&resolution=1`;
 });
 
 store.dispatch("tradingOrder/initChart").then(() => {
     const CURRENT_SEC = moment().unix();
-    // if (
-    //     store.state.tradingOrder.config.openingMarket &&
-    //     CURRENT_SEC >= TIME.START &&
-    //     CURRENT_SEC <= TIME.END
-    // )
-    connectSocket();
+    if (
+        config.value.openingMarket &&
+        CURRENT_SEC >= TIME.START &&
+        CURRENT_SEC <= TIME.END
+    )
+        connectSocket();
 });
 store.dispatch("tradingOrder/getStatus");
 
@@ -384,7 +385,7 @@ watch(
     () => {
         if (
             state.chartDate != CURRENT_DATE ||
-            !store.state.tradingOrder.config.openingMarket ||
+            !config.value.openingMarket ||
             moment().unix() > TIME.END
         )
             loadChartData();
@@ -717,15 +718,15 @@ function loadToolsData() {
     for (const [name, points] of Object.entries(tools)) {
         switch (name) {
             case "order":
-                if (status.value.pending) {
-                    Object.entries(points).forEach(([point, line]) => {
-                        params.tools.order.side = line.side;
-                        params.tools.order[point].price = line.price;
-                        params.tools.order[point].line =
-                            params.series.price.createPriceLine(line);
-                        toggleCancelOrderButton(true);
-                    });
-                }
+                // if (status.value.pending) {
+                Object.entries(points).forEach(([point, line]) => {
+                    params.tools.order.side = line.side;
+                    params.tools.order[point].price = line.price;
+                    params.tools.order[point].line =
+                        params.series.price.createPriceLine(line);
+                    toggleCancelOrderButton(true);
+                });
+                // }
                 break;
             case "line":
                 Object.values(points).forEach((line) =>
@@ -861,7 +862,7 @@ function mergeChartData(data1, data2) {
 //     params.websocket.onopen = (e) => {
 //         let msg = {
 //             action: "join",
-//             list: store.state.tradingOrder.config.vn30f1m,
+//             list: config.value.vn30f1m,
 //         };
 //         params.websocket.send(
 //             `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
@@ -987,10 +988,7 @@ function intervalHandler() {
                 }
             }
         }
-        if (
-            store.state.tradingOrder.config.openingMarket &&
-            CURRENT_SEC == TIME.START
-        )
+        if (config.value.openingMarket && CURRENT_SEC == TIME.START)
             connectSocket();
     }
     state.clock = moment().format("HH:mm:ss");
@@ -1547,7 +1545,7 @@ function removeRrTool(withServer = true) {
         });
 }
 function showOrderButton() {
-    if (store.state.tradingOrder.config.openingMarket) {
+    if (config.value.openingMarket) {
         const CURRENT_SEC = moment().unix();
         if (inSession(CURRENT_SEC)) {
             if (!params.tools.order.tp.hasOwnProperty("line")) {
