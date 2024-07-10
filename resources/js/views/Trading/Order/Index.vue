@@ -758,13 +758,11 @@ function loadChartData() {
         params.series.volume.setData(params.data.volume);
     }
 }
-function updateChartData(data) {
+function updateChartData(data, lastVolume) {
     let prices = [],
-        volumes = [],
-        lastVolume =
-            params.data.volume.length > 0
-                ? params.data.volume.slice(-1)[0].value
-                : 0;
+        volumes = [];
+    if (lastVolume == undefined)
+        lastVolume = params.data.volume.slice(-1)[0].value;
     data.forEach((item) => {
         const time = moment(item[1].toLocaleString("sv-SE") + "Z").unix();
         prices.push({ time, value: +item[2].toFixed(1) });
@@ -828,7 +826,7 @@ function connectSocket() {
                         createWhitespaceData(CURRENT_DATE)
                     );
                     params.series.whitespace.setData(params.data.whitespace);
-                    updateChartData(r[4]);
+                    updateChartData(r[4], 0);
                 } else if (r[3] == "UpdateTrades" && r[4][0] == "VN30F1M") {
                     scanOrder(+r[4][1].slice(-1)[0][2].toFixed(1));
                     updateChartData(r[4][1]);
