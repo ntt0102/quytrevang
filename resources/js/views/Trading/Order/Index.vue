@@ -288,7 +288,6 @@ let params = {
         rr: { EP: {}, SL: {}, TP: {} },
     },
     crosshair: {},
-    loadWhitespace: true,
     interval: null,
     interval60: null,
     websocket: null,
@@ -327,9 +326,12 @@ onMounted(() => {
     params.chart = createChart(orderChartRef.value, CHART_OPTIONS);
     params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(eventPriceLineDrag);
-    params.series.whitespace = params.chart.addLineSeries({
+    params.series.whitespace = params.chart.addHistogramSeries({
         priceScaleId: "whitespace",
-        visible: false,
+        scaleMargins: { top: 0, bottom: 0 },
+        color: "gray",
+        lastValueVisible: false,
+        priceLineVisible: false,
     });
     params.series.volume = params.chart.addLineSeries({
         priceScaleId: "volume",
@@ -737,15 +739,12 @@ function loadToolsData() {
 }
 function loadChartData() {
     if (!(state.chartDate == CURRENT_DATE && inSession())) {
-        if (params.loadWhitespace) {
-            if (store.state.tradingOrder.chartData.price.length > 0)
-                params.data.whitespace = mergeChartData(
-                    params.data.whitespace,
-                    createWhitespaceData(state.chartDate)
-                );
-            params.series.whitespace.setData(params.data.whitespace);
-            params.loadWhitespace = false;
-        }
+        if (store.state.tradingOrder.chartData.price.length > 0)
+            params.data.whitespace = mergeChartData(
+                params.data.whitespace,
+                createWhitespaceData(state.chartDate)
+            );
+        params.series.whitespace.setData(params.data.whitespace);
 
         params.data.price = mergeChartData(
             params.data.price,
@@ -782,10 +781,13 @@ function createWhitespaceData(date) {
     const amEnd = moment(`${date}T11:30:00Z`).unix();
     const pmStart = moment(`${date}T13:00:00Z`).unix();
     const pmEnd = moment(`${date}T14:30:00Z`).unix();
+    const pm14h00 = moment(`${date}T14:00:00Z`).unix();
     let data = [];
     for (let sec = amStart; sec <= pmEnd; sec++) {
         if (sec > amEnd && sec < pmStart) continue;
-        data.push({ time: sec });
+        let item = { time: sec };
+        if (sec == pm14h00 || sec == pmEnd) item.value = 1;
+        data.push(item);
     }
     return data;
 }
@@ -821,15 +823,11 @@ function connectSocket() {
             parsedMessages.forEach((e) => {
                 const r = bufferDecode(e);
                 if (r[2] == "UpdateTrades_VN30F1M") {
-                    if (!params.data.price.length) {
-                        params.data.whitespace = mergeChartData(
-                            params.data.whitespace,
-                            createWhitespaceData(CURRENT_DATE)
-                        );
-                        params.series.whitespace.setData(
-                            params.data.whitespace
-                        );
-                    }
+                    params.data.whitespace = mergeChartData(
+                        params.data.whitespace,
+                        createWhitespaceData(CURRENT_DATE)
+                    );
+                    params.series.whitespace.setData(params.data.whitespace);
                     updateChartData(r[4]);
                 } else if (r[3] == "UpdateTrades" && r[4][0] == "VN30F1M") {
                     scanOrder(+r[4][1].slice(-1)[0][2].toFixed(1));
@@ -1778,7 +1776,6 @@ function toastOrderError(error) {
 }
 function dateSelectChange() {
     if (!state.chartDate) return false;
-    params.loadWhitespace = true;
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 function refreshChart() {
