@@ -279,14 +279,7 @@ let params = {
         price: [],
         volume: [],
     },
-    tools: {
-        order: { side: 0, entry: {}, tp: {}, sl: {} },
-        lines: [],
-        target: { A: {}, B: {}, X: {}, Y: {}, Z: {} },
-        uplps: { P1: {}, P2: {} },
-        downlps: { P1: {}, P2: {} },
-        rr: { EP: {}, SL: {}, TP: {} },
-    },
+    tools: {},
     crosshair: {},
     interval: null,
     interval60: null,
@@ -296,6 +289,8 @@ let params = {
     socketSendData: null,
     currentSeconds: moment().unix(),
 };
+initToolsParams();
+//
 const state = reactive({
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: moment().format("HH:mm:ss"),
@@ -364,7 +359,7 @@ watch(() => store.state.tradingOrder.chartData, loadChartData);
 
 function eventChartClick(e) {
     state.showLineContext = false;
-    hideOrderButton();
+    toggleOrderButton(false);
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (targetToolRef.value.classList.contains("selected"))
         drawTargetTool();
@@ -374,7 +369,7 @@ function eventChartClick(e) {
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
 }
 function eventChartContextmenu(e) {
-    showOrderButton();
+    toggleOrderButton(true);
     e.preventDefault();
 }
 function toolAreaClick(e) {
@@ -705,34 +700,12 @@ function loadToolsData() {
                     )
                 );
                 break;
-            case "target":
-                Object.entries(points).forEach(
-                    ([point, line]) =>
-                        (params.tools.target[point] =
-                            params.series.price.createPriceLine(line))
-                );
-                break;
-            case "rr":
-                Object.entries(points).forEach(
-                    ([point, line]) =>
-                        (params.tools.rr[point] =
-                            params.series.price.createPriceLine(line))
-                );
-                break;
             default:
-                if (name.includes("uplps")) {
-                    Object.entries(points).forEach(
-                        ([point, line]) =>
-                            (params.tools.uplps[point] =
-                                params.series.price.createPriceLine(line))
-                    );
-                } else if (name.includes("downlps")) {
-                    Object.entries(points).forEach(
-                        ([point, line]) =>
-                            (params.tools.downlps[point] =
-                                params.series.price.createPriceLine(line))
-                    );
-                }
+                Object.entries(points).forEach(
+                    ([point, line]) =>
+                        (params.tools[name][point] =
+                            params.series.price.createPriceLine(line))
+                );
                 break;
         }
     }
@@ -851,7 +824,7 @@ function intervalHandler() {
                 blinkCancelOrderButton();
                 if (
                     params.currentSeconds > TIME.ATC - 15 &&
-                    params.tools.order.tp.hasOwnProperty("line")
+                    mf.isSet(params.tools.order.tp.line)
                 ) {
                     store
                         .dispatch("tradingOrder/executeOrder", {
@@ -923,7 +896,7 @@ function drawOrderLine(kinds) {
                 break;
         }
         param.points.push(kind);
-        if (params.tools.order[kind].hasOwnProperty("line")) {
+        if (mf.isSet(params.tools.order[kind].line)) {
             params.tools.order[kind].line.applyOptions({
                 price: params.tools.order[kind].price,
                 title: title,
@@ -950,11 +923,9 @@ function drawOrderLine(kinds) {
 }
 function removeOrderLine(kinds, withServer = true) {
     kinds.forEach((kind) => {
-        if (params.tools.order[kind].hasOwnProperty("line")) {
+        if (mf.isSet(params.tools.order[kind].line)) {
             params.series.price.removePriceLine(params.tools.order[kind].line);
-            setTimeout(() => {
-                delete params.tools.order[kind].line;
-            }, 1000);
+            delete params.tools.order[kind].line;
         }
     });
     if (withServer)
@@ -1020,9 +991,7 @@ function removeLineTool(withServer = true) {
         params.tools.lines.forEach((line) =>
             params.series.price.removePriceLine(line)
         );
-        setTimeout(() => {
-            params.tools.lines = [];
-        }, 1000);
+        initToolsParams(["lines"]);
         if (withServer)
             store.dispatch("tradingOrder/drawTools", {
                 isRemove: true,
@@ -1044,12 +1013,10 @@ function uplpsToolContextmenu(e) {
 }
 function drawUplpsTool() {
     let startTime, endTime;
-    const name = "price";
-    const char = "P";
-    if (mf.isSet(params.tools.uplps[`${char}1`])) {
-        startTime = +params.tools.uplps[`${char}1`].options().startTime;
+    if (mf.isSet(params.tools.uplps.P1)) {
+        startTime = +params.tools.uplps.P1.options().startTime;
         endTime = params.crosshair.time;
-        removeUplpsTool();
+        removeUplpsTool(false);
     } else startTime = params.crosshair.time;
     const { value1, value2 } = findUplps(startTime, endTime);
     let option = {
@@ -1060,22 +1027,22 @@ function drawUplpsTool() {
     };
     let param = {
         isRemove: false,
-        name: `${name}uplps`,
+        name: "uplps",
         points: [],
         data: [],
     };
     option.startTime = startTime;
     option.price = value1;
-    option.title = `${char}1`;
+    option.title = "P1";
     params.tools.uplps[option.title] =
-        params.series[name].createPriceLine(option);
+        params.series.price.createPriceLine(option);
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
     //
     option.price = value2;
-    option.title = `${char}2`;
+    option.title = "P2";
     params.tools.uplps[option.title] =
-        params.series[name].createPriceLine(option);
+        params.series.price.createPriceLine(option);
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
 
@@ -1118,22 +1085,15 @@ function findUplps(startTime, endTime) {
     };
 }
 function removeUplpsTool(withServer = true) {
-    const name = "price";
-    const char = "P";
-    const point1 = `${char}1`;
-    const point2 = `${char}2`;
-    if (mf.isSet(params.tools.uplps[point1])) {
-        params.series[name].removePriceLine(params.tools.uplps[point1]);
-        params.series[name].removePriceLine(params.tools.uplps[point2]);
+    if (mf.isSet(params.tools.uplps.P1)) {
+        params.series.price.removePriceLine(params.tools.uplps.P1);
+        params.series.price.removePriceLine(params.tools.uplps.P2);
     }
-    setTimeout(() => {
-        params.tools.uplps[point1] = {};
-        params.tools.uplps[point2] = {};
-    }, 1000);
+    initToolsParams(["uplps"]);
     if (withServer)
         store.dispatch("tradingOrder/drawTools", {
             isRemove: true,
-            name: `${name}uplps`,
+            name: "uplps",
         });
 }
 function downlpsToolClick(e) {
@@ -1150,12 +1110,10 @@ function downlpsToolContextmenu(e) {
 }
 function drawDownlpsTool() {
     let startTime, endTime;
-    const name = "price";
-    const char = "P";
-    if (mf.isSet(params.tools.downlps[`${char}1`])) {
-        startTime = +params.tools.downlps[`${char}1`].options().startTime;
+    if (mf.isSet(params.tools.downlps.P1)) {
+        startTime = +params.tools.downlps.P1.options().startTime;
         endTime = params.crosshair.time;
-        removeDownlpsTool();
+        removeDownlpsTool(false);
     } else startTime = params.crosshair.time;
     const { value1, value2 } = findDownlps(startTime, endTime);
     let option = {
@@ -1166,22 +1124,22 @@ function drawDownlpsTool() {
     };
     let param = {
         isRemove: false,
-        name: `${name}downlps`,
+        name: "downlps",
         points: [],
         data: [],
     };
     option.startTime = startTime;
     option.price = value1;
-    option.title = `${char}1`;
+    option.title = "P1";
     params.tools.downlps[option.title] =
-        params.series[name].createPriceLine(option);
+        params.series.price.createPriceLine(option);
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
     //
     option.price = value2;
-    option.title = `${char}2`;
+    option.title = "P2";
     params.tools.downlps[option.title] =
-        params.series[name].createPriceLine(option);
+        params.series.price.createPriceLine(option);
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
 
@@ -1224,22 +1182,15 @@ function findDownlps(startTime, endTime) {
     };
 }
 function removeDownlpsTool(withServer = true) {
-    const name = "price";
-    const char = "P";
-    const point1 = `${char}1`;
-    const point2 = `${char}2`;
-    if (mf.isSet(params.tools.downlps[point1])) {
-        params.series[name].removePriceLine(params.tools.downlps[point1]);
-        params.series[name].removePriceLine(params.tools.downlps[point2]);
+    if (mf.isSet(params.tools.downlps.P1)) {
+        params.series.price.removePriceLine(params.tools.downlps.P1);
+        params.series.price.removePriceLine(params.tools.downlps.P2);
     }
-    setTimeout(() => {
-        params.tools.downlps[point1] = {};
-        params.tools.downlps[point2] = {};
-    }, 1000);
+    initToolsParams(["downlps"]);
     if (withServer)
         store.dispatch("tradingOrder/drawTools", {
             isRemove: true,
-            name: `${name}downlps`,
+            name: "downlps",
         });
 }
 function targetToolClick(e) {
@@ -1332,10 +1283,8 @@ function removeTargetTool(withServer = true) {
             params.series.price.removePriceLine(params.tools.target.Y);
             params.series.price.removePriceLine(params.tools.target.Z);
         }
-        setTimeout(() => {
-            params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
-        }, 1000);
     }
+    initToolsParams(["target"]);
     if (withServer)
         store.dispatch("tradingOrder/drawTools", {
             isRemove: true,
@@ -1428,19 +1377,17 @@ function removeRrTool(withServer = true) {
             }
         }
     }
-    setTimeout(() => {
-        params.tools.rr = { EP: {}, SL: {}, TP: {} };
-    }, 1000);
+    initToolsParams(["rr"]);
     if (withServer)
         store.dispatch("tradingOrder/drawTools", {
             isRemove: true,
             name: "rr",
         });
 }
-function showOrderButton() {
-    if (config.value.openingMarket) {
+function toggleOrderButton(status) {
+    if (status) {
         if (inSession()) {
-            if (!params.tools.order.tp.hasOwnProperty("line")) {
+            if (!mf.isSet(params.tools.order.tp.line)) {
                 if (!!status.value.position) {
                     if (
                         true ||
@@ -1463,7 +1410,7 @@ function showOrderButton() {
                     }
                 }
             }
-            if (!params.tools.order.entry.hasOwnProperty("line")) {
+            if (!mf.isSet(params.tools.order.entry.line)) {
                 let price = null,
                     side = 0;
                 if (!status.value.position) {
@@ -1508,11 +1455,10 @@ function showOrderButton() {
                 }
             }
         }
+    } else {
+        entryOrderRef.value.style.display = "none";
+        tpslOrderRef.value.style.display = "none";
     }
-}
-function hideOrderButton() {
-    entryOrderRef.value.style.display = "none";
-    tpslOrderRef.value.style.display = "none";
 }
 function entryOrderClick() {
     if (inSession()) {
@@ -1612,8 +1558,8 @@ function tpslOrderClick() {
         });
 }
 function cancelOrderClick() {
-    if (params.tools.order.entry.hasOwnProperty("line")) {
-        if (params.tools.order.tp.hasOwnProperty("line")) {
+    if (mf.isSet(params.tools.order.entry.line)) {
+        if (mf.isSet(params.tools.order.tp.line)) {
             store
                 .dispatch("tradingOrder/executeOrder", {
                     action: "exit",
@@ -1656,8 +1602,8 @@ function cancelOrderClick() {
     }
 }
 function scanOrder(lastPrice) {
-    if (params.tools.order.entry.hasOwnProperty("line")) {
-        if (params.tools.order.tp.hasOwnProperty("line")) {
+    if (mf.isSet(params.tools.order.entry.line)) {
+        if (mf.isSet(params.tools.order.tp.line)) {
             if (
                 (params.tools.order.side > 0 &&
                     lastPrice >= params.tools.order.tp.price) ||
@@ -1680,7 +1626,7 @@ function scanOrder(lastPrice) {
                                 toast.success(
                                     t("trading.orderChart.deleteTpSuccess")
                                 );
-                                hideOrderButton();
+                                toggleOrderButton(false);
                             } else toastOrderError(resp.message);
                             params.isAutoOrdering = false;
                         });
@@ -1708,7 +1654,7 @@ function scanOrder(lastPrice) {
                                 toast.success(
                                     t("trading.orderChart.deleteSlSuccess")
                                 );
-                                hideOrderButton();
+                                toggleOrderButton(false);
                             } else toastOrderError(resp.message);
                             params.isAutoOrdering = false;
                         });
@@ -1802,6 +1748,18 @@ function resetTools() {
     removeTargetTool(false);
     removeRrTool(false);
     store.dispatch("tradingOrder/getTools").then(loadToolsData);
+}
+function initToolsParams(tools) {
+    if (tools == undefined)
+        tools = ["order", "lines", "target", "uplps", "downlps", "rr"];
+    if (tools.includes("order"))
+        params.tools.order = { side: 0, entry: {}, tp: {}, sl: {} };
+    if (tools.includes("lines")) params.tools.lines = [];
+    if (tools.includes("target"))
+        params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
+    if (tools.includes("uplps")) params.tools.uplps = { P1: {}, P2: {} };
+    if (tools.includes("downlps")) params.tools.downlps = { P1: {}, P2: {} };
+    if (tools.includes("rr")) params.tools.rr = { EP: {}, SL: {}, TP: {} };
 }
 function getAccountInfo() {
     store.dispatch("tradingOrder/getAccountInfo").then((data) => {
