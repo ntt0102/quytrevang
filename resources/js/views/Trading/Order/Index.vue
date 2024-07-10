@@ -769,10 +769,17 @@ function updateChartData(data, lastVolume) {
         lastVolume += (item[4] == "B" ? 1 : item[4] == "S" ? -1 : 0) * item[3];
         volumes.push({ time, value: lastVolume });
     });
-    params.data.price = mergeChartData(params.data.price, prices);
-    params.series.price.setData(params.data.price);
-    params.data.volume = mergeChartData(params.data.volume, volumes);
-    params.series.volume.setData(params.data.volume);
+    if (prices.length > 1) {
+        params.data.price = mergeChartData(params.data.price, prices);
+        params.series.price.setData(params.data.price);
+        params.data.volume = mergeChartData(params.data.volume, volumes);
+        params.series.volume.setData(params.data.volume);
+    } else {
+        params.data.price.push(prices[0]);
+        params.series.price.update(prices[0]);
+        params.data.volume.push(volumes[0]);
+        params.series.volume.update(volumes[0]);
+    }
 }
 function createWhitespaceData(date) {
     const amStart = moment(`${date}T09:00:00Z`).unix();
