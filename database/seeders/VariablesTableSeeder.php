@@ -55,10 +55,6 @@ class VariablesTableSeeder extends Seeder
             'value' => "",
         ]);
         Variable::create([
-            'name' => "dnseEmailOtp",
-            'value' => "",
-        ]);
-        Variable::create([
             'name' => "dnseTradingToken",
             'value' => "",
         ]);
