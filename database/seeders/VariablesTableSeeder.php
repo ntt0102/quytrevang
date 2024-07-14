@@ -50,5 +50,17 @@ class VariablesTableSeeder extends Seeder
             'name' => "exitOrderId",
             'value' => "",
         ]);
+        Variable::create([
+            'name' => "dnseAccessToken",
+            'value' => "",
+        ]);
+        Variable::create([
+            'name' => "dnseEmailOtp",
+            'value' => "",
+        ]);
+        Variable::create([
+            'name' => "dnseTradingToken",
+            'value' => "",
+        ]);
     }
 }

@@ -74,7 +74,7 @@ Route::get('test', function () {
     // $s = new \App\Jobs\FilterStockJob($payload);
     // $s = $s->getForeignRatio($payload);
     // $s = $s->getRatio($payload);
-    $s = app(\App\Services\Special\CsvService::class)->convert();
+    // $s = app(\App\Services\Special\CsvService::class)->convert();
     // $s = app(\App\Services\Trading\OrderChartService::class)->cloneVn30f1mData();
     // $s = app(\App\Services\Trading\OrderChartService::class)->generateDataFromApi();
     // $s = file_exists(storage_path('app'));
@@ -103,6 +103,44 @@ Route::get('test', function () {
     // $o = \App\Models\StockOrder::find(1);
     // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
     // $s = app(\App\Services\Trading\StatisticService::class)->calculateProfit($o);
-    dd($s);
+
+    // \App\Jobs\GetDnseAccessTokenJob::dispatch();
+    // \App\Jobs\GetDnseEmailOtpJob::dispatch();
+    // $emailOtp = "";
+    $client = \Webklex\IMAP\Facades\Client::account('default');
+    $client->connect();
+    $folder = $client->getFolders();
+    // dd($folder);
+    $folder = $client->getFolderByPath('[Gmail]/Quan tr&Hs0-ng');
+    $messages = $folder->messages()->from('quytrevang@gmail.com')->unseen()->limit(1)->get();
+    dd($messages);
+    $messages[0]->move('[Gmail]/Th&APk-ng r&AOE-c');
+    // while (!$emailOtp) {
+    //     // $messages = $folder->messages()->from('noreply@mail.dnse.com.vn')->unseen()->limit(1)->get();
+    //     $messages = $folder->messages()->from('quytrevang@gmail.com')->unseen()->limit(1)->get();
+    //     echo count($messages);
+    //     echo "\n";
+    //     if (count($messages)) {
+    //         preg_match('/\b\d{6}\b/', $messages[0]->getHTMLBody(), $otpMatches);
+    //         if ($otpMatches) $emailOtp = $otpMatches[0];
+    //     }
+    // }
+    // $client->disconnect();
+    // set_global_value('dnseEmailOtp', $emailOtp);
+    // $client = new \GuzzleHttp\Client();
+    // $data = [
+    //     'headers' => [
+    //         'Content-Type' => 'application/json',
+    //     ],
+    //     'json' => [
+    //         'username' => '0367269284',
+    //         'password' => 'Ckvndrt0!',
+    //     ],
+    // ];
+    // $req = $client->post('https://services.entrade.com.vn/dnse-auth-service/login', $data);
+    // $rsp = json_decode($req->getBody());
+    // echo $rsp->token;
+    // set_global_value('dnseAccessToken', $rsp->token);
+    // dd($s);
     return 'ok';
 });
