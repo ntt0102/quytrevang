@@ -10,12 +10,12 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Webklex\IMAP\Facades\Client;
 
-class GetDnseTokenJob implements ShouldQueue
+class LoginDnseJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    const DNSE_USR = '0367269284';
-    const DNSE_PWD = 'Ckvndrt0!';
+    const USR = '0367269284';
+    const PWD = 'Ckvndrt0!';
     private $client;
 
     /**
@@ -50,8 +50,8 @@ class GetDnseTokenJob implements ShouldQueue
                 'Content-Type' => 'application/json',
             ],
             'json' => [
-                'username' => self::DNSE_USR,
-                'password' => self::DNSE_PWD,
+                'username' => self::USR,
+                'password' => self::PWD,
             ],
         ];
         $rsp = $this->client->post('https://services.entrade.com.vn/dnse-auth-service/login', $data);
