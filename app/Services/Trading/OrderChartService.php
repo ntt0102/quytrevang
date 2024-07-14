@@ -3,12 +3,11 @@
 namespace App\Services\Trading;
 
 use App\Services\CoreService;
-use App\Models\Copyist;
 use App\Services\Special\VpsOrderService;
-use App\Jobs\OrderVpsJob;
+use App\Models\DrawTool;
 use App\Jobs\ReportTradingJob;
 use App\Jobs\ExportTradingJob;
-use App\Models\DrawTool;
+use App\Jobs\LoginDnseJob;
 
 class OrderChartService extends CoreService
 {
@@ -305,34 +304,6 @@ class OrderChartService extends CoreService
     }
 
     /**
-     * Report
-     * 
-     * @param $payload
-     * 
-     */
-    public function report($payload)
-    {
-        return $this->transaction(function () {
-            ReportTradingJob::dispatch();
-            return ['isOk' => true];
-        });
-    }
-
-    /**
-     * Export
-     * 
-     * @param $payload
-     * 
-     */
-    public function export($payload)
-    {
-        return $this->transaction(function () {
-            ExportTradingJob::dispatch();
-            return ['isOk' => true];
-        });
-    }
-
-    /**
      * Draw Tools
      *
      * @param $payload
@@ -354,5 +325,41 @@ class OrderChartService extends CoreService
             }
         }
         return (object)[];
+    }
+
+    /**
+     * Report
+     * 
+     * @param $payload
+     * 
+     */
+    public function report($payload)
+    {
+        ReportTradingJob::dispatch();
+        return ['isOk' => true];
+    }
+
+    /**
+     * Export
+     * 
+     * @param $payload
+     * 
+     */
+    public function export($payload)
+    {
+        ExportTradingJob::dispatch();
+        return ['isOk' => true];
+    }
+
+    /**
+     * loginDnse
+     * 
+     * @param $payload
+     * 
+     */
+    public function loginDnse($payload)
+    {
+        LoginDnseJob::dispatch();
+        return ['isOk' => true];
     }
 }

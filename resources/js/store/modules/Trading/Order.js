@@ -88,6 +88,15 @@ const actions = {
                 });
         });
     },
+    drawTools({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/order/draw-tools", param, { noLoading: true })
+                .then((response) => {
+                    resolve();
+                });
+        });
+    },
     report({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios.post("trading/order/report", null).then((response) => {
@@ -102,13 +111,11 @@ const actions = {
             });
         });
     },
-    drawTools({ commit, dispatch, getters, state, rootGetters }, param) {
+    loginDnse({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios
-                .post("trading/order/draw-tools", param, { noLoading: true })
-                .then((response) => {
-                    resolve();
-                });
+            axios.post("trading/order/login-dnse", null).then((response) => {
+                resolve();
+            });
         });
     },
     resetState({ commit }) {

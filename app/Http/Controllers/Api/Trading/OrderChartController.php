@@ -121,6 +121,19 @@ class OrderChartController extends CoreController
     }
 
     /**
+     * Draw Tools
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function drawTools(Request $request)
+    {
+        $data = $this->orderChartService->drawTools($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Report.
      *
      * @param Illuminate\Http\Request $request
@@ -147,15 +160,15 @@ class OrderChartController extends CoreController
     }
 
     /**
-     * Draw Tools
+     * loginDnse
      *
-     * @param \Illuminate\Http\Request $request
-     * 
+     * @param Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\Response
      */
-    public function drawTools(Request $request)
+    public function loginDnse(Request $request)
     {
-        $data = $this->orderChartService->drawTools($this->payload);
+        $data = $this->orderChartService->loginDnse($this->payload);
         return $this->sendResponse($data);
     }
 }

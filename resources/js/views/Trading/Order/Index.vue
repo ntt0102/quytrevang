@@ -20,6 +20,16 @@
                         onClick: exportCsv,
                     },
                 },
+                {
+                    visible: false,
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-sign-in-alt small',
+                        hint: $t('trading.orderChart.buttons.loginDnse'),
+                        onClick: loginDnse,
+                    },
+                },
             ]"
         />
         <div
@@ -1786,6 +1796,9 @@ function report() {
 }
 function exportCsv() {
     bus.emit("checkPin", () => store.dispatch("tradingOrder/export"));
+}
+function loginDnse() {
+    bus.emit("checkPin", () => store.dispatch("tradingOrder/loginDnse"));
 }
 </script>
 <style lang="scss">

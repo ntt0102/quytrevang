@@ -119,9 +119,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('get-account-info', 'OrderChartController@getAccountInfo');
                     Route::post('execute-order', 'OrderChartController@executeOrder');
                     Route::post('close-position', 'OrderChartController@closePosition');
+                    Route::post('draw-tools', 'OrderChartController@drawTools');
                     Route::post('report', 'OrderChartController@report');
                     Route::post('export', 'OrderChartController@export');
-                    Route::post('draw-tools', 'OrderChartController@drawTools');
+                    Route::post('login-dnse', 'OrderChartController@loginDnse');
                 });
                 Route::group(['prefix' => 'stock', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'StockController@getChart');
