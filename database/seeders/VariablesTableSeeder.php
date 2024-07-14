@@ -51,11 +51,11 @@ class VariablesTableSeeder extends Seeder
             'value' => "",
         ]);
         Variable::create([
-            'name' => "dnseAccessToken",
+            'name' => "dnseAccess",
             'value' => "",
         ]);
         Variable::create([
-            'name' => "dnseTradingToken",
+            'name' => "dnseTrading",
             'value' => "",
         ]);
     }

@@ -39,8 +39,8 @@ class GetDnseTokenJob implements ShouldQueue
         $this->sendEmailOtp($accessToken);
         $emailOtp = $this->getEmailOtp();
         $tradingToken = $this->getTradingToken($accessToken, $emailOtp);
-        set_global_value('dnseAccessToken', $accessToken);
-        set_global_value('dnseTradingToken', $tradingToken);
+        set_global_value('dnseAccess', $accessToken);
+        set_global_value('dnseTrading', $tradingToken);
     }
 
     private function getAccessToken()
