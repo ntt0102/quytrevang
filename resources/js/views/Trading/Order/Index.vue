@@ -1394,8 +1394,8 @@ function removeRrTool(withServer = true) {
             name: "rr",
         });
 }
-function toggleOrderButton(status) {
-    if (status) {
+function toggleOrderButton(show) {
+    if (show) {
         if (inSession()) {
             if (!mf.isSet(params.tools.order.tp.line)) {
                 if (!!status.value.position) {

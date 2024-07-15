@@ -107,14 +107,14 @@ Route::get('test', function () {
     // \App\Jobs\GetDnseAccessTokenJob::dispatch();
     // \App\Jobs\GetDnseEmailOtpJob::dispatch();
     // $emailOtp = "";
-    $client = \Webklex\IMAP\Facades\Client::account('default');
-    $client->connect();
-    $folder = $client->getFolders();
-    // dd($folder);
-    $folder = $client->getFolderByPath('[Gmail]/Quan tr&Hs0-ng');
-    $messages = $folder->messages()->from('quytrevang@gmail.com')->unseen()->limit(1)->get();
-    dd($messages);
-    $messages[0]->move('[Gmail]/Th&APk-ng r&AOE-c');
+    // $client = \Webklex\IMAP\Facades\Client::account('default');
+    // $client->connect();
+    // $folder = $client->getFolders();
+    // // dd($folder);
+    // $folder = $client->getFolderByPath('[Gmail]/Quan tr&Hs0-ng');
+    // $messages = $folder->messages()->from('quytrevang@gmail.com')->unseen()->limit(1)->get();
+    // dd($messages);
+    // $messages[0]->move('[Gmail]/Th&APk-ng r&AOE-c');
     // while (!$emailOtp) {
     //     // $messages = $folder->messages()->from('noreply@mail.dnse.com.vn')->unseen()->limit(1)->get();
     //     $messages = $folder->messages()->from('quytrevang@gmail.com')->unseen()->limit(1)->get();
@@ -141,6 +141,7 @@ Route::get('test', function () {
     // $rsp = json_decode($req->getBody());
     // echo $rsp->token;
     // set_global_value('dnseAccessToken', $rsp->token);
-    // dd($s);
+    $s = new \App\Services\Special\VpsOrderService();
+    dd($s);
     return 'ok';
 });
