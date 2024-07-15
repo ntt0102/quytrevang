@@ -241,7 +241,7 @@ const CHART_OPTIONS = {
     crosshair: { mode: 0 },
     timeScale: {
         timeVisible: true,
-        rightOffset: 20,
+        rightOffset: 1000,
         minBarSpacing: 0.01,
         barSpacing: 0.05,
     },

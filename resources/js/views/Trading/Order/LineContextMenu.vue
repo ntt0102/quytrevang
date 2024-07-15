@@ -30,11 +30,8 @@
 
 <script setup>
 import { ref, nextTick, watch } from "vue";
-import { useI18n } from "vue-i18n";
 import DxTextBox from "devextreme-vue/text-box";
-import { confirm } from "devextreme/ui/dialog";
 
-const { t } = useI18n();
 const props = defineProps(["enable", "title", "color"]);
 const emit = defineEmits(["update:title", "update:color"]);
 
@@ -66,11 +63,7 @@ function updateColor(color) {
     emit("update:color", color);
 }
 function deleteAllLine() {
-    confirm(`${t("trading.stock.deleteAllLine")}?`, t("titles.confirm")).then(
-        (result) => {
-            if (result) emit("deleteAllLine");
-        }
-    );
+    emit("deleteAllLine");
 }
 function stopPropagationEvent(e) {
     e.stopPropagation();
