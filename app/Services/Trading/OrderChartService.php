@@ -188,7 +188,7 @@ class OrderChartService extends CoreService
     public function generateDataFromCsv($date)
     {
         $data = ['price' => [], 'volume' => []];
-        $file = storage_path('app/phaisinh/' . $date . '/.csv');
+        $file = storage_path('app/phaisinh/' . $date . '.csv');
         if (!file_exists($file)) return $data;
         $fp = fopen($file, 'r');
         $volume = 0;

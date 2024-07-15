@@ -33,7 +33,7 @@ class ExportTradingJob implements ShouldQueue
     {
         if (get_global_value('openingMarketFlag') == '1') {
             $date = date('Y-m-d');
-            $file = storage_path('app/phaisinh/' . $date . '/.csv');
+            $file = storage_path('app/phaisinh/' . $date . '.csv');
             if (file_exists($file)) return false;
             //
             $orderChartService = app(\App\Services\Trading\OrderChartService::class);
