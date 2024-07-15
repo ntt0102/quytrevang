@@ -38,6 +38,8 @@ class ExportTradingJob implements ShouldQueue
             //
             $orderChartService = app(\App\Services\Trading\OrderChartService::class);
             $data = $orderChartService->cloneVn30f1mData();
+            if (!count($data)) return false;
+
             $fp = fopen($file, 'w');
             foreach ($data as $item) {
                 $line = [];
