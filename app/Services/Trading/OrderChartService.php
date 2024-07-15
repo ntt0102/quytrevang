@@ -308,7 +308,7 @@ class OrderChartService extends CoreService
      */
     public function export($payload)
     {
-        ExportTradingJob::dispatch($payload->date);
+        ExportTradingJob::dispatch();
         return ['isOk' => true];
     }
 
