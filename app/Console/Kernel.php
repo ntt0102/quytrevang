@@ -10,7 +10,6 @@ use App\Jobs\UpdateOpeningMarketJob;
 use App\Jobs\UpdateVn30f1mSymbolJob;
 use App\Jobs\ReportTradingJob;
 use App\Jobs\ExportTradingJob;
-use App\Jobs\TestJob;
 
 class Kernel extends ConsoleKernel
 {

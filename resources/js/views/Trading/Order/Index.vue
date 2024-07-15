@@ -1795,7 +1795,9 @@ function report() {
     bus.emit("checkPin", () => store.dispatch("tradingOrder/report"));
 }
 function exportCsv() {
-    bus.emit("checkPin", () => store.dispatch("tradingOrder/export"));
+    bus.emit("checkPin", () =>
+        store.dispatch("tradingOrder/export", state.chartDate)
+    );
 }
 function loginDnse() {
     bus.emit("checkPin", () => store.dispatch("tradingOrder/loginDnse"));

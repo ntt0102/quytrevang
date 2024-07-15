@@ -13,15 +13,17 @@ class ExportTradingJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    private $SHIFT_TIME = 7 * 60 * 60;
+    const SHIFT_TIME = 7 * 60 * 60;
+    private $date;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($date = null)
     {
+        $this->date = $date ?? date('Y-m-d');
     }
 
     /**
@@ -32,8 +34,7 @@ class ExportTradingJob implements ShouldQueue
     public function handle()
     {
         if (get_global_value('openingMarketFlag') == '1') {
-            $date = date('Y-m-d');
-            $file = storage_path('app/phaisinh/' . $date . '.csv');
+            $file = storage_path('app/phaisinh/' . $this->date . '.csv');
             if (file_exists($file)) return false;
             //
             $orderChartService = app(\App\Services\Trading\OrderChartService::class);
@@ -43,7 +44,7 @@ class ExportTradingJob implements ShouldQueue
             $fp = fopen($file, 'w');
             foreach ($data as $item) {
                 $line = [];
-                $line[] = strtotime($item->Date) + $this->SHIFT_TIME;
+                $line[] = strtotime($item->Date) + self::SHIFT_TIME;
                 $line[] = $item->Price;
                 $line[] = $item->Volume;
                 $line[] = $item->Side == 'B' ? 1 : ($item->Side == 'S' ? -1 : 0);

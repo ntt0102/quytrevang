@@ -6,7 +6,7 @@ use App\Services\CoreService;
 
 class CsvService extends CoreService
 {
-    private $SHIFT_TIME = 7 * 60 * 60;
+    const SHIFT_TIME = 7 * 60 * 60;
 
     public function convert()
     {
@@ -20,7 +20,7 @@ class CsvService extends CoreService
         $fp = fopen($file, 'w');
         foreach ($data as $item) {
             $line = [];
-            // $line[] = strtotime($item->Date) + $this->SHIFT_TIME;
+            // $line[] = strtotime($item->Date) + self::SHIFT_TIME;
             $line[] = $item[0];
             $line[] = $item[1];
             $line[] = 0;

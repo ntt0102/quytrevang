@@ -11,7 +11,7 @@ use App\Jobs\LoginDnseJob;
 
 class OrderChartService extends CoreService
 {
-    private $SHIFT_TIME = 7 * 60 * 60;
+    const SHIFT_TIME = 7 * 60 * 60;
 
     /**
      * Get chart data
@@ -156,7 +156,7 @@ class OrderChartService extends CoreService
         // $vn30f1mData = $this->cloneVn30f1mData();
         $volume = 0;
         foreach ($vn30f1mData as $item) {
-            $time = strtotime($item->time) + $this->SHIFT_TIME;
+            $time = strtotime($item->time) + self::SHIFT_TIME;
             $data['price'][] = [
                 'time' => $time,
                 'value' => $item->matchPrice,
@@ -168,7 +168,7 @@ class OrderChartService extends CoreService
             ];
         }
         // foreach ($vn30f1mData as $item) {
-        //     $time = strtotime($item->Date) + $this->SHIFT_TIME;
+        //     $time = strtotime($item->Date) + self::SHIFT_TIME;
         //     $data['price'][] = [
         //         'time' => $time,
         //         'value' => $item->Price,
@@ -308,7 +308,7 @@ class OrderChartService extends CoreService
      */
     public function export($payload)
     {
-        ExportTradingJob::dispatch();
+        ExportTradingJob::dispatch($payload->date);
         return ['isOk' => true];
     }
 

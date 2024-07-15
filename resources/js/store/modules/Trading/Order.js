@@ -104,11 +104,13 @@ const actions = {
             });
         });
     },
-    export({ commit, dispatch, getters, state, rootGetters }) {
+    export({ commit, dispatch, getters, state, rootGetters }, chartDate) {
         return new Promise((resolve, reject) => {
-            axios.post("trading/order/export", null).then((response) => {
-                resolve();
-            });
+            axios
+                .post("trading/order/export", { date: chartDate })
+                .then((response) => {
+                    resolve();
+                });
         });
     },
     loginDnse({ commit, dispatch, getters, state, rootGetters }) {
