@@ -500,9 +500,14 @@ function eventPriceLineDrag(e) {
             break;
         case "line":
             store.dispatch("tradingOrder/drawTools", {
+                isRemove: true,
+                name: "line",
+                point: oldPrice,
+            });
+            store.dispatch("tradingOrder/drawTools", {
                 isRemove: false,
-                name: lineOptions.lineType,
-                points: [oldPrice],
+                name: "line",
+                points: [newPrice],
                 data: [lineOptions],
             });
             lineToolRef.value.classList.remove("selected");
