@@ -322,10 +322,10 @@ store.dispatch("tradingOrder/initChart").then(() => {
 store.dispatch("tradingOrder/getStatus");
 
 params.interval = setInterval(intervalHandler, 1000);
-params.interval60 = setInterval(
-    () => store.dispatch("tradingOrder/getStatus"),
-    60000
-);
+params.interval60 = setInterval(() => {
+    if (inSession()) store.dispatch("tradingOrder/getStatus");
+    else clearInterval(params.interval60);
+}, 60000);
 
 onMounted(() => {
     params.chart = createChart(orderChartRef.value, CHART_OPTIONS);

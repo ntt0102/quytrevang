@@ -35,24 +35,28 @@ class VpsOrderService extends CoreService
 
     public function getPosition()
     {
-        $payload = [
-            "group" => "Q",
-            "user" => $this->vpsUser,
-            "session" => $this->vpsSession,
-            "c" => "H",
-            "data" => [
-                "type" => "string",
-                "cmd" => "Web.Portfolio.PortfolioStatus2",
-                "p1" => $this->formatAccount(),
-            ],
-        ];
-        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
-        $res = $this->client->post($url, ['json' => $payload]);
-        $rsp = json_decode($res->getBody());
-        if (!$rsp) return;
-        $this->connection = $rsp->rc == 1;
-        if ($this->connection && count($rsp->data))
-            $this->position = intval($rsp->data[0]->net);
+        try {
+            $payload = [
+                "group" => "Q",
+                "user" => $this->vpsUser,
+                "session" => $this->vpsSession,
+                "c" => "H",
+                "data" => [
+                    "type" => "string",
+                    "cmd" => "Web.Portfolio.PortfolioStatus2",
+                    "p1" => $this->formatAccount(),
+                ],
+            ];
+            $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
+            $res = $this->client->post($url, ['json' => $payload]);
+            $rsp = json_decode($res->getBody());
+            if (!$rsp) return;
+            $this->connection = $rsp->rc == 1;
+            if ($this->connection && count($rsp->data))
+                $this->position = intval($rsp->data[0]->net);
+        } catch (\Throwable $th) {
+            return;
+        }
     }
 
     public function hasOrder()
