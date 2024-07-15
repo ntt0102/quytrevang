@@ -32,16 +32,14 @@ class ExportTradingJob implements ShouldQueue
     public function handle()
     {
         if (get_global_value('openingMarketFlag') == '1') {
-            $orderChartService = app(\App\Services\Trading\OrderChartService::class);
             $date = date('Y-m-d');
-            $path = storage_path('app/phaisinh/' . $date);
-            if (is_dir($path)) return false;
-            if (!mkdir($path, 0777, true)) return false;
+            $file = storage_path('app/phaisinh/' . $date . '/.csv');
+            if (file_exists($file)) return false;
             //
-            $vn30f1mFile = $path . '/vn30f1m.csv';
-            $vn30f1mData = $orderChartService->cloneVn30f1mData();
-            $fp = fopen($vn30f1mFile, 'w');
-            foreach ($vn30f1mData as $item) {
+            $orderChartService = app(\App\Services\Trading\OrderChartService::class);
+            $data = $orderChartService->cloneVn30f1mData();
+            $fp = fopen($file, 'w');
+            foreach ($data as $item) {
                 $line = [];
                 $line[] = strtotime($item->Date) + $this->SHIFT_TIME;
                 $line[] = $item->Price;

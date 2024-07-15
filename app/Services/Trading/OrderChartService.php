@@ -187,11 +187,10 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $data = ['price' => [], 'volume' => [], 'vn30' => [], 'foreign' => [], 'active' => []];
-        $path = storage_path('app/phaisinh/' . $date);
-        if (!is_dir($path)) return $data;
-        $vn30f1mFile = $path . '/vn30f1m.csv';
-        $fp = fopen($vn30f1mFile, 'r');
+        $data = ['price' => [], 'volume' => []];
+        $file = storage_path('app/phaisinh/' . $date . '/.csv');
+        if (!file_exists($file)) return $data;
+        $fp = fopen($file, 'r');
         $volume = 0;
         while (!feof($fp)) {
             $line = fgetcsv($fp);
@@ -260,36 +259,6 @@ class OrderChartService extends CoreService
                 return $b->time < $a->time;
             });
             return $data;
-        } catch (\Throwable $th) {
-            return [];
-        }
-    }
-
-    /**
-     * Vps data
-     */
-    public function cloneVn30Data()
-    {
-        try {
-            $client = new \GuzzleHttp\Client();
-            $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayMarketStatistic?symbol=VN30";
-            $res = $client->get($url);
-            return json_decode($res->getBody());
-        } catch (\Throwable $th) {
-            return [];
-        }
-    }
-
-    /**
-     * Vps data
-     */
-    public function clonevolumeData()
-    {
-        try {
-            $client = new \GuzzleHttp\Client();
-            $url = "https://fwtapi2.fialda.com/api/services/app/Home/GetForeignerTradingChart?indexCode=VN30F1M&chartPedirod=oneDay";
-            $res = $client->get($url);
-            return json_decode($res->getBody())->result->tradingVolumeChart;
         } catch (\Throwable $th) {
             return [];
         }
