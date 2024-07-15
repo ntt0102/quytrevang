@@ -23,7 +23,7 @@ class OrderChartService extends CoreService
     {
         // $date = date('Y-m-d');
         // if ($payload->date == $date && get_global_value('openingMarketFlag') == '1' && time() < strtotime('15:00:00'))
-        //     return $this->generateDataFromApi();
+        // return $this->generateDataFromApi();
         return $this->generateDataFromCsv($payload->date);
     }
 
@@ -151,43 +151,33 @@ class OrderChartService extends CoreService
      */
     public function generateDataFromApi()
     {
-        $data = ['price' => [], 'vn30' => [], 'foreign' => [], 'active' => [], 'volume' => []];
-        $vn30f1mData = $this->cloneVn30f1mData();
+        $data = ['price' => [], 'volume' => []];
+        $vn30f1mData = $this->cloneDnseData();
+        // $vn30f1mData = $this->cloneVn30f1mData();
         $volume = 0;
         foreach ($vn30f1mData as $item) {
-            $time = strtotime($item->Date) + $this->SHIFT_TIME;
+            $time = strtotime($item->time) + $this->SHIFT_TIME;
             $data['price'][] = [
                 'time' => $time,
-                'value' => $item->Price,
+                'value' => $item->matchPrice,
             ];
-            $volume += ($item->Side == 'B' ? 1 : ($item->Side == 'S' ? -1 : 0)) * $item->Volume;
+            $volume += ($item->side == 1 ? 1 : ($item->side == 2 ? -1 : 0)) * $item->matchQtty;
             $data['volume'][] = [
                 'time' => $time,
                 'value' => $volume,
             ];
         }
-        // $vn30Data = $this->cloneVn30Data();
-        // foreach ($vn30Data as $item) {
+        // foreach ($vn30f1mData as $item) {
         //     $time = strtotime($item->Date) + $this->SHIFT_TIME;
-        //     $data['vn30'][] = [
+        //     $data['price'][] = [
         //         'time' => $time,
-        //         'value' => $item->IndexCurrent,
+        //         'value' => $item->Price,
         //     ];
-        //     $data['foreign'][] = [
+        //     $volume += ($item->Side == 'B' ? 1 : ($item->Side == 'S' ? -1 : 0)) * $item->Volume;
+        //     $data['volume'][] = [
         //         'time' => $time,
-        //         'value' => $item->BuyForeignQuantity - $item->SellForeignQuantity,
+        //         'value' => $volume,
         //     ];
-        //     $data['active'][] = [
-        //         'time' => $time,
-        //         'value' => $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume,
-        //     ];
-        // }
-        // $volumeData = $this->clonevolumeData();
-        // foreach ($volumeData as $item) {
-        //     array_unshift($data['volume'], [
-        //         'time' => strtotime($item->dateTime . 'Z'),
-        //         'value' => $item->value,
-        //     ]);
         // }
         return $data;
     }
@@ -218,41 +208,6 @@ class OrderChartService extends CoreService
             }
         }
         fclose($fp);
-        //
-        // $vn30File = $path . '/vn30.csv';
-        // $fp = fopen($vn30File, 'r');
-        // while (!feof($fp)) {
-        //     $line = fgetcsv($fp);
-        //     if (!!$line) {
-        //         $time = +$line[0];
-        //         $data['vn30'][] = [
-        //             'time' => $time,
-        //             'value' => +$line[1],
-        //         ];
-        //         $data['foreign'][] = [
-        //             'time' => $time,
-        //             'value' => +$line[2],
-        //         ];
-        //         $data['active'][] = [
-        //             'time' => $time,
-        //             'value' => +$line[3],
-        //         ];
-        //     }
-        // }
-        // fclose($fp);
-        //
-        // $volumeFile = $path . '/volume.csv';
-        // $fp = fopen($volumeFile, 'r');
-        // while (!feof($fp)) {
-        //     $line = fgetcsv($fp);
-        //     if (!!$line) {
-        //         array_unshift($data['volume'], [
-        //             'time' => +$line[0],
-        //             'value' => +$line[1],
-        //         ]);
-        //     }
-        // }
-        // fclose($fp);
         return $data;
     }
 
@@ -268,6 +223,43 @@ class OrderChartService extends CoreService
             $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayQuotes?symbol=VN30F1M";
             $res = $client->get($url);
             return json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            return [];
+        }
+    }
+
+
+    /**
+     * Vps data
+     */
+    public function cloneDnseData()
+    {
+        try {
+            $client = new \GuzzleHttp\Client();
+            $data = [
+                'json' => [
+                    'operationName' => 'GetTicksBySymbol',
+                    'query' => 'query GetTicksBySymbol {
+                        GetTicksBySymbol(symbol: "VN30F2407", date: "2024-07-14", limit: 6000) {
+                            data {
+                                symbol
+                                matchPrice
+                                matchQtty
+                                time
+                                side
+                            }
+                        }
+                    }',
+                    'variables' => (object)[]
+                ],
+            ];
+
+            $req = $client->post('https://services.entrade.com.vn/price-api/query', $data);
+            $data = json_decode($req->getBody())->data->GetTicksBySymbol->data;
+            usort($data, function ($a, $b) {
+                return $b->time < $a->time;
+            });
+            return $data;
         } catch (\Throwable $th) {
             return [];
         }

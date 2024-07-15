@@ -50,30 +50,6 @@ class ExportTradingJob implements ShouldQueue
                 fputcsv($fp, $line);
             }
             fclose($fp);
-            //
-            $vn30File = $path . '/vn30.csv';
-            $vn30Data = $orderChartService->cloneVn30Data();
-            $fp = fopen($vn30File, 'w');
-            foreach ($vn30Data as $item) {
-                $line = [];
-                $line[] = strtotime($item->Date) + $this->SHIFT_TIME;
-                $line[] = $item->IndexCurrent;
-                $line[] = $item->BuyForeignQuantity - $item->SellForeignQuantity;
-                $line[] = $item->TotalActiveBuyVolume - $item->TotalActiveSellVolume;
-                fputcsv($fp, $line);
-            }
-            fclose($fp);
-            //
-            $fgnf1mFile = $path . '/fgnf1m.csv';
-            $fgnf1mData = $orderChartService->cloneFgnf1mData();
-            $fp = fopen($fgnf1mFile, 'w');
-            foreach ($fgnf1mData as $item) {
-                $line = [];
-                $line[] = strtotime($item->dateTime . 'Z');
-                $line[] = $item->value;
-                fputcsv($fp, $line);
-            }
-            fclose($fp);
         }
     }
 }
