@@ -243,6 +243,7 @@ const CHART_OPTIONS = {
         timeVisible: true,
         rightOffset: 20,
         minBarSpacing: 0.01,
+        barSpacing: 0.05,
     },
 };
 const TP_DEFAULT = 3;
@@ -334,18 +335,18 @@ onMounted(() => {
     params.series.whitespace = params.chart.addHistogramSeries({
         priceScaleId: "whitespace",
         scaleMargins: { top: 0, bottom: 0 },
-        color: "gray",
+        color: "#333333",
         lastValueVisible: false,
         priceLineVisible: false,
     });
     params.series.volume = params.chart.addLineSeries({
         priceScaleId: "volume",
         scaleMargins: { top: 0.61, bottom: 0.01 },
-        color: "yellow",
+        color: "#FFD700",
         lastValueVisible: false,
     });
     params.series.price = params.chart.addLineSeries({
-        color: "white",
+        color: "#F5F5F5",
         priceFormat: { minMove: 0.1 },
     });
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
@@ -361,7 +362,7 @@ onUnmounted(() => {
     clearInterval(params.interval);
     clearInterval(params.interval60);
     params.socketStop = true;
-    params.websocket.close();
+    if (mf.isSet(params.websocket)) params.websocket.close();
     params.websocket = null;
 });
 
@@ -631,32 +632,36 @@ function eventChartResize() {
     }
 }
 function eventKeyPress(e) {
-    if (e.ctrlKey || e.metaKey) {
+    if (e.ctrlKey) {
         switch (e.keyCode) {
-            case 38:
+            case 219:
                 params.chart.timeScale().applyOptions({
                     barSpacing:
-                        params.chart.options().timeScale.barSpacing + 0.05,
+                        params.chart.options().timeScale.barSpacing - 0.01,
                 });
                 break;
-            case 40:
+            case 221:
                 params.chart.timeScale().applyOptions({
                     barSpacing:
-                        params.chart.options().timeScale.barSpacing - 0.05,
+                        params.chart.options().timeScale.barSpacing + 0.01,
                 });
                 break;
-            case 37:
+        }
+    }
+    if (e.altKey) {
+        switch (e.keyCode) {
+            case 219:
                 params.chart
                     .timeScale()
                     .scrollToPosition(
-                        params.chart.timeScale().scrollPosition() - 10
+                        params.chart.timeScale().scrollPosition() - 50
                     );
                 break;
-            case 39:
+            case 221:
                 params.chart
                     .timeScale()
                     .scrollToPosition(
-                        params.chart.timeScale().scrollPosition() + 10
+                        params.chart.timeScale().scrollPosition() + 50
                     );
                 break;
         }
