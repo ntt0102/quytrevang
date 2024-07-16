@@ -69,6 +69,8 @@ function onLevelClick(nextLevel) {
 @import "../../../../sass/variables.scss";
 
 .level-bar {
+    text-align: center;
+
     $brand-primary: $base-accent;
     $white: #fff;
     $grey-light: #ededed;
@@ -82,7 +84,6 @@ function onLevelClick(nextLevel) {
             background-color: $grey-light;
         }
     }
-    text-align: center;
 
     ul {
         display: table;
