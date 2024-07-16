@@ -335,7 +335,7 @@ onMounted(() => {
     params.series.whitespace = params.chart.addHistogramSeries({
         priceScaleId: "whitespace",
         scaleMargins: { top: 0, bottom: 0 },
-        color: "#333333",
+        color: "#808080",
         lastValueVisible: false,
         priceLineVisible: false,
     });
