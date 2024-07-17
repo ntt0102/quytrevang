@@ -103,8 +103,31 @@ Route::get('test', function () {
     // $o = \App\Models\StockOrder::find(1);
     // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
     // $s = app(\App\Services\Trading\StatisticService::class)->calculateProfit($o);
-
-    \App\Jobs\ExportTradingJob::dispatch();
+    // $o = (object)[
+    //     'receiver' => 1,
+    //     'title' => 'test',
+    //     'body' => 'OK'
+    // ];
+    // $s = app(\App\Services\Setting\NotificationService::class)->send($o);
+    $receiver = \App\Models\User::whereIn('code', ['121992'])->get();
+    \Illuminate\Support\Facades\Notification::send(
+        $receiver,
+        new \App\Notifications\ExportStockNotification()
+    );
+    // $date = '2024-07-18';
+    // $file = storage_path('app/cophieu/date.txt');
+    // $isUpdated = false;
+    // if (file_exists($file)) {
+    //     $fp = fopen($file, 'r');
+    //     $line = fgets($fp);
+    //     if (!!$line && $date <= $line) $isUpdated = true;
+    //     fclose($fp);
+    // }
+    // file_put_contents($file, $date);
+    // dd($isUpdated);
+    // $s = \App\Models\StockSymbol::where('name', 'vn100')->select('symbols')->first();
+    // dd($s->symbols);
+    // \App\Jobs\ExportTradingJob::dispatch();
     // \App\Jobs\GetDnseEmailOtpJob::dispatch();
     // $emailOtp = "";
     // $client = \Webklex\IMAP\Facades\Client::account('default');

@@ -16,14 +16,25 @@ class CoreNotification extends Notification
     use Queueable;
 
     private $params;
+    private $hasDatabase;
+    private $hasBroadcast;
+    private $hasWebPush;
+
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(array $params)
+    public function __construct(array $params, $hasDatabase = true, $hasBroadcast = true, $hasWebPush = true)
     {
+        $this->hasDatabase = $hasDatabase;
+        $this->hasBroadcast = $hasBroadcast;
+        $this->hasWebPush = $hasWebPush;
+
+        if (!isset($params['hasDatabase'])) {
+            $params['hasDatabase'] = "core";
+        }
         if (!isset($params['event'])) {
             $params['event'] = "core";
         }
@@ -46,7 +57,11 @@ class CoreNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast', WebPushChannel::class];
+        $channels = [];
+        if ($this->hasDatabase) $channels[] = 'database';
+        if ($this->hasBroadcast) $channels[] = 'broadcast';
+        if ($this->hasWebPush) $channels[] = WebPushChannel::class;
+        return $channels;
     }
 
     /**

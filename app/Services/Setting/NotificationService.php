@@ -32,7 +32,7 @@ class NotificationService extends CoreService
         if (isset($payload->actions)) {
             $params['actions'] = [];
             foreach ($payload->actions as $action) {
-                if (isset($action)) {
+                if ($action != "") {
                     list($title, $url) = explode(",", $action);
                     $params['actions'][] = array(
                         "action" => trim($url),

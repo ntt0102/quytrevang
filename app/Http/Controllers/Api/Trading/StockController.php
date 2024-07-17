@@ -124,4 +124,17 @@ class StockController extends CoreController
         $data = $this->stockService->drawTools($this->payload);
         return $this->sendResponse($data);
     }
+
+    /**
+     * Export Stock
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function exportStock(Request $request)
+    {
+        $data = $this->stockService->exportStock($request);
+        return $this->sendResponseWithoutEncrypt($data);
+    }
 }

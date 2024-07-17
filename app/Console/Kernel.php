@@ -10,6 +10,7 @@ use App\Jobs\UpdateOpeningMarketJob;
 use App\Jobs\UpdateVn30f1mSymbolJob;
 use App\Jobs\ReportTradingJob;
 use App\Jobs\ExportTradingJob;
+use App\Jobs\ExportStockJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -32,9 +33,11 @@ class Kernel extends ConsoleKernel
         $schedule->job(new CleanSubscriptionJob)->yearly();
         $schedule->job(new UpdateOpeningMarketJob)->dailyAt('08:45');
         $schedule->job(new UpdateVn30f1mSymbolJob)->fridays()->at('09:00');
+
         $schedule->job(new ReportTradingJob)->dailyAt('14:46');
         $schedule->job(new ExportTradingJob)->dailyAt('14:46');
-        $schedule->job(new ExportTradingJob)->dailyAt('14:50');
+        // $schedule->job(new ExportStockJob)->dailyAt('14:46');
+        $schedule->command('stock:export')->dailyAt('14:46');
 
         $schedule->command('queue:work --stop-when-empty')->everyMinute();
     }

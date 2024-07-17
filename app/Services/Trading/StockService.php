@@ -8,6 +8,7 @@ use App\Models\StockOrder;
 use App\Models\DrawTool;
 use App\Models\Parameter;
 use App\Jobs\FilterStockJob;
+use App\Jobs\ExportStockJob;
 use stdClass;
 
 class StockService extends CoreService
@@ -720,5 +721,19 @@ class StockService extends CoreService
             }
         }
         return (object)[];
+    }
+
+    /**
+     * Export Stock
+     *
+     * @param $payload
+     * 
+     */
+    public function exportStock($payload)
+    {
+        $data = json_decode($payload->stockData);
+        $vn100 = StockSymbol::where('name', 'vn100')->select('symbols')->first();
+        ExportStockJob::dispatch($data, $vn100->symbols);
+        return ['ok' => $vn100->symbols];
     }
 }

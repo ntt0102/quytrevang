@@ -20,6 +20,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
     Route::post('core.vpbs', 'Trading\OrderChartController@setVpsSession');
+    Route::post('export-stock', 'Trading\StockController@exportStock');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login')->name('login');
