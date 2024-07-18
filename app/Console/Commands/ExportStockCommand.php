@@ -41,7 +41,7 @@ class ExportStockCommand extends Command
     public function handle()
     {
         if (get_global_value('openingMarketFlag') == '1') {
-            $receiver = User::whereIn('code', ['121992'])->get();
+            $receiver = User::where('code', '121992')->get();
             Notification::send(
                 $receiver,
                 new ExportStockNotification()
