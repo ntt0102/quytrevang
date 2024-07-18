@@ -45,6 +45,15 @@
                     location: 'after',
                     widget: 'dxButton',
                     options: {
+                        icon: 'far fa-file-export small',
+                        hint: $t('trading.stock.exportStock'),
+                        onClick: exportStock,
+                    },
+                },
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
                         icon: 'far fa-list small',
                         hint: $t('trading.stock.cloneSymbols'),
                         onClick: cloneSymbols,
@@ -1444,6 +1453,13 @@ function listChanged(e) {
 function chartShiftChanged(e) {
     state.chartShift = e.value;
     reloadChart(false, true);
+}
+function exportStock() {
+    confirm(`${t("trading.stock.exportStock")}?`, t("titles.confirm")).then(
+        (result) => {
+            if (result) store.dispatch("tradingStock/exportStock");
+        }
+    );
 }
 function cloneSymbols() {
     confirm(`${t("trading.stock.cloneSymbols")}?`, t("titles.confirm")).then(

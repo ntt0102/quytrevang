@@ -37,9 +37,8 @@ self.addEventListener("push", (event) => {
         return;
     }
     const data = event.data.json();
-    console.log("push", data);
-    event.waitUntil(self.registration.showNotification(data.title, data));
-    connectWebsocket();
+    if (data.data.event == "export-stock") connectFireantSocket();
+    else event.waitUntil(self.registration.showNotification(data.title, data));
 });
 
 self.addEventListener("notificationclick", (event) => {
@@ -82,7 +81,7 @@ function dismissNotification(event) {
     });
 }
 
-async function connectWebsocket() {
+async function connectFireantSocket() {
     const url =
         "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
     const ws = new WebSocket(url);
@@ -102,7 +101,7 @@ async function connectWebsocket() {
                 const r = self.bufferDecode(e);
                 if (r[3] == "UpdateLastPrices" && r[4][0].length > 2000) {
                     exportStock(r[4][0]);
-                    console.log("WebSocket connection msg", r[4][0]);
+                    ws.close();
                 }
             });
         };
@@ -114,14 +113,12 @@ async function connectWebsocket() {
     };
 
     ws.onerror = function (error) {
-        connectWebsocket();
+        connectFireantSocket();
         console.error("WebSocket error:", error);
     };
 }
 
 function exportStock(data) {
-    // const s = JSON.stringify({ stockData: data });
-    // console.log(JSON.parse(s));
     const form = new FormData();
     form.append("stockData", JSON.stringify(data));
     fetch("api/export-stock", {
@@ -129,18 +126,5 @@ function exportStock(data) {
         body: form,
     })
         .then((rsp) => rsp.json())
-        .then((result) => console.log("Data saved:", result));
-    // try {
-    //     const response = await fetch("/api/save-data", {
-    //         method: "POST",
-    //         headers: {
-    //             "Content-Type": "application/json",
-    //         },
-    //         body: JSON.stringify(data),
-    //     });
-    //     const result = await response.json();
-    //     console.log("Data saved:", result);
-    // } catch (error) {
-    //     console.error("Error saving data:", error);
-    // }
+        .then((result) => console.log("result: ", result));
 }

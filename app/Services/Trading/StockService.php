@@ -6,9 +6,9 @@ use App\Services\CoreService;
 use App\Models\StockSymbol;
 use App\Models\StockOrder;
 use App\Models\DrawTool;
-use App\Models\Parameter;
 use App\Jobs\FilterStockJob;
 use App\Jobs\ExportStockJob;
+use Illuminate\Support\Facades\Artisan;
 use stdClass;
 
 class StockService extends CoreService
@@ -587,6 +587,16 @@ class StockService extends CoreService
         }
         return $ret;
     }
+    /**
+     * Request Export Stock
+     *
+     */
+    public function requestExportStock()
+    {
+        Artisan::call('stock:export');
+        return ['isOk' => true];
+    }
+
     /**
      * Clone Symbols
      *

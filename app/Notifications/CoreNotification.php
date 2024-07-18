@@ -94,7 +94,7 @@ class CoreNotification extends Notification
             ->title($this->params['title'])
             ->icon($this->params['icon'])
             ->badge($this->params['badge'])
-            ->data(['id' => $notification->id]);
+            ->data(['id' => $notification->id, 'event' => $this->params['event']]);
 
         if (isset($this->params['image'])) $msg->image($this->params['image']);
         if (isset($this->params['actions'])) {

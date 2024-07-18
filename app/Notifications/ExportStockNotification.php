@@ -15,8 +15,8 @@ class ExportStockNotification extends CoreNotification
     {
         $params = [
             'event' => 'export-stock',
-            'title' => 'export-stock',
-            'body' => 'OK',
+            'title' => '',
+            'body' => '',
         ];
         parent::__construct($params, false, false, true);
     }
