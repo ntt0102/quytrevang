@@ -109,12 +109,12 @@ Route::get('test', function () {
     //     'body' => 'OK'
     // ];
     // $s = app(\App\Services\Setting\NotificationService::class)->send($o);
-    // $receiver = \App\Models\User::whereIn('code', ['121992'])->get();
-    // \Illuminate\Support\Facades\Notification::send(
-    //     $receiver,
-    //     new \App\Notifications\ExportStockNotification()
-    // );
-    \Illuminate\Support\Facades\Artisan::call('stock:export');
+    $receiver = \App\Models\User::whereIn('code', ['121992'])->get();
+    \Illuminate\Support\Facades\Notification::send(
+        $receiver,
+        new \App\Notifications\ExportStockNotification()
+    );
+    // \Illuminate\Support\Facades\Artisan::call('stock:export');
     // $date = '2024-07-18';
     // $file = storage_path('app/cophieu/date.txt');
     // $isUpdated = false;
