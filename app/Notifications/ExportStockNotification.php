@@ -13,10 +13,11 @@ class ExportStockNotification extends CoreNotification
      */
     public function __construct()
     {
+        $path = 'Notifications/ExportStock.';
         $params = [
             'event' => 'export-stock',
-            'title' => '',
-            'body' => '',
+            'title' => trans($path . 'title'),
+            'body' => trans($path . 'body'),
         ];
         parent::__construct($params, false, false, true);
     }

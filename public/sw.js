@@ -38,7 +38,7 @@ self.addEventListener("push", (event) => {
     }
     const data = event.data.json();
     if (data.data.event == "export-stock") connectFireantSocket();
-    else event.waitUntil(self.registration.showNotification(data.title, data));
+    event.waitUntil(self.registration.showNotification(data.title, data));
 });
 
 self.addEventListener("notificationclick", (event) => {
