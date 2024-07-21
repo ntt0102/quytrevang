@@ -31,25 +31,23 @@ class ExportTradingJob implements ShouldQueue
      */
     public function handle()
     {
-        if (get_global_value('openingMarketFlag') == '1') {
-            $orderChartService = app(\App\Services\Trading\OrderChartService::class);
-            $data = $orderChartService->cloneVn30f1mData();
-            if (!count($data)) return false;
+        $orderChartService = app(\App\Services\Trading\OrderChartService::class);
+        $data = $orderChartService->cloneVn30f1mData();
+        if (!count($data)) return false;
 
-            $date = substr($data[0]->Date, 0, 10);
-            $file = storage_path('app/phaisinh/' . $date . '.csv');
-            if (file_exists($file)) return false;
+        $date = substr($data[0]->Date, 0, 10);
+        $file = storage_path('app/phaisinh/' . $date . '.csv');
+        if (file_exists($file)) return false;
 
-            $fp = fopen($file, 'w');
-            foreach ($data as $item) {
-                $line = [];
-                $line[] = strtotime($item->Date) + self::SHIFT_TIME;
-                $line[] = $item->Price;
-                $line[] = $item->Volume;
-                $line[] = $item->Side == 'B' ? 1 : ($item->Side == 'S' ? -1 : 0);
-                fputcsv($fp, $line);
-            }
-            fclose($fp);
+        $fp = fopen($file, 'w');
+        foreach ($data as $item) {
+            $line = [];
+            $line[] = strtotime($item->Date) + self::SHIFT_TIME;
+            $line[] = $item->Price;
+            $line[] = $item->Volume;
+            $line[] = $item->Side == 'B' ? 1 : ($item->Side == 'S' ? -1 : 0);
+            fputcsv($fp, $line);
         }
+        fclose($fp);
     }
 }

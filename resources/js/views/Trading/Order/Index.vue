@@ -210,12 +210,8 @@ import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
 import moment from "moment";
-import {
-    bufferEncode,
-    bufferDecode,
-    bufferWrite,
-    bufferParse,
-} from "../../../plugins/fireant";
+import { vleWrite, vleParse } from "../../../plugins/vle.js";
+import { encode, decode } from "@msgpack/msgpack";
 
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
@@ -255,8 +251,6 @@ const TIME = {
     ATC: moment(CURRENT_DATE + "T14:30:00").unix(),
     END: moment(CURRENT_DATE + "T14:45:00").unix(),
 };
-// const SOCKET_ENDPOINT =
-//     "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
 const FIREANT_SOCKET_ENDPOINT =
     "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
 
@@ -804,8 +798,7 @@ function connectSocket() {
         let data = '{"protocol":"messagepack","version":1}';
         params.websocket.send(data);
         data = [1, {}, "UpdateTrades_VN30F1M", "SubscribeTrades", ["VN30F1M"]];
-        const encoded = bufferEncode(data);
-        params.socketSendData = bufferWrite(encoded.slice());
+        params.socketSendData = vleWrite(encode(data));
         params.websocket.send(params.socketSendData);
     };
     params.websocket.onclose = (e) => {
@@ -817,9 +810,9 @@ function connectSocket() {
         const reader = new FileReader();
         reader.onload = function (evt) {
             const arrayBuffer = evt.target.result;
-            const parsedMessages = bufferParse(arrayBuffer);
+            const parsedMessages = vleParse(arrayBuffer);
             parsedMessages.forEach((e) => {
-                const r = bufferDecode(e);
+                const r = decode(e);
                 if (r[2] == "UpdateTrades_VN30F1M") {
                     params.data.whitespace = mergeChartData(
                         params.data.whitespace,

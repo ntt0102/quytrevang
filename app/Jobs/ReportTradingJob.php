@@ -42,36 +42,34 @@ class ReportTradingJob implements ShouldQueue
      */
     public function handle()
     {
-        if (get_global_value('openingMarketFlag') == '1') {
-            if (Trade::where('date', date_create()->format('Y-m-d'))->count() > 0) return false;
-            $copyist = User::permission('trades@edit')->first()->copyist;
-            $vos = new VpsOrderService($copyist);
-            if (!$vos->connection) return false;
-            $info = $vos->getAccountInfo();
-            //
-            if (!$info) return false;
-            Notification::send(
-                User::permission('trades@view')->get(),
-                new UpdatedTradesNotification(
-                    number_format($info->vm, 0, ",", ".") . ' ₫',
-                    number_format($info->fee, 0, ",", ".") . ' ₫'
-                )
-            );
-            //
-            if (!$info->fee && !$info->vm) return false;
-            $revenue = $info->vm > 0 ? $info->vm : 0;
-            $loss = $info->vm < 0 ? -$info->vm : 0;
-            $trade = Trade::create([
-                "amount" => $copyist->volume,
-                "scores" => $this->getVn30f1mInfo($vos->symbol)->r,
-                "revenue" => $revenue,
-                "loss" => $loss,
-                "fees" => $info->fee,
-                "date" => date_create()->format('Y-m-d'),
-            ]);
-            if (!$trade) return false;
-            event(new UpdateStatisticEvent());
-        }
+        if (Trade::where('date', date_create()->format('Y-m-d'))->count() > 0) return false;
+        $copyist = User::permission('trades@edit')->first()->copyist;
+        $vos = new VpsOrderService($copyist);
+        if (!$vos->connection) return false;
+        $info = $vos->getAccountInfo();
+        //
+        if (!$info) return false;
+        Notification::send(
+            User::permission('trades@view')->get(),
+            new UpdatedTradesNotification(
+                number_format($info->vm, 0, ",", ".") . ' ₫',
+                number_format($info->fee, 0, ",", ".") . ' ₫'
+            )
+        );
+        //
+        if (!$info->fee && !$info->vm) return false;
+        $revenue = $info->vm > 0 ? $info->vm : 0;
+        $loss = $info->vm < 0 ? -$info->vm : 0;
+        $trade = Trade::create([
+            "amount" => $copyist->volume,
+            "scores" => $this->getVn30f1mInfo($vos->symbol)->r,
+            "revenue" => $revenue,
+            "loss" => $loss,
+            "fees" => $info->fee,
+            "date" => date_create()->format('Y-m-d'),
+        ]);
+        if (!$trade) return false;
+        event(new UpdateStatisticEvent());
     }
 
     /**
