@@ -319,6 +319,7 @@ let params = {
         price: [],
         cash: [],
         foreign: [],
+        active: [],
     },
     tools: {
         lines: [],
@@ -439,6 +440,13 @@ onMounted(() => {
         scaleMargins: { top: 0.05, bottom: 0.76 },
         color: "aqua",
         priceFormat: { minMove: 0.01 },
+        lastValueVisible: false,
+    });
+    params.series.active = params.chart.addLineSeries({
+        priceScaleId: "active",
+        scaleMargins: { top: 0.69, bottom: 0.03 },
+        color: "purple",
+        priceFormat: { type: "volume", minMove: 1 },
         lastValueVisible: false,
     });
     params.series.foreign = params.chart.addLineSeries({
@@ -805,6 +813,7 @@ function loadChartData() {
     params.series.price.setData(params.data.price);
     params.series.cash.setData(params.data.cash);
     params.series.foreign.setData(params.data.foreign);
+    params.series.active.setData(params.data.active);
     params.series.signal.setData(params.data.signal);
     params.series.gap.setData(params.data.gap);
     params.chart.applyOptions({ watermark: { text: state.symbol } });

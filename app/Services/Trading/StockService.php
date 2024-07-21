@@ -60,17 +60,9 @@ class StockService extends CoreService
     }
     public function getData($payload)
     {
-        //
-        // $data = str_contains($payload->symbol, '^') ?
-        //     $this->getDataFromCp68($payload) :
-        //     $this->getDataTradingview($payload);
-        // return array_merge_recursive(
-        //     $data,
-        //     $this->getDataForeign($payload)
-        // );
-        return str_contains($payload->symbol, '^') ?
-            $this->getDataFromCp68($payload) :
-            $this->getDataFireAnt($payload);
+        $data = $this->getDataFireAnt($payload);
+        $data['chart']['active'] = $this->getActiveVolume($payload);
+        return $data;
     }
     public function getDataFireAnt($payload)
     {
@@ -262,267 +254,33 @@ class StockService extends CoreService
         }
         $data = array_values($bars);
     }
-    public function getDataFromCp68($payload)
+
+    public function getActiveVolume($payload)
     {
-        $r = ['chart' => ['ohlc' => [], 'price' => [], 'cash' => [], 'foreign' => [], 'gap' => [], 'signal' => []]];
-        if (!$payload->symbol) return $r;
-        $client = new \GuzzleHttp\Client();
-        $url = "https://www.cophieu68.vn/chart/chart_data.php?parameters=%7B%7D&dateby=1&stockname={$payload->symbol}";
-        $res = $client->get($url);
-        $rsp = json_decode($res->getBody());
-        if (!is_object($rsp)) return $r;
-        $candles = array_values(array_filter(
-            $rsp->candle,
-            function ($i) use ($payload) {
-                $date = $this->unix($i->date);
-                return $date >= $payload->from && $date <= $payload->to;
+        $data = [];
+        if (!$payload->symbol) return $data;
+        $startDate = date('Y-m-d', $payload->from);
+        $endDate = date("Y-m-d", $payload->to);
+        $file = storage_path('app/cophieu/' . $payload->symbol . '.csv');
+        if (!file_exists($file)) return $data;
+        $fp = fopen($file, 'r');
+        $volume = 0;
+        while (!feof($fp)) {
+            $line = fgetcsv($fp);
+            if (!!$line) {
+                if ($line[0] < $startDate) continue;
+                if ($line[0] > $endDate) break;
+                $volume += $volume + $line[1];
+                $data[] = [
+                    'time' => strtotime($line[0] . 'Z'),
+                    'value' => $volume,
+                ];
             }
-        ));
-        if ($payload->timeframe != 'D') $this->getDataCp68Timeframe($candles, $payload->timeframe);
-        $size = count($candles);
-        if ($size == 0) return $r;
-        $accCash = 0;
-        $prevAvg = 0;
-        for ($i = 0; $i < $size; $i++) {
-            $candle = $candles[$i];
-            $date = $this->unix($candle->date);
-            if ($i > 0) {
-                $preDate = $this->unix($candles[$i - 1]->date);
-                if ($date == $preDate) continue;
-            }
-            $r['chart']['ohlc'][] = [
-                'time' => $date,
-                'open' => +$candle->open,
-                'high' => +$candle->high,
-                'low' => +$candle->low,
-                'close' => +$candle->close
-            ];
-            $avg = ($candle->high + $candle->low + $candle->close) / 3;
-            $r['chart']['price'][] = [
-                'time' => $date,
-                'value' => $avg
-            ];
-            if (!$prevAvg) $prevAvg = $avg;
-            $change = $avg - $prevAvg;
-            $side = 0;
-            if ($change > 0) $side = 1;
-            else if ($change < 0) $side = -1;
-            $prevAvg = $avg;
-            $cash = $side * $candle->volume;
-            $accCash += $cash;
-            $r['chart']['cash'][] = [
-                'time' => $date,
-                'value' => $accCash
-            ];
-            //
         }
-        return $r;
+        fclose($fp);
+        return $data;
     }
-    private function getDataCp68Timeframe(&$data, $tf)
-    {
-        $candles = [];
-        foreach ($data as $candle) {
-            $key = date('Y-' . $tf, $this->unix($candle->date));
-            if (!array_key_exists($key, $candles)) {
-                $candles[$key] = new stdClass();
-                $candles[$key]->date = $candle->date;
-                $candles[$key]->open = $candle->open;
-                $candles[$key]->high = $candle->high;
-                $candles[$key]->low = $candle->low;
-                $candles[$key]->volume = 0;
-            } else {
-                if ($candle->high > $candles[$key]->high) $candles[$key]->high = $candle->high;
-                if ($candle->low < $candles[$key]->low) $candles[$key]->low = $candle->low;
-            }
-            $candles[$key]->close = $candle->close;
-            $candles[$key]->volume += $candle->volume;
-        }
-        $data = array_values($candles);
-    }
-    // public function getDataForeign($payload)
-    // {
-    //     $r = ['chart' => ['foreign' => []], 'rsi' => ['foreign' => [0, 0, 0]]];
-    //     if (!$payload->foreign) return $r;
-    //     $startDate = date('m/d/Y', $payload->from);
-    //     $endDate = date("m/d/Y", $payload->to);
-    //     if (!$payload->symbol) return $r;
-    //     $client = new \GuzzleHttp\Client();
-    //     $url = "https://s.cafef.vn/Ajax/PageNew/DataHistory/GDKhoiNgoai.ashx?Symbol={$payload->symbol}&StartDate={$startDate}&EndDate={$endDate}&PageIndex=1&PageSize=1000000";
-    //     $res = $client->get($url);
-    //     $rsp = json_decode($res->getBody())->Data;
-    //     usort($rsp->Data, function ($a, $b) {
-    //         $at = $this->unix($a->Ngay);
-    //         $bt = $this->unix($b->Ngay);
-    //         return strcmp($at, $bt);
-    //     });
-    //     $data = $rsp->Data;
-    //     if ($payload->timeframe != 'D')  $this->getDataForeignTimeframe($data, $payload->timeframe);
-    //     $size = count($data);
-    //     if ($size == 0) return $r;
-    //     $acc = 0;
-    //     $gains = [0, 0, 0];
-    //     $losses = [0, 0, 0];
-    //     for ($i = 0; $i < $size; $i++) {
-    //         $date = $this->unix($data[$i]->Ngay);
-    //         if ($i > 0) {
-    //             $preDate = $this->unix($data[$i - 1]->Ngay);
-    //             if ($date == $preDate) continue;
-    //         }
-    //         $acc += $data[$i]->KLGDRong;
-    //         $r['chart']['foreign'][] = [
-    //             'time' => $date,
-    //             'value' => $acc
-    //         ];
-    //         //
-    //         $j = $i < $size / 2 ? 1 : 2;
-    //         if ($data[$i]->KLGDRong > 0) {
-    //             $gains[0] += $data[$i]->KLGDRong;
-    //             $gains[$j] += $data[$i]->KLGDRong;
-    //         } else {
-    //             $losses[0] -= $data[$i]->KLGDRong;
-    //             $losses[$j] -= $data[$i]->KLGDRong;
-    //         }
-    //     }
-    //     for ($i = 0; $i < 3; $i++) {
-    //         if ($losses[$i] > 0)
-    //             $r['rsi']['foreign'][$i] = 100 - (100 / (1 + ($gains[$i] / $losses[$i])));
-    //     }
-    //     return $r;
-    // }
-    // private function getDataForeignTimeframe(&$data, $tf)
-    // {
-    //     $candles = [];
-    //     foreach ($data as $candle) {
-    //         $key = date('Y-' . $tf, $this->unix($candle->Ngay));
-    //         if (!array_key_exists($key, $candles)) {
-    //             $candles[$key] = new stdClass();
-    //             $candles[$key]->Ngay = $candle->Ngay;
-    //             $candles[$key]->KLGDRong = 0;
-    //         }
-    //         $candles[$key]->KLGDRong += $candle->KLGDRong;
-    //     }
-    //     $data = array_values($candles);
-    // }
-    // public function getDataTradingview($payload)
-    // {
-    //     $r = [
-    //         'chart' => ['ohlc' => [], 'price' => [], 'cash' => []],
-    //         'rsi' => ['price' => [100, 0], 'cash' => [0, 0]]
-    //     ];
-    //     if (!$payload->symbol) return $r;
-    //     $client = new \GuzzleHttp\Client();
-    //     $url = "https://histdatafeed.vps.com.vn/tradingview/history?symbol={$payload->symbol}&resolution=D&from={$payload->from}&to={$payload->to}";
-    //     // $url = "https://sbboard.sbsi.vn/datafeed/history?symbol={$payload->symbol}&resolution=D&from={$payload->from}&to={$payload->to}";
-    //     $res = $client->get($url);
-    //     $rsp = json_decode($res->getBody());
-    //     if ($rsp->s != 'ok') return $r;
-    //     if ($payload->timeframe != 'D')  $this->getDataTimeframe($rsp, $payload->timeframe);
-    //     $size = count($rsp->t);
-    //     if ($size == 0) return $r;
-    //     $accCash = 0;
-    //     $prevAvg = 0;
-    //     $topAvg = 0;
-    //     $bottomAvg = 0;
-    //     $priceGains = [0, 0];
-    //     $priceLosses = [0, 0];
-    //     $cashGains = [0, 0];
-    //     $cashLosses = [0, 0];
-    //     for ($i = 0; $i < $size; $i++) {
-    //         $date = $rsp->t[$i];
-    //         $r['chart']['ohlc'][] = [
-    //             'time' => $date,
-    //             'open' => +$rsp->o[$i],
-    //             'high' => +$rsp->h[$i],
-    //             'low' => +$rsp->l[$i],
-    //             'close' => +$rsp->c[$i]
-    //         ];
-    //         $avg = ($rsp->h[$i] + $rsp->l[$i] + $rsp->c[$i]) / 3;
-    //         $r['chart']['price'][] = [
-    //             'time' => $date,
-    //             'value' => $avg
-    //         ];
-    //         if (!$topAvg) $topAvg = $avg;
-    //         if (!$bottomAvg) $bottomAvg = $avg;
-    //         if ($i < $size / 4) {
-    //             if ($avg > $topAvg) {
-    //                 $topAvg = $avg;
-    //                 $priceGains[0] = 0;
-    //                 $priceLosses[0] = 0;
-    //                 $cashGains[0] = 0;
-    //                 $cashLosses[0] = 0;
-    //             }
-    //             if ($avg < $bottomAvg) {
-    //                 $bottomAvg = $avg;
-    //                 $priceGains[1] = 0;
-    //                 $priceLosses[1] = 0;
-    //                 $cashGains[1] = 0;
-    //                 $cashLosses[1] = 0;
-    //             }
-    //         }
-    //         if (!$prevAvg) $prevAvg = $avg;
-    //         $change = $avg - $prevAvg;
-    //         $prevAvg = $avg;
-    //         $side = 0;
-    //         if ($change > 0) {
-    //             $side = 1;
-    //             $priceGains[0] += $change;
-    //             $priceGains[1] += $change;
-    //             $cashGains[0] += $rsp->v[$i];
-    //             $cashGains[1] += $rsp->v[$i];
-    //         } else if ($change < 0) {
-    //             $side = -1;
-    //             $priceLosses[0] -= $change;
-    //             $priceLosses[1] -= $change;
-    //             $cashLosses[0] += $rsp->v[$i];
-    //             $cashLosses[1] += $rsp->v[$i];
-    //         }
-    //         $cash = $side * $rsp->v[$i];
-    //         $accCash += $cash;
-    //         $r['chart']['cash'][] = [
-    //             'time' => $date,
-    //             'value' => $accCash
-    //         ];
-    //     }
-    //     for ($i = 0; $i < 2; $i++) {
-    //         if ($priceLosses[$i] > 0)
-    //             $r['rsi']['price'][$i] = 100 - (100 / (1 + ($priceGains[$i] / $priceLosses[$i])));
-    //         if ($cashLosses[$i] > 0)
-    //             $r['rsi']['cash'][$i] = 100 - (100 / (1 + ($cashGains[$i] / $cashLosses[$i])));
-    //     }
-    //     return $r;
-    // }
-    // private function getDataTimeframe(&$data, $tf)
-    // {
-    //     $t = [];
-    //     $o = [];
-    //     $h = [];
-    //     $l = [];
-    //     $c = [];
-    //     $v = [];
-    //     for ($i = 0; $i < count($data->t); $i++) {
-    //         $key = date('Y-' . $tf, +$data->t[$i] + self::TIME_ZONE);
-    //         if (!array_key_exists($key, $t)) {
-    //             $t[$key] = $data->t[$i];
-    //             $o[$key] = $data->o[$i];
-    //             $h[$key] = $data->h[$i];
-    //             $l[$key] = $data->l[$i];
-    //             $v[$key] = 0;
-    //         } else {
-    //             if ($data->h[$i] > $h[$key]) $h[$key] = $data->h[$i];
-    //             if ($data->l[$i] < $l[$key]) $l[$key] = $data->l[$i];
-    //         }
-    //         $c[$key] = $data->c[$i];
-    //         $v[$key] += $data->v[$i];
-    //     }
-    //     $data = (object)[
-    //         't' => array_values($t),
-    //         'o' => array_values($o),
-    //         'h' => array_values($h),
-    //         'l' => array_values($l),
-    //         'c' => array_values($c),
-    //         'v' => array_values($v),
-    //     ];
-    // }
+
     private function unix($str)
     {
         return strtotime(str_replace('/', '-', $str)) + self::TIME_ZONE;
@@ -605,17 +363,10 @@ class StockService extends CoreService
     {
         return $this->transaction(function () {
             $client = new \GuzzleHttp\Client();
-            // $url = "https://priceapi.bsc.com.vn/datafeed/instruments/100";
             $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/VN100";
             $res = $client->get($url);
             $vn100 = json_decode($res->getBody());
             $vn100 = explode(",", " " . implode(", ", $vn100));
-            // $vn100[0] = ' ' . $vn100[0];
-            // $vn100 = [];
-            // if ($rsp->s == 'ok') {
-            //     $vn100 = explode(",", implode(", ", $rsp->d));
-            //     $vn100[0] = ' ' . $vn100[0];
-            // }
 
             $index = ['^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
             $nh = [' VCB', ' BID', ' CTG', ' VPB', ' MBB', ' ACB', ' STB', ' HDB', ' VIB', ' SSB', ' SHB', ' MSB', ' TPB', ' LPB', ' EIB', ' OCB'];
