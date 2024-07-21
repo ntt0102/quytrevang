@@ -32,7 +32,7 @@ class ExportStockJob implements ShouldQueue
      */
     public function handle()
     {
-        if (!count($this->data)) return false;
+        if (count($this->data) < 2000) return false;
         $vnindex = current(array_filter($this->data, function ($item) {
             return $item[0] === 'VNINDEX';
         }));
@@ -49,8 +49,7 @@ class ExportStockJob implements ShouldQueue
         file_put_contents($file, $date);
         foreach ($this->data as $item) {
             if ((!str_contains($item[0], '$') && !str_contains($item[0], '^') && strlen($item[0]) == 3) ||
-                $item[0] == 'VNINDEX' ||
-                $item[0] == 'VN30'
+                in_array($item[0], ['VNINDEX', 'VN30', 'VN30F1M', 'VN30F2M', 'VN30F1Q', 'VN30F2Q'])
             ) {
                 $file = storage_path('app/cophieu/' . $item[0] . '.csv');
                 $fp = fopen($file, 'w');
