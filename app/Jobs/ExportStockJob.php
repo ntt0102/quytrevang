@@ -52,7 +52,7 @@ class ExportStockJob implements ShouldQueue
                 in_array($item[0], ['VNINDEX', 'VN30', 'VN30F1M', 'VN30F2M', 'VN30F1Q', 'VN30F2Q'])
             ) {
                 $file = storage_path('app/cophieu/' . $item[0] . '.csv');
-                $fp = fopen($file, 'w');
+                $fp = fopen($file, 'a+');
                 $line = [
                     substr($item[1], 0, 10),
                     $item[7] - ($item[4] - $item[7])

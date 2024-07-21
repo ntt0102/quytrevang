@@ -3,5 +3,5 @@
 return [
 
     'title' => 'Xuất dữ liệu cổ phiếu.',
-    'body' => 'Đang thực hiện...',
+    'body' => 'Lưu Khối lượng chủ động ròng',
 ];
