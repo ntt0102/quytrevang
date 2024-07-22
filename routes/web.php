@@ -109,12 +109,15 @@ Route::get('test', function () {
     //     'body' => 'OK'
     // ];
     // $s = app(\App\Services\Setting\NotificationService::class)->send($o);
-    $receiver = \App\Models\User::whereIn('code', ['121992'])->get();
-    \Illuminate\Support\Facades\Notification::send(
-        $receiver,
-        new \App\Notifications\ExportStockNotification()
-    );
-    // \Illuminate\Support\Facades\Artisan::call('stock:export');
+    // $params = [
+    //     'test' => 'tho',
+    // ];
+    // $receiver = \App\Models\User::whereIn('code', ['121992'])->get();
+    // \Illuminate\Support\Facades\Notification::send(
+    //     $receiver,
+    //     new \App\Notifications\CoreNotification($params, false, true)
+    // );
+    \Illuminate\Support\Facades\Artisan::call('connect:socket');
     // $date = '2024-07-18';
     // $file = storage_path('app/cophieu/date.txt');
     // $isUpdated = false;
@@ -220,6 +223,9 @@ Route::get('test', function () {
     // echo $rsp->token;
     // set_global_value('dnseAccessToken', $rsp->token);
     // $s = new \App\Services\Special\VpsOrderService();
+    // $s = new \App\Services\Special\SocketService();
+    // $s->connectSocket();
+    // \App\Jobs\ConnectSocketJob::dispatch();
     // $s = '2024-07-15' || date('Y-m-d');
     // dd($s);
     return 'ok';

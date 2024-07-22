@@ -32,15 +32,6 @@ const actions = {
                 });
         });
     },
-    exportStock({ commit, dispatch, getters, state, rootGetters }) {
-        return new Promise((resolve, reject) => {
-            axios
-                .post("trading/stock/export-stock", {}, { noLoading: true })
-                .then((response) => {
-                    resolve();
-                });
-        });
-    },
     cloneSymbols({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios

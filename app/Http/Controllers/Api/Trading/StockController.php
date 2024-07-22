@@ -40,18 +40,6 @@ class StockController extends CoreController
         $data = $this->stockService->getChart($this->payload);
         return $this->sendResponse($data);
     }
-    /**
-     * Request Export Stock
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function requestExportStock(Request $request)
-    {
-        $data = $this->stockService->requestExportStock();
-        return $this->sendResponse($data);
-    }
 
     /**
      * Clone the symbols

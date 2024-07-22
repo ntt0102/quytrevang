@@ -4,9 +4,9 @@ namespace App\Services\Trading;
 
 use App\Services\CoreService;
 use App\Services\Special\VpsOrderService;
+use Illuminate\Support\Facades\Artisan;
 use App\Models\DrawTool;
 use App\Jobs\ReportTradingJob;
-use App\Jobs\ExportTradingJob;
 use App\Jobs\LoginDnseJob;
 
 class OrderChartService extends CoreService
@@ -308,7 +308,7 @@ class OrderChartService extends CoreService
      */
     public function export($payload)
     {
-        ExportTradingJob::dispatch();
+        Artisan::call('connect:socket');
         return ['isOk' => true];
     }
 

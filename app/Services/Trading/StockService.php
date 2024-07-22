@@ -345,15 +345,6 @@ class StockService extends CoreService
         }
         return $ret;
     }
-    /**
-     * Request Export Stock
-     *
-     */
-    public function requestExportStock()
-    {
-        Artisan::call('stock:export');
-        return ['isOk' => true];
-    }
 
     /**
      * Clone Symbols

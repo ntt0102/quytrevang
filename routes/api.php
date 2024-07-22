@@ -20,7 +20,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
     Route::post('core.vpbs', 'Trading\OrderChartController@setVpsSession');
-    Route::post('export-stock', 'Trading\StockController@exportStock');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login')->name('login');
@@ -128,7 +127,6 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::group(['prefix' => 'stock', 'middleware' => ['can:stock@order']], function () {
                     Route::post('/', 'StockController@getChart');
                     Route::post('init-chart', 'StockController@initChart');
-                    Route::post('export-stock', 'StockController@requestExportStock');
                     Route::post('clone-symbols', 'StockController@cloneSymbols');
                     Route::post('get-symbols', 'StockController@getSymbols');
                     Route::post('filter', 'StockController@filterSymbols');

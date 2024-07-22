@@ -32,9 +32,6 @@ class CoreNotification extends Notification
         $this->hasBroadcast = $hasBroadcast;
         $this->hasWebPush = $hasWebPush;
 
-        if (!isset($params['hasDatabase'])) {
-            $params['hasDatabase'] = "core";
-        }
         if (!isset($params['event'])) {
             $params['event'] = "core";
         }
@@ -43,6 +40,9 @@ class CoreNotification extends Notification
         }
         if (!isset($params['title'])) {
             $params['title'] = config("app.name");
+        }
+        if (!isset($params['body'])) {
+            $params['body'] = "Notification";
         }
         $params['badge'] = "/images/badge-128x128.png";
 
@@ -90,8 +90,8 @@ class CoreNotification extends Notification
     public function toWebPush($notifiable, $notification)
     {
         $msg = (new WebPushMessage)
-            ->body($this->params['body'])
             ->title($this->params['title'])
+            ->body($this->params['body'])
             ->icon($this->params['icon'])
             ->badge($this->params['badge'])
             ->data(['id' => $notification->id, 'event' => $this->params['event']]);

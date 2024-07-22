@@ -36,9 +36,7 @@ class Kernel extends ConsoleKernel
 
         if (get_global_value('openingMarketFlag') == '1') {
             $schedule->job(new ReportTradingJob)->dailyAt('14:46');
-            $schedule->job(new ExportTradingJob)->dailyAt('14:46');
-            // $schedule->job(new ExportStockJob)->dailyAt('14:46');
-            $schedule->command('stock:export')->dailyAt('14:46');
+            $schedule->command('connect:socket')->dailyAt('14:46');
         }
 
         $schedule->command('queue:work --stop-when-empty')->everyMinute();
