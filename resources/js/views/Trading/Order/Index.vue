@@ -210,8 +210,6 @@ import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
 import moment from "moment";
-import { vleWrite, vleParse } from "../../../plugins/vle.js";
-import { encode, decode } from "@msgpack/msgpack";
 
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
@@ -242,6 +240,7 @@ const CHART_OPTIONS = {
         barSpacing: 0.05,
     },
 };
+const SHIFT_TIME = 7 * 60 * 60;
 const TP_DEFAULT = 3;
 const SL_DEFAULT = 2;
 const CURRENT_DATE = moment().format("YYYY-MM-DD");
@@ -751,9 +750,10 @@ function updateChartData(data, lastVolume) {
     if (lastVolume == undefined)
         lastVolume = params.data.volume.slice(-1)[0].value;
     data.forEach((item) => {
-        const time = moment(item[1].toLocaleString("sv-SE") + "Z").unix();
-        prices.push({ time, value: +item[2].toFixed(1) });
-        lastVolume += (item[4] == "B" ? 1 : item[4] == "S" ? -1 : 0) * item[3];
+        const time = moment(item.date).unix() + SHIFT_TIME;
+        prices.push({ time, value: item.price });
+        lastVolume +=
+            (item.side == "B" ? 1 : item.side == "S" ? -1 : 0) * item.volume;
         volumes.push({ time, value: lastVolume });
     });
     if (prices.length > 1) {
@@ -795,11 +795,11 @@ function mergeChartData(data1, data2) {
 function connectSocket() {
     params.websocket = new WebSocket(FIREANT_SOCKET_ENDPOINT);
     params.websocket.onopen = (e) => {
-        let data = '{"protocol":"messagepack","version":1}';
-        params.websocket.send(data);
-        data = [1, {}, "UpdateTrades_VN30F1M", "SubscribeTrades", ["VN30F1M"]];
-        params.socketSendData = vleWrite(encode(data));
-        params.websocket.send(params.socketSendData);
+        let message = '{"protocol":"json","version":1}';
+        params.websocket.send(message);
+        message =
+            '{"arguments":["VN30F1M"],"invocationId":"0","target":"SubscribeTrades","type":1}';
+        params.websocket.send(message);
     };
     params.websocket.onclose = (e) => {
         console.log("websocket-close");
@@ -807,27 +807,40 @@ function connectSocket() {
     };
     params.websocket.onmessage = (e) => {
         blinkSocketStatus(false);
-        const reader = new FileReader();
-        reader.onload = function (evt) {
-            const arrayBuffer = evt.target.result;
-            const parsedMessages = vleParse(arrayBuffer);
-            parsedMessages.forEach((e) => {
-                const r = decode(e);
-                if (r[2] == "UpdateTrades_VN30F1M") {
-                    params.data.whitespace = mergeChartData(
-                        params.data.whitespace,
-                        createWhitespaceData(CURRENT_DATE)
-                    );
-                    params.series.whitespace.setData(params.data.whitespace);
-                    updateChartData(r[4], 0);
-                } else if (r[3] == "UpdateTrades" && r[4][0] == "VN30F1M") {
-                    scanOrder(+r[4][1].slice(-1)[0][2].toFixed(1));
-                    updateChartData(r[4][1]);
-                }
-            });
-        };
-        reader.readAsArrayBuffer(e.data);
+        const data = parseSocketMessage(e.data);
+        data.forEach((item) => {
+            if (!item) return false;
+            if (item.type == 3) {
+                params.data.whitespace = mergeChartData(
+                    params.data.whitespace,
+                    createWhitespaceData(CURRENT_DATE)
+                );
+                params.series.whitespace.setData(params.data.whitespace);
+                updateChartData(item.result, 0);
+            } else if (
+                item.type == 1 &&
+                item.target == "UpdateTrades" &&
+                item.arguments[0] == "VN30F1M"
+            ) {
+                scanOrder(item.arguments[1].slice(-1)[0].price);
+                updateChartData(item.arguments[1]);
+            }
+        });
     };
+}
+function parseSocketMessage(msg) {
+    let result = [];
+    msg.split("").forEach((item) => {
+        const startPos = item.indexOf("{");
+        const endPos = item.lastIndexOf("}");
+        let temp = null;
+        if (startPos !== -1 && endPos !== -1 && endPos > startPos) {
+            const filteredData = item.substring(startPos, endPos + 1);
+            if (filteredData != "{}") temp = JSON.parse(filteredData);
+        }
+        result.push(temp);
+    });
+    return result;
 }
 function intervalHandler() {
     params.currentSeconds = moment().unix();

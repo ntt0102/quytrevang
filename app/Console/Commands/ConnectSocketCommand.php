@@ -52,13 +52,15 @@ class ConnectSocketCommand extends Command
 
             $ws->on('message', function ($msg) use ($ws) {
                 echo "Received message: \n";
-                $data = $this->getSocketData($msg);
-                if (!isset($data)) return false;
-                if ($data->type == 1 && $data->target == 'UpdateLastPrices' && count($data->arguments[0]) > 2000) {
-                    ExportStockJob::dispatch(json_encode($data->arguments[0]));
-                } else if ($data->type == 3) {
-                    $ws->close();
-                    ExportDerivativeJob::dispatch(json_encode($data->result));
+                $data = $this->parseSocketMessage($msg);
+                foreach ($data as $item) {
+                    if (!$item) return false;
+                    if ($item->type == 1 && $item->target == 'UpdateLastPrices' && count($item->arguments[0]) > 2000) {
+                        ExportStockJob::dispatch(json_encode($item->arguments[0]));
+                    } else if ($item->type == 3) {
+                        $ws->close();
+                        ExportDerivativeJob::dispatch(json_encode($item->result));
+                    }
                 }
             });
 
@@ -73,18 +75,24 @@ class ConnectSocketCommand extends Command
         });
     }
 
-    private function getSocketData($msg)
+    private function parseSocketMessage($msg)
     {
-        $startPos = strpos($msg, '{');
-        $endPos = strrpos($msg, '}');
+        $result = [];
+        $items = explode("", $msg);
 
-        if (
-            $startPos !== false && $endPos !== false && $endPos > $startPos
-        ) {
-            $filteredData = substr($msg, $startPos, ($endPos - $startPos + 1));
-            if ($filteredData === '{}') return null;
-            return json_decode($filteredData);
+        foreach ($items as $item) {
+            $startPos = strpos($item, '{');
+            $endPos = strrpos($item, '}');
+            $temp = null;
+
+            if ($startPos !== false && $endPos !== false && $endPos > $startPos) {
+                $filteredData = substr($item, $startPos, ($endPos - $startPos + 1));
+                if ($filteredData != '{}') $temp = json_decode($filteredData);
+            }
+
+            $result[] = $temp;
         }
-        return null;
+
+        return $result;
     }
 }
