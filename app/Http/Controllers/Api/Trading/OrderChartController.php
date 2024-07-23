@@ -56,6 +56,19 @@ class OrderChartController extends CoreController
     }
 
     /**
+     * Login Vps
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function loginVps(Request $request)
+    {
+        $data = $this->orderChartService->loginVps($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Get Status
      *
      * @param \Illuminate\Http\Request $request

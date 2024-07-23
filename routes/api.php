@@ -115,6 +115,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('/', 'OrderChartController@getChartData');
                     Route::post('init-chart', 'OrderChartController@initChart');
                     Route::post('get-tools', 'OrderChartController@getTools');
+                    Route::post('login-vps', 'OrderChartController@loginVps');
                     Route::post('get-status', 'OrderChartController@getStatus');
                     Route::post('get-account-info', 'OrderChartController@getAccountInfo');
                     Route::post('execute-order', 'OrderChartController@executeOrder');

@@ -21,6 +21,15 @@
                     },
                 },
                 {
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-sign-in-alt small',
+                        hint: $t('trading.orderChart.buttons.loginVps'),
+                        onClick: loginVps,
+                    },
+                },
+                {
                     visible: false,
                     location: 'before',
                     widget: 'dxButton',
@@ -189,10 +198,12 @@
             </div>
         </div>
     </div>
+    <VpsOtpPopup ref="vpsOtpPopupRef" />
 </template>
 
 <script setup>
 import LineContextMenu from "./LineContextMenu.vue";
+import VpsOtpPopup from "./VpsOtpPopup.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
 import { confirm } from "devextreme/ui/dialog";
@@ -275,6 +286,7 @@ const rrToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
+const vpsOtpPopupRef = ref(null);
 let params = {
     chart: {},
     series: {},
@@ -1814,6 +1826,9 @@ function exportCsv() {
     bus.emit("checkPin", () =>
         store.dispatch("tradingOrder/export", state.chartDate)
     );
+}
+function loginVps() {
+    vpsOtpPopupRef.value.show();
 }
 function loginDnse() {
     bus.emit("checkPin", () => store.dispatch("tradingOrder/loginDnse"));

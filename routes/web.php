@@ -117,7 +117,7 @@ Route::get('test', function () {
     //     $receiver,
     //     new \App\Notifications\CoreNotification($params, false, true)
     // );
-    \Illuminate\Support\Facades\Artisan::call('connect:socket');
+    // \Illuminate\Support\Facades\Artisan::call('connect:socket');
     // $date = '2024-07-18';
     // $file = storage_path('app/cophieu/date.txt');
     // $isUpdated = false;
@@ -222,7 +222,7 @@ Route::get('test', function () {
 
     // echo $rsp->token;
     // set_global_value('dnseAccessToken', $rsp->token);
-    // $s = new \App\Services\Special\VpsOrderService();
+    $s = new \App\Services\Special\VpsOrderService('756428');
     // $s = new \App\Services\Special\SocketService();
     // $s->connectSocket();
     // \App\Jobs\ConnectSocketJob::dispatch();

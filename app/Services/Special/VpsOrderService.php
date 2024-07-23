@@ -12,17 +12,19 @@ class VpsOrderService extends CoreService
     public $orderVolume;
     public $symbol;
     public $vpsUser;
+    public $vpsPass;
     public $vpsSession;
     public $orderId;
     public $connection = false;
     public $position = 0;
 
-    public function __construct()
+    public function __construct($otpCode = null)
     {
         $this->client = new Client();
         $this->orderVolume = (int) Parameter::getValue('orderVolume');
         $this->symbol = get_global_value('vn30f1m');
         $this->vpsUser = get_global_value('vpsUser');
+        $this->vpsPass = get_global_value('vpsPass');
         $this->vpsSession = get_global_value('vpsSession');
         $this->orderId = [
             'entry' => get_global_value('entryOrderId'),
@@ -30,7 +32,42 @@ class VpsOrderService extends CoreService
             'sl' => get_global_value('slOrderId'),
             'exit' => get_global_value('exitOrderId'),
         ];
-        $this->getPosition();
+        if ($otpCode) $this->loginVps($otpCode);
+        else $this->getPosition();
+    }
+
+    public function loginVps($otpCode)
+    {
+        $gssc = "yZl5Ut7NiKPg8FR+5aBvJza/JKiXuXbNMOIJ7AMQJjJV5/hblO8LUP95XiiLdiEGrtav+a4rLsyXadGWVMOKKOsnAbcQ50VfIXKxnwxHRw09sYG5ESUOXrV6AqjbeMQ+nK9nfO9ReDevPABSo2ZjuOCZExx30GlMblu+ALXf3VByCTSFL2mLH40JPH67sTstV5U3Uq0ZCOGXBxF8SzqA5zhhpgyebpIVukw/yR4AbkMPgbhyhah6wg==";
+        $deviceInfo = "eyJ0eXBlIjoid2ViIiwic291cmNlIjoiU21hcnRQcm8gV2ViIiwidmVyc2lvbiI6IjEuNyIsIm1vZGVsIjoiRWRnZSIsImRldmljZU9TIjoiV2luZG93cyIsImdlb0xvY2F0aW9uIjoiIn0=";
+        try {
+            $payload = [
+                'user' => $this->vpsUser,
+                'pass' => $this->vpsPass,
+                'channel' => 'H',
+                'language' => 'VI',
+                'cmd' => 'Web.sCheckLoginOTP',
+                'p5' => $otpCode,
+                'p6' => '',
+                'p7' => 0,
+                'deviceNew' => $gssc,
+                'deviceName' => 'Edge Windows 10',
+                'deviceInfo' => $deviceInfo,
+            ];
+            $url = "https://smartpro.vps.com.vn/handler/core_check.login";
+            $res = $this->client->post($url, [
+                'headers' => ['X-Device-New' => $gssc],
+                'body' => $this->build_query_string($payload)
+            ]);
+            $rsp = json_decode($res->getBody());
+            if ($rsp->rc == 1) {
+                $this->vpsSession = $rsp->data->sid;
+                $this->getPosition();
+                set_global_value('vpsSession', $rsp->data->sid);
+            };
+        } catch (\Throwable $th) {
+            return;
+        }
     }
 
     public function getPosition()
@@ -326,5 +363,14 @@ class VpsOrderService extends CoreService
     private function todayFormat()
     {
         return now()->format('d/m/Y');
+    }
+
+    private function build_query_string(array $data)
+    {
+        $query = '';
+        foreach ($data as $key => $value) {
+            $query .= $key . '=' . $value . '&';
+        }
+        return rtrim($query, '&');
     }
 }

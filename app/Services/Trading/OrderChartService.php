@@ -64,6 +64,25 @@ class OrderChartService extends CoreService
     }
 
     /**
+     * Login VPS
+     *
+     * @param $payload
+     * 
+     */
+    public function loginVps($payload)
+    {
+        $vos = new VpsOrderService($payload->otpCode);
+        return [
+            'isOk' => $vos->connection,
+            'status' => [
+                'connection' => $vos->connection,
+                'position' => $vos->position,
+                'pending' => $vos->hasOrder() || $vos->hasConditionOrder()
+            ]
+        ];
+    }
+
+    /**
      * Get Status
      *
      * @param $payload
