@@ -28,11 +28,11 @@ class VariablesTableSeeder extends Seeder
         ]);
         Variable::create([
             'name' => "vpsUser",
-            'value' => "",
+            'value' => "228582",
         ]);
         Variable::create([
             'name' => "vpsPass",
-            'value' => "",
+            'value' => "a21328cca830063d80791b9e1e8b76a4",
         ]);
         Variable::create([
             'name' => "vpsSession",
