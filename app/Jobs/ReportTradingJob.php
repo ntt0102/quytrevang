@@ -43,8 +43,7 @@ class ReportTradingJob implements ShouldQueue
     public function handle()
     {
         if (Trade::where('date', date_create()->format('Y-m-d'))->count() > 0) return false;
-        $copyist = User::permission('trades@edit')->first()->copyist;
-        $vos = new VpsOrderService($copyist);
+        $vos = new VpsOrderService();
         if (!$vos->connection) return false;
         $info = $vos->getAccountInfo();
         //
@@ -61,8 +60,8 @@ class ReportTradingJob implements ShouldQueue
         $revenue = $info->vm > 0 ? $info->vm : 0;
         $loss = $info->vm < 0 ? -$info->vm : 0;
         $trade = Trade::create([
-            "amount" => $copyist->volume,
-            "scores" => $this->getVn30f1mInfo($vos->symbol)->r,
+            "amount" => $vos->orderVolume,
+            "scores" => $this->getVn30f1mInfo($vos->symbol),
             "revenue" => $revenue,
             "loss" => $loss,
             "fees" => $info->fee,
@@ -80,6 +79,6 @@ class ReportTradingJob implements ShouldQueue
         $client = new \GuzzleHttp\Client();
         $url = "https://spwapidatafeed.vps.com.vn/getpsalldatalsnapshot/{$symbol}";
         $res = $client->get($url);
-        return json_decode($res->getBody())[0];
+        return json_decode($res->getBody())[0]->r;
     }
 }
