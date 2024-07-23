@@ -584,35 +584,50 @@ function eventPriceLineDrag(e) {
                 const epPrice = +params.tools.rr.EP.options().price;
                 const slPrice = +params.tools.rr.SL.options().price;
                 const tpPrice = +params.tools.rr.TP.options().price;
-                const rSl = slPrice - epPrice;
-                const rTp = tpPrice - epPrice;
-                if (rTp / rSl > 0) {
-                    line.applyOptions({ price: oldPrice });
-                    return false;
+                if (lineOptions.point == "EP") {
+                    point = "SL";
+                    params.tools.rr[point].applyOptions({
+                        price: epPrice + slPrice - oldPrice,
+                    });
+                    param.points.push(point);
+                    param.data.push(params.tools.rr[point].options());
+                    //
+                    point = "TP";
+                    params.tools.rr[point].applyOptions({
+                        price: epPrice + tpPrice - oldPrice,
+                    });
+                    param.points.push(point);
+                    param.data.push(params.tools.rr[point].options());
+                } else {
+                    const rSl = slPrice - epPrice;
+                    const rTp = tpPrice - epPrice;
+                    if (rTp / rSl > 0) {
+                        line.applyOptions({ price: oldPrice });
+                        return false;
+                    }
+                    const rr = Math.abs(rTp) / Math.abs(rSl);
+                    //
+                    point = "EP";
+                    params.tools.rr[point].applyOptions({
+                        title: `RR=${rr.toFixed(1)}`,
+                    });
+                    param.points.push(point);
+                    param.data.push(params.tools.rr[point].options());
+                    //
+                    point = "SL";
+                    params.tools.rr[point].applyOptions({
+                        title: `SL=${rSl.toFixed(1)}`,
+                    });
+                    param.points.push(point);
+                    param.data.push(params.tools.rr[point].options());
+                    //
+                    point = "TP";
+                    params.tools.rr[point].applyOptions({
+                        title: `TP=${rTp.toFixed(1)}`,
+                    });
+                    param.points.push(point);
+                    param.data.push(params.tools.rr[point].options());
                 }
-                const rr = Math.abs(rTp) / Math.abs(rSl);
-                //
-                point = "EP";
-                params.tools.rr[point].applyOptions({
-                    title: `RR=${rr.toFixed(1)}`,
-                });
-                param.points.push(point);
-                param.data.push(params.tools.rr[point].options());
-                //
-                point = "SL";
-                params.tools.rr[point].applyOptions({
-                    title: `SL=${rSl.toFixed(1)}`,
-                });
-                param.points.push(point);
-                param.data.push(params.tools.rr[point].options());
-                //
-                point = "TP";
-                params.tools.rr[point].applyOptions({
-                    title: `TP=${rTp.toFixed(1)}`,
-                });
-                param.points.push(point);
-                param.data.push(params.tools.rr[point].options());
-                //
                 store.dispatch("tradingOrder/drawTools", param);
             }
             break;
@@ -1365,8 +1380,12 @@ function drawRrTool() {
         if (mf.isSet(params.tools.rr.SL)) {
             const slPrice = +params.tools.rr.SL.options().price;
             const rSl = slPrice - epPrice;
-            const rTp = price - epPrice;
-            if (rTp / rSl > 0) return false;
+            let rTp = price - epPrice;
+            if (rTp / rSl > 0) {
+                const tpPrice = epPrice - (slPrice - epPrice);
+                option.price = tpPrice;
+                rTp = tpPrice - epPrice;
+            }
             option.point = "TP";
             option.title = `TP=${rTp.toFixed(1)}`;
             option.color = "lime";
