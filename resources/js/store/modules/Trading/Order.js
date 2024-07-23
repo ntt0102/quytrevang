@@ -46,11 +46,7 @@ const actions = {
     loginVps({ commit, dispatch, getters, state, rootGetters }, otpCode) {
         return new Promise((resolve, reject) => {
             axios
-                .post(
-                    "trading/order/login-vps",
-                    { otpCode },
-                    { noLoading: true }
-                )
+                .post("trading/order/login-vps", { otpCode })
                 .then((response) => {
                     commit("setStatus", response.data.status);
                     resolve(response.data.isOk);
