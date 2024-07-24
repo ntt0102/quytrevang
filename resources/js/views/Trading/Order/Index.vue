@@ -820,6 +820,7 @@ function mergeChartData(data1, data2) {
     );
 }
 function connectSocket() {
+    store.dispatch("tradingOrder/setChartLoading", true);
     params.websocket = new WebSocket(FIREANT_SOCKET_ENDPOINT);
     params.websocket.onopen = (e) => {
         let message = '{"protocol":"json","version":1}';
@@ -844,6 +845,7 @@ function connectSocket() {
                 );
                 params.series.whitespace.setData(params.data.whitespace);
                 updateChartData(item.result, 0);
+                store.dispatch("tradingOrder/setChartLoading", false);
             } else if (
                 item.type == 1 &&
                 item.target == "UpdateTrades" &&

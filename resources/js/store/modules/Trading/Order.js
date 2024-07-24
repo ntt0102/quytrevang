@@ -131,6 +131,9 @@ const actions = {
             });
         });
     },
+    setChartLoading({ commit }, state) {
+        commit("setChartLoading", state);
+    },
     resetState({ commit }) {
         commit("resetState");
     },

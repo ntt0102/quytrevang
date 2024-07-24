@@ -1,4 +1,3 @@
-// import auth from "../auth";
 import { getCurrentInstance } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 import routes from "./routes";
@@ -9,25 +8,6 @@ const router = createRouter({
     history: createWebHistory(),
     routes: routes,
 });
-
-// router.beforeEach((to, from, next) => {
-//     if (to.name === "login-form" && auth.loggedIn()) {
-//         next({ name: "home" });
-//     }
-
-//     if (to.matched.some((record) => record.meta.requiresAuth)) {
-//         if (!auth.loggedIn()) {
-//             next({
-//                 name: "login-form",
-//                 query: { redirect: to.fullPath },
-//             });
-//         } else {
-//             next();
-//         }
-//     } else {
-//         next();
-//     }
-// });
 
 // Register before guard.
 router.beforeEach(async (to, from, next) => {
