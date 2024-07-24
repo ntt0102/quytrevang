@@ -366,8 +366,8 @@ onUnmounted(() => {
     document.removeEventListener("fullscreenchange", eventFullscreenChange);
     clearInterval(params.interval);
     clearInterval(params.interval60);
+    params.websocket.close();
     params.socketStop = true;
-    if (mf.isSet(params.websocket)) params.websocket.close();
     params.websocket = null;
 });
 

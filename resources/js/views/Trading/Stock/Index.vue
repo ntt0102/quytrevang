@@ -45,15 +45,6 @@
                     location: 'after',
                     widget: 'dxButton',
                     options: {
-                        icon: 'far fa-file-export small',
-                        hint: $t('trading.stock.exportStock'),
-                        onClick: exportStock,
-                    },
-                },
-                {
-                    location: 'after',
-                    widget: 'dxButton',
-                    options: {
                         icon: 'far fa-list small',
                         hint: $t('trading.stock.cloneSymbols'),
                         onClick: cloneSymbols,
@@ -299,6 +290,7 @@ const route = useRoute();
 const { t } = useI18n();
 const devices = inject("devices");
 const mf = inject("mf");
+const bus = inject("bus");
 const chartContainerRef = ref(null);
 const chartRef = ref(null);
 const symbolAutocompleteRef = ref(null);
@@ -1463,43 +1455,23 @@ function chartShiftChanged(e) {
     state.chartShift = e.value;
     reloadChart(false, true);
 }
-function exportStock() {
-    confirm(`${t("trading.stock.exportStock")}?`, t("titles.confirm")).then(
-        (result) => {
-            if (result) store.dispatch("tradingStock/exportStock");
-        }
-    );
-}
 function cloneSymbols() {
-    confirm(`${t("trading.stock.cloneSymbols")}?`, t("titles.confirm")).then(
-        (result) => {
-            if (result) store.dispatch("tradingStock/cloneSymbols");
-        }
-    );
+    bus.emit("checkPin", () => store.dispatch("tradingStock/cloneSymbols"));
 }
 function deleteWatchlist() {
-    confirm(`${t("trading.stock.deleteWatchList")}?`, t("titles.confirm")).then(
-        (result) => {
-            if (result) store.dispatch("tradingStock/deleteWatchlist");
-        }
-    );
+    bus.emit("checkPin", () => store.dispatch("tradingStock/deleteWatchlist"));
 }
 function filterSymbols(kind) {
     if (params.tools.range.length == 2) {
-        confirm(
-            `${t("trading.stock.filterSymbols")}?`,
-            t("titles.confirm")
-        ).then((result) => {
-            if (result) {
-                const param = {
-                    from: params.tools.range[0].time,
-                    to: params.tools.range[1].time,
-                    timeframe: state.timeframe,
-                    name: state.symbolKind,
-                    kind: kind,
-                };
-                store.dispatch("tradingStock/filterSymbols", param);
-            }
+        bus.emit("checkPin", () => {
+            const param = {
+                from: params.tools.range[0].time,
+                to: params.tools.range[1].time,
+                timeframe: state.timeframe,
+                name: state.symbolKind,
+                kind: kind,
+            };
+            store.dispatch("tradingStock/filterSymbols", param);
         });
     } else toast.error(t("trading.stock.rangeWarning"));
 }
