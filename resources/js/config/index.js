@@ -9,25 +9,18 @@ let shownOfflineAt = moment();
 
 axios.interceptors.request.use(
     (config) => {
-        console.log(
-            "request:" + config.url,
-            config[config.method === "post" ? "data" : "params"]
-        );
-        console.log(config);
-        const token = store.state.auth.token;
-        if (!!token) config.headers["Authorization"] = `Bearer ${token}`;
-        if (config.method === "post") {
-            if (navigator.onLine) {
-                if (!config.noLoading) store.dispatch("setSyncing", true);
-            } else if (moment().diff(shownOfflineAt, "seconds") > 5) {
-                toast.info(lang.global.t("messages.error.offline"));
-                shownOfflineAt = moment();
-            }
-        }
-        if (!config.noCrypt) {
-            if (config.method === "post")
-                config.data = crypto.encrypt(config.data);
-            else config.params = crypto.encrypt(config.params);
+        const dataKey = config.method === "post" ? "data" : "params";
+        console.log("request:" + config.url, config[dataKey]);
+        config.headers["Authorization"] = `Bearer ${store.state.auth.token}`;
+        if (!config.noCrypt) config[dataKey] = crypto.encrypt(config[dataKey]);
+        if (!config.noLoading) store.dispatch("setSyncing", true);
+        if (
+            !navigator.onLine &&
+            config.method === "post" &&
+            moment().diff(shownOfflineAt, "seconds") > 5
+        ) {
+            toast.info(lang.global.t("messages.error.offline"));
+            shownOfflineAt = moment();
         }
         return config;
     },
