@@ -35,8 +35,6 @@ router.beforeEach(async (to, from, next) => {
     //
     let nextRoute = {};
     const isLoggedin = store.state.auth.user.code;
-    console.log("isLoggedin: ", isLoggedin);
-    console.log("to: ", to);
     if (to.name != "policy") {
         if (isLoggedin) {
             const permissions = store.state.auth.user.permissions;
@@ -58,7 +56,6 @@ router.beforeEach(async (to, from, next) => {
                 hash: to.hash,
             };
     }
-    console.log("nextRoute: ", nextRoute);
     if (Object.keys(nextRoute).length === 0) next();
     else next(nextRoute);
 });

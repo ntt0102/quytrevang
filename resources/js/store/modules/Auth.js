@@ -261,7 +261,6 @@ const actions = {
             axios
                 .post("auth/user", null, { noLoading: true })
                 .then((response) => {
-                    console.log(response);
                     commit("setUser", response.data);
                     resolve();
                 })

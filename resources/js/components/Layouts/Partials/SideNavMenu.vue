@@ -120,7 +120,6 @@ watch(
     }
 );
 const notify = computed(() => store.state.notify);
-console.log("notify", notify.value);
 function getCount(routeName) {
     let count = 0;
     switch (routeName) {
