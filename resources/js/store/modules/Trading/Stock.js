@@ -8,11 +8,11 @@ function initialState() {
 const getters = {};
 
 const actions = {
-    getChartData({ commit, dispatch, getters, state, rootGetters }, param) {
+    getChartData({ commit, dispatch, getters, state, rootGetters }, params) {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/stock", param, { noLoading: true })
+                .get("trading/stock", { params, noLoading: true })
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
@@ -20,11 +20,14 @@ const actions = {
                 });
         });
     },
-    initChart({ commit, dispatch, getters, state, rootGetters }, param) {
+    initChart({ commit, dispatch, getters, state, rootGetters }, params) {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/stock/init-chart", param, { noLoading: true })
+                .get("trading/stock/init-chart", {
+                    params,
+                    noLoading: true,
+                })
                 .then((response) => {
                     commit("setChartData", response.data.chart);
                     commit("setChartLoading", false);
@@ -45,7 +48,7 @@ const actions = {
     getSymbols({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/stock/get-symbols", {}, { noLoading: true })
+                .get("trading/stock/get-symbols", { noLoading: true })
                 .then((response) => {
                     commit("setSymbols", {
                         ...state.symbols,

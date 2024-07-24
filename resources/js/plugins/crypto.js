@@ -28,6 +28,7 @@ class Crypto {
         };
     }
     encrypt(text) {
+        if (!text) return text;
         try {
             return JSON.parse(
                 CryptoJS.AES.encrypt(JSON.stringify(text), this.key, {
@@ -36,14 +37,17 @@ class Crypto {
             );
         } catch (error) {}
     }
-    decrypt(encrypted) { 
+    decrypt(encrypted) {
+        if (!encrypted) return encrypted;
         try {
             return JSON.parse(
                 CryptoJS.AES.decrypt(JSON.stringify(encrypted), this.key, {
                     format: this.format,
                 }).toString(CryptoJS.enc.Utf8)
             );
-        } catch (error) {return {}}
+        } catch (error) {
+            return {};
+        }
     }
 }
 

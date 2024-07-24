@@ -112,12 +112,12 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             });
             Route::group(['namespace' => 'Trading', 'prefix' => 'trading'], function () {
                 Route::group(['prefix' => 'order', 'middleware' => ['can:stock@order']], function () {
-                    Route::post('/', 'OrderChartController@getChartData');
-                    Route::post('init-chart', 'OrderChartController@initChart');
-                    Route::post('get-tools', 'OrderChartController@getTools');
+                    Route::get('/', 'OrderChartController@getChartData');
+                    Route::get('init-chart', 'OrderChartController@initChart');
+                    Route::get('get-tools', 'OrderChartController@getTools');
                     Route::post('login-vps', 'OrderChartController@loginVps');
-                    Route::post('get-status', 'OrderChartController@getStatus');
-                    Route::post('get-account-info', 'OrderChartController@getAccountInfo');
+                    Route::get('get-status', 'OrderChartController@getStatus');
+                    Route::get('get-account-info', 'OrderChartController@getAccountInfo');
                     Route::post('execute-order', 'OrderChartController@executeOrder');
                     Route::post('close-position', 'OrderChartController@closePosition');
                     Route::post('draw-tools', 'OrderChartController@drawTools');
@@ -126,10 +126,10 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('login-dnse', 'OrderChartController@loginDnse');
                 });
                 Route::group(['prefix' => 'stock', 'middleware' => ['can:stock@order']], function () {
-                    Route::post('/', 'StockController@getChart');
-                    Route::post('init-chart', 'StockController@initChart');
+                    Route::get('/', 'StockController@getChart');
+                    Route::get('init-chart', 'StockController@initChart');
                     Route::post('clone-symbols', 'StockController@cloneSymbols');
-                    Route::post('get-symbols', 'StockController@getSymbols');
+                    Route::get('get-symbols', 'StockController@getSymbols');
                     Route::post('filter', 'StockController@filterSymbols');
                     Route::post('remove-filter-list', 'StockController@removeFilterList');
                     Route::post('add-watchlist', 'StockController@addWatchlist');

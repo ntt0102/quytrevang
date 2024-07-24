@@ -15,7 +15,10 @@ const actions = {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/order", { date: chartDate }, { noLoading: true })
+                .get("trading/order", {
+                    params: { date: chartDate },
+                    noLoading: true,
+                })
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
@@ -26,7 +29,7 @@ const actions = {
     initChart({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/order/init-chart", {}, { noLoading: true })
+                .get("trading/order/init-chart", { noLoading: true })
                 .then((response) => {
                     commit("setInitChart", response.data);
                     resolve();
@@ -36,7 +39,7 @@ const actions = {
     getTools({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/order/get-tools", {}, { noLoading: true })
+                .get("trading/order/get-tools", { noLoading: true })
                 .then((response) => {
                     commit("setTools", response.data);
                     resolve();
@@ -56,7 +59,7 @@ const actions = {
     getStatus({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/order/get-status", {}, { noLoading: true })
+                .get("trading/order/get-status", { noLoading: true })
                 .then((response) => {
                     commit("setStatus", response.data);
                     resolve();
@@ -65,11 +68,9 @@ const actions = {
     },
     getAccountInfo({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
-            axios
-                .post("trading/order/get-account-info", {}, { noLoading: true })
-                .then((response) => {
-                    resolve(response.data);
-                });
+            axios.get("trading/order/get-account-info").then((response) => {
+                resolve(response.data);
+            });
         });
     },
     executeOrder({ commit, dispatch, getters, state, rootGetters }, data) {

@@ -82,6 +82,7 @@ class CoreController extends Controller
      */
     function encrypt($value)
     {
+        if (!$value) return $value;
         $salt = openssl_random_pseudo_bytes(8);
         $salted = '';
         $dx = '';
@@ -107,6 +108,7 @@ class CoreController extends Controller
      */
     function decrypt($input)
     {
+        if (!$input) return $input;
         $salt = hex2bin($input->s);
         $ct = base64_decode($input->ct);
         $iv  = hex2bin($input->iv);

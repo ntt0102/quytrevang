@@ -9,7 +9,11 @@ let shownOfflineAt = moment();
 
 axios.interceptors.request.use(
     (config) => {
-        console.log("request:" + config.url, config.data);
+        console.log(
+            "request:" + config.url,
+            config[config.method === "post" ? "data" : "params"]
+        );
+        console.log(config);
         const token = store.state.auth.token;
         if (!!token) config.headers["Authorization"] = `Bearer ${token}`;
         if (config.method === "post") {
@@ -20,7 +24,11 @@ axios.interceptors.request.use(
                 shownOfflineAt = moment();
             }
         }
-        if (!config.noCrypt) config.data = crypto.encrypt(config.data);
+        if (!config.noCrypt) {
+            if (config.method === "post")
+                config.data = crypto.encrypt(config.data);
+            else config.params = crypto.encrypt(config.params);
+        }
         return config;
     },
     (error) => {
