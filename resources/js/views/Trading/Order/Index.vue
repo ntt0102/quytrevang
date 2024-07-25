@@ -774,8 +774,10 @@ function loadChartData() {
 function updateChartData(data, lastVolume) {
     let prices = [],
         volumes = [];
-    if (lastVolume == undefined)
+    if (lastVolume == undefined) {
+        if (params.data.volume.length == 0) return false;
         lastVolume = params.data.volume.slice(-1)[0].value;
+    }
     data.forEach((item) => {
         const time = moment(item.date).unix() + SHIFT_TIME;
         prices.push({ time, value: item.price });
