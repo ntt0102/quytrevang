@@ -830,10 +830,14 @@ function connectSocket() {
         message =
             '{"arguments":["VN30F1M"],"invocationId":"0","target":"SubscribeTrades","type":1}';
         params.websocket.send(message);
+        params.socketSendData = message;
     };
     params.websocket.onclose = (e) => {
         console.log("websocket-close");
-        if (!params.socketStop && inSession()) connectSocket();
+        if (!params.socketStop && inSession()) {
+            blinkSocketStatus(true);
+            connectSocket();
+        }
     };
     params.websocket.onmessage = (e) => {
         blinkSocketStatus(false);
