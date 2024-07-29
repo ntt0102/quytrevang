@@ -164,7 +164,7 @@
                     ></div>
                     <div
                         ref="superToolRef"
-                        class="command far fa-sliders-v fa-rotate-180"
+                        class="command far fa-sliders-v"
                         :title="$t('trading.orderChart.superTool')"
                         @click="superToolClick"
                         @contextmenu="superToolContextmenu"
