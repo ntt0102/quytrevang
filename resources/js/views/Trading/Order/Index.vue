@@ -1532,7 +1532,7 @@ function findSuper(startTime, endTime, type, side) {
         if (!!endTime && time > endTime) break;
         const value = data[i].value;
         if (side == undefined) side = value - data[i - 1].value > 0;
-        if (v1 == undefined || (cmp(value, v1, side, true) && t2 - t1 < 60)) {
+        if (v1 == undefined || (cmp(value, v1, side, true) && t2 - t1 < 1000)) {
             v1 = value;
             t1 = time;
             v2 = value;
