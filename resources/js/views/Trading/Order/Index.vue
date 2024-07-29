@@ -358,12 +358,6 @@ onMounted(() => {
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    params.series.super1 = params.chart.addHistogramSeries({
-        priceScaleId: "super",
-        scaleMargins: { top: 0, bottom: 0 },
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
     params.series.volume = params.chart.addLineSeries({
         priceScaleId: "volume",
         scaleMargins: { top: 0.61, bottom: 0.01 },
