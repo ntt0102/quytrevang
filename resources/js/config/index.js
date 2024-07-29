@@ -10,7 +10,7 @@ let shownOfflineAt = moment();
 axios.interceptors.request.use(
     (config) => {
         const dataKey = config.method === "post" ? "data" : "params";
-        // console.log("request:" + config.url, config[dataKey]);
+        console.log("request:" + config.url, config[dataKey]);
         config.headers["Authorization"] = `Bearer ${store.state.auth.token}`;
         if (!config.noCrypt) config[dataKey] = crypto.encrypt(config[dataKey]);
         if (!config.noLoading) store.dispatch("setSyncing", true);
@@ -33,7 +33,7 @@ axios.interceptors.response.use(
     (response) => {
         store.dispatch("setSyncing", false);
         response.data = crypto.decrypt(response.data);
-        // console.log("response:" + response.config.url, response.data);
+        console.log("response:" + response.config.url, response.data);
         if (!response.config.notify && response.data.hasOwnProperty("isOk")) {
             if (response.data.isOk) {
                 if (response.data.hasOwnProperty("message")) {
