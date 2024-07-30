@@ -2140,7 +2140,7 @@ function loginDnse() {
         bottom: 29px;
         right: 55px;
         border-radius: 50%;
-        border: 1px solid gray;
+        border: 1px solid #2b2b43;
         padding-left: 1px;
         line-height: 22px !important;
         width: 25px !important;
