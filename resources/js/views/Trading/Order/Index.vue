@@ -1581,9 +1581,8 @@ function toggleOrderButton(show) {
             if (!mf.isSet(params.tools.order.tp.line)) {
                 if (!!status.value.position) {
                     if (
-                        true ||
-                        (params.currentSeconds > TIME.ATO &&
-                            params.currentSeconds < TIME.ATC)
+                        params.currentSeconds > TIME.ATO &&
+                        params.currentSeconds < TIME.ATC
                     ) {
                         tpslOrderRef.value.style.left =
                             +(
@@ -1606,9 +1605,8 @@ function toggleOrderButton(show) {
                     side = 0;
                 if (!status.value.position) {
                     if (
-                        true ||
-                        (params.currentSeconds > TIME.ATO &&
-                            params.currentSeconds < TIME.ATC)
+                        params.currentSeconds > TIME.ATO &&
+                        params.currentSeconds < TIME.ATC
                     ) {
                         price = coordinateToPrice(params.crosshair.y);
                         side =
