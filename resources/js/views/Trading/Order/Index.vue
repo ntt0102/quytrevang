@@ -386,6 +386,12 @@ onUnmounted(() => {
 });
 
 watch(() => store.state.tradingOrder.chartData, loadChartData);
+watch(
+    () => store.state.tradingOrder.status.pending,
+    (value) => {
+        if (value) toggleCancelOrderButton(true);
+    }
+);
 
 function eventChartClick(e) {
     state.showLineContext = false;
