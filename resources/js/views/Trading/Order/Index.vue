@@ -1118,6 +1118,7 @@ function verticalToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
+    else scanExtremes();
 }
 function verticalToolContextmenu(e) {
     removeVerticalTool();
@@ -1160,6 +1161,84 @@ function removeVerticalTool(withServer = true) {
             isRemove: true,
             name: "vertical",
         });
+}
+function findLongTermExtremes(data, isPeak) {
+    const indexRange = 24 * 3;
+    const minSeconds = 120;
+    let extremes = [];
+    let halfRange = Math.floor(indexRange / 2);
+
+    for (let i = 0; i < data.length; i++) {
+        let isExtreme = true;
+        for (
+            let j = Math.max(0, i - halfRange);
+            j <= Math.min(data.length - 1, i + halfRange);
+            j++
+        ) {
+            if (i !== j) {
+                if (
+                    isPeak &&
+                    (data[i].value < data[j].value ||
+                        (data[i].value == data[j].value &&
+                            extremes.length &&
+                            data[i].time - extremes.at(-1).time < minSeconds))
+                ) {
+                    isExtreme = false;
+                    break;
+                } else if (
+                    !isPeak &&
+                    (data[i].value > data[j].value ||
+                        (data[i].value == data[j].value &&
+                            extremes.length &&
+                            data[i].time - extremes.at(-1).time < minSeconds))
+                ) {
+                    isExtreme = false;
+                    break;
+                }
+            }
+        }
+        if (isExtreme) {
+            extremes.push({
+                ...data[i],
+                ...{ color: isPeak ? "lime" : "red" },
+            });
+        }
+    }
+
+    return extremes;
+}
+
+function findCommonExtremes(priceExtremes, volumeExtremes) {
+    const tolerance = 30;
+    let commonExtremes = [];
+
+    let i = 0,
+        j = 0;
+    while (i < priceExtremes.length && j < volumeExtremes.length) {
+        let priceTime = priceExtremes[i].time;
+        let signalTime = volumeExtremes[j].time;
+        if (Math.abs(priceTime - signalTime) <= tolerance) {
+            commonExtremes.push(priceExtremes[i]);
+            i++;
+            j++;
+        } else if (priceTime < signalTime) {
+            i++;
+        } else {
+            j++;
+        }
+    }
+
+    return commonExtremes;
+}
+function scanExtremes() {
+    const pricePeaks = findLongTermExtremes(params.data.price, true);
+    const priceValleys = findLongTermExtremes(params.data.price, false);
+    const volumePeaks = findLongTermExtremes(params.data.volume, true);
+    const volumeValleys = findLongTermExtremes(params.data.volume, false);
+    const commonPeaks = findCommonExtremes(pricePeaks, volumePeaks);
+    const commonValleys = findCommonExtremes(priceValleys, volumeValleys);
+    params.data.vertical = mergeChartData(commonPeaks, commonValleys);
+    params.series.vertical.setData(params.data.vertical);
 }
 function uplpsToolClick(e) {
     state.showLineContext = false;
