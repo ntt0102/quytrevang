@@ -1209,7 +1209,7 @@ function findLongTermExtremes(data, isPeak) {
 }
 
 function findCommonExtremes(priceExtremes, volumeExtremes) {
-    const tolerance = 30;
+    const tolerance = 60;
     let commonExtremes = [];
 
     let i = 0,
@@ -1218,7 +1218,7 @@ function findCommonExtremes(priceExtremes, volumeExtremes) {
         let priceTime = priceExtremes[i].time;
         let signalTime = volumeExtremes[j].time;
         if (Math.abs(priceTime - signalTime) <= tolerance) {
-            commonExtremes.push(priceExtremes[i]);
+            commonExtremes.push(volumeExtremes[j]);
             i++;
             j++;
         } else if (priceTime < signalTime) {
