@@ -1199,8 +1199,9 @@ function findLongTermExtremes(data, isPeak) {
         }
         if (isExtreme) {
             extremes.push({
-                ...data[i],
-                ...{ color: isPeak ? "lime" : "red" },
+                time: data[i].time,
+                value: 1,
+                color: isPeak ? "lime" : "red",
             });
         }
     }
