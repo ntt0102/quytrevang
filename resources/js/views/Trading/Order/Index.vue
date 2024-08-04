@@ -369,7 +369,7 @@ onMounted(() => {
     params.series.vertical = params.chart.addHistogramSeries({
         priceScaleId: "vertical",
         scaleMargins: { top: 0, bottom: 0 },
-        color: "#00BCD4",
+        color: "magenta",
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -395,9 +395,11 @@ onUnmounted(() => {
     document.removeEventListener("fullscreenchange", eventFullscreenChange);
     clearInterval(params.interval);
     clearInterval(params.interval60);
-    params.websocket.close();
+    if (params.websocket) {
+        params.websocket.close();
+        params.websocket = null;
+    }
     params.socketStop = true;
-    params.websocket = null;
 });
 
 watch(() => store.state.tradingOrder.chartData, loadChartData);
@@ -1163,9 +1165,9 @@ function removeVerticalTool(withServer = true) {
         });
 }
 function findLongTermExtremes(data, isPeak) {
-    const indexRange = 24 * 6;
-    const timeRange = 60 * 6;
-    const minSeconds = 120;
+    const indexRange = 24 * 5;
+    const posTimeRange = 60 * 10;
+    const negTimeRange = 60 * 20;
     let extremes = [];
 
     for (let i = 0; i < data.length; i++) {
@@ -1176,22 +1178,7 @@ function findLongTermExtremes(data, isPeak) {
             j++
         ) {
             if (i !== j) {
-                if (
-                    isPeak &&
-                    (data[i].value < data[j].value ||
-                        (data[i].value == data[j].value &&
-                            extremes.length &&
-                            data[i].time - extremes.at(-1).time < minSeconds))
-                ) {
-                    isExtreme = false;
-                    break;
-                } else if (
-                    !isPeak &&
-                    (data[i].value > data[j].value ||
-                        (data[i].value == data[j].value &&
-                            extremes.length &&
-                            data[i].time - extremes.at(-1).time < minSeconds))
-                ) {
+                if (cmp(data[i].value, data[j].value, !isPeak)) {
                     isExtreme = false;
                     break;
                 }
@@ -1201,19 +1188,17 @@ function findLongTermExtremes(data, isPeak) {
             let newItem = {
                 time: data[i].time,
                 value: 1,
-                color: isPeak ? "lime" : "red",
+                color: isPeak ? "green" : "darkred",
                 level: data[i].value,
             };
-            if (
-                extremes.length &&
-                data[i].time - extremes.at(-1).time < timeRange
-            ) {
-                const lastExs = extremes.pop();
-                if (
-                    (isPeak && data[i].value <= lastExs.level) ||
-                    (!isPeak && data[i].value >= lastExs.level)
-                )
-                    newItem = lastExs;
+            if (extremes.length) {
+                const distance = getTimeDistance(
+                    data[i].time,
+                    extremes.at(-1).time
+                );
+                if (cmp(data[i].value, extremes.at(-1).level, !isPeak)) {
+                    if (distance < negTimeRange) newItem = extremes.pop();
+                } else if (distance < posTimeRange) extremes.pop();
             }
             extremes.push(newItem);
         }
@@ -1221,21 +1206,35 @@ function findLongTermExtremes(data, isPeak) {
 
     return extremes;
 }
-
-function findCommonExtremes(priceExtremes, volumeExtremes) {
-    const tolerance = 30;
+function findCommonExtremes(priceExtremes, volumeExtremes, isPeak) {
+    const tolerance = 60 * 3;
     let commonExtremes = [];
 
     let i = 0,
         j = 0;
     while (i < priceExtremes.length && j < volumeExtremes.length) {
-        let priceTime = priceExtremes[i].time;
-        let signalTime = volumeExtremes[j].time;
-        if (Math.abs(priceTime - signalTime) <= tolerance) {
-            commonExtremes.push(volumeExtremes[j]);
+        const priceTime = priceExtremes[i].time;
+        const volumeTime = volumeExtremes[j].time;
+        let distance = getTimeDistance(priceTime, volumeTime);
+        if (distance <= tolerance) {
+            let newItem = {
+                ...volumeExtremes[j],
+                ...{
+                    distance,
+                    color:
+                        volumeTime > priceTime
+                            ? isPeak
+                                ? "lime"
+                                : "red"
+                            : isPeak
+                            ? "cyan"
+                            : "orange",
+                },
+            };
+            commonExtremes.push(newItem);
             i++;
             j++;
-        } else if (priceTime < signalTime) {
+        } else if (priceTime < volumeTime) {
             i++;
         } else {
             j++;
@@ -1245,13 +1244,18 @@ function findCommonExtremes(priceExtremes, volumeExtremes) {
     return commonExtremes;
 }
 function scanExtremes() {
-    const pricePeaks = findLongTermExtremes(params.data.price, true);
-    const priceValleys = findLongTermExtremes(params.data.price, false);
+    // const pricePeaks = findLongTermExtremes(params.data.price, true);
+    // const priceValleys = findLongTermExtremes(params.data.price, false);
     const volumePeaks = findLongTermExtremes(params.data.volume, true);
     const volumeValleys = findLongTermExtremes(params.data.volume, false);
-    const commonPeaks = findCommonExtremes(pricePeaks, volumePeaks);
-    const commonValleys = findCommonExtremes(priceValleys, volumeValleys);
-    params.data.vertical = mergeChartData(commonPeaks, commonValleys);
+    // const commonPeaks = findCommonExtremes(pricePeaks, volumePeaks, true);
+    // const commonValleys = findCommonExtremes(
+    //     priceValleys,
+    //     volumeValleys,
+    //     false
+    // );
+    // params.data.vertical = mergeChartData(commonPeaks, commonValleys);
+    params.data.vertical = mergeChartData(volumePeaks, volumeValleys);
     params.series.vertical.setData(params.data.vertical);
 }
 function uplpsToolClick(e) {
@@ -1731,14 +1735,6 @@ function findSuper(startTime, endTime, type, side) {
         side,
     };
 }
-function cmp(vari, value, side, eq = false) {
-    if (side) {
-        if (eq) return vari >= value;
-        return vari > value;
-    }
-    if (eq) return vari <= value;
-    return vari < value;
-}
 function removeSuperTool(withServer = true) {
     initToolsParams(["super"]);
     params.series.super.setData([]);
@@ -2167,6 +2163,19 @@ function loginVps() {
 }
 function loginDnse() {
     bus.emit("checkPin", () => store.dispatch("tradingOrder/loginDnse"));
+}
+function getTimeDistance(start, end) {
+    let distance = Math.abs(start - end);
+    if (distance > 5400) distance -= 5400;
+    return distance;
+}
+function cmp(vari, value, side, eq = false) {
+    if (side) {
+        if (eq) return vari >= value;
+        return vari > value;
+    }
+    if (eq) return vari <= value;
+    return vari < value;
 }
 </script>
 <style lang="scss">
