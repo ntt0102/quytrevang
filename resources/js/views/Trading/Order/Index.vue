@@ -1188,7 +1188,7 @@ function findLongTermExtremes(data, isPeak) {
             let newItem = {
                 time: data[i].time,
                 value: 1,
-                color: isPeak ? "green" : "darkred",
+                color: isPeak ? "lime" : "red",
                 level: data[i].value,
             };
             if (extremes.length) {
