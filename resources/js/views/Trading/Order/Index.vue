@@ -829,7 +829,7 @@ function updateChartData(data, lastVolume) {
         volumes = [];
     if (lastVolume == undefined) {
         if (params.data.volume.length == 0) return false;
-        lastVolume = params.data.volume.slice(-1)[0].value;
+        lastVolume = params.data.volume.at(-1).value;
     }
     data.forEach((item) => {
         const time = moment(item.date).unix() + SHIFT_TIME;
@@ -910,7 +910,7 @@ function connectSocket() {
                 item.target == "UpdateTrades" &&
                 item.arguments[0] == "VN30F1M"
             ) {
-                scanOrder(item.arguments[1].slice(-1)[0].price);
+                scanOrder(item.arguments[1].at(-1).price);
                 updateChartData(item.arguments[1]);
             }
         });
@@ -1778,10 +1778,7 @@ function toggleOrderButton(show) {
                         params.currentSeconds < TIME.ATC
                     ) {
                         price = coordinateToPrice(params.crosshair.y);
-                        side =
-                            price >= params.data.price.slice(-1)[0].value
-                                ? 1
-                                : -1;
+                        side = price >= params.data.price.at(-1).value ? 1 : -1;
                         params.tools.order.side = side;
                         params.tools.order.entry.price = price;
                     }
