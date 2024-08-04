@@ -1163,16 +1163,16 @@ function removeVerticalTool(withServer = true) {
         });
 }
 function findLongTermExtremes(data, isPeak) {
-    const indexRange = 24 * 3;
+    const indexRange = 24 * 6;
+    const timeRange = 60 * 6;
     const minSeconds = 120;
     let extremes = [];
-    let halfRange = Math.floor(indexRange / 2);
 
     for (let i = 0; i < data.length; i++) {
         let isExtreme = true;
         for (
-            let j = Math.max(0, i - halfRange);
-            j <= Math.min(data.length - 1, i + halfRange);
+            let j = Math.max(0, i - (2 * indexRange) / 3);
+            j <= Math.min(data.length - 1, i + indexRange / 3);
             j++
         ) {
             if (i !== j) {
@@ -1198,11 +1198,24 @@ function findLongTermExtremes(data, isPeak) {
             }
         }
         if (isExtreme) {
-            extremes.push({
+            let newItem = {
                 time: data[i].time,
                 value: 1,
                 color: isPeak ? "lime" : "red",
-            });
+                level: data[i].value,
+            };
+            if (
+                extremes.length &&
+                data[i].time - extremes.at(-1).time < timeRange
+            ) {
+                const lastExs = extremes.pop();
+                if (
+                    (isPeak && data[i].value <= lastExs.level) ||
+                    (!isPeak && data[i].value >= lastExs.level)
+                )
+                    newItem = lastExs;
+            }
+            extremes.push(newItem);
         }
     }
 
@@ -1210,7 +1223,7 @@ function findLongTermExtremes(data, isPeak) {
 }
 
 function findCommonExtremes(priceExtremes, volumeExtremes) {
-    const tolerance = 60;
+    const tolerance = 30;
     let commonExtremes = [];
 
     let i = 0,
