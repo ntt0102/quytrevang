@@ -120,6 +120,19 @@ const actions = {
             axios
                 .post("trading/order/export", { date: chartDate })
                 .then((response) => {
+                    if (response.headers["content-type"].includes("text/csv")) {
+                        var fileURL = window.URL.createObjectURL(
+                            new Blob([response.data])
+                        );
+                        var fileLink = document.createElement("a");
+                        fileLink.href = fileURL;
+                        const filename = response.headers["content-disposition"]
+                            .split("=")
+                            .pop();
+                        fileLink.setAttribute("download", filename);
+                        document.body.appendChild(fileLink);
+                        fileLink.click();
+                    }
                     resolve();
                 });
         });

@@ -327,8 +327,19 @@ class OrderChartService extends CoreService
      */
     public function export($payload)
     {
-        Artisan::call('connect:socket');
-        return ['isOk' => true];
+        $ret['download'] = false;
+        $filename = $payload->date . '.csv';
+        $file = storage_path('app/phaisinh/' . $filename);
+        if (file_exists($file)) {
+            $ret['download'] = true;
+            $ret['file'] = $file;
+            $ret['filename'] = $filename;
+            $ret['headers'] = ['Content-Type' => 'text/csv'];
+        } else {
+            Artisan::call('connect:socket');
+            $ret['isOk'] = true;
+        }
+        return $ret;
     }
 
     /**

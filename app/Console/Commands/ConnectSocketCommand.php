@@ -44,14 +44,14 @@ class ConnectSocketCommand extends Command
     {
         $connector = new Connector();
         $connector(self::ENPOINT)->then(function ($ws) {
-            echo "Connected to WebSocket server.\n";
+            // echo "Connected to WebSocket server.\n";
             $msg = '{"protocol":"json","version":1}';
             $ws->send($msg);
             $msg = '{"arguments":["VN30F1M"],"invocationId":"0","target":"SubscribeTrades","type":1}';
             $ws->send($msg);
 
             $ws->on('message', function ($msg) use ($ws) {
-                echo "Received message: \n";
+                // echo "Received message: \n";
                 $data = $this->parseSocketMessage($msg);
                 foreach ($data as $item) {
                     if (!$item) return false;
@@ -65,13 +65,13 @@ class ConnectSocketCommand extends Command
             });
 
             $ws->on('error', function ($e) {
-                echo "Error: {$e->getMessage()}\n";
+                // echo "Error: {$e->getMessage()}\n";
             });
             $ws->on('close', function ($e) {
-                echo "Close socket.\n";
+                // echo "Close socket.\n";
             });
         }, function ($e) {
-            echo "Could not connect: {$e->getMessage()}\n";
+            // echo "Could not connect: {$e->getMessage()}\n";
         });
     }
 

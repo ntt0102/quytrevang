@@ -169,6 +169,7 @@ class OrderChartController extends CoreController
     public function export(Request $request)
     {
         $data = $this->orderChartService->export($this->payload);
+        if ($data['download']) return $this->sendDownload($data);
         return $this->sendResponse($data);
     }
 
