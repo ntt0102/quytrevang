@@ -1165,9 +1165,9 @@ function removeVerticalTool(withServer = true) {
         });
 }
 function findLongTermExtremes(data, isPeak) {
-    const indexRange = 24 * 5;
-    const posTimeRange = 60 * 10;
-    const negTimeRange = 60 * 20;
+    const indexRange = 24 * 10;
+    const posTimeRange = 60 * 5;
+    const negTimeRange = 60 * 10;
     let extremes = [];
 
     for (let i = 0; i < data.length; i++) {
