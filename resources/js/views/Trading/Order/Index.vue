@@ -1244,10 +1244,10 @@ function findCommonExtremes(priceExtremes, volumeExtremes, isPeak) {
     return commonExtremes;
 }
 function scanExtremes() {
-    // const pricePeaks = findLongTermExtremes(params.data.price, true);
-    // const priceValleys = findLongTermExtremes(params.data.price, false);
-    const volumePeaks = findLongTermExtremes(params.data.volume, true);
-    const volumeValleys = findLongTermExtremes(params.data.volume, false);
+    const pricePeaks = findLongTermExtremes(params.data.price, true);
+    const priceValleys = findLongTermExtremes(params.data.price, false);
+    // const volumePeaks = findLongTermExtremes(params.data.volume, true);
+    // const volumeValleys = findLongTermExtremes(params.data.volume, false);
     // const commonPeaks = findCommonExtremes(pricePeaks, volumePeaks, true);
     // const commonValleys = findCommonExtremes(
     //     priceValleys,
@@ -1255,7 +1255,7 @@ function scanExtremes() {
     //     false
     // );
     // params.data.vertical = mergeChartData(commonPeaks, commonValleys);
-    params.data.vertical = mergeChartData(volumePeaks, volumeValleys);
+    params.data.vertical = mergeChartData(pricePeaks, priceValleys);
     params.series.vertical.setData(params.data.vertical);
 }
 function uplpsToolClick(e) {
