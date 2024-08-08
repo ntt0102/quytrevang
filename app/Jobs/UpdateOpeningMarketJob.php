@@ -29,7 +29,14 @@ class UpdateOpeningMarketJob implements ShouldQueue
      */
     public function handle()
     {
-        set_global_value('openingMarketFlag', $this->checkOpeningMarket() ? '1' : '0');
+        $isOpeningMarket = $this->checkOpeningMarket();
+        set_global_value('openingMarketFlag', $isOpeningMarket ? '1' : '0');
+        if ($isOpeningMarket) {
+            set_global_value('entryOrderId', '');
+            set_global_value('tpOrderId', '');
+            set_global_value('slOrderId', '');
+            set_global_value('exitOrderId', '');
+        }
     }
 
     /**
