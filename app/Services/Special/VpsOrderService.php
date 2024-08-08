@@ -261,7 +261,7 @@ class VpsOrderService extends CoreService
                 return ['isOk' => false, 'message' => 'failOrder'];
             else return ['isOk' => true];
         }
-        $isOk = set_global_value($type . 'OrderId', $rsp->data->stopOrderID);
+        $isOk = set_global_value($type . 'OrderId', $isNotDelete ? $rsp->data->stopOrderID : '');
         if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
         return ['isOk' => true];
     }
@@ -308,7 +308,7 @@ class VpsOrderService extends CoreService
                 return ['isOk' => false, 'message' => 'failOrder'];
             else return ['isOk' => true];
         }
-        $isOk = set_global_value($type . 'OrderId', $rsp->data[0]->orderNo);
+        $isOk = set_global_value($type . 'OrderId', $isNotCancel ? $rsp->data[0]->orderNo : '');
         if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
         return ['isOk' => true];
     }
