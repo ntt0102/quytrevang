@@ -29,17 +29,17 @@ if (!function_exists('set_global_value')) {
     }
 }
 
-if (!function_exists('trading_time')) {
+if (!function_exists('in_trading_time')) {
     /**
      * Get start trading time.
      *
      * @return string
      */
-    function trading_time($time, $onlyMin = false)
+    function in_trading_time()
     {
-        $str = Parameter::getValue($time);
-        if ($onlyMin) return substr($str, 0, 5);
-        else return $str;
+        $time = time();
+        return ($time >= strtotime('09:00:00') && $time <= strtotime('11:30:00')) ||
+            ($time >= strtotime('13:00:00') && $time <= strtotime('14:30:00'));
     }
 }
 

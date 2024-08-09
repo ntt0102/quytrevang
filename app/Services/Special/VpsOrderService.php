@@ -199,18 +199,34 @@ class VpsOrderService extends CoreService
                 $isNew = $payload->tpData->cmd == "new";
                 if ($isNew && $this->position == 0)
                     return ['isOk' => false, 'message' => 'unopenedPosition'];
-                else return $this->order($payload->action, $payload->tpData);
+                else {
+                    $tp = $this->order($payload->action, $payload->tpData);
+                    if ($tp['isOk']) {
+                        set_global_value('entryOrderId', '');
+                        set_global_value('slOrderId', '');
+                    }
+                    return $tp;
+                }
                 break;
             case 'sl':
                 $isNew = $payload->slData->cmd == "new";
                 if ($isNew && $this->position == 0)
                     return ['isOk' => false, 'message' => 'unopenedPosition'];
-                else return $this->conditionOrder($payload->action, $payload->slData);
+                else {
+                    $sl = $this->conditionOrder($payload->action, $payload->slData);
+                    if ($sl['isOk']) {
+                        set_global_value('entryOrderId', '');
+                        set_global_value('tpOrderId', '');
+                    }
+                    return $sl;
+                }
                 break;
             case 'cancel':
                 $tp = $this->order('tp', $payload->tpData);
                 if (!$tp['isOk']) return $tp;
-                return $this->conditionOrder('sl', $payload->slData);
+                $sl = $this->conditionOrder('sl', $payload->slData);
+                if ($sl['isOk']) set_global_value('entryOrderId', '');
+                return $sl;
                 break;
             case 'exit':
                 if (isset($payload->tpData)) {
@@ -221,6 +237,7 @@ class VpsOrderService extends CoreService
                     $sl = $this->conditionOrder('sl', $payload->slData);
                     if (!$sl['isOk']) return $sl;
                 }
+                set_global_value('entryOrderId', '');
                 if ($this->position == 0) return ['isOk' => true];
                 else return $this->order('exit', $payload->exitData);
                 break;
