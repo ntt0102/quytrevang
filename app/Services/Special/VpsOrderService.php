@@ -196,12 +196,9 @@ class VpsOrderService extends CoreService
                 }
                 break;
             case 'tp':
-                $isNew = $payload->tpData->cmd == "new";
-                if ($isNew && $this->position == 0)
-                    return ['isOk' => false, 'message' => 'unopenedPosition'];
-                else {
+                if ($this->position == 0) {
                     $tp = $this->order($payload->action, $payload->tpData);
-                    if ($tp['isOk']) {
+                    if ($tp['isOk'] && $payload->tpData->cmd == "cancel") {
                         set_global_value('entryOrderId', '');
                         set_global_value('slOrderId', '');
                     }
@@ -209,12 +206,9 @@ class VpsOrderService extends CoreService
                 }
                 break;
             case 'sl':
-                $isNew = $payload->slData->cmd == "new";
-                if ($isNew && $this->position == 0)
-                    return ['isOk' => false, 'message' => 'unopenedPosition'];
-                else {
+                if ($this->position == 0) {
                     $sl = $this->conditionOrder($payload->action, $payload->slData);
-                    if ($sl['isOk']) {
+                    if ($sl['isOk'] && $payload->slData->cmd == "delete") {
                         set_global_value('entryOrderId', '');
                         set_global_value('tpOrderId', '');
                     }
