@@ -270,63 +270,46 @@ function connectPusher() {
             store.dispatch("getNotify", ["notification"]);
             store.dispatch("getNotifications");
         });
-    if (user.value.permissions.includes("users@control")) {
-        pusher.subscribe("private-admin-user").bind("update-user", () => {
-            setTimeout(() => {
-                store.dispatch("getNotify", ["adminUser"]);
-                if (route.name == "admin-user")
-                    store.dispatch("adminUser/getUsers"), 2000;
-            });
+    pusher.subscribe("private-admin-user").bind("update-user", () => {
+        setTimeout(() => {
+            store.dispatch("getNotify", ["adminUser"]);
+            if (route.name == "admin-user")
+                store.dispatch("adminUser/getUsers"), 2000;
         });
-    }
-    if (user.value.permissions.includes("contracts@control")) {
-        pusher
-            .subscribe("private-admin-contract")
-            .bind("update-contract", () => {
-                setTimeout(() => {
-                    store.dispatch("getNotify", ["adminContract"]);
-                    if (route.name == "admin-contract")
-                        store.dispatch("adminContract/getContracts"), 2000;
-                });
-            });
-    }
-    if (user.value.permissions.includes("comments@control")) {
-        pusher.subscribe("private-admin-comment").bind("update-comment", () => {
-            setTimeout(() => {
-                store.dispatch("getNotify", ["adminComment"]);
-                if (route.name == "admin-comment")
-                    store.dispatch("adminComment/getComments"), 2000;
-            });
+    });
+    pusher.subscribe("private-admin-contract").bind("update-contract", () => {
+        setTimeout(() => {
+            store.dispatch("getNotify", ["adminContract"]);
+            if (route.name == "admin-contract")
+                store.dispatch("adminContract/getContracts"), 2000;
         });
-    }
-    if (user.value.permissions.includes("trades@view")) {
-        pusher
-            .subscribe("private-trading-shrstats")
-            .bind("update-statistic", () => {
-                setTimeout(() => {
-                    if (route.name == "trading-shrstats") {
-                        store.dispatch("tradingStatistic/getData");
-                        store.dispatch("tradingStatistic/getSummary");
-                        store.dispatch("tradingStatistic/getOpening");
-                        store.dispatch(
-                            "tradingStatistic/getProfitChart",
-                            store.tradingStatistic.charts.period
-                        );
-                    }
-                }, 2000);
-            });
-    }
-    if (user.value.permissions.includes("finbooks@control")) {
-        pusher
-            .subscribe("private-trading-finbook")
-            .bind("update-finbook", () => {
-                if (["finbooks", "overview"].includes(route.name))
-                    setTimeout(
-                        () => store.dispatch("tradingFinbook/getFinbook"),
-                        2000
+    });
+    pusher.subscribe("private-admin-comment").bind("update-comment", () => {
+        setTimeout(() => {
+            store.dispatch("getNotify", ["adminComment"]);
+            if (route.name == "admin-comment")
+                store.dispatch("adminComment/getComments"), 2000;
+        });
+    });
+    pusher
+        .subscribe("private-trading-shrstats")
+        .bind("update-statistic", () => {
+            setTimeout(() => {
+                if (route.name == "trading-shrstats") {
+                    store.dispatch("tradingStatistic/getData");
+                    store.dispatch("tradingStatistic/getSummary");
+                    store.dispatch("tradingStatistic/getOpening");
+                    store.dispatch(
+                        "tradingStatistic/getProfitChart",
+                        store.tradingStatistic.charts.period
                     );
-            });
-    }
+                }
+            }, 2000);
+        });
+    pusher.subscribe("private-trading-finbook").bind("update-finbook", () => {
+        if (["finbooks", "overview"].includes(route.name))
+            setTimeout(() => store.dispatch("tradingFinbook/getFinbook"), 2000);
+    });
 }
 
 onMounted(() => {

@@ -69,7 +69,7 @@ class AppService extends CoreService
                 ];
                 $comment = Comment::create($data);
                 Notification::send(
-                    User::permission('comments@control')->get(),
+                    User::permission('admin:manage_comments')->get(),
                     new SentCommentNotification($comment)
                 );
                 return ['isOk' => !!$comment];

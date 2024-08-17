@@ -31,9 +31,7 @@ class ReportTradingJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Execute the job.
@@ -49,7 +47,7 @@ class ReportTradingJob implements ShouldQueue
         //
         if (!$info) return false;
         Notification::send(
-            User::permission('trades@view')->get(),
+            User::permission('admin:statistic_derivative')->get(),
             new UpdatedTradesNotification(
                 number_format($info->vm, 0, ",", ".") . ' ₫',
                 number_format($info->fee, 0, ",", ".") . ' ₫'

@@ -66,10 +66,10 @@ class ContractService extends CoreService
 
                     case 'update':
                         $contract = Contract::where('code', $change->key)->first();
-                        if ($contract->status <= 3 || request()->user()->can('system@control')) {
+                        if ($contract->status <= 3 || request()->user()->can('admin:control_system')) {
                             $data = [];
                             $isUnconfirmed = false;
-                            if ($contract->status <= 1 || request()->user()->can('system@control')) {
+                            if ($contract->status <= 1 || request()->user()->can('admin:control_system')) {
                                 $isUnconfirmed = true;
                                 $oldUserCode = $contract->user_code;
                                 $data = array_merge($data, [
@@ -108,7 +108,7 @@ class ContractService extends CoreService
 
                     case 'remove':
                         $contract = Contract::where('code', $change->key)->first();
-                        if ($contract->status == 1 || request()->user()->can('system@control')) {
+                        if ($contract->status == 1 || request()->user()->can('admin:control_system')) {
                             $isOk = $contract->delete();
                             if ($isOk) {
                                 $path = 'public/' . md5($contract->user_code) . '/c/';

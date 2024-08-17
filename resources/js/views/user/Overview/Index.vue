@@ -1,10 +1,10 @@
 <template>
     <div class="overview-page">
-        <!-- <TradeSummary v-if="user.permissions.includes('trades@view')" /> -->
+        <!-- <TradeSummary v-if="user.permissions.includes('admin:statistic_derivative')" /> -->
         <LevelBar v-if="user.level < 6" />
         <!-- <MonthTrade v-if="user.level > 1" /> -->
-        <Finbook v-if="user.permissions.includes('finbooks@control')" />
-        <Summary v-if="user.permissions.includes('contracts@control')" />
+        <Finbook v-if="user.permissions.includes('admin:access_finbooks')" />
+        <Summary v-if="user.permissions.includes('admin:manage_contracts')" />
         <Contracts v-if="user.level >= 6" />
     </div>
 </template>

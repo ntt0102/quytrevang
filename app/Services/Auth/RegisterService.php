@@ -41,7 +41,7 @@ class RegisterService extends CoreService
             $token->save();
 
             Notification::send(
-                User::permission('users@control')->get(),
+                User::permission('admin:manage_users')->get(),
                 new RegisteredUserNotification($user)
             );
 

@@ -163,7 +163,9 @@
                         {
                             visible:
                                 (data.data.status == 2 &&
-                                    permissions.includes('system@control')) ||
+                                    permissions.includes(
+                                        'admin:control_system'
+                                    )) ||
                                 [0, 1].includes(data.data.status),
                             locateInMenu: 'auto',
                             showText: 'inMenu',
@@ -196,7 +198,9 @@
                             visible:
                                 data.data.status == 3 ||
                                 (data.data.status == 4 &&
-                                    permissions.includes('system@control')),
+                                    permissions.includes(
+                                        'admin:control_system'
+                                    )),
                             locateInMenu: 'auto',
                             showText: 'inMenu',
                             location: 'center',
@@ -233,7 +237,7 @@
                         {
                             visible:
                                 data.data.status <= 3 ||
-                                permissions.includes('system@control'),
+                                permissions.includes('admin:control_system'),
                             locateInMenu: 'auto',
                             showText: 'inMenu',
                             location: 'center',
@@ -250,7 +254,7 @@
                         {
                             visible:
                                 data.data.status == 0 ||
-                                permissions.includes('system@control'),
+                                permissions.includes('admin:control_system'),
                             locateInMenu: 'auto',
                             showText: 'inMenu',
                             location: 'center',
@@ -419,7 +423,7 @@ function onInitNewRow(e) {
     dataGridRef.value.instance.columnOption(
         "interest_rate",
         "allowEditing",
-        permissions.value.includes("system@control")
+        permissions.value.includes("admin:control_system")
     );
     dataGridRef.value.instance.option(
         "editing.popup.title",
@@ -430,22 +434,22 @@ function onEditingStart(e) {
     dataGridRef.value.instance.columnOption(
         "user_code",
         "allowEditing",
-        e.data.status == 1 || permissions.value.includes("system@control")
+        e.data.status == 1 || permissions.value.includes("admin:control_system")
     );
     dataGridRef.value.instance.columnOption(
         "principal",
         "allowEditing",
-        e.data.status == 1 || permissions.value.includes("system@control")
+        e.data.status == 1 || permissions.value.includes("admin:control_system")
     );
     dataGridRef.value.instance.columnOption(
         "interest_rate",
         "allowEditing",
-        permissions.value.includes("system@control")
+        permissions.value.includes("admin:control_system")
     );
     dataGridRef.value.instance.columnOption(
         "paid_at",
         "allowEditing",
-        e.data.status == 1 || permissions.value.includes("system@control")
+        e.data.status == 1 || permissions.value.includes("admin:control_system")
     );
     dataGridRef.value.instance.columnOption(
         "withdrawn_at",

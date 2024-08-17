@@ -52,7 +52,7 @@ class ProfileService extends CoreService
                 $isOk = $user->update($data);
                 if ($isOk && $isFirstUpdate) {
                     Notification::send(
-                        User::permission('users@control')->get(),
+                        User::permission('admin:manage_users')->get(),
                         new ConfirmingUserNotification(request()->user())
                     );
                 }

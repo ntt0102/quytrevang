@@ -20,9 +20,9 @@
                 :loadPanel="{ enabled: true }"
                 :selection="{ mode: 'single' }"
                 :editing="{
-                    allowAdding: permissions.includes(state.editPermission),
-                    allowUpdating: permissions.includes(state.editPermission),
-                    allowDeleting: permissions.includes(state.editPermission),
+                    allowAdding: true,
+                    allowUpdating: true,
+                    allowDeleting: true,
                     mode: 'batch',
                     startEditAction: 'dblClick',
                 }"
@@ -33,7 +33,7 @@
             >
                 <DxColumn
                     :fixed="true"
-                    :visible="permissions.includes(state.editPermission)"
+                    :visible="false"
                     :width="35"
                     type="buttons"
                     cssClass="dx-datagrid-command-column"
@@ -146,7 +146,6 @@ const popupRef = ref(null);
 const dataGridRef = ref(null);
 const state = reactive({
     gridData: null,
-    editPermission: "trades@edit",
     validationRules: {
         amount: [
             {

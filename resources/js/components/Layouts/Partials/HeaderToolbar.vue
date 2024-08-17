@@ -255,11 +255,11 @@ const notificationDropdown = ref([]);
 const disabledSwitch = ref(false);
 const menuNotifications = computed(() => {
     let count = 0;
-    if (user.value.permissions.includes("users@control"))
+    if (user.value.permissions.includes("admin:manage_users"))
         count += notify.value.adminUser;
-    if (user.value.permissions.includes("contracts@control"))
+    if (user.value.permissions.includes("admin:manage_contracts"))
         count += notify.value.adminContract;
-    if (user.value.permissions.includes("comments@control"))
+    if (user.value.permissions.includes("admin:manage_comments"))
         count += notify.value.adminComment;
     return count;
 });

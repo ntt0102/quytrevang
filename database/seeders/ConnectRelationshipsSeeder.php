@@ -18,43 +18,44 @@ class ConnectRelationshipsSeeder extends Seeder
          * Attach Permissions to User.
          */
         $userRole = Role::where('name', 'user')->first();
-        $userRole->givePermissionTo('common@access');
+        $userRole->givePermissionTo('user:access_overview');
+        $userRole->givePermissionTo('user:access_profile');
+        $userRole->givePermissionTo('user:access_contract');
 
         /**
          * Attach Permissions to Assistant.
          */
         $assistantRole = Role::where('name', 'assistant')->first();
-        $assistantRole->givePermissionTo('users@control');
-        $assistantRole->givePermissionTo('contracts@control');
-        $assistantRole->givePermissionTo('copyists@control');
-        $assistantRole->givePermissionTo('notification@setting');
-        $assistantRole->givePermissionTo('files@setting');
-        $assistantRole->givePermissionTo('faqs@setting');
+        $assistantRole->givePermissionTo('admin:manage_users');
+        $assistantRole->givePermissionTo('admin:manage_contracts');
+        $assistantRole->givePermissionTo('admin:setting_notification');
+        $assistantRole->givePermissionTo('admin:setting_files');
+        $assistantRole->givePermissionTo('admin:setting_faqs');
 
         /**
          * Attach Permissions to Admin.
          */
         $adminRole = Role::where('name', 'admin')->first();
-        $adminRole->givePermissionTo('system@control');
+        $adminRole->givePermissionTo('admin:control_system');
 
-        $adminRole->givePermissionTo('users@control');
-        $adminRole->givePermissionTo('contracts@control');
-        $adminRole->givePermissionTo('copyists@control');
-        $adminRole->givePermissionTo('comments@control');
+        $adminRole->givePermissionTo('admin:manage_users');
+        $adminRole->givePermissionTo('admin:manage_contracts');
+        $adminRole->givePermissionTo('admin:manage_comments');
 
-        $adminRole->givePermissionTo('stock@order');
-        $adminRole->givePermissionTo('trades@view');
-        $adminRole->givePermissionTo('trades@edit');
-        $adminRole->givePermissionTo('finbooks@control');
+        $adminRole->givePermissionTo('admin:order_derivative');
+        $adminRole->givePermissionTo('admin:statistic_derivative');
+        $adminRole->givePermissionTo('admin:access_share');
+        $adminRole->givePermissionTo('admin:statistic_share');
+        $adminRole->givePermissionTo('admin:access_finbooks');
 
-        $adminRole->givePermissionTo('command@setting');
-        $adminRole->givePermissionTo('notification@setting');
-        $adminRole->givePermissionTo('files@setting');
-        $adminRole->givePermissionTo('log@setting');
-        $adminRole->givePermissionTo('faqs@setting');
-        $adminRole->givePermissionTo('parameters@setting');
-        $adminRole->givePermissionTo('database@setting');
-        $adminRole->givePermissionTo('roles@setting');
-        $adminRole->givePermissionTo('permissions@setting');
+        $adminRole->givePermissionTo('admin:setting_command');
+        $adminRole->givePermissionTo('admin:setting_notification');
+        $adminRole->givePermissionTo('admin:setting_files');
+        $adminRole->givePermissionTo('admin:setting_log');
+        $adminRole->givePermissionTo('admin:setting_faqs');
+        $adminRole->givePermissionTo('admin:setting_parameters');
+        $adminRole->givePermissionTo('admin:setting_database');
+        $adminRole->givePermissionTo('admin:setting_roles');
+        $adminRole->givePermissionTo('admin:setting_permissions');
     }
 }

@@ -62,7 +62,7 @@ class ContractService extends CoreService
                         ];
                         $contract = Contract::create($data);
                         Notification::send(
-                            User::permission('contracts@control')->get(),
+                            User::permission('admin:manage_contracts')->get(),
                             new CreatedContractNotification($contract)
                         );
                         $response['isOk'] = !!$contract;
@@ -123,7 +123,7 @@ class ContractService extends CoreService
             );
             if ($isOk && $isFirstPaid)
                 Notification::send(
-                    User::permission('contracts@control')->get(),
+                    User::permission('admin:manage_contracts')->get(),
                     new PayingContractNotification($contract)
                 );
             return ['isOk' => $isOk];
@@ -147,7 +147,7 @@ class ContractService extends CoreService
                 $isOk = $contract->update($data);
                 if ($isOk)
                     Notification::send(
-                        User::permission('contracts@control')->get(),
+                        User::permission('admin:manage_contracts')->get(),
                         new WithdrawingContractNotification($contract)
                     );
                 return ['isOk' => $isOk];

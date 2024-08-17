@@ -83,7 +83,7 @@ const authRoute = [
         name: "overview",
         meta: {
             auth: true,
-            permission: "common@access",
+            permission: "user:access_overview",
             title: lang.global.t("user.overview.title"),
             layout: AuthLayout,
         },
@@ -94,7 +94,7 @@ const authRoute = [
         name: "profile",
         meta: {
             auth: true,
-            permission: "common@access",
+            permission: "user:access_profile",
             title: lang.global.t("user.profile.title"),
             layout: AuthLayout,
         },
@@ -105,22 +105,11 @@ const authRoute = [
         name: "contract",
         meta: {
             auth: true,
-            permission: "common@access",
+            permission: "user:access_contract",
             title: lang.global.t("user.contract.title"),
             layout: AuthLayout,
         },
         component: loadView("User", "Contract", "Index"),
-    },
-    {
-        path: `/${lang.global.t("route.copyist")}`,
-        name: "copyist",
-        meta: {
-            auth: true,
-            permission: "common@access",
-            title: lang.global.t("user.copyist.title"),
-            layout: AuthLayout,
-        },
-        component: loadView("User", "Copyist", "Index"),
     },
     // Manager
     {
@@ -128,7 +117,7 @@ const authRoute = [
         name: "admin-user",
         meta: {
             auth: true,
-            permission: "users@control",
+            permission: "admin:manage_users",
             title: lang.global.t("admin.users.title"),
             layout: AuthLayout,
         },
@@ -139,29 +128,18 @@ const authRoute = [
         name: "admin-contract",
         meta: {
             auth: true,
-            permission: "contracts@control",
+            permission: "admin:manage_contracts",
             title: lang.global.t("admin.contracts.title"),
             layout: AuthLayout,
         },
         component: loadView("Admin", "Contract", "Index"),
     },
     {
-        path: `/${lang.global.t("route.adminCopyist")}`,
-        name: "admin-copyist",
-        meta: {
-            auth: true,
-            permission: "copyists@control",
-            title: lang.global.t("admin.copyists.title"),
-            layout: AuthLayout,
-        },
-        component: loadView("Admin", "Copyist", "Index"),
-    },
-    {
         path: `/${lang.global.t("route.adminComment")}`,
         name: "admin-comment",
         meta: {
             auth: true,
-            permission: "comments@control",
+            permission: "admin:manage_comments",
             title: lang.global.t("admin.comments.title"),
             layout: AuthLayout,
         },
@@ -173,18 +151,29 @@ const authRoute = [
         name: "trading-derivative",
         meta: {
             auth: true,
-            permission: "stock@order",
+            permission: "admin:order_derivative",
             title: lang.global.t("trading.derivative.title"),
             layout: AuthLayout,
         },
         component: loadView("Trading", "Order", "Index"),
     },
     {
+        path: `/${lang.global.t("route.tradingStatistic1")}`,
+        name: "trading-derstats",
+        meta: {
+            auth: true,
+            permission: "admin:statistic_derivative",
+            title: lang.global.t("trading.derstats.title"),
+            layout: AuthLayout,
+        },
+        component: loadView("Trading", "Statistic1", "Index"),
+    },
+    {
         path: `/${lang.global.t("route.tradingStock")}`,
         name: "trading-share",
         meta: {
             auth: true,
-            permission: "stock@order",
+            permission: "admin:access_share",
             title: lang.global.t("trading.share.title"),
             layout: AuthLayout,
         },
@@ -195,29 +184,18 @@ const authRoute = [
         name: "trading-shrstats",
         meta: {
             auth: true,
-            permission: "stock@order",
+            permission: "admin:statistic_share",
             title: lang.global.t("trading.shrstats.title"),
             layout: AuthLayout,
         },
         component: loadView("Trading", "Statistic", "Index"),
     },
     {
-        path: `/${lang.global.t("route.tradingStatistic1")}`,
-        name: "trading-derstats",
-        meta: {
-            auth: true,
-            permission: "stock@order",
-            title: lang.global.t("trading.derstats.title"),
-            layout: AuthLayout,
-        },
-        component: loadView("Trading", "Statistic1", "Index"),
-    },
-    {
         path: `/${lang.global.t("route.tradingFinbook")}`,
         name: "trading-finbook",
         meta: {
             auth: true,
-            permission: "finbooks@control",
+            permission: "admin:access_finbooks",
             title: lang.global.t("trading.finbooks.title"),
             layout: AuthLayout,
         },
@@ -229,7 +207,7 @@ const authRoute = [
         name: "setting-command",
         meta: {
             auth: true,
-            permission: "command@setting",
+            permission: "admin:setting_command",
             title: lang.global.t("settings.command.title"),
             layout: AuthLayout,
         },
@@ -240,7 +218,7 @@ const authRoute = [
         name: "setting-notification",
         meta: {
             auth: true,
-            permission: "notification@setting",
+            permission: "admin:setting_notification",
             title: lang.global.t("settings.notification.title"),
             layout: AuthLayout,
         },
@@ -251,7 +229,7 @@ const authRoute = [
         name: "setting-file",
         meta: {
             auth: true,
-            permission: "files@setting",
+            permission: "admin:setting_files",
             title: lang.global.t("settings.files.title"),
             layout: AuthLayout,
         },
@@ -262,7 +240,7 @@ const authRoute = [
         name: "setting-log",
         meta: {
             auth: true,
-            permission: "log@setting",
+            permission: "admin:setting_log",
             title: lang.global.t("settings.log.title"),
             layout: AuthLayout,
         },
@@ -273,7 +251,7 @@ const authRoute = [
         name: "setting-faq",
         meta: {
             auth: true,
-            permission: "faqs@setting",
+            permission: "admin:setting_faqs",
             title: lang.global.t("settings.faqs.title"),
             layout: AuthLayout,
         },
@@ -284,7 +262,7 @@ const authRoute = [
         name: "setting-parameter",
         meta: {
             auth: true,
-            permission: "parameters@setting",
+            permission: "admin:setting_parameters",
             title: lang.global.t("settings.parameters.title"),
             layout: AuthLayout,
         },
@@ -295,7 +273,7 @@ const authRoute = [
         name: "setting-database",
         meta: {
             auth: true,
-            permission: "database@setting",
+            permission: "admin:setting_database",
             title: lang.global.t("settings.database.title"),
             layout: AuthLayout,
         },
@@ -306,7 +284,7 @@ const authRoute = [
         name: "setting-role",
         meta: {
             auth: true,
-            permission: "roles@setting",
+            permission: "admin:setting_roles",
             title: lang.global.t("settings.roles.title"),
             layout: AuthLayout,
         },
@@ -317,7 +295,7 @@ const authRoute = [
         name: "setting-permission",
         meta: {
             auth: true,
-            permission: "permissions@setting",
+            permission: "admin:setting_permissions",
             title: lang.global.t("settings.permissions.title"),
             layout: AuthLayout,
         },

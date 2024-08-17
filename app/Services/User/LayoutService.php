@@ -24,11 +24,11 @@ class LayoutService extends CoreService
         if (in_array("notification", $types)) {
             $ret['notification'] = $user->unreadNotifications->count();
         }
-        if ($user->can('users@control') && in_array("adminUser", $types)) {
+        if ($user->can('admin:manage_users') && in_array("adminUser", $types)) {
             $ret['adminUser'] = User::whereNotNull('phone')->whereNull('deleted_at')
                 ->where('documents', '[]')->count();
         }
-        if ($user->can('contracts@control') && in_array("adminContract", $types)) {
+        if ($user->can('admin:manage_contracts') && in_array("adminContract", $types)) {
             $ret['adminContract'] = Contract::orWhere(function ($query) {
                 $query->where('paid_at', '<>', null)->where('paid_docs', '[]');
             })
@@ -36,7 +36,7 @@ class LayoutService extends CoreService
                     $query->where('withdrawn_at', '<>', null)->where('withdrawn_docs', '[]');
                 })->count();
         }
-        if ($user->can('comments@control') && in_array("adminComment", $types)) {
+        if ($user->can('admin:manage_comments') && in_array("adminComment", $types)) {
             $ret['adminComment'] = Comment::where('read', 0)->count();
         }
 

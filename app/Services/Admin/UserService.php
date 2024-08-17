@@ -67,7 +67,7 @@ class UserService extends CoreService
                             "password" => bcrypt($change->data->phone),
                         ]);
                         $user = User::create($data);
-                        if (request()->user()->can('system@control')) {
+                        if (request()->user()->can('admin:control_system')) {
                             $user->syncRoles($change->data->roles);
                             $user->syncPermissions($change->data->permissions);
                         } else $user->assignRole('user');
@@ -76,9 +76,9 @@ class UserService extends CoreService
 
                     case 'update':
                         $user = User::where('code', $change->key)->first();
-                        if ($user->level <= 4 || request()->user()->can('system@control')) {
+                        if ($user->level <= 4 || request()->user()->can('admin:control_system')) {
                             $response['isOk'] = $user->update($data);
-                            if (request()->user()->can('system@control')) {
+                            if (request()->user()->can('admin:control_system')) {
                                 $user->syncRoles($change->data->roles);
                                 $user->syncPermissions($change->data->permissions);
                             }
@@ -137,7 +137,7 @@ class UserService extends CoreService
     {
         return $this->transaction(function () use ($payload) {
             $user = User::find((int) $payload->userId);
-            if (in_array($user->level, [4, 5]) || request()->user()->can('system@control')) {
+            if (in_array($user->level, [4, 5]) || request()->user()->can('admin:control_system')) {
                 $isFirstUpload = count($user->documents) == 0;
                 $path = 'public/' . md5($user->code) . '/u/d/';
 

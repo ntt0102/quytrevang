@@ -79,7 +79,7 @@ class FilterStockJob implements ShouldQueue
         if ($this->payload->kind == self::F_BOTTOM)
             StockSymbol::updateOrCreate(['name' => self::F_BOTTOM], ['symbols' => $rBottom]);
         Notification::send(
-            User::permission('trades@edit')->get(),
+            User::permission('admin:access_share')->get(),
             new FilteredStockNotification($this->payload->kind)
         );
         // \Log::info('End filter');

@@ -87,7 +87,9 @@
                             ],
                         },
                         {
-                            visible: permissions.includes('system@control'),
+                            visible: permissions.includes(
+                                'admin:control_system'
+                            ),
                             colCount: 2,
                             colSpan: 2,
                             itemType: 'group',
@@ -261,7 +263,7 @@
                 :caption="$t('models.user.accountNumber')"
             />
             <DxColumn
-                v-if="permissions.includes('system@control')"
+                v-if="permissions.includes('admin:control_system')"
                 :visible="false"
                 :allow-sorting="false"
                 data-field="roles"
@@ -278,7 +280,7 @@
                 }"
             />
             <DxColumn
-                v-if="permissions.includes('system@control')"
+                v-if="permissions.includes('admin:control_system')"
                 :visible="false"
                 :allow-sorting="false"
                 data-field="permissions"
@@ -326,7 +328,7 @@
                         {
                             visible:
                                 [4, 5].includes(data.data.level) ||
-                                (permissions.includes('system@control') &&
+                                (permissions.includes('admin:control_system') &&
                                     data.data.level > 5),
                             locateInMenu: 'auto',
                             showText: 'inMenu',
@@ -380,8 +382,9 @@
                         {
                             visible:
                                 !data.data.permissions.includes(
-                                    'system@control'
-                                ) || permissions.includes('system@control'),
+                                    'admin:control_system'
+                                ) ||
+                                permissions.includes('admin:control_system'),
                             locateInMenu: 'auto',
                             showText: 'inMenu',
                             location: 'center',
@@ -400,7 +403,7 @@
                                 data.data.level <= 6 &&
                                 data.data.code != code &&
                                 !data.data.permissions.includes(
-                                    'system@control'
+                                    'admin:control_system'
                                 ),
                             locateInMenu: 'auto',
                             showText: 'inMenu',

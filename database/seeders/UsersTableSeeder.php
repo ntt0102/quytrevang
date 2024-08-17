@@ -61,8 +61,8 @@ class UsersTableSeeder extends Seeder
         ]);
         $user->assignRole('user');
         $user->assignRole('assistant');
-        $user->givePermissionTo('trades@view');
-        $user->givePermissionTo('finbooks@control');
+        // $user->givePermissionTo('admin:statistic_derivative');
+        $user->givePermissionTo('admin:access_finbooks');
 
         $user = User::create([
             'code'     => '100001',
