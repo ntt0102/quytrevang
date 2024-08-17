@@ -28,10 +28,10 @@ Broadcast::channel('admin-contract', function ($user) {
 Broadcast::channel('admin-comment', function ($user) {
     return $user->can('comments@control');
 });
-Broadcast::channel('trading-statistic1', function ($user) {
+Broadcast::channel('trading-derstats', function ($user) {
     return $user->hasAnyPermission(['trades@view', 'trades@edit']);
 });
-Broadcast::channel('trading-stock', function ($user) {
+Broadcast::channel('trading-share', function ($user) {
     return $user->can('trades@edit');
 });
 Broadcast::channel('trading-finbook', function ($user) {

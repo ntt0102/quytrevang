@@ -4,7 +4,7 @@
         :width="400"
         :height="190"
         class="vps-otp-popup"
-        :title="$t('trading.orderChart.buttons.loginVps')"
+        :title="$t('trading.derivative.buttons.loginVps')"
         @shown="onShown"
         @hidden="onHidden"
     >

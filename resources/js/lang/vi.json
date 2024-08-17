@@ -158,7 +158,7 @@
     },
     "trading": {
         "title": "Đầu tư",
-        "orderChart": {
+        "derivative": {
             "title": "Phái sinh",
             "connection": "Trạng thái kết nối VPS",
             "position": "Vị thế đang mở",
@@ -219,7 +219,44 @@
                 "loginDnse": "Đăng nhập DNSE"
             }
         },
-        "stock": {
+        "derstats": {
+            "title": "Thống kê PS",
+            "amount": "Số HĐ",
+            "scores": "Điểm TT",
+            "revenue": "Lãi",
+            "loss": "Lỗ",
+            "fees": "Phí",
+            "date": "Ngày",
+            "validations": {
+                "date": "Không được trùng ngày"
+            },
+            "charTitle": "Kết quả đầu tư",
+            "chartSubtitle": "Biểu đồ",
+            "profitPerPrincipal": "Lợi nhuận trên vốn",
+            "profitPerFees": "Lợi nhuận trên phí",
+            "principalAvg": "Vốn trung bình",
+            "revenueSum": "Tổng tiền lãi",
+            "lossSum": "Tổng tiền lỗ",
+            "feesSum": "Tổng tiền phí",
+            "profitSum": "Tổng lợi nhuận",
+            "accumulatedProfit": "Lợi nhuận lũy kế",
+            "kpi": "KPI",
+            "selects": {
+                "period": {
+                    "day": "Ngày",
+                    "week": "Tuần",
+                    "month": "Tháng",
+                    "quarter": "Quý",
+                    "year": "Năm",
+                    "all": "Tất cả"
+                }
+            },
+            "buttons": {
+                "more": "Xem nhiều hơn",
+                "addData": "Dữ liệu"
+            }
+        },
+        "share": {
             "title": "Cổ phiếu",
             "symbol": "Mã chứng khoán",
             "cloneSymbols": "Tạo danh sách mã",
@@ -260,7 +297,7 @@
             "event": "Sự kiện",
             "date": "Ngày {date}"
         },
-        "statistic": {
+        "shrstats": {
             "title": "Thống kê CP",
             "symbol": "Mã",
             "buy": "Mua",
@@ -305,43 +342,6 @@
                 "volume": "KL",
                 "profit": "Lãi",
                 "totalProfit": "Tổng lãi chưa đóng"
-            }
-        },
-        "trades": {
-            "title": "Thống kê PS",
-            "amount": "Số HĐ",
-            "scores": "Điểm TT",
-            "revenue": "Lãi",
-            "loss": "Lỗ",
-            "fees": "Phí",
-            "date": "Ngày",
-            "validations": {
-                "date": "Không được trùng ngày"
-            },
-            "charTitle": "Kết quả đầu tư",
-            "chartSubtitle": "Biểu đồ",
-            "profitPerPrincipal": "Lợi nhuận trên vốn",
-            "profitPerFees": "Lợi nhuận trên phí",
-            "principalAvg": "Vốn trung bình",
-            "revenueSum": "Tổng tiền lãi",
-            "lossSum": "Tổng tiền lỗ",
-            "feesSum": "Tổng tiền phí",
-            "profitSum": "Tổng lợi nhuận",
-            "accumulatedProfit": "Lợi nhuận lũy kế",
-            "kpi": "KPI",
-            "selects": {
-                "period": {
-                    "day": "Ngày",
-                    "week": "Tuần",
-                    "month": "Tháng",
-                    "quarter": "Quý",
-                    "year": "Năm",
-                    "all": "Tất cả"
-                }
-            },
-            "buttons": {
-                "more": "Xem nhiều hơn",
-                "addData": "Dữ liệu"
             }
         },
         "finbooks": {

@@ -20,7 +20,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-backward small',
-                        hint: $t('trading.statistic.buttons.more'),
+                        hint: $t('trading.shrstats.buttons.more'),
                         elementAttr: { 'data-page': charts.page },
                         onClick: () =>
                             $store.dispatch('tradingStatistic/lazyLoad'),
@@ -31,7 +31,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-database small',
-                        hint: $t('trading.statistic.buttons.addData'),
+                        hint: $t('trading.shrstats.buttons.addData'),
                         onClick: () => $refs.trackStatisticPopupRef.show(),
                     },
                 },
@@ -63,7 +63,7 @@
             :data-source="charts.data"
             :customize-point="customizePoint"
             :title="{
-                text: $t('trading.statistic.charTitle'),
+                text: $t('trading.shrstats.charTitle'),
                 horizontalAlignment: 'center',
             }"
             :size="{ width: '100%' }"
@@ -82,7 +82,7 @@
             :commonSeriesSettings="{ argumentField: 'date', barPadding: 0 }"
             :series="[
                 {
-                    name: $t('trading.statistic.profitSum'),
+                    name: $t('trading.shrstats.profitSum'),
                     tag: 'profit',
                     valueField: 'profit',
                     axis: 'profit',
@@ -91,7 +91,7 @@
                     visible: visibleSeries.profit,
                 },
                 {
-                    name: $t('trading.statistic.rr'),
+                    name: $t('trading.shrstats.rr'),
                     tag: 'rr',
                     valueField: 'rr',
                     axis: 'rr',
@@ -100,7 +100,7 @@
                     visible: visibleSeries.rr,
                 },
                 {
-                    name: $t('trading.statistic.winrate'),
+                    name: $t('trading.shrstats.winrate'),
                     tag: 'winrate',
                     valueField: 'winrate',
                     axis: 'winrate',
@@ -109,7 +109,7 @@
                     visible: visibleSeries.winrate,
                 },
                 {
-                    name: $t('trading.statistic.accProfit'),
+                    name: $t('trading.shrstats.accProfit'),
                     tag: 'accProfit',
                     valueField: 'accProfit',
                     axis: 'accProfit',
@@ -284,7 +284,7 @@ function customizeTooltip(pointInfo) {
                 <div class='tooltip-body'>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.statistic.profitSum")}
+                      ${t("trading.shrstats.profitSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -296,7 +296,7 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.statistic.rr")}
+                      ${t("trading.shrstats.rr")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -309,7 +309,7 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.statistic.winrate")}
+                      ${t("trading.shrstats.winrate")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -322,7 +322,7 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.statistic.accProfit")}
+                      ${t("trading.shrstats.accProfit")}
                     </span>:
                   </div>
                   <div class='value-text'>

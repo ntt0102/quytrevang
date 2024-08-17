@@ -1,10 +1,10 @@
 <template>
     <div class="overview-trading dx-card responsive-paddings content-block">
-        <div class="header">{{ $t("trading.trades.charTitle") }}</div>
+        <div class="header">{{ $t("trading.derstats.charTitle") }}</div>
         <div class="body">
             <div @click="viewDetail('day')">
                 <div class="period">
-                    {{ $t("trading.trades.selects.period.day") }}
+                    {{ $t("trading.derstats.selects.period.day") }}
                 </div>
                 <div
                     v-if="$mf.isSet(summary)"
@@ -22,7 +22,7 @@
             </div>
             <div @click="viewDetail('week')">
                 <div class="period">
-                    {{ $t("trading.trades.selects.period.week") }}
+                    {{ $t("trading.derstats.selects.period.week") }}
                 </div>
                 <div
                     v-if="$mf.isSet(summary)"
@@ -40,7 +40,7 @@
             </div>
             <div @click="viewDetail('month')">
                 <div class="period">
-                    {{ $t("trading.trades.selects.period.month") }}
+                    {{ $t("trading.derstats.selects.period.month") }}
                 </div>
                 <div
                     v-if="$mf.isSet(summary)"
@@ -58,7 +58,7 @@
             </div>
             <div @click="viewDetail('quater')">
                 <div class="period">
-                    {{ $t("trading.trades.selects.period.quarter") }}
+                    {{ $t("trading.derstats.selects.period.quarter") }}
                 </div>
                 <div
                     v-if="$mf.isSet(summary)"
@@ -76,7 +76,7 @@
             </div>
             <div @click="viewDetail('year')">
                 <div class="period">
-                    {{ $t("trading.trades.selects.period.year") }}
+                    {{ $t("trading.derstats.selects.period.year") }}
                 </div>
                 <div
                     v-if="$mf.isSet(summary)"
@@ -94,7 +94,7 @@
             </div>
             <div @click="viewDetail('year')">
                 <div class="period">
-                    {{ $t("trading.trades.selects.period.all") }}
+                    {{ $t("trading.derstats.selects.period.all") }}
                 </div>
                 <div
                     v-if="$mf.isSet(summary)"
@@ -164,7 +164,7 @@ watch(
     }
 );
 function viewDetail(period) {
-    router.push({ name: "trading-statistic1", query: { period } });
+    router.push({ name: "trading-derstats", query: { period } });
 }
 function animatedNumber(type) {
     if (

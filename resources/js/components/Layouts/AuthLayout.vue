@@ -256,7 +256,7 @@ function connectPusher() {
                                 store.dispatch("adminComment/getComments");
                             break;
                         case "filtered-stock":
-                            if (route.name == "trading-stock") {
+                            if (route.name == "trading-share") {
                                 store.dispatch("tradingStock/getSymbols");
                             }
                             break;
@@ -301,10 +301,10 @@ function connectPusher() {
     }
     if (user.value.permissions.includes("trades@view")) {
         pusher
-            .subscribe("private-trading-statistic")
+            .subscribe("private-trading-shrstats")
             .bind("update-statistic", () => {
                 setTimeout(() => {
-                    if (route.name == "trading-statistic") {
+                    if (route.name == "trading-shrstats") {
                         store.dispatch("tradingStatistic/getData");
                         store.dispatch("tradingStatistic/getSummary");
                         store.dispatch("tradingStatistic/getOpening");

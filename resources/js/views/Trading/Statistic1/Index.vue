@@ -18,7 +18,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-backward small',
-                        hint: $t('trading.trades.buttons.more'),
+                        hint: $t('trading.derstats.buttons.more'),
                         elementAttr: { 'data-page': charts.page },
                         onClick: () =>
                             $store.dispatch('tradingStatistic1/lazyLoad'),
@@ -29,7 +29,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-database small',
-                        hint: $t('trading.trades.buttons.addData'),
+                        hint: $t('trading.derstats.buttons.addData'),
                         onClick: () => $refs.trackStatisticPopupRef.show(),
                     },
                 },
@@ -61,7 +61,7 @@
             :data-source="charts.data"
             :customize-point="customizePoint"
             :title="{
-                text: $t('trading.trades.charTitle'),
+                text: $t('trading.derstats.charTitle'),
                 horizontalAlignment: 'center',
             }"
             :size="{ width: '100%' }"
@@ -80,7 +80,7 @@
             :commonSeriesSettings="{ argumentField: 'time', barPadding: 0 }"
             :series="[
                 {
-                    name: $t('trading.trades.profitSum'),
+                    name: $t('trading.derstats.profitSum'),
                     tag: 'money',
                     valueField: 's3',
                     axis: 'money',
@@ -90,7 +90,7 @@
                     visible: visibleSeries.money,
                 },
                 {
-                    name: $t('trading.trades.lossSum'),
+                    name: $t('trading.derstats.lossSum'),
                     valueField: 's4',
                     axis: 'money',
                     type: 'stackedbar',
@@ -100,7 +100,7 @@
                     visible: visibleSeries.money,
                 },
                 {
-                    name: $t('trading.trades.feesSum'),
+                    name: $t('trading.derstats.feesSum'),
                     valueField: 's5',
                     axis: 'money',
                     type: 'stackedbar',
@@ -111,7 +111,7 @@
                 },
 
                 {
-                    name: $t('trading.trades.feesSum'),
+                    name: $t('trading.derstats.feesSum'),
                     valueField: 's2',
                     axis: 'money',
                     type: 'stackedbar',
@@ -121,7 +121,7 @@
                     visible: visibleSeries.money,
                 },
                 {
-                    name: $t('trading.trades.lossSum'),
+                    name: $t('trading.derstats.lossSum'),
                     valueField: 's1',
                     axis: 'money',
                     type: 'stackedbar',
@@ -132,7 +132,7 @@
                 },
 
                 {
-                    name: $t('trading.trades.profitPerPrincipal'),
+                    name: $t('trading.derstats.profitPerPrincipal'),
                     tag: 'profitPerPrincipal',
                     valueField: 'profitPerPrincipal',
                     axis: 'profitPerPrincipal',
@@ -142,7 +142,7 @@
                     visible: visibleSeries.profitPerPrincipal,
                 },
                 {
-                    name: $t('trading.trades.profitPerFees'),
+                    name: $t('trading.derstats.profitPerFees'),
                     tag: 'profitPerFees',
                     valueField: 'profitPerFees',
                     axis: 'profitPerFees',
@@ -152,7 +152,7 @@
                     visible: visibleSeries.profitPerFees,
                 },
                 {
-                    name: $t('trading.trades.accumulatedProfit'),
+                    name: $t('trading.derstats.accumulatedProfit'),
                     tag: 'accumulatedProfit',
                     valueField: 'accumulatedProfit',
                     axis: 'accumulatedProfit',
@@ -346,7 +346,7 @@ function customizeTooltip(pointInfo) {
                 <div class='tooltip-body'>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.principalAvg")}
+                      ${t("trading.derstats.principalAvg")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -356,7 +356,7 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.revenueSum")}
+                      ${t("trading.derstats.revenueSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -366,7 +366,7 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.lossSum")}
+                      ${t("trading.derstats.lossSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -376,7 +376,7 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.feesSum")}
+                      ${t("trading.derstats.feesSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -386,7 +386,7 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.profitSum")}
+                      ${t("trading.derstats.profitSum")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -398,7 +398,7 @@ function customizeTooltip(pointInfo) {
                   </div>
                   <div class='series-name'>
                     <span class='top-series-name'>
-                      ${t("trading.trades.profitPerPrincipal")}
+                      ${t("trading.derstats.profitPerPrincipal")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -411,12 +411,12 @@ function customizeTooltip(pointInfo) {
                           (100 * pointInfo.point.data.profitPerPrincipal) /
                           params.principalTargetThreshold[charts.value.period]
                       ).toFixed(0)}%
-                      ${t("trading.trades.kpi")})
+                      ${t("trading.derstats.kpi")})
                     </span>
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.profitPerFees")}
+                      ${t("trading.derstats.profitPerFees")}
                     </span>:
                   </div>
                   <div class='value-text'>
@@ -429,12 +429,12 @@ function customizeTooltip(pointInfo) {
                           (100 * pointInfo.point.data.profitPerFees) /
                           params.feesTargetThreshold
                       ).toFixed(0)}%
-                      ${t("trading.trades.kpi")})
+                      ${t("trading.derstats.kpi")})
                     </span>
                   </div>
                   <div class='series-name'>
                     <span class='bottom-series-name'>
-                      ${t("trading.trades.accumulatedProfit")}
+                      ${t("trading.derstats.accumulatedProfit")}
                     </span>:
                   </div>
                   <div class='value-text'>

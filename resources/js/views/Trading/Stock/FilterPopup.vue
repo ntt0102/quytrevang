@@ -1,7 +1,7 @@
 <template>
     <CorePopup
         ref="popupRef"
-        :title="$t('trading.stock.filterPopup.title')"
+        :title="$t('trading.share.filterPopup.title')"
         @shown="onShown"
         @hidden="onHidden"
     >
@@ -10,7 +10,7 @@
                 <div class="dx-fieldset">
                     <div class="dx-field">
                         <div class="dx-field-label">
-                            {{ $t("trading.stock.filterPopup.fromDate") }}
+                            {{ $t("trading.share.filterPopup.fromDate") }}
                         </div>
                         <div class="dx-field-value">
                             <DxDateBox
@@ -23,7 +23,7 @@
                     </div>
                     <div class="dx-field">
                         <div class="dx-field-label">
-                            {{ $t("trading.stock.filterPopup.toDate") }}
+                            {{ $t("trading.share.filterPopup.toDate") }}
                         </div>
                         <div class="dx-field-value">
                             <DxDateBox
@@ -35,7 +35,7 @@
                     </div>
                     <div class="dx-field">
                         <div class="dx-field-label">
-                            {{ $t("trading.stock.filterPopup.filterModel") }}
+                            {{ $t("trading.share.filterPopup.filterModel") }}
                         </div>
                         <div class="dx-field-value">
                             <DxSelectBox
@@ -51,7 +51,7 @@
                         <div class="dx-field-value">
                             <DxButton
                                 icon="far fa-filter"
-                                :text="$t('trading.stock.filterPopup.title')"
+                                :text="$t('trading.share.filterPopup.title')"
                                 @click="filterSymbols()"
                             />
                         </div>
@@ -79,9 +79,9 @@ const state = reactive({
     toDate: null,
     type: null,
     filterTypes: [
-        { text: t("trading.stock.symbolList.filterTop"), value: "fcash" },
-        { text: t("trading.stock.symbolList.filterBottom"), value: "findex" },
-        { text: t("trading.stock.symbolList.filterBreak"), value: "fmix" },
+        { text: t("trading.share.symbolList.filterTop"), value: "fcash" },
+        { text: t("trading.share.symbolList.filterBottom"), value: "findex" },
+        { text: t("trading.share.symbolList.filterBreak"), value: "fmix" },
     ],
 });
 function show(option) {

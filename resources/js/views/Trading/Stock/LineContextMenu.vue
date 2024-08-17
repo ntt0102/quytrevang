@@ -66,7 +66,7 @@ function updateColor(color) {
     emit("update:color", color);
 }
 function deleteAllLine() {
-    confirm(`${t("trading.stock.deleteAllLine")}?`, t("titles.confirm")).then(
+    confirm(`${t("trading.share.deleteAllLine")}?`, t("titles.confirm")).then(
         (result) => {
             if (result) emit("deleteAllLine");
         }

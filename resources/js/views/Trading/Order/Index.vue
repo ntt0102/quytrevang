@@ -7,7 +7,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-poll small',
-                        hint: $t('trading.orderChart.buttons.report'),
+                        hint: $t('trading.derivative.buttons.report'),
                         onClick: report,
                     },
                 },
@@ -16,7 +16,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-file-export small',
-                        hint: $t('trading.orderChart.buttons.export'),
+                        hint: $t('trading.derivative.buttons.export'),
                         onClick: exportCsv,
                     },
                 },
@@ -25,7 +25,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-sign-in-alt small',
-                        hint: $t('trading.orderChart.buttons.loginVps'),
+                        hint: $t('trading.derivative.buttons.loginVps'),
                         onClick: loginVps,
                     },
                 },
@@ -35,7 +35,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-sign-in-alt small',
-                        hint: $t('trading.orderChart.buttons.loginDnse'),
+                        hint: $t('trading.derivative.buttons.loginDnse'),
                         onClick: loginDnse,
                     },
                 },
@@ -58,7 +58,7 @@
                         :class="`command far fa-${
                             status.connection ? 'link' : 'unlink'
                         }`"
-                        :title="$t('trading.orderChart.connection')"
+                        :title="$t('trading.derivative.connection')"
                         @click="() => $store.dispatch('tradingOrder/getStatus')"
                     ></div>
                     <div
@@ -68,7 +68,7 @@
                             red: status.position < 0,
                             pending: status.pending,
                         }"
-                        :title="$t('trading.orderChart.position')"
+                        :title="$t('trading.derivative.position')"
                         @click="getAccountInfo"
                     >
                         {{ status.position }}
@@ -79,14 +79,14 @@
                     <input
                         type="date"
                         class="chart-date command"
-                        :title="$t('trading.orderChart.date')"
+                        :title="$t('trading.derivative.date')"
                         v-model="state.chartDate"
                         @change="dateSelectChange"
                     />
                     <div
                         ref="reloadToolRef"
                         class="command"
-                        :title="$t('trading.orderChart.reload')"
+                        :title="$t('trading.derivative.reload')"
                         @click="resetChart"
                         @contextmenu="resetTools"
                     >
@@ -109,19 +109,19 @@
                         :class="`command far fa-${
                             state.isFullscreen ? 'compress' : 'expand'
                         }`"
-                        :title="$t('trading.orderChart.fullscreen')"
+                        :title="$t('trading.derivative.fullscreen')"
                         @click="toggleFullscreen"
                     ></div>
                     <div
                         ref="tradingviewRef"
                         class="command far fa-chart-bar"
-                        :title="$t('trading.orderChart.tradingview')"
+                        :title="$t('trading.derivative.tradingview')"
                         @click="tradingviewClick"
                     ></div>
                     <div
                         ref="lineToolRef"
                         class="line command far fa-horizontal-rule"
-                        :title="$t('trading.orderChart.lineTool')"
+                        :title="$t('trading.derivative.lineTool')"
                         @click="lineToolClick"
                         @contextmenu="lineToolContextmenu"
                     >
@@ -138,7 +138,7 @@
                         v-show="false"
                         ref="verticalToolRef"
                         class="command far fa-grip-lines-vertical"
-                        :title="$t('trading.orderChart.verticalTool')"
+                        :title="$t('trading.derivative.verticalTool')"
                         @click="verticalToolClick"
                         @contextmenu="verticalToolContextmenu"
                     ></div>
@@ -146,7 +146,7 @@
                         v-show="false"
                         ref="uplpsToolRef"
                         class="command far fa-arrow-up"
-                        :title="$t('trading.orderChart.uplpsTool')"
+                        :title="$t('trading.derivative.uplpsTool')"
                         @click="uplpsToolClick"
                         @contextmenu="uplpsToolContextmenu"
                     ></div>
@@ -154,21 +154,21 @@
                         v-show="false"
                         ref="downlpsToolRef"
                         class="command far fa-arrow-down"
-                        :title="$t('trading.orderChart.downlpsTool')"
+                        :title="$t('trading.derivative.downlpsTool')"
                         @click="downlpsToolClick"
                         @contextmenu="downlpsToolContextmenu"
                     ></div>
                     <div
                         ref="rrToolRef"
                         class="command far fa-line-height"
-                        :title="$t('trading.orderChart.rrTool')"
+                        :title="$t('trading.derivative.rrTool')"
                         @click="rrToolClick"
                         @contextmenu="rrToolContextmenu"
                     ></div>
                     <div
                         ref="targetToolRef"
                         class="command far fa-flag-checkered"
-                        :title="$t('trading.orderChart.targetTool')"
+                        :title="$t('trading.derivative.targetTool')"
                         @click="targetToolClick"
                         @contextmenu="targetToolContextmenu"
                     ></div>
@@ -176,14 +176,14 @@
                         v-show="false"
                         ref="superToolRef"
                         class="command far fa-sliders-v"
-                        :title="$t('trading.orderChart.superTool')"
+                        :title="$t('trading.derivative.superTool')"
                         @click="superToolClick"
                         @contextmenu="superToolContextmenu"
                     ></div>
                     <div
                         ref="cancelOrderRef"
                         class="cancel-order command far fa-trash-alt"
-                        :title="$t('trading.orderChart.cancelTool')"
+                        :title="$t('trading.derivative.cancelTool')"
                         @click="cancelOrderClick"
                     ></div>
                 </div>
@@ -482,7 +482,7 @@ function eventPriceLineDrag(e) {
                                     drawOrderLine([lineOptions.kind]);
                                     toast.success(
                                         t(
-                                            "trading.orderChart.changeEntrySuccess"
+                                            "trading.derivative.changeEntrySuccess"
                                         )
                                     );
                                 } else {
@@ -509,7 +509,7 @@ function eventPriceLineDrag(e) {
                                 if (resp.isOk) {
                                     drawOrderLine([lineOptions.kind]);
                                     toast.success(
-                                        t("trading.orderChart.changeTpSuccess")
+                                        t("trading.derivative.changeTpSuccess")
                                     );
                                 } else {
                                     line.applyOptions({
@@ -531,7 +531,7 @@ function eventPriceLineDrag(e) {
                                 if (resp.isOk) {
                                     drawOrderLine([lineOptions.kind]);
                                     toast.success(
-                                        t("trading.orderChart.changeSlSuccess")
+                                        t("trading.derivative.changeSlSuccess")
                                     );
                                 } else {
                                     line.applyOptions({
@@ -544,7 +544,7 @@ function eventPriceLineDrag(e) {
                 //
                 if (!isChanged) {
                     line.applyOptions({ price: oldPrice });
-                    toast.show(t("trading.orderChart.noChangeOrderLine"));
+                    toast.show(t("trading.derivative.noChangeOrderLine"));
                 }
             }
             break;
@@ -956,7 +956,7 @@ function intervalHandler() {
                                 toggleCancelOrderButton(false);
                                 toast.success(
                                     t(
-                                        "trading.orderChart.autoCancelTpSlSuccess"
+                                        "trading.derivative.autoCancelTpSlSuccess"
                                     )
                                 );
                             } else toastOrderError(resp.message);
@@ -1823,7 +1823,7 @@ function entryOrderClick() {
     if (inSession()) {
         if (params.currentSeconds < TIME.ATO) {
             let result = confirm(
-                t("trading.orderChart.atoOrder"),
+                t("trading.derivative.atoOrder"),
                 t("titles.confirm")
             );
             result.then((dialogResult) => {
@@ -1839,7 +1839,7 @@ function entryOrderClick() {
                         .then((resp) => {
                             if (resp.isOk)
                                 toast.success(
-                                    t("trading.orderChart.atoOrderSuccess")
+                                    t("trading.derivative.atoOrderSuccess")
                                 );
                             else toastOrderError(resp.message);
                         });
@@ -1859,12 +1859,12 @@ function entryOrderClick() {
                     if (resp.isOk) {
                         drawOrderLine(["entry"]);
                         toggleCancelOrderButton(true);
-                        toast.success(t("trading.orderChart.newEntrySuccess"));
+                        toast.success(t("trading.derivative.newEntrySuccess"));
                     } else toastOrderError(resp.message);
                 });
         } else {
             let result = confirm(
-                t("trading.orderChart.atcOrder"),
+                t("trading.derivative.atcOrder"),
                 t("titles.confirm")
             );
             result.then((dialogResult) => {
@@ -1880,7 +1880,7 @@ function entryOrderClick() {
                         .then((resp) => {
                             if (resp.isOk)
                                 toast.success(
-                                    t("trading.orderChart.atcOrderSuccess")
+                                    t("trading.derivative.atcOrderSuccess")
                                 );
                             else toastOrderError(resp.message);
                         });
@@ -1912,7 +1912,7 @@ function tpslOrderClick() {
                     draggable: false,
                 });
                 drawOrderLine(["entry", "tp", "sl"]);
-                toast.success(t("trading.orderChart.newTpSlSuccess"));
+                toast.success(t("trading.derivative.newTpSlSuccess"));
             } else toastOrderError(resp.message);
         });
 }
@@ -1933,7 +1933,7 @@ function cancelOrderClick() {
                     if (resp.isOk) {
                         removeOrderLine(["entry", "tp", "sl"]);
                         toggleCancelOrderButton(false);
-                        toast.success(t("trading.orderChart.exitSuccess"));
+                        toast.success(t("trading.derivative.exitSuccess"));
                     } else {
                         toggleCancelOrderButton(true);
                         toastOrderError(resp.message);
@@ -1950,7 +1950,7 @@ function cancelOrderClick() {
                         removeOrderLine(["entry"]);
                         toggleCancelOrderButton(false);
                         toast.success(
-                            t("trading.orderChart.deleteEntrySuccess")
+                            t("trading.derivative.deleteEntrySuccess")
                         );
                     } else {
                         toggleCancelOrderButton(true);
@@ -1983,7 +1983,7 @@ function scanOrder(lastPrice) {
                                 removeOrderLine(["entry", "tp", "sl"]);
                                 toggleCancelOrderButton(false);
                                 toast.success(
-                                    t("trading.orderChart.deleteTpSuccess")
+                                    t("trading.derivative.deleteTpSuccess")
                                 );
                                 toggleOrderButton(false);
                             } else toastOrderError(resp.message);
@@ -2011,7 +2011,7 @@ function scanOrder(lastPrice) {
                                 removeOrderLine(["entry", "tp", "sl"]);
                                 toggleCancelOrderButton(false);
                                 toast.success(
-                                    t("trading.orderChart.deleteSlSuccess")
+                                    t("trading.derivative.deleteSlSuccess")
                                 );
                                 toggleOrderButton(false);
                             } else toastOrderError(resp.message);
@@ -2055,7 +2055,7 @@ function scanOrder(lastPrice) {
                                     drawOrderLine(["entry", "tp", "sl"]);
                                     toast.success(
                                         t(
-                                            "trading.orderChart.autoNewTpSlSuccess"
+                                            "trading.derivative.autoNewTpSlSuccess"
                                         )
                                     );
                                 } else toastOrderError(resp.message);
@@ -2082,7 +2082,7 @@ function coordinateToPrice(y) {
 }
 function toastOrderError(error) {
     if (!error) error = "unknown";
-    toast.error(t(`trading.orderChart.${error}`));
+    toast.error(t(`trading.derivative.${error}`));
 }
 function dateSelectChange() {
     if (!state.chartDate) return false;
@@ -2136,19 +2136,19 @@ function getAccountInfo() {
         let html = "";
         html += '<div style="width: 200px;">';
         html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.orderChart.nav"
+            "trading.derivative.nav"
         )}</div><div>: ${filters.currency(data.nav)}</div></div>`;
         html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.orderChart.maxVol"
+            "trading.derivative.maxVol"
         )}</div><div>: ${filters.numberVnFormat(data.maxVol)}</div></div>`;
         html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.orderChart.vm"
+            "trading.derivative.vm"
         )}</div><div>: ${filters.currency(data.vm)}</div></div>`;
         html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.orderChart.fee"
+            "trading.derivative.fee"
         )}</div><div>: ${filters.currency(data.fee)}</div></div>`;
         html += "</div>";
-        alert(html, t("trading.orderChart.accountInfo"));
+        alert(html, t("trading.derivative.accountInfo"));
     });
 }
 function report() {

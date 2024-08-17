@@ -28,7 +28,7 @@ class FilterStockEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return [new PrivateChannel("trading-stock")];
+        return [new PrivateChannel("trading-share")];
     }
 
     /**

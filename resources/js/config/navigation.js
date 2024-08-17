@@ -75,27 +75,27 @@ export default [
         ],
         items: [
             {
-                text: lang.global.t("trading.orderChart.title"),
-                name: "trading-order",
+                text: lang.global.t("trading.derivative.title"),
+                name: "trading-derivative",
                 icon: "far fa-bolt",
                 permissions: ["stock@order"],
             },
             {
-                text: lang.global.t("trading.trades.title"),
-                name: "trading-statistic1",
+                text: lang.global.t("trading.derstats.title"),
+                name: "trading-derstats",
                 icon: "far fa-analytics",
                 permissions: ["trades@view", "trades@edit"],
             },
             {
-                text: lang.global.t("trading.stock.title"),
-                name: "trading-stock",
+                text: lang.global.t("trading.share.title"),
+                name: "trading-share",
                 icon: "far fa-gavel",
                 permissions: ["stock@order"],
             },
             {
-                text: lang.global.t("trading.statistic.title"),
-                name: "trading-statistic",
-                icon: "far fa-analytics",
+                text: lang.global.t("trading.shrstats.title"),
+                name: "trading-shrstats",
+                icon: "far fa-chart-scatter",
                 permissions: ["trades@edit"],
             },
             {

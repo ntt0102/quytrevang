@@ -22,7 +22,7 @@
                         valueExpr: 'value',
                         displayExpr: 'text',
                         value: state.symbolKind,
-                        hint: $t('trading.stock.symbolKind'),
+                        hint: $t('trading.share.symbolKind'),
                         onValueChanged: listChanged,
                     },
                 },
@@ -37,7 +37,7 @@
                         dropDownOptions: {
                             wrapperAttr: { class: 'stock-min-select-dropdown' },
                         },
-                        hint: $t('trading.stock.chartShift'),
+                        hint: $t('trading.share.chartShift'),
                         onValueChanged: chartShiftChanged,
                     },
                 },
@@ -46,7 +46,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-list small',
-                        hint: $t('trading.stock.cloneSymbols'),
+                        hint: $t('trading.share.cloneSymbols'),
                         onClick: cloneSymbols,
                     },
                 },
@@ -55,7 +55,7 @@
                     widget: 'dxButton',
                     options: {
                         icon: 'far fa-folder-times small',
-                        hint: $t('trading.stock.deleteWatchList'),
+                        hint: $t('trading.share.deleteWatchList'),
                         onClick: deleteWatchlist,
                     },
                 },
@@ -68,7 +68,7 @@
                         displayExpr: 'text',
                         keyExpr: 'value',
                         icon: 'far fa-filter small',
-                        hint: $t('trading.stock.filterSymbols'),
+                        hint: $t('trading.share.filterSymbols'),
                         dropDownOptions: { width: '130px' },
                         onItemClick: filterItemClick,
                     },
@@ -111,7 +111,7 @@
                     </div>
                     <div
                         class="command"
-                        :title="$t('trading.stock.reload')"
+                        :title="$t('trading.share.reload')"
                         @click="reloadChartData"
                         @contextmenu="loadNextSymbol"
                     >
@@ -126,7 +126,7 @@
                     <div
                         v-show="showRemoveFilterSymbol"
                         :class="`command far fa-times`"
-                        :title="$t('trading.stock.removeFilterList')"
+                        :title="$t('trading.share.removeFilterList')"
                         @click="removeFilterList"
                     ></div>
                     <div
@@ -135,13 +135,13 @@
                         :class="`command far fa-${
                             inWatchlist ? 'minus-circle' : 'plus-circle'
                         }`"
-                        :title="$t('trading.stock.addWatchlist')"
+                        :title="$t('trading.share.addWatchlist')"
                         @click="addWatchlist"
                     ></div>
                     <div
                         v-show="!!$store.state.tradingStock.chart.foreignRSI"
                         class="command"
-                        :title="$t('trading.stock.foreignRSI')"
+                        :title="$t('trading.share.foreignRSI')"
                     >
                         {{ $store.state.tradingStock.chart.foreignRSI }}
                     </div>
@@ -152,19 +152,19 @@
                         :class="`command far fa-${
                             state.isFullscreen ? 'compress' : 'expand'
                         }`"
-                        :title="$t('trading.stock.fullscreen')"
+                        :title="$t('trading.share.fullscreen')"
                         @click="toggleFullscreen"
                     ></div>
                     <div
                         ref="tradingviewRef"
                         class="command far fa-chart-bar"
-                        :title="$t('trading.stock.tradingview')"
+                        :title="$t('trading.share.tradingview')"
                         @click="tradingviewClick"
                     ></div>
                     <div
                         ref="lineToolRef"
                         class="line command far fa-horizontal-rule"
-                        :title="$t('trading.stock.tools.line')"
+                        :title="$t('trading.share.tools.line')"
                         @click="lineToolClick"
                         @contextmenu="lineToolContextmenu"
                     >
@@ -180,49 +180,49 @@
                     <div
                         ref="uplpsToolRef"
                         class="command far fa-arrow-up"
-                        :title="$t('trading.stock.tools.uplps')"
+                        :title="$t('trading.share.tools.uplps')"
                         @click="uplpsToolClick"
                         @contextmenu="uplpsToolContextmenu"
                     ></div>
                     <div
                         ref="cashToolRef"
                         class="command drawless far fa-dot-circle"
-                        :title="$t('trading.stock.tools.cash')"
+                        :title="$t('trading.share.tools.cash')"
                         @click="cashToolClick"
                         @contextmenu="cashToolContextmenu"
                     ></div>
                     <div
                         ref="downlpsToolRef"
                         class="command far fa-arrow-down"
-                        :title="$t('trading.stock.tools.downlps')"
+                        :title="$t('trading.share.tools.downlps')"
                         @click="downlpsToolClick"
                         @contextmenu="downlpsToolContextmenu"
                     ></div>
                     <div
                         ref="targetToolRef"
                         class="command far fa-flag-checkered"
-                        :title="$t('trading.stock.tools.target')"
+                        :title="$t('trading.share.tools.target')"
                         @click="targetToolClick"
                         @contextmenu="targetToolContextmenu"
                     ></div>
                     <div
                         ref="rrToolRef"
                         class="command far fa-line-height"
-                        :title="$t('trading.stock.tools.rr')"
+                        :title="$t('trading.share.tools.rr')"
                         @click="rrToolClick"
                         @contextmenu="rrToolContextmenu"
                     ></div>
                     <div
                         ref="rangeToolRef"
                         class="command far fa-grip-lines-vertical"
-                        :title="$t('trading.stock.tools.range')"
+                        :title="$t('trading.share.tools.range')"
                         @click="rangeToolClick"
                         @contextmenu="rangeToolContextmenu"
                     ></div>
                     <div
                         ref="eventsToolRef"
                         class="command drawless far fa-map-marker-exclamation"
-                        :title="$t('trading.stock.tools.events')"
+                        :title="$t('trading.share.tools.events')"
                         @click="eventsToolClick"
                         @contextmenu="eventsToolContextmenu"
                     ></div>
@@ -333,18 +333,18 @@ const state = reactive({
     symbolKind: null,
     chartShift: 0,
     symbolKinds: [
-        { text: t("trading.stock.symbolList.vn100"), value: "vn100" },
-        { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
-        { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
-        { text: t("trading.stock.symbolList.watch"), value: "watch" },
-        { text: t("trading.stock.symbolList.hold"), value: "hold" },
-        { text: t("trading.stock.symbolList.nh"), value: "nh" },
-        { text: t("trading.stock.symbolList.ck"), value: "ck" },
-        { text: t("trading.stock.symbolList.index"), value: "index" },
+        { text: t("trading.share.symbolList.vn100"), value: "vn100" },
+        { text: t("trading.share.symbolList.filterTop"), value: "f_top" },
+        { text: t("trading.share.symbolList.filterBottom"), value: "f_bottom" },
+        { text: t("trading.share.symbolList.watch"), value: "watch" },
+        { text: t("trading.share.symbolList.hold"), value: "hold" },
+        { text: t("trading.share.symbolList.nh"), value: "nh" },
+        { text: t("trading.share.symbolList.ck"), value: "ck" },
+        { text: t("trading.share.symbolList.index"), value: "index" },
     ],
     filterItems: [
-        { text: t("trading.stock.symbolList.filterTop"), value: "f_top" },
-        { text: t("trading.stock.symbolList.filterBottom"), value: "f_bottom" },
+        { text: t("trading.share.symbolList.filterTop"), value: "f_top" },
+        { text: t("trading.share.symbolList.filterBottom"), value: "f_bottom" },
     ],
     lineTitle: "",
     lineColor: "#F44336",
@@ -707,7 +707,7 @@ function eventFullscreenChange() {
 }
 function removeFilterList() {
     confirm(
-        `${t("trading.stock.removeFilterList")}?`,
+        `${t("trading.share.removeFilterList")}?`,
         t("titles.confirm")
     ).then((result) => {
         if (result) {
@@ -1377,7 +1377,7 @@ function showNewsInfo() {
         if (mf.isSet(event)) {
             const text = event.title.split("|");
             let html = `
-                <div>${t("trading.stock.date")} ${moment
+                <div>${t("trading.share.date")} ${moment
                 .unix(event.time)
                 .format("DD/MM/YYYY")}:</div>
                 <div>&nbsp;</div>
@@ -1385,7 +1385,7 @@ function showNewsInfo() {
             text.forEach((t) => {
                 html += `<div>${t}</div>`;
             });
-            alert(html, t("trading.stock.event"));
+            alert(html, t("trading.share.event"));
         }
     }
 }
@@ -1473,7 +1473,7 @@ function filterSymbols(kind) {
             };
             store.dispatch("tradingStock/filterSymbols", param);
         });
-    } else toast.error(t("trading.stock.rangeWarning"));
+    } else toast.error(t("trading.share.rangeWarning"));
 }
 function filterItemClick({ itemData }) {
     filterSymbols(itemData.value);

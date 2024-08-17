@@ -1,7 +1,7 @@
 <template>
     <CorePopup
         ref="popupRef"
-        :title="$t('trading.orderChart.copyistStatusPopup.title')"
+        :title="$t('trading.derivative.copyistStatusPopup.title')"
         :toolbarItems="[
             {
                 toolbar: 'bottom',
@@ -47,21 +47,21 @@
                     data-field="vps_code"
                     data-type="string"
                     :caption="
-                        $t('trading.orderChart.copyistStatusPopup.vpsCode')
+                        $t('trading.derivative.copyistStatusPopup.vpsCode')
                     "
                 />
                 <DxColumn
                     data-field="connection"
                     data-type="boolean"
                     :caption="
-                        $t('trading.orderChart.copyistStatusPopup.connection')
+                        $t('trading.derivative.copyistStatusPopup.connection')
                     "
                 />
                 <DxColumn
                     data-field="position"
                     data-type="number"
                     :caption="
-                        $t('trading.orderChart.copyistStatusPopup.position')
+                        $t('trading.derivative.copyistStatusPopup.position')
                     "
                 />
                 <template #commandCellTemplate="{ data }">
@@ -77,10 +77,10 @@
                                     type: 'default',
                                     icon: 'far fa-times small',
                                     hint: $t(
-                                        'trading.orderChart.copyistStatusPopup.closePosition'
+                                        'trading.derivative.copyistStatusPopup.closePosition'
                                     ),
                                     text: $t(
-                                        'trading.orderChart.copyistStatusPopup.closePosition'
+                                        'trading.derivative.copyistStatusPopup.closePosition'
                                     ),
                                     onClick: () => closePosition(data.data),
                                 },
@@ -121,7 +121,7 @@ function show() {
 }
 function closePosition(data) {
     let result = confirm(
-        `${t("trading.orderChart.copyistStatusPopup.closePosition")} ${
+        `${t("trading.derivative.copyistStatusPopup.closePosition")} ${
             data.vps_code
         }?`,
         t("titles.confirm")

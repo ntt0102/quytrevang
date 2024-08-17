@@ -1,18 +1,16 @@
 <template>
     <div class="statistic-summary dx-card responsive-paddings content-block">
         <div v-if="props.hasTitle" class="header">
-            {{ $t("trading.statistic.summary.title") }}
+            {{ $t("trading.shrstats.summary.title") }}
         </div>
         <div class="body">
             <div>
                 <div class="period" @click="periodClick('quarter')">
-                    {{ $t("trading.statistic.periods.quarter") }}
+                    {{ $t("trading.shrstats.periods.quarter") }}
                 </div>
                 <div v-if="$mf.isSet(summary)" class="detail">
                     <div>
-                        <span>{{
-                            $t("trading.statistic.summary.winrate")
-                        }}</span
+                        <span>{{ $t("trading.shrstats.summary.winrate") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
@@ -27,7 +25,7 @@
                         >
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.summary.rr") }}</span
+                        <span>{{ $t("trading.shrstats.summary.rr") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
@@ -43,7 +41,7 @@
                         </span>
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.summary.profit") }}</span
+                        <span>{{ $t("trading.shrstats.summary.profit") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
@@ -59,13 +57,11 @@
             </div>
             <div>
                 <div class="period" @click="periodClick('year')">
-                    {{ $t("trading.statistic.periods.year") }}
+                    {{ $t("trading.shrstats.periods.year") }}
                 </div>
                 <div v-if="$mf.isSet(summary)" class="detail">
                     <div>
-                        <span>{{
-                            $t("trading.statistic.summary.winrate")
-                        }}</span
+                        <span>{{ $t("trading.shrstats.summary.winrate") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
@@ -80,7 +76,7 @@
                         >
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.summary.rr") }}</span
+                        <span>{{ $t("trading.shrstats.summary.rr") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
@@ -96,7 +92,7 @@
                         </span>
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.summary.profit") }}</span
+                        <span>{{ $t("trading.shrstats.summary.profit") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
@@ -112,13 +108,11 @@
             </div>
             <div>
                 <div class="period">
-                    {{ $t("trading.statistic.periods.all") }}
+                    {{ $t("trading.shrstats.periods.all") }}
                 </div>
                 <div v-if="$mf.isSet(summary)" class="detail">
                     <div>
-                        <span>{{
-                            $t("trading.statistic.summary.winrate")
-                        }}</span
+                        <span>{{ $t("trading.shrstats.summary.winrate") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
@@ -130,7 +124,7 @@
                         >
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.summary.rr") }}</span
+                        <span>{{ $t("trading.shrstats.summary.rr") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
@@ -146,7 +140,7 @@
                         </span>
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.summary.profit") }}</span
+                        <span>{{ $t("trading.shrstats.summary.profit") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${

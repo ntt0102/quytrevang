@@ -2,7 +2,7 @@
     <CorePopup
         ref="popupRef"
         class="transaction-finbook-popup"
-        :title="$t('trading.trades.buttons.addData')"
+        :title="$t('trading.derstats.buttons.addData')"
         :toolbarItems="[
             {
                 toolbar: 'bottom',

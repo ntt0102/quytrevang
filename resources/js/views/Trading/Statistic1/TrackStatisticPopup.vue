@@ -1,7 +1,7 @@
 <template>
     <CorePopup
         ref="popupRef"
-        :title="$t('trading.trades.buttons.addData')"
+        :title="$t('trading.derstats.buttons.addData')"
         @shown="onShown"
         @hidden="onHidden"
     >
@@ -49,14 +49,14 @@
                         useMaskBehavior: 'true',
                         applyValueMode: 'useButtons',
                     }"
-                    :caption="$t('trading.trades.date')"
+                    :caption="$t('trading.derstats.date')"
                     :validation-rules="state.validationRules.date"
                 />
                 <DxColumn
                     data-field="amount"
                     data-type="number"
                     :width="100"
-                    :caption="$t('trading.trades.amount')"
+                    :caption="$t('trading.derstats.amount')"
                     :validation-rules="state.validationRules.amount"
                 />
                 <DxColumn
@@ -67,7 +67,7 @@
                         step: '0.1',
                         format: '#0.#',
                     }"
-                    :caption="$t('trading.trades.scores')"
+                    :caption="$t('trading.derstats.scores')"
                     :validation-rules="state.validationRules.scores"
                 />
                 <DxColumn
@@ -78,7 +78,7 @@
                         step: '1',
                         format: '#,##0',
                     }"
-                    :caption="$t('trading.trades.revenue')"
+                    :caption="$t('trading.derstats.revenue')"
                     :validation-rules="state.validationRules.revenue"
                 />
                 <DxColumn
@@ -89,7 +89,7 @@
                         step: '1',
                         format: '#,##0',
                     }"
-                    :caption="$t('trading.trades.loss')"
+                    :caption="$t('trading.derstats.loss')"
                     :validation-rules="state.validationRules.loss"
                 />
                 <DxColumn
@@ -100,7 +100,7 @@
                         step: '1',
                         format: '#,##0',
                     }"
-                    :caption="$t('trading.trades.fees')"
+                    :caption="$t('trading.derstats.fees')"
                     :validation-rules="state.validationRules.fees"
                 />
                 <template #commandCellTemplate="{ data }">
@@ -151,37 +151,38 @@ const state = reactive({
         amount: [
             {
                 type: "required",
-                message: t("trading.trades.amount") + mt.validations.required,
+                message: t("trading.derstats.amount") + mt.validations.required,
             },
         ],
         scores: [
             {
                 type: "required",
-                message: t("trading.trades.scores") + mt.validations.required,
+                message: t("trading.derstats.scores") + mt.validations.required,
             },
         ],
         revenue: [
             {
                 type: "required",
-                message: t("trading.trades.revenue") + mt.validations.required,
+                message:
+                    t("trading.derstats.revenue") + mt.validations.required,
             },
         ],
         loss: [
             {
                 type: "required",
-                message: t("trading.trades.loss") + mt.validations.required,
+                message: t("trading.derstats.loss") + mt.validations.required,
             },
         ],
         fees: [
             {
                 type: "required",
-                message: t("trading.trades.fees") + mt.validations.required,
+                message: t("trading.derstats.fees") + mt.validations.required,
             },
         ],
         date: [
             {
                 type: "required",
-                message: t("trading.trades.date") + mt.validations.required,
+                message: t("trading.derstats.date") + mt.validations.required,
             },
             {
                 type: "async",
@@ -190,7 +191,7 @@ const state = reactive({
                         "tradingStatistic1/validateDuplicateDate",
                         e
                     ),
-                message: t("trading.trades.validations.date"),
+                message: t("trading.derstats.validations.date"),
             },
         ],
     },

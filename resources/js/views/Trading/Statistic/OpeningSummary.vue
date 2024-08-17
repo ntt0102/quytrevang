@@ -2,10 +2,10 @@
     <div class="statistic-opening dx-card responsive-paddings content-block">
         <div class="header">
             <div v-if="props.hasTitle">
-                {{ $t("trading.statistic.opening.title") }}
+                {{ $t("trading.shrstats.opening.title") }}
             </div>
             <div>
-                <span>{{ $t("trading.statistic.opening.totalProfit") }}</span
+                <span>{{ $t("trading.shrstats.opening.totalProfit") }}</span
                 >&nbsp;
                 <span
                     :class="`quality ${
@@ -26,7 +26,7 @@
                 </div>
                 <div class="detail">
                     <div>
-                        <span>{{ $t("trading.statistic.opening.price") }}</span
+                        <span>{{ $t("trading.shrstats.opening.price") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${getChangeClass(order.change)}`"
@@ -34,14 +34,14 @@
                         >
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.opening.volume") }}</span
+                        <span>{{ $t("trading.shrstats.opening.volume") }}</span
                         >&nbsp;
                         <span class="quality orange"
                             >{{ order.openingVol }}
                         </span>
                     </div>
                     <div>
-                        <span>{{ $t("trading.statistic.opening.profit") }}</span
+                        <span>{{ $t("trading.shrstats.opening.profit") }}</span
                         >&nbsp;
                         <span
                             :class="`quality ${
@@ -80,7 +80,7 @@ function getChangeClass(change) {
     return cls;
 }
 function gotoChart(symbol) {
-    router.push({ name: "trading-stock", query: { symbol, list: "hold" } });
+    router.push({ name: "trading-share", query: { symbol, list: "hold" } });
 }
 </script>
 <style lang="scss">

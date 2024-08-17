@@ -58,7 +58,7 @@ function rSquared(predictions, targets) {
     return 1 - residualSumOfSquares / totalSumOfSquares;
 }
 function trainAI() {
-    confirm(`${t("trading.stock.trainAI")}?`, t("titles.confirm")).then(
+    confirm(`${t("trading.share.trainAI")}?`, t("titles.confirm")).then(
         (result) => {
             if (result) {
                 store
