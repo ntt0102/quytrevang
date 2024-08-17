@@ -135,6 +135,7 @@
                         ></LineContextMenu>
                     </div>
                     <div
+                        v-show="false"
                         ref="verticalToolRef"
                         class="command far fa-grip-lines-vertical"
                         :title="$t('trading.orderChart.verticalTool')"
@@ -142,6 +143,7 @@
                         @contextmenu="verticalToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="uplpsToolRef"
                         class="command far fa-arrow-up"
                         :title="$t('trading.orderChart.uplpsTool')"
@@ -149,18 +151,12 @@
                         @contextmenu="uplpsToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="downlpsToolRef"
                         class="command far fa-arrow-down"
                         :title="$t('trading.orderChart.downlpsTool')"
                         @click="downlpsToolClick"
                         @contextmenu="downlpsToolContextmenu"
-                    ></div>
-                    <div
-                        ref="targetToolRef"
-                        class="command far fa-flag-checkered"
-                        :title="$t('trading.orderChart.targetTool')"
-                        @click="targetToolClick"
-                        @contextmenu="targetToolContextmenu"
                     ></div>
                     <div
                         ref="rrToolRef"
@@ -170,6 +166,14 @@
                         @contextmenu="rrToolContextmenu"
                     ></div>
                     <div
+                        ref="targetToolRef"
+                        class="command far fa-flag-checkered"
+                        :title="$t('trading.orderChart.targetTool')"
+                        @click="targetToolClick"
+                        @contextmenu="targetToolContextmenu"
+                    ></div>
+                    <div
+                        v-show="false"
                         ref="superToolRef"
                         class="command far fa-sliders-v"
                         :title="$t('trading.orderChart.superTool')"
@@ -1490,7 +1494,7 @@ function drawTargetTool() {
         const ba = price - a;
         option.point = "B";
         option.title = ba.toFixed(1);
-        option.color = "#FF9800";
+        option.color = "#F44336";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
@@ -1517,7 +1521,7 @@ function drawTargetTool() {
         option.point = "Z";
         option.price = +(a - 2 * ba).toFixed(1);
         option.title = (-2 * ba).toFixed(1);
-        option.color = "#673AB7";
+        option.color = "#9C27B0";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
