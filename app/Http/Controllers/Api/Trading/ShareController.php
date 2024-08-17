@@ -4,16 +4,16 @@ namespace App\Http\Controllers\Api\Trading;
 
 use App\Http\Controllers\Api\CoreController;
 use Illuminate\Http\Request;
-use App\Services\Trading\StockService;
+use App\Services\Trading\ShareService;
 
-class StockController extends CoreController
+class ShareController extends CoreController
 {
-    protected $stockService;
+    protected $shareService;
 
-    public function __construct(StockService $stockService)
+    public function __construct(ShareService $shareService)
     {
         parent::__construct();
-        $this->stockService = $stockService;
+        $this->shareService = $shareService;
     }
 
     /**
@@ -25,7 +25,7 @@ class StockController extends CoreController
      */
     public function initChart(Request $request)
     {
-        $data = $this->stockService->initChart($this->payload);
+        $data = $this->shareService->initChart($this->payload);
         return $this->sendResponse($data);
     }
     /**
@@ -37,7 +37,7 @@ class StockController extends CoreController
      */
     public function getChart(Request $request)
     {
-        $data = $this->stockService->getChart($this->payload);
+        $data = $this->shareService->getChart($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -50,7 +50,7 @@ class StockController extends CoreController
      */
     public function cloneSymbols(Request $request)
     {
-        $data = $this->stockService->cloneSymbols();
+        $data = $this->shareService->cloneSymbols();
         return $this->sendResponse($data);
     }
     /**
@@ -62,7 +62,7 @@ class StockController extends CoreController
      */
     public function getSymbols(Request $request)
     {
-        $data = $this->stockService->getSymbols();
+        $data = $this->shareService->getSymbols();
         return $this->sendResponse($data);
     }
     /**
@@ -74,7 +74,7 @@ class StockController extends CoreController
      */
     public function filterSymbols(Request $request)
     {
-        $data = $this->stockService->filterSymbols($this->payload);
+        $data = $this->shareService->filterSymbols($this->payload);
         return $this->sendResponse($data);
     }
     /**
@@ -86,7 +86,7 @@ class StockController extends CoreController
      */
     public function removeFilterList(Request $request)
     {
-        $data = $this->stockService->removeFilterList($this->payload);
+        $data = $this->shareService->removeFilterList($this->payload);
         return $this->sendResponse($data);
     }
     /**
@@ -98,7 +98,7 @@ class StockController extends CoreController
      */
     public function addWatchlist(Request $request)
     {
-        $data = $this->stockService->addWatchlist($this->payload);
+        $data = $this->shareService->addWatchlist($this->payload);
         return $this->sendResponse($data);
     }
     /**
@@ -110,7 +110,7 @@ class StockController extends CoreController
      */
     public function deleteWatchlist(Request $request)
     {
-        $data = $this->stockService->deleteWatchlist($this->payload);
+        $data = $this->shareService->deleteWatchlist($this->payload);
         return $this->sendResponse($data);
     }
     /**
@@ -122,7 +122,7 @@ class StockController extends CoreController
      */
     public function drawTools(Request $request)
     {
-        $data = $this->stockService->drawTools($this->payload);
+        $data = $this->shareService->drawTools($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -135,7 +135,7 @@ class StockController extends CoreController
      */
     public function exportStock(Request $request)
     {
-        $data = $this->stockService->exportStock($request);
+        $data = $this->shareService->exportStock($request);
         return $this->sendResponseWithoutEncrypt($data);
     }
 }

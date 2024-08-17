@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Models\Trade;
+use App\Models\DerivativeStat;
 
-class TradesTableSeeder extends Seeder
+class DerivativeStatsTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,7 +14,7 @@ class TradesTableSeeder extends Seeder
      */
     public function run()
     {
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1091,
             'revenue' => 1420000,
@@ -22,7 +22,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 126231,
             'date' => date_create_from_format('d/m/Y', '04/01/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1080.9,
             'revenue' => 930000,
@@ -30,7 +30,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 114268,
             'date' => date_create_from_format('d/m/Y', '11/01/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1193.1,
             'revenue' => 3180000,
@@ -38,7 +38,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 354529,
             'date' => date_create_from_format('d/m/Y', '18/01/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1172,
             'revenue' => 5990000,
@@ -46,7 +46,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 443319,
             'date' => date_create_from_format('d/m/Y', '25/01/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1065,
             'revenue' => 3490000,
@@ -54,7 +54,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 433784,
             'date' => date_create_from_format('d/m/Y', '01/02/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1138.2,
             'revenue' => 0,
@@ -62,7 +62,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 108424,
             'date' => date_create_from_format('d/m/Y', '08/02/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1140.5,
             'revenue' => 1050000,
@@ -70,7 +70,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 337379,
             'date' => date_create_from_format('d/m/Y', '15/02/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1182.4,
             'revenue' => 2750000,
@@ -78,7 +78,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 546138,
             'date' => date_create_from_format('d/m/Y', '22/02/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1183.5,
             'revenue' => 540000,
@@ -86,7 +86,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 274823,
             'date' => date_create_from_format('d/m/Y', '01/03/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1180.6,
             'revenue' => 770000,
@@ -94,7 +94,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 225738,
             'date' => date_create_from_format('d/m/Y', '08/03/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1189,
             'revenue' => 240000,
@@ -102,7 +102,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 137720,
             'date' => date_create_from_format('d/m/Y', '15/03/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1207.6,
             'revenue' => 0,
@@ -110,7 +110,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 135046,
             'date' => date_create_from_format('d/m/Y', '23/03/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1176.8,
             'revenue' => 870000,
@@ -118,7 +118,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 229659,
             'date' => date_create_from_format('d/m/Y', '30/03/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1241,
             'revenue' => 390000,
@@ -126,7 +126,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 330964,
             'date' => date_create_from_format('d/m/Y', '06/04/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1260,
             'revenue' => 1600000,
@@ -134,7 +134,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 336590,
             'date' => date_create_from_format('d/m/Y', '12/04/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1276,
             'revenue' => 1490000,
@@ -142,7 +142,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 241635,
             'date' => date_create_from_format('d/m/Y', '19/04/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1297,
             'revenue' => 2160000,
@@ -150,7 +150,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 119849,
             'date' => date_create_from_format('d/m/Y', '26/04/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1278,
             'revenue' => 0,
@@ -158,7 +158,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 49448,
             'date' => date_create_from_format('d/m/Y', '03/05/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1323.2,
             'revenue' => 1100000,
@@ -166,7 +166,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 100668,
             'date' => date_create_from_format('d/m/Y', '10/05/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1382.1,
             'revenue' => 350000,
@@ -174,7 +174,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 127809,
             'date' => date_create_from_format('d/m/Y', '17/05/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1415,
             'revenue' => 2310000,
@@ -182,7 +182,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 182783,
             'date' => date_create_from_format('d/m/Y', '24/05/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1485,
             'revenue' => 2630000,
@@ -190,7 +190,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 133273,
             'date' => date_create_from_format('d/m/Y', '01/06/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1507,
             'revenue' => 1190000,
@@ -198,7 +198,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 211732,
             'date' => date_create_from_format('d/m/Y', '07/06/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1494.2,
             'revenue' => 1850000,
@@ -206,7 +206,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 160304,
             'date' => date_create_from_format('d/m/Y', '14/06/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1476,
             'revenue' => 770000,
@@ -214,7 +214,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 295216,
             'date' => date_create_from_format('d/m/Y', '21/06/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1509.1,
             'revenue' => 260000,
@@ -222,7 +222,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 246302,
             'date' => date_create_from_format('d/m/Y', '28/06/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1560,
             'revenue' => 2840000,
@@ -230,7 +230,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 355309,
             'date' => date_create_from_format('d/m/Y', '05/07/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1503,
             'revenue' => 3270000,
@@ -238,7 +238,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 311774,
             'date' => date_create_from_format('d/m/Y', '12/07/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1414.8,
             'revenue' => 1630000,
@@ -246,7 +246,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 178847,
             'date' => date_create_from_format('d/m/Y', '19/07/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1413,
             'revenue' => 600000,
@@ -254,7 +254,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 128754,
             'date' => date_create_from_format('d/m/Y', '27/07/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 2,
             'scores' => 1446.6,
             'revenue' => 980000,
@@ -262,7 +262,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 425403,
             'date' => date_create_from_format('d/m/Y', '02/08/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 2,
             'scores' => 1469.9,
             'revenue' => 2000000,
@@ -270,7 +270,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 588279,
             'date' => date_create_from_format('d/m/Y', '09/08/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1485.2,
             'revenue' => 580000,
@@ -278,7 +278,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 481734,
             'date' => date_create_from_format('d/m/Y', '16/08/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1444.4,
             'revenue' => 1410000,
@@ -286,7 +286,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 412645,
             'date' => date_create_from_format('d/m/Y', '23/08/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1423,
             'revenue' => 1000000,
@@ -294,7 +294,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 234044,
             'date' => date_create_from_format('d/m/Y', '30/08/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1433.8,
             'revenue' => 1310000,
@@ -302,7 +302,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 235187,
             'date' => date_create_from_format('d/m/Y', '06/09/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1445.3,
             'revenue' => 50000,
@@ -310,7 +310,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 261887,
             'date' => date_create_from_format('d/m/Y', '13/09/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1460,
             'revenue' => 580000,
@@ -318,7 +318,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 130934,
             'date' => date_create_from_format('d/m/Y', '20/09/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1452.3,
             'revenue' => 270000,
@@ -326,7 +326,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 288569,
             'date' => date_create_from_format('d/m/Y', '27/09/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1441,
             'revenue' => 1010000,
@@ -334,7 +334,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 184021,
             'date' => date_create_from_format('d/m/Y', '04/10/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1475.5,
             'revenue' => 750000,
@@ -342,7 +342,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 350912,
             'date' => date_create_from_format('d/m/Y', '11/10/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1505.1,
             'revenue' => 960000,
@@ -350,7 +350,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 242652,
             'date' => date_create_from_format('d/m/Y', '18/10/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1495,
             'revenue' => 2370000,
@@ -358,7 +358,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 213895,
             'date' => date_create_from_format('d/m/Y', '25/10/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1535,
             'revenue' => 850000,
@@ -366,7 +366,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 409291,
             'date' => date_create_from_format('d/m/Y', '01/11/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1537.6,
             'revenue' => 1210000,
@@ -374,7 +374,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 463130,
             'date' => date_create_from_format('d/m/Y', '08/11/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1533,
             'revenue' => 640000,
@@ -382,7 +382,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 217046,
             'date' => date_create_from_format('d/m/Y', '15/11/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1503.6,
             'revenue' => 2040000,
@@ -390,7 +390,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 165426,
             'date' => date_create_from_format('d/m/Y', '22/11/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1548.2,
             'revenue' => 1360000,
@@ -398,7 +398,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 192504,
             'date' => date_create_from_format('d/m/Y', '29/11/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1508.1,
             'revenue' => 1730000,
@@ -406,7 +406,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 80698,
             'date' => date_create_from_format('d/m/Y', '6/12/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1508.1,
             'revenue' => 910000,
@@ -414,7 +414,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 407056,
             'date' => date_create_from_format('d/m/Y', '13/12/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1512,
             'revenue' => 0,
@@ -422,7 +422,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 134831,
             'date' => date_create_from_format('d/m/Y', '20/12/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1524.5,
             'revenue' => 690000,
@@ -430,7 +430,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 135949,
             'date' => date_create_from_format('d/m/Y', '27/12/2021'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1544.9,
             'revenue' => 0,
@@ -438,7 +438,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 82163,
             'date' => date_create_from_format('d/m/Y', '3/1/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1540,
             'revenue' => 1170000,
@@ -446,7 +446,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 163122,
             'date' => date_create_from_format('d/m/Y', '10/1/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1525.4,
             'revenue' => 0,
@@ -454,7 +454,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 53342,
             'date' => date_create_from_format('d/m/Y', '17/1/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1496,
             'revenue' => 470000,
@@ -462,7 +462,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 323418,
             'date' => date_create_from_format('d/m/Y', '24/1/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1543.9,
             'revenue' => 360000,
@@ -470,7 +470,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 54958,
             'date' => date_create_from_format('d/m/Y', '7/2/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1535.5,
             'revenue' => 120000,
@@ -478,7 +478,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 163100,
             'date' => date_create_from_format('d/m/Y', '14/2/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1523.2,
             'revenue' => 0,
@@ -486,7 +486,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 243587,
             'date' => date_create_from_format('d/m/Y', '21/2/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1511,
             'revenue' => 30000,
@@ -494,7 +494,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 107769,
             'date' => date_create_from_format('d/m/Y', '28/2/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1496,
             'revenue' => 790000,
@@ -502,7 +502,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 455645,
             'date' => date_create_from_format('d/m/Y', '7/3/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1475.2,
             'revenue' => 0,
@@ -510,7 +510,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 79220,
             'date' => date_create_from_format('d/m/Y', '14/3/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1479.7,
             'revenue' => 570000,
@@ -518,7 +518,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 215139,
             'date' => date_create_from_format('d/m/Y', '21/3/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1489.1,
             'revenue' => 1160000,
@@ -526,7 +526,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 268204,
             'date' => date_create_from_format('d/m/Y', '28/3/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1529.4,
             'revenue' => 0,
@@ -534,7 +534,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 246137,
             'date' => date_create_from_format('d/m/Y', '4/4/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1525.9,
             'revenue' => 390000,
@@ -542,7 +542,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 108599,
             'date' => date_create_from_format('d/m/Y', '11/4/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1494.1,
             'revenue' => 1160000,
@@ -550,7 +550,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 108599,
             'date' => date_create_from_format('d/m/Y', '18/4/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1442.9,
             'revenue' => 1000000,
@@ -558,7 +558,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 76703,
             'date' => date_create_from_format('d/m/Y', '25/4/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1408.3,
             'revenue' => 440000,
@@ -566,7 +566,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 25158,
             'date' => date_create_from_format('d/m/Y', '2/5/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1353.7,
             'revenue' => 380000,
@@ -574,7 +574,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 112171,
             'date' => date_create_from_format('d/m/Y', '9/5/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1240,
             'revenue' => 950000,
@@ -582,7 +582,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 191798,
             'date' => date_create_from_format('d/m/Y', '16/5/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1289,
             'revenue' => 1940000,
@@ -590,7 +590,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 192527,
             'date' => date_create_from_format('d/m/Y', '23/5/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1322.5,
             'revenue' => 190000,
@@ -598,7 +598,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 241510,
             'date' => date_create_from_format('d/m/Y', '30/5/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1318,
             'revenue' => 0,
@@ -606,7 +606,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 171103,
             'date' => date_create_from_format('d/m/Y', '6/6/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1311.1,
             'revenue' => 1760000,
@@ -614,7 +614,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 166123,
             'date' => date_create_from_format('d/m/Y', '13/6/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1245.2,
             'revenue' => 1160000,
@@ -622,7 +622,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 46691,
             'date' => date_create_from_format('d/m/Y', '20/6/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1227,
             'revenue' => 0,
@@ -630,7 +630,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 70555,
             'date' => date_create_from_format('d/m/Y', '27/6/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1242,
             'revenue' => 1150000,
@@ -638,7 +638,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 93641,
             'date' => date_create_from_format('d/m/Y', '4/7/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1225,
             'revenue' => 160000,
@@ -646,7 +646,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 115831,
             'date' => date_create_from_format('d/m/Y', '11/7/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1210.1,
             'revenue' => 20000,
@@ -654,7 +654,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 279802,
             'date' => date_create_from_format('d/m/Y', '18/7/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1225.6,
             'revenue' => 140000,
@@ -662,7 +662,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 117139,
             'date' => date_create_from_format('d/m/Y', '25/7/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1230.7,
             'revenue' => 420000,
@@ -670,7 +670,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 189301,
             'date' => date_create_from_format('d/m/Y', '1/8/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1264.5,
             'revenue' => 70000,
@@ -678,7 +678,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 239210,
             'date' => date_create_from_format('d/m/Y', '8/8/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1280.1,
             'revenue' => 0,
@@ -686,7 +686,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 363237,
             'date' => date_create_from_format('d/m/Y', '15/8/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1281,
             'revenue' => 20000,
@@ -694,7 +694,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 109253,
             'date' => date_create_from_format('d/m/Y', '22/8/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1293,
             'revenue' => 2620000,
@@ -702,7 +702,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 36145,
             'date' => date_create_from_format('d/m/Y', '29/8/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1293.9,
             'revenue' => 710000,
@@ -710,7 +710,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 143596,
             'date' => date_create_from_format('d/m/Y', '5/9/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1275,
             'revenue' => 330000,
@@ -718,7 +718,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 47371,
             'date' => date_create_from_format('d/m/Y', '12/9/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1237,
             'revenue' => 1320000,
@@ -726,7 +726,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 221489,
             'date' => date_create_from_format('d/m/Y', '19/9/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1210,
             'revenue' => 840000,
@@ -734,7 +734,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 146931,
             'date' => date_create_from_format('d/m/Y', '26/9/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1150,
             'revenue' => 1310000,
@@ -742,7 +742,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 152189,
             'date' => date_create_from_format('d/m/Y', '3/10/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1032.2,
             'revenue' => 2810000,
@@ -750,7 +750,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 114001,
             'date' => date_create_from_format('d/m/Y', '10/10/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 1,
             'scores' => 1048,
             'revenue' => 2600000,
@@ -758,7 +758,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 73716,
             'date' => date_create_from_format('d/m/Y', '17/10/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 2,
             'scores' => 985,
             'revenue' => 2640000,
@@ -766,7 +766,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 201717,
             'date' => date_create_from_format('d/m/Y', '24/10/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 2,
             'scores' => 1016,
             'revenue' => 4540000,
@@ -774,7 +774,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 205004,
             'date' => date_create_from_format('d/m/Y', '31/10/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 3,
             'scores' => 980,
             'revenue' => 7920000,
@@ -782,7 +782,7 @@ class TradesTableSeeder extends Seeder
             'fees' => 215224,
             'date' => date_create_from_format('d/m/Y', '7/11/2022'),
         ]);
-        Trade::create([
+        DerivativeStat::create([
             'amount' => 3,
             'scores' => 938,
             'revenue' => 3000000,

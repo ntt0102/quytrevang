@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\User;
-use App\Models\Trade;
+use App\Models\DerivativeStat;
 use App\Services\Special\VpsOrderService;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\UpdatedTradesNotification;
@@ -40,7 +40,7 @@ class ReportTradingJob implements ShouldQueue
      */
     public function handle()
     {
-        if (Trade::where('date', date_create()->format('Y-m-d'))->count() > 0) return false;
+        if (DerivativeStat::where('date', date_create()->format('Y-m-d'))->count() > 0) return false;
         $vos = new VpsOrderService();
         if (!$vos->connection) return false;
         $info = $vos->getAccountInfo();
@@ -57,7 +57,7 @@ class ReportTradingJob implements ShouldQueue
         if (!$info->fee && !$info->vm) return false;
         $revenue = $info->vm > 0 ? $info->vm : 0;
         $loss = $info->vm < 0 ? -$info->vm : 0;
-        $trade = Trade::create([
+        $trade = DerivativeStat::create([
             "amount" => $vos->orderVolume,
             "scores" => $this->getVn30f1mInfo($vos->symbol),
             "revenue" => $revenue,

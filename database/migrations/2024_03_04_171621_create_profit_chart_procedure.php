@@ -28,7 +28,7 @@ return new class extends Migration
                         WHEN period = 'year' THEN YEAR(`buy_date`)
                         WHEN period = 'all' THEN 1
                     END AS `date`
-                    FROM `stock_orders` 
+                    FROM `share_orders` 
                     WHERE CHECK_CLOSED(`buy_volume`,`sell_volume`) AND `buy_date` >= from_date AND `buy_date` <= to_date;
 
                 DROP TEMPORARY TABLE IF EXISTS t2;

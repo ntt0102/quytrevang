@@ -12,7 +12,7 @@ use Database\Seeders\FaqsTableSeeder;
 use Database\Seeders\CommentsTableSeeder;
 use Database\Seeders\VariablesTableSeeder;
 use Database\Seeders\CopyistsTableSeeder;
-use Database\Seeders\TradesTableSeeder;
+use Database\Seeders\DerivativeStatsTableSeeder;
 use Database\Seeders\FinbooksTableSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -35,8 +35,8 @@ class DatabaseSeeder extends Seeder
         $this->call(FaqsTableSeeder::class);
         $this->call(CommentsTableSeeder::class);
         $this->call(VariablesTableSeeder::class);
-        $this->call(CopyistsTableSeeder::class);
-        // $this->call(TradesTableSeeder::class);
+        // $this->call(CopyistsTableSeeder::class);
+        // $this->call(DerivativeStatsTableSeeder::class);
         // $this->call(FinbooksTableSeeder::class);
 
         Model::reguard();

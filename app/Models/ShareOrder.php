@@ -6,7 +6,7 @@ use App\Models\CoreModel;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
-class StockOrder extends CoreModel
+class ShareOrder extends CoreModel
 {
     protected $visible = [
         'id',

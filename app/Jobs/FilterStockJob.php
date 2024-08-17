@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\StockSymbol;
+use App\Models\ShareSymbol;
 use App\Services\Trading\StockService;
 use App\Notifications\FilteredStockNotification;
 use Illuminate\Support\Facades\Notification;
@@ -45,7 +45,7 @@ class FilterStockJob implements ShouldQueue
     public function handle()
     {
         // \Log::info('Start filter');
-        $stock = StockSymbol::where('name', $this->payload->name)->first();
+        $stock = ShareSymbol::where('name', $this->payload->name)->first();
         if (!$stock) return false;
         $rTop = [];
         $rBottom = [];
@@ -75,9 +75,9 @@ class FilterStockJob implements ShouldQueue
             }
         }
         if ($this->payload->kind == self::F_TOP)
-            StockSymbol::updateOrCreate(['name' => self::F_TOP], ['symbols' => $rTop]);
+            ShareSymbol::updateOrCreate(['name' => self::F_TOP], ['symbols' => $rTop]);
         if ($this->payload->kind == self::F_BOTTOM)
-            StockSymbol::updateOrCreate(['name' => self::F_BOTTOM], ['symbols' => $rBottom]);
+            ShareSymbol::updateOrCreate(['name' => self::F_BOTTOM], ['symbols' => $rBottom]);
         Notification::send(
             User::permission('admin:access_share')->get(),
             new FilteredStockNotification($this->payload->kind)

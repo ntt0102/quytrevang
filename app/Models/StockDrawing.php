@@ -4,29 +4,31 @@ namespace App\Models;
 
 use App\Models\CoreModel;
 
-class StockSymbol extends CoreModel
+class StockDrawing extends CoreModel
 {
     protected $visible = [
         'id',
+        'symbol',
         'name',
-        'symbols',
+        'point',
+        'data',
         'updated_at'
     ];
 
     protected $fillable = [
+        'symbol',
         'name',
-        'symbols',
+        'point',
+        'data',
     ];
 
     protected static $logAttributes = [
+        'symbol',
         'name',
-        'symbols',
+        'point',
+        'data',
         'updated_at'
     ];
 
-    protected $casts = ['symbols' => 'array'];
-
-    protected $attributes = [
-        'symbols' => '[]',
-    ];
+    protected $casts = ['data' => 'object'];
 }

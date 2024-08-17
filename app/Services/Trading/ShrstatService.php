@@ -3,11 +3,11 @@
 namespace App\Services\Trading;
 
 use App\Services\CoreService;
-use App\Models\StockOrder;
+use App\Models\ShareOrder;
 use App\Events\UpdateStatisticEvent;
 
 
-class StatisticService extends CoreService
+class ShrstatService extends CoreService
 {
 
     /**
@@ -17,7 +17,7 @@ class StatisticService extends CoreService
      */
     public function getData()
     {
-        return StockOrder::orderBy('buy_date', 'DESC')->take(5)->get();
+        return ShareOrder::orderBy('buy_date', 'DESC')->take(5)->get();
     }
 
     /**
@@ -46,7 +46,7 @@ class StatisticService extends CoreService
         $pNeg = 0;
         $oPos = 0;
         $oNeg = 0;
-        $data = StockOrder::getProfitChart($period, $fromDate, date('Y-m-d'));
+        $data = ShareOrder::getProfitChart($period, $fromDate, date('Y-m-d'));
         foreach ($data as $item) {
             if ($item->profit > 0) {
                 $pPos = $item->profit;
@@ -75,7 +75,7 @@ class StatisticService extends CoreService
         $totalCost = 0;
         $client = new \GuzzleHttp\Client();
         $url = "https://bgapidatafeed.vps.com.vn/getliststockdata/";
-        $orders = StockOrder::opening()->get();
+        $orders = ShareOrder::opening()->get();
         foreach ($orders as $order) {
             $res = $client->get($url . $order->symbol);
             $info = json_decode($res->getBody())[0];
@@ -167,7 +167,7 @@ class StatisticService extends CoreService
         $endOfPage = date_create()->modify('-' . (($page - 1) * $multiplier * $barsPerPage) . ' ' . $unit);
         $startDate = first_day_of($period, $startOfPage)->format('Y-m-d');
         $endDate = last_day_of($period, $endOfPage)->format('Y-m-d');
-        $orders = StockOrder::getProfitChart($period, $startDate, $endDate);
+        $orders = ShareOrder::getProfitChart($period, $startDate, $endDate);
         foreach ($orders as $order) {
             if (!array_key_exists($order->date, $ret)) {
                 $pPos = 0;
@@ -226,16 +226,16 @@ class StatisticService extends CoreService
             foreach ($payload->changes as $change) {
                 switch ($change->type) {
                     case 'insert':
-                        $isOk = !!StockOrder::create((array)$change->data);
+                        $isOk = !!ShareOrder::create((array)$change->data);
                         break;
 
                     case 'update':
-                        $trade = StockOrder::find($change->key);
+                        $trade = ShareOrder::find($change->key);
                         $isOk = $trade->update((array)$change->data);
                         break;
 
                     case 'remove':
-                        $trade = StockOrder::find($change->key);
+                        $trade = ShareOrder::find($change->key);
                         $isOk = $trade->delete();
                         break;
                 }

@@ -4,16 +4,16 @@ namespace App\Http\Controllers\Api\Trading;
 
 use App\Http\Controllers\Api\CoreController;
 use Illuminate\Http\Request;
-use App\Services\Trading\OrderChartService;
+use App\Services\Trading\DerivativeService;
 
-class OrderChartController extends CoreController
+class DerivativeController extends CoreController
 {
-    protected $orderChartService;
+    protected $derivativeService;
 
-    public function __construct(OrderChartService $orderChartService)
+    public function __construct(DerivativeService $derivativeService)
     {
         parent::__construct();
-        $this->orderChartService = $orderChartService;
+        $this->derivativeService = $derivativeService;
     }
 
     /**
@@ -25,7 +25,7 @@ class OrderChartController extends CoreController
      */
     public function getChartData(Request $request)
     {
-        $data = $this->orderChartService->getChartData($this->payload);
+        $data = $this->derivativeService->getChartData($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -38,7 +38,7 @@ class OrderChartController extends CoreController
      */
     public function initChart(Request $request)
     {
-        $data = $this->orderChartService->initChart($this->payload);
+        $data = $this->derivativeService->initChart($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -51,7 +51,7 @@ class OrderChartController extends CoreController
      */
     public function getTools(Request $request)
     {
-        $data = $this->orderChartService->getTools(false);
+        $data = $this->derivativeService->getTools(false);
         return $this->sendResponse($data);
     }
 
@@ -64,7 +64,7 @@ class OrderChartController extends CoreController
      */
     public function loginVps(Request $request)
     {
-        $data = $this->orderChartService->loginVps($this->payload);
+        $data = $this->derivativeService->loginVps($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -77,7 +77,7 @@ class OrderChartController extends CoreController
      */
     public function getStatus(Request $request)
     {
-        $data = $this->orderChartService->getStatus($this->payload);
+        $data = $this->derivativeService->getStatus($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -90,7 +90,7 @@ class OrderChartController extends CoreController
      */
     public function getAccountInfo(Request $request)
     {
-        $data = $this->orderChartService->getAccountInfo($this->payload);
+        $data = $this->derivativeService->getAccountInfo($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -103,7 +103,7 @@ class OrderChartController extends CoreController
      */
     public function executeOrder(Request $request)
     {
-        $data = $this->orderChartService->executeOrder($this->payload);
+        $data = $this->derivativeService->executeOrder($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -116,7 +116,7 @@ class OrderChartController extends CoreController
      */
     public function closePosition(Request $request)
     {
-        $data = $this->orderChartService->closePosition($this->payload);
+        $data = $this->derivativeService->closePosition($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -129,7 +129,7 @@ class OrderChartController extends CoreController
      */
     public function setVpsSession(Request $request)
     {
-        $data = $this->orderChartService->setVpsSession($request);
+        $data = $this->derivativeService->setVpsSession($request);
         return $this->sendResponseWithoutEncrypt($data);
     }
 
@@ -142,7 +142,7 @@ class OrderChartController extends CoreController
      */
     public function drawTools(Request $request)
     {
-        $data = $this->orderChartService->drawTools($this->payload);
+        $data = $this->derivativeService->drawTools($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -155,7 +155,7 @@ class OrderChartController extends CoreController
      */
     public function report(Request $request)
     {
-        $data = $this->orderChartService->report($this->payload);
+        $data = $this->derivativeService->report($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -168,7 +168,7 @@ class OrderChartController extends CoreController
      */
     public function export(Request $request)
     {
-        $data = $this->orderChartService->export($this->payload);
+        $data = $this->derivativeService->export($this->payload);
         if ($data['download']) return $this->sendDownload($data);
         return $this->sendResponse($data);
     }
@@ -182,7 +182,7 @@ class OrderChartController extends CoreController
      */
     public function loginDnse(Request $request)
     {
-        $data = $this->orderChartService->loginDnse($this->payload);
+        $data = $this->derivativeService->loginDnse($this->payload);
         return $this->sendResponse($data);
     }
 }

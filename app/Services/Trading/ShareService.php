@@ -3,15 +3,14 @@
 namespace App\Services\Trading;
 
 use App\Services\CoreService;
-use App\Models\StockSymbol;
-use App\Models\StockOrder;
-use App\Models\DrawTool;
+use App\Models\ShareSymbol;
+use App\Models\ShareOrder;
+use App\Models\StockDrawing;
 use App\Jobs\FilterStockJob;
 use App\Jobs\ExportStockJob;
-use Illuminate\Support\Facades\Artisan;
 use stdClass;
 
-class StockService extends CoreService
+class ShareService extends CoreService
 {
     const TIME_ZONE = 7 * 60 * 60;
     const FA_AUTH = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
@@ -24,7 +23,7 @@ class StockService extends CoreService
      */
     public function initChart($payload)
     {
-        $range = DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
+        $range = StockDrawing::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
         $payload->window = $range->map(function ($t) {
             return $t->time;
         });
@@ -293,7 +292,7 @@ class StockService extends CoreService
     public function getTools($payload)
     {
         $result = array();
-        $ss = DrawTool::where('symbol', $payload->symbol)->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
+        $ss = StockDrawing::where('symbol', $payload->symbol)->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
         foreach ($ss as $d) {
             if (!isset($result[$d->name])) $result[$d->name] = array();
             $result[$d->name][$d->point] = $d->data;
@@ -369,7 +368,7 @@ class StockService extends CoreService
             ];
             $stt = true;
             foreach ($list as $item) {
-                $stt &= !!StockSymbol::updateOrCreate(['name' => $item->name], ['symbols' => $item->symbols]);
+                $stt &= !!ShareSymbol::updateOrCreate(['name' => $item->name], ['symbols' => $item->symbols]);
             }
             return ['isOk' => $stt];
         });
@@ -381,9 +380,9 @@ class StockService extends CoreService
      */
     public function getSymbols()
     {
-        $symbols = StockSymbol::get(array('name', 'symbols'))
+        $symbols = ShareSymbol::get(array('name', 'symbols'))
             ->pluck('symbols', 'name');
-        $holdSymbols = StockOrder::opening()->get('symbol')->pluck('symbol');
+        $holdSymbols = ShareOrder::opening()->get('symbol')->pluck('symbol');
         $holdSymbols = $holdSymbols->map(function ($s) {
             return ' ' . $s;
         });
@@ -411,7 +410,7 @@ class StockService extends CoreService
      */
     public function removeFilterList($payload)
     {
-        $list = StockSymbol::where('name', $payload->name)->first();
+        $list = ShareSymbol::where('name', $payload->name)->first();
         $list->symbols = array_values(array_diff($list->symbols, [' ' . $payload->symbol]));
         $list->save();
         return (object)[];
@@ -426,8 +425,8 @@ class StockService extends CoreService
     public function addWatchlist($payload)
     {
         $symbol = ' ' . $payload->symbol;
-        $watch = StockSymbol::where('name', 'watch')->first();
-        if (!$watch) StockSymbol::create(['name' => 'watch', 'symbols' => [$symbol]]);
+        $watch = ShareSymbol::where('name', 'watch')->first();
+        if (!$watch) ShareSymbol::create(['name' => 'watch', 'symbols' => [$symbol]]);
         else {
             $symbols = $watch->symbols;
             if ($payload->add) array_push($symbols, $symbol);
@@ -446,7 +445,7 @@ class StockService extends CoreService
      */
     public function deleteWatchlist($payload)
     {
-        $stt = StockSymbol::updateOrCreate(['name' => 'watch'], ['symbols' => []]);
+        $stt = ShareSymbol::updateOrCreate(['name' => 'watch'], ['symbols' => []]);
         return ['isOk' => !!$stt];
     }
 
@@ -459,7 +458,7 @@ class StockService extends CoreService
     public function drawTools($payload)
     {
         if ($payload->isRemove) {
-            $dt = DrawTool::where('symbol', $payload->symbol)->where('name', $payload->name);
+            $dt = StockDrawing::where('symbol', $payload->symbol)->where('name', $payload->name);
             if ($payload->name == 'line' && !!$payload->point)
                 $dt = $dt->where('point', $payload->point);
             $dt->delete();
@@ -468,7 +467,7 @@ class StockService extends CoreService
                 $key = ['symbol' => $payload->symbol, 'name' => $payload->name, 'point' => $payload->points[$i]];
                 $data = ['data' => $payload->data[$i]];
                 // if ($payload->name == 'line') $data['point'] = $payload->data[$i]->price;
-                DrawTool::updateOrCreate($key, $data);
+                StockDrawing::updateOrCreate($key, $data);
             }
         }
         return (object)[];
@@ -483,7 +482,7 @@ class StockService extends CoreService
     public function exportStock($payload)
     {
         $data = json_decode($payload->stockData);
-        $vn100 = StockSymbol::where('name', 'vn100')->select('symbols')->first();
+        $vn100 = ShareSymbol::where('name', 'vn100')->select('symbols')->first();
         ExportStockJob::dispatch($data, $vn100->symbols);
         return ['ok' => $vn100->symbols];
     }

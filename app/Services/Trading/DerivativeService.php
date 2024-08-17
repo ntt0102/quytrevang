@@ -5,11 +5,11 @@ namespace App\Services\Trading;
 use App\Services\CoreService;
 use App\Services\Special\VpsOrderService;
 use Illuminate\Support\Facades\Artisan;
-use App\Models\DrawTool;
+use App\Models\StockDrawing;
 use App\Jobs\ReportTradingJob;
 use App\Jobs\LoginDnseJob;
 
-class OrderChartService extends CoreService
+class DerivativeService extends CoreService
 {
     const SHIFT_TIME = 7 * 60 * 60;
 
@@ -55,7 +55,7 @@ class OrderChartService extends CoreService
     public function getTools()
     {
         $result = array();
-        $tools = DrawTool::where('symbol', 'VN30F1M')->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
+        $tools = StockDrawing::where('symbol', 'VN30F1M')->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
         foreach ($tools as $tool) {
             if (!isset($result[$tool->name])) $result[$tool->name] = array();
             $result[$tool->name][$tool->point] = $tool->data;
@@ -293,7 +293,7 @@ class OrderChartService extends CoreService
     {
         $symbol = 'VN30F1M';
         if ($payload->isRemove) {
-            $dt = DrawTool::where('symbol', $symbol)->where('name', $payload->name);
+            $dt = StockDrawing::where('symbol', $symbol)->where('name', $payload->name);
             if (isset($payload, $payload->point))
                 $dt = $dt->where('point', $payload->point);
             $dt->delete();
@@ -301,7 +301,7 @@ class OrderChartService extends CoreService
             for ($i = 0; $i < count($payload->points); $i++) {
                 $key = ['symbol' => $symbol, 'name' => $payload->name, 'point' => $payload->points[$i]];
                 $data = ['data' => $payload->data[$i]];
-                DrawTool::updateOrCreate($key, $data);
+                StockDrawing::updateOrCreate($key, $data);
             }
         }
         return (object)[];

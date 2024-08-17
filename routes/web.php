@@ -25,17 +25,17 @@ Route::get('cache', function () {
 });
 
 Route::get('migrate', function () {
-    // set_time_limit(300);
-    // exec('php ../artisan migrate:refresh --seed', $output, $return);
-    // if ($return != 0) return dd($output);
-    // exec('php ../artisan passport:install --force', $output, $return);
-    // if ($return != 0) return dd($output);
-    // return "Migrate done!";
+    set_time_limit(300);
+    exec('php ../artisan migrate:refresh --seed', $output, $return);
+    if ($return != 0) return dd($output);
+    exec('php ../artisan passport:install --force', $output, $return);
+    if ($return != 0) return dd($output);
+    return "Migrate done!";
 });
 
 Route::get('test', function () {
-    // $s = \App\Models\DrawTool::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
-    // $s = \App\Models\StockOrder::opening()->get('symbol')->pluck('symbol');
+    // $s = \App\Models\StockDrawing::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
+    // $s = \App\Models\ShareOrder::opening()->get('symbol')->pluck('symbol');
     // $s = $s->map(function ($s) {
     //     return ' ' . $s;
     // })->toArray();
@@ -45,7 +45,7 @@ Route::get('test', function () {
     // dd($vos->hasOrder() || $vos->hasConditionOrder());
     // dd(strtotime("2022-04-04"));
     // $result = array();
-    // $ss = \App\Models\DrawTool::where('symbol', 'VNINDEX')->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
+    // $ss = \App\Models\StockDrawing::where('symbol', 'VNINDEX')->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
     // foreach ($ss as $d) {
     //     if (!isset($result[$d->name])) $result[$d->name] = array();
     //     $result[$d->name][$d->point] = $d->data;
@@ -99,8 +99,8 @@ Route::get('test', function () {
     // }, $rsp);
     // $s = $rsp;
     // \Log::info('Hello world!!');
-    // $s = \App\Models\StockOrder::getProfitChart('quarter', '2023-03-04', '2024-03-04');
-    // $o = \App\Models\StockOrder::find(1);
+    // $s = \App\Models\ShareOrder::getProfitChart('quarter', '2023-03-04', '2024-03-04');
+    // $o = \App\Models\ShareOrder::find(1);
     // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
     // $s = app(\App\Services\Trading\StatisticService::class)->calculateProfit($o);
     // $o = (object)[
@@ -129,7 +129,7 @@ Route::get('test', function () {
     // }
     // file_put_contents($file, $date);
     // dd($isUpdated);
-    // $s = \App\Models\StockSymbol::where('name', 'vn100')->select('symbols')->first();
+    // $s = \App\Models\ShareSymbol::where('name', 'vn100')->select('symbols')->first();
     // dd($s->symbols);
     // \App\Jobs\ExportTradingJob::dispatch();
     // \App\Jobs\GetDnseEmailOtpJob::dispatch();
@@ -227,7 +227,7 @@ Route::get('test', function () {
     // $s->connectSocket();
     // \App\Jobs\ConnectSocketJob::dispatch();
     // $s = '2024-07-15' || date('Y-m-d');
-    // $s = \App\Models\DrawTool::select('data')->where('symbol', 'VN30F1M')->where('name', 'order')->where('point', 'entry')->first();
+    // $s = \App\Models\StockDrawing::select('data')->where('symbol', 'VN30F1M')->where('name', 'order')->where('point', 'entry')->first();
     // if ($s) {
     //     $data = $s->data;
     //     $data->price = 1000;

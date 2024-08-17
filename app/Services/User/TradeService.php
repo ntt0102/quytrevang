@@ -3,7 +3,7 @@
 namespace App\Services\User;
 
 use App\Services\CoreService;
-use App\Models\Trade;
+use App\Models\DerivativeStat;
 
 class TradeService extends CoreService
 {
@@ -18,7 +18,7 @@ class TradeService extends CoreService
     {
         $startDate = date_create()->modify('-1 month')->format('Y-m-d');
         $endDate = date_create()->format('Y-m-d');
-        $data = Trade::where('date', '>=', $startDate)
+        $data = DerivativeStat::where('date', '>=', $startDate)
             ->where('date', '<=', $endDate)
             ->orderBy('date', 'asc')->get()
             ->reduce(function ($carry, $item) {

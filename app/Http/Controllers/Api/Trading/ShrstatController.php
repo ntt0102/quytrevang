@@ -4,16 +4,16 @@ namespace App\Http\Controllers\Api\Trading;
 
 use App\Http\Controllers\Api\CoreController;
 use Illuminate\Http\Request;
-use App\Services\Trading\StatisticService;
+use App\Services\Trading\ShrstatService;
 
-class StatisticController extends CoreController
+class ShrstatController extends CoreController
 {
-    protected $statisticService;
+    protected $shrstatService;
 
-    public function __construct(StatisticService $statisticService)
+    public function __construct(ShrstatService $shrstatService)
     {
         parent::__construct();
-        $this->statisticService = $statisticService;
+        $this->shrstatService = $shrstatService;
     }
 
     /**
@@ -25,7 +25,7 @@ class StatisticController extends CoreController
      */
     public function getData(Request $request)
     {
-        $data = $this->statisticService->getData($this->payload);
+        $data = $this->shrstatService->getData($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -38,7 +38,7 @@ class StatisticController extends CoreController
      */
     public function getSummary(Request $request)
     {
-        $data = $this->statisticService->getSummary($this->payload);
+        $data = $this->shrstatService->getSummary($this->payload);
         return $this->sendResponse($data);
     }
     /**
@@ -50,7 +50,7 @@ class StatisticController extends CoreController
      */
     public function getOpening(Request $request)
     {
-        $data = $this->statisticService->getOpening($this->payload);
+        $data = $this->shrstatService->getOpening($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -63,7 +63,7 @@ class StatisticController extends CoreController
      */
     public function getProfitChart(Request $request)
     {
-        $data = $this->statisticService->getProfitChart($this->payload);
+        $data = $this->shrstatService->getProfitChart($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -76,7 +76,7 @@ class StatisticController extends CoreController
      */
     public function save(Request $request)
     {
-        $data = $this->statisticService->save($this->payload);
+        $data = $this->shrstatService->save($this->payload);
         return $this->sendResponse($data);
     }
 }

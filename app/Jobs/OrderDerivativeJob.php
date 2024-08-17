@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Services\Special\VpsOrderService;
-use App\Models\DrawTool;
+use App\Models\StockDrawing;
 
 class OrderDerivativeJob implements ShouldQueue
 {
@@ -34,7 +34,7 @@ class OrderDerivativeJob implements ShouldQueue
         if (!$vos->connection) return false;
         if ($vos->orderId['entry']) {
             if (!$vos->orderId['tp'] && $vos->position != 0) {
-                $entry = DrawTool::select('data')->where('symbol', $symbol)->where('name', 'order')->where('point', 'entry')->first();
+                $entry = StockDrawing::select('data')->where('symbol', $symbol)->where('name', 'order')->where('point', 'entry')->first();
                 if (!$entry) return false;
                 $entryLine = $entry->data;
                 $tpLine = $entryLine;
@@ -54,7 +54,7 @@ class OrderDerivativeJob implements ShouldQueue
                 $tpLine->color = 'lime';
                 $tpLine->title = number_format(abs($tpPrice - $entryLine->price), 1);
                 $tpLine->price = $tpPrice;
-                DrawTool::updateOrCreate(
+                StockDrawing::updateOrCreate(
                     ['symbol' => $symbol, 'name' => 'order', 'point' => 'tp'],
                     ['data' => $tpLine]
                 );
@@ -62,7 +62,7 @@ class OrderDerivativeJob implements ShouldQueue
                 $slLine->color = 'red';
                 $slLine->title = number_format(abs($slPrice - $entryLine->price), 1);
                 $slLine->price = $slPrice;
-                DrawTool::updateOrCreate(
+                StockDrawing::updateOrCreate(
                     ['symbol' => $symbol, 'name' => 'order', 'point' => 'sl'],
                     ['data' => $slLine]
                 );
@@ -70,7 +70,7 @@ class OrderDerivativeJob implements ShouldQueue
                 $tp = $vos->order('tp', ["cmd" => "cancel"]);
                 $sl = $vos->conditionOrder('sl', ["cmd" => "delete"]);
                 if (!$tp['isOk'] && !$sl['isOk']) return false;
-                DrawTool::where('symbol', $symbol)->where('name', 'order')->delete();
+                StockDrawing::where('symbol', $symbol)->where('name', 'order')->delete();
                 set_global_value('entryOrderId', '');
                 set_global_value('tpOrderId', '');
                 set_global_value('slOrderId', '');

@@ -4,31 +4,29 @@ namespace App\Models;
 
 use App\Models\CoreModel;
 
-class DrawTool extends CoreModel
+class ShareSymbol extends CoreModel
 {
     protected $visible = [
         'id',
-        'symbol',
         'name',
-        'point',
-        'data',
+        'symbols',
         'updated_at'
     ];
 
     protected $fillable = [
-        'symbol',
         'name',
-        'point',
-        'data',
+        'symbols',
     ];
 
     protected static $logAttributes = [
-        'symbol',
         'name',
-        'point',
-        'data',
+        'symbols',
         'updated_at'
     ];
 
-    protected $casts = ['data' => 'object'];
+    protected $casts = ['symbols' => 'array'];
+
+    protected $attributes = [
+        'symbols' => '[]',
+    ];
 }

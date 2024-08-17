@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateTradesTable extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -13,7 +13,7 @@ class CreateTradesTable extends Migration
      */
     public function up()
     {
-        Schema::create('trades', function (Blueprint $table) {
+        Schema::create('derivative_stats', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedSmallInteger('amount');
             $table->float('scores');
@@ -32,6 +32,6 @@ class CreateTradesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('trades');
+        Schema::dropIfExists('derivative_stats');
     }
-}
+};

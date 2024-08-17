@@ -4,16 +4,16 @@ namespace App\Http\Controllers\Api\Trading;
 
 use App\Http\Controllers\Api\CoreController;
 use Illuminate\Http\Request;
-use App\Services\Trading\TradeService;
+use App\Services\Trading\DerstatService;
 
-class TradeController extends CoreController
+class DerstatController extends CoreController
 {
-    protected $tradeService;
+    protected $derstatService;
 
-    public function __construct(TradeService $tradeService)
+    public function __construct(DerstatService $derstatService)
     {
         parent::__construct();
-        $this->tradeService = $tradeService;
+        $this->derstatService = $derstatService;
     }
 
     /**
@@ -25,7 +25,7 @@ class TradeController extends CoreController
      */
     public function fetch(Request $request)
     {
-        $data = $this->tradeService->fetch($this->payload);
+        $data = $this->derstatService->fetch($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -38,7 +38,7 @@ class TradeController extends CoreController
      */
     public function getChart(Request $request)
     {
-        $data = $this->tradeService->getChart($this->payload);
+        $data = $this->derstatService->getChart($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -51,7 +51,7 @@ class TradeController extends CoreController
      */
     public function getSummary(Request $request)
     {
-        $data = $this->tradeService->getSummary($this->payload);
+        $data = $this->derstatService->getSummary($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -64,7 +64,7 @@ class TradeController extends CoreController
      */
     public function save(Request $request)
     {
-        $data = $this->tradeService->save($this->payload);
+        $data = $this->derstatService->save($this->payload);
         return $this->sendResponse($data);
     }
 
@@ -77,7 +77,7 @@ class TradeController extends CoreController
      */
     public function validateDuplicateDate(Request $request)
     {
-        $data = $this->tradeService->validateDuplicateDate($this->payload);
+        $data = $this->derstatService->validateDuplicateDate($this->payload);
         return $this->sendResponse($data);
     }
 }

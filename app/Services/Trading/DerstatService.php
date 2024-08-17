@@ -4,11 +4,11 @@ namespace App\Services\Trading;
 
 use App\Services\CoreService;
 use App\Models\Parameter;
-use App\Models\Trade;
+use App\Models\DerivativeStat;
 use App\Events\UpdateStatisticEvent;
 
 
-class TradeService extends CoreService
+class DerstatService extends CoreService
 {
 
     /**
@@ -18,7 +18,7 @@ class TradeService extends CoreService
      */
     public function fetch()
     {
-        return Trade::orderBy('date', 'DESC')->take(5)->get();
+        return DerivativeStat::orderBy('date', 'DESC')->take(5)->get();
     }
 
     /**
@@ -92,7 +92,7 @@ class TradeService extends CoreService
     }
     private function queryChart($period, $startDate, $endDate)
     {
-        $charts = Trade::selectRaw('CAST(count(*) as INT) as counter');
+        $charts = DerivativeStat::selectRaw('CAST(count(*) as INT) as counter');
         $charts->selectRaw('CAST(sum(amount) as INT) as amount');
         $charts->selectRaw('CAST(sum(scores) as INT) as scores');
         $charts->selectRaw('CAST(sum(revenue) as INT) as revenue');
@@ -190,16 +190,16 @@ class TradeService extends CoreService
             foreach ($payload->changes as $change) {
                 switch ($change->type) {
                     case 'insert':
-                        $isOk = !!Trade::create((array)$change->data);
+                        $isOk = !!DerivativeStat::create((array)$change->data);
                         break;
 
                     case 'update':
-                        $trade = Trade::find($change->key);
+                        $trade = DerivativeStat::find($change->key);
                         $isOk = $trade->update((array)$change->data);
                         break;
 
                     case 'remove':
-                        $trade = Trade::find($change->key);
+                        $trade = DerivativeStat::find($change->key);
                         $isOk = $trade->delete();
                         break;
                 }
@@ -302,7 +302,7 @@ class TradeService extends CoreService
      */
     public function validateDuplicateDate($payload)
     {
-        $count = Trade::where('date', $payload->date)->count();
+        $count = DerivativeStat::where('date', $payload->date)->count();
         return $count == 0;
     }
 }

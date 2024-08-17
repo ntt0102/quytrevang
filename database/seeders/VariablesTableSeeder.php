@@ -24,7 +24,7 @@ class VariablesTableSeeder extends Seeder
         ]);
         Variable::create([
             'name' => "vn30f1m",
-            'value' => "VN30F2408",
+            'value' => "VN30F2409",
         ]);
         Variable::create([
             'name' => "vpsUser",

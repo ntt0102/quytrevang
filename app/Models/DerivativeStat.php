@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\CoreModel;
 
-class Trade extends CoreModel
+class DerivativeStat extends CoreModel
 {
     protected $visible = [
         'id',

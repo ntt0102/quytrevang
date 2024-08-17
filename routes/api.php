@@ -19,7 +19,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
     Route::post('send-comment', 'AppController@sendComment');
     Route::post('contact', 'AppController@getContact');
     Route::post('notifications/{id}/dismiss', 'User\NotificationController@dismiss');
-    Route::post('core.vpbs', 'Trading\OrderChartController@setVpsSession');
+    Route::post('core.vpbs', 'Trading\DerivativeController@setVpsSession');
 
     Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
         Route::post('login', 'LoginController@login')->name('login');
@@ -102,43 +102,43 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             });
             Route::group(['namespace' => 'Trading', 'prefix' => 'trading'], function () {
                 Route::group(['prefix' => 'order', 'middleware' => ['can:admin:order_derivative']], function () {
-                    Route::get('/', 'OrderChartController@getChartData');
-                    Route::get('init-chart', 'OrderChartController@initChart');
-                    Route::get('get-tools', 'OrderChartController@getTools');
-                    Route::post('login-vps', 'OrderChartController@loginVps');
-                    Route::get('get-status', 'OrderChartController@getStatus');
-                    Route::get('get-account-info', 'OrderChartController@getAccountInfo');
-                    Route::post('execute-order', 'OrderChartController@executeOrder');
-                    Route::post('close-position', 'OrderChartController@closePosition');
-                    Route::post('draw-tools', 'OrderChartController@drawTools');
-                    Route::post('report', 'OrderChartController@report');
-                    Route::post('export', 'OrderChartController@export');
-                    Route::post('login-dnse', 'OrderChartController@loginDnse');
+                    Route::get('/', 'DerivativeController@getChartData');
+                    Route::get('init-chart', 'DerivativeController@initChart');
+                    Route::get('get-tools', 'DerivativeController@getTools');
+                    Route::post('login-vps', 'DerivativeController@loginVps');
+                    Route::get('get-status', 'DerivativeController@getStatus');
+                    Route::get('get-account-info', 'DerivativeController@getAccountInfo');
+                    Route::post('execute-order', 'DerivativeController@executeOrder');
+                    Route::post('close-position', 'DerivativeController@closePosition');
+                    Route::post('draw-tools', 'DerivativeController@drawTools');
+                    Route::post('report', 'DerivativeController@report');
+                    Route::post('export', 'DerivativeController@export');
+                    Route::post('login-dnse', 'DerivativeController@loginDnse');
                 });
                 Route::group(['prefix' => 'statistic1', 'middleware' => 'can:admin:statistic_derivative'], function () {
-                    Route::post('/', 'TradeController@fetch');
-                    Route::post('validate-duplicate-date', 'TradeController@validateDuplicateDate');
-                    Route::post('chart', 'TradeController@getChart');
-                    Route::post('summary', 'TradeController@getSummary');
-                    Route::post('save', 'TradeController@save');
+                    Route::post('/', 'DerstatController@fetch');
+                    Route::post('validate-duplicate-date', 'DerstatController@validateDuplicateDate');
+                    Route::post('chart', 'DerstatController@getChart');
+                    Route::post('summary', 'DerstatController@getSummary');
+                    Route::post('save', 'DerstatController@save');
                 });
                 Route::group(['prefix' => 'stock', 'middleware' => ['can:admin:access_share']], function () {
-                    Route::get('/', 'StockController@getChart');
-                    Route::get('init-chart', 'StockController@initChart');
-                    Route::post('clone-symbols', 'StockController@cloneSymbols');
-                    Route::get('get-symbols', 'StockController@getSymbols');
-                    Route::post('filter', 'StockController@filterSymbols');
-                    Route::post('remove-filter-list', 'StockController@removeFilterList');
-                    Route::post('add-watchlist', 'StockController@addWatchlist');
-                    Route::post('delete-watchlist', 'StockController@deleteWatchlist');
-                    Route::post('draw-tools', 'StockController@drawTools');
+                    Route::get('/', 'ShareController@getChart');
+                    Route::get('init-chart', 'ShareController@initChart');
+                    Route::post('clone-symbols', 'ShareController@cloneSymbols');
+                    Route::get('get-symbols', 'ShareController@getSymbols');
+                    Route::post('filter', 'ShareController@filterSymbols');
+                    Route::post('remove-filter-list', 'ShareController@removeFilterList');
+                    Route::post('add-watchlist', 'ShareController@addWatchlist');
+                    Route::post('delete-watchlist', 'ShareController@deleteWatchlist');
+                    Route::post('draw-tools', 'ShareController@drawTools');
                 });
                 Route::group(['prefix' => 'statistic', 'middleware' => 'can:admin:statistic_share'], function () {
-                    Route::post('/', 'StatisticController@getData');
-                    Route::post('summary', 'StatisticController@getSummary');
-                    Route::post('opening', 'StatisticController@getOpening');
-                    Route::post('profit-chart', 'StatisticController@getProfitChart');
-                    Route::post('save', 'StatisticController@save');
+                    Route::post('/', 'ShrstatController@getData');
+                    Route::post('summary', 'ShrstatController@getSummary');
+                    Route::post('opening', 'ShrstatController@getOpening');
+                    Route::post('profit-chart', 'ShrstatController@getProfitChart');
+                    Route::post('save', 'ShrstatController@save');
                 });
                 Route::group(['prefix' => 'finbook', 'middleware' => 'can:admin:access_finbooks'], function () {
                     Route::post('/', 'FinbookController@fetch');
