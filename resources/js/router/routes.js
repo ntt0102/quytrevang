@@ -155,7 +155,7 @@ const authRoute = [
             title: lang.global.t("trading.derivative.title"),
             layout: AuthLayout,
         },
-        component: loadView("Trading", "Order", "Index"),
+        component: loadView("Trading", "Derivative", "Index"),
     },
     {
         path: `/${lang.global.t("route.tradingDerstat")}`,
@@ -166,7 +166,7 @@ const authRoute = [
             title: lang.global.t("trading.derstats.title"),
             layout: AuthLayout,
         },
-        component: loadView("Trading", "Statistic1", "Index"),
+        component: loadView("Trading", "Derstat", "Index"),
     },
     {
         path: `/${lang.global.t("route.tradingShare")}`,
@@ -177,7 +177,7 @@ const authRoute = [
             title: lang.global.t("trading.share.title"),
             layout: AuthLayout,
         },
-        component: loadView("Trading", "Stock", "Index"),
+        component: loadView("Trading", "Share", "Index"),
     },
     {
         path: `/${lang.global.t("route.tradingShrstat")}`,
@@ -188,7 +188,7 @@ const authRoute = [
             title: lang.global.t("trading.shrstats.title"),
             layout: AuthLayout,
         },
-        component: loadView("Trading", "Statistic", "Index"),
+        component: loadView("Trading", "Shrstat", "Index"),
     },
     {
         path: `/${lang.global.t("route.tradingFinbook")}`,
