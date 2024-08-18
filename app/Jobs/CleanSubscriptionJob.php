@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\User;
 
-class CleanSubscriptionJob implements ShouldQueue
+class CleanDatabaseCommand implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -26,9 +26,7 @@ class CleanSubscriptionJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Execute the job.

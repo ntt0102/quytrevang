@@ -4,22 +4,23 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Models\User;
+use Illuminate\Notifications\DatabaseNotification;
 
-class CleanSubscriptionCommand extends Command
+class CleanDatabaseCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'subscription:clean';
+    protected $signature = 'database:clean';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Clean Subscription';
+    protected $description = 'Clean Database';
 
     /**
      * Create a new command instance.
@@ -38,16 +39,15 @@ class CleanSubscriptionCommand extends Command
      */
     public function handle()
     {
-        $dateYearAgo = date_sub(date_create(), date_interval_create_from_date_string('1 year'));
-        $users = User::all();
+        $users = User::with('pushSubscriptions')->has('pushSubscriptions', '>', 1)->get();
         foreach ($users as $user) {
-            $subs = $user->routeNotificationForWebPush();
-            if (count($subs) > 1) {
-                foreach ($subs as $sub) {
-                    if ($sub->updated_at->lessThan($dateYearAgo))
-                        $user->deletePushSubscription($sub->endpoint);
+            foreach ($user->pushSubscriptions as $sub) {
+                if ($sub->updated_at->lessThan(now()->subDays(365))) {
+                    $user->deletePushSubscription($sub->endpoint);
                 }
             }
         }
+        //
+        DatabaseNotification::where('created_at', '<', now()->subDays(30))->delete();
     }
 }

@@ -234,7 +234,21 @@ Route::get('test', function () {
     //     $s->data = $data;
     //     $s->save();
     // }
-    $s = number_format(abs(1223.122 - 1215.356), 1);
-    dd($s);
+    // $s = number_format(abs(1223.122 - 1215.356), 1);
+    // dd($s);
+    // Illuminate\Notifications\DatabaseNotification::where('created_at', '<', now()->subDays(30))->delete();
+    $users = App\Models\User::with('pushSubscriptions')
+        ->has('pushSubscriptions', '>=', 1)
+        ->get();
+
+    $dateYearAgo = now()->subDays(365);
+
+    foreach ($users as $user) {
+        foreach ($user->pushSubscriptions as $sub) {
+            if ($sub->updated_at->lessThan($dateYearAgo)) {
+                $user->deletePushSubscription($sub->endpoint);
+            }
+        }
+    }
     return 'ok';
 });
