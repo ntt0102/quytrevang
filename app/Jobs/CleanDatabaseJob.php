@@ -8,9 +8,10 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
-class CleanDatabaseCommand implements ShouldQueue
+class CleanDatabaseJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -35,16 +36,15 @@ class CleanDatabaseCommand implements ShouldQueue
      */
     public function handle()
     {
-        $date = date_create()->modify('-1 year');
-        $users = User::all();
+        $users = User::with('pushSubscriptions')->has('pushSubscriptions', '>', 1)->get();
         foreach ($users as $user) {
-            $subs = $user->routeNotificationForWebPush();
-            if (count($subs) > 1) {
-                foreach ($subs as $sub) {
-                    if ($sub->updated_at->lessThan($date))
-                        $user->deletePushSubscription($sub->endpoint);
+            foreach ($user->pushSubscriptions as $sub) {
+                if ($sub->updated_at->lessThan(now()->subDays(365))) {
+                    $user->deletePushSubscription($sub->endpoint);
                 }
             }
         }
+        DB::table('notifications')->where('created_at', '<', now()->subDays(30))->delete();
+        DB::table('oauth_access_tokens')->where('expires_at', '<', now())->delete();
     }
 }
