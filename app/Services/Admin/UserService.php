@@ -8,7 +8,7 @@ use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\Parameter;
 use Illuminate\Support\Facades\Storage;
-use App\Events\AdminBroadcastEvent;
+use App\Events\UpdateUserEvent;
 use App\Notifications\ConfirmedUserNotification;
 
 
@@ -162,7 +162,7 @@ class UserService extends CoreService
                 //
                 if ($isOk && $isFirstUpload) {
                     $user->notify(new ConfirmedUserNotification());
-                    event(new AdminBroadcastEvent('users'));
+                    event(new UpdateUserEvent());
                 }
 
                 return ['isOk' => $isOk];

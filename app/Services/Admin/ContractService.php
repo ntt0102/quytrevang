@@ -8,7 +8,7 @@ use App\Models\User;
 use App\Models\Parameter;
 use App\Notifications\PaidContractNotification;
 use App\Notifications\WithdrawnContractNotification;
-use App\Events\AdminBroadcastEvent;
+use App\Events\UpdateContractEvent;
 use Illuminate\Support\Facades\Storage;
 
 
@@ -169,7 +169,7 @@ class ContractService extends CoreService
             );
             if ($isOk && $isFirstConfirm && $isConfirmed) {
                 $user->notify(new PaidContractNotification($contract));
-                event(new AdminBroadcastEvent('contracts'));
+                event(new UpdateContractEvent());
             }
             return ['isOk' => $isOk, 'doc' => $documents];
         });
@@ -210,7 +210,7 @@ class ContractService extends CoreService
             );
             if ($isOk && $isFirstWithdrawn) {
                 $user->notify(new WithdrawnContractNotification($contract));
-                event(new AdminBroadcastEvent('contracts'));
+                event(new UpdateContractEvent());
                 if ($contract->advance < $contract->total) {
                     $data = [
                         "code" => Contract::generateUniqueCode(),
