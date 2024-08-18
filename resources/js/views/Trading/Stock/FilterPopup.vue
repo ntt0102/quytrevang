@@ -96,10 +96,10 @@ function filterSymbols() {
         to: moment(state.toDate).unix(),
         type: state.type.value,
     };
-    store.dispatch("tradingStock/filterSymbols", param);
+    store.dispatch("tradingShare/filterSymbols", param);
 }
 function onShown() {
-    store.dispatch("tradingOrder/getCopyistStatus");
+    store.dispatch("tradingDerivative/getCopyistStatus");
     fromDateRef.value.instance.focus();
 }
 function onHidden() {}

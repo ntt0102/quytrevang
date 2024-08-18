@@ -37,7 +37,7 @@ function show() {
     popupRef.value.show();
 }
 function handleOnComplete(e) {
-    store.dispatch("tradingOrder/loginVps", e).then((isOk) => {
+    store.dispatch("tradingDerivative/loginVps", e).then((isOk) => {
         if (isOk) popupRef.value.hide();
         otpInputRef.value.clearInput();
     });

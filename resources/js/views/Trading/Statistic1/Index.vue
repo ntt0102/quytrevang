@@ -21,7 +21,7 @@
                         hint: $t('trading.derstats.buttons.more'),
                         elementAttr: { 'data-page': charts.page },
                         onClick: () =>
-                            $store.dispatch('tradingStatistic1/lazyLoad'),
+                            $store.dispatch('tradingDerstat/lazyLoad'),
                     },
                 },
                 {
@@ -48,10 +48,7 @@
                             },
                         },
                         onValueChanged: (e) =>
-                            $store.dispatch(
-                                'tradingStatistic1/getChart',
-                                e.value
-                            ),
+                            $store.dispatch('tradingDerstat/getChart', e.value),
                     },
                 },
             ]"
@@ -299,10 +296,10 @@ const visibleSeries = reactive({
     accumulatedProfit: true,
 });
 const chartRef = ref(null);
-const charts = computed(() => store.state.tradingStatistic1.charts);
+const charts = computed(() => store.state.tradingDerstat.charts);
 const permissions = computed(() => store.state.auth.user.permissions);
 
-store.dispatch("tradingStatistic1/getChart", route.query.period ?? "day");
+store.dispatch("tradingDerstat/getChart", route.query.period ?? "day");
 bus.on("toggleMenu", () => {
     setTimeout(() => chartRef.value.instance.render(), 300);
 });

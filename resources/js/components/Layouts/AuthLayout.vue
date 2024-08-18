@@ -257,7 +257,7 @@ function connectPusher() {
                             break;
                         case "filtered-stock":
                             if (route.name == "trading-share") {
-                                store.dispatch("tradingStock/getSymbols");
+                                store.dispatch("tradingShare/getSymbols");
                             }
                             break;
                     }
@@ -294,8 +294,8 @@ function connectPusher() {
     pusher.subscribe("private-trading-derivative").bind("update-status", () => {
         setTimeout(() => {
             if (route.name == "trading-derivative") {
-                store.dispatch("tradingOrder/getStatus");
-                store.dispatch("tradingStatistic/getTools");
+                store.dispatch("tradingDerivative/getStatus");
+                store.dispatch("tradingShrstat/getTools");
             }
         }, 2000);
     });
@@ -304,12 +304,12 @@ function connectPusher() {
         .bind("update-statistic", () => {
             setTimeout(() => {
                 if (route.name == "trading-shrstats") {
-                    store.dispatch("tradingStatistic/getData");
-                    store.dispatch("tradingStatistic/getSummary");
-                    store.dispatch("tradingStatistic/getOpening");
+                    store.dispatch("tradingShrstat/getData");
+                    store.dispatch("tradingShrstat/getSummary");
+                    store.dispatch("tradingShrstat/getOpening");
                     store.dispatch(
-                        "tradingStatistic/getProfitChart",
-                        store.tradingStatistic.charts.period
+                        "tradingShrstat/getProfitChart",
+                        store.tradingShrstat.charts.period
                     );
                 }
             }, 2000);

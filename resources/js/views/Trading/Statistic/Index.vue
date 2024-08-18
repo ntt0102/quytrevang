@@ -23,7 +23,7 @@
                         hint: $t('trading.shrstats.buttons.more'),
                         elementAttr: { 'data-page': charts.page },
                         onClick: () =>
-                            $store.dispatch('tradingStatistic/lazyLoad'),
+                            $store.dispatch('tradingShrstat/lazyLoad'),
                     },
                 },
                 {
@@ -51,7 +51,7 @@
                         },
                         onValueChanged: (e) =>
                             $store.dispatch(
-                                'tradingStatistic/getProfitChart',
+                                'tradingShrstat/getProfitChart',
                                 e.value
                             ),
                     },
@@ -232,9 +232,9 @@ const visibleSeries = reactive({
     accProfit: true,
 });
 const chartRef = ref(null);
-const charts = computed(() => store.state.tradingStatistic.charts);
+const charts = computed(() => store.state.tradingShrstat.charts);
 
-store.dispatch("tradingStatistic/getProfitChart", route.query.period ?? "day");
+store.dispatch("tradingShrstat/getProfitChart", route.query.period ?? "day");
 bus.on("toggleMenu", () => {
     setTimeout(() => chartRef.value.instance.render(), 300);
 });
@@ -242,7 +242,7 @@ bus.on("toggleMenu", () => {
 onUnmounted(() => bus.off("toggleMenu"));
 
 function periodEmit(period) {
-    store.dispatch("tradingStatistic/getProfitChart", period);
+    store.dispatch("tradingShrstat/getProfitChart", period);
 }
 
 function customizePoint({ value, series }) {

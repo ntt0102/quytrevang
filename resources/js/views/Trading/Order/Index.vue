@@ -59,7 +59,9 @@
                             status.connection ? 'link' : 'unlink'
                         }`"
                         :title="$t('trading.derivative.connection')"
-                        @click="() => $store.dispatch('tradingOrder/getStatus')"
+                        @click="
+                            () => $store.dispatch('tradingDerivative/getStatus')
+                        "
                     ></div>
                     <div
                         class="command status"
@@ -92,7 +94,7 @@
                     >
                         <i
                             :class="`far fa-sync-alt ${
-                                $store.state.tradingOrder.isChartLoading
+                                $store.state.tradingDerivative.isChartLoading
                                     ? 'fa-spin'
                                     : ''
                             }`"
@@ -337,25 +339,25 @@ const state = reactive({
     showLineContext: false,
     showTradingView: false,
 });
-const status = computed(() => store.state.tradingOrder.status);
-const config = computed(() => store.state.tradingOrder.config);
+const status = computed(() => store.state.tradingDerivative.status);
+const config = computed(() => store.state.tradingDerivative.config);
 const showCancelOrder = computed(
     () =>
         status.value.position != 0 ||
         !!status.value.pending ||
-        !!store.state.tradingOrder.tools.order
+        !!store.state.tradingDerivative.tools.order
 );
 const tradingViewSrc = computed(() => {
     return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${config.value.vpsUser}&s=${config.value.vpsSession}&resolution=1`;
 });
 
-store.dispatch("tradingOrder/initChart").then(() => {
+store.dispatch("tradingDerivative/initChart").then(() => {
     if (inSession()) connectSocket();
 });
 
 params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
-    if (inSession()) store.dispatch("tradingOrder/getStatus");
+    if (inSession()) store.dispatch("tradingDerivative/getStatus");
     else clearInterval(params.interval60);
 }, 60000);
 
@@ -396,8 +398,8 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    store.dispatch("tradingOrder/getChartData", state.chartDate);
-    store.dispatch("tradingOrder/getTools");
+    store.dispatch("tradingDerivative/getChartData", state.chartDate);
+    store.dispatch("tradingDerivative/getTools");
 });
 onUnmounted(() => {
     document.removeEventListener("keydown", eventKeyPress);
@@ -411,8 +413,8 @@ onUnmounted(() => {
     params.socketStop = true;
 });
 
-watch(() => store.state.tradingOrder.chartData, loadChartData);
-watch(() => store.state.tradingOrder.tools, loadToolsData);
+watch(() => store.state.tradingDerivative.chartData, loadChartData);
+watch(() => store.state.tradingDerivative.tools, loadToolsData);
 
 function eventChartClick(e) {
     state.showLineContext = false;
@@ -470,7 +472,7 @@ function eventPriceLineDrag(e) {
                         isChanged = true;
                         params.tools.order[lineOptions.kind].price = newPrice;
                         store
-                            .dispatch("tradingOrder/executeOrder", {
+                            .dispatch("tradingDerivative/executeOrder", {
                                 action: "entry",
                                 etData: {
                                     cmd: "change",
@@ -498,7 +500,7 @@ function eventPriceLineDrag(e) {
                     params.tools.order[lineOptions.kind].price = newPrice;
                     if (lineOptions.kind == "tp")
                         store
-                            .dispatch("tradingOrder/executeOrder", {
+                            .dispatch("tradingDerivative/executeOrder", {
                                 action: "tp",
                                 tpData: {
                                     cmd: "change",
@@ -520,7 +522,7 @@ function eventPriceLineDrag(e) {
                             });
                     else
                         store
-                            .dispatch("tradingOrder/executeOrder", {
+                            .dispatch("tradingDerivative/executeOrder", {
                                 action: "sl",
                                 slData: {
                                     cmd: "change",
@@ -549,12 +551,12 @@ function eventPriceLineDrag(e) {
             }
             break;
         case "line":
-            store.dispatch("tradingOrder/drawTools", {
+            store.dispatch("tradingDerivative/drawTools", {
                 isRemove: true,
                 name: "line",
                 point: oldPrice,
             });
-            store.dispatch("tradingOrder/drawTools", {
+            store.dispatch("tradingDerivative/drawTools", {
                 isRemove: false,
                 name: "line",
                 points: [newPrice],
@@ -612,7 +614,7 @@ function eventPriceLineDrag(e) {
                 param.points.push(point);
                 param.data.push(params.tools.target[point].options());
                 //
-                store.dispatch("tradingOrder/drawTools", param);
+                store.dispatch("tradingDerivative/drawTools", param);
             }
             break;
         case "rr":
@@ -672,7 +674,7 @@ function eventPriceLineDrag(e) {
                     param.points.push(point);
                     param.data.push(params.tools.rr[point].options());
                 }
-                store.dispatch("tradingOrder/drawTools", param);
+                store.dispatch("tradingDerivative/drawTools", param);
             }
             break;
     }
@@ -873,7 +875,7 @@ function mergeChartData(data1, data2) {
     );
 }
 function connectSocket() {
-    store.dispatch("tradingOrder/setChartLoading", true);
+    store.dispatch("tradingDerivative/setChartLoading", true);
     params.websocket = new WebSocket(FIREANT_SOCKET_ENDPOINT);
     params.websocket.onopen = (e) => {
         let message = '{"protocol":"json","version":1}';
@@ -902,7 +904,7 @@ function connectSocket() {
                 );
                 params.series.whitespace.setData(params.data.whitespace);
                 updateChartData(item.result, 0);
-                store.dispatch("tradingOrder/setChartLoading", false);
+                store.dispatch("tradingDerivative/setChartLoading", false);
             } else if (
                 item.type == 1 &&
                 item.target == "UpdateTrades" &&
@@ -939,7 +941,7 @@ function intervalHandler() {
                     mf.isSet(params.tools.order.tp.line)
                 ) {
                     store
-                        .dispatch("tradingOrder/executeOrder", {
+                        .dispatch("tradingDerivative/executeOrder", {
                             action: "cancel",
                             tpData: { cmd: "cancel" },
                             slData: { cmd: "delete" },
@@ -1027,7 +1029,7 @@ function drawOrderLine(kinds) {
             param.data.push(options);
         }
     });
-    store.dispatch("tradingOrder/drawTools", param);
+    store.dispatch("tradingDerivative/drawTools", param);
 }
 function removeOrderLine(kinds, withServer = true) {
     kinds.forEach((kind) => {
@@ -1037,7 +1039,7 @@ function removeOrderLine(kinds, withServer = true) {
         }
     });
     if (withServer)
-        store.dispatch("tradingOrder/drawTools", {
+        store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "order",
         });
@@ -1066,7 +1068,7 @@ function drawLineTool() {
         const isExist = (ops.type = TYPE && price == +ops.price);
         if (isExist) {
             params.series.price.removePriceLine(line);
-            store.dispatch("tradingOrder/drawTools", {
+            store.dispatch("tradingDerivative/drawTools", {
                 isRemove: true,
                 name: TYPE,
                 point: price,
@@ -1085,7 +1087,7 @@ function drawLineTool() {
             draggable: true,
         };
         params.tools.lines.push(params.series.price.createPriceLine(options));
-        store.dispatch("tradingOrder/drawTools", {
+        store.dispatch("tradingDerivative/drawTools", {
             isRemove: false,
             name: TYPE,
             points: [price],
@@ -1101,7 +1103,7 @@ function removeLineTool(withServer = true) {
         );
         initToolsParams(["lines"]);
         if (withServer)
-            store.dispatch("tradingOrder/drawTools", {
+            store.dispatch("tradingDerivative/drawTools", {
                 isRemove: true,
                 name: "line",
             });
@@ -1127,7 +1129,7 @@ function drawVerticalTool() {
     params.tools.vertical = params.tools.vertical.filter((item) => {
         const isExist = item.time == time;
         if (isExist) {
-            store.dispatch("tradingOrder/drawTools", {
+            store.dispatch("tradingDerivative/drawTools", {
                 isRemove: true,
                 name: TYPE,
                 point: time,
@@ -1139,7 +1141,7 @@ function drawVerticalTool() {
         const tmp = { time, value: 1 };
         params.tools.vertical.push(tmp);
         params.tools.vertical.sort((a, b) => a.time - b.time);
-        store.dispatch("tradingOrder/drawTools", {
+        store.dispatch("tradingDerivative/drawTools", {
             isRemove: false,
             name: TYPE,
             points: [time],
@@ -1153,7 +1155,7 @@ function removeVerticalTool(withServer = true) {
     initToolsParams(["vertical"]);
     params.series.vertical.setData([]);
     if (withServer)
-        store.dispatch("tradingOrder/drawTools", {
+        store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "vertical",
         });
@@ -1300,7 +1302,7 @@ function drawUplpsTool() {
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
 
-    store.dispatch("tradingOrder/drawTools", param);
+    store.dispatch("tradingDerivative/drawTools", param);
     uplpsToolRef.value.classList.remove("selected");
 }
 function findUplps(startTime, endTime) {
@@ -1345,7 +1347,7 @@ function removeUplpsTool(withServer = true) {
     }
     initToolsParams(["uplps"]);
     if (withServer)
-        store.dispatch("tradingOrder/drawTools", {
+        store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "uplps",
         });
@@ -1398,7 +1400,7 @@ function drawDownlpsTool() {
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
 
-    store.dispatch("tradingOrder/drawTools", param);
+    store.dispatch("tradingDerivative/drawTools", param);
     downlpsToolRef.value.classList.remove("selected");
 }
 function findDownlps(startTime, endTime) {
@@ -1443,7 +1445,7 @@ function removeDownlpsTool(withServer = true) {
     }
     initToolsParams(["downlps"]);
     if (withServer)
-        store.dispatch("tradingOrder/drawTools", {
+        store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "downlps",
         });
@@ -1527,7 +1529,7 @@ function drawTargetTool() {
         param.points.push(option.point);
         param.data.push(mf.cloneDeep(option));
     }
-    store.dispatch("tradingOrder/drawTools", param);
+    store.dispatch("tradingDerivative/drawTools", param);
 }
 function removeTargetTool(withServer = true) {
     if (mf.isSet(params.tools.target.A)) {
@@ -1541,7 +1543,7 @@ function removeTargetTool(withServer = true) {
     }
     initToolsParams(["target"]);
     if (withServer)
-        store.dispatch("tradingOrder/drawTools", {
+        store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "target",
         });
@@ -1624,7 +1626,7 @@ function drawRrTool() {
         param.points.push(option.point);
         param.data.push(mf.cloneDeep(option));
     }
-    store.dispatch("tradingOrder/drawTools", param);
+    store.dispatch("tradingDerivative/drawTools", param);
 }
 function removeRrTool(withServer = true) {
     if (mf.isSet(params.tools.rr.EP)) {
@@ -1638,7 +1640,7 @@ function removeRrTool(withServer = true) {
     }
     initToolsParams(["rr"]);
     if (withServer)
-        store.dispatch("tradingOrder/drawTools", {
+        store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "rr",
         });
@@ -1691,7 +1693,7 @@ function drawSuperTool() {
         points: [0, 1, 2],
         data: params.tools.super,
     };
-    store.dispatch("tradingOrder/drawTools", param);
+    store.dispatch("tradingDerivative/drawTools", param);
     superToolRef.value.classList.remove("selected");
 }
 function findSuper(startTime, endTime, type, side) {
@@ -1733,7 +1735,7 @@ function removeSuperTool(withServer = true) {
     initToolsParams(["super"]);
     params.series.super.setData([]);
     if (withServer)
-        store.dispatch("tradingOrder/drawTools", {
+        store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "super",
         });
@@ -1827,7 +1829,7 @@ function entryOrderClick() {
             result.then((dialogResult) => {
                 if (dialogResult) {
                     store
-                        .dispatch("tradingOrder/executeOrder", {
+                        .dispatch("tradingDerivative/executeOrder", {
                             action: "exit",
                             exitData: {
                                 cmd: "new",
@@ -1845,7 +1847,7 @@ function entryOrderClick() {
             });
         } else if (params.currentSeconds < TIME.ATC) {
             store
-                .dispatch("tradingOrder/executeOrder", {
+                .dispatch("tradingDerivative/executeOrder", {
                     action: "entry",
                     etData: {
                         cmd: "new",
@@ -1867,7 +1869,7 @@ function entryOrderClick() {
             result.then((dialogResult) => {
                 if (dialogResult) {
                     store
-                        .dispatch("tradingOrder/executeOrder", {
+                        .dispatch("tradingDerivative/executeOrder", {
                             action: "exit",
                             exitData: {
                                 cmd: "new",
@@ -1892,7 +1894,7 @@ function tpslOrderClick() {
     params.tools.order.sl.price =
         params.tools.order.entry.price - params.tools.order.side * SL_DEFAULT;
     store
-        .dispatch("tradingOrder/executeOrder", {
+        .dispatch("tradingDerivative/executeOrder", {
             action: "tpsl",
             tpData: {
                 cmd: "new",
@@ -1917,7 +1919,7 @@ function cancelOrderClick() {
     if (mf.isSet(params.tools.order.entry.line)) {
         if (mf.isSet(params.tools.order.tp.line)) {
             store
-                .dispatch("tradingOrder/executeOrder", {
+                .dispatch("tradingDerivative/executeOrder", {
                     action: "exit",
                     tpData: { cmd: "cancel" },
                     slData: { cmd: "delete" },
@@ -1936,7 +1938,7 @@ function cancelOrderClick() {
                 });
         } else {
             store
-                .dispatch("tradingOrder/executeOrder", {
+                .dispatch("tradingDerivative/executeOrder", {
                     action: "entry",
                     etData: { cmd: "delete" },
                 })
@@ -1965,7 +1967,7 @@ function scanOrder(lastPrice) {
                 if (!params.isAutoOrdering) {
                     params.isAutoOrdering = true;
                     store
-                        .dispatch("tradingOrder/executeOrder", {
+                        .dispatch("tradingDerivative/executeOrder", {
                             action: "sl",
                             slData: {
                                 cmd: "delete",
@@ -1992,7 +1994,7 @@ function scanOrder(lastPrice) {
                 if (!params.isAutoOrdering) {
                     params.isAutoOrdering = true;
                     store
-                        .dispatch("tradingOrder/executeOrder", {
+                        .dispatch("tradingDerivative/executeOrder", {
                             action: "tp",
                             tpData: {
                                 cmd: "cancel",
@@ -2027,7 +2029,7 @@ function scanOrder(lastPrice) {
                             params.tools.order.entry.price -
                             params.tools.order.side * SL_DEFAULT;
                         store
-                            .dispatch("tradingOrder/executeOrder", {
+                            .dispatch("tradingDerivative/executeOrder", {
                                 action: "tpsl",
                                 tpData: {
                                     cmd: "new",
@@ -2077,7 +2079,7 @@ function toastOrderError(error) {
 }
 function dateSelectChange() {
     if (!state.chartDate) return false;
-    store.dispatch("tradingOrder/getChartData", state.chartDate);
+    store.dispatch("tradingDerivative/getChartData", state.chartDate);
 }
 function refreshChart() {
     if (inSession()) params.websocket.send(params.socketSendData);
@@ -2087,10 +2089,10 @@ function resetChart() {
     params.data.price = [];
     params.data.volume = [];
     refreshChart();
-    store.dispatch("tradingOrder/getChartData", state.chartDate);
+    store.dispatch("tradingDerivative/getChartData", state.chartDate);
 }
 function resetTools() {
-    store.dispatch("tradingOrder/getTools");
+    store.dispatch("tradingDerivative/getTools");
 }
 function initToolsParams(tools) {
     if (tools == undefined)
@@ -2116,7 +2118,7 @@ function initToolsParams(tools) {
     if (tools.includes("super")) params.tools.super = [];
 }
 function getAccountInfo() {
-    store.dispatch("tradingOrder/getAccountInfo").then((data) => {
+    store.dispatch("tradingDerivative/getAccountInfo").then((data) => {
         let html = "";
         html += '<div style="width: 200px;">';
         html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
@@ -2136,18 +2138,18 @@ function getAccountInfo() {
     });
 }
 function report() {
-    bus.emit("checkPin", () => store.dispatch("tradingOrder/report"));
+    bus.emit("checkPin", () => store.dispatch("tradingDerivative/report"));
 }
 function exportCsv() {
     bus.emit("checkPin", () =>
-        store.dispatch("tradingOrder/export", state.chartDate)
+        store.dispatch("tradingDerivative/export", state.chartDate)
     );
 }
 function loginVps() {
     vpsOtpPopupRef.value.show();
 }
 function loginDnse() {
-    bus.emit("checkPin", () => store.dispatch("tradingOrder/loginDnse"));
+    bus.emit("checkPin", () => store.dispatch("tradingDerivative/loginDnse"));
 }
 function getTimeDistance(start, end) {
     let distance = Math.abs(start - end);

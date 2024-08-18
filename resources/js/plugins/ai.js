@@ -62,7 +62,7 @@ function trainAI() {
         (result) => {
             if (result) {
                 store
-                    .dispatch("tradingStock/getTrainData")
+                    .dispatch("tradingShare/getTrainData")
                     .then(async (data) => {
                         console.log("trainAI-start");
                         // Define future time for prediction

@@ -124,7 +124,7 @@ const INTERVAL = 4; // 4ms
 const store = useStore();
 const router = useRouter();
 const mf = inject("mf");
-const summary = computed(() => store.state.tradingStatistic.summary);
+const summary = computed(() => store.state.tradingShrstat.summary);
 const state = reactive({
     day: 0,
     week: 0,
@@ -139,10 +139,10 @@ let params = {
     doneFlag: false,
 };
 
-store.dispatch("tradingStatistic1/getSummary");
+store.dispatch("tradingDerstat/getSummary");
 
 watch(
-    () => store.state.tradingStatistic.summary,
+    () => store.state.tradingShrstat.summary,
     (value) => {
         if (mf.isSet(value)) {
             calculateChange();

@@ -162,7 +162,7 @@ import { computed } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const summary = computed(() => store.state.tradingStatistic.summary);
+const summary = computed(() => store.state.tradingShrstat.summary);
 
 const props = defineProps({
     hasTitle: {
@@ -172,7 +172,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["period"]);
 
-store.dispatch("tradingStatistic/getSummary");
+store.dispatch("tradingShrstat/getSummary");
 function periodClick(period) {
     emit("period", period);
 }

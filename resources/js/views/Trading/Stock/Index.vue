@@ -117,7 +117,7 @@
                     >
                         <i
                             :class="`far fa-sync-alt ${
-                                $store.state.tradingStock.isChartLoading
+                                $store.state.tradingShare.isChartLoading
                                     ? 'fa-spin'
                                     : ''
                             }`"
@@ -139,11 +139,11 @@
                         @click="addWatchlist"
                     ></div>
                     <div
-                        v-show="!!$store.state.tradingStock.chart.foreignRSI"
+                        v-show="!!$store.state.tradingShare.chart.foreignRSI"
                         class="command"
                         :title="$t('trading.share.foreignRSI')"
                     >
-                        {{ $store.state.tradingStock.chart.foreignRSI }}
+                        {{ $store.state.tradingShare.chart.foreignRSI }}
                     </div>
                 </div>
                 <div class="area tool-area" @click="stopPropagationEvent">
@@ -381,8 +381,8 @@ const chartTo = computed(
 const showRemoveFilterSymbol = computed(
     () =>
         state.symbolKind.includes("f_") &&
-        mf.isSet(store.state.tradingStock.symbols[state.symbolKind]) &&
-        store.state.tradingStock.symbols[state.symbolKind].includes(
+        mf.isSet(store.state.tradingShare.symbols[state.symbolKind]) &&
+        store.state.tradingShare.symbols[state.symbolKind].includes(
             " " + state.symbol
         )
 );
@@ -391,13 +391,13 @@ const showWatchlist = computed(
 );
 const inWatchlist = computed(
     () =>
-        mf.isSet(store.state.tradingStock.symbols.watch) &&
-        store.state.tradingStock.symbols.watch.includes(" " + state.symbol)
+        mf.isSet(store.state.tradingShare.symbols.watch) &&
+        store.state.tradingShare.symbols.watch.includes(" " + state.symbol)
 );
 const symbols = computed(
-    () => store.state.tradingStock.symbols[state.symbolKind]
+    () => store.state.tradingShare.symbols[state.symbolKind]
 );
-store.dispatch("tradingStock/getSymbols");
+store.dispatch("tradingShare/getSymbols");
 
 onMounted(() => {
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
@@ -476,7 +476,7 @@ onMounted(() => {
 });
 
 watch(
-    () => store.state.tradingStock.chart,
+    () => store.state.tradingShare.chart,
     () => {
         if (!params.isOnlyLoadData) {
             loadChartTools();
@@ -529,7 +529,7 @@ function eventPriceLineDrag(e) {
     const newPrice = +lineOptions.price;
     switch (lineOptions.lineType) {
         case "line":
-            store.dispatch("tradingStock/drawTools", {
+            store.dispatch("tradingShare/drawTools", {
                 isRemove: false,
                 symbol: state.symbol,
                 name: lineOptions.lineType,
@@ -589,7 +589,7 @@ function eventPriceLineDrag(e) {
                 param.points.push(point);
                 param.data.push(params.tools.target[point].options());
                 //
-                store.dispatch("tradingStock/drawTools", param);
+                store.dispatch("tradingShare/drawTools", param);
             }
             break;
         case "rr":
@@ -636,7 +636,7 @@ function eventPriceLineDrag(e) {
                 param.points.push(point);
                 param.data.push(params.tools.rr[point].options());
                 //
-                store.dispatch("tradingStock/drawTools", param);
+                store.dispatch("tradingShare/drawTools", param);
             }
             break;
     }
@@ -711,7 +711,7 @@ function removeFilterList() {
         t("titles.confirm")
     ).then((result) => {
         if (result) {
-            const symbols = store.state.tradingStock.symbols[state.symbolKind];
+            const symbols = store.state.tradingShare.symbols[state.symbolKind];
             let idx = symbols.findIndex((e) => e.trim() == state.symbol);
             idx = idx == symbols.length - 1 ? 0 : idx + 1;
             const nextSymbol = symbols[idx].trim();
@@ -719,7 +719,7 @@ function removeFilterList() {
                 symbol: state.symbol,
                 name: state.symbolKind,
             };
-            store.dispatch("tradingStock/removeFilterList", param).then(() => {
+            store.dispatch("tradingShare/removeFilterList", param).then(() => {
                 state.inputSymbol = nextSymbol;
                 state.symbol = nextSymbol;
                 reloadChart(true);
@@ -733,7 +733,7 @@ function addWatchlist() {
         symbol: state.symbol,
         add: !inWatchlist.value,
     };
-    store.dispatch("tradingStock/addWatchlist", param);
+    store.dispatch("tradingShare/addWatchlist", param);
 }
 function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
@@ -750,7 +750,7 @@ function loadChartTools() {
     loadTools();
 }
 function loadTools() {
-    const tools = store.state.tradingStock.chart.tools;
+    const tools = store.state.tradingShare.chart.tools;
     for (const [name, tool] of Object.entries(tools)) {
         switch (name) {
             case "line":
@@ -797,10 +797,10 @@ function loadTools() {
     }
 }
 function loadChartNews() {
-    params.series.events.setData(store.state.tradingStock.chart.events);
+    params.series.events.setData(store.state.tradingShare.chart.events);
 }
 function loadChartData() {
-    params.data = store.state.tradingStock.chart.data;
+    params.data = store.state.tradingShare.chart.data;
     params.series.ohlc.setData(params.data.ohlc);
     params.series.price.setData(params.data.price);
     params.series.cash.setData(params.data.cash);
@@ -833,7 +833,7 @@ function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
         const isExist = (ops.type = TYPE && price == +ops.price);
         if (isExist) {
             params.series.price.removePriceLine(line);
-            store.dispatch("tradingStock/drawTools", {
+            store.dispatch("tradingShare/drawTools", {
                 isRemove: true,
                 symbol: state.symbol,
                 name: TYPE,
@@ -853,7 +853,7 @@ function drawLineTool(price = null, forceDraw = false, forceRemove = false) {
             draggable: true,
         };
         params.tools.lines.push(params.series.price.createPriceLine(options));
-        store.dispatch("tradingStock/drawTools", {
+        store.dispatch("tradingShare/drawTools", {
             isRemove: false,
             symbol: state.symbol,
             name: TYPE,
@@ -870,7 +870,7 @@ function removeLineTool(server = true) {
         );
         params.tools.lines = [];
         if (server)
-            store.dispatch("tradingStock/drawTools", {
+            store.dispatch("tradingShare/drawTools", {
                 isRemove: true,
                 symbol: state.symbol,
                 name: "line",
@@ -958,7 +958,7 @@ function drawTargetTool() {
         param.points.push(option.point);
         param.data.push(mf.cloneDeep(option));
     }
-    store.dispatch("tradingStock/drawTools", param);
+    store.dispatch("tradingShare/drawTools", param);
 }
 function removeTargetTool(server = true) {
     if (mf.isSet(params.tools.target.A)) {
@@ -978,7 +978,7 @@ function removeTargetTool(server = true) {
         };
     }
     if (server)
-        store.dispatch("tradingStock/drawTools", {
+        store.dispatch("tradingShare/drawTools", {
             isRemove: true,
             symbol: state.symbol,
             name: "target",
@@ -1034,7 +1034,7 @@ function drawUplpsTool() {
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
 
-    store.dispatch("tradingStock/drawTools", param);
+    store.dispatch("tradingShare/drawTools", param);
     uplpsToolRef.value.classList.remove("selected");
 }
 function findUplps(startTime, endTime) {
@@ -1085,7 +1085,7 @@ function removeUplpsTool(server = true, forceCash = false) {
     params.tools.uplps[point1] = {};
     params.tools.uplps[point2] = {};
     if (server)
-        store.dispatch("tradingStock/drawTools", {
+        store.dispatch("tradingShare/drawTools", {
             isRemove: true,
             symbol: state.symbol,
             name: `${name}uplps`,
@@ -1141,7 +1141,7 @@ function drawDownlpsTool() {
     param.points.push(option.title);
     param.data.push(mf.cloneDeep(option));
 
-    store.dispatch("tradingStock/drawTools", param);
+    store.dispatch("tradingShare/drawTools", param);
     downlpsToolRef.value.classList.remove("selected");
 }
 function findDownlps(startTime, endTime) {
@@ -1192,7 +1192,7 @@ function removeDownlpsTool(server = true, forceCash = false) {
     params.tools.downlps[point1] = {};
     params.tools.downlps[point2] = {};
     if (server)
-        store.dispatch("tradingStock/drawTools", {
+        store.dispatch("tradingShare/drawTools", {
             isRemove: true,
             symbol: state.symbol,
             name: `${name}downlps`,
@@ -1289,7 +1289,7 @@ function drawRrTool() {
         param.points.push(option.point);
         param.data.push(mf.cloneDeep(option));
     }
-    store.dispatch("tradingStock/drawTools", param);
+    store.dispatch("tradingShare/drawTools", param);
 }
 function removeRrTool(server = true) {
     if (mf.isSet(params.tools.rr.EP)) {
@@ -1303,7 +1303,7 @@ function removeRrTool(server = true) {
     }
     params.tools.rr = { EP: {}, SL: {}, TP: {} };
     if (server)
-        store.dispatch("tradingStock/drawTools", {
+        store.dispatch("tradingShare/drawTools", {
             isRemove: true,
             symbol: state.symbol,
             name: "rr",
@@ -1344,12 +1344,12 @@ function drawRangeTool() {
     }
     params.series.range.setData(params.tools.range);
     param.data.push(option);
-    store.dispatch("tradingStock/drawTools", param);
+    store.dispatch("tradingShare/drawTools", param);
 }
 function removeRangeTool() {
     params.tools.range = [];
     params.series.range.setData([]);
-    store.dispatch("tradingStock/drawTools", {
+    store.dispatch("tradingShare/drawTools", {
         isRemove: true,
         symbol: "ALL",
         name: "range",
@@ -1371,7 +1371,7 @@ function eventsToolContextmenu(e) {
 }
 function showNewsInfo() {
     if (params.showNewsInfo) {
-        const event = store.state.tradingStock.chart.events.find(
+        const event = store.state.tradingShare.chart.events.find(
             (e) => e.time == params.crosshair.time
         );
         if (mf.isSet(event)) {
@@ -1412,7 +1412,7 @@ function reloadChartData() {
 }
 function initChart() {
     store
-        .dispatch("tradingStock/initChart", {
+        .dispatch("tradingShare/initChart", {
             symbol: state.symbol,
             from: chartFrom.value,
             to: chartTo.value,
@@ -1428,7 +1428,7 @@ function initChart() {
 function reloadChart(onlyData = false, withVnindex = false) {
     params.isOnlyLoadData = onlyData;
     store
-        .dispatch("tradingStock/getChartData", {
+        .dispatch("tradingShare/getChartData", {
             symbol: state.symbol,
             from: chartFrom.value,
             to: chartTo.value,
@@ -1441,7 +1441,7 @@ function reloadChart(onlyData = false, withVnindex = false) {
         });
 }
 function loadNextSymbol() {
-    const symbols = store.state.tradingStock.symbols[state.symbolKind];
+    const symbols = store.state.tradingShare.symbols[state.symbolKind];
     let idx = symbols.findIndex((e) => e.trim() == state.symbol);
     idx = idx == symbols.length - 1 ? 0 : idx + 1;
     state.inputSymbol = symbols[idx];
@@ -1456,10 +1456,10 @@ function chartShiftChanged(e) {
     reloadChart(false, true);
 }
 function cloneSymbols() {
-    bus.emit("checkPin", () => store.dispatch("tradingStock/cloneSymbols"));
+    bus.emit("checkPin", () => store.dispatch("tradingShare/cloneSymbols"));
 }
 function deleteWatchlist() {
-    bus.emit("checkPin", () => store.dispatch("tradingStock/deleteWatchlist"));
+    bus.emit("checkPin", () => store.dispatch("tradingShare/deleteWatchlist"));
 }
 function filterSymbols(kind) {
     if (params.tools.range.length == 2) {
@@ -1471,7 +1471,7 @@ function filterSymbols(kind) {
                 name: state.symbolKind,
                 kind: kind,
             };
-            store.dispatch("tradingStock/filterSymbols", param);
+            store.dispatch("tradingShare/filterSymbols", param);
         });
     } else toast.error(t("trading.share.rangeWarning"));
 }

@@ -101,7 +101,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 });
             });
             Route::group(['namespace' => 'Trading', 'prefix' => 'trading'], function () {
-                Route::group(['prefix' => 'order', 'middleware' => ['can:admin:order_derivative']], function () {
+                Route::group(['prefix' => 'derivative', 'middleware' => ['can:admin:order_derivative']], function () {
                     Route::get('/', 'DerivativeController@getChartData');
                     Route::get('init-chart', 'DerivativeController@initChart');
                     Route::get('get-tools', 'DerivativeController@getTools');
@@ -115,14 +115,14 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('export', 'DerivativeController@export');
                     Route::post('login-dnse', 'DerivativeController@loginDnse');
                 });
-                Route::group(['prefix' => 'statistic1', 'middleware' => 'can:admin:statistic_derivative'], function () {
+                Route::group(['prefix' => 'derstat', 'middleware' => 'can:admin:statistic_derivative'], function () {
                     Route::post('/', 'DerstatController@fetch');
                     Route::post('validate-duplicate-date', 'DerstatController@validateDuplicateDate');
                     Route::post('chart', 'DerstatController@getChart');
                     Route::post('summary', 'DerstatController@getSummary');
                     Route::post('save', 'DerstatController@save');
                 });
-                Route::group(['prefix' => 'stock', 'middleware' => ['can:admin:access_share']], function () {
+                Route::group(['prefix' => 'share', 'middleware' => ['can:admin:access_share']], function () {
                     Route::get('/', 'ShareController@getChart');
                     Route::get('init-chart', 'ShareController@initChart');
                     Route::post('clone-symbols', 'ShareController@cloneSymbols');
@@ -133,7 +133,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('delete-watchlist', 'ShareController@deleteWatchlist');
                     Route::post('draw-tools', 'ShareController@drawTools');
                 });
-                Route::group(['prefix' => 'statistic', 'middleware' => 'can:admin:statistic_share'], function () {
+                Route::group(['prefix' => 'shrstat', 'middleware' => 'can:admin:statistic_share'], function () {
                     Route::post('/', 'ShrstatController@getData');
                     Route::post('summary', 'ShrstatController@getSummary');
                     Route::post('opening', 'ShrstatController@getOpening');

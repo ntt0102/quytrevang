@@ -110,7 +110,7 @@ const state = reactive({
 });
 
 watch(
-    () => store.state.tradingOrder.copyists,
+    () => store.state.tradingDerivative.copyists,
     (value) => {
         state.gridData = mf.cloneDeep(value);
     }
@@ -128,12 +128,12 @@ function closePosition(data) {
     );
     result.then((dialogResult) => {
         if (dialogResult) {
-            store.dispatch("tradingOrder/closePosition", data.id);
+            store.dispatch("tradingDerivative/closePosition", data.id);
         }
     });
 }
 function onShown() {
-    store.dispatch("tradingOrder/getCopyistStatus");
+    store.dispatch("tradingDerivative/getCopyistStatus");
 }
 function onHidden() {
     state.gridData = null;

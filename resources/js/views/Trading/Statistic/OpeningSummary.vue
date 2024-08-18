@@ -64,7 +64,7 @@ import { useRouter } from "vue-router";
 
 const store = useStore();
 const router = useRouter();
-const opening = computed(() => store.state.tradingStatistic.opening);
+const opening = computed(() => store.state.tradingShrstat.opening);
 const props = defineProps({
     hasTitle: {
         type: Boolean,
@@ -72,7 +72,7 @@ const props = defineProps({
     },
 });
 
-store.dispatch("tradingStatistic/getOpening");
+store.dispatch("tradingShrstat/getOpening");
 function getChangeClass(change) {
     let cls = "orange";
     if (change < 0) cls = "bad";

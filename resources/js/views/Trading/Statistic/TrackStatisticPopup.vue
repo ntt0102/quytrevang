@@ -260,7 +260,7 @@ const state = reactive({
 const permissions = computed(() => store.state.auth.user.permissions);
 
 watch(
-    () => store.state.tradingStatistic.data,
+    () => store.state.tradingShrstat.data,
     (data) => {
         state.gridData = mf.cloneDeep(data);
     }
@@ -271,9 +271,7 @@ function show() {
 }
 function onSave(formData) {
     if (!formData.changes.length) return;
-    bus.emit("checkPin", () =>
-        store.dispatch("tradingStatistic/save", formData)
-    );
+    bus.emit("checkPin", () => store.dispatch("tradingShrstat/save", formData));
 }
 function onInitNewRow(e) {
     e.data.buy_date = moment().format(mc.SERVER_DATE_FORMAT);
@@ -332,7 +330,7 @@ function calcutateProfit(rowData) {
     return { money: profit, percent: (profit / -totalCost) * 100 };
 }
 function onShown() {
-    store.dispatch("tradingStatistic/getData");
+    store.dispatch("tradingShrstat/getData");
 }
 function onHidden() {
     state.gridData = null;

@@ -186,10 +186,7 @@ const state = reactive({
             {
                 type: "async",
                 validationCallback: (e) =>
-                    store.dispatch(
-                        "tradingStatistic1/validateDuplicateDate",
-                        e
-                    ),
+                    store.dispatch("tradingDerstat/validateDuplicateDate", e),
                 message: t("trading.derstats.validations.date"),
             },
         ],
@@ -198,7 +195,7 @@ const state = reactive({
 const permissions = computed(() => store.state.auth.user.permissions);
 
 watch(
-    () => store.state.tradingStatistic1.data,
+    () => store.state.tradingDerstat.data,
     (data) => {
         state.gridData = mf.cloneDeep(data);
     }
@@ -209,12 +206,10 @@ function show() {
 }
 function onSave(formData) {
     if (!formData.changes.length) return;
-    bus.emit("checkPin", () =>
-        store.dispatch("tradingStatistic1/save", formData)
-    );
+    bus.emit("checkPin", () => store.dispatch("tradingDerstat/save", formData));
 }
 function onShown() {
-    store.dispatch("tradingStatistic1/getData");
+    store.dispatch("tradingDerstat/getData");
 }
 function onHidden() {
     state.gridData = null;

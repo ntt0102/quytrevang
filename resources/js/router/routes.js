@@ -147,7 +147,7 @@ const authRoute = [
     },
     // Trading
     {
-        path: `/${lang.global.t("route.tradingOrder")}`,
+        path: `/${lang.global.t("route.tradingDerivative")}`,
         name: "trading-derivative",
         meta: {
             auth: true,
@@ -158,7 +158,7 @@ const authRoute = [
         component: loadView("Trading", "Order", "Index"),
     },
     {
-        path: `/${lang.global.t("route.tradingStatistic1")}`,
+        path: `/${lang.global.t("route.tradingDerstat")}`,
         name: "trading-derstats",
         meta: {
             auth: true,
@@ -169,7 +169,7 @@ const authRoute = [
         component: loadView("Trading", "Statistic1", "Index"),
     },
     {
-        path: `/${lang.global.t("route.tradingStock")}`,
+        path: `/${lang.global.t("route.tradingShare")}`,
         name: "trading-share",
         meta: {
             auth: true,
@@ -180,7 +180,7 @@ const authRoute = [
         component: loadView("Trading", "Stock", "Index"),
     },
     {
-        path: `/${lang.global.t("route.tradingStatistic")}`,
+        path: `/${lang.global.t("route.tradingShrstat")}`,
         name: "trading-shrstats",
         meta: {
             auth: true,
