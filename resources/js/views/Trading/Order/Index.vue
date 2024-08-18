@@ -181,6 +181,7 @@
                         @contextmenu="superToolContextmenu"
                     ></div>
                     <div
+                        v-show="showCancelOrder"
                         ref="cancelOrderRef"
                         class="cancel-order command far fa-trash-alt"
                         :title="$t('trading.derivative.cancelTool')"
@@ -338,6 +339,12 @@ const state = reactive({
 });
 const status = computed(() => store.state.tradingOrder.status);
 const config = computed(() => store.state.tradingOrder.config);
+const showCancelOrder = computed(
+    () =>
+        status.value.position != 0 ||
+        !!status.value.pending ||
+        !!store.state.tradingOrder.tools.order
+);
 const tradingViewSrc = computed(() => {
     return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${config.value.vpsUser}&s=${config.value.vpsSession}&resolution=1`;
 });
@@ -345,7 +352,6 @@ const tradingViewSrc = computed(() => {
 store.dispatch("tradingOrder/initChart").then(() => {
     if (inSession()) connectSocket();
 });
-store.dispatch("tradingOrder/getStatus");
 
 params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
@@ -390,9 +396,8 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    store
-        .dispatch("tradingOrder/getChartData", state.chartDate)
-        .then(loadToolsData);
+    store.dispatch("tradingOrder/getChartData", state.chartDate);
+    store.dispatch("tradingOrder/getTools");
 });
 onUnmounted(() => {
     document.removeEventListener("keydown", eventKeyPress);
@@ -407,12 +412,7 @@ onUnmounted(() => {
 });
 
 watch(() => store.state.tradingOrder.chartData, loadChartData);
-watch(
-    () => store.state.tradingOrder.status.pending,
-    (value) => {
-        if (value) toggleCancelOrderButton(true);
-    }
-);
+watch(() => store.state.tradingOrder.tools, loadToolsData);
 
 function eventChartClick(e) {
     state.showLineContext = false;
@@ -762,20 +762,16 @@ function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
 }
-function loadToolsData() {
-    const tools = store.state.tradingOrder.tools;
+function loadToolsData(tools) {
     for (const [name, points] of Object.entries(tools)) {
         switch (name) {
             case "order":
-                // if (status.value.pending) {
                 Object.entries(points).forEach(([point, line]) => {
                     params.tools.order.side = line.side;
                     params.tools.order[point].price = line.price;
                     params.tools.order[point].line =
                         params.series.price.createPriceLine(line);
-                    toggleCancelOrderButton(true);
                 });
-                // }
                 break;
             case "line":
                 Object.values(points).forEach((line) =>
@@ -784,19 +780,19 @@ function loadToolsData() {
                     )
                 );
                 break;
-            case "vertical":
-                setTimeout(() => {
-                    params.tools.vertical = Object.values(points);
-                    params.tools.vertical.sort((a, b) => a.time - b.time);
-                    params.series.vertical.setData(params.tools.vertical);
-                }, 1000);
-                break;
-            case "super":
-                setTimeout(() => {
-                    params.tools.super = Object.values(points);
-                    params.series.super.setData(params.tools.super);
-                }, 1000);
-                break;
+            // case "vertical":
+            //     setTimeout(() => {
+            //         params.tools.vertical = Object.values(points);
+            //         params.tools.vertical.sort((a, b) => a.time - b.time);
+            //         params.series.vertical.setData(params.tools.vertical);
+            //     }, 1000);
+            //     break;
+            // case "super":
+            //     setTimeout(() => {
+            //         params.tools.super = Object.values(points);
+            //         params.series.super.setData(params.tools.super);
+            //     }, 1000);
+            //     break;
             default:
                 Object.entries(points).forEach(
                     ([point, line]) =>
@@ -807,23 +803,20 @@ function loadToolsData() {
         }
     }
 }
-function loadChartData() {
+function loadChartData(chartData) {
     if (!(state.chartDate == CURRENT_DATE && inSession())) {
-        if (store.state.tradingOrder.chartData.price.length > 0)
+        if (chartData.price.length > 0)
             params.data.whitespace = mergeChartData(
                 params.data.whitespace,
                 createWhitespaceData(state.chartDate)
             );
         params.series.whitespace.setData(params.data.whitespace);
 
-        params.data.price = mergeChartData(
-            params.data.price,
-            store.state.tradingOrder.chartData.price
-        );
+        params.data.price = mergeChartData(params.data.price, chartData.price);
         params.series.price.setData(params.data.price);
         params.data.volume = mergeChartData(
             params.data.volume,
-            store.state.tradingOrder.chartData.volume
+            chartData.volume
         );
         params.series.volume.setData(params.data.volume);
     }
@@ -953,7 +946,6 @@ function intervalHandler() {
                         .then((resp) => {
                             if (resp.isOk) {
                                 removeOrderLine(["entry", "tp", "sl"]);
-                                toggleCancelOrderButton(false);
                                 toast.success(
                                     t(
                                         "trading.derivative.autoCancelTpSlSuccess"
@@ -968,9 +960,6 @@ function intervalHandler() {
             connectSocket();
     }
     state.clock = moment().format("HH:mm:ss");
-}
-function toggleCancelOrderButton(visible) {
-    cancelOrderRef.value.style.display = visible ? "block" : "none";
 }
 function blinkCancelOrderButton() {
     if (!cancelOrderRef.value.classList.contains("blink"))
@@ -1858,7 +1847,6 @@ function entryOrderClick() {
                 .then((resp) => {
                     if (resp.isOk) {
                         drawOrderLine(["entry"]);
-                        toggleCancelOrderButton(true);
                         toast.success(t("trading.derivative.newEntrySuccess"));
                     } else toastOrderError(resp.message);
                 });
@@ -1932,10 +1920,8 @@ function cancelOrderClick() {
                 .then((resp) => {
                     if (resp.isOk) {
                         removeOrderLine(["entry", "tp", "sl"]);
-                        toggleCancelOrderButton(false);
                         toast.success(t("trading.derivative.exitSuccess"));
                     } else {
-                        toggleCancelOrderButton(true);
                         toastOrderError(resp.message);
                     }
                 });
@@ -1948,12 +1934,10 @@ function cancelOrderClick() {
                 .then((resp) => {
                     if (resp.isOk) {
                         removeOrderLine(["entry"]);
-                        toggleCancelOrderButton(false);
                         toast.success(
                             t("trading.derivative.deleteEntrySuccess")
                         );
                     } else {
-                        toggleCancelOrderButton(true);
                         toastOrderError(resp.message);
                     }
                 });
@@ -1981,7 +1965,6 @@ function scanOrder(lastPrice) {
                         .then((resp) => {
                             if (resp.isOk) {
                                 removeOrderLine(["entry", "tp", "sl"]);
-                                toggleCancelOrderButton(false);
                                 toast.success(
                                     t("trading.derivative.deleteTpSuccess")
                                 );
@@ -2009,7 +1992,6 @@ function scanOrder(lastPrice) {
                         .then((resp) => {
                             if (resp.isOk) {
                                 removeOrderLine(["entry", "tp", "sl"]);
-                                toggleCancelOrderButton(false);
                                 toast.success(
                                     t("trading.derivative.deleteSlSuccess")
                                 );
@@ -2100,13 +2082,12 @@ function resetChart() {
 }
 function resetTools() {
     removeOrderLine(["entry", "tp", "sl"], false);
-    toggleCancelOrderButton(false);
     removeLineTool(false);
     removeUplpsTool(false);
     removeDownlpsTool(false);
     removeTargetTool(false);
     removeRrTool(false);
-    store.dispatch("tradingOrder/getTools").then(loadToolsData);
+    store.dispatch("tradingOrder/getTools");
 }
 function initToolsParams(tools) {
     if (tools == undefined)
@@ -2263,7 +2244,6 @@ function cmp(vari, value, side, eq = false) {
             }
 
             .cancel-order {
-                display: none;
                 color: red;
             }
         }

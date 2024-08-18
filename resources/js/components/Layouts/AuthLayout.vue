@@ -291,6 +291,14 @@ function connectPusher() {
                 store.dispatch("adminComment/getComments"), 2000;
         });
     });
+    pusher.subscribe("private-trading-derivative").bind("update-status", () => {
+        setTimeout(() => {
+            if (route.name == "trading-derivative") {
+                store.dispatch("tradingOrder/getStatus");
+                store.dispatch("tradingStatistic/getTools");
+            }
+        }, 2000);
+    });
     pusher
         .subscribe("private-trading-shrstats")
         .bind("update-statistic", () => {

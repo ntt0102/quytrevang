@@ -167,7 +167,8 @@ const mutations = {
     },
     setInitChart(state, data) {
         state.config = data.config;
-        state.tools = data.tools;
+        state.status = data.status;
+        // state.tools = data.tools;
     },
     setTools(state, data) {
         state.tools = data;

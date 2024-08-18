@@ -42,7 +42,8 @@ class DerivativeService extends CoreService
                 'vpsUser' => get_global_value('vpsUser'),
                 'vpsSession' => get_global_value('vpsSession'),
             ],
-            'tools' => $this->getTools()
+            'status' => $this->getStatus($payload)
+            // 'tools' => $this->getTools()
         ];
     }
 

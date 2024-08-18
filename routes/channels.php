@@ -17,7 +17,11 @@ Broadcast::channel('user-{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 Broadcast::channel('admin', function ($user) {
-    return $user->hasAnyPermission(['admin:manage_users', 'admin:manage_contracts', 'admin:manage_comments']);
+    return $user->hasAnyPermission([
+        'admin:manage_users',
+        'admin:manage_contracts',
+        'admin:manage_comments'
+    ]);
 });
 Broadcast::channel('admin-user', function ($user) {
     return $user->can('admin:manage_users');
@@ -27,6 +31,9 @@ Broadcast::channel('admin-contract', function ($user) {
 });
 Broadcast::channel('admin-comment', function ($user) {
     return $user->can('admin:manage_comments');
+});
+Broadcast::channel('trading-derivative', function ($user) {
+    return $user->can(['admin:order_derivative']);
 });
 Broadcast::channel('trading-derstats', function ($user) {
     return $user->can(['admin:statistic_derivative']);
