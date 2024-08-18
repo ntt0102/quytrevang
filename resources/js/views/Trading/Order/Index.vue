@@ -763,6 +763,7 @@ function toggleFullscreen() {
     else document.documentElement.requestFullscreen();
 }
 function loadToolsData(tools) {
+    removeAllTools();
     for (const [name, points] of Object.entries(tools)) {
         switch (name) {
             case "order":
@@ -1737,6 +1738,14 @@ function removeSuperTool(withServer = true) {
             name: "super",
         });
 }
+function removeAllTools() {
+    removeOrderLine(["entry", "tp", "sl"], false);
+    removeLineTool(false);
+    removeUplpsTool(false);
+    removeDownlpsTool(false);
+    removeTargetTool(false);
+    removeRrTool(false);
+}
 function toggleOrderButton(show) {
     if (show) {
         if (inSession()) {
@@ -2081,12 +2090,6 @@ function resetChart() {
     store.dispatch("tradingOrder/getChartData", state.chartDate);
 }
 function resetTools() {
-    removeOrderLine(["entry", "tp", "sl"], false);
-    removeLineTool(false);
-    removeUplpsTool(false);
-    removeDownlpsTool(false);
-    removeTargetTool(false);
-    removeRrTool(false);
     store.dispatch("tradingOrder/getTools");
 }
 function initToolsParams(tools) {
