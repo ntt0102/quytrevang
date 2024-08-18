@@ -274,22 +274,22 @@ function connectPusher() {
         setTimeout(() => {
             store.dispatch("getNotify", ["adminUser"]);
             if (route.name == "admin-user")
-                store.dispatch("adminUser/getUsers"), 2000;
-        });
+                store.dispatch("adminUser/getUsers");
+        }, 2000);
     });
     pusher.subscribe("private-admin-contract").bind("update-contract", () => {
         setTimeout(() => {
             store.dispatch("getNotify", ["adminContract"]);
             if (route.name == "admin-contract")
-                store.dispatch("adminContract/getContracts"), 2000;
-        });
+                store.dispatch("adminContract/getContracts");
+        }, 2000);
     });
     pusher.subscribe("private-admin-comment").bind("update-comment", () => {
         setTimeout(() => {
             store.dispatch("getNotify", ["adminComment"]);
             if (route.name == "admin-comment")
-                store.dispatch("adminComment/getComments"), 2000;
-        });
+                store.dispatch("adminComment/getComments");
+        }, 2000);
     });
     pusher.subscribe("private-trading-derivative").bind("update-status", () => {
         setTimeout(() => {
@@ -315,8 +315,10 @@ function connectPusher() {
             }, 2000);
         });
     pusher.subscribe("private-trading-finbook").bind("update-finbook", () => {
-        if (["finbooks", "overview"].includes(route.name))
-            setTimeout(() => store.dispatch("tradingFinbook/getFinbook"), 2000);
+        setTimeout(() => {
+            if (["finbooks", "overview"].includes(route.name))
+                store.dispatch("tradingFinbook/getFinbook");
+        }, 2000);
     });
 }
 
