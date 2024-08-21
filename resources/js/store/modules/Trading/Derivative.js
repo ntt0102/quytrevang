@@ -11,12 +11,13 @@ function initialState() {
 const getters = {};
 
 const actions = {
-    getChartData({ commit, dispatch, getters, state, rootGetters }, chartDate) {
+    getChartData({ commit, dispatch, getters, state, rootGetters }, param) {
         commit("setChartLoading", true);
+        param.isDay = param.isDay || false;
         return new Promise((resolve, reject) => {
             axios
                 .get("trading/derivative", {
-                    params: { date: chartDate },
+                    params: param,
                     noLoading: true,
                 })
                 .then((response) => {

@@ -21,7 +21,11 @@ class DerivativeService extends CoreService
      */
     public function getChartData($payload)
     {
-        return $this->generateDataFromCsv($payload->date);
+        if ($payload->isDay)
+            $data = $this->generateDayData($payload->date);
+        else $data = $this->generateDataFromCsv($payload->date);
+        $data['isDay'] = $payload->isDay;
+        return $data;
     }
 
     /**
@@ -223,6 +227,48 @@ class DerivativeService extends CoreService
             }
         }
         fclose($fp);
+        return $data;
+    }
+    /**
+     * generate Data From Csv
+     */
+    public function generateDayData($date)
+    {
+        $data = ['price' => [], 'volume' => []];
+        $idx = 0;
+        $volume = 0;
+        $dt = date_create_from_format('Y-m-d', $date);
+        $directory = storage_path('app/phaisinh');
+        $count = count(glob($directory . '/*.csv'));
+        while ($idx < min($count, 60)) {
+            $dtStr = $dt->format('Y-m-d');
+            $file = $directory . '/' . $dtStr . '.csv';
+            if (file_exists($file)) {
+                $fp = fopen($file, 'r');
+                $price = 0;
+                $volsum = 0;
+                while (!feof($fp)) {
+                    $line = fgetcsv($fp);
+                    if (!!$line) {
+                        $price = +$line[1];
+                        $volsum += +$line[3] * +$line[2];
+                    }
+                }
+                fclose($fp);
+                $time = strtotime($dtStr) + self::SHIFT_TIME;
+                array_unshift($data['price'], [
+                    'time' => $time,
+                    'value' => $price,
+                ]);
+                $volume -= $volsum;
+                array_unshift($data['volume'], [
+                    'time' => $time,
+                    'value' => $volume,
+                ]);
+                $idx++;
+            }
+            $dt->sub(new \DateInterval('P1D'));
+        }
         return $data;
     }
 

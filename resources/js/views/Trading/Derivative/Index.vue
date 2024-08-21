@@ -89,8 +89,8 @@
                         ref="reloadToolRef"
                         class="command"
                         :title="$t('trading.derivative.reload')"
-                        @click="resetChart"
-                        @contextmenu="resetTools"
+                        @click="() => resetChart(false)"
+                        @contextmenu="() => resetChart(true)"
                     >
                         <i
                             :class="`far fa-sync-alt ${
@@ -119,6 +119,7 @@
                         class="command far fa-chart-bar"
                         :title="$t('trading.derivative.tradingview')"
                         @click="tradingviewClick"
+                        @contextmenu="resetTools"
                     ></div>
                     <div
                         ref="lineToolRef"
@@ -398,7 +399,7 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    store.dispatch("tradingDerivative/getChartData", state.chartDate);
+    store.dispatch("tradingDerivative/getChartData", { date: state.chartDate });
     store.dispatch("tradingDerivative/getTools");
 });
 onUnmounted(() => {
@@ -808,11 +809,12 @@ function loadToolsData(tools) {
 }
 function loadChartData(chartData) {
     if (!(state.chartDate == CURRENT_DATE && inSession())) {
-        if (chartData.price.length > 0)
+        if (!chartData.isDay && chartData.price.length > 0) {
             params.data.whitespace = mergeChartData(
                 params.data.whitespace,
                 createWhitespaceData(state.chartDate)
             );
+        }
         params.series.whitespace.setData(params.data.whitespace);
 
         params.data.price = mergeChartData(params.data.price, chartData.price);
@@ -2079,17 +2081,20 @@ function toastOrderError(error) {
 }
 function dateSelectChange() {
     if (!state.chartDate) return false;
-    store.dispatch("tradingDerivative/getChartData", state.chartDate);
+    store.dispatch("tradingDerivative/getChartData", { date: state.chartDate });
 }
 function refreshChart() {
     if (inSession()) params.websocket.send(params.socketSendData);
 }
-function resetChart() {
+function resetChart(isDay) {
     params.data.whitespace = [];
     params.data.price = [];
     params.data.volume = [];
     refreshChart();
-    store.dispatch("tradingDerivative/getChartData", state.chartDate);
+    store.dispatch("tradingDerivative/getChartData", {
+        date: state.chartDate,
+        isDay,
+    });
 }
 function resetTools() {
     store.dispatch("tradingDerivative/getTools");
