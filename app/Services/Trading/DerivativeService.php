@@ -236,10 +236,10 @@ class DerivativeService extends CoreService
     {
         $data = ['price' => [], 'volume' => []];
         $idx = 0;
-        $volume = 0;
         $dt = date_create_from_format('Y-m-d', $date);
         $directory = storage_path('app/phaisinh');
         $count = count(glob($directory . '/*.csv'));
+        $dayData = [];
         while ($idx < min($count, 60)) {
             $dtStr = $dt->format('Y-m-d');
             $file = $directory . '/' . $dtStr . '.csv';
@@ -255,19 +255,26 @@ class DerivativeService extends CoreService
                     }
                 }
                 fclose($fp);
-                $time = strtotime($dtStr) + self::SHIFT_TIME;
-                array_unshift($data['price'], [
-                    'time' => $time,
-                    'value' => $price,
-                ]);
-                $volume -= $volsum;
-                array_unshift($data['volume'], [
-                    'time' => $time,
-                    'value' => $volume,
+                array_unshift($dayData, [
+                    'time' => strtotime($dtStr) + self::SHIFT_TIME,
+                    'price' => $price,
+                    'volume' => $volsum,
                 ]);
                 $idx++;
             }
             $dt->sub(new \DateInterval('P1D'));
+        }
+        $volume = 0;
+        foreach ($dayData as $item) {
+            $data['price'][] = [
+                'time' => $item['time'],
+                'value' => $item['price'],
+            ];
+            $volume += $item['volume'];
+            $data['volume'][] = [
+                'time' => $item['time'],
+                'value' => $volume,
+            ];
         }
         return $data;
     }
