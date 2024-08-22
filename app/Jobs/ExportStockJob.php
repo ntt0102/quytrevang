@@ -50,7 +50,7 @@ class ExportStockJob implements ShouldQueue
         file_put_contents($file, $date);
         foreach ($data as $item) {
             if ((!str_contains($item->symbol, '$') && !str_contains($item->symbol, '^') && strlen($item->symbol) == 3) ||
-                in_array($item->symbol, ['VNINDEX', 'VN30', 'VN30F1M', 'VN30F2M', 'VN30F1Q', 'VN30F2Q'])
+                in_array($item->symbol, ['VNINDEX', 'VN30'])
             ) {
                 $file = storage_path('app/cophieu/' . $item->symbol . '.csv');
                 $fp = fopen($file, 'a+');
