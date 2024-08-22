@@ -6,8 +6,8 @@ use App\Services\CoreService;
 use App\Models\ShareSymbol;
 use App\Models\ShareOrder;
 use App\Models\StockDrawing;
-use App\Jobs\FilterStockJob;
-use App\Jobs\ExportStockJob;
+use App\Jobs\FilterShareJob;
+use App\Jobs\ExportShareJob;
 use stdClass;
 
 class ShareService extends CoreService
@@ -398,7 +398,7 @@ class ShareService extends CoreService
      */
     public function filterSymbols($payload)
     {
-        FilterStockJob::dispatch($payload);
+        FilterShareJob::dispatch($payload);
         return ['isOk' => true];
     }
 
@@ -471,19 +471,5 @@ class ShareService extends CoreService
             }
         }
         return (object)[];
-    }
-
-    /**
-     * Export Stock
-     *
-     * @param $payload
-     * 
-     */
-    public function exportStock($payload)
-    {
-        $data = json_decode($payload->stockData);
-        $vn100 = ShareSymbol::where('name', 'vn100')->select('symbols')->first();
-        ExportStockJob::dispatch($data, $vn100->symbols);
-        return ['ok' => $vn100->symbols];
     }
 }

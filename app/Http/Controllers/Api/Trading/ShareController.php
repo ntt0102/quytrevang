@@ -125,17 +125,4 @@ class ShareController extends CoreController
         $data = $this->shareService->drawTools($this->payload);
         return $this->sendResponse($data);
     }
-
-    /**
-     * Export Stock
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function exportStock(Request $request)
-    {
-        $data = $this->shareService->exportStock($request);
-        return $this->sendResponseWithoutEncrypt($data);
-    }
 }

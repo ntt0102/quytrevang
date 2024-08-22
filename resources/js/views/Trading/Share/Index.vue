@@ -1,5 +1,5 @@
 <template>
-    <div class="stock-page content-block dx-card responsive-paddings">
+    <div class="share-page content-block dx-card responsive-paddings">
         <DxToolbar
             :items="[
                 {
@@ -35,7 +35,7 @@
                         dataSource: [0, 1, 2, 3, 4, 5],
                         value: state.chartShift,
                         dropDownOptions: {
-                            wrapperAttr: { class: 'stock-min-select-dropdown' },
+                            wrapperAttr: { class: 'share-min-select-dropdown' },
                         },
                         hint: $t('trading.share.chartShift'),
                         onValueChanged: chartShiftChanged,
@@ -76,7 +76,7 @@
             ]"
         />
         <div
-            class="stock-container"
+            class="share-container"
             ref="chartContainerRef"
             @click="eventChartClick"
             @contextmenu="stopPropagationEvent"
@@ -102,7 +102,7 @@
                             :showDropDownButton="false"
                             :dropDownOptions="{
                                 wrapperAttr: {
-                                    class: 'stock-min-select-dropdown',
+                                    class: 'share-min-select-dropdown',
                                 },
                             }"
                             v-model="state.timeframe"
@@ -1480,8 +1480,8 @@ function filterItemClick({ itemData }) {
 }
 </script>
 <style lang="scss">
-.stock-page {
-    .stock-container {
+.share-page {
+    .share-container {
         height: 400px;
         background: #131722;
         border: none;
@@ -1596,7 +1596,7 @@ function filterItemClick({ itemData }) {
         }
     }
 }
-.stock-min-select-dropdown {
+.share-min-select-dropdown {
     .dx-list-item-content {
         padding: 5px 5px !important;
         text-align: center;

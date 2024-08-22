@@ -255,7 +255,7 @@ function connectPusher() {
                             if (route.name == "admin-comment")
                                 store.dispatch("adminComment/getComments");
                             break;
-                        case "filtered-stock":
+                        case "filtered-share":
                             if (route.name == "trading-share") {
                                 store.dispatch("tradingShare/getSymbols");
                             }

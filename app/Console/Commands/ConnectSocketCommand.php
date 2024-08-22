@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Ratchet\Client\Connector;
-use App\Jobs\ExportStockJob;
+use App\Jobs\ExportShareJob;
 use App\Jobs\ExportDerivativeJob;
 
 class ConnectSocketCommand extends Command
@@ -56,7 +56,7 @@ class ConnectSocketCommand extends Command
                 foreach ($data as $item) {
                     if (!$item) return false;
                     if ($item->type == 1 && $item->target == 'UpdateLastPrices' && count($item->arguments[0]) > 2000) {
-                        ExportStockJob::dispatch(json_encode($item->arguments[0]));
+                        ExportShareJob::dispatch(json_encode($item->arguments[0]));
                     } else if ($item->type == 3) {
                         $ws->close();
                         ExportDerivativeJob::dispatch(json_encode($item->result));

@@ -11,7 +11,7 @@ class ShrstatService extends CoreService
 {
 
     /**
-     * Return all the stock.
+     * Return all the share.
      *
      * @return array
      */

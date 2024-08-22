@@ -44,7 +44,6 @@
                         :label="{ text: $t('models.copyist.allowCopy') }"
                     />
                     <DxItem
-                        :visible="permissions.includes('stock@order')"
                         :colSpan="2"
                         data-field="allow_share"
                         editor-type="dxSwitch"
