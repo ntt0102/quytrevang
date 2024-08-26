@@ -1745,8 +1745,8 @@ function removeSuperTool(withServer = true) {
 function removeAllTools() {
     removeOrderLine(["entry", "tp", "sl"], false);
     removeLineTool(false);
-    removeUplpsTool(false);
-    removeDownlpsTool(false);
+    // removeUplpsTool(false);
+    // removeDownlpsTool(false);
     removeTargetTool(false);
     removeRrTool(false);
 }
