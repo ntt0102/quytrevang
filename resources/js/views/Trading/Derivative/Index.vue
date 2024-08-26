@@ -2104,23 +2104,23 @@ function initToolsParams(tools) {
         tools = [
             "order",
             "lines",
-            "vertical",
+            // "vertical",
             "target",
-            "uplps",
-            "downlps",
+            // "uplps",
+            // "downlps",
             "rr",
-            "super",
+            // "super",
         ];
     if (tools.includes("order"))
         params.tools.order = { side: 0, entry: {}, tp: {}, sl: {} };
     if (tools.includes("lines")) params.tools.lines = [];
-    if (tools.includes("vertical")) params.tools.vertical = [];
+    // if (tools.includes("vertical")) params.tools.vertical = [];
     if (tools.includes("target"))
         params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
-    if (tools.includes("uplps")) params.tools.uplps = { P1: {}, P2: {} };
-    if (tools.includes("downlps")) params.tools.downlps = { P1: {}, P2: {} };
+    // if (tools.includes("uplps")) params.tools.uplps = { P1: {}, P2: {} };
+    // if (tools.includes("downlps")) params.tools.downlps = { P1: {}, P2: {} };
     if (tools.includes("rr")) params.tools.rr = { EP: {}, SL: {}, TP: {} };
-    if (tools.includes("super")) params.tools.super = [];
+    // if (tools.includes("super")) params.tools.super = [];
 }
 function getAccountInfo() {
     store.dispatch("tradingDerivative/getAccountInfo").then((data) => {
