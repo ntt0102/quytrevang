@@ -421,15 +421,15 @@ function eventChartClick(e) {
     state.showLineContext = false;
     toggleOrderButton(false);
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
+    // else if (verticalToolRef.value.classList.contains("selected"))
+    //     drawVerticalTool();
     else if (targetToolRef.value.classList.contains("selected"))
         drawTargetTool();
-    else if (verticalToolRef.value.classList.contains("selected"))
-        drawVerticalTool();
-    else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
-    else if (downlpsToolRef.value.classList.contains("selected"))
-        drawDownlpsTool();
+    // else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
+    // else if (downlpsToolRef.value.classList.contains("selected"))
+    //     drawDownlpsTool();
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
-    else if (superToolRef.value.classList.contains("selected")) drawSuperTool();
+    // else if (superToolRef.value.classList.contains("selected")) drawSuperTool();
 }
 function eventChartContextmenu(e) {
     toggleOrderButton(true);
