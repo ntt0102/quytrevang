@@ -196,24 +196,20 @@ class VpsOrderService extends CoreService
                 }
                 break;
             case 'tp':
-                if ($this->position == 0) {
-                    $tp = $this->order($payload->action, $payload->tpData);
-                    if ($tp['isOk'] && $payload->tpData->cmd == "cancel") {
-                        set_global_value('entryOrderId', '');
-                        set_global_value('slOrderId', '');
-                    }
-                    return $tp;
+                $tp = $this->order($payload->action, $payload->tpData);
+                if ($tp['isOk'] && $payload->tpData->cmd == "cancel") {
+                    set_global_value('entryOrderId', '');
+                    set_global_value('slOrderId', '');
                 }
+                return $tp;
                 break;
             case 'sl':
-                if ($this->position == 0) {
-                    $sl = $this->conditionOrder($payload->action, $payload->slData);
-                    if ($sl['isOk'] && $payload->slData->cmd == "delete") {
-                        set_global_value('entryOrderId', '');
-                        set_global_value('tpOrderId', '');
-                    }
-                    return $sl;
+                $sl = $this->conditionOrder($payload->action, $payload->slData);
+                if ($sl['isOk'] && $payload->slData->cmd == "delete") {
+                    set_global_value('entryOrderId', '');
+                    set_global_value('tpOrderId', '');
                 }
+                return $sl;
                 break;
             case 'cancel':
                 $tp = $this->order('tp', $payload->tpData);
