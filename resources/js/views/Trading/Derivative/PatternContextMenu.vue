@@ -1,5 +1,5 @@
 <template>
-    <div class="pattern-popup">
+    <div class="pattern-popup" @click="stopPropagationEvent">
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
 
@@ -302,6 +302,9 @@ onMounted(() => {
         ctx.stroke();
     }
 });
+function stopPropagationEvent(e) {
+    e.stopPropagation();
+}
 </script>
 
 <style lang="scss">
