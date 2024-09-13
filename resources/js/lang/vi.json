@@ -175,8 +175,9 @@
             "verticalTool": "Vẽ đường dọc",
             "uplpsTool": "Đo LPS tăng",
             "downlpsTool": "Đo LPS giảm",
-            "targetTool": "Xác định TP",
             "rrTool": "Xác định RR",
+            "targetTool": "Xác định TP",
+            "patternTool": "Mẫu hình",
             "superTool": "Xác định lệnh",
             "cancelTool": "Huỷ lệnh và đóng vị thế",
             "newEntrySuccess": "Đặt lệnh Entry thành công",
@@ -217,6 +218,10 @@
                 "export": "Xuất dữ liệu",
                 "loginVps": "Đăng nhập VPS",
                 "loginDnse": "Đăng nhập DNSE"
+            },
+            "patternContextMenu": {
+                "continue": "Tiếp diễn",
+                "reversal": "Đảo chiều"
             }
         },
         "derstats": {

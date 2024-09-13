@@ -130,7 +130,7 @@
                     >
                         <LineContextMenu
                             v-show="state.showLineContext"
-                            class="line-contextmenu"
+                            class="contextmenu"
                             :enable="state.showLineContext"
                             v-model:title="state.lineTitle"
                             v-model:color="state.lineColor"
@@ -175,6 +175,20 @@
                         @click="targetToolClick"
                         @contextmenu="targetToolContextmenu"
                     ></div>
+                    <div
+                        ref="patternToolRef"
+                        class="pattern command far fa-heart-rate"
+                        :title="$t('trading.derivative.patternTool')"
+                        @click="patternToolClick"
+                    >
+                        <PatternContextMenu
+                            v-show="state.showPatternContext"
+                            class="contextmenu"
+                            v-model:title="state.lineTitle"
+                            v-model:color="state.lineColor"
+                            @deleteAllLine="removeLineTool"
+                        ></PatternContextMenu>
+                    </div>
                     <div
                         v-show="false"
                         ref="superToolRef"
@@ -225,6 +239,7 @@
 
 <script setup>
 import LineContextMenu from "./LineContextMenu.vue";
+import PatternContextMenu from "./PatternContextMenu.vue";
 import VpsOtpPopup from "./VpsOtpPopup.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
@@ -338,6 +353,7 @@ const state = reactive({
     lineColor: "#F44336",
     lineTitle: "",
     showLineContext: false,
+    showPatternContext: false,
     showTradingView: false,
 });
 const status = computed(() => store.state.tradingDerivative.status);
@@ -419,6 +435,7 @@ watch(() => store.state.tradingDerivative.tools, loadToolsData);
 
 function eventChartClick(e) {
     state.showLineContext = false;
+    state.showPatternContext = false;
     toggleOrderButton(false);
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     // else if (verticalToolRef.value.classList.contains("selected"))
@@ -1452,6 +1469,103 @@ function removeDownlpsTool(withServer = true) {
             name: "downlps",
         });
 }
+function rrToolClick(e) {
+    state.showLineContext = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removeRrTool();
+    }
+}
+function rrToolContextmenu(e) {
+    removeRrTool();
+    e.target.classList.remove("selected");
+}
+function drawRrTool() {
+    const TYPE = "rr";
+    const price = coordinateToPrice(params.crosshair.y);
+    let option = {
+        lineType: TYPE,
+        price: price,
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: true,
+    };
+    let param = {
+        isRemove: false,
+        name: TYPE,
+        points: [],
+        data: [],
+    };
+    if (mf.isSet(params.tools.rr.EP)) {
+        const epPrice = +params.tools.rr.EP.options().price;
+        if (mf.isSet(params.tools.rr.SL)) {
+            const slPrice = +params.tools.rr.SL.options().price;
+            const rSl = slPrice - epPrice;
+            let rTp = price - epPrice;
+            if (rTp / rSl > 0) {
+                const tpPrice = epPrice - (slPrice - epPrice);
+                option.price = tpPrice;
+                rTp = tpPrice - epPrice;
+            }
+            option.point = "TP";
+            option.title = `TP=${rTp.toFixed(1)}`;
+            option.color = "lime";
+            params.tools.rr[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+            //
+            const rr = Math.abs(rTp) / Math.abs(rSl);
+            const EP_POINT = "EP";
+            params.tools.rr[EP_POINT].applyOptions({
+                title: `RR=${rr.toFixed(1)}`,
+            });
+            param.points.push(EP_POINT);
+            param.data.push(params.tools.rr[EP_POINT].options());
+            //
+            rrToolRef.value.classList.remove("selected");
+        } else {
+            const rSl = price - epPrice;
+            option.point = "SL";
+            option.title = `SL=${rSl.toFixed(1)}`;
+            option.color = "red";
+            params.tools.rr[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+        }
+    } else {
+        option.point = "EP";
+        option.title = "RR=";
+        option.color = "yellow";
+        params.tools.rr[option.point] =
+            params.series.price.createPriceLine(option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
+    }
+    store.dispatch("tradingDerivative/drawTools", param);
+}
+function removeRrTool(withServer = true) {
+    if (mf.isSet(params.tools.rr.EP)) {
+        params.series.price.removePriceLine(params.tools.rr.EP);
+        if (mf.isSet(params.tools.rr.SL)) {
+            params.series.price.removePriceLine(params.tools.rr.SL);
+            if (mf.isSet(params.tools.rr.TP)) {
+                params.series.price.removePriceLine(params.tools.rr.TP);
+            }
+        }
+    }
+    initToolsParams(["rr"]);
+    if (withServer)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: true,
+            name: "rr",
+        });
+}
 function targetToolClick(e) {
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
@@ -1550,102 +1664,8 @@ function removeTargetTool(withServer = true) {
             name: "target",
         });
 }
-function rrToolClick(e) {
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-        removeRrTool();
-    }
-}
-function rrToolContextmenu(e) {
-    removeRrTool();
-    e.target.classList.remove("selected");
-}
-function drawRrTool() {
-    const TYPE = "rr";
-    const price = coordinateToPrice(params.crosshair.y);
-    let option = {
-        lineType: TYPE,
-        price: price,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: true,
-    };
-    let param = {
-        isRemove: false,
-        name: TYPE,
-        points: [],
-        data: [],
-    };
-    if (mf.isSet(params.tools.rr.EP)) {
-        const epPrice = +params.tools.rr.EP.options().price;
-        if (mf.isSet(params.tools.rr.SL)) {
-            const slPrice = +params.tools.rr.SL.options().price;
-            const rSl = slPrice - epPrice;
-            let rTp = price - epPrice;
-            if (rTp / rSl > 0) {
-                const tpPrice = epPrice - (slPrice - epPrice);
-                option.price = tpPrice;
-                rTp = tpPrice - epPrice;
-            }
-            option.point = "TP";
-            option.title = `TP=${rTp.toFixed(1)}`;
-            option.color = "lime";
-            params.tools.rr[option.point] =
-                params.series.price.createPriceLine(option);
-            param.points.push(option.point);
-            param.data.push(mf.cloneDeep(option));
-            //
-            const rr = Math.abs(rTp) / Math.abs(rSl);
-            const EP_POINT = "EP";
-            params.tools.rr[EP_POINT].applyOptions({
-                title: `RR=${rr.toFixed(1)}`,
-            });
-            param.points.push(EP_POINT);
-            param.data.push(params.tools.rr[EP_POINT].options());
-            //
-            rrToolRef.value.classList.remove("selected");
-        } else {
-            const rSl = price - epPrice;
-            option.point = "SL";
-            option.title = `SL=${rSl.toFixed(1)}`;
-            option.color = "red";
-            params.tools.rr[option.point] =
-                params.series.price.createPriceLine(option);
-            param.points.push(option.point);
-            param.data.push(mf.cloneDeep(option));
-        }
-    } else {
-        option.point = "EP";
-        option.title = "RR=";
-        option.color = "yellow";
-        params.tools.rr[option.point] =
-            params.series.price.createPriceLine(option);
-        param.points.push(option.point);
-        param.data.push(mf.cloneDeep(option));
-    }
-    store.dispatch("tradingDerivative/drawTools", param);
-}
-function removeRrTool(withServer = true) {
-    if (mf.isSet(params.tools.rr.EP)) {
-        params.series.price.removePriceLine(params.tools.rr.EP);
-        if (mf.isSet(params.tools.rr.SL)) {
-            params.series.price.removePriceLine(params.tools.rr.SL);
-            if (mf.isSet(params.tools.rr.TP)) {
-                params.series.price.removePriceLine(params.tools.rr.TP);
-            }
-        }
-    }
-    initToolsParams(["rr"]);
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "rr",
-        });
+function patternToolClick() {
+    state.showPatternContext = !state.showPatternContext;
 }
 function superToolClick(e) {
     state.showLineContext = false;
@@ -2246,10 +2266,20 @@ function cmp(vari, value, side, eq = false) {
             .line {
                 position: relative;
 
-                .line-contextmenu {
+                .contextmenu {
                     position: absolute;
-                    top: 0;
-                    left: 40px;
+                    top: 0px;
+                    left: 42px;
+                }
+            }
+
+            .pattern {
+                position: relative;
+
+                .contextmenu {
+                    position: absolute;
+                    top: -110px;
+                    left: 42px;
                 }
             }
 
