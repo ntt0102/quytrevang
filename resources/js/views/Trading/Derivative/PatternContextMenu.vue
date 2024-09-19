@@ -276,7 +276,7 @@ onMounted(() => {
             ],
         },
     ];
-    for (let item = 0; item < 9; item++) {
+    for (let item = 0; item < data.length; item++) {
         const canvas = document.getElementById(`item${item + 1}`);
         canvas.width = 300;
         canvas.height = 200;
