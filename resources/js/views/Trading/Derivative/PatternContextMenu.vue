@@ -9,7 +9,7 @@
                     {{ $t("trading.derivative.patternContextMenu.continue") }}
                 </div>
                 <DxScrollView class="items">
-                    <div v-for="i in 6" :key="i">
+                    <div v-for="i in 4" :key="i">
                         <div class="name">{{ i }}.</div>
                         <canvas :id="`item${i}`" />
                     </div>
@@ -20,9 +20,9 @@
                     {{ $t("trading.derivative.patternContextMenu.reversal") }}
                 </div>
                 <DxScrollView class="items">
-                    <div v-for="i in 4" :key="i">
+                    <div v-for="i in 5" :key="i">
                         <div class="name">{{ i }}.</div>
-                        <canvas :id="`item${6 + i}`" />
+                        <canvas :id="`item${4 + i}`" />
                     </div>
                 </DxScrollView>
             </div>
@@ -34,7 +34,7 @@
 import { onMounted } from "vue";
 onMounted(() => {
     const data = [
-        // 1
+        // 1-1
         {
             price: [
                 [0, 100],
@@ -57,7 +57,7 @@ onMounted(() => {
                 [300, 100],
             ],
         },
-        // 2
+        // 2-2
         {
             price: [
                 [0, 100],
@@ -82,7 +82,7 @@ onMounted(() => {
                 [300, 100],
             ],
         },
-        // 3
+        // 3-3
         {
             price: [
                 [0, 100],
@@ -107,7 +107,7 @@ onMounted(() => {
                 [300, 100],
             ],
         },
-        // 4
+        // 4-4
         {
             price: [
                 [0, 100],
@@ -130,49 +130,7 @@ onMounted(() => {
                 [300, 100],
             ],
         },
-        // 5
-        {
-            price: [
-                [0, 100],
-                [60, 30],
-                [100, 60],
-                [125, 40],
-                [170, 80],
-                [200, 50],
-                [230, 70],
-                [300, 0],
-            ],
-            volume: [
-                [0, 200],
-                [125, 140],
-                [170, 180],
-                [200, 120],
-                [230, 130],
-                [300, 100],
-            ],
-        },
-        // 6
-        {
-            price: [
-                [0, 100],
-                [60, 30],
-                [100, 60],
-                [125, 40],
-                [170, 80],
-                [200, 50],
-                [230, 70],
-                [300, 0],
-            ],
-            volume: [
-                [0, 200],
-                [60, 150],
-                [100, 180],
-                [125, 120],
-                [170, 140],
-                [300, 100],
-            ],
-        },
-        // 1
+        // 5-1
         {
             price: [
                 [0, 80],
@@ -197,7 +155,7 @@ onMounted(() => {
                 [300, 200],
             ],
         },
-        // 2
+        // 6-2
         {
             price: [
                 [0, 80],
@@ -222,7 +180,7 @@ onMounted(() => {
                 [300, 200],
             ],
         },
-        // 3
+        // 7-3
         {
             price: [
                 [0, 80],
@@ -247,33 +205,78 @@ onMounted(() => {
                 [300, 200],
             ],
         },
-        // 4
+        // 8-4
         {
             price: [
-                [0, 100],
-                [40, 40],
-                [70, 60],
-                [110, 20],
-                [140, 40],
-                [180, 0],
-                [210, 30],
-                [250, 10],
-                [300, 100],
+                [0, 60],
+                [50, 30],
+                [100, 100],
+                [170, 60],
+                [200, 80],
+                [300, 0],
             ],
             volume: [
-                [0, 180],
-                [40, 130],
-                [70, 150],
-                [110, 100],
-                [140, 160],
-                [180, 140],
-                [210, 170],
-                [250, 150],
-                [300, 200],
+                [0, 200],
+                [50, 160],
+                [100, 190],
+                [170, 140],
+                [200, 160],
+                [300, 100],
+            ],
+            target: [[160, 60], [180, 60], 2],
+            entry: [
+                [215, 60],
+                [235, 60],
+            ],
+            sl: [
+                [190, 80],
+                [210, 80],
+            ],
+            tp: [
+                [280, 10],
+                [297, 10],
+            ],
+        },
+        // 9-5
+        {
+            price: [
+                [0, 30],
+                [50, 0],
+                [100, 90],
+                [120, 60],
+                [140, 80],
+                [170, 40],
+                [200, 100],
+                [230, 60],
+                [250, 90],
+                [295, 0],
+            ],
+            volume: [
+                [0, 200],
+                [50, 160],
+                [100, 190],
+                [170, 140],
+                [200, 170],
+                [230, 150],
+                [250, 160],
+                [295, 100],
+            ],
+            target: [[160, 40], [180, 40], 0.5],
+            entry: [
+                [255, 60],
+                [275, 60],
+            ],
+            sl: [
+                [240, 90],
+                [260, 90],
+            ],
+            tp: [
+                [280, 10],
+                [300, 10],
             ],
         },
     ];
-    for (let item = 0; item < 10; item++) {
+    for (let item = 0; item < 9; item++) {
         const canvas = document.getElementById(`item${item + 1}`);
         canvas.width = 300;
         canvas.height = 200;
@@ -281,7 +284,12 @@ onMounted(() => {
 
         const price = data[item].price;
         const volume = data[item].volume;
+        const target = data[item].target;
+        const entry = data[item].entry;
+        const sl = data[item].sl;
+        const tp = data[item].tp;
 
+        // price
         ctx.beginPath();
         ctx.strokeStyle = "white";
         ctx.lineWidth = 2;
@@ -290,9 +298,9 @@ onMounted(() => {
             ctx.lineTo(price[i][0], price[i][1]);
         }
         ctx.stroke();
-        //
+        // volume
         ctx.beginPath();
-        ctx.strokeStyle = "yellow";
+        ctx.strokeStyle = "orange";
         ctx.lineWidth = 2;
         ctx.moveTo(volume[0][0], volume[0][1]);
 
@@ -300,6 +308,45 @@ onMounted(() => {
             ctx.lineTo(volume[i][0], volume[i][1]);
         }
         ctx.stroke();
+        // target
+        if (!!target) {
+            ctx.beginPath();
+            ctx.strokeStyle = "magenta";
+            ctx.lineWidth = 2;
+            ctx.moveTo(target[0][0], target[0][1]);
+            ctx.lineTo(target[1][0], target[1][1]);
+            ctx.stroke();
+            ctx.font = "15px Arial";
+            ctx.fillStyle = "magenta";
+            ctx.fillText(target[2], target[1][0] + 5, target[1][1] + 5);
+        }
+        // entry
+        if (!!entry) {
+            ctx.beginPath();
+            ctx.strokeStyle = "yellow";
+            ctx.lineWidth = 2;
+            ctx.moveTo(entry[0][0], entry[0][1]);
+            ctx.lineTo(entry[1][0], entry[1][1]);
+            ctx.stroke();
+        }
+        // sl
+        if (!!sl) {
+            ctx.beginPath();
+            ctx.strokeStyle = "red";
+            ctx.lineWidth = 2;
+            ctx.moveTo(sl[0][0], sl[0][1]);
+            ctx.lineTo(sl[1][0], sl[1][1]);
+            ctx.stroke();
+        }
+        // tp
+        if (!!tp) {
+            ctx.beginPath();
+            ctx.strokeStyle = "lime";
+            ctx.lineWidth = 2;
+            ctx.moveTo(tp[0][0], tp[0][1]);
+            ctx.lineTo(tp[1][0], tp[1][1]);
+            ctx.stroke();
+        }
     }
 });
 function stopPropagationEvent(e) {
