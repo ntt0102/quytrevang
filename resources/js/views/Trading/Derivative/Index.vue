@@ -365,7 +365,7 @@ const showCancelOrder = computed(
         !!store.state.tradingDerivative.tools.order
 );
 const tradingViewSrc = computed(() => {
-    return `https://chart.vps.com.vn/tv/?loadLastChart=true&symbol=VN30F1M&u=${config.value.vpsUser}&s=${config.value.vpsSession}&resolution=1`;
+    return `https://chart.vps.com.vn/tv/?u=${config.value.vpsUser}&s=${config.value.vpsSession}&symbol=VN30F1M&resolution=1&lang=vi&allowFullscreen=true&loadLastChart=true`;
 });
 
 store.dispatch("tradingDerivative/initChart").then(() => {
