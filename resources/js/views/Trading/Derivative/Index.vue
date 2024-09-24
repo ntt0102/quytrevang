@@ -138,30 +138,6 @@
                         ></LineContextMenu>
                     </div>
                     <div
-                        v-show="false"
-                        ref="verticalToolRef"
-                        class="command far fa-grip-lines-vertical"
-                        :title="$t('trading.derivative.verticalTool')"
-                        @click="verticalToolClick"
-                        @contextmenu="verticalToolContextmenu"
-                    ></div>
-                    <div
-                        v-show="false"
-                        ref="uplpsToolRef"
-                        class="command far fa-arrow-up"
-                        :title="$t('trading.derivative.uplpsTool')"
-                        @click="uplpsToolClick"
-                        @contextmenu="uplpsToolContextmenu"
-                    ></div>
-                    <div
-                        v-show="false"
-                        ref="downlpsToolRef"
-                        class="command far fa-arrow-down"
-                        :title="$t('trading.derivative.downlpsTool')"
-                        @click="downlpsToolClick"
-                        @contextmenu="downlpsToolContextmenu"
-                    ></div>
-                    <div
                         ref="rrToolRef"
                         class="command far fa-line-height"
                         :title="$t('trading.derivative.rrTool')"
@@ -196,14 +172,6 @@
                             @deleteAllLine="removeLineTool"
                         ></PatternContextMenu>
                     </div>
-                    <div
-                        v-show="false"
-                        ref="superToolRef"
-                        class="command far fa-sliders-v"
-                        :title="$t('trading.derivative.superTool')"
-                        @click="superToolClick"
-                        @contextmenu="superToolContextmenu"
-                    ></div>
                     <div
                         v-show="showCancelOrder"
                         ref="cancelOrderRef"
@@ -323,13 +291,9 @@ const tradingviewChartRef = ref(null);
 const reloadToolRef = ref(null);
 const tradingviewRef = ref(null);
 const lineToolRef = ref(null);
-const verticalToolRef = ref(null);
-const uplpsToolRef = ref(null);
-const downlpsToolRef = ref(null);
 const rrToolRef = ref(null);
 const targetToolRef = ref(null);
 const timeRangeToolRef = ref(null);
-const superToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
@@ -397,19 +361,6 @@ onMounted(() => {
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    params.series.super = params.chart.addHistogramSeries({
-        priceScaleId: "super",
-        scaleMargins: { top: 0, bottom: 0 },
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
-    params.series.vertical = params.chart.addHistogramSeries({
-        priceScaleId: "vertical",
-        scaleMargins: { top: 0, bottom: 0 },
-        color: "magenta",
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
     params.series.timeRange = params.chart.addHistogramSeries({
         priceScaleId: "range",
         scaleMargins: { top: 0, bottom: 0 },
@@ -452,17 +403,11 @@ function eventChartClick(e) {
     state.showPatternContext = false;
     toggleOrderButton(false);
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
-    // else if (verticalToolRef.value.classList.contains("selected"))
-    //     drawVerticalTool();
     else if (targetToolRef.value.classList.contains("selected"))
         drawTargetTool();
     else if (timeRangeToolRef.value.classList.contains("selected"))
         drawTimeRangeTool();
-    // else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
-    // else if (downlpsToolRef.value.classList.contains("selected"))
-    //     drawDownlpsTool();
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
-    // else if (superToolRef.value.classList.contains("selected")) drawSuperTool();
 }
 function eventChartContextmenu(e) {
     toggleOrderButton(true);
@@ -821,19 +766,6 @@ function loadToolsData(tools) {
                 params.tools.timeRange = Object.values(points);
                 params.series.timeRange.setData(params.tools.timeRange);
                 break;
-            // case "vertical":
-            //     setTimeout(() => {
-            //         params.tools.vertical = Object.values(points);
-            //         params.tools.vertical.sort((a, b) => a.time - b.time);
-            //         params.series.vertical.setData(params.tools.vertical);
-            //     }, 1000);
-            //     break;
-            // case "super":
-            //     setTimeout(() => {
-            //         params.tools.super = Object.values(points);
-            //         params.series.super.setData(params.tools.super);
-            //     }, 1000);
-            //     break;
             default:
                 Object.entries(points).forEach(
                     ([point, line]) =>
@@ -1148,57 +1080,6 @@ function removeLineTool(withServer = true) {
             });
     }
 }
-function verticalToolClick(e) {
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) e.target.classList.add("selected");
-    else scanExtremes();
-}
-function verticalToolContextmenu(e) {
-    removeVerticalTool();
-    e.target.classList.remove("selected");
-}
-function drawVerticalTool() {
-    const TYPE = "vertical";
-    const time = params.crosshair.time;
-    const oldLength = params.tools.vertical.length;
-    params.tools.vertical = params.tools.vertical.filter((item) => {
-        const isExist = item.time == time;
-        if (isExist) {
-            store.dispatch("tradingDerivative/drawTools", {
-                isRemove: true,
-                name: TYPE,
-                point: time,
-            });
-        }
-        return !isExist;
-    });
-    if (params.tools.vertical.length == oldLength) {
-        const tmp = { time, value: 1 };
-        params.tools.vertical.push(tmp);
-        params.tools.vertical.sort((a, b) => a.time - b.time);
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: false,
-            name: TYPE,
-            points: [time],
-            data: [tmp],
-        });
-    }
-    params.series.vertical.setData(params.tools.vertical);
-    verticalToolRef.value.classList.remove("selected");
-}
-function removeVerticalTool(withServer = true) {
-    initToolsParams(["vertical"]);
-    params.series.vertical.setData([]);
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "vertical",
-        });
-}
 function findLongTermExtremes(data, isPeak) {
     const indexRange = 24 * 10;
     const posTimeRange = 60 * 5;
@@ -1277,217 +1158,6 @@ function findCommonExtremes(priceExtremes, volumeExtremes, isPeak) {
     }
 
     return commonExtremes;
-}
-function scanExtremes() {
-    const pricePeaks = findLongTermExtremes(params.data.price, true);
-    const priceValleys = findLongTermExtremes(params.data.price, false);
-    // const volumePeaks = findLongTermExtremes(params.data.volume, true);
-    // const volumeValleys = findLongTermExtremes(params.data.volume, false);
-    // const commonPeaks = findCommonExtremes(pricePeaks, volumePeaks, true);
-    // const commonValleys = findCommonExtremes(
-    //     priceValleys,
-    //     volumeValleys,
-    //     false
-    // );
-    // params.data.vertical = mergeChartData(commonPeaks, commonValleys);
-    params.data.vertical = mergeChartData(pricePeaks, priceValleys);
-    params.series.vertical.setData(params.data.vertical);
-}
-function uplpsToolClick(e) {
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) e.target.classList.add("selected");
-    else if (mf.isSet(params.tools.uplps.P1)) drawUplpsTool();
-}
-function uplpsToolContextmenu(e) {
-    removeUplpsTool();
-    e.target.classList.remove("selected");
-}
-function drawUplpsTool() {
-    let startTime, endTime;
-    if (mf.isSet(params.tools.uplps.P1)) {
-        startTime = +params.tools.uplps.P1.options().startTime;
-        endTime = params.crosshair.time;
-        removeUplpsTool(false);
-    } else startTime = params.crosshair.time;
-    const { value1, value2 } = findUplps(startTime, endTime);
-    let option = {
-        lineWidth: 1,
-        lineStyle: 1,
-        color: "#009688",
-        draggable: false,
-    };
-    let param = {
-        isRemove: false,
-        name: "uplps",
-        points: [],
-        data: [],
-    };
-    option.startTime = startTime;
-    option.price = value1;
-    option.title = "P1";
-    params.tools.uplps[option.title] =
-        params.series.price.createPriceLine(option);
-    param.points.push(option.title);
-    param.data.push(mf.cloneDeep(option));
-    //
-    option.price = value2;
-    option.title = "P2";
-    params.tools.uplps[option.title] =
-        params.series.price.createPriceLine(option);
-    param.points.push(option.title);
-    param.data.push(mf.cloneDeep(option));
-
-    store.dispatch("tradingDerivative/drawTools", param);
-    uplpsToolRef.value.classList.remove("selected");
-}
-function findUplps(startTime, endTime) {
-    let v1,
-        v2,
-        v3,
-        d = 0,
-        dMax = 0;
-    const data = params.data.price;
-    for (let i = 0; i < data.length; i++) {
-        const time = data[i].time;
-        if (time < startTime) continue;
-        if (!!endTime && time > endTime) break;
-        const value = data[i].value;
-        if (v1 == undefined) {
-            v1 = value;
-            v2 = value;
-            v3 = value;
-        }
-        if (value > v3) {
-            if (d > dMax) {
-                v2 = v3;
-                dMax = d;
-            }
-            v3 = value;
-            d = 0;
-        } else if (value < v3) {
-            const _d = +(v3 - value).toFixed(2);
-            if (_d > d) d = _d;
-        }
-        if (value < v1 && dMax > 0) break;
-    }
-    return {
-        value1: +(v2 - dMax).toFixed(2),
-        value2: +(v3 - dMax).toFixed(2),
-    };
-}
-function removeUplpsTool(withServer = true) {
-    if (mf.isSet(params.tools.uplps.P1)) {
-        params.series.price.removePriceLine(params.tools.uplps.P1);
-        params.series.price.removePriceLine(params.tools.uplps.P2);
-    }
-    initToolsParams(["uplps"]);
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "uplps",
-        });
-}
-function downlpsToolClick(e) {
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) e.target.classList.add("selected");
-    else if (mf.isSet(params.tools.downlps.P1)) drawDownlpsTool();
-}
-function downlpsToolContextmenu(e) {
-    removeDownlpsTool();
-    e.target.classList.remove("selected");
-}
-function drawDownlpsTool() {
-    let startTime, endTime;
-    if (mf.isSet(params.tools.downlps.P1)) {
-        startTime = +params.tools.downlps.P1.options().startTime;
-        endTime = params.crosshair.time;
-        removeDownlpsTool(false);
-    } else startTime = params.crosshair.time;
-    const { value1, value2 } = findDownlps(startTime, endTime);
-    let option = {
-        lineWidth: 1,
-        lineStyle: 1,
-        color: "#E91E63",
-        draggable: false,
-    };
-    let param = {
-        isRemove: false,
-        name: "downlps",
-        points: [],
-        data: [],
-    };
-    option.startTime = startTime;
-    option.price = value1;
-    option.title = "P1";
-    params.tools.downlps[option.title] =
-        params.series.price.createPriceLine(option);
-    param.points.push(option.title);
-    param.data.push(mf.cloneDeep(option));
-    //
-    option.price = value2;
-    option.title = "P2";
-    params.tools.downlps[option.title] =
-        params.series.price.createPriceLine(option);
-    param.points.push(option.title);
-    param.data.push(mf.cloneDeep(option));
-
-    store.dispatch("tradingDerivative/drawTools", param);
-    downlpsToolRef.value.classList.remove("selected");
-}
-function findDownlps(startTime, endTime) {
-    let v1,
-        v2,
-        v3,
-        d = 0,
-        dMax = 0;
-    const data = params.data.price;
-    for (let i = 0; i < data.length; i++) {
-        const time = data[i].time;
-        if (time < startTime) continue;
-        if (!!endTime && time > endTime) break;
-        const value = data[i].value;
-        if (v1 == undefined) {
-            v1 = value;
-            v2 = value;
-            v3 = value;
-        }
-        if (value < v3) {
-            if (d < dMax) {
-                v2 = v3;
-                dMax = d;
-            }
-            v3 = value;
-            d = 0;
-        } else if (value > v3) {
-            const _d = +(v3 - value).toFixed(2);
-            if (_d < d) d = _d;
-        }
-        if (value > v1 && dMax < 0) break;
-    }
-    return {
-        value1: +(v2 - dMax).toFixed(2),
-        value2: +(v3 - dMax).toFixed(2),
-    };
-}
-function removeDownlpsTool(withServer = true) {
-    if (mf.isSet(params.tools.downlps.P1)) {
-        params.series.price.removePriceLine(params.tools.downlps.P1);
-        params.series.price.removePriceLine(params.tools.downlps.P2);
-    }
-    initToolsParams(["downlps"]);
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "downlps",
-        });
 }
 function rrToolClick(e) {
     state.showLineContext = false;
@@ -1732,106 +1402,9 @@ function removeTimeRangeTool(withServer = true) {
 function patternToolClick() {
     state.showPatternContext = !state.showPatternContext;
 }
-function superToolClick(e) {
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-    } else if (params.tools.super.length > 0) drawSuperTool();
-}
-function superToolContextmenu(e) {
-    removeSuperTool();
-    e.target.classList.remove("selected");
-}
-function drawSuperTool() {
-    let startTime, endTime;
-    if (params.tools.super.length > 0) {
-        startTime = params.tools.super[0].startTime;
-        endTime = params.crosshair.time;
-    } else startTime = params.crosshair.time;
-
-    const v = findSuper(startTime, endTime, "volume");
-    const p = findSuper(startTime, endTime, "price", v.side);
-    params.tools.super = [
-        {
-            time: v.time1,
-            value: 1,
-            color: v.time1 >= p.time1 ? "lime" : "red",
-            startTime,
-        },
-        {
-            time: v.time2,
-            value: 1,
-            color: v.time2 <= p.time2 ? "lime" : "red",
-        },
-        {
-            time: v.time3,
-            value: 1,
-            color: v.time3 >= p.time3 ? "lime" : "red",
-        },
-    ];
-    params.series.super.setData(params.tools.super);
-    const param = {
-        isRemove: false,
-        name: "super",
-        points: [0, 1, 2],
-        data: params.tools.super,
-    };
-    store.dispatch("tradingDerivative/drawTools", param);
-    superToolRef.value.classList.remove("selected");
-}
-function findSuper(startTime, endTime, type, side) {
-    let v1, t1, v2, t2, v3, t3;
-    const data = params.data[type];
-    for (let i = 0; i < data.length; i++) {
-        const time = data[i].time;
-        if (time < startTime) continue;
-        if (!!endTime && time > endTime) break;
-        const value = data[i].value;
-        if (side == undefined) side = value - data[i - 1].value > 0;
-        if (v1 == undefined || (cmp(value, v1, side, true) && t3 - t1 < 200)) {
-            v1 = value;
-            t1 = time;
-            v2 = value;
-            t2 = time;
-            v3 = value;
-            t3 = time;
-        }
-        if (cmp(value, v2, !side, true)) {
-            v2 = value;
-            t2 = time;
-            v3 = value;
-            t3 = time;
-        }
-        if (cmp(value, v3, side, true)) {
-            v3 = value;
-            t3 = time;
-        }
-    }
-    return {
-        time1: t1,
-        time2: t2,
-        time3: t3,
-        side,
-    };
-}
-function removeSuperTool(withServer = true) {
-    initToolsParams(["super"]);
-    params.series.super.setData([]);
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "super",
-        });
-}
 function removeAllTools() {
     removeOrderLine(["entry", "tp", "sl"], false);
     removeLineTool(false);
-    // removeUplpsTool(false);
-    // removeDownlpsTool(false);
     removeRrTool(false);
     removeTargetTool(false);
     removeTimeRangeTool(false);
@@ -2186,29 +1759,14 @@ function resetTools() {
     store.dispatch("tradingDerivative/getTools");
 }
 function initToolsParams(tools) {
-    if (tools == undefined)
-        tools = [
-            "order",
-            "lines",
-            // "vertical",
-            "rr",
-            "target",
-            "tr",
-            // "uplps",
-            // "downlps",
-            // "super",
-        ];
+    if (tools == undefined) tools = ["order", "lines", "rr", "target", "tr"];
     if (tools.includes("order"))
         params.tools.order = { side: 0, entry: {}, tp: {}, sl: {} };
     if (tools.includes("lines")) params.tools.lines = [];
-    // if (tools.includes("vertical")) params.tools.vertical = [];
     if (tools.includes("rr")) params.tools.rr = { EP: {}, SL: {}, TP: {} };
     if (tools.includes("target"))
         params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
     if (tools.includes("tr")) params.tools.timeRange = [];
-    // if (tools.includes("uplps")) params.tools.uplps = { P1: {}, P2: {} };
-    // if (tools.includes("downlps")) params.tools.downlps = { P1: {}, P2: {} };
-    // if (tools.includes("super")) params.tools.super = [];
 }
 function getAccountInfo() {
     store.dispatch("tradingDerivative/getAccountInfo").then((data) => {
