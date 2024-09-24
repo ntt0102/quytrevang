@@ -176,6 +176,13 @@
                         @contextmenu="targetToolContextmenu"
                     ></div>
                     <div
+                        ref="timeRangeToolRef"
+                        class="command far fa-grip-lines-vertical"
+                        :title="$t('trading.derivative.timeRangeTool')"
+                        @click="timeRangeToolClick"
+                        @contextmenu="timeRangeToolContextmenu"
+                    ></div>
+                    <div
                         ref="patternToolRef"
                         class="pattern command far fa-heart-rate"
                         :title="$t('trading.derivative.patternTool')"
@@ -319,8 +326,9 @@ const lineToolRef = ref(null);
 const verticalToolRef = ref(null);
 const uplpsToolRef = ref(null);
 const downlpsToolRef = ref(null);
-const targetToolRef = ref(null);
 const rrToolRef = ref(null);
+const targetToolRef = ref(null);
+const timeRangeToolRef = ref(null);
 const superToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
@@ -402,6 +410,12 @@ onMounted(() => {
         lastValueVisible: false,
         priceLineVisible: false,
     });
+    params.series.timeRange = params.chart.addHistogramSeries({
+        priceScaleId: "range",
+        scaleMargins: { top: 0, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
     params.series.volume = params.chart.addLineSeries({
         priceScaleId: "volume",
         scaleMargins: { top: 0.61, bottom: 0.01 },
@@ -442,6 +456,8 @@ function eventChartClick(e) {
     //     drawVerticalTool();
     else if (targetToolRef.value.classList.contains("selected"))
         drawTargetTool();
+    else if (timeRangeToolRef.value.classList.contains("selected"))
+        drawTimeRangeTool();
     // else if (uplpsToolRef.value.classList.contains("selected")) drawUplpsTool();
     // else if (downlpsToolRef.value.classList.contains("selected"))
     //     drawDownlpsTool();
@@ -800,6 +816,10 @@ function loadToolsData(tools) {
                         params.series.price.createPriceLine(line)
                     )
                 );
+                break;
+            case "tr":
+                params.tools.timeRange = Object.values(points);
+                params.series.timeRange.setData(params.tools.timeRange);
                 break;
             // case "vertical":
             //     setTimeout(() => {
@@ -1664,6 +1684,51 @@ function removeTargetTool(withServer = true) {
             name: "target",
         });
 }
+function timeRangeToolClick(e) {
+    state.showLineContext = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+    }
+}
+function timeRangeToolContextmenu(e) {
+    removeTimeRangeTool();
+    e.target.classList.remove("selected");
+}
+function drawTimeRangeTool() {
+    let param = {
+        isRemove: false,
+        name: "tr",
+        points: [],
+        data: [],
+    };
+    let option = { time: params.crosshair.time, value: 1 };
+    if (params.tools.timeRange.length > 0) {
+        option.color = "red";
+        params.tools.timeRange[1] = option;
+        param.points.push(1);
+        timeRangeToolRef.value.classList.remove("selected");
+    } else {
+        option.color = "lime";
+        params.tools.timeRange[0] = option;
+        param.points.push(0);
+    }
+    params.series.timeRange.setData(params.tools.timeRange);
+    param.data.push(option);
+    store.dispatch("tradingDerivative/drawTools", param);
+}
+function removeTimeRangeTool(withServer = true) {
+    params.series.timeRange.setData([]);
+    initToolsParams(["tr"]);
+    if (withServer)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: true,
+            name: "tr",
+        });
+}
 function patternToolClick() {
     state.showPatternContext = !state.showPatternContext;
 }
@@ -1767,8 +1832,9 @@ function removeAllTools() {
     removeLineTool(false);
     // removeUplpsTool(false);
     // removeDownlpsTool(false);
-    removeTargetTool(false);
     removeRrTool(false);
+    removeTargetTool(false);
+    removeTimeRangeTool(false);
 }
 function toggleOrderButton(show) {
     if (show) {
@@ -2125,21 +2191,23 @@ function initToolsParams(tools) {
             "order",
             "lines",
             // "vertical",
+            "rr",
             "target",
+            "tr",
             // "uplps",
             // "downlps",
-            "rr",
             // "super",
         ];
     if (tools.includes("order"))
         params.tools.order = { side: 0, entry: {}, tp: {}, sl: {} };
     if (tools.includes("lines")) params.tools.lines = [];
     // if (tools.includes("vertical")) params.tools.vertical = [];
+    if (tools.includes("rr")) params.tools.rr = { EP: {}, SL: {}, TP: {} };
     if (tools.includes("target"))
         params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
+    if (tools.includes("tr")) params.tools.timeRange = [];
     // if (tools.includes("uplps")) params.tools.uplps = { P1: {}, P2: {} };
     // if (tools.includes("downlps")) params.tools.downlps = { P1: {}, P2: {} };
-    if (tools.includes("rr")) params.tools.rr = { EP: {}, SL: {}, TP: {} };
     // if (tools.includes("super")) params.tools.super = [];
 }
 function getAccountInfo() {
