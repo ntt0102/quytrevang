@@ -138,11 +138,11 @@
                         ></LineContextMenu>
                     </div>
                     <div
-                        ref="rrToolRef"
-                        class="command far fa-line-height"
-                        :title="$t('trading.derivative.rrTool')"
-                        @click="rrToolClick"
-                        @contextmenu="rrToolContextmenu"
+                        ref="timeRangeToolRef"
+                        class="command far fa-grip-lines-vertical"
+                        :title="$t('trading.derivative.timeRangeTool')"
+                        @click="timeRangeToolClick"
+                        @contextmenu="timeRangeToolContextmenu"
                     ></div>
                     <div
                         ref="targetToolRef"
@@ -152,11 +152,11 @@
                         @contextmenu="targetToolContextmenu"
                     ></div>
                     <div
-                        ref="timeRangeToolRef"
-                        class="command far fa-grip-lines-vertical"
-                        :title="$t('trading.derivative.timeRangeTool')"
-                        @click="timeRangeToolClick"
-                        @contextmenu="timeRangeToolContextmenu"
+                        ref="rrToolRef"
+                        class="command far fa-line-height"
+                        :title="$t('trading.derivative.rrTool')"
+                        @click="rrToolClick"
+                        @contextmenu="rrToolContextmenu"
                     ></div>
                     <div
                         ref="patternToolRef"
