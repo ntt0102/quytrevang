@@ -381,7 +381,7 @@ onMounted(() => {
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
     store.dispatch("tradingDerivative/getChartData", { date: state.chartDate });
-    store.dispatch("tradingDerivative/getTools");
+    setTimeout(() => store.dispatch("tradingDerivative/getTools"), 1000);
 });
 onUnmounted(() => {
     document.removeEventListener("keydown", eventKeyPress);
@@ -771,10 +771,8 @@ function loadToolsData(tools) {
                 );
                 break;
             case "tr":
-                setTimeout(() => {
-                    params.tools.timeRange = Object.values(points);
-                    params.series.timeRange.setData(params.tools.timeRange);
-                }, 1000);
+                params.tools.timeRange = Object.values(points);
+                params.series.timeRange.setData(params.tools.timeRange);
                 break;
             default:
                 Object.entries(points).forEach(
