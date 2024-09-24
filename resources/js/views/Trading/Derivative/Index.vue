@@ -771,8 +771,10 @@ function loadToolsData(tools) {
                 );
                 break;
             case "tr":
-                params.tools.timeRange = Object.values(points);
-                params.series.timeRange.setData(params.tools.timeRange);
+                setTimeout(() => {
+                    params.tools.timeRange = Object.values(points);
+                    params.series.timeRange.setData(params.tools.timeRange);
+                }, 1000);
                 break;
             default:
                 Object.entries(points).forEach(
