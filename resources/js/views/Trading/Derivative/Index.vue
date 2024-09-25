@@ -167,10 +167,18 @@
                         <PatternContextMenu
                             v-show="state.showPatternContext"
                             class="contextmenu"
-                            v-model:title="state.lineTitle"
-                            v-model:color="state.lineColor"
-                            @deleteAllLine="removeLineTool"
                         ></PatternContextMenu>
+                    </div>
+                    <div
+                        ref="progressToolRef"
+                        class="progress command far fa-tasks"
+                        :title="$t('trading.derivative.progressTool')"
+                        @click="progressToolClick"
+                    >
+                        <ProgressContextMenu
+                            v-show="state.showProgressContext"
+                            class="contextmenu"
+                        ></ProgressContextMenu>
                     </div>
                     <div
                         v-show="showCancelOrder"
@@ -215,6 +223,7 @@
 <script setup>
 import LineContextMenu from "./LineContextMenu.vue";
 import PatternContextMenu from "./PatternContextMenu.vue";
+import ProgressContextMenu from "./ProgressContextMenu/Index.vue";
 import VpsOtpPopup from "./VpsOtpPopup.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
@@ -326,6 +335,7 @@ const state = reactive({
     lineTitle: "",
     showLineContext: false,
     showPatternContext: false,
+    showProgressContext: false,
     showTradingView: false,
 });
 const status = computed(() => store.state.tradingDerivative.status);
@@ -401,6 +411,7 @@ watch(() => store.state.tradingDerivative.tools, loadToolsData);
 function eventChartClick(e) {
     state.showLineContext = false;
     state.showPatternContext = false;
+    state.showProgressContext = false;
     toggleOrderButton(false);
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (targetToolRef.value.classList.contains("selected"))
@@ -1409,6 +1420,11 @@ function removeTimeRangeTool(withServer = true) {
 }
 function patternToolClick() {
     state.showPatternContext = !state.showPatternContext;
+    state.showProgressContext = false;
+}
+function progressToolClick() {
+    state.showProgressContext = !state.showProgressContext;
+    state.showPatternContext = false;
 }
 function removeAllTools() {
     removeOrderLine(["entry", "tp", "sl"], false);
@@ -1912,7 +1928,17 @@ function cmp(vari, value, side, eq = false) {
 
                 .contextmenu {
                     position: absolute;
-                    top: -110px;
+                    top: -140px;
+                    left: 42px;
+                }
+            }
+
+            .progress {
+                position: relative;
+
+                .contextmenu {
+                    position: absolute;
+                    top: -170px;
                     left: 42px;
                 }
             }

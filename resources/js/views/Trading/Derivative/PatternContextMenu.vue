@@ -1,5 +1,5 @@
 <template>
-    <div class="pattern-popup" @click="stopPropagationEvent">
+    <div class="pattern-popup" @click="stopPropagationEvent" title="">
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
 
@@ -450,7 +450,7 @@ function stopPropagationEvent(e) {
     .triangle {
         width: 0px;
         height: 0px;
-        top: 115px;
+        top: 145px;
         left: -10px;
         border-style: solid;
         border-width: 9px 10px 9px 0;
@@ -470,6 +470,7 @@ function stopPropagationEvent(e) {
     .container {
         display: flex;
         gap: 10px;
+        font-family: Roboto;
 
         .items {
             width: 315px;

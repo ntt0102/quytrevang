@@ -176,6 +176,7 @@
             "targetTool": "Xác định TP",
             "timeRangeTool": "Xác định thời gian",
             "patternTool": "Mẫu hình",
+            "progressTool": "Tiến trình",
             "cancelTool": "Huỷ lệnh và đóng vị thế",
             "newEntrySuccess": "Đặt lệnh Entry thành công",
             "changeEntrySuccess": "Sửa lệnh Entry thành công",
@@ -219,6 +220,10 @@
             "patternContextMenu": {
                 "continue": "Tiếp diễn",
                 "reversal": "Đảo chiều"
+            },
+            "progressContextMenu": {
+                "start": "Bắt đầu",
+                "end": "Kết thúc"
             }
         },
         "derstats": {
