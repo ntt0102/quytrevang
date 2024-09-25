@@ -381,7 +381,7 @@ onMounted(() => {
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
     store.dispatch("tradingDerivative/getChartData", { date: state.chartDate });
-    setTimeout(() => store.dispatch("tradingDerivative/getTools"), 500);
+    setTimeout(() => store.dispatch("tradingDerivative/getTools"), 1000);
 });
 onUnmounted(() => {
     document.removeEventListener("keydown", eventKeyPress);
