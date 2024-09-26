@@ -99,7 +99,7 @@ let faqsSource = [];
 watch(
     () => store.state.faqs,
     (value) => {
-        import(`../lang/chatbot/${window.lang}.js`).then((extra) => {
+        import(`../lang/${window.lang}/chatbot.js`).then((extra) => {
             faqsSource = [...value, ...extra.default];
         });
     }

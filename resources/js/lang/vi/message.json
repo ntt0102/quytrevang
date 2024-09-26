@@ -1,0 +1,814 @@
+{
+    "policy": {
+        "title": "Chính sách",
+        "terms": {
+            "title": "Điều khoản dịch vụ",
+            "short": "Điều khoản"
+        },
+        "privacy": {
+            "title": "Chính sách bảo mật",
+            "short": "Bảo mật"
+        },
+        "faq": {
+            "title": "Câu hỏi thường gặp",
+            "short": "Trợ giúp",
+            "topic": "Chủ đề"
+        }
+    },
+    "auth": {
+        "login": {
+            "title": "Đăng nhập",
+            "rememberMe": "Duy trì đăng nhập",
+            "forgotPassword": "Quên mật khẩu?",
+            "createAccount": "Đăng ký",
+            "submit": "Đăng nhập",
+            "logout": "Đăng xuất",
+            "haveNotAccount": "Chưa có tài khoản?",
+            "anotherAccount": "Chọn tài khoản khác"
+        },
+        "createAccount": {
+            "title": "Đăng ký",
+            "policy": "Bằng cách đăng ký, quý khách đã đồng ý với ",
+            "and": " và ",
+            "our": " của chúng tôi.",
+            "haveAccount": "Đã có tài khoản?",
+            "login": "Đăng nhập",
+            "submit": "Đăng ký"
+        },
+        "verifyEmail": {
+            "title": "Xác nhận email",
+            "description": "Sau khi xác nhận xong, sẽ tự động đăng nhập vào hệ thống."
+        },
+        "resetPassword": {
+            "title": "Đặt lại mật khẩu",
+            "send": "Gửi đường dẫn",
+            "returnTo": "Trở về",
+            "signIn": "Đăng nhập"
+        }
+    },
+    "user": {
+        "overview": {
+            "title": "Tổng quan",
+            "levels": {
+                "register": "Tạo tài khoản",
+                "verifyEmail": "Xác thực email",
+                "setPin": "Đặt mã PIN",
+                "updateInfo": "Bổ sung hồ sơ",
+                "signContract": "Ký thỏa thuận",
+                "createContract": "Mở giao dịch"
+            },
+            "monthTrade": {
+                "title": "Lợi nhuận luỹ kế tháng",
+                "subtitle": "Tỷ lệ sao chép: {0}%"
+            },
+            "finbook": {
+                "title": "Sổ tài chính",
+                "subtitle": "Tổng số dư: {0}"
+            },
+            "summary": {
+                "title": "Các tài khoản tiết kiệm",
+                "userName": "Tài khoản",
+                "asset": "Tiền gốc"
+            },
+            "contract": {
+                "sumTitle": "Tài sản tiết kiệm",
+                "principalSum": "Tổng tiền gốc",
+                "interestSum": "Tổng tiền lãi",
+                "assetSum": "Tổng tài sản",
+                "listTitle": "Các sổ tiết kiệm"
+            }
+        },
+        "profile": {
+            "title": "Hồ sơ",
+            "detailInfo": "Thông tin chi tiết",
+            "fingerPrint": "Đăng ký vân tay",
+            "delete": {
+                "title": "Vùng nguy hiểm",
+                "desctiption": "Trước khi xóa tài khoản, quý khách hãy chắc chắn rằng không còn hợp đồng nào đang mở.",
+                "command": "Xóa tài khoản"
+            },
+            "changeRequest": {
+                "title": "Yêu cầu thay đổi",
+                "desctiption": "Nếu quý khách có nhu cầu thay đổi thông tin hồ sơ, hãy gửi yêu cầu cho chúng tôi.",
+                "command": "Gửi yêu cầu"
+            }
+        },
+        "contract": {
+            "title": "Sổ tiết kiệm",
+            "paidContract": "Nộp tiền",
+            "editPaidContract": "Đổi biên lai",
+            "withdrawContract": "Rút tiền",
+            "unwithdrawContract": "Huỷ rút tiền",
+            "interestRate": "Lãi suất trên tuần (i)",
+            "principalMin": "Tiền gốc (P) tối thiểu",
+            "holdWeeksMin": "Tuần nắm giữ (n) tối thiểu",
+            "interestFormula": "Công thức tính lãi"
+        },
+        "copyist": {
+            "title": "Sao chép lệnh",
+            "setting": "Cài đặt sao chép"
+        }
+    },
+    "admin": {
+        "title": "Quản lý",
+        "users": {
+            "title": "Tài khoản",
+            "deletedUsers": "Tài khoản đã xóa",
+            "detailUser": "Chi tiết tài khoản",
+            "buttons": {
+                "remove": "Xóa vĩnh viễn",
+                "revert": "Khôi phục",
+                "addMethod": "Thêm kênh chuyển tiền",
+                "downloadContract": "Lưu hợp đồng",
+                "uploadContract": "Tải lên hợp đồng",
+                "selectedDelete": "Xóa tài khoản",
+                "sendNotification": "Gửi thông báo",
+                "viewContract": "Xem hợp đồng",
+                "confirmUser": "Xác nhận tài khoản"
+            },
+            "selects": {
+                "level": {
+                    "level1": "Chưa xác thực email",
+                    "level2": "Chưa đặt mã PIN",
+                    "level3": "Chưa cập nhật hồ sơ",
+                    "level4": "Chưa ký thỏa thuận",
+                    "level5": "Chưa mở hợp đồng",
+                    "level6": "Đã mở hợp đồng",
+                    "level7": "Đang mở hợp đồng"
+                }
+            }
+        },
+        "contracts": {
+            "title": "Hợp đồng"
+        },
+        "copyists": {
+            "title": "Sao chép",
+            "user": "Tài khoản",
+            "vpsCode": "Mã VPS",
+            "volume": "Số HĐ",
+            "allowMaxVol": "HĐ lớn nhất",
+            "allowCopy": "Sao chép",
+            "allowShare": "Chia sẻ"
+        },
+        "comments": {
+            "title": "Phản hồi",
+            "markAsRead": "Đánh dấu đã đọc",
+            "viewUser": "Xem tài khoản {0}"
+        }
+    },
+    "trading": {
+        "title": "Đầu tư",
+        "derivative": {
+            "title": "Phái sinh",
+            "connection": "Trạng thái kết nối VPS",
+            "position": "Vị thế đang mở",
+            "accountInfo": "Thông tin tài khoản",
+            "nav": "Tài sản",
+            "maxVol": "Sức mua",
+            "vm": "Lợi nhuận",
+            "fee": "Phí",
+            "date": "Dữ liệu của ngày",
+            "fullscreen": "Bật tắt toàn màn hình",
+            "reload": "Tải lại dữ liệu",
+            "tradingview": "TradingView",
+            "lineTool": "Vẽ đường ngang",
+            "rrTool": "Xác định RR",
+            "targetTool": "Xác định TP",
+            "timeRangeTool": "Xác định thời gian",
+            "patternTool": "Mẫu hình",
+            "progressTool": "Tiến trình",
+            "cancelTool": "Huỷ lệnh và đóng vị thế",
+            "newEntrySuccess": "Đặt lệnh Entry thành công",
+            "changeEntrySuccess": "Sửa lệnh Entry thành công",
+            "deleteEntrySuccess": "Huỷ lệnh Entry thành công",
+            "newTpSlSuccess": "Đặt lệnh TP/SL thành công",
+            "autoNewTpSlSuccess": "Tự động đặt lệnh TP/SL thành công",
+            "changeTpSuccess": "Sửa lệnh TP thành công",
+            "deleteTpSuccess": "Đã khớp lệnh TP và đóng vị thế",
+            "changeSlSuccess": "Sửa lệnh SL thành công",
+            "deleteSlSuccess": "Đã khớp lệnh SL và đóng vị thế",
+            "exitSuccess": "Đóng vị thế thành công",
+            "atoOrderSuccess": "Đặt lệnh ATO thành công",
+            "atcOrderSuccess": "Đặt lệnh ATC thành công",
+            "autoCancelTpSlSuccess": "Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế",
+            "cancelOrder": "Huỷ lệnh?",
+            "atoOrder": "Đặt lệnh ATO?",
+            "atcOrder": "Đặt lệnh ATC?",
+            "cancelConfirm": "Xác nhận",
+            "noChangeOrderLine": "Không được thay đổi",
+            "notConnect": "Chưa kết nối tài khoản VPS",
+            "invalidVolume": "Số hợp đồng vượt quá sức mua",
+            "openedPosition": "Đã mở vị thế",
+            "unopenedPosition": "Chưa mở vị thế",
+            "failOrder": "Đặt lệnh thất bại",
+            "failSave": "Lưu lệnh thất bại",
+            "unknown": "Lỗi chưa xác định",
+            "copyistStatusPopup": {
+                "title": "Trạng thái đặt lệnh",
+                "account": "Tài khoản",
+                "vpsCode": "Mã VPS",
+                "connection": "Kết nối",
+                "position": "Vị thế",
+                "closePosition": "Đóng vị thế"
+            },
+            "buttons": {
+                "report": "Báo cáo",
+                "export": "Xuất dữ liệu",
+                "loginVps": "Đăng nhập VPS",
+                "loginDnse": "Đăng nhập DNSE"
+            },
+            "patternContextMenu": {
+                "continue": "Tiếp diễn",
+                "reversal": "Đảo chiều"
+            },
+            "progressContextMenu": {
+                "start": "Bắt đầu"
+            }
+        },
+        "derstats": {
+            "title": "Thống kê PS",
+            "amount": "Số HĐ",
+            "scores": "Điểm TT",
+            "revenue": "Lãi",
+            "loss": "Lỗ",
+            "fees": "Phí",
+            "date": "Ngày",
+            "validations": {
+                "date": "Không được trùng ngày"
+            },
+            "charTitle": "Kết quả đầu tư",
+            "chartSubtitle": "Biểu đồ",
+            "profitPerPrincipal": "Lợi nhuận trên vốn",
+            "profitPerFees": "Lợi nhuận trên phí",
+            "principalAvg": "Vốn trung bình",
+            "revenueSum": "Tổng tiền lãi",
+            "lossSum": "Tổng tiền lỗ",
+            "feesSum": "Tổng tiền phí",
+            "profitSum": "Tổng lợi nhuận",
+            "accumulatedProfit": "Lợi nhuận lũy kế",
+            "kpi": "KPI",
+            "selects": {
+                "period": {
+                    "day": "Ngày",
+                    "week": "Tuần",
+                    "month": "Tháng",
+                    "quarter": "Quý",
+                    "year": "Năm",
+                    "all": "Tất cả"
+                }
+            },
+            "buttons": {
+                "more": "Xem nhiều hơn",
+                "addData": "Dữ liệu"
+            }
+        },
+        "share": {
+            "title": "Cổ phiếu",
+            "symbol": "Mã chứng khoán",
+            "cloneSymbols": "Tạo danh sách mã",
+            "symbolKind": "Danh sách mã",
+            "chartShift": "Khung biểu đồ",
+            "deleteWatchList": "Xoá tất cả các mã theo dõi",
+            "filterSymbols": "Lọc cổ phiếu",
+            "symbolList": {
+                "vn100": "VN100",
+                "index": "Chỉ số",
+                "nh": "Ngân hàng",
+                "ck": "Chứng khoán",
+                "filterTop": "Lọc CP đỉnh",
+                "filterBottom": "Lọc CP đáy",
+                "filterBreak": "Lọc CP break",
+                "watch": "Theo dõi",
+                "hold": "Nắm giữ"
+            },
+            "addWatchlist": "Thêm theo dõi",
+            "foreignRSI": "RSI trong cửa sổ",
+            "removeFilterList": "Xoá khỏi danh sách lọc",
+            "reload": "Tải lại dữ liệu",
+            "fullscreen": "Bật tắt toàn màn hình",
+            "tradingview": "TradingView",
+            "tools": {
+                "line": "Vẽ đường giá",
+                "target": "Xác định mục tiêu",
+                "uplps": "Đo LPS tăng",
+                "cash": "Vẽ trên dòng tiền",
+                "downlps": "Đo LPS giảm",
+                "rr": "Xác định RR",
+                "range": "Khoảng cách ngày",
+                "events": "Hiển thị tin tức"
+            },
+            "symbolFiltered": "Đã lọc mã chứng khoán",
+            "rangeWarning": "Chưa chọn khoảng thời gian lọc",
+            "deleteAllLine": "Xoá tất cả đường giá",
+            "event": "Sự kiện",
+            "date": "Ngày {date}"
+        },
+        "shrstats": {
+            "title": "Thống kê CP",
+            "symbol": "Mã",
+            "buy": "Mua",
+            "sell": "Bán",
+            "date": "Ngày",
+            "volume": "KL",
+            "price": "Giá",
+            "fee": "Phí",
+            "profit": "Lãi/Lỗ",
+            "moneyProfit": "Tiền",
+            "percentProfit": "%",
+            "charTitle": "Kết quả đầu tư",
+            "profitSum": "Tổng lợi nhuận",
+            "rr": "Tỷ lệ lãi/lỗ",
+            "winrate": "Tỷ lệ lệnh thắng",
+            "accProfit": "Lợi nhuận lũy kế",
+            "periods": {
+                "day": "Ngày",
+                "week": "Tuần",
+                "month": "Tháng",
+                "quarter": "Quý",
+                "year": "Năm",
+                "all": "Tất cả"
+            },
+            "validations": {
+                "sellDate": "Ngày bán phải sau ngày mua",
+                "array": "Phải chứa trong cặp dấu [ ]"
+            },
+            "buttons": {
+                "more": "Xem nhiều hơn",
+                "addData": "Dữ liệu"
+            },
+            "summary": {
+                "title": "Tổng kết",
+                "rr": "RR",
+                "winrate": "WR",
+                "profit": "LN"
+            },
+            "opening": {
+                "title": "Tổng kết",
+                "price": "Giá",
+                "volume": "KL",
+                "profit": "Lãi",
+                "totalProfit": "Tổng lãi chưa đóng"
+            }
+        },
+        "finbooks": {
+            "title": "Sổ tài chính",
+            "name": "Tên sổ",
+            "balance": "Số dư hiện tại",
+            "lastTransaction": "Nội dung GD gần nhất",
+            "display": "Thứ tự",
+            "updatedAt": "Ngày GD gần nhất",
+            "openNewBook": "Mở sổ mới",
+            "create": "Tạo sổ mới",
+            "edit": "Sửa sổ",
+            "createTransaction": "Tạo giao dịch"
+        }
+    },
+    "settings": {
+        "title": "Cài đặt",
+        "parameters": {
+            "title": "Thông số",
+            "value": "Giá trị",
+            "description": "Tên thông số"
+        },
+        "faqs": {
+            "title": "Hỏi đáp",
+            "topic": "Chủ đề",
+            "question": "Câu hỏi",
+            "answer": "Trả lời",
+            "useHtml": "Dùng HTML",
+            "popup": {
+                "create": "Thêm hỏi đáp",
+                "edit": "Sửa hỏi đáp"
+            }
+        },
+        "database": {
+            "title": "Dữ liệu",
+            "backup": "Sao lưu dữ liệu",
+            "sendMail": "Gửi email",
+            "download": "Tải xuống",
+            "restore": "Khôi phục dữ liệu",
+            "notMatchExtension": "Không phải tệp SQL"
+        },
+        "command": {
+            "title": "Lệnh",
+            "run": "Thực hiện",
+            "selects": {
+                "cache": "Xóa cache",
+                "resetMigrate": "Đặt lại cơ sở dữ liệu",
+                "downMaintance": "Bật chế độ bảo trì",
+                "upMaintance": "Tắt chế độ bảo trì",
+                "cleanLog": "Xóa toàn bộ nhật ký",
+                "updateTrade": "Bật tự động cập nhật đầu tư",
+                "storageLink": "Tạo liên kết tượng trưng",
+                "custom": "Nhập lệnh khác"
+            }
+        },
+        "notification": {
+            "title": "Thông báo",
+            "receiver": "Người nhận",
+            "notificationTitle": "Tiêu đề",
+            "body": "Nội dung",
+            "image": "Hình ảnh",
+            "receiverPlaceholder": "* hoặc MTK1,MTK2,...",
+            "action": {
+                "title": "Phím bấm",
+                "placeholder": "<Tên phím bấm>,<Đường dẫn>"
+            }
+        },
+        "files": {
+            "title": "Tập tin",
+            "copyUrl": "Lấy đường dẫn",
+            "messages": {
+                "multiFile": "Chỉ được chọn một tập tin",
+                "notIsFile": "Mục chọn không phải là tập tin",
+                "notIsImage": "Không thể mở tập tin không phải hình ảnh",
+                "copiedUrl": "Đã sao chép đường dẫn",
+                "notCopiedUrl": "Đường dẫn chưa được sao chép"
+            }
+        },
+        "log": {
+            "title": "Nhật ký",
+            "causer": "Người tạo",
+            "subject": "Đối tượng",
+            "description": "Mô tả",
+            "createdAt": "Ngày tạo",
+            "propertiesBtn": "Xem dữ liệu",
+            "propertiesTitle": "Dữ liệu thay đổi"
+        },
+        "roles": {
+            "title": "Vai trò",
+            "name": "Tên vai trò",
+            "permission": "Các quyền"
+        },
+        "permissions": {
+            "title": "Quyền",
+            "name": "Tên quyền"
+        }
+    },
+    "models": {
+        "user": {
+            "code": "Mã tài khoản",
+            "codeShort": "Mã TK",
+            "avatar": "Avt.",
+            "status": "Trạng thái",
+            "name": "Họ và tên",
+            "email": "Email",
+            "username": "Số điện thoại hoặc Email",
+            "password": "Mật khẩu",
+            "confirmPassword": "Mật khẩu xác nhận",
+            "oldPassword": "Mật khẩu cũ",
+            "newPassword": "Mật khẩu mới",
+            "phone": "Số điện thoại",
+            "idNumber": "Số CCCD",
+            "idIssuedAt": "Nơi cấp",
+            "idIssuedAtValue": "Cục CS QLHC về TTXH",
+            "idIssuedOn": "Ngày cấp",
+            "birthday": "Ngày sinh",
+            "sex": "Giới tính",
+            "address": "Địa chỉ",
+            "bankName": "Ngân hàng",
+            "accountNumber": "Số tài khoản",
+            "accountName": "Chủ tài khoản",
+            "roles": "Vai trò",
+            "permissions": "Quyền",
+            "popup": {
+                "detail": "Chi tiết tài khoản",
+                "create": "Thêm tài khoản",
+                "edit": "Sửa tài khoản"
+            },
+            "groups": {
+                "personalInfo": "Thông tin cá nhân",
+                "idInfo": "Thông tin CCCD",
+                "contactInfo": "Thông tin liên lạc",
+                "bankInfo": "Tài khoản ngân hàng",
+                "confirmDocuments": "Tài liệu xác minh",
+                "permission": "Phân quyền"
+            },
+            "selects": {
+                "sex": {
+                    "male": "Nam",
+                    "female": "Nữ"
+                }
+            },
+            "validations": {
+                "name": "Không được vượt quá 50 ký tự",
+                "email": "Email không tồn tại",
+                "birthday": "Phải lớn hơn 18 tuổi",
+                "idIssuedOn": "Phải nhỏ hơn ngày hiện tại",
+                "address": "Không được vượt quá 100 ký tự",
+                "password": "Phải từ 8 đến 20 ký tự, ít nhất 1 chữ thường, 1 chữ hoa và 1 chữ số."
+            }
+        },
+        "contract": {
+            "code": "Mã hợp đồng",
+            "codeShort": "Mã HĐ",
+            "status": "Trạng thái",
+            "user": "Tài khoản",
+            "principal": "Tiền gốc",
+            "advance": "Tiền rút",
+            "interestRate": "Lãi suất",
+            "interest": "Tiền lãi",
+            "paidAt": "Ngày mở",
+            "withdrawnAt": "Ngày đóng",
+            "duration": "Nắm giữ",
+            "frequency": "tuần",
+            "includeWithdrawn": "Hợp đồng cũ",
+            "receipt": "Biên lai chuyển tiền",
+            "popup": {
+                "detail": "Chi tiết hợp đồng",
+                "create": "Thêm hợp đồng",
+                "edit": "Sửa hợp đồng"
+            },
+            "selects": {
+                "status": {
+                    "paying": "Chờ nộp tiền",
+                    "confirming": "Chờ xác nhận",
+                    "paid": "Đang nắm giữ",
+                    "withdrawing": "Chờ rút tiền",
+                    "withdrawn": "Đã tất toán"
+                }
+            },
+            "validations": {
+                "paidAt": "Phải là ngày hôm nay trở đi",
+                "withdrawnAt": "Nắm giữ ít nhất 4 tuần",
+                "principal": "Không được nhỏ hơn {amount}",
+                "advance": "Không được nhỏ hơn {advance} và đảm bảo số dư không nhỏ hơn {surplus}"
+            },
+            "transfer": {
+                "amount": "Số tiền",
+                "content": "Nội dung",
+                "contentValue": "QTV{0}",
+                "note": "Lưu ý: Nhập chính xác nội dung khi chuyển khoản",
+                "qrCode": "Quét mã QR hoặc chuyển khoản theo thông tin"
+            }
+        },
+        "copyist": {
+            "user": "Tài khoản",
+            "vpsCode": "Mã VPS",
+            "volume": "Số HĐ",
+            "allowMaxVol": "Tối đa HĐ",
+            "allowCopy": "Sao chép",
+            "allowShare": "Chia sẻ"
+        }
+    },
+    "components": {
+        "changePassword": {
+            "title": "Đổi mật khẩu",
+            "submit": "Lưu"
+        },
+        "changeAvatar": {
+            "title": "Đổi hình đại diện",
+            "error": {
+                "imageType": "Vui lòng chọn một ảnh",
+                "fileReaderSupport": "Xin lỗi, FileReader API không được hỗ trợ"
+            },
+            "buttons": {
+                "choose": "Chọn ảnh",
+                "zoomOut": "Thu nhỏ",
+                "zoomIn": "Phóng to",
+                "rotateLeft": "Xoay trái",
+                "rotateRight": "Xoay phải",
+                "crop": "Cắt và lưu ảnh"
+            }
+        },
+        "addDocument": {
+            "title1": "Tải văn bản thỏa thuận",
+            "title2": "Tải phụ lục, biên lai, ...",
+            "signedAt": "Nơi ký",
+            "signedOn": "Ngày ký",
+            "isAddFile": "Thêm ảnh",
+            "fileEmpty": "Ảnh hợp đồng là bắt buộc",
+            "chooseFile": "Chọn ảnh",
+            "fileCounter": "Có {count} ảnh"
+        },
+        "sendComment": {
+            "title": "Gửi yêu cầu",
+            "name": "Họ và tên",
+            "phone": "Số điện thoại",
+            "subject": "Chủ đề",
+            "content": "Nội dung",
+            "chooseFile": "Chọn ảnh",
+            "fileCounter": "Có {0} ảnh"
+        },
+        "chatbot": {
+            "botTitle": "Trợ lý giải đáp",
+            "botName": "Trợ lý",
+            "placeholder": "Nhập tin nhắn...",
+            "hello": "Xin chào {title}{name}, chúng tôi có thể giúp gì được cho {title}!",
+            "title": {
+                "user": "quý khách",
+                "user0": "chị",
+                "user1": "anh"
+            },
+            "sendZalo": "Nhắn tin Zalo",
+            "unknown": "Xin lỗi, tôi chưa rõ yêu cầu của {title}. Vui lòng nhập từ khác hoặc tra cứu Câu hỏi thường gặp hoặc gửi trực tiếp Zalo."
+        },
+        "notification": {
+            "title": "Thông báo",
+            "viewAll": "Xem tất cả",
+            "markAsRead": "Đánh dấu đã đọc",
+            "markAllRead": "Đọc tất cả",
+            "receiveOption": "Nhận thông báo",
+            "empty": "Không có thông báo nào",
+            "blocked": "Thông báo đã bị chặn. Quý khách sẽ không nhận được thông báo khi tắt ứng dụng!"
+        },
+        "pickImage": {
+            "title": "Thư viện ảnh"
+        },
+        "resendVerifyEmail": {
+            "title": "Gửi lại email xác thực",
+            "description": "Email xác thực đã được gửi tới {0} (có thể xuất hiện trong hộp thư rác). Nếu không nhận được email, hãy nhấn Gửi lại.",
+            "resend": "Gửi lại"
+        },
+        "changePin": {
+            "title": "Đổi mã PIN",
+            "setTitle": "Đặt mã PIN",
+            "oldPin": "Mã PIN cũ",
+            "newPin": "Mã PIN",
+            "confirmPin": "Mã PIN xác nhận",
+            "submit": "Lưu"
+        },
+        "checkPin": {
+            "title": "Xác nhận mã PIN",
+            "fingerPrint": "Quét vân tay"
+        },
+        "editProfile": {
+            "title": "Cập nhật hồ sơ"
+        },
+        "tradeFlow": {
+            "detail": "Chi tiết",
+            "selectSingle": "Chỉ chọn một mẫu hình"
+        },
+        "confirmUser": {
+            "title": "Xác thực tài khoản",
+            "confirmedTitle": "Tài liệu xác thực",
+            "step1": "Bước 1: Tải và in văn bản",
+            "step2": "Bước 2: Đăng ảnh tài liệu",
+            "preview": "Xem trước văn bản",
+            "chooseContractImage": "Chọn ảnh thoả thuận",
+            "chooseIdentityImage": "Chọn ảnh CCCD"
+        },
+        "payingContract": {
+            "title": "Nộp tiền",
+            "changeReceiptTitle": "Đổi biên lai",
+            "paidDateCaution": "Ngày mở hợp đồng được tính là ngày nộp tiền",
+            "timeCaution": "Không nộp tiền trong khung giờ 17:00 - 20:00",
+            "step1": "Bước 1: Chuyển khoản",
+            "step2": "Bước 2: Đăng ảnh biên lai",
+            "payWay1": "Cách 1: Quét QRCode",
+            "payWay2": "Cách 2: Chuyển khoản theo thông tin",
+            "paidButton": "Tôi đã nộp tiền !",
+            "changeReceiptButton": "Đổi biên lai"
+        },
+        "withdrawingContract": {
+            "title": "Rút tiền",
+            "duration": "Số tuần nắm giữ",
+            "availableBalances": "Số tiền có thể rút",
+            "withdrawalAmount": "Số tiền muốn rút",
+            "all": "Toàn bộ",
+            "other": "Số khác",
+            "validateDuration": "Không thể rút tiền vì số tuần nắm giữ nhỏ hơn mức tối thiểu ({0} tuần)",
+            "validateAdvance": "Số tiền nằm trong khoảng từ {min} đến {max}",
+            "withdrawButton": "Tôi muốn rút tiền !"
+        },
+        "paidContract": {
+            "title": "Xác nhận đã nộp tiền",
+            "confirmTitle": "Biên lai nộp tiền",
+            "step1": "Bước 1: Xuất biên lai (Nếu nộp tiền mặt)",
+            "step2": "Bước 2: Đăng ảnh biên lai",
+            "preview": "Xem trước biên lai",
+            "isConfirmed": "Xác nhận khách hàng đã nộp tiền !",
+            "confirmedBy": "Được xác nhận bởi"
+        },
+        "withdrawnContract": {
+            "title": "Xác nhận đã rút tiền",
+            "withdrawnTitle": "Biên lai rút tiền",
+            "amount": "Khách hàng muốn rút <b class='text-light'>{0}</b>/{1}",
+            "surplus": "Số dư còn lại <b class='text-light'>{0}</b> sẽ được chuyển sang hợp đồng mới",
+            "newContract": "",
+            "step1": "Bước 1: Thanh toán hợp đồng",
+            "step2": "Bước 2: Đăng ảnh biên lai",
+            "withdrawnWay1": "Cách 1: Chuyển khoản",
+            "withdrawnWay2": "Cách 2: Xuất biên lai (Nếu rút tiền mặt)",
+            "preview": "Xem trước biên lai"
+        },
+        "contractConditions": {
+            "title": "Điều kiện hợp đồng"
+        },
+        "transactionFinbook": {
+            "deposit": "Nộp thêm",
+            "withdraw": "Sử dụng",
+            "transfer": "Chuyển khoản",
+            "adjustment": "Điều chỉnh số dư",
+            "money": "Số tiền",
+            "content": "Nội dung",
+            "receiverId": "Sổ nhận"
+        }
+    },
+    "validations": {
+        "required": " là bắt buộc",
+        "email": " không đúng định dạng",
+        "numeric": " không phải số",
+        "duplicate": " đã tồn tại",
+        "match": " không trùng khớp"
+    },
+    "buttons": {
+        "add": "Thêm",
+        "edit": "Sửa",
+        "delete": "Xóa",
+        "undo": "Phục hồi",
+        "back": "Trở về",
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "close": "Đóng",
+        "download": "Tải xuống",
+        "qrDownload": "Tải mã QR",
+        "receiptDownload": "Tải biên lai",
+        "send": "Gửi",
+        "copy": "Sao chép",
+        "installApp": "Thêm vào màn hình",
+        "chooseFile": "Chọn tệp",
+        "backup": "Sao lưu",
+        "restore": "Khôi phục",
+        "reload": "Tải lại"
+    },
+    "messages": {
+        "success": {
+            "saved": "Thực hiện thành công",
+            "sendResetPasswordLink": "Đường dẫn đặt lại mật khẩu đã được gửi",
+            "sentVerifyEmailLink": "Email xác thực đã được gửi",
+            "verifiedEmail": "Email đã được xác thực",
+            "copiedText": "Đã sao chép"
+        },
+        "warning": {
+            "unVerifiedReCaptcha": "Quý khách vui lòng xác minh lại",
+            "fingerUsernameEmpty": "Số điện thoại hoặc Email trống",
+            "unregisteredFingerPrint": "Đăng nhập bằng vân tay thất bại",
+            "imageEmpty": "Không có ảnh nào",
+            "holdWeeksMin": "Phải nắm giữ hợp đồng ít nhất {weeks} tuần"
+        },
+        "error": {
+            "server": {
+                "403": "Quý khách không có quyền thực hiện yêu cầu này",
+                "429": "Gửi yêu cầu quá nhiều, vui lòng đợi khoảng 30 giây.",
+                "500": "Rất tiếc! Đã xảy ra lỗi."
+            },
+            "offline": "Đang ngoại tuyến. Yêu cầu bị gián đoạn.",
+            "unsaved": "Thực hiện thất bại",
+            "unauthorized": "Đăng nhập thất bại",
+            "hasOpeningContract": "Tài khoản {param} vẫn còn hợp đồng đang mở",
+            "sendResetPasswordLink": "Gửi email thất bại",
+            "invalidResetPasswordLink": "Đường dẫn đặt lại mật khẩu không hợp lệ",
+            "invalidVerifyEmailLink": "Đường dẫn xác thực email không hợp lệ",
+            "checkPinFail": "Xác nhận mã PIN thất bại"
+        },
+        "info": {
+            "noChangedData": "Không có dữ liệu thay đổi",
+            "noUploadImage": "Chưa chọn ảnh",
+            "noSelectedRow": "Không có tài khoản nào được chọn",
+            "copiedError": "Đã sao chép lỗi"
+        }
+    },
+    "titles": {
+        "dateFullFormat": "ngà\\y DD t\\háng MM nă\\m YYYY",
+        "dxSelectPlacehoder": "Chọn...",
+        "loadingText": "Đang tải...",
+        "commandHeaderTitle": "Thao tác",
+        "commandHeaderTitleShort": "TT",
+        "caution": "Chú ý",
+        "chooseImage": "Chọn ảnh",
+        "deleteOldImage": "Xoá ảnh cũ",
+        "confirm": "Xác nhận"
+    },
+    "route": {
+        "login": "dang-nhap",
+        "loginMaintain": "dang-nhap-bao-tri",
+        "register": "dang-ky",
+        "resetPassword": "quen-mat-khau",
+        "changePassword": "dat-lai-mat-khau",
+        "verifyEmail": "xac-thuc-email",
+        "policy": "chinh-sach",
+        "overview": "tong-quan",
+        "profile": "ho-so",
+        "contract": "so-tiet-kiem",
+        "copyist": "sao-chep-lenh",
+        "adminUser": "quan-ly-tai-khoan",
+        "adminContract": "quan-ly-so-tiet-kiem",
+        "adminCopyist": "quan-ly-sao-chep-lenh",
+        "adminComment": "quan-ly-phan-hoi",
+        "tradingDerivative": "dau-tu-phai-sinh",
+        "tradingDerstat": "thong-ke-phai-sinh",
+        "tradingShare": "dau-tu-co-phieu",
+        "tradingShrstat": "thong-ke-co-phieu",
+        "tradingFinbook": "so-tai-chinh",
+        "settingCommand": "cai-dat-lenh",
+        "settingNotification": "cai-dat-thong-bao",
+        "settingFile": "cai-dat-tap-tin",
+        "settingLog": "cai-dat-nhat-ky",
+        "settingFaq": "cai-dat-hoi-dap",
+        "settingParameter": "cai-dat-tham-so",
+        "settingDatabase": "cai-dat-co-so-du-lieu",
+        "settingRole": "cai-dat-vai-tro",
+        "settingPermission": "cai-dat-quyen"
+    }
+}

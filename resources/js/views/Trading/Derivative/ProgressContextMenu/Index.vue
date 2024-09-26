@@ -9,6 +9,7 @@
             </div>
             <i class="arrow far fa-arrow-alt-down"></i>
             <TreeNode
+                v-if="isShowNode"
                 :node="treeData"
                 :index="0"
                 v-model="treeValue"
@@ -21,88 +22,15 @@
 <script setup>
 import TreeNode from "./TreeNode.vue";
 import { ref, watch } from "vue";
-import { useI18n } from "vue-i18n";
-
-const { t } = useI18n();
 
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue", "change"]);
 
-const treeData = ref({
-    items: [
-        {
-            name: t("trading.derivative.progressContextMenu.step1"),
-            items: [
-                {
-                    name: t("trading.derivative.progressContextMenu.step11"),
-                    items: [
-                        {
-                            name: t(
-                                "trading.derivative.progressContextMenu.step111"
-                            ),
-                            items: [
-                                {
-                                    name: t(
-                                        "trading.derivative.progressContextMenu.step1111"
-                                    ),
-                                    items: t(
-                                        "trading.derivative.progressContextMenu.step11111"
-                                    ),
-                                },
-                                {
-                                    name: t(
-                                        "trading.derivative.progressContextMenu.step1112"
-                                    ),
-                                    items: [
-                                        {
-                                            name: "Giá tạo nền",
-                                            items: t(
-                                                "trading.derivative.progressContextMenu.step11121"
-                                            ),
-                                        },
-                                        {
-                                            name: "Giá gãy hỗ trợ",
-                                            items: t(
-                                                "trading.derivative.progressContextMenu.step11122"
-                                            ),
-                                        },
-                                    ],
-                                },
-                            ],
-                        },
-                    ],
-                },
-                {
-                    name: t("trading.derivative.progressContextMenu.step12"),
-                    items: [
-                        {
-                            name: t(
-                                "trading.derivative.progressContextMenu.step121"
-                            ),
-                            items: [
-                                {
-                                    name: t(
-                                        "trading.derivative.progressContextMenu.step1211"
-                                    ),
-                                    items: t(
-                                        "trading.derivative.progressContextMenu.step12111"
-                                    ),
-                                },
-                                {
-                                    name: t(
-                                        "trading.derivative.progressContextMenu.step1212"
-                                    ),
-                                    items: t(
-                                        "trading.derivative.progressContextMenu.step12121"
-                                    ),
-                                },
-                            ],
-                        },
-                    ],
-                },
-            ],
-        },
-    ],
+const isShowNode = ref(false);
+const treeData = ref({});
+import(`../../../../lang/${window.lang}/derivative.js`).then((e) => {
+    treeData.value = e.default;
+    isShowNode.value = true;
 });
 
 const treeValue = ref(props.modelValue);
