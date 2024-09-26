@@ -4,42 +4,65 @@
         <div class="triangle"></div>
 
         <div class="container">
-            {{ value }}
             <div class="text">
                 {{ $t("trading.derivative.progressContextMenu.start") }}
             </div>
             <i class="arrow far fa-arrow-alt-down"></i>
-            <TreeNode :node="treeData" :index="0" v-model="value" />
+            <TreeNode
+                :node="treeData"
+                :index="0"
+                v-model="treeValue"
+                @update:modelValue="updateTreeValue"
+            />
         </div>
     </div>
 </template>
 
 <script setup>
-import { reactive } from "vue";
+import { ref, watch } from "vue";
 import TreeNode from "./TreeNode.vue";
 
-const treeData = reactive({
+const props = defineProps(["modelValue"]);
+const emit = defineEmits(["update:modelValue", "change"]);
+
+const treeData = ref({
     children: [
         {
             name: "Trùng đỉnh đáy",
             children: [
                 {
-                    name: "Child Node 1.1",
+                    name: "KL bức phá",
                     children: [
-                        { name: "Child Node 1.1.1", children: [] },
-                        { name: "Child Node 1.1.2", children: [] },
+                        {
+                            name: "KL test kháng cự",
+                            children: [{ name: "Mẫu hình 1.1.1" }],
+                        },
+                        {
+                            name: "KL chưa test",
+                            children: [{ name: "Mẫu hình 1.1.2" }],
+                        },
                     ],
                 },
                 {
-                    name: "Child Node 1.2",
-                    children: [],
+                    name: "KL điều chỉnh",
+                    children: [{ name: "Mẫu hình 1.2" }],
                 },
             ],
         },
     ],
 });
 
-const value = reactive([]);
+const treeValue = ref(props.modelValue);
+
+watch(
+    () => props.modelValue,
+    (e) => (treeValue.value = e)
+);
+
+function updateTreeValue(e) {
+    emit("update:modelValue", e);
+    emit("change", e);
+}
 
 function stopPropagationEvent(e) {
     e.stopPropagation();
@@ -58,7 +81,7 @@ function stopPropagationEvent(e) {
     .triangle {
         width: 0px;
         height: 0px;
-        top: 175px;
+        top: 5px;
         left: -10px;
         border-style: solid;
         border-width: 9px 10px 9px 0;
@@ -77,15 +100,15 @@ function stopPropagationEvent(e) {
     }
     .container {
         min-width: 200px;
-        padding: 10px;
+        padding: auto 20px;
 
         .text {
-            font-size: 20px;
+            font-size: 18px;
             font-family: Roboto;
         }
         .arrow {
-            font-size: 30px;
-            margin: 20px auto 10px;
+            font-size: 20px;
+            margin: 10px auto 5px;
         }
     }
 }

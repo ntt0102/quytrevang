@@ -450,7 +450,7 @@ function stopPropagationEvent(e) {
     .triangle {
         width: 0px;
         height: 0px;
-        top: 145px;
+        top: 5px;
         left: -10px;
         border-style: solid;
         border-width: 9px 10px 9px 0;

@@ -122,8 +122,30 @@
                         @contextmenu="resetTools"
                     ></div>
                     <div
+                        class="popup command far fa-tasks"
+                        :title="$t('trading.derivative.progressTool')"
+                        @click="progressToolClick"
+                    >
+                        <ProgressContextMenu
+                            v-show="state.showProgressContext"
+                            class="contextmenu"
+                            v-model="state.progress"
+                            @change="progressChange"
+                        ></ProgressContextMenu>
+                    </div>
+                    <div
+                        class="popup command far fa-heart-rate"
+                        :title="$t('trading.derivative.patternTool')"
+                        @click="patternToolClick"
+                    >
+                        <PatternContextMenu
+                            v-show="state.showPatternContext"
+                            class="contextmenu"
+                        ></PatternContextMenu>
+                    </div>
+                    <div
                         ref="lineToolRef"
-                        class="line command far fa-horizontal-rule"
+                        class="popup command far fa-horizontal-rule"
                         :title="$t('trading.derivative.lineTool')"
                         @click="lineToolClick"
                         @contextmenu="lineToolContextmenu"
@@ -158,28 +180,6 @@
                         @click="rrToolClick"
                         @contextmenu="rrToolContextmenu"
                     ></div>
-                    <div
-                        ref="patternToolRef"
-                        class="pattern command far fa-heart-rate"
-                        :title="$t('trading.derivative.patternTool')"
-                        @click="patternToolClick"
-                    >
-                        <PatternContextMenu
-                            v-show="state.showPatternContext"
-                            class="contextmenu"
-                        ></PatternContextMenu>
-                    </div>
-                    <div
-                        ref="progressToolRef"
-                        class="progress command far fa-tasks"
-                        :title="$t('trading.derivative.progressTool')"
-                        @click="progressToolClick"
-                    >
-                        <ProgressContextMenu
-                            v-show="state.showProgressContext"
-                            class="contextmenu"
-                        ></ProgressContextMenu>
-                    </div>
                     <div
                         v-show="showCancelOrder"
                         ref="cancelOrderRef"
@@ -333,6 +333,7 @@ const state = reactive({
     isFullscreen: false,
     lineColor: "#F44336",
     lineTitle: "",
+    progress: [],
     showLineContext: false,
     showPatternContext: false,
     showProgressContext: false,
@@ -785,6 +786,9 @@ function loadToolsData(tools) {
                 params.tools.timeRange = Object.values(points);
                 params.series.timeRange.setData(params.tools.timeRange);
                 break;
+            case "progress":
+                state.progress = Object.values(points)[0];
+                break;
             default:
                 Object.entries(points).forEach(
                     ([point, line]) =>
@@ -1048,6 +1052,8 @@ function lineToolClick(e) {
 }
 function lineToolContextmenu(e) {
     state.showLineContext = !state.showLineContext;
+    state.showPatternContext = false;
+    state.showProgressContext = false;
 }
 function drawLineTool() {
     const TYPE = "line";
@@ -1098,85 +1104,6 @@ function removeLineTool(withServer = true) {
                 name: "line",
             });
     }
-}
-function findLongTermExtremes(data, isPeak) {
-    const indexRange = 24 * 10;
-    const posTimeRange = 60 * 5;
-    const negTimeRange = 60 * 10;
-    let extremes = [];
-
-    for (let i = 0; i < data.length; i++) {
-        let isExtreme = true;
-        for (
-            let j = Math.max(0, i - (2 * indexRange) / 3);
-            j <= Math.min(data.length - 1, i + indexRange / 3);
-            j++
-        ) {
-            if (i !== j) {
-                if (cmp(data[i].value, data[j].value, !isPeak)) {
-                    isExtreme = false;
-                    break;
-                }
-            }
-        }
-        if (isExtreme) {
-            let newItem = {
-                time: data[i].time,
-                value: 1,
-                color: isPeak ? "lime" : "red",
-                level: data[i].value,
-            };
-            if (extremes.length) {
-                const distance = getTimeDistance(
-                    data[i].time,
-                    extremes.at(-1).time
-                );
-                if (cmp(data[i].value, extremes.at(-1).level, !isPeak)) {
-                    if (distance < negTimeRange) newItem = extremes.pop();
-                } else if (distance < posTimeRange) extremes.pop();
-            }
-            extremes.push(newItem);
-        }
-    }
-
-    return extremes;
-}
-function findCommonExtremes(priceExtremes, volumeExtremes, isPeak) {
-    const tolerance = 60 * 3;
-    let commonExtremes = [];
-
-    let i = 0,
-        j = 0;
-    while (i < priceExtremes.length && j < volumeExtremes.length) {
-        const priceTime = priceExtremes[i].time;
-        const volumeTime = volumeExtremes[j].time;
-        let distance = getTimeDistance(priceTime, volumeTime);
-        if (distance <= tolerance) {
-            let newItem = {
-                ...volumeExtremes[j],
-                ...{
-                    distance,
-                    color:
-                        volumeTime > priceTime
-                            ? isPeak
-                                ? "lime"
-                                : "red"
-                            : isPeak
-                            ? "cyan"
-                            : "orange",
-                },
-            };
-            commonExtremes.push(newItem);
-            i++;
-            j++;
-        } else if (priceTime < volumeTime) {
-            i++;
-        } else {
-            j++;
-        }
-    }
-
-    return commonExtremes;
 }
 function rrToolClick(e) {
     state.showLineContext = false;
@@ -1421,10 +1348,20 @@ function removeTimeRangeTool(withServer = true) {
 function patternToolClick() {
     state.showPatternContext = !state.showPatternContext;
     state.showProgressContext = false;
+    state.showLineContext = false;
 }
 function progressToolClick() {
     state.showProgressContext = !state.showProgressContext;
     state.showPatternContext = false;
+    state.showLineContext = false;
+}
+function progressChange(e) {
+    store.dispatch("tradingDerivative/drawTools", {
+        isRemove: !e.length,
+        name: "progress",
+        points: [""],
+        data: [e],
+    });
 }
 function removeAllTools() {
     removeOrderLine(["entry", "tp", "sl"], false);
@@ -1913,7 +1850,7 @@ function cmp(vari, value, side, eq = false) {
                 color: yellow !important;
             }
 
-            .line {
+            .popup {
                 position: relative;
 
                 .contextmenu {
