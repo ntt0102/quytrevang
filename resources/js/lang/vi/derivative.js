@@ -34,7 +34,7 @@ export default {
                     name: "KL hồi về mức 50",
                     items: [
                         {
-                            name: "KL vượt kháng cự yếu",
+                            name: "KL vượt kháng cự 2",
                             items: [
                                 {
                                     name: "Giá hình nêm",
