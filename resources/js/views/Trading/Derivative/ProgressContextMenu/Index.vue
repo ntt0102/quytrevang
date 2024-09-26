@@ -19,61 +19,86 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
 import TreeNode from "./TreeNode.vue";
+import { ref, watch } from "vue";
+import { useI18n } from "vue-i18n";
+
+const { t } = useI18n();
 
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue", "change"]);
 
 const treeData = ref({
-    children: [
+    items: [
         {
-            name: "Đồng thuận giá và KL",
-            children: [
+            name: t("trading.derivative.progressContextMenu.step1"),
+            items: [
                 {
-                    name: "KL vượt kháng cự",
-                    children: [
+                    name: t("trading.derivative.progressContextMenu.step11"),
+                    items: [
                         {
-                            name: "Giá vượt mức 50",
-                            children: [
+                            name: t(
+                                "trading.derivative.progressContextMenu.step111"
+                            ),
+                            items: [
                                 {
-                                    name: "KL test kháng cự",
-                                    children: [
-                                        { name: "Mẫu hình tiếp diễn 1" },
-                                    ],
+                                    name: t(
+                                        "trading.derivative.progressContextMenu.step1111"
+                                    ),
+                                    items: t(
+                                        "trading.derivative.progressContextMenu.step11111"
+                                    ),
                                 },
                                 {
-                                    name: "KL chưa test",
-                                    children: [
+                                    name: t(
+                                        "trading.derivative.progressContextMenu.step1112"
+                                    ),
+                                    items: [
                                         {
                                             name: "Giá tạo nền",
-                                            children: [
-                                                {
-                                                    name: "Mẫu hình đảo chiều 1",
-                                                },
-                                            ],
+                                            items: t(
+                                                "trading.derivative.progressContextMenu.step11121"
+                                            ),
                                         },
                                         {
                                             name: "Giá gãy hỗ trợ",
-                                            children: [
-                                                {
-                                                    name: "Mẫu hình đảo chiều 2",
-                                                },
-                                            ],
+                                            items: t(
+                                                "trading.derivative.progressContextMenu.step11122"
+                                            ),
                                         },
                                     ],
                                 },
                             ],
                         },
-                        // {
-                        //     name: "Giá chưa vượt mức 50",
-                        //     children: [{ name: "Mẫu hình 1.2.1" }],
-                        // },
                     ],
                 },
                 {
-                    name: "KL vượt mức 50",
-                    children: [{ name: "Mẫu hình 1.2" }],
+                    name: t("trading.derivative.progressContextMenu.step12"),
+                    items: [
+                        {
+                            name: t(
+                                "trading.derivative.progressContextMenu.step121"
+                            ),
+                            items: [
+                                {
+                                    name: t(
+                                        "trading.derivative.progressContextMenu.step1211"
+                                    ),
+                                    items: t(
+                                        "trading.derivative.progressContextMenu.step12111"
+                                    ),
+                                },
+                                {
+                                    name: t(
+                                        "trading.derivative.progressContextMenu.step1212"
+                                    ),
+                                    items: t(
+                                        "trading.derivative.progressContextMenu.step12121"
+                                    ),
+                                },
+                            ],
+                        },
+                    ],
                 },
             ],
         },

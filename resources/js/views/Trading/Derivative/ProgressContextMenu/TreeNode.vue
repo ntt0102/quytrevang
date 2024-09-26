@@ -1,8 +1,8 @@
 <template>
-    <div v-if="node.children && node.children.length">
+    <div v-if="node.items">
         <DxSelectBox
-            v-if="node.children[0].children"
-            :items="node.children"
+            v-if="Array.isArray(node.items)"
+            :items="node.items"
             v-model="state.selectedChild"
             displayExpr="name"
             stylingMode="outlined"
@@ -13,7 +13,7 @@
         />
         <div v-else>
             <div class="text">
-                {{ node.children[0].name }}
+                {{ node.items }}
             </div>
         </div>
         <div v-if="state.isShowChild">
@@ -36,7 +36,7 @@ const props = defineProps(["node", "index", "modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 
 const state = reactive({
-    selectedChild: props.node.children[props.modelValue[props.index]],
+    selectedChild: props.node.items[props.modelValue[props.index]],
     childValue: props.modelValue,
     isShowChild: false,
 });
@@ -48,7 +48,7 @@ watch(
     () => props.modelValue,
     (e) => {
         isLoadProps = true;
-        state.selectedChild = props.node.children[e[props.index]];
+        state.selectedChild = props.node.items[e[props.index]];
         state.childValue = e;
         state.isShowChild = !!state.selectedChild;
         setTimeout(() => (isLoadProps = false), 1000);
@@ -58,7 +58,7 @@ watch(
     () => props.node,
     (e) => {
         isLoadProps = true;
-        state.selectedChild = e.children[state.childValue[props.index]];
+        state.selectedChild = e.items[state.childValue[props.index]];
         state.isShowChild = !!state.selectedChild;
         setTimeout(() => (isLoadProps = false), 1000);
     }
@@ -71,7 +71,7 @@ function handleSelectChange() {
         if (state.selectedChild) state.isShowChild = true;
     }, 0);
 
-    const childIndex = props.node.children.findIndex(
+    const childIndex = props.node.items.findIndex(
         (item) => item === state.selectedChild
     );
     if (childIndex == -1)
