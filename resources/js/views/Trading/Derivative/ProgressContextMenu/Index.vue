@@ -28,23 +28,51 @@ const emit = defineEmits(["update:modelValue", "change"]);
 const treeData = ref({
     children: [
         {
-            name: "Trùng đỉnh đáy",
+            name: "Đồng thuận giá và KL",
             children: [
                 {
-                    name: "KL bức phá",
+                    name: "KL vượt kháng cự",
                     children: [
                         {
-                            name: "KL test kháng cự",
-                            children: [{ name: "Mẫu hình 1.1.1" }],
+                            name: "Giá vượt mức 50",
+                            children: [
+                                {
+                                    name: "KL test kháng cự",
+                                    children: [
+                                        { name: "Mẫu hình tiếp diễn 1" },
+                                    ],
+                                },
+                                {
+                                    name: "KL chưa test",
+                                    children: [
+                                        {
+                                            name: "Giá tạo nền",
+                                            children: [
+                                                {
+                                                    name: "Mẫu hình đảo chiều 1",
+                                                },
+                                            ],
+                                        },
+                                        {
+                                            name: "Giá gãy hỗ trợ",
+                                            children: [
+                                                {
+                                                    name: "Mẫu hình đảo chiều 2",
+                                                },
+                                            ],
+                                        },
+                                    ],
+                                },
+                            ],
                         },
-                        {
-                            name: "KL chưa test",
-                            children: [{ name: "Mẫu hình 1.1.2" }],
-                        },
+                        // {
+                        //     name: "Giá chưa vượt mức 50",
+                        //     children: [{ name: "Mẫu hình 1.2.1" }],
+                        // },
                     ],
                 },
                 {
-                    name: "KL điều chỉnh",
+                    name: "KL vượt mức 50",
                     children: [{ name: "Mẫu hình 1.2" }],
                 },
             ],
@@ -99,8 +127,15 @@ function stopPropagationEvent(e) {
         position: absolute;
     }
     .container {
-        min-width: 200px;
+        min-width: 230px;
         padding: auto 20px;
+
+        input {
+            text-align: center;
+        }
+        .dx-clear-button-area {
+            margin: auto 0px;
+        }
 
         .text {
             font-size: 18px;
