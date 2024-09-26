@@ -37,12 +37,17 @@ export default {
                             name: "KL vượt kháng cự 2",
                             items: [
                                 {
-                                    name: "Giá hình nêm",
-                                    items: "Mẫu hình tiếp diễn 2",
-                                },
-                                {
-                                    name: "Giá hình tam giác",
-                                    items: "Mẫu hình tiếp diễn 3",
+                                    name: "Giá vượt mức 50",
+                                    items: [
+                                        {
+                                            name: "Giá hình nêm",
+                                            items: "Mẫu hình tiếp diễn 2",
+                                        },
+                                        {
+                                            name: "Giá hình tam giác",
+                                            items: "Mẫu hình tiếp diễn 3",
+                                        },
+                                    ],
                                 },
                             ],
                         },
