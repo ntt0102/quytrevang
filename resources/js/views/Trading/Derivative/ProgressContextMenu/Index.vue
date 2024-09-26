@@ -152,7 +152,7 @@ function stopPropagationEvent(e) {
         position: absolute;
     }
     .container {
-        min-width: 230px;
+        min-width: 250px;
         padding: auto 20px;
 
         input {
