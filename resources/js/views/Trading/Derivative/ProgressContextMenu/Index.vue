@@ -4,10 +4,6 @@
         <div class="triangle"></div>
 
         <div class="container">
-            <div class="text">
-                {{ $t("trading.derivative.progressContextMenu.start") }}
-            </div>
-            <i class="arrow far fa-arrow-alt-down"></i>
             <TreeNode
                 v-if="isShowNode"
                 :node="treeData"
@@ -88,15 +84,6 @@ function stopPropagationEvent(e) {
         }
         .dx-clear-button-area {
             margin: auto 0px;
-        }
-
-        .text {
-            font-size: 18px;
-            font-family: Roboto;
-        }
-        .arrow {
-            font-size: 20px;
-            margin: 10px auto 5px;
         }
     }
 }

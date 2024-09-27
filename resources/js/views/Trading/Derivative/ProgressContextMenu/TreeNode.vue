@@ -1,7 +1,13 @@
 <template>
     <div v-if="node.items">
+        <div v-if="index == 0" class="text">
+            {{ $t("trading.derivative.progressContextMenu.start") }}
+        </div>
+        <i
+            :class="`arrow far fa-chevron-${isMultiItems ? 'double-' : ''}down`"
+        ></i>
         <DxSelectBox
-            v-if="Array.isArray(node.items)"
+            v-if="isItemsArray"
             :items="node.items"
             v-model="state.selectedChild"
             displayExpr="name"
@@ -11,36 +17,34 @@
             :placeholder="$t('titles.dxSelectPlacehoder')"
             @valueChanged="handleSelectChange"
         />
-        <div v-else>
-            <div class="text">
-                {{ node.items }}
-            </div>
-        </div>
-        <div v-if="state.isShowChild">
-            <i class="arrow far fa-arrow-alt-down"></i>
-            <TreeNode
-                :node="state.selectedChild"
-                :index="index + 1"
-                v-model="state.childValue"
-                @update:modelValue="updateTreeValue"
-            />
-        </div>
+        <div v-else class="text" v-html="node.items" />
+        <TreeNode
+            v-if="state.hasChild"
+            :node="state.selectedChild"
+            :index="index + 1"
+            v-model="state.childValue"
+            @update:modelValue="updateTreeValue"
+        />
     </div>
 </template>
 
 <script setup>
-import { reactive, watch } from "vue";
+import { reactive, computed, watch } from "vue";
 import DxSelectBox from "devextreme-vue/select-box";
 
 const props = defineProps(["node", "index", "modelValue"]);
 const emit = defineEmits(["update:modelValue"]);
 
+const isItemsArray = computed(() => Array.isArray(props.node.items));
+const isMultiItems = computed(
+    () => Array.isArray(props.node.items) && props.node.items.length > 1
+);
 const state = reactive({
     selectedChild: props.node.items[props.modelValue[props.index]],
     childValue: props.modelValue,
-    isShowChild: false,
+    hasChild: false,
 });
-state.isShowChild = !!state.selectedChild;
+state.hasChild = !!state.selectedChild;
 
 let isLoadProps = false;
 
@@ -50,7 +54,7 @@ watch(
         isLoadProps = true;
         state.selectedChild = props.node.items[e[props.index]];
         state.childValue = e;
-        state.isShowChild = !!state.selectedChild;
+        state.hasChild = !!state.selectedChild;
         setTimeout(() => (isLoadProps = false), 1000);
     }
 );
@@ -59,16 +63,16 @@ watch(
     (e) => {
         isLoadProps = true;
         state.selectedChild = e.items[state.childValue[props.index]];
-        state.isShowChild = !!state.selectedChild;
+        state.hasChild = !!state.selectedChild;
         setTimeout(() => (isLoadProps = false), 1000);
     }
 );
 
 function handleSelectChange() {
     if (isLoadProps) return false;
-    state.isShowChild = false;
+    state.hasChild = false;
     setTimeout(() => {
-        if (state.selectedChild) state.isShowChild = true;
+        if (state.selectedChild) state.hasChild = true;
     }, 0);
 
     const childIndex = props.node.items.findIndex(
@@ -87,4 +91,13 @@ function updateTreeValue(e) {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.text {
+    font-size: 18px;
+    font-family: Roboto;
+}
+.arrow {
+    font-size: 20px;
+    margin: 10px auto 5px;
+}
+</style>
