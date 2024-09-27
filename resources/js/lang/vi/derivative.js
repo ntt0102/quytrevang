@@ -4,24 +4,24 @@ export default {
             name: "Đồng thuận giá và KL",
             items: [
                 {
-                    name: "KL vượt kháng cự",
+                    name: "KL gãy hỗ trợ",
                     items: [
                         {
-                            name: "Giá vượt mức 50 (1 lần)",
+                            name: "Giá gãy mức 50 (1 lần)",
                             items: [
                                 {
-                                    name: "KL test kháng cự",
+                                    name: "KL hồi về hỗ trợ",
                                     items: "Mẫu hình tiếp diễn 1",
                                 },
                                 {
-                                    name: "KL chưa test kháng cự",
+                                    name: "KL chưa hồi hỗ trợ",
                                     items: [
                                         {
-                                            name: "Giá tạo nền",
+                                            name: "Tạo nền giá dưới mức 50",
                                             items: "Mẫu hình đảo chiều 1",
                                         },
                                         {
-                                            name: "Giá gãy hỗ trợ",
+                                            name: "Giá vượt kháng cự",
                                             items: "Mẫu hình đảo chiều 2",
                                         },
                                     ],
