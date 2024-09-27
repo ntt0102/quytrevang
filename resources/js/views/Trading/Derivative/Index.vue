@@ -168,7 +168,7 @@
                     ></div>
                     <div
                         ref="targetToolRef"
-                        class="command far fa-flag-checkered"
+                        class="command far fa-windsock"
                         :title="$t('trading.derivative.targetTool')"
                         @click="targetToolClick"
                         @contextmenu="targetToolContextmenu"
