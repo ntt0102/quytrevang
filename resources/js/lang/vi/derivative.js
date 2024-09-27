@@ -12,6 +12,7 @@ export default {
                                 {
                                     name: "KL hồi về hỗ trợ",
                                     items: "Mẫu hình tiếp diễn 1",
+                                    pattern: ["continueData", 0],
                                 },
                                 {
                                     name: "KL chưa hồi hỗ trợ",
@@ -52,6 +53,16 @@ export default {
                             ],
                         },
                     ],
+                },
+            ],
+        },
+        {
+            name: "Phân kỳ giá và KL",
+            items: [
+                {
+                    name: "Giá vượt mức 50",
+                    items: "Mẫu hình đảo chiều 3",
+                    pattern: ["reversalData", 2],
                 },
             ],
         },

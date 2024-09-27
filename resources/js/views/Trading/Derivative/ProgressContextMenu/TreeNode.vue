@@ -17,7 +17,13 @@
             :placeholder="$t('titles.dxSelectPlacehoder')"
             @valueChanged="handleSelectChange"
         />
-        <div v-else class="text" v-html="node.items" />
+        <div v-else>
+            <span class="text" v-html="node.items"></span>
+            <Pattern
+                v-if="node.pattern"
+                :pattern="patterns[node.pattern[0]][node.pattern[1]]"
+            />
+        </div>
         <TreeNode
             v-if="state.hasChild"
             :node="state.selectedChild"
@@ -30,7 +36,9 @@
 
 <script setup>
 import { reactive, computed, watch } from "vue";
+import patterns from "../../../../data/derivative";
 import DxSelectBox from "devextreme-vue/select-box";
+import Pattern from "../PatternContextMenu/Pattern.vue";
 
 const props = defineProps(["node", "index", "modelValue"]);
 const emit = defineEmits(["update:modelValue"]);

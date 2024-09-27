@@ -222,7 +222,7 @@
 
 <script setup>
 import LineContextMenu from "./LineContextMenu.vue";
-import PatternContextMenu from "./PatternContextMenu.vue";
+import PatternContextMenu from "./PatternContextMenu/Index.vue";
 import ProgressContextMenu from "./ProgressContextMenu/Index.vue";
 import VpsOtpPopup from "./VpsOtpPopup.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
