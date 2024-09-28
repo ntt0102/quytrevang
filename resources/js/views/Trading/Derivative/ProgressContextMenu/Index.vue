@@ -3,7 +3,7 @@
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
 
-        <DxScrollView class="container">
+        <div class="container">
             <TreeNode
                 v-if="isShowNode"
                 :node="treeData"
@@ -11,7 +11,7 @@
                 v-model="treeValue"
                 @update:modelValue="updateTreeValue"
             />
-        </DxScrollView>
+        </div>
     </div>
 </template>
 
@@ -79,7 +79,10 @@ function stopPropagationEvent(e) {
         min-width: 250px;
         max-height: 500px;
         overflow-y: auto;
-        padding: auto 20px;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
 
         input {
             text-align: center;

@@ -5,6 +5,10 @@
 @import "./fontawesome/css/regular.min.css";
 @import "./variables.scss";
 
+html::-webkit-scrollbar {
+    display: none;
+}
+
 .dx-widget,
 .dx-overlay-wrapper,
 .dx-context-menu .dx-menu-item,
