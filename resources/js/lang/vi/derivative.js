@@ -18,7 +18,7 @@ export default {
                                     name: "KL chưa hồi hỗ trợ",
                                     items: [
                                         {
-                                            name: "Tạo nền giá dưới mức 50",
+                                            name: "Giá tạo nền",
                                             items: "Mẫu hình đảo chiều 1",
                                             pattern: ["reversalData", 1],
                                         },
