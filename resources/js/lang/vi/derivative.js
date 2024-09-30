@@ -12,7 +12,7 @@ export default {
                                 {
                                     name: "KL hồi về hỗ trợ",
                                     items: "Mẫu hình tiếp diễn 1",
-                                    pattern: ["continueData", 0],
+                                    pattern: ["continueData", 1],
                                 },
                                 {
                                     name: "KL chưa hồi hỗ trợ",
@@ -20,10 +20,12 @@ export default {
                                         {
                                             name: "Tạo nền giá dưới mức 50",
                                             items: "Mẫu hình đảo chiều 1",
+                                            pattern: ["reversalData", 1],
                                         },
                                         {
                                             name: "Giá vượt kháng cự",
                                             items: "Mẫu hình đảo chiều 2",
+                                            pattern: ["reversalData", 2],
                                         },
                                     ],
                                 },
@@ -43,10 +45,12 @@ export default {
                                         {
                                             name: "Giá hình nêm",
                                             items: "Mẫu hình tiếp diễn 2",
+                                            pattern: ["continueData", 3],
                                         },
                                         {
                                             name: "Giá hình tam giác",
                                             items: "Mẫu hình tiếp diễn 3",
+                                            pattern: ["continueData", 3],
                                         },
                                     ],
                                 },
@@ -62,7 +66,7 @@ export default {
                 {
                     name: "Giá vượt mức 50",
                     items: "Mẫu hình đảo chiều 3",
-                    pattern: ["reversalData", 2],
+                    pattern: ["reversalData", 3],
                 },
             ],
         },

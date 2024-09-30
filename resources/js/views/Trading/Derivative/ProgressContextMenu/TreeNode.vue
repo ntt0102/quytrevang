@@ -21,7 +21,7 @@
             <span class="text" v-html="node.items"></span>
             <Pattern
                 v-if="node.pattern"
-                :pattern="patterns[node.pattern[0]][node.pattern[1]]"
+                :pattern="patterns[node.pattern[0]][node.pattern[1] - 1]"
             />
         </div>
         <TreeNode
