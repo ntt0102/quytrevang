@@ -45,7 +45,7 @@ export default {
                                         {
                                             name: "Giá hình nêm",
                                             items: "Mẫu hình tiếp diễn 2",
-                                            pattern: ["continueData", 3],
+                                            pattern: ["continueData", 2],
                                         },
                                         {
                                             name: "Giá hình tam giác",
