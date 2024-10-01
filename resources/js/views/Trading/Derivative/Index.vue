@@ -412,7 +412,6 @@ watch(() => store.state.tradingDerivative.tools, loadToolsData);
 function eventChartClick(e) {
     state.showLineContext = false;
     state.showPatternContext = false;
-    state.showProgressContext = false;
     toggleOrderButton(false);
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (targetToolRef.value.classList.contains("selected"))
