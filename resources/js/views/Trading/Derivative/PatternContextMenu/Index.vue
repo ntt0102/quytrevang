@@ -80,13 +80,12 @@ function stopPropagationEvent(e) {
         font-family: Roboto;
 
         .items {
-            width: 315px;
+            width: 300px;
             height: 230px;
         }
 
         .name {
             text-align: left;
-            text-indent: 10px;
         }
     }
 }
