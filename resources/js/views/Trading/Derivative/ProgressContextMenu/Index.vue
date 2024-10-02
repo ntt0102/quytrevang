@@ -3,7 +3,7 @@
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
 
-        <div class="container">
+        <div ref="scrollContainer" class="container">
             <TreeNode
                 v-if="isShowNode"
                 :node="treeData"
@@ -22,6 +22,7 @@ import { ref, watch } from "vue";
 const props = defineProps(["modelValue"]);
 const emit = defineEmits(["update:modelValue", "change"]);
 
+const scrollContainer = ref(null);
 const isShowNode = ref(false);
 const treeData = ref({});
 import(`../../../../lang/${window.lang}/derivative.js`).then((e) => {
@@ -39,6 +40,9 @@ watch(
 function updateTreeValue(e) {
     emit("update:modelValue", e);
     emit("change", e);
+    setTimeout(() => {
+        scrollContainer.value.scrollTop = scrollContainer.value.scrollHeight;
+    }, 0);
 }
 
 function stopPropagationEvent(e) {
@@ -76,7 +80,7 @@ function stopPropagationEvent(e) {
         position: absolute;
     }
     .container {
-        min-width: 250px;
+        min-width: 300px;
         max-height: 500px;
         overflow-y: auto;
 

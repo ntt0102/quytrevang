@@ -1,25 +1,34 @@
 <template>
-    <div>
-        <canvas ref="canvasRef" width="300" height="200"></canvas>
-    </div>
+    <canvas ref="canvasRef" width="300" height="200"></canvas>
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 const props = defineProps(["pattern"]);
 
 const canvasRef = ref(null);
 const patternData = ref(props.pattern);
 
-onMounted(() => {
-    drawPattern();
-});
-function drawPattern() {
+watch(
+    () => props.pattern,
+    (e) => {
+        patternData.value = e;
+        drawPattern(true);
+    }
+);
+
+onMounted(() =>
+    setTimeout(() => {
+        drawPattern();
+    }, 0)
+);
+function drawPattern(isClean = false) {
+    if (!patternData.value) return false;
+
     const canvas = canvasRef.value;
     const ctx = canvas.getContext("2d");
-
-    if (!patternData.value) return false;
+    if (isClean) ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     const price = patternData.value.price;
     const volume = patternData.value.volume;
@@ -33,6 +42,7 @@ function drawPattern() {
     ctx.beginPath();
     ctx.strokeStyle = "white";
     ctx.lineWidth = 2;
+    ctx.setLineDash([1, 0]);
     ctx.moveTo(price[0][0], price[0][1]);
     for (let i = 1; i < price.length; i++) {
         ctx.lineTo(price[i][0], price[i][1]);
