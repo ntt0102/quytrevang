@@ -7,27 +7,22 @@ export default {
                     name: "KL gãy hỗ trợ",
                     items: [
                         {
-                            name: "Giá gãy mức 50 (1 lần)",
+                            name: "Giá gãy mức 50",
                             items: [
                                 {
-                                    name: "KL hồi về hỗ trợ",
+                                    name: "KL test hỗ trợ và đồng thuận",
                                     items: "Mẫu hình tiếp diễn 1",
                                     pattern: ["continueData", 1],
                                 },
                                 {
-                                    name: "KL chưa hồi hỗ trợ",
-                                    items: [
-                                        {
-                                            name: "Giá tạo nền",
-                                            items: "Mẫu hình đảo chiều 1",
-                                            pattern: ["reversalData", 1],
-                                        },
-                                        {
-                                            name: "Giá vượt kháng cự",
-                                            items: "Mẫu hình đảo chiều 2",
-                                            pattern: ["reversalData", 2],
-                                        },
-                                    ],
+                                    name: "Giá tạo nền",
+                                    items: "Mẫu hình đảo chiều 1",
+                                    pattern: ["reversalData", 1],
+                                },
+                                {
+                                    name: "Giá vượt kháng cự",
+                                    items: "Mẫu hình đảo chiều 2",
+                                    pattern: ["reversalData", 2],
                                 },
                             ],
                         },
