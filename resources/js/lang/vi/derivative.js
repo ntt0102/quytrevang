@@ -10,7 +10,7 @@ export default {
                             name: "Giá gãy mức 50",
                             items: [
                                 {
-                                    name: "KL test hỗ trợ và đồng thuận",
+                                    name: "Giá là sóng hồi",
                                     items: "Mẫu hình tiếp diễn 1",
                                     pattern: ["continueData", 1],
                                 },
