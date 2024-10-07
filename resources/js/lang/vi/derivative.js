@@ -15,6 +15,11 @@ export default {
                                     pattern: ["continueData", 1],
                                 },
                                 {
+                                    name: "Giá tạo nền trong nền",
+                                    items: "Mẫu hình tiếp diễn 4",
+                                    pattern: ["continueData", 4],
+                                },
+                                {
                                     name: "Giá tạo nền",
                                     items: "Mẫu hình đảo chiều 1",
                                     pattern: ["reversalData", 1],
@@ -55,15 +60,15 @@ export default {
                 },
             ],
         },
-        {
-            name: "Phân kỳ giá và KL",
-            items: [
-                {
-                    name: "Giá vượt mức 50",
-                    items: "Mẫu hình đảo chiều 3",
-                    pattern: ["reversalData", 3],
-                },
-            ],
-        },
+        // {
+        //     name: "Phân kỳ giá và KL",
+        //     items: [
+        //         {
+        //             name: "Giá vượt mức 50",
+        //             items: "Mẫu hình đảo chiều 3",
+        //             pattern: ["reversalData", 3],
+        //         },
+        //     ],
+        // },
     ],
 };
