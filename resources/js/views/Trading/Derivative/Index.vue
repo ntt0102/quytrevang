@@ -1321,18 +1321,39 @@ function drawTimeRangeTool() {
         data: [],
     };
     let option = { time: params.crosshair.time, value: 1 };
-    if (params.tools.timeRange.length > 0) {
-        option.color = "red";
-        params.tools.timeRange[1] = option;
-        param.points.push(1);
-        timeRangeToolRef.value.classList.remove("selected");
-    } else {
-        option.color = "lime";
-        params.tools.timeRange[0] = option;
-        param.points.push(0);
+    switch (params.tools.timeRange.length) {
+        case 0:
+            option.color = "lime";
+            params.tools.timeRange[0] = option;
+            param.points.push(0);
+            param.data.push(option);
+            break;
+        case 1:
+            option.color = "red";
+            params.tools.timeRange[1] = option;
+            param.points.push(1);
+            param.data.push(option);
+            timeRangeToolRef.value.classList.remove("selected");
+            break;
+        default:
+            let tmp =
+                params.tools.timeRange[1].time - params.tools.timeRange[0].time;
+            if (tmp > 5400) tmp -= 5400;
+            //
+            option.color = "lime";
+            params.tools.timeRange[0] = mf.cloneDeep(option);
+            param.points.push(0);
+            param.data.push(mf.cloneDeep(option));
+            //
+            option.time = option.time + tmp;
+            option.color = "red";
+            params.tools.timeRange[1] = option;
+            param.points.push(1);
+            param.data.push(option);
+            timeRangeToolRef.value.classList.remove("selected");
+            break;
     }
     params.series.timeRange.setData(params.tools.timeRange);
-    param.data.push(option);
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function removeTimeRangeTool(withServer = true) {
