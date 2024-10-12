@@ -70,11 +70,11 @@ export default {
                             name: "Giá hồi qua mức 50",
                             items: [
                                 {
-                                    name: "Giá điều chỉnh về mức 50",
+                                    name: "Giá đi ngang đủ lâu",
                                     items: "Target x2",
                                 },
                                 {
-                                    name: "Giá đi ngang đủ lâu",
+                                    name: "Giá điều chỉnh về mức 50",
                                     items: "Target x2",
                                 },
                             ],
