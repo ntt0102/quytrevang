@@ -60,15 +60,23 @@ export default {
                 },
             ],
         },
-        // {
-        //     name: "Phân kỳ giá và KL",
-        //     items: [
-        //         {
-        //             name: "Giá vượt mức 50",
-        //             items: "Mẫu hình đảo chiều 3",
-        //             pattern: ["reversalData", 3],
-        //         },
-        //     ],
-        // },
+        {
+            name: "Giá tạo xu hướng và điều chỉnh",
+            items: [
+                {
+                    name: "Giá hồi qua mức 50",
+                    items: [
+                        {
+                            name: "Giá điều chỉnh về mức 50",
+                            items: "Target x2",
+                        },
+                        {
+                            name: "Giá đi ngang đủ lâu",
+                            items: "Target x2",
+                        },
+                    ],
+                },
+            ],
+        },
     ],
 };

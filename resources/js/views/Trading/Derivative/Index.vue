@@ -1336,16 +1336,23 @@ function drawTimeRangeTool() {
             timeRangeToolRef.value.classList.remove("selected");
             break;
         default:
-            let tmp =
-                params.tools.timeRange[1].time - params.tools.timeRange[0].time;
-            if (tmp > 5400) tmp -= 5400;
-            //
+            const index0 = params.data.whitespace.findIndex(
+                (item) => item.time == params.tools.timeRange[0].time
+            );
+            const index1 = params.data.whitespace.findIndex(
+                (item) => item.time == params.tools.timeRange[1].time
+            );
+            const index2 = params.data.whitespace.findIndex(
+                (item) => item.time == option.time
+            );
+            const index3 = index2 + (index1 - index0);
+
             option.color = "lime";
             params.tools.timeRange[0] = mf.cloneDeep(option);
             param.points.push(0);
             param.data.push(mf.cloneDeep(option));
             //
-            option.time = option.time + tmp;
+            option.time = params.data.whitespace[index3].time;
             option.color = "red";
             params.tools.timeRange[1] = option;
             param.points.push(1);
@@ -1782,19 +1789,6 @@ function loginVps() {
 }
 function loginDnse() {
     bus.emit("checkPin", () => store.dispatch("tradingDerivative/loginDnse"));
-}
-function getTimeDistance(start, end) {
-    let distance = Math.abs(start - end);
-    if (distance > 5400) distance -= 5400;
-    return distance;
-}
-function cmp(vari, value, side, eq = false) {
-    if (side) {
-        if (eq) return vari >= value;
-        return vari > value;
-    }
-    if (eq) return vari <= value;
-    return vari < value;
 }
 </script>
 <style lang="scss">
