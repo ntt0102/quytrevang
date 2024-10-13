@@ -564,23 +564,37 @@ function eventPriceLineDrag(e) {
                 };
                 let point, changeOptions;
                 let a = +params.tools.target.A.options().price;
-                const b = +params.tools.target.B.options().price;
+                let b = +params.tools.target.B.options().price;
                 let ba = b - a;
                 //
                 point = "A";
-                if (lineOptions.point == "Y") {
-                    ba = +((b - newPrice) / 2).toFixed(1);
+                if (lineOptions.point == "A") {
+                    ba = +params.tools.target.B.options().title;
+                    b = a + ba;
+                } else if (lineOptions.point != "B") {
+                    let div = 0;
+                    switch (lineOptions.point) {
+                        case "X":
+                            div = 1.5;
+                            break;
+                        case "Y":
+                            div = 2;
+                            break;
+                        case "Z":
+                            div = 3;
+                            break;
+                    }
+                    ba = +((b - newPrice) / div).toFixed(1);
                     a = b - ba;
                     changeOptions = { price: a };
                     params.tools.target[point].applyOptions(changeOptions);
                 }
-                if (["A", "Y"].includes(lineOptions.point)) {
-                    param.points.push(point);
-                    param.data.push(params.tools.target[point].options());
-                }
+                param.points.push(point);
+                param.data.push(params.tools.target[point].options());
                 //
                 point = "B";
-                changeOptions = { title: ba.toFixed(1) };
+                changeOptions = { price: b, title: ba.toFixed(1) };
+                if (lineOptions.point == point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.target[point].options());
@@ -590,15 +604,17 @@ function eventPriceLineDrag(e) {
                     price: +(a - 0.5 * ba).toFixed(1),
                     title: (-0.5 * ba).toFixed(1),
                 };
+                if (lineOptions.point == point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.target[point].options());
                 //
                 point = "Y";
-                changeOptions = { title: (-ba).toFixed(1) };
-                if (lineOptions.point != "Y") {
-                    changeOptions.price = +(a - ba).toFixed(1);
-                }
+                changeOptions = {
+                    price: +(a - ba).toFixed(1),
+                    title: (-ba).toFixed(1),
+                };
+                if (lineOptions.point == point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.target[point].options());
@@ -608,6 +624,7 @@ function eventPriceLineDrag(e) {
                     price: +(a - 2 * ba).toFixed(1),
                     title: (-2 * ba).toFixed(1),
                 };
+                if (lineOptions.point == point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.target[point].options());
