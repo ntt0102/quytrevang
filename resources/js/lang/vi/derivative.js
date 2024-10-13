@@ -61,23 +61,18 @@ export default {
             ],
         },
         {
-            name: "Giá tạo xu hướng",
+            name: "Giá tạo xu hướng và điều chỉnh",
             items: [
                 {
-                    name: "Giá điều chỉnh không quá 75",
+                    name: "Giá hồi qua mức 50",
                     items: [
                         {
-                            name: "Giá hồi qua mức 50",
-                            items: [
-                                {
-                                    name: "Giá đi ngang đủ lâu",
-                                    items: "Target x2",
-                                },
-                                {
-                                    name: "Giá điều chỉnh về mức 50",
-                                    items: "Target x2",
-                                },
-                            ],
+                            name: "Thời gian điều chỉnh lớn",
+                            items: "Target x2",
+                        },
+                        {
+                            name: "Mức điều chỉnh quá 50",
+                            items: "Target x2",
                         },
                     ],
                 },
