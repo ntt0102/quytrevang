@@ -78,5 +78,46 @@ export default {
                 },
             ],
         },
+        {
+            name: "Khối lượng vượt kháng cự",
+            items: [
+                {
+                    name: "Giá hồi và tạo nền",
+                    items: [
+                        {
+                            name: "Giá hồi qua mức 50",
+                            items: [
+                                {
+                                    name: "Thời gian điều chỉnh lớn",
+                                    items: "Target x2",
+                                },
+                                {
+                                    name: "Mức điều chỉnh quá 50",
+                                    items: "Target x2",
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    name: "Giá gãy hỗ trợ và hồi",
+                    items: [
+                        {
+                            name: "Giá hồi qua mức 50",
+                            items: [
+                                {
+                                    name: "Thời gian điều chỉnh lớn",
+                                    items: "Target x2",
+                                },
+                                {
+                                    name: "Mức điều chỉnh quá 50",
+                                    items: "Target x2",
+                                },
+                            ],
+                        },
+                    ],
+                },
+            ],
+        },
     ],
 };
