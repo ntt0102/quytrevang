@@ -81,7 +81,7 @@ function stopPropagationEvent(e) {
     }
     .container {
         min-width: 300px;
-        max-height: 500px;
+        max-height: 550px;
         overflow-y: auto;
 
         &::-webkit-scrollbar {

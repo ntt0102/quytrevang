@@ -78,8 +78,13 @@ export default {
             name: "Giá tạo xu hướng sóng",
             items: [
                 {
-                    name: "Sóng điều chỉnh mức 50 và TGPH lớn",
-                    items: [{ ...common }],
+                    name: "Sóng điều chỉnh mức 50",
+                    items: [
+                        {
+                            name: "TGPH sóng điều chỉnh lớn",
+                            items: [{ ...common }],
+                        },
+                    ],
                 },
             ],
         },
