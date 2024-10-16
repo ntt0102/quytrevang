@@ -168,6 +168,13 @@
                         @contextmenu="timeRangeToolContextmenu"
                     ></div>
                     <div
+                        ref="phaseToolRef"
+                        class="command far fa-heart-rate"
+                        :title="$t('trading.derivative.phaseTool')"
+                        @click="phaseToolClick"
+                        @contextmenu="phaseToolContextmenu"
+                    ></div>
+                    <div
                         ref="targetToolRef"
                         class="command far fa-windsock"
                         :title="$t('trading.derivative.targetTool')"
@@ -180,13 +187,6 @@
                         :title="$t('trading.derivative.rrTool')"
                         @click="rrToolClick"
                         @contextmenu="rrToolContextmenu"
-                    ></div>
-                    <div
-                        ref="phaseToolRef"
-                        class="command far fa-heart-rate"
-                        :title="$t('trading.derivative.phaseTool')"
-                        @click="phaseToolClick"
-                        @contextmenu="phaseToolContextmenu"
                     ></div>
                     <div
                         v-show="showCancelOrder"
@@ -1337,7 +1337,7 @@ function drawPhaseTool() {
         //
         option.point = "B";
         option.title = "B";
-        option.color = "red";
+        option.color = "#4CAF50";
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
@@ -1346,7 +1346,7 @@ function drawPhaseTool() {
         option.point = "C";
         option.price = c;
         option.title = (((c - b) / (a - b)) * 100).toFixed(0);
-        option.color = "green";
+        option.color = "#FF9800";
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
@@ -1355,7 +1355,7 @@ function drawPhaseTool() {
         option.point = "D";
         option.price = d;
         option.title = (((d - c) / (b - c)) * 100).toFixed(0);
-        option.color = "blue";
+        option.color = "#009688";
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
@@ -1364,7 +1364,7 @@ function drawPhaseTool() {
         option.point = "E";
         option.price = e;
         option.title = (((e - d) / (c - d)) * 100).toFixed(0);
-        option.color = "pink";
+        option.color = "#FFEB3B";
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
@@ -1374,7 +1374,7 @@ function drawPhaseTool() {
     } else {
         option.point = "A";
         option.title = "A";
-        option.color = "yellow";
+        option.color = "#F44336";
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
