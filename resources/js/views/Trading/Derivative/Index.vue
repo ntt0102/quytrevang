@@ -1337,7 +1337,7 @@ function drawPhaseTool() {
         //
         option.point = "B";
         option.title = "B";
-        option.color = "#4CAF50";
+        option.color = "#009688";
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
@@ -1355,7 +1355,7 @@ function drawPhaseTool() {
         option.point = "D";
         option.price = d;
         option.title = (((d - c) / (b - c)) * 100).toFixed(0);
-        option.color = "#009688";
+        option.color = "#4CAF50";
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
