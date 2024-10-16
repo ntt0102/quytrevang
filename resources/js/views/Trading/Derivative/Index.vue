@@ -134,6 +134,7 @@
                         ></ProgressContextMenu>
                     </div>
                     <div
+                        v-show="false"
                         class="popup command far fa-heart-rate"
                         :title="$t('trading.derivative.patternTool')"
                         @click="patternToolClick"
@@ -179,6 +180,13 @@
                         :title="$t('trading.derivative.rrTool')"
                         @click="rrToolClick"
                         @contextmenu="rrToolContextmenu"
+                    ></div>
+                    <div
+                        ref="phaseToolRef"
+                        class="command far fa-heart-rate"
+                        :title="$t('trading.derivative.phaseTool')"
+                        @click="phaseToolClick"
+                        @contextmenu="phaseToolContextmenu"
                     ></div>
                     <div
                         v-show="showCancelOrder"
@@ -301,6 +309,7 @@ const reloadToolRef = ref(null);
 const tradingviewRef = ref(null);
 const lineToolRef = ref(null);
 const rrToolRef = ref(null);
+const phaseToolRef = ref(null);
 const targetToolRef = ref(null);
 const timeRangeToolRef = ref(null);
 const cancelOrderRef = ref(null);
@@ -419,6 +428,7 @@ function eventChartClick(e) {
     else if (timeRangeToolRef.value.classList.contains("selected"))
         drawTimeRangeTool();
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
+    else if (phaseToolRef.value.classList.contains("selected")) drawPhaseTool();
 }
 function eventChartContextmenu(e) {
     toggleOrderButton(true);
@@ -689,6 +699,75 @@ function eventPriceLineDrag(e) {
                     param.points.push(point);
                     param.data.push(params.tools.rr[point].options());
                 }
+                store.dispatch("tradingDerivative/drawTools", param);
+            }
+            break;
+        case "phase":
+            if (mf.isSet(params.tools.phase.B)) {
+                let param = {
+                    isRemove: false,
+                    name: "phase",
+                    points: [],
+                    data: [],
+                };
+                let point, changeOptions;
+                const a = +params.tools.phase.A.options().price;
+                const b = +params.tools.phase.B.options().price;
+                let c = +params.tools.phase.C.options().price;
+                let d = +params.tools.phase.D.options().price;
+                let e = +params.tools.phase.E.options().price;
+                //
+                if (lineOptions.point == "A") {
+                    c = +(b + (a - b) / 2).toFixed(1);
+                    point = "A";
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                }
+                if (lineOptions.point == "B") {
+                    c = +(b + (a - b) / 2).toFixed(1);
+                    point = "B";
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                }
+                //
+                if (["A", "B", "C"].includes(lineOptions.point)) {
+                    d = +(c + (b - c) / 2).toFixed(1);
+                    point = "C";
+                    changeOptions = {
+                        price: c,
+                        title: (((c - b) / (a - b)) * 100).toFixed(0),
+                    };
+                    if (lineOptions.point == point) delete changeOptions.price;
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                }
+                //
+                if (["A", "B", "C", "D"].includes(lineOptions.point)) {
+                    e = +(d + (c - d) / 2).toFixed(1);
+                    point = "D";
+                    changeOptions = {
+                        price: d,
+                        title: (((d - c) / (b - c)) * 100).toFixed(0),
+                    };
+                    if (lineOptions.point == point) delete changeOptions.price;
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                }
+                //
+                if (["A", "B", "C", "D", "E"].includes(lineOptions.point)) {
+                    point = "E";
+                    changeOptions = {
+                        price: e,
+                        title: (((e - d) / (c - d)) * 100).toFixed(0),
+                    };
+                    if (lineOptions.point == point) delete changeOptions.price;
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                }
+                //
                 store.dispatch("tradingDerivative/drawTools", param);
             }
             break;
@@ -1218,6 +1297,108 @@ function removeRrTool(withServer = true) {
             name: "rr",
         });
 }
+function phaseToolClick(e) {
+    state.showLineContext = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+        removePhaseTool();
+    }
+}
+function phaseToolContextmenu(e) {
+    removePhaseTool();
+    e.target.classList.remove("selected");
+}
+function drawPhaseTool() {
+    const TYPE = "phase";
+    const price = coordinateToPrice(params.crosshair.y);
+    let option = {
+        lineType: TYPE,
+        price: price,
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: true,
+    };
+    let param = {
+        isRemove: false,
+        name: TYPE,
+        points: [],
+        data: [],
+    };
+    if (mf.isSet(params.tools.phase.A)) {
+        const a = +params.tools.phase.A.options().price;
+        const b = price;
+        const c = +(b + (a - b) / 2).toFixed(1);
+        const d = +(c + (b - c) / 2).toFixed(1);
+        const e = +(d + (c - d) / 2).toFixed(1);
+        //
+        option.point = "B";
+        option.title = "B";
+        option.color = "red";
+        params.tools.phase[option.point] =
+            params.series.price.createPriceLine(option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
+        //
+        option.point = "C";
+        option.price = c;
+        option.title = (((c - b) / (a - b)) * 100).toFixed(0);
+        option.color = "green";
+        params.tools.phase[option.point] =
+            params.series.price.createPriceLine(option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
+        //
+        option.point = "D";
+        option.price = d;
+        option.title = (((d - c) / (b - c)) * 100).toFixed(0);
+        option.color = "blue";
+        params.tools.phase[option.point] =
+            params.series.price.createPriceLine(option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
+        //
+        option.point = "E";
+        option.price = e;
+        option.title = (((e - d) / (c - d)) * 100).toFixed(0);
+        option.color = "pink";
+        params.tools.phase[option.point] =
+            params.series.price.createPriceLine(option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
+        //
+        phaseToolRef.value.classList.remove("selected");
+    } else {
+        option.point = "A";
+        option.title = "A";
+        option.color = "yellow";
+        params.tools.phase[option.point] =
+            params.series.price.createPriceLine(option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
+    }
+    store.dispatch("tradingDerivative/drawTools", param);
+}
+function removePhaseTool(withServer = true) {
+    if (mf.isSet(params.tools.phase.A)) {
+        params.series.price.removePriceLine(params.tools.phase.A);
+        if (mf.isSet(params.tools.phase.B)) {
+            params.series.price.removePriceLine(params.tools.phase.B);
+            params.series.price.removePriceLine(params.tools.phase.C);
+            params.series.price.removePriceLine(params.tools.phase.D);
+            params.series.price.removePriceLine(params.tools.phase.E);
+        }
+    }
+    initToolsParams(["phase"]);
+    if (withServer)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: true,
+            name: "phase",
+        });
+}
 function targetToolClick(e) {
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
@@ -1413,6 +1594,7 @@ function removeAllTools() {
     removeRrTool(false);
     removeTargetTool(false);
     removeTimeRangeTool(false);
+    removePhaseTool(false);
 }
 function toggleOrderButton(show) {
     if (show) {
@@ -1764,7 +1946,8 @@ function resetTools() {
     store.dispatch("tradingDerivative/getTools");
 }
 function initToolsParams(tools) {
-    if (tools == undefined) tools = ["order", "lines", "rr", "target", "tr"];
+    if (tools == undefined)
+        tools = ["order", "lines", "rr", "target", "tr", "phase"];
     if (tools.includes("order"))
         params.tools.order = { side: 0, entry: {}, tp: {}, sl: {} };
     if (tools.includes("lines")) params.tools.lines = [];
@@ -1772,6 +1955,8 @@ function initToolsParams(tools) {
     if (tools.includes("target"))
         params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
     if (tools.includes("tr")) params.tools.timeRange = [];
+    if (tools.includes("phase"))
+        params.tools.phase = { A: {}, B: {}, C: {}, D: {}, E: {} };
 }
 function getAccountInfo() {
     store.dispatch("tradingDerivative/getAccountInfo").then((data) => {
