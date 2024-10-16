@@ -1,11 +1,11 @@
 const common = {
-    name: "Sóng hồi vượt mức 50",
+    name: "Mức hồi lớn hơn điều chỉnh (>50)",
     items: [
         {
-            name: "Sóng tái điều chỉnh mức 50",
+            name: "Mức tái điều chỉnh nhỏ hơn hồi (>50)",
             items: [
                 {
-                    name: "TGPH sóng hồi lớn",
+                    name: "TGPH sóng hồi lớn hơn",
                     items: "Target x2",
                 },
             ],
@@ -78,10 +78,10 @@ export default {
             name: "Giá tạo xu hướng sóng",
             items: [
                 {
-                    name: "Sóng điều chỉnh mức 50",
+                    name: "Mức điều chỉnh lớn hơn 50",
                     items: [
                         {
-                            name: "TGPH sóng điều chỉnh lớn",
+                            name: "TGPH sóng điều chỉnh lớn hơn",
                             items: [{ ...common }],
                         },
                     ],
