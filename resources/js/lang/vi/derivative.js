@@ -1,8 +1,8 @@
 const common = {
-    name: "Mức hồi lớn hơn điều chỉnh (>50)",
+    name: "Mức hồi lớn hơn ĐC (>50)",
     items: [
         {
-            name: "Mức tái điều chỉnh nhỏ hơn hồi (>50)",
+            name: "Mức tái ĐC nhỏ hơn hồi (>50)",
             items: [
                 {
                     name: "TGPH sóng hồi lớn hơn",
