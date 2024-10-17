@@ -771,6 +771,17 @@ function eventPriceLineDrag(e) {
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
                 //
+                point = "F";
+                const target = (d - e) * 2;
+                const f = +(d + target).toFixed(1);
+                changeOptions = {
+                    price: ["D", "E"].includes(lineOptions.point) ? f : b,
+                    title: target.toFixed(1),
+                };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
                 store.dispatch("tradingDerivative/drawTools", param);
             }
             break;
@@ -1373,6 +1384,16 @@ function drawPhaseTool() {
         param.points.push(option.point);
         param.data.push(mf.cloneDeep(option));
         //
+        option.point = "F";
+        option.price = b;
+        option.title = ((d - e) * 2).toFixed(1);
+        option.color = "#9C27B0";
+        option.draggable = false;
+        params.tools.phase[option.point] =
+            params.series.price.createPriceLine(option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
+        //
         phaseToolRef.value.classList.remove("selected");
     } else {
         option.point = "A";
@@ -1393,6 +1414,7 @@ function removePhaseTool(withServer = true) {
             params.series.price.removePriceLine(params.tools.phase.C);
             params.series.price.removePriceLine(params.tools.phase.D);
             params.series.price.removePriceLine(params.tools.phase.E);
+            params.series.price.removePriceLine(params.tools.phase.F);
         }
     }
     initToolsParams(["phase"]);
@@ -1959,7 +1981,7 @@ function initToolsParams(tools) {
         params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
     if (tools.includes("tr")) params.tools.timeRange = [];
     if (tools.includes("phase"))
-        params.tools.phase = { A: {}, B: {}, C: {}, D: {}, E: {} };
+        params.tools.phase = { A: {}, B: {}, C: {}, D: {}, E: {}, F: {} };
 }
 function getAccountInfo() {
     store.dispatch("tradingDerivative/getAccountInfo").then((data) => {
