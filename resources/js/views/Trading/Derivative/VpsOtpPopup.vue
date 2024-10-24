@@ -35,6 +35,15 @@ const otp = ref("");
 
 function show() {
     popupRef.value.show();
+    setTimeout(checkClipboard, 500);
+}
+function checkClipboard() {
+    if (navigator.clipboard) {
+        navigator.clipboard.readText().then((text) => {
+            text = text.replace(/\s+/g, "");
+            if (/^\d{6}$/.test(text)) otpInputRef.value.fillInput(text);
+        });
+    }
 }
 function handleOnComplete(e) {
     store.dispatch("tradingDerivative/loginVps", e).then((isOk) => {
