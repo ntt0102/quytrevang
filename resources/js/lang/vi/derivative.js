@@ -17,6 +17,10 @@ const common = {
             name: "Thời gian tích luỹ sớm",
             items: "Target lớn hơn kháng cự",
         },
+        {
+            name: "Hai sóng hội tụ",
+            items: "Target x2",
+        },
     ],
 };
 export default {
