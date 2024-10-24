@@ -176,14 +176,14 @@
                     ></div>
                     <div
                         ref="targetToolRef"
-                        class="command far fa-windsock"
+                        class="command far fa-line-height"
                         :title="$t('trading.derivative.targetTool')"
                         @click="targetToolClick"
                         @contextmenu="targetToolContextmenu"
                     ></div>
                     <div
                         ref="rrToolRef"
-                        class="command far fa-line-height"
+                        class="command far fa-percent"
                         :title="$t('trading.derivative.rrTool')"
                         @click="rrToolClick"
                         @contextmenu="rrToolContextmenu"
