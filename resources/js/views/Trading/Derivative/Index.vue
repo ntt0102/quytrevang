@@ -1135,17 +1135,17 @@ function drawOrderLine(kinds) {
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function removeOrderLine(kinds, withServer = true) {
+    if (withServer)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: true,
+            name: "order",
+        });
     kinds.forEach((kind) => {
         if (mf.isSet(params.tools.order[kind].line)) {
             params.series.price.removePriceLine(params.tools.order[kind].line);
             delete params.tools.order[kind].line;
         }
     });
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "order",
-        });
 }
 function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
@@ -1203,15 +1203,15 @@ function drawLineTool() {
 }
 function removeLineTool(withServer = true) {
     if (params.tools.lines.length > 0) {
-        params.tools.lines.forEach((line) =>
-            params.series.price.removePriceLine(line)
-        );
-        initToolsParams(["lines"]);
         if (withServer)
             store.dispatch("tradingDerivative/drawTools", {
                 isRemove: true,
                 name: "line",
             });
+        params.tools.lines.forEach((line) =>
+            params.series.price.removePriceLine(line)
+        );
+        initToolsParams(["lines"]);
     }
 }
 function rrToolClick(e) {
@@ -1295,6 +1295,11 @@ function drawRrTool() {
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function removeRrTool(withServer = true) {
+    if (withServer)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: true,
+            name: "rr",
+        });
     if (mf.isSet(params.tools.rr.EP)) {
         params.series.price.removePriceLine(params.tools.rr.EP);
         if (mf.isSet(params.tools.rr.SL)) {
@@ -1305,11 +1310,6 @@ function removeRrTool(withServer = true) {
         }
     }
     initToolsParams(["rr"]);
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "rr",
-        });
 }
 function phaseToolClick(e) {
     state.showLineContext = false;
@@ -1407,6 +1407,11 @@ function drawPhaseTool() {
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function removePhaseTool(withServer = true) {
+    if (withServer)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: true,
+            name: "phase",
+        });
     if (mf.isSet(params.tools.phase.A)) {
         params.series.price.removePriceLine(params.tools.phase.A);
         if (mf.isSet(params.tools.phase.B)) {
@@ -1418,11 +1423,6 @@ function removePhaseTool(withServer = true) {
         }
     }
     initToolsParams(["phase"]);
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "phase",
-        });
 }
 function targetToolClick(e) {
     state.showLineContext = false;
@@ -1506,6 +1506,11 @@ function drawTargetTool() {
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function removeTargetTool(withServer = true) {
+    if (withServer)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: true,
+            name: "target",
+        });
     if (mf.isSet(params.tools.target.A)) {
         params.series.price.removePriceLine(params.tools.target.A);
         if (mf.isSet(params.tools.target.B)) {
@@ -1516,11 +1521,6 @@ function removeTargetTool(withServer = true) {
         }
     }
     initToolsParams(["target"]);
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "target",
-        });
 }
 function timeRangeToolClick(e) {
     state.showLineContext = false;
@@ -1587,13 +1587,13 @@ function drawTimeRangeTool() {
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function removeTimeRangeTool(withServer = true) {
-    params.series.timeRange.setData([]);
-    initToolsParams(["tr"]);
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "tr",
         });
+    params.series.timeRange.setData([]);
+    initToolsParams(["tr"]);
 }
 function patternToolClick() {
     state.showPatternContext = !state.showPatternContext;
