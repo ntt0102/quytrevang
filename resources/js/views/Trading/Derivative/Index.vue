@@ -6,7 +6,7 @@
                     location: 'before',
                     widget: 'dxButton',
                     options: {
-                        icon: 'far fa-poll small',
+                        icon: 'far fa-file-chart-pie small',
                         hint: $t('trading.derivative.buttons.report'),
                         onClick: report,
                     },
@@ -15,7 +15,7 @@
                     location: 'before',
                     widget: 'dxButton',
                     options: {
-                        icon: 'far fa-file-export small',
+                        icon: 'far fa-cloud-arrow-down small',
                         hint: $t('trading.derivative.buttons.export'),
                         onClick: exportCsv,
                     },
@@ -24,7 +24,7 @@
                     location: 'before',
                     widget: 'dxButton',
                     options: {
-                        icon: 'far fa-sign-in-alt small',
+                        icon: 'far fa-arrow-right-to-arc small',
                         hint: $t('trading.derivative.buttons.loginVps'),
                         onClick: loginVps,
                     },
@@ -116,13 +116,13 @@
                     ></div>
                     <div
                         ref="tradingviewRef"
-                        class="command far fa-chart-bar"
+                        class="command far fa-chart-candlestick"
                         :title="$t('trading.derivative.tradingview')"
                         @click="tradingviewClick"
                         @contextmenu="resetTools"
                     ></div>
                     <div
-                        class="popup command far fa-tasks"
+                        class="popup command far fa-list-ol"
                         :title="$t('trading.derivative.progressTool')"
                         @click="progressToolClick"
                     >
@@ -255,7 +255,7 @@ const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.05, bottom: 0.4 },
+        scaleMargins: { top: 0.1, bottom: 0.3 },
     },
     leftPriceScale: { visible: false },
     layout: {
@@ -389,7 +389,7 @@ onMounted(() => {
     });
     params.series.volume = params.chart.addLineSeries({
         priceScaleId: "volume",
-        scaleMargins: { top: 0.61, bottom: 0.01 },
+        scaleMargins: { top: 0.71, bottom: 0.01 },
         color: "#FFD700",
         lastValueVisible: false,
     });

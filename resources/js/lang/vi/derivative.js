@@ -1,14 +1,21 @@
 const common = {
-    name: "Mức hồi lớn hơn ĐC (>50)",
+    name: "Sóng hồi có tỷ lệ lớn hơn 50",
     items: [
         {
-            name: "Mức tái ĐC nhỏ hơn hồi (>50)",
-            items: [
-                {
-                    name: "TGPH sóng hồi lớn hơn",
-                    items: "Target x2",
-                },
-            ],
+            name: "Thời gian tích luỹ đủ",
+            items: "Target lớn hơn kháng cự",
+        },
+        {
+            name: "Thời gian tích luỹ thiếu",
+            items: "Tỷ lệ sóng hồi rất lớn",
+        },
+        {
+            name: "Thời gian tích luỹ dư",
+            items: "Target của sóng con",
+        },
+        {
+            name: "Thời gian tích luỹ sớm",
+            items: "Target lớn hơn kháng cự",
         },
     ],
 };
@@ -78,13 +85,8 @@ export default {
             name: "Giá tạo xu hướng sóng",
             items: [
                 {
-                    name: "Mức điều chỉnh lớn hơn 50",
-                    items: [
-                        {
-                            name: "TGPH sóng điều chỉnh lớn hơn",
-                            items: [{ ...common }],
-                        },
-                    ],
+                    name: "Sóng điều chỉnh có TGHP lớn",
+                    items: [{ ...common }],
                 },
             ],
         },
