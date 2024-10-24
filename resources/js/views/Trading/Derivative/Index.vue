@@ -1552,7 +1552,7 @@ function drawTimeRangeTool() {
             param.data.push(option);
             break;
         case 1:
-            option.color = "red";
+            option.color = "OrangeRed";
             params.tools.timeRange[1] = option;
             param.points.push(1);
             param.data.push(option);
