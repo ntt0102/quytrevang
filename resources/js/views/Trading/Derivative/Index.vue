@@ -55,8 +55,8 @@
                 >
                     <div
                         ref="connectionRef"
-                        :class="`command far fa-${
-                            status.connection ? 'link' : 'unlink'
+                        :class="`command far fa-link-simple${
+                            status.connection ? '' : '-slash'
                         }`"
                         :title="$t('trading.derivative.connection')"
                         @click="
