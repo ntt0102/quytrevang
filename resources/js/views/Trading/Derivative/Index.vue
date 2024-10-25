@@ -735,7 +735,7 @@ function eventPriceLineDrag(e) {
                         C = "50";
                         changeOptions = { price: c, title: C };
                     } else {
-                        C = (((c - b) / (a - b)) * 100).toFixed(0);
+                        C = (((c - b) / (a - b)) * 100).toFixed(1);
                         changeOptions = { title: C };
                     }
                     params.tools.phase[point].applyOptions(changeOptions);
@@ -750,7 +750,7 @@ function eventPriceLineDrag(e) {
                         D = "50";
                         changeOptions = { price: d, title: D };
                     } else {
-                        D = (((d - c) / (b - c)) * 100).toFixed(0);
+                        D = (((d - c) / (b - c)) * 100).toFixed(1);
                         changeOptions = { title: D };
                     }
                     params.tools.phase[point].applyOptions(changeOptions);
@@ -764,7 +764,7 @@ function eventPriceLineDrag(e) {
                     E = "50";
                     changeOptions = { price: e, title: E };
                 } else {
-                    E = (((e - d) / (c - d)) * 100).toFixed(0);
+                    E = (((e - d) / (c - d)) * 100).toFixed(1);
                     changeOptions = { title: E };
                 }
                 params.tools.phase[point].applyOptions(changeOptions);
