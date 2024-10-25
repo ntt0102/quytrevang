@@ -101,7 +101,8 @@ function updateTreeValue(e) {
 
 <style scoped>
 .text {
-    font-size: 18px;
+    font-size: 17px;
+    color: #fff;
     font-family: Roboto;
 }
 .arrow {

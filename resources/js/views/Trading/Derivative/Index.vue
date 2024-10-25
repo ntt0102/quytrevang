@@ -715,7 +715,6 @@ function eventPriceLineDrag(e) {
                 const b = +params.tools.phase.B.options().price;
                 let c = +params.tools.phase.C.options().price;
                 let d = +params.tools.phase.D.options().price;
-                let e = +params.tools.phase.E.options().price;
                 //
                 if (lineOptions.point == "A") {
                     point = "A";
@@ -728,11 +727,11 @@ function eventPriceLineDrag(e) {
                     param.data.push(params.tools.phase[point].options());
                 }
                 //
-                if (!["D", "E"].includes(lineOptions.point)) {
+                if (lineOptions.point != "D") {
                     point = "C";
                     if (lineOptions.point != point) {
-                        c = +(b + (a - b) / 2).toFixed(1);
-                        C = "50";
+                        c = +(b + (a - b) * 0.382).toFixed(1);
+                        C = "38.2";
                         changeOptions = { price: c, title: C };
                     } else {
                         C = (((c - b) / (a - b)) * 100).toFixed(1);
@@ -743,40 +742,41 @@ function eventPriceLineDrag(e) {
                     param.data.push(params.tools.phase[point].options());
                 }
                 //
-                if (lineOptions.point != "E") {
-                    point = "D";
-                    if (lineOptions.point != point) {
-                        d = +(c + (b - c) / 2).toFixed(1);
-                        D = "50";
-                        changeOptions = { price: d, title: D };
-                    } else {
-                        D = (((d - c) / (b - c)) * 100).toFixed(1);
-                        changeOptions = { title: D };
-                    }
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                }
-                //
-                point = "E";
+                point = "D";
                 if (lineOptions.point != point) {
-                    e = +(d + (c - d) / 2).toFixed(1);
-                    E = "50";
-                    changeOptions = { price: e, title: E };
+                    d = +(c + (b - c) * 0.618).toFixed(1);
+                    D = "61.8";
+                    changeOptions = { price: d, title: D };
                 } else {
-                    E = (((e - d) / (c - d)) * 100).toFixed(1);
-                    changeOptions = { title: E };
+                    D = (((d - c) / (b - c)) * 100).toFixed(1);
+                    changeOptions = { title: D };
                 }
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
                 //
-                point = "F";
-                const target = (d - e) * 2;
-                const f = +(d + target).toFixed(1);
+                point = "X";
                 changeOptions = {
-                    price: ["D", "E"].includes(lineOptions.point) ? f : b,
-                    title: target.toFixed(1),
+                    price: +(d + (d - c) * 0.5).toFixed(1),
+                    title: ((d - c) * 0.5).toFixed(1),
+                };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
+                point = "Y";
+                changeOptions = {
+                    price: +(d + (d - c)).toFixed(1),
+                    title: (d - c).toFixed(1),
+                };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
+                point = "Z";
+                changeOptions = {
+                    price: +(d + (d - c) * 2).toFixed(1),
+                    title: ((d - c) * 2).toFixed(1),
                 };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1345,9 +1345,8 @@ function drawPhaseTool() {
     if (mf.isSet(params.tools.phase.A)) {
         const a = +params.tools.phase.A.options().price;
         const b = price;
-        const c = +(b + (a - b) / 2).toFixed(1);
-        const d = +(c + (b - c) / 2).toFixed(1);
-        const e = +(d + (c - d) / 2).toFixed(1);
+        const c = +(b + (a - b) * 0.382).toFixed(1);
+        const d = +(c + (b - c) * 0.618).toFixed(1);
         //
         option.point = "B";
         option.title = "B";
@@ -1359,7 +1358,7 @@ function drawPhaseTool() {
         //
         option.point = "C";
         option.price = c;
-        option.title = "50";
+        option.title = "38.2";
         option.color = "#FF9800";
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
@@ -1368,25 +1367,36 @@ function drawPhaseTool() {
         //
         option.point = "D";
         option.price = d;
-        option.title = "50";
+        option.title = "61.8";
         option.color = "#4CAF50";
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
         param.data.push(mf.cloneDeep(option));
         //
-        option.point = "E";
-        option.price = e;
-        option.title = "50";
-        option.color = "#FFEB3B";
+        option.point = "X";
+        option.price = +(d + (d - c) * 0.5).toFixed(1);
+        option.title = ((d - c) * 0.5).toFixed(1);
+        option.color = "#2196F3";
+        option.draggable = false;
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
         param.data.push(mf.cloneDeep(option));
         //
-        option.point = "F";
-        option.price = b;
-        option.title = ((d - e) * 2).toFixed(1);
+        option.point = "Y";
+        option.price = +(d + (d - c)).toFixed(1);
+        option.title = (d - c).toFixed(1);
+        option.color = "#673AB7";
+        option.draggable = false;
+        params.tools.phase[option.point] =
+            params.series.price.createPriceLine(option);
+        param.points.push(option.point);
+        param.data.push(mf.cloneDeep(option));
+        //
+        option.point = "Z";
+        option.price = +(d + (d - c) * 2).toFixed(1);
+        option.title = ((d - c) * 2).toFixed(1);
         option.color = "#9C27B0";
         option.draggable = false;
         params.tools.phase[option.point] =
@@ -1418,8 +1428,9 @@ function removePhaseTool(withServer = true) {
             params.series.price.removePriceLine(params.tools.phase.B);
             params.series.price.removePriceLine(params.tools.phase.C);
             params.series.price.removePriceLine(params.tools.phase.D);
-            params.series.price.removePriceLine(params.tools.phase.E);
-            params.series.price.removePriceLine(params.tools.phase.F);
+            params.series.price.removePriceLine(params.tools.phase.X);
+            params.series.price.removePriceLine(params.tools.phase.Y);
+            params.series.price.removePriceLine(params.tools.phase.Z);
         }
     }
     initToolsParams(["phase"]);
@@ -1981,7 +1992,15 @@ function initToolsParams(tools) {
         params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
     if (tools.includes("tr")) params.tools.timeRange = [];
     if (tools.includes("phase"))
-        params.tools.phase = { A: {}, B: {}, C: {}, D: {}, E: {}, F: {} };
+        params.tools.phase = {
+            A: {},
+            B: {},
+            C: {},
+            D: {},
+            X: {},
+            Y: {},
+            Z: {},
+        };
 }
 function getAccountInfo() {
     store.dispatch("tradingDerivative/getAccountInfo").then((data) => {
