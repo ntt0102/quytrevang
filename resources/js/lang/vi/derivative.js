@@ -37,6 +37,10 @@ export default {
                     items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x2",
                 },
                 {
+                    name: "Sóng điều chỉnh - TLMR lớn",
+                    items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x1",
+                },
+                {
                     name: "Sóng điều chỉnh - TGPH nhỏ",
                     items: "<u>Entry</u>: Vượt kháng cự và tạo nền </br><u>Target</u>: x1",
                 },
