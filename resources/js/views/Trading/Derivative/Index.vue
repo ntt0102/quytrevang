@@ -710,12 +710,9 @@ function eventPriceLineDrag(e) {
                     points: [],
                     data: [],
                 };
-                let point, changeOptions, C, D, E;
+                let point, changeOptions, C, D;
                 const a = +params.tools.phase.A.options().price;
-                const bOptions = params.tools.phase.B.options();
-                const b = +bOptions.price;
-                const bTime = +bOptions.time;
-                const rtRef = +bOptions.rt;
+                const b = +params.tools.phase.B.options().price;
                 const c = +params.tools.phase.C.options().price;
                 let d = +params.tools.phase.D.options().price;
                 const rr = ((c - b) / (a - b)) * 100;
@@ -730,9 +727,6 @@ function eventPriceLineDrag(e) {
                     const aTime = +params.tools.phase.A.options().time;
                     const { rt } = findPhase(aTime, b);
                     loadTimeRangeTool(rt, true, true);
-                    state.progress = [0, checkPhase(rt.count, er, rr)];
-                    progressChange(state.progress);
-                    state.showProgressContext = true;
                     changeOptions = { rt: rt.distance };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -753,6 +747,8 @@ function eventPriceLineDrag(e) {
                     D = (((d - c) / (b - c)) * 100).toFixed(1);
                     changeOptions = { title: D };
                 } else {
+                    const bTime = +params.tools.phase.B.options().time;
+                    const rtRef = +params.tools.phase.B.options().rt;
                     const { rt, er, sp } = findPhase(bTime, c, rtRef);
                     state.progress = [0, checkPhase(rt.count, er, rr)];
                     progressChange(state.progress);
