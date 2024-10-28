@@ -1358,6 +1358,7 @@ function drawPhaseTool() {
             const rtRef = +bOptions.rt;
             const c = price;
             const { rt, er, sp } = findPhase(bTime, c, rtRef);
+            loadTimeRangeTool(rt, true, true);
             const d = rt.distance > rtRef ? sp : b;
             const rr = ((c - b) / (a - b)) * 100;
 
@@ -1473,7 +1474,7 @@ function findPhase(startTime, endPrice, rtRef = 0) {
                 resPoint = { index, time, price, iD: 0, pD: 0 };
             } else {
                 resPoint.iD = index - resPoint.index;
-                if (resPoint.price - price > resPoint.pD)
+                if (cmp(resPoint.price - price, side, resPoint.pD))
                     resPoint.pD = resPoint.price - price;
             }
 
