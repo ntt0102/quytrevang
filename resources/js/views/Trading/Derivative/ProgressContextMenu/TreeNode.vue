@@ -1,5 +1,5 @@
 <template>
-    <div v-if="node.items">
+    <div v-if="node.items" class="tree-node">
         <div v-if="index == 0" class="text">
             {{ $t("trading.derivative.progressContextMenu.start") }}
         </div>
@@ -100,13 +100,17 @@ function updateTreeValue(e) {
 </script>
 
 <style scoped>
-.text {
-    font-size: 17px;
-    color: #fff;
-    font-family: Roboto;
-}
-.arrow {
-    font-size: 20px;
-    margin: 10px auto 5px;
+.tree-node {
+    color: #bbbbbb !important;
+
+    .text {
+        font-size: 17px;
+        color: #fff;
+        font-family: Roboto;
+    }
+    .arrow {
+        font-size: 20px;
+        margin: 10px auto 5px;
+    }
 }
 </style>

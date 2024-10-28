@@ -123,6 +123,14 @@
                     ></div>
                     <div
                         class="popup command far fa-list-ol"
+                        :class="{
+                            green:
+                                state.progress.length == 2 &&
+                                state.progress[1] == 0,
+                            red:
+                                state.progress.length == 2 &&
+                                state.progress[1] != 0,
+                        }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="progressToolClick"
                     >
@@ -1358,7 +1366,6 @@ function drawPhaseTool() {
             const rtRef = +bOptions.rt;
             const c = price;
             const { rt, er, sp } = findPhase(bTime, c, rtRef);
-            loadTimeRangeTool(rt, true, true);
             const d = rt.distance > rtRef ? sp : b;
             const rr = ((c - b) / (a - b)) * 100;
 
@@ -1483,10 +1490,10 @@ function findPhase(startTime, endPrice, rtRef = 0) {
     return { rt, er, sp };
 }
 function checkPhase(rt, er, rr) {
-    if (rt < 1) return 3;
+    if (rt < 1) return 4;
     if (rr < 38.2) return 1;
     if (er > 1) return 2;
-    if (rt > 1) return 4;
+    if (rt > 1) return 3;
     return 0;
 }
 function removePhaseTool(withServer = true) {
@@ -2217,26 +2224,6 @@ function cmp(value1, side, value2, eq = false) {
                 }
             }
 
-            .pattern {
-                position: relative;
-
-                .contextmenu {
-                    position: absolute;
-                    top: -140px;
-                    left: 42px;
-                }
-            }
-
-            .progress {
-                position: relative;
-
-                .contextmenu {
-                    position: absolute;
-                    top: -170px;
-                    left: 42px;
-                }
-            }
-
             .cancel-order {
                 color: red;
             }
@@ -2264,6 +2251,12 @@ function cmp(value1, side, value2, eq = false) {
         }
         &.noaction {
             cursor: unset !important;
+        }
+        &.green {
+            color: lime !important;
+        }
+        &.red {
+            color: red !important;
         }
         &.blink {
             animation: blinker 0.5s linear infinite;

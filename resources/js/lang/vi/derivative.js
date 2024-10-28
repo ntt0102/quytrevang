@@ -29,7 +29,7 @@ export default {
             name: "Giá - tạo sóng xu hướng",
             items: [
                 {
-                    name: "Sóng điều chỉnh - TLTL > 38.2",
+                    name: "Sóng điều chỉnh - Hợp lệ",
                     items: "<u>Entry</u>: Kháng cự 2 </br><u>Target</u>: x1 hoặc x2 nếu có nền",
                 },
                 {
@@ -41,12 +41,12 @@ export default {
                     items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x1",
                 },
                 {
-                    name: "Sóng điều chỉnh - TGPH nhỏ",
-                    items: "<u>Entry</u>: Vượt kháng cự và tạo nền </br><u>Target</u>: x1",
-                },
-                {
                     name: "Sóng điều chỉnh - TGPH lớn",
                     items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x0.5",
+                },
+                {
+                    name: "Sóng điều chỉnh - TGPH nhỏ",
+                    items: "<u>Entry</u>: Vượt kháng cự và tạo nền </br><u>Target</u>: x1",
                 },
             ],
         },
