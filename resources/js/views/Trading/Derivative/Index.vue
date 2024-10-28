@@ -749,16 +749,16 @@ function eventPriceLineDrag(e) {
                 }
                 //
                 point = "D";
-                if (lineOptions.point == "C") {
+                if (lineOptions.point == point) {
+                    D = (((d - c) / (b - c)) * 100).toFixed(1);
+                    changeOptions = { title: D };
+                } else {
                     const { rt, er, sp } = findPhase(bTime, c, rtRef);
                     state.progress = [0, checkPhase(rt.count, er, rr)];
                     progressChange(state.progress);
                     d = rt.distance > rtRef ? sp : b;
                     D = (((d - c) / (b - c)) * 100).toFixed(1);
                     changeOptions = { price: d, title: D };
-                } else if (lineOptions.point == "D") {
-                    D = (((d - c) / (b - c)) * 100).toFixed(1);
-                    changeOptions = { title: D };
                 }
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
