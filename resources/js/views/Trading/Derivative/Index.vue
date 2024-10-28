@@ -712,42 +712,51 @@ function eventPriceLineDrag(e) {
                 };
                 let point, changeOptions, C, D, E;
                 const a = +params.tools.phase.A.options().price;
-                const b = +params.tools.phase.B.options().price;
-                let c = +params.tools.phase.C.options().price;
+                const bOptions = params.tools.phase.B.options();
+                const b = +bOptions.price;
+                const bTime = +bOptions.time;
+                const rtRef = +bOptions.rt;
+                const c = +params.tools.phase.C.options().price;
                 let d = +params.tools.phase.D.options().price;
+                const rr = ((c - b) / (a - b)) * 100;
                 //
                 if (lineOptions.point == "A") {
                     point = "A";
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                 }
-                if (lineOptions.point == "B") {
+                if (["A", "B"].includes(lineOptions.point)) {
                     point = "B";
+                    const aTime = +params.tools.phase.A.options().time;
+                    const { rt } = findPhase(aTime, b);
+                    loadTimeRangeTool(rt, true, true);
+                    state.progress = [0, checkPhase(rt.count, er, rr)];
+                    progressChange(state.progress);
+                    state.showProgressContext = true;
+                    changeOptions = { rt: rt.distance };
+                    params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                 }
                 //
-                if (lineOptions.point != "D") {
+                if (lineOptions.point == "C") {
                     point = "C";
-                    if (lineOptions.point != point) {
-                        c = +(b + (a - b) * 0.382).toFixed(1);
-                        C = "38.2";
-                        changeOptions = { price: c, title: C };
-                    } else {
-                        C = (((c - b) / (a - b)) * 100).toFixed(1);
-                        changeOptions = { title: C };
-                    }
+                    C = (((c - b) / (a - b)) * 100).toFixed(1);
+                    changeOptions = { title: C };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                 }
                 //
                 point = "D";
-                if (lineOptions.point != point) {
-                    d = +(c + (b - c) * 0.618).toFixed(1);
-                    D = "61.8";
+                if (lineOptions.point == "C") {
+                    const { rt, er, sp } = findPhase(bTime, c, rtRef);
+                    state.progress = [0, checkPhase(rt.count, er, rr)];
+                    progressChange(state.progress);
+                    d = rt.distance > rtRef ? sp : b;
+                    D = (((d - c) / (b - c)) * 100).toFixed(1);
                     changeOptions = { price: d, title: D };
-                } else {
+                } else if (lineOptions.point == "D") {
                     D = (((d - c) / (b - c)) * 100).toFixed(1);
                     changeOptions = { title: D };
                 }
@@ -892,8 +901,7 @@ function loadToolsData(tools) {
                 );
                 break;
             case "tr":
-                params.tools.timeRange = Object.values(points);
-                params.series.timeRange.setData(params.tools.timeRange);
+                loadTimeRangeTool(Object.values(points));
                 break;
             case "progress":
                 state.progress = Object.values(points)[0];
@@ -1329,9 +1337,10 @@ function phaseToolContextmenu(e) {
 function drawPhaseTool() {
     const TYPE = "phase";
     const price = coordinateToPrice(params.crosshair.y);
+    const time = params.crosshair.time;
     let option = {
         lineType: TYPE,
-        price: price,
+        price,
         lineWidth: 1,
         lineStyle: 1,
         draggable: true,
@@ -1343,78 +1352,145 @@ function drawPhaseTool() {
         data: [],
     };
     if (mf.isSet(params.tools.phase.A)) {
-        const a = +params.tools.phase.A.options().price;
-        const b = price;
-        const c = +(b + (a - b) * 0.382).toFixed(1);
-        const d = +(c + (b - c) * 0.618).toFixed(1);
-        //
-        option.point = "B";
-        option.title = "B";
-        option.color = "#009688";
-        params.tools.phase[option.point] =
-            params.series.price.createPriceLine(option);
-        param.points.push(option.point);
-        param.data.push(mf.cloneDeep(option));
-        //
-        option.point = "C";
-        option.price = c;
-        option.title = "38.2";
-        option.color = "#FF9800";
-        params.tools.phase[option.point] =
-            params.series.price.createPriceLine(option);
-        param.points.push(option.point);
-        param.data.push(mf.cloneDeep(option));
-        //
-        option.point = "D";
-        option.price = d;
-        option.title = "61.8";
-        option.color = "#4CAF50";
-        params.tools.phase[option.point] =
-            params.series.price.createPriceLine(option);
-        param.points.push(option.point);
-        param.data.push(mf.cloneDeep(option));
-        //
-        option.point = "X";
-        option.price = +(d + (d - c) * 0.5).toFixed(1);
-        option.title = ((d - c) * 0.5).toFixed(1);
-        option.color = "#2196F3";
-        option.draggable = false;
-        params.tools.phase[option.point] =
-            params.series.price.createPriceLine(option);
-        param.points.push(option.point);
-        param.data.push(mf.cloneDeep(option));
-        //
-        option.point = "Y";
-        option.price = +(d + (d - c)).toFixed(1);
-        option.title = (d - c).toFixed(1);
-        option.color = "#673AB7";
-        option.draggable = false;
-        params.tools.phase[option.point] =
-            params.series.price.createPriceLine(option);
-        param.points.push(option.point);
-        param.data.push(mf.cloneDeep(option));
-        //
-        option.point = "Z";
-        option.price = +(d + (d - c) * 2).toFixed(1);
-        option.title = ((d - c) * 2).toFixed(1);
-        option.color = "#9C27B0";
-        option.draggable = false;
-        params.tools.phase[option.point] =
-            params.series.price.createPriceLine(option);
-        param.points.push(option.point);
-        param.data.push(mf.cloneDeep(option));
-        //
-        phaseToolRef.value.classList.remove("selected");
+        const aOptions = params.tools.phase.A.options();
+        const a = +aOptions.price;
+
+        if (mf.isSet(params.tools.phase.B)) {
+            const bOptions = params.tools.phase.B.options();
+            const b = +bOptions.price;
+            const bTime = +bOptions.time;
+            const rtRef = +bOptions.rt;
+            const c = price;
+            const { rt, er, sp } = findPhase(bTime, c, rtRef);
+            const d = rt.distance > rtRef ? sp : b;
+            const rr = ((c - b) / (a - b)) * 100;
+
+            state.progress = [0, checkPhase(rt.count, er, rr)];
+            progressChange(state.progress);
+
+            option.point = "C";
+            option.title = rr.toFixed(1);
+            option.color = "#FF9800";
+            params.tools.phase[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+            //
+            option.point = "D";
+            option.price = d;
+            option.title = (((d - c) / (b - c)) * 100).toFixed(1);
+            option.color = "#4CAF50";
+            params.tools.phase[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+            //
+            option.point = "X";
+            option.price = +(d + (d - c) * 0.5).toFixed(1);
+            option.title = ((d - c) * 0.5).toFixed(1);
+            option.color = "#2196F3";
+            option.draggable = false;
+            params.tools.phase[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+            //
+            option.point = "Y";
+            option.price = +(d + (d - c)).toFixed(1);
+            option.title = (d - c).toFixed(1);
+            option.color = "#673AB7";
+            option.draggable = false;
+            params.tools.phase[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+            //
+            option.point = "Z";
+            option.price = +(d + (d - c) * 2).toFixed(1);
+            option.title = ((d - c) * 2).toFixed(1);
+            option.color = "#9C27B0";
+            option.draggable = false;
+            params.tools.phase[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+            //
+            phaseToolRef.value.classList.remove("selected");
+        } else {
+            const aTime = +aOptions.time;
+            const b = price;
+            const { rt } = findPhase(aTime, b);
+            loadTimeRangeTool(rt, true, true);
+            //
+            option.point = "B";
+            option.title = "B";
+            option.color = "#009688";
+            option.time = time;
+            option.rt = rt.distance;
+            params.tools.phase[option.point] =
+                params.series.price.createPriceLine(option);
+            param.points.push(option.point);
+            param.data.push(mf.cloneDeep(option));
+        }
     } else {
         option.point = "A";
         option.title = "A";
         option.color = "#F44336";
+        option.time = time;
         params.tools.phase[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
         param.data.push(mf.cloneDeep(option));
     }
     store.dispatch("tradingDerivative/drawTools", param);
+}
+function findPhase(startTime, endPrice, rtRef = 0) {
+    let side = false,
+        resPoint = {},
+        rt = {},
+        er = 0,
+        sp;
+    params.data.price
+        .filter((item) => item.time >= startTime)
+        .every((item, index) => {
+            const price = item.value;
+            const time = item.time;
+            if (index == 0) {
+                side = endPrice >= price;
+                resPoint = { index, time, price, iD: 0, pD: 0 };
+                rt = { start: time, end: time, distance: 0, count: 0 };
+                sp = price;
+            }
+            if (cmp(price, side, endPrice)) return false;
+            //
+            if (cmp(price, side, resPoint.price)) {
+                if (resPoint.iD > rt.distance) {
+                    rt.start = resPoint.time;
+                    rt.end = time;
+                    rt.distance = resPoint.iD;
+                    if (rtRef > 0 && resPoint.iD > rtRef) rt.count++;
+                    er = +((endPrice - resPoint.price) / resPoint.pD).toFixed(
+                        1
+                    );
+                    sp = resPoint.price - resPoint.pD;
+                }
+                resPoint = { index, time, price, iD: 0, pD: 0 };
+            } else {
+                resPoint.iD = index - resPoint.index;
+                if (resPoint.price - price > resPoint.pD)
+                    resPoint.pD = resPoint.price - price;
+            }
+
+            return true;
+        });
+    return { rt, er, sp };
+}
+function checkPhase(rt, er, rr) {
+    if (rt < 1) return 3;
+    if (rr < 38.2) return 1;
+    if (er > 1) return 2;
+    if (rt > 1) return 4;
+    return 0;
 }
 function removePhaseTool(withServer = true) {
     if (withServer)
@@ -1426,11 +1502,13 @@ function removePhaseTool(withServer = true) {
         params.series.price.removePriceLine(params.tools.phase.A);
         if (mf.isSet(params.tools.phase.B)) {
             params.series.price.removePriceLine(params.tools.phase.B);
-            params.series.price.removePriceLine(params.tools.phase.C);
-            params.series.price.removePriceLine(params.tools.phase.D);
-            params.series.price.removePriceLine(params.tools.phase.X);
-            params.series.price.removePriceLine(params.tools.phase.Y);
-            params.series.price.removePriceLine(params.tools.phase.Z);
+            if (mf.isSet(params.tools.phase.C)) {
+                params.series.price.removePriceLine(params.tools.phase.C);
+                params.series.price.removePriceLine(params.tools.phase.D);
+                params.series.price.removePriceLine(params.tools.phase.X);
+                params.series.price.removePriceLine(params.tools.phase.Y);
+                params.series.price.removePriceLine(params.tools.phase.Z);
+            }
         }
     }
     initToolsParams(["phase"]);
@@ -1605,6 +1683,24 @@ function removeTimeRangeTool(withServer = true) {
         });
     params.series.timeRange.setData([]);
     initToolsParams(["tr"]);
+}
+function loadTimeRangeTool(data, onlyTime = false, isStore = false) {
+    if (onlyTime)
+        data = [
+            { time: data.start, value: 1, color: "lime" },
+            { time: data.end, value: 1, color: "OrangeRed" },
+        ];
+    // const timeRanges = mf.cloneDeep(data);
+    // console.log("timeRanges", timeRanges);
+    params.tools.timeRange = data;
+    params.series.timeRange.setData(data);
+    if (isStore)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: false,
+            name: "tr",
+            points: [0, 1],
+            data: data,
+        });
 }
 function patternToolClick() {
     state.showPatternContext = !state.showPatternContext;
@@ -2035,6 +2131,10 @@ function loginVps() {
 }
 function loginDnse() {
     bus.emit("checkPin", () => store.dispatch("tradingDerivative/loginDnse"));
+}
+function cmp(value1, side, value2, eq = false) {
+    if (side) return eq ? value1 >= value2 : value1 > value2;
+    else return eq ? value1 <= value2 : value1 < value2;
 }
 </script>
 <style lang="scss">
