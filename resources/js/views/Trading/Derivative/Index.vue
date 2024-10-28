@@ -1466,8 +1466,6 @@ function findPhase(startTime, endPrice, rtRef = 0) {
                 rt = { start: time, end: time, distance: 0, count: 0 };
                 sp = price;
             }
-            if (cmp(price, side, endPrice, true)) return false;
-            //
             if (cmp(price, side, resPoint.price)) {
                 if (resPoint.iD > rt.distance) {
                     rt.start = resPoint.time;
@@ -1485,8 +1483,8 @@ function findPhase(startTime, endPrice, rtRef = 0) {
                 if (cmp(resPoint.price - price, side, resPoint.pD))
                     resPoint.pD = resPoint.price - price;
             }
-
-            return true;
+            if (cmp(price, side, endPrice, true)) return false;
+            else return true;
         });
     return { rt, er, sp };
 }
