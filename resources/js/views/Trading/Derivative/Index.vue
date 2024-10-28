@@ -133,6 +133,7 @@
                         }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="progressToolClick"
+                        @contextmenu="progressToolContextmenu"
                     >
                         <ProgressContextMenu
                             v-show="state.showProgressContext"
@@ -1715,6 +1716,10 @@ function progressToolClick() {
     state.showProgressContext = !state.showProgressContext;
     state.showPatternContext = false;
     state.showLineContext = false;
+}
+function progressToolContextmenu() {
+    state.progress = [];
+    progressChange(state.progress);
 }
 function progressChange(e) {
     store.dispatch("tradingDerivative/drawTools", {
