@@ -744,7 +744,7 @@ function eventPriceLineDrag(e) {
                 //
                 if (lineOptions.point == "C") {
                     point = "C";
-                    C = (((c - b) / (a - b)) * 100).toFixed(1);
+                    C = rr.toFixed(1);
                     changeOptions = { title: C };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -1330,10 +1330,7 @@ function phaseToolClick(e) {
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-        removePhaseTool();
-    }
+    if (!selected) e.target.classList.add("selected");
 }
 function phaseToolContextmenu(e) {
     removePhaseTool();
@@ -1361,65 +1358,133 @@ function drawPhaseTool() {
         const a = +aOptions.price;
 
         if (mf.isSet(params.tools.phase.B)) {
-            const bOptions = params.tools.phase.B.options();
-            const b = +bOptions.price;
-            const bTime = +bOptions.time;
-            const rtRef = +bOptions.rt;
-            const c = price;
-            const { rt, er, sp } = findPhase(bTime, c, rtRef);
-            const d = rt.distance > rtRef ? sp : b;
-            const rr = ((c - b) / (a - b)) * 100;
+            if (mf.isSet(params.tools.phase.C)) {
+                let point, changeOptions;
+                const a = price;
+                const b = +params.tools.phase.B.options().price;
+                const c = +params.tools.phase.C.options().price;
+                const rr = ((c - b) / (a - b)) * 100;
+                //
+                point = "A";
+                changeOptions = { price, time };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
+                point = "B";
+                const mainPhase = findPhase(time, b);
+                const rtRef = mainPhase.rt.distance;
+                loadTimeRangeTool(mainPhase.rt, true, true);
+                changeOptions = { rt: rtRef };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
+                point = "C";
+                const C = rr.toFixed(1);
+                changeOptions = { title: C };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
+                point = "D";
+                const bTime = +params.tools.phase.B.options().time;
+                const { rt, er, sp } = findPhase(bTime, c, rtRef);
+                state.progress = [0, checkPhase(rt.count, er, rr)];
+                progressChange(state.progress);
+                const d = rt.distance > rtRef ? sp : b;
+                const D = (((d - c) / (b - c)) * 100).toFixed(1);
+                changeOptions = { price: d, title: D };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
+                point = "X";
+                changeOptions = {
+                    price: +(d + (d - c) * 0.5).toFixed(1),
+                    title: ((d - c) * 0.5).toFixed(1),
+                };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
+                point = "Y";
+                changeOptions = {
+                    price: +(d + (d - c)).toFixed(1),
+                    title: (d - c).toFixed(1),
+                };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
+                point = "Z";
+                changeOptions = {
+                    price: +(d + (d - c) * 2).toFixed(1),
+                    title: ((d - c) * 2).toFixed(1),
+                };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+            } else {
+                const bOptions = params.tools.phase.B.options();
+                const b = +bOptions.price;
+                const bTime = +bOptions.time;
+                const rtRef = +bOptions.rt;
+                const c = price;
+                const { rt, er, sp } = findPhase(bTime, c, rtRef);
+                const d = rt.distance > rtRef ? sp : b;
+                const rr = ((c - b) / (a - b)) * 100;
 
-            state.progress = [0, checkPhase(rt.count, er, rr)];
-            progressChange(state.progress);
+                state.progress = [0, checkPhase(rt.count, er, rr)];
+                progressChange(state.progress);
 
-            option.point = "C";
-            option.title = rr.toFixed(1);
-            option.color = "#FF9800";
-            params.tools.phase[option.point] =
-                params.series.price.createPriceLine(option);
-            param.points.push(option.point);
-            param.data.push(mf.cloneDeep(option));
-            //
-            option.point = "D";
-            option.price = d;
-            option.title = (((d - c) / (b - c)) * 100).toFixed(1);
-            option.color = "#4CAF50";
-            params.tools.phase[option.point] =
-                params.series.price.createPriceLine(option);
-            param.points.push(option.point);
-            param.data.push(mf.cloneDeep(option));
-            //
-            option.point = "X";
-            option.price = +(d + (d - c) * 0.5).toFixed(1);
-            option.title = ((d - c) * 0.5).toFixed(1);
-            option.color = "#2196F3";
-            option.draggable = false;
-            params.tools.phase[option.point] =
-                params.series.price.createPriceLine(option);
-            param.points.push(option.point);
-            param.data.push(mf.cloneDeep(option));
-            //
-            option.point = "Y";
-            option.price = +(d + (d - c)).toFixed(1);
-            option.title = (d - c).toFixed(1);
-            option.color = "#673AB7";
-            option.draggable = false;
-            params.tools.phase[option.point] =
-                params.series.price.createPriceLine(option);
-            param.points.push(option.point);
-            param.data.push(mf.cloneDeep(option));
-            //
-            option.point = "Z";
-            option.price = +(d + (d - c) * 2).toFixed(1);
-            option.title = ((d - c) * 2).toFixed(1);
-            option.color = "#9C27B0";
-            option.draggable = false;
-            params.tools.phase[option.point] =
-                params.series.price.createPriceLine(option);
-            param.points.push(option.point);
-            param.data.push(mf.cloneDeep(option));
-            //
+                option.point = "C";
+                option.title = rr.toFixed(1);
+                option.color = "#FF9800";
+                params.tools.phase[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
+                //
+                option.point = "D";
+                option.price = d;
+                option.title = (((d - c) / (b - c)) * 100).toFixed(1);
+                option.color = "#4CAF50";
+                params.tools.phase[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
+                //
+                option.point = "X";
+                option.price = +(d + (d - c) * 0.5).toFixed(1);
+                option.title = ((d - c) * 0.5).toFixed(1);
+                option.color = "#2196F3";
+                option.draggable = false;
+                params.tools.phase[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
+                //
+                option.point = "Y";
+                option.price = +(d + (d - c)).toFixed(1);
+                option.title = (d - c).toFixed(1);
+                option.color = "#673AB7";
+                option.draggable = false;
+                params.tools.phase[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
+                //
+                option.point = "Z";
+                option.price = +(d + (d - c) * 2).toFixed(1);
+                option.title = ((d - c) * 2).toFixed(1);
+                option.color = "#9C27B0";
+                option.draggable = false;
+                params.tools.phase[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
+            }
             phaseToolRef.value.classList.remove("selected");
         } else {
             const aTime = +aOptions.time;
