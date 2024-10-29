@@ -264,7 +264,7 @@ const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
         visible: true,
-        scaleMargins: { top: 0.1, bottom: 0.3 },
+        scaleMargins: { top: 0.1, bottom: 0.2 },
     },
     leftPriceScale: { visible: false },
     layout: {
@@ -398,7 +398,7 @@ onMounted(() => {
     });
     params.series.volume = params.chart.addLineSeries({
         priceScaleId: "volume",
-        scaleMargins: { top: 0.71, bottom: 0.01 },
+        scaleMargins: { top: 0.81, bottom: 0.01 },
         color: "#FFD700",
         lastValueVisible: false,
     });
