@@ -122,7 +122,7 @@
                         @contextmenu="resetTools"
                     ></div>
                     <div
-                        class="popup command far fa-list-ol"
+                        class="popup command far fa-badge-check"
                         :class="{
                             green:
                                 state.progress.length && state.progress[0] == 0,
