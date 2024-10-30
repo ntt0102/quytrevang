@@ -125,11 +125,9 @@
                         class="popup command far fa-list-ol"
                         :class="{
                             green:
-                                state.progress.length == 2 &&
-                                state.progress[1] == 0,
+                                state.progress.length && state.progress[0] == 0,
                             red:
-                                state.progress.length == 2 &&
-                                state.progress[1] != 0,
+                                state.progress.length && state.progress[0] != 0,
                         }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="progressToolClick"
@@ -719,12 +717,12 @@ function eventPriceLineDrag(e) {
                     points: [],
                     data: [],
                 };
-                let point, changeOptions, C, D;
+                let point, changeOptions, rr2;
                 const a = +params.tools.phase.A.options().price;
                 const b = +params.tools.phase.B.options().price;
                 const c = +params.tools.phase.C.options().price;
                 let d = +params.tools.phase.D.options().price;
-                const rr = ((c - b) / (a - b)) * 100;
+                const rr1 = ((c - b) / (a - b)) * 100;
                 //
                 if (lineOptions.point == "A") {
                     point = "A";
@@ -744,8 +742,7 @@ function eventPriceLineDrag(e) {
                 //
                 if (lineOptions.point == "C") {
                     point = "C";
-                    C = rr.toFixed(1);
-                    changeOptions = { title: C };
+                    changeOptions = { title: rr1.toFixed(1) };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
@@ -753,18 +750,19 @@ function eventPriceLineDrag(e) {
                 //
                 point = "D";
                 if (lineOptions.point == point) {
-                    D = (((d - c) / (b - c)) * 100).toFixed(1);
-                    changeOptions = { title: D };
+                    rr2 = ((d - c) / (b - c)) * 100;
+                    changeOptions = { title: rr2.toFixed(1) };
                 } else {
                     const bTime = +params.tools.phase.B.options().time;
                     const rtRef = +params.tools.phase.B.options().rt;
                     const { rt, er, sp } = findPhase(bTime, c, rtRef);
-                    state.progress = [0, checkPhase(rt.count, er, rr)];
-                    progressChange(state.progress);
                     d = rt.distance > rtRef ? sp : b;
-                    D = (((d - c) / (b - c)) * 100).toFixed(1);
-                    changeOptions = { price: d, title: D };
+                    rr2 = ((d - c) / (b - c)) * 100;
+                    changeOptions = { price: d, title: rr2.toFixed(1) };
+                    state.progress = [checkPhase(rt.count, er, rr1, rr2)];
+                    progressChange(state.progress);
                 }
+
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
@@ -1363,7 +1361,7 @@ function drawPhaseTool() {
                 const a = price;
                 const b = +params.tools.phase.B.options().price;
                 const c = +params.tools.phase.C.options().price;
-                const rr = ((c - b) / (a - b)) * 100;
+                const rr1 = ((c - b) / (a - b)) * 100;
                 //
                 point = "A";
                 changeOptions = { price, time };
@@ -1381,8 +1379,7 @@ function drawPhaseTool() {
                 param.data.push(params.tools.phase[point].options());
                 //
                 point = "C";
-                const C = rr.toFixed(1);
-                changeOptions = { title: C };
+                changeOptions = { title: rr1.toFixed(1) };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
@@ -1390,11 +1387,11 @@ function drawPhaseTool() {
                 point = "D";
                 const bTime = +params.tools.phase.B.options().time;
                 const { rt, er, sp } = findPhase(bTime, c, rtRef);
-                state.progress = [0, checkPhase(rt.count, er, rr)];
-                progressChange(state.progress);
                 const d = rt.distance > rtRef ? sp : b;
-                const D = (((d - c) / (b - c)) * 100).toFixed(1);
-                changeOptions = { price: d, title: D };
+                const rr2 = ((d - c) / (b - c)) * 100;
+                changeOptions = { price: d, title: rr2.toFixed(1) };
+                state.progress = [checkPhase(rt.count, er, rr1, rr2)];
+                progressChange(state.progress);
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
@@ -1433,13 +1430,14 @@ function drawPhaseTool() {
                 const c = price;
                 const { rt, er, sp } = findPhase(bTime, c, rtRef);
                 const d = rt.distance > rtRef ? sp : b;
-                const rr = ((c - b) / (a - b)) * 100;
+                const rr1 = ((c - b) / (a - b)) * 100;
+                const rr2 = ((d - c) / (b - c)) * 100;
 
-                state.progress = [0, checkPhase(rt.count, er, rr)];
+                state.progress = [checkPhase(rt.count, er, rr1, rr2)];
                 progressChange(state.progress);
 
                 option.point = "C";
-                option.title = rr.toFixed(1);
+                option.title = rr1.toFixed(1);
                 option.color = "#FF9800";
                 params.tools.phase[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1448,7 +1446,7 @@ function drawPhaseTool() {
                 //
                 option.point = "D";
                 option.price = d;
-                option.title = (((d - c) / (b - c)) * 100).toFixed(1);
+                option.title = rr2.toFixed(1);
                 option.color = "#4CAF50";
                 params.tools.phase[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1569,11 +1567,12 @@ function findPhase(startTime, endPrice, rtRef = 0) {
         });
     return { rt, er, sp };
 }
-function checkPhase(rt, er, rr) {
+function checkPhase(rt, er, rr1, rr2) {
     if (rt < 1) return 4;
-    if (rr < 38.2) return 1;
+    if (rr1 < 38.2) return 1;
     if (er > 1) return 2;
     if (rt > 1) return 3;
+    if (rr2 < 50) return 5;
     return 0;
 }
 function removePhaseTool(withServer = true) {
