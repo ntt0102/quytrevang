@@ -135,7 +135,7 @@
                         }`"
                         :title="$t('trading.derivative.progressTool')"
                         @click="progressToolClick"
-                        @contextmenu="progressToolContextmenu"
+                        @contextmenu="removeProgressTool"
                     >
                         <ProgressContextMenu
                             v-show="state.showProgressContext"
@@ -205,6 +205,7 @@
                         class="cancel-order command far fa-trash-alt"
                         :title="$t('trading.derivative.cancelTool')"
                         @click="cancelOrderClick"
+                        @contextmenu="resetTools"
                     ></div>
                 </div>
                 <div>
@@ -1336,6 +1337,8 @@ function phaseToolClick(e) {
 }
 function phaseToolContextmenu(e) {
     removePhaseTool();
+    removeTimeRangeTool();
+    removeProgressTool();
     e.target.classList.remove("selected");
 }
 function drawPhaseTool() {
@@ -1771,8 +1774,6 @@ function loadTimeRangeTool(data, onlyTime = false, isStore = false) {
             { time: data.start, value: 1, color: "lime" },
             { time: data.end, value: 1, color: "OrangeRed" },
         ];
-    // const timeRanges = mf.cloneDeep(data);
-    // console.log("timeRanges", timeRanges);
     params.tools.timeRange = data;
     params.series.timeRange.setData(data);
     if (isStore)
@@ -1793,7 +1794,7 @@ function progressToolClick() {
     state.showPatternContext = false;
     state.showLineContext = false;
 }
-function progressToolContextmenu() {
+function removeProgressTool() {
     state.progress = [];
     progressChange(state.progress);
 }
