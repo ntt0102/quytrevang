@@ -721,24 +721,43 @@ function eventPriceLineDrag(e) {
                     points: [],
                     data: [],
                 };
-                let point, changeOptions, rr2;
+                let point, changeOptions;
                 const a = +params.tools.phase.A.options().price;
                 const b = +params.tools.phase.B.options().price;
                 const c = +params.tools.phase.C.options().price;
-                let d = +params.tools.phase.D.options().price;
                 const rr1 = ((c - b) / (a - b)) * 100;
+                const aTime = +params.tools.phase.A.options().time;
+                const phase1 = findPhase(aTime, b);
+                const bTime = +params.tools.phase.B.options().time;
+                const rtRef = phase1.rt.distance;
+                const phase2 = findPhase(bTime, c, rtRef);
+                const d =
+                    lineOptions.point == "D"
+                        ? +params.tools.phase.D.options().price
+                        : phase2.rt.distance > rtRef
+                        ? phase2.sp
+                        : b;
+                const rr2 = ((d - c) / (b - c)) * 100;
+                loadTimeRangeTool(phase1.rt, true, true);
+                state.progress = [
+                    checkPhase(phase2.rt.count, phase2.er, rr1, rr2),
+                ];
+                progressChange(state.progress);
                 //
-                if (lineOptions.point == "A") {
+                if (["A", "B"].includes(lineOptions.point)) {
                     point = "A";
+                    changeOptions = { title: phase1.er };
+                    params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                 }
-                if (["A", "B"].includes(lineOptions.point)) {
+                //
+                if (["A", "B", "C"].includes(lineOptions.point)) {
                     point = "B";
-                    const aTime = +params.tools.phase.A.options().time;
-                    const { rt } = findPhase(aTime, b);
-                    loadTimeRangeTool(rt, true, true);
-                    changeOptions = { rt: rt.distance };
+                    changeOptions = {
+                        rt: phase1.rt.distance,
+                        title: phase2.er,
+                    };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
@@ -753,20 +772,9 @@ function eventPriceLineDrag(e) {
                 }
                 //
                 point = "D";
-                if (lineOptions.point == point) {
-                    rr2 = ((d - c) / (b - c)) * 100;
+                if (lineOptions.point == point)
                     changeOptions = { title: rr2.toFixed(1) };
-                } else {
-                    const bTime = +params.tools.phase.B.options().time;
-                    const rtRef = +params.tools.phase.B.options().rt;
-                    const { rt, er, sp } = findPhase(bTime, c, rtRef);
-                    d = rt.distance > rtRef ? sp : b;
-                    rr2 = ((d - c) / (b - c)) * 100;
-                    changeOptions = { price: d, title: rr2.toFixed(1) };
-                    state.progress = [checkPhase(rt.count, er, rr1, rr2)];
-                    progressChange(state.progress);
-                }
-
+                else changeOptions = { price: d, title: rr2.toFixed(1) };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
@@ -1368,17 +1376,25 @@ function drawPhaseTool() {
                 const b = +params.tools.phase.B.options().price;
                 const c = +params.tools.phase.C.options().price;
                 const rr1 = ((c - b) / (a - b)) * 100;
+                const phase1 = findPhase(time, b);
+                const rtRef = phase1.rt.distance;
+                const bTime = +params.tools.phase.B.options().time;
+                const phase2 = findPhase(bTime, c, rtRef);
+                const d = phase2.rt.distance > rtRef ? phase2.sp : b;
+                const rr2 = ((d - c) / (b - c)) * 100;
+                loadTimeRangeTool(phase1.rt, true, true);
+                state.progress = [
+                    checkPhase(phase2.rt.count, phase2.er, rr1, rr2),
+                ];
+                progressChange(state.progress);
                 //
                 point = "A";
-                changeOptions = { price, time };
+                changeOptions = { price, time, title: phase1.er };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
                 //
                 point = "B";
-                const mainPhase = findPhase(time, b);
-                const rtRef = mainPhase.rt.distance;
-                loadTimeRangeTool(mainPhase.rt, true, true);
                 changeOptions = { rt: rtRef };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1391,13 +1407,7 @@ function drawPhaseTool() {
                 param.data.push(params.tools.phase[point].options());
                 //
                 point = "D";
-                const bTime = +params.tools.phase.B.options().time;
-                const { rt, er, sp } = findPhase(bTime, c, rtRef);
-                const d = rt.distance > rtRef ? sp : b;
-                const rr2 = ((d - c) / (b - c)) * 100;
                 changeOptions = { price: d, title: rr2.toFixed(1) };
-                state.progress = [checkPhase(rt.count, er, rr1, rr2)];
-                progressChange(state.progress);
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
@@ -1442,6 +1452,11 @@ function drawPhaseTool() {
                 state.progress = [checkPhase(rt.count, er, rr1, rr2)];
                 progressChange(state.progress);
 
+                const point = "B";
+                params.tools.phase[point].applyOptions({ title: er });
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
+                //
                 option.point = "C";
                 option.title = rr1.toFixed(1);
                 option.color = "#FF9800";
@@ -1492,9 +1507,13 @@ function drawPhaseTool() {
             phaseToolRef.value.classList.remove("selected");
         } else {
             const aTime = +aOptions.time;
-            const b = price;
-            const { rt } = findPhase(aTime, b);
+            const { rt, er } = findPhase(aTime, price);
             loadTimeRangeTool(rt, true, true);
+            //
+            const point = "A";
+            params.tools.phase[point].applyOptions({ title: er });
+            param.points.push(point);
+            param.data.push(params.tools.phase[point].options());
             //
             option.point = "B";
             option.title = "B";
