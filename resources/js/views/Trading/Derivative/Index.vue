@@ -1522,31 +1522,47 @@ function findPhase(startTime, endPrice, rtRef = 0) {
         sp;
     params.data.price
         .filter((item) => item.time >= startTime)
-        .every((item, index) => {
+        .every((item, priceIndex) => {
             const price = item.value;
             const time = item.time;
-            if (index == 0) {
+            const index = getTimeIndex(time);
+            if (priceIndex == 0) {
                 side = endPrice >= price;
-                resPoint = { index, time, price, iD: 0, pD: 0 };
+                resPoint = {
+                    time,
+                    price,
+                    start: index,
+                    end: index,
+                    margin: 0,
+                };
                 rt = { start: time, end: time, distance: 0, count: 0 };
                 sp = price;
             }
             if (cmp(price, side, resPoint.price)) {
-                if (resPoint.iD > rt.distance) {
+                const distance = resPoint.end - resPoint.start;
+                if (distance > rt.distance) {
                     rt.start = resPoint.time;
                     rt.end = time;
-                    rt.distance = resPoint.iD;
-                    if (rtRef > 0 && resPoint.iD > rtRef) rt.count++;
-                    er = +((endPrice - resPoint.price) / resPoint.pD).toFixed(
-                        1
-                    );
-                    sp = resPoint.price - resPoint.pD;
+                    rt.distance = distance;
+                    if (rtRef > 0 && distance > rtRef) rt.count++;
+                    er = +(
+                        (endPrice - resPoint.price) /
+                        resPoint.margin
+                    ).toFixed(1);
+                    sp = resPoint.price - resPoint.margin;
                 }
-                resPoint = { index, time, price, iD: 0, pD: 0 };
+                resPoint = {
+                    time,
+                    price,
+                    start: index,
+                    end: index,
+                    margin: 0,
+                };
             } else {
-                resPoint.iD = index - resPoint.index;
-                if (cmp(resPoint.price - price, side, resPoint.pD))
-                    resPoint.pD = resPoint.price - price;
+                resPoint.end = index;
+                const margin = +(resPoint.price - price).toFixed(1);
+                if (cmp(margin, side, resPoint.margin))
+                    resPoint.margin = margin;
             }
             if (cmp(price, side, endPrice, true)) return false;
             else return true;
@@ -1716,15 +1732,9 @@ function drawTimeRangeTool() {
             timeRangeToolRef.value.classList.remove("selected");
             break;
         default:
-            const index0 = params.data.whitespace.findIndex(
-                (item) => item.time == params.tools.timeRange[0].time
-            );
-            const index1 = params.data.whitespace.findIndex(
-                (item) => item.time == params.tools.timeRange[1].time
-            );
-            const index2 = params.data.whitespace.findIndex(
-                (item) => item.time == option.time
-            );
+            const index0 = getTimeIndex(params.tools.timeRange[0].time);
+            const index1 = getTimeIndex(params.tools.timeRange[1].time);
+            const index2 = getTimeIndex(option.time);
             const index3 = index2 + (index1 - index0);
 
             option.color = "lime";
@@ -2207,6 +2217,9 @@ function loginDnse() {
 function cmp(value1, side, value2, eq = false) {
     if (side) return eq ? value1 >= value2 : value1 > value2;
     else return eq ? value1 <= value2 : value1 < value2;
+}
+function getTimeIndex(time) {
+    return params.data.whitespace.findIndex((item) => item.time == time);
 }
 </script>
 <style lang="scss">
