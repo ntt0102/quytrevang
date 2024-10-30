@@ -205,7 +205,6 @@
                         class="cancel-order command far fa-trash-alt"
                         :title="$t('trading.derivative.cancelTool')"
                         @click="cancelOrderClick"
-                        @contextmenu="resetTools"
                     ></div>
                 </div>
                 <div>
@@ -2019,7 +2018,7 @@ function cancelOrderClick() {
                     }
                 });
         }
-    }
+    } else resetTools();
 }
 function scanOrder(lastPrice) {
     if (mf.isSet(params.tools.order.entry.line)) {
