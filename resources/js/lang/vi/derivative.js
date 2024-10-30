@@ -5,6 +5,10 @@ export default {
             items: "<u>Entry</u>: Kháng cự 2 </br><u>Target</u>: x1 hoặc x2 nếu có nền",
         },
         {
+            name: "Thời gian hồi phục nhỏ",
+            items: "<u>Entry</u>: Vượt kháng cự và tạo nền </br><u>Target</u>: x1",
+        },
+        {
             name: "Tỷ lệ điều chỉnh < 38.2",
             items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x2",
         },
@@ -15,10 +19,6 @@ export default {
         {
             name: "Thời gian hồi phục lớn",
             items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x0.5",
-        },
-        {
-            name: "Thời gian hồi phục nhỏ",
-            items: "<u>Entry</u>: Vượt kháng cự và tạo nền </br><u>Target</u>: x1",
         },
         {
             name: "Tỷ lệ kháng cự 2 < 50",

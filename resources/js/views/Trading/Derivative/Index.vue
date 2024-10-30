@@ -1568,10 +1568,10 @@ function findPhase(startTime, endPrice, rtRef = 0) {
     return { rt, er, sp };
 }
 function checkPhase(rt, er, rr1, rr2) {
-    if (rt < 1) return 4;
-    if (rr1 < 38.2) return 1;
-    if (er > 1) return 2;
-    if (rt > 1) return 3;
+    if (rt < 1) return 1;
+    if (rr1 < 38.2) return 2;
+    if (er > 1) return 3;
+    if (rt > 1) return 4;
     if (rr2 < 50) return 5;
     return 0;
 }
