@@ -134,8 +134,8 @@
                                 : ''
                         }`"
                         :title="$t('trading.derivative.progressTool')"
-                        @click="progressToolClick"
-                        @contextmenu="removeProgressTool"
+                        @click="scanPhase"
+                        @contextmenu="showProgressToolPopup"
                     >
                         <ProgressContextMenu
                             v-show="state.showProgressContext"
@@ -438,8 +438,12 @@ function eventChartClick(e) {
         drawTargetTool();
     else if (timeRangeToolRef.value.classList.contains("selected"))
         drawTimeRangeTool();
-    else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
-    else if (phaseToolRef.value.classList.contains("selected")) drawPhaseTool();
+    // else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
+    else if (rrToolRef.value.classList.contains("selected")) {
+        scanPhase(params.crosshair.time);
+        rrToolRef.value.classList.remove("selected");
+    } else if (phaseToolRef.value.classList.contains("selected"))
+        drawPhaseTool();
 }
 function eventChartContextmenu(e) {
     toggleOrderButton(true);
@@ -1621,6 +1625,58 @@ function removePhaseTool(withServer = true) {
     }
     initToolsParams(["phase"]);
 }
+function scanPhase(time) {
+    const data = params.data.price.filter((item) => item.time <= time);
+    let side, aPoint, bPoint, cPoint, dPoint;
+    for (let i = data.length - 1; i >= 0; i--) {
+        const price = data[i].value;
+        const time = data[i].time;
+        const index = getTimeIndex(time);
+        if (i == data.length - 1) {
+            dPoint = { index, time, price };
+            cPoint = mf.cloneDeep(dPoint);
+            bPoint = mf.cloneDeep(dPoint);
+            aPoint = mf.cloneDeep(dPoint);
+        }
+        if (side == undefined) {
+            if (price == dPoint.price) continue;
+            side = dPoint.price > price;
+        }
+        if (
+            !cmp(bPoint.price, side, dPoint.price) &&
+            cmp(price, !side, cPoint.price)
+        ) {
+            cPoint = { index, time, price };
+            console.log("cPoint", cPoint.price);
+        }
+        if (cmp(price, side, bPoint.price)) {
+            if (cmp(aPoint.price, !side, cPoint.price)) {
+                dPoint = mf.cloneDeep(cPoint);
+                cPoint = mf.cloneDeep(bPoint);
+                bPoint = mf.cloneDeep(aPoint);
+                aPoint = { index, time, price };
+                side = !side;
+            } else {
+                bPoint = { index, time, price };
+                console.log("bPoint", bPoint.price);
+            }
+        }
+        if (cmp(price, !side, aPoint.price)) {
+            aPoint = { index, time, price };
+            console.log("aPoint", cPoint.price);
+        }
+        if (
+            dPoint.index > cPoint.index &&
+            cPoint.index > bPoint.index &&
+            bPoint.index > aPoint.index &&
+            aPoint.index - index > cPoint.index - bPoint.index &&
+            Math.abs(bPoint.price - cPoint.price) >= 2
+        )
+            break;
+    }
+    console.log("scanPhase", [side, aPoint, bPoint, cPoint, dPoint]);
+    loadTimeRangeTool({ start: aPoint.time, end: dPoint.time }, true);
+}
 function targetToolClick(e) {
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
@@ -1807,7 +1863,7 @@ function patternToolClick() {
     state.showProgressContext = false;
     state.showLineContext = false;
 }
-function progressToolClick() {
+function showProgressToolPopup() {
     state.showProgressContext = !state.showProgressContext;
     state.showPatternContext = false;
     state.showLineContext = false;
