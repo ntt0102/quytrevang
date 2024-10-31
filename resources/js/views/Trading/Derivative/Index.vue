@@ -55,9 +55,12 @@
                 >
                     <div
                         ref="connectionRef"
-                        :class="`command far fa-link-simple${
-                            status.connection ? '' : '-slash'
-                        }`"
+                        class="command far"
+                        :class="{
+                            'fa-link-simple': status.connection,
+                            'fa-link-simple-slash': !status.connection,
+                            blink: state.isSocketWarning,
+                        }"
                         :title="$t('trading.derivative.connection')"
                         @click="
                             () => $store.dispatch('tradingDerivative/getStatus')
@@ -93,11 +96,12 @@
                         @contextmenu="() => resetChart(true)"
                     >
                         <i
-                            :class="`far fa-sync-alt ${
-                                $store.state.tradingDerivative.isChartLoading
-                                    ? 'fa-spin'
-                                    : ''
-                            }`"
+                            class="far fa-sync-alt"
+                            :class="{
+                                'fa-spin':
+                                    $store.state.tradingDerivative
+                                        .isChartLoading,
+                            }"
                         ></i>
                     </div>
                 </div>
@@ -108,9 +112,11 @@
                 >
                     <div
                         ref="fullscreenToolRef"
-                        :class="`command far fa-${
-                            state.isFullscreen ? 'compress' : 'expand'
-                        }`"
+                        class="command far"
+                        :class="{
+                            'fa-compress': state.isFullscreen,
+                            'fa-expand': !state.isFullscreen,
+                        }"
                         :title="$t('trading.derivative.fullscreen')"
                         @click="toggleFullscreen"
                     ></div>
@@ -134,8 +140,7 @@
                                 : ''
                         }`"
                         :title="$t('trading.derivative.progressTool')"
-                        @click="scanPhase"
-                        @contextmenu="showProgressToolPopup"
+                        @click="showProgressToolPopup"
                     >
                         <ProgressContextMenu
                             v-show="state.showProgressContext"
@@ -144,6 +149,14 @@
                             @change="progressChange"
                         ></ProgressContextMenu>
                     </div>
+                    <div
+                        ref="autoScanToolRef"
+                        class="command far fa-bolt-auto"
+                        :class="{ blink: state.isAutoScan }"
+                        :title="$t('trading.derivative.autoScanTool')"
+                        @click="autoScanToolClick"
+                        @contextmenu="autoScanToolContextmenu"
+                    ></div>
                     <div
                         v-show="false"
                         class="popup command far fa-heart-rate"
@@ -193,6 +206,7 @@
                         @contextmenu="targetToolContextmenu"
                     ></div>
                     <div
+                        v-show="false"
                         ref="rrToolRef"
                         class="command far fa-percent"
                         :title="$t('trading.derivative.rrTool')"
@@ -203,6 +217,7 @@
                         v-show="showCancelOrder"
                         ref="cancelOrderRef"
                         class="cancel-order command far fa-trash-alt"
+                        :class="{ blink: state.isOrderWarning }"
                         :title="$t('trading.derivative.cancelTool')"
                         @click="cancelOrderClick"
                     ></div>
@@ -323,6 +338,7 @@ const rrToolRef = ref(null);
 const phaseToolRef = ref(null);
 const targetToolRef = ref(null);
 const timeRangeToolRef = ref(null);
+const autoScanToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
@@ -351,6 +367,9 @@ const state = reactive({
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: moment().format("HH:mm:ss"),
     isFullscreen: false,
+    isSocketWarning: false,
+    isOrderWarning: false,
+    isAutoScan: false,
     lineColor: "#F44336",
     lineTitle: "",
     progress: [],
@@ -377,8 +396,11 @@ store.dispatch("tradingDerivative/initChart").then(() => {
 
 params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
-    if (inSession()) store.dispatch("tradingDerivative/getStatus");
-    else clearInterval(params.interval60);
+    if (inSession()) {
+        store.dispatch("tradingDerivative/getStatus");
+        if (state.isAutoScan) runAutoScan(true);
+        console.log("lặp lại 1 phút");
+    } else clearInterval(params.interval60);
 }, 60000);
 
 onMounted(() => {
@@ -438,12 +460,10 @@ function eventChartClick(e) {
         drawTargetTool();
     else if (timeRangeToolRef.value.classList.contains("selected"))
         drawTimeRangeTool();
-    // else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
-    else if (rrToolRef.value.classList.contains("selected")) {
-        scanPhase(params.crosshair.time);
-        rrToolRef.value.classList.remove("selected");
-    } else if (phaseToolRef.value.classList.contains("selected"))
-        drawPhaseTool();
+    else if (autoScanToolRef.value.classList.contains("selected"))
+        runAutoScan();
+    else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
+    else if (phaseToolRef.value.classList.contains("selected")) drawPhaseTool();
 }
 function eventChartContextmenu(e) {
     toggleOrderButton(true);
@@ -1018,12 +1038,12 @@ function connectSocket() {
     params.websocket.onclose = (e) => {
         console.log("websocket-close");
         if (!params.socketStop && inSession()) {
-            blinkSocketStatus(true);
+            state.isSocketWarning = true;
             connectSocket();
         }
     };
     params.websocket.onmessage = (e) => {
-        blinkSocketStatus(false);
+        state.isSocketWarning = false;
         const data = parseSocketMessage(e.data);
         data.forEach((item) => {
             if (!item) return false;
@@ -1065,7 +1085,7 @@ function intervalHandler() {
     if (inSession()) {
         if (!!status.value.position) {
             if (params.currentSeconds > TIME.ATC - 5 * 60) {
-                blinkCancelOrderButton();
+                state.isOrderWarning = true;
                 if (
                     params.currentSeconds > TIME.ATC - 15 &&
                     mf.isSet(params.tools.order.tp.line)
@@ -1093,19 +1113,6 @@ function intervalHandler() {
             connectSocket();
     }
     state.clock = moment().format("HH:mm:ss");
-}
-function blinkCancelOrderButton() {
-    if (!cancelOrderRef.value.classList.contains("blink"))
-        cancelOrderRef.value.classList.add("blink");
-}
-function blinkSocketStatus(status) {
-    if (status) {
-        if (!connectionRef.value.classList.contains("blink"))
-            connectionRef.value.classList.add("blink");
-    } else {
-        if (connectionRef.value.classList.contains("blink"))
-            connectionRef.value.classList.remove("blink");
-    }
 }
 function drawOrderLine(kinds) {
     const TYPE = "order";
@@ -1541,6 +1548,104 @@ function drawPhaseTool() {
     }
     store.dispatch("tradingDerivative/drawTools", param);
 }
+function loadPhase({ aPoint, bPoint, cPoint }) {
+    const TYPE = "phase";
+    let option = {
+        lineType: TYPE,
+        lineWidth: 1,
+        lineStyle: 1,
+        draggable: true,
+    };
+    let param = {
+        isRemove: false,
+        name: TYPE,
+        points: [],
+        data: [],
+    };
+    const a = aPoint.price;
+    const b = bPoint.price;
+    const c = cPoint.price;
+    const rr1 = ((c - b) / (a - b)) * 100;
+    const phase1 = findPhase(aPoint.time, b);
+    const rtRef = phase1.rt.distance;
+    const phase2 = findPhase(bPoint.time, c, rtRef);
+    const d = phase2.rt.distance > rtRef ? phase2.sp : b;
+    const rr2 = ((d - c) / (b - c)) * 100;
+    loadTimeRangeTool(phase1.rt, true, true);
+    state.progress = [checkPhase(phase2.rt.count, phase2.er, rr1, rr2)];
+    progressChange(state.progress);
+    //
+    option.point = "A";
+    option.title = phase1.er;
+    option.color = "#F44336";
+    option.price = a;
+    option.time = aPoint.time;
+    params.tools.phase[option.point] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.point);
+    param.data.push(mf.cloneDeep(option));
+    //
+    option.point = "B";
+    option.title = phase2.er;
+    option.color = "#009688";
+    option.price = b;
+    option.time = cPoint.time;
+    option.rt = phase1.rt.distance;
+    params.tools.phase[option.point] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.point);
+    param.data.push(mf.cloneDeep(option));
+    //
+    option.point = "C";
+    option.price = c;
+    option.title = rr1.toFixed(1);
+    option.color = "#FF9800";
+    params.tools.phase[option.point] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.point);
+    param.data.push(mf.cloneDeep(option));
+    //
+    option.point = "D";
+    option.price = d;
+    option.title = rr2.toFixed(1);
+    option.color = "#4CAF50";
+    params.tools.phase[option.point] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.point);
+    param.data.push(mf.cloneDeep(option));
+    //
+    option.point = "X";
+    option.price = +(d + (d - c) * 0.5).toFixed(1);
+    option.title = ((d - c) * 0.5).toFixed(1);
+    option.color = "#2196F3";
+    option.draggable = false;
+    params.tools.phase[option.point] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.point);
+    param.data.push(mf.cloneDeep(option));
+    //
+    option.point = "Y";
+    option.price = +(d + (d - c)).toFixed(1);
+    option.title = (d - c).toFixed(1);
+    option.color = "#673AB7";
+    option.draggable = false;
+    params.tools.phase[option.point] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.point);
+    param.data.push(mf.cloneDeep(option));
+    //
+    option.point = "Z";
+    option.price = +(d + (d - c) * 2).toFixed(1);
+    option.title = ((d - c) * 2).toFixed(1);
+    option.color = "#9C27B0";
+    option.draggable = false;
+    params.tools.phase[option.point] =
+        params.series.price.createPriceLine(option);
+    param.points.push(option.point);
+    param.data.push(mf.cloneDeep(option));
+    //
+    store.dispatch("tradingDerivative/drawTools", param);
+}
 function findPhase(startTime, endPrice, rtRef = 0) {
     let side = false,
         resPoint = {},
@@ -1624,58 +1729,6 @@ function removePhaseTool(withServer = true) {
         }
     }
     initToolsParams(["phase"]);
-}
-function scanPhase(time) {
-    const data = params.data.price.filter((item) => item.time <= time);
-    let side, aPoint, bPoint, cPoint, dPoint;
-    for (let i = data.length - 1; i >= 0; i--) {
-        const price = data[i].value;
-        const time = data[i].time;
-        const index = getTimeIndex(time);
-        if (i == data.length - 1) {
-            dPoint = { index, time, price };
-            cPoint = mf.cloneDeep(dPoint);
-            bPoint = mf.cloneDeep(dPoint);
-            aPoint = mf.cloneDeep(dPoint);
-        }
-        if (side == undefined) {
-            if (price == dPoint.price) continue;
-            side = dPoint.price > price;
-        }
-        if (
-            !cmp(bPoint.price, side, dPoint.price) &&
-            cmp(price, !side, cPoint.price)
-        ) {
-            cPoint = { index, time, price };
-            console.log("cPoint", cPoint.price);
-        }
-        if (cmp(price, side, bPoint.price)) {
-            if (cmp(aPoint.price, !side, cPoint.price)) {
-                dPoint = mf.cloneDeep(cPoint);
-                cPoint = mf.cloneDeep(bPoint);
-                bPoint = mf.cloneDeep(aPoint);
-                aPoint = { index, time, price };
-                side = !side;
-            } else {
-                bPoint = { index, time, price };
-                console.log("bPoint", bPoint.price);
-            }
-        }
-        if (cmp(price, !side, aPoint.price)) {
-            aPoint = { index, time, price };
-            console.log("aPoint", cPoint.price);
-        }
-        if (
-            dPoint.index > cPoint.index &&
-            cPoint.index > bPoint.index &&
-            bPoint.index > aPoint.index &&
-            aPoint.index - index > cPoint.index - bPoint.index &&
-            Math.abs(bPoint.price - cPoint.price) >= 2
-        )
-            break;
-    }
-    console.log("scanPhase", [side, aPoint, bPoint, cPoint, dPoint]);
-    loadTimeRangeTool({ start: aPoint.time, end: dPoint.time }, true);
 }
 function targetToolClick(e) {
     state.showLineContext = false;
@@ -1774,6 +1827,73 @@ function removeTargetTool(withServer = true) {
         }
     }
     initToolsParams(["target"]);
+}
+function autoScanToolClick(e) {
+    state.showLineContext = false;
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+    }
+}
+function autoScanToolContextmenu(e) {
+    state.isAutoScan = !state.isAutoScan;
+    e.target.classList.remove("selected");
+}
+function runAutoScan(isAuto = false) {
+    autoScanToolRef.value.classList.remove("selected");
+    const data = isAuto
+        ? params.data.price
+        : params.data.price.filter(
+              (item) => item.time <= params.crosshair.time
+          );
+    const points = scanPhase(data);
+    removePhaseTool();
+    loadPhase(points);
+}
+function scanPhase(data) {
+    let side, aPoint, bPoint, cPoint, dPoint;
+    for (let i = data.length - 1; i >= 0; i--) {
+        const price = data[i].value;
+        const time = data[i].time;
+        const index = getTimeIndex(time);
+        if (i == data.length - 1) {
+            dPoint = { index, time, price };
+            cPoint = mf.cloneDeep(dPoint);
+            bPoint = mf.cloneDeep(dPoint);
+            aPoint = mf.cloneDeep(dPoint);
+        }
+        if (side == undefined) {
+            if (price == dPoint.price) continue;
+            side = dPoint.price > price;
+        }
+        if (
+            !cmp(bPoint.price, side, dPoint.price) &&
+            cmp(price, !side, cPoint.price)
+        )
+            cPoint = { index, time, price };
+        if (cmp(price, side, bPoint.price)) {
+            if (cmp(aPoint.price, !side, cPoint.price)) {
+                dPoint = mf.cloneDeep(cPoint);
+                cPoint = mf.cloneDeep(bPoint);
+                bPoint = mf.cloneDeep(aPoint);
+                aPoint = { index, time, price };
+                side = !side;
+            } else bPoint = { index, time, price };
+        }
+        if (cmp(price, !side, aPoint.price)) aPoint = { index, time, price };
+        if (
+            dPoint.index > cPoint.index &&
+            cPoint.index > bPoint.index &&
+            bPoint.index > aPoint.index &&
+            aPoint.index - index > cPoint.index - bPoint.index &&
+            Math.abs(bPoint.price - cPoint.price) >= 2
+        )
+            break;
+    }
+    return { aPoint, bPoint, cPoint };
 }
 function timeRangeToolClick(e) {
     state.showLineContext = false;
