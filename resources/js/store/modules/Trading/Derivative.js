@@ -37,6 +37,18 @@ const actions = {
                 });
         });
     },
+    setAutoScan({ commit, dispatch, getters, state, rootGetters }, autoScan) {
+        commit("setAutoScan", autoScan);
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "trading/derivative/set-auto-scan",
+                    { autoScan },
+                    { noLoading: true }
+                )
+                .then((response) => resolve());
+        });
+    },
     getTools({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
@@ -175,7 +187,9 @@ const mutations = {
     setInitChart(state, data) {
         state.config = data.config;
         state.status = data.status;
-        // state.tools = data.tools;
+    },
+    setAutoScan(state, autoScan) {
+        state.config.autoScan = autoScan;
     },
     setTools(state, data) {
         state.tools = data;

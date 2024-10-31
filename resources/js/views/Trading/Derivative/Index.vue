@@ -152,7 +152,7 @@
                     <div
                         ref="autoScanToolRef"
                         class="command far fa-bolt-auto"
-                        :class="{ blink: state.isAutoScan }"
+                        :class="{ blink: config.autoScan }"
                         :title="$t('trading.derivative.autoScanTool')"
                         @click="autoScanToolClick"
                         @contextmenu="autoScanToolContextmenu"
@@ -398,8 +398,7 @@ params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
     if (inSession()) {
         store.dispatch("tradingDerivative/getStatus");
-        if (state.isAutoScan) runAutoScan(true);
-        console.log("lặp lại 1 phút");
+        if (config.value.autoScan) resetTools();
     } else clearInterval(params.interval60);
 }, 60000);
 
@@ -461,7 +460,7 @@ function eventChartClick(e) {
     else if (timeRangeToolRef.value.classList.contains("selected"))
         drawTimeRangeTool();
     else if (autoScanToolRef.value.classList.contains("selected"))
-        runAutoScan();
+        drawAutoScanTool();
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
     else if (phaseToolRef.value.classList.contains("selected")) drawPhaseTool();
 }
@@ -763,10 +762,8 @@ function eventPriceLineDrag(e) {
                         : b;
                 const rr2 = ((d - c) / (b - c)) * 100;
                 loadTimeRangeTool(phase1.rt, true, true);
-                state.progress = [
-                    checkPhase(phase2.rt.count, phase2.er, rr1, rr2),
-                ];
-                progressChange(state.progress);
+                const prog = checkPhase(phase2.rt.count, phase2.er, rr1, rr2);
+                loadProgressTool(prog, true);
                 //
                 if (["A", "B"].includes(lineOptions.point)) {
                     point = "A";
@@ -921,8 +918,16 @@ function toggleFullscreen() {
     else document.documentElement.requestFullscreen();
 }
 function loadToolsData(tools) {
+    let toolsData = mf.cloneDeep(tools);
     removeAllTools();
-    for (const [name, points] of Object.entries(tools)) {
+    if ("auto" in toolsData) {
+        loadPhaseTool(toolsData.auto);
+        delete toolsData.phase;
+        delete toolsData.tr;
+        delete toolsData.progress;
+        delete toolsData.auto;
+    }
+    Object.entries(toolsData).forEach(([name, points]) => {
         switch (name) {
             case "order":
                 Object.entries(points).forEach(([point, line]) => {
@@ -953,7 +958,7 @@ function loadToolsData(tools) {
                 );
                 break;
         }
-    }
+    });
 }
 function loadChartData(chartData) {
     if (!(state.chartDate == CURRENT_DATE && inSession())) {
@@ -1394,10 +1399,8 @@ function drawPhaseTool() {
                 const d = phase2.rt.distance > rtRef ? phase2.sp : b;
                 const rr2 = ((d - c) / (b - c)) * 100;
                 loadTimeRangeTool(phase1.rt, true, true);
-                state.progress = [
-                    checkPhase(phase2.rt.count, phase2.er, rr1, rr2),
-                ];
-                progressChange(state.progress);
+                const prog = checkPhase(phase2.rt.count, phase2.er, rr1, rr2);
+                loadProgressTool(prog, true);
                 //
                 point = "A";
                 changeOptions = { price, time, title: phase1.er };
@@ -1459,9 +1462,8 @@ function drawPhaseTool() {
                 const d = rt.distance > rtRef ? sp : b;
                 const rr1 = ((c - b) / (a - b)) * 100;
                 const rr2 = ((d - c) / (b - c)) * 100;
-
-                state.progress = [checkPhase(rt.count, er, rr1, rr2)];
-                progressChange(state.progress);
+                const prog = checkPhase(rt.count, er, rr1, rr2);
+                loadProgressTool(prog, true);
 
                 const point = "B";
                 params.tools.phase[point].applyOptions({ title: er });
@@ -1548,7 +1550,8 @@ function drawPhaseTool() {
     }
     store.dispatch("tradingDerivative/drawTools", param);
 }
-function loadPhase({ aPoint, bPoint, cPoint }) {
+function loadPhaseTool({ A, B, C }, isStore = false) {
+    if (!params.data.price.length) return false;
     const TYPE = "phase";
     let option = {
         lineType: TYPE,
@@ -1562,24 +1565,25 @@ function loadPhase({ aPoint, bPoint, cPoint }) {
         points: [],
         data: [],
     };
-    const a = aPoint.price;
-    const b = bPoint.price;
-    const c = cPoint.price;
+    const a = A.price;
+    const b = B.price;
+    const c = C.price;
     const rr1 = ((c - b) / (a - b)) * 100;
-    const phase1 = findPhase(aPoint.time, b);
+    const phase1 = findPhase(A.time, b);
+    console.log("phase1", phase1);
     const rtRef = phase1.rt.distance;
-    const phase2 = findPhase(bPoint.time, c, rtRef);
+    const phase2 = findPhase(B.time, c, rtRef);
     const d = phase2.rt.distance > rtRef ? phase2.sp : b;
     const rr2 = ((d - c) / (b - c)) * 100;
-    loadTimeRangeTool(phase1.rt, true, true);
-    state.progress = [checkPhase(phase2.rt.count, phase2.er, rr1, rr2)];
-    progressChange(state.progress);
+    loadTimeRangeTool(phase1.rt, true, isStore);
+    const prog = checkPhase(phase2.rt.count, phase2.er, rr1, rr2);
+    loadProgressTool(prog, isStore);
     //
     option.point = "A";
     option.title = phase1.er;
     option.color = "#F44336";
     option.price = a;
-    option.time = aPoint.time;
+    option.time = A.time;
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
@@ -1589,7 +1593,7 @@ function loadPhase({ aPoint, bPoint, cPoint }) {
     option.title = phase2.er;
     option.color = "#009688";
     option.price = b;
-    option.time = cPoint.time;
+    option.time = C.time;
     option.rt = phase1.rt.distance;
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
@@ -1644,7 +1648,7 @@ function loadPhase({ aPoint, bPoint, cPoint }) {
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
     //
-    store.dispatch("tradingDerivative/drawTools", param);
+    if (isStore) store.dispatch("tradingDerivative/drawTools", param);
 }
 function findPhase(startTime, endPrice, rtRef = 0) {
     let side = false,
@@ -1672,7 +1676,7 @@ function findPhase(startTime, endPrice, rtRef = 0) {
             }
             if (cmp(price, side, resPoint.price)) {
                 const distance = resPoint.end - resPoint.start;
-                if (distance > rt.distance) {
+                if (distance > rt.distance && resPoint.margin > 0) {
                     rt.start = resPoint.time;
                     rt.end = time;
                     rt.distance = distance;
@@ -1835,65 +1839,90 @@ function autoScanToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
+        removeAutoScanTool();
+        removePhaseTool(false);
+        removeTimeRangeTool(false);
+        removeProgressTool(false);
         e.target.classList.add("selected");
     }
 }
 function autoScanToolContextmenu(e) {
-    state.isAutoScan = !state.isAutoScan;
+    store.dispatch("tradingDerivative/setAutoScan", !config.value.autoScan);
     e.target.classList.remove("selected");
 }
-function runAutoScan(isAuto = false) {
+function drawAutoScanTool() {
     autoScanToolRef.value.classList.remove("selected");
-    const data = isAuto
-        ? params.data.price
-        : params.data.price.filter(
-              (item) => item.time <= params.crosshair.time
-          );
+    const data = params.crosshair.time
+        ? params.data.price.filter((item) => item.time <= params.crosshair.time)
+        : params.data.price;
+    console.log("params.crosshair.time", params.crosshair.time);
+    let param = {
+        isRemove: false,
+        name: "auto",
+        points: [],
+        data: [],
+    };
     const points = scanPhase(data);
-    removePhaseTool();
-    loadPhase(points);
+    removePhaseTool(false);
+    loadPhaseTool(points);
+    if (JSON.stringify(params.tools.auto) != JSON.stringify(points)) {
+        params.tools.auto = points;
+        Object.entries(points).forEach(([key, value]) => {
+            param.points.push(key);
+            param.data.push(value);
+        });
+        store.dispatch("tradingDerivative/drawTools", param);
+    }
 }
 function scanPhase(data) {
-    let side, aPoint, bPoint, cPoint, dPoint;
+    let side, A, B, C, D;
     for (let i = data.length - 1; i >= 0; i--) {
         const price = data[i].value;
         const time = data[i].time;
         const index = getTimeIndex(time);
         if (i == data.length - 1) {
-            dPoint = { index, time, price };
-            cPoint = mf.cloneDeep(dPoint);
-            bPoint = mf.cloneDeep(dPoint);
-            aPoint = mf.cloneDeep(dPoint);
+            D = { index, time, price };
+            C = mf.cloneDeep(D);
+            B = mf.cloneDeep(D);
+            A = mf.cloneDeep(D);
         }
         if (side == undefined) {
-            if (price == dPoint.price) continue;
-            side = dPoint.price > price;
+            if (price == D.price) continue;
+            side = D.price > price;
         }
-        if (
-            !cmp(bPoint.price, side, dPoint.price) &&
-            cmp(price, !side, cPoint.price)
-        )
-            cPoint = { index, time, price };
-        if (cmp(price, side, bPoint.price)) {
-            if (cmp(aPoint.price, !side, cPoint.price)) {
-                dPoint = mf.cloneDeep(cPoint);
-                cPoint = mf.cloneDeep(bPoint);
-                bPoint = mf.cloneDeep(aPoint);
-                aPoint = { index, time, price };
+        if (!cmp(B.price, side, D.price) && cmp(price, !side, C.price))
+            C = { index, time, price };
+        if (cmp(price, side, B.price)) {
+            if (cmp(A.price, !side, C.price)) {
+                D = mf.cloneDeep(C);
+                C = mf.cloneDeep(B);
+                B = mf.cloneDeep(A);
+                A = { index, time, price };
                 side = !side;
-            } else bPoint = { index, time, price };
+            } else B = { index, time, price };
         }
-        if (cmp(price, !side, aPoint.price)) aPoint = { index, time, price };
+        if (cmp(price, !side, A.price)) A = { index, time, price };
         if (
-            dPoint.index > cPoint.index &&
-            cPoint.index > bPoint.index &&
-            bPoint.index > aPoint.index &&
-            aPoint.index - index > cPoint.index - bPoint.index &&
-            Math.abs(bPoint.price - cPoint.price) >= 2
+            D.index > C.index &&
+            C.index > B.index &&
+            B.index > A.index &&
+            A.index - index > C.index - B.index &&
+            Math.abs(B.price - C.price) >= 2
         )
             break;
     }
-    return { aPoint, bPoint, cPoint };
+    delete A.index;
+    delete B.index;
+    delete C.index;
+    return { A, B, C };
+}
+function removeAutoScanTool(withServer = true) {
+    if (withServer)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: true,
+            name: "auto",
+        });
+    initToolsParams(["auto"]);
 }
 function timeRangeToolClick(e) {
     state.showLineContext = false;
@@ -1968,6 +1997,8 @@ function loadTimeRangeTool(data, onlyTime = false, isStore = false) {
             { time: data.start, value: 1, color: "lime" },
             { time: data.end, value: 1, color: "OrangeRed" },
         ];
+    if (!data[0].time || !data[1].time) return false;
+    if (data[1].time <= data[0].time) return false;
     params.tools.timeRange = data;
     params.series.timeRange.setData(data);
     if (isStore)
@@ -1988,9 +2019,13 @@ function showProgressToolPopup() {
     state.showPatternContext = false;
     state.showLineContext = false;
 }
-function removeProgressTool() {
+function loadProgressTool(data, isStore = false) {
+    state.progress = [data];
+    if (isStore) progressChange(state.progress);
+}
+function removeProgressTool(withServer = true) {
     state.progress = [];
-    progressChange(state.progress);
+    if (withServer) progressChange(state.progress);
 }
 function progressChange(e) {
     store.dispatch("tradingDerivative/drawTools", {
@@ -2003,7 +2038,7 @@ function progressChange(e) {
 function removeAllTools() {
     removeOrderLine(["entry", "tp", "sl"], false);
     removeLineTool(false);
-    removeRrTool(false);
+    // removeRrTool(false);
     removeTargetTool(false);
     removeTimeRangeTool(false);
     removePhaseTool(false);
@@ -2359,7 +2394,7 @@ function resetTools() {
 }
 function initToolsParams(tools) {
     if (tools == undefined)
-        tools = ["order", "lines", "rr", "target", "tr", "phase"];
+        tools = ["order", "lines", "rr", "target", "tr", "phase", "auto"];
     if (tools.includes("order"))
         params.tools.order = { side: 0, entry: {}, tp: {}, sl: {} };
     if (tools.includes("lines")) params.tools.lines = [];
@@ -2377,6 +2412,7 @@ function initToolsParams(tools) {
             Y: {},
             Z: {},
         };
+    if (tools.includes("auto")) params.tools.auto = { A: {}, B: {}, C: {} };
 }
 function getAccountInfo() {
     store.dispatch("tradingDerivative/getAccountInfo").then((data) => {

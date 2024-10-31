@@ -117,7 +117,7 @@ Route::get('test', function () {
     //     $receiver,
     //     new \App\Notifications\CoreNotification($params, false, true)
     // );
-    // \Illuminate\Support\Facades\Artisan::call('connect:socket');
+    // \Illuminate\Support\Facades\Artisan::call('export:trading');
     // $date = '2024-07-18';
     // $file = storage_path('app/cophieu/date.txt');
     // $isUpdated = false;
@@ -133,6 +133,8 @@ Route::get('test', function () {
     // dd($s->symbols);
     // \App\Jobs\ExportTradingJob::dispatch();
     // \App\Jobs\GetDnseEmailOtpJob::dispatch();
+    $s = app(\App\Jobs\ScanPhaseJob::class)->test();
+    // $s = 1;
     // $emailOtp = "";
     // $client = \Webklex\IMAP\Facades\Client::account('default');
     // $client->connect();
@@ -237,18 +239,19 @@ Route::get('test', function () {
     // $s = number_format(abs(1223.122 - 1215.356), 1);
     // dd($s);
     // Illuminate\Notifications\DatabaseNotification::where('created_at', '<', now()->subDays(30))->delete();
-    $users = App\Models\User::with('pushSubscriptions')
-        ->has('pushSubscriptions', '>=', 1)
-        ->get();
+    // $users = App\Models\User::with('pushSubscriptions')
+    //     ->has('pushSubscriptions', '>=', 1)
+    //     ->get();
 
-    $dateYearAgo = now()->subDays(365);
+    // $dateYearAgo = now()->subDays(365);
 
-    foreach ($users as $user) {
-        foreach ($user->pushSubscriptions as $sub) {
-            if ($sub->updated_at->lessThan($dateYearAgo)) {
-                $user->deletePushSubscription($sub->endpoint);
-            }
-        }
-    }
+    // foreach ($users as $user) {
+    //     foreach ($user->pushSubscriptions as $sub) {
+    //         if ($sub->updated_at->lessThan($dateYearAgo)) {
+    //             $user->deletePushSubscription($sub->endpoint);
+    //         }
+    //     }
+    // }
+    dd($s);
     return 'ok';
 });

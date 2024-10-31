@@ -42,9 +42,22 @@ class DerivativeService extends CoreService
                 'vn30f1m' => get_global_value('vn30f1m'),
                 'vpsUser' => get_global_value('vpsUser'),
                 'vpsSession' => get_global_value('vpsSession'),
+                'autoScan' => get_global_value('autoScanFlag') == '1',
             ],
             'status' => $this->getStatus($payload)
         ];
+    }
+
+    /**
+     * Set Auto Scan
+     *
+     * @param $payload
+     * 
+     */
+    public function setAutoScan($payload)
+    {
+        $status = $payload->autoScan ? '1' : '0';
+        set_global_value('autoScanFlag', $status);
     }
 
     /**
@@ -173,7 +186,7 @@ class DerivativeService extends CoreService
     {
         $data = ['price' => [], 'volume' => []];
         $vn30f1mData = $this->cloneDnseData();
-        // $vn30f1mData = $this->cloneVn30f1mData();
+        // $vn30f1mData = $this->cloneVpsData();
         $volume = 0;
         foreach ($vn30f1mData as $item) {
             $time = strtotime($item->time) + self::SHIFT_TIME;
@@ -282,13 +295,13 @@ class DerivativeService extends CoreService
     /**
      * Vps data
      */
-    public function cloneVn30f1mData()
+    public function cloneVpsData()
     {
         try {
             $client = new \GuzzleHttp\Client();
-            // $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
             // $url = "https://fwtapi3.fialda.com/api/services/app/Stock/GetIntraday?symbol=VN30F2407";
-            $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayQuotes?symbol=VN30F1M";
+            // $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayQuotes?symbol=VN30F1M";
             $res = $client->get($url);
             return json_decode($res->getBody());
         } catch (\Throwable $th) {
@@ -386,7 +399,7 @@ class DerivativeService extends CoreService
             $ret['filename'] = $filename;
             $ret['headers'] = ['Content-Type' => 'text/csv'];
         } else {
-            Artisan::call('connect:socket');
+            Artisan::call('export:trading');
             $ret['isOk'] = true;
         }
         return $ret;
