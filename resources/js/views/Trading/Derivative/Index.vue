@@ -1658,11 +1658,10 @@ function findPhase(startTime, endPrice, rtRef = 0) {
         sp;
     params.data.price
         .filter((item) => item.time >= startTime)
-        .every((item, priceIndex) => {
+        .every((item, index) => {
             const price = item.value;
             const time = item.time;
-            const index = getTimeIndex(time);
-            if (priceIndex == 0) {
+            if (index == 0) {
                 side = endPrice >= price;
                 resPoint = {
                     time,
@@ -1676,16 +1675,18 @@ function findPhase(startTime, endPrice, rtRef = 0) {
             }
             if (cmp(price, side, resPoint.price)) {
                 const distance = resPoint.end - resPoint.start;
-                if (distance > rt.distance && resPoint.margin > 0) {
+                if (distance > rt.distance) {
                     rt.start = resPoint.time;
                     rt.end = time;
                     rt.distance = distance;
                     if (rtRef > 0 && distance > rtRef) rt.count++;
-                    er = +(
-                        (endPrice - resPoint.price) /
-                        resPoint.margin
-                    ).toFixed(1);
-                    sp = resPoint.price - resPoint.margin;
+                    if (resPoint.margin != 0) {
+                        er = +(
+                            (endPrice - resPoint.price) /
+                            resPoint.margin
+                        ).toFixed(1);
+                        sp = resPoint.price - resPoint.margin;
+                    }
                 }
                 resPoint = {
                     time,
@@ -1876,11 +1877,10 @@ function drawAutoScanTool() {
 }
 function scanPhase(data) {
     let side, A, B, C, D;
-    for (let i = data.length - 1; i >= 0; i--) {
-        const price = data[i].value;
-        const time = data[i].time;
-        const index = getTimeIndex(time);
-        if (i == data.length - 1) {
+    for (let index = data.length - 1; index >= 0; index--) {
+        const price = data[index].value;
+        const time = data[index].time;
+        if (index == data.length - 1) {
             D = { index, time, price };
             C = mf.cloneDeep(D);
             B = mf.cloneDeep(D);

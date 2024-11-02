@@ -19,12 +19,17 @@ class ScanPhaseJob implements ShouldQueue
 
     const SHIFT_TIME = 7 * 60 * 60;
 
+    private $date;
+
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct() {}
+    public function __construct()
+    {
+        $this->date = get_last_opening_date();
+    }
 
     /**
      * Execute the job.
@@ -140,9 +145,9 @@ class ScanPhaseJob implements ShouldQueue
         unset($A['index']);
         unset($B['index']);
         unset($C['index']);
-        $A['time'] = strtotime($A['time']) + self::SHIFT_TIME;
-        $B['time'] = strtotime($B['time']) + self::SHIFT_TIME;
-        $C['time'] = strtotime($C['time']) + self::SHIFT_TIME;
+        $A['time'] = $this->unix($A['time']);
+        $B['time'] = $this->unix($B['time']);
+        $C['time'] = $this->unix($C['time']);
         return ['A' => $A, 'B' => $B, 'C' => $C];
     }
 
@@ -155,7 +160,7 @@ class ScanPhaseJob implements ShouldQueue
         $sp = 0;
 
         $data = array_filter($data, function ($item) use ($startTime) {
-            return strtotime($item->time) + self::SHIFT_TIME >= $startTime;
+            return $this->unix($item->time) >= $startTime;
         });
         foreach ($data as $index => $item) {
             $price = $item->lastPrice;
@@ -181,15 +186,17 @@ class ScanPhaseJob implements ShouldQueue
 
             if ($this->cmp($price, $side, $resPoint['price'])) {
                 $distance = $resPoint['end'] - $resPoint['start'];
-                if ($distance > $rt['distance'] && $resPoint['margin'] > 0) {
+                if ($distance > $rt['distance']) {
                     $rt['start'] = $resPoint['time'];
                     $rt['end'] = $time;
                     $rt['distance'] = $distance;
                     if ($rtRef > 0 && $distance > $rtRef) {
                         $rt['count']++;
                     }
-                    $er = round(($endPrice - $resPoint['price']) / $resPoint['margin'], 1);
-                    $sp = $resPoint['price'] - $resPoint['margin'];
+                    if ($resPoint['margin'] != 0) {
+                        $er = round(($endPrice - $resPoint['price']) / $resPoint['margin'], 1);
+                        $sp = $resPoint['price'] - $resPoint['margin'];
+                    }
                 }
                 $resPoint = [
                     'time' => $time,
@@ -243,5 +250,10 @@ class ScanPhaseJob implements ShouldQueue
         }
 
         return true;
+    }
+
+    private function unix($time)
+    {
+        return strtotime($this->date . ' ' . $time) + self::SHIFT_TIME;
     }
 }
