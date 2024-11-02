@@ -42,7 +42,7 @@ class ScanPhaseJob implements ShouldQueue
 
         $data = $this->cloneVpsData();
 
-        // $targetTime = '14:11:32';
+        // $targetTime = '13:35:47';
         // $data = array_filter($data, function ($item) use ($targetTime) {
         //     return $item->time <= $targetTime;
         // });
@@ -136,10 +136,11 @@ class ScanPhaseJob implements ShouldQueue
                 $D['index'] > $C['index'] &&
                 $C['index'] > $B['index'] &&
                 $B['index'] > $A['index'] &&
-                $A['index'] - $index > $C['index'] - $B['index'] &&
-                abs($B['price'] - $C['price']) >= 2
+                $A['index'] - $index > $C['index'] - $B['index']
             ) {
-                break;
+                $ab = abs($A['price'] - $B['price']);
+                $bc = abs($B['price'] - $C['price']);
+                if ($bc >= 2 && $bc / $ab < 0.786) break;
             }
         }
         unset($A['index']);

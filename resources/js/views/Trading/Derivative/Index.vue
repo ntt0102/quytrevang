@@ -1041,7 +1041,6 @@ function connectSocket() {
         params.socketSendData = message;
     };
     params.websocket.onclose = (e) => {
-        console.log("websocket-close");
         if (!params.socketStop && inSession()) {
             state.isSocketWarning = true;
             connectSocket();
@@ -1570,7 +1569,6 @@ function loadPhaseTool({ A, B, C }, isStore = false) {
     const c = C.price;
     const rr1 = ((c - b) / (a - b)) * 100;
     const phase1 = findPhase(A.time, b);
-    console.log("phase1", phase1);
     const rtRef = phase1.rt.distance;
     const phase2 = findPhase(B.time, c, rtRef);
     const d = phase2.rt.distance > rtRef ? phase2.sp : b;
@@ -1593,7 +1591,7 @@ function loadPhaseTool({ A, B, C }, isStore = false) {
     option.title = phase2.er;
     option.color = "#009688";
     option.price = b;
-    option.time = C.time;
+    option.time = B.time;
     option.rt = phase1.rt.distance;
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
@@ -1685,7 +1683,7 @@ function findPhase(startTime, endPrice, rtRef = 0) {
                             (endPrice - resPoint.price) /
                             resPoint.margin
                         ).toFixed(1);
-                        sp = resPoint.price - resPoint.margin;
+                        sp = +(resPoint.price - resPoint.margin).toFixed(1);
                     }
                 }
                 resPoint = {
@@ -1856,7 +1854,6 @@ function drawAutoScanTool() {
     const data = params.crosshair.time
         ? params.data.price.filter((item) => item.time <= params.crosshair.time)
         : params.data.price;
-    console.log("params.crosshair.time", params.crosshair.time);
     let param = {
         isRemove: false,
         name: "auto",
@@ -1906,11 +1903,14 @@ function scanPhase(data) {
             D.index > C.index &&
             C.index > B.index &&
             B.index > A.index &&
-            A.index - index > C.index - B.index &&
-            Math.abs(B.price - C.price) >= 2
-        )
-            break;
+            A.index - index > C.index - B.index
+        ) {
+            const ab = Math.abs(A.price - B.price);
+            const bc = Math.abs(B.price - C.price);
+            if (bc >= 2 && bc / ab < 0.786) break;
+        }
     }
+
     delete A.index;
     delete B.index;
     delete C.index;
