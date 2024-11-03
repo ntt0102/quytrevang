@@ -743,29 +743,28 @@ function eventPriceLineDrag(e) {
                     data: [],
                 };
                 let point, changeOptions;
-                const a = +params.tools.phase.A.options().price;
-                const b = +params.tools.phase.B.options().price;
-                const c = +params.tools.phase.C.options().price;
-                const rr1 = ((c - b) / (a - b)) * 100;
-                const aTime = +params.tools.phase.A.options().time;
-                const phase1 = scanPhase(aTime, b);
-                const bTime = +params.tools.phase.B.options().time;
-                const rtRef = phase1.rt.distance;
-                const phase2 = scanPhase(bTime, c, rtRef);
-                const d =
-                    lineOptions.point == "D"
-                        ? +params.tools.phase.D.options().price
-                        : phase2.rt.distance > rtRef
-                        ? phase2.sp
-                        : b;
-                const rr2 = ((d - c) / (b - c)) * 100;
-                loadTimeRangeTool(phase1.rt, true, true);
-                const prog = checkPhase(phase2.rt.count, phase2.er, rr1, rr2);
-                loadProgressTool(prog, true);
+                const { pattern, info } = runAutoScan(
+                    {
+                        A: {
+                            time: +params.tools.phase.A.options().time,
+                            price: +params.tools.phase.A.options().price,
+                        },
+                        B: {
+                            time: +params.tools.phase.B.options().time,
+                            price: +params.tools.phase.B.options().price,
+                        },
+                        C: { price: +params.tools.phase.C.options().price },
+                    },
+                    true
+                );
+                const { b, c } = info;
+                let d = info.d;
+                loadTimeRangeTool(info.rt1, true, true);
+                loadProgressTool(pattern, true);
                 //
                 if (["A", "B"].includes(lineOptions.point)) {
                     point = "A";
-                    changeOptions = { title: phase1.er };
+                    changeOptions = { title: info.er1 };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
@@ -774,8 +773,8 @@ function eventPriceLineDrag(e) {
                 if (["A", "B", "C"].includes(lineOptions.point)) {
                     point = "B";
                     changeOptions = {
-                        rt: phase1.rt.distance,
-                        title: phase2.er,
+                        rt: info.rtRef,
+                        title: info.er2,
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -784,16 +783,22 @@ function eventPriceLineDrag(e) {
                 //
                 if (lineOptions.point == "C") {
                     point = "C";
-                    changeOptions = { title: rr1.toFixed(1) };
+                    changeOptions = { title: info.rr1.toFixed(1) };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                 }
                 //
                 point = "D";
-                if (lineOptions.point == point)
+                if (lineOptions.point == point) {
+                    d = +params.tools.phase.D.options().price;
+                    const rr2 = ((c - d) / (c - b)) * 100;
                     changeOptions = { title: rr2.toFixed(1) };
-                else changeOptions = { price: d, title: rr2.toFixed(1) };
+                } else
+                    changeOptions = {
+                        price: info.d,
+                        title: info.rr2.toFixed(1),
+                    };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
@@ -1372,46 +1377,44 @@ function drawPhaseTool() {
         data: [],
     };
     if (mf.isSet(params.tools.phase.A)) {
-        const aOptions = params.tools.phase.A.options();
-        const a = +aOptions.price;
-
         if (mf.isSet(params.tools.phase.B)) {
             if (mf.isSet(params.tools.phase.C)) {
                 let point, changeOptions;
-                const a = price;
-                const b = +params.tools.phase.B.options().price;
-                const c = +params.tools.phase.C.options().price;
-                const rr1 = ((c - b) / (a - b)) * 100;
-                const phase1 = scanPhase(time, b);
-                const rtRef = phase1.rt.distance;
-                const bTime = +params.tools.phase.B.options().time;
-                const phase2 = scanPhase(bTime, c, rtRef);
-                const d = phase2.rt.distance > rtRef ? phase2.sp : b;
-                const rr2 = ((d - c) / (b - c)) * 100;
-                loadTimeRangeTool(phase1.rt, true, true);
-                const prog = checkPhase(phase2.rt.count, phase2.er, rr1, rr2);
-                loadProgressTool(prog, true);
+                const { pattern, info } = runAutoScan(
+                    {
+                        A: { time, price },
+                        B: {
+                            time: +params.tools.phase.B.options().time,
+                            price: +params.tools.phase.B.options().price,
+                        },
+                        C: { price: +params.tools.phase.C.options().price },
+                    },
+                    true
+                );
+                const { c, d } = info;
+                loadTimeRangeTool(info.rt1, true, true);
+                loadProgressTool(pattern, true);
                 //
                 point = "A";
-                changeOptions = { price, time, title: phase1.er };
+                changeOptions = { price, time, title: info.er1 };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
                 //
                 point = "B";
-                changeOptions = { rt: rtRef };
+                changeOptions = { rt: info.rtRef };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
                 //
                 point = "C";
-                changeOptions = { title: rr1.toFixed(1) };
+                changeOptions = { title: info.rr1.toFixed(1) };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
                 //
                 point = "D";
-                changeOptions = { price: d, title: rr2.toFixed(1) };
+                changeOptions = { price: d, title: info.rr2.toFixed(1) };
                 params.tools.phase[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
@@ -1444,24 +1447,28 @@ function drawPhaseTool() {
                 param.data.push(params.tools.phase[point].options());
             } else {
                 const bOptions = params.tools.phase.B.options();
-                const b = +bOptions.price;
-                const bTime = +bOptions.time;
-                const rtRef = +bOptions.rt;
-                const c = price;
-                const { rt, er, sp } = scanPhase(bTime, c, rtRef);
-                const d = rt.distance > rtRef ? sp : b;
-                const rr1 = ((c - b) / (a - b)) * 100;
-                const rr2 = ((d - c) / (b - c)) * 100;
-                const prog = checkPhase(rt.count, er, rr1, rr2);
-                loadProgressTool(prog, true);
-
+                const { pattern, info } = runAutoScan(
+                    {
+                        A: { price: +params.tools.phase.A.options().price },
+                        B: {
+                            time: +bOptions.time,
+                            price: +bOptions.price,
+                            rt: +bOptions.rt,
+                        },
+                        C: { price },
+                    },
+                    true
+                );
+                const { c, d } = info;
+                loadProgressTool(pattern, true);
+                //
                 const point = "B";
-                params.tools.phase[point].applyOptions({ title: er });
+                params.tools.phase[point].applyOptions({ title: info.er2 });
                 param.points.push(point);
                 param.data.push(params.tools.phase[point].options());
                 //
                 option.point = "C";
-                option.title = rr1.toFixed(1);
+                option.title = info.rr1.toFixed(1);
                 option.color = "#FF9800";
                 params.tools.phase[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1470,7 +1477,7 @@ function drawPhaseTool() {
                 //
                 option.point = "D";
                 option.price = d;
-                option.title = rr2.toFixed(1);
+                option.title = info.rr2.toFixed(1);
                 option.color = "#4CAF50";
                 params.tools.phase[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1509,7 +1516,7 @@ function drawPhaseTool() {
             }
             phaseToolRef.value.classList.remove("selected");
         } else {
-            const aTime = +aOptions.time;
+            const aTime = +params.tools.phase.A.options().time;
             const { rt, er } = scanPhase(aTime, price);
             loadTimeRangeTool(rt, true, true);
             //
@@ -1686,14 +1693,6 @@ function scanPhase(startTime, endPrice, rtRef = 0) {
         });
     return { rt, er, sp };
 }
-function checkPhase(rt, er, rr1, rr2) {
-    if (rt < 1) return 1;
-    if (rr1 < 38.2) return 2;
-    if (er > 1) return 3;
-    if (rt > 1) return 4;
-    if (rr2 < 50) return 5;
-    return 0;
-}
 function removePhaseTool(withServer = true) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
@@ -1866,6 +1865,7 @@ function loadAutoScanTool(data) {
         const { phase, tr, progress, auto, ...updatedToolsData } = data;
         return updatedToolsData;
     }
+    return data;
 }
 function runAutoScan(data, isAvailable = false) {
     const points = isAvailable ? data : scanPattern(data);
@@ -1874,7 +1874,9 @@ function runAutoScan(data, isAvailable = false) {
     const c = points.C.price;
     const aTime = points.A.time;
     const bTime = points.B.time;
-    const phase1 = scanPhase(aTime, b);
+    const phase1 = !points.B.rt
+        ? scanPhase(aTime, b)
+        : { rt: { distance: points.B.rt } };
     const rtRef = phase1.rt.distance;
     const phase2 = scanPhase(bTime, c, rtRef);
     const pattern = validatePattern(points, phase2);
@@ -1961,7 +1963,6 @@ function scanPattern(data) {
         A.index == C.index
             ? { A: C, B: D, C: E, D: F, E: {}, F: {} }
             : { A, B, C, D, E, F };
-    console.log("scanPattern", ret);
     return removeIndex(ret);
 }
 function removeIndex(obj) {

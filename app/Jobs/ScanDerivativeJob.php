@@ -13,7 +13,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ScanedPhaseNotification;
 
-class ScanPhaseJob implements ShouldQueue
+class ScanDerivativeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
@@ -47,7 +47,7 @@ class ScanPhaseJob implements ShouldQueue
         //     return $item->time <= $targetTime;
         // });
 
-        $points = $this->scanPhase($data);
+        $points = $this->scanPattern($data);
 
         if ($this->isSame($points)) return false;
 
@@ -58,23 +58,18 @@ class ScanPhaseJob implements ShouldQueue
             );
         }
 
-        $phase1 = $this->findPhase($data, $points['A']['time'], $points['B']['price']);
-        $rtRef = $phase1['rt']['distance'];
-        $phase2 = $this->findPhase($data, $points['B']['time'], $points['C']['price'], $rtRef);
-        $rr1 = (($points['C']['price'] - $points['B']['price']) /
-            ($points['A']['price'] - $points['B']['price'])) * 100;
-        $rr2 = (($phase2['sp'] - $points['C']['price']) /
-            ($points['B']['price'] - $points['C']['price'])) * 100;
-        $progress = $this->checkPhase($phase2['rt']['count'], $phase2['er'], $rr1, $rr2);
+        $phase1 = $this->scanPhase($data, $points['A']['time'], $points['B']['price']);
+        $phase2 = $this->scanPhase($data, $points['B']['time'], $points['C']['price'], $phase1['rt']['distance']);
+        $pattern = $this->validatePattern($points, $phase2);
 
-        if ($progress == 0) {
+        if ($pattern == 0) {
             Notification::send(
                 User::permission('admin:order_derivative')->get(),
                 new ScanedPhaseNotification()
             );
         }
 
-        return $progress;
+        return $pattern;
     }
 
     private function cloneVpsData()
@@ -89,10 +84,10 @@ class ScanPhaseJob implements ShouldQueue
         }
     }
 
-    private function scanPhase($data)
+    private function scanPattern($data)
     {
         $side = null;
-        $A = $B = $C = $D = null;
+        $A = $B = $C = $D = $E = $F = null;
 
         $lastPos = count($data) - 1;
         for ($index = $lastPos; $index >= 0; $index--) {
@@ -100,26 +95,39 @@ class ScanPhaseJob implements ShouldQueue
             $time = $data[$index]->time;
 
             if ($index == $lastPos) {
-                $D = ['index' => $index, 'time' => $time, 'price' => $price];
-                $C = $D;
-                $B = $D;
-                $A = $D;
+                $F = ['index' => $index, 'time' => $time, 'price' => $price];
+                $E = $F;
+                $D = $F;
+                $C = $F;
+                $B = $F;
+                $A = $F;
             }
 
             if ($side === null) {
-                if ($price == $D['price']) continue;
-                $side = $D['price'] > $price;
+                if ($price == $F['price']) continue;
+                $side = $F['price'] > $price;
             }
 
             if (
+                !$this->cmp($D['price'], $side, $F['price']) &&
+                $this->cmp($price, !$side, $E['price'])
+            )
+                $E = ['index' => $index, 'time' => $time, 'price' => $price];
+            if (
+                !$this->cmp($C['price'], !$side, $E['price']) &&
+                $this->cmp($price, $side, $D['price'])
+            )
+                $D = ['index' => $index, 'time' => $time, 'price' => $price];
+            if (
                 !$this->cmp($B['price'], $side, $D['price']) &&
                 $this->cmp($price, !$side, $C['price'])
-            ) {
+            )
                 $C = ['index' => $index, 'time' => $time, 'price' => $price];
-            }
 
             if ($this->cmp($price, $side, $B['price'])) {
                 if ($this->cmp($A['price'], !$side, $C['price'])) {
+                    $F = $E;
+                    $E = $D;
                     $D = $C;
                     $C = $B;
                     $B = $A;
@@ -134,25 +142,29 @@ class ScanPhaseJob implements ShouldQueue
 
             if (
                 $D['index'] > $C['index'] &&
-                $C['index'] > $B['index'] &&
+                $C['index'] - $index > $E['index'] - $D['index']
+            ) {
+                $cd = abs($C['price'] - $D['price']);
+                $de = abs($D['price'] - $E['price']);
+                if ($de >= 1.5 && $de / $cd < 0.786) break;
+            }
+            if (
                 $B['index'] > $A['index'] &&
                 $A['index'] - $index > $C['index'] - $B['index']
             ) {
                 $ab = abs($A['price'] - $B['price']);
                 $bc = abs($B['price'] - $C['price']);
-                if ($bc >= 2 && $bc / $ab < 0.786) break;
+                if ($bc >= 1.5 && $bc / $ab < 0.786) break;
             }
         }
-        unset($A['index']);
-        unset($B['index']);
-        unset($C['index']);
-        $A['time'] = $this->unix($A['time']);
-        $B['time'] = $this->unix($B['time']);
-        $C['time'] = $this->unix($C['time']);
-        return ['A' => $A, 'B' => $B, 'C' => $C];
+        $ret = ($A['index'] === $C['index'])
+            ? ['A' => $C, 'B' => $D, 'C' => $E, 'D' => $F, 'E' => [], 'F' => []]
+            : ['A' => $A, 'B' => $B, 'C' => $C, 'D' => $D, 'E' => $E, 'F' => $F];
+
+        return $this->removeIndex($ret);
     }
 
-    function findPhase($data, $startTime, $endPrice, $rtRef = 0)
+    function scanPhase($data, $startTime, $endPrice, $rtRef = 0)
     {
         $side = false;
         $resPoint = [];
@@ -222,13 +234,33 @@ class ScanPhaseJob implements ShouldQueue
         return ['rt' => $rt, 'er' => $er, 'sp' => $sp];
     }
 
-    function checkPhase($rt, $er, $rr1, $rr2)
+    function validatePattern($points, $phase2)
     {
-        if ($rt < 1) return 1;
-        if ($rr1 < 38.2) return 2;
-        if ($er > 1) return 3;
-        if ($rt > 1) return 4;
-        if ($rr2 < 50) return 5;
+        $A = $points['A'];
+        $B = $points['B'];
+        $C = $points['C'];
+        $D = $points['D'];
+        $E = $points['E'];
+
+        if ($phase2['rt']['count'] > 1) return 6;
+
+        if ($phase2['rt']['count'] < 1) {
+            if (
+                !empty($E) &&
+                ($C['price'] - $D['price']) / ($C['price'] - $B['price']) >= 0.786 &&
+                ($D['price'] - $E['price']) / ($D['price'] - $C['price']) >= 0.786
+            ) {
+                return 1;
+            }
+            return 2;
+        }
+
+        if (($B['price'] - $C['price']) / ($B['price'] - $A['price']) < 0.382) return 3;
+
+        if ($phase2['er'] > 1) return 4;
+
+        if (($C['price'] - $phase2['sp']) / ($C['price'] - $B['price']) < 0.786) return 5;
+
         return 0;
     }
 
@@ -236,6 +268,17 @@ class ScanPhaseJob implements ShouldQueue
     {
         if ($side) return $eq ? $value1 >= $value2 : $value1 > $value2;
         else return $eq ? $value1 <= $value2 : $value1 < $value2;
+    }
+
+    private function removeIndex($data)
+    {
+        $result = [];
+        foreach ($data as $key => $value) {
+            if (isset($value['index'])) unset($value['index']);
+            if (isset($value['time'])) $value['time'] = $this->unix($value['time']);
+            $result[$key] = $value;
+        }
+        return $result;
     }
 
     private function isSame($new)

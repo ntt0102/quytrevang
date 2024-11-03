@@ -10,7 +10,7 @@ use App\Jobs\UpdateOpeningMarketJob;
 use App\Jobs\UpdateVn30f1mSymbolJob;
 use App\Jobs\ReportTradingJob;
 use App\Jobs\OrderDerivativeJob;
-use App\Jobs\ScanPhaseJob;
+use App\Jobs\ScanDerivativeJob;
 
 class Kernel extends ConsoleKernel
 {
@@ -39,7 +39,7 @@ class Kernel extends ConsoleKernel
             $schedule->command('export:trading')->dailyAt('14:48');
             if (in_trading_time()) {
                 $schedule->job(new OrderDerivativeJob)->everyMinute();
-                $schedule->job(new ScanPhaseJob)->everyMinute();
+                $schedule->job(new ScanDerivativeJob)->everyMinute();
             }
         }
 
