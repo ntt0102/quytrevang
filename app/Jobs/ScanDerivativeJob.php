@@ -146,7 +146,7 @@ class ScanDerivativeJob implements ShouldQueue
             ) {
                 $cd = abs($C['price'] - $D['price']);
                 $de = abs($D['price'] - $E['price']);
-                if ($de >= 1.5 && $de / $cd < 0.786) break;
+                if ($de / $cd < 0.786 && ($cd >= 3 || $de >= 1.5)) break;
             }
             if (
                 $B['index'] > $A['index'] &&
@@ -154,7 +154,7 @@ class ScanDerivativeJob implements ShouldQueue
             ) {
                 $ab = abs($A['price'] - $B['price']);
                 $bc = abs($B['price'] - $C['price']);
-                if ($bc >= 1.5 && $bc / $ab < 0.786) break;
+                if ($bc / $ab < 0.786 && ($ab >= 3 || $bc >= 1.5))  break;
             }
         }
         $ret = ($A['index'] === $C['index'])
