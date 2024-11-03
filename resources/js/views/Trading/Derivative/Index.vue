@@ -130,11 +130,11 @@
                     <div
                         class="popup command far"
                         :class="{
-                            'fa-badge-check': !state.progress[0],
-                            [`fa-circle-${state.progress[0]}`]:
-                                state.progress[0],
-                            green: state.progress[0] == 0,
-                            red: state.progress[0] > 0,
+                            'fa-badge-check': !state.progress.length,
+                            [`fa-circle-${state.progress[0] + 1}`]:
+                                state.progress.length,
+                            green: state.progress[0] <= 1,
+                            red: state.progress[0] > 1,
                         }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="showProgressToolPopup"
@@ -748,10 +748,10 @@ function eventPriceLineDrag(e) {
                 const c = +params.tools.phase.C.options().price;
                 const rr1 = ((c - b) / (a - b)) * 100;
                 const aTime = +params.tools.phase.A.options().time;
-                const phase1 = findPhase(aTime, b);
+                const phase1 = scanPhase(aTime, b);
                 const bTime = +params.tools.phase.B.options().time;
                 const rtRef = phase1.rt.distance;
-                const phase2 = findPhase(bTime, c, rtRef);
+                const phase2 = scanPhase(bTime, c, rtRef);
                 const d =
                     lineOptions.point == "D"
                         ? +params.tools.phase.D.options().price
@@ -916,15 +916,8 @@ function toggleFullscreen() {
     else document.documentElement.requestFullscreen();
 }
 function loadToolsData(tools) {
-    let toolsData = mf.cloneDeep(tools);
     removeAllTools();
-    if ("auto" in toolsData) {
-        loadPhaseTool(toolsData.auto);
-        delete toolsData.phase;
-        delete toolsData.tr;
-        delete toolsData.progress;
-        delete toolsData.auto;
-    }
+    let toolsData = loadAutoScanTool(mf.cloneDeep(tools));
     Object.entries(toolsData).forEach(([name, points]) => {
         switch (name) {
             case "order":
@@ -1389,10 +1382,10 @@ function drawPhaseTool() {
                 const b = +params.tools.phase.B.options().price;
                 const c = +params.tools.phase.C.options().price;
                 const rr1 = ((c - b) / (a - b)) * 100;
-                const phase1 = findPhase(time, b);
+                const phase1 = scanPhase(time, b);
                 const rtRef = phase1.rt.distance;
                 const bTime = +params.tools.phase.B.options().time;
-                const phase2 = findPhase(bTime, c, rtRef);
+                const phase2 = scanPhase(bTime, c, rtRef);
                 const d = phase2.rt.distance > rtRef ? phase2.sp : b;
                 const rr2 = ((d - c) / (b - c)) * 100;
                 loadTimeRangeTool(phase1.rt, true, true);
@@ -1455,7 +1448,7 @@ function drawPhaseTool() {
                 const bTime = +bOptions.time;
                 const rtRef = +bOptions.rt;
                 const c = price;
-                const { rt, er, sp } = findPhase(bTime, c, rtRef);
+                const { rt, er, sp } = scanPhase(bTime, c, rtRef);
                 const d = rt.distance > rtRef ? sp : b;
                 const rr1 = ((c - b) / (a - b)) * 100;
                 const rr2 = ((d - c) / (b - c)) * 100;
@@ -1517,7 +1510,7 @@ function drawPhaseTool() {
             phaseToolRef.value.classList.remove("selected");
         } else {
             const aTime = +aOptions.time;
-            const { rt, er } = findPhase(aTime, price);
+            const { rt, er } = scanPhase(aTime, price);
             loadTimeRangeTool(rt, true, true);
             //
             const point = "A";
@@ -1547,7 +1540,10 @@ function drawPhaseTool() {
     }
     store.dispatch("tradingDerivative/drawTools", param);
 }
-function loadPhaseTool({ A, B, C }, isStore = false) {
+function loadPhaseTool(
+    { a, b, c, d, aTime, bTime, rtRef, er1, er2, rr1, rr2 },
+    isStore = false
+) {
     if (!params.data.price.length) return false;
     const TYPE = "phase";
     let option = {
@@ -1562,35 +1558,23 @@ function loadPhaseTool({ A, B, C }, isStore = false) {
         points: [],
         data: [],
     };
-    const a = A.price;
-    const b = B.price;
-    const c = C.price;
-    const rr1 = ((c - b) / (a - b)) * 100;
-    const phase1 = findPhase(A.time, b);
-    const rtRef = phase1.rt.distance;
-    const phase2 = findPhase(B.time, c, rtRef);
-    const d = phase2.rt.distance > rtRef ? phase2.sp : b;
-    const rr2 = ((d - c) / (b - c)) * 100;
-    loadTimeRangeTool(phase1.rt, true, isStore);
-    const prog = checkPhase(phase2.rt.count, phase2.er, rr1, rr2);
-    loadProgressTool(prog, isStore);
     //
     option.point = "A";
-    option.title = phase1.er;
+    option.title = er1;
     option.color = "#F44336";
     option.price = a;
-    option.time = A.time;
+    option.time = aTime;
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "B";
-    option.title = phase2.er;
+    option.title = er2;
     option.color = "#009688";
     option.price = b;
-    option.time = B.time;
-    option.rt = phase1.rt.distance;
+    option.time = bTime;
+    option.rt = rtRef;
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
@@ -1646,7 +1630,7 @@ function loadPhaseTool({ A, B, C }, isStore = false) {
     //
     if (isStore) store.dispatch("tradingDerivative/drawTools", param);
 }
-function findPhase(startTime, endPrice, rtRef = 0) {
+function scanPhase(startTime, endPrice, rtRef = 0) {
     let side = false,
         resPoint = {},
         rt = {},
@@ -1858,9 +1842,11 @@ function drawAutoScanTool() {
         points: [],
         data: [],
     };
-    const points = scanPhase(data);
+    const { pattern, info, points } = runAutoScan(data);
+    loadTimeRangeTool(info.rt1, true, true);
+    loadProgressTool(pattern, true);
     removePhaseTool(false);
-    loadPhaseTool(points);
+    loadPhaseTool(info, true);
     if (JSON.stringify(params.tools.auto) != JSON.stringify(points)) {
         params.tools.auto = points;
         Object.entries(points).forEach(([key, value]) => {
@@ -1870,25 +1856,88 @@ function drawAutoScanTool() {
         store.dispatch("tradingDerivative/drawTools", param);
     }
 }
-function scanPhase(data) {
-    let side, A, B, C, D;
+function loadAutoScanTool(data) {
+    if ("auto" in data) {
+        params.tools.auto = data.auto;
+        const { pattern, info } = runAutoScan(params.tools.auto, true);
+        loadTimeRangeTool(info.rt1, true);
+        loadProgressTool(pattern);
+        loadPhaseTool(info);
+        const { phase, tr, progress, auto, ...updatedToolsData } = data;
+        return updatedToolsData;
+    }
+}
+function runAutoScan(data, isAvailable = false) {
+    const points = isAvailable ? data : scanPattern(data);
+    const a = points.A.price;
+    const b = points.B.price;
+    const c = points.C.price;
+    const aTime = points.A.time;
+    const bTime = points.B.time;
+    const phase1 = scanPhase(aTime, b);
+    const rtRef = phase1.rt.distance;
+    const phase2 = scanPhase(bTime, c, rtRef);
+    const pattern = validatePattern(points, phase2);
+    const d = phase2.rt.count > 0 ? phase2.sp : b;
+    const info = {
+        a,
+        b,
+        c,
+        d,
+        aTime,
+        bTime,
+        rtRef,
+        rt1: phase1.rt,
+        er1: phase1.er,
+        er2: phase2.er,
+        rr1: ((b - c) / (b - a)) * 100,
+        rr2: ((c - d) / (c - b)) * 100,
+    };
+    return { pattern, info, points };
+}
+function validatePattern({ A, B, C, D, E }, phase2) {
+    if (phase2.rt.count > 1) return 6;
+    if (phase2.rt.count < 1) {
+        if (
+            mf.isSet(E) &&
+            (C.price - D.price) / (C.price - B.price) >= 0.786 &&
+            (D.price - E.price) / (D.price - C.price) >= 0.786
+        )
+            return 1;
+        return 2;
+    }
+    if ((B.price - C.price) / (B.price - A.price) < 0.382) return 3;
+    if (phase2.er > 1) return 4;
+    if ((C.price - phase2.sp) / (C.price - B.price) < 0.786) return 5;
+    return 0;
+}
+function scanPattern(data) {
+    let side, A, B, C, D, E, F;
     for (let index = data.length - 1; index >= 0; index--) {
         const price = data[index].value;
         const time = data[index].time;
         if (index == data.length - 1) {
-            D = { index, time, price };
-            C = mf.cloneDeep(D);
-            B = mf.cloneDeep(D);
-            A = mf.cloneDeep(D);
+            F = { index, time, price };
+            E = mf.cloneDeep(F);
+            D = mf.cloneDeep(F);
+            C = mf.cloneDeep(F);
+            B = mf.cloneDeep(F);
+            A = mf.cloneDeep(F);
         }
         if (side == undefined) {
-            if (price == D.price) continue;
-            side = D.price > price;
+            if (price == F.price) continue;
+            side = F.price > price;
         }
+        if (!cmp(D.price, side, F.price) && cmp(price, !side, E.price))
+            E = { index, time, price };
+        if (!cmp(C.price, !side, E.price) && cmp(price, side, D.price))
+            D = { index, time, price };
         if (!cmp(B.price, side, D.price) && cmp(price, !side, C.price))
             C = { index, time, price };
         if (cmp(price, side, B.price)) {
             if (cmp(A.price, !side, C.price)) {
+                F = mf.cloneDeep(E);
+                E = mf.cloneDeep(D);
                 D = mf.cloneDeep(C);
                 C = mf.cloneDeep(B);
                 B = mf.cloneDeep(A);
@@ -1897,22 +1946,31 @@ function scanPhase(data) {
             } else B = { index, time, price };
         }
         if (cmp(price, !side, A.price)) A = { index, time, price };
-        if (
-            D.index > C.index &&
-            C.index > B.index &&
-            B.index > A.index &&
-            A.index - index > C.index - B.index
-        ) {
+        if (D.index > C.index && C.index - index > E.index - D.index) {
+            const cd = Math.abs(C.price - D.price);
+            const de = Math.abs(D.price - E.price);
+            if (de >= 1.5 && de / cd < 0.786) break;
+        }
+        if (B.index > A.index && A.index - index > C.index - B.index) {
             const ab = Math.abs(A.price - B.price);
             const bc = Math.abs(B.price - C.price);
-            if (bc >= 2 && bc / ab < 0.786) break;
+            if (bc >= 1.5 && bc / ab < 0.786) break;
         }
     }
-
-    delete A.index;
-    delete B.index;
-    delete C.index;
-    return { A, B, C };
+    const ret =
+        A.index == C.index
+            ? { A: C, B: D, C: E, D: F, E: {}, F: {} }
+            : { A, B, C, D, E, F };
+    console.log("scanPattern", ret);
+    return removeIndex(ret);
+}
+function removeIndex(obj) {
+    const result = {};
+    Object.entries(obj).forEach(([key, value]) => {
+        const { index, ...rest } = value;
+        result[key] = rest;
+    });
+    return result;
 }
 function removeAutoScanTool(withServer = true) {
     if (withServer)
