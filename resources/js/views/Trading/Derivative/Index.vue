@@ -1951,12 +1951,15 @@ function scanPattern(data) {
         if (D.index > C.index && C.index - index > E.index - D.index) {
             const cd = Math.abs(C.price - D.price);
             const de = Math.abs(D.price - E.price);
-            if (de / cd < 0.786 && (cd >= 3 || de >= 1.5)) break;
+            if (de >= 1.5 && de / cd < 0.786) break;
         }
-        if (B.index > A.index && A.index - index > C.index - B.index) {
-            const ab = Math.abs(A.price - B.price);
-            const bc = Math.abs(B.price - C.price);
-            if (bc / ab < 0.786 && (ab >= 3 || bc >= 1.5)) break;
+        if (B.index > A.index) {
+            if (A.index - index > C.index - B.index) {
+                const ab = Math.abs(A.price - B.price);
+                const bc = Math.abs(B.price - C.price);
+                if (bc >= 1.5 && bc / ab < 0.786) break;
+            }
+            if (A.index - index > B.index - A.index) break;
         }
     }
     const ret =
