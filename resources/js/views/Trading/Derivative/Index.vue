@@ -1953,13 +1953,10 @@ function scanPattern(data) {
             const de = Math.abs(D.price - E.price);
             if (de >= 1.5 && de / cd < 0.786) break;
         }
-        if (B.index > A.index) {
-            if (A.index - index > C.index - B.index) {
-                const ab = Math.abs(A.price - B.price);
-                const bc = Math.abs(B.price - C.price);
-                if (bc >= 1.5 && bc / ab < 0.786) break;
-            }
-            if (A.index - index > B.index - A.index) break;
+        if (B.index > A.index && A.index - index > C.index - B.index) {
+            const ab = Math.abs(A.price - B.price);
+            const bc = Math.abs(B.price - C.price);
+            if (bc >= 1.5 && bc / ab < 0.786) break;
         }
     }
     const ret =
