@@ -128,17 +128,14 @@
                         @contextmenu="resetTools"
                     ></div>
                     <div
-                        :class="`popup command far fa-${
-                            !state.progress[0]
-                                ? 'badge-check'
-                                : 'circle-' + state.progress[0]
-                        } ${
-                            state.progress[0] == 0
-                                ? 'green'
-                                : state.progress[0] > 0
-                                ? 'red'
-                                : ''
-                        }`"
+                        class="popup command far"
+                        :class="{
+                            'fa-badge-check': !state.progress[0],
+                            [`fa-circle-${state.progress[0]}`]:
+                                state.progress[0],
+                            green: state.progress[0] == 0,
+                            red: state.progress[0] > 0,
+                        }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="showProgressToolPopup"
                     >
