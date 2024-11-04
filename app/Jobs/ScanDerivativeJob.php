@@ -29,7 +29,7 @@ class ScanDerivativeJob implements ShouldQueue
      */
     public function __construct()
     {
-        $this->date = get_last_opening_date();
+        $this->date = get_global_value('lastOpeningDate');
     }
 
     /**
