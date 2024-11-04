@@ -2098,6 +2098,7 @@ function removeAllTools() {
     // removeRrTool(false);
     removeTargetTool(false);
     removeTimeRangeTool(false);
+    removeProgressTool(false);
     removePhaseTool(false);
 }
 function toggleOrderButton(show) {
