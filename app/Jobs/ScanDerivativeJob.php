@@ -39,10 +39,10 @@ class ScanDerivativeJob implements ShouldQueue
      */
     public function handle()
     {
-        set_global_value("dnseTrading", date('H:i:s'));
         if (get_global_value('autoScanFlag') == '0') return false;
 
         $data = $this->cloneVpsData();
+        set_global_value("dnseTrading", 'count: ' . count($data) . ', time: ' . date('H:i:s'));
 
         // $targetTime = '13:35:47';
         // $data = array_filter($data, function ($item) use ($targetTime) {
@@ -89,7 +89,7 @@ class ScanDerivativeJob implements ShouldQueue
     private function scanPattern($data)
     {
         $side = null;
-        $A = $B = $C = $D = $E = $F = null;
+        $A = $B = $C = $D = $E = $F = [];
 
         $lastPos = count($data) - 1;
         for ($index = $lastPos; $index >= 0; $index--) {
