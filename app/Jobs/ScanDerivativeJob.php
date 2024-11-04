@@ -43,8 +43,6 @@ class ScanDerivativeJob implements ShouldQueue
 
         $data = json_decode($this->data);
 
-        set_global_value("dnseTrading", 'count: ' . count($data) . ', time: ' . date('H:i:s'));
-
         // $targetTime = '13:35:47';
         // $data = array_filter($data, function ($item) use ($targetTime) {
         //     return $item->time <= $targetTime;
