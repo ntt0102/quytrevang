@@ -1823,9 +1823,9 @@ function autoScanToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         removeAutoScanTool();
-        removePhaseTool(false);
-        removeTimeRangeTool(false);
-        removeProgressTool(false);
+        removePhaseTool();
+        removeTimeRangeTool();
+        removeProgressTool();
         e.target.classList.add("selected");
     }
 }
@@ -1862,9 +1862,9 @@ function loadAutoScanTool(data) {
     if ("auto" in data) {
         params.tools.auto = data.auto;
         const { pattern, info } = runAutoScan(params.tools.auto, true);
-        loadTimeRangeTool(info.rt1, true);
-        loadProgressTool(pattern);
-        loadPhaseTool(info);
+        loadTimeRangeTool(info.rt1, true, true);
+        loadProgressTool(pattern, true);
+        loadPhaseTool(info, true);
         const { phase, tr, progress, auto, ...updatedToolsData } = data;
         return updatedToolsData;
     }
