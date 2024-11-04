@@ -1858,6 +1858,7 @@ function drawAutoScanTool() {
 }
 function loadAutoScanTool(data) {
     if ("auto" in data) {
+        console.log("loadAutoScanTool", data);
         params.tools.auto = data.auto;
         const { pattern, info } = runAutoScan(params.tools.auto, true);
         loadTimeRangeTool(info.rt1, true);
@@ -2055,8 +2056,8 @@ function loadTimeRangeTool(data, onlyTime = false, isStore = false) {
             { time: data.start, value: 1, color: "lime" },
             { time: data.end, value: 1, color: "OrangeRed" },
         ];
-    if (!data[0].time || !data[1].time) return false;
-    if (data[1].time <= data[0].time) return false;
+    // if (!data[0].time || !data[1].time) return false;
+    // if (data[1].time <= data[0].time) return false;
     params.tools.timeRange = data;
     params.series.timeRange.setData(data);
     if (isStore)
