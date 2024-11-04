@@ -64,7 +64,7 @@ class ScanDerivativeJob implements ShouldQueue
         $phase2 = $this->scanPhase($data, $points['B']['time'], $points['C']['price'], $phase1['rt']['distance']);
         $pattern = $this->validatePattern($points, $phase2);
 
-        if ($pattern == 0) {
+        if ($pattern == 0 || $pattern == 1) {
             Notification::send(
                 User::permission('admin:order_derivative')->get(),
                 new ScanedPhaseNotification()
