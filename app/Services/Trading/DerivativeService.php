@@ -399,7 +399,7 @@ class DerivativeService extends CoreService
             $ret['filename'] = $filename;
             $ret['headers'] = ['Content-Type' => 'text/csv'];
         } else {
-            Artisan::call('export:trading');
+            Artisan::call('clone:data --type=export');
             $ret['isOk'] = true;
         }
         return $ret;

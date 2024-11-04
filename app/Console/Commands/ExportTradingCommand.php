@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Ratchet\Client\Connector;
 use App\Jobs\ExportShareJob;
 use App\Jobs\ExportDerivativeJob;
+use App\Jobs\ScanDerivativeJob;
 
 class ExportTradingCommand extends Command
 {
@@ -16,7 +17,7 @@ class ExportTradingCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'export:trading';
+    protected $signature = 'clone:data {--type=}';
 
     /**
      * The console command description.
@@ -55,11 +56,21 @@ class ExportTradingCommand extends Command
                 $data = $this->parseSocketMessage($msg);
                 foreach ($data as $item) {
                     if (!$item) return false;
-                    if ($item->type == 1 && $item->target == 'UpdateLastPrices' && count($item->arguments[0]) > 2000) {
-                        ExportShareJob::dispatch(json_encode($item->arguments[0]));
-                    } else if ($item->type == 3) {
-                        $ws->close();
-                        ExportDerivativeJob::dispatch(json_encode($item->result));
+                    switch ($this->option('type')) {
+                        case 'export':
+                            if ($item->type == 1 && $item->target == 'UpdateLastPrices' && count($item->arguments[0]) > 2000) {
+                                ExportShareJob::dispatch(json_encode($item->arguments[0]));
+                            } else if ($item->type == 3) {
+                                $ws->close();
+                                ExportDerivativeJob::dispatch(json_encode($item->result));
+                            }
+                            break;
+                        case 'scan':
+                            if ($item->type == 3) {
+                                $ws->close();
+                                ScanDerivativeJob::dispatch(json_encode($item->result));
+                            }
+                            break;
                     }
                 }
             });

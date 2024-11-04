@@ -20,16 +20,18 @@ class ScanDerivativeJob implements ShouldQueue
     const SHIFT_TIME = 7 * 60 * 60;
     public $tries = 1;
     public $timeout = 3600;
-    private $date;
+    private $data;
+    // private $date;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($data)
     {
-        $this->date = get_global_value('lastOpeningDate');
+        $this->data = $data;
+        // $this->date = get_global_value('lastOpeningDate');
     }
 
     /**
@@ -45,7 +47,7 @@ class ScanDerivativeJob implements ShouldQueue
 
     public function execute()
     {
-        $data = $this->cloneVpsData();
+        $data = json_decode($this->data);
         set_global_value("dnseTrading", 'count: ' . count($data) . ', time: ' . date('H:i:s'));
 
         // $targetTime = '13:35:47';
@@ -97,8 +99,8 @@ class ScanDerivativeJob implements ShouldQueue
 
         $lastPos = count($data) - 1;
         for ($index = $lastPos; $index >= 0; $index--) {
-            $price = $data[$index]->lastPrice;
-            $time = $data[$index]->time;
+            $price = $data[$index]->price;
+            $time = $data[$index]->date;
 
             if ($index == $lastPos) {
                 $F = ['index' => $index, 'time' => $time, 'price' => $price];
@@ -304,6 +306,6 @@ class ScanDerivativeJob implements ShouldQueue
 
     private function unix($time)
     {
-        return strtotime($this->date . ' ' . $time) + self::SHIFT_TIME;
+        return strtotime($time) + self::SHIFT_TIME;
     }
 }

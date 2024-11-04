@@ -117,7 +117,7 @@ Route::get('test', function () {
     //     $receiver,
     //     new \App\Notifications\CoreNotification($params, false, true)
     // );
-    // \Illuminate\Support\Facades\Artisan::call('export:trading');
+    $s = \Illuminate\Support\Facades\Artisan::call('clone:data --type=scan');
     // $date = '2024-07-18';
     // $file = storage_path('app/cophieu/date.txt');
     // $isUpdated = false;
@@ -134,7 +134,7 @@ Route::get('test', function () {
     // \App\Jobs\ExportTradingJob::dispatch();
     // \App\Jobs\GetDnseEmailOtpJob::dispatch();
     // $s = \App\Jobs\ScanDerivativeJob::dispatch();
-    $s = app(\App\Jobs\ScanDerivativeJob::class)->execute();
+    // $s = app(\App\Jobs\ScanDerivativeJob::class)->execute();
     // $s = check_opening_market(date_create_from_format("Y-m-d", '2024-11-01'));
     // $s = get_last_opening_date();
     // $emailOtp = "";
