@@ -38,6 +38,7 @@ class Kernel extends ConsoleKernel
             $schedule->job(new ReportTradingJob)->dailyAt('14:47');
             $schedule->command('export:trading')->dailyAt('14:48');
             if (in_trading_time()) {
+                set_global_value("dnseAccess", date('H:i:s'));
                 $schedule->job(new OrderDerivativeJob)->everyMinute();
                 $schedule->job(new ScanDerivativeJob)->everyMinute();
             }
