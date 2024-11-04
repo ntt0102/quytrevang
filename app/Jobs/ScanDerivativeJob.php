@@ -38,6 +38,7 @@ class ScanDerivativeJob implements ShouldQueue
      */
     public function handle()
     {
+        set_global_value("dnseTrading", date('H:i:s'));
         if (get_global_value('autoScanFlag') == '0') return false;
 
         $data = $this->cloneVpsData();
