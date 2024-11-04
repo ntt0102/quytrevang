@@ -133,8 +133,8 @@ Route::get('test', function () {
     // dd($s->symbols);
     // \App\Jobs\ExportTradingJob::dispatch();
     // \App\Jobs\GetDnseEmailOtpJob::dispatch();
-    $s = \App\Jobs\ScanDerivativeJob::dispatch();
-    // $s = app(\App\Jobs\ScanDerivativeJob::class)->test();
+    // $s = \App\Jobs\ScanDerivativeJob::dispatch();
+    $s = app(\App\Jobs\ScanDerivativeJob::class)->execute();
     // $s = check_opening_market(date_create_from_format("Y-m-d", '2024-11-01'));
     // $s = get_last_opening_date();
     // $emailOtp = "";
