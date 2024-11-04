@@ -39,12 +39,12 @@ class ScanDerivativeJob implements ShouldQueue
      */
     public function handle()
     {
+        if (get_global_value('autoScanFlag') == '0') return false;
         $this->execute();
     }
 
     public function execute()
     {
-        if (get_global_value('autoScanFlag') == '0') return false;
 
         $data = $this->cloneVpsData();
         dd($data);
