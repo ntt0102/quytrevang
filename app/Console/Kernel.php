@@ -43,7 +43,7 @@ class Kernel extends ConsoleKernel
                 $schedule->job(new ScanDerivativeJob)->everyMinute();
             }
         }
-
+        set_global_value("test", date('H:i:s'));
         $schedule->command('queue:work --stop-when-empty')->everyMinute();
     }
 
