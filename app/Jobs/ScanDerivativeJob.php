@@ -21,7 +21,6 @@ class ScanDerivativeJob implements ShouldQueue
     public $tries = 1;
     public $timeout = 3600;
     private $data;
-    // private $date;
 
     /**
      * Create a new job instance.
@@ -31,7 +30,6 @@ class ScanDerivativeJob implements ShouldQueue
     public function __construct($data)
     {
         $this->data = $data;
-        // $this->date = get_global_value('lastOpeningDate');
     }
 
     /**
@@ -42,12 +40,9 @@ class ScanDerivativeJob implements ShouldQueue
     public function handle()
     {
         if (get_global_value('autoScanFlag') == '0') return false;
-        $this->execute();
-    }
 
-    public function execute()
-    {
         $data = json_decode($this->data);
+
         set_global_value("dnseTrading", 'count: ' . count($data) . ', time: ' . date('H:i:s'));
 
         // $targetTime = '13:35:47';
@@ -79,18 +74,6 @@ class ScanDerivativeJob implements ShouldQueue
 
         return $pattern;
     }
-
-    // private function cloneVpsData()
-    // {
-    //     try {
-    //         $client = new \GuzzleHttp\Client();
-    //         $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-    //         $res = $client->get($url);
-    //         return json_decode($res->getBody());
-    //     } catch (\Throwable $th) {
-    //         return [];
-    //     }
-    // }
 
     private function scanPattern($data)
     {

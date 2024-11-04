@@ -42,6 +42,7 @@ class DerivativeService extends CoreService
                 'vn30f1m' => get_global_value('vn30f1m'),
                 'vpsUser' => get_global_value('vpsUser'),
                 'vpsSession' => get_global_value('vpsSession'),
+                'lastOpeningDate' => get_global_value('lastOpeningDate'),
                 'autoScan' => get_global_value('autoScanFlag') == '1',
             ],
             'status' => $this->getStatus($payload)

@@ -389,6 +389,7 @@ const tradingViewSrc = computed(() => {
 
 store.dispatch("tradingDerivative/initChart").then(() => {
     if (inSession()) connectSocket();
+    state.chartDate = route.query.date ?? config.value.lastOpeningDate;
 });
 
 params.interval = setInterval(intervalHandler, 1000);
