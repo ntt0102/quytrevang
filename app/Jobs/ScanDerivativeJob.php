@@ -80,17 +80,17 @@ class ScanDerivativeJob implements ShouldQueue
         return $pattern;
     }
 
-    private function cloneVpsData()
-    {
-        try {
-            $client = new \GuzzleHttp\Client();
-            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-            $res = $client->get($url);
-            return json_decode($res->getBody());
-        } catch (\Throwable $th) {
-            return [];
-        }
-    }
+    // private function cloneVpsData()
+    // {
+    //     try {
+    //         $client = new \GuzzleHttp\Client();
+    //         $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+    //         $res = $client->get($url);
+    //         return json_decode($res->getBody());
+    //     } catch (\Throwable $th) {
+    //         return [];
+    //     }
+    // }
 
     private function scanPattern($data)
     {
@@ -181,11 +181,11 @@ class ScanDerivativeJob implements ShouldQueue
         $sp = 0;
 
         $data = array_filter($data, function ($item) use ($startTime) {
-            return $this->unix($item->time) >= $startTime;
+            return $this->unix($item->date) >= $startTime;
         });
         foreach ($data as $index => $item) {
-            $price = $item->lastPrice;
-            $time = $item->time;
+            $price = $item->price;
+            $time = $item->date;
 
             if ($sp == 0) {
                 $side = $endPrice >= $price;
