@@ -747,7 +747,7 @@ function eventPriceLineDrag(e) {
                     data: [],
                 };
                 let point, changeOptions;
-                const { pattern, info } = runAutoScan(
+                const { valid, pattern, info } = runAutoScan(
                     {
                         A: {
                             time: +params.tools.phase.A.options().time,
@@ -761,78 +761,80 @@ function eventPriceLineDrag(e) {
                     },
                     true
                 );
-                const { b, c } = info;
-                let d = info.d;
-                loadTimeRangeTool(info.rt1, true, true);
-                loadProgressTool(pattern, true);
-                //
-                if (["A", "B"].includes(lineOptions.point)) {
-                    point = "A";
-                    changeOptions = { title: info.er1 };
+                if (valid) {
+                    const { b, c } = info;
+                    let d = info.d;
+                    loadTimeRangeTool(info.rt1, true, true);
+                    loadProgressTool(pattern, true);
+                    //
+                    if (["A", "B"].includes(lineOptions.point)) {
+                        point = "A";
+                        changeOptions = { title: info.er1 };
+                        params.tools.phase[point].applyOptions(changeOptions);
+                        param.points.push(point);
+                        param.data.push(params.tools.phase[point].options());
+                    }
+                    //
+                    if (["A", "B", "C"].includes(lineOptions.point)) {
+                        point = "B";
+                        changeOptions = {
+                            rt: info.rtRef,
+                            title: info.er2,
+                        };
+                        params.tools.phase[point].applyOptions(changeOptions);
+                        param.points.push(point);
+                        param.data.push(params.tools.phase[point].options());
+                    }
+                    //
+                    point = "C";
+                    changeOptions = { title: info.rr1.toFixed(1) };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
-                }
-                //
-                if (["A", "B", "C"].includes(lineOptions.point)) {
-                    point = "B";
+                    //
+                    point = "D";
+                    if (lineOptions.point == point) {
+                        d = +params.tools.phase.D.options().price;
+                        const rr2 = ((c - d) / (c - b)) * 100;
+                        changeOptions = { title: rr2.toFixed(1) };
+                    } else
+                        changeOptions = {
+                            price: info.d,
+                            title: info.rr2.toFixed(1),
+                        };
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    point = "X";
                     changeOptions = {
-                        rt: info.rtRef,
-                        title: info.er2,
+                        price: +(d + (d - c) * 0.5).toFixed(1),
+                        title: ((d - c) * 0.5).toFixed(1),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
-                }
-                //
-                point = "C";
-                changeOptions = { title: info.rr1.toFixed(1) };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "D";
-                if (lineOptions.point == point) {
-                    d = +params.tools.phase.D.options().price;
-                    const rr2 = ((c - d) / (c - b)) * 100;
-                    changeOptions = { title: rr2.toFixed(1) };
-                } else
+                    //
+                    point = "Y";
                     changeOptions = {
-                        price: info.d,
-                        title: info.rr2.toFixed(1),
+                        price: +(d + (d - c)).toFixed(1),
+                        title: (d - c).toFixed(1),
                     };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "X";
-                changeOptions = {
-                    price: +(d + (d - c) * 0.5).toFixed(1),
-                    title: ((d - c) * 0.5).toFixed(1),
-                };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "Y";
-                changeOptions = {
-                    price: +(d + (d - c)).toFixed(1),
-                    title: (d - c).toFixed(1),
-                };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "Z";
-                changeOptions = {
-                    price: +(d + (d - c) * 2).toFixed(1),
-                    title: ((d - c) * 2).toFixed(1),
-                };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                store.dispatch("tradingDerivative/drawTools", param);
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    point = "Z";
+                    changeOptions = {
+                        price: +(d + (d - c) * 2).toFixed(1),
+                        title: ((d - c) * 2).toFixed(1),
+                    };
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    store.dispatch("tradingDerivative/drawTools", param);
+                }
             }
             break;
     }
@@ -1383,7 +1385,7 @@ function drawPhaseTool() {
         if (mf.isSet(params.tools.phase.B)) {
             if (mf.isSet(params.tools.phase.C)) {
                 let point, changeOptions;
-                const { pattern, info } = runAutoScan(
+                const { valid, pattern, info } = runAutoScan(
                     {
                         A: { time, price },
                         B: {
@@ -1394,63 +1396,65 @@ function drawPhaseTool() {
                     },
                     true
                 );
-                const { c, d } = info;
-                loadTimeRangeTool(info.rt1, true, true);
-                loadProgressTool(pattern, true);
-                //
-                point = "A";
-                changeOptions = { price, time, title: info.er1 };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "B";
-                changeOptions = { rt: info.rtRef };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "C";
-                changeOptions = { title: info.rr1.toFixed(1) };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "D";
-                changeOptions = { price: d, title: info.rr2.toFixed(1) };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "X";
-                changeOptions = {
-                    price: +(d + (d - c) * 0.5).toFixed(1),
-                    title: ((d - c) * 0.5).toFixed(1),
-                };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "Y";
-                changeOptions = {
-                    price: +(d + (d - c)).toFixed(1),
-                    title: (d - c).toFixed(1),
-                };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                point = "Z";
-                changeOptions = {
-                    price: +(d + (d - c) * 2).toFixed(1),
-                    title: ((d - c) * 2).toFixed(1),
-                };
-                params.tools.phase[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
+                if (valid) {
+                    const { c, d } = info;
+                    loadTimeRangeTool(info.rt1, true, true);
+                    loadProgressTool(pattern, true);
+                    //
+                    point = "A";
+                    changeOptions = { price, time, title: info.er1 };
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    point = "B";
+                    changeOptions = { rt: info.rtRef };
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    point = "C";
+                    changeOptions = { title: info.rr1.toFixed(1) };
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    point = "D";
+                    changeOptions = { price: d, title: info.rr2.toFixed(1) };
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    point = "X";
+                    changeOptions = {
+                        price: +(d + (d - c) * 0.5).toFixed(1),
+                        title: ((d - c) * 0.5).toFixed(1),
+                    };
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    point = "Y";
+                    changeOptions = {
+                        price: +(d + (d - c)).toFixed(1),
+                        title: (d - c).toFixed(1),
+                    };
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    point = "Z";
+                    changeOptions = {
+                        price: +(d + (d - c) * 2).toFixed(1),
+                        title: ((d - c) * 2).toFixed(1),
+                    };
+                    params.tools.phase[point].applyOptions(changeOptions);
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                }
             } else {
                 const bOptions = params.tools.phase.B.options();
-                const { pattern, info } = runAutoScan(
+                const { valid, pattern, info } = runAutoScan(
                     {
                         A: { price: +params.tools.phase.A.options().price },
                         B: {
@@ -1462,60 +1466,62 @@ function drawPhaseTool() {
                     },
                     true
                 );
-                const { c, d } = info;
-                loadProgressTool(pattern, true);
-                //
-                const point = "B";
-                params.tools.phase[point].applyOptions({ title: info.er2 });
-                param.points.push(point);
-                param.data.push(params.tools.phase[point].options());
-                //
-                option.point = "C";
-                option.title = info.rr1.toFixed(1);
-                option.color = "#FF9800";
-                params.tools.phase[option.point] =
-                    params.series.price.createPriceLine(option);
-                param.points.push(option.point);
-                param.data.push(mf.cloneDeep(option));
-                //
-                option.point = "D";
-                option.price = d;
-                option.title = info.rr2.toFixed(1);
-                option.color = "#4CAF50";
-                params.tools.phase[option.point] =
-                    params.series.price.createPriceLine(option);
-                param.points.push(option.point);
-                param.data.push(mf.cloneDeep(option));
-                //
-                option.point = "X";
-                option.price = +(d + (d - c) * 0.5).toFixed(1);
-                option.title = ((d - c) * 0.5).toFixed(1);
-                option.color = "#2196F3";
-                option.draggable = false;
-                params.tools.phase[option.point] =
-                    params.series.price.createPriceLine(option);
-                param.points.push(option.point);
-                param.data.push(mf.cloneDeep(option));
-                //
-                option.point = "Y";
-                option.price = +(d + (d - c)).toFixed(1);
-                option.title = (d - c).toFixed(1);
-                option.color = "#673AB7";
-                option.draggable = false;
-                params.tools.phase[option.point] =
-                    params.series.price.createPriceLine(option);
-                param.points.push(option.point);
-                param.data.push(mf.cloneDeep(option));
-                //
-                option.point = "Z";
-                option.price = +(d + (d - c) * 2).toFixed(1);
-                option.title = ((d - c) * 2).toFixed(1);
-                option.color = "#9C27B0";
-                option.draggable = false;
-                params.tools.phase[option.point] =
-                    params.series.price.createPriceLine(option);
-                param.points.push(option.point);
-                param.data.push(mf.cloneDeep(option));
+                if (valid) {
+                    const { c, d } = info;
+                    loadProgressTool(pattern, true);
+                    //
+                    const point = "B";
+                    params.tools.phase[point].applyOptions({ title: info.er2 });
+                    param.points.push(point);
+                    param.data.push(params.tools.phase[point].options());
+                    //
+                    option.point = "C";
+                    option.title = info.rr1.toFixed(1);
+                    option.color = "#FF9800";
+                    params.tools.phase[option.point] =
+                        params.series.price.createPriceLine(option);
+                    param.points.push(option.point);
+                    param.data.push(mf.cloneDeep(option));
+                    //
+                    option.point = "D";
+                    option.price = d;
+                    option.title = info.rr2.toFixed(1);
+                    option.color = "#4CAF50";
+                    params.tools.phase[option.point] =
+                        params.series.price.createPriceLine(option);
+                    param.points.push(option.point);
+                    param.data.push(mf.cloneDeep(option));
+                    //
+                    option.point = "X";
+                    option.price = +(d + (d - c) * 0.5).toFixed(1);
+                    option.title = ((d - c) * 0.5).toFixed(1);
+                    option.color = "#2196F3";
+                    option.draggable = false;
+                    params.tools.phase[option.point] =
+                        params.series.price.createPriceLine(option);
+                    param.points.push(option.point);
+                    param.data.push(mf.cloneDeep(option));
+                    //
+                    option.point = "Y";
+                    option.price = +(d + (d - c)).toFixed(1);
+                    option.title = (d - c).toFixed(1);
+                    option.color = "#673AB7";
+                    option.draggable = false;
+                    params.tools.phase[option.point] =
+                        params.series.price.createPriceLine(option);
+                    param.points.push(option.point);
+                    param.data.push(mf.cloneDeep(option));
+                    //
+                    option.point = "Z";
+                    option.price = +(d + (d - c) * 2).toFixed(1);
+                    option.title = ((d - c) * 2).toFixed(1);
+                    option.color = "#9C27B0";
+                    option.draggable = false;
+                    params.tools.phase[option.point] =
+                        params.series.price.createPriceLine(option);
+                    param.points.push(option.point);
+                    param.data.push(mf.cloneDeep(option));
+                }
             }
             phaseToolRef.value.classList.remove("selected");
         } else {
@@ -1844,7 +1850,9 @@ function drawAutoScanTool() {
         points: [],
         data: [],
     };
-    const { pattern, info, points } = runAutoScan(data);
+    const { valid, pattern, info, points } = runAutoScan(data);
+    if (!valid) return false;
+
     loadTimeRangeTool(info.rt1, true, true);
     loadProgressTool(pattern, true);
     removePhaseTool(false);
@@ -1861,17 +1869,20 @@ function drawAutoScanTool() {
 function loadAutoScanTool(data) {
     if ("auto" in data) {
         params.tools.auto = data.auto;
-        const { pattern, info } = runAutoScan(params.tools.auto, true);
-        loadTimeRangeTool(info.rt1, true, true);
-        loadProgressTool(pattern, true);
-        loadPhaseTool(info, true);
-        const { phase, tr, progress, auto, ...updatedToolsData } = data;
-        return updatedToolsData;
+        const { valid, pattern, info } = runAutoScan(params.tools.auto, true);
+        if (valid) {
+            loadTimeRangeTool(info.rt1, true, true);
+            loadProgressTool(pattern, true);
+            loadPhaseTool(info, true);
+            const { phase, tr, progress, auto, ...updatedToolsData } = data;
+            return updatedToolsData;
+        }
     }
     return data;
 }
 function runAutoScan(data, isAvailable = false) {
     const points = isAvailable ? data : scanPattern(data);
+    if (!mf.isSet(points)) return { valid: false };
     const a = points.A.price;
     const b = points.B.price;
     const c = points.C.price;
@@ -1898,7 +1909,7 @@ function runAutoScan(data, isAvailable = false) {
         rr1: ((b - c) / (b - a)) * 100,
         rr2: ((c - d) / (c - b)) * 100,
     };
-    return { pattern, info, points };
+    return { valid: true, pattern, info, points };
 }
 function validatePattern({ A, B, C, D, E }, phase2) {
     if (phase2.rt.count > 1) return 6;
@@ -1977,10 +1988,11 @@ function scanPattern(data) {
             }
         }
     }
-    const ret =
-        A.index == C.index
-            ? { A: C, B: D, C: E, D: F, E: {}, F: {} }
-            : { A, B, C, D, E, F };
+    let ret = {};
+    if (A.index != C.index) ret = { A, B, C, D, E, F };
+    else if (C.index != E.index) ret = { A: C, B: D, C: E, D: F, E: {}, F: {} };
+
+    console.log("ret", ret);
     return removeIndex(ret);
 }
 function removeIndex(obj) {

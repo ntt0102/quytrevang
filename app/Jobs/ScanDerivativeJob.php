@@ -154,9 +154,9 @@ class ScanDerivativeJob implements ShouldQueue
                 if ($bc >= 1.5 && ($bc / $ab > 0.5 || $cd / $bc > 0.5)) break;
             }
         }
-        $ret = ($A['index'] === $C['index'])
-            ? ['A' => $C, 'B' => $D, 'C' => $E, 'D' => $F, 'E' => [], 'F' => []]
-            : ['A' => $A, 'B' => $B, 'C' => $C, 'D' => $D, 'E' => $E, 'F' => $F];
+        $ret = [];
+        if ($A['index'] != $C['index']) $ret = ['A' => $A, 'B' => $B, 'C' => $C, 'D' => $D, 'E' => $E, 'F' => $F];
+        else if ($C['index'] != $E['index']) $ret = ['A' => $C, 'B' => $D, 'C' => $E, 'D' => $F, 'E' => [], 'F' => []];
 
         return $this->removeIndex($ret);
     }
