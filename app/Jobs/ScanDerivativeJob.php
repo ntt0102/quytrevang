@@ -18,7 +18,8 @@ class ScanDerivativeJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     const SHIFT_TIME = 7 * 60 * 60;
-
+    public $tries = 3;
+    public $timeout = 3600;
     private $date;
 
     /**
