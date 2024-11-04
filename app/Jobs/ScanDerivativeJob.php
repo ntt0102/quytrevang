@@ -43,6 +43,7 @@ class ScanDerivativeJob implements ShouldQueue
 
         $data = $this->cloneVpsData();
         set_global_value("dnseTrading", 'count: ' . count($data) . ', time: ' . date('H:i:s'));
+        return false;
 
         // $targetTime = '13:35:47';
         // $data = array_filter($data, function ($item) use ($targetTime) {
