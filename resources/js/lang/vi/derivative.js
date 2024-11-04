@@ -2,11 +2,11 @@ export default {
     items: [
         {
             name: "Mẫu hình chuẩn",
-            items: "<u>Entry</u>: Kháng cự 2 </br><u>Target</u>: x1 hoặc x2 nếu có nền / Kháng cự 2",
+            items: "<u>Entry</u>: Kháng cự 2 </br><u>Target</u>: x1 hoặc x2 / Kháng cự 2",
         },
         {
             name: "Mẫu hình tam giác",
-            items: "<u>Entry</u>: Kháng cự 3 </br><u>Target</u>: x1 / Kháng cự 1",
+            items: "<u>Entry</u>: Tạo nền tam giác </br><u>Target</u>: x1 / Kháng cự",
         },
         {
             name: "Thời gian hồi phục nhỏ",
@@ -14,19 +14,19 @@ export default {
         },
         {
             name: "Tỷ lệ điều chỉnh < 38.2",
-            items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x2",
+            items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x2 / Kháng cự 2",
         },
         {
             name: "Tỷ lệ mở rộng điều chỉnh > 1 ",
-            items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x1",
+            items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x1 / Kháng cự 2",
         },
         {
             name: "Tỷ lệ kháng cự 2 < 78.6",
-            items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x2",
+            items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x1 / Kháng cự 2",
         },
         {
             name: "Thời gian hồi phục lớn",
-            items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x0.5",
+            items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x0.5 / Kháng cự 2",
         },
     ],
 };
