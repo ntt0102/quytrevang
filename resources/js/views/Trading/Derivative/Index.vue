@@ -1935,8 +1935,14 @@ function scanPattern(data) {
         }
         if (!cmp(D.price, side, F.price) && cmp(price, !side, E.price))
             E = { index, time, price };
-        if (!cmp(C.price, !side, E.price) && cmp(price, side, D.price))
-            D = { index, time, price };
+        if (!cmp(C.price, !side, E.price) && cmp(price, side, D.price)) {
+            if (F.index - E.index <= 5) {
+                F = mf.cloneDeep(E);
+                D = mf.cloneDeep(E);
+                E = { index, time, price };
+                side = !side;
+            } else D = { index, time, price };
+        }
         if (!cmp(B.price, side, D.price) && cmp(price, !side, C.price))
             C = { index, time, price };
         if (cmp(price, side, B.price)) {
@@ -1952,25 +1958,22 @@ function scanPattern(data) {
         }
         if (cmp(price, !side, A.price)) A = { index, time, price };
         //
-        if (A.index == C.index) {
-            if (D.index > C.index && C.index - index > E.index - D.index) {
-                const cd = Math.abs(C.price - D.price);
-                const de = Math.abs(D.price - E.price);
-                const ef = Math.abs(E.price - F.price);
-                if (de >= 1.5 && de / cd < 0.786 && ef / de > 0.5) {
-                    console.log("con", ef / de);
-                    break;
-                }
+        if (E.index > C.index && C.index - index > E.index - D.index) {
+            const cd = Math.abs(C.price - D.price);
+            const de = Math.abs(D.price - E.price);
+            const ef = Math.abs(E.price - F.price);
+            if (de >= 1.5 && (de / cd > 0.5 || ef / de > 0.5)) {
+                console.log("con", { C, D, E, F });
+                break;
             }
-        } else {
-            if (B.index > A.index && A.index - index > C.index - B.index) {
-                const ab = Math.abs(A.price - B.price);
-                const bc = Math.abs(B.price - C.price);
-                const cd = Math.abs(C.price - D.price);
-                if (bc >= 1.5 && bc / ab < 0.786 && cd / bc > 0.5) {
-                    console.log("cha", cd / bc);
-                    break;
-                }
+        }
+        if (C.index > A.index && A.index - index > C.index - B.index) {
+            const ab = Math.abs(A.price - B.price);
+            const bc = Math.abs(B.price - C.price);
+            const cd = Math.abs(C.price - D.price);
+            if (bc >= 1.5 && (bc / ab > 0.5 || cd / bc > 0.5)) {
+                console.log("cha", { A, B, C, D });
+                break;
             }
         }
     }

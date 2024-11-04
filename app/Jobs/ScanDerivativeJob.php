@@ -105,8 +105,14 @@ class ScanDerivativeJob implements ShouldQueue
             if (
                 !$this->cmp($C['price'], !$side, $E['price']) &&
                 $this->cmp($price, $side, $D['price'])
-            )
-                $D = ['index' => $index, 'time' => $time, 'price' => $price];
+            ) {
+                if ($F['index'] - $E['index'] <= 5) {
+                    $F = $E;
+                    $D = $E;
+                    $E = ['index' => $index, 'time' => $time, 'price' => $price];
+                    $side = !$side;
+                } else $D = ['index' => $index, 'time' => $time, 'price' => $price];
+            }
             if (
                 !$this->cmp($B['price'], $side, $D['price']) &&
                 $this->cmp($price, !$side, $C['price'])
@@ -129,26 +135,23 @@ class ScanDerivativeJob implements ShouldQueue
                 $A = ['index' => $index, 'time' => $time, 'price' => $price];
             }
 
-            if ($A['index'] === $C['index']) {
-                if (
-                    $D['index'] > $C['index'] &&
-                    $C['index'] - $index > $E['index'] - $D['index']
-                ) {
-                    $cd = abs($C['price'] - $D['price']);
-                    $de = abs($D['price'] - $E['price']);
-                    $ef = abs($E['price'] - $F['price']);
-                    if ($de >= 1.5 && $de / $cd < 0.786 && $ef / $de > 0.5) break;
-                }
-            } else {
-                if (
-                    $B['index'] > $A['index'] &&
-                    $A['index'] - $index > $C['index'] - $B['index']
-                ) {
-                    $ab = abs($A['price'] - $B['price']);
-                    $bc = abs($B['price'] - $C['price']);
-                    $cd = abs($C['price'] - $D['price']);
-                    if ($bc >= 1.5 && $bc / $ab < 0.786 && $cd / $bc > 0.5) break;
-                }
+            if (
+                $E['index'] > $C['index'] &&
+                $C['index'] - $index > $E['index'] - $D['index']
+            ) {
+                $cd = abs($C['price'] - $D['price']);
+                $de = abs($D['price'] - $E['price']);
+                $ef = abs($E['price'] - $F['price']);
+                if ($de >= 1.5 && ($de / $cd > 0.5 || $ef / $de > 0.5)) break;
+            }
+            if (
+                $C['index'] > $A['index'] &&
+                $A['index'] - $index > $C['index'] - $B['index']
+            ) {
+                $ab = abs($A['price'] - $B['price']);
+                $bc = abs($B['price'] - $C['price']);
+                $cd = abs($C['price'] - $D['price']);
+                if ($bc >= 1.5 && ($bc / $ab > 0.5 || $cd / $bc > 0.5)) break;
             }
         }
         $ret = ($A['index'] === $C['index'])
