@@ -785,13 +785,11 @@ function eventPriceLineDrag(e) {
                     param.data.push(params.tools.phase[point].options());
                 }
                 //
-                if (lineOptions.point == "C") {
-                    point = "C";
-                    changeOptions = { title: info.rr1.toFixed(1) };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                }
+                point = "C";
+                changeOptions = { title: info.rr1.toFixed(1) };
+                params.tools.phase[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.phase[point].options());
                 //
                 point = "D";
                 if (lineOptions.point == point) {
