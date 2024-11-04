@@ -23,7 +23,7 @@ const actions = {
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
-                    resolve();
+                    resolve(!!response.data.length);
                 });
         });
     },

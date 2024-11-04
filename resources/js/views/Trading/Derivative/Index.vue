@@ -431,8 +431,11 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    store.dispatch("tradingDerivative/getChartData", { date: state.chartDate });
-    setTimeout(() => store.dispatch("tradingDerivative/getTools"), 1000);
+    store
+        .dispatch("tradingDerivative/getChartData", { date: state.chartDate })
+        .then((hasData) => {
+            if (hasData) store.dispatch("tradingDerivative/getTools");
+        });
 });
 onUnmounted(() => {
     document.removeEventListener("keydown", eventKeyPress);
@@ -1049,6 +1052,7 @@ function connectSocket() {
         data.forEach((item) => {
             if (!item) return false;
             if (item.type == 3) {
+                store.dispatch("tradingDerivative/getTools");
                 params.data.whitespace = mergeChartData(
                     params.data.whitespace,
                     createWhitespaceData(CURRENT_DATE)
@@ -1858,7 +1862,6 @@ function drawAutoScanTool() {
 }
 function loadAutoScanTool(data) {
     if ("auto" in data) {
-        console.log("loadAutoScanTool", data);
         params.tools.auto = data.auto;
         const { pattern, info } = runAutoScan(params.tools.auto, true);
         loadTimeRangeTool(info.rt1, true);
@@ -1950,15 +1953,27 @@ function scanPattern(data) {
             } else B = { index, time, price };
         }
         if (cmp(price, !side, A.price)) A = { index, time, price };
-        if (D.index > C.index && C.index - index > E.index - D.index) {
-            const cd = Math.abs(C.price - D.price);
-            const de = Math.abs(D.price - E.price);
-            if (de >= 1.5 && de / cd < 0.786) break;
-        }
-        if (B.index > A.index && A.index - index > C.index - B.index) {
-            const ab = Math.abs(A.price - B.price);
-            const bc = Math.abs(B.price - C.price);
-            if (bc >= 1.5 && bc / ab < 0.786) break;
+        //
+        if (A.index == C.index) {
+            if (D.index > C.index && C.index - index > E.index - D.index) {
+                const cd = Math.abs(C.price - D.price);
+                const de = Math.abs(D.price - E.price);
+                const ef = Math.abs(E.price - F.price);
+                if (de >= 1.5 && de / cd < 0.786 && ef / de > 0.5) {
+                    console.log("con", ef / de);
+                    break;
+                }
+            }
+        } else {
+            if (B.index > A.index && A.index - index > C.index - B.index) {
+                const ab = Math.abs(A.price - B.price);
+                const bc = Math.abs(B.price - C.price);
+                const cd = Math.abs(C.price - D.price);
+                if (bc >= 1.5 && bc / ab < 0.786 && cd / bc > 0.5) {
+                    console.log("cha", cd / bc);
+                    break;
+                }
+            }
         }
     }
     const ret =
@@ -2056,8 +2071,6 @@ function loadTimeRangeTool(data, onlyTime = false, isStore = false) {
             { time: data.start, value: 1, color: "lime" },
             { time: data.end, value: 1, color: "OrangeRed" },
         ];
-    // if (!data[0].time || !data[1].time) return false;
-    // if (data[1].time <= data[0].time) return false;
     params.tools.timeRange = data;
     params.series.timeRange.setData(data);
     if (isStore)
