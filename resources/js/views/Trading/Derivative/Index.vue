@@ -757,31 +757,32 @@ function eventPriceLineDrag(e) {
                     price: +params.tools.phase.B.options().price,
                 };
                 const C = { price: +params.tools.phase.C.options().price };
-                const { valid, pattern, info } = runAutoScan({ A, B, C }, true);
+                const { valid, pattern, phase1, phase2, rr1, rr2 } =
+                    runAutoScan({ A, B, C }, true);
                 if (valid) {
                     const b = B.price;
                     const c = C.price;
-                    const d = info.res;
-                    loadTimeRangeTool(info.rt1, true, true);
+                    let d = phase2.sp;
+                    loadTimeRangeTool(phase1.rt, true, true);
                     loadProgressTool(pattern, true);
                     //
                     point = "A";
-                    changeOptions = { title: info.er1 };
+                    changeOptions = { title: phase1.er };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                     //
                     point = "B";
                     changeOptions = {
-                        rt: info.rtRef,
-                        title: info.er2,
+                        rt: phase1.rt.distance,
+                        title: phase2.er,
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                     //
                     point = "C";
-                    changeOptions = { title: info.rr1.toFixed(1) };
+                    changeOptions = { title: rr1 };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
@@ -789,12 +790,15 @@ function eventPriceLineDrag(e) {
                     point = "D";
                     if (lineOptions.point == point) {
                         d = +params.tools.phase.D.options().price;
-                        const rr2 = ((c - d) / (c - b)) * 100;
-                        changeOptions = { title: rr2.toFixed(1) };
+                        changeOptions = {
+                            title: parseFloat(
+                                (((c - d) / (c - b)) * 100).toFixed(1)
+                            ),
+                        };
                     } else
                         changeOptions = {
-                            price: info.d,
-                            title: info.rr2.toFixed(1),
+                            price: d,
+                            title: rr2,
                         };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -803,7 +807,7 @@ function eventPriceLineDrag(e) {
                     point = "X";
                     changeOptions = {
                         price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
-                        title: ((d - c) * 0.5).toFixed(1),
+                        title: parseFloat(((d - c) * 0.5).toFixed(1)),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -812,7 +816,7 @@ function eventPriceLineDrag(e) {
                     point = "Y";
                     changeOptions = {
                         price: parseFloat((d + (d - c)).toFixed(1)),
-                        title: (d - c).toFixed(1),
+                        title: parseFloat((d - c).toFixed(1)),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -821,7 +825,7 @@ function eventPriceLineDrag(e) {
                     point = "Z";
                     changeOptions = {
                         price: parseFloat((d + (d - c) * 2).toFixed(1)),
-                        title: ((d - c) * 2).toFixed(1),
+                        title: parseFloat(((d - c) * 2).toFixed(1)),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -1282,13 +1286,14 @@ function drawAutoScanTool() {
         points: [],
         data: [],
     };
-    const { valid, pattern, info, points } = runAutoScan(data);
+    const { valid, pattern, phase1, phase2, rr1, rr2, points } =
+        runAutoScan(data);
     if (!valid) return false;
 
-    loadTimeRangeTool(info.rt1, true);
+    loadTimeRangeTool(phase1.rt, true);
     loadProgressTool(pattern);
     removePhaseTool(false);
-    loadPhaseTool(info);
+    loadPhaseTool(points, { phase1, phase2, rr1, rr2 });
     if (JSON.stringify(params.tools.auto) != JSON.stringify(points)) {
         params.tools.auto = points;
         Object.entries(points).forEach(([key, value]) => {
@@ -1301,11 +1306,14 @@ function drawAutoScanTool() {
 function loadAutoScanTool(data) {
     if ("auto" in data) {
         params.tools.auto = data.auto;
-        const { valid, pattern, info } = runAutoScan(params.tools.auto, true);
+        const { valid, pattern, phase1, phase2, rr1, rr2 } = runAutoScan(
+            params.tools.auto,
+            true
+        );
         if (valid) {
-            loadTimeRangeTool(info.rt1, true);
+            loadTimeRangeTool(phase1.rt, true);
             loadProgressTool(pattern);
-            loadPhaseTool(info);
+            loadPhaseTool(data.auto, { phase1, phase2, rr1, rr2 });
             const { phase, tr, progress, auto, ...updatedData } = data;
             return updatedData;
         }
@@ -1321,23 +1329,22 @@ function runAutoScan(data, isAvailable = false) {
     const phase1 = !points.B.rt
         ? scanPhase(points.A, points.B)
         : { rt: { distance: points.B.rt } };
-    const rtRef = phase1.rt.distance;
-    const phase2 = scanPhase(points.B, points.C, rtRef);
+    const phase2 = scanPhase(points.B, points.C, phase1.rt.distance);
     const pattern = validatePattern(points, phase2);
-    const res = phase2.rt.count > 0 ? phase2.sp : points.B.price;
-    const info = {
-        res,
-        rtRef,
-        rt1: phase1.rt,
-        er1: phase1.er,
-        er2: phase2.er,
-        rr1:
+    const rr1 = parseFloat(
+        (
             ((points.B.price - points.C.price) /
                 (points.B.price - points.A.price)) *
-            100,
-        rr2: ((points.C.price - res) / (points.C.price - points.B.price)) * 100,
-    };
-    return { valid: true, pattern, info, points };
+            100
+        ).toFixed(1)
+    );
+    const rr2 = parseFloat(
+        (
+            ((points.C.price - phase2.sp) / (points.C.price - points.B.price)) *
+            100
+        ).toFixed(1)
+    );
+    return { valid: true, pattern, phase1, phase2, rr1, rr2, points };
 }
 function scanPattern(data) {
     let side, A, B, C, D, E, F;
@@ -1483,33 +1490,34 @@ function drawPhaseTool() {
                     price: +params.tools.phase.B.options().price,
                 };
                 const C = { price: +params.tools.phase.C.options().price };
-                const { valid, pattern, info } = runAutoScan({ A, B, C }, true);
+                const { valid, pattern, phase1, phase2, rr1, rr2 } =
+                    runAutoScan({ A, B, C }, true);
                 if (valid) {
                     const c = C.price;
-                    const d = info.res;
-                    loadTimeRangeTool(info.rt1, true, true);
+                    const d = phase2.sp;
+                    loadTimeRangeTool(phase1.rt, true, true);
                     loadProgressTool(pattern, true);
                     //
                     point = "A";
-                    changeOptions = { price, time, title: info.er1 };
+                    changeOptions = { price, time, title: phase1.er };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                     //
                     point = "B";
-                    changeOptions = { rt: info.rtRef };
+                    changeOptions = { rt: phase1.rt.distance };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                     //
                     point = "C";
-                    changeOptions = { title: info.rr1.toFixed(1) };
+                    changeOptions = { title: rr1 };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                     //
                     point = "D";
-                    changeOptions = { price: d, title: info.rr2.toFixed(1) };
+                    changeOptions = { price: d, title: rr2 };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
@@ -1517,7 +1525,7 @@ function drawPhaseTool() {
                     point = "X";
                     changeOptions = {
                         price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
-                        title: ((d - c) * 0.5).toFixed(1),
+                        title: parseFloat(((d - c) * 0.5).toFixed(1)),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -1526,7 +1534,7 @@ function drawPhaseTool() {
                     point = "Y";
                     changeOptions = {
                         price: parseFloat((d + (d - c)).toFixed(1)),
-                        title: (d - c).toFixed(1),
+                        title: parseFloat((d - c).toFixed(1)),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -1535,7 +1543,7 @@ function drawPhaseTool() {
                     point = "Z";
                     changeOptions = {
                         price: parseFloat((d + (d - c) * 2).toFixed(1)),
-                        title: ((d - c) * 2).toFixed(1),
+                        title: parseFloat(((d - c) * 2).toFixed(1)),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
@@ -1550,19 +1558,24 @@ function drawPhaseTool() {
                     rt: +bOptions.rt,
                 };
                 const C = { price };
-                const { valid, pattern, info } = runAutoScan({ A, B, C }, true);
+                const { valid, pattern, phase2, rr1, rr2 } = runAutoScan(
+                    { A, B, C },
+                    true
+                );
                 if (valid) {
                     const c = C.price;
-                    const d = info.res;
+                    const d = phase2.sp;
                     loadProgressTool(pattern, true);
                     //
                     const point = "B";
-                    params.tools.phase[point].applyOptions({ title: info.er2 });
+                    params.tools.phase[point].applyOptions({
+                        title: phase2.er,
+                    });
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                     //
                     option.point = "C";
-                    option.title = parseFloat(info.rr1.toFixed(1));
+                    option.title = rr1;
                     option.color = "#FF9800";
                     params.tools.phase[option.point] =
                         params.series.price.createPriceLine(option);
@@ -1571,7 +1584,7 @@ function drawPhaseTool() {
                     //
                     option.point = "D";
                     option.price = d;
-                    option.title = parseFloat(info.rr2.toFixed(1));
+                    option.title = rr2;
                     option.color = "#4CAF50";
                     params.tools.phase[option.point] =
                         params.series.price.createPriceLine(option);
@@ -1648,7 +1661,8 @@ function drawPhaseTool() {
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function loadPhaseTool(
-    { a, b, c, d, aTime, bTime, rtRef, er1, er2, rr1, rr2 },
+    { A, B, C },
+    { phase1, phase2, rr1, rr2 },
     isStore = false
 ) {
     if (!params.data.price.length) return false;
@@ -1665,23 +1679,25 @@ function loadPhaseTool(
         points: [],
         data: [],
     };
+    const c = C.price;
+    const d = phase2.sp;
     //
     option.point = "A";
-    option.title = er1;
+    option.title = phase1.er;
     option.color = "#F44336";
-    option.price = a;
-    option.time = aTime;
+    option.price = A.price;
+    option.time = A.time;
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "B";
-    option.title = er2;
+    option.title = phase2.er;
     option.color = "#009688";
-    option.price = b;
-    option.time = bTime;
-    option.rt = rtRef;
+    option.price = B.price;
+    option.time = B.time;
+    option.rt = phase1.rt.distance;
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
@@ -1689,7 +1705,7 @@ function loadPhaseTool(
     //
     option.point = "C";
     option.price = c;
-    option.title = parseFloat(rr1.toFixed(1));
+    option.title = rr1;
     option.color = "#FF9800";
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
@@ -1698,7 +1714,7 @@ function loadPhaseTool(
     //
     option.point = "D";
     option.price = d;
-    option.title = parseFloat(rr2.toFixed(1));
+    option.title = rr2;
     option.color = "#4CAF50";
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
@@ -1782,9 +1798,14 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
                                 resPoint.margin
                             ).toFixed(1)
                         );
-                        sp = parseFloat(
-                            (resPoint.price - resPoint.margin).toFixed(1)
-                        );
+                        sp =
+                            rt.count > 0
+                                ? parseFloat(
+                                      (
+                                          resPoint.price - resPoint.margin
+                                      ).toFixed(1)
+                                  )
+                                : startPoint.price;
                     }
                 }
                 resPoint = {
