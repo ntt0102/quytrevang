@@ -288,15 +288,15 @@ class ScanDerivativeJob implements ShouldQueue
         $old = StockDrawing::where('symbol', 'VN30F1M')
             ->where('name', 'auto')
             ->pluck('data', 'point')->toArray();
-        if (isEmpty($old) && isEmpty($new)) return true;
-        foreach (['A', 'B', 'C'] as $key) {
-            if (!isset($old[$key]) || $old[$key]->time !== $new[$key]['time']) {
-                return false;
-            }
-        }
 
-        return true;
+        $keysToRemove = array_flip(['D', 'C', 'E', 'F']);
+
+        $filteredOld = array_diff_key($old, $keysToRemove);
+        $filteredNew = array_diff_key($new, $keysToRemove);
+
+        return json_encode($filteredOld) === json_encode($filteredNew);
     }
+
 
     private function unix($time)
     {
