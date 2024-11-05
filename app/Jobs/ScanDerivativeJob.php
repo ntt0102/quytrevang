@@ -42,7 +42,6 @@ class ScanDerivativeJob implements ShouldQueue
         if (get_global_value('autoScanFlag') == '0') return false;
 
         $data = json_decode($this->data);
-        set_global_value("dnseTrading", 'count: ' . count($data) . ', time: ' . date('H:i:s'));
 
         // $targetTime = '13:35:47';
         // $data = array_filter($data, function ($item) use ($targetTime) {
@@ -50,6 +49,8 @@ class ScanDerivativeJob implements ShouldQueue
         // });
 
         $points = $this->scanPattern($data);
+
+        set_global_value("dnseTrading", 'count: ' . count($data) . ', time: ' . date('H:i:s') . ', points: ' . json_encode($points));
 
         if ($this->isSame($points)) return false;
 
