@@ -767,16 +767,16 @@ function eventPriceLineDrag(e) {
                     loadProgressTool(pattern, true);
                     //
                     point = "A";
-                    changeOptions = { title: phase1.er };
+                    changeOptions = {
+                        rt: phase1.rt.distance,
+                        title: phase1.er,
+                    };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                     //
                     point = "B";
-                    changeOptions = {
-                        rt: phase1.rt.distance,
-                        title: phase2.er,
-                    };
+                    changeOptions = { title: phase2.er };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
@@ -1326,9 +1326,9 @@ function loadAutoScanTool(data) {
 function runAutoScan(data, isAvailable = false) {
     const points = isAvailable ? data : scanPattern(data);
     if (!mf.isSet(points)) return { valid: false };
-    const phase1 = !points.B.rt
+    const phase1 = !points.A.rt
         ? scanPhase(points.A, points.B)
-        : { rt: { distance: points.B.rt } };
+        : { rt: { distance: points.A.rt } };
     const phase2 = scanPhase(points.B, points.C, phase1.rt.distance);
     const pattern = validatePattern(points, phase2);
     const rr1 = parseFloat(
@@ -1499,13 +1499,18 @@ function drawPhaseTool() {
                     loadProgressTool(pattern, true);
                     //
                     point = "A";
-                    changeOptions = { price, time, title: phase1.er };
+                    changeOptions = {
+                        price,
+                        time,
+                        title: phase1.er,
+                        rt: phase1.rt.distance,
+                    };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
                     //
                     point = "B";
-                    changeOptions = { rt: phase1.rt.distance };
+                    changeOptions = { title: phase2.er };
                     params.tools.phase[point].applyOptions(changeOptions);
                     param.points.push(point);
                     param.data.push(params.tools.phase[point].options());
@@ -1550,12 +1555,13 @@ function drawPhaseTool() {
                     param.data.push(params.tools.phase[point].options());
                 }
             } else {
-                const bOptions = params.tools.phase.B.options();
-                const A = { price: +params.tools.phase.A.options().price };
+                const A = {
+                    price: +params.tools.phase.A.options().price,
+                    rt: +params.tools.phase.A.options().rt,
+                };
                 const B = {
-                    time: +bOptions.time,
-                    price: +bOptions.price,
-                    rt: +bOptions.rt,
+                    time: +params.tools.phase.B.options().time,
+                    price: +params.tools.phase.B.options().price,
                 };
                 const C = { price };
                 const { valid, pattern, phase2, rr1, rr2 } = runAutoScan(
@@ -1634,7 +1640,10 @@ function drawPhaseTool() {
             loadTimeRangeTool(rt, true, true);
             //
             const point = "A";
-            params.tools.phase[point].applyOptions({ title: er });
+            params.tools.phase[point].applyOptions({
+                title: er,
+                rt: rt.distance,
+            });
             param.points.push(point);
             param.data.push(params.tools.phase[point].options());
             //
@@ -1642,7 +1651,6 @@ function drawPhaseTool() {
             option.title = "B";
             option.color = "#009688";
             option.time = time;
-            option.rt = rt.distance;
             params.tools.phase[option.point] =
                 params.series.price.createPriceLine(option);
             param.points.push(option.point);
