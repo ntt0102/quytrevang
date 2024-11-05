@@ -13,6 +13,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\ScanedPhaseNotification;
 
+use function PHPUnit\Framework\isEmpty;
+
 class ScanDerivativeJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -286,7 +288,7 @@ class ScanDerivativeJob implements ShouldQueue
         $old = StockDrawing::where('symbol', 'VN30F1M')
             ->where('name', 'auto')
             ->pluck('data', 'point')->toArray();
-
+        if (isEmpty($old) && isEmpty($new)) return true;
         foreach (['A', 'B', 'C'] as $key) {
             if (!isset($old[$key]) || $old[$key]->time !== $new[$key]['time']) {
                 return false;
