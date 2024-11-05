@@ -1343,6 +1343,7 @@ function runAutoScan(data, isAvailable = false) {
     return { valid: true, pattern, info, points };
 }
 function validatePattern({ A, B, C, D, E }, phase2) {
+    if (phase2.rt.over) return 7;
     if (phase2.rt.count > 1) return 6;
     if (phase2.rt.count < 1) {
         if (
@@ -1759,7 +1760,13 @@ function scanPhase(startTime, endPrice, rtRef = 0) {
                     end: index,
                     margin: 0,
                 };
-                rt = { start: time, end: time, distance: 0, count: 0 };
+                rt = {
+                    start: time,
+                    end: time,
+                    distance: 0,
+                    count: 0,
+                    over: false,
+                };
                 sp = price;
             }
             if (cmp(price, side, resPoint.price)) {
@@ -1768,7 +1775,10 @@ function scanPhase(startTime, endPrice, rtRef = 0) {
                     rt.start = resPoint.time;
                     rt.end = time;
                     rt.distance = distance;
-                    if (rtRef > 0 && distance > rtRef) rt.count++;
+                    if (rtRef > 0) {
+                        if (distance > rtRef) rt.count++;
+                        if (distance > 3 * rtRef) rt.over = true;
+                    }
                     if (resPoint.margin != 0) {
                         er = +(
                             (endPrice - resPoint.price) /

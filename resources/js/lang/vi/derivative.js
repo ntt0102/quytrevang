@@ -9,7 +9,7 @@ export default {
             items: "<u>Entry</u>: Tạo nền tam giác </br><u>Target</u>: x1 / Kháng cự",
         },
         {
-            name: "3. Thời gian hồi phục nhỏ",
+            name: "3. Thời gian hồi phục không có",
             items: "<u>Entry</u>: Vượt kháng cự và tạo nền </br><u>Target</u>: x1 / Kháng cự",
         },
         {
@@ -25,8 +25,12 @@ export default {
             items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x1 / Kháng cự 2",
         },
         {
-            name: "7. Thời gian hồi phục lớn",
+            name: "7. Thời gian hồi phục nhiều lần",
             items: "<u>Entry</u>: Vượt kháng cự 2 và tạo nền </br><u>Target</u>: x0.5 / Kháng cự 2",
+        },
+        {
+            name: "8. Thời gian hồi phục quá lớn",
+            items: "<u>Entry</u>: Không vào lệnh",
         },
     ],
 };

@@ -193,6 +193,7 @@ class ScanDerivativeJob implements ShouldQueue
                     'end' => $time,
                     'distance' => 0,
                     'count' => 0,
+                    'over' => false,
                 ];
                 $sp = $price;
             }
@@ -203,8 +204,9 @@ class ScanDerivativeJob implements ShouldQueue
                     $rt['start'] = $resPoint['time'];
                     $rt['end'] = $time;
                     $rt['distance'] = $distance;
-                    if ($rtRef > 0 && $distance > $rtRef) {
-                        $rt['count']++;
+                    if ($rtRef > 0) {
+                        if ($distance > $rtRef) $rt['count']++;
+                        if ($distance > 3 * $rtRef) $rt['count'] = true;
                     }
                     if ($resPoint['margin'] != 0) {
                         $er = round(($endPrice - $resPoint['price']) / $resPoint['margin'], 1);
@@ -242,6 +244,7 @@ class ScanDerivativeJob implements ShouldQueue
         $D = $points['D'];
         $E = $points['E'];
 
+        if ($phase2['rt']['over']) return 7;
         if ($phase2['rt']['count'] > 1) return 6;
 
         if ($phase2['rt']['count'] < 1) {
