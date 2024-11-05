@@ -496,7 +496,7 @@ function eventChartCrosshairMove(e) {
 function eventPriceLineDrag(e) {
     let line = e.customPriceLine;
     let lineOptions = line.options();
-    lineOptions.price = +lineOptions.price.toFixed(1);
+    lineOptions.price = parseFloat(lineOptions.price.toFixed(1));
     const oldPrice = +e.fromPriceString;
     const newPrice = lineOptions.price;
     switch (lineOptions.lineType) {
@@ -1132,15 +1132,21 @@ function drawOrderLine(kinds) {
                 break;
             case "tp":
                 color = "lime";
-                title = Math.abs(
-                    params.tools.order.tp.price - params.tools.order.entry.price
-                ).toFixed(1);
+                title = parseFloat(
+                    Math.abs(
+                        params.tools.order.tp.price -
+                            params.tools.order.entry.price
+                    ).toFixed(1)
+                );
                 break;
             case "sl":
                 color = "red";
-                title = Math.abs(
-                    params.tools.order.sl.price - params.tools.order.entry.price
-                ).toFixed(1);
+                title = parseFloat(
+                    Math.abs(
+                        params.tools.order.sl.price -
+                            params.tools.order.entry.price
+                    ).toFixed(1)
+                );
                 break;
         }
         param.points.push(kind);
@@ -1571,7 +1577,7 @@ function drawPhaseTool() {
                     param.data.push(params.tools.phase[point].options());
                     //
                     option.point = "C";
-                    option.title = info.rr1.toFixed(1);
+                    option.title = parseFloat(info.rr1.toFixed(1));
                     option.color = "#FF9800";
                     params.tools.phase[option.point] =
                         params.series.price.createPriceLine(option);
@@ -1580,7 +1586,7 @@ function drawPhaseTool() {
                     //
                     option.point = "D";
                     option.price = d;
-                    option.title = info.rr2.toFixed(1);
+                    option.title = parseFloat(info.rr2.toFixed(1));
                     option.color = "#4CAF50";
                     params.tools.phase[option.point] =
                         params.series.price.createPriceLine(option);
@@ -1589,7 +1595,7 @@ function drawPhaseTool() {
                     //
                     option.point = "X";
                     option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
-                    option.title = ((d - c) * 0.5).toFixed(1);
+                    option.title = parseFloat(((d - c) * 0.5).toFixed(1));
                     option.color = "#2196F3";
                     option.draggable = false;
                     params.tools.phase[option.point] =
@@ -1599,7 +1605,7 @@ function drawPhaseTool() {
                     //
                     option.point = "Y";
                     option.price = parseFloat((d + (d - c)).toFixed(1));
-                    option.title = (d - c).toFixed(1);
+                    option.title = parseFloat((d - c).toFixed(1));
                     option.color = "#673AB7";
                     option.draggable = false;
                     params.tools.phase[option.point] =
@@ -1609,7 +1615,7 @@ function drawPhaseTool() {
                     //
                     option.point = "Z";
                     option.price = parseFloat((d + (d - c) * 2).toFixed(1));
-                    option.title = ((d - c) * 2).toFixed(1);
+                    option.title = parseFloat(((d - c) * 2).toFixed(1));
                     option.color = "#9C27B0";
                     option.draggable = false;
                     params.tools.phase[option.point] =
@@ -1693,7 +1699,7 @@ function loadPhaseTool(
     //
     option.point = "C";
     option.price = c;
-    option.title = rr1.toFixed(1);
+    option.title = parseFloat(rr1.toFixed(1));
     option.color = "#FF9800";
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
@@ -1702,7 +1708,7 @@ function loadPhaseTool(
     //
     option.point = "D";
     option.price = d;
-    option.title = rr2.toFixed(1);
+    option.title = parseFloat(rr2.toFixed(1));
     option.color = "#4CAF50";
     params.tools.phase[option.point] =
         params.series.price.createPriceLine(option);
@@ -1711,7 +1717,7 @@ function loadPhaseTool(
     //
     option.point = "X";
     option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
-    option.title = ((d - c) * 0.5).toFixed(1);
+    option.title = parseFloat(((d - c) * 0.5).toFixed(1));
     option.color = "#2196F3";
     option.draggable = false;
     params.tools.phase[option.point] =
@@ -1721,7 +1727,7 @@ function loadPhaseTool(
     //
     option.point = "Y";
     option.price = parseFloat((d + (d - c)).toFixed(1));
-    option.title = (d - c).toFixed(1);
+    option.title = parseFloat((d - c).toFixed(1));
     option.color = "#673AB7";
     option.draggable = false;
     params.tools.phase[option.point] =
@@ -1731,7 +1737,7 @@ function loadPhaseTool(
     //
     option.point = "Z";
     option.price = parseFloat((d + (d - c) * 2).toFixed(1));
-    option.title = ((d - c) * 2).toFixed(1);
+    option.title = parseFloat(((d - c) * 2).toFixed(1));
     option.color = "#9C27B0";
     option.draggable = false;
     params.tools.phase[option.point] =
@@ -1953,7 +1959,7 @@ function drawTargetTool() {
         const a = +params.tools.target.A.options().price;
         const ba = price - a;
         option.point = "B";
-        option.title = ba.toFixed(1);
+        option.title = parseFloat(ba.toFixed(1));
         option.color = "#F44336";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
@@ -1962,7 +1968,7 @@ function drawTargetTool() {
         //
         option.point = "X";
         option.price = parseFloat((a - 0.5 * ba).toFixed(1));
-        option.title = (-0.5 * ba).toFixed(1);
+        option.title = parseFloat((-0.5 * ba).toFixed(1));
         option.color = "#2196F3";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
@@ -1971,7 +1977,7 @@ function drawTargetTool() {
         //
         option.point = "Y";
         option.price = parseFloat((a - ba).toFixed(1));
-        option.title = (-ba).toFixed(1);
+        option.title = parseFloat(-ba.toFixed(1));
         option.color = "#673AB7";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
@@ -1980,7 +1986,7 @@ function drawTargetTool() {
         //
         option.point = "Z";
         option.price = parseFloat((a - 2 * ba).toFixed(1));
-        option.title = (-2 * ba).toFixed(1);
+        option.title = parseFloat((-2 * ba).toFixed(1));
         option.color = "#9C27B0";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
@@ -2471,7 +2477,7 @@ function inSession() {
     );
 }
 function coordinateToPrice(y) {
-    return +params.series.price.coordinateToPrice(y).toFixed(1);
+    return parseFloat(params.series.price.coordinateToPrice(y).toFixed(1));
 }
 function toastOrderError(error) {
     if (!error) error = "unknown";

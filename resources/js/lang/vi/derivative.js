@@ -30,7 +30,7 @@ export default {
         },
         {
             name: "8. Thời gian hồi phục quá lớn",
-            items: "<u>Entry</u>: Không vào lệnh",
+            items: "<u>Entry</u>: Vượt hỗ trợ 2, vào lệnh ngược chiều </br><u>Target</u>: x2 / Hỗ cự 2",
         },
     ],
 };
