@@ -2113,7 +2113,7 @@ function loadProgressTool(data, isStore = false) {
     if (isStore) progressChange(state.progress);
 }
 function removeProgressTool(withServer = true, onlyServer = false) {
-    if (withServer) progressChange(state.progress);
+    if (withServer) progressChange([]);
     if (!onlyServer) state.progress = [];
 }
 function progressChange(e) {
