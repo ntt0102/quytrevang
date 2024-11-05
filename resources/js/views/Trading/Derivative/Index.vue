@@ -1452,10 +1452,10 @@ function phaseToolClick(e) {
 }
 function phaseToolContextmenu(e) {
     e.target.classList.remove("selected");
-    if (mf.isSet(params.tools.auto)) return false;
-    removePhaseTool();
-    removeTimeRangeTool();
-    removeProgressTool();
+    const onlyServer = mf.isSet(params.tools.auto);
+    removePhaseTool(true, onlyServer);
+    removeTimeRangeTool(true, onlyServer);
+    removeProgressTool(true, onlyServer);
 }
 function drawPhaseTool() {
     const TYPE = "phase";
@@ -1795,26 +1795,28 @@ function scanPhase(startTime, endPrice, rtRef = 0) {
         });
     return { rt, er, sp };
 }
-function removePhaseTool(withServer = true) {
+function removePhaseTool(withServer = true, onlyServer = false) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "phase",
         });
-    if (mf.isSet(params.tools.phase.A)) {
-        params.series.price.removePriceLine(params.tools.phase.A);
-        if (mf.isSet(params.tools.phase.B)) {
-            params.series.price.removePriceLine(params.tools.phase.B);
-            if (mf.isSet(params.tools.phase.C)) {
-                params.series.price.removePriceLine(params.tools.phase.C);
-                params.series.price.removePriceLine(params.tools.phase.D);
-                params.series.price.removePriceLine(params.tools.phase.X);
-                params.series.price.removePriceLine(params.tools.phase.Y);
-                params.series.price.removePriceLine(params.tools.phase.Z);
+    if (!onlyServer) {
+        if (mf.isSet(params.tools.phase.A)) {
+            params.series.price.removePriceLine(params.tools.phase.A);
+            if (mf.isSet(params.tools.phase.B)) {
+                params.series.price.removePriceLine(params.tools.phase.B);
+                if (mf.isSet(params.tools.phase.C)) {
+                    params.series.price.removePriceLine(params.tools.phase.C);
+                    params.series.price.removePriceLine(params.tools.phase.D);
+                    params.series.price.removePriceLine(params.tools.phase.X);
+                    params.series.price.removePriceLine(params.tools.phase.Y);
+                    params.series.price.removePriceLine(params.tools.phase.Z);
+                }
             }
         }
+        initToolsParams(["phase"]);
     }
-    initToolsParams(["phase"]);
 }
 function timeRangeToolClick(e) {
     state.showLineContext = false;
@@ -1890,14 +1892,16 @@ function loadTimeRangeTool(data, onlyTime = false, isStore = false) {
             data: data,
         });
 }
-function removeTimeRangeTool(withServer = true) {
+function removeTimeRangeTool(withServer = true, onlyServer = false) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
             name: "tr",
         });
-    params.series.timeRange.setData([]);
-    initToolsParams(["tr"]);
+    if (!onlyServer) {
+        params.series.timeRange.setData([]);
+        initToolsParams(["tr"]);
+    }
 }
 function targetToolClick(e) {
     state.showLineContext = false;
@@ -2108,9 +2112,9 @@ function loadProgressTool(data, isStore = false) {
     state.progress = [data];
     if (isStore) progressChange(state.progress);
 }
-function removeProgressTool(withServer = true) {
-    state.progress = [];
+function removeProgressTool(withServer = true, onlyServer = false) {
     if (withServer) progressChange(state.progress);
+    if (!onlyServer) state.progress = [];
 }
 function progressChange(e) {
     store.dispatch("tradingDerivative/drawTools", {
