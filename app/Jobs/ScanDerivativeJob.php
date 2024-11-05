@@ -250,6 +250,7 @@ class ScanDerivativeJob implements ShouldQueue
         if ($phase2['rt']['count'] < 1) {
             if (
                 !empty($E) &&
+                ($B['price'] - $C['price']) / ($B['price'] - $A['price']) >= 0.5 &&
                 ($C['price'] - $D['price']) / ($C['price'] - $B['price']) >= 0.786 &&
                 ($D['price'] - $E['price']) / ($D['price'] - $C['price']) >= 0.786
             ) {

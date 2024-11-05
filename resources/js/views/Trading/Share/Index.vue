@@ -567,7 +567,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "X";
                 params.tools.target[point].applyOptions({
-                    price: +(a - 0.5 * ba).toFixed(2),
+                    price: parseFloat(a - 0.5 * ba).toFixed(2),
                     title: ((100 * -0.5 * ba) / a).toFixed(1) + "%",
                 });
                 param.points.push(point);
@@ -575,7 +575,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "Y";
                 params.tools.target[point].applyOptions({
-                    price: +(a - ba).toFixed(2),
+                    price: parseFloat(a - ba).toFixed(2),
                     title: ((100 * -ba) / a).toFixed(1) + "%",
                 });
                 param.points.push(point);
@@ -583,7 +583,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "Z";
                 params.tools.target[point].applyOptions({
-                    price: +(a - 2 * ba).toFixed(2),
+                    price: parseFloat(a - 2 * ba).toFixed(2),
                     title: ((100 * -2 * ba) / a).toFixed(1) + "%",
                 });
                 param.points.push(point);
@@ -922,7 +922,7 @@ function drawTargetTool() {
         param.data.push(mf.cloneDeep(option));
         //
         option.point = "X";
-        option.price = +(a - 0.5 * ba).toFixed(2);
+        option.price = parseFloat(a - 0.5 * ba).toFixed(2);
         option.title = ((100 * -0.5 * ba) / a).toFixed(1) + "%";
         option.color = "#2196F3";
         params.tools.target[option.point] =
@@ -931,7 +931,7 @@ function drawTargetTool() {
         param.data.push(mf.cloneDeep(option));
         //
         option.point = "Y";
-        option.price = +(a - ba).toFixed(2);
+        option.price = parseFloat(a - ba).toFixed(2);
         option.title = ((100 * -ba) / a).toFixed(1) + "%";
         option.color = "#673AB7";
         params.tools.target[option.point] =
@@ -940,7 +940,7 @@ function drawTargetTool() {
         param.data.push(mf.cloneDeep(option));
         //
         option.point = "Z";
-        option.price = +(a - 2 * ba).toFixed(2);
+        option.price = parseFloat(a - 2 * ba).toFixed(2);
         option.title = ((100 * -2 * ba) / a).toFixed(1) + "%";
         option.color = "#673AB7";
         params.tools.target[option.point] =
@@ -1062,14 +1062,14 @@ function findUplps(startTime, endTime) {
             v3 = value;
             d = 0;
         } else if (value < v3) {
-            const _d = +(v3 - value).toFixed(2);
+            const _d = parseFloat(v3 - value).toFixed(2);
             if (_d > d) d = _d;
         }
         if (value < v1 && dMax > 0) break;
     }
     return {
-        value1: +(v2 - dMax).toFixed(2),
-        value2: +(v3 - dMax).toFixed(2),
+        value1: parseFloat(v2 - dMax).toFixed(2),
+        value2: parseFloat(v3 - dMax).toFixed(2),
     };
 }
 function removeUplpsTool(server = true, forceCash = false) {
@@ -1169,14 +1169,14 @@ function findDownlps(startTime, endTime) {
             v3 = value;
             d = 0;
         } else if (value > v3) {
-            const _d = +(v3 - value).toFixed(2);
+            const _d = parseFloat(v3 - value).toFixed(2);
             if (_d < d) d = _d;
         }
         if (value > v1 && dMax < 0) break;
     }
     return {
-        value1: +(v2 - dMax).toFixed(2),
-        value2: +(v3 - dMax).toFixed(2),
+        value1: parseFloat(v2 - dMax).toFixed(2),
+        value2: parseFloat(v3 - dMax).toFixed(2),
     };
 }
 function removeDownlpsTool(server = true, forceCash = false) {
@@ -1394,7 +1394,7 @@ function coordinateToPrice(y, name = "price") {
 }
 function formatPrice(price) {
     if (!price) return 0;
-    return +(+price.toFixed(2));
+    return parseFloat(+price.toFixed(2));
 }
 function symbolChanged() {
     if (!state.inputSymbol || !state.inputSymbol.trim()) return false;
