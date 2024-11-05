@@ -1874,9 +1874,12 @@ function loadAutoScanTool(data) {
             loadTimeRangeTool(info.rt1, true, true);
             loadProgressTool(pattern, true);
             loadPhaseTool(info, true);
-            const { phase, tr, progress, auto, ...updatedToolsData } = data;
-            return updatedToolsData;
+            const { phase, tr, progress, auto, ...updatedData } = data;
+            return updatedData;
         }
+    } else if (config.value.autoScan) {
+        const { phase, tr, progress, ...updatedData } = data;
+        return updatedData;
     }
     return data;
 }
