@@ -62,8 +62,8 @@ class ScanDerivativeJob implements ShouldQueue
             );
         }
 
-        $phase1 = $this->scanPhase($data, $points['A']['time'], $points['B']['price']);
-        $phase2 = $this->scanPhase($data, $points['B']['time'], $points['C']['price'], $phase1['rt']['distance']);
+        $phase1 = $this->scanPhase($data, $points['A'], $points['B']);
+        $phase2 = $this->scanPhase($data, $points['B'], $points['C'], $phase1['rt']['distance']);
         $pattern = $this->validatePattern($points, $phase2);
 
         if ($pattern == 0 || $pattern == 1) {
@@ -164,23 +164,22 @@ class ScanDerivativeJob implements ShouldQueue
         return $this->removeIndex($ret);
     }
 
-    function scanPhase($data, $startTime, $endPrice, $rtRef = 0)
+    function scanPhase($data, $startPoint, $endPoint, $rtRef = 0)
     {
-        $side = false;
+        $side = $endPoint['price'] > $startPoint['price'];
         $resPoint = [];
         $rt = [];
         $er = 0;
         $sp = 0;
 
-        $data = array_filter($data, function ($item) use ($startTime) {
-            return $this->unix($item->date) >= $startTime;
+        $data = array_filter($data, function ($item) use ($startPoint) {
+            return $this->unix($item->date) >= $startPoint['time'];
         });
         foreach ($data as $index => $item) {
             $price = $item->price;
             $time = $item->date;
 
-            if ($sp == 0) {
-                $side = $endPrice >= $price;
+            if ($sp == 0 || $price == $startPoint['price']) {
                 $resPoint = [
                     'time' => $time,
                     'price' => $price,
@@ -209,7 +208,7 @@ class ScanDerivativeJob implements ShouldQueue
                         if ($distance > 3 * $rtRef) $rt['count'] = true;
                     }
                     if ($resPoint['margin'] != 0) {
-                        $er = round(($endPrice - $resPoint['price']) / $resPoint['margin'], 1);
+                        $er = round(($endPoint['price'] - $resPoint['price']) / $resPoint['margin'], 1);
                         $sp = $resPoint['price'] - $resPoint['margin'];
                     }
                 }
@@ -228,7 +227,7 @@ class ScanDerivativeJob implements ShouldQueue
                 }
             }
 
-            if ($this->cmp($price, $side, $endPrice, true)) {
+            if ($this->cmp($price, $side, $endPoint['price'], true)) {
                 break;
             }
         }
