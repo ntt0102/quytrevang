@@ -11,9 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\StockDrawing;
 use App\Models\User;
 use Illuminate\Support\Facades\Notification;
-use App\Notifications\ScanedPhaseNotification;
-
-use function PHPUnit\Framework\isEmpty;
+use App\Notifications\ScanedPatternNotification;
 
 class ScanDerivativeJob implements ShouldQueue
 {
@@ -71,7 +69,7 @@ class ScanDerivativeJob implements ShouldQueue
         if ($pattern == 0 || $pattern == 1) {
             Notification::send(
                 User::permission('admin:order_derivative')->get(),
-                new ScanedPhaseNotification()
+                new ScanedPatternNotification()
             );
         }
 

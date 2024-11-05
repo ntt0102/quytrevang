@@ -4,7 +4,7 @@ namespace App\Notifications;
 
 use App\Notifications\CoreNotification;
 
-class ScanedPhaseNotification extends CoreNotification
+class ScanedPatternNotification extends CoreNotification
 {
     /**
      * Create a new notification instance.
@@ -13,7 +13,7 @@ class ScanedPhaseNotification extends CoreNotification
      */
     public function __construct()
     {
-        $path = 'Notifications/ScanedPhase.';
+        $path = 'Notifications/ScanedPattern.';
         $params = [
             'event' => 'scaned-phase',
             'title' => trans($path . 'title'),
