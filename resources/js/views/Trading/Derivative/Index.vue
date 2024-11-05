@@ -1451,10 +1451,11 @@ function phaseToolClick(e) {
     if (!selected) e.target.classList.add("selected");
 }
 function phaseToolContextmenu(e) {
+    e.target.classList.remove("selected");
+    if (mf.isSet(params.tools.auto)) return false;
     removePhaseTool();
     removeTimeRangeTool();
     removeProgressTool();
-    e.target.classList.remove("selected");
 }
 function drawPhaseTool() {
     const TYPE = "phase";
