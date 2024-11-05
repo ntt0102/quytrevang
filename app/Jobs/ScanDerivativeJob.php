@@ -50,9 +50,10 @@ class ScanDerivativeJob implements ShouldQueue
 
         $points = $this->scanPattern($data);
 
-        set_global_value("dnseTrading", 'count: ' . count($data) . ', time: ' . date('H:i:s') . ', points: ' . json_encode($points));
 
-        if ($this->isSame($points)) return false;
+        if ($this->isOldPattern($points)) return false;
+
+        set_global_value("dnseTrading", 'count: ' . count($data) . ', time: ' . date('H:i:s') . ', points: ' . json_encode($points));
 
         foreach ($points as $key => $value) {
             StockDrawing::updateOrCreate(
@@ -280,7 +281,7 @@ class ScanDerivativeJob implements ShouldQueue
         return $result;
     }
 
-    private function isSame($new)
+    private function isOldPattern($new)
     {
         $old = StockDrawing::where('symbol', 'VN30F1M')
             ->where('name', 'auto')
