@@ -630,7 +630,7 @@ function eventPriceLineDrag(e) {
                             div = 3;
                             break;
                     }
-                    ba = parseFloat((b - newPrice) / div).toFixed(1);
+                    ba = parseFloat(((b - newPrice) / div).toFixed(1));
                     a = b - ba;
                     changeOptions = { price: a };
                     params.tools.target[point].applyOptions(changeOptions);
@@ -647,7 +647,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat(a - 0.5 * ba).toFixed(1),
+                    price: parseFloat((a - 0.5 * ba).toFixed(1)),
                     title: (-0.5 * ba).toFixed(1),
                 };
                 if (lineOptions.point == point) delete changeOptions.price;
@@ -657,7 +657,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat(a - ba).toFixed(1),
+                    price: parseFloat((a - ba).toFixed(1)),
                     title: (-ba).toFixed(1),
                 };
                 if (lineOptions.point == point) delete changeOptions.price;
@@ -667,7 +667,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "Z";
                 changeOptions = {
-                    price: parseFloat(a - 2 * ba).toFixed(1),
+                    price: parseFloat((a - 2 * ba).toFixed(1)),
                     title: (-2 * ba).toFixed(1),
                 };
                 if (lineOptions.point == point) delete changeOptions.price;
@@ -804,7 +804,7 @@ function eventPriceLineDrag(e) {
                     //
                     point = "X";
                     changeOptions = {
-                        price: parseFloat(d + (d - c) * 0.5).toFixed(1),
+                        price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
                         title: ((d - c) * 0.5).toFixed(1),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
@@ -813,7 +813,7 @@ function eventPriceLineDrag(e) {
                     //
                     point = "Y";
                     changeOptions = {
-                        price: parseFloat(d + (d - c)).toFixed(1),
+                        price: parseFloat((d + (d - c)).toFixed(1)),
                         title: (d - c).toFixed(1),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
@@ -822,7 +822,7 @@ function eventPriceLineDrag(e) {
                     //
                     point = "Z";
                     changeOptions = {
-                        price: parseFloat(d + (d - c) * 2).toFixed(1),
+                        price: parseFloat((d + (d - c) * 2).toFixed(1)),
                         title: ((d - c) * 2).toFixed(1),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
@@ -1522,7 +1522,7 @@ function drawPhaseTool() {
                     //
                     point = "X";
                     changeOptions = {
-                        price: parseFloat(d + (d - c) * 0.5).toFixed(1),
+                        price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
                         title: ((d - c) * 0.5).toFixed(1),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
@@ -1531,7 +1531,7 @@ function drawPhaseTool() {
                     //
                     point = "Y";
                     changeOptions = {
-                        price: parseFloat(d + (d - c)).toFixed(1),
+                        price: parseFloat((d + (d - c)).toFixed(1)),
                         title: (d - c).toFixed(1),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
@@ -1540,7 +1540,7 @@ function drawPhaseTool() {
                     //
                     point = "Z";
                     changeOptions = {
-                        price: parseFloat(d + (d - c) * 2).toFixed(1),
+                        price: parseFloat((d + (d - c) * 2).toFixed(1)),
                         title: ((d - c) * 2).toFixed(1),
                     };
                     params.tools.phase[point].applyOptions(changeOptions);
@@ -1588,7 +1588,7 @@ function drawPhaseTool() {
                     param.data.push(mf.cloneDeep(option));
                     //
                     option.point = "X";
-                    option.price = parseFloat(d + (d - c) * 0.5).toFixed(1);
+                    option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
                     option.title = ((d - c) * 0.5).toFixed(1);
                     option.color = "#2196F3";
                     option.draggable = false;
@@ -1598,7 +1598,7 @@ function drawPhaseTool() {
                     param.data.push(mf.cloneDeep(option));
                     //
                     option.point = "Y";
-                    option.price = parseFloat(d + (d - c)).toFixed(1);
+                    option.price = parseFloat((d + (d - c)).toFixed(1));
                     option.title = (d - c).toFixed(1);
                     option.color = "#673AB7";
                     option.draggable = false;
@@ -1608,7 +1608,7 @@ function drawPhaseTool() {
                     param.data.push(mf.cloneDeep(option));
                     //
                     option.point = "Z";
-                    option.price = parseFloat(d + (d - c) * 2).toFixed(1);
+                    option.price = parseFloat((d + (d - c) * 2).toFixed(1));
                     option.title = ((d - c) * 2).toFixed(1);
                     option.color = "#9C27B0";
                     option.draggable = false;
@@ -1710,7 +1710,7 @@ function loadPhaseTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "X";
-    option.price = parseFloat(d + (d - c) * 0.5).toFixed(1);
+    option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
     option.title = ((d - c) * 0.5).toFixed(1);
     option.color = "#2196F3";
     option.draggable = false;
@@ -1720,7 +1720,7 @@ function loadPhaseTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "Y";
-    option.price = parseFloat(d + (d - c)).toFixed(1);
+    option.price = parseFloat((d + (d - c)).toFixed(1));
     option.title = (d - c).toFixed(1);
     option.color = "#673AB7";
     option.draggable = false;
@@ -1730,7 +1730,7 @@ function loadPhaseTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "Z";
-    option.price = parseFloat(d + (d - c) * 2).toFixed(1);
+    option.price = parseFloat((d + (d - c) * 2).toFixed(1));
     option.title = ((d - c) * 2).toFixed(1);
     option.color = "#9C27B0";
     option.draggable = false;
@@ -1782,11 +1782,14 @@ function scanPhase(startTime, endPrice, rtRef = 0) {
                     }
                     if (resPoint.margin != 0) {
                         er = parseFloat(
-                            (endPrice - resPoint.price) / resPoint.margin
-                        ).toFixed(1);
+                            (
+                                (endPrice - resPoint.price) /
+                                resPoint.margin
+                            ).toFixed(1)
+                        );
                         sp = parseFloat(
-                            resPoint.price - resPoint.margin
-                        ).toFixed(1);
+                            (resPoint.price - resPoint.margin).toFixed(1)
+                        );
                     }
                 }
                 resPoint = {
@@ -1798,7 +1801,7 @@ function scanPhase(startTime, endPrice, rtRef = 0) {
                 };
             } else {
                 resPoint.end = index;
-                const margin = parseFloat(resPoint.price - price).toFixed(1);
+                const margin = parseFloat((resPoint.price - price).toFixed(1));
                 if (cmp(margin, side, resPoint.margin))
                     resPoint.margin = margin;
             }
@@ -1958,7 +1961,7 @@ function drawTargetTool() {
         param.data.push(mf.cloneDeep(option));
         //
         option.point = "X";
-        option.price = parseFloat(a - 0.5 * ba).toFixed(1);
+        option.price = parseFloat((a - 0.5 * ba).toFixed(1));
         option.title = (-0.5 * ba).toFixed(1);
         option.color = "#2196F3";
         params.tools.target[option.point] =
@@ -1967,7 +1970,7 @@ function drawTargetTool() {
         param.data.push(mf.cloneDeep(option));
         //
         option.point = "Y";
-        option.price = parseFloat(a - ba).toFixed(1);
+        option.price = parseFloat((a - ba).toFixed(1));
         option.title = (-ba).toFixed(1);
         option.color = "#673AB7";
         params.tools.target[option.point] =
@@ -1976,7 +1979,7 @@ function drawTargetTool() {
         param.data.push(mf.cloneDeep(option));
         //
         option.point = "Z";
-        option.price = parseFloat(a - 2 * ba).toFixed(1);
+        option.price = parseFloat((a - 2 * ba).toFixed(1));
         option.title = (-2 * ba).toFixed(1);
         option.color = "#9C27B0";
         params.tools.target[option.point] =
@@ -2155,18 +2158,16 @@ function toggleOrderButton(show) {
                         params.currentSeconds < TIME.ATC
                     ) {
                         tpslOrderRef.value.style.left =
-                            parseFloat(
+                            +(
                                 params.crosshair.x +
-                                    (params.crosshair.x > innerWidth - 61
-                                        ? -61
-                                        : 1)
+                                (params.crosshair.x > innerWidth - 61 ? -61 : 1)
                             ) + "px";
                         tpslOrderRef.value.style.top =
-                            parseFloat(
+                            +(
                                 params.crosshair.y +
-                                    (params.crosshair.y > innerHeight - 51
-                                        ? -51
-                                        : 1)
+                                (params.crosshair.y > innerHeight - 51
+                                    ? -51
+                                    : 1)
                             ) + "px";
                         tpslOrderRef.value.style.display = "block";
                     }
@@ -2195,16 +2196,14 @@ function toggleOrderButton(show) {
                 }
                 if (!!side) {
                     entryOrderRef.value.style.left =
-                        parseFloat(
+                        +(
                             params.crosshair.x +
-                                (params.crosshair.x > innerWidth - 71 ? -71 : 1)
+                            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
                         ) + "px";
                     entryOrderRef.value.style.top =
-                        parseFloat(
+                        +(
                             params.crosshair.y +
-                                (params.crosshair.y > innerHeight - 61
-                                    ? -61
-                                    : 1)
+                            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
                         ) + "px";
                     entryOrderRef.value.style.background =
                         side > 0 ? "green" : "red";
