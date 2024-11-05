@@ -37,9 +37,14 @@ if (!function_exists('in_trading_time')) {
      */
     function in_trading_time()
     {
-        $time = time();
-        return ($time >= strtotime('09:00:00') && $time <= strtotime('11:30:00')) ||
-            ($time >= strtotime('13:00:00') && $time <= strtotime('14:30:00'));
+        $current_time = date('H:i');
+        $morning_start = '09:00';
+        $morning_end = '11:30';
+        $afternoon_start = '13:00';
+        $afternoon_end = '14:30';
+
+        return ($current_time >= $morning_start && $current_time <= $morning_end) ||
+            ($current_time >= $afternoon_start && $current_time <= $afternoon_end);
     }
 }
 
