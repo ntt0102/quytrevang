@@ -391,6 +391,11 @@ store.dispatch("tradingDerivative/initChart").then(() => {
     if (inSession()) connectSocket();
     if (!route.query.date && config.value.lastOpeningDate)
         state.chartDate = config.value.lastOpeningDate;
+    store
+        .dispatch("tradingDerivative/getChartData", { date: state.chartDate })
+        .then((hasData) => {
+            if (hasData) store.dispatch("tradingDerivative/getTools");
+        });
 });
 
 params.interval = setInterval(intervalHandler, 1000);
@@ -432,11 +437,6 @@ onMounted(() => {
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
-    store
-        .dispatch("tradingDerivative/getChartData", { date: state.chartDate })
-        .then((hasData) => {
-            if (hasData) store.dispatch("tradingDerivative/getTools");
-        });
 });
 onUnmounted(() => {
     document.removeEventListener("keydown", eventKeyPress);
