@@ -17,11 +17,11 @@ export default {
             items: "<u>Entry</u>: Vào lệnh tại nền vượt kháng cự 2. </br><u>Target</u>: x2 / Kháng cự 2",
         },
         {
-            name: "5. Tỷ lệ mở rộng điều chỉnh > 1 ",
+            name: "6. Tỷ lệ kháng cự 2 < 78.6",
             items: "<u>Entry</u>: Vào lệnh tại nền vượt kháng cự 2. </br><u>Target</u>: x1 / Kháng cự 2",
         },
         {
-            name: "6. Tỷ lệ kháng cự 2 < 78.6",
+            name: "5. Tỷ lệ mở rộng điều chỉnh > 1 ",
             items: "<u>Entry</u>: Vào lệnh tại nền vượt kháng cự 2. </br><u>Target</u>: x1 / Kháng cự 2",
         },
         {

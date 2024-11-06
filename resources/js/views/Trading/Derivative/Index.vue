@@ -1435,9 +1435,9 @@ function validatePattern({ A, B, C, D, E }, phase2) {
             return 1;
         return 2;
     }
+    if (phase2.er > 1) return 5;
+    if ((C.price - phase2.sp) / (C.price - B.price) < 0.786) return 4;
     if ((B.price - C.price) / (B.price - A.price) < 0.382) return 3;
-    if (phase2.er > 1) return 4;
-    if ((C.price - phase2.sp) / (C.price - B.price) < 0.786) return 5;
     return 0;
 }
 function removeAutoScanTool(withServer = true) {
