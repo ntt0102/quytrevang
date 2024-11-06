@@ -1881,13 +1881,13 @@ function drawTimeRangeTool() {
     let option = { time: params.crosshair.time, value: 1 };
     switch (params.tools.timeRange.length) {
         case 0:
-            option.color = "lime";
+            option.color = "OrangeRed";
             params.tools.timeRange[0] = option;
             param.points.push(0);
             param.data.push(option);
             break;
         case 1:
-            option.color = "OrangeRed";
+            option.color = "lime";
             params.tools.timeRange[1] = option;
             param.points.push(1);
             param.data.push(option);
@@ -1899,13 +1899,13 @@ function drawTimeRangeTool() {
             const index2 = getTimeIndex(option.time);
             const index3 = index2 + (index1 - index0);
 
-            option.color = "lime";
+            option.color = "OrangeRed";
             params.tools.timeRange[0] = mf.cloneDeep(option);
             param.points.push(0);
             param.data.push(mf.cloneDeep(option));
             //
             option.time = params.data.whitespace[index3].time;
-            option.color = "red";
+            option.color = "lime";
             params.tools.timeRange[1] = option;
             param.points.push(1);
             param.data.push(option);
@@ -1918,8 +1918,8 @@ function drawTimeRangeTool() {
 function loadTimeRangeTool(data, onlyTime = false, isStore = false) {
     if (onlyTime)
         data = [
-            { time: data.start, value: 1, color: "lime" },
-            { time: data.end, value: 1, color: "OrangeRed" },
+            { time: data.start, value: 1, color: "OrangeRed" },
+            { time: data.end, value: 1, color: "lime" },
         ];
     params.tools.timeRange = data;
     params.series.timeRange.setData(data);
