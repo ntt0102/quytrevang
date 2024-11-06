@@ -55,23 +55,27 @@
                 >
                     <div
                         ref="connectionRef"
-                        class="command far"
-                        :class="{
-                            'fa-link-simple': status.connection,
-                            'fa-link-simple-slash': !status.connection,
-                            blink: state.isSocketWarning,
-                        }"
+                        class="command"
+                        :class="{ yellow: status.pending }"
                         :title="$t('trading.derivative.connection')"
                         @click="
                             () => $store.dispatch('tradingDerivative/getStatus')
                         "
-                    ></div>
+                    >
+                        <i
+                            class="far"
+                            :class="{
+                                'fa-link-simple': status.connection,
+                                'fa-link-simple-slash': !status.connection,
+                                blink: state.isSocketWarning,
+                            }"
+                        ></i>
+                    </div>
                     <div
                         class="command status"
                         :class="{
                             green: status.position > 0,
                             red: status.position < 0,
-                            pending: status.pending,
                         }"
                         :title="$t('trading.derivative.position')"
                         @click="getAccountInfo"
@@ -112,14 +116,18 @@
                 >
                     <div
                         ref="fullscreenToolRef"
-                        class="command far"
-                        :class="{
-                            'fa-compress': state.isFullscreen,
-                            'fa-expand': !state.isFullscreen,
-                        }"
+                        class="command"
                         :title="$t('trading.derivative.fullscreen')"
                         @click="toggleFullscreen"
-                    ></div>
+                    >
+                        <i
+                            class="far"
+                            :class="{
+                                'fa-compress': state.isFullscreen,
+                                'fa-expand': !state.isFullscreen,
+                            }"
+                        ></i>
+                    </div>
                     <div
                         ref="tradingviewRef"
                         class="command far fa-chart-candlestick"
@@ -128,17 +136,23 @@
                         @contextmenu="resetTools"
                     ></div>
                     <div
-                        class="popup command far"
+                        class="popup command"
                         :class="{
-                            'fa-badge-check': !state.progress.length,
-                            [`fa-circle-${state.progress[0] + 1}`]:
-                                state.progress.length,
                             green: state.progress[0] <= 1,
                             red: state.progress[0] > 1,
                         }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="showProgressToolPopup"
                     >
+                        <i
+                            class="far"
+                            :class="{
+                                'fa-badge-check': !state.progress.length,
+                                [`fa-circle-${state.progress[0] + 1}`]:
+                                    state.progress.length,
+                            }"
+                        >
+                        </i>
                         <ProgressContextMenu
                             v-show="state.showProgressContext"
                             class="contextmenu"
@@ -148,18 +162,23 @@
                     </div>
                     <div
                         ref="autoScanToolRef"
-                        class="command far fa-bolt-auto"
-                        :class="{ blink: config.autoScan }"
+                        class="command"
                         :title="$t('trading.derivative.autoScanTool')"
                         @click="autoScanToolClick"
                         @contextmenu="autoScanToolContextmenu"
-                    ></div>
+                    >
+                        <i
+                            class="far fa-bolt-auto"
+                            :class="{ blink: config.autoScan }"
+                        ></i>
+                    </div>
                     <div
                         v-show="false"
-                        class="popup command far fa-heart-rate"
+                        class="popup command"
                         :title="$t('trading.derivative.patternTool')"
                         @click="patternToolClick"
                     >
+                        <i class="far fa-heart-rate"></i>
                         <PatternContextMenu
                             v-show="state.showPatternContext"
                             class="contextmenu"
@@ -167,11 +186,12 @@
                     </div>
                     <div
                         ref="lineToolRef"
-                        class="popup command far fa-horizontal-rule"
+                        class="popup command"
                         :title="$t('trading.derivative.lineTool')"
                         @click="lineToolClick"
                         @contextmenu="lineToolContextmenu"
                     >
+                        <i class="far fa-horizontal-rule"></i>
                         <LineContextMenu
                             v-show="state.showLineContext"
                             class="contextmenu"
@@ -183,41 +203,54 @@
                     </div>
                     <div
                         ref="timeRangeToolRef"
-                        class="command far fa-grip-lines-vertical"
+                        class="command"
                         :title="$t('trading.derivative.timeRangeTool')"
                         @click="timeRangeToolClick"
                         @contextmenu="timeRangeToolContextmenu"
-                    ></div>
+                    >
+                        <i class="far fa-grip-lines-vertical"></i>
+                    </div>
                     <div
                         ref="phaseToolRef"
-                        class="command far fa-heart-rate"
+                        class="command"
                         :title="$t('trading.derivative.phaseTool')"
                         @click="phaseToolClick"
                         @contextmenu="phaseToolContextmenu"
-                    ></div>
+                    >
+                        <i class="far fa-heart-rate"></i>
+                    </div>
                     <div
                         ref="targetToolRef"
-                        class="command far fa-line-height"
+                        class="command"
                         :title="$t('trading.derivative.targetTool')"
                         @click="targetToolClick"
                         @contextmenu="targetToolContextmenu"
-                    ></div>
+                    >
+                        <i class="far fa-line-height"> </i>
+                    </div>
                     <div
                         v-show="false"
                         ref="rrToolRef"
-                        class="command far fa-percent"
+                        class="command"
                         :title="$t('trading.derivative.rrTool')"
                         @click="rrToolClick"
                         @contextmenu="rrToolContextmenu"
-                    ></div>
+                    >
+                        <i class="far fa-percent"> </i>
+                    </div>
                     <div
                         v-show="showCancelOrder"
                         ref="cancelOrderRef"
-                        class="cancel-order command far fa-trash-alt"
-                        :class="{ blink: state.isOrderWarning }"
+                        class="cancel-order command"
                         :title="$t('trading.derivative.cancelTool')"
                         @click="cancelOrderClick"
-                    ></div>
+                    >
+                        <i
+                            class="far fa-trash-alt"
+                            :class="{ blink: state.isOrderWarning }"
+                        >
+                        </i>
+                    </div>
                 </div>
                 <div>
                     <div
@@ -377,11 +410,12 @@ const state = reactive({
 });
 const status = computed(() => store.state.tradingDerivative.status);
 const config = computed(() => store.state.tradingDerivative.config);
+const tools = computed(() => store.state.tradingDerivative.tools);
 const showCancelOrder = computed(
     () =>
         status.value.position != 0 ||
         !!status.value.pending ||
-        !!store.state.tradingDerivative.tools.order
+        !!tools.value.order
 );
 const tradingViewSrc = computed(() => {
     return `https://chart.vps.com.vn/tv/?u=${config.value.vpsUser}&s=${config.value.vpsSession}&symbol=VN30F1M&resolution=1&lang=vi`;
@@ -451,7 +485,7 @@ onUnmounted(() => {
 });
 
 watch(() => store.state.tradingDerivative.chartData, loadChartData);
-watch(() => store.state.tradingDerivative.tools, loadToolsData);
+watch(() => tools.value, loadToolsData);
 
 function eventChartClick(e) {
     state.showLineContext = false;
@@ -922,9 +956,8 @@ function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
 }
-function loadToolsData(tools) {
+function loadToolsData(toolsData) {
     removeAllTools();
-    let toolsData = loadAutoScanTool(mf.cloneDeep(tools));
     Object.entries(toolsData).forEach(([name, points]) => {
         switch (name) {
             case "order":
@@ -948,12 +981,16 @@ function loadToolsData(tools) {
             case "progress":
                 state.progress = Object.values(points)[0];
                 break;
-            default:
+            case "target":
+            case "phase":
                 Object.entries(points).forEach(
                     ([point, line]) =>
                         (params.tools[name][point] =
                             params.series.price.createPriceLine(line))
                 );
+                break;
+            case "auto":
+                if (!("phase" in toolsData)) loadAutoScanTool(toolsData);
                 break;
         }
     });
@@ -1265,9 +1302,9 @@ function autoScanToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         removeAutoScanTool();
-        removePhaseTool();
-        removeTimeRangeTool();
-        removeProgressTool();
+        removePhaseTool(false);
+        removeTimeRangeTool(false);
+        removeProgressTool(false);
         e.target.classList.add("selected");
     }
 }
@@ -1304,24 +1341,16 @@ function drawAutoScanTool() {
     }
 }
 function loadAutoScanTool(data) {
-    if ("auto" in data) {
-        params.tools.auto = data.auto;
-        const { valid, pattern, phase1, phase2, rr1, rr2 } = runAutoScan(
-            params.tools.auto,
-            true
-        );
-        if (valid) {
-            loadTimeRangeTool(phase1.rt, true);
-            loadProgressTool(pattern);
-            loadPhaseTool(data.auto, { phase1, phase2, rr1, rr2 });
-            const { phase, tr, progress, auto, ...updatedData } = data;
-            return updatedData;
-        }
-    } else if (config.value.autoScan) {
-        const { phase, tr, progress, ...updatedData } = data;
-        return updatedData;
+    params.tools.auto = mf.cloneDeep(data.auto);
+    const { valid, pattern, phase1, phase2, rr1, rr2 } = runAutoScan(
+        params.tools.auto,
+        true
+    );
+    if (valid) {
+        loadTimeRangeTool(phase1.rt, true);
+        loadProgressTool(pattern);
+        loadPhaseTool(data.auto, { phase1, phase2, rr1, rr2 });
     }
-    return data;
 }
 function runAutoScan(data, isAvailable = false) {
     const points = isAvailable ? data : scanPattern(data);
@@ -1458,10 +1487,9 @@ function phaseToolClick(e) {
 }
 function phaseToolContextmenu(e) {
     e.target.classList.remove("selected");
-    const onlyServer = mf.isSet(params.tools.auto);
-    removePhaseTool(true, onlyServer);
-    removeTimeRangeTool(true, onlyServer);
-    removeProgressTool(true, onlyServer);
+    removePhaseTool(true);
+    removeTimeRangeTool(true);
+    removeProgressTool(true);
 }
 function drawPhaseTool() {
     const TYPE = "phase";
@@ -2639,16 +2667,6 @@ function getTimeIndex(time) {
             .status {
                 width: unset !important;
                 padding: 0 10px !important;
-
-                &.green {
-                    color: lime !important;
-                }
-                &.red {
-                    color: red !important;
-                }
-                &.pending {
-                    background: gold !important;
-                }
             }
         }
 
@@ -2659,10 +2677,6 @@ function getTimeIndex(time) {
 
             .command:not(:first-child) {
                 border-top: solid 2px #2a2e39 !important;
-            }
-
-            .warning {
-                color: yellow !important;
             }
 
             .popup {
@@ -2704,17 +2718,29 @@ function getTimeIndex(time) {
             cursor: unset !important;
         }
         &.green {
-            color: lime !important;
+            color: lime;
         }
         &.red {
-            color: red !important;
+            color: red;
         }
-        &.blink {
-            animation: blinker 0.5s linear infinite;
+        &.yellow {
+            color: orange;
         }
-        @keyframes blinker {
-            50% {
-                color: transparent;
+        i {
+            pointer-events: none;
+            &.blink {
+                animation: blinker 0.5s linear infinite;
+            }
+            @keyframes blinker {
+                0% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0;
+                }
+                100% {
+                    opacity: 1;
+                }
             }
         }
     }
