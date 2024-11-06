@@ -191,6 +191,7 @@ class ScanDerivativeJob implements ShouldQueue
                     'start' => $time,
                     'end' => $time,
                     'distance' => 0,
+                    'margin' => 0,
                     'count' => 0,
                     'over' => false,
                 ];
@@ -199,10 +200,14 @@ class ScanDerivativeJob implements ShouldQueue
 
             if ($this->cmp($price, $side, $resPoint['price'])) {
                 $distance = $resPoint['end'] - $resPoint['start'];
-                if ($distance > $rt['distance']) {
+                if (
+                    $distance > $rt['distance'] ||
+                    ($distance > 0.5 * $rt['distance'] && $resPoint['margin'] > 2 * $rt['margin'])
+                ) {
                     $rt['start'] = $resPoint['time'];
                     $rt['end'] = $time;
                     $rt['distance'] = $distance;
+                    $rt['margin'] = $resPoint['margin'];
                     if ($rtRef > 0) {
                         if ($distance > $rtRef) $rt['count']++;
                         if ($distance > 3 * $rtRef) $rt['count'] = true;

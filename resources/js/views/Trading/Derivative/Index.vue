@@ -1784,6 +1784,7 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
                     start: time,
                     end: time,
                     distance: 0,
+                    margin: 0,
                     count: 0,
                     over: false,
                 };
@@ -1791,10 +1792,15 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
             }
             if (cmp(price, side, resPoint.price)) {
                 const distance = resPoint.end - resPoint.start;
-                if (distance > rt.distance) {
+                if (
+                    distance > rt.distance ||
+                    (distance > 0.5 * rt.distance &&
+                        resPoint.margin > 2 * rt.margin)
+                ) {
                     rt.start = resPoint.time;
                     rt.end = time;
                     rt.distance = distance;
+                    rt.margin = resPoint.margin;
                     if (rtRef > 0) {
                         if (distance > rtRef) rt.count++;
                         if (distance > 3 * rtRef) rt.over = true;
