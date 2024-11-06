@@ -1793,7 +1793,8 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
             if (cmp(price, side, resPoint.price)) {
                 const distance = resPoint.end - resPoint.start;
                 if (
-                    distance > rt.distance ||
+                    (distance > rt.distance &&
+                        resPoint.margin > 0.5 * rt.margin) ||
                     (distance > 0.5 * rt.distance &&
                         resPoint.margin > 2 * rt.margin)
                 ) {
