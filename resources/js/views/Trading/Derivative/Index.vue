@@ -2743,7 +2743,8 @@ function getTimeIndex(time) {
         right: 55px;
         border-radius: 50%;
         border: 1px solid #2b2b43;
-        padding-left: 1px;
+        padding-left: 0.7px;
+        padding-top: 1.3px;
         line-height: 22px !important;
         width: 25px !important;
         height: 25px !important;
