@@ -783,22 +783,24 @@ function eventPriceLineDrag(e) {
                     data: [],
                 };
                 let point, changeOptions;
-                const A = {
-                    time: +params.tools.pattern.A.options().time,
-                    price: +params.tools.pattern.A.options().price,
+                const aOptions = params.tools.pattern.A.options();
+                const bOptions = params.tools.pattern.B.options();
+                const cOptions = params.tools.pattern.C.options();
+                const points = {
+                    A: {
+                        time: +aOptions.time,
+                        price: +aOptions.price,
+                    },
+                    B: {
+                        time: +bOptions.time,
+                        price: +bOptions.price,
+                    },
+                    C: { price: +cOptions.price },
                 };
-                const B = {
-                    time: +params.tools.pattern.B.options().time,
-                    price: +params.tools.pattern.B.options().price,
-                };
-                const C = { price: +params.tools.pattern.C.options().price };
-                const { pattern, phase1, phase2, rr1, rr2 } = calculatePattern({
-                    A,
-                    B,
-                    C,
-                });
-                const b = B.price;
-                const c = C.price;
+                const { pattern, phase1, phase2, rr1, rr2 } =
+                    calculatePattern(points);
+                const b = points.B.price;
+                const c = points.C.price;
                 let d = phase2.sp;
                 loadTimeRangeTool(phase1.rt, true, true);
                 loadProgressTool(pattern, true);
@@ -1461,21 +1463,25 @@ function drawPatternTool() {
         data: [],
     };
     if (mf.isSet(params.tools.pattern.A)) {
+        const aOptions = params.tools.pattern.A.options();
+
         if (mf.isSet(params.tools.pattern.B)) {
+            const bOptions = params.tools.pattern.B.options();
+
             if (mf.isSet(params.tools.pattern.C)) {
                 let point, changeOptions;
-                const A = { time, price };
-                const B = {
-                    time: +params.tools.pattern.B.options().time,
-                    price: +params.tools.pattern.B.options().price,
+                const cOptions = params.tools.pattern.C.options();
+                const points = {
+                    A: { time, price },
+                    B: {
+                        time: +bOptions.time,
+                        price: +bOptions.price,
+                    },
+                    C: { price: +cOptions.price },
                 };
-                const C = { price: +params.tools.pattern.C.options().price };
-                const { pattern, phase1, phase2, rr1, rr2 } = calculatePattern({
-                    A,
-                    B,
-                    C,
-                });
-                const c = C.price;
+                const { pattern, phase1, phase2, rr1, rr2 } =
+                    calculatePattern(points);
+                const c = points.C.price;
                 const d = phase2.sp;
                 loadTimeRangeTool(phase1.rt, true, true);
                 loadProgressTool(pattern, true);
@@ -1536,21 +1542,19 @@ function drawPatternTool() {
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
             } else {
-                const A = {
-                    price: +params.tools.pattern.A.options().price,
-                    rt: +params.tools.pattern.A.options().rt,
+                const points = {
+                    A: {
+                        price: +aOptions.price,
+                        rt: +aOptions.rt,
+                    },
+                    B: {
+                        time: +bOptions.time,
+                        price: +bOptions.price,
+                    },
+                    C: { price },
                 };
-                const B = {
-                    time: +params.tools.pattern.B.options().time,
-                    price: +params.tools.pattern.B.options().price,
-                };
-                const C = { price };
-                const { pattern, phase2, rr1, rr2 } = calculatePattern({
-                    A,
-                    B,
-                    C,
-                });
-                const c = C.price;
+                const { pattern, phase2, rr1, rr2 } = calculatePattern(points);
+                const c = points.C.price;
                 const d = phase2.sp;
                 loadProgressTool(pattern, true);
                 //
@@ -1612,8 +1616,8 @@ function drawPatternTool() {
         } else {
             const { rt, er } = scanPhase(
                 {
-                    time: +params.tools.pattern.A.options().time,
-                    price: +params.tools.pattern.A.options().price,
+                    time: +aOptions.time,
+                    price: +aOptions.price,
                 },
                 { price }
             );
