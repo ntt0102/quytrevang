@@ -809,14 +809,14 @@ function eventPriceLineDrag(e) {
                 point = "A";
                 changeOptions = {
                     rt: phase1.rt.distance,
-                    title: phase1.er,
+                    title: phase1.phase,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "B";
-                changeOptions = { title: phase2.er };
+                changeOptions = { title: phase2.phase };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -1491,7 +1491,7 @@ function drawPatternTool() {
                 changeOptions = {
                     price,
                     time,
-                    title: phase1.er,
+                    title: phase1.phase,
                     rt: phase1.rt.distance,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
@@ -1499,7 +1499,7 @@ function drawPatternTool() {
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "B";
-                changeOptions = { title: phase2.er };
+                changeOptions = { title: phase2.phase };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -1561,7 +1561,7 @@ function drawPatternTool() {
                 //
                 const point = "B";
                 params.tools.pattern[point].applyOptions({
-                    title: phase2.er,
+                    title: phase2.phase,
                 });
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -1615,7 +1615,7 @@ function drawPatternTool() {
             }
             patternToolRef.value.classList.remove("selected");
         } else {
-            const { rt, er } = scanPhase(
+            const { rt, phase } = scanPhase(
                 {
                     time: +aOptions.time,
                     price: +aOptions.price,
@@ -1626,7 +1626,7 @@ function drawPatternTool() {
             //
             const point = "A";
             params.tools.pattern[point].applyOptions({
-                title: er,
+                title: phase,
                 rt: rt.distance,
             });
             param.points.push(point);
@@ -1676,7 +1676,7 @@ function loadPatternTool(
     const d = phase2.sp;
     //
     option.point = "A";
-    option.title = phase1.er;
+    option.title = phase1.phase;
     option.color = "#F44336";
     option.price = A.price;
     option.time = A.time;
@@ -1686,7 +1686,7 @@ function loadPatternTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "B";
-    option.title = phase2.er;
+    option.title = phase2.phase;
     option.color = "#009688";
     option.price = B.price;
     option.time = B.time;
@@ -1771,7 +1771,7 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
     let side = endPoint.price > startPoint.price,
         resPoint = {},
         rt = {},
-        er = 0,
+        phase = 0,
         sp = 0;
     params.data.price
         .filter((item) => item.time >= startPoint.time)
@@ -1794,6 +1794,7 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
                     count: 0,
                     over: false,
                 };
+                phase = 0;
                 sp = price;
             }
             if (cmp(price, side, resPoint.price)) {
@@ -1813,12 +1814,6 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
                         if (distance > 3 * rtRef) rt.over = true;
                     }
                     if (resPoint.margin != 0) {
-                        er = parseFloat(
-                            (
-                                (endPoint.price - resPoint.price) /
-                                resPoint.margin
-                            ).toFixed(1)
-                        );
                         sp =
                             rt.count > 0
                                 ? parseFloat(
@@ -1827,6 +1822,12 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
                                       ).toFixed(1)
                                   )
                                 : startPoint.price;
+                        phase = validatePhase(
+                            startPoint.price,
+                            resPoint.price,
+                            resPoint.price - resPoint.margin,
+                            endPoint.price
+                        );
                     }
                 }
                 resPoint = {
@@ -1845,7 +1846,7 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
             if (cmp(price, side, endPoint.price, true)) return false;
             else return true;
         });
-    return { rt, er, sp };
+    return { phase, rt, sp };
 }
 function validatePattern({ A, B, C, D, E }, phase2) {
     if (phase2.rt.count < 1) {
@@ -1856,14 +1857,19 @@ function validatePattern({ A, B, C, D, E }, phase2) {
             (D.price - E.price) / (D.price - C.price) >= 0.786
         )
             return 1;
-        return 7;
+        return 6;
     }
-    if (phase2.rt.over) return 6;
+    if (phase2.rt.over) return 5;
     if (phase2.rt.count > 1) return 4;
-    if (phase2.er > 1) return 4;
-    if ((C.price - phase2.sp) / (C.price - B.price) < 0.786) return 3;
+    if (phase2.phase > 0) return 3;
     if ((B.price - C.price) / (B.price - A.price) < 0.382) return 2;
     return 0;
+}
+function validatePhase(a, b, c, d) {
+    let result = 0;
+    if ((a - b) / (a - d) < 0.786) result += 1;
+    if ((d - c) / (d - a) < 0.786) result += 2;
+    return result;
 }
 function removePatternTool(withServer = true, onlyServer = false) {
     if (withServer)

@@ -169,8 +169,8 @@ class ScanDerivativeJob implements ShouldQueue
         $side = $endPoint['price'] > $startPoint['price'];
         $resPoint = [];
         $rt = [];
-        $er = 0;
-        $sp = 0;
+        $phase = 0;
+        $isFirst = false;
 
         $data = array_filter($data, function ($item) use ($startPoint) {
             return $this->unix($item->date) >= $startPoint['time'];
@@ -179,7 +179,8 @@ class ScanDerivativeJob implements ShouldQueue
             $price = $item->price;
             $time = $item->date;
 
-            if ($sp == 0 || $price == $startPoint['price']) {
+            if (!$isFirst || $price == $startPoint['price']) {
+                $isFirst = true;
                 $resPoint = [
                     'time' => $time,
                     'price' => $price,
@@ -195,7 +196,7 @@ class ScanDerivativeJob implements ShouldQueue
                     'count' => 0,
                     'over' => false,
                 ];
-                $sp = $price;
+                $phase = 0;
             }
 
             if ($this->cmp($price, $side, $resPoint['price'])) {
@@ -215,8 +216,12 @@ class ScanDerivativeJob implements ShouldQueue
                         if ($distance > 3 * $rtRef) $rt['count'] = true;
                     }
                     if ($resPoint['margin'] != 0) {
-                        $er = round(($endPoint['price'] - $resPoint['price']) / $resPoint['margin'], 1);
-                        $sp = $resPoint['price'] - $resPoint['margin'];
+                        $phase = $this->validatePhase(
+                            $startPoint['price'],
+                            $resPoint['price'],
+                            $resPoint['price'] - $resPoint['margin'],
+                            $endPoint['price']
+                        );
                     }
                 }
                 $resPoint = [
@@ -239,7 +244,7 @@ class ScanDerivativeJob implements ShouldQueue
             }
         }
 
-        return ['rt' => $rt, 'er' => $er, 'sp' => $sp];
+        return ['phase' => $phase, 'rt' => $rt];
     }
 
     function validatePattern($points, $phase2)
@@ -259,18 +264,24 @@ class ScanDerivativeJob implements ShouldQueue
             ) {
                 return 1;
             }
-            return 7;
+            return 6;
         }
-        if ($phase2['rt']['over']) return 6;
-        if ($phase2['rt']['count'] > 1) return 5;
+        if ($phase2['rt']['over']) return 5;
+        if ($phase2['rt']['count'] > 1) return 4;
 
-        if ($phase2['er'] > 1) return 4;
-
-        if (($C['price'] - $phase2['sp']) / ($C['price'] - $B['price']) < 0.786) return 3;
+        if ($phase2['phase'] > 0) return 3;
 
         if (($B['price'] - $C['price']) / ($B['price'] - $A['price']) < 0.382) return 2;
 
         return 0;
+    }
+
+    private function validatePhase($a, $b, $c, $d)
+    {
+        $result = 0;
+        if (($a - $b) / ($a - $d) < 0.786) $result += 1;
+        if (($d - $c) / ($d - $a) < 0.786) $result += 2;
+        return $result;
     }
 
     private function cmp($value1, $side, $value2, $eq = false)
