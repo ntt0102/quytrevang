@@ -173,16 +173,22 @@
                         ></i>
                     </div>
                     <div
-                        v-show="false"
-                        class="popup command"
-                        :title="$t('trading.derivative.sampleTool')"
-                        @click="sampleToolClick"
+                        ref="patternToolRef"
+                        class="command"
+                        :title="$t('trading.derivative.patternTool')"
+                        @click="patternToolClick"
+                        @contextmenu="patternToolContextmenu"
                     >
                         <i class="far fa-heart-rate"></i>
-                        <PatternContextMenu
-                            v-show="state.showSampleContext"
-                            class="contextmenu"
-                        ></PatternContextMenu>
+                    </div>
+                    <div
+                        ref="timeRangeToolRef"
+                        class="command"
+                        :title="$t('trading.derivative.timeRangeTool')"
+                        @click="timeRangeToolClick"
+                        @contextmenu="timeRangeToolContextmenu"
+                    >
+                        <i class="far fa-grip-lines-vertical"></i>
                     </div>
                     <div
                         ref="lineToolRef"
@@ -201,24 +207,7 @@
                             @deleteAllLine="removeLineTool"
                         ></LineContextMenu>
                     </div>
-                    <div
-                        ref="timeRangeToolRef"
-                        class="command"
-                        :title="$t('trading.derivative.timeRangeTool')"
-                        @click="timeRangeToolClick"
-                        @contextmenu="timeRangeToolContextmenu"
-                    >
-                        <i class="far fa-grip-lines-vertical"></i>
-                    </div>
-                    <div
-                        ref="patternToolRef"
-                        class="command"
-                        :title="$t('trading.derivative.patternTool')"
-                        @click="patternToolClick"
-                        @contextmenu="patternToolContextmenu"
-                    >
-                        <i class="far fa-heart-rate"></i>
-                    </div>
+
                     <div
                         ref="targetToolRef"
                         class="command"
@@ -237,6 +226,18 @@
                         @contextmenu="rrToolContextmenu"
                     >
                         <i class="far fa-percent"> </i>
+                    </div>
+                    <div
+                        v-show="false"
+                        class="popup command"
+                        :title="$t('trading.derivative.sampleTool')"
+                        @click="sampleToolClick"
+                    >
+                        <i class="far fa-heart-rate"></i>
+                        <PatternContextMenu
+                            v-show="state.showSampleContext"
+                            class="contextmenu"
+                        ></PatternContextMenu>
                     </div>
                     <div
                         v-show="showCancelOrder"
