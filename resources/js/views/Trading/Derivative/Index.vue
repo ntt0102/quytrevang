@@ -1373,6 +1373,7 @@ function runAutoScan(data, isAvailable = false) {
             100
         ).toFixed(1)
     );
+    console.log("phase2", phase2);
     return { valid: true, pattern, phase1, phase2, rr1, rr2, points };
 }
 function scanPattern(data) {
@@ -1822,9 +1823,9 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
                 const distance = resPoint.end - resPoint.start;
                 if (
                     (distance > rt.distance &&
-                        resPoint.margin > 0.5 * rt.margin) ||
+                        cmp(resPoint.margin, side, 0.5 * rt.margin)) ||
                     (distance > 0.5 * rt.distance &&
-                        resPoint.margin > 2 * rt.margin)
+                        cmp(resPoint.margin, side, 2 * rt.margin))
                 ) {
                     rt.start = resPoint.time;
                     rt.end = time;
