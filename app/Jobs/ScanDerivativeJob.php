@@ -273,8 +273,11 @@ class ScanDerivativeJob implements ShouldQueue
     private function validatePhase($a, $b, $c, $d)
     {
         $result = 0;
-        if (($a - $b) / ($a - $d) < 0.618) $result += 1;
-        if (($d - $c) / ($d - $a) < 0.786) $result += 2;
+        $da = $d - $a;
+        $db = $d - $b;
+        $dc = $d - $c;
+        if ($db / $da > 0.236) $result += 1;
+        if ($dc / $da < 0.786) $result += 2;
         return $result;
     }
 

@@ -1857,8 +1857,11 @@ function validatePattern({ A, B, C, D, E }, phase2) {
 }
 function validatePhase(a, b, c, d) {
     let result = 0;
-    if ((a - b) / (a - d) < 0.618) result += 1;
-    if ((d - c) / (d - a) < 0.786) result += 2;
+    const da = d - a;
+    const db = d - b;
+    const dc = d - c;
+    if (db / da > 0.236) result += 1;
+    if (dc / da < 0.786) result += 2;
     return result;
 }
 function removePatternTool(withServer = true, onlyServer = false) {
