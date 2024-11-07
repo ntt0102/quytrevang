@@ -175,12 +175,12 @@
                     <div
                         v-show="false"
                         class="popup command"
-                        :title="$t('trading.derivative.patternTool')"
-                        @click="patternToolClick"
+                        :title="$t('trading.derivative.sampleTool')"
+                        @click="sampleToolClick"
                     >
                         <i class="far fa-heart-rate"></i>
                         <PatternContextMenu
-                            v-show="state.showPatternContext"
+                            v-show="state.showSampleContext"
                             class="contextmenu"
                         ></PatternContextMenu>
                     </div>
@@ -211,11 +211,11 @@
                         <i class="far fa-grip-lines-vertical"></i>
                     </div>
                     <div
-                        ref="phaseToolRef"
+                        ref="patternToolRef"
                         class="command"
-                        :title="$t('trading.derivative.phaseTool')"
-                        @click="phaseToolClick"
-                        @contextmenu="phaseToolContextmenu"
+                        :title="$t('trading.derivative.patternTool')"
+                        @click="patternToolClick"
+                        @contextmenu="patternToolContextmenu"
                     >
                         <i class="far fa-heart-rate"></i>
                     </div>
@@ -365,7 +365,7 @@ const reloadToolRef = ref(null);
 const tradingviewRef = ref(null);
 const lineToolRef = ref(null);
 const rrToolRef = ref(null);
-const phaseToolRef = ref(null);
+const patternToolRef = ref(null);
 const targetToolRef = ref(null);
 const timeRangeToolRef = ref(null);
 const autoScanToolRef = ref(null);
@@ -404,7 +404,7 @@ const state = reactive({
     lineTitle: "",
     progress: [],
     showLineContext: false,
-    showPatternContext: false,
+    showSampleContext: false,
     showProgressContext: false,
     showTradingView: false,
 });
@@ -489,7 +489,7 @@ watch(() => tools.value, loadToolsData);
 
 function eventChartClick(e) {
     state.showLineContext = false;
-    state.showPatternContext = false;
+    state.showSampleContext = false;
     toggleOrderButton(false);
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (targetToolRef.value.classList.contains("selected"))
@@ -499,7 +499,8 @@ function eventChartClick(e) {
     else if (autoScanToolRef.value.classList.contains("selected"))
         drawAutoScanTool();
     else if (rrToolRef.value.classList.contains("selected")) drawRrTool();
-    else if (phaseToolRef.value.classList.contains("selected")) drawPhaseTool();
+    else if (patternToolRef.value.classList.contains("selected"))
+        drawPatternTool();
 }
 function eventChartContextmenu(e) {
     toggleOrderButton(true);
@@ -773,100 +774,101 @@ function eventPriceLineDrag(e) {
                 store.dispatch("tradingDerivative/drawTools", param);
             }
             break;
-        case "phase":
-            if (mf.isSet(params.tools.phase.B)) {
+        case "pattern":
+            if (mf.isSet(params.tools.pattern.B)) {
                 let param = {
                     isRemove: false,
-                    name: "phase",
+                    name: "pattern",
                     points: [],
                     data: [],
                 };
                 let point, changeOptions;
                 const A = {
-                    time: +params.tools.phase.A.options().time,
-                    price: +params.tools.phase.A.options().price,
+                    time: +params.tools.pattern.A.options().time,
+                    price: +params.tools.pattern.A.options().price,
                 };
                 const B = {
-                    time: +params.tools.phase.B.options().time,
-                    price: +params.tools.phase.B.options().price,
+                    time: +params.tools.pattern.B.options().time,
+                    price: +params.tools.pattern.B.options().price,
                 };
-                const C = { price: +params.tools.phase.C.options().price };
-                const { valid, pattern, phase1, phase2, rr1, rr2 } =
-                    runAutoScan({ A, B, C }, true);
-                if (valid) {
-                    const b = B.price;
-                    const c = C.price;
-                    let d = phase2.sp;
-                    loadTimeRangeTool(phase1.rt, true, true);
-                    loadProgressTool(pattern, true);
-                    //
-                    point = "A";
+                const C = { price: +params.tools.pattern.C.options().price };
+                const { pattern, phase1, phase2, rr1, rr2 } = calculatePattern({
+                    A,
+                    B,
+                    C,
+                });
+                const b = B.price;
+                const c = C.price;
+                let d = phase2.sp;
+                loadTimeRangeTool(phase1.rt, true, true);
+                loadProgressTool(pattern, true);
+                //
+                point = "A";
+                changeOptions = {
+                    rt: phase1.rt.distance,
+                    title: phase1.er,
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "B";
+                changeOptions = { title: phase2.er };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "C";
+                changeOptions = { title: rr1 };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "D";
+                if (lineOptions.point == point) {
+                    d = +params.tools.pattern.D.options().price;
                     changeOptions = {
-                        rt: phase1.rt.distance,
-                        title: phase1.er,
+                        title: parseFloat(
+                            (((c - d) / (c - b)) * 100).toFixed(1)
+                        ),
                     };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "B";
-                    changeOptions = { title: phase2.er };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "C";
-                    changeOptions = { title: rr1 };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "D";
-                    if (lineOptions.point == point) {
-                        d = +params.tools.phase.D.options().price;
-                        changeOptions = {
-                            title: parseFloat(
-                                (((c - d) / (c - b)) * 100).toFixed(1)
-                            ),
-                        };
-                    } else
-                        changeOptions = {
-                            price: d,
-                            title: rr2,
-                        };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "X";
+                } else
                     changeOptions = {
-                        price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
-                        title: parseFloat(((d - c) * 0.5).toFixed(1)),
+                        price: d,
+                        title: rr2,
                     };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "Y";
-                    changeOptions = {
-                        price: parseFloat((d + (d - c)).toFixed(1)),
-                        title: parseFloat((d - c).toFixed(1)),
-                    };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "Z";
-                    changeOptions = {
-                        price: parseFloat((d + (d - c) * 2).toFixed(1)),
-                        title: parseFloat(((d - c) * 2).toFixed(1)),
-                    };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    store.dispatch("tradingDerivative/drawTools", param);
-                }
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "X";
+                changeOptions = {
+                    price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
+                    title: parseFloat(((d - c) * 0.5).toFixed(1)),
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "Y";
+                changeOptions = {
+                    price: parseFloat((d + (d - c)).toFixed(1)),
+                    title: parseFloat((d - c).toFixed(1)),
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "Z";
+                changeOptions = {
+                    price: parseFloat((d + (d - c) * 2).toFixed(1)),
+                    title: parseFloat(((d - c) * 2).toFixed(1)),
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                store.dispatch("tradingDerivative/drawTools", param);
             }
             break;
     }
@@ -982,7 +984,7 @@ function loadToolsData(toolsData) {
                 state.progress = Object.values(points)[0];
                 break;
             case "target":
-            case "phase":
+            case "pattern":
                 Object.entries(points).forEach(
                     ([point, line]) =>
                         (params.tools[name][point] =
@@ -990,7 +992,7 @@ function loadToolsData(toolsData) {
                 );
                 break;
             case "auto":
-                if (!("phase" in toolsData)) loadAutoScanTool(toolsData);
+                if (!("pattern" in toolsData)) loadAutoScanTool(toolsData);
                 break;
         }
     });
@@ -1241,7 +1243,7 @@ function lineToolClick(e) {
 }
 function lineToolContextmenu(e) {
     state.showLineContext = !state.showLineContext;
-    state.showPatternContext = false;
+    state.showSampleContext = false;
     state.showProgressContext = false;
 }
 function drawLineTool() {
@@ -1302,7 +1304,7 @@ function autoScanToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         removeAutoScanTool();
-        removePhaseTool(false);
+        removePatternTool(false);
         removeTimeRangeTool(false);
         removeProgressTool(false);
         e.target.classList.add("selected");
@@ -1323,14 +1325,14 @@ function drawAutoScanTool() {
         points: [],
         data: [],
     };
-    const { valid, pattern, phase1, phase2, rr1, rr2, points } =
-        runAutoScan(data);
-    if (!valid) return false;
+    const points = scanPattern(data);
+    if (!mf.isSet(points)) return false;
+    const { pattern, phase1, phase2, rr1, rr2 } = calculatePattern(points);
 
     loadTimeRangeTool(phase1.rt, true);
     loadProgressTool(pattern);
-    removePhaseTool(false);
-    loadPhaseTool(points, { phase1, phase2, rr1, rr2 });
+    removePatternTool(false);
+    loadPatternTool(points, { phase1, phase2, rr1, rr2 });
     if (JSON.stringify(params.tools.auto) != JSON.stringify(points)) {
         params.tools.auto = points;
         Object.entries(points).forEach(([key, value]) => {
@@ -1341,40 +1343,14 @@ function drawAutoScanTool() {
     }
 }
 function loadAutoScanTool(data) {
-    params.tools.auto = mf.cloneDeep(data.auto);
-    const { valid, pattern, phase1, phase2, rr1, rr2 } = runAutoScan(
-        params.tools.auto,
-        true
-    );
-    if (valid) {
-        loadTimeRangeTool(phase1.rt, true);
-        loadProgressTool(pattern);
-        loadPhaseTool(data.auto, { phase1, phase2, rr1, rr2 });
-    }
-}
-function runAutoScan(data, isAvailable = false) {
-    const points = isAvailable ? data : scanPattern(data);
-    if (!mf.isSet(points)) return { valid: false };
-    const phase1 = !points.A.rt
-        ? scanPhase(points.A, points.B)
-        : { rt: { distance: points.A.rt } };
-    const phase2 = scanPhase(points.B, points.C, phase1.rt.distance);
-    const pattern = validatePattern(points, phase2);
-    const rr1 = parseFloat(
-        (
-            ((points.B.price - points.C.price) /
-                (points.B.price - points.A.price)) *
-            100
-        ).toFixed(1)
-    );
-    const rr2 = parseFloat(
-        (
-            ((points.C.price - phase2.sp) / (points.C.price - points.B.price)) *
-            100
-        ).toFixed(1)
-    );
-    console.log("phase2", phase2);
-    return { valid: true, pattern, phase1, phase2, rr1, rr2, points };
+    const points = mf.cloneDeep(data.auto);
+    params.tools.auto = points;
+    const { pattern, phase1, phase2, rr1, rr2 } = calculatePattern(points);
+    if (!mf.isSet(points)) return false;
+
+    loadTimeRangeTool(phase1.rt, true);
+    loadProgressTool(pattern);
+    loadPatternTool(points, { phase1, phase2, rr1, rr2 });
 }
 function scanPattern(data) {
     let side, A, B, C, D, E, F;
@@ -1422,26 +1398,19 @@ function scanPattern(data) {
             const cd = Math.abs(C.price - D.price);
             const de = Math.abs(D.price - E.price);
             const ef = Math.abs(E.price - F.price);
-            if (de >= 1.5 && (de / cd > 0.5 || ef / de > 0.5)) {
-                console.log("con", { C, D, E, F });
-                break;
-            }
+            if (de >= 1.5 && (de / cd > 0.5 || ef / de > 0.5)) break;
         }
         if (C.index > A.index && A.index - index > C.index - B.index) {
             const ab = Math.abs(A.price - B.price);
             const bc = Math.abs(B.price - C.price);
             const cd = Math.abs(C.price - D.price);
-            if (bc >= 1.5 && (bc / ab > 0.5 || cd / bc > 0.5)) {
-                console.log("cha", { A, B, C, D });
-                break;
-            }
+            if (bc >= 1.5 && (bc / ab > 0.5 || cd / bc > 0.5)) break;
         }
     }
     let ret = {};
     if (A.index != C.index) ret = { A, B, C, D, E, F };
     else if (C.index != E.index) ret = { A: C, B: D, C: E, D: F, E: {}, F: {} };
 
-    console.log("ret", ret);
     return removeIndex(ret);
 }
 function removeIndex(obj) {
@@ -1452,24 +1421,6 @@ function removeIndex(obj) {
     });
     return result;
 }
-function validatePattern({ A, B, C, D, E }, phase2) {
-    if (phase2.rt.count < 1) {
-        if (
-            mf.isSet(E) &&
-            (B.price - C.price) / (B.price - A.price) >= 0.5 &&
-            (C.price - D.price) / (C.price - B.price) >= 0.786 &&
-            (D.price - E.price) / (D.price - C.price) >= 0.786
-        )
-            return 1;
-        return 7;
-    }
-    if (phase2.rt.over) return 6;
-    if (phase2.rt.count > 1) return 4;
-    if (phase2.er > 1) return 4;
-    if ((C.price - phase2.sp) / (C.price - B.price) < 0.786) return 3;
-    if ((B.price - C.price) / (B.price - A.price) < 0.382) return 2;
-    return 0;
-}
 function removeAutoScanTool(withServer = true) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
@@ -1478,7 +1429,7 @@ function removeAutoScanTool(withServer = true) {
         });
     initToolsParams(["auto"]);
 }
-function phaseToolClick(e) {
+function patternToolClick(e) {
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
@@ -1486,14 +1437,14 @@ function phaseToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) e.target.classList.add("selected");
 }
-function phaseToolContextmenu(e) {
+function patternToolContextmenu(e) {
     e.target.classList.remove("selected");
-    removePhaseTool(true);
+    removePatternTool(true);
     removeTimeRangeTool(true);
     removeProgressTool(true);
 }
-function drawPhaseTool() {
-    const TYPE = "phase";
+function drawPatternTool() {
+    const TYPE = "pattern";
     const price = coordinateToPrice(params.crosshair.y);
     const time = params.crosshair.time;
     let option = {
@@ -1509,178 +1460,178 @@ function drawPhaseTool() {
         points: [],
         data: [],
     };
-    if (mf.isSet(params.tools.phase.A)) {
-        if (mf.isSet(params.tools.phase.B)) {
-            if (mf.isSet(params.tools.phase.C)) {
+    if (mf.isSet(params.tools.pattern.A)) {
+        if (mf.isSet(params.tools.pattern.B)) {
+            if (mf.isSet(params.tools.pattern.C)) {
                 let point, changeOptions;
                 const A = { time, price };
                 const B = {
-                    time: +params.tools.phase.B.options().time,
-                    price: +params.tools.phase.B.options().price,
+                    time: +params.tools.pattern.B.options().time,
+                    price: +params.tools.pattern.B.options().price,
                 };
-                const C = { price: +params.tools.phase.C.options().price };
-                const { valid, pattern, phase1, phase2, rr1, rr2 } =
-                    runAutoScan({ A, B, C }, true);
-                if (valid) {
-                    const c = C.price;
-                    const d = phase2.sp;
-                    loadTimeRangeTool(phase1.rt, true, true);
-                    loadProgressTool(pattern, true);
-                    //
-                    point = "A";
-                    changeOptions = {
-                        price,
-                        time,
-                        title: phase1.er,
-                        rt: phase1.rt.distance,
-                    };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "B";
-                    changeOptions = { title: phase2.er };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "C";
-                    changeOptions = { title: rr1 };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "D";
-                    changeOptions = { price: d, title: rr2 };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "X";
-                    changeOptions = {
-                        price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
-                        title: parseFloat(((d - c) * 0.5).toFixed(1)),
-                    };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "Y";
-                    changeOptions = {
-                        price: parseFloat((d + (d - c)).toFixed(1)),
-                        title: parseFloat((d - c).toFixed(1)),
-                    };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    point = "Z";
-                    changeOptions = {
-                        price: parseFloat((d + (d - c) * 2).toFixed(1)),
-                        title: parseFloat(((d - c) * 2).toFixed(1)),
-                    };
-                    params.tools.phase[point].applyOptions(changeOptions);
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                }
+                const C = { price: +params.tools.pattern.C.options().price };
+                const { pattern, phase1, phase2, rr1, rr2 } = calculatePattern({
+                    A,
+                    B,
+                    C,
+                });
+                const c = C.price;
+                const d = phase2.sp;
+                loadTimeRangeTool(phase1.rt, true, true);
+                loadProgressTool(pattern, true);
+                //
+                point = "A";
+                changeOptions = {
+                    price,
+                    time,
+                    title: phase1.er,
+                    rt: phase1.rt.distance,
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "B";
+                changeOptions = { title: phase2.er };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "C";
+                changeOptions = { title: rr1 };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "D";
+                changeOptions = { price: d, title: rr2 };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "X";
+                changeOptions = {
+                    price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
+                    title: parseFloat(((d - c) * 0.5).toFixed(1)),
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "Y";
+                changeOptions = {
+                    price: parseFloat((d + (d - c)).toFixed(1)),
+                    title: parseFloat((d - c).toFixed(1)),
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "Z";
+                changeOptions = {
+                    price: parseFloat((d + (d - c) * 2).toFixed(1)),
+                    title: parseFloat(((d - c) * 2).toFixed(1)),
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
             } else {
                 const A = {
-                    price: +params.tools.phase.A.options().price,
-                    rt: +params.tools.phase.A.options().rt,
+                    price: +params.tools.pattern.A.options().price,
+                    rt: +params.tools.pattern.A.options().rt,
                 };
                 const B = {
-                    time: +params.tools.phase.B.options().time,
-                    price: +params.tools.phase.B.options().price,
+                    time: +params.tools.pattern.B.options().time,
+                    price: +params.tools.pattern.B.options().price,
                 };
                 const C = { price };
-                const { valid, pattern, phase2, rr1, rr2 } = runAutoScan(
-                    { A, B, C },
-                    true
-                );
-                if (valid) {
-                    const c = C.price;
-                    const d = phase2.sp;
-                    loadProgressTool(pattern, true);
-                    //
-                    const point = "B";
-                    params.tools.phase[point].applyOptions({
-                        title: phase2.er,
-                    });
-                    param.points.push(point);
-                    param.data.push(params.tools.phase[point].options());
-                    //
-                    option.point = "C";
-                    option.title = rr1;
-                    option.color = "#FF9800";
-                    params.tools.phase[option.point] =
-                        params.series.price.createPriceLine(option);
-                    param.points.push(option.point);
-                    param.data.push(mf.cloneDeep(option));
-                    //
-                    option.point = "D";
-                    option.price = d;
-                    option.title = rr2;
-                    option.color = "#4CAF50";
-                    params.tools.phase[option.point] =
-                        params.series.price.createPriceLine(option);
-                    param.points.push(option.point);
-                    param.data.push(mf.cloneDeep(option));
-                    //
-                    option.point = "X";
-                    option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
-                    option.title = parseFloat(((d - c) * 0.5).toFixed(1));
-                    option.color = "#2196F3";
-                    option.draggable = false;
-                    params.tools.phase[option.point] =
-                        params.series.price.createPriceLine(option);
-                    param.points.push(option.point);
-                    param.data.push(mf.cloneDeep(option));
-                    //
-                    option.point = "Y";
-                    option.price = parseFloat((d + (d - c)).toFixed(1));
-                    option.title = parseFloat((d - c).toFixed(1));
-                    option.color = "#673AB7";
-                    option.draggable = false;
-                    params.tools.phase[option.point] =
-                        params.series.price.createPriceLine(option);
-                    param.points.push(option.point);
-                    param.data.push(mf.cloneDeep(option));
-                    //
-                    option.point = "Z";
-                    option.price = parseFloat((d + (d - c) * 2).toFixed(1));
-                    option.title = parseFloat(((d - c) * 2).toFixed(1));
-                    option.color = "#9C27B0";
-                    option.draggable = false;
-                    params.tools.phase[option.point] =
-                        params.series.price.createPriceLine(option);
-                    param.points.push(option.point);
-                    param.data.push(mf.cloneDeep(option));
-                }
+                const { pattern, phase2, rr1, rr2 } = calculatePattern({
+                    A,
+                    B,
+                    C,
+                });
+                const c = C.price;
+                const d = phase2.sp;
+                loadProgressTool(pattern, true);
+                //
+                const point = "B";
+                params.tools.pattern[point].applyOptions({
+                    title: phase2.er,
+                });
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                option.point = "C";
+                option.title = rr1;
+                option.color = "#FF9800";
+                params.tools.pattern[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
+                //
+                option.point = "D";
+                option.price = d;
+                option.title = rr2;
+                option.color = "#4CAF50";
+                params.tools.pattern[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
+                //
+                option.point = "X";
+                option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
+                option.title = parseFloat(((d - c) * 0.5).toFixed(1));
+                option.color = "#2196F3";
+                option.draggable = false;
+                params.tools.pattern[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
+                //
+                option.point = "Y";
+                option.price = parseFloat((d + (d - c)).toFixed(1));
+                option.title = parseFloat((d - c).toFixed(1));
+                option.color = "#673AB7";
+                option.draggable = false;
+                params.tools.pattern[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
+                //
+                option.point = "Z";
+                option.price = parseFloat((d + (d - c) * 2).toFixed(1));
+                option.title = parseFloat(((d - c) * 2).toFixed(1));
+                option.color = "#9C27B0";
+                option.draggable = false;
+                params.tools.pattern[option.point] =
+                    params.series.price.createPriceLine(option);
+                param.points.push(option.point);
+                param.data.push(mf.cloneDeep(option));
             }
-            phaseToolRef.value.classList.remove("selected");
+            patternToolRef.value.classList.remove("selected");
         } else {
             const { rt, er } = scanPhase(
                 {
-                    time: +params.tools.phase.A.options().time,
-                    price: +params.tools.phase.A.options().price,
+                    time: +params.tools.pattern.A.options().time,
+                    price: +params.tools.pattern.A.options().price,
                 },
                 { price }
             );
             loadTimeRangeTool(rt, true, true);
             //
             const point = "A";
-            params.tools.phase[point].applyOptions({
+            params.tools.pattern[point].applyOptions({
                 title: er,
                 rt: rt.distance,
             });
             param.points.push(point);
-            param.data.push(params.tools.phase[point].options());
+            param.data.push(params.tools.pattern[point].options());
             //
             option.point = "B";
             option.title = "B";
             option.color = "#009688";
             option.time = time;
-            params.tools.phase[option.point] =
+            params.tools.pattern[option.point] =
                 params.series.price.createPriceLine(option);
             param.points.push(option.point);
             param.data.push(mf.cloneDeep(option));
@@ -1690,20 +1641,20 @@ function drawPhaseTool() {
         option.title = "A";
         option.color = "#F44336";
         option.time = time;
-        params.tools.phase[option.point] =
+        params.tools.pattern[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
         param.data.push(mf.cloneDeep(option));
     }
     store.dispatch("tradingDerivative/drawTools", param);
 }
-function loadPhaseTool(
+function loadPatternTool(
     { A, B, C },
     { phase1, phase2, rr1, rr2 },
     isStore = false
 ) {
     if (!params.data.price.length) return false;
-    const TYPE = "phase";
+    const TYPE = "pattern";
     let option = {
         lineType: TYPE,
         lineWidth: 1,
@@ -1724,7 +1675,7 @@ function loadPhaseTool(
     option.color = "#F44336";
     option.price = A.price;
     option.time = A.time;
-    params.tools.phase[option.point] =
+    params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
@@ -1735,7 +1686,7 @@ function loadPhaseTool(
     option.price = B.price;
     option.time = B.time;
     option.rt = phase1.rt.distance;
-    params.tools.phase[option.point] =
+    params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
@@ -1744,7 +1695,7 @@ function loadPhaseTool(
     option.price = c;
     option.title = rr1;
     option.color = "#FF9800";
-    params.tools.phase[option.point] =
+    params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
@@ -1753,7 +1704,7 @@ function loadPhaseTool(
     option.price = d;
     option.title = rr2;
     option.color = "#4CAF50";
-    params.tools.phase[option.point] =
+    params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
@@ -1763,7 +1714,7 @@ function loadPhaseTool(
     option.title = parseFloat(((d - c) * 0.5).toFixed(1));
     option.color = "#2196F3";
     option.draggable = false;
-    params.tools.phase[option.point] =
+    params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
@@ -1773,7 +1724,7 @@ function loadPhaseTool(
     option.title = parseFloat((d - c).toFixed(1));
     option.color = "#673AB7";
     option.draggable = false;
-    params.tools.phase[option.point] =
+    params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
@@ -1783,12 +1734,33 @@ function loadPhaseTool(
     option.title = parseFloat(((d - c) * 2).toFixed(1));
     option.color = "#9C27B0";
     option.draggable = false;
-    params.tools.phase[option.point] =
+    params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
     param.data.push(mf.cloneDeep(option));
     //
     if (isStore) store.dispatch("tradingDerivative/drawTools", param);
+}
+function calculatePattern(points) {
+    const phase1 = !points.A.rt
+        ? scanPhase(points.A, points.B)
+        : { rt: { distance: points.A.rt } };
+    const phase2 = scanPhase(points.B, points.C, phase1.rt.distance);
+    const pattern = validatePattern(points, phase2);
+    const rr1 = parseFloat(
+        (
+            ((points.B.price - points.C.price) /
+                (points.B.price - points.A.price)) *
+            100
+        ).toFixed(1)
+    );
+    const rr2 = parseFloat(
+        (
+            ((points.C.price - phase2.sp) / (points.C.price - points.B.price)) *
+            100
+        ).toFixed(1)
+    );
+    return { pattern, phase1, phase2, rr1, rr2, points };
 }
 function scanPhase(startPoint, endPoint, rtRef = 0) {
     let side = endPoint.price > startPoint.price,
@@ -1870,27 +1842,45 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
         });
     return { rt, er, sp };
 }
-function removePhaseTool(withServer = true, onlyServer = false) {
+function validatePattern({ A, B, C, D, E }, phase2) {
+    if (phase2.rt.count < 1) {
+        if (
+            mf.isSet(E) &&
+            (B.price - C.price) / (B.price - A.price) >= 0.5 &&
+            (C.price - D.price) / (C.price - B.price) >= 0.786 &&
+            (D.price - E.price) / (D.price - C.price) >= 0.786
+        )
+            return 1;
+        return 7;
+    }
+    if (phase2.rt.over) return 6;
+    if (phase2.rt.count > 1) return 4;
+    if (phase2.er > 1) return 4;
+    if ((C.price - phase2.sp) / (C.price - B.price) < 0.786) return 3;
+    if ((B.price - C.price) / (B.price - A.price) < 0.382) return 2;
+    return 0;
+}
+function removePatternTool(withServer = true, onlyServer = false) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
-            name: "phase",
+            name: "pattern",
         });
     if (!onlyServer) {
-        if (mf.isSet(params.tools.phase.A)) {
-            params.series.price.removePriceLine(params.tools.phase.A);
-            if (mf.isSet(params.tools.phase.B)) {
-                params.series.price.removePriceLine(params.tools.phase.B);
-                if (mf.isSet(params.tools.phase.C)) {
-                    params.series.price.removePriceLine(params.tools.phase.C);
-                    params.series.price.removePriceLine(params.tools.phase.D);
-                    params.series.price.removePriceLine(params.tools.phase.X);
-                    params.series.price.removePriceLine(params.tools.phase.Y);
-                    params.series.price.removePriceLine(params.tools.phase.Z);
+        if (mf.isSet(params.tools.pattern.A)) {
+            params.series.price.removePriceLine(params.tools.pattern.A);
+            if (mf.isSet(params.tools.pattern.B)) {
+                params.series.price.removePriceLine(params.tools.pattern.B);
+                if (mf.isSet(params.tools.pattern.C)) {
+                    params.series.price.removePriceLine(params.tools.pattern.C);
+                    params.series.price.removePriceLine(params.tools.pattern.D);
+                    params.series.price.removePriceLine(params.tools.pattern.X);
+                    params.series.price.removePriceLine(params.tools.pattern.Y);
+                    params.series.price.removePriceLine(params.tools.pattern.Z);
                 }
             }
         }
-        initToolsParams(["phase"]);
+        initToolsParams(["pattern"]);
     }
 }
 function timeRangeToolClick(e) {
@@ -2173,14 +2163,14 @@ function removeRrTool(withServer = true) {
     }
     initToolsParams(["rr"]);
 }
-function patternToolClick() {
-    state.showPatternContext = !state.showPatternContext;
+function sampleToolClick() {
+    state.showSampleContext = !state.showSampleContext;
     state.showProgressContext = false;
     state.showLineContext = false;
 }
 function showProgressToolPopup() {
     state.showProgressContext = !state.showProgressContext;
-    state.showPatternContext = false;
+    state.showSampleContext = false;
     state.showLineContext = false;
 }
 function loadProgressTool(data, isStore = false) {
@@ -2206,7 +2196,7 @@ function removeAllTools() {
     removeTargetTool(false);
     removeTimeRangeTool(false);
     removeProgressTool(false);
-    removePhaseTool(false);
+    removePatternTool(false);
 }
 function toggleOrderButton(show) {
     if (show) {
@@ -2559,7 +2549,7 @@ function resetTools() {
 }
 function initToolsParams(tools) {
     if (tools == undefined)
-        tools = ["order", "lines", "rr", "target", "tr", "phase", "auto"];
+        tools = ["order", "lines", "rr", "target", "tr", "pattern", "auto"];
     if (tools.includes("order"))
         params.tools.order = { side: 0, entry: {}, tp: {}, sl: {} };
     if (tools.includes("lines")) params.tools.lines = [];
@@ -2567,8 +2557,8 @@ function initToolsParams(tools) {
     if (tools.includes("target"))
         params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
     if (tools.includes("tr")) params.tools.timeRange = [];
-    if (tools.includes("phase"))
-        params.tools.phase = {
+    if (tools.includes("pattern"))
+        params.tools.pattern = {
             A: {},
             B: {},
             C: {},
