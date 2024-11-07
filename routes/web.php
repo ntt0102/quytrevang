@@ -117,12 +117,7 @@ Route::get('test', function () {
     //     $receiver,
     //     new \App\Notifications\CoreNotification($params, false, true)
     // );
-    // $s = \Illuminate\Support\Facades\Artisan::call('clone:data --type=scan');
-    \Illuminate\Support\Facades\Notification::send(
-        \App\Models\User::permission('admin:order_derivative')->get(),
-        new \App\Notifications\ScanedPatternNotification()
-    );
-    $s = 'ok';
+    $s = \Illuminate\Support\Facades\Artisan::call('clone:data --type=scan');
     // $date = '2024-07-18';
     // $file = storage_path('app/cophieu/date.txt');
     // $isUpdated = false;

@@ -167,26 +167,24 @@ class ScanDerivativeJob implements ShouldQueue
     function scanPhase($data, $startPoint, $endPoint, $rtRef = 0)
     {
         $side = $endPoint['price'] > $startPoint['price'];
-        $resPoint = [];
+        $point = [];
         $rt = [];
         $phase = 0;
-        $isFirst = false;
 
-        $data = array_filter($data, function ($item) use ($startPoint) {
+        $data = array_values(array_filter($data, function ($item) use ($startPoint) {
             return $this->unix($item->date) >= $startPoint['time'];
-        });
+        }));
         foreach ($data as $index => $item) {
             $price = $item->price;
             $time = $item->date;
 
-            if (!$isFirst || $price == $startPoint['price']) {
-                $isFirst = true;
-                $resPoint = [
+            if ($index == 0 || $price == $startPoint['price']) {
+                $point = [
                     'time' => $time,
-                    'price' => $price,
                     'start' => $index,
                     'end' => $index,
-                    'margin' => 0,
+                    'resistance' => $price,
+                    'support' => $price,
                 ];
                 $rt = [
                     'start' => $time,
@@ -199,44 +197,40 @@ class ScanDerivativeJob implements ShouldQueue
                 $phase = 0;
             }
 
-            if ($this->cmp($price, $side, $resPoint['price'])) {
-                $distance = $resPoint['end'] - $resPoint['start'];
+            if ($this->cmp($price, $side, $point['resistance'])) {
+                $distance = $point['end'] - $point['start'];
+                $margin = $point['support'] - $point['resistance'];
                 if (
                     ($distance > $rt['distance'] &&
-                        $this->cmp($resPoint['margin'], $side, 0.5 * $rt['margin'])) ||
+                        $this->cmp($margin, !$side, 0.5 * $rt['margin'])) ||
                     ($distance > 0.5 * $rt['distance'] &&
-                        $this->cmp($resPoint['margin'], $side, 2 * $rt['margin']))
+                        $this->cmp($margin, !$side, 2 * $rt['margin']))
                 ) {
-                    $rt['start'] = $resPoint['time'];
+                    $rt['start'] = $point['time'];
                     $rt['end'] = $time;
                     $rt['distance'] = $distance;
-                    $rt['margin'] = $resPoint['margin'];
+                    $rt['margin'] = $margin;
                     if ($rtRef > 0) {
                         if ($distance > $rtRef) $rt['count']++;
                         if ($distance > 3 * $rtRef) $rt['count'] = true;
                     }
-                    if ($resPoint['margin'] != 0) {
-                        $phase = $this->validatePhase(
-                            $startPoint['price'],
-                            $resPoint['price'],
-                            $resPoint['price'] - $resPoint['margin'],
-                            $endPoint['price']
-                        );
-                    }
+                    $phase = $this->validatePhase(
+                        $startPoint['price'],
+                        $point['resistance'],
+                        $point['support'],
+                        $endPoint['price']
+                    );
                 }
-                $resPoint = [
+                $point = [
                     'time' => $time,
-                    'price' => $price,
                     'start' => $index,
                     'end' => $index,
-                    'margin' => 0,
+                    'resistance' => $price,
+                    'support' => $price,
                 ];
             } else {
-                $resPoint['end'] = $index;
-                $margin = round($resPoint['price'] - $price, 1);
-                if ($this->cmp($margin, $side, $resPoint['margin'])) {
-                    $resPoint['margin'] = $margin;
-                }
+                $point['end'] = $index;
+                if ($this->cmp($price, !$side, $point['support'])) $point['support'] = $price;
             }
 
             if ($this->cmp($price, $side, $endPoint['price'], true)) {
@@ -279,7 +273,7 @@ class ScanDerivativeJob implements ShouldQueue
     private function validatePhase($a, $b, $c, $d)
     {
         $result = 0;
-        if (($a - $b) / ($a - $d) < 0.786) $result += 1;
+        if (($a - $b) / ($a - $d) < 0.618) $result += 1;
         if (($d - $c) / ($d - $a) < 0.786) $result += 2;
         return $result;
     }

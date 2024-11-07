@@ -809,14 +809,14 @@ function eventPriceLineDrag(e) {
                 point = "A";
                 changeOptions = {
                     rt: phase1.rt.distance,
-                    title: phase1.phase,
+                    title: phase1.phase.toString(),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "B";
-                changeOptions = { title: phase2.phase };
+                changeOptions = { title: phase2.phase.toString() };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -1491,7 +1491,7 @@ function drawPatternTool() {
                 changeOptions = {
                     price,
                     time,
-                    title: phase1.phase,
+                    title: phase1.phase.toString(),
                     rt: phase1.rt.distance,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
@@ -1499,7 +1499,7 @@ function drawPatternTool() {
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "B";
-                changeOptions = { title: phase2.phase };
+                changeOptions = { title: phase2.phase.toString() };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -1561,7 +1561,7 @@ function drawPatternTool() {
                 //
                 const point = "B";
                 params.tools.pattern[point].applyOptions({
-                    title: phase2.phase,
+                    title: phase2.phase.toString(),
                 });
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -1676,7 +1676,7 @@ function loadPatternTool(
     const d = phase2.sp;
     //
     option.point = "A";
-    option.title = phase1.phase;
+    option.title = phase1.phase.toString();
     option.color = "#F44336";
     option.price = A.price;
     option.time = A.time;
@@ -1686,7 +1686,7 @@ function loadPatternTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "B";
-    option.title = phase2.phase;
+    option.title = phase2.phase.toString();
     option.color = "#009688";
     option.price = B.price;
     option.time = B.time;
@@ -1769,7 +1769,7 @@ function calculatePattern(points) {
 }
 function scanPhase(startPoint, endPoint, rtRef = 0) {
     let side = endPoint.price > startPoint.price,
-        resPoint = {},
+        point = {},
         rt = {},
         phase = 0,
         sp = 0;
@@ -1778,13 +1778,13 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
         .every((item, index) => {
             const price = item.value;
             const time = item.time;
-            if (sp == 0 || price == startPoint.price) {
-                resPoint = {
+            if (index == 0 || price == startPoint.price) {
+                point = {
                     time,
-                    price,
                     start: index,
                     end: index,
-                    margin: 0,
+                    resistance: price,
+                    support: price,
                 };
                 rt = {
                     start: time,
@@ -1797,51 +1797,41 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
                 phase = 0;
                 sp = price;
             }
-            if (cmp(price, side, resPoint.price)) {
-                const distance = resPoint.end - resPoint.start;
+            if (cmp(price, side, point.resistance)) {
+                const distance = point.end - point.start;
+                const margin = point.support - point.resistance;
                 if (
                     (distance > rt.distance &&
-                        cmp(resPoint.margin, side, 0.5 * rt.margin)) ||
+                        cmp(margin, !side, 0.5 * rt.margin)) ||
                     (distance > 0.5 * rt.distance &&
-                        cmp(resPoint.margin, side, 2 * rt.margin))
+                        cmp(margin, !side, 2 * rt.margin))
                 ) {
-                    rt.start = resPoint.time;
+                    rt.start = point.time;
                     rt.end = time;
                     rt.distance = distance;
-                    rt.margin = resPoint.margin;
+                    rt.margin = margin;
                     if (rtRef > 0) {
                         if (distance > rtRef) rt.count++;
                         if (distance > 3 * rtRef) rt.over = true;
                     }
-                    if (resPoint.margin != 0) {
-                        sp =
-                            rt.count > 0
-                                ? parseFloat(
-                                      (
-                                          resPoint.price - resPoint.margin
-                                      ).toFixed(1)
-                                  )
-                                : startPoint.price;
-                        phase = validatePhase(
-                            startPoint.price,
-                            resPoint.price,
-                            resPoint.price - resPoint.margin,
-                            endPoint.price
-                        );
-                    }
+                    sp = rt.count > 0 ? point.support : startPoint.price;
+                    phase = validatePhase(
+                        startPoint.price,
+                        point.resistance,
+                        point.support,
+                        endPoint.price
+                    );
                 }
-                resPoint = {
+                point = {
                     time,
-                    price,
                     start: index,
                     end: index,
-                    margin: 0,
+                    resistance: price,
+                    support: price,
                 };
             } else {
-                resPoint.end = index;
-                const margin = parseFloat((resPoint.price - price).toFixed(1));
-                if (cmp(margin, side, resPoint.margin))
-                    resPoint.margin = margin;
+                point.end = index;
+                if (cmp(price, !side, point.support)) point.support = price;
             }
             if (cmp(price, side, endPoint.price, true)) return false;
             else return true;
@@ -1867,7 +1857,7 @@ function validatePattern({ A, B, C, D, E }, phase2) {
 }
 function validatePhase(a, b, c, d) {
     let result = 0;
-    if ((a - b) / (a - d) < 0.786) result += 1;
+    if ((a - b) / (a - d) < 0.618) result += 1;
     if ((d - c) / (d - a) < 0.786) result += 2;
     return result;
 }
