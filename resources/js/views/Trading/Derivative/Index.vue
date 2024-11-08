@@ -809,20 +809,22 @@ function eventPriceLineDrag(e) {
                 point = "A";
                 changeOptions = {
                     rt: phase1.rt.distance,
-                    title: phase1.phase.toString(),
+                    title: "A " + phase1.phase.toString().padStart(2, "0"),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "B";
-                changeOptions = { title: phase2.phase.toString() };
+                changeOptions = {
+                    title: "B " + phase2.phase.toString().padStart(2, "0"),
+                };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "C";
-                changeOptions = { title: rr1 };
+                changeOptions = { title: "S " + rr1 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -831,14 +833,14 @@ function eventPriceLineDrag(e) {
                 if (lineOptions.point == point) {
                     d = +params.tools.pattern.D.options().price;
                     changeOptions = {
-                        title: parseFloat(
-                            (((c - d) / (c - b)) * 100).toFixed(1)
-                        ),
+                        title:
+                            "R" +
+                            parseFloat((((c - d) / (c - b)) * 100).toFixed(1)),
                     };
                 } else
                     changeOptions = {
                         price: d,
-                        title: rr2,
+                        title: "R " + rr2,
                     };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -847,7 +849,7 @@ function eventPriceLineDrag(e) {
                 point = "X";
                 changeOptions = {
                     price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
-                    title: parseFloat(((d - c) * 0.5).toFixed(1)),
+                    title: "T " + parseFloat(((d - c) * 0.5).toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -856,7 +858,7 @@ function eventPriceLineDrag(e) {
                 point = "Y";
                 changeOptions = {
                     price: parseFloat((d + (d - c)).toFixed(1)),
-                    title: parseFloat((d - c).toFixed(1)),
+                    title: "T " + parseFloat((d - c).toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -865,7 +867,7 @@ function eventPriceLineDrag(e) {
                 point = "Z";
                 changeOptions = {
                     price: parseFloat((d + (d - c) * 2).toFixed(1)),
-                    title: parseFloat(((d - c) * 2).toFixed(1)),
+                    title: "T " + parseFloat(((d - c) * 2).toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1384,7 +1386,9 @@ function scanPattern(data) {
             C = { index, time, price };
         if (cmp(price, side, B.price)) {
             if (cmp(A.price, !side, C.price)) {
-                [F, E, D, C, B] = [E, D, C, B, A].map(item => mf.cloneDeep(item));
+                [F, E, D, C, B] = [E, D, C, B, A].map((item) =>
+                    mf.cloneDeep(item)
+                );
                 A = { index, time, price };
                 S = mf.cloneDeep(A);
                 side = !side;
@@ -1496,7 +1500,7 @@ function drawPatternTool() {
                 changeOptions = {
                     price,
                     time,
-                    title: phase1.phase.toString(),
+                    title: "A " + phase1.phase.toString().padStart(2, "0"),
                     rt: phase1.rt.distance,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
@@ -1504,19 +1508,21 @@ function drawPatternTool() {
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "B";
-                changeOptions = { title: phase2.phase.toString() };
+                changeOptions = {
+                    title: "B " + phase2.phase.toString().padStart(2, "0"),
+                };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "C";
-                changeOptions = { title: rr1 };
+                changeOptions = { title: "S " + rr1 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "D";
-                changeOptions = { price: d, title: rr2 };
+                changeOptions = { price: d, title: "R " + rr2 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -1524,7 +1530,7 @@ function drawPatternTool() {
                 point = "X";
                 changeOptions = {
                     price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
-                    title: parseFloat(((d - c) * 0.5).toFixed(1)),
+                    title: "T " + parseFloat(((d - c) * 0.5).toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1533,7 +1539,7 @@ function drawPatternTool() {
                 point = "Y";
                 changeOptions = {
                     price: parseFloat((d + (d - c)).toFixed(1)),
-                    title: parseFloat((d - c).toFixed(1)),
+                    title: "T " + parseFloat((d - c).toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1542,7 +1548,7 @@ function drawPatternTool() {
                 point = "Z";
                 changeOptions = {
                     price: parseFloat((d + (d - c) * 2).toFixed(1)),
-                    title: parseFloat(((d - c) * 2).toFixed(1)),
+                    title: "T " + parseFloat(((d - c) * 2).toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1566,13 +1572,13 @@ function drawPatternTool() {
                 //
                 const point = "B";
                 params.tools.pattern[point].applyOptions({
-                    title: phase2.phase.toString(),
+                    title: "B " + phase2.phase.toString().padStart(2, "0"),
                 });
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 option.point = "C";
-                option.title = rr1;
+                option.title = "S " + rr1;
                 option.color = "#FF9800";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1581,7 +1587,7 @@ function drawPatternTool() {
                 //
                 option.point = "D";
                 option.price = d;
-                option.title = rr2;
+                option.title = "R " + rr2;
                 option.color = "#4CAF50";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1590,7 +1596,7 @@ function drawPatternTool() {
                 //
                 option.point = "X";
                 option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
-                option.title = parseFloat(((d - c) * 0.5).toFixed(1));
+                option.title = "T " + parseFloat(((d - c) * 0.5).toFixed(1));
                 option.color = "#2196F3";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1600,7 +1606,7 @@ function drawPatternTool() {
                 //
                 option.point = "Y";
                 option.price = parseFloat((d + (d - c)).toFixed(1));
-                option.title = parseFloat((d - c).toFixed(1));
+                option.title = "T " + parseFloat((d - c).toFixed(1));
                 option.color = "#673AB7";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1610,7 +1616,7 @@ function drawPatternTool() {
                 //
                 option.point = "Z";
                 option.price = parseFloat((d + (d - c) * 2).toFixed(1));
-                option.title = parseFloat(((d - c) * 2).toFixed(1));
+                option.title = "T " + parseFloat(((d - c) * 2).toFixed(1));
                 option.color = "#9C27B0";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1632,6 +1638,7 @@ function drawPatternTool() {
             const point = "A";
             params.tools.pattern[point].applyOptions({
                 title: phase,
+                title: "A " + phase.toString().padStart(2, "0"),
                 rt: rt.distance,
             });
             param.points.push(point);
@@ -1681,7 +1688,7 @@ function loadPatternTool(
     const d = phase2.sp;
     //
     option.point = "A";
-    option.title = phase1.phase.toString();
+    option.title = "A " + phase1.phase.toString().padStart(2, "0");
     option.color = "#F44336";
     option.price = A.price;
     option.time = A.time;
@@ -1691,7 +1698,7 @@ function loadPatternTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "B";
-    option.title = phase2.phase.toString();
+    option.title = "B " + phase2.phase.toString().padStart(2, "0");
     option.color = "#009688";
     option.price = B.price;
     option.time = B.time;
@@ -1703,7 +1710,7 @@ function loadPatternTool(
     //
     option.point = "C";
     option.price = c;
-    option.title = rr1;
+    option.title = "S " + rr1;
     option.color = "#FF9800";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
@@ -1712,7 +1719,7 @@ function loadPatternTool(
     //
     option.point = "D";
     option.price = d;
-    option.title = rr2;
+    option.title = "R " + rr2;
     option.color = "#4CAF50";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
@@ -1721,7 +1728,7 @@ function loadPatternTool(
     //
     option.point = "X";
     option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
-    option.title = parseFloat(((d - c) * 0.5).toFixed(1));
+    option.title = "T " + parseFloat(((d - c) * 0.5).toFixed(1));
     option.color = "#2196F3";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1731,7 +1738,7 @@ function loadPatternTool(
     //
     option.point = "Y";
     option.price = parseFloat((d + (d - c)).toFixed(1));
-    option.title = parseFloat((d - c).toFixed(1));
+    option.title = "T " + parseFloat((d - c).toFixed(1));
     option.color = "#673AB7";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1741,7 +1748,7 @@ function loadPatternTool(
     //
     option.point = "Z";
     option.price = parseFloat((d + (d - c) * 2).toFixed(1));
-    option.title = parseFloat(((d - c) * 2).toFixed(1));
+    option.title = "T " + parseFloat(((d - c) * 2).toFixed(1));
     option.color = "#9C27B0";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1865,8 +1872,12 @@ function validatePhase(a, b, c, d) {
     const da = d - a;
     const db = d - b;
     const dc = d - c;
-    if (db / da > 0.236) result += 1;
-    if (dc / da < 0.786) result += 2;
+    const bda = db / da;
+    const cda = dc / da;
+    if (bda > 0.382) result += 20;
+    else if (bda > 0.236) result += 10;
+    if (cda < 0.618) result += 2;
+    else if (cda < 0.786) result += 1;
     return result;
 }
 function removePatternTool(withServer = true, onlyServer = false) {
