@@ -79,7 +79,7 @@ class ScanDerivativeJob implements ShouldQueue
     private function scanPattern($data)
     {
         $side = null;
-        $A = $B = $C = $D = $E = $F = [];
+        $A = $B = $C = $D = $E = $F = $S = [];
 
         $lastPos = count($data) - 1;
         for ($index = $lastPos; $index >= 0; $index--) {
@@ -88,11 +88,7 @@ class ScanDerivativeJob implements ShouldQueue
 
             if ($index == $lastPos) {
                 $F = ['index' => $index, 'time' => $time, 'price' => $price];
-                $E = $F;
-                $D = $F;
-                $C = $F;
-                $B = $F;
-                $A = $F;
+                $E = $D = $C = $B = $A = $S = $F;
             }
 
             if ($side === null) {
@@ -110,8 +106,7 @@ class ScanDerivativeJob implements ShouldQueue
                 $this->cmp($price, $side, $D['price'])
             ) {
                 if ($F['index'] - $E['index'] <= 5) {
-                    $F = $E;
-                    $D = $E;
+                    $F = $D = $E;
                     $E = ['index' => $index, 'time' => $time, 'price' => $price];
                     $side = !$side;
                 } else $D = ['index' => $index, 'time' => $time, 'price' => $price];
@@ -124,39 +119,42 @@ class ScanDerivativeJob implements ShouldQueue
 
             if ($this->cmp($price, $side, $B['price'])) {
                 if ($this->cmp($A['price'], !$side, $C['price'])) {
-                    $F = $E;
-                    $E = $D;
-                    $D = $C;
-                    $C = $B;
-                    $B = $A;
+                    [$F, $E, $D, $C, $B] = [$E, $D, $C, $B, $A];
                     $A = ['index' => $index, 'time' => $time, 'price' => $price];
+                    $S = $A;
                     $side = !$side;
                 } else $B = ['index' => $index, 'time' => $time, 'price' => $price];
             }
 
             if ($this->cmp($price, !$side, $A['price'])) {
                 $A = ['index' => $index, 'time' => $time, 'price' => $price];
+                $S = $A;
+            } else $S['index'] = $index;
+
+            if ($this->cmp($price, $side, $S['price'])) {
+                $S = ['index' => $index, 'time' => $time, 'price' => $price];
             }
 
-            if (
-                $E['index'] > $C['index'] &&
-                $C['index'] - $index > $E['index'] - $D['index']
-            ) {
-                $cd = abs($C['price'] - $D['price']);
+            if ($E['index'] > $C['index']) {
                 $de = abs($D['price'] - $E['price']);
                 $ef = abs($E['price'] - $F['price']);
-                if ($de >= 1.5 && ($de / $cd > 0.5 || $ef / $de > 0.5)) break;
+                if ($de >= 1.5 && $ef / $de > 0.5) {
+                    if ($C['index'] - $S['index'] > $E['index'] - $D['index']) break;
+                    $cs = abs($C['price'] - $S['price']);
+                    if ($cs > $de) break;
+                }
             }
-            if (
-                $C['index'] > $A['index'] &&
-                $A['index'] - $index > $C['index'] - $B['index']
-            ) {
-                $ab = abs($A['price'] - $B['price']);
+            if ($C['index'] > $A['index']) {
                 $bc = abs($B['price'] - $C['price']);
                 $cd = abs($C['price'] - $D['price']);
-                if ($bc >= 1.5 && ($bc / $ab > 0.5 || $cd / $bc > 0.5)) break;
+                if ($bc >= 1.5 &&  $cd / $bc > 0.5) {
+                    if ($A['index'] - $S['index'] > $C['index'] - $B['index']) break;
+                    $as = abs($A['price'] - $S['price']);
+                    if ($as > $bc) break;
+                }
             }
         }
+
         $ret = [];
         if ($A['index'] != $C['index']) $ret = ['A' => $A, 'B' => $B, 'C' => $C, 'D' => $D, 'E' => $E, 'F' => $F];
         else if ($C['index'] != $E['index']) $ret = ['A' => $C, 'B' => $D, 'C' => $E, 'D' => $F, 'E' => [], 'F' => []];
@@ -211,7 +209,7 @@ class ScanDerivativeJob implements ShouldQueue
                     $rt['distance'] = $distance;
                     $rt['margin'] = $margin;
                     if ($rtRef > 0) {
-                        if ($distance > $rtRef) $rt['count']++;
+                        if ($distance >= $rtRef) $rt['count']++;
                         if ($distance > 3 * $rtRef) $rt['count'] = true;
                     }
                     $phase = $this->validatePhase(

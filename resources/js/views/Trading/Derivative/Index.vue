@@ -1356,17 +1356,15 @@ function loadAutoScanTool(data) {
     loadPatternTool(points, { phase1, phase2, rr1, rr2 });
 }
 function scanPattern(data) {
-    let side, A, B, C, D, E, F;
+    let side, A, B, C, D, E, F, S;
     for (let index = data.length - 1; index >= 0; index--) {
         const price = data[index].value;
         const time = data[index].time;
         if (index == data.length - 1) {
             F = { index, time, price };
-            E = mf.cloneDeep(F);
-            D = mf.cloneDeep(F);
-            C = mf.cloneDeep(F);
-            B = mf.cloneDeep(F);
-            A = mf.cloneDeep(F);
+            [E, D, C, B, A, S] = Array(6)
+                .fill(null)
+                .map(() => mf.cloneDeep(F));
         }
         if (side == undefined) {
             if (price == F.price) continue;
@@ -1386,28 +1384,35 @@ function scanPattern(data) {
             C = { index, time, price };
         if (cmp(price, side, B.price)) {
             if (cmp(A.price, !side, C.price)) {
-                F = mf.cloneDeep(E);
-                E = mf.cloneDeep(D);
-                D = mf.cloneDeep(C);
-                C = mf.cloneDeep(B);
-                B = mf.cloneDeep(A);
+                [F, E, D, C, B] = [E, D, C, B, A].map(item => mf.cloneDeep(item));
                 A = { index, time, price };
+                S = mf.cloneDeep(A);
                 side = !side;
             } else B = { index, time, price };
         }
-        if (cmp(price, !side, A.price)) A = { index, time, price };
+        if (cmp(price, !side, A.price)) {
+            A = { index, time, price };
+            S = mf.cloneDeep(A);
+        } else S.index = index;
+        if (cmp(price, side, S.price)) S = { index, time, price };
         //
-        if (E.index > C.index && C.index - index > E.index - D.index) {
-            const cd = Math.abs(C.price - D.price);
+        if (E.index > C.index) {
             const de = Math.abs(D.price - E.price);
             const ef = Math.abs(E.price - F.price);
-            if (de >= 1.5 && (de / cd > 0.5 || ef / de > 0.5)) break;
+            if (de >= 1.5 && ef / de > 0.5) {
+                if (C.index - S.index > E.index - D.index) break;
+                const cs = Math.abs(C.price - S.price);
+                if (cs > de) break;
+            }
         }
-        if (C.index > A.index && A.index - index > C.index - B.index) {
-            const ab = Math.abs(A.price - B.price);
+        if (C.index > A.index) {
             const bc = Math.abs(B.price - C.price);
             const cd = Math.abs(C.price - D.price);
-            if (bc >= 1.5 && (bc / ab > 0.5 || cd / bc > 0.5)) break;
+            if (bc >= 1.5 && cd / bc > 0.5) {
+                if (A.index - S.index > C.index - B.index) break;
+                const as = Math.abs(A.price - S.price);
+                if (as > bc) break;
+            }
         }
     }
     let ret = {};
@@ -1811,7 +1816,7 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
                     rt.distance = distance;
                     rt.margin = margin;
                     if (rtRef > 0) {
-                        if (distance > rtRef) rt.count++;
+                        if (distance >= rtRef) rt.count++;
                         if (distance > 3 * rtRef) rt.over = true;
                     }
                     sp = rt.count > 0 ? point.support : startPoint.price;
