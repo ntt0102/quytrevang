@@ -792,39 +792,41 @@ function eventPriceLineDrag(e) {
                         time: +aOptions.time,
                         price: +aOptions.price,
                     },
-                    B: {
-                        time: +bOptions.time,
-                        price: +bOptions.price,
-                    },
+                    B: { price: +bOptions.price },
                     C: { price: +cOptions.price },
                 };
-                const { pattern, phase1, phase2, rr1, rr2 } =
-                    calculatePattern(points);
+                const {
+                    pattern,
+                    times1,
+                    tr1,
+                    tr2,
+                    tr3,
+                    pr1,
+                    pr2,
+                    pr3,
+                    fibo,
+                    sp,
+                } = calculatePattern(points);
                 const b = points.B.price;
                 const c = points.C.price;
-                let d = phase2.sp;
-                loadTimeRangeTool(phase1.rt, true, true);
+                let d = sp;
+                loadTimeRangeTool(times1, true, true);
                 loadProgressTool(pattern, true);
                 //
                 point = "A";
-                changeOptions = {
-                    rt: phase1.rt,
-                    title: "A " + phase1.phase.toString().padStart(2, "0"),
-                };
+                changeOptions = { title: `A ${tr1} ${pr1}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "B";
-                changeOptions = {
-                    title: "B " + phase2.phase.toString().padStart(2, "0"),
-                };
+                changeOptions = { title: `B ${tr2} ${pr2}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "C";
-                changeOptions = { title: "S " + rr1 };
+                changeOptions = { title: `C ${tr3} ${pr3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -833,14 +835,12 @@ function eventPriceLineDrag(e) {
                 if (lineOptions.point == point) {
                     d = +params.tools.pattern.D.options().price;
                     changeOptions = {
-                        title:
-                            "R " +
-                            parseFloat((((c - d) / (c - b)) * 100).toFixed(1)),
+                        title: "F " + parseInt(((c - d) / (c - b)) * 100),
                     };
                 } else
                     changeOptions = {
                         price: d,
-                        title: "R " + rr2,
+                        title: "F " + fibo,
                     };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1332,12 +1332,13 @@ function drawAutoScanTool() {
     };
     const points = scanPattern(data);
     if (!mf.isSet(points)) return false;
-    const { pattern, phase1, phase2, rr1, rr2 } = calculatePattern(points);
+    const { pattern, times1, tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp } =
+        calculatePattern(points);
 
-    loadTimeRangeTool(phase1.rt, true);
+    loadTimeRangeTool(times1, true);
     loadProgressTool(pattern);
     removePatternTool(false);
-    loadPatternTool(points, { phase1, phase2, rr1, rr2 });
+    loadPatternTool(points, { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp });
     if (JSON.stringify(params.tools.auto) != JSON.stringify(points)) {
         params.tools.auto = points;
         Object.entries(points).forEach(([key, value]) => {
@@ -1350,12 +1351,23 @@ function drawAutoScanTool() {
 function loadAutoScanTool(data) {
     const points = mf.cloneDeep(data.auto);
     params.tools.auto = points;
-    const { pattern, phase1, phase2, rr1, rr2 } = calculatePattern(points);
+    const { pattern, times1, tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp } =
+        calculatePattern(points);
     if (!mf.isSet(points)) return false;
 
-    loadTimeRangeTool(phase1.rt, true);
+    loadTimeRangeTool(phase1.box, true);
     loadProgressTool(pattern);
-    loadPatternTool(points, { phase1, phase2, rr1, rr2 });
+    loadPatternTool(points, {
+        times1,
+        tr1,
+        tr2,
+        tr3,
+        pr1,
+        pr2,
+        pr3,
+        fibo,
+        sp,
+    });
 }
 function scanPattern(data) {
     let side, A, B, C, D, E, F, S;
@@ -1483,25 +1495,31 @@ function drawPatternTool() {
                 const cOptions = params.tools.pattern.C.options();
                 const points = {
                     A: { time, price },
-                    B: {
-                        time: +bOptions.time,
-                        price: +bOptions.price,
-                    },
+                    B: { price: +bOptions.price },
                     C: { price: +cOptions.price },
                 };
-                const { pattern, phase1, phase2, rr1, rr2 } =
-                    calculatePattern(points);
+                const {
+                    pattern,
+                    times1,
+                    tr1,
+                    tr2,
+                    tr3,
+                    pr1,
+                    pr2,
+                    pr3,
+                    fibo,
+                    sp,
+                } = calculatePattern(points);
                 const c = points.C.price;
-                const d = phase2.sp;
-                loadTimeRangeTool(phase1.rt, true, true);
+                const d = sp;
+                loadTimeRangeTool(times1, true, true);
                 loadProgressTool(pattern, true);
                 //
                 point = "A";
                 changeOptions = {
                     price,
                     time,
-                    title: "A " + phase1.phase.toString().padStart(2, "0"),
-                    rt: phase1.rt,
+                    title: `A ${tr1} ${pr1}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1509,20 +1527,20 @@ function drawPatternTool() {
                 //
                 point = "B";
                 changeOptions = {
-                    title: "B " + phase2.phase.toString().padStart(2, "0"),
+                    title: `B ${tr2} ${pr2}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "C";
-                changeOptions = { title: "S " + rr1 };
+                changeOptions = { title: `C ${tr3} ${pr3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "D";
-                changeOptions = { price: d, title: "R " + rr2 };
+                changeOptions = { price: d, title: "F " + fibo };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
@@ -1556,29 +1574,45 @@ function drawPatternTool() {
             } else {
                 const points = {
                     A: {
+                        time: +aOptions.time,
                         price: +aOptions.price,
-                        rt: +aOptions.rt,
                     },
-                    B: {
-                        time: +bOptions.time,
-                        price: +bOptions.price,
-                    },
+                    B: { price: +bOptions.price },
                     C: { price },
                 };
-                const { pattern, phase2, rr1, rr2 } = calculatePattern(points);
+                const {
+                    pattern,
+                    times1,
+                    tr1,
+                    tr2,
+                    tr3,
+                    pr1,
+                    pr2,
+                    pr3,
+                    fibo,
+                    sp,
+                } = calculatePattern(points);
                 const c = points.C.price;
-                const d = phase2.sp;
+                const d = sp;
+                loadTimeRangeTool(times1, true, true);
                 loadProgressTool(pattern, true);
                 //
-                const point = "B";
+                let point = "A";
                 params.tools.pattern[point].applyOptions({
-                    title: "B " + phase2.phase.toString().padStart(2, "0"),
+                    title: `A ${tr1} ${pr1}`,
+                });
+                param.points.push(point);
+                param.data.push(params.tools.pattern[point].options());
+                //
+                point = "B";
+                params.tools.pattern[point].applyOptions({
+                    title: `B ${tr2} ${pr2}`,
                 });
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 option.point = "C";
-                option.title = "S " + rr1;
+                option.title = `C ${tr3} ${pr3}`;
                 option.color = "#FF9800";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1587,7 +1621,7 @@ function drawPatternTool() {
                 //
                 option.point = "D";
                 option.price = d;
-                option.title = "R " + rr2;
+                option.title = "F " + fibo;
                 option.color = "#4CAF50";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1626,28 +1660,9 @@ function drawPatternTool() {
             }
             patternToolRef.value.classList.remove("selected");
         } else {
-            const { rt, phase } = scanPhase(
-                {
-                    time: +aOptions.time,
-                    price: +aOptions.price,
-                },
-                { price }
-            );
-            loadTimeRangeTool(rt, true, true);
-            //
-            const point = "A";
-            params.tools.pattern[point].applyOptions({
-                title: phase,
-                title: "A " + phase.toString().padStart(2, "0"),
-                rt: rt,
-            });
-            param.points.push(point);
-            param.data.push(params.tools.pattern[point].options());
-            //
             option.point = "B";
-            option.title = "B";
+            option.title = "B 0 0";
             option.color = "#009688";
-            option.time = time;
             params.tools.pattern[option.point] =
                 params.series.price.createPriceLine(option);
             param.points.push(option.point);
@@ -1655,7 +1670,7 @@ function drawPatternTool() {
         }
     } else {
         option.point = "A";
-        option.title = "A";
+        option.title = "A 0 0";
         option.color = "#F44336";
         option.time = time;
         params.tools.pattern[option.point] =
@@ -1667,7 +1682,7 @@ function drawPatternTool() {
 }
 function loadPatternTool(
     { A, B, C },
-    { phase1, phase2, rr1, rr2 },
+    { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp },
     isStore = false
 ) {
     if (!params.data.price.length) return false;
@@ -1685,10 +1700,10 @@ function loadPatternTool(
         data: [],
     };
     const c = C.price;
-    const d = phase2.sp;
+    const d = sp;
     //
     option.point = "A";
-    option.title = "A " + phase1.phase.toString().padStart(2, "0");
+    option.title = `A ${tr1} ${pr1}`;
     option.color = "#F44336";
     option.price = A.price;
     option.time = A.time;
@@ -1698,11 +1713,10 @@ function loadPatternTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "B";
-    option.title = "B " + phase2.phase.toString().padStart(2, "0");
+    option.title = `B ${tr2} ${pr2}`;
     option.color = "#009688";
     option.price = B.price;
     option.time = B.time;
-    option.rt = phase1.rt;
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
@@ -1710,7 +1724,7 @@ function loadPatternTool(
     //
     option.point = "C";
     option.price = c;
-    option.title = "S " + rr1;
+    option.title = `C ${tr3} ${pr3}`;
     option.color = "#FF9800";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
@@ -1719,7 +1733,7 @@ function loadPatternTool(
     //
     option.point = "D";
     option.price = d;
-    option.title = "R " + rr2;
+    option.title = "F " + fibo;
     option.color = "#4CAF50";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
@@ -1759,116 +1773,142 @@ function loadPatternTool(
     if (isStore) store.dispatch("tradingDerivative/drawTools", param);
 }
 function calculatePattern(points) {
-    const phase1 = !points.A.rt
-        ? scanPhase(points.A, points.B)
-        : { rt: points.A.rt };
-    const phase2 = scanPhase(points.B, points.C, phase1.rt);
+    const phase1 = scanPhase(points.A, points.B);
+    const phase2 = scanPhase(phase1.R, points.C, phase1.box);
+    const phase3 = scanPhase(phase2.R, points.B, phase1.box);
+    //
+    const times1 = [phase1.box.R.time, phase1.box.S.time];
+    //
+    const cb = points.C.price - points.B.price;
+    const side = cb > 0;
+    const _pr1 = phase1.box.S.price - phase1.box.R.price;
+    const _pr2 = phase2.box.R.price - phase2.box.S.price;
+    const _pr3 = phase3.box.S.price - phase3.box.R.price;
+    const tr1 =
+        cmp(phase1.box.R.price, side, points.B.price) &&
+        cmp(phase1.box.S.price, !side, points.C.price)
+            ? 1
+            : 0;
+    const pr1 = tr1 == 1 ? parseInt((100 * _pr1) / cb) : 0;
+    const tr2 =
+        phase2.box.tr >= phase1.box.tr ||
+        (tr1 == 1 && phase2.box.pr >= phase1.box.pr)
+            ? 1
+            : 0;
+    const pr2 = parseInt(100 * (_pr2 / cb));
+    const tr3 =
+        phase3.box.tr >= phase1.box.tr ||
+        (tr1 == 1 && phase3.box.pr >= phase1.box.pr)
+            ? 1
+            : 0;
+    const pr3 = parseInt((100 * _pr3) / cb);
+    //
     const pattern = validatePattern(points, phase2);
-    const rr1 = parseFloat(
-        (
-            ((points.B.price - points.C.price) /
-                (points.B.price - points.A.price)) *
-            100
-        ).toFixed(1)
-    );
-    const rr2 = parseFloat(
-        (
-            ((points.C.price - phase2.sp) / (points.C.price - points.B.price)) *
-            100
-        ).toFixed(1)
-    );
-    return { pattern, phase1, phase2, rr1, rr2, points };
+    //
+    let prMax = 0,
+        sp = points.B.price;
+    if (tr1 == 1) {
+        sp = phase1.box.R.price;
+        prMax = _pr1;
+    }
+    if (tr2 == 1 && cmp(_pr2, side, prMax)) {
+        sp = phase2.box.S.price;
+        prMax = _pr2;
+    }
+    if (tr3 == 1 && cmp(_pr3, side, prMax)) {
+        sp = phase3.box.S.price;
+    }
+    //
+    const fibo = parseInt((Math.abs(points.C.price - sp) / cb) * 100);
+    //
+    return {
+        pattern,
+        times1,
+        tr1,
+        tr2,
+        tr3,
+        pr1,
+        pr2,
+        pr3,
+        fibo,
+        sp,
+        points,
+    };
 }
-function scanPhase(startPoint, endPoint, ref = {}) {
+function scanPhase(S, R, ref = {}) {
     const hasRef = mf.isSet(ref);
-    const side = endPoint.price > startPoint.price;
-    let point = {},
-        rt = {},
+    const side = R.price > S.price;
+    let box = {},
+        maxBox = {},
         phase = 0,
         sp = 0;
     params.data.price
-        .filter((item) => item.time >= startPoint.time)
+        .filter((item) => item.time >= S.time)
         .every((item, index) => {
             const price = item.value;
             const time = item.time;
-            if (index == 0 || price == startPoint.price) {
-                point = {
-                    time,
-                    start: index,
-                    end: index,
-                    resistance: price,
-                    support: price,
+            if (index == 0 || price == S.price) {
+                box = {
+                    R: { index, time, price },
+                    S: { index, time, price },
                 };
-                rt = {
-                    start: time,
-                    end: time,
-                    resistance: price,
-                    support: price,
-                    distance: 0,
+                maxBox = {
+                    R: box.R,
+                    S: box.S,
+                    pr: 0,
+                    tr: 0,
                     count: 0,
                     over: false,
                 };
                 phase = 0;
                 sp = price;
             }
-            if (cmp(price, side, point.resistance)) {
-                const distance = point.end - point.start;
-                const margin = point.support - point.resistance;
-                const rtMargin = rt.support - rt.resistance;
+            if (cmp(price, side, box.R.price)) {
+                const ir = box.S.index - box.R.index;
+                const pr = Math.abs(box.S.price - box.R.price);
                 if (
-                    (distance > rt.distance &&
-                        cmp(margin, !side, 0.5 * rtMargin)) ||
-                    (distance > 0.5 * rt.distance &&
-                        cmp(margin, !side, 2 * rtMargin))
+                    (ir > maxBox.tr && pr > 0.5 * maxBox.pr) ||
+                    (ir > 0.5 * maxBox.tr && pr > 2 * maxBox.pr)
                 ) {
-                    rt.start = point.time;
-                    rt.end = time;
-                    rt.distance = distance;
-                    rt.resistance = point.resistance;
-                    rt.support = point.support;
+                    maxBox.tr = ir;
+                    maxBox.pr = pr;
+                    maxBox.R = box.R;
+                    maxBox.S = box.S;
                     if (hasRef) {
-                        if (distance >= ref.distance) rt.count++;
-                        if (distance > 3 * ref.distance) rt.over = true;
+                        if (ir >= ref.tr || pr >= ref.pr) maxBox.count++;
+                        if (ir > 3 * ref.tr) maxBox.over = true;
                     }
                 }
-                point = {
-                    time,
-                    start: index,
-                    end: index,
-                    resistance: price,
-                    support: price,
+                box = {
+                    R: { index, time, price },
+                    S: { index, time, price },
                 };
             } else {
-                point.end = index;
-                if (cmp(price, !side, point.support)) point.support = price;
+                box.S.index = index;
+                box.S.time = time;
+                if (cmp(price, !side, box.S.price)) box.S.price = price;
             }
-            if (cmp(price, side, endPoint.price, true)) return false;
+            if (cmp(price, side, R.price, true)) return false;
             else return true;
         });
-    if (hasRef) {
-        if (rt.count == 0) {
-            if (
-                cmp(ref.resistance, side, startPoint.price) &&
-                cmp(ref.support, !side, endPoint.price)
-            ) {
-                rt.resistance = ref.support;
-                rt.support = ref.resistance;
-                rt.before = true;
-                sp = rt.support;
-            } else sp = startPoint.price;
-        } else sp = rt.support;
+    const ir = box.S.index - box.R.index;
+    if (ir > maxBox.tr) {
+        const pr = Math.abs(box.S.price - box.R.price);
+        maxBox.tr = ir;
+        maxBox.pr = pr;
+        maxBox.R = box.R;
+        maxBox.S = box.S;
+        if (hasRef) {
+            if (ir >= ref.tr || pr >= ref.pr) maxBox.count++;
+            if (ir > 3 * ref.tr) maxBox.over = true;
+        }
     }
-    phase = validatePhase(
-        startPoint.price,
-        rt.resistance,
-        rt.support,
-        endPoint.price
-    );
-    return { phase, rt, sp };
+    if (!R.time) R.time = box.S.time;
+    return { phase, box: maxBox, sp, S, R };
 }
 function validatePattern({ A, B, C, D, E }, phase2) {
-    if (phase2.rt.count < 1) {
-        if (phase2.rt.before) {
+    if (phase2.box.count < 1) {
+        if (phase2.box.before) {
             if (phase2.phase > 0) return 4;
             else return 1;
         } else {
@@ -1882,24 +1922,11 @@ function validatePattern({ A, B, C, D, E }, phase2) {
             return 7;
         }
     }
-    if (phase2.rt.over) return 6;
-    if (phase2.rt.count > 1) return 5;
+    if (phase2.box.over) return 6;
+    if (phase2.box.count > 1) return 5;
     if (phase2.phase > 0) return 4;
     if ((B.price - C.price) / (B.price - A.price) < 0.382) return 3;
     return 0;
-}
-function validatePhase(a, b, c, d) {
-    let result = 0;
-    const da = d - a;
-    const db = d - b;
-    const dc = d - c;
-    const bda = db / da;
-    const cda = dc / da;
-    if (bda > 0.382) result += 20;
-    else if (bda > 0.236) result += 10;
-    if (cda < 0.618) result += 2;
-    else if (cda < 0.786) result += 1;
-    return result;
 }
 function removePatternTool(withServer = true, onlyServer = false) {
     if (withServer)
@@ -1985,8 +2012,8 @@ function drawTimeRangeTool() {
 function loadTimeRangeTool(data, onlyTime = false, isStore = false) {
     if (onlyTime)
         data = [
-            { time: data.start, value: 1, color: "OrangeRed" },
-            { time: data.end, value: 1, color: "lime" },
+            { time: data[0], value: 1, color: "OrangeRed" },
+            { time: data[1], value: 1, color: "lime" },
         ];
     params.tools.timeRange = data;
     params.series.timeRange.setData(data);
