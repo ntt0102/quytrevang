@@ -1795,7 +1795,7 @@ function calculatePattern(points) {
         (tr1 == 1 && phase2.box.pr >= phase1.box.pr)
             ? 1
             : 0;
-    const pr2 = parseInt(100 * (_pr2 / cb));
+    const pr2 = parseInt((100 * _pr2) / cb);
     const tr3 =
         phase3.box.tr >= phase1.box.tr ||
         (tr1 == 1 && phase3.box.pr >= phase1.box.pr)
@@ -1816,7 +1816,7 @@ function calculatePattern(points) {
         prMax = _pr2;
     }
     if (tr3 == 1 && cmp(_pr3, side, prMax)) {
-        sp = phase3.box.S.price;
+        sp = phase3.box.R.price;
     }
     //
     const fibo = parseInt((Math.abs(points.C.price - sp) / cb) * 100);
