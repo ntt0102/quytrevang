@@ -808,7 +808,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "A";
                 changeOptions = {
-                    rt: phase1.rt.distance,
+                    rt: phase1.rt,
                     title: "A " + phase1.phase.toString().padStart(2, "0"),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
@@ -834,7 +834,7 @@ function eventPriceLineDrag(e) {
                     d = +params.tools.pattern.D.options().price;
                     changeOptions = {
                         title:
-                            "R" +
+                            "R " +
                             parseFloat((((c - d) / (c - b)) * 100).toFixed(1)),
                     };
                 } else
@@ -1501,7 +1501,7 @@ function drawPatternTool() {
                     price,
                     time,
                     title: "A " + phase1.phase.toString().padStart(2, "0"),
-                    rt: phase1.rt.distance,
+                    rt: phase1.rt,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1639,7 +1639,7 @@ function drawPatternTool() {
             params.tools.pattern[point].applyOptions({
                 title: phase,
                 title: "A " + phase.toString().padStart(2, "0"),
-                rt: rt.distance,
+                rt: rt,
             });
             param.points.push(point);
             param.data.push(params.tools.pattern[point].options());
@@ -1702,7 +1702,7 @@ function loadPatternTool(
     option.color = "#009688";
     option.price = B.price;
     option.time = B.time;
-    option.rt = phase1.rt.distance;
+    option.rt = phase1.rt;
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
@@ -1761,8 +1761,8 @@ function loadPatternTool(
 function calculatePattern(points) {
     const phase1 = !points.A.rt
         ? scanPhase(points.A, points.B)
-        : { rt: { distance: points.A.rt } };
-    const phase2 = scanPhase(points.B, points.C, phase1.rt.distance);
+        : { rt: points.A.rt };
+    const phase2 = scanPhase(points.B, points.C, phase1.rt);
     const pattern = validatePattern(points, phase2);
     const rr1 = parseFloat(
         (
@@ -1779,9 +1779,10 @@ function calculatePattern(points) {
     );
     return { pattern, phase1, phase2, rr1, rr2, points };
 }
-function scanPhase(startPoint, endPoint, rtRef = 0) {
-    let side = endPoint.price > startPoint.price,
-        point = {},
+function scanPhase(startPoint, endPoint, ref = {}) {
+    const hasRef = mf.isSet(ref);
+    const side = endPoint.price > startPoint.price;
+    let point = {},
         rt = {},
         phase = 0,
         sp = 0;
@@ -1801,8 +1802,9 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
                 rt = {
                     start: time,
                     end: time,
+                    resistance: price,
+                    support: price,
                     distance: 0,
-                    margin: 0,
                     count: 0,
                     over: false,
                 };
@@ -1812,27 +1814,22 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
             if (cmp(price, side, point.resistance)) {
                 const distance = point.end - point.start;
                 const margin = point.support - point.resistance;
+                const rtMargin = rt.support - rt.resistance;
                 if (
                     (distance > rt.distance &&
-                        cmp(margin, !side, 0.5 * rt.margin)) ||
+                        cmp(margin, !side, 0.5 * rtMargin)) ||
                     (distance > 0.5 * rt.distance &&
-                        cmp(margin, !side, 2 * rt.margin))
+                        cmp(margin, !side, 2 * rtMargin))
                 ) {
                     rt.start = point.time;
                     rt.end = time;
                     rt.distance = distance;
-                    rt.margin = margin;
-                    if (rtRef > 0) {
-                        if (distance >= rtRef) rt.count++;
-                        if (distance > 3 * rtRef) rt.over = true;
+                    rt.resistance = point.resistance;
+                    rt.support = point.support;
+                    if (hasRef) {
+                        if (distance >= ref.distance) rt.count++;
+                        if (distance > 3 * ref.distance) rt.over = true;
                     }
-                    sp = rt.count > 0 ? point.support : startPoint.price;
-                    phase = validatePhase(
-                        startPoint.price,
-                        point.resistance,
-                        point.support,
-                        endPoint.price
-                    );
                 }
                 point = {
                     time,
@@ -1848,23 +1845,47 @@ function scanPhase(startPoint, endPoint, rtRef = 0) {
             if (cmp(price, side, endPoint.price, true)) return false;
             else return true;
         });
+    if (hasRef) {
+        if (rt.count == 0) {
+            if (
+                cmp(ref.resistance, side, startPoint.price) &&
+                cmp(ref.support, !side, endPoint.price)
+            ) {
+                rt.resistance = ref.support;
+                rt.support = ref.resistance;
+                rt.before = true;
+                sp = rt.support;
+            } else sp = startPoint.price;
+        } else sp = rt.support;
+    }
+    phase = validatePhase(
+        startPoint.price,
+        rt.resistance,
+        rt.support,
+        endPoint.price
+    );
     return { phase, rt, sp };
 }
 function validatePattern({ A, B, C, D, E }, phase2) {
     if (phase2.rt.count < 1) {
-        if (
-            mf.isSet(E) &&
-            (B.price - C.price) / (B.price - A.price) >= 0.5 &&
-            (C.price - D.price) / (C.price - B.price) >= 0.786 &&
-            (D.price - E.price) / (D.price - C.price) >= 0.786
-        )
-            return 1;
-        return 6;
+        if (phase2.rt.before) {
+            if (phase2.phase > 0) return 4;
+            else return 1;
+        } else {
+            if (
+                mf.isSet(E) &&
+                (B.price - C.price) / (B.price - A.price) >= 0.5 &&
+                (C.price - D.price) / (C.price - B.price) >= 0.786 &&
+                (D.price - E.price) / (D.price - C.price) >= 0.786
+            )
+                return 2;
+            return 7;
+        }
     }
-    if (phase2.rt.over) return 5;
-    if (phase2.rt.count > 1) return 4;
-    if (phase2.phase > 0) return 3;
-    if ((B.price - C.price) / (B.price - A.price) < 0.382) return 2;
+    if (phase2.rt.over) return 6;
+    if (phase2.rt.count > 1) return 5;
+    if (phase2.phase > 0) return 4;
+    if ((B.price - C.price) / (B.price - A.price) < 0.382) return 3;
     return 0;
 }
 function validatePhase(a, b, c, d) {
