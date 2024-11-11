@@ -1370,39 +1370,32 @@ function loadAutoScanTool(data) {
     });
 }
 function scanPattern(data) {
-    let side, A, B, C, D, E, F, S;
+    let side, A, B, C, D, S;
     for (let index = data.length - 1; index >= 0; index--) {
         const price = data[index].value;
         const time = data[index].time;
         if (index == data.length - 1) {
-            F = { index, time, price };
-            [E, D, C, B, A, S] = Array(6)
+            D = { index, time, price };
+            [C, B, A, S] = Array(6)
                 .fill(null)
-                .map(() => mf.cloneDeep(F));
+                .map(() => mf.cloneDeep(D));
         }
         if (side == undefined) {
-            if (price == F.price) continue;
-            side = F.price > price;
-        }
-        if (!cmp(D.price, side, F.price) && cmp(price, !side, E.price))
-            E = { index, time, price };
-        if (!cmp(C.price, !side, E.price) && cmp(price, side, D.price)) {
-            if (F.index - E.index <= 5) {
-                F = mf.cloneDeep(E);
-                D = mf.cloneDeep(E);
-                E = { index, time, price };
-                side = !side;
-            } else D = { index, time, price };
+            if (price == D.price) continue;
+            side = D.price > price;
         }
         if (!cmp(B.price, side, D.price) && cmp(price, !side, C.price))
             C = { index, time, price };
         if (cmp(price, side, B.price)) {
             if (cmp(A.price, !side, C.price)) {
-                [F, E, D, C, B] = [E, D, C, B, A].map((item) =>
-                    mf.cloneDeep(item)
-                );
+                [D, C, B] = [C, B, A].map((item) => mf.cloneDeep(item));
                 A = { index, time, price };
                 S = mf.cloneDeep(A);
+                side = !side;
+            } else if (D.index - C.index <= 5) {
+                D = mf.cloneDeep(C);
+                B = mf.cloneDeep(C);
+                C = { index, time, price };
                 side = !side;
             } else B = { index, time, price };
         }
@@ -1412,15 +1405,6 @@ function scanPattern(data) {
         } else S.index = index;
         if (cmp(price, side, S.price)) S = { index, time, price };
         //
-        if (E.index > C.index) {
-            const de = Math.abs(D.price - E.price);
-            const ef = Math.abs(E.price - F.price);
-            if (de >= 1.5 && ef / de > 0.5) {
-                if (C.index - S.index > E.index - D.index) break;
-                const cs = Math.abs(C.price - S.price);
-                if (cs > de) break;
-            }
-        }
         if (C.index > A.index) {
             const bc = Math.abs(B.price - C.price);
             const cd = Math.abs(C.price - D.price);
@@ -1431,11 +1415,7 @@ function scanPattern(data) {
             }
         }
     }
-    let ret = {};
-    if (A.index != C.index) ret = { A, B, C, D, E, F };
-    else if (C.index != E.index) ret = { A: C, B: D, C: E, D: F, E: {}, F: {} };
-
-    return removeIndex(ret);
+    return removeIndex({ A, B, C, D });
 }
 function removeIndex(obj) {
     const result = {};
