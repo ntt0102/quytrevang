@@ -1370,10 +1370,11 @@ function loadAutoScanTool(data) {
 }
 function scanPattern(data) {
     let side, A, B, C, D, S;
-    for (let index = data.length - 1; index >= 0; index--) {
-        const price = data[index].value;
-        const time = data[index].time;
-        if (index == data.length - 1) {
+    for (let i = data.length - 1; i >= 0; i--) {
+        const price = data[i].value;
+        const time = data[i].time;
+        const index = getTimeIndex(time);
+        if (i == data.length - 1) {
             D = { index, time, price };
             [C, B, A, S] = Array(6)
                 .fill(null)
@@ -1822,10 +1823,11 @@ function scanPhase(S, R, ref = {}) {
         sp = 0;
     params.data.price
         .filter((item) => item.time >= S.time)
-        .every((item, index) => {
+        .every((item, i) => {
             const price = item.value;
             const time = item.time;
-            if (index == 0 || price == S.price) {
+            const index = getTimeIndex(time);
+            if (i == 0 || price == S.price) {
                 box = {
                     R: { index, time, price },
                     S: { index, time, price },
