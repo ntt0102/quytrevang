@@ -1355,10 +1355,9 @@ function loadAutoScanTool(data) {
         calculatePattern(points);
     if (!mf.isSet(points)) return false;
 
-    loadTimeRangeTool(phase1.box, true);
+    loadTimeRangeTool(times1, true);
     loadProgressTool(pattern);
     loadPatternTool(points, {
-        times1,
         tr1,
         tr2,
         tr3,
