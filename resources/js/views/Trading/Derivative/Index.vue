@@ -1695,7 +1695,6 @@ function loadPatternTool(
     option.title = `B ${tr2} ${pr2}`;
     option.color = "#009688";
     option.price = B.price;
-    option.time = B.time;
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     param.points.push(option.point);
