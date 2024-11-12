@@ -1759,6 +1759,7 @@ function calculatePattern(points) {
     const timeRS1 = [phase1.R1.time, phase1.S1.time];
     //
     const cb = points.C.price - points.B.price;
+    const ab = points.A.price - points.B.price;
     const side = cb > 0;
     const rs1 = phase1.S1.price - phase1.R1.price;
     const rs2 = phase2.R1.price - phase2.S1.price;
@@ -1769,8 +1770,8 @@ function calculatePattern(points) {
             ? 1
             : 0;
     const pr1 = tr1 == 1 ? parseInt((100 * rs1) / cb) : 0;
-    const tr2 =
-        phase2.tr >= phase1.tr ? (phase2.tr > 3 * phase1.tr ? 2 : 1) : 0;
+    const tr2 = phase2.tr >= phase1.tr ? 1 : 0;
+    if (phase2.tr > 3 * phase1.tr && cb / ab < 0.5) tr2 = 2;
     if (
         tr1 == 1 &&
         cmp(phase2.S1.price, !side, phase1.R1.price) &&
@@ -1778,8 +1779,8 @@ function calculatePattern(points) {
     )
         tr2 = 3;
     const pr2 = parseInt((100 * rs2) / cb);
-    const tr3 =
-        phase3.tr >= phase1.tr ? (phase3.tr > 3 * phase1.tr ? 2 : 1) : 0;
+    const tr3 = phase3.tr >= phase1.tr ? 1 : 0;
+    if (phase3.tr > 3 * phase1.tr && cb / ab < 0.5) tr3 = 2;
     const pr3 = parseInt((100 * rs3) / cb);
     //
     const pattern = validatePattern(tr2, tr3, pr2, pr3);
