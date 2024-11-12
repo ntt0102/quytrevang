@@ -1782,7 +1782,7 @@ function calculatePattern(points) {
         phase3.tr >= phase1.tr ? (phase3.tr > 3 * phase1.tr ? 2 : 1) : 0;
     const pr3 = parseInt((100 * rs3) / cb);
     //
-    const pattern = validatePattern(tr1, tr2, tr3, pr1, pr2, pr3);
+    const pattern = validatePattern(tr2, tr3, pr2, pr3);
     //
     let prMax = 0,
         sp = points.B.price;
@@ -1871,9 +1871,14 @@ function scanPhase(S, R) {
     if (!R.time) R.time = box.S.time;
     return { tr: maxBox.tr, pr: maxBox.pr, S1: maxBox.S, R1: maxBox.R, S, R };
 }
-function validatePattern(tr1, tr2, tr3, pr1, pr2, pr3) {
-    if (tr2 > 0) return 0;
-    else if (tr3 > 0) return 1;
+function validatePattern(tr2, tr3, pr2, pr3) {
+    if (pr2 >= pr3) {
+        if (tr2 > 0) return 0;
+        else if (tr3 > 0) return 1;
+    } else {
+        if (tr3 > 0) return 1;
+        else if (tr2 > 0) return 0;
+    }
     return 2;
 }
 function removePatternTool(withServer = true, onlyServer = false) {
