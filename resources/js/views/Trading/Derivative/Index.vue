@@ -1770,12 +1770,16 @@ function calculatePattern(points) {
             : 0;
     const pr1 = tr1 == 1 ? parseInt((100 * rs1) / cb) : 0;
     const tr2 =
-        phase2.tr >= phase1.tr || (tr1 == 1 && phase2.pr >= phase1.pr) ? 1 : 0;
-    if (phase2.tr > 3 * phase1.tr) tr2 = 2;
+        phase2.tr >= phase1.tr ? (phase2.tr > 3 * phase1.tr ? 2 : 1) : 0;
+    if (
+        tr1 == 1 &&
+        cmp(phase2.S1.price, !side, phase1.R1.price) &&
+        cmp(phase2.R1.price, side, phase1.S1.price)
+    )
+        tr2 = 3;
     const pr2 = parseInt((100 * rs2) / cb);
     const tr3 =
-        phase3.tr >= phase1.tr || (tr1 == 1 && phase3.pr >= phase1.pr) ? 1 : 0;
-    if (phase3.tr > 3 * phase1.tr) tr3 = 2;
+        phase3.tr >= phase1.tr ? (phase3.tr > 3 * phase1.tr ? 2 : 1) : 0;
     const pr3 = parseInt((100 * rs3) / cb);
     //
     const pattern = validatePattern(points, phase2);
