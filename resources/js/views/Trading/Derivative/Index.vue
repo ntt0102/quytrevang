@@ -797,7 +797,7 @@ function eventPriceLineDrag(e) {
                 };
                 const {
                     pattern,
-                    times1,
+                    timeRS1,
                     tr1,
                     tr2,
                     tr3,
@@ -810,7 +810,7 @@ function eventPriceLineDrag(e) {
                 const b = points.B.price;
                 const c = points.C.price;
                 let d = sp;
-                loadTimeRangeTool(times1, true, true);
+                loadTimeRangeTool(timeRS1, true, true);
                 loadProgressTool(pattern, true);
                 //
                 point = "A";
@@ -1332,10 +1332,10 @@ function drawAutoScanTool() {
     };
     const points = scanPattern(data);
     if (!mf.isSet(points)) return false;
-    const { pattern, times1, tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp } =
+    const { pattern, timeRS1, tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp } =
         calculatePattern(points);
 
-    loadTimeRangeTool(times1, true);
+    loadTimeRangeTool(timeRS1, true);
     loadProgressTool(pattern);
     removePatternTool(false);
     loadPatternTool(points, { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp });
@@ -1351,11 +1351,11 @@ function drawAutoScanTool() {
 function loadAutoScanTool(data) {
     const points = mf.cloneDeep(data.auto);
     params.tools.auto = points;
-    const { pattern, times1, tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp } =
+    const { pattern, timeRS1, tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp } =
         calculatePattern(points);
     if (!mf.isSet(points)) return false;
 
-    loadTimeRangeTool(times1, true);
+    loadTimeRangeTool(timeRS1, true);
     loadProgressTool(pattern);
     loadPatternTool(points, {
         tr1,
@@ -1480,7 +1480,7 @@ function drawPatternTool() {
                 };
                 const {
                     pattern,
-                    times1,
+                    timeRS1,
                     tr1,
                     tr2,
                     tr3,
@@ -1492,7 +1492,7 @@ function drawPatternTool() {
                 } = calculatePattern(points);
                 const c = points.C.price;
                 const d = sp;
-                loadTimeRangeTool(times1, true, true);
+                loadTimeRangeTool(timeRS1, true, true);
                 loadProgressTool(pattern, true);
                 //
                 point = "A";
@@ -1562,7 +1562,7 @@ function drawPatternTool() {
                 };
                 const {
                     pattern,
-                    times1,
+                    timeRS1,
                     tr1,
                     tr2,
                     tr3,
@@ -1574,7 +1574,7 @@ function drawPatternTool() {
                 } = calculatePattern(points);
                 const c = points.C.price;
                 const d = sp;
-                loadTimeRangeTool(times1, true, true);
+                loadTimeRangeTool(timeRS1, true, true);
                 loadProgressTool(pattern, true);
                 //
                 let point = "A";
@@ -1753,58 +1753,52 @@ function loadPatternTool(
 }
 function calculatePattern(points) {
     const phase1 = scanPhase(points.A, points.B);
-    const phase2 = scanPhase(phase1.R, points.C, phase1.box);
-    const phase3 = scanPhase(phase2.R, points.B, phase1.box);
+    const phase2 = scanPhase(phase1.R, points.C);
+    const phase3 = scanPhase(phase2.R, points.B);
     //
-    const times1 = [phase1.box.R.time, phase1.box.S.time];
+    const timeRS1 = [phase1.R1.time, phase1.S1.time];
     //
     const cb = points.C.price - points.B.price;
     const side = cb > 0;
-    const _pr1 = phase1.box.S.price - phase1.box.R.price;
-    const _pr2 = phase2.box.R.price - phase2.box.S.price;
-    const _pr3 = phase3.box.S.price - phase3.box.R.price;
+    const rs1 = phase1.S1.price - phase1.R1.price;
+    const rs2 = phase2.R1.price - phase2.S1.price;
+    const rs3 = phase3.S1.price - phase3.R1.price;
     const tr1 =
-        cmp(phase1.box.R.price, side, points.B.price) &&
-        cmp(phase1.box.S.price, !side, points.C.price)
+        cmp(phase1.R1.price, side, points.B.price) &&
+        cmp(phase1.S1.price, !side, points.C.price)
             ? 1
             : 0;
-    const pr1 = tr1 == 1 ? parseInt((100 * _pr1) / cb) : 0;
+    const pr1 = tr1 == 1 ? parseInt((100 * rs1) / cb) : 0;
     const tr2 =
-        phase2.box.tr >= phase1.box.tr ||
-        (tr1 == 1 && phase2.box.pr >= phase1.box.pr)
-            ? 1
-            : 0;
-    if (phase2.box.tr > 3 * phase1.box.tr) tr2 = 2;
-    const pr2 = parseInt((100 * _pr2) / cb);
+        phase2.tr >= phase1.tr || (tr1 == 1 && phase2.pr >= phase1.pr) ? 1 : 0;
+    if (phase2.tr > 3 * phase1.tr) tr2 = 2;
+    const pr2 = parseInt((100 * rs2) / cb);
     const tr3 =
-        phase3.box.tr >= phase1.box.tr ||
-        (tr1 == 1 && phase3.box.pr >= phase1.box.pr)
-            ? 1
-            : 0;
-    if (phase3.box.tr > 3 * phase1.box.tr) tr3 = 2;
-    const pr3 = parseInt((100 * _pr3) / cb);
+        phase3.tr >= phase1.tr || (tr1 == 1 && phase3.pr >= phase1.pr) ? 1 : 0;
+    if (phase3.tr > 3 * phase1.tr) tr3 = 2;
+    const pr3 = parseInt((100 * rs3) / cb);
     //
     const pattern = validatePattern(points, phase2);
     //
     let prMax = 0,
         sp = points.B.price;
     if (tr1 >= 1) {
-        sp = phase1.box.R.price;
-        prMax = _pr1;
+        sp = phase1.R1.price;
+        prMax = rs1;
     }
-    if (tr2 >= 1 && cmp(_pr2, side, prMax)) {
-        sp = phase2.box.S.price;
-        prMax = _pr2;
+    if (tr2 >= 1 && cmp(rs2, side, prMax)) {
+        sp = phase2.S1.price;
+        prMax = rs2;
     }
-    if (tr3 >= 1 && cmp(_pr3, side, prMax)) {
-        sp = phase3.box.R.price;
+    if (tr3 >= 1 && cmp(rs3, side, prMax)) {
+        sp = phase3.R1.price;
     }
     //
     const fibo = parseInt((Math.abs(points.C.price - sp) / cb) * 100);
     //
     return {
         pattern,
-        times1,
+        timeRS1,
         tr1,
         tr2,
         tr3,
@@ -1816,13 +1810,10 @@ function calculatePattern(points) {
         points,
     };
 }
-function scanPhase(S, R, ref = {}) {
-    const hasRef = mf.isSet(ref);
+function scanPhase(S, R) {
     const side = R.price > S.price;
     let box = {},
-        maxBox = {},
-        phase = 0,
-        sp = 0;
+        maxBox = {};
     params.data.price
         .filter((item) => item.time >= S.time)
         .every((item, i) => {
@@ -1839,11 +1830,7 @@ function scanPhase(S, R, ref = {}) {
                     S: box.S,
                     pr: 0,
                     tr: 0,
-                    count: 0,
-                    over: false,
                 };
-                phase = 0;
-                sp = price;
             }
             if (cmp(price, side, box.R.price)) {
                 const ir = box.S.index - box.R.index;
@@ -1856,10 +1843,6 @@ function scanPhase(S, R, ref = {}) {
                     maxBox.pr = pr;
                     maxBox.R = box.R;
                     maxBox.S = box.S;
-                    if (hasRef) {
-                        if (ir >= ref.tr || pr >= ref.pr) maxBox.count++;
-                        if (ir > 3 * ref.tr) maxBox.over = true;
-                    }
                 }
                 box = {
                     R: { index, time, price },
@@ -1880,13 +1863,9 @@ function scanPhase(S, R, ref = {}) {
         maxBox.pr = pr;
         maxBox.R = box.R;
         maxBox.S = box.S;
-        if (hasRef) {
-            if (ir >= ref.tr || pr >= ref.pr) maxBox.count++;
-            if (ir > 3 * ref.tr) maxBox.over = true;
-        }
     }
     if (!R.time) R.time = box.S.time;
-    return { phase, box: maxBox, sp, S, R };
+    return { tr: maxBox.tr, pr: maxBox.pr, S1: maxBox.S, R1: maxBox.R, S, R };
 }
 function validatePattern({ A, B, C, D, E }, phase2) {
     if (phase2.box.count < 1) {
