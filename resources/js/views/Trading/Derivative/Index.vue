@@ -1409,7 +1409,7 @@ function scanPattern(data) {
             const bc = Math.abs(B.price - C.price);
             const cd = Math.abs(C.price - D.price);
             if (bc >= 1.5 && cd / bc > 0.5) {
-                if (A.index - S.index > C.index - B.index) break;
+                if (A.index - S.index > D.index - B.index) break;
                 const as = Math.abs(A.price - S.price);
                 if (as > bc) break;
             }
