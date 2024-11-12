@@ -1868,25 +1868,25 @@ function scanPhase(S, R) {
     return { tr: maxBox.tr, pr: maxBox.pr, S1: maxBox.S, R1: maxBox.R, S, R };
 }
 function validatePattern({ A, B, C, D, E }, phase2) {
-    if (phase2.box.count < 1) {
-        if (phase2.box.before) {
-            if (phase2.phase > 0) return 4;
-            else return 1;
-        } else {
-            if (
-                mf.isSet(E) &&
-                (B.price - C.price) / (B.price - A.price) >= 0.5 &&
-                (C.price - D.price) / (C.price - B.price) >= 0.786 &&
-                (D.price - E.price) / (D.price - C.price) >= 0.786
-            )
-                return 2;
-            return 7;
-        }
-    }
-    if (phase2.box.over) return 6;
-    if (phase2.box.count > 1) return 5;
-    if (phase2.phase > 0) return 4;
-    if ((B.price - C.price) / (B.price - A.price) < 0.382) return 3;
+    // if (phase2.box.count < 1) {
+    //     if (phase2.box.before) {
+    //         if (phase2.phase > 0) return 4;
+    //         else return 1;
+    //     } else {
+    //         if (
+    //             mf.isSet(E) &&
+    //             (B.price - C.price) / (B.price - A.price) >= 0.5 &&
+    //             (C.price - D.price) / (C.price - B.price) >= 0.786 &&
+    //             (D.price - E.price) / (D.price - C.price) >= 0.786
+    //         )
+    //             return 2;
+    //         return 7;
+    //     }
+    // }
+    // if (phase2.box.over) return 6;
+    // if (phase2.box.count > 1) return 5;
+    // if (phase2.phase > 0) return 4;
+    // if ((B.price - C.price) / (B.price - A.price) < 0.382) return 3;
     return 0;
 }
 function removePatternTool(withServer = true, onlyServer = false) {
