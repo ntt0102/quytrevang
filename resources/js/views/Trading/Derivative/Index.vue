@@ -1774,9 +1774,9 @@ function calculatePattern(points) {
             pr1 = parseInt((100 * rs1) / cb);
         }
         //
-        if (phase2.tr >= phase1.tr) tr2 = 1;
-        if (phase2.tr > 3 * phase1.tr && cb / ab < 0.5) tr2 = 2;
-        if (
+        if (phase2.tr >= phase1.tr && phase2.tr < 3 * phase1.tr) tr2 = 1;
+        else if (phase2.tr >= 3 * phase1.tr && cb / ab < 0.5) tr2 = 2;
+        else if (
             tr1 == 1 &&
             cmp(phase2.S1.price, !side, phase1.R1.price) &&
             cmp(phase2.R1.price, side, phase1.S1.price)
@@ -1785,8 +1785,8 @@ function calculatePattern(points) {
         }
         pr2 = parseInt((100 * rs2) / cb);
         //
-        if (phase3.tr >= phase1.tr) tr3 = 1;
-        if (phase3.tr > 3 * phase1.tr && cb / ab < 0.5) tr3 = 2;
+        if (phase3.tr >= phase1.tr && phase3.tr < 3 * phase1.tr) tr3 = 1;
+        else if (phase3.tr >= 3 * phase1.tr && cb / ab < 0.5) tr3 = 2;
         pr3 = parseInt((100 * rs3) / cb);
     }
     //
