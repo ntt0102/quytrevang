@@ -1774,27 +1774,29 @@ function calculatePattern(points) {
         (tr1 == 1 && phase2.box.pr >= phase1.box.pr)
             ? 1
             : 0;
+    if (phase2.box.tr > 3 * phase1.box.tr) tr2 = 2;
     const pr2 = parseInt((100 * _pr2) / cb);
     const tr3 =
         phase3.box.tr >= phase1.box.tr ||
         (tr1 == 1 && phase3.box.pr >= phase1.box.pr)
             ? 1
             : 0;
+    if (phase3.box.tr > 3 * phase1.box.tr) tr3 = 2;
     const pr3 = parseInt((100 * _pr3) / cb);
     //
     const pattern = validatePattern(points, phase2);
     //
     let prMax = 0,
         sp = points.B.price;
-    if (tr1 == 1) {
+    if (tr1 >= 1) {
         sp = phase1.box.R.price;
         prMax = _pr1;
     }
-    if (tr2 == 1 && cmp(_pr2, side, prMax)) {
+    if (tr2 >= 1 && cmp(_pr2, side, prMax)) {
         sp = phase2.box.S.price;
         prMax = _pr2;
     }
-    if (tr3 == 1 && cmp(_pr3, side, prMax)) {
+    if (tr3 >= 1 && cmp(_pr3, side, prMax)) {
         sp = phase3.box.R.price;
     }
     //
