@@ -1764,24 +1764,31 @@ function calculatePattern(points) {
     const rs1 = phase1.S1.price - phase1.R1.price;
     const rs2 = phase2.R1.price - phase2.S1.price;
     const rs3 = phase3.S1.price - phase3.R1.price;
-    const tr1 =
-        cmp(phase1.R1.price, side, points.B.price) &&
-        cmp(phase1.S1.price, !side, points.C.price)
-            ? 1
-            : 0;
-    const pr1 = tr1 == 1 ? parseInt((100 * rs1) / cb) : 0;
-    const tr2 = phase2.tr >= phase1.tr ? 1 : 0;
-    if (phase2.tr > 3 * phase1.tr && cb / ab < 0.5) tr2 = 2;
-    if (
-        tr1 == 1 &&
-        cmp(phase2.S1.price, !side, phase1.R1.price) &&
-        cmp(phase2.R1.price, side, phase1.S1.price)
-    )
-        tr2 = 3;
-    const pr2 = parseInt((100 * rs2) / cb);
-    const tr3 = phase3.tr >= phase1.tr ? 1 : 0;
-    if (phase3.tr > 3 * phase1.tr && cb / ab < 0.5) tr3 = 2;
-    const pr3 = parseInt((100 * rs3) / cb);
+    let [tr1, tr2, tr3, pr1, pr2, pr3] = Array(6).fill(0);
+    if (Math.abs(cb) > 1.5) {
+        if (
+            cmp(phase1.R1.price, side, points.B.price) &&
+            cmp(phase1.S1.price, !side, points.C.price)
+        ) {
+            tr1 = 1;
+            pr1 = parseInt((100 * rs1) / cb);
+        }
+        //
+        if (phase2.tr >= phase1.tr) tr2 = 1;
+        if (phase2.tr > 3 * phase1.tr && cb / ab < 0.5) tr2 = 2;
+        if (
+            tr1 == 1 &&
+            cmp(phase2.S1.price, !side, phase1.R1.price) &&
+            cmp(phase2.R1.price, side, phase1.S1.price)
+        ) {
+            tr2 = 3;
+        }
+        pr2 = parseInt((100 * rs2) / cb);
+        //
+        if (phase3.tr >= phase1.tr) tr3 = 1;
+        if (phase3.tr > 3 * phase1.tr && cb / ab < 0.5) tr3 = 2;
+        pr3 = parseInt((100 * rs3) / cb);
+    }
     //
     const pattern = validatePattern(tr2, tr3, pr2, pr3);
     //
@@ -1812,7 +1819,6 @@ function calculatePattern(points) {
         pr3,
         fibo,
         sp,
-        points,
     };
 }
 function scanPhase(S, R) {
