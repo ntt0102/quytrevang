@@ -1782,7 +1782,7 @@ function calculatePattern(points) {
         phase3.tr >= phase1.tr ? (phase3.tr > 3 * phase1.tr ? 2 : 1) : 0;
     const pr3 = parseInt((100 * rs3) / cb);
     //
-    const pattern = validatePattern(points, phase2);
+    const pattern = validatePattern(tr1, tr2, tr3, pr1, pr2, pr3);
     //
     let prMax = 0,
         sp = points.B.price;
@@ -1871,27 +1871,10 @@ function scanPhase(S, R) {
     if (!R.time) R.time = box.S.time;
     return { tr: maxBox.tr, pr: maxBox.pr, S1: maxBox.S, R1: maxBox.R, S, R };
 }
-function validatePattern({ A, B, C, D, E }, phase2) {
-    // if (phase2.box.count < 1) {
-    //     if (phase2.box.before) {
-    //         if (phase2.phase > 0) return 4;
-    //         else return 1;
-    //     } else {
-    //         if (
-    //             mf.isSet(E) &&
-    //             (B.price - C.price) / (B.price - A.price) >= 0.5 &&
-    //             (C.price - D.price) / (C.price - B.price) >= 0.786 &&
-    //             (D.price - E.price) / (D.price - C.price) >= 0.786
-    //         )
-    //             return 2;
-    //         return 7;
-    //     }
-    // }
-    // if (phase2.box.over) return 6;
-    // if (phase2.box.count > 1) return 5;
-    // if (phase2.phase > 0) return 4;
-    // if ((B.price - C.price) / (B.price - A.price) < 0.382) return 3;
-    return 0;
+function validatePattern(tr1, tr2, tr3, pr1, pr2, pr3) {
+    if (tr2 > 0) return 0;
+    else if (tr3 > 0) return 1;
+    return 2;
 }
 function removePatternTool(withServer = true, onlyServer = false) {
     if (withServer)
