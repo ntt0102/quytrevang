@@ -1814,11 +1814,11 @@ function calculatePattern(points) {
     //
     let prMax = 0,
         sp = points.B.price;
-    if (tr2 >= 1 && cmp(rs2, side, prMax)) {
+    if (tr2 > 0 && tr2 < 4 && cmp(rs2, side, prMax)) {
         sp = phase2.S1.price;
         prMax = rs2;
     }
-    if (tr3 >= 1 && cmp(rs3, side, prMax)) {
+    if (tr3 > 0 && cmp(rs3, side, prMax)) {
         sp = phase3.R1.price;
     }
     //
