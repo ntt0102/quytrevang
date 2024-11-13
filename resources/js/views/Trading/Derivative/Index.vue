@@ -1774,21 +1774,22 @@ function calculatePattern(points) {
     if (Math.abs(cb) > 1.5 && cmp(cb, side, rs1)) {
         pr2 = parseInt((rs2 / cb) * 100);
         if (pr2 > 50) {
-            if (phase2.tr >= phase1.tr && phase2.tr < 3 * phase1.tr) tr2 = 1;
-            else if (phase2.tr >= 3 * phase1.tr && cb / ab < 0.5) tr2 = 2;
+            if (phase2.count == 1) tr2 = 1;
+            else if (cb / ab < 0.5 && (phase2.count > 1 || phase2.over))
+                tr2 = 2;
             else if (
                 tr1 == 1 &&
                 cmp(phase2.S1.price, !side, phase1.R1.price) &&
                 cmp(phase2.R1.price, side, phase1.S1.price)
-            ) {
+            )
                 tr2 = 3;
-            }
         }
         //
         pr3 = parseInt((rs3 / cb) * 100);
         if (pr3 > 40) {
-            if (phase3.tr >= phase1.tr && phase3.tr < 3 * phase1.tr) tr3 = 1;
-            else if (phase3.tr >= 3 * phase1.tr && cb / ab < 0.5) tr3 = 2;
+            if (phase3.count == 1) tr3 = 1;
+            else if (cb / ab < 0.5 && (phase3.count > 1 || phase3.over))
+                tr3 = 2;
         }
     }
     //
@@ -1819,7 +1820,7 @@ function calculatePattern(points) {
         sp,
     };
 }
-function scanPhase(S, R) {
+function scanPhase(S, R, trRef = 0) {
     const side = R.price > S.price;
     let box = {},
         maxBox = {};
@@ -1839,6 +1840,8 @@ function scanPhase(S, R) {
                     S: box.S,
                     pr: 0,
                     tr: 0,
+                    count: 0,
+                    over: false,
                 };
             }
             if (cmp(price, side, box.R.price)) {
@@ -1852,6 +1855,10 @@ function scanPhase(S, R) {
                     maxBox.pr = pr;
                     maxBox.R = box.R;
                     maxBox.S = box.S;
+                    if (trRef > 0) {
+                        maxBox.count++;
+                        if (ir >= 3 * maxBox.tr) maxBox.over = true;
+                    }
                 }
                 box = {
                     R: { index, time, price },
@@ -1873,9 +1880,22 @@ function scanPhase(S, R) {
         maxBox.pr = pr;
         maxBox.R = box.R;
         maxBox.S = box.S;
+        if (trRef > 0) {
+            maxBox.count++;
+            if (ir >= 3 * maxBox.tr) maxBox.over = true;
+        }
     }
     if (!R.time) R.time = box.S.time;
-    return { tr: maxBox.tr, pr: maxBox.pr, S1: maxBox.S, R1: maxBox.R, S, R };
+    return {
+        tr: maxBox.tr,
+        pr: maxBox.pr,
+        count: maxBox.count,
+        over: maxBox.over,
+        S1: maxBox.S,
+        R1: maxBox.R,
+        S,
+        R,
+    };
 }
 function validatePattern(tr2, tr3, pr2, pr3) {
     if (pr2 >= pr3) {
