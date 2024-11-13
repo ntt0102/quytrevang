@@ -795,21 +795,15 @@ function eventPriceLineDrag(e) {
                     B: { price: +bOptions.price },
                     C: { price: +cOptions.price },
                 };
+                const d =
+                    lineOptions.point == "D"
+                        ? +params.tools.pattern.D.options().price
+                        : null;
                 const {
                     pattern,
                     timeRS1,
-                    tr1,
-                    tr2,
-                    tr3,
-                    pr1,
-                    pr2,
-                    pr3,
-                    fibo,
-                    sp,
-                } = calculatePattern(points);
-                const b = points.B.price;
-                const c = points.C.price;
-                let d = sp;
+                    info: { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
+                } = calculatePattern(points, d);
                 loadTimeRangeTool(timeRS1, true, true);
                 loadProgressTool([pattern], true);
                 //
@@ -832,24 +826,19 @@ function eventPriceLineDrag(e) {
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "D";
-                if (lineOptions.point == point) {
-                    d = +params.tools.pattern.D.options().price;
-                    changeOptions = {
-                        title: "F " + parseInt(((c - d) / (c - b)) * 100),
-                    };
-                } else
-                    changeOptions = {
-                        price: d,
-                        title: "F " + fibo,
-                    };
+                changeOptions = {
+                    price: sp,
+                    title: "F " + fibo,
+                };
+                if (lineOptions.point == point) delete changeOptions.price;
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
-                    title: "T " + parseFloat(((d - c) * 0.5).toFixed(1)),
+                    price: parseFloat((sp + X).toFixed(1)),
+                    title: "T " + parseFloat(X.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -857,8 +846,8 @@ function eventPriceLineDrag(e) {
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat((d + (d - c)).toFixed(1)),
-                    title: "T " + parseFloat((d - c).toFixed(1)),
+                    price: parseFloat((sp + Y).toFixed(1)),
+                    title: "T " + parseFloat(Y.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -866,8 +855,8 @@ function eventPriceLineDrag(e) {
                 //
                 point = "Z";
                 changeOptions = {
-                    price: parseFloat((d + (d - c) * 2).toFixed(1)),
-                    title: "T " + parseFloat(((d - c) * 2).toFixed(1)),
+                    price: parseFloat((sp + Z).toFixed(1)),
+                    title: "T " + parseFloat(Z.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1336,13 +1325,12 @@ function drawAutoScanTool() {
     };
     const points = scanPattern(data);
     if (!mf.isSet(points)) return false;
-    const { pattern, timeRS1, tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp } =
-        calculatePattern(points);
+    const { pattern, timeRS1, info } = calculatePattern(points);
 
     loadTimeRangeTool(timeRS1, true);
     loadProgressTool([pattern]);
     removePatternTool(false);
-    loadPatternTool(points, { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp });
+    loadPatternTool(points, info);
     if (JSON.stringify(params.tools.auto) != JSON.stringify(points)) {
         params.tools.auto = points;
         Object.entries(points).forEach(([key, value]) => {
@@ -1356,22 +1344,12 @@ function loadAutoScanTool(data, loadPattern = true, loadTimeRange = true) {
     if (!loadPattern) return false;
     const points = mf.cloneDeep(data);
     params.tools.auto = points;
-    const { pattern, timeRS1, tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp } =
-        calculatePattern(points);
+    const { pattern, timeRS1, info } = calculatePattern(points);
     if (!mf.isSet(points)) return false;
 
     if (loadTimeRange) loadTimeRangeTool(timeRS1, true);
     loadProgressTool([pattern]);
-    loadPatternTool(points, {
-        tr1,
-        tr2,
-        tr3,
-        pr1,
-        pr2,
-        pr3,
-        fibo,
-        sp,
-    });
+    loadPatternTool(points, info);
 }
 function scanPattern(data) {
     let side, A, B, C, D, S;
@@ -1485,17 +1463,8 @@ function drawPatternTool() {
                 const {
                     pattern,
                     timeRS1,
-                    tr1,
-                    tr2,
-                    tr3,
-                    pr1,
-                    pr2,
-                    pr3,
-                    fibo,
-                    sp,
+                    info: { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
                 } = calculatePattern(points);
-                const c = points.C.price;
-                const d = sp;
                 loadTimeRangeTool(timeRS1, true, true);
                 loadProgressTool([pattern], true);
                 //
@@ -1524,15 +1493,15 @@ function drawPatternTool() {
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "D";
-                changeOptions = { price: d, title: "F " + fibo };
+                changeOptions = { price: sp, title: "F " + fibo };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(params.tools.pattern[point].options());
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat((d + (d - c) * 0.5).toFixed(1)),
-                    title: "T " + parseFloat(((d - c) * 0.5).toFixed(1)),
+                    price: parseFloat((sp + X).toFixed(1)),
+                    title: "T " + parseFloat(X.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1540,8 +1509,8 @@ function drawPatternTool() {
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat((d + (d - c)).toFixed(1)),
-                    title: "T " + parseFloat((d - c).toFixed(1)),
+                    price: parseFloat((sp + Y).toFixed(1)),
+                    title: "T " + parseFloat(Y.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1549,8 +1518,8 @@ function drawPatternTool() {
                 //
                 point = "Z";
                 changeOptions = {
-                    price: parseFloat((d + (d - c) * 2).toFixed(1)),
-                    title: "T " + parseFloat(((d - c) * 2).toFixed(1)),
+                    price: parseFloat((sp + Z).toFixed(1)),
+                    title: "T " + parseFloat(Z.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -1567,17 +1536,8 @@ function drawPatternTool() {
                 const {
                     pattern,
                     timeRS1,
-                    tr1,
-                    tr2,
-                    tr3,
-                    pr1,
-                    pr2,
-                    pr3,
-                    fibo,
-                    sp,
+                    info: { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
                 } = calculatePattern(points);
-                const c = points.C.price;
-                const d = sp;
                 loadTimeRangeTool(timeRS1, true, true);
                 loadProgressTool([pattern], true);
                 //
@@ -1604,7 +1564,7 @@ function drawPatternTool() {
                 param.data.push(mf.cloneDeep(option));
                 //
                 option.point = "D";
-                option.price = d;
+                option.price = sp;
                 option.title = "F " + fibo;
                 option.color = "#4CAF50";
                 params.tools.pattern[option.point] =
@@ -1613,8 +1573,8 @@ function drawPatternTool() {
                 param.data.push(mf.cloneDeep(option));
                 //
                 option.point = "X";
-                option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
-                option.title = "T " + parseFloat(((d - c) * 0.5).toFixed(1));
+                option.price = parseFloat((sp + X).toFixed(1));
+                option.title = "T " + parseFloat(X.toFixed(1));
                 option.color = "#2196F3";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1623,8 +1583,8 @@ function drawPatternTool() {
                 param.data.push(mf.cloneDeep(option));
                 //
                 option.point = "Y";
-                option.price = parseFloat((d + (d - c)).toFixed(1));
-                option.title = "T " + parseFloat((d - c).toFixed(1));
+                option.price = parseFloat((sp + Y).toFixed(1));
+                option.title = "T " + parseFloat(Y.toFixed(1));
                 option.color = "#673AB7";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1633,8 +1593,8 @@ function drawPatternTool() {
                 param.data.push(mf.cloneDeep(option));
                 //
                 option.point = "Z";
-                option.price = parseFloat((d + (d - c) * 2).toFixed(1));
-                option.title = "T " + parseFloat(((d - c) * 2).toFixed(1));
+                option.price = parseFloat((sp + Z).toFixed(1));
+                option.title = "T " + parseFloat(Z.toFixed(1));
                 option.color = "#9C27B0";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1666,7 +1626,7 @@ function drawPatternTool() {
 }
 function loadPatternTool(
     { A, B, C },
-    { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp },
+    { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
     isStore = false
 ) {
     if (!params.data.price.length) return false;
@@ -1683,8 +1643,6 @@ function loadPatternTool(
         points: [],
         data: [],
     };
-    const c = C.price;
-    const d = sp;
     //
     option.point = "A";
     option.title = `A ${tr1} ${pr1}`;
@@ -1706,7 +1664,7 @@ function loadPatternTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "C";
-    option.price = c;
+    option.price = C.price;
     option.title = `C ${tr3} ${pr3}`;
     option.color = "#FF9800";
     params.tools.pattern[option.point] =
@@ -1715,7 +1673,7 @@ function loadPatternTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "D";
-    option.price = d;
+    option.price = sp;
     option.title = "F " + fibo;
     option.color = "#4CAF50";
     params.tools.pattern[option.point] =
@@ -1724,8 +1682,8 @@ function loadPatternTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "X";
-    option.price = parseFloat((d + (d - c) * 0.5).toFixed(1));
-    option.title = "T " + parseFloat(((d - c) * 0.5).toFixed(1));
+    option.price = parseFloat((sp + X).toFixed(1));
+    option.title = "T " + parseFloat(X.toFixed(1));
     option.color = "#2196F3";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1734,8 +1692,8 @@ function loadPatternTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "Y";
-    option.price = parseFloat((d + (d - c)).toFixed(1));
-    option.title = "T " + parseFloat((d - c).toFixed(1));
+    option.price = parseFloat((sp + Y).toFixed(1));
+    option.title = "T " + parseFloat(Y.toFixed(1));
     option.color = "#673AB7";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1744,8 +1702,8 @@ function loadPatternTool(
     param.data.push(mf.cloneDeep(option));
     //
     option.point = "Z";
-    option.price = parseFloat((d + (d - c) * 2).toFixed(1));
-    option.title = "T " + parseFloat(((d - c) * 2).toFixed(1));
+    option.price = parseFloat((sp + Z).toFixed(1));
+    option.title = "T " + parseFloat(Z.toFixed(1));
     option.color = "#9C27B0";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1755,7 +1713,7 @@ function loadPatternTool(
     //
     if (isStore) store.dispatch("tradingDerivative/drawTools", param);
 }
-function calculatePattern(points) {
+function calculatePattern(points, spDefault = null) {
     const phase1 = scanPhase(points.A, points.B);
     const phase2 = scanPhase(phase1.R, points.C, phase1.tr);
     const phase3 = scanPhase(phase2.R, phase2.S, phase1.tr);
@@ -1812,29 +1770,32 @@ function calculatePattern(points) {
     //
     const pattern = validatePattern(tr2, tr3, pr2, pr3);
     //
-    let prMax = 0,
+    let sp = spDefault;
+    if (!sp) {
+        let prMax = 0;
         sp = points.B.price;
-    if (tr2 > 0 && tr2 < 4 && cmp(rs2, side, prMax)) {
-        sp = phase2.S1.price;
-        prMax = rs2;
-    }
-    if (tr3 > 0 && cmp(rs3, side, prMax)) {
-        sp = phase3.R1.price;
+        if (tr2 > 0 && cmp(rs2, side, prMax)) {
+            prMax = rs2;
+            sp = tr2 < 4 ? phase2.S1.price : phase3.S1.price;
+        }
+        if (tr3 > 0 && cmp(rs3, side, prMax)) {
+            sp = phase3.R1.price;
+        }
     }
     //
-    const fibo = parseInt((Math.abs(points.C.price - sp) / cb) * 100);
+    const fibo = parseInt(
+        (tr2 == 4
+            ? (sp - phase3.R1.price) / (points.C.price - phase3.R1.price)
+            : (points.C.price - sp) / cb) * 100
+    );
     //
+    const Y = sp - (tr2 == 4 ? phase3.R1.price : points.C.price);
+    const X = 0.5 * Y;
+    const Z = 2 * Y;
     return {
         pattern,
         timeRS1,
-        tr1,
-        tr2,
-        tr3,
-        pr1,
-        pr2,
-        pr3,
-        fibo,
-        sp,
+        info: { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
     };
 }
 function scanPhase(start, end, trRef = 0) {
@@ -1895,8 +1856,11 @@ function scanPhase(start, end, trRef = 0) {
                 box.S.time = time;
                 if (cmp(price, !side, box.S.price)) box.S.price = price;
             }
+            if (cmp(price, !side, S.price)) {
+                box.S.price = S.price;
+                return false;
+            }
             if (!cmp(price, !side, R.price)) return false;
-            if (cmp(price, !side, S.price)) return false;
             return true;
         });
     const ir = box.S.index - box.R.index;
