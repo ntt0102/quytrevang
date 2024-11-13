@@ -1862,8 +1862,9 @@ function scanPhase(S, R) {
                 box.S.time = time;
                 if (cmp(price, !side, box.S.price)) box.S.price = price;
             }
-            if (cmp(price, side, R.price, true)) return false;
-            else return true;
+            if (!cmp(price, !side, R.price)) return false;
+            if (cmp(price, !side, S.price)) return false;
+            return true;
         });
     const ir = box.S.index - box.R.index;
     if (ir > maxBox.tr) {
