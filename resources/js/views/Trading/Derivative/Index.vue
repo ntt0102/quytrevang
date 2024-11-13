@@ -1752,8 +1752,8 @@ function loadPatternTool(
 }
 function calculatePattern(points) {
     const phase1 = scanPhase(points.A, points.B);
-    const phase2 = scanPhase(phase1.R, points.C);
-    const phase3 = scanPhase(phase2.R, points.B);
+    const phase2 = scanPhase(phase1.R, points.C, phase1.tr);
+    const phase3 = scanPhase(phase2.R, points.B, phase1.tr);
     //
     const timeRS1 = [phase1.R1.time, phase1.S1.time];
     //
@@ -1874,8 +1874,8 @@ function scanPhase(S, R, trRef = 0) {
             return true;
         });
     const ir = box.S.index - box.R.index;
-    if (ir > maxBox.tr) {
-        const pr = Math.abs(box.S.price - box.R.price);
+    const pr = Math.abs(box.S.price - box.R.price);
+    if ((ir >= maxBox.tr && pr >= maxBox.pr) || pr >= 2 * maxBox.pr) {
         maxBox.tr = ir;
         maxBox.pr = pr;
         maxBox.R = box.R;
