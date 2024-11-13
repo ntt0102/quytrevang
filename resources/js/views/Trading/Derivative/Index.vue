@@ -1792,10 +1792,6 @@ function calculatePattern(points) {
     //
     let prMax = 0,
         sp = points.B.price;
-    if (tr1 >= 1) {
-        sp = phase1.R1.price;
-        prMax = rs1;
-    }
     if (tr2 >= 1 && cmp(rs2, side, prMax)) {
         sp = phase2.S1.price;
         prMax = rs2;
