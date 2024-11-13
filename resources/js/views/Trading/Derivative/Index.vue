@@ -138,8 +138,8 @@
                     <div
                         class="popup command"
                         :class="{
-                            green: state.progress[0] <= 1,
-                            red: state.progress[0] > 1,
+                            green: state.progress[0] <= 2,
+                            red: state.progress[0] > 2,
                         }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="showProgressToolPopup"
@@ -811,7 +811,7 @@ function eventPriceLineDrag(e) {
                 const c = points.C.price;
                 let d = sp;
                 loadTimeRangeTool(timeRS1, true, true);
-                loadProgressTool(pattern, true);
+                loadProgressTool([pattern], true);
                 //
                 point = "A";
                 changeOptions = { title: `A ${tr1} ${pr1}` };
@@ -986,7 +986,7 @@ function loadToolsData(toolsData) {
                 loadTimeRangeTool(Object.values(points));
                 break;
             case "progress":
-                state.progress = Object.values(points)[0];
+                loadProgressTool(Object.values(points)[0]);
                 break;
             case "target":
             case "pattern":
@@ -997,7 +997,11 @@ function loadToolsData(toolsData) {
                 );
                 break;
             case "auto":
-                if (!("pattern" in toolsData)) loadAutoScanTool(toolsData);
+                loadAutoScanTool(
+                    toolsData.auto,
+                    !("pattern" in toolsData),
+                    !("tr" in toolsData)
+                );
                 break;
         }
     });
@@ -1336,7 +1340,7 @@ function drawAutoScanTool() {
         calculatePattern(points);
 
     loadTimeRangeTool(timeRS1, true);
-    loadProgressTool(pattern);
+    loadProgressTool([pattern]);
     removePatternTool(false);
     loadPatternTool(points, { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp });
     if (JSON.stringify(params.tools.auto) != JSON.stringify(points)) {
@@ -1348,15 +1352,16 @@ function drawAutoScanTool() {
         store.dispatch("tradingDerivative/drawTools", param);
     }
 }
-function loadAutoScanTool(data) {
-    const points = mf.cloneDeep(data.auto);
+function loadAutoScanTool(data, loadPattern = true, loadTimeRange = true) {
+    if (!loadPattern) return false;
+    const points = mf.cloneDeep(data);
     params.tools.auto = points;
     const { pattern, timeRS1, tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp } =
         calculatePattern(points);
     if (!mf.isSet(points)) return false;
 
-    loadTimeRangeTool(timeRS1, true);
-    loadProgressTool(pattern);
+    if (loadTimeRange) loadTimeRangeTool(timeRS1, true);
+    loadProgressTool([pattern]);
     loadPatternTool(points, {
         tr1,
         tr2,
@@ -1492,7 +1497,7 @@ function drawPatternTool() {
                 const c = points.C.price;
                 const d = sp;
                 loadTimeRangeTool(timeRS1, true, true);
-                loadProgressTool(pattern, true);
+                loadProgressTool([pattern], true);
                 //
                 point = "A";
                 changeOptions = {
@@ -1574,7 +1579,7 @@ function drawPatternTool() {
                 const c = points.C.price;
                 const d = sp;
                 loadTimeRangeTool(timeRS1, true, true);
-                loadProgressTool(pattern, true);
+                loadProgressTool([pattern], true);
                 //
                 let point = "A";
                 params.tools.pattern[point].applyOptions({
@@ -1753,7 +1758,7 @@ function loadPatternTool(
 function calculatePattern(points) {
     const phase1 = scanPhase(points.A, points.B);
     const phase2 = scanPhase(phase1.R, points.C, phase1.tr);
-    const phase3 = scanPhase(phase2.R, points.B, phase1.tr);
+    const phase3 = scanPhase(phase2.R, phase2.S, phase1.tr);
     //
     const timeRS1 = [phase1.R1.time, phase1.S1.time];
     //
@@ -1791,6 +1796,18 @@ function calculatePattern(points) {
             else if (cb / ab < 0.5 && (phase3.count > 1 || phase3.over))
                 tr3 = 2;
         }
+        //
+        if (
+            tr2 == 0 &&
+            pr2 > 50 &&
+            tr3 == 0 &&
+            pr3 > 50 &&
+            phase2.tr > 0.5 * phase1.tr &&
+            phase2.pr > 0.5 * phase1.pr &&
+            phase3.R.index - phase3.S.index >= phase1.tr &&
+            Math.abs(phase3.S.price - phase3.R1.price) >= phase1.pr
+        )
+            tr2 = 4;
     }
     //
     const pattern = validatePattern(tr2, tr3, pr2, pr3);
@@ -1820,7 +1837,9 @@ function calculatePattern(points) {
         sp,
     };
 }
-function scanPhase(S, R, trRef = 0) {
+function scanPhase(start, end, trRef = 0) {
+    let S = mf.cloneDeep(start);
+    let R = mf.cloneDeep(end);
     const side = R.price > S.price;
     let box = {},
         maxBox = {};
@@ -1892,7 +1911,9 @@ function scanPhase(S, R, trRef = 0) {
             if (ir >= 3 * trRef) maxBox.over = true;
         }
     }
-    if (!R.time) R.time = box.S.time;
+    R.time = box.S.time;
+    S.index = getTimeIndex(S.time);
+    R.index = getTimeIndex(R.time);
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
@@ -1906,13 +1927,13 @@ function scanPhase(S, R, trRef = 0) {
 }
 function validatePattern(tr2, tr3, pr2, pr3) {
     if (pr2 >= pr3) {
-        if (tr2 > 0) return 0;
+        if (tr2 > 0) return tr2 < 4 ? 0 : 2;
         else if (tr3 > 0) return 1;
     } else {
         if (tr3 > 0) return 1;
-        else if (tr2 > 0) return 0;
+        else if (tr2 > 0) return tr2 < 4 ? 0 : 2;
     }
-    return 2;
+    return 3;
 }
 function removePatternTool(withServer = true, onlyServer = false) {
     if (withServer)
@@ -2228,7 +2249,7 @@ function showProgressToolPopup() {
     state.showLineContext = false;
 }
 function loadProgressTool(data, isStore = false) {
-    state.progress = [data];
+    state.progress = data;
     if (isStore) progressChange(state.progress);
 }
 function removeProgressTool(withServer = true, onlyServer = false) {

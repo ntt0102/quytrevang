@@ -1,1 +1,0 @@
-const h={items:[{name:"1. Tích luỹ hình thang",items:"<u>Entry</u>: Chờ vào lệnh"},{name:"2. Tích luỹ hình tam giác",items:"<u>Entry</u>: Chờ vào lệnh"},{name:"3. Không tích luỹ",items:"<u>Entry</u>: Không vào lệnh"}]};export{h as default};

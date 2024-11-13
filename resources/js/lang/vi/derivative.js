@@ -1,15 +1,19 @@
 export default {
     items: [
         {
-            name: "1. Tích luỹ hình thang",
+            name: "1. Tiếp diễn hình thang",
             items: "<u>Entry</u>: Chờ vào lệnh",
         },
         {
-            name: "2. Tích luỹ hình tam giác",
+            name: "2. Tiếp diễn tam giác",
             items: "<u>Entry</u>: Chờ vào lệnh",
         },
         {
-            name: "3. Không tích luỹ",
+            name: "3. Đảo chiều",
+            items: "<u>Entry</u>: Chờ lệnh đảo chiều",
+        },
+        {
+            name: "4. Không có mẫu hình",
             items: "<u>Entry</u>: Không vào lệnh",
         },
         // {
