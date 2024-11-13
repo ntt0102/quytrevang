@@ -1764,28 +1764,32 @@ function calculatePattern(points) {
     const rs2 = phase2.R1.price - phase2.S1.price;
     const rs3 = phase3.S1.price - phase3.R1.price;
     let [tr1, tr2, tr3, pr1, pr2, pr3] = Array(6).fill(0);
+    pr1 = parseInt((rs1 / ab) * 100);
     if (
         cmp(phase1.R1.price, side, points.B.price) &&
         cmp(phase1.S1.price, !side, points.C.price)
     ) {
         tr1 = 1;
     }
-    pr1 = parseInt((rs1 / ab) * 100);
     if (Math.abs(cb) > 1.5 && cmp(cb, side, rs1)) {
-        if (phase2.tr >= phase1.tr && phase2.tr < 3 * phase1.tr) tr2 = 1;
-        else if (phase2.tr >= 3 * phase1.tr && cb / ab < 0.5) tr2 = 2;
-        else if (
-            tr1 == 1 &&
-            cmp(phase2.S1.price, !side, phase1.R1.price) &&
-            cmp(phase2.R1.price, side, phase1.S1.price)
-        ) {
-            tr2 = 3;
-        }
         pr2 = parseInt((rs2 / cb) * 100);
+        if (pr2 > 50) {
+            if (phase2.tr >= phase1.tr && phase2.tr < 3 * phase1.tr) tr2 = 1;
+            else if (phase2.tr >= 3 * phase1.tr && cb / ab < 0.5) tr2 = 2;
+            else if (
+                tr1 == 1 &&
+                cmp(phase2.S1.price, !side, phase1.R1.price) &&
+                cmp(phase2.R1.price, side, phase1.S1.price)
+            ) {
+                tr2 = 3;
+            }
+        }
         //
-        if (phase3.tr >= phase1.tr && phase3.tr < 3 * phase1.tr) tr3 = 1;
-        else if (phase3.tr >= 3 * phase1.tr && cb / ab < 0.5) tr3 = 2;
         pr3 = parseInt((rs3 / cb) * 100);
+        if (pr3 > 40) {
+            if (phase3.tr >= phase1.tr && phase3.tr < 3 * phase1.tr) tr3 = 1;
+            else if (phase3.tr >= 3 * phase1.tr && cb / ab < 0.5) tr3 = 2;
+        }
     }
     //
     const pattern = validatePattern(tr2, tr3, pr2, pr3);
