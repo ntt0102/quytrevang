@@ -1845,8 +1845,8 @@ function scanPhase(S, R) {
                 const ir = box.S.index - box.R.index;
                 const pr = Math.abs(box.S.price - box.R.price);
                 if (
-                    (ir > maxBox.tr && pr > 0.5 * maxBox.pr) ||
-                    (ir > 0.5 * maxBox.tr && pr > 2 * maxBox.pr)
+                    (ir >= maxBox.tr && pr >= maxBox.pr) ||
+                    pr >= 2 * maxBox.pr
                 ) {
                     maxBox.tr = ir;
                     maxBox.pr = pr;
