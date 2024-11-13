@@ -1847,23 +1847,30 @@ function scanPhase(S, R, trRef = 0) {
             if (cmp(price, side, box.R.price)) {
                 const ir = box.S.index - box.R.index;
                 const pr = Math.abs(box.S.price - box.R.price);
-                if (
-                    (ir >= maxBox.tr && pr >= maxBox.pr) ||
-                    pr >= 2 * maxBox.pr
-                ) {
+                if (ir >= maxBox.tr && pr >= maxBox.pr) {
                     maxBox.tr = ir;
                     maxBox.pr = pr;
                     maxBox.R = box.R;
                     maxBox.S = box.S;
-                    if (trRef > 0) {
+                    if (trRef > 0 && ir >= trRef) {
                         maxBox.count++;
-                        if (ir >= 3 * maxBox.tr) maxBox.over = true;
+                        if (ir >= 3 * trRef) maxBox.over = true;
                     }
                 }
                 box = {
                     R: { index, time, price },
                     S: { index, time, price },
                 };
+                if (pr >= 2 * maxBox.pr) {
+                    maxBox = {
+                        R: box.R,
+                        S: box.S,
+                        pr: 0,
+                        tr: 0,
+                        count: 0,
+                        over: false,
+                    };
+                }
             } else {
                 box.S.index = index;
                 box.S.time = time;
@@ -1880,9 +1887,9 @@ function scanPhase(S, R, trRef = 0) {
         maxBox.pr = pr;
         maxBox.R = box.R;
         maxBox.S = box.S;
-        if (trRef > 0) {
+        if (trRef > 0 && ir >= trRef) {
             maxBox.count++;
-            if (ir >= 3 * maxBox.tr) maxBox.over = true;
+            if (ir >= 3 * trRef) maxBox.over = true;
         }
     }
     if (!R.time) R.time = box.S.time;
@@ -2655,7 +2662,12 @@ function cmp(value1, side, value2, eq = false) {
     else return eq ? value1 <= value2 : value1 < value2;
 }
 function getTimeIndex(time) {
-    return params.data.whitespace.findIndex((item) => item.time == time);
+    let index = -1;
+    while (index == -1) {
+        index = params.data.whitespace.findIndex((item) => item.time == time);
+        time--;
+    }
+    return index;
 }
 </script>
 <style lang="scss">
