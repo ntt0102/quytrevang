@@ -1392,7 +1392,7 @@ function scanPattern(data) {
                 A = { index, time, price };
                 S = mf.cloneDeep(A);
                 side = !side;
-            } else if (D.index - C.index <= 5) {
+            } else if (D.index - C.index <= 20) {
                 D = mf.cloneDeep(C);
                 B = mf.cloneDeep(C);
                 C = { index, time, price };
@@ -1407,8 +1407,7 @@ function scanPattern(data) {
         //
         if (C.index > A.index) {
             const bc = Math.abs(B.price - C.price);
-            const cd = Math.abs(C.price - D.price);
-            if (bc >= 1.5 && cd / bc > 0.5) {
+            if (bc >= 1.5) {
                 if (A.index - S.index > D.index - B.index) break;
                 const as = Math.abs(A.price - S.price);
                 if (as > bc) break;
@@ -1765,15 +1764,14 @@ function calculatePattern(points) {
     const rs2 = phase2.R1.price - phase2.S1.price;
     const rs3 = phase3.S1.price - phase3.R1.price;
     let [tr1, tr2, tr3, pr1, pr2, pr3] = Array(6).fill(0);
-    if (Math.abs(cb) > 1.5) {
-        if (
-            cmp(phase1.R1.price, side, points.B.price) &&
-            cmp(phase1.S1.price, !side, points.C.price)
-        ) {
-            tr1 = 1;
-            pr1 = parseInt((100 * rs1) / cb);
-        }
-        //
+    if (
+        cmp(phase1.R1.price, side, points.B.price) &&
+        cmp(phase1.S1.price, !side, points.C.price)
+    ) {
+        tr1 = 1;
+    }
+    pr1 = parseInt((rs1 / ab) * 100);
+    if (Math.abs(cb) > 1.5 && cmp(cb, side, rs1)) {
         if (phase2.tr >= phase1.tr && phase2.tr < 3 * phase1.tr) tr2 = 1;
         else if (phase2.tr >= 3 * phase1.tr && cb / ab < 0.5) tr2 = 2;
         else if (
@@ -1783,11 +1781,11 @@ function calculatePattern(points) {
         ) {
             tr2 = 3;
         }
-        pr2 = parseInt((100 * rs2) / cb);
+        pr2 = parseInt((rs2 / cb) * 100);
         //
         if (phase3.tr >= phase1.tr && phase3.tr < 3 * phase1.tr) tr3 = 1;
         else if (phase3.tr >= 3 * phase1.tr && cb / ab < 0.5) tr3 = 2;
-        pr3 = parseInt((100 * rs3) / cb);
+        pr3 = parseInt((rs3 / cb) * 100);
     }
     //
     const pattern = validatePattern(tr2, tr3, pr2, pr3);
