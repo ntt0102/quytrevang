@@ -156,7 +156,7 @@ function getCount(routeName) {
 
     .menu-container {
         background-color: $base-bg;
-        background-image: url("../../../../images/background-sidebar.jpg");
+        background-image: url("../../../../images/background-sidebar.jpg") !important;
         background-size: cover;
         background-repeat: no-repeat;
         background-position: left top;
@@ -166,11 +166,8 @@ function getCount(routeName) {
         padding-bottom: 60px;
 
         .dx-treeview {
-            // ## Long text positioning
             white-space: nowrap;
-            // ##
 
-            // ## Icon width customization
             .dx-treeview-item {
                 padding-left: 0;
                 padding-right: 0;
@@ -185,9 +182,7 @@ function getCount(routeName) {
                     padding-left: 1px;
                 }
             }
-            // ##
 
-            // ## Arrow customization
             .dx-treeview-node {
                 padding: 0 0 !important;
             }
@@ -201,9 +196,7 @@ function getCount(routeName) {
                 left: 10px;
                 right: auto;
             }
-            // ##
 
-            // ## Item levels customization
             .dx-treeview-node {
                 &[aria-level="1"] {
                     font-weight: bold;
@@ -215,10 +208,8 @@ function getCount(routeName) {
                     padding: 0 calc($side-panel-min-width/4);
                 }
             }
-            // ##
         }
 
-        // ## Selected & Focuced items customization
         .dx-treeview {
             .dx-treeview-node-container {
                 .dx-treeview-node {
@@ -247,7 +238,6 @@ function getCount(routeName) {
                 color: inherit;
             }
         }
-        // ##
     }
 
     .item {
