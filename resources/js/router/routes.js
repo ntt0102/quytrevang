@@ -76,7 +76,8 @@ const authRoute = [
     // User
     {
         path: "/",
-        redirect: `/${lang.global.t("route.overview")}`,
+        // redirect: `/${lang.global.t("route.overview")}`,
+        redirect: `/${lang.global.t("route.tradingDerivative")}`,
     },
     {
         path: `/${lang.global.t("route.overview")}`,
