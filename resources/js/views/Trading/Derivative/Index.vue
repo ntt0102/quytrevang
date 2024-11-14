@@ -58,9 +58,7 @@
                         class="command"
                         :class="{ yellow: status.pending }"
                         :title="$t('trading.derivative.connection')"
-                        @click="
-                            () => $store.dispatch('tradingDerivative/getStatus')
-                        "
+                        @click="getStatus"
                     >
                         <i
                             class="far"
@@ -96,15 +94,12 @@
                         ref="reloadToolRef"
                         class="command"
                         :title="$t('trading.derivative.reload')"
-                        @click="() => resetChart(false)"
-                        @contextmenu="() => resetChart(true)"
+                        @click="resetChart"
                     >
                         <i
                             class="far fa-sync-alt"
                             :class="{
-                                'fa-spin':
-                                    $store.state.tradingDerivative
-                                        .isChartLoading,
+                                'fa-spin': isChartLoading,
                             }"
                         ></i>
                     </div>
@@ -133,7 +128,7 @@
                         class="command far fa-chart-candlestick"
                         :title="$t('trading.derivative.tradingview')"
                         @click="tradingviewClick"
-                        @contextmenu="resetTools"
+                        @contextmenu="getTools"
                     ></div>
                     <div
                         class="popup command"
@@ -398,6 +393,9 @@ const state = reactive({
 const status = computed(() => store.state.tradingDerivative.status);
 const config = computed(() => store.state.tradingDerivative.config);
 const tools = computed(() => store.state.tradingDerivative.tools);
+const isChartLoading = computed(
+    () => store.state.tradingDerivative.isChartLoading
+);
 const showCancelOrder = computed(
     () =>
         status.value.position != 0 ||
@@ -414,17 +412,17 @@ store.dispatch("tradingDerivative/initChart").then(() => {
     if (!route.query.date && config.value.lastOpeningDate)
         state.chartDate = config.value.lastOpeningDate;
     store
-        .dispatch("tradingDerivative/getChartData", { date: state.chartDate })
+        .dispatch("tradingDerivative/getChartData", state.chartDate)
         .then((hasData) => {
-            if (hasData) store.dispatch("tradingDerivative/getTools");
+            if (hasData) getTools();
         });
 });
 
 params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
     if (inSession()) {
-        store.dispatch("tradingDerivative/getStatus");
-        if (config.value.autoScan) resetTools();
+        getStatus();
+        if (config.value.autoScan) getTools();
     } else clearInterval(params.interval60);
 }, 60000);
 
@@ -887,7 +885,7 @@ function loadToolsData(toolsData) {
 }
 function loadChartData(chartData) {
     if (!(state.chartDate == CURRENT_DATE && inSession())) {
-        if (!chartData.isDay && chartData.price.length > 0) {
+        if (chartData.length > 0) {
             params.data.whitespace = mergeChartData(
                 params.data.whitespace,
                 createWhitespaceData(state.chartDate)
@@ -895,11 +893,11 @@ function loadChartData(chartData) {
         }
         params.series.whitespace.setData(params.data.whitespace);
 
-        params.data.price = mergeChartData(params.data.price, chartData.price);
+        params.data.price = mergeChartData(params.data.price, chartData);
         params.series.price.setData(params.data.price);
     }
 }
-function updateChartData(data, lastVolume) {
+function updateChartData(data) {
     let prices = [];
     data.forEach((item) => {
         const time = getUnixTime(addHours(new Date(item.date), 7));
@@ -960,13 +958,13 @@ function connectSocket() {
         data.forEach((item) => {
             if (!item) return false;
             if (item.type == 3) {
-                store.dispatch("tradingDerivative/getTools");
+                getTools();
                 params.data.whitespace = mergeChartData(
                     params.data.whitespace,
                     createWhitespaceData(CURRENT_DATE)
                 );
                 params.series.whitespace.setData(params.data.whitespace);
-                updateChartData(item.result, 0);
+                updateChartData(item.result);
                 store.dispatch("tradingDerivative/setChartLoading", false);
             } else if (
                 item.type == 1 &&
@@ -1186,21 +1184,22 @@ function autoScanToolContextmenu(e) {
     e.target.classList.remove("selected");
 }
 function drawAutoScanTool() {
-    autoScanToolRef.value.classList.remove("selected");
     const data = params.crosshair.time
         ? params.data.price.filter((item) => item.time <= params.crosshair.time)
         : params.data.price;
     const points = scanPattern(data);
-    if (!mf.isSet(points)) return false;
-    const { pattern, timeRange, info } = calculatePattern(points);
+    if (mf.isSet(points)) {
+        const { pattern, timeRange, info } = calculatePattern(points);
 
-    removePatternTool();
-    loadPatternTool(points, info);
-    loadProgressTool([pattern]);
-    loadTimeRangeTool(timeRange);
-    savePattern(points);
+        removePatternTool();
+        loadPatternTool(points, info);
+        loadProgressTool([pattern]);
+        loadTimeRangeTool(timeRange);
+        savePattern(points);
+    }
+    autoScanToolRef.value.classList.remove("selected");
 }
-function loadAutoScanTool(data, loadTimeRange = true) {
+function loadAutoScanTool(data, loadTimeRange) {
     const points = mf.cloneDeep(data);
     params.tools.auto = points;
     const { pattern, timeRange, info } = calculatePattern(points);
@@ -1701,7 +1700,7 @@ function validatePattern(tr2, tr3) {
     else if (tr2 > 0) return tr2 + 2;
     return 0;
 }
-function savePattern(points) {
+function savePattern(points = {}) {
     let isRemove = !mf.isSet(points);
     let param = {
         isRemove,
@@ -2142,7 +2141,7 @@ function cancelOrderClick() {
                     }
                 });
         }
-    } else resetTools();
+    } else getTools();
 }
 function scanOrder(lastPrice) {
     if (mf.isSet(params.tools.order.entry.line)) {
@@ -2268,21 +2267,21 @@ function toastOrderError(error) {
 }
 function dateSelectChange() {
     if (!state.chartDate) return false;
-    store.dispatch("tradingDerivative/getChartData", { date: state.chartDate });
+    store.dispatch("tradingDerivative/getChartData", state.chartDate);
 }
 function refreshChart() {
     if (inSession()) params.websocket.send(params.socketSendData);
 }
-function resetChart(isDay) {
+function resetChart() {
     params.data.whitespace = [];
     params.data.price = [];
     refreshChart();
-    store.dispatch("tradingDerivative/getChartData", {
-        date: state.chartDate,
-        isDay,
-    });
+    store.dispatch("tradingDerivative/getChartData", state.chartDate);
 }
-function resetTools() {
+function getStatus() {
+    store.dispatch("tradingDerivative/getStatus");
+}
+function getTools() {
     store.dispatch("tradingDerivative/getTools");
 }
 function initToolsParams(tools) {

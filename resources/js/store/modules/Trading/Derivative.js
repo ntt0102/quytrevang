@@ -1,6 +1,6 @@
 function initialState() {
     return {
-        status: { connection: true, position: 0, pending: false },
+        status: { connection: false, position: 0, pending: false },
         config: {},
         tools: [],
         chartData: [],
@@ -11,19 +11,18 @@ function initialState() {
 const getters = {};
 
 const actions = {
-    getChartData({ commit, dispatch, getters, state, rootGetters }, param) {
+    getChartData({ commit, dispatch, getters, state, rootGetters }, date) {
         commit("setChartLoading", true);
-        param.isDay = param.isDay || false;
         return new Promise((resolve, reject) => {
             axios
                 .get("trading/derivative", {
-                    params: param,
+                    params: { date },
                     noLoading: true,
                 })
                 .then((response) => {
                     commit("setChartData", response.data);
                     commit("setChartLoading", false);
-                    resolve(!!response.data.price.length);
+                    resolve(!!response.data.length);
                 });
         });
     },

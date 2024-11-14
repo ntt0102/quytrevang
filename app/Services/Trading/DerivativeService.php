@@ -21,11 +21,7 @@ class DerivativeService extends CoreService
      */
     public function getChartData($payload)
     {
-        if ($payload->isDay)
-            $data = $this->generateDayData($payload->date);
-        else $data = $this->generateDataFromCsv($payload->date);
-        $data['isDay'] = $payload->isDay;
-        return $data;
+        return $this->generateDataFromCsv($payload->date);
     }
 
     /**
@@ -221,75 +217,20 @@ class DerivativeService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $data = ['price' => [], 'volume' => []];
+        $data = [];
         $file = storage_path('app/phaisinh/' . $date . '.csv');
         if (!file_exists($file)) return $data;
         $fp = fopen($file, 'r');
-        $volume = 0;
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
-                $data['price'][] = [
+                $data[] = [
                     'time' => +$line[0],
                     'value' => +$line[1],
-                ];
-                $volume += +$line[3] * +$line[2];
-                $data['volume'][] = [
-                    'time' => +$line[0],
-                    'value' => $volume,
                 ];
             }
         }
         fclose($fp);
-        return $data;
-    }
-    /**
-     * generate Data From Csv
-     */
-    public function generateDayData($date)
-    {
-        $data = ['price' => [], 'volume' => []];
-        $idx = 0;
-        $dt = date_create_from_format('Y-m-d', $date);
-        $directory = storage_path('app/phaisinh');
-        $count = count(glob($directory . '/*.csv'));
-        $dayData = [];
-        while ($idx < min($count, 60)) {
-            $dtStr = $dt->format('Y-m-d');
-            $file = $directory . '/' . $dtStr . '.csv';
-            if (file_exists($file)) {
-                $fp = fopen($file, 'r');
-                $price = 0;
-                $volsum = 0;
-                while (!feof($fp)) {
-                    $line = fgetcsv($fp);
-                    if (!!$line) {
-                        $price = +$line[1];
-                        $volsum += +$line[3] * +$line[2];
-                    }
-                }
-                fclose($fp);
-                array_unshift($dayData, [
-                    'time' => strtotime($dtStr) + self::SHIFT_TIME,
-                    'price' => $price,
-                    'volume' => $volsum,
-                ]);
-                $idx++;
-            }
-            $dt->sub(new \DateInterval('P1D'));
-        }
-        $volume = 0;
-        foreach ($dayData as $item) {
-            $data['price'][] = [
-                'time' => $item['time'],
-                'value' => $item['price'],
-            ];
-            $volume += $item['volume'];
-            $data['volume'][] = [
-                'time' => $item['time'],
-                'value' => $volume,
-            ];
-        }
         return $data;
     }
 
