@@ -530,7 +530,7 @@ function eventPriceLineDrag(e) {
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
-                                    drawOrderLine([lineOptions.kind]);
+                                    drawOrderTool([lineOptions.kind]);
                                     toast.success(
                                         t(
                                             "trading.derivative.changeEntrySuccess"
@@ -558,7 +558,7 @@ function eventPriceLineDrag(e) {
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
-                                    drawOrderLine([lineOptions.kind]);
+                                    drawOrderTool([lineOptions.kind]);
                                     toast.success(
                                         t("trading.derivative.changeTpSuccess")
                                     );
@@ -580,7 +580,7 @@ function eventPriceLineDrag(e) {
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
-                                    drawOrderLine([lineOptions.kind]);
+                                    drawOrderTool([lineOptions.kind]);
                                     toast.success(
                                         t("trading.derivative.changeSlSuccess")
                                     );
@@ -848,12 +848,7 @@ function loadToolsData(toolsData) {
     Object.entries(toolsData).forEach(([name, points]) => {
         switch (name) {
             case "order":
-                Object.entries(points).forEach(([point, line]) => {
-                    params.tools.order.side = line.side;
-                    params.tools.order[point].price = line.price;
-                    params.tools.order[point].line =
-                        params.series.price.createPriceLine(line);
-                });
+                loadOrderTool(points);
                 break;
             case "pattern":
                 loadPatternTool(toolsData.pattern, !("tr" in toolsData));
@@ -996,7 +991,7 @@ function intervalHandler() {
                         })
                         .then((resp) => {
                             if (resp.isOk) {
-                                removeOrderLine(["entry", "tp", "sl"]);
+                                removeOrderTool(["entry", "tp", "sl"]);
                                 toast.success(
                                     t(
                                         "trading.derivative.autoCancelTpSlSuccess"
@@ -1012,7 +1007,7 @@ function intervalHandler() {
     }
     state.clock = format(new Date(), "HH:mm:ss");
 }
-function drawOrderLine(kinds) {
+function drawOrderTool(kinds) {
     const TYPE = "order";
     let param = {
         isRemove: false,
@@ -1072,7 +1067,15 @@ function drawOrderLine(kinds) {
     });
     store.dispatch("tradingDerivative/drawTools", param);
 }
-function removeOrderLine(kinds, withServer = true) {
+function loadOrderTool(kinds) {
+    Object.entries(kinds).forEach(([kind, option]) => {
+        params.tools.order.side = option.side;
+        params.tools.order[kind].price = option.price;
+        params.tools.order[kind].line =
+            params.series.price.createPriceLine(option);
+    });
+}
+function removeOrderTool(kinds, withServer = true) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
@@ -1958,9 +1961,8 @@ function sampleToolClick() {
     state.showLineContext = false;
 }
 function removeAllTools() {
-    removeOrderLine(["entry", "tp", "sl"], false);
+    removeOrderTool(["entry", "tp", "sl"], false);
     removeLineTool(false);
-    // removeRrTool(false);
     removeTargetTool(false);
     removeTimeRangeTool(false);
     removeProgressTool();
@@ -2075,7 +2077,7 @@ function entryOrderClick() {
                 })
                 .then((resp) => {
                     if (resp.isOk) {
-                        drawOrderLine(["entry"]);
+                        drawOrderTool(["entry"]);
                         toast.success(t("trading.derivative.newEntrySuccess"));
                     } else toastOrderError(resp.message);
                 });
@@ -2128,7 +2130,7 @@ function tpslOrderClick() {
                 params.tools.order.entry.line.applyOptions({
                     draggable: false,
                 });
-                drawOrderLine(["entry", "tp", "sl"]);
+                drawOrderTool(["entry", "tp", "sl"]);
                 toast.success(t("trading.derivative.newTpSlSuccess"));
             } else toastOrderError(resp.message);
         });
@@ -2148,7 +2150,7 @@ function cancelOrderClick() {
                 })
                 .then((resp) => {
                     if (resp.isOk) {
-                        removeOrderLine(["entry", "tp", "sl"]);
+                        removeOrderTool(["entry", "tp", "sl"]);
                         toast.success(t("trading.derivative.exitSuccess"));
                     } else {
                         toastOrderError(resp.message);
@@ -2162,7 +2164,7 @@ function cancelOrderClick() {
                 })
                 .then((resp) => {
                     if (resp.isOk) {
-                        removeOrderLine(["entry"]);
+                        removeOrderTool(["entry"]);
                         toast.success(
                             t("trading.derivative.deleteEntrySuccess")
                         );
@@ -2193,7 +2195,7 @@ function scanOrder(lastPrice) {
                         })
                         .then((resp) => {
                             if (resp.isOk) {
-                                removeOrderLine(["entry", "tp", "sl"]);
+                                removeOrderTool(["entry", "tp", "sl"]);
                                 toast.success(
                                     t("trading.derivative.deleteTpSuccess")
                                 );
@@ -2220,7 +2222,7 @@ function scanOrder(lastPrice) {
                         })
                         .then((resp) => {
                             if (resp.isOk) {
-                                removeOrderLine(["entry", "tp", "sl"]);
+                                removeOrderTool(["entry", "tp", "sl"]);
                                 toast.success(
                                     t("trading.derivative.deleteSlSuccess")
                                 );
@@ -2263,7 +2265,7 @@ function scanOrder(lastPrice) {
                                     params.tools.order.entry.line.applyOptions({
                                         draggable: false,
                                     });
-                                    drawOrderLine(["entry", "tp", "sl"]);
+                                    drawOrderTool(["entry", "tp", "sl"]);
                                     toast.success(
                                         t(
                                             "trading.derivative.autoNewTpSlSuccess"
