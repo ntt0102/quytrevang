@@ -1128,7 +1128,7 @@ function scanPattern(data) {
     for (let i = data.length - 1; i >= 0; i--) {
         const price = data[i].value;
         const time = data[i].time;
-        const index = getTimeIndex(time);
+        const index = timeToIndex(time);
         if (index == -1) break;
         if (i == data.length - 1) {
             D = { index, time, price };
@@ -1429,8 +1429,6 @@ function calculatePattern(points, spDefault = null) {
     const phase2 = scanPhase(phase1.R, points.C, phase1.tr);
     const phase3 = scanPhase(phase2.R, phase2.S, phase1.tr);
     //
-    const timeRange = [phase1.R1.time, phase1.S1.time];
-    //
     const cb = points.C.price - points.B.price;
     const ab = points.A.price - points.B.price;
     const side = cb > 0;
@@ -1480,6 +1478,27 @@ function calculatePattern(points, spDefault = null) {
         }
     }
     //
+    let timeRange = [];
+    if (tr3 > 0)
+        timeRange = [
+            phase1.R1.time,
+            indexToTime(phase1.S1.index),
+            phase3.R1.time,
+        ];
+    else if (tr2 > 0 && tr2 <= 3)
+        timeRange = [
+            phase2.R1.time,
+            indexToTime(phase2.S1.index),
+            phase2.S1.time,
+        ];
+    else if (tr2 > 3)
+        timeRange = [
+            phase1.R1.time,
+            indexToTime(phase1.S1.index),
+            phase2.R.time,
+        ];
+    else timeRange = [phase1.R1.time, indexToTime(phase1.S1.index)];
+    //
     const pattern = validatePattern(tr2, tr3);
     //
     let sp = spDefault;
@@ -1521,7 +1540,7 @@ function scanPhase(start, end, trRef = 0) {
         .every((item, i) => {
             const price = item.value;
             const time = item.time;
-            const index = getTimeIndex(time);
+            const index = timeToIndex(time);
             if (index == -1) return false;
             if (i == 0 || price == S.price) {
                 box = {
@@ -1556,7 +1575,6 @@ function scanPhase(start, end, trRef = 0) {
                     Math.abs(box.R.price - maxBox.R.price) <= 0.2
                 ) {
                     maxBox.S.index = box.S.index;
-                    maxBox.S.time = box.S.time;
                     maxBox.tr = box.S.index - maxBox.R.index;
                 }
                 box = {
@@ -1575,8 +1593,10 @@ function scanPhase(start, end, trRef = 0) {
                 }
             } else {
                 box.S.index = index;
-                box.S.time = time;
-                if (cmp(price, !side, box.S.price)) box.S.price = price;
+                if (cmp(price, !side, box.S.price)) {
+                    box.S.time = time;
+                    box.S.price = price;
+                }
             }
             if (cmp(price, !side, S.price)) {
                 box.S.price = S.price;
@@ -1598,8 +1618,8 @@ function scanPhase(start, end, trRef = 0) {
         }
     }
     R.time = box.S.time;
-    S.index = getTimeIndex(S.time);
-    R.index = getTimeIndex(R.time);
+    S.index = timeToIndex(S.time);
+    R.index = timeToIndex(R.time);
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
@@ -1686,11 +1706,11 @@ function drawTimeRangeTool() {
             timeRangeToolRef.value.classList.remove("selected");
             break;
         default:
-            const index0 = getTimeIndex(params.tools.timeRange[0].time);
-            const index1 = getTimeIndex(params.tools.timeRange[1].time);
-            const index2 = getTimeIndex(time);
+            const index0 = timeToIndex(params.tools.timeRange[0].time);
+            const index1 = timeToIndex(params.tools.timeRange[1].time);
+            const index2 = timeToIndex(time);
             const index3 = index2 + (index1 - index0);
-            const time3 = params.data.whitespace[index3].time;
+            const time3 = indexToTime(index3);
 
             option.color = "OrangeRed";
             params.tools.timeRange[0] = mf.cloneDeep(option);
@@ -1709,9 +1729,21 @@ function drawTimeRangeTool() {
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function loadTimeRangeTool(data) {
+    let start, end;
+    if (data.length == 2) {
+        start = data[0];
+        end = data[1];
+    } else if (data.length == 3) {
+        const index0 = timeToIndex(data[0]);
+        const index1 = timeToIndex(data[1]);
+        const index2 = timeToIndex(data[2]);
+        const index3 = index2 + (index1 - index0);
+        start = data[2];
+        end = indexToTime(index3);
+    } else return false;
     let timeRange = [
-        { time: data[0], value: 1, color: "OrangeRed" },
-        { time: data[1], value: 1, color: "lime" },
+        { time: start, value: 1, color: "OrangeRed" },
+        { time: end, value: 1, color: "lime" },
     ];
     params.tools.timeRange = timeRange;
     params.series.timeRange.setData(timeRange);
@@ -2374,7 +2406,7 @@ function cmp(value1, side, value2, eq = false) {
     if (side) return eq ? value1 >= value2 : value1 > value2;
     else return eq ? value1 <= value2 : value1 < value2;
 }
-function getTimeIndex(time) {
+function timeToIndex(time) {
     let index = params.data.whitespace.findIndex((item) => item.time == time);
     if (index == -1) {
         const date = format(new Date(time * 1000), "yyyy-MM-dd");
@@ -2386,6 +2418,9 @@ function getTimeIndex(time) {
         index = params.data.whitespace.findIndex((item) => item.time == time);
     }
     return index;
+}
+function indexToTime(index) {
+    return params.data.whitespace[index].time;
 }
 </script>
 <style lang="scss">
