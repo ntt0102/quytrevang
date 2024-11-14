@@ -379,7 +379,7 @@ let params = {
     data: {
         whitespace: [],
         price: [],
-        volume: [],
+        // volume: [],
     },
     tools: {},
     crosshair: {},
@@ -458,13 +458,13 @@ onMounted(() => {
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    params.series.volume = params.chart.addLineSeries({
-        priceScaleId: "volume",
-        scaleMargins: { top: 0.86, bottom: 0.01 },
-        color: "#FFD700",
-        lastValueVisible: false,
-        visible: false,
-    });
+    // params.series.volume = params.chart.addLineSeries({
+    //     priceScaleId: "volume",
+    //     scaleMargins: { top: 0.86, bottom: 0.01 },
+    //     color: "#FFD700",
+    //     lastValueVisible: false,
+    //     visible: false,
+    // });
     params.series.price = params.chart.addLineSeries({
         color: "#F5F5F5",
         priceFormat: { minMove: 0.1 },
@@ -1007,37 +1007,37 @@ function loadChartData(chartData) {
 
         params.data.price = mergeChartData(params.data.price, chartData.price);
         params.series.price.setData(params.data.price);
-        params.data.volume = mergeChartData(
-            params.data.volume,
-            chartData.volume
-        );
-        params.series.volume.setData(params.data.volume);
+        // params.data.volume = mergeChartData(
+        //     params.data.volume,
+        //     chartData.volume
+        // );
+        // params.series.volume.setData(params.data.volume);
     }
 }
 function updateChartData(data, lastVolume) {
-    let prices = [],
-        volumes = [];
-    if (lastVolume == undefined) {
-        if (params.data.volume.length == 0) return false;
-        lastVolume = params.data.volume.at(-1).value;
-    }
+    let prices = [];
+    // let volumes = [];
+    // if (lastVolume == undefined) {
+    //     if (params.data.volume.length == 0) return false;
+    //     lastVolume = params.data.volume.at(-1).value;
+    // }
     data.forEach((item) => {
         const time = getUnixTime(addHours(new Date(item.date), 7));
         prices.push({ time, value: item.price });
-        lastVolume +=
-            (item.side == "B" ? 1 : item.side == "S" ? -1 : 0) * item.volume;
-        volumes.push({ time, value: lastVolume });
+        // lastVolume +=
+        //     (item.side == "B" ? 1 : item.side == "S" ? -1 : 0) * item.volume;
+        // volumes.push({ time, value: lastVolume });
     });
     if (prices.length > 1) {
         params.data.price = mergeChartData(params.data.price, prices);
         params.series.price.setData(params.data.price);
-        params.data.volume = mergeChartData(params.data.volume, volumes);
-        params.series.volume.setData(params.data.volume);
+        // params.data.volume = mergeChartData(params.data.volume, volumes);
+        // params.series.volume.setData(params.data.volume);
     } else {
         params.data.price.push(prices[0]);
         params.series.price.update(prices[0]);
-        params.data.volume.push(volumes[0]);
-        params.series.volume.update(volumes[0]);
+        // params.data.volume.push(volumes[0]);
+        // params.series.volume.update(volumes[0]);
     }
 }
 function createWhitespaceData(date) {
@@ -2579,7 +2579,7 @@ function refreshChart() {
 function resetChart(isDay) {
     params.data.whitespace = [];
     params.data.price = [];
-    params.data.volume = [];
+    // params.data.volume = [];
     refreshChart();
     store.dispatch("tradingDerivative/getChartData", {
         date: state.chartDate,
