@@ -1,20 +1,36 @@
 export default {
     items: [
         {
-            name: "1. Tiếp diễn hình thang",
-            items: "<u>Entry</u>: Chờ vào lệnh",
-        },
-        {
-            name: "2. Tiếp diễn tam giác",
-            items: "<u>Entry</u>: Chờ vào lệnh",
-        },
-        {
-            name: "3. Đảo chiều",
-            items: "<u>Entry</u>: Chờ lệnh đảo chiều",
-        },
-        {
-            name: "4. Không có mẫu hình",
+            name: "0. Không có mẫu hình",
             items: "<u>Entry</u>: Không vào lệnh",
+        },
+        {
+            name: "1. Tiếp diễn tam giác",
+            items: "<u>Entry</u>: Chờ vào lệnh",
+        },
+        {
+            name: "2. Tiếp diễn tam giác rộng",
+            items: "<u>Entry</u>: Chờ vào lệnh",
+        },
+        {
+            name: "3. Tiếp diễn hình thang",
+            items: "<u>Entry</u>: Chờ vào lệnh",
+        },
+        {
+            name: "4. Tiếp diễn hình thang rộng",
+            items: "<u>Entry</u>: Chờ vào lệnh",
+        },
+        {
+            name: "5. Tiếp diễn hình thang hẹp",
+            items: "<u>Entry</u>: Chờ vào lệnh",
+        },
+        {
+            name: "6. Tiếp diễn kết hợp",
+            items: "<u>Entry</u>: Chờ vào lệnh",
+        },
+        {
+            name: "7. Đảo chiều",
+            items: "<u>Entry</u>: Chờ lệnh đảo chiều",
         },
         // {
         //     name: "1. Tích luỹ chuẩn",
