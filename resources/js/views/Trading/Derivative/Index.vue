@@ -1352,14 +1352,16 @@ function loadAutoScanTool(data, loadPattern = true, loadTimeRange = true) {
     loadPatternTool(points, info);
 }
 function scanPattern(data) {
-    let side, A, B, C, D, S;
+    let side;
+    let [A, B, C, D, S] = Array(5).fill({});
     for (let i = data.length - 1; i >= 0; i--) {
         const price = data[i].value;
         const time = data[i].time;
         const index = getTimeIndex(time);
+        if (index == -1) break;
         if (i == data.length - 1) {
             D = { index, time, price };
-            [C, B, A, S] = Array(6)
+            [C, B, A, S] = Array(4)
                 .fill(null)
                 .map(() => mf.cloneDeep(D));
         }
@@ -1810,6 +1812,7 @@ function scanPhase(start, end, trRef = 0) {
             const price = item.value;
             const time = item.time;
             const index = getTimeIndex(time);
+            if (index == -1) return false;
             if (i == 0 || price == S.price) {
                 box = {
                     R: { index, time, price },
@@ -2647,10 +2650,15 @@ function cmp(value1, side, value2, eq = false) {
     else return eq ? value1 <= value2 : value1 < value2;
 }
 function getTimeIndex(time) {
-    let index = -1;
-    while (index == -1) {
+    let index = params.data.whitespace.findIndex((item) => item.time == time);
+    if (index == -1) {
+        const date = moment.unix(time).format("YYYY/MM/DD");
+        const amEnd = moment(`${date}T11:30:00Z`).unix();
+        const pmStart = moment(`${date}T13:00:00Z`).unix();
+        const pmEnd = moment(`${date}T14:30:00Z`).unix();
+        if (time > amEnd && time < pmStart) time = amEnd;
+        else if (time > pmEnd) time = pmEnd;
         index = params.data.whitespace.findIndex((item) => item.time == time);
-        time--;
     }
     return index;
 }
