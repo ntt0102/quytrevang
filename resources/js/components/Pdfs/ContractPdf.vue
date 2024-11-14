@@ -242,6 +242,7 @@
 <script setup>
 import { reactive } from "vue";
 import { useStore } from "vuex";
+import { format } from "date-fns";
 const emit = defineEmits(["generatePdf"]);
 const store = useStore();
 const state = reactive({
@@ -264,7 +265,7 @@ function create({ user }) {
             "QTV_HDHTDT_" +
             (state.user.code || "template") +
             "_" +
-            moment().format("YYYYMMDDHHmmss");
+            format(new Date(), "yyyyMMddHHmmss");
         emit("generatePdf", filename);
     });
 }

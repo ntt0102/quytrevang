@@ -46,7 +46,6 @@ const actions = {
         });
     },
     getChart({ commit, dispatch, getters, state, rootGetters }, period) {
-        // if (moment().diff(state.updatedAt, "seconds") < 3) return false;
         return new Promise((resolve, reject) => {
             axios
                 .post(
@@ -117,7 +116,7 @@ const mutations = {
     },
     setChart(state, data) {
         state.charts = data;
-        state.updatedAt = moment();
+        state.updatedAt = new Date();
     },
     setSummary(state, data) {
         state.summary = data;

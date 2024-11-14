@@ -190,6 +190,7 @@ import CorePopup from "../../../components/Popups/CorePopup.vue";
 import { inject, ref, reactive } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
+import { isBefore, subYears, subDays } from "date-fns";
 
 const store = useStore();
 const { t } = useI18n();
@@ -336,10 +337,10 @@ function onSubmit() {
     });
 }
 function validateBirthday(e) {
-    return moment(e.value).isBefore(moment().subtract(18, "years"));
+    return isBefore(new Date(e.value), subYears(new Date(), 18));
 }
 function validateIdIssuedOn(e) {
-    return moment(e.value).isBefore(moment().subtract(1, "day"));
+    return isBefore(new Date(e.value), subDays(new Date(), 1));
 }
 function onShown() {
     setTimeout(() => formRef.value.instance.getEditor("name").focus(), 500);

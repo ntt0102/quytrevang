@@ -1,3 +1,5 @@
+import { formatDistanceToNow } from "date-fns";
+
 export default function fromNow(time) {
-    return moment(time, "X").fromNow();
+    return formatDistanceToNow(new Date(time * 1000), { addSuffix: true });
 }

@@ -307,6 +307,7 @@ import { ref, reactive, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter, useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { format } from "date-fns";
 
 const store = useStore();
 const router = useRouter();
@@ -419,7 +420,7 @@ function createValidation() {
 }
 function onInitNewRow(e) {
     e.data.interest_rate = state.interestRate;
-    e.data.paid_at = moment().format(mc.SERVER_DATE_FORMAT);
+    e.data.paid_at = format(new Date(), "yyyy-MM-dd");
     dataGridRef.value.instance.columnOption(
         "interest_rate",
         "allowEditing",

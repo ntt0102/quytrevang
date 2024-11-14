@@ -104,6 +104,7 @@
 <script setup>
 import { reactive } from "vue";
 import { useStore } from "vuex";
+import { format } from "date-fns";
 const emit = defineEmits(["generatePdf"]);
 const store = useStore();
 const state = reactive({
@@ -124,7 +125,7 @@ function create({ contract }) {
                 "QTV_BLNT_" +
                 state.contract.code +
                 "_" +
-                moment().format("YYYYMMDDHHmmss");
+                format(new Date(), "yyyyMMddHHmmss");
             emit("generatePdf", filename);
         });
 }

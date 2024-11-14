@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 export default function formatTime(time) {
-    return moment(String(time)).format("MM/DD/YYYY hh:mm");
+    return format(new Date(time), "MM/dd/yyyy hh:mm");
 }

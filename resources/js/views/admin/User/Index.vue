@@ -456,6 +456,7 @@ import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 import { useRoute, useRouter } from "vue-router";
 import { toast } from "vue3-toastify";
+import { isBefore, subYears, subDays } from "date-fns";
 
 const store = useStore();
 const router = useRouter();
@@ -722,10 +723,10 @@ function onValueChanged(value, cellInfo) {
     cellInfo.component.updateDimensions();
 }
 function validateBirthday(e) {
-    return moment(e.value).isBefore(moment().subtract(18, "years"));
+    return isBefore(new Date(e.value), subYears(new Date(), 18));
 }
 function validateIdIssuedOn(e) {
-    return moment(e.value).isBefore(moment().subtract(1, "day"));
+    return isBefore(new Date(e.value), subDays(new Date(), 1));
 }
 function onInitNewRow(e) {
     e.data.roles = ["user"];

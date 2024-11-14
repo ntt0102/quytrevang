@@ -13,7 +13,8 @@ const getters = {};
 
 const actions = {
     getContracts({ commit, dispatch, getters, state, rootGetters }, isOld) {
-        if (moment().diff(state.updatedAt, "seconds") < 3) return false;
+        if (differenceInSeconds(new Date(), new Date(state.updatedAt)) < 3)
+            return false;
         if (isOld == undefined) isOld = state.isOld;
         return new Promise((resolve, reject) => {
             axios.post("admin/contract", { isOld: isOld }).then((response) => {
@@ -112,7 +113,7 @@ const mutations = {
         state.interestRate = data.interestRate;
         state.principalMin = data.principalMin;
         state.isOld = data.isOld;
-        state.updatedAt = moment();
+        state.updatedAt = new Date();
     },
     resetState(state) {
         state = Object.assign(state, initialState());

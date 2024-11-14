@@ -169,6 +169,7 @@ import CorePopup from "../../../components/Popups/CorePopup.vue";
 import { computed, inject, ref, reactive, watch } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
+import { format, isAfter } from "date-fns";
 
 const store = useStore();
 const { t } = useI18n();
@@ -274,7 +275,8 @@ function onSave(formData) {
     bus.emit("checkPin", () => store.dispatch("tradingShrstat/save", formData));
 }
 function onInitNewRow(e) {
-    e.data.buy_date = moment().format(mc.SERVER_DATE_FORMAT);
+    const currentDate = new Date();
+    e.data.buy_date = format(currentDate, mc.SERVER_DATE_FORMAT);
     e.data.buy_volume = "[]";
     e.data.buy_price = "[]";
     e.data.buy_fee = "[]";
@@ -284,7 +286,7 @@ function onInitNewRow(e) {
 }
 function validateSellDate(e) {
     if (!e.value) return true;
-    return moment(e.value).isAfter(moment(e.data.buy_date));
+    return isAfter(new Date(e.value), new Date(e.data.buy_date));
 }
 function validateArray(e) {
     const regex = /^\[.*\]$/;

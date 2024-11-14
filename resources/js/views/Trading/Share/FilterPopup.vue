@@ -68,6 +68,7 @@ import CorePopup from "../../../components/Popups/CorePopup.vue";
 import { inject, ref, reactive, watch } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
+import { fromUnixTime, getUnixTime } from "date-fns";
 
 const store = useStore();
 const { t } = useI18n();
@@ -85,15 +86,15 @@ const state = reactive({
     ],
 });
 function show(option) {
-    if (!!option.from) state.fromDate = moment.unix(option.from);
-    if (!!option.to) state.toDate = moment.unix(option.to);
+    if (option.from) state.fromDate = fromUnixTime(option.from);
+    if (option.to) state.toDate = fromUnixTime(option.to);
     state.type = state.filterTypes[0];
     popupRef.value.show();
 }
 function filterSymbols() {
     const param = {
-        from: moment(state.fromDate).unix(),
-        to: moment(state.toDate).unix(),
+        from: getUnixTime(state.fromDate),
+        to: getUnixTime(state.toDate),
         type: state.type.value,
     };
     store.dispatch("tradingShare/filterSymbols", param);

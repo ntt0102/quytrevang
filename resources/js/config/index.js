@@ -4,8 +4,9 @@ import crypto from "../plugins/crypto";
 import { toast } from "vue3-toastify";
 import mf from "../properties/functions";
 import config from "devextreme/core/config";
+import { differenceInSeconds } from "date-fns";
 
-let shownOfflineAt = moment();
+let shownOfflineAt = new Date();
 
 axios.interceptors.request.use(
     (config) => {
@@ -17,10 +18,10 @@ axios.interceptors.request.use(
         if (
             !navigator.onLine &&
             config.method === "post" &&
-            moment().diff(shownOfflineAt, "seconds") > 5
+            differenceInSeconds(new Date(), new Date(shownOfflineAt)) > 5
         ) {
             toast.info(lang.global.t("messages.error.offline"));
-            shownOfflineAt = moment();
+            shownOfflineAt = new Date();
         }
         return config;
     },

@@ -4,7 +4,7 @@ import { toast } from "vue3-toastify";
 import mt from "./texts";
 import mitt from "mitt";
 
-let shown429At = moment();
+let shown429At = new Date();
 
 export default {
     handleError: (error, message) => {
@@ -13,9 +13,9 @@ export default {
         if (error.response.status == 403)
             message = lang.global.t("messages.error.server.403");
         else if (error.response.status == 429) {
-            if (moment().diff(shown429At, "seconds") > 5) {
+            if (differenceInSeconds(new Date(), new Date(shown429At)) > 5) {
                 message = lang.global.t("messages.error.server.429");
-                shown429At = moment();
+                shown429At = new Date();
             } else message = null;
         } else {
             if (message == undefined)

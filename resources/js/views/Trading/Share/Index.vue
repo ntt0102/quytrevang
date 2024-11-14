@@ -249,6 +249,7 @@ import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
+import { subYears, getUnixTime, fromUnixTime, format } from "date-fns";
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
     rightPriceScale: {
@@ -360,24 +361,17 @@ const tradingViewSrc = computed(
     // () => `https://banggia.dag.vn/stock-chart?symbol=${state.symbol}`
     () => `https://chart.vps.com.vn/tv/?symbol=${state.symbol}`
 );
-const chartFrom = computed(
-    () =>
-        route.query.from ??
-        moment()
-            .subtract(
-                state.chartShift +
-                    (state.timeframe == "M"
-                        ? 7
-                        : state.timeframe == "W"
-                        ? 5
-                        : 3),
-                "years"
-            )
-            .unix()
-);
-const chartTo = computed(
-    () => route.query.to ?? moment().subtract(state.chartShift, "years").unix()
-);
+const chartFrom = computed(() => {
+    const shift =
+        state.chartShift +
+        (state.timeframe === "M" ? 7 : state.timeframe === "W" ? 5 : 3);
+    return route.query.from ?? getUnixTime(subYears(new Date(), shift));
+});
+const chartTo = computed(() => {
+    return (
+        route.query.to ?? getUnixTime(subYears(new Date(), state.chartShift))
+    );
+});
 const showRemoveFilterSymbol = computed(
     () =>
         state.symbolKind.includes("f_") &&
@@ -1377,9 +1371,10 @@ function showNewsInfo() {
         if (mf.isSet(event)) {
             const text = event.title.split("|");
             let html = `
-                <div>${t("trading.share.date")} ${moment
-                .unix(event.time)
-                .format("DD/MM/YYYY")}:</div>
+                <div>${t("trading.share.date")} ${format(
+                fromUnixTime(event.time),
+                "dd/MM/yyyy"
+            )}:</div>
                 <div>&nbsp;</div>
                 `;
             text.forEach((t) => {

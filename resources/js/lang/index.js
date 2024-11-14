@@ -7,7 +7,6 @@ const langDefault = "vi";
 const devextremeMessages = { vi: devextremeVi };
 loadMessages(devextremeMessages[window.lang]);
 locale(window.lang);
-window.moment.locale(window.lang);
 
 export default createI18n({
     legacy: false,

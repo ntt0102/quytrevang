@@ -226,6 +226,8 @@ import { ref, computed, inject, watch, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter, useRoute } from "vue-router";
 import { useCookies } from "vue3-cookies";
+import { formatDistanceToNow } from "date-fns";
+import { vi } from "date-fns/locale";
 
 const props = defineProps({
     menuToggleEnabled: Boolean,
@@ -290,7 +292,10 @@ function onNotificationShown() {
     }).then((permissionResult) => {
         notificationInterval = setInterval(() => {
             notificationDropdown.value = notificationDropdown.value.map((n) => {
-                n.ago = moment(n.created_at).fromNow();
+                n.ago = formatDistanceToNow(new Date(n.created_at), {
+                    addSuffix: true,
+                    locale: vi,
+                });
                 return n;
             });
         }, 1000);
@@ -396,7 +401,12 @@ watch(
     () => store.state.notifications,
     (value) => {
         notificationDropdown.value = mf.cloneDeep(value).map((item) => {
-            const ago = { ago: moment(item.created_at).fromNow() };
+            const ago = {
+                ago: formatDistanceToNow(new Date(item.created_at), {
+                    addSuffix: true,
+                    locale: vi,
+                }),
+            };
             return { ...item, ...ago };
         });
     }

@@ -64,7 +64,8 @@ const actions = {
         });
     },
     getUsers({ commit, dispatch, getters, state, rootGetters }) {
-        if (moment().diff(state.updatedAt, "seconds") < 3) return false;
+        if (differenceInSeconds(new Date(), new Date(state.updatedAt)) < 3)
+            return false;
         return new Promise((resolve, reject) => {
             axios
                 .post("admin/user", {}, { noLoading: true })
@@ -128,7 +129,7 @@ const mutations = {
         state.deletedUsers = data.deletedUsers;
         state.allRolesName = data.allRolesName;
         state.allPermissionsName = data.allPermissionsName;
-        state.updatedAt = moment();
+        state.updatedAt = new Date();
     },
     resetState(state) {
         state = Object.assign(state, initialState());

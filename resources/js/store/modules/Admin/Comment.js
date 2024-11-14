@@ -9,7 +9,8 @@ const getters = {};
 
 const actions = {
     getComments({ commit, dispatch, getters, state, rootGetters }, param) {
-        if (moment().diff(state.updatedAt, "seconds") < 3) return false;
+        if (differenceInSeconds(new Date(), new Date(state.updatedAt)) < 3)
+            return false;
         return new Promise((resolve, reject) => {
             axios.post("admin/comment").then((response) => {
                 commit("setState", response.data);
@@ -54,7 +55,7 @@ const actions = {
 const mutations = {
     setState(state, data) {
         state.comments = data;
-        state.updatedAt = moment();
+        state.updatedAt = new Date();
     },
     resetState(state) {
         state = Object.assign(state, initialState());

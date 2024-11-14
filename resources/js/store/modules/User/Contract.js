@@ -1,3 +1,5 @@
+import { differenceInSeconds } from "date-fns";
+
 function initialState() {
     return {
         contracts: [],
@@ -16,7 +18,8 @@ const actions = {
         { commit, dispatch, getters, state, rootGetters },
         isOld = true
     ) {
-        if (moment().diff(state.updatedAt, "seconds") < 3) return false;
+        if (differenceInSeconds(new Date(), new Date(state.updatedAt)) < 3)
+            return false;
         return new Promise((resolve, reject) => {
             axios.post("user/contract", { isOld: isOld }).then((response) => {
                 // console.log(response);
@@ -66,7 +69,7 @@ const mutations = {
         state.principalMin = data.principalMin;
         state.holdWeeksMin = data.holdWeeksMin;
         state.transferInfo = data.transferInfo;
-        state.updatedAt = moment();
+        state.updatedAt = new Date();
     },
     resetState(state) {
         state = Object.assign(state, initialState());

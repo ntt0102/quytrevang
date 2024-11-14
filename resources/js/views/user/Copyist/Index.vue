@@ -22,6 +22,7 @@ import { inject, ref, reactive, watch } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { format } from "date-fns";
 
 const store = useStore();
 const route = useRoute();
@@ -77,7 +78,7 @@ function validatePrincipal(e) {
 function onInitNewRow(e) {
     e.data.status = 1;
     e.data.interest_rate = store.state.userContract.interestRate;
-    e.data.paid_at = moment().format(mc.SERVER_DATE_FORMAT);
+    e.data.paid_at = format(new Date(), mc.SERVER_DATE_FORMAT);
     dataGridRef.value.instance.option(
         "editing.popup.title",
         t("models.contract.popup.create")
