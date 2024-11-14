@@ -306,7 +306,7 @@ import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
-import moment from "moment";
+import { format, getUnixTime, addHours } from "date-fns";
 
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
@@ -337,15 +337,14 @@ const CHART_OPTIONS = {
         barSpacing: 0.05,
     },
 };
-const SHIFT_TIME = 7 * 60 * 60;
 const TP_DEFAULT = 3;
 const SL_DEFAULT = 2;
-const CURRENT_DATE = moment().format("YYYY-MM-DD");
+const CURRENT_DATE = format(new Date(), "yyyy-MM-dd");
 const TIME = {
-    START: moment(CURRENT_DATE + "T08:45:00").unix(),
-    ATO: moment(CURRENT_DATE + "T09:00:00").unix(),
-    ATC: moment(CURRENT_DATE + "T14:30:00").unix(),
-    END: moment(CURRENT_DATE + "T14:45:00").unix(),
+    START: getUnixTime(new Date(`${CURRENT_DATE}T08:45:00Z`)),
+    ATO: getUnixTime(new Date(`${CURRENT_DATE}T09:00:00Z`)),
+    ATC: getUnixTime(new Date(`${CURRENT_DATE}T14:30:00Z`)),
+    END: getUnixTime(new Date(`${CURRENT_DATE}T14:45:00Z`)),
 };
 const FIREANT_SOCKET_ENDPOINT =
     "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
@@ -390,13 +389,13 @@ let params = {
     isAutoOrdering: false,
     socketStop: false,
     socketSendData: null,
-    currentSeconds: moment().unix(),
+    currentSeconds: getUnixTime(addHours(new Date(), 7)),
 };
 initToolsParams();
 //
 const state = reactive({
     chartDate: route.query.date ?? CURRENT_DATE,
-    clock: moment().format("HH:mm:ss"),
+    clock: format(new Date(), "HH:mm:ss"),
     isFullscreen: false,
     isSocketWarning: false,
     isOrderWarning: false,
@@ -423,6 +422,7 @@ const tradingViewSrc = computed(() => {
 });
 
 store.dispatch("tradingDerivative/initChart").then(() => {
+    console.log("inSession()", inSession());
     if (inSession()) connectSocket();
     if (!route.query.date && config.value.lastOpeningDate)
         state.chartDate = config.value.lastOpeningDate;
@@ -1022,7 +1022,7 @@ function updateChartData(data, lastVolume) {
         lastVolume = params.data.volume.at(-1).value;
     }
     data.forEach((item) => {
-        const time = moment(item.date).unix() + SHIFT_TIME;
+        const time = getUnixTime(addHours(new Date(item.date), 7));
         prices.push({ time, value: item.price });
         lastVolume +=
             (item.side == "B" ? 1 : item.side == "S" ? -1 : 0) * item.volume;
@@ -1041,11 +1041,11 @@ function updateChartData(data, lastVolume) {
     }
 }
 function createWhitespaceData(date) {
-    const amStart = moment(`${date}T09:00:00Z`).unix();
-    const amEnd = moment(`${date}T11:30:00Z`).unix();
-    const pmStart = moment(`${date}T13:00:00Z`).unix();
-    const pmEnd = moment(`${date}T14:30:00Z`).unix();
-    const pm14h00 = moment(`${date}T14:00:00Z`).unix();
+    const amStart = getUnixTime(new Date(`${date}T09:00:00Z`));
+    const amEnd = getUnixTime(new Date(`${date}T11:30:00Z`));
+    const pmStart = getUnixTime(new Date(`${date}T13:00:00Z`));
+    const pmEnd = getUnixTime(new Date(`${date}T14:30:00Z`));
+    const pm14h00 = getUnixTime(new Date(`${date}T14:00:00Z`));
     let data = [];
     for (let sec = amStart; sec <= pmEnd; sec++) {
         if (sec > amEnd && sec < pmStart) continue;
@@ -1121,7 +1121,7 @@ function parseSocketMessage(msg) {
     return result;
 }
 function intervalHandler() {
-    params.currentSeconds = moment().unix();
+    params.currentSeconds = getUnixTime(addHours(new Date(), 7));
     if (inSession()) {
         if (!!status.value.position) {
             if (params.currentSeconds > TIME.ATC - 5 * 60) {
@@ -1152,7 +1152,7 @@ function intervalHandler() {
         if (config.value.openingMarket && params.currentSeconds == TIME.START)
             connectSocket();
     }
-    state.clock = moment().format("HH:mm:ss");
+    state.clock = format(new Date(), "HH:mm:ss");
 }
 function drawOrderLine(kinds) {
     const TYPE = "order";
@@ -2652,10 +2652,10 @@ function cmp(value1, side, value2, eq = false) {
 function getTimeIndex(time) {
     let index = params.data.whitespace.findIndex((item) => item.time == time);
     if (index == -1) {
-        const date = moment.unix(time).format("YYYY/MM/DD");
-        const amEnd = moment(`${date}T11:30:00Z`).unix();
-        const pmStart = moment(`${date}T13:00:00Z`).unix();
-        const pmEnd = moment(`${date}T14:30:00Z`).unix();
+        const date = format(new Date(time * 1000), "yyyy-MM-dd");
+        const amEnd = getUnixTime(new Date(`${date}T11:30:00Z`));
+        const pmStart = getUnixTime(new Date(`${date}T13:00:00Z`));
+        const pmEnd = getUnixTime(new Date(`${date}T14:30:00Z`));
         if (time > amEnd && time < pmStart) time = amEnd;
         else if (time > pmEnd) time = pmEnd;
         index = params.data.whitespace.findIndex((item) => item.time == time);
