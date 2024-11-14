@@ -855,14 +855,14 @@ function loadToolsData(toolsData) {
                         params.series.price.createPriceLine(line);
                 });
                 break;
-            case "line":
-                loadLineTool(points);
-                break;
             case "pattern":
                 loadPatternTool(toolsData.pattern, !("tr" in toolsData));
                 break;
             case "tr":
                 loadTimeRangeTool(Object.values(points));
+                break;
+            case "line":
+                loadLineTool(points);
                 break;
             case "target":
                 loadTargetTool(points);
