@@ -1606,7 +1606,7 @@ function scanPhase(start, end, trRef = 0) {
             if (cmp(price, side, box.R.price)) {
                 const ir = box.S.index - box.R.index;
                 const pr = Math.abs(box.S.price - box.R.price);
-                if (ir >= maxBox.tr && pr >= 0.5 * maxBox.pr) {
+                if (ir >= maxBox.tr) {
                     maxBox.tr = ir;
                     maxBox.pr = pr;
                     maxBox.R = box.R;
@@ -1628,16 +1628,6 @@ function scanPhase(start, end, trRef = 0) {
                     R: { index, time, price },
                     S: { index, time, price },
                 };
-                if (pr >= 2 * maxBox.pr) {
-                    maxBox = {
-                        R: box.R,
-                        S: box.S,
-                        pr: 0,
-                        tr: 0,
-                        count: 0,
-                        over: false,
-                    };
-                }
             } else {
                 box.S.index = index;
                 if (cmp(price, !side, box.S.price)) {
@@ -1653,8 +1643,8 @@ function scanPhase(start, end, trRef = 0) {
             return true;
         });
     const ir = box.S.index - box.R.index;
-    const pr = Math.abs(box.S.price - box.R.price);
-    if (ir >= maxBox.tr && pr >= 0.5 * maxBox.pr) {
+    if (ir >= maxBox.tr) {
+        const pr = Math.abs(box.S.price - box.R.price);
         maxBox.tr = ir;
         maxBox.pr = pr;
         maxBox.R = box.R;
@@ -1664,7 +1654,7 @@ function scanPhase(start, end, trRef = 0) {
             if (ir >= 3 * trRef) maxBox.over = true;
         }
     }
-    R.time = box.S.time;
+    R.time = indexToTime(box.S.index);
     S.index = timeToIndex(S.time);
     R.index = timeToIndex(R.time);
     return {
