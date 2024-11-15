@@ -95,6 +95,7 @@
                         class="command"
                         :title="$t('trading.derivative.reload')"
                         @click="resetChart"
+                        @contextmenu="getTools"
                     >
                         <i
                             class="far fa-sync-alt"
@@ -128,7 +129,6 @@
                         class="command far fa-chart-candlestick"
                         :title="$t('trading.derivative.tradingview')"
                         @click="tradingviewClick"
-                        @contextmenu="getTools"
                     ></div>
                     <div
                         class="context command"
@@ -1126,10 +1126,14 @@ function scanToolContextMenu() {
     state.showLineContext = false;
 }
 function drawScanTool() {
+    const leftSide = state.scanSide == "left";
     const data = params.crosshair.time
-        ? params.data.price.filter((item) => item.time <= params.crosshair.time)
+        ? params.data.price.filter(
+              (item) => !cmp(item.time, leftSide, params.crosshair.time)
+          )
         : params.data.price;
-    const points = scanPattern(data);
+    let points = leftSide ? leftScanPattern(data) : rightScanPattern(data);
+    points = removeIndex(points);
     if (mf.isSet(points)) {
         removePatternTool();
         loadPatternTool(points);
@@ -1137,36 +1141,29 @@ function drawScanTool() {
     }
     scanToolRef.value.classList.remove("selected");
 }
-function scanPattern(data) {
+function leftScanPattern(data) {
     let side;
-    let [A, B, C, D, S] = Array(5).fill({});
+    let [A, B, C, S] = Array(4).fill({});
     for (let i = data.length - 1; i >= 0; i--) {
         const price = data[i].value;
         const time = data[i].time;
         const index = timeToIndex(time);
         if (index == -1) break;
         if (i == data.length - 1) {
-            D = { index, time, price };
-            [C, B, A, S] = Array(4)
+            C = { index, time, price };
+            [B, A, S] = Array(3)
                 .fill(null)
-                .map(() => mf.cloneDeep(D));
+                .map(() => mf.cloneDeep(C));
         }
         if (side == undefined) {
-            if (price == D.price) continue;
-            side = D.price > price;
+            if (price == C.price) continue;
+            side = price > C.price;
         }
-        if (!cmp(B.price, side, D.price) && cmp(price, !side, C.price))
-            C = { index, time, price };
         if (cmp(price, side, B.price)) {
             if (cmp(A.price, !side, C.price)) {
-                [D, C, B] = [C, B, A].map((item) => mf.cloneDeep(item));
+                [C, B] = [B, A].map((item) => mf.cloneDeep(item));
                 A = { index, time, price };
                 S = mf.cloneDeep(A);
-                side = !side;
-            } else if (D.index - C.index <= 20) {
-                D = mf.cloneDeep(C);
-                B = mf.cloneDeep(C);
-                C = { index, time, price };
                 side = !side;
             } else B = { index, time, price };
         }
@@ -1185,7 +1182,39 @@ function scanPattern(data) {
             }
         }
     }
-    return removeIndex({ A, B, C, D });
+    return { A, B, C };
+}
+function rightScanPattern(data) {
+    let side;
+    let [A, B, C] = Array(3).fill({});
+    for (let i = 0; i < data.length; i++) {
+        const price = data[i].value;
+        const time = data[i].time;
+        const index = timeToIndex(time);
+        if (index == -1) break;
+        if (i == 0) {
+            A = { index, time, price };
+            B = mf.cloneDeep(A);
+            C = mf.cloneDeep(A);
+        }
+        if (side == undefined) {
+            if (price == A.price) continue;
+            side = price > A.price;
+        }
+        if (cmp(price, side, B.price)) {
+            B = { index, time, price };
+            C = mf.cloneDeep(B);
+        }
+        if (cmp(B.price, side, A.price) && cmp(price, !side, C.price)) {
+            if (!cmp(price, side, A.price)) {
+                A = mf.cloneDeep(B);
+                B = { index, time, price };
+                C = mf.cloneDeep(B);
+                side = !side;
+            } else C = { index, time, price };
+        }
+    }
+    return { A, B, C };
 }
 function removeIndex(obj) {
     const result = {};
