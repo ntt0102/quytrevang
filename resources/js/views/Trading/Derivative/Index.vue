@@ -2620,9 +2620,9 @@ function indexToTime(index) {
     }
 
     .tradingview-chart {
-        position: absolute;
+        position: absolute !important;
         top: 0;
-        left: 32px;
+        left: 32px !important;
         width: calc(100% - 32px);
         height: 100%;
         z-index: 3;
