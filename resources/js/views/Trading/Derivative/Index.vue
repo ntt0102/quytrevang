@@ -258,6 +258,7 @@
                     v-show="state.showTradingView"
                     ref="tradingviewChartRef"
                     class="tradingview-chart"
+                    :style="state.tradingViewStyle"
                     :src="tradingViewSrc"
                 ></iframe>
             </div>
@@ -387,6 +388,7 @@ const state = reactive({
     showScanContext: false,
     showLineContext: false,
     showTradingView: false,
+    tradingViewStyle: { left: "32px" },
 });
 const status = computed(() => store.state.tradingDerivative.status);
 const config = computed(() => store.state.tradingDerivative.config);
@@ -2620,9 +2622,9 @@ function indexToTime(index) {
     }
 
     .tradingview-chart {
-        position: absolute !important;
+        position: absolute;
         top: 0;
-        left: 32px !important;
+        left: 32px;
         width: calc(100% - 32px);
         height: 100%;
         z-index: 3;
