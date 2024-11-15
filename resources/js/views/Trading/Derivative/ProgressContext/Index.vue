@@ -1,5 +1,5 @@
 <template>
-    <div class="progress-popup" @click="stopPropagationEvent" title="">
+    <div class="progress-context" @click="stopPropagationEvent" title="">
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
 
@@ -51,7 +51,7 @@ function stopPropagationEvent(e) {
 </script>
 
 <style lang="scss">
-.progress-popup {
+.progress-context {
     background: #4d4d5c;
     border: 0 solid rgba(0, 0, 0, 0.25);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);

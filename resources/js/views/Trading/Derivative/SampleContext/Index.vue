@@ -1,5 +1,5 @@
 <template>
-    <div class="pattern-popup" @click="stopPropagationEvent" title="">
+    <div class="sample-context" @click="stopPropagationEvent" title="">
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
 
@@ -46,7 +46,7 @@ function stopPropagationEvent(e) {
 </script>
 
 <style lang="scss">
-.pattern-popup {
+.sample-context {
     background: #4d4d5c;
     border: 0 solid rgba(0, 0, 0, 0.25);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);

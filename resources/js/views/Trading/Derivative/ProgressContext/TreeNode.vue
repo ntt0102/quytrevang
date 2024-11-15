@@ -1,7 +1,7 @@
 <template>
     <div v-if="node.items" class="tree-node">
         <div v-if="index == 0" class="text">
-            {{ $t("trading.derivative.progressContextMenu.start") }}
+            {{ $t("trading.derivative.progressContext.start") }}
         </div>
         <i
             :class="`arrow far fa-chevron-${isMultiItems ? 'double-' : ''}down`"
@@ -38,7 +38,7 @@
 import { reactive, computed, watch } from "vue";
 import patterns from "../../../../data/derivative";
 import DxSelectBox from "devextreme-vue/select-box";
-import Pattern from "../PatternContextMenu/Pattern.vue";
+import Pattern from "../SampleContext/Pattern.vue";
 
 const props = defineProps(["node", "index", "modelValue"]);
 const emit = defineEmits(["update:modelValue"]);

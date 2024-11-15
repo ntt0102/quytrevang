@@ -131,13 +131,14 @@
                         @contextmenu="getTools"
                     ></div>
                     <div
-                        class="popup command"
+                        class="context command"
                         :class="{
                             green: state.progress[0] > 0,
                             red: state.progress[0] == 0,
                         }"
                         :title="$t('trading.derivative.progressTool')"
-                        @click="showProgressToolPopup"
+                        @click="progressToolClick"
+                        @contextmenu="progressToolContextMenu"
                     >
                         <i
                             class="far"
@@ -145,26 +146,34 @@
                                 'fa-badge-check': !state.progress[0],
                                 [`fa-circle-${state.progress[0]}`]:
                                     state.progress[0],
+                                blink: config.autoScan,
                             }"
                         >
                         </i>
-                        <ProgressContextMenu
+                        <ProgressContext
                             v-show="state.showProgressContext"
                             class="contextmenu"
                             v-model="state.progress"
-                        ></ProgressContextMenu>
+                        ></ProgressContext>
                     </div>
                     <div
                         ref="scanToolRef"
-                        class="command"
+                        class="context command"
                         :title="$t('trading.derivative.scanTool')"
                         @click="scanToolClick"
-                        @contextmenu="scanToolContextmenu"
+                        @contextmenu="scanToolContextMenu"
                     >
                         <i
-                            class="far fa-bolt-auto"
-                            :class="{ blink: config.autoScan }"
+                            class="far"
+                            :class="{
+                                [`fa-angles-${state.scanSide}`]: true,
+                            }"
                         ></i>
+                        <ScanContext
+                            v-show="state.showScanContext"
+                            class="contextmenu"
+                            v-model="state.scanSide"
+                        ></ScanContext>
                     </div>
                     <div
                         ref="patternToolRef"
@@ -186,20 +195,20 @@
                     </div>
                     <div
                         ref="lineToolRef"
-                        class="popup command"
+                        class="context command"
                         :title="$t('trading.derivative.lineTool')"
                         @click="lineToolClick"
                         @contextmenu="lineToolContextmenu"
                     >
                         <i class="far fa-horizontal-rule"></i>
-                        <LineContextMenu
+                        <LineContext
                             v-show="state.showLineContext"
                             class="contextmenu"
                             :enable="state.showLineContext"
                             v-model:title="state.lineTitle"
                             v-model:color="state.lineColor"
                             @deleteAllLine="removeLineTool"
-                        ></LineContextMenu>
+                        ></LineContext>
                     </div>
 
                     <div
@@ -210,18 +219,6 @@
                         @contextmenu="targetToolContextmenu"
                     >
                         <i class="far fa-line-height"> </i>
-                    </div>
-                    <div
-                        v-show="false"
-                        class="popup command"
-                        :title="$t('trading.derivative.sampleTool')"
-                        @click="sampleToolClick"
-                    >
-                        <i class="far fa-heart-rate"></i>
-                        <PatternContextMenu
-                            v-show="state.showSampleContext"
-                            class="contextmenu"
-                        ></PatternContextMenu>
                     </div>
                     <div
                         v-show="showCancelOrder"
@@ -270,9 +267,9 @@
 </template>
 
 <script setup>
-import LineContextMenu from "./LineContextMenu.vue";
-import PatternContextMenu from "./PatternContextMenu/Index.vue";
-import ProgressContextMenu from "./ProgressContextMenu/Index.vue";
+import LineContext from "./LineContext.vue";
+import ScanContext from "./ScanContext.vue";
+import ProgressContext from "./ProgressContext/Index.vue";
 import VpsOtpPopup from "./VpsOtpPopup.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
@@ -385,9 +382,10 @@ const state = reactive({
     lineColor: "#F44336",
     lineTitle: "",
     progress: [],
-    showLineContext: false,
-    showSampleContext: false,
     showProgressContext: false,
+    scanSide: "left",
+    showScanContext: false,
+    showLineContext: false,
     showTradingView: false,
 });
 const status = computed(() => store.state.tradingDerivative.status);
@@ -467,8 +465,9 @@ watch(() => store.state.tradingDerivative.chartData, loadChartData);
 watch(() => tools.value, loadToolsData);
 
 function eventChartClick(e) {
+    state.showProgressContext = false;
+    state.showScanContext = false;
     state.showLineContext = false;
-    state.showSampleContext = false;
     toggleOrderButton(false);
     if (lineToolRef.value.classList.contains("selected")) drawLineTool();
     else if (targetToolRef.value.classList.contains("selected"))
@@ -867,7 +866,7 @@ function loadToolsData(toolsData) {
 }
 function loadChartData(chartData) {
     if (!(state.chartDate == CURRENT_DATE && inSession())) {
-        if (chartData.length > 0) {
+        if (chartData.price.length > 0) {
             params.data.whitespace = mergeChartData(
                 params.data.whitespace,
                 createWhitespaceData(state.chartDate)
@@ -875,7 +874,7 @@ function loadChartData(chartData) {
         }
         params.series.whitespace.setData(params.data.whitespace);
 
-        params.data.price = mergeChartData(params.data.price, chartData);
+        params.data.price = mergeChartData(params.data.price, chartData.price);
         params.series.price.setData(params.data.price);
     }
 }
@@ -1092,7 +1091,22 @@ function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
     e.stopPropagation();
 }
+function progressToolClick() {
+    store.dispatch("tradingDerivative/setAutoScan", !config.value.autoScan);
+}
+function progressToolContextMenu() {
+    state.showProgressContext = !state.showProgressContext;
+    state.showScanContext = false;
+    state.showLineContext = false;
+}
+function loadProgressTool(data) {
+    state.progress = data;
+}
+function removeProgressTool() {
+    state.progress = [];
+}
 function scanToolClick(e) {
+    state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
@@ -1106,9 +1120,10 @@ function scanToolClick(e) {
         e.target.classList.add("selected");
     }
 }
-function scanToolContextmenu(e) {
-    store.dispatch("tradingDerivative/setAutoScan", !config.value.autoScan);
-    e.target.classList.remove("selected");
+function scanToolContextMenu() {
+    state.showScanContext = !state.showScanContext;
+    state.showProgressContext = false;
+    state.showLineContext = false;
 }
 function drawScanTool() {
     const data = params.crosshair.time
@@ -1181,6 +1196,7 @@ function removeIndex(obj) {
     return result;
 }
 function patternToolClick(e) {
+    state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
@@ -1572,7 +1588,7 @@ function scanPhase(start, end, trRef = 0) {
                 if (
                     ir >= 0.5 * maxBox.tr &&
                     !cmp(box.S.price, !side, maxBox.S.price) &&
-                    Math.abs(box.R.price - maxBox.R.price) <= 0.2
+                    Math.abs(box.R.price - maxBox.R.price) / maxBox.pr < 0.1
                 ) {
                     maxBox.S.index = box.S.index;
                     maxBox.tr = box.S.index - maxBox.R.index;
@@ -1669,6 +1685,7 @@ function removePatternTool() {
     initToolsParams(["pattern"]);
 }
 function timeRangeToolClick(e) {
+    state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
@@ -1759,18 +1776,8 @@ function removeTimeRangeTool(withServer = true, onlyServer = false) {
         initToolsParams(["tr"]);
     }
 }
-function showProgressToolPopup() {
-    state.showProgressContext = !state.showProgressContext;
-    state.showSampleContext = false;
-    state.showLineContext = false;
-}
-function loadProgressTool(data) {
-    state.progress = data;
-}
-function removeProgressTool() {
-    state.progress = [];
-}
 function lineToolClick(e) {
+    state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
@@ -1780,8 +1787,8 @@ function lineToolClick(e) {
 }
 function lineToolContextmenu(e) {
     state.showLineContext = !state.showLineContext;
-    state.showSampleContext = false;
     state.showProgressContext = false;
+    state.showScanContext = false;
 }
 function drawLineTool() {
     const TYPE = "line";
@@ -1851,6 +1858,7 @@ function removeLineTool(withServer = true) {
     }
 }
 function targetToolClick(e) {
+    state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
     document
@@ -1986,11 +1994,6 @@ function removeTargetTool(withServer = true) {
         }
     }
     initToolsParams(["target"]);
-}
-function sampleToolClick() {
-    state.showSampleContext = !state.showSampleContext;
-    state.showProgressContext = false;
-    state.showLineContext = false;
 }
 function removeAllTools() {
     removeOrderTool(["entry", "tp", "sl"], false);
@@ -2482,7 +2485,7 @@ function indexToTime(index) {
                 border-top: solid 2px #2a2e39 !important;
             }
 
-            .popup {
+            .context {
                 position: relative;
 
                 .contextmenu {

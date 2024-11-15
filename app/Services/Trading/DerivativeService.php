@@ -217,14 +217,14 @@ class DerivativeService extends CoreService
      */
     public function generateDataFromCsv($date)
     {
-        $data = [];
+        $data = ['price' => []];
         $file = storage_path('app/phaisinh/' . $date . '.csv');
         if (!file_exists($file)) return $data;
         $fp = fopen($file, 'r');
         while (!feof($fp)) {
             $line = fgetcsv($fp);
             if (!!$line) {
-                $data[] = [
+                $data['price'][] = [
                     'time' => +$line[0],
                     'value' => +$line[1],
                 ];

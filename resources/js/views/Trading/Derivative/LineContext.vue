@@ -1,5 +1,5 @@
 <template>
-    <div class="line-popup" @click="stopPropagationEvent">
+    <div class="line-context" @click="stopPropagationEvent">
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
 
@@ -71,7 +71,7 @@ function stopPropagationEvent(e) {
 </script>
 
 <style lang="scss">
-.line-popup {
+.line-context {
     background: #4d4d5c;
     border: 0 solid rgba(0, 0, 0, 0.25);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
