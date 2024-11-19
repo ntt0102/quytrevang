@@ -3,7 +3,7 @@
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
 
-        <ul>
+        <ul v-if="sortedItems.length">
             <li
                 v-for="(item, index) in sortedItems"
                 :key="index"
@@ -13,6 +13,9 @@
                 {{ item }}
             </li>
         </ul>
+        <div v-else>
+            {{ $t("trading.derivative.patternContext.noPattern") }}
+        </div>
     </div>
 </template>
 
