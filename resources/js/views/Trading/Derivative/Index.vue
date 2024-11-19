@@ -407,7 +407,6 @@ const tradingViewSrc = computed(() => {
 });
 
 store.dispatch("tradingDerivative/initChart").then(() => {
-    console.log("inSession()", inSession());
     if (inSession()) connectSocket();
     if (!route.query.date && config.value.lastOpeningDate)
         state.chartDate = config.value.lastOpeningDate;
