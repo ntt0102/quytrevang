@@ -7,10 +7,10 @@
             <li
                 v-for="(item, index) in sortedItems"
                 :key="index"
-                :class="{ selected: props.selected.tag === item.tag }"
+                :class="{ selected: props.selected === item.tag }"
                 @click="selectItem(item)"
             >
-                {{ item }}
+                {{ item.name }}
             </li>
         </ul>
         <div v-else>
@@ -62,7 +62,7 @@ function stopPropagationEvent(e) {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     border-radius: 4px;
     position: relative;
-    width: 180px;
+    width: 250px;
     padding: 10px;
 
     .triangle {
@@ -89,19 +89,25 @@ function stopPropagationEvent(e) {
     ul {
         list-style-type: none;
         padding: 0;
+        margin: 0;
     }
 
     li {
         padding: 10px;
         cursor: pointer;
         border: 1px solid #ddd;
-        margin-bottom: 5px;
         border-radius: 4px;
         transition: background-color 0.3s;
+        color: white;
+
+        &:not(:last-child) {
+            margin-bottom: 7px;
+        }
     }
 
     li:hover {
         background-color: #f0f0f0;
+        color: black;
     }
 
     li.selected {

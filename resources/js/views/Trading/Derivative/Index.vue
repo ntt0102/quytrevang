@@ -1125,6 +1125,7 @@ function selectPattern(e) {
 }
 function loadProgressTool(e) {
     state.pattern = e;
+    setTimeout(() => (state.showPatternContext = true), 0);
 }
 function removeProgressTool() {
     state.pattern.items = [];
