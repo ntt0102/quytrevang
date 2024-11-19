@@ -1698,7 +1698,7 @@ function scanPhase(start, end) {
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
-        el: exr / maxBox.pr,
+        el: maxBox.pr != 0 ? exr / maxBox.pr : 0,
         S1: maxBox.S,
         R1: maxBox.R,
         S,
