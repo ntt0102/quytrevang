@@ -133,8 +133,8 @@
                     <div
                         class="context command"
                         :class="{
-                            green: state.progress[0] > 0,
-                            red: state.progress[0] == 0,
+                            green: state.pattern.items.length,
+                            red: !state.pattern.items.length,
                         }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="progressToolClick"
@@ -143,18 +143,20 @@
                         <i
                             class="far"
                             :class="{
-                                'fa-badge-check': !state.progress[0],
-                                [`fa-circle-${state.progress[0]}`]:
-                                    state.progress[0],
+                                'fa-badge-check': !state.pattern.items.length,
+                                [`fa-circle-${state.pattern.items.length}`]:
+                                    state.pattern.items.length,
                                 blink: config.autoScan,
                             }"
                         >
                         </i>
-                        <ProgressContext
-                            v-show="state.showProgressContext"
+                        <PatternContext
+                            v-show="state.showPatternContext"
                             class="contextmenu"
-                            v-model="state.progress"
-                        ></ProgressContext>
+                            :items="state.pattern.items"
+                            :selected="state.pattern.selected"
+                            @selectPattern="selectPattern"
+                        ></PatternContext>
                     </div>
                     <div
                         ref="scanToolRef"
@@ -270,7 +272,7 @@
 <script setup>
 import LineContext from "./LineContext.vue";
 import ScanContext from "./ScanContext.vue";
-import ProgressContext from "./ProgressContext/Index.vue";
+import PatternContext from "./PatternContext.vue";
 import VpsOtpPopup from "./VpsOtpPopup.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
@@ -383,7 +385,8 @@ const state = reactive({
     lineColor: "#F44336",
     lineTitle: "",
     progress: [],
-    showProgressContext: false,
+    pattern: { items: [], selected: null },
+    showPatternContext: false,
     scanSide: "left",
     showScanContext: false,
     showLineContext: false,
@@ -467,7 +470,7 @@ watch(() => store.state.tradingDerivative.chartData, loadChartData);
 watch(() => tools.value, loadToolsData);
 
 function eventChartClick(e) {
-    state.showProgressContext = false;
+    state.showPatternContext = false;
     state.showScanContext = false;
     state.showLineContext = false;
     toggleOrderButton(false);
@@ -709,27 +712,27 @@ function eventPriceLineDrag(e) {
                 const {
                     pattern,
                     timeRange,
-                    info: { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
-                } = calculatePattern(points, d);
-                loadProgressTool([pattern]);
+                    info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
+                } = calculatePattern(points, null, d);
+                loadProgressTool(pattern);
                 loadTimeRangeTool(timeRange);
                 savePattern(points);
                 //
                 point = "A";
-                changeOptions = { title: `A ${tr1} ${pr1}` };
+                changeOptions = { title: `A ${el1}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "B";
-                changeOptions = { title: `B ${tr2} ${pr2}` };
+                changeOptions = { title: `B ${el2}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "C";
-                changeOptions = { title: `C ${tr3} ${pr3}` };
+                changeOptions = { title: `C ${el3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
                 changeOptions = {
-                    price: sp,
+                    price: tR,
                     title: "F " + fibo,
                 };
                 if (lineOptions.point == point) delete changeOptions.price;
@@ -737,22 +740,29 @@ function eventPriceLineDrag(e) {
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat((sp + X).toFixed(1)),
+                    price: parseFloat((tR + X).toFixed(1)),
                     title: "T " + parseFloat(X.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat((sp + Y).toFixed(1)),
+                    price: parseFloat((tR + Y).toFixed(1)),
                     title: "T " + parseFloat(Y.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Z";
                 changeOptions = {
-                    price: parseFloat((sp + Z).toFixed(1)),
+                    price: parseFloat((tR + Z).toFixed(1)),
                     title: "T " + parseFloat(Z.toFixed(1)),
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                //
+                point = "W";
+                changeOptions = {
+                    price: parseFloat((tR + W).toFixed(1)),
+                    title: "T " + parseFloat(W.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
             }
@@ -852,7 +862,7 @@ function loadToolsData(toolsData) {
                 loadOrderTool(points);
                 break;
             case "pattern":
-                loadPatternTool(toolsData.pattern, !("tr" in toolsData));
+                loadPatternTool(toolsData.pattern, null, !("tr" in toolsData));
                 break;
             case "tr":
                 loadTimeRangeTool(Object.values(points));
@@ -1094,18 +1104,34 @@ function tradingviewClick(e) {
     e.stopPropagation();
 }
 function progressToolClick() {
-    store.dispatch("tradingDerivative/setAutoScan", !config.value.autoScan);
-}
-function progressToolContextMenu() {
-    state.showProgressContext = !state.showProgressContext;
+    state.showPatternContext = !state.showPatternContext;
     state.showScanContext = false;
     state.showLineContext = false;
 }
-function loadProgressTool(data) {
-    state.progress = data;
+function progressToolContextMenu() {
+    store.dispatch("tradingDerivative/setAutoScan", !config.value.autoScan);
+}
+function selectPattern(e) {
+    if (e != state.pattern.selected) {
+        state.pattern.selected = e;
+        const aOptions = params.tools.pattern.A.options();
+        const bOptions = params.tools.pattern.B.options();
+        const cOptions = params.tools.pattern.C.options();
+        const points = {
+            A: { time: +aOptions.time, price: +aOptions.price },
+            B: { price: +bOptions.price },
+            C: { price: +cOptions.price },
+        };
+        removePatternTool();
+        loadPatternTool(points, e);
+    }
+}
+function loadProgressTool(e) {
+    state.pattern = e;
 }
 function removeProgressTool() {
-    state.progress = [];
+    state.pattern.items = [];
+    state.pattern.selected = null;
 }
 function scanToolClick(e) {
     state.showScanContext = false;
@@ -1124,7 +1150,7 @@ function scanToolClick(e) {
 }
 function scanToolContextMenu() {
     state.showScanContext = !state.showScanContext;
-    state.showProgressContext = false;
+    state.showPatternContext = false;
     state.showLineContext = false;
 }
 function drawScanTool() {
@@ -1271,7 +1297,7 @@ function drawPatternTool() {
                 const {
                     pattern,
                     timeRange,
-                    info: { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
+                    info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
                 } = calculatePattern(points);
                 _timeRange = timeRange;
                 _pattern = pattern;
@@ -1280,42 +1306,49 @@ function drawPatternTool() {
                 changeOptions = {
                     price,
                     time,
-                    title: `A ${tr1} ${pr1}`,
+                    title: `A ${el1}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "B";
                 changeOptions = {
-                    title: `B ${tr2} ${pr2}`,
+                    title: `B ${el2}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "C";
-                changeOptions = { title: `C ${tr3} ${pr3}` };
+                changeOptions = { title: `C ${el3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
-                changeOptions = { price: sp, title: "F " + fibo };
+                changeOptions = { price: tR, title: "F " + fibo };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat((sp + X).toFixed(1)),
+                    price: parseFloat((tR + X).toFixed(1)),
                     title: "T " + parseFloat(X.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat((sp + Y).toFixed(1)),
+                    price: parseFloat((tR + Y).toFixed(1)),
                     title: "T " + parseFloat(Y.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Z";
                 changeOptions = {
-                    price: parseFloat((sp + Z).toFixed(1)),
+                    price: parseFloat((tR + Z).toFixed(1)),
                     title: "T " + parseFloat(Z.toFixed(1)),
+                };
+                params.tools.pattern[point].applyOptions(changeOptions);
+                //
+                point = "W";
+                changeOptions = {
+                    price: parseFloat((tR + W).toFixed(1)),
+                    title: "T " + parseFloat(W.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
             } else {
@@ -1330,36 +1363,36 @@ function drawPatternTool() {
                 const {
                     pattern,
                     timeRange,
-                    info: { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
+                    info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
                 } = calculatePattern(points);
                 _timeRange = timeRange;
                 _pattern = pattern;
                 //
                 let point = "A";
                 params.tools.pattern[point].applyOptions({
-                    title: `A ${tr1} ${pr1}`,
+                    title: `A ${el1}`,
                 });
                 //
                 point = "B";
                 params.tools.pattern[point].applyOptions({
-                    title: `B ${tr2} ${pr2}`,
+                    title: `B ${el2}`,
                 });
                 //
                 option.point = "C";
-                option.title = `C ${tr3} ${pr3}`;
+                option.title = `C ${el3}`;
                 option.color = "#FF9800";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
                 //
                 option.point = "D";
-                option.price = sp;
+                option.price = tR;
                 option.title = "F " + fibo;
                 option.color = "#4CAF50";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
                 //
                 option.point = "X";
-                option.price = parseFloat((sp + X).toFixed(1));
+                option.price = parseFloat((tR + X).toFixed(1));
                 option.title = "T " + parseFloat(X.toFixed(1));
                 option.color = "#2196F3";
                 option.draggable = false;
@@ -1367,7 +1400,7 @@ function drawPatternTool() {
                     params.series.price.createPriceLine(option);
                 //
                 option.point = "Y";
-                option.price = parseFloat((sp + Y).toFixed(1));
+                option.price = parseFloat((tR + Y).toFixed(1));
                 option.title = "T " + parseFloat(Y.toFixed(1));
                 option.color = "#673AB7";
                 option.draggable = false;
@@ -1375,34 +1408,42 @@ function drawPatternTool() {
                     params.series.price.createPriceLine(option);
                 //
                 option.point = "Z";
-                option.price = parseFloat((sp + Z).toFixed(1));
+                option.price = parseFloat((tR + Z).toFixed(1));
                 option.title = "T " + parseFloat(Z.toFixed(1));
                 option.color = "#9C27B0";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
+                //
+                option.point = "W";
+                option.price = parseFloat((tR + W).toFixed(1));
+                option.title = "T " + parseFloat(W.toFixed(1));
+                option.color = "#E91E63";
+                option.draggable = false;
+                params.tools.pattern[option.point] =
+                    params.series.price.createPriceLine(option);
             }
-            loadProgressTool([_pattern]);
+            loadProgressTool(_pattern);
             loadTimeRangeTool(_timeRange);
             savePattern(points);
             patternToolRef.value.classList.remove("selected");
         } else {
             option.point = "B";
-            option.title = "B 0 0";
+            option.title = "B 0";
             option.color = "#009688";
             params.tools.pattern[option.point] =
                 params.series.price.createPriceLine(option);
         }
     } else {
         option.point = "A";
-        option.title = "A 0 0";
+        option.title = "A 0";
         option.color = "#F44336";
         option.time = time;
         params.tools.pattern[option.point] =
             params.series.price.createPriceLine(option);
     }
 }
-function loadPatternTool(points, loadTimeRange = true) {
+function loadPatternTool(points, patternSelected = null, loadTimeRange = true) {
     const TYPE = "pattern";
     let option = {
         lineType: TYPE,
@@ -1413,13 +1454,13 @@ function loadPatternTool(points, loadTimeRange = true) {
     const {
         pattern,
         timeRange,
-        info: { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
-    } = calculatePattern(points);
-    loadProgressTool([pattern]);
+        info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
+    } = calculatePattern(points, patternSelected);
+    loadProgressTool(pattern);
     if (loadTimeRange) loadTimeRangeTool(timeRange);
     //
     option.point = "A";
-    option.title = `A ${tr1} ${pr1}`;
+    option.title = `A ${el1}`;
     option.color = "#F44336";
     option.price = points.A.price;
     option.time = points.A.time;
@@ -1427,7 +1468,7 @@ function loadPatternTool(points, loadTimeRange = true) {
         params.series.price.createPriceLine(option);
     //
     option.point = "B";
-    option.title = `B ${tr2} ${pr2}`;
+    option.title = `B ${el2}`;
     option.color = "#009688";
     option.price = points.B.price;
     params.tools.pattern[option.point] =
@@ -1435,20 +1476,20 @@ function loadPatternTool(points, loadTimeRange = true) {
     //
     option.point = "C";
     option.price = points.C.price;
-    option.title = `C ${tr3} ${pr3}`;
+    option.title = `C ${el3}`;
     option.color = "#FF9800";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     //
     option.point = "D";
-    option.price = sp;
+    option.price = tR;
     option.title = "F " + fibo;
     option.color = "#4CAF50";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     //
     option.point = "X";
-    option.price = parseFloat((sp + X).toFixed(1));
+    option.price = parseFloat((tR + X).toFixed(1));
     option.title = "T " + parseFloat(X.toFixed(1));
     option.color = "#2196F3";
     option.draggable = false;
@@ -1456,7 +1497,7 @@ function loadPatternTool(points, loadTimeRange = true) {
         params.series.price.createPriceLine(option);
     //
     option.point = "Y";
-    option.price = parseFloat((sp + Y).toFixed(1));
+    option.price = parseFloat((tR + Y).toFixed(1));
     option.title = "T " + parseFloat(Y.toFixed(1));
     option.color = "#673AB7";
     option.draggable = false;
@@ -1464,119 +1505,117 @@ function loadPatternTool(points, loadTimeRange = true) {
         params.series.price.createPriceLine(option);
     //
     option.point = "Z";
-    option.price = parseFloat((sp + Z).toFixed(1));
+    option.price = parseFloat((tR + Z).toFixed(1));
     option.title = "T " + parseFloat(Z.toFixed(1));
     option.color = "#9C27B0";
     option.draggable = false;
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
+    //
+    option.point = "W";
+    option.price = parseFloat((tR + W).toFixed(1));
+    option.title = "T " + parseFloat(W.toFixed(1));
+    option.color = "#E91E63";
+    option.draggable = false;
+    params.tools.pattern[option.point] =
+        params.series.price.createPriceLine(option);
 }
-function calculatePattern(points, spDefault = null) {
+function calculatePattern(points, patternDefault = null, tRDefault = null) {
     const phase1 = scanPhase(points.A, points.B);
-    const phase2 = scanPhase(phase1.R, points.C, phase1.tr);
-    const phase3 = scanPhase(phase2.R, phase2.S, phase1.tr);
+    const phase2 = scanPhase(phase1.R, points.C);
+    const phase3 = scanPhase(phase2.R, phase2.S);
     //
-    const cb = points.C.price - points.B.price;
-    const ab = points.A.price - points.B.price;
-    const side = cb > 0;
-    const rs1 = phase1.S1.price - phase1.R1.price;
-    const rs2 = phase2.R1.price - phase2.S1.price;
-    const rs3 = phase3.S1.price - phase3.R1.price;
-    let [tr1, tr2, tr3, pr1, pr2, pr3] = Array(6).fill(0);
-    pr1 = parseInt((rs1 / ab) * 100);
-    if (
-        cmp(phase1.R1.price, side, points.B.price) &&
-        cmp(phase1.S1.price, !side, points.C.price)
-    ) {
-        tr1 = 1;
-    }
-    if (Math.abs(cb) > 1.5 && cmp(cb, side, rs1)) {
-        pr2 = parseInt((rs2 / cb) * 100);
-        if (pr2 > 50) {
-            if (phase2.count == 1) tr2 = 1;
-            else if (cb / ab < 0.5 && (phase2.count > 1 || phase2.over))
-                tr2 = 2;
-            else if (
-                tr1 == 1 &&
-                cmp(phase2.S1.price, !side, phase1.R1.price) &&
-                cmp(phase2.R1.price, side, phase1.S1.price)
-            )
-                tr2 = 3;
+    const el1 = parseFloat(phase1.el.toFixed(1));
+    const el2 = parseFloat(phase2.el.toFixed(1));
+    const el3 = parseFloat(phase3.el.toFixed(1));
+    //
+    const bc = points.B.price - points.C.price;
+    const ba = points.B.price - points.A.price;
+    const side = ba > 0;
+    const BC = Math.abs(bc);
+    let patterns = [];
+    let tR, tS, timeRange, fibo;
+    if (BC > phase1.pr) {
+        if (BC >= 1.5) {
+            if (phase2.tr >= 3 * phase1.tr) {
+                if (bc / ba < 0.5) patterns.push("FL");
+            } else if (phase2.tr >= phase1.tr) patterns.push("F");
+            else {
+                if (
+                    cmp(phase2.S1.price, side, phase1.R1.price) &&
+                    cmp(phase2.R1.price, !side, phase1.S1.price)
+                )
+                    patterns.push("FS");
+            }
+            if (phase3.tr >= 3 * phase1.tr) {
+                if (bc / ba < 0.5) patterns.push("TL");
+            } else if (phase3.tr >= phase1.tr) patterns.push("T");
         }
-        //
-        pr3 = parseInt((rs3 / cb) * 100);
-        if (pr3 > 40) {
-            if (phase3.count == 1) tr3 = 1;
-            else if (cb / ab < 0.5 && (phase3.count > 1 || phase3.over))
-                tr3 = 2;
-        }
-        //
-        if (
-            tr2 == 0 &&
-            pr2 > 50 &&
-            tr3 == 0 &&
-            pr3 > 50 &&
-            phase2.tr > 0.5 * phase1.tr &&
-            phase2.pr > 0.5 * phase1.pr &&
-            phase3.R.index - phase3.S.index >= phase1.tr
-        ) {
-            if (cmp(phase3.R1.price, !side, phase2.S1.price)) tr2 = 4;
-            else tr2 = 5;
+        if (phase1.pr >= 1.5) {
+            if (cmp(points.C.price, side, phase1.S1.price)) {
+                if (phase1.el >= 2) {
+                    if (phase2.tr > phase3.tr) patterns.push("ELF");
+                    else patterns.push("ELT");
+                } else if (phase1.el >= 1) {
+                    if (phase2.tr > phase3.tr) patterns.push("EF");
+                    else patterns.push("ET");
+                }
+            }
         }
     }
-    //
-    let timeRange = [];
-    if (tr3 > 0)
-        timeRange = [
-            phase1.R1.time,
-            indexToTime(phase1.S1.index),
-            phase3.R1.time,
-        ];
-    else if (tr2 > 0 && tr2 <= 3)
+    const pattern = patternDefault ?? (patterns.length ? patterns[0] : null);
+    if (["FL", "F", "FS"].includes(pattern)) {
+        tS = phase2.R.price;
+        tR = phase2.S1.price;
         timeRange = [
             phase2.R1.time,
             indexToTime(phase2.S1.index),
             phase2.S1.time,
         ];
-    else if (tr2 > 3)
+    } else if (["TL", "T"].includes(pattern)) {
+        tS = phase3.S.price;
+        tR = phase3.R1.price;
         timeRange = [
             phase1.R1.time,
             indexToTime(phase1.S1.index),
-            phase2.R.time,
+            phase3.R1.time,
         ];
-    else timeRange = [phase1.R1.time, indexToTime(phase1.S1.index)];
-    //
-    const pattern = validatePattern(tr2, tr3);
-    //
-    let sp = spDefault;
-    if (!sp) {
-        let prMax = 0;
-        sp = points.B.price;
-        if (tr2 > 0 && cmp(rs2, side, prMax)) {
-            prMax = rs2;
-            sp = tr2 < 5 ? phase2.S1.price : phase3.S1.price;
-        }
-        if (tr3 > 0 && cmp(rs3, side, prMax)) {
-            sp = phase3.R1.price;
+    } else if (["ELF", "ELT", "EF", "ET"].includes(pattern)) {
+        tS = phase1.S1.price;
+        tR = phase1.R1.price;
+        fibo = parseInt(((tR - tS) / ba) * 100);
+        if (["ELF", "EF"].includes(pattern)) {
+            timeRange = [
+                phase2.R1.time,
+                indexToTime(phase2.S1.index),
+                phase2.R.time,
+            ];
+        } else {
+            timeRange = [
+                phase1.R1.time,
+                indexToTime(phase1.S1.index),
+                phase1.R.time,
+            ];
         }
     }
+    if (!tS) tS = phase2.R.price;
+    if (!tR) tR = points.B.price;
+    if (tRDefault) tR = tRDefault;
+    if (!timeRange) timeRange = [phase1.R1.time, indexToTime(phase1.S1.index)];
+    if (!fibo) fibo = parseInt(((tR - tS) / bc) * 100);
     //
-    const fibo = parseInt(
-        (tr2 < 5
-            ? (points.C.price - sp) / cb
-            : (sp - phase3.R1.price) / (points.C.price - phase3.R1.price)) * 100
-    );
-    //
-    const Y = sp - (tr2 < 5 ? points.C.price : phase3.R1.price);
+    const Y = tR - tS;
     const X = 0.5 * Y;
     const Z = 2 * Y;
+    const W = 4 * Y;
+
     return {
-        pattern,
+        pattern: { items: patterns, selected: pattern },
         timeRange,
-        info: { tr1, tr2, tr3, pr1, pr2, pr3, fibo, sp, X, Y, Z },
+        info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
     };
 }
-function scanPhase(start, end, trRef = 0) {
+function scanPhase(start, end) {
     let S = mf.cloneDeep(start);
     let R = mf.cloneDeep(end);
     const side = R.price > S.price;
@@ -1599,30 +1638,24 @@ function scanPhase(start, end, trRef = 0) {
                     S: box.S,
                     pr: 0,
                     tr: 0,
-                    count: 0,
-                    over: false,
                 };
             }
             if (cmp(price, side, box.R.price)) {
-                const ir = box.S.index - box.R.index;
+                const tr = box.S.index - box.R.index;
                 const pr = Math.abs(box.S.price - box.R.price);
-                if (ir >= maxBox.tr) {
-                    maxBox.tr = ir;
+                if (tr >= maxBox.tr) {
+                    maxBox.tr = tr;
                     maxBox.pr = pr;
                     maxBox.R = box.R;
                     maxBox.S = box.S;
-                    if (trRef > 0 && ir >= trRef) {
-                        maxBox.count++;
-                        if (ir >= 3 * trRef) maxBox.over = true;
-                    }
                 }
                 if (
-                    ir >= 0.5 * maxBox.tr &&
-                    !cmp(box.S.price, !side, maxBox.S.price) &&
-                    Math.abs(box.R.price - maxBox.R.price) / maxBox.pr < 0.1
+                    pr >= maxBox.pr &&
+                    Math.abs(box.R.price - maxBox.R.price) / pr < 0.2
                 ) {
                     maxBox.S.index = box.S.index;
                     maxBox.tr = box.S.index - maxBox.R.index;
+                    maxBox.pr = pr;
                 }
                 box = {
                     R: { index, time, price },
@@ -1642,36 +1675,27 @@ function scanPhase(start, end, trRef = 0) {
             if (!cmp(price, !side, R.price)) return false;
             return true;
         });
-    const ir = box.S.index - box.R.index;
-    if (ir >= maxBox.tr) {
+    const tr = box.S.index - box.R.index;
+    if (tr >= maxBox.tr) {
         const pr = Math.abs(box.S.price - box.R.price);
-        maxBox.tr = ir;
+        maxBox.tr = tr;
         maxBox.pr = pr;
         maxBox.R = box.R;
         maxBox.S = box.S;
-        if (trRef > 0 && ir >= trRef) {
-            maxBox.count++;
-            if (ir >= 3 * trRef) maxBox.over = true;
-        }
     }
     R.time = indexToTime(box.S.index);
-    S.index = timeToIndex(S.time);
     R.index = timeToIndex(R.time);
+    S.index = timeToIndex(S.time);
+    const exr = Math.abs(R.price - maxBox.R.price);
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
-        count: maxBox.count,
-        over: maxBox.over,
+        el: exr / maxBox.pr,
         S1: maxBox.S,
         R1: maxBox.R,
         S,
         R,
     };
-}
-function validatePattern(tr2, tr3) {
-    if (tr3 > 0) return tr3;
-    else if (tr2 > 0) return tr2 + 2;
-    return 0;
 }
 function savePattern(points = {}) {
     let isRemove = !mf.isSet(points);
@@ -1700,6 +1724,7 @@ function removePatternTool() {
                 params.series.price.removePriceLine(params.tools.pattern.X);
                 params.series.price.removePriceLine(params.tools.pattern.Y);
                 params.series.price.removePriceLine(params.tools.pattern.Z);
+                params.series.price.removePriceLine(params.tools.pattern.W);
             }
         }
     }
@@ -1808,7 +1833,7 @@ function lineToolClick(e) {
 }
 function lineToolContextmenu(e) {
     state.showLineContext = !state.showLineContext;
-    state.showProgressContext = false;
+    state.showPatternContext = false;
     state.showScanContext = false;
 }
 function drawLineTool() {
@@ -2390,6 +2415,7 @@ function initToolsParams(tools) {
             X: {},
             Y: {},
             Z: {},
+            W: {},
         };
 }
 function getAccountInfo() {
