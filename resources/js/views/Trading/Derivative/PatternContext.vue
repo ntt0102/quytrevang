@@ -62,7 +62,7 @@ function stopPropagationEvent(e) {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     border-radius: 4px;
     position: relative;
-    width: 250px;
+    width: 280px;
     padding: 10px;
 
     .triangle {
