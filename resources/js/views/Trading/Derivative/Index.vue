@@ -132,10 +132,7 @@
                     ></div>
                     <div
                         class="context command"
-                        :class="{
-                            green: state.pattern.items.length,
-                            red: !state.pattern.items.length,
-                        }"
+                        :class="{ green: state.pattern.items.length }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="progressToolClick"
                         @contextmenu="progressToolContextMenu"
@@ -1537,18 +1534,18 @@ function calculatePattern(points, patternDefault = null, tRDefault = null) {
     let tR, tS, timeRange, fibo;
     if (BC > phase1.pr) {
         if (BC >= 1.5) {
-            if (phase2.tr >= 3 * phase1.tr) {
-                if (bc / ba < 0.5) patterns.push("FL");
+            if (phase2.tr >= 2 * phase1.tr) {
+                // if (bc / ba < 0.5) patterns.push("FL");
             } else if (phase2.tr >= phase1.tr) patterns.push("F");
             else {
-                if (
-                    cmp(phase2.S1.price, side, phase1.R1.price) &&
-                    cmp(phase2.R1.price, !side, phase1.S1.price)
-                )
-                    patterns.push("FS");
+                // if (
+                //     cmp(phase2.S1.price, side, phase1.R1.price) &&
+                //     cmp(phase2.R1.price, !side, phase1.S1.price)
+                // )
+                //     patterns.push("FS");
             }
-            if (phase3.tr >= 3 * phase1.tr) {
-                if (bc / ba < 0.5) patterns.push("TL");
+            if (phase3.tr >= 2 * phase1.tr) {
+                // if (bc / ba < 0.5) patterns.push("TL");
             } else if (phase3.tr >= phase1.tr) patterns.push("T");
         }
         if (phase1.pr >= 1.5) {
