@@ -645,6 +645,9 @@ function eventPriceLineDrag(e) {
                         case "Z":
                             div = 3;
                             break;
+                        case "W":
+                            div = 5;
+                            break;
                     }
                     ba = parseFloat(((b - newPrice) / div).toFixed(1));
                     a = b - ba;
@@ -681,6 +684,14 @@ function eventPriceLineDrag(e) {
                 changeOptions = {
                     price: parseFloat((a - 2 * ba).toFixed(1)),
                     title: (-2 * ba).toFixed(1),
+                };
+                if (lineOptions.point == point) delete changeOptions.price;
+                params.tools.target[point].applyOptions(changeOptions);
+                //
+                point = "W";
+                changeOptions = {
+                    price: parseFloat((a - 4 * ba).toFixed(1)),
+                    title: (-4 * ba).toFixed(1),
                 };
                 if (lineOptions.point == point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
@@ -1964,6 +1975,13 @@ function drawTargetTool() {
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
         //
+        option.point = "W";
+        option.price = parseFloat((a - 4 * ba).toFixed(1));
+        option.title = parseFloat((-4 * ba).toFixed(1));
+        option.color = "#E91E63";
+        params.tools.target[option.point] =
+            params.series.price.createPriceLine(option);
+        //
         targetToolRef.value.classList.remove("selected");
     } else {
         option.point = "A";
@@ -2021,6 +2039,13 @@ function loadTargetTool(points) {
     option.color = "#9C27B0";
     params.tools.target[option.point] =
         params.series.price.createPriceLine(option);
+    //
+    option.point = "W";
+    option.price = parseFloat((a - 4 * ba).toFixed(1));
+    option.title = parseFloat((-4 * ba).toFixed(1));
+    option.color = "#E91E63";
+    params.tools.target[option.point] =
+        params.series.price.createPriceLine(option);
 }
 function removeTargetTool(withServer = true) {
     if (withServer)
@@ -2035,6 +2060,7 @@ function removeTargetTool(withServer = true) {
             params.series.price.removePriceLine(params.tools.target.X);
             params.series.price.removePriceLine(params.tools.target.Y);
             params.series.price.removePriceLine(params.tools.target.Z);
+            params.series.price.removePriceLine(params.tools.target.W);
         }
     }
     initToolsParams(["target"]);
@@ -2401,20 +2427,9 @@ function initToolsParams(tools) {
     if (tools.includes("order"))
         params.tools.order = { side: 0, entry: {}, tp: {}, sl: {} };
     if (tools.includes("lines")) params.tools.lines = [];
-    if (tools.includes("target"))
-        params.tools.target = { A: {}, B: {}, X: {}, Y: {}, Z: {} };
+    if (tools.includes("target")) params.tools.target = {};
     if (tools.includes("tr")) params.tools.timeRange = [];
-    if (tools.includes("pattern"))
-        params.tools.pattern = {
-            A: {},
-            B: {},
-            C: {},
-            D: {},
-            X: {},
-            Y: {},
-            Z: {},
-            W: {},
-        };
+    if (tools.includes("pattern")) params.tools.pattern = {};
 }
 function getAccountInfo() {
     store.dispatch("tradingDerivative/getAccountInfo").then((data) => {
