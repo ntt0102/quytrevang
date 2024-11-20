@@ -1546,14 +1546,14 @@ function calculatePattern(points, patternDefault = null, tRDefault = null) {
     if (BC > phase1.pr) {
         const isSupportHeld = cmp(points.C.price, side, phase1.S1.price);
         if (BC >= 1.5) {
-            if (phase2.tr >= phase1.tr && phase2.tr < 2 * phase1.tr) {
+            if (phase2.tr >= phase1.tr && phase2.tr < 3 * phase1.tr) {
                 if (isSupportHeld) patterns.push("F");
                 else {
                     if (cmp(phase3.R1.price, !side, phase2.S1.price))
                         patterns.push("R");
                 }
             }
-            if (phase3.tr >= phase1.tr && phase3.tr < 2 * phase1.tr)
+            if (phase3.tr >= phase1.tr && phase3.tr < 3 * phase1.tr)
                 patterns.push("T");
         }
         if (phase1.pr >= 1.5) {
@@ -1563,8 +1563,10 @@ function calculatePattern(points, patternDefault = null, tRDefault = null) {
                     if (phase2.tr > phase3.tr) patterns.push("E2F");
                     else patterns.push("E2T");
                 } else if (phase1.el >= 1) {
-                    if (phase2.tr > phase3.tr) patterns.push("EF");
-                    else patterns.push("ET");
+                    if (!cmp(points.C.price, !side, phase1.R1.price)) {
+                        if (phase2.tr > phase3.tr) patterns.push("EF");
+                        else patterns.push("ET");
+                    }
                 }
             }
         }
