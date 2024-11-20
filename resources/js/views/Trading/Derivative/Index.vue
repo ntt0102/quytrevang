@@ -748,28 +748,28 @@ function eventPriceLineDrag(e) {
                 point = "X";
                 changeOptions = {
                     price: parseFloat((tR + X).toFixed(1)),
-                    title: "T " + parseFloat(X.toFixed(1)),
+                    title: "X " + parseFloat(X.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Y";
                 changeOptions = {
                     price: parseFloat((tR + Y).toFixed(1)),
-                    title: "T " + parseFloat(Y.toFixed(1)),
+                    title: "Y " + parseFloat(Y.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Z";
                 changeOptions = {
                     price: parseFloat((tR + Z).toFixed(1)),
-                    title: "T " + parseFloat(Z.toFixed(1)),
+                    title: "Z " + parseFloat(Z.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "W";
                 changeOptions = {
                     price: parseFloat((tR + W).toFixed(1)),
-                    title: "T " + parseFloat(W.toFixed(1)),
+                    title: "W " + parseFloat(W.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
             }
@@ -1335,28 +1335,28 @@ function drawPatternTool() {
                 point = "X";
                 changeOptions = {
                     price: parseFloat((tR + X).toFixed(1)),
-                    title: "T " + parseFloat(X.toFixed(1)),
+                    title: "X " + parseFloat(X.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Y";
                 changeOptions = {
                     price: parseFloat((tR + Y).toFixed(1)),
-                    title: "T " + parseFloat(Y.toFixed(1)),
+                    title: "Y " + parseFloat(Y.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Z";
                 changeOptions = {
                     price: parseFloat((tR + Z).toFixed(1)),
-                    title: "T " + parseFloat(Z.toFixed(1)),
+                    title: "Z " + parseFloat(Z.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "W";
                 changeOptions = {
                     price: parseFloat((tR + W).toFixed(1)),
-                    title: "T " + parseFloat(W.toFixed(1)),
+                    title: "W " + parseFloat(W.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
             } else {
@@ -1395,13 +1395,13 @@ function drawPatternTool() {
                 option.point = "D";
                 option.price = tR;
                 option.title = "F " + fibo;
-                option.color = "#4CAF50";
+                option.color = "#FFEB3B";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
                 //
                 option.point = "X";
                 option.price = parseFloat((tR + X).toFixed(1));
-                option.title = "T " + parseFloat(X.toFixed(1));
+                option.title = "X " + parseFloat(X.toFixed(1));
                 option.color = "#2196F3";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1409,7 +1409,7 @@ function drawPatternTool() {
                 //
                 option.point = "Y";
                 option.price = parseFloat((tR + Y).toFixed(1));
-                option.title = "T " + parseFloat(Y.toFixed(1));
+                option.title = "Y " + parseFloat(Y.toFixed(1));
                 option.color = "#673AB7";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1417,7 +1417,7 @@ function drawPatternTool() {
                 //
                 option.point = "Z";
                 option.price = parseFloat((tR + Z).toFixed(1));
-                option.title = "T " + parseFloat(Z.toFixed(1));
+                option.title = "Z " + parseFloat(Z.toFixed(1));
                 option.color = "#9C27B0";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1425,7 +1425,7 @@ function drawPatternTool() {
                 //
                 option.point = "W";
                 option.price = parseFloat((tR + W).toFixed(1));
-                option.title = "T " + parseFloat(W.toFixed(1));
+                option.title = "W " + parseFloat(W.toFixed(1));
                 option.color = "#E91E63";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1438,7 +1438,7 @@ function drawPatternTool() {
         } else {
             option.point = "B";
             option.title = "B 0";
-            option.color = "#009688";
+            option.color = "#4CAF50";
             params.tools.pattern[option.point] =
                 params.series.price.createPriceLine(option);
         }
@@ -1477,7 +1477,7 @@ function loadPatternTool(points, patternSelected = null, loadTimeRange = true) {
     //
     option.point = "B";
     option.title = `B ${el2}`;
-    option.color = "#009688";
+    option.color = "#4CAF50";
     option.price = points.B.price;
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
@@ -1492,13 +1492,13 @@ function loadPatternTool(points, patternSelected = null, loadTimeRange = true) {
     option.point = "D";
     option.price = tR;
     option.title = "F " + fibo;
-    option.color = "#4CAF50";
+    option.color = "#FFEB3B";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     //
     option.point = "X";
     option.price = parseFloat((tR + X).toFixed(1));
-    option.title = "T " + parseFloat(X.toFixed(1));
+    option.title = "X " + parseFloat(X.toFixed(1));
     option.color = "#2196F3";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1506,7 +1506,7 @@ function loadPatternTool(points, patternSelected = null, loadTimeRange = true) {
     //
     option.point = "Y";
     option.price = parseFloat((tR + Y).toFixed(1));
-    option.title = "T " + parseFloat(Y.toFixed(1));
+    option.title = "Y " + parseFloat(Y.toFixed(1));
     option.color = "#673AB7";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1514,7 +1514,7 @@ function loadPatternTool(points, patternSelected = null, loadTimeRange = true) {
     //
     option.point = "Z";
     option.price = parseFloat((tR + Z).toFixed(1));
-    option.title = "T " + parseFloat(Z.toFixed(1));
+    option.title = "Z " + parseFloat(Z.toFixed(1));
     option.color = "#9C27B0";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1522,7 +1522,7 @@ function loadPatternTool(points, patternSelected = null, loadTimeRange = true) {
     //
     option.point = "W";
     option.price = parseFloat((tR + W).toFixed(1));
-    option.title = "T " + parseFloat(W.toFixed(1));
+    option.title = "W " + parseFloat(W.toFixed(1));
     option.color = "#E91E63";
     option.draggable = false;
     params.tools.pattern[option.point] =
