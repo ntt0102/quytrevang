@@ -13,7 +13,7 @@
                 {{ item.name }}
             </li>
         </ul>
-        <div v-else>
+        <div v-else class="no-pattern">
             {{ $t("trading.derivative.patternContext.noPattern") }}
         </div>
     </div>
@@ -85,13 +85,11 @@ function stopPropagationEvent(e) {
         border-color: transparent rgba(0, 0, 0, 0.1) transparent transparent;
         position: absolute;
     }
-
     ul {
         list-style-type: none;
         padding: 0;
         margin: 0;
     }
-
     li {
         padding: 10px;
         cursor: pointer;
@@ -104,14 +102,15 @@ function stopPropagationEvent(e) {
             margin-bottom: 7px;
         }
     }
-
     li:hover {
         background-color: #f0f0f0;
         color: black;
     }
-
     li.selected {
         background-color: #007bff;
+        color: white;
+    }
+    .no-pattern {
         color: white;
     }
 }

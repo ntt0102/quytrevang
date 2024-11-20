@@ -1,0 +1,1 @@
+const a=[{tag:"F",name:"Mẫu hình lá cờ"},{tag:"R",name:"Mẫu hình đảo chiều"},{tag:"T",name:"Mẫu hình tam giác"},{tag:"EF",name:"Mẫu hình mở rộng lá cờ"},{tag:"ET",name:"Mẫu hình mở rộng tam giác"},{tag:"E2F",name:"Mẫu hình siêu mở rộng lá cờ"},{tag:"E2T",name:"Mẫu hình siêu mở rộng tam giác"}];export{a as default};

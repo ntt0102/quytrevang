@@ -1,13 +1,11 @@
 export default [
-    { tag: "FL", name: "Mẫu hình lá cờ lớn" },
     { tag: "F", name: "Mẫu hình lá cờ" },
-    { tag: "FS", name: "Mẫu hình lá cờ nhỏ" },
-    { tag: "TL", name: "Mẫu hình tam giác lớn" },
+    { tag: "R", name: "Mẫu hình đảo chiều" },
     { tag: "T", name: "Mẫu hình tam giác" },
     { tag: "EF", name: "Mẫu hình mở rộng lá cờ" },
     { tag: "ET", name: "Mẫu hình mở rộng tam giác" },
-    { tag: "ELF", name: "Mẫu hình siêu mở rộng lá cờ" },
-    { tag: "ELT", name: "Mẫu hình siêu mở rộng tam giác" },
+    { tag: "E2F", name: "Mẫu hình siêu mở rộng lá cờ" },
+    { tag: "E2T", name: "Mẫu hình siêu mở rộng tam giác" },
 ];
 // export default {
 //     items: [

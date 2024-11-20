@@ -1542,28 +1542,26 @@ function calculatePattern(points, patternDefault = null, tRDefault = null) {
     const side = ba > 0;
     const BC = Math.abs(bc);
     let patterns = [];
-    let tR, tS, timeRange, fibo;
+    let tR, tS, timeRange, fiboWave;
     if (BC > phase1.pr) {
+        const isSupportHeld = cmp(points.C.price, side, phase1.S1.price);
         if (BC >= 1.5) {
-            if (phase2.tr >= 2 * phase1.tr) {
-                // if (bc / ba < 0.5) patterns.push("FL");
-            } else if (phase2.tr >= phase1.tr) patterns.push("F");
-            else {
-                // if (
-                //     cmp(phase2.S1.price, side, phase1.R1.price) &&
-                //     cmp(phase2.R1.price, !side, phase1.S1.price)
-                // )
-                //     patterns.push("FS");
+            if (phase2.tr >= phase1.tr && phase2.tr < 2 * phase1.tr) {
+                if (isSupportHeld) patterns.push("F");
+                else {
+                    if (cmp(phase3.R1.price, !side, phase2.S1.price))
+                        patterns.push("R");
+                }
             }
-            if (phase3.tr >= 2 * phase1.tr) {
-                // if (bc / ba < 0.5) patterns.push("TL");
-            } else if (phase3.tr >= phase1.tr) patterns.push("T");
+            if (phase3.tr >= phase1.tr && phase3.tr < 2 * phase1.tr)
+                patterns.push("T");
         }
         if (phase1.pr >= 1.5) {
-            if (cmp(points.C.price, side, phase1.S1.price)) {
-                if (phase1.el >= 2) {
-                    if (phase2.tr > phase3.tr) patterns.push("ELF");
-                    else patterns.push("ELT");
+            if (isSupportHeld) {
+                if (phase1.el >= 3);
+                else if (phase1.el >= 2) {
+                    if (phase2.tr > phase3.tr) patterns.push("E2F");
+                    else patterns.push("E2T");
                 } else if (phase1.el >= 1) {
                     if (phase2.tr > phase3.tr) patterns.push("EF");
                     else patterns.push("ET");
@@ -1571,28 +1569,12 @@ function calculatePattern(points, patternDefault = null, tRDefault = null) {
             }
         }
     }
-    const pattern = patternDefault ?? (patterns.length ? patterns[0] : null);
-    if (["FL", "F", "FS"].includes(pattern)) {
-        tS = phase2.R.price;
-        tR = phase2.S1.price;
-        timeRange = [
-            phase2.R1.time,
-            indexToTime(phase2.S1.index),
-            phase2.S1.time,
-        ];
-    } else if (["TL", "T"].includes(pattern)) {
-        tS = phase3.S.price;
-        tR = phase3.R1.price;
-        timeRange = [
-            phase1.R1.time,
-            indexToTime(phase1.S1.index),
-            phase3.R1.time,
-        ];
-    } else if (["ELF", "ELT", "EF", "ET"].includes(pattern)) {
+    const pattern = patternDefault ?? (patterns.length ? patterns[0] : "");
+    //
+    if (pattern.includes("E")) {
         tS = phase1.S1.price;
         tR = phase1.R1.price;
-        fibo = parseInt(((tR - tS) / ba) * 100);
-        if (["ELF", "EF"].includes(pattern)) {
+        if (pattern.includes("F")) {
             timeRange = [
                 phase2.R1.time,
                 indexToTime(phase2.S1.index),
@@ -1605,17 +1587,48 @@ function calculatePattern(points, patternDefault = null, tRDefault = null) {
                 phase1.R.time,
             ];
         }
+        fiboWave = phase1.R1.price - phase1.S1.price;
+    } else if (pattern == "R") {
+        tS = phase3.R1.price;
+        tR = phase3.S1.price;
+        timeRange = [
+            phase2.R1.time,
+            indexToTime(phase2.S1.index),
+            phase2.R.time,
+        ];
+        fiboWave = phase3.S.price - phase3.R1.price;
+    } else if (pattern != "") {
+        if (pattern == "F") {
+            tS = phase2.R.price;
+            tR = phase2.S1.price;
+            timeRange = [
+                phase2.R1.time,
+                indexToTime(phase2.S1.index),
+                phase2.S1.time,
+            ];
+        } else if (pattern == "T") {
+            tS = phase3.S.price;
+            tR = phase3.R1.price;
+            timeRange = [
+                phase1.R1.time,
+                indexToTime(phase1.S1.index),
+                phase3.R1.time,
+            ];
+        }
+        fiboWave = bc;
+    } else {
+        tS = phase2.R.price;
+        tR = points.B.price;
+        timeRange = [phase1.R1.time, indexToTime(phase1.S1.index)];
+        fiboWave = bc;
     }
-    if (!tS) tS = phase2.R.price;
-    if (!tR) tR = points.B.price;
     if (tRDefault) tR = tRDefault;
-    if (!timeRange) timeRange = [phase1.R1.time, indexToTime(phase1.S1.index)];
-    if (!fibo) fibo = parseInt(((tR - tS) / bc) * 100);
     //
     const Y = tR - tS;
     const X = 0.5 * Y;
     const Z = 2 * Y;
     const W = 4 * Y;
+    const fibo = parseInt((Y / fiboWave) * 100);
 
     return {
         pattern: { items: patterns, selected: pattern },
