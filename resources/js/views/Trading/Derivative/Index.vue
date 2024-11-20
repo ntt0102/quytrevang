@@ -1593,6 +1593,19 @@ function removePatternTool() {
         }
     }
     initToolsParams(["pattern"]);
+    removeTimeMark();
+}
+function loadTimeMark(data) {
+    const colors = ["#F44336", "#4CAF50", "#FF9800"];
+    let result = [];
+    for (let i = 0; i < data.length; i++) {
+        result.push({ time: indexToTime(data[i]), value: 1, color: colors[i] });
+    }
+    result.sort((a, b) => a.time - b.time);
+    params.series.timeMark.setData(result);
+}
+function removeTimeMark() {
+    params.series.timeMark.setData([]);
 }
 function timeRangeToolClick(e) {
     state.showScanContext = false;
@@ -1685,15 +1698,6 @@ function removeTimeRangeTool(withServer = true, onlyServer = false) {
         params.series.timeRange.setData([]);
         initToolsParams(["tr"]);
     }
-}
-function loadTimeMark(data) {
-    const colors = ["#F44336", "#4CAF50", "#FF9800"];
-    let result = [];
-    for (let i = 0; i < data.length; i++) {
-        result.push({ time: indexToTime(data[i]), value: 1, color: colors[i] });
-    }
-    result.sort((a, b) => a.time - b.time);
-    params.series.timeMark.setData(result);
 }
 function lineToolClick(e) {
     state.showScanContext = false;
