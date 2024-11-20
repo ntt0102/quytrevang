@@ -1447,7 +1447,7 @@ function calculatePattern(points) {
         phase2.R.index + phase2.tr,
         phase3.R2.index + phase3.tr,
     ];
-    let entry = points.B.price;
+    let entry = phase1.R1.price;
     let pattern = 0;
     if (
         BC > phase1.pr &&
