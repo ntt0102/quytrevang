@@ -1480,7 +1480,7 @@ function calculatePattern(points) {
     const X = tR - tS;
     const x = tR + X;
     const scale = parseInt((phase3.R.index - phase1.R.index) / phase1.tr);
-    const Y = X * scale;
+    const Y = scale > 1 ? X * scale : X;
     const y = tR + Y;
 
     return {
