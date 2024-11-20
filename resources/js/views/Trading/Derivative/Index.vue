@@ -1563,10 +1563,8 @@ function calculatePattern(points, patternDefault = null, tRDefault = null) {
                     if (phase2.tr > phase3.tr) patterns.push("E2F");
                     else patterns.push("E2T");
                 } else if (phase1.el >= 1) {
-                    if (!cmp(points.C.price, !side, phase1.R1.price)) {
-                        if (phase2.tr > phase3.tr) patterns.push("EF");
-                        else patterns.push("ET");
-                    }
+                    if (phase2.tr > phase3.tr) patterns.push("EF");
+                    else patterns.push("ET");
                 }
             }
         }
@@ -1643,6 +1641,7 @@ function scanPhase(start, end) {
     let R = mf.cloneDeep(end);
     const side = R.price > S.price;
     let box = {},
+        preBox = {},
         maxBox = {};
     params.data.price
         .filter((item) => item.time >= S.time)
@@ -1655,40 +1654,34 @@ function scanPhase(start, end) {
                 box = {
                     R: { index, time, price },
                     S: { index, time, price },
-                };
-                maxBox = {
-                    R: box.R,
-                    S: box.S,
                     pr: 0,
                     tr: 0,
                 };
+                preBox = box;
+                maxBox = box;
             }
             if (cmp(price, side, box.R.price)) {
-                const tr = box.S.index - box.R.index;
-                const pr = Math.abs(box.S.price - box.R.price);
-                if (tr >= maxBox.tr) {
-                    maxBox.tr = tr;
-                    maxBox.pr = pr;
-                    maxBox.R = box.R;
-                    maxBox.S = box.S;
+                const dis = Math.abs(box.R.price - preBox.R.price);
+                if (box.tr > 0 && box.pr >= preBox.pr && dis / box.pr <= 0.2) {
+                    box.R.index = preBox.R.index;
+                    box.R.time = preBox.R.time;
+                    box.tr = box.S.index - box.R.index;
                 }
-                if (
-                    pr >= maxBox.pr &&
-                    Math.abs(box.R.price - maxBox.R.price) / pr < 0.2
-                ) {
-                    maxBox.S.index = box.S.index;
-                    maxBox.tr = box.S.index - maxBox.R.index;
-                    maxBox.pr = pr;
-                }
+                if (box.tr >= maxBox.tr) maxBox = box;
+                if (dis / preBox.pr > 0.2 || box.tr >= preBox.tr) preBox = box;
                 box = {
                     R: { index, time, price },
                     S: { index, time, price },
+                    pr: 0,
+                    tr: 0,
                 };
             } else {
                 box.S.index = index;
+                box.tr = box.S.index - box.R.index;
                 if (cmp(price, !side, box.S.price)) {
                     box.S.time = time;
                     box.S.price = price;
+                    box.pr = Math.abs(box.S.price - box.R.price);
                 }
             }
             if (cmp(price, !side, S.price)) {
@@ -1698,18 +1691,12 @@ function scanPhase(start, end) {
             if (!cmp(price, !side, R.price)) return false;
             return true;
         });
-    const tr = box.S.index - box.R.index;
-    if (tr >= maxBox.tr) {
-        const pr = Math.abs(box.S.price - box.R.price);
-        maxBox.tr = tr;
-        maxBox.pr = pr;
-        maxBox.R = box.R;
-        maxBox.S = box.S;
-    }
+    if (box.tr >= maxBox.tr) maxBox = box;
     R.time = indexToTime(box.S.index);
     R.index = timeToIndex(R.time);
     S.index = timeToIndex(S.time);
     const exr = Math.abs(R.price - maxBox.R.price);
+
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,

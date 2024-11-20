@@ -41,7 +41,6 @@ const sortedItems = computed(() => {
 
 function loadItems() {
     import(`../../../lang/${window.lang}/derivative.js`).then((e) => {
-        console.log("loadItems", e.default);
         items.value = e.default || [];
     });
 }
