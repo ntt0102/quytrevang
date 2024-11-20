@@ -132,28 +132,19 @@
                     ></div>
                     <div
                         class="context command"
-                        :class="{ green: state.pattern.items.length }"
+                        :class="{ green: state.pattern }"
                         :title="$t('trading.derivative.progressTool')"
                         @click="progressToolClick"
-                        @contextmenu="progressToolContextMenu"
                     >
                         <i
                             class="far"
                             :class="{
-                                'fa-badge-check': !state.pattern.items.length,
-                                [`fa-circle-${state.pattern.items.length}`]:
-                                    state.pattern.items.length,
+                                'fa-badge-check': !state.pattern,
+                                [`fa-circle-${state.pattern}`]: state.pattern,
                                 blink: config.autoScan,
                             }"
                         >
                         </i>
-                        <PatternContext
-                            v-show="state.showPatternContext"
-                            class="contextmenu"
-                            :items="state.pattern.items"
-                            :selected="state.pattern.selected"
-                            @selectPattern="selectPattern"
-                        ></PatternContext>
                     </div>
                     <div
                         ref="scanToolRef"
@@ -184,15 +175,6 @@
                         <i class="far fa-heart-rate"></i>
                     </div>
                     <div
-                        ref="timeRangeToolRef"
-                        class="command"
-                        :title="$t('trading.derivative.timeRangeTool')"
-                        @click="timeRangeToolClick"
-                        @contextmenu="timeRangeToolContextmenu"
-                    >
-                        <i class="far fa-grip-lines-vertical"></i>
-                    </div>
-                    <div
                         ref="lineToolRef"
                         class="context command"
                         :title="$t('trading.derivative.lineTool')"
@@ -209,7 +191,15 @@
                             @deleteAllLine="removeLineTool"
                         ></LineContext>
                     </div>
-
+                    <div
+                        ref="timeRangeToolRef"
+                        class="command"
+                        :title="$t('trading.derivative.timeRangeTool')"
+                        @click="timeRangeToolClick"
+                        @contextmenu="timeRangeToolContextmenu"
+                    >
+                        <i class="far fa-grip-lines-vertical"></i>
+                    </div>
                     <div
                         ref="targetToolRef"
                         class="command"
@@ -269,7 +259,6 @@
 <script setup>
 import LineContext from "./LineContext.vue";
 import ScanContext from "./ScanContext.vue";
-import PatternContext from "./PatternContext.vue";
 import VpsOtpPopup from "./VpsOtpPopup.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
@@ -381,9 +370,7 @@ const state = reactive({
     isAutoScan: false,
     lineColor: "#F44336",
     lineTitle: "",
-    progress: [],
-    pattern: { items: [], selected: null },
-    showPatternContext: false,
+    pattern: 0,
     scanSide: "left",
     showScanContext: false,
     showLineContext: false,
@@ -437,7 +424,13 @@ onMounted(() => {
         priceLineVisible: false,
     });
     params.series.timeRange = params.chart.addHistogramSeries({
-        priceScaleId: "range",
+        priceScaleId: "timeRange",
+        scaleMargins: { top: 0, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    params.series.timeMark = params.chart.addHistogramSeries({
+        priceScaleId: "timeMark",
         scaleMargins: { top: 0, bottom: 0 },
         lastValueVisible: false,
         priceLineVisible: false,
@@ -712,17 +705,13 @@ function eventPriceLineDrag(e) {
                     B: { price: +bOptions.price },
                     C: { price: +cOptions.price },
                 };
-                const d =
-                    lineOptions.point == "D"
-                        ? +params.tools.pattern.D.options().price
-                        : null;
                 const {
                     pattern,
-                    timeRange,
-                    info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
-                } = calculatePattern(points, null, d);
+                    timeMark,
+                    info: { el1, el2, el3, entry, x, X, y, Y },
+                } = calculatePattern(points);
                 loadProgressTool(pattern);
-                loadTimeRangeTool(timeRange);
+                loadTimeMark(timeMark);
                 savePattern(points);
                 //
                 point = "A";
@@ -739,37 +728,23 @@ function eventPriceLineDrag(e) {
                 //
                 point = "D";
                 changeOptions = {
-                    price: tR,
-                    title: "F " + fibo,
+                    price: entry,
+                    title: "Entry",
                 };
                 if (lineOptions.point == point) delete changeOptions.price;
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat((tR + X).toFixed(1)),
+                    price: parseFloat(x.toFixed(1)),
                     title: "X " + parseFloat(X.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat((tR + Y).toFixed(1)),
+                    price: parseFloat(y.toFixed(1)),
                     title: "Y " + parseFloat(Y.toFixed(1)),
-                };
-                params.tools.pattern[point].applyOptions(changeOptions);
-                //
-                point = "Z";
-                changeOptions = {
-                    price: parseFloat((tR + Z).toFixed(1)),
-                    title: "Z " + parseFloat(Z.toFixed(1)),
-                };
-                params.tools.pattern[point].applyOptions(changeOptions);
-                //
-                point = "W";
-                changeOptions = {
-                    price: parseFloat((tR + W).toFixed(1)),
-                    title: "W " + parseFloat(W.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
             }
@@ -869,7 +844,7 @@ function loadToolsData(toolsData) {
                 loadOrderTool(points);
                 break;
             case "pattern":
-                loadPatternTool(toolsData.pattern, null, !("tr" in toolsData));
+                loadPatternTool(toolsData.pattern);
                 break;
             case "tr":
                 loadTimeRangeTool(Object.values(points));
@@ -1111,35 +1086,10 @@ function tradingviewClick(e) {
     e.stopPropagation();
 }
 function progressToolClick() {
-    state.showPatternContext = !state.showPatternContext;
-    state.showScanContext = false;
-    state.showLineContext = false;
-}
-function progressToolContextMenu() {
     store.dispatch("tradingDerivative/setAutoScan", !config.value.autoScan);
-}
-function selectPattern(e) {
-    if (e != state.pattern.selected) {
-        state.pattern.selected = e;
-        const aOptions = params.tools.pattern.A.options();
-        const bOptions = params.tools.pattern.B.options();
-        const cOptions = params.tools.pattern.C.options();
-        const points = {
-            A: { time: +aOptions.time, price: +aOptions.price },
-            B: { price: +bOptions.price },
-            C: { price: +cOptions.price },
-        };
-        removePatternTool();
-        loadPatternTool(points, e);
-    }
 }
 function loadProgressTool(e) {
     state.pattern = e;
-    setTimeout(() => (state.showPatternContext = true), 0);
-}
-function removeProgressTool() {
-    state.pattern.items = [];
-    state.pattern.selected = null;
 }
 function scanToolClick(e) {
     state.showScanContext = false;
@@ -1150,15 +1100,12 @@ function scanToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         removePatternTool();
-        removeTimeRangeTool(false);
-        removeProgressTool();
         savePattern();
         e.target.classList.add("selected");
     }
 }
 function scanToolContextMenu() {
     state.showScanContext = !state.showScanContext;
-    state.showPatternContext = false;
     state.showLineContext = false;
 }
 function drawScanTool() {
@@ -1272,8 +1219,6 @@ function patternToolClick(e) {
 function patternToolContextmenu(e) {
     e.target.classList.remove("selected");
     removePatternTool();
-    removeTimeRangeTool(true);
-    removeProgressTool();
     savePattern();
 }
 function drawPatternTool() {
@@ -1284,7 +1229,7 @@ function drawPatternTool() {
         lineType: TYPE,
         price,
         lineWidth: 1,
-        lineStyle: 1,
+        lineStyle: 0,
         draggable: true,
     };
     if (mf.isSet(params.tools.pattern.A)) {
@@ -1292,7 +1237,7 @@ function drawPatternTool() {
 
         if (mf.isSet(params.tools.pattern.B)) {
             const bOptions = params.tools.pattern.B.options();
-            let points, _timeRange, _pattern;
+            let points, _timeMark, _pattern;
 
             if (mf.isSet(params.tools.pattern.C)) {
                 let point, changeOptions;
@@ -1304,11 +1249,11 @@ function drawPatternTool() {
                 };
                 const {
                     pattern,
-                    timeRange,
-                    info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
+                    timeMark,
+                    info: { el1, el2, el3, entry, x, X, y, Y },
                 } = calculatePattern(points);
-                _timeRange = timeRange;
                 _pattern = pattern;
+                _timeMark = timeMark;
                 //
                 point = "A";
                 changeOptions = {
@@ -1329,34 +1274,20 @@ function drawPatternTool() {
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
-                changeOptions = { price: tR, title: "F " + fibo };
+                changeOptions = { price: entry, title: "Entry" };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat((tR + X).toFixed(1)),
+                    price: parseFloat(x.toFixed(1)),
                     title: "X " + parseFloat(X.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat((tR + Y).toFixed(1)),
+                    price: parseFloat(y.toFixed(1)),
                     title: "Y " + parseFloat(Y.toFixed(1)),
-                };
-                params.tools.pattern[point].applyOptions(changeOptions);
-                //
-                point = "Z";
-                changeOptions = {
-                    price: parseFloat((tR + Z).toFixed(1)),
-                    title: "Z " + parseFloat(Z.toFixed(1)),
-                };
-                params.tools.pattern[point].applyOptions(changeOptions);
-                //
-                point = "W";
-                changeOptions = {
-                    price: parseFloat((tR + W).toFixed(1)),
-                    title: "W " + parseFloat(W.toFixed(1)),
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
             } else {
@@ -1370,11 +1301,11 @@ function drawPatternTool() {
                 };
                 const {
                     pattern,
-                    timeRange,
-                    info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
+                    timeMark,
+                    info: { el1, el2, el3, entry, x, X, y, Y },
                 } = calculatePattern(points);
-                _timeRange = timeRange;
                 _pattern = pattern;
+                _timeMark = timeMark;
                 //
                 let point = "A";
                 params.tools.pattern[point].applyOptions({
@@ -1393,46 +1324,31 @@ function drawPatternTool() {
                     params.series.price.createPriceLine(option);
                 //
                 option.point = "D";
-                option.price = tR;
-                option.title = "F " + fibo;
-                option.color = "#FFEB3B";
-                params.tools.pattern[option.point] =
-                    params.series.price.createPriceLine(option);
-                //
-                option.point = "X";
-                option.price = parseFloat((tR + X).toFixed(1));
-                option.title = "X " + parseFloat(X.toFixed(1));
-                option.color = "#2196F3";
-                option.draggable = false;
-                params.tools.pattern[option.point] =
-                    params.series.price.createPriceLine(option);
-                //
-                option.point = "Y";
-                option.price = parseFloat((tR + Y).toFixed(1));
-                option.title = "Y " + parseFloat(Y.toFixed(1));
-                option.color = "#673AB7";
-                option.draggable = false;
-                params.tools.pattern[option.point] =
-                    params.series.price.createPriceLine(option);
-                //
-                option.point = "Z";
-                option.price = parseFloat((tR + Z).toFixed(1));
-                option.title = "Z " + parseFloat(Z.toFixed(1));
+                option.price = entry;
+                option.title = "Entry";
                 option.color = "#9C27B0";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
                 //
-                option.point = "W";
-                option.price = parseFloat((tR + W).toFixed(1));
-                option.title = "W " + parseFloat(W.toFixed(1));
+                option.point = "Y";
+                option.price = parseFloat(y.toFixed(1));
+                option.title = "Y " + parseFloat(Y.toFixed(1));
                 option.color = "#E91E63";
+                option.draggable = false;
+                params.tools.pattern[option.point] =
+                    params.series.price.createPriceLine(option);
+                //
+                option.point = "X";
+                option.price = parseFloat(x.toFixed(1));
+                option.title = "X " + parseFloat(X.toFixed(1));
+                option.color = "#2196F3";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
             }
             loadProgressTool(_pattern);
-            loadTimeRangeTool(_timeRange);
+            loadTimeMark(_timeMark);
             savePattern(points);
             patternToolRef.value.classList.remove("selected");
         } else {
@@ -1451,21 +1367,21 @@ function drawPatternTool() {
             params.series.price.createPriceLine(option);
     }
 }
-function loadPatternTool(points, patternSelected = null, loadTimeRange = true) {
+function loadPatternTool(points) {
     const TYPE = "pattern";
     let option = {
         lineType: TYPE,
         lineWidth: 1,
-        lineStyle: 1,
+        lineStyle: 0,
         draggable: true,
     };
     const {
         pattern,
-        timeRange,
-        info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
-    } = calculatePattern(points, patternSelected);
+        timeMark,
+        info: { el1, el2, el3, entry, x, X, y, Y },
+    } = calculatePattern(points);
     loadProgressTool(pattern);
-    if (loadTimeRange) loadTimeRangeTool(timeRange);
+    loadTimeMark(timeMark);
     //
     option.point = "A";
     option.title = `A ${el1}`;
@@ -1490,150 +1406,87 @@ function loadPatternTool(points, patternSelected = null, loadTimeRange = true) {
         params.series.price.createPriceLine(option);
     //
     option.point = "D";
-    option.price = tR;
-    option.title = "F " + fibo;
-    option.color = "#FFEB3B";
-    params.tools.pattern[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "X";
-    option.price = parseFloat((tR + X).toFixed(1));
-    option.title = "X " + parseFloat(X.toFixed(1));
-    option.color = "#2196F3";
-    option.draggable = false;
-    params.tools.pattern[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "Y";
-    option.price = parseFloat((tR + Y).toFixed(1));
-    option.title = "Y " + parseFloat(Y.toFixed(1));
-    option.color = "#673AB7";
-    option.draggable = false;
-    params.tools.pattern[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "Z";
-    option.price = parseFloat((tR + Z).toFixed(1));
-    option.title = "Z " + parseFloat(Z.toFixed(1));
+    option.price = entry;
+    option.title = "Entry";
     option.color = "#9C27B0";
     option.draggable = false;
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     //
-    option.point = "W";
-    option.price = parseFloat((tR + W).toFixed(1));
-    option.title = "W " + parseFloat(W.toFixed(1));
+    option.point = "Y";
+    option.price = parseFloat(y.toFixed(1));
+    option.title = "Y " + parseFloat(Y.toFixed(1));
     option.color = "#E91E63";
     option.draggable = false;
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
+    //
+    option.point = "X";
+    option.price = parseFloat(x.toFixed(1));
+    option.title = "X " + parseFloat(X.toFixed(1));
+    option.color = "#2196F3";
+    option.draggable = false;
+    params.tools.pattern[option.point] =
+        params.series.price.createPriceLine(option);
 }
-function calculatePattern(points, patternDefault = null, tRDefault = null) {
+function calculatePattern(points) {
     const phase1 = scanPhase(points.A, points.B);
     const phase2 = scanPhase(phase1.R, points.C);
-    const phase3 = scanPhase(phase2.R, phase2.S);
+    const phase3 = scanPhase(phase2.R, points.B);
     //
     const el1 = parseFloat(phase1.el.toFixed(1));
     const el2 = parseFloat(phase2.el.toFixed(1));
     const el3 = parseFloat(phase3.el.toFixed(1));
     //
     const bc = points.B.price - points.C.price;
-    const ba = points.B.price - points.A.price;
-    const side = ba > 0;
+    const side = bc > 0;
     const BC = Math.abs(bc);
-    let patterns = [];
-    let tR, tS, timeRange, fiboWave;
-    if (BC > phase1.pr) {
-        const isSupportHeld = cmp(points.C.price, side, phase1.S1.price);
-        if (BC >= 1.5) {
-            if (phase2.tr >= phase1.tr && phase2.tr < 3 * phase1.tr) {
-                if (isSupportHeld) patterns.push("F");
-                else {
-                    if (cmp(phase3.R1.price, !side, phase2.S1.price))
-                        patterns.push("R");
-                }
-            }
-            if (phase3.tr >= phase1.tr && phase3.tr < 3 * phase1.tr)
-                patterns.push("T");
-        }
-        if (phase1.pr >= 1.5) {
-            if (isSupportHeld) {
-                if (phase1.el >= 3);
-                else if (phase1.el >= 2) {
-                    if (phase2.tr > phase3.tr) patterns.push("E2F");
-                    else patterns.push("E2T");
-                } else if (phase1.el >= 1) {
-                    if (phase2.tr > phase3.tr) patterns.push("EF");
-                    else patterns.push("ET");
-                }
+
+    const timeMark = [
+        phase1.R.index + phase1.tr,
+        phase2.R.index + phase2.tr,
+        phase3.R2.index + phase3.tr,
+    ];
+    let entry = points.B.price;
+    let pattern = 0;
+    if (
+        BC > phase1.pr &&
+        phase3.R.index - phase1.R.index > phase1.tr &&
+        cmp(points.C.price, side, phase1.S1.price)
+    ) {
+        entry = phase2.S1.price;
+        pattern = 1;
+
+        const CD = Math.abs(points.C.price - phase3.R.price);
+        if (
+            CD > phase2.pr &&
+            phase3.R.index - phase2.R.index > phase2.tr &&
+            cmp(phase3.R.price, !side, phase2.S1.price)
+        ) {
+            const DE = Math.abs(phase3.R.price - phase3.S1.price);
+            if (
+                DE > phase3.pr &&
+                phase3.R.index - phase3.R2.index > phase3.tr &&
+                cmp(phase3.S2.price, side, phase3.S1.price)
+            ) {
+                entry = phase3.R2.price;
+                pattern = 2;
             }
         }
     }
-    const pattern = patternDefault ?? (patterns.length ? patterns[0] : "");
-    //
-    if (pattern.includes("E")) {
-        tS = phase1.S1.price;
-        tR = phase1.R1.price;
-        if (pattern.includes("F")) {
-            timeRange = [
-                phase2.R1.time,
-                indexToTime(phase2.S1.index),
-                phase2.R.time,
-            ];
-        } else {
-            timeRange = [
-                phase1.R1.time,
-                indexToTime(phase1.S1.index),
-                phase1.R.time,
-            ];
-        }
-        fiboWave = phase1.R1.price - phase1.S1.price;
-    } else if (pattern == "R") {
-        tS = phase3.R1.price;
-        tR = phase3.S1.price;
-        timeRange = [
-            phase2.R1.time,
-            indexToTime(phase2.S1.index),
-            phase2.R.time,
-        ];
-        fiboWave = phase3.S.price - phase3.R1.price;
-    } else if (pattern != "") {
-        if (pattern == "F") {
-            tS = phase2.R.price;
-            tR = phase2.S1.price;
-            timeRange = [
-                phase2.R1.time,
-                indexToTime(phase2.S1.index),
-                phase2.S1.time,
-            ];
-        } else if (pattern == "T") {
-            tS = phase3.S.price;
-            tR = phase3.R1.price;
-            timeRange = [
-                phase1.R1.time,
-                indexToTime(phase1.S1.index),
-                phase3.R1.time,
-            ];
-        }
-        fiboWave = bc;
-    } else {
-        tS = phase2.R.price;
-        tR = points.B.price;
-        timeRange = [phase1.R1.time, indexToTime(phase1.S1.index)];
-        fiboWave = bc;
-    }
-    if (tRDefault) tR = tRDefault;
-    //
-    const Y = tR - tS;
-    const X = 0.5 * Y;
-    const Z = 2 * Y;
-    const W = 4 * Y;
-    const fibo = parseInt((Y / fiboWave) * 100);
+
+    const tR = points.B.price;
+    const tS = phase1.R1.price;
+    const X = tR - tS;
+    const x = tR + X;
+    const scale = parseInt((phase3.R.index - phase1.R.index) / phase1.tr);
+    const Y = X * scale;
+    const y = tR + Y;
 
     return {
-        pattern: { items: patterns, selected: pattern },
-        timeRange,
-        info: { el1, el2, el3, fibo, tR, X, Y, Z, W },
+        pattern,
+        timeMark,
+        info: { el1, el2, el3, entry, x, X, y, Y },
     };
 }
 function scanPhase(start, end) {
@@ -1662,13 +1515,13 @@ function scanPhase(start, end) {
             }
             if (cmp(price, side, box.R.price)) {
                 const dis = Math.abs(box.R.price - preBox.R.price);
-                if (box.tr > 0 && box.pr >= preBox.pr && dis / box.pr <= 0.2) {
-                    box.R.index = preBox.R.index;
-                    box.R.time = preBox.R.time;
-                    box.tr = box.S.index - box.R.index;
-                }
-                if (box.tr >= maxBox.tr) maxBox = box;
-                if (dis / preBox.pr > 0.2 || box.tr >= preBox.tr) preBox = box;
+                // if (box.tr > 0 && box.pr >= preBox.pr && dis / box.pr <= 0.2) {
+                //     box.R.index = preBox.R.index;
+                //     box.R.time = preBox.R.time;
+                //     box.tr = box.S.index - box.R.index;
+                // }
+                if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) maxBox = box;
+                // if (dis / preBox.pr > 0.2 || box.tr >= preBox.tr) preBox = box;
                 box = {
                     R: { index, time, price },
                     S: { index, time, price },
@@ -1691,18 +1544,21 @@ function scanPhase(start, end) {
             if (!cmp(price, !side, R.price)) return false;
             return true;
         });
-    if (box.tr >= maxBox.tr) maxBox = box;
+    // R.price = box.R.price;
+    R.index = box.S.index;
     R.time = indexToTime(box.S.index);
-    R.index = timeToIndex(R.time);
-    S.index = timeToIndex(S.time);
+    // S.index = timeToIndex(S.time);
     const exr = Math.abs(R.price - maxBox.R.price);
 
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
+        exr,
         el: maxBox.pr != 0 ? exr / maxBox.pr : 0,
         S1: maxBox.S,
         R1: maxBox.R,
+        S2: box.S,
+        R2: box.R,
         S,
         R,
     };
@@ -1733,8 +1589,6 @@ function removePatternTool() {
                 params.series.price.removePriceLine(params.tools.pattern.D);
                 params.series.price.removePriceLine(params.tools.pattern.X);
                 params.series.price.removePriceLine(params.tools.pattern.Y);
-                params.series.price.removePriceLine(params.tools.pattern.Z);
-                params.series.price.removePriceLine(params.tools.pattern.W);
             }
         }
     }
@@ -1832,6 +1686,15 @@ function removeTimeRangeTool(withServer = true, onlyServer = false) {
         initToolsParams(["tr"]);
     }
 }
+function loadTimeMark(data) {
+    const colors = ["#F44336", "#4CAF50", "#FF9800"];
+    let result = [];
+    for (let i = 0; i < data.length; i++) {
+        result.push({ time: indexToTime(data[i]), value: 1, color: colors[i] });
+    }
+    result.sort((a, b) => a.time - b.time);
+    params.series.timeMark.setData(result);
+}
 function lineToolClick(e) {
     state.showScanContext = false;
     state.showLineContext = false;
@@ -1843,7 +1706,6 @@ function lineToolClick(e) {
 }
 function lineToolContextmenu(e) {
     state.showLineContext = !state.showLineContext;
-    state.showPatternContext = false;
     state.showScanContext = false;
 }
 function drawLineTool() {
@@ -2071,7 +1933,6 @@ function removeAllTools() {
     removeLineTool(false);
     removeTargetTool(false);
     removeTimeRangeTool(false);
-    removeProgressTool();
     removePatternTool();
 }
 function toggleOrderButton(show) {
