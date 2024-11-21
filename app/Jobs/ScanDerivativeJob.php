@@ -39,7 +39,7 @@ class ScanDerivativeJob implements ShouldQueue
      */
     public function handle()
     {
-        if (get_global_value('autoScanFlag') == '0') return false;
+        if (get_global_value('autoRefreshFlag') == '0') return false;
 
         $data = json_decode($this->data);
 

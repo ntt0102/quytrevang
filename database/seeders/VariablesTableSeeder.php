@@ -67,7 +67,7 @@ class VariablesTableSeeder extends Seeder
             'value' => "",
         ]);
         Variable::create([
-            'name' => "autoScanFlag",
+            'name' => "autoRefreshFlag",
             'value' => "0",
         ]);
     }

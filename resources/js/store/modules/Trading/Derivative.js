@@ -38,13 +38,16 @@ const actions = {
                 });
         });
     },
-    setAutoScan({ commit, dispatch, getters, state, rootGetters }, autoScan) {
-        commit("setAutoScan", autoScan);
+    setAutoRefresh(
+        { commit, dispatch, getters, state, rootGetters },
+        autoRefresh
+    ) {
+        commit("setAutoRefresh", autoRefresh);
         return new Promise((resolve, reject) => {
             axios
                 .post(
-                    "trading/derivative/set-auto-scan",
-                    { autoScan },
+                    "trading/derivative/set-auto-refresh",
+                    { autoRefresh },
                     { noLoading: true }
                 )
                 .then((response) => resolve());
@@ -191,8 +194,8 @@ const mutations = {
         state.config = data.config;
         state.status = data.status;
     },
-    setAutoScan(state, autoScan) {
-        state.config.autoScan = autoScan;
+    setAutoRefresh(state, autoRefresh) {
+        state.config.autoRefresh = autoRefresh;
     },
     setTools(state, data) {
         state.tools = data;
