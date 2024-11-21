@@ -712,22 +712,35 @@ function eventPriceLineDrag(e) {
                 const {
                     progress,
                     timeMark,
-                    info: { el1, el2, el3, entry, prValid, x, X, y, Y },
+                    info: {
+                        et1,
+                        et2,
+                        et3,
+                        ep1,
+                        ep2,
+                        ep3,
+                        entry,
+                        prValid,
+                        x,
+                        X,
+                        y,
+                        Y,
+                    },
                 } = calculatePattern(points);
                 setProgress(progress);
                 setTimeMark(timeMark);
                 savePattern(points);
                 //
                 point = "A";
-                changeOptions = { title: `A ${el1}` };
+                changeOptions = { title: `A ${et1}/${ep1}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "B";
-                changeOptions = { title: `B ${el2}` };
+                changeOptions = { title: `B ${et2}/${ep2}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "C";
-                changeOptions = { title: `C ${el3}` };
+                changeOptions = { title: `C ${et3}/${ep3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
@@ -1251,7 +1264,20 @@ function drawPatternTool() {
                 const {
                     progress,
                     timeMark,
-                    info: { el1, el2, el3, entry, prValid, x, X, y, Y },
+                    info: {
+                        et1,
+                        et2,
+                        et3,
+                        ep1,
+                        ep2,
+                        ep3,
+                        entry,
+                        prValid,
+                        x,
+                        X,
+                        y,
+                        Y,
+                    },
                 } = calculatePattern(points);
                 _progress = progress;
                 _timeMark = timeMark;
@@ -1260,18 +1286,18 @@ function drawPatternTool() {
                 changeOptions = {
                     price,
                     time,
-                    title: `A ${el1}`,
+                    title: `A ${et1}/${ep1}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "B";
                 changeOptions = {
-                    title: `B ${el2}`,
+                    title: `B ${et2}/${ep2}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "C";
-                changeOptions = { title: `C ${el3}` };
+                changeOptions = { title: `C ${et3}/${ep3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
@@ -1303,23 +1329,36 @@ function drawPatternTool() {
                 const {
                     progress,
                     timeMark,
-                    info: { el1, el2, el3, entry, prValid, x, X, y, Y },
+                    info: {
+                        et1,
+                        et2,
+                        et3,
+                        ep1,
+                        ep2,
+                        ep3,
+                        entry,
+                        prValid,
+                        x,
+                        X,
+                        y,
+                        Y,
+                    },
                 } = calculatePattern(points);
                 _progress = progress;
                 _timeMark = timeMark;
                 //
                 let point = "A";
                 params.tools.pattern[point].applyOptions({
-                    title: `A ${el1}`,
+                    title: `A ${et1}/${ep1}`,
                 });
                 //
                 point = "B";
                 params.tools.pattern[point].applyOptions({
-                    title: `B ${el2}`,
+                    title: `B ${et2}/${ep2}`,
                 });
                 //
                 option.point = "C";
-                option.title = `C ${el3}`;
+                option.title = `C ${et3}/${ep3}`;
                 option.color = "#FF9800";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1379,13 +1418,13 @@ function loadPatternTool(points) {
     const {
         progress,
         timeMark,
-        info: { el1, el2, el3, entry, prValid, x, X, y, Y },
+        info: { et1, et2, et3, ep1, ep2, ep3, entry, prValid, x, X, y, Y },
     } = calculatePattern(points);
     setProgress(progress);
     setTimeMark(timeMark);
     //
     option.point = "A";
-    option.title = `A ${el1}`;
+    option.title = `A ${et1}/${ep1}`;
     option.color = "#F44336";
     option.price = points.A.price;
     option.time = points.A.time;
@@ -1393,7 +1432,7 @@ function loadPatternTool(points) {
         params.series.price.createPriceLine(option);
     //
     option.point = "B";
-    option.title = `B ${el2}`;
+    option.title = `B ${et2}/${ep2}`;
     option.color = "#4CAF50";
     option.price = points.B.price;
     params.tools.pattern[option.point] =
@@ -1401,7 +1440,7 @@ function loadPatternTool(points) {
     //
     option.point = "C";
     option.price = points.C.price;
-    option.title = `C ${el3}`;
+    option.title = `C ${et3}/${ep3}`;
     option.color = "#FF9800";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
@@ -1455,6 +1494,7 @@ function calculatePattern(points) {
     let progress = 0;
     if (Math.abs(X) >= 1.5) {
         if (
+            phase1.et < 1 &&
             pr1Valid &&
             phase3.S2.index - phase1.R.index > phase1.tr &&
             cmp(points.C.price, side, phase1.S1.price)
@@ -1486,9 +1526,12 @@ function calculatePattern(points) {
         phase3.R2.index + phase3.tr,
     ];
     //
-    const el1 = parseFloat(phase1.el.toFixed(1));
-    const el2 = parseFloat(phase2.el.toFixed(1));
-    const el3 = parseFloat(phase3.el.toFixed(1));
+    const et1 = parseFloat(phase1.et.toFixed(1));
+    const et2 = parseFloat(phase2.et.toFixed(1));
+    const et3 = parseFloat(phase3.et.toFixed(1));
+    const ep1 = parseFloat(phase1.ep.toFixed(1));
+    const ep2 = parseFloat(phase2.ep.toFixed(1));
+    const ep3 = parseFloat(phase3.ep.toFixed(1));
     //
     const x = adjustTargetPrice(tR + X, side);
     const scale = parseInt((phase3.breakIndex - phase1.R.index) / phase1.tr);
@@ -1498,7 +1541,7 @@ function calculatePattern(points) {
     return {
         progress,
         timeMark,
-        info: { el1, el2, el3, entry, prValid, x, X, y, Y },
+        info: { et1, et2, et3, ep1, ep2, ep3, entry, prValid, x, X, y, Y },
     };
 }
 function scanPhase(start, end, breakPrice = null) {
@@ -1534,6 +1577,10 @@ function scanPhase(start, end, breakPrice = null) {
                 //     box.tr = box.S.index - box.R.index;
                 // }
                 // if (dis / preBox.pr > 0.2 || box.tr >= preBox.tr) preBox = box;
+                if (Math.abs(box.R.price - maxBox.R.price) == 0.1) {
+                    maxBox.S.index = box.S.index;
+                    maxBox.tr = maxBox.S.index - maxBox.R.index;
+                }
                 if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) maxBox = box;
                 box = {
                     R: { index, time, price },
@@ -1561,12 +1608,13 @@ function scanPhase(start, end, breakPrice = null) {
         });
     R.index = box.S.index;
     R.time = indexToTime(box.S.index);
-    const exr = Math.abs(R.price - maxBox.R.price);
 
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
-        el: maxBox.pr != 0 ? exr / maxBox.pr : 0,
+        et: (R.index - maxBox.S.index) / maxBox.tr,
+        // ep: maxBox.pr ? Math.abs(R.price - maxBox.R.price) / maxBox.pr : 0,
+        ep: Math.abs(R.price - maxBox.R.price) / maxBox.pr,
         S1: maxBox.S,
         R1: maxBox.R,
         S2: box.S,
