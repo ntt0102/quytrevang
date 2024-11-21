@@ -733,15 +733,15 @@ function eventPriceLineDrag(e) {
                 savePattern(points);
                 //
                 point = "A";
-                changeOptions = { title: `A ${et1}/${ep1}` };
+                changeOptions = { title: `A ${ep1}/${et1}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "B";
-                changeOptions = { title: `B ${et2}/${ep2}` };
+                changeOptions = { title: `B ${ep2}/${et2}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "C";
-                changeOptions = { title: `C ${et3}/${ep3}` };
+                changeOptions = { title: `C ${ep3}/${et3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
@@ -1287,18 +1287,18 @@ function drawPatternTool() {
                 changeOptions = {
                     price,
                     time,
-                    title: `A ${et1}/${ep1}`,
+                    title: `A ${ep1}/${et1}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "B";
                 changeOptions = {
-                    title: `B ${et2}/${ep2}`,
+                    title: `B ${ep2}/${et2}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "C";
-                changeOptions = { title: `C ${et3}/${ep3}` };
+                changeOptions = { title: `C ${ep3}/${et3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
@@ -1350,16 +1350,16 @@ function drawPatternTool() {
                 //
                 let point = "A";
                 params.tools.pattern[point].applyOptions({
-                    title: `A ${et1}/${ep1}`,
+                    title: `A ${ep1}/${et1}`,
                 });
                 //
                 point = "B";
                 params.tools.pattern[point].applyOptions({
-                    title: `B ${et2}/${ep2}`,
+                    title: `B ${ep2}/${et2}`,
                 });
                 //
                 option.point = "C";
-                option.title = `C ${et3}/${ep3}`;
+                option.title = `C ${ep3}/${et3}`;
                 option.color = "#FF9800";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1426,7 +1426,7 @@ function loadPatternTool(prePoints, isAdjust = false) {
     setTimeMark(timeMark);
     //
     option.point = "A";
-    option.title = `A ${et1}/${ep1}`;
+    option.title = `A ${ep1}/${et1}`;
     option.color = "#F44336";
     option.price = points.A.price;
     option.time = points.A.time;
@@ -1434,7 +1434,7 @@ function loadPatternTool(prePoints, isAdjust = false) {
         params.series.price.createPriceLine(option);
     //
     option.point = "B";
-    option.title = `B ${et2}/${ep2}`;
+    option.title = `B ${ep2}/${et2}`;
     option.color = "#4CAF50";
     option.price = points.B.price;
     params.tools.pattern[option.point] =
@@ -1442,7 +1442,7 @@ function loadPatternTool(prePoints, isAdjust = false) {
     //
     option.point = "C";
     option.price = points.C.price;
-    option.title = `C ${et3}/${ep3}`;
+    option.title = `C ${ep3}/${et3}`;
     option.color = "#FF9800";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
@@ -1506,8 +1506,10 @@ function calculatePattern(points) {
             cmp(points.C.price, side, phase1.S1.price)
         ) {
             if (!tr2Valid) {
-                entry = phase2.S1.price;
-                progress = 1;
+                if (phase2.ep < 1) {
+                    entry = phase2.S1.price;
+                    progress = 1;
+                }
             } else {
                 if (pr2Valid) {
                     if (
