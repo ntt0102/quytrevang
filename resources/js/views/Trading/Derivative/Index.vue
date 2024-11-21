@@ -1500,7 +1500,7 @@ function calculatePattern(points) {
     let progress = 0;
     if (Math.abs(X) >= 1.5) {
         if (
-            phase1.et < 1.5 &&
+            phase1.et < 1.2 &&
             pr1Valid &&
             tr1Valid &&
             cmp(points.C.price, side, phase1.S1.price)
