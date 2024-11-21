@@ -733,15 +733,15 @@ function eventPriceLineDrag(e) {
                 savePattern(points);
                 //
                 point = "A";
-                changeOptions = { title: `A ${ep1}/${et1}` };
+                changeOptions = { title: `A ${ep1}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "B";
-                changeOptions = { title: `B ${ep2}/${et2}` };
+                changeOptions = { title: `B ${ep2}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "C";
-                changeOptions = { title: `C ${ep3}/${et3}` };
+                changeOptions = { title: `C ${ep3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
@@ -1287,18 +1287,18 @@ function drawPatternTool() {
                 changeOptions = {
                     price,
                     time,
-                    title: `A ${ep1}/${et1}`,
+                    title: `A ${ep1}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "B";
                 changeOptions = {
-                    title: `B ${ep2}/${et2}`,
+                    title: `B ${ep2}`,
                 };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "C";
-                changeOptions = { title: `C ${ep3}/${et3}` };
+                changeOptions = { title: `C ${ep3}` };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
@@ -1350,16 +1350,16 @@ function drawPatternTool() {
                 //
                 let point = "A";
                 params.tools.pattern[point].applyOptions({
-                    title: `A ${ep1}/${et1}`,
+                    title: `A ${ep1}`,
                 });
                 //
                 point = "B";
                 params.tools.pattern[point].applyOptions({
-                    title: `B ${ep2}/${et2}`,
+                    title: `B ${ep2}`,
                 });
                 //
                 option.point = "C";
-                option.title = `C ${ep3}/${et3}`;
+                option.title = `C ${ep3}`;
                 option.color = "#FF9800";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
@@ -1420,13 +1420,13 @@ function loadPatternTool(prePoints, isAdjust = false) {
     const {
         progress,
         timeMark,
-        info: { et1, et2, et3, ep1, ep2, ep3, entry, prValid, x, X, y, Y },
+        info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
     } = calculatePattern(points);
     setProgress(progress);
     setTimeMark(timeMark);
     //
     option.point = "A";
-    option.title = `A ${ep1}/${et1}`;
+    option.title = `A ${ep1}`;
     option.color = "#F44336";
     option.price = points.A.price;
     option.time = points.A.time;
@@ -1434,7 +1434,7 @@ function loadPatternTool(prePoints, isAdjust = false) {
         params.series.price.createPriceLine(option);
     //
     option.point = "B";
-    option.title = `B ${ep2}/${et2}`;
+    option.title = `B ${ep2}`;
     option.color = "#4CAF50";
     option.price = points.B.price;
     params.tools.pattern[option.point] =
@@ -1442,7 +1442,7 @@ function loadPatternTool(prePoints, isAdjust = false) {
     //
     option.point = "C";
     option.price = points.C.price;
-    option.title = `C ${ep3}/${et3}`;
+    option.title = `C ${ep3}`;
     option.color = "#FF9800";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
@@ -1500,7 +1500,6 @@ function calculatePattern(points) {
     let progress = 0;
     if (Math.abs(X) >= 1.5) {
         if (
-            phase1.et < 1.2 &&
             pr1Valid &&
             tr1Valid &&
             cmp(points.C.price, side, phase1.S1.price)
@@ -1530,9 +1529,6 @@ function calculatePattern(points) {
         phase3.R2.index + phase3.tr,
     ];
     //
-    const et1 = parseFloat(phase1.et.toFixed(1));
-    const et2 = parseFloat(phase2.et.toFixed(1));
-    const et3 = parseFloat(phase3.et.toFixed(1));
     const ep1 = parseFloat(phase1.ep.toFixed(1));
     const ep2 = parseFloat(phase2.ep.toFixed(1));
     const ep3 = parseFloat(phase3.ep.toFixed(1));
@@ -1545,7 +1541,7 @@ function calculatePattern(points) {
     return {
         progress,
         timeMark,
-        info: { et1, et2, et3, ep1, ep2, ep3, entry, prValid, x, X, y, Y },
+        info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
     };
 }
 function scanPhase(start, end, breakPrice = null) {
@@ -1618,7 +1614,6 @@ function scanPhase(start, end, breakPrice = null) {
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
-        et: (R.index - maxBox.S.index) / maxBox.tr,
         ep: Math.abs(R.price - maxBox.R.price) / maxBox.pr,
         S1: maxBox.S,
         R1: maxBox.R,
