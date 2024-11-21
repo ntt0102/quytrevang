@@ -1581,9 +1581,11 @@ function scanPhase(start, end, breakPrice = null) {
                 //     box.tr = box.S.index - box.R.index;
                 // }
                 // if (dis / preBox.pr > 0.2 || box.tr >= preBox.tr) preBox = box;
-                if (Math.abs(box.R.price - maxBox.R.price) < 0.2) {
+                const dis = Math.abs(box.R.price - maxBox.R.price);
+                if (dis < 0.2) {
                     maxBox.S.index = box.S.index;
                     maxBox.tr = maxBox.S.index - maxBox.R.index;
+                    maxBox.pr += dis;
                 }
                 if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) maxBox = box;
                 box = {
