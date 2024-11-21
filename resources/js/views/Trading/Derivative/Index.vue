@@ -1443,12 +1443,9 @@ function calculatePattern(points) {
     //
     const bc = points.B.price - points.C.price;
     const side = bc > 0;
-    const BC = Math.abs(bc);
-    const CD = Math.abs(points.C.price - phase3.R2.price);
-    const DE = Math.abs(phase3.R2.price - phase3.S2.price);
-    const pr1Valid = BC > phase1.pr;
-    const pr2Valid = CD > phase2.pr;
-    const pr3Valid = DE > phase3.pr;
+    const pr1Valid = Math.abs(bc) > phase1.pr;
+    const pr2Valid = Math.abs(points.C.price - phase3.R2.price) > phase2.pr;
+    const pr3Valid = Math.abs(phase3.R2.price - phase3.S2.price) > phase3.pr;
     const prValid =
         (pr1Valid ? "1" : "0") +
         (pr2Valid ? "1" : "0") +
