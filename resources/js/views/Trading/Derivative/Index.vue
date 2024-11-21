@@ -134,7 +134,8 @@
                         class="context command"
                         :class="{ green: state.progress }"
                         :title="$t('trading.derivative.progressTool')"
-                        @click="toggleAutoScan"
+                        @click="getTools"
+                        @contextmenu="toggleAutoScan"
                     >
                         <i
                             class="far"

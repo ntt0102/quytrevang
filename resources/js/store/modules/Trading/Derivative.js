@@ -27,11 +27,13 @@ const actions = {
         });
     },
     initChart({ commit, dispatch, getters, state, rootGetters }) {
+        commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .get("trading/derivative/init-chart", { noLoading: true })
                 .then((response) => {
                     commit("setInitChart", response.data);
+                    commit("setChartLoading", false);
                     resolve();
                 });
         });
@@ -49,11 +51,13 @@ const actions = {
         });
     },
     getTools({ commit, dispatch, getters, state, rootGetters }) {
+        commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .get("trading/derivative/get-tools", { noLoading: true })
                 .then((response) => {
                     commit("setTools", response.data);
+                    commit("setChartLoading", false);
                     resolve();
                 });
         });
