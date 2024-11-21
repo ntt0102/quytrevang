@@ -713,20 +713,7 @@ function eventPriceLineDrag(e) {
                 const {
                     progress,
                     timeMark,
-                    info: {
-                        et1,
-                        et2,
-                        et3,
-                        ep1,
-                        ep2,
-                        ep3,
-                        entry,
-                        prValid,
-                        x,
-                        X,
-                        y,
-                        Y,
-                    },
+                    info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
                 } = calculatePattern(points);
                 setProgress(progress);
                 setTimeMark(timeMark);
@@ -1244,7 +1231,7 @@ function drawPatternTool() {
         lineType: TYPE,
         price,
         lineWidth: 1,
-        lineStyle: 0,
+        lineStyle: 1,
         draggable: true,
     };
     if (mf.isSet(params.tools.pattern.A)) {
@@ -1265,20 +1252,7 @@ function drawPatternTool() {
                 const {
                     progress,
                     timeMark,
-                    info: {
-                        et1,
-                        et2,
-                        et3,
-                        ep1,
-                        ep2,
-                        ep3,
-                        entry,
-                        prValid,
-                        x,
-                        X,
-                        y,
-                        Y,
-                    },
+                    info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
                 } = calculatePattern(points);
                 _progress = progress;
                 _timeMark = timeMark;
@@ -1330,20 +1304,7 @@ function drawPatternTool() {
                 const {
                     progress,
                     timeMark,
-                    info: {
-                        et1,
-                        et2,
-                        et3,
-                        ep1,
-                        ep2,
-                        ep3,
-                        entry,
-                        prValid,
-                        x,
-                        X,
-                        y,
-                        Y,
-                    },
+                    info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
                 } = calculatePattern(points);
                 _progress = progress;
                 _timeMark = timeMark;
@@ -1414,7 +1375,7 @@ function loadPatternTool(prePoints, isAdjust = false) {
     let option = {
         lineType: TYPE,
         lineWidth: 1,
-        lineStyle: 0,
+        lineStyle: 1,
         draggable: true,
     };
     const {
