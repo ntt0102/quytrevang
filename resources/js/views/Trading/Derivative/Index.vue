@@ -1502,7 +1502,7 @@ function calculatePattern(points) {
     let progress = 0;
     if (Math.abs(X) >= 1.5) {
         if (
-            phase1.et < 1 &&
+            phase1.et < 1.5 &&
             pr1Valid &&
             tr1Valid &&
             cmp(points.C.price, side, phase1.S1.price)
@@ -1581,7 +1581,7 @@ function scanPhase(start, end, breakPrice = null) {
                 //     box.tr = box.S.index - box.R.index;
                 // }
                 // if (dis / preBox.pr > 0.2 || box.tr >= preBox.tr) preBox = box;
-                if (Math.abs(box.R.price - maxBox.R.price) == 0.1) {
+                if (Math.abs(box.R.price - maxBox.R.price) < 0.2) {
                     maxBox.S.index = box.S.index;
                     maxBox.tr = maxBox.S.index - maxBox.R.index;
                 }
