@@ -1456,28 +1456,30 @@ function calculatePattern(points) {
 
     let entry = phase1.R1.price;
     let progress = 0;
-    if (
-        pr1Valid &&
-        phase3.S2.index - phase1.R.index > phase1.tr &&
-        cmp(points.C.price, side, phase1.S1.price)
-    ) {
-        entry = phase2.S1.price;
-        progress = 1;
-
+    if (Math.abs(X) >= 1.5) {
         if (
-            pr2Valid &&
-            phase3.S2.index - phase2.R.index > phase2.tr &&
-            cmp(phase3.R2.price, !side, phase2.S1.price)
+            pr1Valid &&
+            phase3.S2.index - phase1.R.index > phase1.tr &&
+            cmp(points.C.price, side, phase1.S1.price)
         ) {
-            progress = 2;
+            entry = phase2.S1.price;
+            progress = 1;
 
             if (
-                pr3Valid &&
-                phase3.S2.index - phase3.R2.index > phase3.tr &&
-                cmp(phase3.S2.price, side, phase3.S1.price)
+                pr2Valid &&
+                phase3.S2.index - phase2.R.index > phase2.tr &&
+                cmp(phase3.R2.price, !side, phase2.S1.price)
             ) {
-                entry = phase3.R2.price;
-                progress = 3;
+                progress = 2;
+
+                if (
+                    pr3Valid &&
+                    phase3.S2.index - phase3.R2.index > phase3.tr &&
+                    cmp(phase3.S2.price, side, phase3.S1.price)
+                ) {
+                    entry = phase3.R2.price;
+                    progress = 3;
+                }
             }
         }
     }
