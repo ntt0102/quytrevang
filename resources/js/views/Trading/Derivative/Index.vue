@@ -1436,17 +1436,19 @@ function loadPatternTool(points) {
 function calculatePattern(points) {
     const phase1 = scanPhase(points.A, points.B);
     const phase2 = scanPhase(phase1.R, points.C);
-    const phase3 = scanPhase(phase2.R, points.B);
-    //
-    const el1 = parseFloat(phase1.el.toFixed(1));
-    const el2 = parseFloat(phase2.el.toFixed(1));
-    const el3 = parseFloat(phase3.el.toFixed(1));
+
+    const tS = phase1.R1.price;
+    const tR = points.B.price;
+    const X = tR - tS;
+
+    const phase3 = scanPhase(phase2.R, { price: tR + X }, points.B.price);
+    // console.log("calculatePattern", [phase1, phase2, phase3]);
     //
     const bc = points.B.price - points.C.price;
     const side = bc > 0;
     const BC = Math.abs(bc);
-    const CD = Math.abs(points.C.price - phase3.R.price);
-    const DE = Math.abs(phase3.R.price - phase3.S1.price);
+    const CD = Math.abs(points.C.price - phase3.R2.price);
+    const DE = Math.abs(phase3.R2.price - phase3.S2.price);
     const pr1Valid = BC > phase1.pr;
     const pr2Valid = CD > phase2.pr;
     const pr3Valid = DE > phase3.pr;
@@ -1459,7 +1461,7 @@ function calculatePattern(points) {
     let progress = 0;
     if (
         pr1Valid &&
-        phase3.R.index - phase1.R.index > phase1.tr &&
+        phase3.S2.index - phase1.R.index > phase1.tr &&
         cmp(points.C.price, side, phase1.S1.price)
     ) {
         entry = phase2.S1.price;
@@ -1467,14 +1469,14 @@ function calculatePattern(points) {
 
         if (
             pr2Valid &&
-            phase3.R.index - phase2.R.index > phase2.tr &&
-            cmp(phase3.R.price, !side, phase2.S1.price)
+            phase3.S2.index - phase2.R.index > phase2.tr &&
+            cmp(phase3.R2.price, !side, phase2.S1.price)
         ) {
             progress = 2;
 
             if (
                 pr3Valid &&
-                phase3.R.index - phase3.R2.index > phase3.tr &&
+                phase3.S2.index - phase3.R2.index > phase3.tr &&
                 cmp(phase3.S2.price, side, phase3.S1.price)
             ) {
                 entry = phase3.R2.price;
@@ -1487,11 +1489,13 @@ function calculatePattern(points) {
         phase2.R.index + phase2.tr,
         phase3.R2.index + phase3.tr,
     ];
-    const tR = points.B.price;
-    const tS = phase1.R1.price;
-    const X = tR - tS;
+    //
+    const el1 = parseFloat(phase1.el.toFixed(1));
+    const el2 = parseFloat(phase2.el.toFixed(1));
+    const el3 = parseFloat(phase3.el.toFixed(1));
+    //
     const x = adjustTargetPrice(tR + X, side);
-    const scale = parseInt((phase3.R.index - phase1.R.index) / phase1.tr);
+    const scale = parseInt((phase3.breakIndex - phase1.R.index) / phase1.tr);
     const Y = scale > 1 ? X * scale : X;
     const y = adjustTargetPrice(tR + Y, side);
 
@@ -1501,13 +1505,14 @@ function calculatePattern(points) {
         info: { el1, el2, el3, entry, prValid, x, X, y, Y },
     };
 }
-function scanPhase(start, end) {
+function scanPhase(start, end, breakPrice = null) {
     let S = mf.cloneDeep(start);
     let R = mf.cloneDeep(end);
     const side = R.price > S.price;
     let box = {},
         preBox = {},
-        maxBox = {};
+        maxBox = {},
+        breakIndex = 0;
     params.data.price
         .filter((item) => item.time >= S.time)
         .every((item, i) => {
@@ -1540,6 +1545,8 @@ function scanPhase(start, end) {
                     pr: 0,
                     tr: 0,
                 };
+                if (breakPrice && !cmp(price, side, breakPrice))
+                    breakIndex = index;
             } else {
                 box.S.index = index;
                 box.tr = box.S.index - box.R.index;
@@ -1570,11 +1577,12 @@ function scanPhase(start, end) {
         R2: box.R,
         S,
         R,
+        breakIndex,
     };
 }
 function adjustTargetPrice(price, side) {
     let decimal = parseFloat((price % 1).toFixed(1));
-    
+
     if (side) {
         if (decimal >= 0.1 && decimal <= 0.2) {
             return Math.floor(price);
