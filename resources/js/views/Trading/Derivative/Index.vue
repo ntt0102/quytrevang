@@ -1409,9 +1409,7 @@ function drawPatternTool() {
     }
 }
 function loadPatternTool(prePoints, isAdjust = false) {
-    const points = isAdjust
-        ? adjustPatternRealtime(mf.cloneDeep(prePoints))
-        : prePoints;
+    const points = isAdjust ? adjustPatternRealtime(prePoints) : prePoints;
     const TYPE = "pattern";
     let option = {
         lineType: TYPE,
@@ -1646,14 +1644,16 @@ function adjustTargetPrice(price, side) {
 
     return price;
 }
-function adjustPatternRealtime(points) {
+function adjustPatternRealtime(prePoints) {
+    let points = mf.cloneDeep(prePoints);
     const side = points.B.price - points.A.price;
-    const lastPrice = params.data.price.at(-1).price;
+    const lastPrice = params.data.price.at(-1).value;
+
     if (cmp(lastPrice, !side, points.C.price)) {
         let cPriceNew = lastPrice;
         for (let i = params.data.price.length - 1; i >= 0; i--) {
-            const { price } = array[i];
-            if (price === points.C.price) break;
+            const price = params.data.price[i].value;
+            if (price == points.C.price) break;
             cPriceNew = side
                 ? Math.min(cPriceNew, price)
                 : Math.max(cPriceNew, price);
