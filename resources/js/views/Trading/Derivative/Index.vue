@@ -862,7 +862,7 @@ function loadToolsData(toolsData) {
                 loadOrderTool(points);
                 break;
             case "pattern":
-                loadPatternTool(toolsData.pattern);
+                loadPatternTool(toolsData.pattern, true);
                 break;
             case "tr":
                 loadTimeRangeTool(Object.values(points));
@@ -1408,7 +1408,10 @@ function drawPatternTool() {
             params.series.price.createPriceLine(option);
     }
 }
-function loadPatternTool(points) {
+function loadPatternTool(prePoints, isAdjust = false) {
+    const points = isAdjust
+        ? adjustPatternRealtime(mf.cloneDeep(prePoints))
+        : prePoints;
     const TYPE = "pattern";
     let option = {
         lineType: TYPE,
@@ -1643,6 +1646,13 @@ function adjustTargetPrice(price, side) {
     }
 
     return price;
+}
+function adjustPatternRealtime(points) {
+    const side = points.B.price - points.A.price;
+    const lastPrice = params.data.price.at(-1).price;
+    if (cmp(lastPrice, !side, points.C.price)) points.C.price = lastPrice;
+    savePattern(points);
+    return points;
 }
 function savePattern(points = {}) {
     let isRemove = !mf.isSet(points);
