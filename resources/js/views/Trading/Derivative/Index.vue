@@ -1650,7 +1650,15 @@ function adjustTargetPrice(price, side) {
 function adjustPatternRealtime(points) {
     const side = points.B.price - points.A.price;
     const lastPrice = params.data.price.at(-1).price;
-    if (cmp(lastPrice, !side, points.C.price)) points.C.price = lastPrice;
+    if (cmp(lastPrice, !side, points.C.price)) {
+        let cPriceNew = lastPrice;
+        for (let i = params.data.price.length - 1; i >= 0; i--) {
+            const { price } = array[i];
+            if (price === points.C.price) break;
+            cPriceNew = side ? Math.min(cPriceNew, price) : Math.max(cPriceNew, price);
+        }
+        points.C.price = cPriceNew;
+    }
     savePattern(points);
     return points;
 }
