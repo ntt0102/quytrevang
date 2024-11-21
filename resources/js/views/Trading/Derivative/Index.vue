@@ -1494,32 +1494,32 @@ function calculatePattern(points) {
         (pr2Valid ? "1" : "0") +
         (pr3Valid ? "1" : "0");
 
+    const tr1Valid = phase3.S2.index - phase1.R.index > phase1.tr;
+    const tr2Valid = phase3.S2.index - phase2.R.index > phase2.tr;
+    const tr3Valid = phase3.S2.index - phase3.R2.index > phase3.tr;
+
     let entry = phase1.R1.price;
     let progress = 0;
     if (Math.abs(X) >= 1.5) {
         if (
             phase1.et < 1 &&
             pr1Valid &&
-            phase3.S2.index - phase1.R.index > phase1.tr &&
+            tr1Valid &&
             cmp(points.C.price, side, phase1.S1.price)
         ) {
-            entry = phase2.S1.price;
-            progress = 1;
-
-            if (
-                pr2Valid &&
-                phase3.S2.index - phase2.R.index > phase2.tr &&
-                cmp(phase3.R2.price, !side, phase2.S1.price)
-            ) {
-                progress = 2;
-
-                if (
-                    pr3Valid &&
-                    phase3.S2.index - phase3.R2.index > phase3.tr &&
-                    cmp(phase3.S2.price, side, phase3.S1.price)
-                ) {
-                    entry = phase3.R2.price;
-                    progress = 3;
+            if (!tr2Valid) {
+                entry = phase2.S1.price;
+                progress = 1;
+            } else {
+                if (pr2Valid) {
+                    if (
+                        pr3Valid &&
+                        tr3Valid &&
+                        cmp(phase3.S2.price, side, phase3.S1.price)
+                    ) {
+                        entry = phase3.R2.price;
+                        progress = 2;
+                    }
                 }
             }
         }
@@ -1617,7 +1617,6 @@ function scanPhase(start, end, breakPrice = null) {
         tr: maxBox.tr,
         pr: maxBox.pr,
         et: (R.index - maxBox.S.index) / maxBox.tr,
-        // ep: maxBox.pr ? Math.abs(R.price - maxBox.R.price) / maxBox.pr : 0,
         ep: Math.abs(R.price - maxBox.R.price) / maxBox.pr,
         S1: maxBox.S,
         R1: maxBox.R,
@@ -1655,7 +1654,9 @@ function adjustPatternRealtime(points) {
         for (let i = params.data.price.length - 1; i >= 0; i--) {
             const { price } = array[i];
             if (price === points.C.price) break;
-            cPriceNew = side ? Math.min(cPriceNew, price) : Math.max(cPriceNew, price);
+            cPriceNew = side
+                ? Math.min(cPriceNew, price)
+                : Math.max(cPriceNew, price);
         }
         points.C.price = cPriceNew;
     }
