@@ -1360,7 +1360,7 @@ function drawPatternTool() {
                 //
                 option.point = "C";
                 option.title = `C ${ep3}`;
-                option.color = "#FF9800";
+                option.color = "#FFEB3B";
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
                 //
@@ -1443,7 +1443,7 @@ function loadPatternTool(prePoints, isAdjust = false) {
     option.point = "C";
     option.price = points.C.price;
     option.title = `C ${ep3}`;
-    option.color = "#FF9800";
+    option.color = "#FFEB3B";
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
     //
@@ -1696,7 +1696,7 @@ function removePatternTool() {
     setProgress(0);
 }
 function setTimeMark(data) {
-    const colors = ["#F44336", "#4CAF50", "#FF9800"];
+    const colors = ["#F44336", "#4CAF50", "#FFEB3B"];
     let result = [];
     for (let i = 0; i < data.length; i++) {
         result.push({ time: indexToTime(data[i]), value: 1, color: colors[i] });
