@@ -134,7 +134,7 @@
                         class="context command"
                         :class="{ green: state.progress }"
                         :title="$t('trading.derivative.progressTool')"
-                        @click="progressToolClick"
+                        @click="toggleAutoScan"
                     >
                         <i
                             class="far"
@@ -714,8 +714,8 @@ function eventPriceLineDrag(e) {
                     timeMark,
                     info: { el1, el2, el3, entry, prValid, x, X, y, Y },
                 } = calculatePattern(points);
-                loadProgressTool(progress);
-                loadTimeMark(timeMark);
+                setProgress(progress);
+                setTimeMark(timeMark);
                 savePattern(points);
                 //
                 point = "A";
@@ -1089,12 +1089,6 @@ function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
     e.stopPropagation();
 }
-function progressToolClick() {
-    store.dispatch("tradingDerivative/setAutoScan", !config.value.autoScan);
-}
-function loadProgressTool(e) {
-    state.progress = e;
-}
 function scanToolClick(e) {
     state.showScanContext = false;
     state.showLineContext = false;
@@ -1111,6 +1105,9 @@ function scanToolClick(e) {
 function scanToolContextMenu() {
     state.showScanContext = !state.showScanContext;
     state.showLineContext = false;
+}
+function toggleAutoScan() {
+    store.dispatch("tradingDerivative/setAutoScan", !config.value.autoScan);
 }
 function drawScanTool() {
     const leftSide = state.scanSide == "left";
@@ -1351,8 +1348,8 @@ function drawPatternTool() {
                 params.tools.pattern[option.point] =
                     params.series.price.createPriceLine(option);
             }
-            loadProgressTool(_progress);
-            loadTimeMark(_timeMark);
+            setProgress(_progress);
+            setTimeMark(_timeMark);
             savePattern(points);
             patternToolRef.value.classList.remove("selected");
         } else {
@@ -1384,8 +1381,8 @@ function loadPatternTool(points) {
         timeMark,
         info: { el1, el2, el3, entry, prValid, x, X, y, Y },
     } = calculatePattern(points);
-    loadProgressTool(progress);
-    loadTimeMark(timeMark);
+    setProgress(progress);
+    setTimeMark(timeMark);
     //
     option.point = "A";
     option.title = `A ${el1}`;
@@ -1629,19 +1626,20 @@ function removePatternTool() {
         }
     }
     initToolsParams(["pattern"]);
-    removeTimeMark();
+    setTimeMark([]);
+    setProgress(0);
 }
-function loadTimeMark(data) {
+function setTimeMark(data) {
     const colors = ["#F44336", "#4CAF50", "#FF9800"];
     let result = [];
     for (let i = 0; i < data.length; i++) {
         result.push({ time: indexToTime(data[i]), value: 1, color: colors[i] });
     }
-    result.sort((a, b) => a.time - b.time);
+    if (result.length) result.sort((a, b) => a.time - b.time);
     params.series.timeMark.setData(result);
 }
-function removeTimeMark() {
-    params.series.timeMark.setData([]);
+function setProgress(e) {
+    state.progress = e;
 }
 function timeRangeToolClick(e) {
     state.showScanContext = false;
