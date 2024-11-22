@@ -1497,22 +1497,22 @@ function calculatePattern(points) {
 
     const prStatus = `${pr1Status}${pr2Status}${pr3Status}`;
 
-    const tr1Valid = phase3.S2.index - phase1.R.index > phase1.tr;
-    const tr2Valid = phase3.S2.index - phase2.R.index > phase2.tr;
-    const tr3Valid = phase3.S2.index - phase3.R2.index > phase3.tr;
+    const tr1Status = phase3.S2.index - phase1.R.index > phase1.tr;
+    const tr2Status = phase3.S2.index - phase2.R.index > phase2.tr;
+    const tr3Status = phase3.S2.index - phase3.R2.index > phase3.tr;
 
     let entry = phase3.R1.price;
     let progress = 0;
     if (Math.abs(X) >= 1.5) {
-        if (pr1Valid && tr1Valid && s1Valid) {
-            if (!tr2Valid) {
+        if (tr1Status && pr1Status == 1) {
+            if (!tr2Status) {
                 if (phase2.ep < phase1.ep) {
                     entry = phase2.S1.price;
                     progress = 1;
                 }
             } else {
-                if (pr2Valid) {
-                    if (pr3Valid && tr3Valid && s3Valid) {
+                if (pr2Status) {
+                    if (tr3Status && pr3Status == 1) {
                         entry = phase3.R2.price;
                         progress = 2;
                     }
