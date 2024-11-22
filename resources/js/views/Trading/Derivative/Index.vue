@@ -730,7 +730,7 @@ function eventPriceLineDrag(e) {
                 const {
                     progress,
                     timeMark,
-                    info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
+                    info: { ep1, ep2, ep3, entry, prStatus, x, X, y, Y },
                 } = calculatePattern(points);
                 setProgress(progress);
                 setTimeMark(timeMark);
@@ -751,7 +751,7 @@ function eventPriceLineDrag(e) {
                 point = "D";
                 changeOptions = {
                     price: entry,
-                    title: "Entry " + prValid,
+                    title: "Entry " + prStatus,
                 };
                 if (lineOptions.point == point) delete changeOptions.price;
                 params.tools.pattern[point].applyOptions(changeOptions);
@@ -1276,7 +1276,7 @@ function drawPatternTool() {
                 const {
                     progress,
                     timeMark,
-                    info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
+                    info: { ep1, ep2, ep3, entry, prStatus, x, X, y, Y },
                 } = calculatePattern(points);
                 _progress = progress;
                 _timeMark = timeMark;
@@ -1300,7 +1300,7 @@ function drawPatternTool() {
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "D";
-                changeOptions = { price: entry, title: "Entry " + prValid };
+                changeOptions = { price: entry, title: "Entry " + prStatus };
                 params.tools.pattern[point].applyOptions(changeOptions);
                 //
                 point = "X";
@@ -1328,7 +1328,7 @@ function drawPatternTool() {
                 const {
                     progress,
                     timeMark,
-                    info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
+                    info: { ep1, ep2, ep3, entry, prStatus, x, X, y, Y },
                 } = calculatePattern(points);
                 _progress = progress;
                 _timeMark = timeMark;
@@ -1351,7 +1351,7 @@ function drawPatternTool() {
                 //
                 option.point = "D";
                 option.price = entry;
-                option.title = "Entry " + prValid;
+                option.title = "Entry " + prStatus;
                 option.color = "#9C27B0";
                 option.draggable = false;
                 params.tools.pattern[option.point] =
@@ -1405,7 +1405,7 @@ function loadPatternTool(prePoints, isAdjust = false) {
     const {
         progress,
         timeMark,
-        info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
+        info: { ep1, ep2, ep3, entry, prStatus, x, X, y, Y },
     } = calculatePattern(points);
     setProgress(progress);
     setTimeMark(timeMark);
@@ -1434,7 +1434,7 @@ function loadPatternTool(prePoints, isAdjust = false) {
     //
     option.point = "D";
     option.price = entry;
-    option.title = "Entry " + prValid;
+    option.title = "Entry " + prStatus;
     option.color = "#9C27B0";
     option.draggable = false;
     params.tools.pattern[option.point] =
@@ -1486,35 +1486,32 @@ function calculatePattern(points) {
     const pr1Valid = Math.abs(bc) > phase1.pr;
     const pr2Valid = Math.abs(points.C.price - phase3.R2.price) > phase2.pr;
     const pr3Valid = Math.abs(phase3.R2.price - phase3.S2.price) > phase3.pr;
-    const prValid =
-        (pr1Valid ? "1" : "0") +
-        (pr2Valid ? "1" : "0") +
-        (pr3Valid ? "1" : "0");
+
+    const s1Valid = cmp(points.C.price, side, phase1.S1.price);
+    const s2Valid = cmp(phase3.R2.price, !side, phase2.S1.price);
+    const s3Valid = cmp(phase3.S2.price, side, phase3.S1.price);
+
+    const prStatus =
+        (s1Valid ? (pr1Valid ? "1" : "0") : "2") +
+        (s2Valid ? (pr2Valid ? "1" : "0") : "2") +
+        (s3Valid ? (pr3Valid ? "1" : "0") : "2");
 
     const tr1Valid = phase3.S2.index - phase1.R.index > phase1.tr;
     const tr2Valid = phase3.S2.index - phase2.R.index > phase2.tr;
     const tr3Valid = phase3.S2.index - phase3.R2.index > phase3.tr;
 
-    let entry = phase1.R1.price;
+    let entry = phase3.R1.price;
     let progress = 0;
     if (Math.abs(X) >= 1.5) {
-        if (
-            pr1Valid &&
-            tr1Valid &&
-            cmp(points.C.price, side, phase1.S1.price)
-        ) {
+        if (pr1Valid && tr1Valid && s1Valid) {
             if (!tr2Valid) {
-                if (phase2.ep < 1) {
+                if (phase2.ep < phase1.ep) {
                     entry = phase2.S1.price;
                     progress = 1;
                 }
             } else {
                 if (pr2Valid) {
-                    if (
-                        pr3Valid &&
-                        tr3Valid &&
-                        cmp(phase3.S2.price, side, phase3.S1.price)
-                    ) {
+                    if (pr3Valid && tr3Valid && s3Valid) {
                         entry = phase3.R2.price;
                         progress = 2;
                     }
@@ -1540,7 +1537,7 @@ function calculatePattern(points) {
     return {
         progress,
         timeMark,
-        info: { ep1, ep2, ep3, entry, prValid, x, X, y, Y },
+        info: { ep1, ep2, ep3, entry, prStatus, x, X, y, Y },
     };
 }
 function scanPhase(start, end, breakPrice = null) {
@@ -1622,7 +1619,7 @@ function scanPhase(start, end, breakPrice = null) {
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
-        ep,
+        ep: maxBox.pr ? ep : 0,
         S1: maxBox.S,
         R1: maxBox.R,
         S2: box.S,
