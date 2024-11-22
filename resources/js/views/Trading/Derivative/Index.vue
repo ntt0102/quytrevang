@@ -1491,10 +1491,11 @@ function calculatePattern(points) {
     const s2Valid = cmp(phase3.R2.price, !side, phase2.S1.price);
     const s3Valid = cmp(phase3.S2.price, side, phase3.S1.price);
 
-    const prStatus =
-        (s1Valid ? (pr1Valid ? "1" : "0") : "2") +
-        (s2Valid ? (pr2Valid ? "1" : "0") : "2") +
-        (s3Valid ? (pr3Valid ? "1" : "0") : "2");
+    const pr1Status = s1Valid ? (pr1Valid ? 1 : 0) : 2;
+    const pr2Status = s2Valid ? (pr2Valid ? 1 : 0) : 2;
+    const pr3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
+
+    const prStatus = `${pr1Status}${pr2Status}${pr3Status}`;
 
     const tr1Valid = phase3.S2.index - phase1.R.index > phase1.tr;
     const tr2Valid = phase3.S2.index - phase2.R.index > phase2.tr;
