@@ -1467,7 +1467,7 @@ function refreshPatternTool() {
             C: { price: +cOptions.price },
         };
         removePatternTool();
-        loadPatternTool(points, true);
+        loadPatternTool(points);
     }
 }
 function calculatePattern(points) {
