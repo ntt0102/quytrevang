@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/workspace:cached
+      - ~/.composer:/home/vscode/.composer
+    ports:
+      - "8000:8000" # Laravel
+      - "5173:5173" # Vite
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.0
+    container_name: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD:
+      MYSQL_DATABASE: u325359649_quytrevang
+      MYSQL_USER: u325359649_quytrevang
+      MYSQL_PASSWORD: Quytrevang0
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:

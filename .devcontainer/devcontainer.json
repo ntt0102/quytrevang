@@ -1,0 +1,29 @@
+{
+  "name": "Laravel 10 Devcontainer",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+  "extensions": [
+    "ms-azuretools.vscode-docker",
+    "ms-vscode.vscode-typescript-next",
+    "dbaeumer.vscode-eslint",
+    "eamodio.gitlens",
+    "xdebug.php-debug",
+    "shufo.vscode-blade-formatter"
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "php.validate.executablePath": "/usr/local/bin/php",
+    "terminal.integrated.defaultProfile.linux": "bash"
+  },
+  "postCreateCommand": "composer install && npm install && php artisan key:generate",
+  "features": {
+    "ghcr.io/devcontainers/features/php:1": {
+      "version": "8.2"
+    },
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  },
+  "remoteUser": "vscode"
+}
