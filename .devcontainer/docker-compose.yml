@@ -1,4 +1,4 @@
-version: "3.8"
+version: '3.8'
 
 services:
   app:
@@ -11,6 +11,15 @@ services:
     ports:
       - "8000:8000" # Laravel
       - "5173:5173" # Vite
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: u325359649_quytrevang
+      MYSQL_USER: u325359649_quytrevang
+      MYSQL_PASSWORD: Quytrevang0
+      APP_ENV: local
+      APP_KEY: base64:CUSTOM_KEY
+      APP_DEBUG: true
+      APP_URL: http://localhost
     depends_on:
       - db
 
