@@ -1,0 +1,1 @@
+import{d as u,a2 as a,G as i}from"./app-4d074802.js";/* empty css            */const c={__name:"VerifyEmail",setup(n){const t=u(),r=a(),s=i(),{url:e}=s.query;return e!=""&&t.dispatch("auth/verifyEmail",e).then(o=>{o&&r.push({name:"overview"})}),()=>{}}};export{c as default};
