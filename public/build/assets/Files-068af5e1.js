@@ -1,1 +1,0 @@
-import{_ as e}from"./FileManager-412d06f9.js";import{a,v as s,f as c,o as n}from"./app-1c931ff3.js";/* empty css            */const o={class:"content-block dx-card responsive-paddings"},d={__name:"Files",setup(i){const t=a({clientPath:"files"});return(r,l)=>(n(),s("div",o,[c(e,{clientPath:t.clientPath},null,8,["clientPath"])]))}};export{d as default};
