@@ -1587,8 +1587,8 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                     pr: 0,
                     tr: 0,
                 };
-                maxBox = box;
-                xBox = box;
+                maxBox = mf.cloneDeep(box);
+                xBox = mf.cloneDeep(box);
             }
             if (cmp(price, side, box.R.price)) {
                 const dis = Math.abs(box.R.price - maxBox.R.price);
@@ -1597,13 +1597,15 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                     maxBox.tr = maxBox.S.index - maxBox.R.index;
                     maxBox.pr += dis;
                 }
-                if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) maxBox = box;
+                if (box.tr >= maxBox.tr && box.pr >= maxBox.pr)
+                    maxBox = mf.cloneDeep(box);
                 if (
                     phase == 1 &&
                     retracementPrice &&
                     !cmp(box.S.price, !side, retracementPrice)
                 ) {
-                    if (box.tr >= xBox.tr && box.pr >= xBox.pr) xBox = box;
+                    if (box.tr >= xBox.tr && box.pr >= xBox.pr)
+                        xBox = mf.cloneDeep(box);
                 }
                 box = {
                     R: { index, time, price },
