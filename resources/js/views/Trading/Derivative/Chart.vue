@@ -1500,7 +1500,7 @@ function calculatePattern({ A, B, C }) {
         ],
         [tr1Status == 1],
         [tr1Status == 1, pr2Status > 0],
-        [tr2Status > 0, pr3Status == 1],
+        [tr2Status == 1, pr3Status == 1],
     ];
     progress.step = 1;
     if (
@@ -1519,9 +1519,9 @@ function calculatePattern({ A, B, C }) {
         } else {
             if (tr1Status == 1) {
                 progress.step = 3;
-                if (progress.steps[2][0]) {
+                if (progress.steps[2][1]) {
                     progress.step = 4;
-                    if (progress.steps[3][0]) {
+                    if (progress.steps[3][1]) {
                         progress.result = true;
                         entry = phase3.xBox.R.price;
                     } else {
