@@ -1522,30 +1522,29 @@ function calculatePattern({ A, B, C }) {
         progress = {};
 
     progress.step = 1;
-    if (
-        phase1.ep > 1 &&
-        pr1Status == 1 &&
-        phase2.epr < phase1.epr &&
-        tr1Status == 1
-    ) {
+    if (phase1.ep > 1 && pr1Status == 1 && phase2.epr < phase1.epr) {
         if (tr2Status == 0) {
-            progress.step = 2;
-            progress.result = true;
-            entry = phase2.S1.price;
+            if (tr1Status == 1) {
+                progress.step = 2;
+                progress.result = true;
+                entry = phase2.S1.price;
+            }
         } else {
-            progress.step = 3;
-            if (pr2Status > 0) {
-                progress.step = 4;
-                if (pr3Status == 1) {
-                    progress.result = true;
-                    entry = phase3.xBox.R.price;
+            if (tr1Status == 1) {
+                progress.step = 3;
+                if (pr2Status > 0) {
+                    progress.step = 4;
+                    if (pr3Status == 1) {
+                        progress.result = true;
+                        entry = phase3.xBox.R.price;
+                    } else {
+                        progress.result = false;
+                        entry = phase3.R1.price;
+                    }
                 } else {
                     progress.result = false;
                     entry = phase3.R1.price;
                 }
-            } else {
-                progress.result = false;
-                entry = phase3.R1.price;
             }
         }
     } else {
