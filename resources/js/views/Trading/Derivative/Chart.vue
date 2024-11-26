@@ -87,6 +87,7 @@
                     class="command far fa-chart-candlestick"
                     :title="$t('trading.derivative.tradingview')"
                     @click="tradingviewClick"
+                    @contextmenu="refreshPatternTool"
                 ></div>
                 <div
                     class="context command"
@@ -95,7 +96,7 @@
                         red: state.progress.result == false,
                     }"
                     :title="$t('trading.derivative.progressTool')"
-                    @click="refreshPatternTool"
+                    @click="showProgressContext"
                     @contextmenu="toggleAutoRefresh"
                 >
                     <i
@@ -109,7 +110,7 @@
                     >
                     </i>
                     <ProgressContext
-                        v-show="state.showScanContext || true"
+                        v-show="state.showProgressContext"
                         class="contextmenu"
                         :progress="state.progress"
                     ></ProgressContext>
@@ -346,6 +347,7 @@ const state = reactive({
     lineTitle: "",
     progress: {},
     scanSide: "left",
+    showProgressContext: false,
     showScanContext: false,
     showLineContext: false,
     showTradingView: false,
@@ -443,7 +445,7 @@ watch(() => store.state.tradingDerivative.chartData, loadChartData);
 watch(() => tools.value, loadToolsData);
 
 function eventChartClick(e) {
-    state.showPatternContext = false;
+    state.showProgressContext = false;
     state.showScanContext = false;
     state.showLineContext = false;
     toggleOrderButton(false);
@@ -1074,7 +1076,13 @@ function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
     e.stopPropagation();
 }
+function showProgressContext() {
+    state.showProgressContext = !state.showProgressContext;
+    state.showScanContext = false;
+    state.showLineContext = false;
+}
 function scanToolClick(e) {
+    state.showProgressContext = false;
     state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
@@ -1089,6 +1097,7 @@ function scanToolClick(e) {
 }
 function scanToolContextMenu() {
     state.showScanContext = !state.showScanContext;
+    state.showProgressContext = false;
     state.showLineContext = false;
 }
 function toggleAutoRefresh() {
@@ -1198,6 +1207,7 @@ function removeIndex(obj) {
     return result;
 }
 function patternToolClick(e) {
+    state.showProgressContext = false;
     state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
@@ -1729,6 +1739,7 @@ function setProgress(e) {
     state.progress = e;
 }
 function pickTimeToolClick(e) {
+    state.showProgressContext = false;
     state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
@@ -1770,6 +1781,7 @@ function removePickTimeTool(withServer = true) {
     initToolsParams(["pt"]);
 }
 function timeRangeToolClick(e) {
+    state.showProgressContext = false;
     state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
@@ -1860,6 +1872,7 @@ function removeTimeRangeTool(withServer = true) {
     initToolsParams(["tr"]);
 }
 function lineToolClick(e) {
+    state.showProgressContext = false;
     state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
@@ -1870,6 +1883,7 @@ function lineToolClick(e) {
 }
 function lineToolContextmenu(e) {
     state.showLineContext = !state.showLineContext;
+    state.showProgressContext = false;
     state.showScanContext = false;
 }
 function drawLineTool() {
@@ -1940,6 +1954,7 @@ function removeLineTool(withServer = true) {
     }
 }
 function targetToolClick(e) {
+    state.showProgressContext = false;
     state.showScanContext = false;
     state.showLineContext = false;
     const selected = e.target.classList.contains("selected");
