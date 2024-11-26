@@ -1,6 +1,6 @@
 export default [
     {
-        name: "Bước 1",
+        name: "Bước kiểm tra pha 1",
         conds: [
             "Biên độ mở rộng > 1",
             "Sóng AB mở rộng mạnh",
@@ -10,15 +10,15 @@ export default [
         ],
     },
     {
-        name: "Bước 2",
+        name: "Bước vào lệnh 1",
         conds: ["Vượt qua T1"],
     },
     {
-        name: "Bước 3",
+        name: "Bước kiểm tra pha 2",
         conds: ["Vượt qua T1", "Trạng thái PR2 > 0"],
     },
     {
-        name: "Bước 4",
+        name: "Bước vào lệnh 2",
         conds: ["Vượt qua T2", "Trạng thái PR3 = 1"],
     },
 ];

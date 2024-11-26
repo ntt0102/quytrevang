@@ -87,7 +87,6 @@
                     class="command far fa-chart-candlestick"
                     :title="$t('trading.derivative.tradingview')"
                     @click="tradingviewClick"
-                    @contextmenu="refreshPatternTool"
                 ></div>
                 <div
                     class="context command"
@@ -384,7 +383,7 @@ params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
     if (inSession()) {
         getStatus();
-        if (config.value.autoRefresh) refreshPatternTool();
+        if (config.value.autoRefresh) refreshPatternTool(true);
     } else clearInterval(params.interval60);
 }, 60000);
 
@@ -832,7 +831,7 @@ function loadToolsData(toolsData) {
                 loadOrderTool(points);
                 break;
             case "pattern":
-                loadPatternTool(toolsData.pattern, true);
+                loadPatternTool(toolsData.pattern);
                 break;
             case "tr":
                 loadTimeRangeTool(points);
@@ -1080,6 +1079,7 @@ function showProgressContext() {
     state.showProgressContext = !state.showProgressContext;
     state.showScanContext = false;
     state.showLineContext = false;
+    if (state.showProgressContext) refreshPatternTool();
 }
 function scanToolClick(e) {
     state.showProgressContext = false;
@@ -1367,8 +1367,7 @@ function drawPatternTool() {
             params.series.price.createPriceLine(option);
     }
 }
-function loadPatternTool(prePoints, isAdjust = false) {
-    const points = isAdjust ? adjustPatternRealtime(prePoints) : prePoints;
+function loadPatternTool(points) {
     const TYPE = "pattern";
     let option = {
         lineType: TYPE,
@@ -1430,21 +1429,24 @@ function loadPatternTool(prePoints, isAdjust = false) {
     params.tools.pattern[option.point] =
         params.series.price.createPriceLine(option);
 }
-function refreshPatternTool() {
+function refreshPatternTool(autoAdjust = false) {
     if (mf.isSet(params.tools.pattern.C)) {
         const aOptions = params.tools.pattern.A.options();
         const bOptions = params.tools.pattern.B.options();
         const cOptions = params.tools.pattern.C.options();
-        const points = {
+        let points = {
             A: { time: +aOptions.time, price: +aOptions.price },
             B: { price: +bOptions.price },
             C: { price: +cOptions.price },
         };
+        if (autoAdjust) points = adjustPatternPoints(points);
         removePatternTool();
         loadPatternTool(points);
     }
 }
 function calculatePattern({ A, B, C }) {
+    const bc = B.price - C.price;
+    const side = bc > 0;
     const phase1 = scanPhase({
         phase: 1,
         start: A,
@@ -1455,16 +1457,14 @@ function calculatePattern({ A, B, C }) {
     const phase3 = scanPhase({
         phase: 3,
         start: phase2.R,
-        end: { price: B.price + phase1.rEp },
-        breakPrices: [phase2.S1, B.price],
+        end: { price: B.price + (side ? 1 : -1) * phase1.rEp },
+        breakPrice: B.price,
     });
     if (phase1.xBox.tr >= phase2.tr) phase2.tr = phase1.xBox.tr;
 
     console.log("calculatePattern", [phase1, phase2, phase3]);
 
     //
-    const bc = B.price - C.price;
-    const side = bc > 0;
     const pr1Valid = Math.abs(bc) > phase1.pr;
     const pr2Valid = Math.abs(C.price - phase3.xBox.R.price) > phase2.pr;
     const pr3Valid = phase3.xBox.pr > phase3.pr;
@@ -1492,7 +1492,7 @@ function calculatePattern({ A, B, C }) {
         progress = {};
     progress.steps = [
         [
-            phase1.rEp > 1,
+            phase1.rEp >= 1,
             phase1.rEt < phase1.tr || phase1.rEp > phase1.sEp,
             phase2.rEpr < phase1.rEpr,
             phase2.R.index - phase1.R.index < 2 * phase1.tr,
@@ -1544,15 +1544,13 @@ function calculatePattern({ A, B, C }) {
     const rEpr2 = parseFloat(phase2.rEpr.toFixed(1));
     const rEpr3 = parseFloat(phase3.rEpr.toFixed(1));
     //
-    const tS = phase1.R1.price;
-    const tR = B.price;
-    const X = tR - tS;
-    const x = adjustTargetPrice(tR + X, side);
-    const scale = phase3.breakIndexs[1]
-        ? parseInt((phase3.breakIndexs[1] - phase1.R.index) / phase1.tr)
+    const X = phase1.rEp;
+    const x = adjustTargetPrice(B.price, X, side);
+    const scale = phase3.breakIndex
+        ? parseInt((phase3.breakIndex - phase1.R.index) / phase1.tr)
         : 1;
-    const Y = scale > 1 ? X * scale : X;
-    const y = adjustTargetPrice(tR + Y, side);
+    const Y = X * scale;
+    const y = adjustTargetPrice(B.price, Y, side);
 
     return {
         progress,
@@ -1560,14 +1558,17 @@ function calculatePattern({ A, B, C }) {
         info: { rEpr1, rEpr2, rEpr3, entry, prStatus, x, X, y, Y },
     };
 }
-function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
+function scanPhase({ phase, start, end, breakPrice, retracementPrice }) {
     let S = mf.cloneDeep(start);
     let R = mf.cloneDeep(end);
     const side = R.price > S.price;
     let box = {},
         maxBox = {},
         xBox = {},
-        breakIndexs = [null, null];
+        breakIndex = null,
+        rEp,
+        sEp,
+        rEt;
     params.data.price
         .filter((item) => {
             let cond = item.time >= S.time;
@@ -1592,7 +1593,11 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
             }
             if (cmp(price, side, box.R.price)) {
                 const dis = Math.abs(box.R.price - maxBox.R.price);
-                if (dis < 0.2 && cmp(box.S.price, !side, maxBox.R.price)) {
+                if (
+                    dis < 0.2 &&
+                    cmp(box.S.price, !side, maxBox.R.price) &&
+                    box.pr < maxBox.pr
+                ) {
                     maxBox.S.index = box.S.index;
                     maxBox.tr = maxBox.S.index - maxBox.R.index;
                     maxBox.pr += dis;
@@ -1613,11 +1618,8 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                     pr: 0,
                     tr: 0,
                 };
-                if (phase == 3 && breakPrices) {
-                    if (!cmp(price, side, breakPrices[0]))
-                        breakIndexs[0] = index;
-                    if (!cmp(price, side, breakPrices[1]))
-                        breakIndexs[1] = index;
+                if (phase == 3 && breakPrice && !cmp(price, side, breakPrice)) {
+                    breakIndex = index;
                 }
             } else {
                 box.S.index = index;
@@ -1635,12 +1637,14 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
             if (!cmp(price, !side, R.price)) return false;
             return true;
         });
-    R.index = box.S.index;
-    R.time = indexToTime(box.S.index);
-    const rEp = Math.abs(R.price - maxBox.R.price);
-    const sEp = Math.abs(S.price - maxBox.S.price);
-    const rEt = R.index - maxBox.S.index;
-    if (phase == 3) xBox = box;
+    if (mf.isSet(box)) {
+        R.index = box.S.index;
+        R.time = indexToTime(box.S.index);
+        rEp = Math.abs(R.price - maxBox.R.price);
+        sEp = Math.abs(S.price - maxBox.S.price);
+        rEt = R.index - maxBox.S.index;
+        if (phase == 3) xBox = box;
+    }
 
     return {
         tr: maxBox.tr,
@@ -1654,29 +1658,30 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         xBox,
         S,
         R,
-        breakIndexs,
+        breakIndex,
     };
 }
-function adjustTargetPrice(price, side) {
-    let decimal = parseFloat((price % 1).toFixed(1));
+function adjustTargetPrice(price, range, side) {
+    const target = price + (side ? 1 : -1) * range;
+    let decimal = parseFloat((target % 1).toFixed(1));
 
     if (side) {
         if (decimal >= 0.1 && decimal <= 0.2) {
-            return Math.floor(price);
+            return Math.floor(target);
         } else if (decimal >= 0.6 && decimal <= 0.7) {
-            return Math.floor(price) + 0.5;
+            return Math.floor(target) + 0.5;
         }
     } else {
         if (decimal >= 0.8 && decimal <= 0.9) {
-            return Math.ceil(price);
+            return Math.ceil(target);
         } else if (decimal >= 0.3 && decimal <= 0.4) {
-            return Math.floor(price) + 0.5;
+            return Math.floor(target) + 0.5;
         }
     }
 
-    return price;
+    return target;
 }
-function adjustPatternRealtime(prePoints) {
+function adjustPatternPoints(prePoints) {
     let points = mf.cloneDeep(prePoints);
     const side = points.B.price - points.A.price;
     const lastPrice = params.data.price.at(-1).value;

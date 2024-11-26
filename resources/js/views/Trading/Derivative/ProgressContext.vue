@@ -15,10 +15,7 @@
                             : '',
                     ]"
                 >
-                    <!-- <span :class="['status']">
-                        {{ progress.steps[i].every(Boolean) ? "✔" : "✘" }}
-                    </span> -->
-                    {{ step.name }}
+                    {{ i + 1 }}. {{ step.name }}
                 </div>
                 <div class="conditions">
                     <div
@@ -121,6 +118,7 @@ function stopPropagationEvent(e) {
             .step-header {
                 padding-left: 10px;
                 font-weight: bold;
+                font-size: larger;
             }
 
             .condition {

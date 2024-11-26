@@ -1,1 +1,0 @@
-const n=[{name:"Bước 1",conds:["Biên độ mở rộng > 1","Sóng AB mở rộng mạnh","Tỷ lệ EP pha 2 < pha 1","Thời gian BC < 2 lần TR1","Trạng thái PR1 = 1"]},{name:"Bước 2",conds:["Vượt qua T1"]},{name:"Bước 3",conds:["Vượt qua T1","Trạng thái PR2 > 0"]},{name:"Bước 4",conds:["Vượt qua T2","Trạng thái PR3 = 1"]}];export{n as default};
