@@ -1,12 +1,36 @@
 export default [
-    { tag: "F", name: "Mẫu hình lá cờ" },
-    { tag: "R", name: "Mẫu hình đảo chiều" },
-    { tag: "T", name: "Mẫu hình tam giác" },
-    { tag: "EF", name: "Mẫu hình mở rộng lá cờ" },
-    { tag: "ET", name: "Mẫu hình mở rộng tam giác" },
-    { tag: "E2F", name: "Mẫu hình siêu mở rộng lá cờ" },
-    { tag: "E2T", name: "Mẫu hình siêu mở rộng tam giác" },
+    {
+        name: "Bước 1",
+        conds: [
+            "Biên độ mở rộng > 1",
+            "Sóng AB mở rộng mạnh",
+            "Tỷ lệ EP pha 2 < pha 1",
+            "Thời gian BC < 2 lần TR1",
+            "Trạng thái PR1 = 1",
+        ],
+    },
+    {
+        name: "Bước 2",
+        conds: ["Vượt qua T1"],
+    },
+    {
+        name: "Bước 3",
+        conds: ["Vượt qua T1", "Trạng thái PR2 > 0"],
+    },
+    {
+        name: "Bước 4",
+        conds: ["Vượt qua T2", "Trạng thái PR3 = 1"],
+    },
 ];
+// export default [
+//     { tag: "F", name: "Mẫu hình lá cờ" },
+//     { tag: "R", name: "Mẫu hình đảo chiều" },
+//     { tag: "T", name: "Mẫu hình tam giác" },
+//     { tag: "EF", name: "Mẫu hình mở rộng lá cờ" },
+//     { tag: "ET", name: "Mẫu hình mở rộng tam giác" },
+//     { tag: "E2F", name: "Mẫu hình siêu mở rộng lá cờ" },
+//     { tag: "E2T", name: "Mẫu hình siêu mở rộng tam giác" },
+// ];
 // export default {
 //     items: [
 //         {

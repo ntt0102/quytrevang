@@ -108,6 +108,11 @@
                         }"
                     >
                     </i>
+                    <ProgressContext
+                        v-show="state.showScanContext || true"
+                        class="contextmenu"
+                        :progress="state.progress"
+                    ></ProgressContext>
                 </div>
                 <div
                     ref="scanToolRef"
@@ -229,6 +234,7 @@
 <script setup>
 import LineContext from "./LineContext.vue";
 import ScanContext from "./ScanContext.vue";
+import ProgressContext from "./ProgressContext.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
 import { confirm } from "devextreme/ui/dialog";
@@ -293,7 +299,6 @@ const route = useRoute();
 const { t } = useI18n();
 const devices = inject("devices");
 const mf = inject("mf");
-const bus = inject("bus");
 const filters = inject("filters");
 const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
@@ -311,7 +316,7 @@ const scanToolRef = ref(null);
 const cancelOrderRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
-const vpsOtpPopupRef = ref(null);
+
 let params = {
     chart: {},
     series: {},
@@ -339,7 +344,7 @@ const state = reactive({
     isOrderWarning: false,
     lineColor: "#F44336",
     lineTitle: "",
-    progress: 0,
+    progress: {},
     scanSide: "left",
     showScanContext: false,
     showLineContext: false,
@@ -1475,14 +1480,25 @@ function calculatePattern({ A, B, C }) {
 
     let entry,
         progress = {};
-
+    progress.steps = [
+        [
+            phase1.rEp > 1,
+            phase1.rEt < phase1.tr || phase1.rEp > phase1.sEp,
+            phase2.rEpr < phase1.rEpr,
+            phase2.R.index - phase1.R.index < 2 * phase1.tr,
+            pr1Status == 1,
+        ],
+        [tr1Status == 1],
+        [tr1Status == 1, pr2Status > 0],
+        [tr2Status > 0, pr3Status == 1],
+    ];
     progress.step = 1;
     if (
-        phase1.rEp > 1 &&
-        (phase1.rEt < phase1.tr || phase1.rEp > phase1.sEp) &&
-        phase2.rEpr < phase1.rEpr &&
-        phase2.R.index - phase1.R.index < 2 * phase1.tr &&
-        pr1Status == 1
+        progress.steps[0][0] &&
+        progress.steps[0][1] &&
+        progress.steps[0][2] &&
+        progress.steps[0][3] &&
+        progress.steps[0][4]
     ) {
         if (tr2Status == 0) {
             if (tr1Status == 1) {
@@ -1493,9 +1509,9 @@ function calculatePattern({ A, B, C }) {
         } else {
             if (tr1Status == 1) {
                 progress.step = 3;
-                if (pr2Status > 0) {
+                if (progress.steps[2][0]) {
                     progress.step = 4;
-                    if (pr3Status == 1) {
+                    if (progress.steps[3][0]) {
                         progress.result = true;
                         entry = phase3.xBox.R.price;
                     } else {

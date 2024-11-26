@@ -4,6 +4,7 @@ function initialState() {
         config: {},
         tools: [],
         chartData: [],
+        chartDate: null,
         isChartLoading: false,
     };
 }
@@ -13,6 +14,7 @@ const getters = {};
 const actions = {
     getChartData({ commit, dispatch, getters, state, rootGetters }, date) {
         commit("setChartLoading", true);
+        commit("setChartDate", date);
         return new Promise((resolve, reject) => {
             axios
                 .get("trading/derivative", {
@@ -138,10 +140,10 @@ const actions = {
             });
         });
     },
-    export({ commit, dispatch, getters, state, rootGetters }, chartDate) {
+    export({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/derivative/export", { date: chartDate })
+                .post("trading/derivative/export", { date: state.chartDate })
                 .then((response) => {
                     if (response.headers["content-type"].includes("text/csv")) {
                         var fileURL = window.URL.createObjectURL(
@@ -180,6 +182,9 @@ const actions = {
 const mutations = {
     setChartData(state, data) {
         state.chartData = data;
+    },
+    setChartDate(state, date) {
+        state.chartDate = date;
     },
     setChartLoading(state, data) {
         state.isChartLoading = data;

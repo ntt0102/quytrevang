@@ -29,16 +29,6 @@
                         onClick: loginVps,
                     },
                 },
-                {
-                    visible: false,
-                    location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-sign-in-alt small',
-                        hint: $t('trading.derivative.buttons.loginDnse'),
-                        onClick: loginDnse,
-                    },
-                },
             ]"
         />
         <Chart />
@@ -49,20 +39,21 @@
 <script setup>
 import Chart from "./Chart.vue";
 import VpsOtpPopup from "./VpsOtpPopup.vue";
+import { ref, inject } from "vue";
+import { useStore } from "vuex";
+
+const store = useStore();
+const bus = inject("bus");
+const vpsOtpPopupRef = ref(null);
 
 function report() {
     bus.emit("checkPin", () => store.dispatch("tradingDerivative/report"));
 }
 function exportCsv() {
-    bus.emit("checkPin", () =>
-        store.dispatch("tradingDerivative/export", state.chartDate)
-    );
+    bus.emit("checkPin", () => store.dispatch("tradingDerivative/export"));
 }
 function loginVps() {
     vpsOtpPopupRef.value.show();
-}
-function loginDnse() {
-    bus.emit("checkPin", () => store.dispatch("tradingDerivative/loginDnse"));
 }
 </script>
 <style lang="scss"></style>
