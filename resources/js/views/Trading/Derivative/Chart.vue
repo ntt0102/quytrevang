@@ -831,7 +831,8 @@ function loadToolsData(toolsData) {
                 loadOrderTool(points);
                 break;
             case "pattern":
-                loadPatternTool(toolsData.pattern);
+                if (checkPatternPointsValid(toolsData.pattern))
+                    loadPatternTool(toolsData.pattern);
                 break;
             case "tr":
                 loadTimeRangeTool(points);
@@ -1443,6 +1444,9 @@ function refreshPatternTool(autoAdjust = false) {
         removePatternTool();
         loadPatternTool(points);
     }
+}
+function checkPatternPointsValid({ A: { time } }) {
+    params.data.price.some((item) => item.time === time);
 }
 function calculatePattern({ A, B, C }) {
     const bc = B.price - C.price;
