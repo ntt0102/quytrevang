@@ -1479,7 +1479,7 @@ function calculatePattern({ A, B, C }) {
     progress.step = 1;
     if (
         phase1.ep > 1 &&
-        // phase1.epr < 4 &&
+        phase1.isStrong &&
         phase2.epr < phase1.epr &&
         phase2.R.index - phase1.R.index < 2 * phase1.tr &&
         pr1Status == 1
@@ -1610,6 +1610,9 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
     R.index = box.S.index;
     R.time = indexToTime(box.S.index);
     const ep = Math.abs(R.price - maxBox.R.price);
+    const isStrong =
+        R.price - maxBox.S.price > maxBox.R.price - S.price ||
+        R.index - maxBox.S.index < maxBox.tr;
     if (phase == 3) xBox = box;
 
     return {
@@ -1622,6 +1625,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         xBox,
         S,
         R,
+        isStrong,
         breakIndexs,
     };
 }
