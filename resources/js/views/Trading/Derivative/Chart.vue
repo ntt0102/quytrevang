@@ -1569,7 +1569,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 if (
                     phase == 1 &&
                     retracementPrice &&
-                    cmp(box.S.price, side, retracementPrice)
+                    !cmp(box.S.price, !side, retracementPrice)
                 ) {
                     if (box.tr >= xBox.tr && box.pr >= xBox.pr) xBox = box;
                 }
