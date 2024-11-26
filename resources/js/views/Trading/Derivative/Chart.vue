@@ -1479,7 +1479,7 @@ function calculatePattern({ A, B, C }) {
     progress.step = 1;
     if (
         phase1.rEp > 1 &&
-        (phase1.rEt < phase1.tr || phase1.rEp > sEp) &&
+        (phase1.rEt < phase1.tr || phase1.rEp > phase1.sEp) &&
         phase2.rEpr < phase1.rEpr &&
         phase2.R.index - phase1.R.index < 2 * phase1.tr &&
         pr1Status == 1
