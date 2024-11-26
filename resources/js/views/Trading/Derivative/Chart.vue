@@ -1480,8 +1480,8 @@ function calculatePattern({ A, B, C }) {
     if (
         phase1.ep > 1 &&
         phase1.epr < 4 &&
-        phase2.epr < phase1.epr &&
         phase2.R.index - phase1.R.index < 2 * phase1.tr &&
+        phase2.epr < phase1.epr &&
         pr1Status == 1
     ) {
         if (tr2Status == 0) {
