@@ -1446,7 +1446,7 @@ function refreshPatternTool(autoAdjust = false) {
     }
 }
 function checkPatternPointsValid({ A: { time } }) {
-    params.data.price.some((item) => item.time === time);
+    return params.data.price.some((item) => item.time === time);
 }
 function calculatePattern({ A, B, C }) {
     const bc = B.price - C.price;
