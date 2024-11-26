@@ -1445,7 +1445,7 @@ function calculatePattern({ A, B, C }) {
     });
     if (phase1.xBox.tr >= phase2.tr) phase2.tr = phase1.xBox.tr;
 
-    // console.log("calculatePattern", [phase1, phase2, phase3]);
+    console.log("calculatePattern", [phase1, phase2, phase3]);
 
     //
     const bc = B.price - C.price;
@@ -1479,9 +1479,9 @@ function calculatePattern({ A, B, C }) {
     progress.step = 1;
     if (
         phase1.ep > 1 &&
-        phase1.epr < 4 &&
-        phase2.R.index - phase1.R.index < 2 * phase1.tr &&
+        // phase1.epr < 4 &&
         phase2.epr < phase1.epr &&
+        phase2.R.index - phase1.R.index < 2 * phase1.tr &&
         pr1Status == 1
     ) {
         if (tr2Status == 0) {
@@ -1514,9 +1514,9 @@ function calculatePattern({ A, B, C }) {
     }
 
     //
-    const epr1 = parseFloat(phase1.ep.toFixed(1));
-    const epr2 = parseFloat(phase2.ep.toFixed(1));
-    const epr3 = parseFloat(phase3.ep.toFixed(1));
+    const epr1 = parseFloat(phase1.epr.toFixed(1));
+    const epr2 = parseFloat(phase2.epr.toFixed(1));
+    const epr3 = parseFloat(phase3.epr.toFixed(1));
     //
     const tS = phase1.R1.price;
     const tR = B.price;
