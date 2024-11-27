@@ -1490,7 +1490,7 @@ function calculatePattern({ A, B, C }) {
 
     const tr1Status = phase3.xBox.S.index > T1;
     const tr2Status = phase3.xBox.S.index > T2;
-    // const tr3Status = phase3.xBox.S.index > T3;
+    const tr3Status = phase3.xBox.S.index > T3;
 
     let entry,
         progress = {};
@@ -1501,41 +1501,32 @@ function calculatePattern({ A, B, C }) {
             phase1.rEpr >= 1 && phase1.rEpr < 3,
             phase1.rEpr > phase2.rEpr,
             pr1Status == 1,
+            tr1Status == 1,
         ],
-        [tr1Status == 1, tr2Status == 0],
-        [tr1Status == 1, pr2Status > 0],
-        [tr2Status == 1, pr3Status == 1],
+        [tr2Status == 0],
+        [pr2Status > 0, tr2Status == 1],
+        [pr3Status == 1, tr3Status == 1],
     ];
     progress.step = 1;
-    if (
-        progress.steps[0][0] &&
-        progress.steps[0][1] &&
-        progress.steps[0][2] &&
-        progress.steps[0][3] &&
-        progress.steps[0][4]
-    ) {
-        if (tr2Status == 0) {
-            if (tr1Status == 1) {
-                progress.step = 2;
-                progress.result = true;
-                entry = phase2.S1.price;
-            }
+    if (progress.steps[0].every(Boolean)) {
+        if (progress.steps[1].every(Boolean)) {
+            progress.step = 2;
+            progress.result = true;
+            entry = phase2.S1.price;
         } else {
-            if (tr1Status == 1) {
-                progress.step = 3;
-                if (progress.steps[2][1]) {
-                    progress.step = 4;
-                    if (progress.steps[3][1]) {
-                        progress.result = true;
-                        entry = phase3.xBox.R.price;
-                    } else {
-                        progress.result = false;
-                        entry = phase3.R1.price;
-                    }
+            progress.step = 3;
+            if (progress.steps[2].every(Boolean)) {
+                progress.step = 4;
+                if (progress.steps[3].every(Boolean)) {
+                    progress.result = true;
+                    entry = phase3.xBox.R.price;
                 } else {
                     progress.result = false;
                     entry = phase3.R1.price;
                 }
+            } else {
+                progress.result = false;
+                entry = phase3.R1.price;
             }
         }
     } else {

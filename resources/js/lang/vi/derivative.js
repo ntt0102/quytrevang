@@ -7,19 +7,20 @@ export default [
             "Tỷ lệ EP1 trong khoảng 1-3",
             "Tỷ lệ EP1 > Tỷ lệ EP2",
             "Trạng thái PR1 = 1",
+            "Vượt qua T1",
         ],
     },
     {
         name: "Bước vào lệnh 1",
-        conds: ["Vượt qua T1", "Chưa vượt T2"],
+        conds: ["Chưa vượt T2"],
     },
     {
         name: "Bước kiểm tra pha 2",
-        conds: ["Vượt qua T1", "Trạng thái PR2 > 0"],
+        conds: ["Trạng thái PR2 > 0", "Vượt qua T2"],
     },
     {
         name: "Bước vào lệnh 2",
-        conds: ["Vượt qua T2", "Trạng thái PR3 = 1"],
+        conds: ["Trạng thái PR3 = 1", "Vượt qua T3"],
     },
 ];
 // export default [

@@ -7,13 +7,10 @@
             <div v-for="(step, i) in steps" :key="i" :class="['step']">
                 <div
                     class="step-header"
-                    :class="[
-                        progress.step && progress.step > i
-                            ? progress.steps[i].every(Boolean)
-                                ? 'success'
-                                : 'fail'
-                            : '',
-                    ]"
+                    :class="{
+                        [progress.steps[i].every(Boolean) ? 'success' : 'fail']:
+                            progress.step && progress.step > i,
+                    }"
                 >
                     {{ i + 1 }}. {{ step.name }}
                 </div>
@@ -22,13 +19,10 @@
                         v-for="(cond, j) in step.conds"
                         :key="j"
                         class="condition"
-                        :class="[
-                            progress.step && progress.step > i
-                                ? progress.steps[i][j]
-                                    ? 'success'
-                                    : 'fail'
-                                : '',
-                        ]"
+                        :class="{
+                            [progress.steps[i][j] ? 'success' : 'fail']:
+                                progress.step && progress.step > i,
+                        }"
                     >
                         {{ j + 1 }}. {{ cond }}
                     </div>
