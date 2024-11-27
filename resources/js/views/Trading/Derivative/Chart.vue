@@ -1089,11 +1089,9 @@ function progressToolContextMenu() {
     }
     toggleAutoRefresh();
 }
-function toggleAutoRefresh() {
-    store.dispatch(
-        "tradingDerivative/setAutoRefresh",
-        !config.value.autoRefresh
-    );
+function toggleAutoRefresh(status) {
+    const autoRefresh = status ?? !config.value.autoRefresh;
+    store.dispatch("tradingDerivative/setAutoRefresh", autoRefresh);
 }
 function scanToolClick(e) {
     state.showProgressContext = false;
@@ -1754,7 +1752,7 @@ function pickTimeToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
-        toggleAutoRefresh();
+        toggleAutoRefresh(false);
         e.target.classList.add("selected");
     }
 }
