@@ -1122,12 +1122,11 @@ function drawScanTool() {
           )
         : params.data.price;
     let points = leftSide ? leftScanPattern(data) : rightScanPattern(data);
-    points = removeIndex(points);
     if (mf.isSet(points)) {
-        params.tools.pattern.points = points;
-        savePattern();
-        removePickTimeTool();
         removePatternTool();
+        removePickTimeTool();
+        params.tools.pattern.points = removeIndex(points);
+        savePattern();
         loadPatternTool();
     }
     scanToolRef.value.classList.remove("selected");
@@ -1260,7 +1259,6 @@ function drawPatternTool() {
                 point = "A";
                 changeOptions = {
                     price,
-                    time,
                     title: `A ${rEpr1}`,
                 };
                 params.tools.pattern.lines[point].applyOptions(changeOptions);
@@ -1357,7 +1355,6 @@ function drawPatternTool() {
         option.point = "A";
         option.title = "A 0";
         option.color = "#F44336";
-        option.time = time;
         params.tools.pattern.lines[option.point] =
             params.series.price.createPriceLine(option);
         params.tools.pattern.points.A = { time, price };
@@ -1372,6 +1369,7 @@ function loadPatternTool() {
         lineStyle: 1,
         draggable: true,
     };
+    const points = params.tools.pattern.points;
     const {
         progress,
         timeMark,
@@ -1384,7 +1382,6 @@ function loadPatternTool() {
     option.title = `A ${rEpr1}`;
     option.color = "#F44336";
     option.price = points.A.price;
-    option.time = points.A.time;
     params.tools.pattern.lines[option.point] =
         params.series.price.createPriceLine(option);
     //

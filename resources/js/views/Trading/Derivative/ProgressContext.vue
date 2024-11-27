@@ -7,10 +7,13 @@
             <div v-for="(step, i) in steps" :key="i" :class="['step']">
                 <div
                     class="step-header"
-                    :class="{
-                        [progress.steps[i].every(Boolean) ? 'success' : 'fail']:
-                            progress.step && progress.step > i,
-                    }"
+                    :class="[
+                        progress.step && progress.step > i
+                            ? progress.steps[i].every(Boolean)
+                                ? 'success'
+                                : 'fail'
+                            : '',
+                    ]"
                 >
                     {{ i + 1 }}. {{ step.name }}
                 </div>
@@ -19,10 +22,13 @@
                         v-for="(cond, j) in step.conds"
                         :key="j"
                         class="condition"
-                        :class="{
-                            [progress.steps[i][j] ? 'success' : 'fail']:
-                                progress.step && progress.step > i,
-                        }"
+                        :class="[
+                            progress.step && progress.step > i
+                                ? progress.steps[i][j]
+                                    ? 'success'
+                                    : 'fail'
+                                : '',
+                        ]"
                     >
                         {{ j + 1 }}. {{ cond }}
                     </div>
@@ -33,10 +39,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted } from "vue";
 
 const props = defineProps(["progress"]);
-const emit = defineEmits(["selectPattern"]);
 
 const steps = ref([]);
 
@@ -44,23 +49,11 @@ onMounted(() => {
     loadProgress();
 });
 
-// const sortedItems = computed(() => {
-//     return items.value
-//         .filter((item) => props.items.includes(item.tag))
-//         .sort(
-//             (a, b) => props.items.indexOf(a.tag) - props.items.indexOf(b.tag)
-//         );
-// });
-
 function loadProgress() {
     import(`../../../lang/${window.lang}/derivative.js`).then((e) => {
         steps.value = e.default || [];
     });
 }
-
-// function selectItem(item) {
-//     emit("selectPattern", item.tag);
-// }
 
 function stopPropagationEvent(e) {
     e.stopPropagation();
