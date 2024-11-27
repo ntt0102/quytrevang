@@ -1715,7 +1715,14 @@ function setTimeMark(data) {
     const colors = ["#F44336", "#4CAF50", "#FFEB3B"];
     let result = [];
     for (let i = 0; i < data.length; i++) {
-        result.push({ time: indexToTime(data[i]), value: 1, color: colors[i] });
+        const time = indexToTime(data[i]);
+        if (time) {
+            result.push({
+                time,
+                value: 1,
+                color: colors[i],
+            });
+        }
     }
     if (result.length) result.sort((a, b) => a.time - b.time);
     params.series.timeMark.setData(result);
@@ -2496,7 +2503,9 @@ function timeToIndex(time) {
     return index;
 }
 function indexToTime(index) {
-    return params.data.whitespace[index].time;
+    if (index < params.data.whitespace.length)
+        return params.data.whitespace[index].time;
+    else return false;
 }
 </script>
 <style lang="scss">
