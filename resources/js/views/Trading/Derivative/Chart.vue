@@ -1498,7 +1498,7 @@ function calculatePattern({ A, B, C }) {
         [
             phase1.rEp >= 1,
             phase1.rEt < phase1.tr || phase1.rEp >= phase1.sEp,
-            phase1.rEpr < 3,
+            phase1.rEpr >= 1 && phase1.rEpr < 3,
             phase1.rEpr > phase2.rEpr,
             pr1Status == 1,
         ],

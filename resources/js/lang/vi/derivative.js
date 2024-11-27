@@ -4,7 +4,7 @@ export default [
         conds: [
             "Biên độ mở rộng > 1",
             "Sóng AB mở rộng mạnh",
-            "Tỷ lệ EP1 < 3",
+            "Tỷ lệ EP1 trong khoảng 1-3",
             "Tỷ lệ EP1 > Tỷ lệ EP2",
             "Trạng thái PR1 = 1",
         ],
