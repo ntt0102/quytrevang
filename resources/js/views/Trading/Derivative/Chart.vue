@@ -95,8 +95,8 @@
                         red: state.progress.result == false,
                     }"
                     :title="$t('trading.derivative.progressTool')"
-                    @click="showProgressContext"
-                    @contextmenu="toggleAutoRefresh"
+                    @click="progressToolClick"
+                    @contextmenu="progressToolContextMenu"
                 >
                     <i
                         class="far"
@@ -1076,11 +1076,24 @@ function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
     e.stopPropagation();
 }
-function showProgressContext() {
+function progressToolClick() {
     state.showProgressContext = !state.showProgressContext;
     state.showScanContext = false;
     state.showLineContext = false;
     if (state.showProgressContext) refreshPatternTool();
+}
+function progressToolContextMenu() {
+    if (!config.value.autoRefresh) {
+        removePickTimeTool();
+        refreshPatternTool();
+    }
+    toggleAutoRefresh();
+}
+function toggleAutoRefresh() {
+    store.dispatch(
+        "tradingDerivative/setAutoRefresh",
+        !config.value.autoRefresh
+    );
 }
 function scanToolClick(e) {
     state.showProgressContext = false;
@@ -1100,12 +1113,6 @@ function scanToolContextMenu() {
     state.showScanContext = !state.showScanContext;
     state.showProgressContext = false;
     state.showLineContext = false;
-}
-function toggleAutoRefresh() {
-    store.dispatch(
-        "tradingDerivative/setAutoRefresh",
-        !config.value.autoRefresh
-    );
 }
 function drawScanTool() {
     const leftSide = state.scanSide == "left";
@@ -1747,6 +1754,7 @@ function pickTimeToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
+        toggleAutoRefresh();
         e.target.classList.add("selected");
     }
 }
