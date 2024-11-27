@@ -1497,12 +1497,12 @@ function calculatePattern({ A, B, C }) {
     progress.steps = [
         [
             phase1.rEp >= 1,
-            phase1.rEt < phase1.tr || phase1.rEp > phase1.sEp,
-            phase2.rEpr < phase1.rEpr,
-            phase2.R.index - phase1.R.index < 2 * phase1.tr,
+            phase1.rEt < phase1.tr || phase1.rEp >= phase1.sEp,
+            phase1.rEpr < 3,
+            phase1.rEpr > phase2.rEpr,
             pr1Status == 1,
         ],
-        [tr1Status == 1],
+        [tr1Status == 1, tr2Status == 0],
         [tr1Status == 1, pr2Status > 0],
         [tr2Status == 1, pr3Status == 1],
     ];
@@ -1550,10 +1550,8 @@ function calculatePattern({ A, B, C }) {
     //
     const X = phase1.rEp;
     const x = adjustTargetPrice(B.price, X, side);
-    const scale = phase3.breakIndex
-        ? parseInt((phase3.breakIndex - phase1.R.index) / phase1.tr)
-        : 1;
-    const Y = X * scale;
+    const scale = parseInt((phase3.breakIndex - phase1.R.index) / phase1.tr);
+    const Y = scale > 1 ? X * scale : X;
     const y = adjustTargetPrice(B.price, Y, side);
 
     return {
