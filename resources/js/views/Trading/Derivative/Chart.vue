@@ -1499,7 +1499,6 @@ function calculatePattern() {
             entry = phase2.S1.price;
         } else {
             entry = phase3.R1.price;
-            console.log("phase3.breakIndexs[0]", [phase3.breakIndexs[0], T2]);
             if (!(phase3.breakIndexs[0] && phase3.breakIndexs[0] < T2)) {
                 progress.step = 3;
                 progress.result = progress.steps[2].every(Boolean);
@@ -1510,6 +1509,8 @@ function calculatePattern() {
                 }
             }
         }
+    } else {
+        if (progress.steps[2][1]) entry = phase3.R1.price;
     }
     //
     const p1Status = s1Valid ? (pr1Valid ? 1 : 0) : 2;
