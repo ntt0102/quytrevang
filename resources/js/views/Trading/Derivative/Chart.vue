@@ -829,7 +829,7 @@ function loadToolsData(toolsData) {
                 break;
             case "pattern":
                 if (checkPatternPointsValid(points)) {
-                    params.tools.pattern.points = points;
+                    params.tools.pattern.points = mf.cloneDeep(points);
                     loadPatternTool();
                 }
                 break;
@@ -1219,7 +1219,10 @@ function patternToolClick(e) {
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
-    if (!selected) e.target.classList.add("selected");
+    if (!selected) {
+        removePickTimeTool();
+        e.target.classList.add("selected");
+    }
 }
 function patternToolContextmenu(e) {
     e.target.classList.remove("selected");
@@ -1658,14 +1661,14 @@ function adjustTargetPrice(price, range, side) {
 }
 function adjustPatternPoints() {
     let points = params.tools.pattern.points;
-    const side = points.B.price - points.A.price;
+    const side = points.B.price - points.A.price > 0;
     const lastPrice = params.data.price.at(-1).value;
 
     if (cmp(lastPrice, !side, points.C.price)) {
         let cPriceNew = lastPrice;
         for (let i = params.data.price.length - 1; i >= 0; i--) {
             const price = params.data.price[i].value;
-            if (price == points.C.price) break;
+            if (price == points.B.price) break;
             cPriceNew = side
                 ? Math.min(cPriceNew, price)
                 : Math.max(cPriceNew, price);
