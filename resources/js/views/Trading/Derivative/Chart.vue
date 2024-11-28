@@ -1475,9 +1475,9 @@ function calculatePattern() {
     const timeMark = [T1, T2, T3];
 
     const T = phase3.xBox.S.index;
-    const t1Status = T - T1 > 3 * phase1.tr ? (T - T1 > phase1.tr ? 1 : 0) : 2;
-    const t2Status = T - T2 > 3 * phase2.tr ? (T - T2 > phase2.tr ? 1 : 0) : 2;
-    const t3Status = T - T3 > 3 * phase3.tr ? (T - T3 > phase3.tr ? 1 : 0) : 2;
+    const t1Status = T > T1 + 3 * phase1.tr ? (T > T1 ? 1 : 0) : 2;
+    const t2Status = T > T2 + 3 * phase2.tr ? (T > T2 ? 1 : 0) : 2;
+    const t3Status = T > T3 + 3 * phase3.tr ? (T > T3 ? 1 : 0) : 2;
 
     let entry,
         progress = {};
