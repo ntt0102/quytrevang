@@ -12,7 +12,7 @@ export default [
     },
     {
         name: "Bước vào lệnh 1",
-        conds: ["Chưa vượt T2"],
+        conds: ["T2 > T1", "Chưa vượt T2"],
     },
     {
         name: "Bước kiểm tra pha 2",
