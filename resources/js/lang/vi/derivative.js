@@ -20,7 +20,7 @@ export default [
     },
     {
         name: "Bước vào lệnh 2",
-        conds: ["Trạng thái PR3 = 1", "Vượt qua T3"],
+        conds: ["Trạng thái PR3 = 1", "T3-T1 < 3 lần TR1", "Vượt qua T3"],
     },
 ];
 // export default [

@@ -1488,7 +1488,7 @@ function calculatePattern() {
         ],
         [tr2Status == 0],
         [pr2Status > 0, tr2Status == 1],
-        [pr3Status == 1, tr3Status == 1],
+        [pr3Status == 1, T3 - T1 < 3 * phase1.tr, tr3Status == 1],
     ];
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
