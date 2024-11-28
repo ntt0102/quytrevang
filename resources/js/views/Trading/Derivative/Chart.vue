@@ -1493,9 +1493,9 @@ function calculatePattern() {
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
     if (progress.result) {
-        progress.result = progress.steps[1].every(Boolean);
-        if (progress.result) {
+        if (tr2Status == 0) {
             progress.step = 2;
+            progress.result = progress.steps[1].every(Boolean);
             entry = phase2.S1.price;
         } else {
             progress.step = 3;
