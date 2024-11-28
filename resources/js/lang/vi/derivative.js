@@ -2,7 +2,7 @@ export default [
     {
         name: "Bước kiểm tra pha 1",
         conds: [
-            "Biên độ mở rộng > 1",
+            "Biên độ mở rộng >= 1",
             "Sóng AB mở rộng mạnh",
             "Tỷ lệ EP1 trong khoảng 1-3",
             "Tỷ lệ EP1 > Tỷ lệ EP2",
