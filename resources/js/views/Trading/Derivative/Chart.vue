@@ -1479,7 +1479,7 @@ function calculatePattern() {
     const t2Status = T < T2 + 3 * phase2.tr ? (T > T2 ? 1 : 0) : 2;
     const t3Status = T < T3 + 3 * phase3.tr ? (T > T3 ? 1 : 0) : 2;
 
-    let entry,
+    let entry = phase1.R1.price,
         progress = {};
     progress.steps = [
         [
@@ -1502,6 +1502,7 @@ function calculatePattern() {
             progress.result = progress.steps[1].every(Boolean);
             entry = phase2.S1.price;
         } else {
+            entry = phase3.R1.price;
             if (!(phase3.breakIndexs[1] && phase3.breakIndexs[1] < T2)) {
                 progress.step = 3;
                 progress.result = progress.steps[2].every(Boolean);
@@ -1509,11 +1510,10 @@ function calculatePattern() {
                     progress.step = 4;
                     progress.result = progress.steps[3].every(Boolean);
                     if (progress.result) entry = phase3.xBox.R.price;
-                    else entry = phase3.R1.price;
-                } else entry = phase3.R1.price;
+                }
             }
         }
-    } else entry = phase1.R1.price;
+    }
 
     //
     const rEpr1 = parseFloat(phase1.rEpr.toFixed(1));
