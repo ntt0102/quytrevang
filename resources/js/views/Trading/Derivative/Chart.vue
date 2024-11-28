@@ -1445,7 +1445,7 @@ function calculatePattern() {
         phase: 3,
         start: phase2.R,
         end: { price: B.price + (side ? 1 : -1) * phase1.rEp },
-        breakPrice: B.price,
+        breakPrices: [phase2.S1.price, B.price],
     });
     if (phase1.xBox.tr >= phase2.tr) phase2.tr = phase1.xBox.tr;
 
@@ -1498,14 +1498,16 @@ function calculatePattern() {
             progress.result = progress.steps[1].every(Boolean);
             entry = phase2.S1.price;
         } else {
-            progress.step = 3;
-            progress.result = progress.steps[2].every(Boolean);
-            if (progress.result) {
-                progress.step = 4;
-                progress.result = progress.steps[3].every(Boolean);
-                if (progress.result) entry = phase3.xBox.R.price;
-                else entry = phase3.R1.price;
-            } else entry = phase3.R1.price;
+            if (!(phase3.breakIndexs[1] && phase3.breakIndexs[1] < T2)) {
+                progress.step = 3;
+                progress.result = progress.steps[2].every(Boolean);
+                if (progress.result) {
+                    progress.step = 4;
+                    progress.result = progress.steps[3].every(Boolean);
+                    if (progress.result) entry = phase3.xBox.R.price;
+                    else entry = phase3.R1.price;
+                } else entry = phase3.R1.price;
+            }
         }
     } else entry = phase1.R1.price;
 
@@ -1516,7 +1518,9 @@ function calculatePattern() {
     //
     const X = phase1.rEp;
     const x = adjustTargetPrice(B.price, X, side);
-    const scale = parseInt((phase3.breakIndex - phase1.R.index) / phase1.tr);
+    const scale = parseInt(
+        (phase3.breakIndexs[1] - phase1.R.index) / phase1.tr
+    );
     const Y = scale > 1 ? X * scale : X;
     const y = adjustTargetPrice(B.price, Y, side);
 
@@ -1526,14 +1530,14 @@ function calculatePattern() {
         info: { rEpr1, rEpr2, rEpr3, entry, prStatus, x, X, y, Y },
     };
 }
-function scanPhase({ phase, start, end, breakPrice, retracementPrice }) {
+function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
     let S = mf.cloneDeep(start);
     let R = mf.cloneDeep(end);
     const side = R.price > S.price;
     let box = {},
         maxBox = {},
         xBox = {},
-        breakIndex = null,
+        breakIndexs = [null, null],
         rEp,
         sEp,
         rEt;
@@ -1586,8 +1590,11 @@ function scanPhase({ phase, start, end, breakPrice, retracementPrice }) {
                     pr: 0,
                     tr: 0,
                 };
-                if (phase == 3 && breakPrice && !cmp(price, side, breakPrice)) {
-                    breakIndex = index;
+                if (phase == 3 && breakPrices) {
+                    if (!cmp(price, side, breakPrices[0]))
+                        breakIndexs[0] = index;
+                    if (!cmp(price, side, breakPrices[1]))
+                        breakIndexs[1] = index;
                 }
             } else {
                 box.S.index = index;
@@ -1626,7 +1633,7 @@ function scanPhase({ phase, start, end, breakPrice, retracementPrice }) {
         xBox,
         S,
         R,
-        breakIndex,
+        breakIndexs,
     };
 }
 function adjustTargetPrice(price, range, side) {
