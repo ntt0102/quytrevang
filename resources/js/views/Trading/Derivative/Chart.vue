@@ -1491,31 +1491,23 @@ function calculatePattern() {
         [pr3Status == 1, tr3Status == 1],
     ];
     progress.step = 1;
-    if (progress.steps[0].every(Boolean)) {
-        if (progress.steps[1].every(Boolean)) {
+    progress.result = progress.steps[0].every(Boolean);
+    if (progress.result) {
+        progress.result = progress.steps[1].every(Boolean);
+        if (progress.result) {
             progress.step = 2;
-            progress.result = true;
             entry = phase2.S1.price;
         } else {
             progress.step = 3;
-            if (progress.steps[2].every(Boolean)) {
+            progress.result = progress.steps[2].every(Boolean);
+            if (progress.result) {
                 progress.step = 4;
-                if (progress.steps[3].every(Boolean)) {
-                    progress.result = true;
-                    entry = phase3.xBox.R.price;
-                } else {
-                    progress.result = false;
-                    entry = phase3.R1.price;
-                }
-            } else {
-                progress.result = false;
-                entry = phase3.R1.price;
-            }
+                progress.result = progress.steps[3].every(Boolean);
+                if (progress.result) entry = phase3.xBox.R.price;
+                else entry = phase3.R1.price;
+            } else entry = phase3.R1.price;
         }
-    } else {
-        progress.result = false;
-        entry = phase1.S1.price;
-    }
+    } else entry = phase1.R1.price;
 
     //
     const rEpr1 = parseFloat(phase1.rEpr.toFixed(1));
