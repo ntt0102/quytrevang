@@ -6,21 +6,32 @@ export default [
             "Sóng AB mở rộng mạnh",
             "Tỷ lệ EP1 trong khoảng 1-3",
             "Tỷ lệ EP1 > Tỷ lệ EP2",
-            "Trạng thái P1 = 1",
-            "Trạng thái T1 = 1",
+            "Biên độ 1 lớn hơn PR1",
+            "Biên độ 1 không gãy hỗ trợ",
+            "Thời gian vượt qua T1",
+            "Thời gian trong giới hạn 1",
         ],
     },
     {
         name: "Bước vào lệnh 1",
-        conds: ["T2 > T1", "Trạng thái T2 = 0"],
+        conds: ["T2 > T1", "Thời gian chưa qua T2"],
     },
     {
         name: "Bước kiểm tra pha 2",
-        conds: ["Trạng thái P2 > 0", "Trạng thái T2 = 1"],
+        conds: [
+            "Biên độ 2 lớn hơn PR2",
+            "Thời gian vượt qua T2",
+            "Thời gian trong giới hạn 2",
+        ],
     },
     {
         name: "Bước vào lệnh 2",
-        conds: ["Trạng thái P3 = 1", "Trạng thái T3 = 1"],
+        conds: [
+            "Biên độ 3 lớn hơn PR3",
+            "Biên độ 3 không gãy hỗ trợ",
+            "Thời gian vượt qua T3",
+            "Thời gian trong giới hạn 3",
+        ],
     },
 ];
 // export default [

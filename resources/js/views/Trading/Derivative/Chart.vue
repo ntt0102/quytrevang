@@ -1463,21 +1463,15 @@ function calculatePattern() {
     const s2Valid = cmp(phase3.xBox.R.price, !side, phase2.S1.price);
     const s3Valid = cmp(phase3.xBox.S.price, side, phase3.S1.price);
 
-    const p1Status = s1Valid ? (pr1Valid ? 1 : 0) : 2;
-    const p2Status = s2Valid ? (pr2Valid ? 1 : 0) : 2;
-    const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
-
-    const pStatus = `${p1Status}${p2Status}${p3Status}`;
-
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T3 = phase3.xBox.R.index + phase3.tr;
     const timeMark = [T1, T2, T3];
 
     const T = phase3.xBox.S.index;
-    const t1Status = T < T1 + 3 * phase1.tr ? (T > T1 ? 1 : 0) : 2;
-    const t2Status = T < T2 + 3 * phase2.tr ? (T > T2 ? 1 : 0) : 2;
-    const t3Status = T < T3 + 3 * phase3.tr ? (T > T3 ? 1 : 0) : 2;
+    const t1Limit = T < T1 + 3 * phase1.tr;
+    const t2Limit = T < T2 + 3 * phase2.tr;
+    const t3Limit = T < T3 + 3 * phase3.tr;
 
     let entry = phase1.R1.price,
         progress = {};
@@ -1487,23 +1481,26 @@ function calculatePattern() {
             phase1.rEt < phase1.tr || phase1.rEp >= phase1.sEp,
             phase1.rEpr >= 1 && phase1.rEpr < 3,
             phase1.rEpr > phase2.rEpr,
-            p1Status == 1,
-            t1Status == 1,
+            pr1Valid,
+            s1Valid,
+            T > T1,
+            t1Limit,
         ],
-        [T2 > T1, t2Status == 0],
-        [p2Status > 0, t2Status > 0],
-        [p3Status == 1, t3Status == 1],
+        [T2 > T1, T <= T2],
+        [pr2Valid, T > T2, t2Limit],
+        [pr3Valid, s3Valid, T > T3, t3Limit],
     ];
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
     if (progress.result) {
-        if (t2Status == 0) {
+        if (progress.steps[1][1]) {
             progress.step = 2;
             progress.result = progress.steps[1].every(Boolean);
             entry = phase2.S1.price;
         } else {
             entry = phase3.R1.price;
-            if (!(phase3.breakIndexs[1] && phase3.breakIndexs[1] < T2)) {
+            console.log("phase3.breakIndexs[0]", [phase3.breakIndexs[0], T2]);
+            if (!(phase3.breakIndexs[0] && phase3.breakIndexs[0] < T2)) {
                 progress.step = 3;
                 progress.result = progress.steps[2].every(Boolean);
                 if (progress.result) {
@@ -1514,7 +1511,11 @@ function calculatePattern() {
             }
         }
     }
-
+    //
+    const p1Status = s1Valid ? (pr1Valid ? 1 : 0) : 2;
+    const p2Status = s2Valid ? (pr2Valid ? 1 : 0) : 2;
+    const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
+    const pStatus = `${p1Status}${p2Status}${p3Status}`;
     //
     const rEpr1 = parseFloat(phase1.rEpr.toFixed(1));
     const rEpr2 = parseFloat(phase2.rEpr.toFixed(1));
@@ -1595,9 +1596,9 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                     tr: 0,
                 };
                 if (phase == 3 && breakPrices) {
-                    if (!cmp(price, side, breakPrices[0]))
+                    if (!breakIndexs[0] && cmp(price, side, breakPrices[0]))
                         breakIndexs[0] = index;
-                    if (!cmp(price, side, breakPrices[1]))
+                    if (!breakIndexs[1] && cmp(price, side, breakPrices[1]))
                         breakIndexs[1] = index;
                 }
             } else {
