@@ -370,16 +370,7 @@ const tradingViewSrc = computed(() => {
     return `https://chart.vps.com.vn/tv/?u=${config.value.vpsUser}&s=${config.value.vpsSession}&symbol=VN30F1M&resolution=1&lang=vi`;
 });
 
-store.dispatch("tradingDerivative/initChart").then(() => {
-    if (inSession()) connectSocket();
-    if (!route.query.date && config.value.lastOpeningDate)
-        state.chartDate = config.value.lastOpeningDate;
-    store
-        .dispatch("tradingDerivative/getChartData", state.chartDate)
-        .then((hasData) => {
-            if (hasData) getTools();
-        });
-});
+initChart();
 
 params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
@@ -2466,7 +2457,7 @@ function toastOrderError(error) {
 }
 function dateSelectChange() {
     if (!state.chartDate) return false;
-    store.dispatch("tradingDerivative/getChartData", state.chartDate);
+    getChartData();
 }
 function refreshChart() {
     if (inSession()) params.websocket.send(params.socketSendData);
@@ -2475,7 +2466,22 @@ function resetChart() {
     params.data.whitespace = [];
     params.data.price = [];
     refreshChart();
-    store.dispatch("tradingDerivative/getChartData", state.chartDate);
+    getChartData();
+}
+function initChart() {
+    store.dispatch("tradingDerivative/initChart").then(() => {
+        if (inSession()) connectSocket();
+        if (!route.query.date && config.value.lastOpeningDate)
+            state.chartDate = config.value.lastOpeningDate;
+        getChartData();
+    });
+}
+function getChartData() {
+    store
+        .dispatch("tradingDerivative/getChartData", state.chartDate)
+        .then((hasData) => {
+            if (hasData) getTools();
+        });
 }
 function getStatus() {
     store.dispatch("tradingDerivative/getStatus");
