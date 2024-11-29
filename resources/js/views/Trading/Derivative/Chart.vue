@@ -334,7 +334,6 @@ let params = {
     socketSendData: null,
     currentSeconds: getUnixTime(addHours(new Date(), 7)),
     alertAudio: null,
-    alertCount: 0,
 };
 initToolsParams();
 //
@@ -905,26 +904,17 @@ function loadToolsData(toolsData) {
     });
 }
 function progressAlert(newProgress, oldProgress) {
-    if (oldProgress.step == 1 && newProgress.step > 1) playAlert();
+    if (newProgress.step > oldProgress.step) playAlert();
 }
 function initializeAudio() {
-    params.alertAudio = new Audio("/audios/alert.mp3");
+    params.alertAudio = new Audio("/audios/brittle-beep.mp3");
 
-    params.alertAudio.addEventListener("ended", () => {
-        if (params.alertCount < 2) {
-            params.alertCount++;
-            params.alertAudio.play();
-        } else params.alertAudio.pause();
-    });
-
-    // Thêm sự kiện để kiểm tra lỗi khi tải
     params.alertAudio.addEventListener("error", (event) => {
         console.error("Lỗi khi tải âm thanh:", event);
     });
 }
 function playAlert() {
     if (params.alertAudio) {
-        params.alertCount = 0;
         params.alertAudio
             .play()
             .then(() => {
@@ -1117,10 +1107,6 @@ function progressToolClick() {
     if (state.showProgressContext) refreshPatternTool();
 }
 function progressToolContextMenu() {
-    if (!state.autoRefresh) {
-        removePickTimeTool();
-        refreshPatternTool();
-    }
     initializeAudio();
     toggleAutoRefresh();
 }
@@ -1699,6 +1685,8 @@ function adjustTargetPrice(price, range, side) {
     return target;
 }
 function adjustPatternPoints() {
+    if (!params.tools.pickTime) return false;
+    //
     let points = params.tools.pattern.points;
     const side = points.B.price - points.A.price > 0;
     const lastPrice = params.data.price.at(-1).value;
@@ -1784,10 +1772,7 @@ function pickTimeToolClick(e) {
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        toggleAutoRefresh(false);
-        e.target.classList.add("selected");
-    }
+    if (!selected) e.target.classList.add("selected");
 }
 function pickTimeToolContextmenu(e) {
     e.target.classList.remove("selected");
