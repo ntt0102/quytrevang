@@ -1,33 +1,33 @@
 self.addEventListener("fetch", (event) => {
     if (!event.request.url.startsWith(self.location.origin)) return;
     if (event.request.method !== "GET") return;
-    return event.respondWith(
-        fetch(event.request)
-            .then((response) =>
-                caches
-                    .open("cache")
-                    .then((cache) =>
-                        cache
-                            .put(event.request, response.clone())
-                            .then(() => response)
-                    )
-            )
-            .catch(() =>
-                caches.match(event.request).then((response) => {
-                    if (!!response) return response;
-                    return self.clients
-                        .matchAll({
-                            includeUncontrolled: true,
-                            type: "window",
-                        })
-                        .then((clients) =>
-                            clients.forEach((client) =>
-                                client.postMessage({ type: "OFFLINE" })
-                            )
-                        );
-                })
-            )
-    );
+    if (event.request.url.endsWith(".mp3"))
+        event.respondWith(fetch(event.request));
+    else
+        event.respondWith(
+            fetch(event.request)
+                .then((response) =>
+                    caches.open("cache").then((cache) => {
+                        cache.put(event.request, response.clone());
+                        return response;
+                    })
+                )
+                .catch(() =>
+                    caches.match(event.request).then((response) => {
+                        if (response) return response;
+                        return self.clients
+                            .matchAll({
+                                includeUncontrolled: true,
+                                type: "window",
+                            })
+                            .then((clients) =>
+                                clients.forEach((client) =>
+                                    client.postMessage({ type: "OFFLINE" })
+                                )
+                            );
+                    })
+                )
+        );
 });
 
 self.addEventListener("push", (event) => {

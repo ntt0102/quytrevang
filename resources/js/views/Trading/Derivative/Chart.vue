@@ -910,8 +910,8 @@ function progressAlert(newProgress, oldProgress) {
     playAlert();
 }
 function initializeAudio() {
-    const path = `${window.baseURL}/audios/alert.mp3`;
-    params.alertAudio = new Audio(path);
+    // const path = `${window.baseURL}/audios/alert.mp3`;
+    params.alertAudio = new Audio("/audios/alert.mp3");
 
     params.alertAudio.addEventListener("ended", () => {
         if (params.alertCount < 2) {
