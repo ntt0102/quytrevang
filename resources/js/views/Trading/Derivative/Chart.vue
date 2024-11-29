@@ -907,8 +907,7 @@ function progressAlert(newProgress, oldProgress) {
     if (
         newProgress.step > oldProgress.step ||
         (newProgress.step == oldProgress.step &&
-            !oldProgress.result &&
-            oldProgress.result)
+            newProgress.result > oldProgress.result)
     )
         playAlert();
 }
