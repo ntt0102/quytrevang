@@ -32,6 +32,7 @@ class DerivativeService extends CoreService
      */
     public function initChart($payload)
     {
+        set_global_value('autoRefreshFlag', '0');
         return [
             'config' => [
                 'openingMarket' => get_global_value('openingMarketFlag') == '1',
@@ -39,7 +40,7 @@ class DerivativeService extends CoreService
                 'vpsUser' => get_global_value('vpsUser'),
                 'vpsSession' => get_global_value('vpsSession'),
                 'lastOpeningDate' => get_global_value('lastOpeningDate'),
-                'autoRefresh' => get_global_value('autoRefreshFlag') == '1',
+                'autoRefresh' => false,
             ],
             'status' => $this->getStatus($payload)
         ];

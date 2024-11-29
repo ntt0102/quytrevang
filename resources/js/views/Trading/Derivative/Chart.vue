@@ -333,6 +333,8 @@ let params = {
     socketStop: false,
     socketSendData: null,
     currentSeconds: getUnixTime(addHours(new Date(), 7)),
+    alertAudio: null,
+    alertCount: 0,
 };
 initToolsParams();
 //
@@ -382,6 +384,7 @@ store.dispatch("tradingDerivative/initChart").then(() => {
 params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
     if (inSession()) {
+        playAlert();
         getStatus();
         if (config.value.autoRefresh) refreshPatternTool(true);
     } else clearInterval(params.interval60);
@@ -424,6 +427,36 @@ onMounted(() => {
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
 });
+function initializeAudio() {
+    params.alertAudio = new Audio("/audios/alert.mp3");
+
+    params.alertAudio.addEventListener("ended", () => {
+        if (params.alertCount < 2) {
+            params.alertCount++;
+            params.alertAudio.play();
+        } else params.alertAudio.pause();
+    });
+
+    // Thêm sự kiện để kiểm tra lỗi khi tải
+    params.alertAudio.addEventListener("error", (event) => {
+        console.error("Lỗi khi tải âm thanh:", event);
+    });
+}
+
+function playAlert() {
+    if (params.alertAudio) {
+        params.alertCount = 0;
+        params.alertAudio
+            .play()
+            .then(() => {
+                console.log("Âm thanh đã phát thành công");
+            })
+            .catch((error) => {
+                console.error("Không thể phát âm thanh:", error);
+            });
+    }
+}
+
 onUnmounted(() => {
     if (params.chart) {
         params.chart.remove();
@@ -1080,12 +1113,14 @@ function progressToolClick() {
     state.showScanContext = false;
     state.showLineContext = false;
     if (state.showProgressContext) refreshPatternTool();
+    playAlert();
 }
 function progressToolContextMenu() {
     if (!config.value.autoRefresh) {
         removePickTimeTool();
         refreshPatternTool();
     }
+    initializeAudio();
     toggleAutoRefresh();
 }
 function toggleAutoRefresh(status) {
