@@ -908,27 +908,20 @@ function progressAlert(newProgress, oldProgress) {
         newProgress.step > oldProgress.step ||
         (newProgress.step == oldProgress.step &&
             newProgress.result > oldProgress.result)
-    )
-        playAlert();
-}
-function initializeAudio() {
-    params.alertAudio = new Audio("/audios/brittle-beep.mp3");
-
-    params.alertAudio.addEventListener("error", (event) => {
-        console.error("Lỗi khi tải âm thanh:", event);
-    });
-}
-function playAlert() {
-    if (params.alertAudio) {
-        params.alertAudio
-            .play()
-            .then(() => {
-                console.log("Âm thanh đã phát thành công");
-            })
-            .catch((error) => {
-                console.error("Không thể phát âm thanh:", error);
-            });
+    ) {
+        let text = "";
+        if (newProgress.result) {
+            if ([2, 4].includes(newProgress.step))
+                text = t("trading.derivative.progressOrder", newProgress);
+            else text = t("trading.derivative.progressSuccess", newProgress);
+        } else text = t("trading.derivative.progressFail", newProgress);
+        speakAlert(text);
     }
+}
+function speakAlert(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "vi-VN";
+    speechSynthesis.speak(utterance);
 }
 function connectSocket() {
     store.dispatch("tradingDerivative/setChartLoading", true);
@@ -1112,7 +1105,6 @@ function progressToolClick() {
     if (state.showProgressContext) refreshPatternTool();
 }
 function progressToolContextMenu() {
-    initializeAudio();
     toggleAutoRefresh();
 }
 function toggleAutoRefresh(status) {
