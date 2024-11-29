@@ -904,7 +904,13 @@ function loadToolsData(toolsData) {
     });
 }
 function progressAlert(newProgress, oldProgress) {
-    if (newProgress.step > oldProgress.step) playAlert();
+    if (
+        newProgress.step > oldProgress.step ||
+        (newProgress.step == oldProgress.step &&
+            !oldProgress.result &&
+            oldProgress.result)
+    )
+        playAlert();
 }
 function initializeAudio() {
     params.alertAudio = new Audio("/audios/brittle-beep.mp3");
