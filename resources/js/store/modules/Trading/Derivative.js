@@ -40,21 +40,6 @@ const actions = {
                 });
         });
     },
-    setAutoRefresh(
-        { commit, dispatch, getters, state, rootGetters },
-        autoRefresh
-    ) {
-        commit("setAutoRefresh", autoRefresh);
-        return new Promise((resolve, reject) => {
-            axios
-                .post(
-                    "trading/derivative/set-auto-refresh",
-                    { autoRefresh },
-                    { noLoading: true }
-                )
-                .then((response) => resolve());
-        });
-    },
     getTools({ commit, dispatch, getters, state, rootGetters }) {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {
@@ -198,9 +183,6 @@ const mutations = {
     setInitChart(state, data) {
         state.config = data.config;
         state.status = data.status;
-    },
-    setAutoRefresh(state, autoRefresh) {
-        state.config.autoRefresh = autoRefresh;
     },
     setTools(state, data) {
         state.tools = data;

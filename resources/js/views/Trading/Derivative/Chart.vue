@@ -104,7 +104,7 @@
                             'fa-badge-check': !state.progress.step,
                             [`fa-circle-${state.progress.step}`]:
                                 state.progress.step,
-                            blink: config.autoRefresh,
+                            blink: state.autoRefresh,
                         }"
                     >
                     </i>
@@ -353,6 +353,7 @@ const state = reactive({
     showLineContext: false,
     showTradingView: false,
     tradingViewStyle: { left: "32px" },
+    autoRefresh: false,
 });
 const status = computed(() => store.state.tradingDerivative.status);
 const config = computed(() => store.state.tradingDerivative.config);
@@ -384,9 +385,9 @@ store.dispatch("tradingDerivative/initChart").then(() => {
 params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
     if (inSession()) {
-        playAlert();
+        // playAlert();
         getStatus();
-        if (config.value.autoRefresh) refreshPatternTool(true);
+        if (state.autoRefresh) refreshPatternTool(true);
     } else clearInterval(params.interval60);
 }, 60000);
 
@@ -1114,10 +1115,10 @@ function progressToolClick() {
     state.showScanContext = false;
     state.showLineContext = false;
     if (state.showProgressContext) refreshPatternTool();
-    playAlert();
+    // playAlert();
 }
 function progressToolContextMenu() {
-    if (!config.value.autoRefresh) {
+    if (!state.autoRefresh) {
         removePickTimeTool();
         refreshPatternTool();
     }
@@ -1125,8 +1126,8 @@ function progressToolContextMenu() {
     toggleAutoRefresh();
 }
 function toggleAutoRefresh(status) {
-    const autoRefresh = status ?? !config.value.autoRefresh;
-    store.dispatch("tradingDerivative/setAutoRefresh", autoRefresh);
+    const autoRefresh = status ?? !state.autoRefresh;
+    state.autoRefresh = autoRefresh;
 }
 function scanToolClick(e) {
     state.showProgressContext = false;

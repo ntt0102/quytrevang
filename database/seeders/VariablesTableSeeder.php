@@ -66,9 +66,5 @@ class VariablesTableSeeder extends Seeder
             'name' => "dnseTrading",
             'value' => "",
         ]);
-        Variable::create([
-            'name' => "autoRefreshFlag",
-            'value' => "0",
-        ]);
     }
 }
