@@ -905,12 +905,9 @@ function loadToolsData(toolsData) {
     });
 }
 function progressAlert(newProgress, oldProgress) {
-    console.log("progressAlert", [newProgress, oldProgress]);
-    // if (oldProgress.step == 1 && newProgress.step > 1) playAlert();
-    playAlert();
+    if (oldProgress.step == 1 && newProgress.step > 1) playAlert();
 }
 function initializeAudio() {
-    // const path = `${window.baseURL}/audios/alert.mp3`;
     params.alertAudio = new Audio("/audios/alert.mp3");
 
     params.alertAudio.addEventListener("ended", () => {
