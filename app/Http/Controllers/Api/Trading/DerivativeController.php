@@ -43,6 +43,19 @@ class DerivativeController extends CoreController
     }
 
     /**
+     * Set Auto Scan
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function setAutoRefresh(Request $request)
+    {
+        $data = $this->derivativeService->setAutoRefresh($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Get Tools
      *
      * @param \Illuminate\Http\Request $request

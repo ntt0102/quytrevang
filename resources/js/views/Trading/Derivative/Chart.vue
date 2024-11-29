@@ -104,7 +104,7 @@
                             'fa-badge-check': !state.progress.step,
                             [`fa-circle-${state.progress.step}`]:
                                 state.progress.step,
-                            blink: state.autoRefresh,
+                            blink: config.autoRefresh,
                         }"
                     >
                     </i>
@@ -352,7 +352,6 @@ const state = reactive({
     showLineContext: false,
     showTradingView: false,
     tradingViewStyle: { left: "32px" },
-    autoRefresh: false,
 });
 const status = computed(() => store.state.tradingDerivative.status);
 const config = computed(() => store.state.tradingDerivative.config);
@@ -376,7 +375,7 @@ params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
     if (inSession()) {
         getStatus();
-        if (state.autoRefresh) refreshPatternTool(true);
+        if (config.value.autoRefresh) refreshPatternTool(true);
     } else clearInterval(params.interval60);
 }, 60000);
 
@@ -895,18 +894,21 @@ function loadToolsData(toolsData) {
     });
 }
 function progressAlert(newProgress, oldProgress) {
-    if (
-        newProgress.step > oldProgress.step ||
-        (newProgress.step == oldProgress.step &&
-            newProgress.result > oldProgress.result)
-    ) {
-        let text = "";
-        if (newProgress.result) {
-            if ([2, 4].includes(newProgress.step))
-                text = t("trading.derivative.progressOrder", newProgress);
-            else text = t("trading.derivative.progressSuccess", newProgress);
-        } else text = t("trading.derivative.progressFail", newProgress);
-        speakAlert(text);
+    if (config.value.autoRefresh) {
+        if (
+            newProgress.step > oldProgress.step ||
+            (newProgress.step == oldProgress.step &&
+                newProgress.result > oldProgress.result)
+        ) {
+            let text = "";
+            if (newProgress.result) {
+                if ([2, 4].includes(newProgress.step))
+                    text = t("trading.derivative.progressOrder", newProgress);
+                else
+                    text = t("trading.derivative.progressSuccess", newProgress);
+            } else text = t("trading.derivative.progressFail", newProgress);
+            speakAlert(text);
+        }
     }
 }
 function speakAlert(text) {
@@ -1099,8 +1101,8 @@ function progressToolContextMenu() {
     toggleAutoRefresh();
 }
 function toggleAutoRefresh(status) {
-    const autoRefresh = status ?? !state.autoRefresh;
-    state.autoRefresh = autoRefresh;
+    const autoRefresh = status ?? !config.value.autoRefresh;
+    store.dispatch("tradingDerivative/setAutoRefresh", autoRefresh);
 }
 function scanToolClick(e) {
     state.showProgressContext = false;
