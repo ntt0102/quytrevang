@@ -385,7 +385,6 @@ store.dispatch("tradingDerivative/initChart").then(() => {
 params.interval = setInterval(intervalHandler, 1000);
 params.interval60 = setInterval(() => {
     if (inSession()) {
-        // playAlert();
         getStatus();
         if (state.autoRefresh) refreshPatternTool(true);
     } else clearInterval(params.interval60);
@@ -428,37 +427,6 @@ onMounted(() => {
     document.addEventListener("keydown", eventKeyPress);
     document.addEventListener("fullscreenchange", eventFullscreenChange);
 });
-function initializeAudio() {
-    const path = `${window.baseURL}/audios/alert.mp3?v=${new Date().getTime()}`;
-    params.alertAudio = new Audio(path);
-
-    params.alertAudio.addEventListener("ended", () => {
-        if (params.alertCount < 2) {
-            params.alertCount++;
-            params.alertAudio.play();
-        } else params.alertAudio.pause();
-    });
-
-    // Thêm sự kiện để kiểm tra lỗi khi tải
-    params.alertAudio.addEventListener("error", (event) => {
-        console.error("Lỗi khi tải âm thanh:", event);
-    });
-}
-
-function playAlert() {
-    if (params.alertAudio) {
-        params.alertCount = 0;
-        params.alertAudio
-            .play()
-            .then(() => {
-                console.log("Âm thanh đã phát thành công");
-            })
-            .catch((error) => {
-                console.error("Không thể phát âm thanh:", error);
-            });
-    }
-}
-
 onUnmounted(() => {
     if (params.chart) {
         params.chart.remove();
@@ -476,7 +444,8 @@ onUnmounted(() => {
 });
 
 watch(() => store.state.tradingDerivative.chartData, loadChartData);
-watch(() => tools.value, loadToolsData);
+watch(tools, loadToolsData);
+watch(() => state.progress, progressAlert);
 
 function eventChartClick(e) {
     state.showProgressContext = false;
@@ -855,34 +824,6 @@ function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
 }
-function loadToolsData(toolsData) {
-    removeAllTools();
-    Object.entries(toolsData).forEach(([name, points]) => {
-        switch (name) {
-            case "order":
-                loadOrderTool(points);
-                break;
-            case "pattern":
-                if (checkPatternPointsValid(points)) {
-                    params.tools.pattern.points = mf.cloneDeep(points);
-                    loadPatternTool();
-                }
-                break;
-            case "tr":
-                loadTimeRangeTool(points);
-                break;
-            case "0_pt":
-                loadPickTimeTool(points[0]);
-                break;
-            case "line":
-                loadLineTool(points);
-                break;
-            case "target":
-                loadTargetTool(points);
-                break;
-        }
-    });
-}
 function loadChartData(chartData) {
     if (!(state.chartDate == CURRENT_DATE && inSession())) {
         if (chartData.price.length > 0) {
@@ -934,6 +875,68 @@ function mergeChartData(data1, data2) {
                 .map((d) => [d.time, d])
         ).values()
     );
+}
+function loadToolsData(toolsData) {
+    removeAllTools();
+    Object.entries(toolsData).forEach(([name, points]) => {
+        switch (name) {
+            case "order":
+                loadOrderTool(points);
+                break;
+            case "pattern":
+                if (checkPatternPointsValid(points)) {
+                    params.tools.pattern.points = mf.cloneDeep(points);
+                    loadPatternTool();
+                }
+                break;
+            case "tr":
+                loadTimeRangeTool(points);
+                break;
+            case "0_pt":
+                loadPickTimeTool(points[0]);
+                break;
+            case "line":
+                loadLineTool(points);
+                break;
+            case "target":
+                loadTargetTool(points);
+                break;
+        }
+    });
+}
+function progressAlert(newProgress, oldProgress) {
+    console.log("progressAlert", [newProgress, oldProgress]);
+    // if (oldProgress.step == 1 && newProgress.step > 1) playAlert();
+    playAlert();
+}
+function initializeAudio() {
+    const path = `${window.baseURL}/audios/alert.mp3?v=${new Date().getTime()}`;
+    params.alertAudio = new Audio(path);
+
+    params.alertAudio.addEventListener("ended", () => {
+        if (params.alertCount < 2) {
+            params.alertCount++;
+            params.alertAudio.play();
+        } else params.alertAudio.pause();
+    });
+
+    // Thêm sự kiện để kiểm tra lỗi khi tải
+    params.alertAudio.addEventListener("error", (event) => {
+        console.error("Lỗi khi tải âm thanh:", event);
+    });
+}
+function playAlert() {
+    if (params.alertAudio) {
+        params.alertCount = 0;
+        params.alertAudio
+            .play()
+            .then(() => {
+                console.log("Âm thanh đã phát thành công");
+            })
+            .catch((error) => {
+                console.error("Không thể phát âm thanh:", error);
+            });
+    }
 }
 function connectSocket() {
     store.dispatch("tradingDerivative/setChartLoading", true);
@@ -1115,7 +1118,6 @@ function progressToolClick() {
     state.showScanContext = false;
     state.showLineContext = false;
     if (state.showProgressContext) refreshPatternTool();
-    // playAlert();
 }
 function progressToolContextMenu() {
     if (!state.autoRefresh) {
