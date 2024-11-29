@@ -428,8 +428,8 @@ onMounted(() => {
     document.addEventListener("fullscreenchange", eventFullscreenChange);
 });
 function initializeAudio() {
-    const audioPath = `${window.baseURL}/audios/alert.mp3`;
-    params.alertAudio = new Audio(audioPath);
+    const path = `${window.baseURL}/audios/alert.mp3?v=${new Date().getTime()}`;
+    params.alertAudio = new Audio(path);
 
     params.alertAudio.addEventListener("ended", () => {
         if (params.alertCount < 2) {
