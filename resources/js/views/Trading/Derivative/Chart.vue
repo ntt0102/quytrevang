@@ -1481,9 +1481,9 @@ function calculatePattern() {
     const timeMark = [T1, T2, T3];
 
     const T = phase3.xBox.S.index;
-    const t1Limit = T < T1 + 3 * phase1.tr;
-    const t2Limit = T < T2 + 3 * phase2.tr;
-    const t3Limit = T < T3 + 3 * phase3.tr;
+    const t1Limit = T < T1 + 3 * phase1.tr || phase3.breakIndexs[1];
+    const t2Limit = T < T2 + 3 * phase2.tr || phase3.breakIndexs[1];
+    const t3Limit = T < T3 + 3 * phase3.tr || phase3.breakIndexs[1];
 
     let entry,
         progress = {};
@@ -1497,7 +1497,7 @@ function calculatePattern() {
             pr1Valid,
             s1Valid,
             T > T1,
-            t1Limit || phase3.breakIndexs[1],
+            t1Limit,
         ],
         [T2 > T1, T <= T2],
         [pr2Valid, T > T2, t2Limit],
