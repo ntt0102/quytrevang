@@ -1596,7 +1596,6 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 ) {
                     maxBox.S.index = box.S.index;
                     maxBox.tr = maxBox.S.index - maxBox.R.index;
-                    maxBox.pr += dis;
                 }
                 if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) {
                     maxBox = mf.cloneDeep(box);
