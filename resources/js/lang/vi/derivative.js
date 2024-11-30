@@ -15,7 +15,7 @@ export default [
     },
     {
         name: "Bước vào lệnh 1",
-        conds: ["T2 > T1", "Thời gian chưa qua T2"],
+        conds: ["T1 < C", "T2 > T1", "Thời gian chưa qua T2"],
     },
     {
         name: "Bước kiểm tra pha 2",
