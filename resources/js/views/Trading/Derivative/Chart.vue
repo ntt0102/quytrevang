@@ -1493,7 +1493,7 @@ function calculatePattern() {
             phase1.rEt < phase1.tr || phase1.rEp >= phase1.sEp,
             phase1.rEpr >= 1 && phase1.rEpr < 3,
             phase1.rEpr > phase2.rEpr,
-            phase1.v > phase2.v,
+            // phase1.v > phase2.v,
             pr1Valid,
             s1Valid,
             T > T1,
