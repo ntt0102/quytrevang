@@ -1499,7 +1499,7 @@ function calculatePattern() {
             T > T1,
             t1Limit,
         ],
-        [T1 < phase2.R.index, T2 > T1, T <= T2],
+        [T1 < phase2.R.index, T2 > T1],
         [pr2Valid, T > T2, t2Limit],
         [pr3Valid, s3Valid, T > T3, t3Limit],
     ];
@@ -1507,12 +1507,14 @@ function calculatePattern() {
     progress.result = progress.steps[0].every(Boolean);
     entry = phase1.R1.price;
     if (progress.result) {
-        if (progress.steps[1][2]) {
+        if (T <= T2) {
             progress.step = 2;
             progress.result = progress.steps[1].every(Boolean);
             entry = phase2.S1.price;
         } else {
-            if (!(phase3.breakIndexs[0] && phase3.breakIndexs[0] < T2)) {
+            if (!(phase3.breakIndexs[0] && phase3.breakIndexs[0] < T2 &&
+                progress.steps[1].every(Boolean)
+            )) {
                 progress.step = 3;
                 progress.result = progress.steps[2].every(Boolean);
                 entry = phase3.R1.price;
@@ -1523,7 +1525,6 @@ function calculatePattern() {
                 }
             } else {
                 progress.step = 2;
-                progress.steps[1][2] = true;
                 progress.result = true;
                 entry = phase2.S1.price;
             }
