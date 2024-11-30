@@ -6,6 +6,7 @@ export default [
             "Sóng AB mở rộng mạnh",
             "Tỷ lệ EP1 trong khoảng 1-3",
             "Tỷ lệ EP1 > Tỷ lệ EP2",
+            "Tốc độ 1 > Tốc độ 2",
             "Biên độ 1 lớn hơn PR1",
             "Biên độ 1 không gãy hỗ trợ",
             "Thời gian vượt qua T1",

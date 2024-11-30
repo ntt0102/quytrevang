@@ -1113,8 +1113,8 @@ function scanToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
-        removePatternTool();
         savePattern(true);
+        removePatternTool();
         e.target.classList.add("selected");
     }
 }
@@ -1238,8 +1238,8 @@ function patternToolClick(e) {
 }
 function patternToolContextmenu(e) {
     e.target.classList.remove("selected");
-    removePatternTool();
     savePattern(true);
+    removePatternTool();
 }
 function drawPatternTool() {
     const TYPE = "pattern";
@@ -1485,7 +1485,7 @@ function calculatePattern() {
     const t2Limit = T < T2 + 3 * phase2.tr;
     const t3Limit = T < T3 + 3 * phase3.tr;
 
-    let entry = phase1.R1.price,
+    let entry,
         progress = {};
     progress.steps = [
         [
@@ -1493,6 +1493,7 @@ function calculatePattern() {
             phase1.rEt < phase1.tr || phase1.rEp >= phase1.sEp,
             phase1.rEpr >= 1 && phase1.rEpr < 3,
             phase1.rEpr > phase2.rEpr,
+            phase1.v > phase2.v,
             pr1Valid,
             s1Valid,
             T > T1,
@@ -1504,25 +1505,29 @@ function calculatePattern() {
     ];
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
+    entry = phase1.R1.price;
     if (progress.result) {
         if (progress.steps[1][1]) {
             progress.step = 2;
             progress.result = progress.steps[1].every(Boolean);
             entry = phase2.S1.price;
         } else {
-            entry = phase3.R1.price;
             if (!(phase3.breakIndexs[0] && phase3.breakIndexs[0] < T2)) {
                 progress.step = 3;
                 progress.result = progress.steps[2].every(Boolean);
+                entry = phase3.R1.price;
                 if (progress.result) {
                     progress.step = 4;
                     progress.result = progress.steps[3].every(Boolean);
                     if (progress.result) entry = phase3.xBox.R.price;
                 }
+            } else {
+                progress.step = 2;
+                progress.steps[1][1] = true;
+                progress.result = true;
+                entry = phase2.S1.price;
             }
         }
-    } else {
-        if (progress.steps[2][1]) entry = phase3.R1.price;
     }
     //
     const p1Status = s1Valid ? (pr1Valid ? 1 : 0) : 2;
@@ -1558,7 +1563,8 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         breakIndexs = [null, null],
         rEp,
         sEp,
-        rEt;
+        rEt,
+        v;
     params.data.price
         .filter((item) => {
             let cond = item.time >= S.time;
@@ -1592,8 +1598,9 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                     maxBox.tr = maxBox.S.index - maxBox.R.index;
                     maxBox.pr += dis;
                 }
-                if (box.tr >= maxBox.tr && box.pr >= maxBox.pr)
+                if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) {
                     maxBox = mf.cloneDeep(box);
+                }
                 if (
                     phase == 1 &&
                     retracementPrice &&
@@ -1631,11 +1638,13 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
             return true;
         });
     if (mf.isSet(box)) {
+        S.index = timeToIndex(S.time);
         R.index = box.S.index;
         R.time = indexToTime(box.S.index);
         rEp = Math.abs(R.price - maxBox.R.price);
         sEp = Math.abs(S.price - maxBox.S.price);
         rEt = R.index - maxBox.S.index;
+        v = Math.abs(R.price - S.price) / (R.index - S.index);
         if (phase == 3) xBox = box;
     }
 
@@ -1646,6 +1655,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         sEp,
         rEpr: maxBox.pr ? rEp / maxBox.pr : 0,
         rEt,
+        v,
         S1: maxBox.S,
         R1: maxBox.R,
         xBox,
