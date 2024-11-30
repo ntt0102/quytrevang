@@ -1497,7 +1497,7 @@ function calculatePattern() {
             pr1Valid,
             s1Valid,
             T > T1,
-            t1Limit,
+            t1Limit || phase3.breakIndexs[1],
         ],
         [T2 > T1, T <= T2],
         [pr2Valid, T > T2, t2Limit],
