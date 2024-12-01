@@ -1512,12 +1512,12 @@ function calculatePattern() {
             progress.result = progress.steps[1].every(Boolean);
             entry = phase2.S1.price;
         } else {
+            entry = phase3.R1.price;
             if (!(phase3.breakIndexs[0] && phase3.breakIndexs[0] < T2 &&
                 progress.steps[1].every(Boolean)
             )) {
                 progress.step = 3;
                 progress.result = progress.steps[2].every(Boolean);
-                entry = phase3.R1.price;
                 if (progress.result) {
                     progress.step = 4;
                     progress.result = progress.steps[3].every(Boolean);
@@ -1526,7 +1526,6 @@ function calculatePattern() {
             } else {
                 progress.step = 2;
                 progress.result = true;
-                entry = phase2.S1.price;
             }
         }
     }
