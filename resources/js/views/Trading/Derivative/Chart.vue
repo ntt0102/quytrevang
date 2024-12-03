@@ -1485,6 +1485,11 @@ function calculatePattern() {
 
     let entry,
         progress = {};
+    const extraCond = [
+        phase2.R.index > T1,
+        phase1.rEpr < 3,
+        phase2.rEpr < phase1.rEpr,
+    ];
     progress.steps = [
         [
             phase1.rEp >= 1,
@@ -1495,9 +1500,7 @@ function calculatePattern() {
         ],
         [
             //
-            phase2.R.index > T1,
-            phase1.rEpr < 3,
-            phase2.rEpr < phase1.rEpr,
+            ...extraCond,
             T2 > T1,
             T < T2,
         ],
@@ -1510,9 +1513,7 @@ function calculatePattern() {
             pr3Valid,
             s3Valid,
             T > T3,
-            phase2.R.index > T1 && phase1.rEpr < 3 && phase2.rEpr < phase1.rEpr
-                ? true
-                : T > T4,
+            extraCond.every(Boolean) || T > T4,
         ],
     ];
     progress.step = 1;
