@@ -67,7 +67,7 @@ function stopPropagationEvent(e) {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     border-radius: 4px;
     position: relative;
-    width: 280px;
+    width: 230px;
     min-height: 50px;
     padding: 10px;
 
@@ -94,24 +94,23 @@ function stopPropagationEvent(e) {
     .container {
         color: white;
         text-align: left;
-        line-height: 24px;
+        line-height: 25px;
 
         .step {
             border-radius: 5px;
 
             &:not(:last-child) {
-                margin-bottom: 0px;
+                margin-bottom: 5px;
             }
 
             .step-header {
                 padding-left: 10px;
                 font-weight: bold;
-                font-size: 17px;
+                font-size: larger;
             }
 
             .condition {
                 padding-left: 30px;
-                font-size: 15px;
             }
 
             .success {

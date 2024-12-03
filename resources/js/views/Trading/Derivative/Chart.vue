@@ -902,7 +902,7 @@ function progressAlert(newProgress, oldProgress) {
         ) {
             let text = "";
             if (newProgress.result) {
-                if ([2, 4].includes(newProgress.step))
+                if ([2, 4, 5].includes(newProgress.step))
                     text = t("trading.derivative.progressOrder", newProgress);
                 else
                     text = t("trading.derivative.progressSuccess", newProgress);
@@ -1443,7 +1443,7 @@ function refreshPatternTool(autoAdjust = false) {
     }
 }
 function checkPatternPointsValid({ A: { time } }) {
-    return params.data.price.some((item) => item.time === time);
+    return params.data.whitespace.some((item) => item.time === time);
 }
 function calculatePattern() {
     const { A, B, C } = params.tools.pattern.points;
@@ -1467,9 +1467,9 @@ function calculatePattern() {
     console.log("calculatePattern", [phase1, phase2, phase3]);
 
     //
-    const pr1Valid = Math.abs(bc) > phase1.pr;
-    const pr2Valid = Math.abs(C.price - phase3.xBox.R.price) > phase2.pr;
-    const pr3Valid = phase3.xBox.pr > phase3.pr;
+    const pr1Valid = Math.abs(bc) >= phase1.pr;
+    const pr2Valid = Math.abs(C.price - phase3.xBox.R.price) >= phase2.pr;
+    const pr3Valid = phase3.xBox.pr >= phase3.pr;
 
     const s1Valid = cmp(C.price, side, phase1.S1.price);
     const s2Valid = cmp(phase3.xBox.R.price, !side, phase2.S1.price);
@@ -1482,27 +1482,35 @@ function calculatePattern() {
     const timeMark = [T1, T2, T3, T4];
 
     const T = phase3.xBox.S.index;
-    const t1Limit = T < T1 + 3 * phase1.tr || phase3.breakIndexs[1];
-    const t2Limit = T < T2 + 3 * phase2.tr || phase3.breakIndexs[1];
-    const t3Limit = T < T3 + 3 * phase3.tr || phase3.breakIndexs[1];
 
     let entry,
         progress = {};
     progress.steps = [
         [
             phase1.rEp >= 1,
-            phase1.rEt < phase1.tr || phase1.rEp >= phase1.sEp,
-            phase1.rEpr >= 1,
-            phase1.rEpr > phase2.rEpr,
-            pr1Valid,
+            pr1Valid || (phase1.rEt < phase1.tr && phase1.rEp >= phase1.sEp),
             s1Valid,
+            !phase3.breakIndexs[1] || T1 < phase3.breakIndexs[1],
             T > T1,
-            t1Limit,
         ],
-        [phase1.rEpr < 3, T1 < phase2.R.index, T2 > T1],
-        [pr2Valid, T > T2, t2Limit, pr3Valid, s3Valid],
-        [T1 < phase2.R.index, T > T3, t3Limit],
-        [T1 >= phase2.R.index, T > T3, T > T4],
+        [
+            //
+            phase1.rEpr < 3,
+            phase2.R.index > T1,
+            T2 > T1,
+            T < T2,
+        ],
+        [
+            //
+            pr2Valid,
+            T > T2,
+        ],
+        [
+            pr3Valid,
+            s3Valid,
+            T > T3,
+            (phase2.R.index < T1 || phase1.rEpr > 3) && T > T4,
+        ],
     ];
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
@@ -1513,28 +1521,13 @@ function calculatePattern() {
             progress.result = progress.steps[1].every(Boolean);
             entry = phase2.S1.price;
         } else {
+            progress.step = 3;
+            progress.result = progress.steps[2].every(Boolean);
             entry = phase3.R1.price;
-            if (
-                phase3.breakIndexs[0] &&
-                phase3.breakIndexs[0] < T2 &&
-                progress.steps[1].every(Boolean)
-            ) {
-                progress.step = 2;
-                progress.result = true;
-            } else {
-                progress.step = 3;
-                progress.result = progress.steps[2].every(Boolean);
-                if (progress.result) {
-                    if (T1 < phase2.R.index) {
-                        progress.step = 4;
-                        progress.result = progress.steps[3].every(Boolean);
-                        if (progress.result) entry = phase3.xBox.R.price;
-                    } else {
-                        progress.step = 5;
-                        progress.result = progress.steps[4].every(Boolean);
-                        if (progress.result) entry = phase3.xBox.R.price;
-                    }
-                }
+            if (progress.result) {
+                progress.step = 4;
+                progress.result = progress.steps[3].every(Boolean);
+                if (progress.result) entry = phase3.xBox.R.price;
             }
         }
     }
@@ -1572,8 +1565,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         breakIndexs = [null, null],
         rEp,
         sEp,
-        rEt,
-        v;
+        rEt;
     params.data.price
         .filter((item) => {
             let cond = item.time >= S.time;
@@ -1597,15 +1589,15 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 xBox = mf.cloneDeep(box);
             }
             if (cmp(price, side, box.R.price)) {
-                const dis = Math.abs(box.R.price - maxBox.R.price);
-                if (
-                    dis < 0.2 &&
-                    cmp(box.S.price, !side, maxBox.R.price) &&
-                    box.pr < maxBox.pr
-                ) {
-                    maxBox.S.index = box.S.index;
-                    maxBox.tr = maxBox.S.index - maxBox.R.index;
-                }
+                // const dis = Math.abs(box.R.price - maxBox.R.price);
+                // if (
+                //     dis < 0.2 &&
+                //     cmp(box.S.price, !side, maxBox.R.price) &&
+                //     box.pr < maxBox.pr
+                // ) {
+                //     maxBox.S.index = box.S.index;
+                //     maxBox.tr = maxBox.S.index - maxBox.R.index;
+                // }
                 if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) {
                     maxBox = mf.cloneDeep(box);
                 }
@@ -1652,7 +1644,6 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         rEp = Math.abs(R.price - maxBox.R.price);
         sEp = Math.abs(S.price - maxBox.S.price);
         rEt = R.index - maxBox.S.index;
-        v = Math.abs(R.price - S.price) / (R.index - S.index);
         if (phase == 3) xBox = box;
     }
 
@@ -1663,7 +1654,6 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         sEp,
         rEpr: maxBox.pr ? rEp / maxBox.pr : 0,
         rEt,
-        v,
         S1: maxBox.S,
         R1: maxBox.R,
         xBox,
