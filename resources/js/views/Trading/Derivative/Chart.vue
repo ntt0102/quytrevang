@@ -1510,7 +1510,9 @@ function calculatePattern() {
             pr3Valid,
             s3Valid,
             T > T3,
-            phase2.R.index > T1 && phase1.rEpr < 3 ? true : T > T4,
+            phase1.rEpr < 3 && phase2.R.index > T1 && phase2.rEpr < phase1.rEpr
+                ? true
+                : T > T4,
         ],
     ];
     progress.step = 1;
