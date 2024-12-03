@@ -94,7 +94,7 @@ function stopPropagationEvent(e) {
     .container {
         color: white;
         text-align: left;
-        line-height: 22px;
+        line-height: 24px;
 
         .step {
             border-radius: 5px;
@@ -106,11 +106,12 @@ function stopPropagationEvent(e) {
             .step-header {
                 padding-left: 10px;
                 font-weight: bold;
+                font-size: 17px;
             }
 
             .condition {
                 padding-left: 30px;
-                font-size: 14px;
+                font-size: 15px;
             }
 
             .success {

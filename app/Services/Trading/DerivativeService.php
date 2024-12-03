@@ -32,6 +32,7 @@ class DerivativeService extends CoreService
      */
     public function initChart($payload)
     {
+        $vos = new VpsOrderService();
         return [
             'config' => [
                 'openingMarket' => get_global_value('openingMarketFlag') == '1',
@@ -40,6 +41,7 @@ class DerivativeService extends CoreService
                 'vpsSession' => get_global_value('vpsSession'),
                 'lastOpeningDate' => get_global_value('lastOpeningDate'),
                 'autoRefresh' => get_global_value('autoRefreshFlag') == "1",
+                'volInValid' => $vos->connection && $vos->getAccountInfo()->maxVol == 0
             ],
             'status' => $this->getStatus($payload)
         ];

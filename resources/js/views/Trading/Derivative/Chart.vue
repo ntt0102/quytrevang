@@ -14,7 +14,7 @@
                 <div
                     ref="connectionRef"
                     class="command"
-                    :class="{ yellow: status.pending }"
+                    :class="{ yellow: status.pending, red: config.volInValid }"
                     :title="$t('trading.derivative.connection')"
                     @click="getStatus"
                 >
