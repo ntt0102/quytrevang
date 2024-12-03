@@ -1471,9 +1471,9 @@ function calculatePattern() {
     const pr2Valid = Math.abs(C.price - phase3.xBox.R.price) >= phase2.pr;
     const pr3Valid = phase3.xBox.pr >= phase3.pr;
 
-    const s1Valid = cmp(C.price, side, phase1.S1.price);
-    const s2Valid = cmp(phase3.xBox.R.price, !side, phase2.S1.price);
-    const s3Valid = cmp(phase3.xBox.S.price, side, phase3.S1.price);
+    const s1Valid = !cmp(C.price, !side, phase1.S1.price);
+    const s2Valid = !cmp(phase3.xBox.R.price, side, phase2.S1.price);
+    const s3Valid = !cmp(phase3.xBox.S.price, !side, phase3.S1.price);
 
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
@@ -1497,6 +1497,7 @@ function calculatePattern() {
             //
             phase1.rEpr < 3,
             phase2.R.index > T1,
+            phase2.rEpr < phase1.rEpr,
             T2 > T1,
             T < T2,
         ],
@@ -1509,7 +1510,7 @@ function calculatePattern() {
             pr3Valid,
             s3Valid,
             T > T3,
-            (phase2.R.index < T1 || phase1.rEpr > 3) && T > T4,
+            phase2.R.index > T1 && phase1.rEpr < 3 ? true : T > T4,
         ],
     ];
     progress.step = 1;
@@ -1747,8 +1748,9 @@ function setTimeMark(data) {
     const colors = ["#F44336", "#4CAF50", "#FFEB3B", "#2196F3"];
     let result = [];
     for (let i = 0; i < data.length; i++) {
-        const time = indexToTime(data[i]);
+        let time = indexToTime(data[i]);
         if (time) {
+            if (data.indexOf(data[i]) != data.lastIndexOf(data[i])) time += i;
             result.push({
                 time,
                 value: 1,

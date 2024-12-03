@@ -13,8 +13,9 @@ export default [
         name: "Bước vào lệnh 1",
         conds: [
             //
-            "Tỷ lệ EP1 < 3",
             "C > T1",
+            "EPR1 < 3",
+            "EPR2 < EPR1",
             "T2 > T1",
             "T < T2",
         ],
@@ -23,7 +24,7 @@ export default [
         name: "Bước kiểm tra 2",
         conds: [
             //
-            "Biên độ 2 > PR2",
+            "CD > PR2",
             "T > T2",
         ],
     },
@@ -31,8 +32,8 @@ export default [
         name: "Bước vào lệnh 2",
         conds: [
             //
-            "Biên độ 3 > PR3",
-            "Biên độ 3 giữ hỗ trợ",
+            "DE > PR3",
+            "E giữ hỗ trợ",
             "T > T3",
             "T > T4",
         ],
