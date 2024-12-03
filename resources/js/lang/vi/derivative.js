@@ -1,6 +1,6 @@
 export default [
     {
-        name: "Bước kiểm tra pha 1",
+        name: "Bước kiểm tra 1",
         conds: [
             "Biên độ mở rộng >= 1",
             "Sóng AB mở rộng mạnh",
@@ -17,21 +17,26 @@ export default [
         conds: ["Tỷ lệ EP1 < 3", "T1 < C", "T2 > T1"],
     },
     {
-        name: "Bước kiểm tra pha 2",
+        name: "Bước kiểm tra 2",
         conds: [
             "Biên độ 2 lớn hơn PR2",
             "Thời gian vượt qua T2",
             "Thời gian trong giới hạn 2",
+            "Biên độ 3 lớn hơn PR3",
+            "Biên độ 3 không gãy hỗ trợ",
         ],
     },
     {
         name: "Bước vào lệnh 2",
         conds: [
-            "Biên độ 3 lớn hơn PR3",
-            "Biên độ 3 không gãy hỗ trợ",
+            "T1 < C",
             "Thời gian vượt qua T3",
             "Thời gian trong giới hạn 3",
         ],
+    },
+    {
+        name: "Bước vào lệnh 3",
+        conds: ["T1 >= C", "Thời gian vượt qua T3", "Thời gian vượt qua T4"],
     },
 ];
 // export default [

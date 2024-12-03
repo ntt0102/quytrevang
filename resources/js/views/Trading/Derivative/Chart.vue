@@ -1478,7 +1478,8 @@ function calculatePattern() {
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T3 = phase3.xBox.R.index + phase3.tr;
-    const timeMark = [T1, T2, T3];
+    const T4 = phase3.xBox.R.index + phase2.tr;
+    const timeMark = [T1, T2, T3, T4];
 
     const T = phase3.xBox.S.index;
     const t1Limit = T < T1 + 3 * phase1.tr || phase3.breakIndexs[1];
@@ -1499,8 +1500,9 @@ function calculatePattern() {
             t1Limit,
         ],
         [phase1.rEpr < 3, T1 < phase2.R.index, T2 > T1],
-        [pr2Valid, T > T2, t2Limit],
-        [pr3Valid, s3Valid, T > T3, t3Limit],
+        [pr2Valid, T > T2, t2Limit, pr3Valid, s3Valid],
+        [T1 < phase2.R.index, T > T3, t3Limit],
+        [T1 >= phase2.R.index, T > T3, T > T4],
     ];
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
@@ -1513,22 +1515,26 @@ function calculatePattern() {
         } else {
             entry = phase3.R1.price;
             if (
-                !(
-                    phase3.breakIndexs[0] &&
-                    phase3.breakIndexs[0] < T2 &&
-                    progress.steps[1].every(Boolean)
-                )
+                phase3.breakIndexs[0] &&
+                phase3.breakIndexs[0] < T2 &&
+                progress.steps[1].every(Boolean)
             ) {
+                progress.step = 2;
+                progress.result = true;
+            } else {
                 progress.step = 3;
                 progress.result = progress.steps[2].every(Boolean);
                 if (progress.result) {
-                    progress.step = 4;
-                    progress.result = progress.steps[3].every(Boolean);
-                    if (progress.result) entry = phase3.xBox.R.price;
+                    if (T1 < phase2.R.index) {
+                        progress.step = 4;
+                        progress.result = progress.steps[3].every(Boolean);
+                        if (progress.result) entry = phase3.xBox.R.price;
+                    } else {
+                        progress.step = 5;
+                        progress.result = progress.steps[4].every(Boolean);
+                        if (progress.result) entry = phase3.xBox.R.price;
+                    }
                 }
-            } else {
-                progress.step = 2;
-                progress.result = true;
             }
         }
     }
@@ -1748,7 +1754,7 @@ function removePatternTool() {
     setProgress({});
 }
 function setTimeMark(data) {
-    const colors = ["#F44336", "#4CAF50", "#FFEB3B"];
+    const colors = ["#F44336", "#4CAF50", "#FFEB3B", "#2196F3"];
     let result = [];
     for (let i = 0; i < data.length; i++) {
         const time = indexToTime(data[i]);

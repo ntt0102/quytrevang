@@ -8,7 +8,7 @@
                 <div
                     class="step-header"
                     :class="[
-                        progress.step && progress.step > i
+                        progress.steps
                             ? progress.steps[i].every(Boolean)
                                 ? 'success'
                                 : 'fail'
@@ -23,7 +23,7 @@
                         :key="j"
                         class="condition"
                         :class="[
-                            progress.step && progress.step > i
+                            progress.steps
                                 ? progress.steps[i][j]
                                     ? 'success'
                                     : 'fail'
@@ -94,22 +94,23 @@ function stopPropagationEvent(e) {
     .container {
         color: white;
         text-align: left;
+        line-height: 22px;
 
         .step {
             border-radius: 5px;
 
             &:not(:last-child) {
-                margin-bottom: 5px;
+                margin-bottom: 0px;
             }
 
             .step-header {
                 padding-left: 10px;
                 font-weight: bold;
-                font-size: larger;
             }
 
             .condition {
                 padding-left: 30px;
+                font-size: 14px;
             }
 
             .success {
