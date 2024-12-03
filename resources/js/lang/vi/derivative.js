@@ -4,9 +4,8 @@ export default [
         conds: [
             "Biên độ mở rộng >= 1",
             "Sóng AB mở rộng mạnh",
-            "Tỷ lệ EP1 trong khoảng 1-3",
+            "Tỷ lệ EP1 >= 1",
             "Tỷ lệ EP1 > Tỷ lệ EP2",
-            // "Tốc độ 1 > Tốc độ 2",
             "Biên độ 1 lớn hơn PR1",
             "Biên độ 1 không gãy hỗ trợ",
             "Thời gian vượt qua T1",
@@ -15,7 +14,7 @@ export default [
     },
     {
         name: "Bước vào lệnh 1",
-        conds: ["T1 < C", "T2 > T1"],
+        conds: ["Tỷ lệ EP1 < 3", "T1 < C", "T2 > T1"],
     },
     {
         name: "Bước kiểm tra pha 2",

@@ -1491,15 +1491,14 @@ function calculatePattern() {
         [
             phase1.rEp >= 1,
             phase1.rEt < phase1.tr || phase1.rEp >= phase1.sEp,
-            phase1.rEpr >= 1 && phase1.rEpr < 3,
+            phase1.rEpr >= 1,
             phase1.rEpr > phase2.rEpr,
-            // phase1.v > phase2.v,
             pr1Valid,
             s1Valid,
             T > T1,
             t1Limit,
         ],
-        [T1 < phase2.R.index, T2 > T1],
+        [phase1.rEpr < 3, T1 < phase2.R.index, T2 > T1],
         [pr2Valid, T > T2, t2Limit],
         [pr3Valid, s3Valid, T > T3, t3Limit],
     ];
@@ -1513,9 +1512,13 @@ function calculatePattern() {
             entry = phase2.S1.price;
         } else {
             entry = phase3.R1.price;
-            if (!(phase3.breakIndexs[0] && phase3.breakIndexs[0] < T2 &&
-                progress.steps[1].every(Boolean)
-            )) {
+            if (
+                !(
+                    phase3.breakIndexs[0] &&
+                    phase3.breakIndexs[0] < T2 &&
+                    progress.steps[1].every(Boolean)
+                )
+            ) {
                 progress.step = 3;
                 progress.result = progress.steps[2].every(Boolean);
                 if (progress.result) {
