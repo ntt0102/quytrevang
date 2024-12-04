@@ -1114,6 +1114,7 @@ function scanToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         savePattern(true);
+        removePickTimeTool();
         removePatternTool();
         e.target.classList.add("selected");
     }
@@ -1239,6 +1240,7 @@ function patternToolClick(e) {
 function patternToolContextmenu(e) {
     e.target.classList.remove("selected");
     savePattern(true);
+    removePickTimeTool();
     removePatternTool();
 }
 function drawPatternTool() {
