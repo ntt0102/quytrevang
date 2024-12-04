@@ -1578,6 +1578,7 @@ function calculatePattern() {
         ],
         [
             //
+            phase2.R.index - phase1.R.index > 0.5 * phase1.tr,
             pr2Valid,
             T > T2,
         ],
