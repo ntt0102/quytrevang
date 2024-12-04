@@ -2,7 +2,7 @@ export default [
     {
         name: "Bước kiểm tra 1",
         conds: [
-            "Target > 1",
+            //
             "BC > PR1",
             "C giữ hỗ trợ",
             "Break sau T1",

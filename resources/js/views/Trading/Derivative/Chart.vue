@@ -1494,7 +1494,6 @@ function calculatePattern() {
     ];
     progress.steps = [
         [
-            phase1.rEp >= 1,
             pr1Valid || (phase1.rEt < phase1.tr && phase1.rEp >= phase1.sEp),
             s1Valid,
             !phase3.breakIndexs[1] || T1 < phase3.breakIndexs[1],
@@ -1544,9 +1543,8 @@ function calculatePattern() {
     //
     const X = phase1.rEp;
     const x = adjustTargetPrice(B.price, X, side);
-    const scale = parseInt(
-        (phase3.breakIndexs[1] - phase1.R.index) / phase1.tr
-    );
+    const mainTR = phase3.breakIndexs[1] ?? T;
+    const scale = parseInt((mainTR - phase1.R.index) / phase1.tr);
     const Y = scale > 1 ? X * scale : X;
     const y = adjustTargetPrice(B.price, Y, side);
 
