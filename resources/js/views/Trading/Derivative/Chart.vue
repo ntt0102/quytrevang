@@ -91,8 +91,8 @@
                 <div
                     class="context command"
                     :class="{
-                        green: state.progress.result == true,
-                        red: state.progress.result == false,
+                        green: state.progress.result === true,
+                        red: state.progress.result === false,
                     }"
                     :title="$t('trading.derivative.progressTool')"
                     @click="progressToolClick"
@@ -359,7 +359,7 @@ const tools = computed(() => store.state.tradingDerivative.tools);
 const isLoading = computed(() => store.state.tradingDerivative.isLoading);
 const showCancelOrder = computed(
     () =>
-        status.value.position != 0 ||
+        status.value.position !== 0 ||
         !!status.value.pending ||
         !!tools.value.order
 );
@@ -473,7 +473,7 @@ function eventChartCrosshairMove(e) {
             params.crosshair.price = null;
         }
     }
-    if (e.point != undefined) {
+    if (e.point !== undefined) {
         params.crosshair.x = e.point.x;
         params.crosshair.y = e.point.y;
     }
@@ -486,9 +486,9 @@ function eventPriceLineDrag(e) {
     const newPrice = lineOptions.price;
     switch (lineOptions.lineType) {
         case "order":
-            if (newPrice != oldPrice) {
+            if (newPrice !== oldPrice) {
                 let isChanged = false;
-                if (lineOptions.kind == "entry") {
+                if (lineOptions.kind === "entry") {
                     if (!status.value.position) {
                         isChanged = true;
                         params.tools.order[lineOptions.kind].price = newPrice;
@@ -519,7 +519,7 @@ function eventPriceLineDrag(e) {
                 } else {
                     isChanged = true;
                     params.tools.order[lineOptions.kind].price = newPrice;
-                    if (lineOptions.kind == "tp")
+                    if (lineOptions.kind === "tp")
                         store
                             .dispatch("tradingDerivative/executeOrder", {
                                 action: "tp",
@@ -601,10 +601,10 @@ function eventPriceLineDrag(e) {
                 let ba = b - a;
                 //
                 point = "A";
-                if (lineOptions.point == "A") {
+                if (lineOptions.point === "A") {
                     ba = +params.tools.target.B.options().title;
                     b = a + ba;
-                } else if (lineOptions.point != "B") {
+                } else if (lineOptions.point !== "B") {
                     let div = 0;
                     switch (lineOptions.point) {
                         case "X":
@@ -630,7 +630,7 @@ function eventPriceLineDrag(e) {
                 //
                 point = "B";
                 changeOptions = { price: b, title: ba.toFixed(1) };
-                if (lineOptions.point == point) delete changeOptions.price;
+                if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 param.points.push(point);
                 param.data.push(b);
@@ -640,7 +640,7 @@ function eventPriceLineDrag(e) {
                     price: parseFloat((a - 0.5 * ba).toFixed(1)),
                     title: (-0.5 * ba).toFixed(1),
                 };
-                if (lineOptions.point == point) delete changeOptions.price;
+                if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 //
                 point = "Y";
@@ -648,7 +648,7 @@ function eventPriceLineDrag(e) {
                     price: parseFloat((a - ba).toFixed(1)),
                     title: (-ba).toFixed(1),
                 };
-                if (lineOptions.point == point) delete changeOptions.price;
+                if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 //
                 point = "Z";
@@ -656,7 +656,7 @@ function eventPriceLineDrag(e) {
                     price: parseFloat((a - 2 * ba).toFixed(1)),
                     title: (-2 * ba).toFixed(1),
                 };
-                if (lineOptions.point == point) delete changeOptions.price;
+                if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 //
                 point = "W";
@@ -664,7 +664,7 @@ function eventPriceLineDrag(e) {
                     price: parseFloat((a - 4 * ba).toFixed(1)),
                     title: (-4 * ba).toFixed(1),
                 };
-                if (lineOptions.point == point) delete changeOptions.price;
+                if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 //
                 store.dispatch("tradingDerivative/drawTools", param);
@@ -707,7 +707,7 @@ function eventPriceLineDrag(e) {
                     price: entry,
                     title: "Entry " + pStatus,
                 };
-                if (lineOptions.point == point) delete changeOptions.price;
+                if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.pattern.lines[point].applyOptions(changeOptions);
                 //
                 point = "X";
@@ -813,7 +813,7 @@ function toggleFullscreen() {
     else document.documentElement.requestFullscreen();
 }
 function loadChartData(chartData) {
-    if (!(state.chartDate == CURRENT_DATE && inSession())) {
+    if (!(state.chartDate === CURRENT_DATE && inSession())) {
         if (chartData.price.length > 0) {
             params.data.whitespace = mergeChartData(
                 params.data.whitespace,
@@ -826,25 +826,18 @@ function loadChartData(chartData) {
         params.series.price.setData(params.data.price);
     }
 }
-function updateFireantData(data) {
+function updateChartData(data) {
     let prices = [];
     data.forEach((item) => {
-        const time = getUnixTime(addHours(new Date(item.date), 7));
-        prices.push({ time, value: item.price });
-    });
-    if (prices.length > 1) {
-        params.data.price = mergeChartData(params.data.price, prices);
-        params.series.price.setData(params.data.price);
-    } else {
-        params.data.price.push(prices[0]);
-        params.series.price.update(prices[0]);
-    }
-}
-function updateVpsData(data) {
-    let prices = [];
-    data.forEach((item) => {
-        const time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
-        prices.push({ time, value: item.lastPrice });
+        let time, value;
+        if (config.value.source === "FireAnt") {
+            time = getUnixTime(addHours(new Date(item.date), 7));
+            value = item.price;
+        } else {
+            time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
+            value = item.lastPrice;
+        }
+        prices.push({ time, value });
     });
     if (prices.length > 1) {
         params.data.price = mergeChartData(params.data.price, prices);
@@ -864,7 +857,7 @@ function createWhitespaceData(date) {
     for (let sec = amStart; sec <= pmEnd; sec++) {
         if (sec > amEnd && sec < pmStart) continue;
         let item = { time: sec };
-        if (sec == pm14h00 || sec == pmEnd) item.value = 1;
+        if (sec === pm14h00 || sec === pmEnd) item.value = 1;
         data.push(item);
     }
     return data;
@@ -910,7 +903,7 @@ function progressAlert(newProgress, oldProgress) {
     if (config.value.autoRefresh) {
         if (
             newProgress.step > oldProgress.step ||
-            (newProgress.step == oldProgress.step &&
+            (newProgress.step === oldProgress.step &&
                 newProgress.result > oldProgress.result)
         ) {
             let text = "";
@@ -981,23 +974,23 @@ function configFireAntSocket() {
         const data = parseFireAntMessage(e.data);
         data.forEach((item) => {
             if (!item) return false;
-            if (item.type == 3) {
+            if (item.type === 3) {
                 getTools();
                 params.data.whitespace = mergeChartData(
                     params.data.whitespace,
                     createWhitespaceData(CURRENT_DATE)
                 );
                 params.series.whitespace.setData(params.data.whitespace);
-                updateFireantData(item.result);
+                updateChartData(item.result);
                 store.dispatch("tradingDerivative/setLoading", false);
             } else if (
-                item.type == 1 &&
-                item.target == "UpdateTrades" &&
-                item.arguments[0] == "VN30F1M"
+                item.type === 1 &&
+                item.target === "UpdateTrades" &&
+                item.arguments[0] === "VN30F1M"
             ) {
                 console.log("FireAnt", item.arguments[1]);
                 scanOrder(item.arguments[1].at(-1).price);
-                updateFireantData(item.arguments[1]);
+                updateChartData(item.arguments[1]);
             }
         });
     };
@@ -1010,7 +1003,7 @@ function parseFireAntMessage(msg) {
         let temp = null;
         if (startPos !== -1 && endPos !== -1 && endPos > startPos) {
             const filteredData = item.substring(startPos, endPos + 1);
-            if (filteredData != "{}") temp = JSON.parse(filteredData);
+            if (filteredData !== "{}") temp = JSON.parse(filteredData);
         }
         result.push(temp);
     });
@@ -1019,7 +1012,7 @@ function parseFireAntMessage(msg) {
 function configVpsSocket() {
     store
         .dispatch("tradingDerivative/getVpsData")
-        .then((data) => updateVpsData(data));
+        .then((data) => updateChartData(data));
     params.websocket.onopen = (e) => {
         if (params.websocket.readyState === WebSocket.OPEN) {
             const msg = {
@@ -1035,15 +1028,15 @@ function configVpsSocket() {
     };
     params.websocket.onmessage = (e) => {
         state.isSocketWarning = false;
-        if (e.data.substr(0, 1) == 4) {
-            if (e.data.substr(1, 1) == 2) {
+        if (e.data.substr(0, 1) === 4) {
+            if (e.data.substr(1, 1) === 2) {
                 const event = JSON.parse(e.data.substr(2));
-                if (event[0] == "stockps") {
+                if (event[0] === "stockps") {
                     const data = event[1].data;
-                    if (data.id == 3220) {
+                    if (data.id === 3220) {
                         console.log("VPS", data);
                         scanOrder(data.lastPrice);
-                        updateVpsData([data]);
+                        updateChartData([data]);
                     }
                 }
             }
@@ -1079,7 +1072,7 @@ function intervalHandler() {
                 }
             }
         }
-        if (config.value.openingMarket && params.currentSeconds == TIME.START)
+        if (config.value.openingMarket && params.currentSeconds === TIME.START)
             connectSocket();
     }
     state.clock = format(new Date(), "HH:mm:ss");
@@ -1203,7 +1196,7 @@ function scanToolContextMenu() {
     state.showLineContext = false;
 }
 function drawScanTool() {
-    const leftSide = state.scanSide == "left";
+    const leftSide = state.scanSide === "left";
     const data = params.crosshair.time
         ? params.data.price.filter(
               (item) => !cmp(item.time, leftSide, params.crosshair.time)
@@ -1226,15 +1219,15 @@ function leftScanPattern(data) {
         const price = data[i].value;
         const time = data[i].time;
         const index = timeToIndex(time);
-        if (index == -1) break;
-        if (i == data.length - 1) {
+        if (index === -1) break;
+        if (i === data.length - 1) {
             C = { index, time, price };
             [B, A, S] = Array(3)
                 .fill(null)
                 .map(() => mf.cloneDeep(C));
         }
-        if (side == undefined) {
-            if (price == C.price) continue;
+        if (side === undefined) {
+            if (price === C.price) continue;
             side = price > C.price;
         }
         if (cmp(price, side, B.price)) {
@@ -1269,14 +1262,14 @@ function rightScanPattern(data) {
         const price = data[i].value;
         const time = data[i].time;
         const index = timeToIndex(time);
-        if (index == -1) break;
-        if (i == 0) {
+        if (index === -1) break;
+        if (i === 0) {
             A = { index, time, price };
             B = mf.cloneDeep(A);
             C = mf.cloneDeep(A);
         }
-        if (side == undefined) {
-            if (price == A.price) continue;
+        if (side === undefined) {
+            if (price === A.price) continue;
             side = price > A.price;
         }
         if (cmp(price, side, B.price)) {
@@ -1654,8 +1647,8 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
             const price = item.value;
             const time = item.time;
             const index = timeToIndex(time);
-            if (index == -1) return false;
-            if (i == 0 || price == S.price) {
+            if (index === -1) return false;
+            if (i === 0 || price === S.price) {
                 box = {
                     R: { index, time, price },
                     S: { index, time, price },
@@ -1679,7 +1672,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                     maxBox = mf.cloneDeep(box);
                 }
                 if (
-                    phase == 1 &&
+                    phase === 1 &&
                     retracementPrice &&
                     !cmp(box.S.price, !side, retracementPrice)
                 ) {
@@ -1692,7 +1685,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                     pr: 0,
                     tr: 0,
                 };
-                if (phase == 3 && breakPrices) {
+                if (phase === 3 && breakPrices) {
                     if (!breakIndexs[0] && cmp(price, side, breakPrices[0]))
                         breakIndexs[0] = index;
                     if (!breakIndexs[1] && cmp(price, side, breakPrices[1]))
@@ -1721,7 +1714,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         rEp = Math.abs(R.price - maxBox.R.price);
         sEp = Math.abs(S.price - maxBox.S.price);
         rEt = R.index - maxBox.S.index;
-        if (phase == 3) xBox = box;
+        if (phase === 3) xBox = box;
     }
 
     return {
@@ -1770,7 +1763,7 @@ function adjustPatternPoints() {
         let cPriceNew = lastPrice;
         for (let i = params.data.price.length - 1; i >= 0; i--) {
             const price = params.data.price[i].value;
-            if (price == points.B.price) break;
+            if (price === points.B.price) break;
             cPriceNew = side
                 ? Math.min(cPriceNew, price)
                 : Math.max(cPriceNew, price);
@@ -1826,7 +1819,7 @@ function setTimeMark(data) {
     for (let i = 0; i < data.length; i++) {
         let time = indexToTime(data[i]);
         if (time) {
-            if (data.indexOf(data[i]) != data.lastIndexOf(data[i])) time += i;
+            if (data.indexOf(data[i]) !== data.lastIndexOf(data[i])) time += i;
             result.push({
                 time,
                 value: 1,
@@ -1944,10 +1937,10 @@ function drawTimeRangeTool() {
 }
 function loadTimeRangeTool(data) {
     let start, end;
-    if (data.length == 2) {
+    if (data.length === 2) {
         start = data[0];
         end = data[1];
-    } else if (data.length == 3) {
+    } else if (data.length === 3) {
         const index0 = timeToIndex(data[0]);
         const index1 = timeToIndex(data[1]);
         const index2 = timeToIndex(data[2]);
@@ -1992,7 +1985,7 @@ function drawLineTool() {
     const oldLength = params.tools.lines.length;
     params.tools.lines = params.tools.lines.filter((line) => {
         const ops = line.options();
-        const isExist = (ops.type = TYPE && price == +ops.price);
+        const isExist = (ops.type = TYPE && price === +ops.price);
         if (isExist) {
             params.series.price.removePriceLine(line);
             store.dispatch("tradingDerivative/drawTools", {
@@ -2003,7 +1996,7 @@ function drawLineTool() {
         }
         return !isExist;
     });
-    if (params.tools.lines.length == oldLength) {
+    if (params.tools.lines.length === oldLength) {
         const color = state.lineColor;
         const title = state.lineTitle;
         const options = {
@@ -2609,15 +2602,15 @@ function cmp(value1, side, value2, eq = false) {
     else return eq ? value1 <= value2 : value1 < value2;
 }
 function timeToIndex(time) {
-    let index = params.data.whitespace.findIndex((item) => item.time == time);
-    if (index == -1) {
+    let index = params.data.whitespace.findIndex((item) => item.time === time);
+    if (index === -1) {
         const date = format(new Date(time * 1000), "yyyy-MM-dd");
         const amEnd = getUnixTime(new Date(`${date}T11:30:00Z`));
         const pmStart = getUnixTime(new Date(`${date}T13:00:00Z`));
         const pmEnd = getUnixTime(new Date(`${date}T14:30:00Z`));
         if (time > amEnd && time < pmStart) time = amEnd;
         else if (time > pmEnd) time = pmEnd;
-        index = params.data.whitespace.findIndex((item) => item.time == time);
+        index = params.data.whitespace.findIndex((item) => item.time === time);
     }
     return index;
 }
