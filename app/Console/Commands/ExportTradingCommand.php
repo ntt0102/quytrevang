@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Ratchet\Client\Connector;
 use App\Jobs\ExportShareJob;
-use App\Jobs\ExportDerivativeJob;
+use App\Jobs\ExportDerFirenAntJob;
 use App\Jobs\ScanDerivativeJob;
 
 class ExportTradingCommand extends Command
@@ -58,18 +58,19 @@ class ExportTradingCommand extends Command
                     if (!$item) return false;
                     switch ($this->option('type')) {
                         case 'export':
-                            if ($item->type == 1 && $item->target == 'UpdateLastPrices' && count($item->arguments[0]) > 2000) {
-                                ExportShareJob::dispatch(json_encode($item->arguments[0]));
-                            } else if ($item->type == 3) {
-                                $ws->close();
-                                ExportDerivativeJob::dispatch(json_encode($item->result));
-                            }
-                            break;
-                        case 'scan':
+                            // if ($item->type == 1 && $item->target == 'UpdateLastPrices' && count($item->arguments[0]) > 2000) {
+                            //     ExportShareJob::dispatch(json_encode($item->arguments[0]));
+                            // } else 
                             if ($item->type == 3) {
                                 $ws->close();
-                                ScanDerivativeJob::dispatch(json_encode($item->result));
+                                ExportDerFirenAntJob::dispatch(json_encode($item->result));
                             }
+                            break;
+                            // case 'scan':
+                            //     if ($item->type == 3) {
+                            //         $ws->close();
+                            //         ScanDerivativeJob::dispatch(json_encode($item->result));
+                            //     }
                             break;
                     }
                 }

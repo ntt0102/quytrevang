@@ -34,6 +34,7 @@ Route::get('migrate', function () {
 });
 
 Route::get('test', function () {
+    set_time_limit(500);
     // $s = \App\Models\StockDrawing::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
     // $s = \App\Models\ShareOrder::opening()->get('symbol')->pluck('symbol');
     // $s = $s->map(function ($s) {
@@ -55,9 +56,8 @@ Route::get('test', function () {
     //     $result[$d->name][$d->point] = $d;
     // });
     // dd($result);
-    // set_time_limit(500);
     // $payload = (object)['from' => strtotime("2022-04-04"), 'to' => strtotime("2023-09-07"), 'type' => 'cash'];
-    // $filter = App\Jobs\FilterShareJob::dispatch($payload);
+    $s = App\Jobs\CsvJob::dispatch();
     // dd(strtotime('02-04-2024') . '-' . strtotime('2024-04-02'));
     // dd(date('Y-m-d H:i:s', 1712028936));
     // // $filter = app(\App\Services\Trading\ShareService::class)->getSymbols(false);
@@ -74,7 +74,7 @@ Route::get('test', function () {
     // $s = new \App\Jobs\FilterShareJob($payload);
     // $s = $s->getForeignRatio($payload);
     // $s = $s->getRatio($payload);
-    // $s = app(\App\Services\Special\CsvService::class)->convert();
+    // $s = app(\App\Services\Special\CsvService::class)->removeSide();
     // $s = app(\App\Services\Trading\OrderChartService::class)->export((object)['date' => '2024-08-05']);
     // $s = app(\App\Services\Trading\OrderChartService::class)->generateDataFromApi();
     // $s = file_exists(storage_path('app'));
@@ -117,7 +117,7 @@ Route::get('test', function () {
     //     $receiver,
     //     new \App\Notifications\CoreNotification($params, false, true)
     // );
-    $s = \Illuminate\Support\Facades\Artisan::call('clone:data --type=scan');
+    // $s = \Illuminate\Support\Facades\Artisan::call('clone:data --type=scan');
     // $date = '2024-07-18';
     // $file = storage_path('app/cophieu/date.txt');
     // $isUpdated = false;

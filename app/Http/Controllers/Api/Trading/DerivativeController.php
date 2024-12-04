@@ -69,6 +69,19 @@ class DerivativeController extends CoreController
     }
 
     /**
+     * Set Source
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function setSource(Request $request)
+    {
+        $data = $this->derivativeService->setSource($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Get Tools
      *
      * @param \Illuminate\Http\Request $request
@@ -130,19 +143,6 @@ class DerivativeController extends CoreController
     public function executeOrder(Request $request)
     {
         $data = $this->derivativeService->executeOrder($this->payload);
-        return $this->sendResponse($data);
-    }
-
-    /**
-     * Close Position
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function closePosition(Request $request)
-    {
-        $data = $this->derivativeService->closePosition($this->payload);
         return $this->sendResponse($data);
     }
 

@@ -106,12 +106,12 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::get('/vps', 'DerivativeController@getVpsData');
                     Route::get('init-chart', 'DerivativeController@initChart');
                     Route::post('set-auto-refresh', 'DerivativeController@setAutoRefresh');
+                    Route::post('set-source', 'DerivativeController@setSource');
                     Route::get('get-tools', 'DerivativeController@getTools');
                     Route::post('login-vps', 'DerivativeController@loginVps');
                     Route::get('get-status', 'DerivativeController@getStatus');
                     Route::get('get-account-info', 'DerivativeController@getAccountInfo');
                     Route::post('execute-order', 'DerivativeController@executeOrder');
-                    Route::post('close-position', 'DerivativeController@closePosition');
                     Route::post('draw-tools', 'DerivativeController@drawTools');
                     Route::post('report', 'DerivativeController@report');
                     Route::post('export', 'DerivativeController@export');

@@ -70,5 +70,9 @@ class VariablesTableSeeder extends Seeder
             'name' => "autoRefreshFlag",
             'value' => "0",
         ]);
+        Variable::create([
+            'name' => "derivativeSource",
+            'value' => "FireAnt",
+        ]);
     }
 }

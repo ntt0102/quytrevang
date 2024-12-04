@@ -1,6 +1,6 @@
 <template>
     <div
-        class="derivative-container"
+        class="derivative-chart"
         ref="chartContainerRef"
         @click="eventChartClick"
         @contextmenu="eventChartContextmenu"
@@ -38,7 +38,7 @@
                 >
                     {{ status.position }}
                 </div>
-                <div class="command clock" @click="refreshChart">
+                <div class="command clock" @click="connectSocket">
                     {{ state.clock }}
                 </div>
                 <input
@@ -58,7 +58,7 @@
                     <i
                         class="far fa-sync-alt"
                         :class="{
-                            'fa-spin': isChartLoading,
+                            'fa-spin': isLoading,
                         }"
                     ></i>
                 </div>
@@ -332,7 +332,6 @@ let params = {
     websocket: null,
     isAutoOrdering: false,
     socketStop: false,
-    socketSendData: null,
     currentSeconds: getUnixTime(addHours(new Date(), 7)),
     alertAudio: null,
 };
@@ -357,9 +356,7 @@ const state = reactive({
 const status = computed(() => store.state.tradingDerivative.status);
 const config = computed(() => store.state.tradingDerivative.config);
 const tools = computed(() => store.state.tradingDerivative.tools);
-const isChartLoading = computed(
-    () => store.state.tradingDerivative.isChartLoading
-);
+const isLoading = computed(() => store.state.tradingDerivative.isLoading);
 const showCancelOrder = computed(
     () =>
         status.value.position != 0 ||
@@ -426,16 +423,17 @@ onUnmounted(() => {
     document.removeEventListener("fullscreenchange", eventFullscreenChange);
     clearInterval(params.interval);
     clearInterval(params.interval60);
-    if (params.websocket) {
-        params.websocket.close();
-        params.websocket = null;
-    }
+    closeSocket();
     params.socketStop = true;
 });
 
 watch(() => store.state.tradingDerivative.chartData, loadChartData);
 watch(tools, loadToolsData);
 watch(() => state.progress, progressAlert);
+watch(
+    () => config.value.source,
+    (_, old) => (old ? connectSocket() : null)
+);
 
 function eventChartClick(e) {
     state.showProgressContext = false;
@@ -931,29 +929,56 @@ function speakAlert(text) {
     utterance.lang = "vi-VN";
     speechSynthesis.speak(utterance);
 }
-function connectSocket() {
-    connectFireantSocket();
+async function connectSocket() {
+    if (inSession()) {
+        await closeSocket();
+        const isFireAnt = config.value.source === "FireAnt";
+        const enpoint = isFireAnt
+            ? FIREANT_SOCKET_ENDPOINT
+            : VPS_SOCKET_ENDPOINT;
+        params.websocket = new WebSocket(enpoint);
+        params.websocket.onclose = (e) => {
+            if (!params.socketStop) {
+                state.isSocketWarning = true;
+                connectSocket();
+            }
+        };
+        if (isFireAnt) configFireAntSocket();
+        else configVpsSocket();
+    }
 }
-function connectFireantSocket() {
-    store.dispatch("tradingDerivative/setChartLoading", true);
-    params.websocket = new WebSocket(FIREANT_SOCKET_ENDPOINT);
+async function closeSocket() {
+    if (params.websocket && params.websocket.readyState === WebSocket.OPEN) {
+        params.websocket.close();
+
+        await new Promise((resolve) => {
+            const interval = setInterval(() => {
+                if (
+                    !params.websocket ||
+                    params.websocket.readyState === WebSocket.CLOSED
+                ) {
+                    params.websocket = null;
+                    clearInterval(interval);
+                    resolve();
+                }
+            }, 100);
+        });
+    }
+}
+function configFireAntSocket() {
+    store.dispatch("tradingDerivative/setLoading", true);
     params.websocket.onopen = (e) => {
-        let message = '{"protocol":"json","version":1}';
-        params.websocket.send(message);
-        message =
-            '{"arguments":["VN30F1M"],"invocationId":"0","target":"SubscribeTrades","type":1}';
-        params.websocket.send(message);
-        params.socketSendData = message;
-    };
-    params.websocket.onclose = (e) => {
-        if (!params.socketStop && inSession()) {
-            state.isSocketWarning = true;
-            connectFireantSocket();
+        if (params.websocket.readyState === WebSocket.OPEN) {
+            let message = '{"protocol":"json","version":1}';
+            params.websocket.send(message);
+            message =
+                '{"arguments":["VN30F1M"],"invocationId":"0","target":"SubscribeTrades","type":1}';
+            params.websocket.send(message);
         }
     };
     params.websocket.onmessage = (e) => {
         state.isSocketWarning = false;
-        const data = parseFireantSocketMessage(e.data);
+        const data = parseFireAntMessage(e.data);
         data.forEach((item) => {
             if (!item) return false;
             if (item.type == 3) {
@@ -964,19 +989,20 @@ function connectFireantSocket() {
                 );
                 params.series.whitespace.setData(params.data.whitespace);
                 updateFireantData(item.result);
-                store.dispatch("tradingDerivative/setChartLoading", false);
+                store.dispatch("tradingDerivative/setLoading", false);
             } else if (
                 item.type == 1 &&
                 item.target == "UpdateTrades" &&
                 item.arguments[0] == "VN30F1M"
             ) {
+                console.log("FireAnt", item.arguments[1]);
                 scanOrder(item.arguments[1].at(-1).price);
                 updateFireantData(item.arguments[1]);
             }
         });
     };
 }
-function parseFireantSocketMessage(msg) {
+function parseFireAntMessage(msg) {
     let result = [];
     msg.split("").forEach((item) => {
         const startPos = item.indexOf("{");
@@ -990,24 +1016,21 @@ function parseFireantSocketMessage(msg) {
     });
     return result;
 }
-function connectVpsSocket() {
-    params.websocket = new WebSocket(VPS_SOCKET_ENDPOINT);
+function configVpsSocket() {
+    store
+        .dispatch("tradingDerivative/getVpsData")
+        .then((data) => updateVpsData(data));
     params.websocket.onopen = (e) => {
-        var msg = {
-            action: "join",
-            list: config.value.vn30f1m,
-        };
-        params.websocket.send(
-            `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
-        );
-        store
-            .dispatch("tradingDerivative/getVpsData")
-            .then((data) => updateVpsData(data));
-    };
-    params.websocket.onclose = (e) => {
-        if (!params.socketStop && inSession()) {
-            state.isSocketWarning = true;
-            connectVpsSocket();
+        if (params.websocket.readyState === WebSocket.OPEN) {
+            const msg = {
+                action: "join",
+                list: config.value.vn30f1m,
+            };
+            const message = `42${JSON.stringify([
+                "regs",
+                JSON.stringify(msg),
+            ])}`;
+            params.websocket.send(message);
         }
     };
     params.websocket.onmessage = (e) => {
@@ -1018,6 +1041,8 @@ function connectVpsSocket() {
                 if (event[0] == "stockps") {
                     const data = event[1].data;
                     if (data.id == 3220) {
+                        console.log("VPS", data);
+                        scanOrder(data.lastPrice);
                         updateVpsData([data]);
                     }
                 }
@@ -2522,18 +2547,15 @@ function dateSelectChange() {
     if (!state.chartDate) return false;
     getChartData();
 }
-function refreshChart() {
-    if (inSession()) params.websocket.send(params.socketSendData);
-}
 function resetChart() {
     params.data.whitespace = [];
     params.data.price = [];
-    refreshChart();
+    connectSocket();
     getChartData();
 }
 function initChart() {
     store.dispatch("tradingDerivative/initChart").then(() => {
-        if (inSession()) connectSocket();
+        connectSocket();
         if (!route.query.date && config.value.lastOpeningDate)
             state.chartDate = config.value.lastOpeningDate;
         getChartData();
@@ -2606,7 +2628,7 @@ function indexToTime(index) {
 }
 </script>
 <style lang="scss">
-.derivative-container {
+.derivative-chart {
     height: 400px;
     background: #131722;
     border: none;

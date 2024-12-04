@@ -5,7 +5,7 @@ function initialState() {
         tools: [],
         chartData: [],
         chartDate: null,
-        isChartLoading: false,
+        isLoading: false,
     };
 }
 
@@ -13,7 +13,7 @@ const getters = {};
 
 const actions = {
     getChartData({ commit, dispatch, getters, state, rootGetters }, date) {
-        commit("setChartLoading", true);
+        commit("setLoading", true);
         commit("setChartDate", date);
         return new Promise((resolve, reject) => {
             axios
@@ -23,39 +23,37 @@ const actions = {
                 })
                 .then((response) => {
                     commit("setChartData", response.data);
-                    commit("setChartLoading", false);
+                    commit("setLoading", false);
                     resolve(!!response.data.price.length);
                 });
         });
     },
     getVpsData({ commit, dispatch, getters, state, rootGetters }) {
+        commit("setLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .get("trading/derivative/vps", {
-                    params: { date },
                     noLoading: true,
                 })
                 .then((response) => {
+                    commit("setLoading", false);
                     resolve(response.data);
                 });
         });
     },
     initChart({ commit, dispatch, getters, state, rootGetters }) {
-        commit("setChartLoading", true);
+        commit("setLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .get("trading/derivative/init-chart", { noLoading: true })
                 .then((response) => {
                     commit("setInitChart", response.data);
-                    commit("setChartLoading", false);
+                    commit("setLoading", false);
                     resolve();
                 });
         });
     },
-    setAutoRefresh(
-        { commit, dispatch, getters, state, rootGetters },
-        autoRefresh
-    ) {
+    setAutoRefresh({ commit, dispatch, getters, state }, autoRefresh) {
         commit("setAutoRefresh", autoRefresh);
         return new Promise((resolve, reject) => {
             axios
@@ -67,14 +65,26 @@ const actions = {
                 .then((response) => resolve());
         });
     },
+    setSource({ commit, dispatch, getters, state, rootGetters }, source) {
+        commit("setSource", source);
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "trading/derivative/set-source",
+                    { source },
+                    { noLoading: true }
+                )
+                .then((response) => resolve());
+        });
+    },
     getTools({ commit, dispatch, getters, state, rootGetters }) {
-        commit("setChartLoading", true);
+        commit("setLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .get("trading/derivative/get-tools", { noLoading: true })
                 .then((response) => {
                     commit("setTools", response.data);
-                    commit("setChartLoading", false);
+                    commit("setLoading", false);
                     resolve();
                 });
         });
@@ -112,24 +122,15 @@ const actions = {
         if (!state.status.connection)
             return Promise.resolve({ isOk: false, message: "notConnect" });
         return new Promise((resolve, reject) => {
-            commit("setChartLoading", true);
+            commit("setLoading", true);
             axios
                 .post("trading/derivative/execute-order", data, {
                     noLoading: true,
                     notify: true,
                 })
                 .then((response) => {
-                    commit("setChartLoading", false);
+                    commit("setLoading", false);
                     dispatch("getStatus");
-                    resolve(response.data);
-                });
-        });
-    },
-    closePosition({ commit, dispatch, getters, state, rootGetters }, id) {
-        return new Promise((resolve, reject) => {
-            axios
-                .post("trading/derivative/close-position", { id })
-                .then((response) => {
                     resolve(response.data);
                 });
         });
@@ -152,10 +153,14 @@ const actions = {
             });
         });
     },
-    export({ commit, dispatch, getters, state, rootGetters }) {
+    export({ commit, dispatch, getters, state, rootGetters }, type) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/derivative/export", { date: state.chartDate })
+                .post("trading/derivative/export", {
+                    date: state.chartDate,
+                    source: state.config.source,
+                    type,
+                })
                 .then((response) => {
                     if (response.headers["content-type"].includes("text/csv")) {
                         var fileURL = window.URL.createObjectURL(
@@ -183,8 +188,8 @@ const actions = {
                 });
         });
     },
-    setChartLoading({ commit }, state) {
-        commit("setChartLoading", state);
+    setLoading({ commit }, state) {
+        commit("setLoading", state);
     },
     resetState({ commit }) {
         commit("resetState");
@@ -198,8 +203,8 @@ const mutations = {
     setChartDate(state, date) {
         state.chartDate = date;
     },
-    setChartLoading(state, data) {
-        state.isChartLoading = data;
+    setLoading(state, data) {
+        state.isLoading = data;
     },
     setStatus(state, data) {
         state.status = data;
@@ -213,6 +218,9 @@ const mutations = {
     },
     setAutoRefresh(state, autoRefresh) {
         state.config.autoRefresh = autoRefresh;
+    },
+    setSource(state, source) {
+        state.config.source = source;
     },
     setTools(state, data) {
         state.tools = data;

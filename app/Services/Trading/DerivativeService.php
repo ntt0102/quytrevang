@@ -7,6 +7,7 @@ use App\Services\Special\VpsOrderService;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\StockDrawing;
 use App\Jobs\ReportTradingJob;
+use App\Jobs\ExportDerVpsJob;
 use App\Jobs\LoginDnseJob;
 
 class DerivativeService extends CoreService
@@ -47,6 +48,7 @@ class DerivativeService extends CoreService
         return [
             'config' => [
                 'openingMarket' => get_global_value('openingMarketFlag') == '1',
+                'source' => get_global_value('derivativeSource'),
                 'vn30f1m' => get_global_value('vn30f1m'),
                 'vpsUser' => get_global_value('vpsUser'),
                 'vpsSession' => get_global_value('vpsSession'),
@@ -68,6 +70,17 @@ class DerivativeService extends CoreService
     {
         $status = $payload->autoRefresh ? '1' : '0';
         set_global_value('autoRefreshFlag', $status);
+    }
+
+    /**
+     * Set Source
+     *
+     * @param $payload
+     * 
+     */
+    public function setSource($payload)
+    {
+        set_global_value('derivativeSource', $payload->source);
     }
 
     /**
@@ -146,32 +159,6 @@ class DerivativeService extends CoreService
             function () use ($payload) {
                 $vos = new VpsOrderService();
                 $ret = $vos->execute($payload);
-                return $ret;
-            }
-        );
-    }
-
-    /**
-     * Close Postion
-     *
-     * @param $payload
-     * 
-     */
-    public function closePosition($payload)
-    {
-        return $this->transaction(
-            function () use ($payload) {
-                $vos = new VpsOrderService();
-                $data = (object)[
-                    "action" => "exit",
-                    "tpData" => ["cmd" => "cancel"],
-                    "slData" => ["cmd" => "delete"],
-                    "exitData" => [
-                        "cmd" => "new",
-                        "price" => "MTL",
-                    ],
-                ];
-                $ret = $vos->execute($data);
                 return $ret;
             }
         );
@@ -344,17 +331,35 @@ class DerivativeService extends CoreService
     public function export($payload)
     {
         $ret['download'] = false;
-        $filename = $payload->date . '.csv';
-        $file = storage_path('app/phaisinh/' . $filename);
-        if (file_exists($file)) {
-            $ret['download'] = true;
-            $ret['file'] = $file;
-            $ret['filename'] = $filename;
-            $ret['headers'] = ['Content-Type' => 'text/csv'];
-        } else {
+        if ($payload->type == 'download') {
+            $filename = $payload->date . '.csv';
+            $file = storage_path('app/phaisinh/' . $filename);
+            if (file_exists($file)) {
+                $ret['download'] = true;
+                $ret['file'] = $file;
+                $ret['filename'] = $filename;
+                $ret['headers'] = ['Content-Type' => 'text/csv'];
+            }
+        } else if ($payload->source == 'FireAnt') {
             Artisan::call('clone:data --type=export');
             $ret['isOk'] = true;
+        } else {
+            ExportDerVpsJob::dispatch();
+            $ret['isOk'] = true;
         }
+        // //
+        // $ret['download'] = false;
+        // $filename = $payload->date . '.csv';
+        // $file = storage_path('app/phaisinh/' . $filename);
+        // if (file_exists($file)) {
+        //     $ret['download'] = true;
+        //     $ret['file'] = $file;
+        //     $ret['filename'] = $filename;
+        //     $ret['headers'] = ['Content-Type' => 'text/csv'];
+        // } else {
+        //     Artisan::call('clone:data --type=export');
+        //     $ret['isOk'] = true;
+        // }
         return $ret;
     }
 
