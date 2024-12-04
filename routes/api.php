@@ -103,6 +103,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             Route::group(['namespace' => 'Trading', 'prefix' => 'trading'], function () {
                 Route::group(['prefix' => 'derivative', 'middleware' => ['can:admin:order_derivative']], function () {
                     Route::get('/', 'DerivativeController@getChartData');
+                    Route::get('/vps', 'DerivativeController@getVpsData');
                     Route::get('init-chart', 'DerivativeController@initChart');
                     Route::post('set-auto-refresh', 'DerivativeController@setAutoRefresh');
                     Route::get('get-tools', 'DerivativeController@getTools');

@@ -28,6 +28,18 @@ const actions = {
                 });
         });
     },
+    getVpsData({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .get("trading/derivative/vps", {
+                    params: { date },
+                    noLoading: true,
+                })
+                .then((response) => {
+                    resolve(response.data);
+                });
+        });
+    },
     initChart({ commit, dispatch, getters, state, rootGetters }) {
         commit("setChartLoading", true);
         return new Promise((resolve, reject) => {

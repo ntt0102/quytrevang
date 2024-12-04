@@ -293,7 +293,8 @@ const TIME = {
 };
 const FIREANT_SOCKET_ENDPOINT =
     "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
-
+const VPS_SOCKET_ENDPOINT =
+    "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
 const store = useStore();
 const route = useRoute();
 const { t } = useI18n();
@@ -827,11 +828,25 @@ function loadChartData(chartData) {
         params.series.price.setData(params.data.price);
     }
 }
-function updateChartData(data) {
+function updateFireantData(data) {
     let prices = [];
     data.forEach((item) => {
         const time = getUnixTime(addHours(new Date(item.date), 7));
         prices.push({ time, value: item.price });
+    });
+    if (prices.length > 1) {
+        params.data.price = mergeChartData(params.data.price, prices);
+        params.series.price.setData(params.data.price);
+    } else {
+        params.data.price.push(prices[0]);
+        params.series.price.update(prices[0]);
+    }
+}
+function updateVpsData(data) {
+    let prices = [];
+    data.forEach((item) => {
+        const time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
+        prices.push({ time, value: item.lastPrice });
     });
     if (prices.length > 1) {
         params.data.price = mergeChartData(params.data.price, prices);
@@ -917,6 +932,9 @@ function speakAlert(text) {
     speechSynthesis.speak(utterance);
 }
 function connectSocket() {
+    connectFireantSocket();
+}
+function connectFireantSocket() {
     store.dispatch("tradingDerivative/setChartLoading", true);
     params.websocket = new WebSocket(FIREANT_SOCKET_ENDPOINT);
     params.websocket.onopen = (e) => {
@@ -930,12 +948,12 @@ function connectSocket() {
     params.websocket.onclose = (e) => {
         if (!params.socketStop && inSession()) {
             state.isSocketWarning = true;
-            connectSocket();
+            connectFireantSocket();
         }
     };
     params.websocket.onmessage = (e) => {
         state.isSocketWarning = false;
-        const data = parseSocketMessage(e.data);
+        const data = parseFireantSocketMessage(e.data);
         data.forEach((item) => {
             if (!item) return false;
             if (item.type == 3) {
@@ -945,7 +963,7 @@ function connectSocket() {
                     createWhitespaceData(CURRENT_DATE)
                 );
                 params.series.whitespace.setData(params.data.whitespace);
-                updateChartData(item.result);
+                updateFireantData(item.result);
                 store.dispatch("tradingDerivative/setChartLoading", false);
             } else if (
                 item.type == 1 &&
@@ -953,12 +971,12 @@ function connectSocket() {
                 item.arguments[0] == "VN30F1M"
             ) {
                 scanOrder(item.arguments[1].at(-1).price);
-                updateChartData(item.arguments[1]);
+                updateFireantData(item.arguments[1]);
             }
         });
     };
 }
-function parseSocketMessage(msg) {
+function parseFireantSocketMessage(msg) {
     let result = [];
     msg.split("").forEach((item) => {
         const startPos = item.indexOf("{");
@@ -971,6 +989,41 @@ function parseSocketMessage(msg) {
         result.push(temp);
     });
     return result;
+}
+function connectVpsSocket() {
+    params.websocket = new WebSocket(VPS_SOCKET_ENDPOINT);
+    params.websocket.onopen = (e) => {
+        var msg = {
+            action: "join",
+            list: config.value.vn30f1m,
+        };
+        params.websocket.send(
+            `42${JSON.stringify(["regs", JSON.stringify(msg)])}`
+        );
+        store
+            .dispatch("tradingDerivative/getVpsData")
+            .then((data) => updateVpsData(data));
+    };
+    params.websocket.onclose = (e) => {
+        if (!params.socketStop && inSession()) {
+            state.isSocketWarning = true;
+            connectVpsSocket();
+        }
+    };
+    params.websocket.onmessage = (e) => {
+        state.isSocketWarning = false;
+        if (e.data.substr(0, 1) == 4) {
+            if (e.data.substr(1, 1) == 2) {
+                const event = JSON.parse(e.data.substr(2));
+                if (event[0] == "stockps") {
+                    const data = event[1].data;
+                    if (data.id == 3220) {
+                        updateVpsData([data]);
+                    }
+                }
+            }
+        }
+    };
 }
 function intervalHandler() {
     params.currentSeconds = getUnixTime(addHours(new Date(), 7));

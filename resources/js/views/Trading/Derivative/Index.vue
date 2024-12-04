@@ -29,6 +29,20 @@
                         onClick: loginVps,
                     },
                 },
+                {
+                    location: 'after',
+                    widget: 'dxDropDownButton',
+                    options: {
+                        showArrowIcon: false,
+                        items: state.filterItems,
+                        displayExpr: 'text',
+                        keyExpr: 'value',
+                        icon: 'far fa-filter small',
+                        hint: $t('trading.share.filterSymbols'),
+                        dropDownOptions: { width: '130px' },
+                        onItemClick: filterItemClick,
+                    },
+                },
             ]"
         />
         <Chart />

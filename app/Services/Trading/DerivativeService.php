@@ -25,6 +25,17 @@ class DerivativeService extends CoreService
     }
 
     /**
+     * Get VPS data
+     *
+     * @param $payload
+     * 
+     */
+    public function getVpsData()
+    {
+        return $this->cloneVpsData();
+    }
+
+    /**
      * Init Chart
      *
      * @param $payload
@@ -244,8 +255,6 @@ class DerivativeService extends CoreService
         try {
             $client = new \GuzzleHttp\Client();
             $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-            // $url = "https://fwtapi3.fialda.com/api/services/app/Stock/GetIntraday?symbol=VN30F2407";
-            // $url = "https://svr5.fireant.vn/api/Data/Markets/IntradayQuotes?symbol=VN30F1M";
             $res = $client->get($url);
             return json_decode($res->getBody());
         } catch (\Throwable $th) {

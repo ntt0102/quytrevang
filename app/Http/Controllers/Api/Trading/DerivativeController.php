@@ -30,6 +30,19 @@ class DerivativeController extends CoreController
     }
 
     /**
+     * Get the VPS data
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getVpsData(Request $request)
+    {
+        $data = $this->derivativeService->getVpsData();
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Init Chart
      *
      * @param \Illuminate\Http\Request $request
