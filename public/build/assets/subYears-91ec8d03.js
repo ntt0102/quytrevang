@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/subYears-91ec8d03.js
-import{B as d,A as c}from"./app-7823a389.js";function h(r,t,e){const a=d(r,e==null?void 0:e.in);if(isNaN(t))return c((e==null?void 0:e.in)||r,NaN);if(!t)return a;const u=a.getDate(),n=c((e==null?void 0:e.in)||r,a.getTime());n.setMonth(a.getMonth()+t+1,0);const f=n.getDate();return u>=f?n:(a.setFullYear(n.getFullYear(),n.getMonth(),u),a)}function M(r,t,e){return h(r,t*12,e)}function l(r,t,e){return M(r,-t,e)}export{l as s};
-========
-import{B as d,A as c}from"./app-f4c6c71e.js";function h(r,t,e){const a=d(r,e==null?void 0:e.in);if(isNaN(t))return c((e==null?void 0:e.in)||r,NaN);if(!t)return a;const u=a.getDate(),n=c((e==null?void 0:e.in)||r,a.getTime());n.setMonth(a.getMonth()+t+1,0);const f=n.getDate();return u>=f?n:(a.setFullYear(n.getFullYear(),n.getMonth(),u),a)}function M(r,t,e){return h(r,t*12,e)}function l(r,t,e){return M(r,-t,e)}export{l as s};
->>>>>>>> 4905e4cac7cccbdd1592842383b70a4894ec7d34:public/build/assets/subYears-36de996b.js
