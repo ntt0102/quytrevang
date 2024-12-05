@@ -251,7 +251,13 @@ import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
-import { format, getUnixTime, addHours } from "date-fns";
+import {
+    format,
+    getUnixTime,
+    addHours,
+    subSeconds,
+    differenceInSeconds,
+} from "date-fns";
 
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
@@ -330,10 +336,10 @@ let params = {
     interval: null,
     interval60: null,
     websocket: null,
-    isAutoOrdering: false,
     socketStop: false,
+    vpsUpdatedAt: subSeconds(new Date(), 60),
+    isAutoOrdering: false,
     currentSeconds: getUnixTime(addHours(new Date(), 7)),
-    alertAudio: null,
 };
 initToolsParams();
 //
@@ -973,7 +979,6 @@ function configFireAntSocket() {
         state.isSocketWarning = false;
         const data = parseFireAntMessage(e.data);
         data.forEach((item) => {
-            console.log("FireAnt-socket: ", item);
             if (!item) return false;
             if (item.type === 3) {
                 const date = item.result[0].date.slice(0, 10);
@@ -1014,16 +1019,18 @@ function parseFireAntMessage(msg) {
     return result;
 }
 function configVpsSocket() {
-    store
-        .dispatch("tradingDerivative/getVpsData")
-        .then((data) => updateChartData(data));
+    if (differenceInSeconds(new Date(), new Date(params.vpsUpdatedAt)) > 30) {
+        store
+            .dispatch("tradingDerivative/getVpsData")
+            .then((data) => updateChartData(data));
+        params.vpsUpdatedAt = new Date();
+    }
     params.websocket.onopen = (e) => {
         if (params.websocket.readyState === WebSocket.OPEN) {
             const msg = {
                 action: "join",
                 list: config.value.vn30f1m,
             };
-            console.log("msg", msg);
             const message = `42${JSON.stringify([
                 "regs",
                 JSON.stringify(msg),

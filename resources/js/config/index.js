@@ -4,14 +4,17 @@ import crypto from "../plugins/crypto";
 import { toast } from "vue3-toastify";
 import mf from "../properties/functions";
 import config from "devextreme/core/config";
-import { differenceInSeconds } from "date-fns";
+import { differenceInSeconds, format } from "date-fns";
 
 let shownOfflineAt = new Date();
 
 axios.interceptors.request.use(
     (config) => {
         const dataKey = config.method === "post" ? "data" : "params";
-        console.log("request:" + config.url, config[dataKey]);
+        console.log(
+            `request: ${config.url} (${format(new Date(), "HH:mm:ss")})`,
+            config[dataKey]
+        );
         config.headers["Authorization"] = `Bearer ${store.state.auth.token}`;
         if (!config.noCrypt) config[dataKey] = crypto.encrypt(config[dataKey]);
         if (!config.noLoading) store.dispatch("setSyncing", true);
@@ -35,7 +38,13 @@ axios.interceptors.response.use(
         store.dispatch("setSyncing", false);
         if (response.headers["content-type"] == "application/json") {
             response.data = crypto.decrypt(response.data);
-            console.log("response:" + response.config.url, response.data);
+            console.log(
+                `response: ${response.config.url} (${format(
+                    new Date(),
+                    "HH:mm:ss"
+                )})`,
+                response.data
+            );
         }
         if (!response.config.notify && response.data.hasOwnProperty("isOk")) {
             if (response.data.isOk) {
@@ -66,9 +75,17 @@ axios.interceptors.response.use(
         return response;
     },
     (error) => {
-        console.log("error:");
-        console.log(error.response);
+        console.log(
+            `error: ${error.response.config.url} (${format(
+                new Date(),
+                "HH:mm:ss"
+            )})`,
+            error.response
+        );
         store.dispatch("setSyncing", false);
+        if (error.response.config.url.includes("derivative")) {
+            store.dispatch("tradingDerivative/setLoading", false);
+        }
         if (navigator.onLine && !!error.response) mf.handleError(error);
         return Promise.reject(error);
     }
