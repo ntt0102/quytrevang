@@ -1561,9 +1561,9 @@ function calculatePattern() {
     console.log("calculatePattern", [phase1, phase2, phase3]);
 
     //
-    const pr1Valid = Math.abs(bc) >= phase1.pr;
-    const pr2Valid = Math.abs(C.price - phase3.xBox.R.price) >= phase2.pr;
-    const pr3Valid = phase3.xBox.pr >= phase3.pr;
+    const pr1Valid = +(Math.abs(bc) - phase1.pr).toFixed(1) >= 0;
+    const pr2Valid = +(Math.abs(C.price - phase3.xBox.R.price) - phase2.pr).toFixed(1) >= 0;
+    const pr3Valid = +(phase3.xBox.pr - phase3.pr).toFixed(1) >= 0;
 
     const s1Valid = !cmp(C.price, !side, phase1.S1.price);
     const s2Valid = !cmp(phase3.xBox.R.price, side, phase2.S1.price);
