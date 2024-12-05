@@ -90,16 +90,7 @@ const dataSource = ref([
 ]);
 
 function report() {
-    // bus.emit("checkPin", () => store.dispatch("tradingDerivative/report"));
-    fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
-        .then((response) => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then((data) => console.log(data))
-        .catch((error) => console.error("Error:", error));
+    bus.emit("checkPin", () => store.dispatch("tradingDerivative/report"));
 }
 function loginVps() {
     vpsOtpPopupRef.value.show();

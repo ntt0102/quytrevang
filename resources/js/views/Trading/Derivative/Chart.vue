@@ -943,7 +943,10 @@ async function connectSocket() {
             }
         };
         if (isFireAnt) configFireAntSocket();
-        else configVpsSocket();
+        else {
+            getVpsData();
+            configVpsSocket();
+        }
     }
 }
 async function closeSocket() {
@@ -1019,12 +1022,6 @@ function parseFireAntMessage(msg) {
     return result;
 }
 function configVpsSocket() {
-    if (differenceInSeconds(new Date(), new Date(params.vpsUpdatedAt)) > 30) {
-        store
-            .dispatch("tradingDerivative/getVpsData")
-            .then((data) => updateChartData(data));
-        params.vpsUpdatedAt = new Date();
-    }
     params.websocket.onopen = (e) => {
         if (params.websocket.readyState === WebSocket.OPEN) {
             const msg = {
@@ -1054,6 +1051,17 @@ function configVpsSocket() {
             }
         }
     };
+}
+function getVpsData() {
+    // if (differenceInSeconds(new Date(), new Date(params.vpsUpdatedAt)) > 30) {
+    fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
+        .then((response) => response.json())
+        .then((data) => {
+            console.log(data);
+            updateChartData(data);
+        });
+    params.vpsUpdatedAt = new Date();
+    // }
 }
 function intervalHandler() {
     params.currentSeconds = getUnixTime(addHours(new Date(), 7));
@@ -1171,7 +1179,8 @@ function removeOrderTool(kinds, withServer = true) {
     });
 }
 function tradingviewClick(e) {
-    state.showTradingView = !state.showTradingView;
+    // state.showTradingView = !state.showTradingView;
+    getVpsData();
     e.stopPropagation();
 }
 function progressToolClick() {
