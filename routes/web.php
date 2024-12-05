@@ -68,7 +68,8 @@ Route::get('test', function () {
     // $payload = (object)['symbol' => 'AAA', 'from' => 1618557594, 'to' => 1713251994, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
     // $s = app(\App\Services\Trading\ShareService::class)->getEvents($payload);
     // $s = app(\App\Services\Trading\ShareService::class)->getDataFireAnt($payload);
-    $s = app(\App\Services\Trading\DerivativeService::class)->cloneVpsData();
+    $s = 'THO';
+    // $s = app(\App\Services\Trading\DerivativeService::class)->cloneVpsData();
     // $s = \App\Jobs\FilterShareJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
     // $s = new \App\Jobs\FilterShareJob($payload);
