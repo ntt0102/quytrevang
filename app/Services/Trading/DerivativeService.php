@@ -249,6 +249,28 @@ class DerivativeService extends CoreService
         }
     }
 
+    public function pingWithCurl()
+    {
+        try {
+            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Timeout 10 giây
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($httpCode === 200) {
+                return json_decode($response, true);
+            }
+
+            return ['error' => 'HTTP Error: ' . $httpCode];
+        } catch (\Throwable $th) {
+            return ['error' => 'Exception occurred: ' . $th->getMessage()];
+        }
+    }
+
+
 
     /**
      * Vps data
