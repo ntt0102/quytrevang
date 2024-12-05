@@ -1690,8 +1690,11 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 //     maxBox.S.index = box.S.index;
                 //     maxBox.tr = maxBox.S.index - maxBox.R.index;
                 // }
-                if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) {
-                    maxBox = mf.cloneDeep(box);
+                if (box.pr > maxBox.pr) maxBox.pr = box.pr;
+                if (box.tr >= maxBox.tr) {
+                    maxBox.tr = box.tr;
+                    maxBox.R = mf.cloneDeep(box.R);
+                    maxBox.S = mf.cloneDeep(box.S);
                 }
                 if (
                     phase === 1 &&
