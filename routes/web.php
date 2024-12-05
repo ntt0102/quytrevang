@@ -57,7 +57,7 @@ Route::get('test', function () {
     // });
     // dd($result);
     // $payload = (object)['from' => strtotime("2022-04-04"), 'to' => strtotime("2023-09-07"), 'type' => 'cash'];
-    $s = App\Jobs\CsvJob::dispatch();
+    // $s = App\Jobs\CsvJob::dispatch();
     // dd(strtotime('02-04-2024') . '-' . strtotime('2024-04-02'));
     // dd(date('Y-m-d H:i:s', 1712028936));
     // // $filter = app(\App\Services\Trading\ShareService::class)->getSymbols(false);
@@ -68,7 +68,7 @@ Route::get('test', function () {
     // $payload = (object)['symbol' => 'AAA', 'from' => 1618557594, 'to' => 1713251994, 'timeframe' => 'D', 'name' => 'vn100', 'kind' => 'f_top', 'foreign' => true, 'dividend' => false, 'vnindex' => true];
     // $s = app(\App\Services\Trading\ShareService::class)->getEvents($payload);
     // $s = app(\App\Services\Trading\ShareService::class)->getDataFireAnt($payload);
-    // $s = app(\App\Services\Trading\ShareService::class)->getData($payload)['rsi'];
+    $s = app(\App\Services\Trading\DerivativeService::class)->cloneVpsData();
     // $s = \App\Jobs\FilterShareJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
     // $s = new \App\Jobs\FilterShareJob($payload);
