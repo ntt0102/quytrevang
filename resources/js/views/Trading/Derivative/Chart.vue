@@ -337,7 +337,7 @@ let params = {
     interval60: null,
     websocket: null,
     socketStop: false,
-    vpsUpdatedAt: subSeconds(new Date(), 60),
+    vpsUpdatedAt: subSeconds(new Date(), 61),
     isAutoOrdering: false,
     currentSeconds: getUnixTime(addHours(new Date(), 7)),
 };
@@ -832,11 +832,12 @@ function loadChartData(chartData) {
         params.series.price.setData(params.data.price);
     }
 }
-function updateChartData(data) {
+function updateChartData(data, source = null) {
+    const _source = source ?? config.value.source;
     let prices = [];
     data.forEach((item) => {
         let time, value;
-        if (config.value.source === "FireAnt") {
+        if (_source === "FireAnt") {
             time = getUnixTime(addHours(new Date(item.date), 7));
             value = item.price;
         } else {
@@ -1053,15 +1054,15 @@ function configVpsSocket() {
     };
 }
 function getVpsData() {
-    // if (differenceInSeconds(new Date(), new Date(params.vpsUpdatedAt)) > 30) {
-    fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
-        .then((response) => response.json())
-        .then((data) => {
-            console.log(data);
-            updateChartData(data);
-        });
-    params.vpsUpdatedAt = new Date();
-    // }
+    if (differenceInSeconds(new Date(), new Date(params.vpsUpdatedAt)) > 60) {
+        fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                updateChartData(data, "VPS");
+            });
+        params.vpsUpdatedAt = new Date();
+    }
 }
 function intervalHandler() {
     params.currentSeconds = getUnixTime(addHours(new Date(), 7));
@@ -1179,8 +1180,7 @@ function removeOrderTool(kinds, withServer = true) {
     });
 }
 function tradingviewClick(e) {
-    // state.showTradingView = !state.showTradingView;
-    getVpsData();
+    state.showTradingView = !state.showTradingView;
     e.stopPropagation();
 }
 function progressToolClick() {
