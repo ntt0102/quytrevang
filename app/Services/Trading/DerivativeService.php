@@ -243,7 +243,7 @@ class DerivativeService extends CoreService
             $client = new \GuzzleHttp\Client();
             $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
             $res = $client->get($url);
-            return json_decode($res->getBody());
+            return (array)json_decode($res->getBody());
         } catch (\Throwable $th) {
             return [];
         }

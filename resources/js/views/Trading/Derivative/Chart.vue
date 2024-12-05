@@ -973,15 +973,19 @@ function configFireAntSocket() {
         state.isSocketWarning = false;
         const data = parseFireAntMessage(e.data);
         data.forEach((item) => {
+            console.log("FireAnt-socket: ", item);
             if (!item) return false;
             if (item.type === 3) {
-                getTools();
-                params.data.whitespace = mergeChartData(
-                    params.data.whitespace,
-                    createWhitespaceData(CURRENT_DATE)
-                );
-                params.series.whitespace.setData(params.data.whitespace);
-                updateChartData(item.result);
+                const date = item.result[0].date.slice(0, 10);
+                if (date === CURRENT_DATE) {
+                    getTools();
+                    params.data.whitespace = mergeChartData(
+                        params.data.whitespace,
+                        createWhitespaceData(CURRENT_DATE)
+                    );
+                    params.series.whitespace.setData(params.data.whitespace);
+                    updateChartData(item.result);
+                }
                 store.dispatch("tradingDerivative/setLoading", false);
             } else if (
                 item.type === 1 &&
@@ -1019,6 +1023,7 @@ function configVpsSocket() {
                 action: "join",
                 list: config.value.vn30f1m,
             };
+            console.log("msg", msg);
             const message = `42${JSON.stringify([
                 "regs",
                 JSON.stringify(msg),
@@ -1028,8 +1033,8 @@ function configVpsSocket() {
     };
     params.websocket.onmessage = (e) => {
         state.isSocketWarning = false;
-        if (e.data.substr(0, 1) === 4) {
-            if (e.data.substr(1, 1) === 2) {
+        if (e.data.substr(0, 1) === "4") {
+            if (e.data.substr(1, 1) === "2") {
                 const event = JSON.parse(e.data.substr(2));
                 if (event[0] === "stockps") {
                     const data = event[1].data;
