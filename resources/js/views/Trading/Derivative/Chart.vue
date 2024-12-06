@@ -112,7 +112,8 @@
                         v-show="state.showProgressContext"
                         class="contextmenu"
                         :progress="state.progress"
-                    ></ProgressContext>
+                    >
+                    </ProgressContext>
                 </div>
                 <div
                     ref="scanToolRef"
@@ -131,7 +132,8 @@
                         v-show="state.showScanContext"
                         class="contextmenu"
                         v-model="state.scanSide"
-                    ></ScanContext>
+                    >
+                    </ScanContext>
                 </div>
                 <div
                     ref="patternToolRef"
@@ -166,7 +168,8 @@
                         v-model:title="state.lineTitle"
                         v-model:color="state.lineColor"
                         @deleteAllLine="removeLineTool"
-                    ></LineContext>
+                    >
+                    </LineContext>
                 </div>
                 <div
                     ref="timeRangeToolRef"
@@ -487,7 +490,7 @@ function eventChartCrosshairMove(e) {
 function eventPriceLineDrag(e) {
     let line = e.customPriceLine;
     let lineOptions = line.options();
-    lineOptions.price = parseFloat(lineOptions.price.toFixed(1));
+    lineOptions.price = fmtNum(lineOptions.price);
     const oldPrice = +e.fromPriceString;
     const newPrice = lineOptions.price;
     switch (lineOptions.lineType) {
@@ -626,7 +629,7 @@ function eventPriceLineDrag(e) {
                             div = 5;
                             break;
                     }
-                    ba = parseFloat(((b - newPrice) / div).toFixed(1));
+                    ba = fmtNum((b - newPrice) / div);
                     a = b - ba;
                     changeOptions = { price: a };
                     params.tools.target[point].applyOptions(changeOptions);
@@ -635,7 +638,7 @@ function eventPriceLineDrag(e) {
                 param.data.push(a);
                 //
                 point = "B";
-                changeOptions = { price: b, title: ba.toFixed(1) };
+                changeOptions = { price: b, title: fmtNum(ba) };
                 if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 param.points.push(point);
@@ -643,32 +646,32 @@ function eventPriceLineDrag(e) {
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat((a - 0.5 * ba).toFixed(1)),
-                    title: (-0.5 * ba).toFixed(1),
+                    price: fmtNum(a - 0.5 * ba),
+                    title: fmtNum(-0.5 * ba),
                 };
                 if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat((a - ba).toFixed(1)),
-                    title: (-ba).toFixed(1),
+                    price: fmtNum(a - ba),
+                    title: fmtNum(-ba),
                 };
                 if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 //
                 point = "Z";
                 changeOptions = {
-                    price: parseFloat((a - 2 * ba).toFixed(1)),
-                    title: (-2 * ba).toFixed(1),
+                    price: fmtNum(a - 2 * ba),
+                    title: fmtNum(-2 * ba),
                 };
                 if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
                 //
                 point = "W";
                 changeOptions = {
-                    price: parseFloat((a - 4 * ba).toFixed(1)),
-                    title: (-4 * ba).toFixed(1),
+                    price: fmtNum(a - 4 * ba),
+                    title: fmtNum(-4 * ba),
                 };
                 if (lineOptions.point === point) delete changeOptions.price;
                 params.tools.target[point].applyOptions(changeOptions);
@@ -718,15 +721,15 @@ function eventPriceLineDrag(e) {
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat(x.toFixed(1)),
-                    title: "X " + parseFloat(X.toFixed(1)),
+                    price: fmtNum(x),
+                    title: `X ${fmtNum(X)}`,
                 };
                 params.tools.pattern.lines[point].applyOptions(changeOptions);
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat(y.toFixed(1)),
-                    title: "Y " + parseFloat(Y.toFixed(1)),
+                    price: fmtNum(y),
+                    title: `Y ${fmtNum(Y)}`,
                 };
                 params.tools.pattern.lines[point].applyOptions(changeOptions);
             }
@@ -1108,6 +1111,9 @@ function drawOrderTool(kinds) {
     };
     let color, title;
     kinds.forEach((kind) => {
+        const entryPrice = params.tools.order.entry.price;
+        const tpPrice = params.tools.order.tp.price;
+        const slPrice = params.tools.order.sl.price;
         switch (kind) {
             case "entry":
                 color = "yellow";
@@ -1115,21 +1121,11 @@ function drawOrderTool(kinds) {
                 break;
             case "tp":
                 color = "lime";
-                title = parseFloat(
-                    Math.abs(
-                        params.tools.order.tp.price -
-                            params.tools.order.entry.price
-                    ).toFixed(1)
-                );
+                title = fmtNum(tpPrice - entryPrice, 1, true);
                 break;
             case "sl":
                 color = "red";
-                title = parseFloat(
-                    Math.abs(
-                        params.tools.order.sl.price -
-                            params.tools.order.entry.price
-                    ).toFixed(1)
-                );
+                title = fmtNum(slPrice - entryPrice, 1, true);
                 break;
         }
         param.points.push(kind);
@@ -1266,10 +1262,10 @@ function leftScanPattern(data) {
         if (cmp(price, side, S.price)) S = { index, time, price };
         //
         if (C.index > A.index) {
-            const bc = Math.abs(B.price - C.price);
+            const bc = fmtNum(B.price - C.price, 1, true);
             if (bc >= 1.5) {
                 if (A.index - S.index > C.index - B.index) break;
-                const as = Math.abs(A.price - S.price);
+                const as = fmtNum(A.price - S.price, 1, true);
                 if (as > bc) break;
             }
         }
@@ -1385,15 +1381,15 @@ function drawPatternTool() {
                 //
                 point = "X";
                 changeOptions = {
-                    price: parseFloat(x.toFixed(1)),
-                    title: "X " + parseFloat(X.toFixed(1)),
+                    price: fmtNum(x),
+                    title: `X ${fmtNum(X)}`,
                 };
                 params.tools.pattern.lines[point].applyOptions(changeOptions);
                 //
                 point = "Y";
                 changeOptions = {
-                    price: parseFloat(y.toFixed(1)),
-                    title: "Y " + parseFloat(Y.toFixed(1)),
+                    price: fmtNum(y),
+                    title: `Y ${fmtNum(Y)}`,
                 };
                 params.tools.pattern.lines[point].applyOptions(changeOptions);
             } else {
@@ -1431,16 +1427,16 @@ function drawPatternTool() {
                     params.series.price.createPriceLine(option);
                 //
                 option.point = "Y";
-                option.price = parseFloat(y.toFixed(1));
-                option.title = "Y " + parseFloat(Y.toFixed(1));
+                option.price = fmtNum(y);
+                option.title = `Y ${fmtNum(Y)}`;
                 option.color = "#E91E63";
                 option.draggable = false;
                 params.tools.pattern.lines[option.point] =
                     params.series.price.createPriceLine(option);
                 //
                 option.point = "X";
-                option.price = parseFloat(x.toFixed(1));
-                option.title = "X " + parseFloat(X.toFixed(1));
+                option.price = fmtNum(x);
+                option.title = `X ${fmtNum(X)}`;
                 option.color = "#2196F3";
                 option.draggable = false;
                 params.tools.pattern.lines[option.point] =
@@ -1514,16 +1510,16 @@ function loadPatternTool() {
         params.series.price.createPriceLine(option);
     //
     option.point = "Y";
-    option.price = parseFloat(y.toFixed(1));
-    option.title = "Y " + parseFloat(Y.toFixed(1));
+    option.price = fmtNum(y);
+    option.title = `Y ${fmtNum(Y)}`;
     option.color = "#E91E63";
     option.draggable = false;
     params.tools.pattern.lines[option.point] =
         params.series.price.createPriceLine(option);
     //
     option.point = "X";
-    option.price = parseFloat(x.toFixed(1));
-    option.title = "X " + parseFloat(X.toFixed(1));
+    option.price = fmtNum(x);
+    option.title = `X ${fmtNum(X)}`;
     option.color = "#2196F3";
     option.draggable = false;
     params.tools.pattern.lines[option.point] =
@@ -1561,9 +1557,10 @@ function calculatePattern() {
     console.log("calculatePattern", [phase1, phase2, phase3]);
 
     //
-    const pr1Valid = +(Math.abs(bc) - phase1.pr).toFixed(1) >= 0;
-    const pr2Valid = +(Math.abs(C.price - phase3.xBox.R.price) - phase2.pr).toFixed(1) >= 0;
-    const pr3Valid = +(phase3.xBox.pr - phase3.pr).toFixed(1) >= 0;
+    const pr1Valid = fmtNum(bc, 1, true) >= phase1.pr;
+    const pr2Valid =
+        fmtNum(C.price - phase3.xBox.R.price, 1, true) >= phase2.pr;
+    const pr3Valid = fmtNum(phase3.xBox.pr) >= phase3.pr;
 
     const s1Valid = !cmp(C.price, !side, phase1.S1.price);
     const s2Valid = !cmp(phase3.xBox.R.price, side, phase2.S1.price);
@@ -1630,10 +1627,6 @@ function calculatePattern() {
     const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
     const pStatus = `${p1Status}${p2Status}${p3Status}`;
     //
-    const rEpr1 = parseFloat(phase1.rEpr.toFixed(1));
-    const rEpr2 = parseFloat(phase2.rEpr.toFixed(1));
-    const rEpr3 = parseFloat(phase3.rEpr.toFixed(1));
-    //
     const X = phase1.rEp;
     const x = adjustTargetPrice(B.price, X, side);
     const mainTR = phase3.breakIndexs[1] ?? T;
@@ -1644,7 +1637,17 @@ function calculatePattern() {
     return {
         progress,
         timeMark,
-        info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x, X, y, Y },
+        info: {
+            rEpr1: phase1.rEpr,
+            rEpr2: phase2.rEpr,
+            rEpr3: phase3.rEpr,
+            entry,
+            pStatus,
+            x,
+            X,
+            y,
+            Y,
+        },
     };
 }
 function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
@@ -1681,7 +1684,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 xBox = mf.cloneDeep(box);
             }
             if (cmp(price, side, box.R.price)) {
-                // const dis = Math.abs(box.R.price - maxBox.R.price);
+                // const dis = fmtNum(box.R.price - maxBox.R.price,1,true);
                 // if (
                 //     dis < 0.2 &&
                 //     cmp(box.S.price, !side, maxBox.R.price) &&
@@ -1722,7 +1725,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 if (cmp(price, !side, box.S.price)) {
                     box.S.time = time;
                     box.S.price = price;
-                    box.pr = Math.abs(box.S.price - box.R.price);
+                    box.pr = fmtNum(box.S.price - box.R.price, 1, true);
                 }
             }
             if (cmp(price, !side, S.price)) {
@@ -1736,8 +1739,8 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         S.index = timeToIndex(S.time);
         R.index = box.S.index;
         R.time = indexToTime(box.S.index);
-        rEp = Math.abs(R.price - maxBox.R.price);
-        sEp = Math.abs(S.price - maxBox.S.price);
+        rEp = fmtNum(R.price - maxBox.R.price, 1, true);
+        sEp = fmtNum(S.price - maxBox.S.price, 1, true);
         rEt = R.index - maxBox.S.index;
         if (phase === 3) xBox = box;
     }
@@ -1747,7 +1750,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         pr: maxBox.pr,
         rEp,
         sEp,
-        rEpr: maxBox.pr ? rEp / maxBox.pr : 0,
+        rEpr: maxBox.pr ? fmtNum(rEp / maxBox.pr) : 0,
         rEt,
         S1: maxBox.S,
         R1: maxBox.R,
@@ -1759,7 +1762,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
 }
 function adjustTargetPrice(price, range, side) {
     const target = price + (side ? 1 : -1) * range;
-    let decimal = parseFloat((target % 1).toFixed(1));
+    let decimal = fmtNum(target % 1);
 
     if (side) {
         if (decimal >= 0.1 && decimal <= 0.2) {
@@ -2108,36 +2111,36 @@ function drawTargetTool() {
         const a = +params.tools.target.A.options().price;
         const ba = price - a;
         option.point = "B";
-        option.title = parseFloat(ba.toFixed(1));
+        option.title = fmtNum(ba);
         option.color = "#F44336";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
         param.points.push(option.point);
         //
         option.point = "X";
-        option.price = parseFloat((a - 0.5 * ba).toFixed(1));
-        option.title = parseFloat((-0.5 * ba).toFixed(1));
+        option.price = fmtNum(a - 0.5 * ba);
+        option.title = fmtNum(-0.5 * ba);
         option.color = "#2196F3";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
         //
         option.point = "Y";
-        option.price = parseFloat((a - ba).toFixed(1));
-        option.title = parseFloat(-ba.toFixed(1));
+        option.price = fmtNum(a - ba);
+        option.title = fmtNum(-ba);
         option.color = "#673AB7";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
         //
         option.point = "Z";
-        option.price = parseFloat((a - 2 * ba).toFixed(1));
-        option.title = parseFloat((-2 * ba).toFixed(1));
+        option.price = fmtNum(a - 2 * ba);
+        option.title = fmtNum(-2 * ba);
         option.color = "#9C27B0";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
         //
         option.point = "W";
-        option.price = parseFloat((a - 4 * ba).toFixed(1));
-        option.title = parseFloat((-4 * ba).toFixed(1));
+        option.price = fmtNum(a - 4 * ba);
+        option.title = fmtNum(-4 * ba);
         option.color = "#E91E63";
         params.tools.target[option.point] =
             params.series.price.createPriceLine(option);
@@ -2174,35 +2177,35 @@ function loadTargetTool(points) {
     //
     option.point = "B";
     option.price = b;
-    option.title = parseFloat(ba.toFixed(1));
+    option.title = fmtNum(ba);
     option.color = "#F44336";
     params.tools.target[option.point] =
         params.series.price.createPriceLine(option);
     //
     option.point = "X";
-    option.price = parseFloat((a - 0.5 * ba).toFixed(1));
-    option.title = parseFloat((-0.5 * ba).toFixed(1));
+    option.price = fmtNum(a - 0.5 * ba);
+    option.title = fmtNum(-0.5 * ba);
     option.color = "#2196F3";
     params.tools.target[option.point] =
         params.series.price.createPriceLine(option);
     //
     option.point = "Y";
-    option.price = parseFloat((a - ba).toFixed(1));
-    option.title = parseFloat(-ba.toFixed(1));
+    option.price = fmtNum(a - ba);
+    option.title = fmtNum(-ba);
     option.color = "#673AB7";
     params.tools.target[option.point] =
         params.series.price.createPriceLine(option);
     //
     option.point = "Z";
-    option.price = parseFloat((a - 2 * ba).toFixed(1));
-    option.title = parseFloat((-2 * ba).toFixed(1));
+    option.price = fmtNum(a - 2 * ba);
+    option.title = fmtNum(-2 * ba);
     option.color = "#9C27B0";
     params.tools.target[option.point] =
         params.series.price.createPriceLine(option);
     //
     option.point = "W";
-    option.price = parseFloat((a - 4 * ba).toFixed(1));
-    option.title = parseFloat((-4 * ba).toFixed(1));
+    option.price = fmtNum(a - 4 * ba);
+    option.title = fmtNum(-4 * ba);
     option.color = "#E91E63";
     params.tools.target[option.point] =
         params.series.price.createPriceLine(option);
@@ -2554,13 +2557,6 @@ function inSession() {
         params.currentSeconds <= TIME.END
     );
 }
-function coordinateToPrice(y) {
-    return parseFloat(params.series.price.coordinateToPrice(y).toFixed(1));
-}
-function toastOrderError(error) {
-    if (!error) error = "unknown";
-    toast.error(t(`trading.derivative.${error}`));
-}
 function dateSelectChange() {
     if (!state.chartDate) return false;
     getChartData();
@@ -2622,6 +2618,18 @@ function getAccountInfo() {
         alert(html, t("trading.derivative.accountInfo"));
     });
 }
+function coordinateToPrice(y) {
+    return fmtNum(params.series.price.coordinateToPrice(y));
+}
+function fmtNum(price, digits = 1, abs = false) {
+    price = +price;
+    if (abs) price = Math.abs(price);
+    return parseFloat(price.toFixed(digits));
+}
+function toastOrderError(error) {
+    if (!error) error = "unknown";
+    toast.error(t(`trading.derivative.${error}`));
+}
 function cmp(value1, side, value2, eq = false) {
     if (side) return eq ? value1 >= value2 : value1 > value2;
     else return eq ? value1 <= value2 : value1 < value2;
@@ -2659,10 +2667,12 @@ function indexToTime(index) {
         height: 100vh;
         z-index: 1501;
     }
+
     .chart-wrapper {
         position: relative;
         height: 100%;
     }
+
     .area {
         position: absolute;
         display: flex;
@@ -2719,6 +2729,7 @@ function indexToTime(index) {
             }
         }
     }
+
     .command {
         width: 30px;
         height: 30px;
@@ -2739,30 +2750,39 @@ function indexToTime(index) {
         &:not(.noaction):hover {
             background: #2a2e39 !important;
         }
+
         &.noaction {
             cursor: unset !important;
         }
+
         &.green {
             color: lime;
         }
+
         &.red {
             color: red;
         }
+
         &.yellow {
             color: orange;
         }
+
         i {
             pointer-events: none;
+
             &.blink {
                 animation: blinker 0.5s linear infinite;
             }
+
             @keyframes blinker {
                 0% {
                     opacity: 1;
                 }
+
                 50% {
                     opacity: 0;
                 }
+
                 100% {
                     opacity: 1;
                 }
