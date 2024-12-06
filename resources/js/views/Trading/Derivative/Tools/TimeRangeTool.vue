@@ -1,0 +1,123 @@
+<template>
+    <div
+        ref="timeRangeToolRef"
+        class="command"
+        :title="$t('trading.derivative.timeRangeTool')"
+        @click="timeRangeToolClick"
+        @contextmenu="timeRangeToolContextmenu"
+    >
+        <i class="far fa-grip-lines-vertical"></i>
+    </div>
+</template>
+<script setup>
+import { ref, inject } from "vue";
+import { useStore } from "vuex";
+
+const store = useStore();
+const mf = inject("mf");
+const props = defineProps(["timeRangeSeries", "timeToIndex", "indexToTime"]);
+const emit = defineEmits(["hideContext"]);
+const timeRangeToolRef = ref(null);
+let timeRanges = [];
+
+defineExpose({
+    isSelected,
+    draw,
+    load,
+});
+function isSelected() {
+    return timeRangeToolRef.value.classList.contains("selected");
+}
+function timeRangeToolClick(e) {
+    emit("hideContext");
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        e.target.classList.add("selected");
+    }
+}
+function timeRangeToolContextmenu(e) {
+    removeTimeRangeTool();
+    e.target.classList.remove("selected");
+}
+function draw({ time }) {
+    let param = {
+        isRemove: false,
+        name: "tr",
+        points: [],
+        data: [],
+    };
+    let option = { time, value: 1 };
+    switch (timeRanges.length) {
+        case 0:
+            option.color = "OrangeRed";
+            timeRanges[0] = option;
+            param.points.push(0);
+            param.data.push(time);
+            break;
+        case 1:
+            option.color = "lime";
+            timeRanges[1] = option;
+            param.points.push(1);
+            param.data.push(time);
+            timeRangeToolRef.value.classList.remove("selected");
+            break;
+        default:
+            const index0 = props.timeToIndex(timeRanges[0].time);
+            const index1 = props.timeToIndex(timeRanges[1].time);
+            const index2 = props.timeToIndex(time);
+            const index3 = index2 + (index1 - index0);
+            const time3 = props.indexToTime(index3);
+
+            option.color = "OrangeRed";
+            timeRanges[0] = mf.cloneDeep(option);
+            param.points.push(0);
+            param.data.push(time);
+            //
+            option.time = time3;
+            option.color = "lime";
+            timeRanges[1] = option;
+            param.points.push(1);
+            param.data.push(time3);
+            timeRangeToolRef.value.classList.remove("selected");
+            break;
+    }
+    props.timeRangeSeries.setData(timeRanges);
+    store.dispatch("tradingDerivative/drawTools", param);
+}
+function load(data) {
+    removeTimeRangeTool(false);
+    loadTimeRangeTool(data);
+}
+function loadTimeRangeTool(data) {
+    let start, end;
+    if (data.length === 2) {
+        start = data[0];
+        end = data[1];
+    } else if (data.length === 3) {
+        const index0 = props.timeToIndex(data[0]);
+        const index1 = props.timeToIndex(data[1]);
+        const index2 = props.timeToIndex(data[2]);
+        const index3 = index2 + (index1 - index0);
+        start = data[2];
+        end = props.indexToTime(index3);
+    } else return false;
+    let timeRange = [
+        { time: start, value: 1, color: "OrangeRed" },
+        { time: end, value: 1, color: "lime" },
+    ];
+    timeRanges = timeRange;
+    props.timeRangeSeries.setData(timeRange);
+}
+function removeTimeRangeTool(withServer = true) {
+    if (withServer)
+        store.dispatch("tradingDerivative/drawTools", {
+            isRemove: true,
+            name: "tr",
+        });
+    props.timeRangeSeries.setData([]);
+    timeRanges = [];
+}
+</script>

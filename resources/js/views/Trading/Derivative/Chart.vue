@@ -68,127 +68,60 @@
                 @click="toolAreaClick"
                 @contextmenu="toolAreaContextmenu"
             >
-                <div
-                    ref="fullscreenToolRef"
-                    class="command"
-                    :title="$t('trading.derivative.fullscreen')"
-                    @click="toggleFullscreen"
-                >
-                    <i
-                        class="far"
-                        :class="{
-                            'fa-compress': state.isFullscreen,
-                            'fa-expand': !state.isFullscreen,
-                        }"
-                    ></i>
-                </div>
+                <FullscreenTool :chartContainerRef="chartContainerRef" />
                 <div
                     ref="tradingviewRef"
                     class="command far fa-chart-candlestick"
                     :title="$t('trading.derivative.tradingview')"
                     @click="tradingviewClick"
                 ></div>
-                <div
-                    class="context command"
-                    :class="{
-                        green: state.progress.result === true,
-                        red: state.progress.result === false,
-                    }"
-                    :title="$t('trading.derivative.progressTool')"
-                    @click="progressToolClick"
-                    @contextmenu="progressToolContextMenu"
-                >
-                    <i
-                        class="far"
-                        :class="{
-                            'fa-badge-check': !state.progress.step,
-                            [`fa-circle-${state.progress.step}`]:
-                                state.progress.step,
-                            blink: config.autoRefresh,
-                        }"
-                    >
-                    </i>
-                    <ProgressContext
-                        v-show="state.showProgressContext"
-                        class="contextmenu"
-                        :progress="state.progress"
-                    >
-                    </ProgressContext>
-                </div>
-                <div
+                <ProgressTool
+                    ref="progressToolRef"
+                    @refreshPattern="refreshPattern"
+                    @hideContext="hideContext"
+                />
+                <ScanTool
                     ref="scanToolRef"
-                    class="context command"
-                    :title="$t('trading.derivative.scanTool')"
-                    @click="scanToolClick"
-                    @contextmenu="scanToolContextMenu"
-                >
-                    <i
-                        class="far"
-                        :class="{
-                            [`fa-angles-${state.scanSide}`]: true,
-                        }"
-                    ></i>
-                    <ScanContext
-                        v-show="state.showScanContext"
-                        class="contextmenu"
-                        v-model="state.scanSide"
-                    >
-                    </ScanContext>
-                </div>
-                <div
+                    :prices="state.data.price"
+                    :timeToIndex="timeToIndex"
+                    @scaned="scaned"
+                    @removePattern="() => patternToolRef.remove()"
+                    @hideContext="hideContext"
+                />
+                <PatternTool
                     ref="patternToolRef"
-                    class="command"
-                    :title="$t('trading.derivative.patternTool')"
-                    @click="patternToolClick"
-                    @contextmenu="patternToolContextmenu"
-                >
-                    <i class="far fa-heart-rate"></i>
-                </div>
-                <div
+                    :prices="state.data.price"
+                    :priceSeries="state.series.price"
+                    :timeMarkSeries="state.series.timeMark"
+                    :pickTimeToolRef="pickTimeToolRef"
+                    :timeToIndex="timeToIndex"
+                    :indexToTime="indexToTime"
+                    @setProgress="setProgress"
+                    @hideContext="hideContext"
+                />
+                <PickTimeTool
                     ref="pickTimeToolRef"
-                    class="command"
-                    :title="$t('trading.derivative.pickTimeTool')"
-                    @click="pickTimeToolClick"
-                    @contextmenu="pickTimeToolContextmenu"
-                >
-                    <i class="far fa-pipe"></i>
-                </div>
-                <div
+                    :pickTimeSeries="state.series.pickTime"
+                    @refreshPattern="refreshPattern"
+                    @hideContext="hideContext"
+                />
+                <LineTool
                     ref="lineToolRef"
-                    class="context command"
-                    :title="$t('trading.derivative.lineTool')"
-                    @click="lineToolClick"
-                    @contextmenu="lineToolContextmenu"
-                >
-                    <i class="far fa-horizontal-rule"></i>
-                    <LineContext
-                        v-show="state.showLineContext"
-                        class="contextmenu"
-                        :enable="state.showLineContext"
-                        v-model:title="state.lineTitle"
-                        v-model:color="state.lineColor"
-                        @deleteAllLine="removeLineTool"
-                    >
-                    </LineContext>
-                </div>
-                <div
+                    :priceSeries="state.series.price"
+                    @hideContext="hideContext"
+                />
+                <TimeRangeTool
                     ref="timeRangeToolRef"
-                    class="command"
-                    :title="$t('trading.derivative.timeRangeTool')"
-                    @click="timeRangeToolClick"
-                    @contextmenu="timeRangeToolContextmenu"
-                >
-                    <i class="far fa-grip-lines-vertical"></i>
-                </div>
-                <div
+                    :timeRangeSeries="state.series.timeRange"
+                    :timeToIndex="timeToIndex"
+                    :indexToTime="indexToTime"
+                    @hideContext="hideContext"
+                />
+                <TargetTool
                     ref="targetToolRef"
-                    class="command"
-                    :title="$t('trading.derivative.targetTool')"
-                    @click="targetToolClick"
-                    @contextmenu="targetToolContextmenu"
-                >
-                    <i class="far fa-line-height"> </i>
-                </div>
+                    :priceSeries="state.series.price"
+                    @hideContext="hideContext"
+                />
                 <div
                     v-show="showCancelOrder"
                     ref="cancelOrderRef"
@@ -235,9 +168,15 @@
 </template>
 
 <script setup>
-import LineContext from "./LineContext.vue";
-import ScanContext from "./ScanContext.vue";
-import ProgressContext from "./ProgressContext.vue";
+import FullscreenTool from "./Tools/FullscreenTool.vue";
+import ProgressTool from "./Tools/ProgressTool.vue";
+import ScanTool from "./Tools/ScanTool.vue";
+import PatternTool from "./Tools/PatternTool.vue";
+import PickTimeTool from "./Tools/PickTimeTool.vue";
+import LineTool from "./Tools/LineTool.vue";
+import TimeRangeTool from "./Tools/TimeRangeTool.vue";
+import TargetTool from "./Tools/TargetTool.vue";
+
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
 import { confirm } from "devextreme/ui/dialog";
@@ -317,6 +256,7 @@ const fullscreenToolRef = ref(null);
 const tradingviewChartRef = ref(null);
 const reloadToolRef = ref(null);
 const tradingviewRef = ref(null);
+const progressToolRef = ref(null);
 const lineToolRef = ref(null);
 const patternToolRef = ref(null);
 const pickTimeToolRef = ref(null);
@@ -347,6 +287,11 @@ let params = {
 initToolsParams();
 //
 const state = reactive({
+    data: {
+        whitespace: [],
+        price: [],
+    },
+    series: {},
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: format(new Date(), "HH:mm:ss"),
     isFullscreen: false,
@@ -397,31 +342,31 @@ onMounted(() => {
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    params.series.timeRange = params.chart.addHistogramSeries({
+    state.series.timeRange = params.chart.addHistogramSeries({
         priceScaleId: "timeRange",
         scaleMargins: { top: 0, bottom: 0 },
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    params.series.pickTime = params.chart.addHistogramSeries({
+    state.series.pickTime = params.chart.addHistogramSeries({
         priceScaleId: "pickTime",
         scaleMargins: { top: 0, bottom: 0 },
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    params.series.timeMark = params.chart.addHistogramSeries({
+    state.series.timeMark = params.chart.addHistogramSeries({
         priceScaleId: "timeMark",
         scaleMargins: { top: 0, bottom: 0 },
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    params.series.price = params.chart.addLineSeries({
+    state.series.price = params.chart.addLineSeries({
         color: "#F5F5F5",
         priceFormat: { minMove: 0.1 },
     });
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
-    document.addEventListener("fullscreenchange", eventFullscreenChange);
+    // document.addEventListener("fullscreenchange", eventFullscreenChange);
 });
 onUnmounted(() => {
     if (params.chart) {
@@ -429,7 +374,7 @@ onUnmounted(() => {
         params.chart = null;
     }
     document.removeEventListener("keydown", eventKeyPress);
-    document.removeEventListener("fullscreenchange", eventFullscreenChange);
+    // document.removeEventListener("fullscreenchange", eventFullscreenChange);
     clearInterval(params.interval);
     clearInterval(params.interval60);
     closeSocket();
@@ -445,20 +390,29 @@ watch(
 );
 
 function eventChartClick(e) {
-    state.showProgressContext = false;
-    state.showScanContext = false;
-    state.showLineContext = false;
+    hideContext();
     toggleOrderButton(false);
-    if (lineToolRef.value.classList.contains("selected")) drawLineTool();
-    else if (targetToolRef.value.classList.contains("selected"))
-        drawTargetTool();
-    else if (timeRangeToolRef.value.classList.contains("selected"))
-        drawTimeRangeTool();
-    else if (scanToolRef.value.classList.contains("selected")) drawScanTool();
-    else if (patternToolRef.value.classList.contains("selected"))
-        drawPatternTool();
-    else if (pickTimeToolRef.value.classList.contains("selected"))
-        drawPickTimeTool();
+
+    if (scanToolRef.value.isSelected()) {
+        scanToolRef.value.draw({ time: params.crosshair.time });
+    } else if (patternToolRef.value.isSelected()) {
+        patternToolRef.value.draw({
+            time: params.crosshair.time,
+            price: coordinateToPrice(params.crosshair.y),
+        });
+    } else if (pickTimeToolRef.value.isSelected()) {
+        pickTimeToolRef.value.draw({ time: params.crosshair.time });
+    } else if (lineToolRef.value.isSelected()) {
+        lineToolRef.value.draw({
+            price: coordinateToPrice(params.crosshair.y),
+        });
+    } else if (timeRangeToolRef.value.isSelected()) {
+        timeRangeToolRef.value.draw({ time: params.crosshair.time });
+    } else if (targetToolRef.value.isSelected()) {
+        targetToolRef.value.draw({
+            price: coordinateToPrice(params.crosshair.y),
+        });
+    }
 }
 function eventChartContextmenu(e) {
     toggleOrderButton(true);
@@ -473,7 +427,7 @@ function toolAreaContextmenu(e) {
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
-        let price = e.seriesPrices.get(params.series.price);
+        let price = e.seriesPrices.get(state.series.price);
         params.crosshair.time = e.time;
         params.crosshair.price = price;
     } else {
@@ -490,7 +444,7 @@ function eventChartCrosshairMove(e) {
 function eventPriceLineDrag(e) {
     let line = e.customPriceLine;
     let lineOptions = line.options();
-    lineOptions.price = fmtNum(lineOptions.price);
+    lineOptions.price = mf.fmtNum(lineOptions.price);
     const oldPrice = +e.fromPriceString;
     const newPrice = lineOptions.price;
     switch (lineOptions.lineType) {
@@ -581,158 +535,13 @@ function eventPriceLineDrag(e) {
             }
             break;
         case "line":
-            store.dispatch("tradingDerivative/drawTools", {
-                isRemove: true,
-                name: "line",
-                point: oldPrice,
-            });
-            const color = lineOptions.color;
-            const title = lineOptions.title;
-            store.dispatch("tradingDerivative/drawTools", {
-                isRemove: false,
-                name: "line",
-                points: [newPrice],
-                data: [{ color, title }],
-            });
-            lineToolRef.value.classList.remove("selected");
+            lineToolRef.value.drag({ lineOptions, oldPrice, newPrice });
             break;
         case "target":
-            if (mf.isSet(params.tools.target.B)) {
-                let param = {
-                    isRemove: false,
-                    name: "target",
-                    points: [],
-                    data: [],
-                };
-                let point, changeOptions;
-                let a = +params.tools.target.A.options().price;
-                let b = +params.tools.target.B.options().price;
-                let ba = b - a;
-                //
-                point = "A";
-                if (lineOptions.point === "A") {
-                    ba = +params.tools.target.B.options().title;
-                    b = a + ba;
-                } else if (lineOptions.point !== "B") {
-                    let div = 0;
-                    switch (lineOptions.point) {
-                        case "X":
-                            div = 1.5;
-                            break;
-                        case "Y":
-                            div = 2;
-                            break;
-                        case "Z":
-                            div = 3;
-                            break;
-                        case "W":
-                            div = 5;
-                            break;
-                    }
-                    ba = fmtNum((b - newPrice) / div);
-                    a = b - ba;
-                    changeOptions = { price: a };
-                    params.tools.target[point].applyOptions(changeOptions);
-                }
-                param.points.push(point);
-                param.data.push(a);
-                //
-                point = "B";
-                changeOptions = { price: b, title: fmtNum(ba) };
-                if (lineOptions.point === point) delete changeOptions.price;
-                params.tools.target[point].applyOptions(changeOptions);
-                param.points.push(point);
-                param.data.push(b);
-                //
-                point = "X";
-                changeOptions = {
-                    price: fmtNum(a - 0.5 * ba),
-                    title: fmtNum(-0.5 * ba),
-                };
-                if (lineOptions.point === point) delete changeOptions.price;
-                params.tools.target[point].applyOptions(changeOptions);
-                //
-                point = "Y";
-                changeOptions = {
-                    price: fmtNum(a - ba),
-                    title: fmtNum(-ba),
-                };
-                if (lineOptions.point === point) delete changeOptions.price;
-                params.tools.target[point].applyOptions(changeOptions);
-                //
-                point = "Z";
-                changeOptions = {
-                    price: fmtNum(a - 2 * ba),
-                    title: fmtNum(-2 * ba),
-                };
-                if (lineOptions.point === point) delete changeOptions.price;
-                params.tools.target[point].applyOptions(changeOptions);
-                //
-                point = "W";
-                changeOptions = {
-                    price: fmtNum(a - 4 * ba),
-                    title: fmtNum(-4 * ba),
-                };
-                if (lineOptions.point === point) delete changeOptions.price;
-                params.tools.target[point].applyOptions(changeOptions);
-                //
-                store.dispatch("tradingDerivative/drawTools", param);
-            }
+            targetToolRef.value.drag({ lineOptions, newPrice });
             break;
         case "pattern":
-            if (mf.isSet(params.tools.pattern.lines.B)) {
-                let point, changeOptions;
-                params.tools.pattern.points = {
-                    A: {
-                        time: params.tools.pattern.points.A.time,
-                        price: +params.tools.pattern.lines.A.options().price,
-                    },
-                    B: { price: +params.tools.pattern.lines.B.options().price },
-                    C: { price: +params.tools.pattern.lines.C.options().price },
-                };
-                savePattern();
-                const {
-                    progress,
-                    timeMark,
-                    info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x, X, y, Y },
-                } = calculatePattern();
-                setProgress(progress);
-                setTimeMark(timeMark);
-                //
-                point = "A";
-                changeOptions = { title: `A ${rEpr1}` };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "B";
-                changeOptions = { title: `B ${rEpr2}` };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "C";
-                changeOptions = { title: `C ${rEpr3}` };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "D";
-                changeOptions = {
-                    price: entry,
-                    title: "Entry " + pStatus,
-                };
-                if (lineOptions.point === point) delete changeOptions.price;
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "X";
-                changeOptions = {
-                    price: fmtNum(x),
-                    title: `X ${fmtNum(X)}`,
-                };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "Y";
-                changeOptions = {
-                    price: fmtNum(y),
-                    title: `Y ${fmtNum(Y)}`,
-                };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-            }
+            patternToolRef.value.drag({ lineOptions });
             break;
     }
 }
@@ -790,37 +599,6 @@ function eventKeyPress(e) {
         }
     }
 }
-function eventFullscreenChange() {
-    if (!!chartContainerRef.value) {
-        if (document.fullscreenElement) {
-            state.isFullscreen = true;
-            chartContainerRef.value.classList.add("fullscreen");
-            document.querySelector(
-                ".dx-drawer-panel-content"
-            ).style.visibility = "hidden";
-            document.querySelector(".header-component").style.visibility =
-                "hidden";
-            document.querySelector(".sc-launcher").style.visibility = "hidden";
-            document.querySelector(".dx-drawer-content").style.transform =
-                "unset";
-        } else {
-            state.isFullscreen = false;
-            chartContainerRef.value.classList.remove("fullscreen");
-            document.querySelector(
-                ".dx-drawer-panel-content"
-            ).style.visibility = "unset";
-            document.querySelector(".header-component").style.visibility =
-                "unset";
-            document.querySelector(".sc-launcher").style.visibility = "unset";
-            document.querySelector(".dx-drawer-content").style.transform =
-                "translate(0px, 0px)";
-        }
-    }
-}
-function toggleFullscreen() {
-    if (document.fullscreenElement) document.exitFullscreen();
-    else document.documentElement.requestFullscreen();
-}
 function loadChartData(chartData) {
     if (!(state.chartDate === CURRENT_DATE && inSession())) {
         if (chartData.price.length > 0) {
@@ -828,11 +606,13 @@ function loadChartData(chartData) {
                 params.data.whitespace,
                 createWhitespaceData(state.chartDate)
             );
+            state.data.whitespace = params.data.whitespace;
         }
         params.series.whitespace.setData(params.data.whitespace);
 
         params.data.price = mergeChartData(params.data.price, chartData.price);
-        params.series.price.setData(params.data.price);
+        state.data.price = params.data.price;
+        state.series.price.setData(params.data.price);
     }
 }
 function updateChartData(data, source = null) {
@@ -851,10 +631,12 @@ function updateChartData(data, source = null) {
     });
     if (prices.length > 1) {
         params.data.price = mergeChartData(params.data.price, prices);
-        params.series.price.setData(params.data.price);
+        state.data.price = params.data.price;
+        state.series.price.setData(params.data.price);
     } else {
         params.data.price.push(prices[0]);
-        params.series.price.update(prices[0]);
+        state.data.price = params.data.price;
+        state.series.price.update(prices[0]);
     }
 }
 function createWhitespaceData(date) {
@@ -890,21 +672,20 @@ function loadToolsData(toolsData) {
                 break;
             case "pattern":
                 if (checkPatternPointsValid(points)) {
-                    params.tools.pattern.points = mf.cloneDeep(points);
-                    loadPatternTool();
+                    patternToolRef.value.load(mf.cloneDeep(points));
                 }
                 break;
             case "tr":
-                loadTimeRangeTool(points);
+                timeRangeToolRef.value.load(points);
                 break;
             case "0_pt":
-                loadPickTimeTool(points[0]);
+                pickTimeToolRef.value.load(points[0]);
                 break;
             case "line":
-                loadLineTool(points);
+                lineToolRef.value.load(points);
                 break;
             case "target":
-                loadTargetTool(points);
+                targetToolRef.value.load(points);
                 break;
         }
     });
@@ -995,6 +776,7 @@ function configFireAntSocket() {
                         params.data.whitespace,
                         createWhitespaceData(CURRENT_DATE)
                     );
+                    state.data.whitespace = params.data.whitespace;
                     params.series.whitespace.setData(params.data.whitespace);
                     updateChartData(item.result);
                 }
@@ -1121,11 +903,11 @@ function drawOrderTool(kinds) {
                 break;
             case "tp":
                 color = "lime";
-                title = fmtNum(tpPrice - entryPrice, 1, true);
+                title = mf.fmtNum(tpPrice - entryPrice, 1, true);
                 break;
             case "sl":
                 color = "red";
-                title = fmtNum(slPrice - entryPrice, 1, true);
+                title = mf.fmtNum(slPrice - entryPrice, 1, true);
                 break;
         }
         param.points.push(kind);
@@ -1148,7 +930,7 @@ function drawOrderTool(kinds) {
                 draggable: true,
             };
             params.tools.order[kind].line =
-                params.series.price.createPriceLine(options);
+                state.series.price.createPriceLine(options);
             param.data.push(options);
         }
     });
@@ -1159,7 +941,7 @@ function loadOrderTool(kinds) {
         params.tools.order.side = option.side;
         params.tools.order[kind].price = option.price;
         params.tools.order[kind].line =
-            params.series.price.createPriceLine(option);
+            state.series.price.createPriceLine(option);
     });
 }
 function removeOrderTool(kinds, withServer = true) {
@@ -1170,7 +952,7 @@ function removeOrderTool(kinds, withServer = true) {
         });
     kinds.forEach((kind) => {
         if (mf.isSet(params.tools.order[kind].line)) {
-            params.series.price.removePriceLine(params.tools.order[kind].line);
+            state.series.price.removePriceLine(params.tools.order[kind].line);
             delete params.tools.order[kind].line;
         }
     });
@@ -1179,1061 +961,26 @@ function tradingviewClick(e) {
     state.showTradingView = !state.showTradingView;
     e.stopPropagation();
 }
-function progressToolClick() {
-    state.showProgressContext = !state.showProgressContext;
-    state.showScanContext = false;
-    state.showLineContext = false;
-    if (state.showProgressContext) refreshPatternTool();
+function refreshPattern() {
+    patternToolRef.value.refresh();
 }
-function progressToolContextMenu() {
-    toggleAutoRefresh();
+function scaned(points) {
+    console.log("scaned", points);
+    patternToolRef.value.load(points, true);
 }
-function toggleAutoRefresh(status) {
-    const autoRefresh = status ?? !config.value.autoRefresh;
-    store.dispatch("tradingDerivative/setAutoRefresh", autoRefresh);
-}
-function scanToolClick(e) {
-    state.showProgressContext = false;
-    state.showScanContext = false;
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        savePattern(true);
-        removePickTimeTool();
-        removePatternTool();
-        e.target.classList.add("selected");
-    }
-}
-function scanToolContextMenu() {
-    state.showScanContext = !state.showScanContext;
-    state.showProgressContext = false;
-    state.showLineContext = false;
-}
-function drawScanTool() {
-    const leftSide = state.scanSide === "left";
-    const data = params.crosshair.time
-        ? params.data.price.filter(
-              (item) => !cmp(item.time, leftSide, params.crosshair.time)
-          )
-        : params.data.price;
-    let points = leftSide ? leftScanPattern(data) : rightScanPattern(data);
-    if (mf.isSet(points)) {
-        params.tools.pattern.points = removeIndex(points);
-        savePattern();
-        removePickTimeTool();
-        removePatternTool();
-        loadPatternTool();
-    }
-    scanToolRef.value.classList.remove("selected");
-}
-function leftScanPattern(data) {
-    let side;
-    let [A, B, C, S] = Array(4).fill({});
-    for (let i = data.length - 1; i >= 0; i--) {
-        const price = data[i].value;
-        const time = data[i].time;
-        const index = timeToIndex(time);
-        if (index === -1) break;
-        if (i === data.length - 1) {
-            C = { index, time, price };
-            [B, A, S] = Array(3)
-                .fill(null)
-                .map(() => mf.cloneDeep(C));
-        }
-        if (side === undefined) {
-            if (price === C.price) continue;
-            side = price > C.price;
-        }
-        if (cmp(price, side, B.price)) {
-            if (cmp(A.price, !side, C.price)) {
-                [C, B] = [B, A].map((item) => mf.cloneDeep(item));
-                A = { index, time, price };
-                S = mf.cloneDeep(A);
-                side = !side;
-            } else B = { index, time, price };
-        }
-        if (cmp(price, !side, A.price)) {
-            A = { index, time, price };
-            S = mf.cloneDeep(A);
-        } else S.index = index;
-        if (cmp(price, side, S.price)) S = { index, time, price };
-        //
-        if (C.index > A.index) {
-            const bc = fmtNum(B.price - C.price, 1, true);
-            if (bc >= 1.5) {
-                if (A.index - S.index > C.index - B.index) break;
-                const as = fmtNum(A.price - S.price, 1, true);
-                if (as > bc) break;
-            }
-        }
-    }
-    return { A, B, C };
-}
-function rightScanPattern(data) {
-    let side;
-    let [A, B, C] = Array(3).fill({});
-    for (let i = 0; i < data.length; i++) {
-        const price = data[i].value;
-        const time = data[i].time;
-        const index = timeToIndex(time);
-        if (index === -1) break;
-        if (i === 0) {
-            A = { index, time, price };
-            B = mf.cloneDeep(A);
-            C = mf.cloneDeep(A);
-        }
-        if (side === undefined) {
-            if (price === A.price) continue;
-            side = price > A.price;
-        }
-        if (cmp(price, side, B.price)) {
-            B = { index, time, price };
-            C = mf.cloneDeep(B);
-        }
-        if (cmp(B.price, side, A.price) && cmp(price, !side, C.price)) {
-            if (!cmp(price, side, A.price)) {
-                A = mf.cloneDeep(B);
-                B = { index, time, price };
-                C = mf.cloneDeep(B);
-                side = !side;
-            } else C = { index, time, price };
-        }
-    }
-    return { A, B, C };
-}
-function removeIndex(obj) {
-    const result = {};
-    Object.entries(obj).forEach(([key, value]) => {
-        const { index, ...rest } = value;
-        result[key] = rest;
-    });
-    return result;
-}
-function patternToolClick(e) {
-    state.showProgressContext = false;
-    state.showScanContext = false;
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        removePickTimeTool();
-        e.target.classList.add("selected");
-    }
-}
-function patternToolContextmenu(e) {
-    e.target.classList.remove("selected");
-    savePattern(true);
-    removePickTimeTool();
-    removePatternTool();
-}
-function drawPatternTool() {
-    const TYPE = "pattern";
-    const price = coordinateToPrice(params.crosshair.y);
-    const time = params.crosshair.time;
-    let option = {
-        lineType: TYPE,
-        price,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: true,
-    };
-    if (mf.isSet(params.tools.pattern.lines.A)) {
-        if (mf.isSet(params.tools.pattern.lines.B)) {
-            let _timeMark, _progress;
-
-            if (mf.isSet(params.tools.pattern.lines.C)) {
-                let point, changeOptions;
-
-                params.tools.pattern.points.A = { time, price };
-                const {
-                    progress,
-                    timeMark,
-                    info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x, X, y, Y },
-                } = calculatePattern();
-                _progress = progress;
-                _timeMark = timeMark;
-                //
-                point = "A";
-                changeOptions = {
-                    price,
-                    title: `A ${rEpr1}`,
-                };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "B";
-                changeOptions = {
-                    title: `B ${rEpr2}`,
-                };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "C";
-                changeOptions = { title: `C ${rEpr3}` };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "D";
-                changeOptions = { price: entry, title: "Entry " + pStatus };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "X";
-                changeOptions = {
-                    price: fmtNum(x),
-                    title: `X ${fmtNum(X)}`,
-                };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-                //
-                point = "Y";
-                changeOptions = {
-                    price: fmtNum(y),
-                    title: `Y ${fmtNum(Y)}`,
-                };
-                params.tools.pattern.lines[point].applyOptions(changeOptions);
-            } else {
-                params.tools.pattern.points.C = { price };
-                const {
-                    progress,
-                    timeMark,
-                    info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x, X, y, Y },
-                } = calculatePattern();
-                _progress = progress;
-                _timeMark = timeMark;
-                //
-                let point = "A";
-                params.tools.pattern.lines[point].applyOptions({
-                    title: `A ${rEpr1}`,
-                });
-                //
-                point = "B";
-                params.tools.pattern.lines[point].applyOptions({
-                    title: `B ${rEpr2}`,
-                });
-                //
-                option.point = "C";
-                option.title = `C ${rEpr3}`;
-                option.color = "#FFEB3B";
-                params.tools.pattern.lines[option.point] =
-                    params.series.price.createPriceLine(option);
-                //
-                option.point = "D";
-                option.price = entry;
-                option.title = "Entry " + pStatus;
-                option.color = "#9C27B0";
-                option.draggable = false;
-                params.tools.pattern.lines[option.point] =
-                    params.series.price.createPriceLine(option);
-                //
-                option.point = "Y";
-                option.price = fmtNum(y);
-                option.title = `Y ${fmtNum(Y)}`;
-                option.color = "#E91E63";
-                option.draggable = false;
-                params.tools.pattern.lines[option.point] =
-                    params.series.price.createPriceLine(option);
-                //
-                option.point = "X";
-                option.price = fmtNum(x);
-                option.title = `X ${fmtNum(X)}`;
-                option.color = "#2196F3";
-                option.draggable = false;
-                params.tools.pattern.lines[option.point] =
-                    params.series.price.createPriceLine(option);
-            }
-            setProgress(_progress);
-            setTimeMark(_timeMark);
-            patternToolRef.value.classList.remove("selected");
-        } else {
-            option.point = "B";
-            option.title = "B 0";
-            option.color = "#4CAF50";
-            params.tools.pattern.lines[option.point] =
-                params.series.price.createPriceLine(option);
-            params.tools.pattern.points.B = { price };
-        }
-    } else {
-        option.point = "A";
-        option.title = "A 0";
-        option.color = "#F44336";
-        params.tools.pattern.lines[option.point] =
-            params.series.price.createPriceLine(option);
-        params.tools.pattern.points = { A: { time, price } };
-    }
-    savePattern();
-}
-function loadPatternTool() {
-    const TYPE = "pattern";
-    let option = {
-        lineType: TYPE,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: true,
-    };
-    const { A, B, C } = params.tools.pattern.points;
-    const {
-        progress,
-        timeMark,
-        info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x, X, y, Y },
-    } = calculatePattern();
-    setProgress(progress);
-    setTimeMark(timeMark);
-    //
-    option.point = "A";
-    option.title = `A ${rEpr1}`;
-    option.color = "#F44336";
-    option.price = A.price;
-    params.tools.pattern.lines[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "B";
-    option.title = `B ${rEpr2}`;
-    option.color = "#4CAF50";
-    option.price = B.price;
-    params.tools.pattern.lines[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "C";
-    option.price = C.price;
-    option.title = `C ${rEpr3}`;
-    option.color = "#FFEB3B";
-    params.tools.pattern.lines[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "D";
-    option.price = entry;
-    option.title = "Entry " + pStatus;
-    option.color = "#9C27B0";
-    option.draggable = false;
-    params.tools.pattern.lines[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "Y";
-    option.price = fmtNum(y);
-    option.title = `Y ${fmtNum(Y)}`;
-    option.color = "#E91E63";
-    option.draggable = false;
-    params.tools.pattern.lines[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "X";
-    option.price = fmtNum(x);
-    option.title = `X ${fmtNum(X)}`;
-    option.color = "#2196F3";
-    option.draggable = false;
-    params.tools.pattern.lines[option.point] =
-        params.series.price.createPriceLine(option);
-}
-function refreshPatternTool(autoAdjust = false) {
-    if (mf.isSet(params.tools.pattern.lines.C)) {
-        if (autoAdjust) adjustPatternPoints();
-        removePatternTool();
-        loadPatternTool();
-    }
+function hideContext() {
+    progressToolRef.value.hide();
+    scanToolRef.value.hide();
+    lineToolRef.value.hide();
 }
 function checkPatternPointsValid({ A: { time } }) {
     return params.data.whitespace.some((item) => item.time === time);
 }
-function calculatePattern() {
-    const { A, B, C } = params.tools.pattern.points;
-    const bc = B.price - C.price;
-    const side = bc > 0;
-    const phase1 = scanPhase({
-        phase: 1,
-        start: A,
-        end: B,
-        retracementPrice: C.price,
-    });
-    let phase2 = scanPhase({ phase: 2, start: phase1.R, end: C });
-    const phase3 = scanPhase({
-        phase: 3,
-        start: phase2.R,
-        end: { price: B.price + (side ? 1 : -1) * phase1.rEp },
-        breakPrices: [phase2.S1.price, B.price],
-    });
-    if (phase1.xBox.tr >= phase2.tr) phase2.tr = phase1.xBox.tr;
-
-    console.log("calculatePattern", [phase1, phase2, phase3]);
-
-    //
-    const pr1Valid = fmtNum(bc, 1, true) >= phase1.pr;
-    const pr2Valid =
-        fmtNum(C.price - phase3.xBox.R.price, 1, true) >= phase2.pr;
-    const pr3Valid = fmtNum(phase3.xBox.pr) >= phase3.pr;
-
-    const s1Valid = !cmp(C.price, !side, phase1.S1.price);
-    const s2Valid = !cmp(phase3.xBox.R.price, side, phase2.S1.price);
-    const s3Valid = !cmp(phase3.xBox.S.price, !side, phase3.S1.price);
-
-    const T1 = phase1.R.index + phase1.tr;
-    const T2 = phase2.R.index + phase2.tr;
-    const T3 = phase3.xBox.R.index + phase3.tr;
-    const T4 = phase3.xBox.R.index + phase2.tr;
-    const timeMark = [T1, T2, T3, T4];
-
-    const T = phase3.xBox.S.index;
-
-    let entry,
-        progress = {};
-    const extraCond = [
-        phase2.R.index > T1,
-        phase1.rEpr < 3,
-        phase2.rEpr < phase1.rEpr,
-    ];
-    progress.steps = [
-        [
-            pr1Valid || (phase1.rEt < phase1.tr && phase1.rEp >= phase1.sEp),
-            s1Valid,
-            !phase3.breakIndexs[1] || T1 < phase3.breakIndexs[1],
-            T > T1,
-        ],
-        [
-            //
-            ...extraCond,
-            T2 > T1,
-            T < T2,
-        ],
-        [
-            //
-            phase2.R.index - phase1.R.index > 0.5 * phase1.tr,
-            pr2Valid,
-            T > T2,
-        ],
-        [pr3Valid, s3Valid, T > T3, extraCond.every(Boolean) || T > T4],
-    ];
-    progress.step = 1;
-    progress.result = progress.steps[0].every(Boolean);
-    entry = phase1.R1.price;
-    if (progress.result) {
-        if (T <= T2) {
-            progress.step = 2;
-            progress.result = progress.steps[1].every(Boolean);
-            entry = phase2.S1.price;
-        } else {
-            progress.step = 3;
-            progress.result = progress.steps[2].every(Boolean);
-            entry = phase3.R1.price;
-            if (progress.result) {
-                progress.step = 4;
-                progress.result = progress.steps[3].every(Boolean);
-                if (progress.result) entry = phase3.xBox.R.price;
-            }
-        }
-    }
-    //
-    const p1Status = s1Valid ? (pr1Valid ? 1 : 0) : 2;
-    const p2Status = s2Valid ? (pr2Valid ? 1 : 0) : 2;
-    const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
-    const pStatus = `${p1Status}${p2Status}${p3Status}`;
-    //
-    const X = phase1.rEp;
-    const x = adjustTargetPrice(B.price, X, side);
-    const mainTR = phase3.breakIndexs[1] ?? T;
-    const scale = parseInt((mainTR - phase1.R.index) / phase1.tr);
-    const Y = scale > 1 ? X * scale : X;
-    const y = adjustTargetPrice(B.price, Y, side);
-
-    return {
-        progress,
-        timeMark,
-        info: {
-            rEpr1: phase1.rEpr,
-            rEpr2: phase2.rEpr,
-            rEpr3: phase3.rEpr,
-            entry,
-            pStatus,
-            x,
-            X,
-            y,
-            Y,
-        },
-    };
-}
-function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
-    let S = mf.cloneDeep(start);
-    let R = mf.cloneDeep(end);
-    const side = R.price > S.price;
-    let box = {},
-        maxBox = {},
-        xBox = {},
-        breakIndexs = [null, null],
-        rEp,
-        sEp,
-        rEt;
-    params.data.price
-        .filter((item) => {
-            let cond = item.time >= S.time;
-            if (params.tools.pickTime)
-                cond &= item.time <= params.tools.pickTime;
-            return cond;
-        })
-        .every((item, i) => {
-            const price = item.value;
-            const time = item.time;
-            const index = timeToIndex(time);
-            if (index === -1) return false;
-            if (i === 0 || price === S.price) {
-                box = {
-                    R: { index, time, price },
-                    S: { index, time, price },
-                    pr: 0,
-                    tr: 0,
-                };
-                maxBox = mf.cloneDeep(box);
-                xBox = mf.cloneDeep(box);
-            }
-            if (cmp(price, side, box.R.price)) {
-                // const dis = fmtNum(box.R.price - maxBox.R.price,1,true);
-                // if (
-                //     dis < 0.2 &&
-                //     cmp(box.S.price, !side, maxBox.R.price) &&
-                //     box.pr < maxBox.pr
-                // ) {
-                //     maxBox.S.index = box.S.index;
-                //     maxBox.tr = maxBox.S.index - maxBox.R.index;
-                // }
-                if (box.pr > maxBox.pr) maxBox.pr = box.pr;
-                if (box.tr >= maxBox.tr) {
-                    maxBox.tr = box.tr;
-                    maxBox.R = mf.cloneDeep(box.R);
-                    maxBox.S = mf.cloneDeep(box.S);
-                }
-                if (
-                    phase === 1 &&
-                    retracementPrice &&
-                    !cmp(box.S.price, !side, retracementPrice)
-                ) {
-                    if (box.tr >= xBox.tr && box.pr >= xBox.pr)
-                        xBox = mf.cloneDeep(box);
-                }
-                box = {
-                    R: { index, time, price },
-                    S: { index, time, price },
-                    pr: 0,
-                    tr: 0,
-                };
-                if (phase === 3 && breakPrices) {
-                    if (!breakIndexs[0] && cmp(price, side, breakPrices[0]))
-                        breakIndexs[0] = index;
-                    if (!breakIndexs[1] && cmp(price, side, breakPrices[1]))
-                        breakIndexs[1] = index;
-                }
-            } else {
-                box.S.index = index;
-                box.tr = box.S.index - box.R.index;
-                if (cmp(price, !side, box.S.price)) {
-                    box.S.time = time;
-                    box.S.price = price;
-                    box.pr = fmtNum(box.S.price - box.R.price, 1, true);
-                }
-            }
-            if (cmp(price, !side, S.price)) {
-                box.S.price = S.price;
-                return false;
-            }
-            if (!cmp(price, !side, R.price)) return false;
-            return true;
-        });
-    if (mf.isSet(box)) {
-        S.index = timeToIndex(S.time);
-        R.index = box.S.index;
-        R.time = indexToTime(box.S.index);
-        rEp = fmtNum(R.price - maxBox.R.price, 1, true);
-        sEp = fmtNum(S.price - maxBox.S.price, 1, true);
-        rEt = R.index - maxBox.S.index;
-        if (phase === 3) xBox = box;
-    }
-
-    return {
-        tr: maxBox.tr,
-        pr: maxBox.pr,
-        rEp,
-        sEp,
-        rEpr: maxBox.pr ? fmtNum(rEp / maxBox.pr) : 0,
-        rEt,
-        S1: maxBox.S,
-        R1: maxBox.R,
-        xBox,
-        S,
-        R,
-        breakIndexs,
-    };
-}
-function adjustTargetPrice(price, range, side) {
-    const target = price + (side ? 1 : -1) * range;
-    let decimal = fmtNum(target % 1);
-
-    if (side) {
-        if (decimal >= 0.1 && decimal <= 0.2) {
-            return Math.floor(target);
-        } else if (decimal >= 0.6 && decimal <= 0.7) {
-            return Math.floor(target) + 0.5;
-        }
-    } else {
-        if (decimal >= 0.8 && decimal <= 0.9) {
-            return Math.ceil(target);
-        } else if (decimal >= 0.3 && decimal <= 0.4) {
-            return Math.floor(target) + 0.5;
-        }
-    }
-
-    return target;
-}
-function adjustPatternPoints() {
-    if (!params.tools.pickTime) return false;
-    //
-    let points = params.tools.pattern.points;
-    const side = points.B.price - points.A.price > 0;
-    const lastPrice = params.data.price.at(-1).value;
-
-    if (cmp(lastPrice, !side, points.C.price)) {
-        let cPriceNew = lastPrice;
-        for (let i = params.data.price.length - 1; i >= 0; i--) {
-            const price = params.data.price[i].value;
-            if (price === points.B.price) break;
-            cPriceNew = side
-                ? Math.min(cPriceNew, price)
-                : Math.max(cPriceNew, price);
-        }
-        points.C.price = cPriceNew;
-        params.tools.pattern.points = points;
-        savePattern();
-    }
-}
-function savePattern(isRemove = false) {
-    let param = {
-        isRemove,
-        name: "pattern",
-        points: [],
-        data: [],
-    };
-    if (!isRemove) {
-        Object.entries(params.tools.pattern.points).forEach(([key, value]) => {
-            param.points.push(key);
-            param.data.push(value);
-        });
-    } else params.tools.pattern.points = {};
-    store.dispatch("tradingDerivative/drawTools", param);
-}
-function removePatternTool() {
-    if (mf.isSet(params.tools.pattern.lines.A)) {
-        params.series.price.removePriceLine(params.tools.pattern.lines.A);
-        if (mf.isSet(params.tools.pattern.lines.B)) {
-            params.series.price.removePriceLine(params.tools.pattern.lines.B);
-            if (mf.isSet(params.tools.pattern.lines.C)) {
-                params.series.price.removePriceLine(
-                    params.tools.pattern.lines.C
-                );
-                params.series.price.removePriceLine(
-                    params.tools.pattern.lines.D
-                );
-                params.series.price.removePriceLine(
-                    params.tools.pattern.lines.X
-                );
-                params.series.price.removePriceLine(
-                    params.tools.pattern.lines.Y
-                );
-            }
-        }
-    }
-    initToolsParams(["pattern"]);
-    setTimeMark([]);
-    setProgress({});
-}
-function setTimeMark(data) {
-    const colors = ["#F44336", "#4CAF50", "#FFEB3B", "#2196F3"];
-    let result = [];
-    for (let i = 0; i < data.length; i++) {
-        let time = indexToTime(data[i]);
-        if (time) {
-            if (data.indexOf(data[i]) !== data.lastIndexOf(data[i])) time += i;
-            result.push({
-                time,
-                value: 1,
-                color: colors[i],
-            });
-        }
-    }
-    if (result.length) result.sort((a, b) => a.time - b.time);
-    params.series.timeMark.setData(result);
-}
-function setProgress(progress) {
-    state.progress = progress;
-}
-function pickTimeToolClick(e) {
-    state.showProgressContext = false;
-    state.showScanContext = false;
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) e.target.classList.add("selected");
-}
-function pickTimeToolContextmenu(e) {
-    e.target.classList.remove("selected");
-    removePickTimeTool();
-    refreshPatternTool();
-}
-function drawPickTimeTool() {
-    const time = params.crosshair.time;
-    store.dispatch("tradingDerivative/drawTools", {
-        isRemove: false,
-        name: "0_pt",
-        points: [0],
-        data: [time],
-    });
-    loadPickTimeTool(time);
-    refreshPatternTool();
-    pickTimeToolRef.value.classList.remove("selected");
-}
-function loadPickTimeTool(time) {
-    params.tools.pickTime = time;
-    params.series.pickTime.setData([{ time, value: 1, color: "#9C27B0" }]);
-}
-function removePickTimeTool(withServer = true) {
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "0_pt",
-        });
-    params.series.pickTime.setData([]);
-    initToolsParams(["pt"]);
-}
-function timeRangeToolClick(e) {
-    state.showProgressContext = false;
-    state.showScanContext = false;
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-    }
-}
-function timeRangeToolContextmenu(e) {
-    removeTimeRangeTool();
-    e.target.classList.remove("selected");
-}
-function drawTimeRangeTool() {
-    let param = {
-        isRemove: false,
-        name: "tr",
-        points: [],
-        data: [],
-    };
-    const time = params.crosshair.time;
-    let option = { time, value: 1 };
-    switch (params.tools.timeRange.length) {
-        case 0:
-            option.color = "OrangeRed";
-            params.tools.timeRange[0] = option;
-            param.points.push(0);
-            param.data.push(time);
-            break;
-        case 1:
-            option.color = "lime";
-            params.tools.timeRange[1] = option;
-            param.points.push(1);
-            param.data.push(time);
-            timeRangeToolRef.value.classList.remove("selected");
-            break;
-        default:
-            const index0 = timeToIndex(params.tools.timeRange[0].time);
-            const index1 = timeToIndex(params.tools.timeRange[1].time);
-            const index2 = timeToIndex(time);
-            const index3 = index2 + (index1 - index0);
-            const time3 = indexToTime(index3);
-
-            option.color = "OrangeRed";
-            params.tools.timeRange[0] = mf.cloneDeep(option);
-            param.points.push(0);
-            param.data.push(time);
-            //
-            option.time = time3;
-            option.color = "lime";
-            params.tools.timeRange[1] = option;
-            param.points.push(1);
-            param.data.push(time3);
-            timeRangeToolRef.value.classList.remove("selected");
-            break;
-    }
-    params.series.timeRange.setData(params.tools.timeRange);
-    store.dispatch("tradingDerivative/drawTools", param);
-}
-function loadTimeRangeTool(data) {
-    let start, end;
-    if (data.length === 2) {
-        start = data[0];
-        end = data[1];
-    } else if (data.length === 3) {
-        const index0 = timeToIndex(data[0]);
-        const index1 = timeToIndex(data[1]);
-        const index2 = timeToIndex(data[2]);
-        const index3 = index2 + (index1 - index0);
-        start = data[2];
-        end = indexToTime(index3);
-    } else return false;
-    let timeRange = [
-        { time: start, value: 1, color: "OrangeRed" },
-        { time: end, value: 1, color: "lime" },
-    ];
-    params.tools.timeRange = timeRange;
-    params.series.timeRange.setData(timeRange);
-}
-function removeTimeRangeTool(withServer = true) {
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "tr",
-        });
-    params.series.timeRange.setData([]);
-    initToolsParams(["tr"]);
-}
-function lineToolClick(e) {
-    state.showProgressContext = false;
-    state.showScanContext = false;
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) e.target.classList.add("selected");
-}
-function lineToolContextmenu(e) {
-    state.showLineContext = !state.showLineContext;
-    state.showProgressContext = false;
-    state.showScanContext = false;
-}
-function drawLineTool() {
-    const TYPE = "line";
-    const price = coordinateToPrice(params.crosshair.y);
-    const oldLength = params.tools.lines.length;
-    params.tools.lines = params.tools.lines.filter((line) => {
-        const ops = line.options();
-        const isExist = (ops.type = TYPE && price === +ops.price);
-        if (isExist) {
-            params.series.price.removePriceLine(line);
-            store.dispatch("tradingDerivative/drawTools", {
-                isRemove: true,
-                name: TYPE,
-                point: price,
-            });
-        }
-        return !isExist;
-    });
-    if (params.tools.lines.length === oldLength) {
-        const color = state.lineColor;
-        const title = state.lineTitle;
-        const options = {
-            lineType: TYPE,
-            price: price,
-            color,
-            title,
-            lineWidth: 1,
-            lineStyle: 1,
-            draggable: true,
-        };
-        params.tools.lines.push(params.series.price.createPriceLine(options));
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: false,
-            name: TYPE,
-            points: [price],
-            data: [{ color, title }],
-        });
-    }
-    lineToolRef.value.classList.remove("selected");
-}
-function loadLineTool(lines) {
-    const TYPE = "line";
-    const options = {
-        lineType: TYPE,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: true,
-    };
-    Object.entries(lines).forEach(([price, { color, title }]) => {
-        options.price = +price;
-        options.color = color;
-        options.title = title;
-        params.tools.lines.push(params.series.price.createPriceLine(options));
-    });
-}
-function removeLineTool(withServer = true) {
-    if (params.tools.lines.length > 0) {
-        if (withServer)
-            store.dispatch("tradingDerivative/drawTools", {
-                isRemove: true,
-                name: "line",
-            });
-        params.tools.lines.forEach((line) =>
-            params.series.price.removePriceLine(line)
-        );
-        initToolsParams(["lines"]);
-    }
-}
-function targetToolClick(e) {
-    state.showProgressContext = false;
-    state.showScanContext = false;
-    state.showLineContext = false;
-    const selected = e.target.classList.contains("selected");
-    document
-        .querySelectorAll(".tool-area > .command:not(.drawless)")
-        .forEach((el) => el.classList.remove("selected"));
-    if (!selected) {
-        e.target.classList.add("selected");
-        removeTargetTool();
-    }
-}
-function targetToolContextmenu(e) {
-    removeTargetTool();
-    e.target.classList.remove("selected");
-}
-function drawTargetTool() {
-    const TYPE = "target";
-    const price = coordinateToPrice(params.crosshair.y);
-    let option = {
-        lineType: TYPE,
-        price: price,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: true,
-    };
-    let param = {
-        isRemove: false,
-        name: TYPE,
-        points: [],
-        data: [price],
-    };
-    if (mf.isSet(params.tools.target.A)) {
-        const a = +params.tools.target.A.options().price;
-        const ba = price - a;
-        option.point = "B";
-        option.title = fmtNum(ba);
-        option.color = "#F44336";
-        params.tools.target[option.point] =
-            params.series.price.createPriceLine(option);
-        param.points.push(option.point);
-        //
-        option.point = "X";
-        option.price = fmtNum(a - 0.5 * ba);
-        option.title = fmtNum(-0.5 * ba);
-        option.color = "#2196F3";
-        params.tools.target[option.point] =
-            params.series.price.createPriceLine(option);
-        //
-        option.point = "Y";
-        option.price = fmtNum(a - ba);
-        option.title = fmtNum(-ba);
-        option.color = "#673AB7";
-        params.tools.target[option.point] =
-            params.series.price.createPriceLine(option);
-        //
-        option.point = "Z";
-        option.price = fmtNum(a - 2 * ba);
-        option.title = fmtNum(-2 * ba);
-        option.color = "#9C27B0";
-        params.tools.target[option.point] =
-            params.series.price.createPriceLine(option);
-        //
-        option.point = "W";
-        option.price = fmtNum(a - 4 * ba);
-        option.title = fmtNum(-4 * ba);
-        option.color = "#E91E63";
-        params.tools.target[option.point] =
-            params.series.price.createPriceLine(option);
-        //
-        targetToolRef.value.classList.remove("selected");
-    } else {
-        option.point = "A";
-        option.title = "0";
-        option.color = "#FF9800";
-        params.tools.target[option.point] =
-            params.series.price.createPriceLine(option);
-        param.points.push(option.point);
-    }
-    store.dispatch("tradingDerivative/drawTools", param);
-}
-function loadTargetTool(points) {
-    const TYPE = "target";
-    let option = {
-        lineType: TYPE,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: true,
-    };
-    const a = points.A;
-    const b = points.B;
-    const ba = b - a;
-    //
-    option.point = "A";
-    option.price = a;
-    option.title = "0";
-    option.color = "#FF9800";
-    params.tools.target[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "B";
-    option.price = b;
-    option.title = fmtNum(ba);
-    option.color = "#F44336";
-    params.tools.target[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "X";
-    option.price = fmtNum(a - 0.5 * ba);
-    option.title = fmtNum(-0.5 * ba);
-    option.color = "#2196F3";
-    params.tools.target[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "Y";
-    option.price = fmtNum(a - ba);
-    option.title = fmtNum(-ba);
-    option.color = "#673AB7";
-    params.tools.target[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "Z";
-    option.price = fmtNum(a - 2 * ba);
-    option.title = fmtNum(-2 * ba);
-    option.color = "#9C27B0";
-    params.tools.target[option.point] =
-        params.series.price.createPriceLine(option);
-    //
-    option.point = "W";
-    option.price = fmtNum(a - 4 * ba);
-    option.title = fmtNum(-4 * ba);
-    option.color = "#E91E63";
-    params.tools.target[option.point] =
-        params.series.price.createPriceLine(option);
-}
-function removeTargetTool(withServer = true) {
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "target",
-        });
-    if (mf.isSet(params.tools.target.A)) {
-        params.series.price.removePriceLine(params.tools.target.A);
-        if (mf.isSet(params.tools.target.B)) {
-            params.series.price.removePriceLine(params.tools.target.B);
-            params.series.price.removePriceLine(params.tools.target.X);
-            params.series.price.removePriceLine(params.tools.target.Y);
-            params.series.price.removePriceLine(params.tools.target.Z);
-            params.series.price.removePriceLine(params.tools.target.W);
-        }
-    }
-    initToolsParams(["target"]);
+function setProgress(value) {
+    progressToolRef.value.set(value);
 }
 function removeAllTools() {
     removeOrderTool(["entry", "tp", "sl"], false);
-    removeLineTool(false);
-    removeTargetTool(false);
-    removeTimeRangeTool(false);
-    removePatternTool();
 }
 function toggleOrderButton(show) {
     if (show) {
@@ -2564,6 +1311,8 @@ function dateSelectChange() {
 function resetChart() {
     params.data.whitespace = [];
     params.data.price = [];
+    state.data.whitespace = params.data.whitespace;
+    state.data.price = params.data.price;
     connectSocket();
     getChartData();
 }
@@ -2619,21 +1368,21 @@ function getAccountInfo() {
     });
 }
 function coordinateToPrice(y) {
-    return fmtNum(params.series.price.coordinateToPrice(y));
+    return mf.fmtNum(state.series.price.coordinateToPrice(y));
 }
-function fmtNum(price, digits = 1, abs = false) {
-    price = +price;
-    if (abs) price = Math.abs(price);
-    return parseFloat(price.toFixed(digits));
-}
+// function mf.fmtNum(price, digits = 1, abs = false) {
+//     price = +price;
+//     if (abs) price = Math.abs(price);
+//     return parseFloat(price.toFixed(digits));
+// }
 function toastOrderError(error) {
     if (!error) error = "unknown";
     toast.error(t(`trading.derivative.${error}`));
 }
-function cmp(value1, side, value2, eq = false) {
-    if (side) return eq ? value1 >= value2 : value1 > value2;
-    else return eq ? value1 <= value2 : value1 < value2;
-}
+// function mf.cmp(value1, side, value2, eq = false) {
+//     if (side) return eq ? value1 >= value2 : value1 > value2;
+//     else return eq ? value1 <= value2 : value1 < value2;
+// }
 function timeToIndex(time) {
     let index = params.data.whitespace.findIndex((item) => item.time === time);
     if (index === -1) {

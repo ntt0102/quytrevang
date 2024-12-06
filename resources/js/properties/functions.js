@@ -59,6 +59,15 @@ export default {
             });
         }
     },
+    fmtNum(num, digits = 1, abs = false) {
+        num = +num;
+        if (abs) num = Math.abs(num);
+        return parseFloat(num.toFixed(digits));
+    },
+    cmp(value1, side, value2, eq = false) {
+        if (side) return eq ? value1 >= value2 : value1 > value2;
+        else return eq ? value1 <= value2 : value1 < value2;
+    },
     checkPinDataGrid(e, dataGridInstance) {
         // let items = e.component.option("toolbarItems");
         // items[0].options.onClick = () => {
