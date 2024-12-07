@@ -273,7 +273,6 @@ const state = reactive({
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: format(new Date(), "HH:mm:ss"),
     isSocketWarning: false,
-    progress: {},
     TIME,
 });
 const status = computed(() => store.state.tradingDerivative.status);
@@ -549,27 +548,29 @@ function mergeChartData(data1, data2) {
 }
 function loadToolsData(data) {
     Object.entries(data).forEach(([name, points]) => {
-        switch (name) {
-            case "order":
-                orderToolRef.value.load(points);
-                break;
-            case "pattern":
-                if (checkPatternPointsValid(points)) {
-                    patternToolRef.value.load(mf.cloneDeep(points));
-                }
-                break;
-            case "tr":
-                timeRangeToolRef.value.load(points);
-                break;
-            case "0_pt":
-                pickTimeToolRef.value.load(points[0]);
-                break;
-            case "line":
-                lineToolRef.value.load(points);
-                break;
-            case "target":
-                targetToolRef.value.load(points);
-                break;
+        switch (
+            name
+            // case "order":
+            //     orderToolRef.value.load(points);
+            //     break;
+            // case "pattern":
+            //     if (checkPatternPointsValid(points)) {
+            //         patternToolRef.value.load(mf.cloneDeep(points));
+            //     }
+            //     break;
+            // case "tr":
+            //     timeRangeToolRef.value.load(points);
+            //     break;
+            // case "0_pt":
+            //     pickTimeToolRef.value.load(points[0]);
+            //     break;
+            // case "line":
+            //     lineToolRef.value.load(points);
+            // break;
+            // case "target":
+            //     targetToolRef.value.load(points);
+            //     break;
+        ) {
         }
     });
 }
@@ -712,15 +713,12 @@ function refreshPattern() {
     patternToolRef.value.refresh();
 }
 function patternScaned(points) {
-    patternToolRef.value.load(points, true);
+    patternToolRef.value.load(points, { isSave: true });
 }
 function hideContext() {
     progressToolRef.value.hide();
     scanToolRef.value.hide();
     lineToolRef.value.hide();
-}
-function checkPatternPointsValid({ A: { time } }) {
-    return params.whitespaces.some((item) => item.time === time);
 }
 function setProgress(value) {
     progressToolRef.value.set(value);

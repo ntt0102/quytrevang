@@ -10,22 +10,29 @@
     </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
 const props = defineProps(["pickTimeSeries"]);
 const emit = defineEmits(["refreshPattern", "hideContext"]);
 const pickTimeToolRef = ref(null);
+const pickTimeStore = computed(
+    () => store.state.tradingDerivative.tools.pickTime
+);
 let pickTime = null;
 
 defineExpose({
     isSelected,
     draw,
-    load,
     remove: removePickTimeTool,
     get,
 });
+
+watch(pickTimeStore, (data) => {
+    if (data) load(data[0]);
+});
+
 function isSelected() {
     return pickTimeToolRef.value.classList.contains("selected");
 }
@@ -48,7 +55,7 @@ function pickTimeToolContextmenu(e) {
 function draw({ time }) {
     store.dispatch("tradingDerivative/drawTools", {
         isRemove: false,
-        name: "0_pt",
+        name: "pickTime",
         points: [0],
         data: [time],
     });
@@ -64,7 +71,7 @@ function removePickTimeTool(withServer = true) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
-            name: "0_pt",
+            name: "pickTime",
         });
     props.pickTimeSeries.setData([]);
     pickTime = null;

@@ -10,7 +10,7 @@
     </div>
 </template>
 <script setup>
-import { ref, inject } from "vue";
+import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -18,13 +18,20 @@ const mf = inject("mf");
 const props = defineProps(["timeRangeSeries", "timeToIndex", "indexToTime"]);
 const emit = defineEmits(["hideContext"]);
 const timeRangeToolRef = ref(null);
+const timeRangeStore = computed(
+    () => store.state.tradingDerivative.tools.timeRange
+);
 let timeRanges = [];
 
 defineExpose({
     isSelected,
     draw,
-    load,
 });
+
+watch(timeRangeStore, (data) => {
+    if (data) load(data);
+});
+
 function isSelected() {
     return timeRangeToolRef.value.classList.contains("selected");
 }
@@ -45,7 +52,7 @@ function timeRangeToolContextmenu(e) {
 function draw({ time }) {
     let param = {
         isRemove: false,
-        name: "tr",
+        name: "timeRange",
         points: [],
         data: [],
     };
@@ -115,7 +122,7 @@ function removeTimeRangeTool(withServer = true) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
-            name: "tr",
+            name: "timeRange",
         });
     props.timeRangeSeries.setData([]);
     timeRanges = [];

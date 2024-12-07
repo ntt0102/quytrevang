@@ -20,7 +20,7 @@
 </template>
 <script setup>
 import LineContext from "./Contexts/LineContext.vue";
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -28,6 +28,7 @@ const props = defineProps(["priceSeries"]);
 const emit = defineEmits(["hideContext"]);
 const lineToolRef = ref(null);
 const showLineContext = ref(false);
+const lineStore = computed(() => store.state.tradingDerivative.tools.line);
 const lineTitle = ref("");
 const lineColor = ref("#F44336");
 let lines = [];
@@ -36,9 +37,13 @@ defineExpose({
     isSelected,
     hide,
     draw,
-    load,
     drag,
 });
+
+watch(lineStore, (data) => {
+    if (data) load(data);
+});
+
 function isSelected() {
     return lineToolRef.value.classList.contains("selected");
 }

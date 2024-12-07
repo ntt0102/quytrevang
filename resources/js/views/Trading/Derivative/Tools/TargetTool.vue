@@ -10,7 +10,7 @@
     </div>
 </template>
 <script setup>
-import { ref, inject } from "vue";
+import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -18,14 +18,19 @@ const mf = inject("mf");
 const props = defineProps(["priceSeries"]);
 const emit = defineEmits(["hideContext"]);
 const targetToolRef = ref(null);
+const targetStore = computed(() => store.state.tradingDerivative.tools.target);
 let lines = {};
 
 defineExpose({
     isSelected,
     draw,
-    load,
     drag,
 });
+
+watch(targetStore, (data) => {
+    if (data) load(data);
+});
+
 function isSelected() {
     return targetToolRef.value.classList.contains("selected");
 }

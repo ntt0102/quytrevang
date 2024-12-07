@@ -10,7 +10,7 @@
     </div>
 </template>
 <script setup>
-import { ref, inject } from "vue";
+import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -25,6 +25,9 @@ const props = defineProps([
 ]);
 const emit = defineEmits(["setProgress", "hideContext"]);
 const patternToolRef = ref(null);
+const patternStore = computed(
+    () => store.state.tradingDerivative.tools.pattern
+);
 let points = {};
 let lines = {};
 
@@ -36,6 +39,11 @@ defineExpose({
     remove,
     drag,
 });
+
+watch(patternStore, (data) => {
+    if (data) load(data, { isCheck: true });
+});
+
 function isSelected() {
     return patternToolRef.value.classList.contains("selected");
 }
@@ -159,6 +167,7 @@ function draw({ time, price }) {
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
             }
+            savePattern();
             emit("setProgress", _progress);
             setTimeMark(_timeMark);
             patternToolRef.value.classList.remove("selected");
@@ -176,13 +185,15 @@ function draw({ time, price }) {
         lines[option.point] = props.priceSeries.createPriceLine(option);
         points = { A: { time, price } };
     }
-    savePattern();
 }
-function load(data, isSave = false) {
-    points = data;
+function load(data, { isSave = false, isCheck = false }) {
+    points = mf.cloneDeep(data);
     if (isSave) savePattern();
-    removePatternTool();
-    loadPatternTool();
+    const isLoad = isCheck ? checkPointsValid(points) : true;
+    if (isLoad) {
+        removePatternTool();
+        loadPatternTool();
+    }
 }
 function loadPatternTool() {
     const TYPE = "pattern";
@@ -297,6 +308,7 @@ function calculatePattern() {
     ];
     progress.steps = [
         [
+            //
             pr1Valid || (phase1.rEt < phase1.tr && phase1.rEp >= phase1.sEp),
             s1Valid,
             !phase3.breakIndexs[1] || T1 < phase3.breakIndexs[1],
@@ -316,7 +328,13 @@ function calculatePattern() {
             pr2Valid,
             T > T2,
         ],
-        [pr3Valid, s3Valid, T > T3, extraCond.every(Boolean) || T > T4],
+        [
+            //
+            pr3Valid,
+            s3Valid,
+            T > T3,
+            extraCond.every(Boolean) || T > T4,
+        ],
     ];
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
@@ -386,13 +404,12 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         })
         .every((item, i) => {
             const price = item.value;
-            const time = item.time;
-            const index = props.timeToIndex(time);
+            const index = props.timeToIndex(item.time);
             if (index === -1) return false;
             if (i === 0 || price === S.price) {
                 box = {
-                    R: { index, time, price },
-                    S: { index, time, price },
+                    R: { index, price },
+                    S: { index, price },
                     pr: 0,
                     tr: 0,
                 };
@@ -400,20 +417,13 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 xBox = mf.cloneDeep(box);
             }
             if (mf.cmp(price, side, box.R.price)) {
-                // const dis = mf.fmtNum(box.R.price - maxBox.R.price,1,true);
-                // if (
-                //     dis < 0.2 &&
-                //     mf.cmp(box.S.price, !side, maxBox.R.price) &&
-                //     box.pr < maxBox.pr
-                // ) {
-                //     maxBox.S.index = box.S.index;
-                //     maxBox.tr = maxBox.S.index - maxBox.R.index;
-                // }
-                if (box.pr > maxBox.pr) maxBox.pr = box.pr;
-                if (box.tr >= maxBox.tr) {
-                    maxBox.tr = box.tr;
+                if (box.pr >= maxBox.pr) {
+                    maxBox.pr = box.pr;
                     maxBox.R = mf.cloneDeep(box.R);
                     maxBox.S = mf.cloneDeep(box.S);
+                }
+                if (box.tr > maxBox.tr) {
+                    maxBox.tr = box.tr;
                 }
                 if (
                     phase === 1 &&
@@ -424,8 +434,8 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                         xBox = mf.cloneDeep(box);
                 }
                 box = {
-                    R: { index, time, price },
-                    S: { index, time, price },
+                    R: { index, price },
+                    S: { index, price },
                     pr: 0,
                     tr: 0,
                 };
@@ -439,7 +449,6 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 box.S.index = index;
                 box.tr = box.S.index - box.R.index;
                 if (mf.cmp(price, !side, box.S.price)) {
-                    box.S.time = time;
                     box.S.price = price;
                     box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                 }
@@ -475,6 +484,9 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         R,
         breakIndexs,
     };
+}
+function checkPointsValid({ A: { time } }) {
+    return time >= props.prices[0].time && time < props.prices.at(-1).time;
 }
 function adjustTargetPrice(price, range, side) {
     const target = price + (side ? 1 : -1) * range;
@@ -534,6 +546,7 @@ function remove() {
     savePattern(true);
     props.pickTimeToolRef.remove();
     removePatternTool();
+    emit("setProgress", {});
 }
 function removePatternTool() {
     if (mf.isSet(lines.A)) {
@@ -549,7 +562,6 @@ function removePatternTool() {
         }
     }
     lines = {};
-    emit("setProgress", {});
     setTimeMark([]);
 }
 function setTimeMark(data) {

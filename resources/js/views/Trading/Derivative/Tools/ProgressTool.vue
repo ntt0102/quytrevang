@@ -30,8 +30,10 @@
 import ProgressContext from "./Contexts/ProgressContext.vue";
 import { ref, computed } from "vue";
 import { useStore } from "vuex";
+import { useI18n } from "vue-i18n";
 
 const store = useStore();
+const { t } = useI18n();
 const emit = defineEmits(["refreshPattern", "hideContext"]);
 const progress = ref({});
 const showProgressContext = ref(false);
@@ -70,7 +72,7 @@ function checkAlert(newProgress, oldProgress) {
         ) {
             let text = "";
             if (newProgress.result) {
-                if ([2, 4, 5].includes(newProgress.step))
+                if ([2, 4].includes(newProgress.step))
                     text = t("trading.derivative.progressOrder", newProgress);
                 else
                     text = t("trading.derivative.progressSuccess", newProgress);

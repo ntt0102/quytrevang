@@ -9,7 +9,7 @@
     </div>
 </template>
 <script setup>
-import { ref, inject } from "vue";
+import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
@@ -35,18 +35,12 @@ const props = defineProps([
 const emit = defineEmits(["getTools", "showEntry", "showTpSl", "hideContext"]);
 const orderToolRef = ref(null);
 const isOrderWarning = ref(false);
+const orderStore = computed(() => store.state.tradingDerivative.tools.order);
 let order = { entry: {}, tp: {}, sl: {} };
 let isAutoOrdering = false;
 
 const TP_DEFAULT = 3;
 const SL_DEFAULT = 2;
-// const CURRENT_DATE = format(new Date(), "yyyy-MM-dd");
-// const TIME = {
-//     START: getUnixTime(new Date(`${CURRENT_DATE}T08:45:00Z`)),
-//     ATO: getUnixTime(new Date(`${CURRENT_DATE}T09:00:00Z`)),
-//     ATC: getUnixTime(new Date(`${CURRENT_DATE}T14:30:00Z`)),
-//     END: getUnixTime(new Date(`${CURRENT_DATE}T14:45:00Z`)),
-// };
 
 defineExpose({
     has,
@@ -56,9 +50,13 @@ defineExpose({
     cancel,
     cancelWithoutClose,
     scan,
-    load,
     drag,
 });
+
+watch(orderStore, (data) => {
+    if (data) load(data);
+});
+
 function has() {
     return mf.isSet(order.entry.line) || mf.isSet(order.tp.line);
 }
