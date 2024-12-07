@@ -347,19 +347,7 @@ class DerivativeService extends CoreService
             ExportDerVpsJob::dispatch();
             $ret['isOk'] = true;
         }
-        // //
-        // $ret['download'] = false;
-        // $filename = $payload->date . '.csv';
-        // $file = storage_path('app/phaisinh/' . $filename);
-        // if (file_exists($file)) {
-        //     $ret['download'] = true;
-        //     $ret['file'] = $file;
-        //     $ret['filename'] = $filename;
-        //     $ret['headers'] = ['Content-Type' => 'text/csv'];
-        // } else {
-        //     Artisan::call('clone:data --type=export');
-        //     $ret['isOk'] = true;
-        // }
+
         return $ret;
     }
 
