@@ -55,7 +55,7 @@
                 },
             ]"
         />
-        <Chart />
+        <Chart ref="chartRef" />
     </div>
     <VpsOtpPopup ref="vpsOtpPopupRef" />
 </template>
@@ -71,6 +71,7 @@ const store = useStore();
 const { t } = useI18n();
 const bus = inject("bus");
 const source = computed(() => store.state.tradingDerivative.config.source);
+const chartRef = ref(null);
 const vpsOtpPopupRef = ref(null);
 const exportTypes = ref([
     {
@@ -106,6 +107,7 @@ function exportItemClick({ itemData }) {
     );
 }
 function sourceSelect({ item: { name } }) {
+    chartRef.value.connectSocket();
     store.dispatch("tradingDerivative/setSource", name);
 }
 </script>

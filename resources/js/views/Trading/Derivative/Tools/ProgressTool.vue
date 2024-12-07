@@ -54,10 +54,34 @@ function hide(status) {
     showProgressContext.value = status;
 }
 function set(value) {
+    checkAlert(value, progress.value);
     progress.value = value;
 }
 function toggleAutoRefresh(status) {
     const autoRefresh = status ?? !autoRefresh.value;
     store.dispatch("tradingDerivative/setAutoRefresh", autoRefresh);
+}
+function checkAlert(newProgress, oldProgress) {
+    if (autoRefresh.value) {
+        if (
+            newProgress.step > oldProgress.step ||
+            (newProgress.step === oldProgress.step &&
+                newProgress.result > oldProgress.result)
+        ) {
+            let text = "";
+            if (newProgress.result) {
+                if ([2, 4, 5].includes(newProgress.step))
+                    text = t("trading.derivative.progressOrder", newProgress);
+                else
+                    text = t("trading.derivative.progressSuccess", newProgress);
+            } else text = t("trading.derivative.progressFail", newProgress);
+            speakAlert(text);
+        }
+    }
+}
+function speakAlert(text) {
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "vi-VN";
+    speechSynthesis.speak(utterance);
 }
 </script>

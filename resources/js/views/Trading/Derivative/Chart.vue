@@ -69,12 +69,12 @@
                 @contextmenu="toolAreaContextmenu"
             >
                 <FullscreenTool :chartContainerRef="chartContainerRef" />
-                <div
+                <TradingviewTool
                     ref="tradingviewRef"
-                    class="command far fa-chart-candlestick"
-                    :title="$t('trading.derivative.tradingview')"
-                    @click="tradingviewClick"
-                ></div>
+                    :vpsUser="config.vpsUser"
+                    :vpsSession="config.vpsSession"
+                    :chartContainerRef="chartContainerRef"
+                />
                 <ProgressTool
                     ref="progressToolRef"
                     @refreshPattern="refreshPattern"
@@ -82,15 +82,15 @@
                 />
                 <ScanTool
                     ref="scanToolRef"
-                    :prices="state.data.price"
+                    :prices="state.prices"
                     :timeToIndex="timeToIndex"
-                    @scaned="scaned"
+                    @scaned="patternScaned"
                     @removePattern="() => patternToolRef.remove()"
                     @hideContext="hideContext"
                 />
                 <PatternTool
                     ref="patternToolRef"
-                    :prices="state.data.price"
+                    :prices="state.prices"
                     :priceSeries="state.series.price"
                     :timeMarkSeries="state.series.timeMark"
                     :pickTimeToolRef="pickTimeToolRef"
@@ -122,19 +122,19 @@
                     :priceSeries="state.series.price"
                     @hideContext="hideContext"
                 />
-                <div
+                <OrderTool
                     v-show="showCancelOrder"
-                    ref="cancelOrderRef"
-                    class="cancel-order command"
-                    :title="$t('trading.derivative.cancelTool')"
-                    @click="cancelOrderClick"
-                >
-                    <i
-                        class="far fa-trash-alt"
-                        :class="{ blink: state.isOrderWarning }"
-                    >
-                    </i>
-                </div>
+                    ref="orderToolRef"
+                    :position="status.position"
+                    :prices="state.prices"
+                    :priceSeries="state.series.price"
+                    :inSession="inSession"
+                    :TIME="state.TIME"
+                    @getTools="getTools"
+                    @showEntry="showEntryButton"
+                    @showTpSl="showTpSlButton"
+                    @hideContext="hideContext"
+                />
             </div>
             <div>
                 <div
@@ -156,19 +156,13 @@
                     @click="chartTopClick"
                 ></div>
             </div>
-            <iframe
-                v-show="state.showTradingView"
-                ref="tradingviewChartRef"
-                class="tradingview-chart"
-                :style="state.tradingViewStyle"
-                :src="tradingViewSrc"
-            ></iframe>
         </div>
     </div>
 </template>
 
 <script setup>
 import FullscreenTool from "./Tools/FullscreenTool.vue";
+import TradingviewTool from "./Tools/TradingviewTool.vue";
 import ProgressTool from "./Tools/ProgressTool.vue";
 import ScanTool from "./Tools/ScanTool.vue";
 import PatternTool from "./Tools/PatternTool.vue";
@@ -176,10 +170,10 @@ import PickTimeTool from "./Tools/PickTimeTool.vue";
 import LineTool from "./Tools/LineTool.vue";
 import TimeRangeTool from "./Tools/TimeRangeTool.vue";
 import TargetTool from "./Tools/TargetTool.vue";
+import OrderTool from "./Tools/OrderTool.vue";
 
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
-import { confirm } from "devextreme/ui/dialog";
 import {
     reactive,
     ref,
@@ -230,8 +224,6 @@ const CHART_OPTIONS = {
         barSpacing: 0.05,
     },
 };
-const TP_DEFAULT = 3;
-const SL_DEFAULT = 2;
 const CURRENT_DATE = format(new Date(), "yyyy-MM-dd");
 const TIME = {
     START: getUnixTime(new Date(`${CURRENT_DATE}T08:45:00Z`)),
@@ -252,8 +244,6 @@ const filters = inject("filters");
 const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
 const connectionRef = ref(null);
-const fullscreenToolRef = ref(null);
-const tradingviewChartRef = ref(null);
 const reloadToolRef = ref(null);
 const tradingviewRef = ref(null);
 const progressToolRef = ref(null);
@@ -263,49 +253,28 @@ const pickTimeToolRef = ref(null);
 const targetToolRef = ref(null);
 const timeRangeToolRef = ref(null);
 const scanToolRef = ref(null);
-const cancelOrderRef = ref(null);
+const orderToolRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
 
 let params = {
     chart: {},
-    series: {},
-    data: {
-        whitespace: [],
-        price: [],
-    },
-    tools: { pattern: {} },
+    whitespaces: [],
     crosshair: {},
     interval: null,
     interval60: null,
     websocket: null,
     socketStop: false,
     vpsUpdatedAt: subSeconds(new Date(), 61),
-    isAutoOrdering: false,
-    currentSeconds: getUnixTime(addHours(new Date(), 7)),
 };
-initToolsParams();
-//
 const state = reactive({
-    data: {
-        whitespace: [],
-        price: [],
-    },
+    prices: [],
     series: {},
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: format(new Date(), "HH:mm:ss"),
-    isFullscreen: false,
     isSocketWarning: false,
-    isOrderWarning: false,
-    lineColor: "#F44336",
-    lineTitle: "",
     progress: {},
-    scanSide: "left",
-    showProgressContext: false,
-    showScanContext: false,
-    showLineContext: false,
-    showTradingView: false,
-    tradingViewStyle: { left: "32px" },
+    TIME,
 });
 const status = computed(() => store.state.tradingDerivative.status);
 const config = computed(() => store.state.tradingDerivative.config);
@@ -313,29 +282,49 @@ const tools = computed(() => store.state.tradingDerivative.tools);
 const isLoading = computed(() => store.state.tradingDerivative.isLoading);
 const showCancelOrder = computed(
     () =>
-        status.value.position !== 0 ||
-        !!status.value.pending ||
-        !!tools.value.order
+        status.value.position ||
+        status.value.pending ||
+        (orderToolRef.value && orderToolRef.value.has())
 );
-const tradingViewSrc = computed(() => {
-    return `https://chart.vps.com.vn/tv/?u=${config.value.vpsUser}&s=${config.value.vpsSession}&symbol=VN30F1M&resolution=1&lang=vi`;
-});
 
-initChart();
-
-params.interval = setInterval(intervalHandler, 1000);
+params.interval = setInterval(() => {
+    if (orderToolRef.value) orderToolRef.value.cancelWithoutClose();
+    state.clock = format(new Date(), "HH:mm:ss");
+}, 1000);
 params.interval60 = setInterval(() => {
     if (inSession()) {
         getStatus();
-        if (config.value.autoRefresh) refreshPatternTool(true);
+        if (config.value.autoRefresh) patternToolRef.value.refresh(true);
     } else clearInterval(params.interval60);
 }, 60000);
 
+initChart();
 onMounted(() => {
+    drawChart();
+    new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
+    document.addEventListener("keydown", eventKeyPress);
+});
+onUnmounted(() => {
+    removeChart();
+    document.removeEventListener("keydown", eventKeyPress);
+    clearInterval(params.interval);
+    clearInterval(params.interval60);
+    closeSocket();
+    params.socketStop = true;
+});
+
+watch(() => store.state.tradingDerivative.chartData, loadChartData);
+watch(tools, loadToolsData);
+
+defineExpose({
+    connectSocket,
+});
+
+function drawChart() {
     params.chart = createChart(orderChartRef.value, CHART_OPTIONS);
     params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(eventPriceLineDrag);
-    params.series.whitespace = params.chart.addHistogramSeries({
+    state.series.whitespace = params.chart.addHistogramSeries({
         priceScaleId: "whitespace",
         scaleMargins: { top: 0, bottom: 0 },
         color: "#808080",
@@ -364,31 +353,13 @@ onMounted(() => {
         color: "#F5F5F5",
         priceFormat: { minMove: 0.1 },
     });
-    new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
-    document.addEventListener("keydown", eventKeyPress);
-    // document.addEventListener("fullscreenchange", eventFullscreenChange);
-});
-onUnmounted(() => {
+}
+function removeChart() {
     if (params.chart) {
         params.chart.remove();
         params.chart = null;
     }
-    document.removeEventListener("keydown", eventKeyPress);
-    // document.removeEventListener("fullscreenchange", eventFullscreenChange);
-    clearInterval(params.interval);
-    clearInterval(params.interval60);
-    closeSocket();
-    params.socketStop = true;
-});
-
-watch(() => store.state.tradingDerivative.chartData, loadChartData);
-watch(tools, loadToolsData);
-watch(() => state.progress, progressAlert);
-watch(
-    () => config.value.source,
-    (_, old) => (old ? connectSocket() : null)
-);
-
+}
 function eventChartClick(e) {
     hideContext();
     toggleOrderButton(false);
@@ -449,90 +420,7 @@ function eventPriceLineDrag(e) {
     const newPrice = lineOptions.price;
     switch (lineOptions.lineType) {
         case "order":
-            if (newPrice !== oldPrice) {
-                let isChanged = false;
-                if (lineOptions.kind === "entry") {
-                    if (!status.value.position) {
-                        isChanged = true;
-                        params.tools.order[lineOptions.kind].price = newPrice;
-                        store
-                            .dispatch("tradingDerivative/executeOrder", {
-                                action: "entry",
-                                etData: {
-                                    cmd: "change",
-                                    price: params.tools.order.entry.price,
-                                },
-                            })
-                            .then((resp) => {
-                                if (resp.isOk) {
-                                    drawOrderTool([lineOptions.kind]);
-                                    toast.success(
-                                        t(
-                                            "trading.derivative.changeEntrySuccess"
-                                        )
-                                    );
-                                } else {
-                                    line.applyOptions({
-                                        price: oldPrice,
-                                    });
-                                    toastOrderError(resp.message);
-                                }
-                            });
-                    }
-                } else {
-                    isChanged = true;
-                    params.tools.order[lineOptions.kind].price = newPrice;
-                    if (lineOptions.kind === "tp")
-                        store
-                            .dispatch("tradingDerivative/executeOrder", {
-                                action: "tp",
-                                tpData: {
-                                    cmd: "change",
-                                    price: params.tools.order.tp.price,
-                                },
-                            })
-                            .then((resp) => {
-                                if (resp.isOk) {
-                                    drawOrderTool([lineOptions.kind]);
-                                    toast.success(
-                                        t("trading.derivative.changeTpSuccess")
-                                    );
-                                } else {
-                                    line.applyOptions({
-                                        price: oldPrice,
-                                    });
-                                    toastOrderError(resp.message);
-                                }
-                            });
-                    else
-                        store
-                            .dispatch("tradingDerivative/executeOrder", {
-                                action: "sl",
-                                slData: {
-                                    cmd: "change",
-                                    price: params.tools.order.sl.price,
-                                },
-                            })
-                            .then((resp) => {
-                                if (resp.isOk) {
-                                    drawOrderTool([lineOptions.kind]);
-                                    toast.success(
-                                        t("trading.derivative.changeSlSuccess")
-                                    );
-                                } else {
-                                    line.applyOptions({
-                                        price: oldPrice,
-                                    });
-                                    toastOrderError(resp.message);
-                                }
-                            });
-                }
-                //
-                if (!isChanged) {
-                    line.applyOptions({ price: oldPrice });
-                    toast.show(t("trading.derivative.noChangeOrderLine"));
-                }
-            }
+            orderToolRef.value.drag({ line, lineOptions, oldPrice, newPrice });
             break;
         case "line":
             lineToolRef.value.drag({ lineOptions, oldPrice, newPrice });
@@ -546,7 +434,7 @@ function eventPriceLineDrag(e) {
     }
 }
 function eventChartResize() {
-    if (!!chartContainerRef.value) {
+    if (chartContainerRef.value) {
         params.chart.resize(
             chartContainerRef.value.offsetWidth,
             chartContainerRef.value.offsetHeight
@@ -602,17 +490,15 @@ function eventKeyPress(e) {
 function loadChartData(chartData) {
     if (!(state.chartDate === CURRENT_DATE && inSession())) {
         if (chartData.price.length > 0) {
-            params.data.whitespace = mergeChartData(
-                params.data.whitespace,
+            params.whitespaces = mergeChartData(
+                params.whitespaces,
                 createWhitespaceData(state.chartDate)
             );
-            state.data.whitespace = params.data.whitespace;
         }
-        params.series.whitespace.setData(params.data.whitespace);
+        state.series.whitespace.setData(params.whitespaces);
 
-        params.data.price = mergeChartData(params.data.price, chartData.price);
-        state.data.price = params.data.price;
-        state.series.price.setData(params.data.price);
+        state.prices = mergeChartData(state.prices, chartData.price);
+        state.series.price.setData(state.prices);
     }
 }
 function updateChartData(data, source = null) {
@@ -630,12 +516,10 @@ function updateChartData(data, source = null) {
         prices.push({ time, value });
     });
     if (prices.length > 1) {
-        params.data.price = mergeChartData(params.data.price, prices);
-        state.data.price = params.data.price;
-        state.series.price.setData(params.data.price);
+        state.prices = mergeChartData(state.prices, prices);
+        state.series.price.setData(state.prices);
     } else {
-        params.data.price.push(prices[0]);
-        state.data.price = params.data.price;
+        state.prices.push(prices[0]);
         state.series.price.update(prices[0]);
     }
 }
@@ -663,12 +547,11 @@ function mergeChartData(data1, data2) {
         ).values()
     );
 }
-function loadToolsData(toolsData) {
-    removeAllTools();
-    Object.entries(toolsData).forEach(([name, points]) => {
+function loadToolsData(data) {
+    Object.entries(data).forEach(([name, points]) => {
         switch (name) {
             case "order":
-                loadOrderTool(points);
+                orderToolRef.value.load(points);
                 break;
             case "pattern":
                 if (checkPatternPointsValid(points)) {
@@ -689,29 +572,6 @@ function loadToolsData(toolsData) {
                 break;
         }
     });
-}
-function progressAlert(newProgress, oldProgress) {
-    if (config.value.autoRefresh) {
-        if (
-            newProgress.step > oldProgress.step ||
-            (newProgress.step === oldProgress.step &&
-                newProgress.result > oldProgress.result)
-        ) {
-            let text = "";
-            if (newProgress.result) {
-                if ([2, 4, 5].includes(newProgress.step))
-                    text = t("trading.derivative.progressOrder", newProgress);
-                else
-                    text = t("trading.derivative.progressSuccess", newProgress);
-            } else text = t("trading.derivative.progressFail", newProgress);
-            speakAlert(text);
-        }
-    }
-}
-function speakAlert(text) {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "vi-VN";
-    speechSynthesis.speak(utterance);
 }
 async function connectSocket() {
     if (inSession()) {
@@ -772,12 +632,11 @@ function configFireAntSocket() {
                 const date = item.result[0].date.slice(0, 10);
                 if (date === CURRENT_DATE) {
                     getTools();
-                    params.data.whitespace = mergeChartData(
-                        params.data.whitespace,
+                    params.whitespaces = mergeChartData(
+                        params.whitespaces,
                         createWhitespaceData(CURRENT_DATE)
                     );
-                    state.data.whitespace = params.data.whitespace;
-                    params.series.whitespace.setData(params.data.whitespace);
+                    state.series.whitespace.setData(params.whitespaces);
                     updateChartData(item.result);
                 }
                 store.dispatch("tradingDerivative/setLoading", false);
@@ -787,7 +646,7 @@ function configFireAntSocket() {
                 item.arguments[0] === "VN30F1M"
             ) {
                 console.log("FireAnt", item.arguments[1]);
-                scanOrder(item.arguments[1].at(-1).price);
+                orderToolRef.value.scan(item.arguments[1].at(-1).price);
                 updateChartData(item.arguments[1]);
             }
         });
@@ -830,7 +689,7 @@ function configVpsSocket() {
                     const data = event[1].data;
                     if (data.id === 3220) {
                         console.log("VPS", data);
-                        scanOrder(data.lastPrice);
+                        orderToolRef.value.scan(data.lastPrice);
                         updateChartData([data]);
                     }
                 }
@@ -849,123 +708,10 @@ function getVpsData() {
         params.vpsUpdatedAt = new Date();
     }
 }
-function intervalHandler() {
-    params.currentSeconds = getUnixTime(addHours(new Date(), 7));
-    if (inSession()) {
-        if (!!status.value.position) {
-            if (params.currentSeconds > TIME.ATC - 5 * 60) {
-                state.isOrderWarning = true;
-                if (
-                    params.currentSeconds > TIME.ATC - 15 &&
-                    mf.isSet(params.tools.order.tp.line)
-                ) {
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "cancel",
-                            tpData: { cmd: "cancel" },
-                            slData: { cmd: "delete" },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderTool(["entry", "tp", "sl"]);
-                                toast.success(
-                                    t(
-                                        "trading.derivative.autoCancelTpSlSuccess"
-                                    )
-                                );
-                            } else toastOrderError(resp.message);
-                        });
-                }
-            }
-        }
-        if (config.value.openingMarket && params.currentSeconds === TIME.START)
-            connectSocket();
-    }
-    state.clock = format(new Date(), "HH:mm:ss");
-}
-function drawOrderTool(kinds) {
-    const TYPE = "order";
-    let param = {
-        isRemove: false,
-        name: TYPE,
-        points: [],
-        data: [],
-    };
-    let color, title;
-    kinds.forEach((kind) => {
-        const entryPrice = params.tools.order.entry.price;
-        const tpPrice = params.tools.order.tp.price;
-        const slPrice = params.tools.order.sl.price;
-        switch (kind) {
-            case "entry":
-                color = "yellow";
-                title = params.tools.order.side > 0 ? "LONG" : "SHORT";
-                break;
-            case "tp":
-                color = "lime";
-                title = mf.fmtNum(tpPrice - entryPrice, 1, true);
-                break;
-            case "sl":
-                color = "red";
-                title = mf.fmtNum(slPrice - entryPrice, 1, true);
-                break;
-        }
-        param.points.push(kind);
-        if (mf.isSet(params.tools.order[kind].line)) {
-            params.tools.order[kind].line.applyOptions({
-                price: params.tools.order[kind].price,
-                title: title,
-            });
-            param.data.push(params.tools.order[kind].line.options());
-        } else {
-            const options = {
-                lineType: TYPE,
-                kind: kind,
-                side: params.tools.order.side,
-                price: params.tools.order[kind].price,
-                color: color,
-                lineWidth: 1,
-                lineStyle: 0,
-                title: title,
-                draggable: true,
-            };
-            params.tools.order[kind].line =
-                state.series.price.createPriceLine(options);
-            param.data.push(options);
-        }
-    });
-    store.dispatch("tradingDerivative/drawTools", param);
-}
-function loadOrderTool(kinds) {
-    Object.entries(kinds).forEach(([kind, option]) => {
-        params.tools.order.side = option.side;
-        params.tools.order[kind].price = option.price;
-        params.tools.order[kind].line =
-            state.series.price.createPriceLine(option);
-    });
-}
-function removeOrderTool(kinds, withServer = true) {
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            name: "order",
-        });
-    kinds.forEach((kind) => {
-        if (mf.isSet(params.tools.order[kind].line)) {
-            state.series.price.removePriceLine(params.tools.order[kind].line);
-            delete params.tools.order[kind].line;
-        }
-    });
-}
-function tradingviewClick(e) {
-    state.showTradingView = !state.showTradingView;
-    e.stopPropagation();
-}
 function refreshPattern() {
     patternToolRef.value.refresh();
 }
-function scaned(points) {
-    console.log("scaned", points);
+function patternScaned(points) {
     patternToolRef.value.load(points, true);
 }
 function hideContext() {
@@ -974,334 +720,64 @@ function hideContext() {
     lineToolRef.value.hide();
 }
 function checkPatternPointsValid({ A: { time } }) {
-    return params.data.whitespace.some((item) => item.time === time);
+    return params.whitespaces.some((item) => item.time === time);
 }
 function setProgress(value) {
     progressToolRef.value.set(value);
 }
-function removeAllTools() {
-    removeOrderTool(["entry", "tp", "sl"], false);
-}
 function toggleOrderButton(show) {
     if (show) {
-        if (inSession()) {
-            if (!mf.isSet(params.tools.order.tp.line)) {
-                if (!!status.value.position) {
-                    if (
-                        params.currentSeconds > TIME.ATO &&
-                        params.currentSeconds < TIME.ATC
-                    ) {
-                        tpslOrderRef.value.style.left =
-                            +(
-                                params.crosshair.x +
-                                (params.crosshair.x > innerWidth - 61 ? -61 : 1)
-                            ) + "px";
-                        tpslOrderRef.value.style.top =
-                            +(
-                                params.crosshair.y +
-                                (params.crosshair.y > innerHeight - 51
-                                    ? -51
-                                    : 1)
-                            ) + "px";
-                        tpslOrderRef.value.style.display = "block";
-                    }
-                }
-            }
-            if (!mf.isSet(params.tools.order.entry.line)) {
-                let price = null,
-                    side = 0;
-                if (!status.value.position) {
-                    if (
-                        params.currentSeconds > TIME.ATO &&
-                        params.currentSeconds < TIME.ATC
-                    ) {
-                        price = coordinateToPrice(params.crosshair.y);
-                        side = price >= params.data.price.at(-1).value ? 1 : -1;
-                        params.tools.order.side = side;
-                        params.tools.order.entry.price = price;
-                    }
-                } else {
-                    if (params.currentSeconds < TIME.ATO) price = "ATO";
-                    else if (params.currentSeconds > TIME.ATC) price = "ATC";
-                    if (!!price) {
-                        params.tools.order.entry.price = price;
-                        side = -status.value.position;
-                    }
-                }
-                if (!!side) {
-                    entryOrderRef.value.style.left =
-                        +(
-                            params.crosshair.x +
-                            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
-                        ) + "px";
-                    entryOrderRef.value.style.top =
-                        +(
-                            params.crosshair.y +
-                            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
-                        ) + "px";
-                    entryOrderRef.value.style.background =
-                        side > 0 ? "green" : "red";
-                    entryOrderRef.value.innerText = `${
-                        side > 0 ? "LONG" : "SHORT"
-                    } ${price}`;
-                    entryOrderRef.value.style.display = "block";
-                }
-            }
-        }
+        orderToolRef.value.show({
+            price: coordinateToPrice(params.crosshair.y),
+        });
     } else {
         entryOrderRef.value.style.display = "none";
         tpslOrderRef.value.style.display = "none";
     }
 }
+function showEntryButton() {
+    entryOrderRef.value.style.left =
+        +(
+            params.crosshair.x +
+            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
+        ) + "px";
+    entryOrderRef.value.style.top =
+        +(
+            params.crosshair.y +
+            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
+        ) + "px";
+    entryOrderRef.value.style.background = side > 0 ? "green" : "red";
+    entryOrderRef.value.innerText = `${side > 0 ? "LONG" : "SHORT"} ${price}`;
+    entryOrderRef.value.style.display = "block";
+}
+function showTpSlButton() {
+    tpslOrderRef.value.style.left =
+        +(
+            params.crosshair.x +
+            (params.crosshair.x > innerWidth - 61 ? -61 : 1)
+        ) + "px";
+    tpslOrderRef.value.style.top =
+        +(
+            params.crosshair.y +
+            (params.crosshair.y > innerHeight - 51 ? -51 : 1)
+        ) + "px";
+    tpslOrderRef.value.style.display = "block";
+}
 function entryOrderClick() {
-    if (inSession()) {
-        if (params.currentSeconds < TIME.ATO) {
-            let result = confirm(
-                t("trading.derivative.atoOrder"),
-                t("titles.confirm")
-            );
-            result.then((dialogResult) => {
-                if (dialogResult) {
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "exit",
-                            exitData: {
-                                cmd: "new",
-                                price: "ATO",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk)
-                                toast.success(
-                                    t("trading.derivative.atoOrderSuccess")
-                                );
-                            else toastOrderError(resp.message);
-                        });
-                }
-            });
-        } else if (params.currentSeconds < TIME.ATC) {
-            store
-                .dispatch("tradingDerivative/executeOrder", {
-                    action: "entry",
-                    etData: {
-                        cmd: "new",
-                        side: params.tools.order.side,
-                        price: params.tools.order.entry.price,
-                    },
-                })
-                .then((resp) => {
-                    if (resp.isOk) {
-                        drawOrderTool(["entry"]);
-                        toast.success(t("trading.derivative.newEntrySuccess"));
-                    } else toastOrderError(resp.message);
-                });
-        } else {
-            let result = confirm(
-                t("trading.derivative.atcOrder"),
-                t("titles.confirm")
-            );
-            result.then((dialogResult) => {
-                if (dialogResult) {
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "exit",
-                            exitData: {
-                                cmd: "new",
-                                price: "ATC",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk)
-                                toast.success(
-                                    t("trading.derivative.atcOrderSuccess")
-                                );
-                            else toastOrderError(resp.message);
-                        });
-                }
-            });
-        }
-    }
+    orderToolRef.value.entry();
 }
 function tpslOrderClick() {
-    params.tools.order.tp.price =
-        params.tools.order.entry.price + params.tools.order.side * TP_DEFAULT;
-    params.tools.order.sl.price =
-        params.tools.order.entry.price - params.tools.order.side * SL_DEFAULT;
-    store
-        .dispatch("tradingDerivative/executeOrder", {
-            action: "tpsl",
-            tpData: {
-                cmd: "new",
-                price: params.tools.order.tp.price,
-            },
-            slData: {
-                cmd: "new",
-                price: params.tools.order.sl.price,
-            },
-        })
-        .then((resp) => {
-            if (resp.isOk) {
-                params.tools.order.entry.line.applyOptions({
-                    draggable: false,
-                });
-                drawOrderTool(["entry", "tp", "sl"]);
-                toast.success(t("trading.derivative.newTpSlSuccess"));
-            } else toastOrderError(resp.message);
-        });
-}
-function cancelOrderClick() {
-    if (mf.isSet(params.tools.order.entry.line)) {
-        if (mf.isSet(params.tools.order.tp.line)) {
-            store
-                .dispatch("tradingDerivative/executeOrder", {
-                    action: "exit",
-                    tpData: { cmd: "cancel" },
-                    slData: { cmd: "delete" },
-                    exitData: {
-                        cmd: "new",
-                        price: "MTL",
-                    },
-                })
-                .then((resp) => {
-                    if (resp.isOk) {
-                        removeOrderTool(["entry", "tp", "sl"]);
-                        toast.success(t("trading.derivative.exitSuccess"));
-                    } else {
-                        toastOrderError(resp.message);
-                    }
-                });
-        } else {
-            store
-                .dispatch("tradingDerivative/executeOrder", {
-                    action: "entry",
-                    etData: { cmd: "delete" },
-                })
-                .then((resp) => {
-                    if (resp.isOk) {
-                        removeOrderTool(["entry"]);
-                        toast.success(
-                            t("trading.derivative.deleteEntrySuccess")
-                        );
-                    } else {
-                        toastOrderError(resp.message);
-                    }
-                });
-        }
-    } else getTools();
-}
-function scanOrder(lastPrice) {
-    if (mf.isSet(params.tools.order.entry.line)) {
-        if (mf.isSet(params.tools.order.tp.line)) {
-            if (
-                (params.tools.order.side > 0 &&
-                    lastPrice >= params.tools.order.tp.price) ||
-                (params.tools.order.side < 0 &&
-                    lastPrice <= params.tools.order.tp.price)
-            ) {
-                if (!params.isAutoOrdering) {
-                    params.isAutoOrdering = true;
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "sl",
-                            slData: {
-                                cmd: "delete",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderTool(["entry", "tp", "sl"]);
-                                toast.success(
-                                    t("trading.derivative.deleteTpSuccess")
-                                );
-                                toggleOrderButton(false);
-                            } else toastOrderError(resp.message);
-                            params.isAutoOrdering = false;
-                        });
-                }
-            }
-            if (
-                (params.tools.order.side > 0 &&
-                    lastPrice <= params.tools.order.sl.price) ||
-                (params.tools.order.side < 0 &&
-                    lastPrice >= params.tools.order.sl.price)
-            ) {
-                if (!params.isAutoOrdering) {
-                    params.isAutoOrdering = true;
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "tp",
-                            tpData: {
-                                cmd: "cancel",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderTool(["entry", "tp", "sl"]);
-                                toast.success(
-                                    t("trading.derivative.deleteSlSuccess")
-                                );
-                                toggleOrderButton(false);
-                            } else toastOrderError(resp.message);
-                            params.isAutoOrdering = false;
-                        });
-                }
-            }
-        } else {
-            if (
-                (params.tools.order.side > 0 &&
-                    lastPrice >= params.tools.order.entry.price) ||
-                (params.tools.order.side < 0 &&
-                    lastPrice <= params.tools.order.entry.price)
-            ) {
-                if (!params.isAutoOrdering) {
-                    params.isAutoOrdering = true;
-                    setTimeout(() => {
-                        params.tools.order.tp.price =
-                            params.tools.order.entry.price +
-                            params.tools.order.side * TP_DEFAULT;
-                        params.tools.order.sl.price =
-                            params.tools.order.entry.price -
-                            params.tools.order.side * SL_DEFAULT;
-                        store
-                            .dispatch("tradingDerivative/executeOrder", {
-                                action: "tpsl",
-                                tpData: {
-                                    cmd: "new",
-                                    price: params.tools.order.tp.price,
-                                },
-                                slData: {
-                                    cmd: "new",
-                                    price: params.tools.order.sl.price,
-                                },
-                            })
-                            .then((resp) => {
-                                if (resp.isOk) {
-                                    params.tools.order.entry.line.applyOptions({
-                                        draggable: false,
-                                    });
-                                    drawOrderTool(["entry", "tp", "sl"]);
-                                    toast.success(
-                                        t(
-                                            "trading.derivative.autoNewTpSlSuccess"
-                                        )
-                                    );
-                                } else toastOrderError(resp.message);
-                                params.isAutoOrdering = false;
-                            });
-                    }, 1000);
-                }
-            }
-        }
-    }
+    orderToolRef.value.tpsl();
 }
 function chartTopClick() {
     params.chart.timeScale().scrollToRealTime();
 }
 function inSession() {
+    const currentSeconds = getUnixTime(addHours(new Date(), 7));
     return (
         config.value.openingMarket &&
-        params.currentSeconds >= TIME.START &&
-        params.currentSeconds <= TIME.END
+        currentSeconds >= TIME.START &&
+        currentSeconds <= TIME.END
     );
 }
 function dateSelectChange() {
@@ -1309,10 +785,8 @@ function dateSelectChange() {
     getChartData();
 }
 function resetChart() {
-    params.data.whitespace = [];
-    params.data.price = [];
-    state.data.whitespace = params.data.whitespace;
-    state.data.price = params.data.price;
+    params.whitespaces = [];
+    state.prices = [];
     connectSocket();
     getChartData();
 }
@@ -1337,16 +811,6 @@ function getStatus() {
 function getTools() {
     store.dispatch("tradingDerivative/getTools");
 }
-function initToolsParams(tools) {
-    if (!tools) tools = ["order", "lines", "tr", "pattern", "target", "pt"];
-    if (tools.includes("order"))
-        params.tools.order = { side: 0, entry: {}, tp: {}, sl: {} };
-    if (tools.includes("lines")) params.tools.lines = [];
-    if (tools.includes("target")) params.tools.target = {};
-    if (tools.includes("tr")) params.tools.timeRange = [];
-    if (tools.includes("pattern")) params.tools.pattern.lines = {};
-    if (tools.includes("pt")) params.tools.pickTime = null;
-}
 function getAccountInfo() {
     store.dispatch("tradingDerivative/getAccountInfo").then((data) => {
         let html = "";
@@ -1370,21 +834,8 @@ function getAccountInfo() {
 function coordinateToPrice(y) {
     return mf.fmtNum(state.series.price.coordinateToPrice(y));
 }
-// function mf.fmtNum(price, digits = 1, abs = false) {
-//     price = +price;
-//     if (abs) price = Math.abs(price);
-//     return parseFloat(price.toFixed(digits));
-// }
-function toastOrderError(error) {
-    if (!error) error = "unknown";
-    toast.error(t(`trading.derivative.${error}`));
-}
-// function mf.cmp(value1, side, value2, eq = false) {
-//     if (side) return eq ? value1 >= value2 : value1 > value2;
-//     else return eq ? value1 <= value2 : value1 < value2;
-// }
 function timeToIndex(time) {
-    let index = params.data.whitespace.findIndex((item) => item.time === time);
+    let index = params.whitespaces.findIndex((item) => item.time === time);
     if (index === -1) {
         const date = format(new Date(time * 1000), "yyyy-MM-dd");
         const amEnd = getUnixTime(new Date(`${date}T11:30:00Z`));
@@ -1392,13 +843,13 @@ function timeToIndex(time) {
         const pmEnd = getUnixTime(new Date(`${date}T14:30:00Z`));
         if (time > amEnd && time < pmStart) time = amEnd;
         else if (time > pmEnd) time = pmEnd;
-        index = params.data.whitespace.findIndex((item) => item.time === time);
+        index = params.whitespaces.findIndex((item) => item.time === time);
     }
     return index;
 }
 function indexToTime(index) {
-    if (index < params.data.whitespace.length)
-        return params.data.whitespace[index].time;
+    if (index < params.whitespaces.length)
+        return params.whitespaces[index].time;
     else return false;
 }
 </script>
@@ -1470,6 +921,13 @@ function indexToTime(index) {
                     position: absolute;
                     top: 0px;
                     left: 42px;
+                }
+            }
+
+            .tradingview {
+                .chart {
+                    position: absolute;
+                    z-index: 3;
                 }
             }
 
@@ -1576,15 +1034,6 @@ function indexToTime(index) {
         width: 25px !important;
         height: 25px !important;
         font-size: 18px;
-    }
-
-    .tradingview-chart {
-        position: absolute;
-        top: 0;
-        left: 32px;
-        width: calc(100% - 32px);
-        height: 100%;
-        z-index: 3;
     }
 }
 </style>
