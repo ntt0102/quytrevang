@@ -175,13 +175,13 @@ import OrderTool from "./Tools/OrderTool.vue";
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { alert } from "devextreme/ui/dialog";
 import {
-    reactive,
     ref,
+    reactive,
     inject,
+    computed,
     watch,
     onMounted,
     onUnmounted,
-    computed,
 } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
