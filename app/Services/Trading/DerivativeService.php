@@ -241,36 +241,14 @@ class DerivativeService extends CoreService
     {
         try {
             $client = new \GuzzleHttp\Client();
-            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+            // $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+            $url = "https://datafeedapi.aisec.com.vn/getpschartintraday/VN30F1M";
             $res = $client->get($url);
             return (array)json_decode($res->getBody());
         } catch (\Throwable $th) {
             return [];
         }
     }
-
-    public function pingWithCurl()
-    {
-        try {
-            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_TIMEOUT, 10); // Timeout 10 giây
-            $response = curl_exec($ch);
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            curl_close($ch);
-
-            if ($httpCode === 200) {
-                return json_decode($response, true);
-            }
-
-            return ['error' => 'HTTP Error: ' . $httpCode];
-        } catch (\Throwable $th) {
-            return ['error' => 'Exception occurred: ' . $th->getMessage()];
-        }
-    }
-
-
 
     /**
      * Vps data
@@ -283,7 +261,7 @@ class DerivativeService extends CoreService
                 'json' => [
                     'operationName' => 'GetTicksBySymbol',
                     'query' => 'query GetTicksBySymbol {
-                        GetTicksBySymbol(symbol: "VN30F2407", date: "2024-07-14", limit: 6000) {
+                        GetTicksBySymbol(symbol: "VN30F2412", date: "2024-12-06", limit: 6000) {
                             data {
                                 symbol
                                 matchPrice

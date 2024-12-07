@@ -70,6 +70,7 @@ Route::get('test', function () {
     // $s = app(\App\Services\Trading\ShareService::class)->getDataFireAnt($payload);
     // $s = 'THO';
     $s = app(\App\Services\Trading\DerivativeService::class)->cloneVpsData();
+    // $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData();
     // $s = app(\App\Services\Trading\DerivativeService::class)->pingWithCurl();
     // $s = \App\Jobs\FilterShareJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
