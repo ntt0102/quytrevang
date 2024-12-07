@@ -4,9 +4,20 @@
         <div class="triangle"></div>
 
         <div class="container">
-            <div v-for="(step, i) in steps" :key="i" :class="['step']">
+            <div
+                v-for="(step, i) in steps"
+                :key="i"
+                class="step"
+                :class="[
+                    progress.step && progress.step === i + 1
+                        ? progress.result
+                            ? 'success'
+                            : 'fail'
+                        : '',
+                ]"
+            >
                 <div
-                    class="step-header"
+                    class="name"
                     :class="[
                         progress.steps
                             ? progress.steps[i].every(Boolean)
@@ -17,7 +28,7 @@
                 >
                     {{ i + 1 }}. {{ step.name }}
                 </div>
-                <div class="conditions">
+                <div>
                     <div
                         v-for="(cond, j) in step.conds"
                         :key="j"
@@ -98,12 +109,17 @@ function stopPropagationEvent(e) {
 
         .step {
             border-radius: 5px;
+            padding: 5px;
 
-            &:not(:last-child) {
-                margin-bottom: 5px;
+            &.success {
+                background: rgba(0, 60, 0, 0.5);
             }
 
-            .step-header {
+            &.fail {
+                background: rgba(60, 0, 0, 0.5);
+            }
+
+            .name {
                 padding-left: 10px;
                 font-weight: bold;
                 font-size: larger;
