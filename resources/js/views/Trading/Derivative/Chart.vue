@@ -313,7 +313,6 @@ onUnmounted(() => {
 });
 
 watch(() => store.state.tradingDerivative.chartData, loadChartData);
-watch(tools, loadToolsData);
 
 defineExpose({
     connectSocket,
@@ -545,34 +544,6 @@ function mergeChartData(data1, data2) {
                 .map((d) => [d.time, d])
         ).values()
     );
-}
-function loadToolsData(data) {
-    Object.entries(data).forEach(([name, points]) => {
-        switch (
-            name
-            // case "order":
-            //     orderToolRef.value.load(points);
-            //     break;
-            // case "pattern":
-            //     if (checkPatternPointsValid(points)) {
-            //         patternToolRef.value.load(mf.cloneDeep(points));
-            //     }
-            //     break;
-            // case "tr":
-            //     timeRangeToolRef.value.load(points);
-            //     break;
-            // case "0_pt":
-            //     pickTimeToolRef.value.load(points[0]);
-            //     break;
-            // case "line":
-            //     lineToolRef.value.load(points);
-            // break;
-            // case "target":
-            //     targetToolRef.value.load(points);
-            //     break;
-        ) {
-        }
-    });
 }
 async function connectSocket() {
     if (inSession()) {
