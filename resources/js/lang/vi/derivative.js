@@ -7,6 +7,7 @@ export default [
             "C giữ hỗ trợ",
             "Break sau T1",
             "T > T1",
+            "T < T1'",
         ],
     },
     {
@@ -17,6 +18,7 @@ export default [
             "EPR1 < 3",
             "EPR2 < EPR1",
             "T2 > T1",
+            "T < T3'",
             "T < T2",
         ],
     },

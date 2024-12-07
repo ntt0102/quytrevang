@@ -186,7 +186,6 @@ import {
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
-import { toast } from "vue3-toastify";
 import {
     format,
     getUnixTime,
@@ -194,6 +193,28 @@ import {
     subSeconds,
     differenceInSeconds,
 } from "date-fns";
+
+const store = useStore();
+const route = useRoute();
+const { t } = useI18n();
+const devices = inject("devices");
+const mf = inject("mf");
+const filters = inject("filters");
+const chartContainerRef = ref(null);
+const orderChartRef = ref(null);
+const connectionRef = ref(null);
+const reloadToolRef = ref(null);
+const tradingviewRef = ref(null);
+const progressToolRef = ref(null);
+const lineToolRef = ref(null);
+const patternToolRef = ref(null);
+const pickTimeToolRef = ref(null);
+const targetToolRef = ref(null);
+const timeRangeToolRef = ref(null);
+const scanToolRef = ref(null);
+const orderToolRef = ref(null);
+const entryOrderRef = ref(null);
+const tpslOrderRef = ref(null);
 
 const CHART_OPTIONS = {
     localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
@@ -235,27 +256,6 @@ const FIREANT_SOCKET_ENDPOINT =
     "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
 const VPS_SOCKET_ENDPOINT =
     "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
-const store = useStore();
-const route = useRoute();
-const { t } = useI18n();
-const devices = inject("devices");
-const mf = inject("mf");
-const filters = inject("filters");
-const chartContainerRef = ref(null);
-const orderChartRef = ref(null);
-const connectionRef = ref(null);
-const reloadToolRef = ref(null);
-const tradingviewRef = ref(null);
-const progressToolRef = ref(null);
-const lineToolRef = ref(null);
-const patternToolRef = ref(null);
-const pickTimeToolRef = ref(null);
-const targetToolRef = ref(null);
-const timeRangeToolRef = ref(null);
-const scanToolRef = ref(null);
-const orderToolRef = ref(null);
-const entryOrderRef = ref(null);
-const tpslOrderRef = ref(null);
 
 let params = {
     chart: {},
@@ -309,7 +309,7 @@ onUnmounted(() => {
     document.removeEventListener("keydown", eventKeyPress);
     clearInterval(params.interval);
     clearInterval(params.interval60);
-    closeSocket();
+    disconnectSocket();
     params.socketStop = true;
 });
 
@@ -575,7 +575,7 @@ function loadToolsData(data) {
 }
 async function connectSocket() {
     if (inSession()) {
-        await closeSocket();
+        await disconnectSocket();
         const isFireAnt = config.value.source === "FireAnt";
         const enpoint = isFireAnt
             ? FIREANT_SOCKET_ENDPOINT
@@ -594,7 +594,7 @@ async function connectSocket() {
         }
     }
 }
-async function closeSocket() {
+async function disconnectSocket() {
     if (params.websocket && params.websocket.readyState === WebSocket.OPEN) {
         params.websocket.close();
 
