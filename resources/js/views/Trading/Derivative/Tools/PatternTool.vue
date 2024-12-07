@@ -417,21 +417,23 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 xBox = mf.cloneDeep(box);
             }
             if (mf.cmp(price, side, box.R.price)) {
-                if (box.pr >= maxBox.pr) {
-                    maxBox.pr = box.pr;
-                    maxBox.R = mf.cloneDeep(box.R);
-                    maxBox.S = mf.cloneDeep(box.S);
-                }
-                if (box.tr > maxBox.tr) {
-                    maxBox.tr = box.tr;
-                }
-                if (
-                    phase === 1 &&
-                    retracementPrice &&
-                    !mf.cmp(box.S.price, !side, retracementPrice)
-                ) {
-                    if (box.tr >= xBox.tr && box.pr >= xBox.pr)
-                        xBox = mf.cloneDeep(box);
+                if (box.pr > 0) {
+                    if (box.pr >= maxBox.pr) {
+                        maxBox.pr = box.pr;
+                        maxBox.R = mf.cloneDeep(box.R);
+                        maxBox.S = mf.cloneDeep(box.S);
+                    }
+                    if (box.tr > maxBox.tr) {
+                        maxBox.tr = box.tr;
+                    }
+                    if (
+                        phase === 1 &&
+                        retracementPrice &&
+                        !mf.cmp(box.S.price, !side, retracementPrice)
+                    ) {
+                        if (box.tr >= xBox.tr && box.pr >= xBox.pr)
+                            xBox = mf.cloneDeep(box);
+                    }
                 }
                 box = {
                     R: { index, price },
