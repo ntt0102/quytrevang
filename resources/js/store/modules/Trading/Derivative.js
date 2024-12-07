@@ -49,6 +49,7 @@ const actions = {
                 .then((response) => {
                     commit("setInitChart", response.data);
                     commit("setLoading", false);
+                    dispatch("getStatus");
                     resolve();
                 });
         });

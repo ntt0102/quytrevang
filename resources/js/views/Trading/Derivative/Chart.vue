@@ -133,6 +133,7 @@
                     @getTools="getTools"
                     @showEntry="showEntryButton"
                     @showTpSl="showTpSlButton"
+                    @orderChanged="orderChanged"
                     @hideContext="hideContext"
                 />
             </div>
@@ -273,17 +274,14 @@ const state = reactive({
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: format(new Date(), "HH:mm:ss"),
     isSocketWarning: false,
+    hasOrderLine: false,
     TIME,
 });
 const status = computed(() => store.state.tradingDerivative.status);
 const config = computed(() => store.state.tradingDerivative.config);
-const tools = computed(() => store.state.tradingDerivative.tools);
 const isLoading = computed(() => store.state.tradingDerivative.isLoading);
 const showCancelOrder = computed(
-    () =>
-        status.value.position ||
-        status.value.pending ||
-        (orderToolRef.value && orderToolRef.value.has())
+    () => status.value.position || status.value.pending || state.hasOrderLine
 );
 
 params.interval = setInterval(() => {
@@ -694,6 +692,9 @@ function hideContext() {
 function setProgress(value) {
     progressToolRef.value.set(value);
 }
+function orderChanged(hasOrder) {
+    state.hasOrderLine = hasOrder;
+}
 function toggleOrderButton(show) {
     if (show) {
         orderToolRef.value.show({
@@ -704,7 +705,7 @@ function toggleOrderButton(show) {
         tpslOrderRef.value.style.display = "none";
     }
 }
-function showEntryButton() {
+function showEntryButton({ side, price }) {
     entryOrderRef.value.style.left =
         +(
             params.crosshair.x +
@@ -719,7 +720,7 @@ function showEntryButton() {
     entryOrderRef.value.innerText = `${side > 0 ? "LONG" : "SHORT"} ${price}`;
     entryOrderRef.value.style.display = "block";
 }
-function showTpSlButton() {
+function showTpSlButton({ side }) {
     tpslOrderRef.value.style.left =
         +(
             params.crosshair.x +
@@ -730,6 +731,7 @@ function showTpSlButton() {
             params.crosshair.y +
             (params.crosshair.y > innerHeight - 51 ? -51 : 1)
         ) + "px";
+    tpslOrderRef.value.style.background = side > 0 ? "green" : "red";
     tpslOrderRef.value.style.display = "block";
 }
 function entryOrderClick() {
@@ -987,7 +989,7 @@ function indexToTime(index) {
             width: 60px;
             height: 50px;
             line-height: 40px;
-            background: yellow;
+            color: white !important;
         }
     }
 

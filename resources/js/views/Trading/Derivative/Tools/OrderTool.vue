@@ -14,13 +14,7 @@ import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
 import { confirm } from "devextreme/ui/dialog";
-import {
-    format,
-    getUnixTime,
-    addHours,
-    subSeconds,
-    differenceInSeconds,
-} from "date-fns";
+import { getUnixTime, addHours } from "date-fns";
 
 const store = useStore();
 const { t } = useI18n();
@@ -32,18 +26,23 @@ const props = defineProps([
     "inSession",
     "TIME",
 ]);
-const emit = defineEmits(["getTools", "showEntry", "showTpSl", "hideContext"]);
+const emit = defineEmits([
+    "getTools",
+    "showEntry",
+    "showTpSl",
+    "orderChanged",
+    "hideContext",
+]);
 const orderToolRef = ref(null);
 const isOrderWarning = ref(false);
 const orderStore = computed(() => store.state.tradingDerivative.tools.order);
-let order = { entry: {}, tp: {}, sl: {} };
+let order = { side: 0, entry: {}, tp: {}, sl: {} };
 let isAutoOrdering = false;
 
 const TP_DEFAULT = 3;
 const SL_DEFAULT = 2;
 
 defineExpose({
-    has,
     show,
     entry,
     tpsl,
@@ -61,7 +60,7 @@ function has() {
     return mf.isSet(order.entry.line) || mf.isSet(order.tp.line);
 }
 function show({ price }) {
-    if (props.inSession()) {
+    if (price && props.inSession()) {
         const currentSeconds = getUnixTime(addHours(new Date(), 7));
         if (!mf.isSet(order.entry.line)) {
             let _price = null,
@@ -85,14 +84,14 @@ function show({ price }) {
                 }
             }
             if (_side) {
-                emit("showEntry");
+                emit("showEntry", { side: _side, price: _price });
             }
         } else if (!mf.isSet(order.tp.line) && props.position) {
             if (
                 currentSeconds > props.TIME.ATO &&
                 currentSeconds < props.TIME.ATC
             ) {
-                emit("showTpSl");
+                emit("showTpSl", { side: props.position });
             }
         }
     }
@@ -267,7 +266,7 @@ function scan(lastPrice) {
     if (mf.isSet(order.entry.line)) {
         const side = order.side > 0;
         if (mf.isSet(order.tp.line)) {
-            if (mf.cmd(lastPrice, side, order.tp.price, true)) {
+            if (mf.cmp(lastPrice, side, order.tp.price, true)) {
                 if (!isAutoOrdering) {
                     isAutoOrdering = true;
                     store
@@ -283,13 +282,12 @@ function scan(lastPrice) {
                                 toast.success(
                                     t("trading.derivative.deleteTpSuccess")
                                 );
-                                toggleOrderButton(false);
                             } else toastOrderError(resp.message);
                             isAutoOrdering = false;
                         });
                 }
             }
-            if (mf.cmd(lastPrice, !side, order.sl.price, true)) {
+            if (mf.cmp(lastPrice, !side, order.sl.price, true)) {
                 if (!isAutoOrdering) {
                     isAutoOrdering = true;
                     store
@@ -305,14 +303,13 @@ function scan(lastPrice) {
                                 toast.success(
                                     t("trading.derivative.deleteSlSuccess")
                                 );
-                                toggleOrderButton(false);
                             } else toastOrderError(resp.message);
                             isAutoOrdering = false;
                         });
                 }
             }
         } else {
-            if (mf.cmd(lastPrice, side, order.entry.price, true)) {
+            if (mf.cmp(lastPrice, side, order.entry.price, true)) {
                 if (!isAutoOrdering) {
                     isAutoOrdering = true;
                     setTimeout(() => {
@@ -403,10 +400,12 @@ function drawOrderTool(kinds) {
         }
     });
     store.dispatch("tradingDerivative/drawTools", param);
+    emit("orderChanged", has());
 }
 function load(kinds) {
     removeOrderTool(["entry", "tp", "sl"], false);
     loadOrderTool(kinds);
+    emit("orderChanged", has());
 }
 function loadOrderTool(kinds) {
     Object.entries(kinds).forEach(([kind, option]) => {
@@ -427,6 +426,7 @@ function removeOrderTool(kinds, withServer = true) {
             delete order[kind].line;
         }
     });
+    emit("orderChanged", has());
 }
 function drag({ line, lineOptions, oldPrice, newPrice }) {
     if (newPrice !== oldPrice) {
