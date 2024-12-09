@@ -54,7 +54,7 @@ class DerivativeService extends CoreService
                 'vpsSession' => get_global_value('vpsSession'),
                 'lastOpeningDate' => get_global_value('lastOpeningDate'),
                 'autoRefresh' => get_global_value('autoRefreshFlag') == "1",
-                'volInValid' => $vos->connection && $vos->getAccountInfo()->maxVol == 0
+                'volInvalid' => $vos->connection && $vos->getAccountInfo()->maxVol == 0
             ],
             'status' => $this->getStatus($payload)
         ];
