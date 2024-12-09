@@ -66,9 +66,9 @@ function toggleAutoRefresh(status) {
 function checkAlert(newProgress, oldProgress) {
     if (autoRefresh.value) {
         if (
-            newProgress.step > oldProgress.step ||
+            newProgress.step !== oldProgress.step ||
             (newProgress.step === oldProgress.step &&
-                newProgress.result > oldProgress.result)
+                newProgress.result !== oldProgress.result)
         ) {
             let text = "";
             if (newProgress.result) {
