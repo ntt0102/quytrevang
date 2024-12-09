@@ -28,6 +28,7 @@ export default [
             //
             "BC > TR1/2",
             "CD > PR2",
+            "Break sau T2",
             "T > T2",
         ],
     },
