@@ -512,7 +512,8 @@ function adjustTargetPrice(price, range, side) {
     return target;
 }
 function adjustPatternPoints() {
-    if (!props.pickTime) return false;
+    const pickTime = props.pickTimeToolRef.get();
+    if (pickTime) return false;
     //
     const side = points.B.price - points.A.price > 0;
     const lastPrice = props.prices.at(-1).value;
