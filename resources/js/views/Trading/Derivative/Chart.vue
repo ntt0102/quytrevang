@@ -263,8 +263,9 @@ let params = {
     chart: {},
     whitespaces: [],
     crosshair: {},
-    interval1: null,
-    interval30: null,
+    interval: null,
+    interval10At: subSeconds(new Date(), 11),
+    interval30At: subSeconds(new Date(), 31),
     websocket: null,
     socketStop: false,
     vpsUpdatedAt: subSeconds(new Date(), 61),
@@ -285,16 +286,20 @@ const showCancelOrder = computed(
     () => status.value.position || status.value.pending || state.hasOrderLine
 );
 
-params.interval1 = setInterval(() => {
+params.interval = setInterval(() => {
     if (orderToolRef.value) orderToolRef.value.cancelWithoutClose();
     state.clock = format(new Date(), "HH:mm:ss");
+    if (differenceInSeconds(new Date(), new Date(params.interval10At)) > 10) {
+        if (inSession() && config.value.autoRefresh) {
+            patternToolRef.value.refresh(true);
+        }
+        params.interval10At = new Date();
+    }
+    if (differenceInSeconds(new Date(), new Date(params.interval30At)) > 30) {
+        if (inSession()) getStatus();
+        params.interval30At = new Date();
+    }
 }, 1000);
-params.interval30 = setInterval(() => {
-    if (inSession()) {
-        getStatus();
-        if (config.value.autoRefresh) patternToolRef.value.refresh(true);
-    } else clearInterval(params.interval30);
-}, 30000);
 
 initChart();
 onMounted(() => {
@@ -305,8 +310,7 @@ onMounted(() => {
 onUnmounted(() => {
     removeChart();
     document.removeEventListener("keydown", eventKeyPress);
-    clearInterval(params.interval1);
-    clearInterval(params.interval30);
+    clearInterval(params.interval);
     disconnectSocket();
     params.socketStop = true;
 });
