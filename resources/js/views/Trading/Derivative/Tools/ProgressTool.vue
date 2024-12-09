@@ -29,12 +29,13 @@
 </template>
 <script setup>
 import ProgressContext from "./Contexts/ProgressContext.vue";
-import { ref, computed } from "vue";
+import { ref, inject, computed } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 
 const store = useStore();
 const { t } = useI18n();
+const mf = inject("mf");
 const props = defineProps(["position"]);
 const emit = defineEmits(["refreshPattern", "hideContext"]);
 const progress = ref({});
@@ -58,7 +59,7 @@ function hide(status) {
     showProgressContext.value = status;
 }
 function set(value) {
-    if (!props.position) checkAlert(value, progress.value);
+    if (!props.position && autoRefresh.value) checkAlert(value, progress.value);
     progress.value = value;
 }
 function refreshPattern() {
@@ -69,7 +70,7 @@ function toggleAutoRefresh(status) {
     store.dispatch("tradingDerivative/setAutoRefresh", autoRefresh);
 }
 function checkAlert(newProgress, oldProgress) {
-    if (autoRefresh.value && newProgress) {
+    if (mf.isSet(newProgress)) {
         if (
             newProgress.step !== oldProgress.step ||
             (newProgress.step === oldProgress.step &&
