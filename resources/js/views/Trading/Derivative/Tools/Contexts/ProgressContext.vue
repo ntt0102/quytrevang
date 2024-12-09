@@ -2,7 +2,14 @@
     <div class="pattern-context" @click="stopPropagationEvent">
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
-
+        <div>
+            <DxButton
+                icon="refresh"
+                type="success"
+                :text="$t('trading.derivative.progressContext.refreshPattern')"
+                @click="refreshPattern"
+            />
+        </div>
         <div class="container">
             <div
                 v-for="(step, i) in steps"
@@ -53,7 +60,7 @@
 import { ref, onMounted } from "vue";
 
 const props = defineProps(["progress"]);
-
+const emit = defineEmits(["refreshPattern"]);
 const steps = ref([]);
 
 onMounted(() => {
@@ -64,6 +71,10 @@ function loadProgress() {
     import(`../../../../../lang/${window.lang}/derivative.js`).then((e) => {
         steps.value = e.default || [];
     });
+}
+
+function refreshPattern() {
+    emit("refreshPattern");
 }
 
 function stopPropagationEvent(e) {
@@ -105,7 +116,8 @@ function stopPropagationEvent(e) {
     .container {
         color: white;
         text-align: left;
-        line-height: 25px;
+        line-height: 23px;
+        margin-top: 10px;
 
         .step {
             border-radius: 5px;

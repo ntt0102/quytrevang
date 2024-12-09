@@ -22,6 +22,7 @@
             v-show="showProgressContext"
             class="contextmenu"
             :progress="progress"
+            @refreshPattern="refreshPattern"
         >
         </ProgressContext>
     </div>
@@ -51,7 +52,7 @@ function toggleProgressContext() {
     const oldValue = showProgressContext.value;
     emit("hideContext");
     showProgressContext.value = !oldValue;
-    if (showProgressContext.value) emit("refreshPattern");
+    if (showProgressContext.value) refreshPattern();
 }
 function hide(status) {
     showProgressContext.value = status;
@@ -60,12 +61,15 @@ function set(value) {
     if (!props.position) checkAlert(value, progress.value);
     progress.value = value;
 }
+function refreshPattern() {
+    emit("refreshPattern");
+}
 function toggleAutoRefresh(status) {
     const autoRefresh = status ?? !autoRefresh.value;
     store.dispatch("tradingDerivative/setAutoRefresh", autoRefresh);
 }
 function checkAlert(newProgress, oldProgress) {
-    if (autoRefresh.value) {
+    if (autoRefresh.value && newProgress) {
         if (
             newProgress.step !== oldProgress.step ||
             (newProgress.step === oldProgress.step &&
