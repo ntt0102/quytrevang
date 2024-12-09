@@ -12,7 +12,6 @@ use App\Jobs\LoginDnseJob;
 
 class DerivativeService extends CoreService
 {
-    const SHIFT_TIME = 7 * 60 * 60;
 
     /**
      * Get chart data
@@ -22,7 +21,21 @@ class DerivativeService extends CoreService
      */
     public function getChartData($payload)
     {
-        return $this->generateDataFromCsv($payload->date);
+        $data = ['price' => []];
+        $file = storage_path('app/phaisinh/' . $payload->date . '.csv');
+        if (!file_exists($file)) return $data;
+        $fp = fopen($file, 'r');
+        while (!feof($fp)) {
+            $line = fgetcsv($fp);
+            if (!!$line) {
+                $data['price'][] = [
+                    'time' => +$line[0],
+                    'value' => +$line[1],
+                ];
+            }
+        }
+        fclose($fp);
+        return $data;
     }
 
     /**
@@ -57,6 +70,22 @@ class DerivativeService extends CoreService
                 'volInvalid' => $vos->connection && $vos->getAccountInfo()->maxVol == 0
             ],
             'status' => $this->getStatus($payload)
+        ];
+    }
+
+    /**
+     * Get Status
+     *
+     * @param $payload
+     * 
+     */
+    public function getStatus($payload)
+    {
+        $vos = new VpsOrderService();
+        return [
+            'connection' => $vos->connection,
+            'position' => $vos->position,
+            'pending' => $vos->hasOrder() || $vos->hasConditionOrder()
         ];
     }
 
@@ -101,6 +130,30 @@ class DerivativeService extends CoreService
     }
 
     /**
+     * Draw Tools
+     *
+     * @param $payload
+     * 
+     */
+    public function drawTools($payload)
+    {
+        $symbol = 'VN30F1M';
+        if ($payload->isRemove) {
+            $dt = StockDrawing::where('symbol', $symbol)->where('name', $payload->name);
+            if (isset($payload, $payload->point))
+                $dt = $dt->where('point', $payload->point);
+            $dt->delete();
+        } else {
+            for ($i = 0; $i < count($payload->points); $i++) {
+                $key = ['symbol' => $symbol, 'name' => $payload->name, 'point' => $payload->points[$i]];
+                $data = ['data' => $payload->data[$i]];
+                StockDrawing::updateOrCreate($key, $data);
+            }
+        }
+        return (object)[];
+    }
+
+    /**
      * Login VPS
      *
      * @param $payload
@@ -116,22 +169,6 @@ class DerivativeService extends CoreService
                 'position' => $vos->position,
                 'pending' => $vos->hasOrder() || $vos->hasConditionOrder()
             ]
-        ];
-    }
-
-    /**
-     * Get Status
-     *
-     * @param $payload
-     * 
-     */
-    public function getStatus($payload)
-    {
-        $vos = new VpsOrderService();
-        return [
-            'connection' => $vos->connection,
-            'position' => $vos->position,
-            'pending' => $vos->hasOrder() || $vos->hasConditionOrder()
         ];
     }
 
@@ -174,64 +211,6 @@ class DerivativeService extends CoreService
     {
         return set_global_value('vpsUser', $payload->user) &&
             set_global_value('vpsSession', $payload->session);
-    }
-
-    /**
-     * Get data from VPS website
-     */
-    public function generateDataFromApi()
-    {
-        $data = ['price' => [], 'volume' => []];
-        $vn30f1mData = $this->cloneDnseData();
-        // $vn30f1mData = $this->cloneVpsData();
-        $volume = 0;
-        foreach ($vn30f1mData as $item) {
-            $time = strtotime($item->time) + self::SHIFT_TIME;
-            $data['price'][] = [
-                'time' => $time,
-                'value' => $item->matchPrice,
-            ];
-            $volume += ($item->side == 1 ? 1 : ($item->side == 2 ? -1 : 0)) * $item->matchQtty;
-            $data['volume'][] = [
-                'time' => $time,
-                'value' => $volume,
-            ];
-        }
-        // foreach ($vn30f1mData as $item) {
-        //     $time = strtotime($item->Date) + self::SHIFT_TIME;
-        //     $data['price'][] = [
-        //         'time' => $time,
-        //         'value' => $item->Price,
-        //     ];
-        //     $volume += ($item->Side == 'B' ? 1 : ($item->Side == 'S' ? -1 : 0)) * $item->Volume;
-        //     $data['volume'][] = [
-        //         'time' => $time,
-        //         'value' => $volume,
-        //     ];
-        // }
-        return $data;
-    }
-
-    /**
-     * generate Data From Csv
-     */
-    public function generateDataFromCsv($date)
-    {
-        $data = ['price' => []];
-        $file = storage_path('app/phaisinh/' . $date . '.csv');
-        if (!file_exists($file)) return $data;
-        $fp = fopen($file, 'r');
-        while (!feof($fp)) {
-            $line = fgetcsv($fp);
-            if (!!$line) {
-                $data['price'][] = [
-                    'time' => +$line[0],
-                    'value' => +$line[1],
-                ];
-            }
-        }
-        fclose($fp);
-        return $data;
     }
 
     /**
@@ -284,30 +263,6 @@ class DerivativeService extends CoreService
         } catch (\Throwable $th) {
             return [];
         }
-    }
-
-    /**
-     * Draw Tools
-     *
-     * @param $payload
-     * 
-     */
-    public function drawTools($payload)
-    {
-        $symbol = 'VN30F1M';
-        if ($payload->isRemove) {
-            $dt = StockDrawing::where('symbol', $symbol)->where('name', $payload->name);
-            if (isset($payload, $payload->point))
-                $dt = $dt->where('point', $payload->point);
-            $dt->delete();
-        } else {
-            for ($i = 0; $i < count($payload->points); $i++) {
-                $key = ['symbol' => $symbol, 'name' => $payload->name, 'point' => $payload->points[$i]];
-                $data = ['data' => $payload->data[$i]];
-                StockDrawing::updateOrCreate($key, $data);
-            }
-        }
-        return (object)[];
     }
 
     /**
