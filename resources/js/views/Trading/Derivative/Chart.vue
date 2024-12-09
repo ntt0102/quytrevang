@@ -262,8 +262,8 @@ let params = {
     chart: {},
     whitespaces: [],
     crosshair: {},
-    interval: null,
-    interval60: null,
+    interval1: null,
+    interval30: null,
     websocket: null,
     socketStop: false,
     vpsUpdatedAt: subSeconds(new Date(), 61),
@@ -284,16 +284,16 @@ const showCancelOrder = computed(
     () => status.value.position || status.value.pending || state.hasOrderLine
 );
 
-params.interval = setInterval(() => {
+params.interval1 = setInterval(() => {
     if (orderToolRef.value) orderToolRef.value.cancelWithoutClose();
     state.clock = format(new Date(), "HH:mm:ss");
 }, 1000);
-params.interval60 = setInterval(() => {
+params.interval30 = setInterval(() => {
     if (inSession()) {
         getStatus();
         if (config.value.autoRefresh) patternToolRef.value.refresh(true);
-    } else clearInterval(params.interval60);
-}, 60000);
+    } else clearInterval(params.interval30);
+}, 30000);
 
 initChart();
 onMounted(() => {
@@ -304,8 +304,8 @@ onMounted(() => {
 onUnmounted(() => {
     removeChart();
     document.removeEventListener("keydown", eventKeyPress);
-    clearInterval(params.interval);
-    clearInterval(params.interval60);
+    clearInterval(params.interval1);
+    clearInterval(params.interval30);
     disconnectSocket();
     params.socketStop = true;
 });
