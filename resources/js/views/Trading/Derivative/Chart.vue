@@ -70,7 +70,7 @@
             >
                 <FullscreenTool :chartContainerRef="chartContainerRef" />
                 <TradingviewTool
-                    ref="tradingviewRef"
+                    ref="tradingviewToolRef"
                     :vpsUser="config.vpsUser"
                     :vpsSession="config.vpsSession"
                     :chartContainerRef="chartContainerRef"
@@ -206,14 +206,14 @@ const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
 const connectionRef = ref(null);
 const reloadToolRef = ref(null);
-const tradingviewRef = ref(null);
+const tradingviewToolRef = ref(null);
 const progressToolRef = ref(null);
-const lineToolRef = ref(null);
+const scanToolRef = ref(null);
 const patternToolRef = ref(null);
 const pickTimeToolRef = ref(null);
-const targetToolRef = ref(null);
+const lineToolRef = ref(null);
 const timeRangeToolRef = ref(null);
-const scanToolRef = ref(null);
+const targetToolRef = ref(null);
 const orderToolRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
