@@ -34,6 +34,7 @@ import { useI18n } from "vue-i18n";
 
 const store = useStore();
 const { t } = useI18n();
+const props = defineProps(["position"]);
 const emit = defineEmits(["refreshPattern", "hideContext"]);
 const progress = ref({});
 const showProgressContext = ref(false);
@@ -56,7 +57,7 @@ function hide(status) {
     showProgressContext.value = status;
 }
 function set(value) {
-    checkAlert(value, progress.value);
+    if (!props.position) checkAlert(value, progress.value);
     progress.value = value;
 }
 function toggleAutoRefresh(status) {
