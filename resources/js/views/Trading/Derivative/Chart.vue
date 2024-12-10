@@ -264,7 +264,7 @@ let params = {
     crosshair: {},
     interval: null,
     interval10At: subSeconds(new Date(), 11),
-    interval30At: subSeconds(new Date(), 31),
+    interval20At: subSeconds(new Date(), 21),
     websocket: null,
     socketStop: false,
     vpsUpdatedAt: subSeconds(new Date(), 61),
@@ -294,9 +294,9 @@ params.interval = setInterval(() => {
         }
         params.interval10At = new Date();
     }
-    if (differenceInSeconds(new Date(), new Date(params.interval30At)) > 30) {
+    if (differenceInSeconds(new Date(), new Date(params.interval20At)) > 20) {
         if (inSession()) getStatus();
-        params.interval30At = new Date();
+        params.interval20At = new Date();
     }
 }, 1000);
 
