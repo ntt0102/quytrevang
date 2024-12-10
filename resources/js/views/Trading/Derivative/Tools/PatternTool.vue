@@ -407,7 +407,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
             const price = item.value;
             const index = props.timeToIndex(item.time);
             if (index === -1) return false;
-            if (i === 0 || price === S.price) {
+            if (i === 0) {
                 box = {
                     R: { index, price },
                     S: { index, price },
