@@ -263,8 +263,8 @@ let params = {
     whitespaces: [],
     crosshair: {},
     interval: null,
-    interval10At: subSeconds(new Date(), 11),
-    interval20At: subSeconds(new Date(), 21),
+    refreshAt: subSeconds(new Date(), 11),
+    statusAt: subSeconds(new Date(), 21),
     websocket: null,
     socketStop: false,
     vpsUpdatedAt: subSeconds(new Date(), 61),
@@ -286,17 +286,17 @@ const showCancelOrder = computed(
 );
 
 params.interval = setInterval(() => {
-    if (orderToolRef.value) orderToolRef.value.cancelWithoutClose();
     state.clock = format(new Date(), "HH:mm:ss");
-    if (differenceInSeconds(new Date(), new Date(params.interval10At)) > 10) {
-        if (inSession() && config.value.autoRefresh) {
-            patternToolRef.value.refresh(true);
+    if (inSession()) {
+        if (orderToolRef.value) orderToolRef.value.cancelWithoutClose();
+        if (differenceInSeconds(new Date(), new Date(params.refreshAt)) > 10) {
+            if (config.value.autoRefresh) patternToolRef.value.refresh(true);
+            params.refreshAt = new Date();
         }
-        params.interval10At = new Date();
-    }
-    if (differenceInSeconds(new Date(), new Date(params.interval20At)) > 20) {
-        if (inSession()) getStatus();
-        params.interval20At = new Date();
+        if (differenceInSeconds(new Date(), new Date(params.statusAt)) > 20) {
+            getStatus();
+            params.statusAt = new Date();
+        }
     }
 }, 1000);
 
