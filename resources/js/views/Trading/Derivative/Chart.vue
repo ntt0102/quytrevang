@@ -77,7 +77,6 @@
                 />
                 <ProgressTool
                     ref="progressToolRef"
-                    :position="status.position"
                     @refreshPattern="refreshPattern"
                     @hideContext="hideContext"
                 />
