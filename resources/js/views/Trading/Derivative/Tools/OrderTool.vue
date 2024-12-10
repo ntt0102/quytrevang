@@ -36,8 +36,8 @@ const emit = defineEmits([
 const orderToolRef = ref(null);
 const isOrderWarning = ref(false);
 const orderStore = computed(() => store.state.tradingDerivative.tools.order);
-let order = { side: 0, entry: null, tp: null, sl: null };
-let lines = { entry: {}, tp: {}, sl: {} };
+let order = {};
+let lines = {};
 let isAutoOrdering = false;
 
 const TP_DEFAULT = 3;
@@ -152,7 +152,7 @@ function entry() {
             store
                 .dispatch("tradingDerivative/executeOrder", {
                     action: "entry",
-                    etData: {
+                    entryData: {
                         cmd: "new",
                         side: order.side,
                         price: order.entry,
@@ -184,10 +184,8 @@ function tpsl() {
         })
         .then((resp) => {
             if (resp.isOk) {
-                lines.entry.applyOptions({
-                    draggable: false,
-                });
-                drawOrderTool(["entry", "tp", "sl"]);
+                lines.entry.applyOptions({ draggable: false });
+                drawOrderTool(["tp", "sl"]);
                 toast.success(t("trading.derivative.newTpSlSuccess"));
             } else toastOrderError(resp.message);
         });
@@ -217,7 +215,7 @@ function cancel() {
             store
                 .dispatch("tradingDerivative/executeOrder", {
                     action: "entry",
-                    etData: { cmd: "delete" },
+                    entryData: { cmd: "delete" },
                 })
                 .then((resp) => {
                     if (resp.isOk) {
@@ -333,7 +331,7 @@ function scan(lastPrice) {
                                     lines.entry.applyOptions({
                                         draggable: false,
                                     });
-                                    drawOrderTool(["entry", "tp", "sl"]);
+                                    drawOrderTool(["tp", "sl"]);
                                     toast.success(
                                         t(
                                             "trading.derivative.autoNewTpSlSuccess"
@@ -348,7 +346,7 @@ function scan(lastPrice) {
         }
     }
 }
-function drawOrderTool(kinds) {
+function drawOrderTool(kinds, isStore = true) {
     const TYPE = "order";
     let param = {
         isRemove: false,
@@ -358,9 +356,6 @@ function drawOrderTool(kinds) {
     };
     let color, title;
     kinds.forEach((kind) => {
-        const entryPrice = order.entry;
-        const tpPrice = order.tp;
-        const slPrice = order.sl;
         switch (kind) {
             case "entry":
                 color = "yellow";
@@ -368,20 +363,20 @@ function drawOrderTool(kinds) {
                 break;
             case "tp":
                 color = "lime";
-                title = mf.fmtNum(tpPrice - entryPrice, 1, true);
+                title = mf.fmtNum(order.tp - order.entry, 1, true);
                 break;
             case "sl":
                 color = "red";
-                title = mf.fmtNum(slPrice - entryPrice, 1, true);
+                title = mf.fmtNum(order.sl - order.entry, 1, true);
                 break;
         }
-        param.points.push(kind);
         if (mf.isSet(lines[kind])) {
             lines[kind].applyOptions({
                 price: order[kind],
                 title: title,
             });
-            param.data.push(lines[kind].options());
+            param.points.push(kind);
+            param.data.push(order[kind]);
         } else {
             const options = {
                 lineType: TYPE,
@@ -392,26 +387,29 @@ function drawOrderTool(kinds) {
                 lineWidth: 1,
                 lineStyle: 0,
                 title: title,
-                draggable: true,
+                draggable: kind === "entry" && order.tp ? false : true,
             };
             lines[kind] = props.priceSeries.createPriceLine(options);
-            param.data.push(options);
+            if (kind === "entry") {
+                param.points.push("side");
+                param.data.push(order.side);
+            }
+            param.points.push(kind);
+            param.data.push(order[kind]);
         }
     });
-    store.dispatch("tradingDerivative/drawTools", param);
+    if (isStore) store.dispatch("tradingDerivative/drawTools", param);
     emit("orderChanged", has());
 }
-function load(kinds) {
+function load(data) {
+    order = mf.cloneDeep(data);
+    let kinds = ["entry"];
+    if ("tp" in order) {
+        kinds.push("tp", "sl");
+    }
     removeOrderTool(["entry", "tp", "sl"], false);
-    loadOrderTool(kinds);
+    drawOrderTool(kinds, false);
     emit("orderChanged", has());
-}
-function loadOrderTool(kinds) {
-    Object.entries(kinds).forEach(([kind, option]) => {
-        if (kind === "entry") order.side = option.side;
-        order[kind] = option.price;
-        lines[kind] = props.priceSeries.createPriceLine(option);
-    });
 }
 function removeOrderTool(kinds, withServer = true) {
     if (withServer)
@@ -429,83 +427,33 @@ function removeOrderTool(kinds, withServer = true) {
 }
 function drag({ line, lineOptions, oldPrice, newPrice }) {
     if (newPrice !== oldPrice) {
-        let isChanged = false;
-        if (lineOptions.kind === "entry") {
-            if (!props.position) {
-                isChanged = true;
-                order[lineOptions.kind] = newPrice;
-                store
-                    .dispatch("tradingDerivative/executeOrder", {
-                        action: "entry",
-                        etData: {
-                            cmd: "change",
-                            price: order.entry,
-                        },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            drawOrderTool([lineOptions.kind]);
-                            toast.success(
-                                t("trading.derivative.changeEntrySuccess")
-                            );
-                        } else {
-                            line.applyOptions({
-                                price: oldPrice,
-                            });
-                            toastOrderError(resp.message);
-                        }
-                    });
-            }
-        } else {
-            isChanged = true;
-            order[lineOptions.kind] = newPrice;
-            if (lineOptions.kind === "tp")
-                store
-                    .dispatch("tradingDerivative/executeOrder", {
-                        action: "tp",
-                        tpData: {
-                            cmd: "change",
-                            price: order.tp,
-                        },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            drawOrderTool([lineOptions.kind]);
-                            toast.success(
-                                t("trading.derivative.changeTpSuccess")
-                            );
-                        } else {
-                            line.applyOptions({
-                                price: oldPrice,
-                            });
-                            toastOrderError(resp.message);
-                        }
-                    });
-            else
-                store
-                    .dispatch("tradingDerivative/executeOrder", {
-                        action: "sl",
-                        slData: {
-                            cmd: "change",
-                            price: order.sl,
-                        },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            drawOrderTool([lineOptions.kind]);
-                            toast.success(
-                                t("trading.derivative.changeSlSuccess")
-                            );
-                        } else {
-                            line.applyOptions({
-                                price: oldPrice,
-                            });
-                            toastOrderError(resp.message);
-                        }
-                    });
-        }
+        const kind = lineOptions.kind;
+        const isChanged = kind !== "entry" || !props.position;
         //
-        if (!isChanged) {
+        if (isChanged) {
+            const dataKey = `${kind}Data`;
+            const toastKey = `change${kind[0].toUpperCase()}${kind.slice(
+                1
+            )}Success`;
+            store
+                .dispatch("tradingDerivative/executeOrder", {
+                    action: kind,
+                    [dataKey]: {
+                        cmd: "change",
+                        price: newPrice,
+                    },
+                })
+                .then((resp) => {
+                    if (resp.isOk) {
+                        order[kind] = newPrice;
+                        drawOrderTool([kind]);
+                        toast.success(t(`trading.derivative.${toastKey}`));
+                    } else {
+                        line.applyOptions({ price: oldPrice });
+                        toastOrderError(resp.message);
+                    }
+                });
+        } else {
             line.applyOptions({ price: oldPrice });
             toast.show(t("trading.derivative.noChangeOrderLine"));
         }

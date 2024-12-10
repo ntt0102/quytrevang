@@ -181,10 +181,10 @@ class VpsOrderService extends CoreService
         //
         switch ($payload->action) {
             case 'entry':
-                $isNew = $payload->etData->cmd == "new";
+                $isNew = $payload->entryData->cmd == "new";
                 if ($isNew && $this->position != 0)
                     return ['isOk' => false, 'message' => 'openedPosition'];
-                else return $this->conditionOrder($payload->action, $payload->etData);
+                else return $this->conditionOrder($payload->action, $payload->entryData);
                 break;
             case 'tpsl':
                 if ($this->position == 0)
