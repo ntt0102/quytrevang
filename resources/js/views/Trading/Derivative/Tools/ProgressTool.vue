@@ -65,9 +65,8 @@ function set(value) {
 function refreshPattern() {
     emit("refreshPattern");
 }
-function toggleAutoRefresh(status) {
-    const autoRefresh = status ?? !autoRefresh.value;
-    store.dispatch("tradingDerivative/setAutoRefresh", autoRefresh);
+function toggleAutoRefresh() {
+    store.dispatch("tradingDerivative/setAutoRefresh", !autoRefresh.value);
 }
 function checkAlert(newProgress, oldProgress) {
     if (mf.isSet(newProgress)) {
