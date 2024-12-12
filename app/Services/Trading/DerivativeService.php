@@ -59,7 +59,7 @@ class DerivativeService extends CoreService
     {
         $vos = new VpsOrderService();
         $volInvalid = false;
-        if($vos->connection && !$vos->position){
+        if ($vos->connection && !$vos->position) {
             $maxVol = $vos->getAccountInfo()->maxVol;
             $volInvalid = $maxVol == 0;
         }
@@ -227,6 +227,22 @@ class DerivativeService extends CoreService
             $client = new \GuzzleHttp\Client();
             // $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
             $url = "https://datafeedapi.aisec.com.vn/getpschartintraday/VN30F1M";
+            $res = $client->get($url);
+            return (array)json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            return [];
+        }
+    }
+
+    /**
+     * Vps data
+     */
+    public function testVpsData()
+    {
+        try {
+            $client = new \GuzzleHttp\Client();
+            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
+            // $url = "https://datafeedapi.aisec.com.vn/getpschartintraday/VN30F1M";
             $res = $client->get($url);
             return (array)json_decode($res->getBody());
         } catch (\Throwable $th) {
