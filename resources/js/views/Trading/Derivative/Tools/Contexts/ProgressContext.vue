@@ -1,5 +1,9 @@
 <template>
-    <div class="pattern-context" @click="stopPropagationEvent">
+    <div
+        class="pattern-context"
+        :class="{ portrait: chartHeightEnough }"
+        @click="stopPropagationEvent"
+    >
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
         <div>
@@ -10,7 +14,7 @@
                 @click="refreshPattern"
             />
         </div>
-        <div class="container">
+        <div class="steps" :class="{ portrait: chartHeightEnough }">
             <div
                 v-for="(step, i) in steps"
                 :key="i"
@@ -59,7 +63,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 
-const props = defineProps(["progress"]);
+const props = defineProps(["progress", "chartHeightEnough"]);
 const emit = defineEmits(["refreshPattern"]);
 const steps = ref([]);
 
@@ -88,10 +92,13 @@ function stopPropagationEvent(e) {
     border: 0 solid rgba(0, 0, 0, 0.25);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
     border-radius: 4px;
-    position: relative;
-    width: 230px;
+    width: 680px;
     min-height: 50px;
     padding: 10px;
+
+    &.portrait {
+        width: 200px !important;
+    }
 
     .triangle {
         width: 0px;
@@ -113,11 +120,18 @@ function stopPropagationEvent(e) {
         border-color: transparent rgba(0, 0, 0, 0.1) transparent transparent;
         position: absolute;
     }
-    .container {
+    .steps {
+        display: flex;
+        flex-direction: row;
         color: white;
         text-align: left;
-        line-height: 23px;
         margin-top: 10px;
+        line-height: 21px;
+        font-size: 15px;
+
+        &.portrait {
+            flex-direction: column !important;
+        }
 
         .step {
             border-radius: 5px;
@@ -132,13 +146,13 @@ function stopPropagationEvent(e) {
             }
 
             .name {
-                padding-left: 10px;
+                padding-left: 5px;
                 font-weight: bold;
                 font-size: larger;
             }
 
             .condition {
-                padding-left: 30px;
+                padding-left: 25px;
             }
 
             .success {

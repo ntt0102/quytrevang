@@ -68,7 +68,10 @@
                 @click="toolAreaClick"
                 @contextmenu="toolAreaContextmenu"
             >
-                <FullscreenTool :chartContainerRef="chartContainerRef" />
+                <FullscreenTool
+                    ref="fullscreenToolRef"
+                    :chartContainerRef="chartContainerRef"
+                />
                 <TradingviewTool
                     ref="tradingviewToolRef"
                     :vpsUser="config.vpsUser"
@@ -77,6 +80,7 @@
                 />
                 <ProgressTool
                     ref="progressToolRef"
+                    :chartHeightEnough="state.chartHeightEnough"
                     @refreshPattern="refreshPattern"
                     @hideContext="hideContext"
                 />
@@ -205,6 +209,7 @@ const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
 const connectionRef = ref(null);
 const reloadToolRef = ref(null);
+const fullscreenToolRef = ref(null);
 const tradingviewToolRef = ref(null);
 const progressToolRef = ref(null);
 const scanToolRef = ref(null);
@@ -274,6 +279,7 @@ const state = reactive({
     series: {},
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: format(new Date(), "HH:mm:ss"),
+    chartHeightEnough: false,
     isSocketWarning: false,
     hasOrderLine: false,
     TIME,
@@ -302,9 +308,11 @@ params.interval = setInterval(() => {
 
 initChart();
 onMounted(() => {
+    checkChartSize();
     drawChart();
     new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
+    fullscreenToolRef.value.toggleFullscreen({ set: true });
 });
 onUnmounted(() => {
     removeChart();
@@ -312,6 +320,7 @@ onUnmounted(() => {
     clearInterval(params.interval);
     disconnectSocket();
     params.socketStop = true;
+    fullscreenToolRef.value.toggleFullscreen({ unset: true });
 });
 
 watch(() => store.state.tradingDerivative.chartData, loadChartData);
@@ -435,21 +444,18 @@ function eventPriceLineDrag(e) {
 }
 function eventChartResize() {
     if (chartContainerRef.value) {
+        checkChartSize();
         params.chart.resize(
             chartContainerRef.value.offsetWidth,
             chartContainerRef.value.offsetHeight
         );
         if (chartContainerRef.value.classList.contains("fullscreen")) {
-            document.querySelector(
-                ".dx-drawer-panel-content"
-            ).style.visibility = "hidden";
-            document.querySelector(".header-component").style.visibility =
-                "hidden";
-            document.querySelector(".sc-launcher").style.visibility = "hidden";
-            document.querySelector(".dx-drawer-content").style.transform =
-                "unset";
+            fullscreenToolRef.value.setFullscreen();
         }
     }
+}
+function checkChartSize() {
+    state.chartHeightEnough = chartContainerRef.value.offsetHeight > 700;
 }
 function eventKeyPress(e) {
     if (e.ctrlKey) {

@@ -22,6 +22,7 @@
             v-show="showProgressContext"
             class="contextmenu"
             :progress="progress"
+            :chartHeightEnough="chartHeightEnough"
             @refreshPattern="refreshPattern"
         >
         </ProgressContext>
@@ -36,7 +37,7 @@ import { useI18n } from "vue-i18n";
 const store = useStore();
 const { t } = useI18n();
 const mf = inject("mf");
-const props = defineProps([]);
+const props = defineProps(["chartHeightEnough"]);
 const emit = defineEmits(["refreshPattern", "hideContext"]);
 const progress = ref({});
 const showProgressContext = ref(false);
