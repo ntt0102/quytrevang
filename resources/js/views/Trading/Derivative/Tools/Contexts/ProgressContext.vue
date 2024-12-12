@@ -1,19 +1,11 @@
 <template>
-    <div
-        class="pattern-context"
-        :class="{ portrait: chartHeightEnough }"
-        @click="stopPropagationEvent"
-    >
-        <div class="triangle-shadow"></div>
-        <div class="triangle"></div>
-        <div>
-            <DxButton
-                icon="refresh"
-                type="success"
-                :text="$t('trading.derivative.progressContext.refreshPattern')"
-                @click="refreshPattern"
-            />
-        </div>
+    <CoreContext class="pattern-context">
+        <DxButton
+            icon="refresh"
+            type="success"
+            :text="$t('trading.derivative.progressContext.refreshPattern')"
+            @click="refreshPattern"
+        />
         <div class="steps" :class="{ portrait: chartHeightEnough }">
             <div
                 v-for="(step, i) in steps"
@@ -57,10 +49,11 @@
                 </div>
             </div>
         </div>
-    </div>
+    </CoreContext>
 </template>
 
 <script setup>
+import CoreContext from "./CoreContext.vue";
 import { ref, onMounted } from "vue";
 
 const props = defineProps(["progress", "chartHeightEnough"]);
@@ -80,46 +73,10 @@ function loadProgress() {
 function refreshPattern() {
     emit("refreshPattern");
 }
-
-function stopPropagationEvent(e) {
-    e.stopPropagation();
-}
 </script>
 
 <style lang="scss">
 .pattern-context {
-    background: #4d4d5c;
-    border: 0 solid rgba(0, 0, 0, 0.25);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 4px;
-    width: 680px;
-    min-height: 50px;
-    padding: 10px;
-
-    &.portrait {
-        width: 200px !important;
-    }
-
-    .triangle {
-        width: 0px;
-        height: 0px;
-        top: 5px;
-        left: -10px;
-        border-style: solid;
-        border-width: 9px 10px 9px 0;
-        border-color: transparent #4d4d5c transparent transparent;
-        position: absolute;
-    }
-    .triangle-shadow {
-        width: 0px;
-        height: 0px;
-        top: 5px;
-        left: -10px;
-        border-style: solid;
-        border-width: 9px 10px 9px transparent;
-        border-color: transparent rgba(0, 0, 0, 0.1) transparent transparent;
-        position: absolute;
-    }
     .steps {
         display: flex;
         flex-direction: row;
@@ -128,6 +85,7 @@ function stopPropagationEvent(e) {
         margin-top: 10px;
         line-height: 21px;
         font-size: 15px;
+        min-height: 50px;
 
         &.portrait {
             flex-direction: column !important;
@@ -136,6 +94,7 @@ function stopPropagationEvent(e) {
         .step {
             border-radius: 5px;
             padding: 5px;
+            width: 170px;
 
             &.success {
                 background: rgba(0, 60, 0, 0.5);

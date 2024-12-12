@@ -1,8 +1,5 @@
 <template>
-    <div class="scan-context" @click="stopPropagationEvent">
-        <div class="triangle-shadow"></div>
-        <div class="triangle"></div>
-
+    <CoreContext class="scan-context">
         <DxButtonGroup
             :items="items"
             :selected-item-keys="[props.modelValue]"
@@ -10,10 +7,11 @@
             styling-mode="outlined"
             @item-click="itemClick"
         />
-    </div>
+    </CoreContext>
 </template>
 
 <script setup>
+import CoreContext from "./CoreContext.vue";
 import DxButtonGroup from "devextreme-vue/button-group";
 import { useI18n } from "vue-i18n";
 
@@ -38,42 +36,12 @@ const emit = defineEmits(["update:modelValue"]);
 function itemClick({ itemData: { side } }) {
     emit("update:modelValue", side);
 }
-
-function stopPropagationEvent(e) {
-    e.stopPropagation();
-}
 </script>
 
 <style lang="scss">
 .scan-context {
-    background: #4d4d5c;
-    border: 0 solid rgba(0, 0, 0, 0.25);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 4px;
-    position: relative;
     width: 180px;
-    padding: 10px;
-
-    .triangle {
-        width: 0px;
-        height: 0px;
-        top: 5px;
-        left: -10px;
-        border-style: solid;
-        border-width: 9px 10px 9px 0;
-        border-color: transparent #4d4d5c transparent transparent;
-        position: absolute;
-    }
-    .triangle-shadow {
-        width: 0px;
-        height: 0px;
-        top: 5px;
-        left: -10px;
-        border-style: solid;
-        border-width: 9px 10px 9px transparent;
-        border-color: transparent rgba(0, 0, 0, 0.1) transparent transparent;
-        position: absolute;
-    }
+    text-align: center;
 
     .dx-buttongroup {
         .dx-buttongroup-wrapper {

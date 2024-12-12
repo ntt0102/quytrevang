@@ -1,8 +1,5 @@
 <template>
-    <div class="line-context" @click="stopPropagationEvent">
-        <div class="triangle-shadow"></div>
-        <div class="triangle"></div>
-
+    <CoreContext class="line-context">
         <div class="input">
             <DxTextBox
                 ref="titleRef"
@@ -25,12 +22,13 @@
                 @click="updateColor(color)"
             ></div>
         </div>
-    </div>
+    </CoreContext>
 </template>
 
 <script setup>
-import { ref, nextTick, watch } from "vue";
+import CoreContext from "./CoreContext.vue";
 import DxTextBox from "devextreme-vue/text-box";
+import { ref, nextTick, watch } from "vue";
 
 const props = defineProps(["enable", "title", "color"]);
 const emit = defineEmits(["update:title", "update:color"]);
@@ -65,41 +63,11 @@ function updateColor(color) {
 function deleteAllLine() {
     emit("deleteAllLine");
 }
-function stopPropagationEvent(e) {
-    e.stopPropagation();
-}
 </script>
 
 <style lang="scss">
 .line-context {
-    background: #4d4d5c;
-    border: 0 solid rgba(0, 0, 0, 0.25);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-    border-radius: 4px;
-    position: relative;
     width: 200px;
-    padding: 10px;
-
-    .triangle {
-        width: 0px;
-        height: 0px;
-        top: 5px;
-        left: -10px;
-        border-style: solid;
-        border-width: 9px 10px 9px 0;
-        border-color: transparent #4d4d5c transparent transparent;
-        position: absolute;
-    }
-    .triangle-shadow {
-        width: 0px;
-        height: 0px;
-        top: 5px;
-        left: -10px;
-        border-style: solid;
-        border-width: 9px 10px 9px transparent;
-        border-color: transparent rgba(0, 0, 0, 0.1) transparent transparent;
-        position: absolute;
-    }
 
     .input {
         display: flex;
