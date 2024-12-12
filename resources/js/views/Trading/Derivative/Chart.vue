@@ -453,25 +453,26 @@ function priceLineDrag(e) {
             break;
     }
 }
-function chartShortcut({ ctrlKey, altKey, key }) {
+function chartShortcut(e) {
     const timeScale = params.chart.timeScale();
     const barSpacing = params.chart.options().timeScale.barSpacing;
-    switch (key) {
+    switch (e.key) {
         case "[":
-            if (ctrlKey) {
+            if (e.ctrlKey) {
                 timeScale.applyOptions({ barSpacing: barSpacing - 0.01 });
-            } else if (altKey) {
+            } else if (e.altKey) {
                 timeScale.scrollToPosition(timeScale.scrollPosition() - 50);
             }
             break;
         case "]":
-            if (ctrlKey) {
+            if (e.ctrlKey) {
                 timeScale.applyOptions({ barSpacing: barSpacing + 0.01 });
-            } else if (altKey) {
+            } else if (e.altKey) {
                 timeScale.scrollToPosition(timeScale.scrollPosition() + 50);
             }
             break;
     }
+    e.preventDefault();
 }
 function setChartData(chartData) {
     if (!(state.chartDate === CURRENT_DATE && inSession())) {
