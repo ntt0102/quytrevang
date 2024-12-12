@@ -891,6 +891,7 @@ function indexToTime(index) {
             }
 
             .context {
+                z-index: 0;
                 position: relative;
 
                 .contextmenu {
