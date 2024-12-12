@@ -23,7 +23,7 @@ const props = defineProps([
     "timeToIndex",
     "indexToTime",
 ]);
-const emit = defineEmits(["setProgress", "hideContext", "drawed"]);
+const emit = defineEmits(["setProgress", "hideContext"]);
 const patternToolRef = ref(null);
 const patternStore = computed(
     () => store.state.tradingDerivative.tools.pattern
@@ -171,7 +171,6 @@ function draw({ time, price }) {
             savePattern();
             emit("setProgress", _progress);
             setTimeMark(_timeMark);
-            emit("drawed");
             patternToolRef.value.classList.remove("selected");
         } else {
             option.point = "B";

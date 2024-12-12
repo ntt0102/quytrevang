@@ -98,7 +98,6 @@
                     :indexToTime="indexToTime"
                     @setProgress="setProgress"
                     @hideContext="hideContext"
-                    @drawed="patternDrawed"
                 />
                 <PickTimeTool
                     ref="pickTimeToolRef"
@@ -688,10 +687,6 @@ function refreshPattern() {
 }
 function patternScaned(points) {
     patternToolRef.value.load(points, { isSave: true });
-    progressToolRef.value.show();
-}
-function patternDrawed() {
-    progressToolRef.value.show();
 }
 function hideContext(progressIgnore = false) {
     if (!progressIgnore) progressToolRef.value.hide();
@@ -699,6 +694,7 @@ function hideContext(progressIgnore = false) {
     lineToolRef.value.hide();
 }
 function setProgress(value) {
+    progressToolRef.value.hide(mf.isSet(value));
     progressToolRef.value.set(value);
 }
 function orderChanged(hasOrder) {
