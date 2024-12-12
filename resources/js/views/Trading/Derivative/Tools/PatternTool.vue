@@ -420,14 +420,15 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
             }
             if (mf.cmp(price, side, box.R.price)) {
                 if (box.pr > 0) {
-                    if (box.pr >= maxBox.pr) {
+                    if (
+                        box.pr > maxBox.pr ||
+                        (box.pr === maxBox.pr && box.tr >= maxBox.tr)
+                    ) {
                         maxBox.pr = box.pr;
                         maxBox.R = mf.cloneDeep(box.R);
                         maxBox.S = mf.cloneDeep(box.S);
                     }
-                    if (box.tr > maxBox.tr) {
-                        maxBox.tr = box.tr;
-                    }
+                    if (box.tr > maxBox.tr) maxBox.tr = box.tr;
                     if (
                         phase === 1 &&
                         retracementPrice &&
