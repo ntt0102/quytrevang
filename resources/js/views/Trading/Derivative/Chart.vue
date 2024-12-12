@@ -202,8 +202,8 @@ import {
 const store = useStore();
 const route = useRoute();
 const { t } = useI18n();
-const devices = inject("devices");
 const mf = inject("mf");
+const devices = inject("devices");
 const filters = inject("filters");
 const chartContainerRef = ref(null);
 const orderChartRef = ref(null);
