@@ -453,40 +453,24 @@ function priceLineDrag(e) {
             break;
     }
 }
-function chartShortcut(e) {
-    if (e.ctrlKey) {
-        switch (e.keyCode) {
-            case 219:
-                params.chart.timeScale().applyOptions({
-                    barSpacing:
-                        params.chart.options().timeScale.barSpacing - 0.01,
-                });
-                break;
-            case 221:
-                params.chart.timeScale().applyOptions({
-                    barSpacing:
-                        params.chart.options().timeScale.barSpacing + 0.01,
-                });
-                break;
-        }
-    }
-    if (e.altKey) {
-        switch (e.keyCode) {
-            case 219:
-                params.chart
-                    .timeScale()
-                    .scrollToPosition(
-                        params.chart.timeScale().scrollPosition() - 50
-                    );
-                break;
-            case 221:
-                params.chart
-                    .timeScale()
-                    .scrollToPosition(
-                        params.chart.timeScale().scrollPosition() + 50
-                    );
-                break;
-        }
+function chartShortcut({ ctrlKey, altKey, key }) {
+    const timeScale = params.chart.timeScale();
+    const barSpacing = params.chart.options().timeScale.barSpacing;
+    switch (key) {
+        case "[":
+            if (ctrlKey) {
+                timeScale.applyOptions({ barSpacing: barSpacing - 0.01 });
+            } else if (altKey) {
+                timeScale.scrollToPosition(timeScale.scrollPosition() - 50);
+            }
+            break;
+        case "]":
+            if (ctrlKey) {
+                timeScale.applyOptions({ barSpacing: barSpacing + 0.01 });
+            } else if (altKey) {
+                timeScale.scrollToPosition(timeScale.scrollPosition() + 50);
+            }
+            break;
     }
 }
 function setChartData(chartData) {

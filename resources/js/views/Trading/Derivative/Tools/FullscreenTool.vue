@@ -24,17 +24,19 @@ defineExpose({
 });
 
 onMounted(() => {
-    document.addEventListener("fullscreenchange", eventFullscreenChange);
+    document.addEventListener("fullscreenchange", fullscreenChange);
+    window.addEventListener("keydown", handleF11);
 });
 
 onUnmounted(() => {
-    document.removeEventListener("fullscreenchange", eventFullscreenChange);
+    document.removeEventListener("fullscreenchange", fullscreenChange);
+    window.removeEventListener("keydown", handleF11);
 });
 function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
 }
-function eventFullscreenChange() {
+function fullscreenChange() {
     if (props.chartContainerRef) {
         if (document.fullscreenElement) {
             isFullscreen.value = true;
@@ -61,5 +63,11 @@ function unsetFullscreen() {
     document.querySelector(".sc-launcher").style.visibility = "unset";
     document.querySelector(".dx-drawer-content").style.transform =
         "translate(0px, 0px)";
+}
+function handleF11(e) {
+    if (e.key === "F11") {
+        toggleFullscreen();
+        e.preventDefault();
+    }
 }
 </script>
