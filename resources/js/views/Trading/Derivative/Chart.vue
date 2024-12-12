@@ -694,7 +694,7 @@ function hideContext() {
     lineToolRef.value.hide();
 }
 function setProgress(value) {
-    progressToolRef.value.hide(mf.isSet(value));
+    if (!devices.phone) progressToolRef.value.hide(mf.isSet(value));
     progressToolRef.value.set(value);
 }
 function orderChanged(hasOrder) {
