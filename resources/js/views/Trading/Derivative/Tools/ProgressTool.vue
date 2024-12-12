@@ -54,7 +54,6 @@ function toggleProgressContext() {
     const oldValue = showProgressContext.value;
     emit("hideContext");
     showProgressContext.value = !oldValue;
-    if (showProgressContext.value) refreshPattern();
 }
 function hide(status = false) {
     showProgressContext.value = status;
