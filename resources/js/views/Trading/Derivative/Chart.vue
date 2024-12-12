@@ -361,7 +361,7 @@ function removeChart() {
     }
 }
 function eventChartClick(e) {
-    hideContext(true);
+    hideContext();
     toggleOrderButton(false);
 
     if (scanToolRef.value.isSelected()) {
@@ -688,8 +688,8 @@ function refreshPattern() {
 function patternScaned(points) {
     patternToolRef.value.load(points, { isSave: true });
 }
-function hideContext(progressIgnore = false) {
-    if (!progressIgnore) progressToolRef.value.hide();
+function hideContext() {
+    progressToolRef.value.hide();
     scanToolRef.value.hide();
     lineToolRef.value.hide();
 }
