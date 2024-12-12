@@ -47,8 +47,8 @@ watch(lineStore, (data) => {
 function isSelected() {
     return lineToolRef.value.classList.contains("selected");
 }
-function hide(status) {
-    showLineContext.value = status;
+function hide() {
+    showLineContext.value = false;
 }
 function lineToolClick(e) {
     emit("hideContext");

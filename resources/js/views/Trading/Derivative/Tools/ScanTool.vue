@@ -39,8 +39,8 @@ defineExpose({
 function isSelected() {
     return scanToolRef.value.classList.contains("selected");
 }
-function hide(status) {
-    showScanContext.value = status;
+function hide() {
+    showScanContext.value = false;
 }
 function scanToolClick(e) {
     emit("hideContext");

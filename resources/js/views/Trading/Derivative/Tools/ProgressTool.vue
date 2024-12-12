@@ -46,6 +46,7 @@ const autoRefresh = computed(
 
 defineExpose({
     hide,
+    show,
     set,
 });
 
@@ -55,8 +56,11 @@ function toggleProgressContext() {
     showProgressContext.value = !oldValue;
     if (showProgressContext.value) refreshPattern();
 }
-function hide(status) {
-    showProgressContext.value = status;
+function hide() {
+    showProgressContext.value = false;
+}
+function show() {
+    showProgressContext.value = true;
 }
 function set(value) {
     if (autoRefresh.value) checkAlert(value, progress.value);

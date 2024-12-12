@@ -98,6 +98,7 @@
                     :indexToTime="indexToTime"
                     @setProgress="setProgress"
                     @hideContext="hideContext"
+                    @drawed="patternDrawed"
                 />
                 <PickTimeTool
                     ref="pickTimeToolRef"
@@ -361,7 +362,7 @@ function removeChart() {
     }
 }
 function eventChartClick(e) {
-    hideContext();
+    hideContext(true);
     toggleOrderButton(false);
 
     if (scanToolRef.value.isSelected()) {
@@ -687,9 +688,13 @@ function refreshPattern() {
 }
 function patternScaned(points) {
     patternToolRef.value.load(points, { isSave: true });
+    progressToolRef.value.show();
 }
-function hideContext() {
-    progressToolRef.value.hide();
+function patternDrawed() {
+    progressToolRef.value.show();
+}
+function hideContext(progressIgnore = false) {
+    if (!progressIgnore) progressToolRef.value.hide();
     scanToolRef.value.hide();
     lineToolRef.value.hide();
 }
