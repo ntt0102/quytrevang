@@ -901,6 +901,8 @@ function indexToTime(index) {
             }
 
             .tradingview {
+                z-index: 1;
+
                 .chart {
                     position: absolute;
                     z-index: 3;
