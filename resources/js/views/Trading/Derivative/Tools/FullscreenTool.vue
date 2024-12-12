@@ -21,7 +21,6 @@ const isFullscreen = ref(false);
 
 defineExpose({
     setFullscreen,
-    toggleFullscreen,
 });
 
 onMounted(() => {
@@ -31,12 +30,9 @@ onMounted(() => {
 onUnmounted(() => {
     document.removeEventListener("fullscreenchange", eventFullscreenChange);
 });
-function toggleFullscreen({ set = false, unset = false }) {
-    if (document.fullscreenElement) {
-        if (!set) document.exitFullscreen();
-    } else {
-        if (!unset) document.documentElement.requestFullscreen();
-    }
+function toggleFullscreen() {
+    if (document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen();
 }
 function eventFullscreenChange() {
     if (props.chartContainerRef) {

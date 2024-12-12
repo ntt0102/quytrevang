@@ -187,7 +187,7 @@ function draw({ time, price }) {
         points = { A: { time, price } };
     }
 }
-function load(data, { isSave = false, isCheck = false }) {
+function load(data, { isSave = false, isCheck = false } = {}) {
     points = mf.cloneDeep(data);
     if (isSave) savePattern();
     const isLoad = isCheck ? checkPointsValid(points) : true;

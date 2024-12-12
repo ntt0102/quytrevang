@@ -310,7 +310,6 @@ onMounted(() => {
     drawChart();
     new ResizeObserver(chartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", chartShortcut);
-    fullscreenToolRef.value.toggleFullscreen({ set: true });
 });
 onUnmounted(() => {
     removeChart();
@@ -318,7 +317,6 @@ onUnmounted(() => {
     clearInterval(params.interval);
     disconnectSocket();
     params.socketStop = true;
-    fullscreenToolRef.value.toggleFullscreen({ unset: true });
 });
 
 watch(() => store.state.tradingDerivative.chartData, setChartData);
