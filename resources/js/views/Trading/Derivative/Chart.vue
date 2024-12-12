@@ -1,165 +1,163 @@
 <template>
     <div
-        class="derivative-chart"
         ref="chartContainerRef"
-        @click="eventChartClick"
-        @contextmenu="eventChartContextmenu"
+        class="derivative-chart"
+        @click="chartClick"
+        @contextmenu="chartContextmenu"
     >
-        <div class="chart-wrapper" ref="orderChartRef">
+        <div ref="chartRef" />
+        <div
+            class="area data-area"
+            @click="areaClick"
+            @contextmenu="areaContextmenu"
+        >
             <div
-                class="area data-area"
-                @click="toolAreaClick"
-                @contextmenu="toolAreaContextmenu"
+                ref="connectionRef"
+                class="command"
+                :class="{ yellow: status.pending, red: config.volInvalid }"
+                :title="$t('trading.derivative.connection')"
+                @click="getStatus"
             >
-                <div
-                    ref="connectionRef"
-                    class="command"
-                    :class="{ yellow: status.pending, red: config.volInvalid }"
-                    :title="$t('trading.derivative.connection')"
-                    @click="getStatus"
-                >
-                    <i
-                        class="far"
-                        :class="{
-                            'fa-link-simple': status.connection,
-                            'fa-link-simple-slash': !status.connection,
-                            blink: state.isSocketWarning,
-                        }"
-                    ></i>
-                </div>
-                <div
-                    class="command status"
+                <i
+                    class="far"
                     :class="{
-                        green: status.position > 0,
-                        red: status.position < 0,
+                        'fa-link-simple': status.connection,
+                        'fa-link-simple-slash': !status.connection,
+                        blink: state.isSocketWarning,
                     }"
-                    :title="$t('trading.derivative.position')"
-                    @click="getAccountInfo"
-                >
-                    {{ status.position }}
-                </div>
-                <div class="command clock" @click="connectSocket">
-                    {{ state.clock }}
-                </div>
-                <input
-                    type="date"
-                    class="chart-date command"
-                    :title="$t('trading.derivative.date')"
-                    v-model="state.chartDate"
-                    @change="dateSelectChange"
-                />
-                <div
-                    ref="reloadToolRef"
-                    class="command"
-                    :title="$t('trading.derivative.reload')"
-                    @click="resetChart"
-                    @contextmenu="getTools"
-                >
-                    <i
-                        class="far fa-sync-alt"
-                        :class="{
-                            'fa-spin': isLoading,
-                        }"
-                    ></i>
-                </div>
+                ></i>
             </div>
             <div
-                class="area tool-area"
-                @click="toolAreaClick"
-                @contextmenu="toolAreaContextmenu"
+                class="command status"
+                :class="{
+                    green: status.position > 0,
+                    red: status.position < 0,
+                }"
+                :title="$t('trading.derivative.position')"
+                @click="getAccountInfo"
             >
-                <FullscreenTool
-                    ref="fullscreenToolRef"
-                    :chartContainerRef="chartContainerRef"
-                />
-                <TradingviewTool
-                    ref="tradingviewToolRef"
-                    :vpsUser="config.vpsUser"
-                    :vpsSession="config.vpsSession"
-                    :chartContainerRef="chartContainerRef"
-                />
-                <ProgressTool
-                    ref="progressToolRef"
-                    :chartHeightEnough="state.chartHeightEnough"
-                    @refreshPattern="refreshPattern"
-                    @hideContext="hideContext"
-                />
-                <ScanTool
-                    ref="scanToolRef"
-                    :prices="state.prices"
-                    :timeToIndex="timeToIndex"
-                    @scaned="patternScaned"
-                    @removePattern="() => patternToolRef.remove()"
-                    @hideContext="hideContext"
-                />
-                <PatternTool
-                    ref="patternToolRef"
-                    :prices="state.prices"
-                    :priceSeries="state.series.price"
-                    :timeMarkSeries="state.series.timeMark"
-                    :pickTimeToolRef="pickTimeToolRef"
-                    :timeToIndex="timeToIndex"
-                    :indexToTime="indexToTime"
-                    @setProgress="setProgress"
-                    @hideContext="hideContext"
-                />
-                <PickTimeTool
-                    ref="pickTimeToolRef"
-                    :pickTimeSeries="state.series.pickTime"
-                    @refreshPattern="refreshPattern"
-                    @hideContext="hideContext"
-                />
-                <LineTool
-                    ref="lineToolRef"
-                    :priceSeries="state.series.price"
-                    @hideContext="hideContext"
-                />
-                <TimeRangeTool
-                    ref="timeRangeToolRef"
-                    :timeRangeSeries="state.series.timeRange"
-                    :timeToIndex="timeToIndex"
-                    :indexToTime="indexToTime"
-                    @hideContext="hideContext"
-                />
-                <TargetTool
-                    ref="targetToolRef"
-                    :priceSeries="state.series.price"
-                    @hideContext="hideContext"
-                />
-                <OrderTool
-                    v-show="showCancelOrder"
-                    ref="orderToolRef"
-                    :position="status.position"
-                    :prices="state.prices"
-                    :priceSeries="state.series.price"
-                    :inSession="inSession"
-                    :TIME="state.TIME"
-                    @getTools="getTools"
-                    @showEntry="showEntryButton"
-                    @showTpSl="showTpSlButton"
-                    @orderChanged="orderChanged"
-                    @hideContext="hideContext"
-                />
+                {{ status.position }}
             </div>
-            <div>
-                <div
-                    ref="entryOrderRef"
-                    class="order-button entry"
-                    @click="entryOrderClick"
-                >
-                    Entry
-                </div>
-                <div
-                    ref="tpslOrderRef"
-                    class="order-button tpsl"
-                    @click="tpslOrderClick"
-                >
-                    TP/SL
-                </div>
-                <div
-                    class="chart-top command far fa-angle-double-right"
-                    @click="chartTopClick"
-                ></div>
+            <div class="command clock" @click="connectSocket">
+                {{ state.clock }}
+            </div>
+            <input
+                type="date"
+                class="chart-date command"
+                :title="$t('trading.derivative.date')"
+                v-model="state.chartDate"
+                @change="dateSelectChange"
+            />
+            <div
+                ref="reloadToolRef"
+                class="command"
+                :title="$t('trading.derivative.reload')"
+                @click="resetChart"
+                @contextmenu="getTools"
+            >
+                <i
+                    class="far fa-sync-alt"
+                    :class="{
+                        'fa-spin': isLoading,
+                    }"
+                ></i>
+            </div>
+        </div>
+        <div
+            class="area tool-area"
+            @click="areaClick"
+            @contextmenu="areaContextmenu"
+        >
+            <FullscreenTool
+                ref="fullscreenToolRef"
+                :chartContainerRef="chartContainerRef"
+            />
+            <TradingviewTool
+                ref="tradingviewToolRef"
+                :vpsUser="config.vpsUser"
+                :vpsSession="config.vpsSession"
+                :chartContainerRef="chartContainerRef"
+            />
+            <ProgressTool
+                ref="progressToolRef"
+                :chartHeightEnough="state.chartHeightEnough"
+                @refreshPattern="refreshPattern"
+                @hideContext="hideContext"
+            />
+            <ScanTool
+                ref="scanToolRef"
+                :prices="state.prices"
+                :timeToIndex="timeToIndex"
+                @scaned="patternScaned"
+                @removePattern="() => patternToolRef.remove()"
+                @hideContext="hideContext"
+            />
+            <PatternTool
+                ref="patternToolRef"
+                :prices="state.prices"
+                :priceSeries="state.series.price"
+                :timeMarkSeries="state.series.timeMark"
+                :pickTimeToolRef="pickTimeToolRef"
+                :timeToIndex="timeToIndex"
+                :indexToTime="indexToTime"
+                @setProgress="setProgress"
+                @hideContext="hideContext"
+            />
+            <PickTimeTool
+                ref="pickTimeToolRef"
+                :pickTimeSeries="state.series.pickTime"
+                @refreshPattern="refreshPattern"
+                @hideContext="hideContext"
+            />
+            <LineTool
+                ref="lineToolRef"
+                :priceSeries="state.series.price"
+                @hideContext="hideContext"
+            />
+            <TimeRangeTool
+                ref="timeRangeToolRef"
+                :timeRangeSeries="state.series.timeRange"
+                :timeToIndex="timeToIndex"
+                :indexToTime="indexToTime"
+                @hideContext="hideContext"
+            />
+            <TargetTool
+                ref="targetToolRef"
+                :priceSeries="state.series.price"
+                @hideContext="hideContext"
+            />
+            <OrderTool
+                v-show="showCancelOrder"
+                ref="orderToolRef"
+                :position="status.position"
+                :prices="state.prices"
+                :priceSeries="state.series.price"
+                :inSession="inSession"
+                :TIME="state.TIME"
+                @getTools="getTools"
+                @showEntry="showEntryButton"
+                @showTpSl="showTpSlButton"
+                @orderChanged="orderChanged"
+                @hideContext="hideContext"
+            />
+        </div>
+        <div>
+            <div
+                ref="entryOrderRef"
+                class="order-button entry"
+                @click="entryOrderClick"
+            >
+                Entry
+            </div>
+            <div
+                ref="tpslOrderRef"
+                class="order-button tpsl"
+                @click="tpslOrderClick"
+            >
+                TP/SL
+            </div>
+            <div class="chart-top" @click="chartTopClick">
+                <i class="far fa-angle-double-right" />
             </div>
         </div>
     </div>
@@ -206,7 +204,7 @@ const mf = inject("mf");
 const devices = inject("devices");
 const filters = inject("filters");
 const chartContainerRef = ref(null);
-const orderChartRef = ref(null);
+const chartRef = ref(null);
 const connectionRef = ref(null);
 const reloadToolRef = ref(null);
 const fullscreenToolRef = ref(null);
@@ -310,29 +308,29 @@ initChart();
 onMounted(() => {
     checkChartSize();
     drawChart();
-    new ResizeObserver(eventChartResize).observe(chartContainerRef.value);
-    document.addEventListener("keydown", eventKeyPress);
+    new ResizeObserver(chartResize).observe(chartContainerRef.value);
+    document.addEventListener("keydown", chartShortcut);
     fullscreenToolRef.value.toggleFullscreen({ set: true });
 });
 onUnmounted(() => {
     removeChart();
-    document.removeEventListener("keydown", eventKeyPress);
+    document.removeEventListener("keydown", chartShortcut);
     clearInterval(params.interval);
     disconnectSocket();
     params.socketStop = true;
     fullscreenToolRef.value.toggleFullscreen({ unset: true });
 });
 
-watch(() => store.state.tradingDerivative.chartData, loadChartData);
+watch(() => store.state.tradingDerivative.chartData, setChartData);
 
 defineExpose({
     connectSocket,
 });
 
 function drawChart() {
-    params.chart = createChart(orderChartRef.value, CHART_OPTIONS);
-    params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
-    params.chart.subscribeCustomPriceLineDragged(eventPriceLineDrag);
+    params.chart = createChart(chartRef.value, CHART_OPTIONS);
+    params.chart.subscribeCrosshairMove(chartCrosshairMove);
+    params.chart.subscribeCustomPriceLineDragged(priceLineDrag);
     state.series.whitespace = params.chart.addHistogramSeries({
         priceScaleId: "whitespace",
         scaleMargins: { top: 0, bottom: 0 },
@@ -369,7 +367,7 @@ function removeChart() {
         params.chart = null;
     }
 }
-function eventChartClick(e) {
+function chartClick(e) {
     hideContext();
     toggleOrderButton(false);
 
@@ -394,18 +392,33 @@ function eventChartClick(e) {
         });
     }
 }
-function eventChartContextmenu(e) {
+function chartContextmenu(e) {
     toggleOrderButton(true);
     e.preventDefault();
 }
-function toolAreaClick(e) {
+function areaClick(e) {
     e.stopPropagation();
 }
-function toolAreaContextmenu(e) {
+function areaContextmenu(e) {
     e.preventDefault();
     e.stopPropagation();
 }
-function eventChartCrosshairMove(e) {
+function chartResize() {
+    if (chartContainerRef.value) {
+        checkChartSize();
+        params.chart.resize(
+            chartContainerRef.value.offsetWidth,
+            chartContainerRef.value.offsetHeight
+        );
+        if (chartContainerRef.value.classList.contains("fullscreen")) {
+            fullscreenToolRef.value.setFullscreen();
+        }
+    }
+}
+function checkChartSize() {
+    state.chartHeightEnough = chartContainerRef.value.offsetHeight > 700;
+}
+function chartCrosshairMove(e) {
     if (e.time) {
         let price = e.seriesPrices.get(state.series.price);
         params.crosshair.time = e.time;
@@ -421,7 +434,7 @@ function eventChartCrosshairMove(e) {
         params.crosshair.y = e.point.y;
     }
 }
-function eventPriceLineDrag(e) {
+function priceLineDrag(e) {
     let line = e.customPriceLine;
     let lineOptions = line.options();
     lineOptions.price = mf.fmtNum(lineOptions.price);
@@ -442,22 +455,7 @@ function eventPriceLineDrag(e) {
             break;
     }
 }
-function eventChartResize() {
-    if (chartContainerRef.value) {
-        checkChartSize();
-        params.chart.resize(
-            chartContainerRef.value.offsetWidth,
-            chartContainerRef.value.offsetHeight
-        );
-        if (chartContainerRef.value.classList.contains("fullscreen")) {
-            fullscreenToolRef.value.setFullscreen();
-        }
-    }
-}
-function checkChartSize() {
-    state.chartHeightEnough = chartContainerRef.value.offsetHeight > 700;
-}
-function eventKeyPress(e) {
+function chartShortcut(e) {
     if (e.ctrlKey) {
         switch (e.keyCode) {
             case 219:
@@ -493,7 +491,7 @@ function eventKeyPress(e) {
         }
     }
 }
-function loadChartData(chartData) {
+function setChartData(chartData) {
     if (!(state.chartDate === CURRENT_DATE && inSession())) {
         if (chartData.price.length > 0) {
             params.whitespaces = mergeChartData(
@@ -688,11 +686,11 @@ function getVpsData() {
         params.vpsUpdatedAt = new Date();
     }
 }
-function refreshPattern() {
-    patternToolRef.value.refresh();
-}
 function patternScaned(points) {
     patternToolRef.value.load(points, { isSave: true });
+}
+function refreshPattern() {
+    patternToolRef.value.refresh();
 }
 function hideContext() {
     progressToolRef.value.hide();
@@ -837,6 +835,7 @@ function indexToTime(index) {
 </script>
 <style lang="scss">
 .derivative-chart {
+    position: relative;
     height: 400px;
     background: #131722;
     border: none;
@@ -848,11 +847,6 @@ function indexToTime(index) {
         width: 100vw;
         height: 100vh;
         z-index: 1501;
-    }
-
-    .chart-wrapper {
-        position: relative;
-        height: 100%;
     }
 
     .area {
@@ -920,63 +914,63 @@ function indexToTime(index) {
                 color: red;
             }
         }
-    }
 
-    .command {
-        width: 30px;
-        height: 30px;
-        flex: 1 1 auto;
-        text-align: center;
-        color: #bbbbbb;
-        background: transparent !important;
-        line-height: 30px;
-        font-size: 16px;
-        border: none;
-        cursor: pointer;
-        z-index: 3;
+        .command {
+            width: 30px;
+            height: 30px;
+            flex: 1 1 auto;
+            text-align: center;
+            color: #bbbbbb;
+            background: transparent !important;
+            line-height: 30px;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            z-index: 3;
 
-        &.selected {
-            color: #1f62ff !important;
-        }
-
-        &:not(.noaction):hover {
-            background: #2a2e39 !important;
-        }
-
-        &.noaction {
-            cursor: unset !important;
-        }
-
-        &.green {
-            color: lime;
-        }
-
-        &.red {
-            color: red;
-        }
-
-        &.yellow {
-            color: orange;
-        }
-
-        i {
-            pointer-events: none;
-
-            &.blink {
-                animation: blinker 0.5s linear infinite;
+            &.selected {
+                color: #1f62ff !important;
             }
 
-            @keyframes blinker {
-                0% {
-                    opacity: 1;
+            &:not(.noaction):hover {
+                background: #2a2e39 !important;
+            }
+
+            &.noaction {
+                cursor: unset !important;
+            }
+
+            &.green {
+                color: lime;
+            }
+
+            &.red {
+                color: red;
+            }
+
+            &.yellow {
+                color: orange;
+            }
+
+            i {
+                pointer-events: none;
+
+                &.blink {
+                    animation: blinker 0.5s linear infinite;
                 }
 
-                50% {
-                    opacity: 0;
-                }
+                @keyframes blinker {
+                    0% {
+                        opacity: 1;
+                    }
 
-                100% {
-                    opacity: 1;
+                    50% {
+                        opacity: 0;
+                    }
+
+                    100% {
+                        opacity: 1;
+                    }
                 }
             }
         }
@@ -1009,16 +1003,17 @@ function indexToTime(index) {
 
     .chart-top {
         position: absolute;
-        bottom: 29px;
-        right: 55px;
+        bottom: 30px;
+        right: 53px;
+        width: 25px;
+        height: 25px;
+        line-height: 24px;
         border-radius: 50%;
+        text-align: center;
+        color: #bbbbbb;
         border: 1px solid #2b2b43;
-        padding-left: 0.7px;
-        padding-top: 1.3px;
-        line-height: 22px !important;
-        width: 25px !important;
-        height: 25px !important;
-        font-size: 18px;
+        z-index: 3;
+        cursor: pointer;
     }
 }
 </style>
