@@ -98,7 +98,7 @@ function speakAlert(text) {
     speechSynthesis.speak(utterance);
 }
 function shortcutHandle(e) {
-    if (e.key === "F2") {
+    if (e.key === "F3") {
         toggleProgressContext();
         e.preventDefault();
     }

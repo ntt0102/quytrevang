@@ -47,7 +47,7 @@ function updateChildSize() {
     }
 }
 function shortcutHandle(e) {
-    if (e.key === "F1") {
+    if (e.key === "F2") {
         toggleTradingview();
         updateChildSize();
         e.preventDefault();
