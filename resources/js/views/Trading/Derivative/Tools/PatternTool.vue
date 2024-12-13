@@ -273,7 +273,7 @@ function calculatePattern() {
     const phase3 = scanPhase({
         phase: 3,
         start: phase2.R,
-        end: { price: B.price + (side ? 1 : -1) * phase1.rEp },
+        end: { price: B.price + (side ? 1 : -1) * 2 * phase1.rEp },
         breakPrices: [phase2.S1.price, B.price],
     });
     if (phase1.xBox.tr >= phase2.tr) phase2.tr = phase1.xBox.tr;
@@ -310,7 +310,7 @@ function calculatePattern() {
     progress.steps = [
         [
             //
-            pr1Valid || phase1.rEp >= phase1.sEp,
+            pr1Valid,
             s1Valid,
             !phase3.breakIndexs[1] || T1 < phase3.breakIndexs[1],
             T > T1,
@@ -481,7 +481,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         pr: maxBox.pr,
         rEp,
         sEp,
-        rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr) : 0,
+        rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr, 1) : 0,
         S1: maxBox.S,
         R1: maxBox.R,
         xBox,
