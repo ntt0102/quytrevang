@@ -293,12 +293,12 @@ function calculatePattern() {
     const T1 = phase1.R.index + phase1.tr;
     const T1p = phase1.R.index + 5 * phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
+    const T2p = 2 * phase2.R.index - phase2.S1.index;
     const T3 = phase3.xBox.R.index + phase3.tr;
-    const T3p = phase3.xBox.R.index + 5 * phase3.tr;
-    const T4 = phase3.xBox.R.index + phase2.tr;
-    const timeMark = [T1, T1p, T2, T3, T3p, T4];
+    const T3p = phase3.xBox.R.index + phase2.tr;
+    const timeMark = [T1, T1p, T2, T2p, T3, T3p];
 
-    const T = phase3.xBox.S.index;
+    const T = phase3.S.index;
 
     let entry,
         progress = {};
@@ -310,7 +310,7 @@ function calculatePattern() {
     progress.steps = [
         [
             //
-            pr1Valid || (phase1.rEt < phase1.tr && phase1.rEp >= phase1.sEp),
+            pr1Valid || phase1.rEp >= phase1.sEp,
             s1Valid,
             !phase3.breakIndexs[1] || T1 < phase3.breakIndexs[1],
             T > T1,
@@ -320,7 +320,7 @@ function calculatePattern() {
             //
             ...extraCond,
             T2 > T1,
-            T < T3p,
+            T < T2p,
             T < T2,
         ],
         [
@@ -335,7 +335,7 @@ function calculatePattern() {
             pr3Valid,
             s3Valid,
             T > T3,
-            extraCond.every(Boolean) || T > T4,
+            extraCond.every(Boolean) || T > T3p,
         ],
     ];
     progress.step = 1;
@@ -396,7 +396,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         breakIndexs = [null, null],
         rEp,
         sEp,
-        rEt;
+        lastIndex;
     const pickTime = props.pickTimeToolRef.get();
     props.prices
         .filter((item) => {
@@ -415,6 +415,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                     pr: 0,
                     tr: 0,
                 };
+                lastIndex = index;
                 maxBox = mf.cloneDeep(box);
                 xBox = mf.cloneDeep(box);
             }
@@ -451,13 +452,14 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                         breakIndexs[1] = index;
                 }
             } else {
-                box.S.index = index;
-                box.tr = box.S.index - box.R.index;
+                box.tr = index - box.R.index;
                 if (mf.cmp(price, !side, box.S.price)) {
+                    box.S.index = index;
                     box.S.price = price;
                     box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                 }
             }
+            lastIndex = index;
             if (mf.cmp(price, !side, S.price)) {
                 box.S.price = S.price;
                 return false;
@@ -467,11 +469,10 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         });
     if (mf.isSet(box)) {
         S.index = props.timeToIndex(S.time);
-        R.index = box.S.index;
-        R.time = props.indexToTime(box.S.index);
+        R.index = lastIndex;
+        R.time = props.indexToTime(R.index);
         rEp = mf.fmtNum(R.price - maxBox.R.price, 1, true);
         sEp = mf.fmtNum(S.price - maxBox.S.price, 1, true);
-        rEt = R.index - maxBox.S.index;
         if (phase === 3) xBox = box;
     }
 
@@ -481,7 +482,6 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         rEp,
         sEp,
         rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr) : 0,
-        rEt,
         S1: maxBox.S,
         R1: maxBox.R,
         xBox,
@@ -575,9 +575,9 @@ function setTimeMark(data) {
         "#F44336",
         "#F44336",
         "#4CAF50",
+        "#009688",
         "#FFEB3B",
-        "#FFEB3B",
-        "#2196F3",
+        "#FF9800",
     ];
     let result = [];
     for (let i = 0; i < data.length; i++) {
