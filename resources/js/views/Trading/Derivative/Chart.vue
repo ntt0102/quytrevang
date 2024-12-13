@@ -408,9 +408,7 @@ function chartResize() {
             chartContainerRef.value.offsetWidth,
             chartContainerRef.value.offsetHeight
         );
-        if (chartContainerRef.value.classList.contains("fullscreen")) {
-            fullscreenToolRef.value.setFullscreen();
-        }
+        fullscreenToolRef.value.checkFullscreen();
     }
 }
 function checkChartSize() {

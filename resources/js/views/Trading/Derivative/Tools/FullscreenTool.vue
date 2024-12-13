@@ -20,7 +20,7 @@ const props = defineProps(["chartContainerRef"]);
 const isFullscreen = ref(false);
 
 defineExpose({
-    setFullscreen,
+    checkFullscreen,
 });
 
 onMounted(() => {
@@ -35,6 +35,11 @@ onUnmounted(() => {
 function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
+}
+function checkFullscreen(){
+    if (props.chartContainerRef.classList.contains("fullscreen")) {
+            setFullscreen();
+    }
 }
 function fullscreenChange() {
     if (props.chartContainerRef) {
