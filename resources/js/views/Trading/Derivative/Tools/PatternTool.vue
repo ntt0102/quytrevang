@@ -298,7 +298,7 @@ function calculatePattern() {
     const T3p = phase3.xBox.R.index + phase2.tr;
     const timeMark = [T1, T1p, T2, T2p, T3, T3p];
 
-    const T = phase3.S.index;
+    const T = phase3.R.index;
 
     let entry,
         progress = {};

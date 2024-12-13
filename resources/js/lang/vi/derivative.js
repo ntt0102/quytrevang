@@ -18,7 +18,7 @@ export default [
             "EPR1 < 3",
             "EPR2 < EPR1",
             "T2 > T1",
-            "T < T3'",
+            "T < T2'",
             "T < T2",
         ],
     },
@@ -39,7 +39,7 @@ export default [
             "DE > PR3",
             "E giữ hỗ trợ",
             "T > T3",
-            "T > T4",
+            "T > T3'",
         ],
     },
 ];
