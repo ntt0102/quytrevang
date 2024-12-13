@@ -1,7 +1,7 @@
 <template>
     <div
         class="command"
-        :title="$t('trading.derivative.fullscreen')"
+        :title="$t('trading.derivative.fullscreenTool')"
         @click="toggleFullscreen"
     >
         <i
@@ -25,12 +25,12 @@ defineExpose({
 
 onMounted(() => {
     document.addEventListener("fullscreenchange", fullscreenChange);
-    window.addEventListener("keydown", handleF11);
+    window.addEventListener("keydown", shortcutHandle);
 });
 
 onUnmounted(() => {
     document.removeEventListener("fullscreenchange", fullscreenChange);
-    window.removeEventListener("keydown", handleF11);
+    window.removeEventListener("keydown", shortcutHandle);
 });
 function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
@@ -64,7 +64,7 @@ function unsetFullscreen() {
     document.querySelector(".dx-drawer-content").style.transform =
         "translate(0px, 0px)";
 }
-function handleF11(e) {
+function shortcutHandle(e) {
     if (e.key === "F11") {
         toggleFullscreen();
         e.preventDefault();

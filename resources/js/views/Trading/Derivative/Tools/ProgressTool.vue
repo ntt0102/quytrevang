@@ -30,7 +30,7 @@
 </template>
 <script setup>
 import ProgressContext from "./Contexts/ProgressContext.vue";
-import { ref, inject, computed } from "vue";
+import { ref, inject, computed, onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 
@@ -49,7 +49,13 @@ defineExpose({
     hide,
     set,
 });
+onMounted(() => {
+    window.addEventListener("keydown", shortcutHandle);
+});
 
+onUnmounted(() => {
+    window.removeEventListener("keydown", shortcutHandle);
+});
 function toggleProgressContext() {
     const oldValue = showProgressContext.value;
     emit("hideContext");
@@ -90,5 +96,11 @@ function speakAlert(text) {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = "vi-VN";
     speechSynthesis.speak(utterance);
+}
+function shortcutHandle(e) {
+    if (e.key === "F2") {
+        toggleProgressContext();
+        e.preventDefault();
+    }
 }
 </script>

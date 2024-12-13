@@ -1,7 +1,7 @@
 <template>
     <div
         class="tradingview command far fa-chart-candlestick"
-        :title="$t('trading.derivative.tradingview')"
+        :title="$t('trading.derivative.tradingviewTool')"
         @click="tradingviewClick"
     >
         <iframe
@@ -13,7 +13,7 @@
     </div>
 </template>
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 
 const props = defineProps(["vpsUser", "vpsSession", "chartContainerRef"]);
 const tradingviewRef = ref(null);
@@ -21,13 +21,21 @@ const showTradingView = ref(false);
 const tradingViewSrc = computed(() => {
     return `https://chart.vps.com.vn/tv/?u=${props.vpsUser}&s=${props.vpsSession}&symbol=VN30F1M&resolution=1&lang=vi`;
 });
+onMounted(() => {
+    window.addEventListener("keydown", shortcutHandle);
+});
 
+onUnmounted(() => {
+    window.removeEventListener("keydown", shortcutHandle);
+});
 function tradingviewClick(e) {
-    showTradingView.value = !showTradingView.value;
+    toggleTradingview();
     updateChildSize();
     e.stopPropagation();
 }
-
+function toggleTradingview() {
+    showTradingView.value = !showTradingView.value;
+}
 function updateChildSize() {
     if (props.chartContainerRef && tradingviewRef.value) {
         const { offsetWidth, offsetHeight } = props.chartContainerRef;
@@ -36,6 +44,13 @@ function updateChildSize() {
         tradingviewRef.value.style.left = `${left + 32}px`;
         tradingviewRef.value.style.width = `${offsetWidth - 34}px`;
         tradingviewRef.value.style.height = `${offsetHeight}px`;
+    }
+}
+function shortcutHandle(e) {
+    if (e.key === "F1") {
+        toggleTradingview();
+        updateChildSize();
+        e.preventDefault();
     }
 }
 </script>
