@@ -482,12 +482,15 @@ function scanPhase({
             return true;
         });
     if (mf.isSet(box)) {
+        if (phase === 3) {
+            xBox = box;
+            R.price = xBox.R.price;
+        }
         S.index = props.timeToIndex(S.time);
         R.index = lastIndex;
         R.time = props.indexToTime(R.index);
         rEp = mf.fmtNum(R.price - maxBox.R.price, 1, true);
         sEp = mf.fmtNum(S.price - maxBox.S.price, 1, true);
-        if (phase === 3) xBox = box;
     }
 
     return {
