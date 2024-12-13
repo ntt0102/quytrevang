@@ -263,18 +263,28 @@ function calculatePattern() {
     const { A, B, C } = points;
     const bc = B.price - C.price;
     const side = bc > 0;
+    const pickTime = props.pickTimeToolRef.get();
     const phase1 = scanPhase({
         phase: 1,
+        side,
         start: A,
         end: B,
         retracementPrice: C.price,
+        stopTime: pickTime,
     });
-    let phase2 = scanPhase({ phase: 2, start: phase1.R, end: C });
+    let phase2 = scanPhase({
+        phase: 2,
+        side: !side,
+        start: phase1.R,
+        end: C,
+        stopTime: pickTime,
+    });
     const phase3 = scanPhase({
         phase: 3,
+        side,
         start: phase2.R,
-        end: { price: B.price + (side ? 1 : -1) * 2 * phase1.rEp },
-        breakPrices: [phase2.S1.price, B.price],
+        breakPrice: B.price,
+        stopTime: pickTime ?? props.indexToTime(phase1.R.index + 6 * phase1.tr),
     });
     if (phase1.xBox.tr >= phase2.tr) phase2.tr = phase1.xBox.tr;
 
@@ -312,7 +322,7 @@ function calculatePattern() {
             //
             pr1Valid,
             s1Valid,
-            !phase3.breakIndexs[1] || T1 < phase3.breakIndexs[1],
+            !phase3.breakIndex || T1 < phase3.breakIndex,
             T > T1,
             T < T1p,
         ],
@@ -327,7 +337,7 @@ function calculatePattern() {
             //
             phase2.R.index - phase1.R.index > 0.5 * phase1.tr,
             pr2Valid,
-            !phase3.breakIndexs[1] || T2 < phase3.breakIndexs[1],
+            !phase3.breakIndex || T2 < phase3.breakIndex,
             T > T2,
         ],
         [
@@ -365,7 +375,7 @@ function calculatePattern() {
     //
     const X = phase1.rEp;
     const x = adjustTargetPrice(B.price, X, side);
-    const mainTR = phase3.breakIndexs[1] ?? T;
+    const mainTR = phase3.breakIndex ?? T;
     const scale = parseInt((mainTR - phase1.R.index) / phase1.tr);
     const Y = scale > 1 ? X * scale : X;
     const y = adjustTargetPrice(B.price, Y, side);
@@ -386,22 +396,28 @@ function calculatePattern() {
         },
     };
 }
-function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
+function scanPhase({
+    phase,
+    start,
+    end,
+    side,
+    breakPrice,
+    retracementPrice,
+    stopTime,
+}) {
     let S = mf.cloneDeep(start);
-    let R = mf.cloneDeep(end);
-    const side = R.price > S.price;
+    let R = mf.cloneDeep(end ?? {});
     let box = {},
         maxBox = {},
         xBox = {},
-        breakIndexs = [null, null],
+        breakIndex = null,
         rEp,
         sEp,
         lastIndex;
-    const pickTime = props.pickTimeToolRef.get();
     props.prices
         .filter((item) => {
             let cond = item.time >= S.time;
-            if (pickTime) cond &= item.time <= pickTime;
+            if (stopTime) cond &= item.time <= stopTime;
             return cond;
         })
         .every((item, i) => {
@@ -445,11 +461,9 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                     pr: 0,
                     tr: 0,
                 };
-                if (phase === 3 && breakPrices) {
-                    if (!breakIndexs[0] && mf.cmp(price, side, breakPrices[0]))
-                        breakIndexs[0] = index;
-                    if (!breakIndexs[1] && mf.cmp(price, side, breakPrices[1]))
-                        breakIndexs[1] = index;
+                if (phase === 3 && breakPrice) {
+                    if (!breakIndex && mf.cmp(price, side, breakPrice))
+                        breakIndex = index;
                 }
             } else {
                 box.tr = index - box.R.index;
@@ -464,7 +478,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
                 box.S.price = S.price;
                 return false;
             }
-            if (!mf.cmp(price, !side, R.price)) return false;
+            if (R.price && !mf.cmp(price, !side, R.price)) return false;
             return true;
         });
     if (mf.isSet(box)) {
@@ -487,7 +501,7 @@ function scanPhase({ phase, start, end, breakPrices, retracementPrice }) {
         xBox,
         S,
         R,
-        breakIndexs,
+        breakIndex,
     };
 }
 function checkPointsValid({ A: { time } }) {
