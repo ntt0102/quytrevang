@@ -472,7 +472,6 @@ function chartShortcut(e) {
             }
             break;
     }
-    e.preventDefault();
 }
 function setChartData(chartData) {
     if (!(state.chartDate === CURRENT_DATE && inSession())) {
