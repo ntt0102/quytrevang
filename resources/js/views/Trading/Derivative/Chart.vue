@@ -992,7 +992,7 @@ function indexToTime(index) {
         text-align: center;
         color: #bbbbbb;
         border: 1px solid #2b2b43;
-        z-index: 3;
+        z-index: 2;
         cursor: pointer;
     }
 }
