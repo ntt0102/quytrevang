@@ -32,7 +32,7 @@
 </template>
 
 <script setup>
-import { DxTreeView } from "devextreme-vue/tree-view";
+import DxTreeView from "devextreme-vue/tree-view";
 import navigation from "../../../config/navigation";
 import { onMounted, ref, inject, watch, computed } from "vue";
 import { useStore } from "vuex";
