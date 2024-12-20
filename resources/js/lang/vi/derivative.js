@@ -27,7 +27,7 @@ export default [
         name: "Bước kiểm tra 2",
         conds: [
             //
-            "BC > TR1/2",
+            "BC > nữa TR1",
             "CD > PR2",
             "Break sau T2",
             "T > T2",
