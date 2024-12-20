@@ -324,7 +324,7 @@ function calculatePattern() {
             s1Valid,
             !phase3.breakIndex || T1 < phase3.breakIndex,
             T > T1,
-            phase3.hasDouble,
+            !phase3.hasDouble,
             T < T1p,
         ],
         [
