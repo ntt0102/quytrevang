@@ -324,6 +324,7 @@ function calculatePattern() {
             s1Valid,
             !phase3.breakIndex || T1 < phase3.breakIndex,
             T > T1,
+            phase3.hasDouble,
             T < T1p,
         ],
         [
@@ -412,7 +413,7 @@ function scanPhase({
         xBox = {},
         breakIndex = null,
         rEp,
-        sEp,
+        doubleTr = 0,
         lastIndex;
     props.prices
         .filter((item) => {
@@ -454,6 +455,9 @@ function scanPhase({
                         if (box.tr >= xBox.tr && box.pr >= xBox.pr)
                             xBox = mf.cloneDeep(box);
                     }
+                    if (box.S.price === S.price && box.tr > doubleTr) {
+                        doubleTr = box.tr;
+                    }
                 }
                 box = {
                     R: { index, price },
@@ -490,20 +494,19 @@ function scanPhase({
         R.index = lastIndex;
         R.time = props.indexToTime(R.index);
         rEp = mf.fmtNum(R.price - maxBox.R.price, 1, true);
-        sEp = mf.fmtNum(S.price - maxBox.S.price, 1, true);
     }
 
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
         rEp,
-        sEp,
         rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr, 1) : 0,
         S1: maxBox.S,
         R1: maxBox.R,
         xBox,
         S,
         R,
+        hasDouble: doubleTr >= maxBox.tr / 2,
         breakIndex,
     };
 }

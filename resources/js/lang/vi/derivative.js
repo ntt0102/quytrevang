@@ -7,6 +7,7 @@ export default [
             "C giữ hỗ trợ",
             "Break sau T1",
             "T > T1",
+            "Không Double",
             "T < T1'",
         ],
     },
