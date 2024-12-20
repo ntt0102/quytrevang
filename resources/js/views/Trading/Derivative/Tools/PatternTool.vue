@@ -408,6 +408,7 @@ function scanPhase({
 }) {
     let S = mf.cloneDeep(start);
     let R = mf.cloneDeep(end ?? {});
+    S.index = props.timeToIndex(S.time);
     let box = {},
         maxBox = {},
         xBox = {},
@@ -455,9 +456,6 @@ function scanPhase({
                         if (box.tr >= xBox.tr && box.pr >= xBox.pr)
                             xBox = mf.cloneDeep(box);
                     }
-                    if (box.S.price === S.price && box.tr > doubleTr) {
-                        doubleTr = box.tr;
-                    }
                 }
                 box = {
                     R: { index, price },
@@ -478,7 +476,9 @@ function scanPhase({
                 }
             }
             lastIndex = index;
-            if (mf.cmp(price, !side, S.price)) {
+            if (price === S.price) {
+                doubleTr = mf.fmtNum(index - S.index, 1);
+            } else if (mf.cmp(price, !side, S.price)) {
                 box.S.price = S.price;
                 return false;
             }
@@ -490,7 +490,6 @@ function scanPhase({
             xBox = box;
             R.price = xBox.R.price;
         }
-        S.index = props.timeToIndex(S.time);
         R.index = lastIndex;
         R.time = props.indexToTime(R.index);
         rEp = mf.fmtNum(R.price - maxBox.R.price, 1, true);
