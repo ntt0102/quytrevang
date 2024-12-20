@@ -522,7 +522,7 @@ function createWhitespaceData(date) {
         data.push(item);
     }
     if (state.chartDate === CURRENT_DATE){
-        for (let sec = amEnd + 1; sec <= pm15h00; sec++) {
+        for (let sec = pmEnd + 1; sec <= pm15h00; sec++) {
             let item = { time: sec };
             data.push(item);
         }
