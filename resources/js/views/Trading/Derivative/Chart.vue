@@ -729,7 +729,7 @@ function getDnseData() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 operationName: "GetTicksBySymbol",
-                query: `query GetTicksBySymbol {GetTicksBySymbol(symbol: "${config.value.vn30f1m}", date: "${state.chartDate}", limit: 10000) {data {symbol matchPrice matchQtty sendingTime: time side}}}`,
+                query: `query GetTicksBySymbol {GetTicksBySymbol(symbol: "${config.value.vn30f1m}", date: "${CURRENT_DATE}", limit: 10000) {data {symbol matchPrice matchQtty sendingTime: time side}}}`,
             }),
         })
             .then((response) => response.json())
