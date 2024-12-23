@@ -514,7 +514,7 @@ function updateChartData(data, source = null) {
     if (prices.length > 1) {
         state.prices = mergeChartData(state.prices, prices);
         state.series.price.setData(state.prices);
-    } else {
+    } else if (prices.length === 1) {
         state.prices.push(prices[0]);
         state.series.price.update(prices[0]);
     }
