@@ -809,7 +809,6 @@ function chartTopClick() {
     params.chart.timeScale().scrollToRealTime();
 }
 function inSession() {
-    return true;
     const currentSeconds = getUnixTime(addHours(new Date(), 7));
     return (
         config.value.openingMarket &&
