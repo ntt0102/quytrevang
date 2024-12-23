@@ -176,6 +176,13 @@ import TargetTool from "./Tools/TargetTool.vue";
 import OrderTool from "./Tools/OrderTool.vue";
 
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
+import mqtt from "mqtt";
+// import protobufjs from "protobufjs";
+import {
+    decodeEncapMessage,
+    decodeMarketIndex,
+    decodeTick,
+} from "../../../plugins/dnse";
 import { alert } from "devextreme/ui/dialog";
 import {
     ref,
@@ -256,10 +263,12 @@ const TIME = {
     ATC: getUnixTime(new Date(`${CURRENT_DATE}T14:30:00Z`)),
     END: getUnixTime(new Date(`${CURRENT_DATE}T14:45:00Z`)),
 };
-const FIREANT_SOCKET_ENDPOINT =
-    "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
-const VPS_SOCKET_ENDPOINT =
-    "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket";
+const SOCKET_ENDPOINT = {
+    FIREANT:
+        "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg",
+    VPS: "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket",
+    DNSE: "wss://datafeed.dnse.com.vn/wss",
+};
 
 let params = {
     chart: {},
@@ -270,7 +279,7 @@ let params = {
     statusAt: subSeconds(new Date(), 21),
     websocket: null,
     socketStop: false,
-    vpsUpdatedAt: subSeconds(new Date(), 61),
+    socketUpdatedAt: subSeconds(new Date(), 61),
 };
 const state = reactive({
     prices: [],
@@ -490,12 +499,15 @@ function updateChartData(data, source = null) {
     let prices = [];
     data.forEach((item) => {
         let time, value;
-        if (_source === "FireAnt") {
+        if (_source === "FIREANT") {
             time = getUnixTime(addHours(new Date(item.date), 7));
             value = item.price;
-        } else {
+        } else if (_source === "VPS") {
             time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
             value = item.lastPrice;
+        } else if (_source === "DNSE") {
+            time = getUnixTime(addHours(new Date(item.sendingTime), 7));
+            value = item.matchPrice;
         }
         prices.push({ time, value });
     });
@@ -521,7 +533,7 @@ function createWhitespaceData(date) {
         if (sec === pm14h00 || sec === pmEnd) item.value = 1;
         data.push(item);
     }
-    if (state.chartDate === CURRENT_DATE){
+    if (state.chartDate === CURRENT_DATE) {
         for (let sec = pmEnd + 1; sec <= pm16h00; sec++) {
             let item = { time: sec };
             data.push(item);
@@ -541,21 +553,30 @@ function mergeChartData(data1, data2) {
 async function connectSocket() {
     if (inSession()) {
         await disconnectSocket();
-        const isFireAnt = config.value.source === "FireAnt";
-        const enpoint = isFireAnt
-            ? FIREANT_SOCKET_ENDPOINT
-            : VPS_SOCKET_ENDPOINT;
-        params.websocket = new WebSocket(enpoint);
-        params.websocket.onclose = (e) => {
+        const source = config.value.source;
+        const enpoint = SOCKET_ENDPOINT[source];
+        const closeHandler = () => {
             if (!params.socketStop) {
                 state.isSocketWarning = true;
                 connectSocket();
             }
         };
-        if (isFireAnt) configFireAntSocket();
-        else {
-            getVpsData();
-            configVpsSocket();
+        if (source === "DNSE") {
+            params.websocket = mqtt.connect(enpoint, {
+                username: "entrade",
+                password: "entrade",
+            });
+            params.websocket.on("close", closeHandler);
+            configDnseSocket();
+            getDnseData();
+        } else {
+            params.websocket = new WebSocket(enpoint);
+            params.websocket.onclose = closeHandler;
+            if (source === "FIREANT") configFIREANTSocket();
+            else {
+                configVpsSocket();
+                getVpsData();
+            }
         }
     }
 }
@@ -577,7 +598,7 @@ async function disconnectSocket() {
         });
     }
 }
-function configFireAntSocket() {
+function configFIREANTSocket() {
     store.dispatch("tradingDerivative/setLoading", true);
     params.websocket.onopen = (e) => {
         if (params.websocket.readyState === WebSocket.OPEN) {
@@ -590,7 +611,7 @@ function configFireAntSocket() {
     };
     params.websocket.onmessage = (e) => {
         state.isSocketWarning = false;
-        const data = parseFireAntMessage(e.data);
+        const data = parseFIREANTMessage(e.data);
         data.forEach((item) => {
             if (!item) return false;
             if (item.type === 3) {
@@ -610,14 +631,14 @@ function configFireAntSocket() {
                 item.target === "UpdateTrades" &&
                 item.arguments[0] === "VN30F1M"
             ) {
-                console.log("FireAnt", item.arguments[1]);
+                console.log("FIREANT", item.arguments[1]);
                 orderToolRef.value.scan(item.arguments[1].at(-1).price);
                 updateChartData(item.arguments[1]);
             }
         });
     };
 }
-function parseFireAntMessage(msg) {
+function parseFIREANTMessage(msg) {
     let result = [];
     msg.split("").forEach((item) => {
         const startPos = item.indexOf("{");
@@ -663,14 +684,61 @@ function configVpsSocket() {
     };
 }
 function getVpsData() {
-    if (differenceInSeconds(new Date(), new Date(params.vpsUpdatedAt)) > 60) {
+    if (
+        differenceInSeconds(new Date(), new Date(params.socketUpdatedAt)) > 60
+    ) {
         fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
+                console.log("VPS: ", data);
                 updateChartData(data, "VPS");
             });
-        params.vpsUpdatedAt = new Date();
+        params.socketUpdatedAt = new Date();
+    }
+}
+function configDnseSocket() {
+    params.websocket.on("connect", () => {
+        if (params.websocket.connected) {
+            const topic = "quotes/index/MI/VNINDEX";
+            // const topic = "quotes/stock/tick/VN30F1M";
+            // const topic = "quotes/derivative/DP/VN30F1M";
+            //   const topic = "stats/index/MB/VNINDEX";
+            //   const topic = "stats/derivative/BA/VN30F1M";
+            params.websocket.subscribe(topic, (err) => {
+                if (err) console.log(`Subscribe error: ${err.message}`);
+                else console.log(`Subscribed to topic: ${topic}`);
+            });
+        }
+    });
+    params.websocket.on("message", (topic, message) => {
+        state.isSocketWarning = false;
+        var encapMsg = decodeEncapMessage(message);
+        //
+        if (encapMsg.type === 2) {
+            const mkid = decodeMarketIndex(encapMsg.payload);
+            console.log("MarketIndex: ", mkid);
+        }
+    });
+}
+function getDnseData() {
+    if (
+        differenceInSeconds(new Date(), new Date(params.socketUpdatedAt)) > 60
+    ) {
+        fetch("https://services.entrade.com.vn/price-api/query", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                operationName: "GetTicksBySymbol",
+                query: `query GetTicksBySymbol {GetTicksBySymbol(symbol: "${config.value.vn30f1m}", date: "${state.chartDate}", limit: 10000) {data {symbol matchPrice matchQtty sendingTime: time side}}}`,
+            }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("DNSE: ", data.data.GetTicksBySymbol.data);
+                updateChartData(data.data.GetTicksBySymbol.data, "DNSE");
+            });
+
+        params.socketUpdatedAt = new Date();
     }
 }
 function patternScaned(points) {
@@ -740,6 +808,7 @@ function chartTopClick() {
     params.chart.timeScale().scrollToRealTime();
 }
 function inSession() {
+    return true;
     const currentSeconds = getUnixTime(addHours(new Date(), 7));
     return (
         config.value.openingMarket &&

@@ -86,7 +86,8 @@ const exportTypes = ref([
     },
 ]);
 const dataSource = ref([
-    { name: "FireAnt", icon: "far fa-database small" },
+    { name: "FIREANT", icon: "far fa-database small" },
+    { name: "DNSE", icon: "far fa-database small" },
     { name: "VPS", icon: "far fa-database small" },
 ]);
 

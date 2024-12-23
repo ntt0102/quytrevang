@@ -72,7 +72,7 @@ class VariablesTableSeeder extends Seeder
         ]);
         Variable::create([
             'name' => "derivativeSource",
-            'value' => "FireAnt",
+            'value' => "FIREANT",
         ]);
     }
 }

@@ -318,7 +318,7 @@ class DerivativeService extends CoreService
                 $ret['filename'] = $filename;
                 $ret['headers'] = ['Content-Type' => 'text/csv'];
             }
-        } else if ($payload->source == 'FireAnt') {
+        } else if ($payload->source == 'FIREANT') {
             Artisan::call('clone:data --type=export');
             $ret['isOk'] = true;
         } else {
