@@ -495,6 +495,7 @@ function setChartData(chartData) {
     }
 }
 function updateChartData(data, source = null) {
+    if (data.length === 0) return false;
     const _source = source ?? config.value.source;
     let prices = [];
     data.forEach((item) => {
@@ -514,7 +515,7 @@ function updateChartData(data, source = null) {
     if (prices.length > 1) {
         state.prices = mergeChartData(state.prices, prices);
         state.series.price.setData(state.prices);
-    } else if (prices.length === 1) {
+    } else {
         state.prices.push(prices[0]);
         state.series.price.update(prices[0]);
     }
