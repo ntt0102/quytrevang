@@ -2,8 +2,6 @@ syntax = "proto3";
 
 package models;
 
-import "google/protobuf/timestamp.proto";
-
 message EncapMessage {
   int32 type = 1;
   bytes payload = 2;
@@ -13,37 +11,12 @@ message Tick {
   string symbol = 1;
   double matchPrice = 2;
   double matchQtty = 3;
-  google.protobuf.Timestamp time = 4;
+  Timestamp time = 4;
   int32 side = 5;
   int32 session = 6;
 }
 
-message MarketIndex {
-  string marketID = 1;
-  float totalTrade = 2;
-  double totalShareTraded = 3;
-  double totalValueTraded = 4;
-  float advance = 5;
-  float decline = 6;
-  float noChange = 7;
-  float indexValue = 8;
-  float changed = 9;
-  int64 tradingTime = 10;
-  int64 tradingDate = 11;
-  string floorCode = 12;
-  float marketIndex = 13;
-  float priorMarketIndex = 14;
-  float highestIndex = 15;
-  float lowestIndex = 16;
-  float shareTraded = 17;
-  float status = 18;
-  float sequence = 19;
-  float predictionMarketIndex = 20;
-  int32 indexName = 21;
-  int32 tradingSessionId = 22;
-  int64 fluctuationUpperLimitIssueCount = 23;
-  int64 fluctuationLowerLimitIssueCount = 24;
-  int64 fluctuationUpIssueVolume = 25;
-  int64 fluctuationDownIssueVolume = 26;
-  int64 fluctuationSteadinessIssueVolume = 27;
+message Timestamp {
+  int64 seconds = 1;
+  int32 nanos = 2;
 }

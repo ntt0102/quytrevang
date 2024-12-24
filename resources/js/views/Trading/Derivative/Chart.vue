@@ -177,12 +177,7 @@ import OrderTool from "./Tools/OrderTool.vue";
 
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import mqtt from "mqtt";
-// import protobufjs from "protobufjs";
-import {
-    decodeEncapMessage,
-    decodeMarketIndex,
-    decodeTick,
-} from "../../../plugins/dnse";
+import { decodeEncapMessage, decodeTick } from "../../../plugins/dnse";
 import { alert } from "devextreme/ui/dialog";
 import {
     ref,
@@ -507,7 +502,7 @@ function updateChartData(data, source = null) {
             time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
             value = item.lastPrice;
         } else if (_source === "DNSE") {
-            time = getUnixTime(addHours(new Date(item.sendingTime), 7));
+            time = getUnixTime(addHours(new Date(item.time), 7));
             value = item.matchPrice;
         }
         prices.push({ time, value });
@@ -554,6 +549,7 @@ function mergeChartData(data1, data2) {
 async function connectSocket() {
     if (inSession()) {
         await disconnectSocket();
+        console.log("params.websocket", params.websocket);
         const source = config.value.source;
         const enpoint = SOCKET_ENDPOINT[source];
         const closeHandler = () => {
@@ -582,22 +578,31 @@ async function connectSocket() {
     }
 }
 async function disconnectSocket() {
-    if (params.websocket && params.websocket.readyState === WebSocket.OPEN) {
-        params.websocket.close();
+    const source = config.value.source;
+    const onStatus =
+        params.websocket &&
+        (source === "DNSE"
+            ? params.websocket.connected
+            : params.websocket.readyState === WebSocket.OPEN);
+    if (onStatus) {
+        if (source === "DNSE") params.websocket.end();
+        else params.websocket.close();
 
         await new Promise((resolve) => {
             const interval = setInterval(() => {
-                if (
+                const offStatus =
                     !params.websocket ||
-                    params.websocket.readyState === WebSocket.CLOSED
-                ) {
+                    (source === "DNSE"
+                        ? params.websocket.disconnected
+                        : params.websocket.readyState === WebSocket.CLOSED);
+                if (offStatus) {
                     params.websocket = null;
                     clearInterval(interval);
                     resolve();
                 }
             }, 100);
         });
-    }
+    } else params.websocket = null;
 }
 function configFIREANTSocket() {
     store.dispatch("tradingDerivative/setLoading", true);
@@ -700,24 +705,20 @@ function getVpsData() {
 function configDnseSocket() {
     params.websocket.on("connect", () => {
         if (params.websocket.connected) {
-            const topic = "quotes/index/MI/VNINDEX";
-            // const topic = "quotes/stock/tick/VN30F1M";
-            // const topic = "quotes/derivative/DP/VN30F1M";
-            //   const topic = "stats/index/MB/VNINDEX";
-            //   const topic = "stats/derivative/BA/VN30F1M";
-            params.websocket.subscribe(topic, (err) => {
-                if (err) console.log(`Subscribe error: ${err.message}`);
-                else console.log(`Subscribed to topic: ${topic}`);
-            });
+            const topic = `quotes/stock/tick/${config.value.vn30f1m}`;
+            params.websocket.subscribe(topic);
         }
     });
-    params.websocket.on("message", (topic, message) => {
+    params.websocket.on("message", (_, message) => {
         state.isSocketWarning = false;
         var encapMsg = decodeEncapMessage(message);
-        //
-        if (encapMsg.type === 2) {
-            const mkid = decodeMarketIndex(encapMsg.payload);
-            console.log("MarketIndex: ", mkid);
+        if (encapMsg.type === 41) {
+            let tick = decodeTick(encapMsg.payload);
+            orderToolRef.value.scan(tick.matchPrice);
+            const time = new Date(tick.time.seconds.low * 1000);
+            tick.time = time.toISOString();
+            console.log("DNSE: ", tick);
+            updateChartData([tick]);
         }
     });
 }
@@ -730,7 +731,7 @@ function getDnseData() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
                 operationName: "GetTicksBySymbol",
-                query: `query GetTicksBySymbol {GetTicksBySymbol(symbol: "${config.value.vn30f1m}", date: "${CURRENT_DATE}", limit: 10000) {data {symbol matchPrice matchQtty sendingTime: time side}}}`,
+                query: `query GetTicksBySymbol {GetTicksBySymbol(symbol: "${config.value.vn30f1m}", date: "${CURRENT_DATE}", limit: 10000) {data {symbol matchPrice matchQtty time side}}}`,
             }),
         })
             .then((response) => response.json())

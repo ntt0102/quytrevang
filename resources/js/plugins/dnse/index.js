@@ -82,12 +82,12 @@ function _encodeTick(message, bb) {
     writeDouble(bb, $matchQtty);
   }
 
-  // optional google.protobuf.Timestamp time = 4;
+  // optional Timestamp time = 4;
   let $time = message.time;
   if ($time !== undefined) {
     writeVarint32(bb, 34);
     let nested = popByteBuffer();
-    _encodegoogle.protobuf.Timestamp($time, nested);
+    _encodeTimestamp($time, nested);
     writeVarint32(bb, nested.limit);
     writeByteBuffer(bb, nested);
     pushByteBuffer(nested);
@@ -140,10 +140,10 @@ function _decodeTick(bb) {
         break;
       }
 
-      // optional google.protobuf.Timestamp time = 4;
+      // optional Timestamp time = 4;
       case 4: {
         let limit = pushTemporaryLength(bb);
-        message.time = _decodegoogle.protobuf.Timestamp(bb);
+        message.time = _decodeTimestamp(bb);
         bb.limit = limit;
         break;
       }
@@ -168,208 +168,33 @@ function _decodeTick(bb) {
   return message;
 }
 
-export function encodeMarketIndex(message) {
+export function encodeTimestamp(message) {
   let bb = popByteBuffer();
-  _encodeMarketIndex(message, bb);
+  _encodeTimestamp(message, bb);
   return toUint8Array(bb);
 }
 
-function _encodeMarketIndex(message, bb) {
-  // optional string marketID = 1;
-  let $marketID = message.marketID;
-  if ($marketID !== undefined) {
-    writeVarint32(bb, 10);
-    writeString(bb, $marketID);
+function _encodeTimestamp(message, bb) {
+  // optional int64 seconds = 1;
+  let $seconds = message.seconds;
+  if ($seconds !== undefined) {
+    writeVarint32(bb, 8);
+    writeVarint64(bb, $seconds);
   }
 
-  // optional float totalTrade = 2;
-  let $totalTrade = message.totalTrade;
-  if ($totalTrade !== undefined) {
-    writeVarint32(bb, 21);
-    writeFloat(bb, $totalTrade);
-  }
-
-  // optional double totalShareTraded = 3;
-  let $totalShareTraded = message.totalShareTraded;
-  if ($totalShareTraded !== undefined) {
-    writeVarint32(bb, 25);
-    writeDouble(bb, $totalShareTraded);
-  }
-
-  // optional double totalValueTraded = 4;
-  let $totalValueTraded = message.totalValueTraded;
-  if ($totalValueTraded !== undefined) {
-    writeVarint32(bb, 33);
-    writeDouble(bb, $totalValueTraded);
-  }
-
-  // optional float advance = 5;
-  let $advance = message.advance;
-  if ($advance !== undefined) {
-    writeVarint32(bb, 45);
-    writeFloat(bb, $advance);
-  }
-
-  // optional float decline = 6;
-  let $decline = message.decline;
-  if ($decline !== undefined) {
-    writeVarint32(bb, 53);
-    writeFloat(bb, $decline);
-  }
-
-  // optional float noChange = 7;
-  let $noChange = message.noChange;
-  if ($noChange !== undefined) {
-    writeVarint32(bb, 61);
-    writeFloat(bb, $noChange);
-  }
-
-  // optional float indexValue = 8;
-  let $indexValue = message.indexValue;
-  if ($indexValue !== undefined) {
-    writeVarint32(bb, 69);
-    writeFloat(bb, $indexValue);
-  }
-
-  // optional float changed = 9;
-  let $changed = message.changed;
-  if ($changed !== undefined) {
-    writeVarint32(bb, 77);
-    writeFloat(bb, $changed);
-  }
-
-  // optional int64 tradingTime = 10;
-  let $tradingTime = message.tradingTime;
-  if ($tradingTime !== undefined) {
-    writeVarint32(bb, 80);
-    writeVarint64(bb, $tradingTime);
-  }
-
-  // optional int64 tradingDate = 11;
-  let $tradingDate = message.tradingDate;
-  if ($tradingDate !== undefined) {
-    writeVarint32(bb, 88);
-    writeVarint64(bb, $tradingDate);
-  }
-
-  // optional string floorCode = 12;
-  let $floorCode = message.floorCode;
-  if ($floorCode !== undefined) {
-    writeVarint32(bb, 98);
-    writeString(bb, $floorCode);
-  }
-
-  // optional float marketIndex = 13;
-  let $marketIndex = message.marketIndex;
-  if ($marketIndex !== undefined) {
-    writeVarint32(bb, 109);
-    writeFloat(bb, $marketIndex);
-  }
-
-  // optional float priorMarketIndex = 14;
-  let $priorMarketIndex = message.priorMarketIndex;
-  if ($priorMarketIndex !== undefined) {
-    writeVarint32(bb, 117);
-    writeFloat(bb, $priorMarketIndex);
-  }
-
-  // optional float highestIndex = 15;
-  let $highestIndex = message.highestIndex;
-  if ($highestIndex !== undefined) {
-    writeVarint32(bb, 125);
-    writeFloat(bb, $highestIndex);
-  }
-
-  // optional float lowestIndex = 16;
-  let $lowestIndex = message.lowestIndex;
-  if ($lowestIndex !== undefined) {
-    writeVarint32(bb, 133);
-    writeFloat(bb, $lowestIndex);
-  }
-
-  // optional float shareTraded = 17;
-  let $shareTraded = message.shareTraded;
-  if ($shareTraded !== undefined) {
-    writeVarint32(bb, 141);
-    writeFloat(bb, $shareTraded);
-  }
-
-  // optional float status = 18;
-  let $status = message.status;
-  if ($status !== undefined) {
-    writeVarint32(bb, 149);
-    writeFloat(bb, $status);
-  }
-
-  // optional float sequence = 19;
-  let $sequence = message.sequence;
-  if ($sequence !== undefined) {
-    writeVarint32(bb, 157);
-    writeFloat(bb, $sequence);
-  }
-
-  // optional float predictionMarketIndex = 20;
-  let $predictionMarketIndex = message.predictionMarketIndex;
-  if ($predictionMarketIndex !== undefined) {
-    writeVarint32(bb, 165);
-    writeFloat(bb, $predictionMarketIndex);
-  }
-
-  // optional int32 indexName = 21;
-  let $indexName = message.indexName;
-  if ($indexName !== undefined) {
-    writeVarint32(bb, 168);
-    writeVarint64(bb, intToLong($indexName));
-  }
-
-  // optional int32 tradingSessionId = 22;
-  let $tradingSessionId = message.tradingSessionId;
-  if ($tradingSessionId !== undefined) {
-    writeVarint32(bb, 176);
-    writeVarint64(bb, intToLong($tradingSessionId));
-  }
-
-  // optional int64 fluctuationUpperLimitIssueCount = 23;
-  let $fluctuationUpperLimitIssueCount = message.fluctuationUpperLimitIssueCount;
-  if ($fluctuationUpperLimitIssueCount !== undefined) {
-    writeVarint32(bb, 184);
-    writeVarint64(bb, $fluctuationUpperLimitIssueCount);
-  }
-
-  // optional int64 fluctuationLowerLimitIssueCount = 24;
-  let $fluctuationLowerLimitIssueCount = message.fluctuationLowerLimitIssueCount;
-  if ($fluctuationLowerLimitIssueCount !== undefined) {
-    writeVarint32(bb, 192);
-    writeVarint64(bb, $fluctuationLowerLimitIssueCount);
-  }
-
-  // optional int64 fluctuationUpIssueVolume = 25;
-  let $fluctuationUpIssueVolume = message.fluctuationUpIssueVolume;
-  if ($fluctuationUpIssueVolume !== undefined) {
-    writeVarint32(bb, 200);
-    writeVarint64(bb, $fluctuationUpIssueVolume);
-  }
-
-  // optional int64 fluctuationDownIssueVolume = 26;
-  let $fluctuationDownIssueVolume = message.fluctuationDownIssueVolume;
-  if ($fluctuationDownIssueVolume !== undefined) {
-    writeVarint32(bb, 208);
-    writeVarint64(bb, $fluctuationDownIssueVolume);
-  }
-
-  // optional int64 fluctuationSteadinessIssueVolume = 27;
-  let $fluctuationSteadinessIssueVolume = message.fluctuationSteadinessIssueVolume;
-  if ($fluctuationSteadinessIssueVolume !== undefined) {
-    writeVarint32(bb, 216);
-    writeVarint64(bb, $fluctuationSteadinessIssueVolume);
+  // optional int32 nanos = 2;
+  let $nanos = message.nanos;
+  if ($nanos !== undefined) {
+    writeVarint32(bb, 16);
+    writeVarint64(bb, intToLong($nanos));
   }
 }
 
-export function decodeMarketIndex(binary) {
-  return _decodeMarketIndex(wrapByteBuffer(binary));
+export function decodeTimestamp(binary) {
+  return _decodeTimestamp(wrapByteBuffer(binary));
 }
 
-function _decodeMarketIndex(bb) {
+function _decodeTimestamp(bb) {
   let message = {};
 
   end_of_message: while (!isAtEnd(bb)) {
@@ -379,165 +204,15 @@ function _decodeMarketIndex(bb) {
       case 0:
         break end_of_message;
 
-      // optional string marketID = 1;
+      // optional int64 seconds = 1;
       case 1: {
-        message.marketID = readString(bb, readVarint32(bb));
+        message.seconds = readVarint64(bb, /* unsigned */ false);
         break;
       }
 
-      // optional float totalTrade = 2;
+      // optional int32 nanos = 2;
       case 2: {
-        message.totalTrade = readFloat(bb);
-        break;
-      }
-
-      // optional double totalShareTraded = 3;
-      case 3: {
-        message.totalShareTraded = readDouble(bb);
-        break;
-      }
-
-      // optional double totalValueTraded = 4;
-      case 4: {
-        message.totalValueTraded = readDouble(bb);
-        break;
-      }
-
-      // optional float advance = 5;
-      case 5: {
-        message.advance = readFloat(bb);
-        break;
-      }
-
-      // optional float decline = 6;
-      case 6: {
-        message.decline = readFloat(bb);
-        break;
-      }
-
-      // optional float noChange = 7;
-      case 7: {
-        message.noChange = readFloat(bb);
-        break;
-      }
-
-      // optional float indexValue = 8;
-      case 8: {
-        message.indexValue = readFloat(bb);
-        break;
-      }
-
-      // optional float changed = 9;
-      case 9: {
-        message.changed = readFloat(bb);
-        break;
-      }
-
-      // optional int64 tradingTime = 10;
-      case 10: {
-        message.tradingTime = readVarint64(bb, /* unsigned */ false);
-        break;
-      }
-
-      // optional int64 tradingDate = 11;
-      case 11: {
-        message.tradingDate = readVarint64(bb, /* unsigned */ false);
-        break;
-      }
-
-      // optional string floorCode = 12;
-      case 12: {
-        message.floorCode = readString(bb, readVarint32(bb));
-        break;
-      }
-
-      // optional float marketIndex = 13;
-      case 13: {
-        message.marketIndex = readFloat(bb);
-        break;
-      }
-
-      // optional float priorMarketIndex = 14;
-      case 14: {
-        message.priorMarketIndex = readFloat(bb);
-        break;
-      }
-
-      // optional float highestIndex = 15;
-      case 15: {
-        message.highestIndex = readFloat(bb);
-        break;
-      }
-
-      // optional float lowestIndex = 16;
-      case 16: {
-        message.lowestIndex = readFloat(bb);
-        break;
-      }
-
-      // optional float shareTraded = 17;
-      case 17: {
-        message.shareTraded = readFloat(bb);
-        break;
-      }
-
-      // optional float status = 18;
-      case 18: {
-        message.status = readFloat(bb);
-        break;
-      }
-
-      // optional float sequence = 19;
-      case 19: {
-        message.sequence = readFloat(bb);
-        break;
-      }
-
-      // optional float predictionMarketIndex = 20;
-      case 20: {
-        message.predictionMarketIndex = readFloat(bb);
-        break;
-      }
-
-      // optional int32 indexName = 21;
-      case 21: {
-        message.indexName = readVarint32(bb);
-        break;
-      }
-
-      // optional int32 tradingSessionId = 22;
-      case 22: {
-        message.tradingSessionId = readVarint32(bb);
-        break;
-      }
-
-      // optional int64 fluctuationUpperLimitIssueCount = 23;
-      case 23: {
-        message.fluctuationUpperLimitIssueCount = readVarint64(bb, /* unsigned */ false);
-        break;
-      }
-
-      // optional int64 fluctuationLowerLimitIssueCount = 24;
-      case 24: {
-        message.fluctuationLowerLimitIssueCount = readVarint64(bb, /* unsigned */ false);
-        break;
-      }
-
-      // optional int64 fluctuationUpIssueVolume = 25;
-      case 25: {
-        message.fluctuationUpIssueVolume = readVarint64(bb, /* unsigned */ false);
-        break;
-      }
-
-      // optional int64 fluctuationDownIssueVolume = 26;
-      case 26: {
-        message.fluctuationDownIssueVolume = readVarint64(bb, /* unsigned */ false);
-        break;
-      }
-
-      // optional int64 fluctuationSteadinessIssueVolume = 27;
-      case 27: {
-        message.fluctuationSteadinessIssueVolume = readVarint64(bb, /* unsigned */ false);
+        message.nanos = readVarint32(bb);
         break;
       }
 

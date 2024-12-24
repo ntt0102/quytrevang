@@ -69,9 +69,10 @@ Route::get('test', function () {
     // $s = app(\App\Services\Trading\ShareService::class)->getEvents($payload);
     // $s = app(\App\Services\Trading\ShareService::class)->getDataFireAnt($payload);
     // $s = 'THO';
-    $s = app(\App\Services\Trading\DerivativeService::class)->testVpsData();
+    $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData();
     // $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData();
     // $s = app(\App\Services\Trading\DerivativeService::class)->pingWithCurl();
+    // $s = \App\Jobs\ExportDerDnseJob::dispatch();
     // $s = \App\Jobs\FilterShareJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
     // $s = new \App\Jobs\FilterShareJob($payload);
@@ -159,73 +160,6 @@ Route::get('test', function () {
     //         if ($otpMatches) $emailOtp = $otpMatches[0];
     //     }
     // }
-    // $client->disconnect();
-    // set_global_value('dnseEmailOtp', $emailOtp);
-    // $client = new \GuzzleHttp\Client();
-    // $jayParsedAry = [
-    //     "operationName" => "GetTicksBySymbol",
-    //     "query" => 'query GetTicksBySymbol {
-    //   GetTicksBySymbol(symbol: "VN30F2407", date: "2024-07-15", limit: 20) {
-    //     data {
-    //       symbol
-    //       matchPrice
-    //       matchQtty
-    //       sendingTime: time
-    //       side
-    //     }
-    //   }
-    // }
-    // ',
-    //     "variables" => []
-    // ];
-
-
-    // $data = [
-    //     'headers' => [
-    //         'Content-Type' => 'application/json',
-    //     ],
-    //     'json' => [
-    //         "operationName" => "GetTicksBySymbol",
-    //         "query" => 'query GetTicksBySymbol {
-    //   GetTicksBySymbol(symbol: "VN30F2407", date: "2024-07-15", limit: 20) {
-    //     data {
-    //       symbol
-    //       matchPrice
-    //       matchQtty
-    //       sendingTime: time
-    //       side
-    //     }
-    //   }
-    // }
-    // ',
-    //         "variables" => []
-    //     ],
-    // ];
-    // $req = $client->post('https://services.entrade.com.vn/price-api/query', $data);
-    // $s = json_decode($req->getBody());
-
-    // $data = [
-    //     'json' => [
-    //         "operationName" => "GetTicksBySymbol",
-    //         "query" => 'query GetTicksBySymbol {
-    //             GetTicksBySymbol(symbol: "VN30F2407", date: "2024-07-15", limit: 6) {
-    //                 data {
-    //                     symbol
-    //                     matchPrice
-    //                     matchQtty
-    //                     time
-    //                     side
-    //                 }
-    //             }
-    //         }',
-    //         "variables" => (object)[]
-    //     ],
-    // ];
-
-    // $req = $client->post('https://services.entrade.com.vn/price-api/query', $data);
-    // $s = json_decode($req->getBody())->data->GetTicksBySymbol->data;
-
-
 
     // echo $rsp->token;
     // set_global_value('dnseAccessToken', $rsp->token);

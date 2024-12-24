@@ -7,6 +7,7 @@ use App\Services\Special\VpsOrderService;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\StockDrawing;
 use App\Jobs\ReportTradingJob;
+use App\Jobs\ExportDerDnseJob;
 use App\Jobs\ExportDerVpsJob;
 use App\Jobs\LoginDnseJob;
 
@@ -257,13 +258,15 @@ class DerivativeService extends CoreService
      */
     public function cloneDnseData()
     {
+        $vn30f1m = get_global_value('vn30f1m');
+        $date = date("Y-m-d");
         try {
             $client = new \GuzzleHttp\Client();
             $data = [
                 'json' => [
                     'operationName' => 'GetTicksBySymbol',
-                    'query' => 'query GetTicksBySymbol {
-                        GetTicksBySymbol(symbol: "VN30F2412", date: "2024-12-06", limit: 6000) {
+                    'query' => "query GetTicksBySymbol {
+                        GetTicksBySymbol(symbol: \"{$vn30f1m}\", date: \"{$date}\", limit: 10000) {
                             data {
                                 symbol
                                 matchPrice
@@ -272,16 +275,16 @@ class DerivativeService extends CoreService
                                 side
                             }
                         }
-                    }',
+                    }",
                     'variables' => (object)[]
                 ],
             ];
 
             $req = $client->post('https://services.entrade.com.vn/price-api/query', $data);
             $data = json_decode($req->getBody())->data->GetTicksBySymbol->data;
-            usort($data, function ($a, $b) {
-                return $b->time < $a->time;
-            });
+            // usort($data, function ($a, $b) {
+            //     return $b->time < $a->time;
+            // });
             return $data;
         } catch (\Throwable $th) {
             return [];
@@ -318,12 +321,23 @@ class DerivativeService extends CoreService
                 $ret['filename'] = $filename;
                 $ret['headers'] = ['Content-Type' => 'text/csv'];
             }
-        } else if ($payload->source == 'FIREANT') {
-            Artisan::call('clone:data --type=export');
-            $ret['isOk'] = true;
         } else {
-            ExportDerVpsJob::dispatch();
-            $ret['isOk'] = true;
+            switch ($payload->source) {
+                case 'FIREANT':
+                    Artisan::call('clone:data --type=export');
+                    $ret['isOk'] = true;
+                    break;
+
+                case 'DNSE':
+                    ExportDerDnseJob::dispatch();
+                    $ret['isOk'] = true;
+                    break;
+
+                case 'VPS':
+                    ExportDerVpsJob::dispatch();
+                    $ret['isOk'] = true;
+                    break;
+            }
         }
 
         return $ret;

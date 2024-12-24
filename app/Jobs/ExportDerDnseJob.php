@@ -9,10 +9,11 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class ExportDerVpsJob implements ShouldQueue
+class ExportDerDnseJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    const SHIFT_TIME = 7 * 60 * 60;
     public $timeout = 3600;
 
     /**
@@ -29,20 +30,18 @@ class ExportDerVpsJob implements ShouldQueue
      */
     public function handle()
     {
-        $data = app(\App\Services\Trading\DerivativeService::class)->cloneVpsData();
+        $data = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData();
         if (!count($data)) return false;
 
-
-        $date = get_global_value('lastOpeningDate');
-        if (!$date) $date = date("Y-m-d");
+        $date = substr($data[0]->time, 0, 10);
         $file = storage_path('app/phaisinh/' . $date . '.csv');
 
         $fp = fopen($file, 'w');
         foreach ($data as $item) {
             $line = [];
-            $line[] = strtotime("{$date}T{$item->time}Z");
-            $line[] = $item->lastPrice;
-            $line[] = $item->lastVol;
+            $line[] = strtotime($item->time) + self::SHIFT_TIME;
+            $line[] = $item->matchPrice;
+            $line[] = $item->matchQtty;
             fputcsv($fp, $line);
         }
         fclose($fp);
