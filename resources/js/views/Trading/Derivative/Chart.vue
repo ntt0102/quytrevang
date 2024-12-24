@@ -508,6 +508,13 @@ function updateChartData(data, source = null) {
         prices.push({ time, value });
     });
     if (prices.length > 1) {
+        getTools();
+        params.whitespaces = mergeChartData(
+            params.whitespaces,
+            createWhitespaceData(CURRENT_DATE)
+        );
+        state.series.whitespace.setData(params.whitespaces);
+        //
         state.prices = mergeChartData(state.prices, prices);
         state.series.price.setData(state.prices);
     } else {
@@ -623,13 +630,8 @@ function configFIREANTSocket() {
             if (item.type === 3) {
                 const date = item.result[0].date.slice(0, 10);
                 if (date === CURRENT_DATE) {
-                    getTools();
-                    params.whitespaces = mergeChartData(
-                        params.whitespaces,
-                        createWhitespaceData(CURRENT_DATE)
-                    );
-                    state.series.whitespace.setData(params.whitespaces);
                     updateChartData(item.result);
+                    console.log("FIREANT", item.result);
                 }
                 store.dispatch("tradingDerivative/setLoading", false);
             } else if (
@@ -696,8 +698,8 @@ function getVpsData() {
         fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
             .then((response) => response.json())
             .then((data) => {
-                console.log("VPS: ", data);
                 updateChartData(data, "VPS");
+                console.log("VPS: ", data);
             });
         params.socketUpdatedAt = new Date();
     }
@@ -824,6 +826,7 @@ function dateSelectChange() {
 function resetChart() {
     params.whitespaces = [];
     state.prices = [];
+    params.socketUpdatedAt = subSeconds(new Date(), 61);
     connectSocket();
     getChartData();
 }
@@ -874,13 +877,17 @@ function coordinateToPrice(y) {
 function timeToIndex(time) {
     let index = params.whitespaces.findIndex((item) => item.time === time);
     if (index === -1) {
-        const date = format(new Date(time * 1000), "yyyy-MM-dd");
-        const amEnd = getUnixTime(new Date(`${date}T11:30:00Z`));
-        const pmStart = getUnixTime(new Date(`${date}T13:00:00Z`));
-        const pmEnd = getUnixTime(new Date(`${date}T14:30:00Z`));
-        if (time > amEnd && time < pmStart) time = amEnd;
-        else if (time > pmEnd) time = pmEnd;
-        index = params.whitespaces.findIndex((item) => item.time === time);
+        try {
+            const date = format(new Date(time * 1000), "yyyy-MM-dd");
+            const amEnd = getUnixTime(new Date(`${date}T11:30:00Z`));
+            const pmStart = getUnixTime(new Date(`${date}T13:00:00Z`));
+            const pmEnd = getUnixTime(new Date(`${date}T14:30:00Z`));
+            if (time > amEnd && time < pmStart) time = amEnd;
+            else if (time > pmEnd) time = pmEnd;
+            index = params.whitespaces.findIndex((item) => item.time === time);
+        } catch (error) {
+            console.log("error", error);
+        }
     }
     return index;
 }
