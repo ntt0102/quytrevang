@@ -262,6 +262,7 @@ function refresh(autoAdjust = false) {
 function calculatePattern() {
     const { A, B, C } = points;
     const bc = B.price - C.price;
+    const BC = mf.fmtNum(bc, 1, true);
     const side = bc > 0;
     const pickTime = props.pickTimeToolRef.get();
     const phase1 = scanPhase({
@@ -291,7 +292,7 @@ function calculatePattern() {
     console.log("calculatePattern", [phase1, phase2, phase3]);
 
     //
-    const pr1Valid = mf.fmtNum(bc, 1, true) >= phase1.pr;
+    const pr1Valid = BC >= phase1.pr;
     const pr2Valid =
         mf.fmtNum(C.price - phase3.xBox.R.price, 1, true) >= phase2.pr;
     const pr3Valid = mf.fmtNum(phase3.xBox.pr) >= phase3.pr;
@@ -374,7 +375,7 @@ function calculatePattern() {
     const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
     const pStatus = `${p1Status}${p2Status}${p3Status}`;
     //
-    const X = phase1.rEp;
+    const X = s1Valid ? phase1.rEp : BC;
     const x = adjustTargetPrice(B.price, X, side);
     const mainTR = phase3.breakIndex ?? T;
     const scale = parseInt((mainTR - phase1.R.index) / phase1.tr);
