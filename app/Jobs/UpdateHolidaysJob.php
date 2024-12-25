@@ -90,7 +90,7 @@ class UpdateHolidaysJob implements ShouldQueue
     private function crawlDays($dates)
     {
         $days = [];
-        if (preg_match('/Từ.* ngày (\d{1,2})\/(\d{1,2})\/(\d{4}).*đến.* ngày (\d{1,2})\/(\d{1,2})\/(\d{4}).*/', $dates, $matches)) {
+        if (preg_match('/.* ngày (\d{1,2})\/(\d{1,2})\/(\d{4}).*đến.* ngày (\d{1,2})\/(\d{1,2})\/(\d{4}).*/', $dates, $matches)) {
             $startDate = sprintf('%s-%s-%s', $matches[3], add_date_zero($matches[2]), add_date_zero($matches[1]));
             $endDate = sprintf('%s-%s-%s', $matches[6], add_date_zero($matches[5]), add_date_zero($matches[4]));
             $startDate = date_create_from_format('Y-m-d', $startDate);
