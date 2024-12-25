@@ -41,7 +41,7 @@ defineExpose({
 });
 
 watch(patternStore, (data) => {
-    if (data) load(data, { isCheck: true });
+    if (data) setTimeout(() => load(data, { isCheck: true }), 0);
 });
 
 function isSelected() {
@@ -306,7 +306,9 @@ function calculatePattern() {
     const T2 = phase2.R.index + phase2.tr;
     const T2p = 2 * phase2.R.index - phase2.S1.index;
     const T3 = phase3.xBox.R.index + phase3.tr;
-    const T3p = phase3.xBox.R.index + phase2.tr;
+    const T3p =
+        phase3.xBox.R.index +
+        (phase3.breakIndex && !s1Valid ? phase1.tr : phase2.tr);
     const timeMark = [T1, T1p, T2, T2p, T3, T3p];
 
     const T = phase3.R.index;
@@ -322,7 +324,6 @@ function calculatePattern() {
         [
             //
             pr1Valid,
-            s1Valid,
             !phase3.breakIndex || T1 < phase3.breakIndex,
             T > T1,
             !phase3.hasDouble,
@@ -345,9 +346,11 @@ function calculatePattern() {
         [
             //
             pr3Valid,
-            s3Valid,
+            s3Valid || phase3.breakIndex,
             T > T3,
-            extraCond.every(Boolean) || T > T3p,
+            phase3.breakIndex && !s1Valid
+                ? T > T3p
+                : extraCond.every(Boolean) || T > T3p,
         ],
     ];
     progress.step = 1;
@@ -375,7 +378,11 @@ function calculatePattern() {
     const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
     const pStatus = `${p1Status}${p2Status}${p3Status}`;
     //
-    const X = s1Valid ? phase1.rEp : BC;
+    const X = s1Valid
+        ? phase3.breakIndex && phase3.xBox.tr > phase1.tr
+            ? mf.fmtNum(phase1.R1.price - phase3.xBox.R.price, 1, true)
+            : phase1.rEp
+        : BC;
     const x = adjustTargetPrice(B.price, X, side);
     const mainTR = phase3.breakIndex ?? T;
     const scale = parseInt((mainTR - phase1.R.index) / phase1.tr);

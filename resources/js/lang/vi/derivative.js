@@ -4,7 +4,6 @@ export default [
         conds: [
             //
             "BC > PR1",
-            "C giữ hỗ trợ",
             "Break sau T1",
             "T > T1",
             "Không Double",
