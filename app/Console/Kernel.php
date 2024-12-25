@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use App\Jobs\UpdateHolidaysJob;
 use App\Jobs\BackupDatabaseJob;
 use App\Jobs\CleanDatabaseJob;
 use App\Jobs\UpdateOpeningMarketJob;
@@ -29,6 +30,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->job(new UpdateHolidaysJob)->yearlyOn(1, 1, '01:00');
         $schedule->job(new CleanDatabaseJob)->daily();
         $schedule->job(new BackupDatabaseJob)->daily();
         $schedule->job(new UpdateOpeningMarketJob)->dailyAt('08:45');

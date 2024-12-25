@@ -48,56 +48,15 @@ if (!function_exists('in_trading_time')) {
     }
 }
 
-if (!function_exists('check_opening_market')) {
+if (!function_exists('add_date_zero')) {
     /**
-     * Check opening market.
+     * Add zero for Day or Month
      *
      * @return string
      */
-    function check_opening_market($date = null)
+    function add_date_zero($component)
     {
-        if (!$date) $date = new DateTime();
-        $currentDay = $date->format("w");
-        if ($currentDay == 0 || $currentDay == 6) return false;
-
-        $currentDate = $date->format("Y-m-d");
-        $currentYear = $date->format("Y");
-        $BASE_CALENDAR_URL = "https://www.googleapis.com/calendar/v3/calendars";
-        $BASE_CALENDAR_ID_FOR_PUBLIC_HOLIDAY =
-            "holiday@group.v.calendar.google.com";
-        $API_KEY = env('GOOGLE_CALENDAR_API_KEY');
-        $CALENDAR_REGION = "en.vietnamese";
-        $url = $BASE_CALENDAR_URL . '/' . $CALENDAR_REGION . '%23' . $BASE_CALENDAR_ID_FOR_PUBLIC_HOLIDAY . '/events?key=' . $API_KEY;
-        $client = new \GuzzleHttp\Client();
-        $res = $client->get($url);
-        $resp = json_decode($res->getBody());
-        $holidays = collect($resp->items)
-            ->filter(function ($item) use ($currentYear) {
-                return $item->start->date >= $currentYear . '-01-01' && $item->start->date <= $currentYear . '-31-12';
-            })
-            ->sortBy('start.date')
-            ->reduce(function ($days, $item) {
-                $days[] = $item->start->date;
-                return $days;
-            }, []);
-        if (in_array($currentDate, $holidays)) return false;
-        return true;
-    }
-}
-
-if (!function_exists('get_last_opening_date')) {
-    /**
-     * Get start trading time.
-     *
-     * @return string
-     */
-    function get_last_opening_date()
-    {
-        $date = new DateTime();
-        while (!check_opening_market($date)) {
-            $date->modify('-1 day');
-        }
-        return $date->format('Y-m-d');
+        return str_pad($component, 2, '0', STR_PAD_LEFT);
     }
 }
 

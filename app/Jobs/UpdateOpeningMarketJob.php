@@ -27,7 +27,7 @@ class UpdateOpeningMarketJob implements ShouldQueue
      */
     public function handle()
     {
-        $date = get_last_opening_date();
+        $date = $this->getLastOpeningDate();
         set_global_value('lastOpeningDate', $date);
 
         $isOpeningMarket = $date == date('Y-m-d');
@@ -39,5 +39,22 @@ class UpdateOpeningMarketJob implements ShouldQueue
             set_global_value('slOrderId', '');
             set_global_value('exitOrderId', '');
         }
+    }
+
+    private function getLastOpeningDate()
+    {
+        $date = new \DateTime();
+        while (!$this->checkOpeningMarket($date)) {
+            $date->modify('-1 day');
+        }
+        return $date->format('Y-m-d');
+    }
+
+    private function checkOpeningMarket($date)
+    {
+        if (in_array($date->format('w'), [0, 6])) return false;
+        $holidays = explode(",", get_global_value('holidays'));
+        if (in_array($date->format('Y-m-d'), $holidays)) return false;
+        return true;
     }
 }

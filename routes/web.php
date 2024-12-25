@@ -69,10 +69,12 @@ Route::get('test', function () {
     // $s = app(\App\Services\Trading\ShareService::class)->getEvents($payload);
     // $s = app(\App\Services\Trading\ShareService::class)->getDataFireAnt($payload);
     // $s = 'THO';
-    $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData();
+    // $s = app(\App\Services\Trading\DerivativeService::class)->getHolidays();
+    // $s = get_holidays('2025');
     // $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData();
     // $s = app(\App\Services\Trading\DerivativeService::class)->pingWithCurl();
-    // $s = \App\Jobs\ExportDerDnseJob::dispatch();
+    $s = \App\Jobs\UpdateHolidaysJob::dispatch();
+    // $s = \App\Jobs\UpdateOpeningMarketJob::dispatch();
     // $s = \App\Jobs\FilterShareJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);
     // $s = new \App\Jobs\FilterShareJob($payload);
@@ -140,7 +142,6 @@ Route::get('test', function () {
     // $s = \App\Jobs\ScanDerivativeJob::dispatch();
     // $s = app(\App\Jobs\ScanDerivativeJob::class)->execute();
     // $s = check_opening_market(date_create_from_format("Y-m-d", '2024-11-01'));
-    // $s = get_last_opening_date();
     // $emailOtp = "";
     // $client = \Webklex\IMAP\Facades\Client::account('default');
     // $client->connect();
