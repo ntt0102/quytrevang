@@ -334,8 +334,8 @@ function calculatePattern() {
             ...extraCond,
             s1Valid,
             T2 > T1,
+            T2p < T2,
             T < T2p,
-            T < T2,
         ],
         [
             //

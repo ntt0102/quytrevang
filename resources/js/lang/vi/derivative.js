@@ -19,8 +19,8 @@ export default [
             "EPR2 < EPR1",
             "C giữ hỗ trợ",
             "T2 > T1",
+            "T2' < T2",
             "T < T2'",
-            "T < T2",
         ],
     },
     {
