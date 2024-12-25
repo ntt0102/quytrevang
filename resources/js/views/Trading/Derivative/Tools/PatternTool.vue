@@ -308,7 +308,7 @@ function calculatePattern() {
     const T3 = phase3.xBox.R.index + phase3.tr;
     const T3p =
         phase3.xBox.R.index +
-        (phase3.breakIndex && !s1Valid ? phase1.tr : phase2.tr);
+        (phase3.breakIndex || !s1Valid ? phase1.tr : phase2.tr);
     const timeMark = [T1, T1p, T2, T2p, T3, T3p];
 
     const T = phase3.R.index;
@@ -348,7 +348,7 @@ function calculatePattern() {
             pr3Valid,
             s3Valid || phase3.breakIndex,
             T > T3,
-            phase3.breakIndex && !s1Valid
+            phase3.breakIndex || !s1Valid
                 ? T > T3p
                 : extraCond.every(Boolean) || T > T3p,
         ],
