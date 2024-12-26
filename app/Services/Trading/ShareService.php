@@ -473,13 +473,11 @@ class ShareService extends CoreService
         return (object)[];
     }
 
-    public function getStock($symbol, $startDate, $endDate)
+    public function getStock($symbol, $from, $to)
     {
         try {
-            $startDate = strtotime($startDate);
-            $endDate = strtotime($endDate);
             $client = new \GuzzleHttp\Client();
-            $url = "https://dchart-api.vndirect.com.vn/dchart/history?resolution=1D&symbol={$symbol}&from={$startDate}&to={$endDate}";
+            $url = "https://dchart-api.vndirect.com.vn/dchart/history?resolution=1D&symbol={$symbol}&from={$from}&to={$to}";
             $res = $client->get($url);
             return json_decode($res->getBody());
         } catch (\Throwable $th) {
@@ -487,37 +485,108 @@ class ShareService extends CoreService
         }
     }
 
-    public function scanStock($symbol, $long, $short, $current)
+    public function scanStock($data, $longDate, $shortDate, $currDate)
     {
-        $data = $this->getStock($symbol, $long, $current);
         if ($data->s !== 'ok') return false;
-        $A = $B = $C = $D = $E = $F = [];
-        $short = strtotime($short);
-        $current = strtotime($current);
-        $mid = ($short + $current) / 2;
+        $A = $B = $C = $D = $E = (object)[];
+        $temp1Date = ($shortDate + $currDate) / 2;
+        $temp2Date = (2 * $shortDate + $currDate) / 3;
+        $temp3Date = ($longDate + $shortDate) / 2;
+        $temp4Date = (2 * $longDate + $shortDate) / 3;
         $last = count($data->t) - 1;
         for ($i = $last; $i >= 0; $i--) {
             $h = $data->h[$i];
             $l = $data->l[$i];
             $t = $data->t[$i];
-            $pL = ['t' => $t, 'p' => $l, 'time' => date('Y-m-d', $t)];
-            $pH = ['t' => $t, 'p' => $h, 'time' => date('Y-m-d', $t)];
+            $pL = (object)['t' => date('Y-m-d', $t), 'p' => $l];
+            $pH = (object)['t' => date('Y-m-d', $t), 'p' => $h];
             if ($i === $last) {
-                $F = $pL;
-                $E = $D = $C = $B = $A = $F;
-            }
-            if ($t >= $short) {
-                if ($t >= $mid) {
-                    if ($h > $E['p']) $E = $pH;
-                } else {
-                    if ($h > $C['p']) $C = $pH;
-                }
-                if ($l < $D['p']) $D = $pL;
+                $A = $B = $C = $D = $E = $pL;
             } else {
-                if ($h > $A['p']) $A = $pH;
+                if ($t >= $shortDate) {
+                    if ($t >= $temp1Date) {
+                        if ($h > $E->p) $D = $E = $pH;
+                    } else {
+                        if ($h > $C->p) $B = $C = $pH;
+                    }
+                    if ($t >= $temp2Date) {
+                        if ($l < $D->p) $C = $D = $pL;
+                    }
+                } else {
+                    if ($t >= $temp3Date) {
+                        if ($h > $C->p) $B = $C = $pH;
+                    } else {
+                        if ($h > $A->p) $A = $pH;
+                    }
+                    if ($t >= $temp4Date) {
+                        if ($l < $B->p) $A = $B = $pL;
+                    }
+                }
             }
-            if ($l < $B['p']) $B = $pL;
         }
-        return ['A' => $A, 'B' => $B, 'C' => $C, 'D' => $D, 'E' => $E];
+        return (object)['A' => $A, 'B' => $B, 'C' => $C, 'D' => $D, 'E' => $E];
+    }
+
+    public function calcStock($symbol, $time1, $time2, $time3)
+    {
+        if (!$time3) $time3 = time();
+        $data = $this->getStock($symbol, $time1, $time3);
+        $points = $this->scanStock($data, $time1, $time2, $time3);
+        // return $points;
+        if (!$points) return false;
+        $long = ($points->C->p - $points->B->p) / ($points->A->p - $points->B->p);
+        $short = ($points->E->p - $points->D->p) / ($points->C->p - $points->D->p);
+        return (object)['long' => $long, 'short' => $short];
+    }
+
+    public function getStockSymbols($group)
+    {
+        try {
+            $client = new \GuzzleHttp\Client();
+            $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/{$group}";
+            $res = $client->get($url);
+            return json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            return [];
+        }
+    }
+
+    public function checkStock($symbol, $time1, $time2, $time3)
+    {
+        $vnindex = $this->calcStock('VNINDEX', $time1, $time2, $time3);
+        $stock = $this->calcStock($symbol, $time1, $time2, $time3);
+        $long = $stock->long > $vnindex->long;
+        $short = $stock->short > $vnindex->short;
+        $total = $long && $short;
+        return (object)[
+            'from' => date('Y-m-d', $time1),
+            'to' => date('Y-m-d', $time3),
+            'VNINDEX' => $vnindex,
+            $symbol => $stock,
+            'check' => (object)[
+                'long' => $long,
+                'short' => $short,
+                'total' => $total,
+            ]
+        ];
+    }
+
+    public function filterStock($group, $time1, $time2, $time3)
+    {
+        $checkResult = [];
+        $vnindex = $this->calcStock('VNINDEX', $time1, $time2, $time3);
+        $symbols = $this->getStockSymbols($group);
+        if (empty($symbols)) return false;
+        foreach ($symbols as $symbol) {
+            $stock = $this->calcStock($symbol, $time1, $time2, $time3);
+            $check = $stock->long > $vnindex->long && $stock->short > $vnindex->short;
+            if ($check) $checkResult[] = $symbol;
+        }
+        return (object)[
+            'from' => date('Y-m-d', $time1),
+            'to' => date('Y-m-d', $time3),
+            'group' => $group,
+            'symbols' => $checkResult
+        ];
     }
 }
