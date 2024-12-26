@@ -72,8 +72,8 @@ Route::get('test', function () {
     // $s = app(\App\Services\Trading\DerivativeService::class)->getHolidays();
     // $s = get_holidays('2025');
     // $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData();
-    // $s = app(\App\Services\Trading\DerivativeService::class)->pingWithCurl();
-    $s = \App\Jobs\UpdateHolidaysJob::dispatch();
+    $s = app(\App\Services\Trading\ShareService::class)->getStock('CTG', '2024-02-20', '2024-12-24');
+    // $s = \App\Jobs\UpdateHolidaysJob::dispatch();
     // $s = \App\Jobs\UpdateOpeningMarketJob::dispatch();
     // $s = \App\Jobs\FilterShareJob::dispatch($payload);
     // $s = \App\Jobs\FilterJob::dispatch($payload);

@@ -472,4 +472,18 @@ class ShareService extends CoreService
         }
         return (object)[];
     }
+
+    public function getStock($symbol, $startDate, $endDate)
+    {
+        try {
+            $startDate = strtotime($startDate);
+            $endDate = strtotime($endDate);
+            $client = new \GuzzleHttp\Client();
+            $url = "https://histdatafeed.vps.com.vn/tradingview/history?symbol={$symbol}&resolution=1D&from={$startDate}&to={$endDate}";
+            $res = $client->get($url);
+            return json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            return [];
+        }
+    }
 }
