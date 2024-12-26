@@ -536,8 +536,8 @@ function createWhitespaceData(date) {
         data.push(item);
     }
     if (state.chartDate === CURRENT_DATE) {
-        const pm15h00 = getUnixTime(new Date(`${date}T15:00:00Z`));
-        for (let sec = pmEnd + 1; sec <= pm15h00; sec++) {
+        const pmExtra = getUnixTime(new Date(`${date}T17:00:00Z`));
+        for (let sec = pmEnd + 1; sec <= pmExtra; sec++) {
             let item = { time: sec };
             data.push(item);
         }

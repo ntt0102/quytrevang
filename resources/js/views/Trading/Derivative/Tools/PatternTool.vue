@@ -333,6 +333,7 @@ function calculatePattern() {
             //
             ...extraCond,
             s1Valid,
+            !phase3.breakIndex,
             T2 > T1,
             T2p < T2,
             T < T2p,

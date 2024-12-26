@@ -18,6 +18,7 @@ export default [
             "EPR1 < 3",
             "EPR2 < EPR1",
             "C giữ hỗ trợ",
+            "Chưa break",
             "T2 > T1",
             "T2' < T2",
             "T < T2'",
