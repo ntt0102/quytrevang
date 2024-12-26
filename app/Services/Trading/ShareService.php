@@ -479,11 +479,45 @@ class ShareService extends CoreService
             $startDate = strtotime($startDate);
             $endDate = strtotime($endDate);
             $client = new \GuzzleHttp\Client();
-            $url = "https://histdatafeed.vps.com.vn/tradingview/history?symbol={$symbol}&resolution=1D&from={$startDate}&to={$endDate}";
+            $url = "https://dchart-api.vndirect.com.vn/dchart/history?resolution=1D&symbol={$symbol}&from={$startDate}&to={$endDate}";
             $res = $client->get($url);
             return json_decode($res->getBody());
         } catch (\Throwable $th) {
-            return [];
+            return (object)['s' => 'ng'];
         }
+    }
+
+    public function scanStock($symbol, $long, $short, $current)
+    {
+        $data = $this->getStock($symbol, $long, $current);
+        if ($data->s !== 'ok') return false;
+        $A = $B = $C = $D = $E = $F = [];
+        $short = strtotime($short);
+        $current = strtotime($current);
+        $mid = ($short + $current) / 2;
+        $last = count($data->t) - 1;
+        for ($i = $last; $i >= 0; $i--) {
+            $h = $data->h[$i];
+            $l = $data->l[$i];
+            $t = $data->t[$i];
+            $pL = ['t' => $t, 'p' => $l, 'time' => date('Y-m-d', $t)];
+            $pH = ['t' => $t, 'p' => $h, 'time' => date('Y-m-d', $t)];
+            if ($i === $last) {
+                $F = $pL;
+                $E = $D = $C = $B = $A = $F;
+            }
+            if ($t >= $short) {
+                if ($t >= $mid) {
+                    if ($h > $E['p']) $E = $pH;
+                } else {
+                    if ($h > $C['p']) $C = $pH;
+                }
+                if ($l < $D['p']) $D = $pL;
+            } else {
+                if ($h > $A['p']) $A = $pH;
+            }
+            if ($l < $B['p']) $B = $pL;
+        }
+        return ['A' => $A, 'B' => $B, 'C' => $C, 'D' => $D, 'E' => $E];
     }
 }

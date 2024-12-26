@@ -71,8 +71,10 @@ Route::get('test', function () {
     // $s = 'THO';
     // $s = app(\App\Services\Trading\DerivativeService::class)->getHolidays();
     // $s = get_holidays('2025');
-    $s = app(\App\Services\Trading\DerivativeService::class)->testVpsData();
+    // $s = app(\App\Services\Trading\DerivativeService::class)->testVpsData();
     // $s = app(\App\Services\Trading\ShareService::class)->getStock('CTG', '2024-02-20', '2024-12-24');
+    // $s = app(\App\Services\Trading\ShareService::class)->getStock('CTG', '2021-05-25', '2024-12-24');
+    $s = app(\App\Services\Trading\ShareService::class)->scanStock('CTG', '2021-05-25', '2024-02-20', '2024-12-24');
     // $s = \App\Jobs\UpdateHolidaysJob::dispatch();
     // $s = \App\Jobs\UpdateOpeningMarketJob::dispatch();
     // $s = \App\Jobs\FilterShareJob::dispatch($payload);
