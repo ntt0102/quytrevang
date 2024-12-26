@@ -262,7 +262,6 @@ function refresh(autoAdjust = false) {
 function calculatePattern() {
     const { A, B, C } = points;
     const bc = B.price - C.price;
-    const BC = mf.fmtNum(bc, 1, true);
     const side = bc > 0;
     const pickTime = props.pickTimeToolRef.get();
     const phase1 = scanPhase({
@@ -292,23 +291,25 @@ function calculatePattern() {
     console.log("calculatePattern", [phase1, phase2, phase3]);
 
     //
+    const BC = mf.fmtNum(bc, 1, true);
+    const CD = mf.fmtNum(C.price - phase3.xBox.R.price, 1, true);
+    const DE = mf.fmtNum(phase3.xBox.pr);
     const pr1Valid = BC >= phase1.pr;
-    const pr2Valid =
-        mf.fmtNum(C.price - phase3.xBox.R.price, 1, true) >= phase2.pr;
-    const pr3Valid = mf.fmtNum(phase3.xBox.pr) >= phase3.pr;
+    const pr2Valid = CD >= phase2.pr;
+    const pr3Valid = DE >= phase3.pr;
 
     const s1Valid = !mf.cmp(C.price, !side, phase1.S1.price);
     const s2Valid = !mf.cmp(phase3.xBox.R.price, side, phase2.S1.price);
     const s3Valid = !mf.cmp(phase3.xBox.S.price, !side, phase3.S1.price);
+
+    const exceptCase = phase3.breakIndex || !s1Valid;
 
     const T1 = phase1.R.index + phase1.tr;
     const T1p = phase1.R.index + 5 * phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T2p = 2 * phase2.R.index - phase2.S1.index;
     const T3 = phase3.xBox.R.index + phase3.tr;
-    const T3p =
-        phase3.xBox.R.index +
-        (phase3.breakIndex || !s1Valid ? phase1.tr : phase2.tr);
+    const T3p = phase3.xBox.R.index + (exceptCase ? phase1.tr : phase2.tr);
     const timeMark = [T1, T1p, T2, T2p, T3, T3p];
 
     const T = phase3.R.index;
@@ -347,12 +348,11 @@ function calculatePattern() {
         ],
         [
             //
+            DE >= phase1.pr || !exceptCase,
             pr3Valid,
-            s3Valid || phase3.breakIndex,
+            s3Valid || exceptCase,
             T > T3,
-            phase3.breakIndex || !s1Valid
-                ? T > T3p
-                : extraCond.every(Boolean) || T > T3p,
+            exceptCase ? T > T3p : extraCond.every(Boolean) || T > T3p,
         ],
     ];
     progress.step = 1;
@@ -381,8 +381,8 @@ function calculatePattern() {
     const pStatus = `${p1Status}${p2Status}${p3Status}`;
     //
     const X = s1Valid
-        ? phase3.breakIndex && phase3.xBox.tr > phase1.tr
-            ? mf.fmtNum(phase1.R1.price - phase3.xBox.R.price, 1, true)
+        ? phase3.breakIndex && T > T3
+            ? 2 * CD
             : phase1.rEp
         : BC;
     const x = adjustTargetPrice(B.price, X, side);
