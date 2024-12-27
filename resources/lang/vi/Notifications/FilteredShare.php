@@ -2,10 +2,9 @@
 
 return [
 
-    'title' => 'Lọc cổ phiếu đã hoàn tất.',
-    'body' => 'Mô hình lọc: :kind',
-    'actionUrl' => 'chung-khoan-dau-tu?list=:kind',
+    'title' => 'Lọc cổ phiếu hoàn tất.',
+    'actionUrl' => 'dau-tu-co-phieu?list=filter',
     'actionTitle' => 'Xem biều đồ',
-    'f_top' => 'Lọc CP đỉnh',
-    'f_bottom' => 'Lọc CP đáy',
+    'success' => 'Lọc được :count cổ phiếu trong rổ :group.',
+    'failed' => 'Tên rổ chỉ số không đúng.',
 ];

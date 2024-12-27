@@ -8,7 +8,6 @@ use App\Models\ShareOrder;
 use App\Models\StockDrawing;
 use App\Jobs\FilterShareJob;
 use App\Jobs\ExportShareJob;
-use stdClass;
 
 class ShareService extends CoreService
 {
@@ -23,13 +22,13 @@ class ShareService extends CoreService
      */
     public function initChart($payload)
     {
-        $range = StockDrawing::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
-        $payload->window = $range->map(function ($t) {
-            return $t->time;
-        });
+        $filterTime = StockDrawing::where('name', 'filterTime')->orderByRaw("point ASC")->pluck('data', 'point');
+        // $tools = StockDrawing::where('symbol', 'VN30F1M')->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
         return [
-            'chart' => $this->getChart($payload),
-            'range' => $range,
+            'vpsUser' => get_global_value('vpsUser'),
+            'vpsSession' => get_global_value('vpsSession'),
+            'vnindex' => $this->getChartData('VNINDEX'),
+            'filterTime' => $filterTime,
         ];
     }
     /**
@@ -40,249 +39,250 @@ class ShareService extends CoreService
      */
     public function getChart($payload)
     {
-        $ret = [
-            'data' => $this->getData($payload)['chart'],
+        return [
+            'price' => $this->getChartData($payload->symbol),
             'tools' => $this->getTools($payload),
-            'events' => $this->getEvents($payload),
         ];
-        if ($payload->vnindex) {
-            $payload->symbol = 'VNINDEX';
-            $ret['vnindex'] = $this->getDataFireAnt($payload)['chart']['price'];
-        }
-        if (count($payload->window) == 2) {
-            $payload->from = $payload->window[0];
-            $payload->to = $payload->window[1];
-            $ret['foreignRSI'] = round($this->getDataFireAnt($payload)['rsi']['foreign'][2]);
-        }
-        return $ret;
     }
-    public function getData($payload)
+    public function getChartData($symbol)
     {
-        $data = $this->getDataFireAnt($payload);
-        $data['chart']['active'] = $this->getActiveVolume($payload);
-        return $data;
-    }
-    public function getDataFireAnt($payload)
-    {
-        $r = [
-            'chart' => ['ohlc' => [], 'price' => [], 'cash' => [], 'foreign' => [], 'gap' => [], 'signal' => []],
-            'rsi' => ['price' => [100, 0], 'cash' => [0, 0], 'foreign' => [0, 0, 0]]
-        ];
-        if (!$payload->symbol) return $r;
-        $startDate = date('Y-m-d', $payload->from);
-        $endDate = date("Y-m-d", $payload->to);
-        $client = new \GuzzleHttp\Client(['headers' => ['authorization' => self::FA_AUTH]]);
-        $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/historical-quotes?startDate={$startDate}&endDate={$endDate}&offset=0&limit=1000000";
-        $res = $client->get($url);
-        $data = json_decode($res->getBody());
-        // usort($data, function ($a, $b) {
-        //     return $a->date < $b->date;
-        // });
-        if ($payload->timeframe != 'D')  $this->getDataFireAntTimeframe($data, $payload->timeframe);
-        $size = count($data);
-        if ($size == 0) return $r;
-        $prevAvg = 0;
-        $prevHigh = 0;
-        $prevLow = 0;
-        $topAvg = 0;
-        $bottomAvg = 0;
-        $priceGains = [0, 0];
-        $priceLosses = [0, 0];
-        $cashAcc = 0;
-        $cashGains = [0, 0];
-        $cashLosses = [0, 0];
-        $frgnAcc = 0;
-        $frgnGains = [0, 0, 0];
-        $frgnLosses = [0, 0, 0];
-        for ($i = $size - 1; $i >= 0; $i--) {
-            $date = $this->unix($data[$i]->date);
-            if ($i < $size - 1) {
-                $preDate = $this->unix($data[$i + 1]->date);
-                if ($date == $preDate) continue;
-            }
-            $priceOpen = $data[$i]->priceOpen / $data[$i]->adjRatio;
-            $priceHigh = $data[$i]->priceHigh / $data[$i]->adjRatio;
-            $priceLow = $data[$i]->priceLow / $data[$i]->adjRatio;
-            $priceClose = $data[$i]->priceClose / $data[$i]->adjRatio;
-            $r['chart']['ohlc'][] = [
-                'time' => $date,
-                'open' => $priceOpen,
-                'high' => $priceHigh,
-                'low' => $priceLow,
-                'close' => $priceClose
+        $chart = [];
+        $from = strtotime('-5 years');
+        $to = time();
+        $data = $this->getStock($symbol, $from, $to);
+        $last = count($data->t) - 1;
+        for ($i = 0; $i <= $last; $i++) {
+            $chart[] = [
+                'time' => $data->t[$i],
+                'open' => $data->o[$i],
+                'high' => $data->h[$i],
+                'low' => $data->l[$i],
+                'close' => $data->c[$i]
             ];
-            //
-            $avg = ($priceHigh + $priceLow + $priceClose) / 3;
-            $r['chart']['price'][] = [
-                'time' => $date,
-                'value' => $avg
-            ];
-            //
-            if (!$prevHigh) $prevHigh = $priceHigh;
-            $buyGap = $priceLow > $prevHigh;
-            $prevHigh = $priceHigh;
-            if (!$prevLow) $prevLow = $priceLow;
-            $sellGap = $priceHigh < $prevLow;
-            $prevLow = $priceLow;
-            if ($buyGap || $sellGap) {
-                $r['chart']['gap'][] = [
-                    'time' => $date,
-                    'value' => 1,
-                    'color' => $buyGap ? 'purple' : 'orange'
-                ];
-            }
-            //
-            if (!$topAvg) $topAvg = $avg;
-            if (!$bottomAvg) $bottomAvg = $avg;
-            if ($i > 3 * $size / 4) {
-                if ($avg > $topAvg) {
-                    $topAvg = $avg;
-                    $priceGains[0] = 0;
-                    $priceLosses[0] = 0;
-                    $cashGains[0] = 0;
-                    $cashLosses[0] = 0;
-                }
-                if ($avg < $bottomAvg) {
-                    $bottomAvg = $avg;
-                    $priceGains[1] = 0;
-                    $priceLosses[1] = 0;
-                    $cashGains[1] = 0;
-                    $cashLosses[1] = 0;
-                }
-            }
-            if (!$prevAvg) $prevAvg = $avg;
-            $change = $avg - $prevAvg;
-            $prevAvg = $avg;
-            $side = 0;
-            if ($change > 0) {
-                $side = 1;
-                $priceGains[0] += $change;
-                $priceGains[1] += $change;
-                $cashGains[0] += $data[$i]->totalVolume;
-                $cashGains[1] += $data[$i]->totalVolume;
-            } else if ($change < 0) {
-                $side = -1;
-                $priceLosses[0] -= $change;
-                $priceLosses[1] -= $change;
-                $cashLosses[0] += $data[$i]->totalVolume;
-                $cashLosses[1] += $data[$i]->totalVolume;
-            }
-            $cash = $side * $data[$i]->totalVolume;
-            $cashAcc += $cash;
-            $r['chart']['cash'][] = [
-                'time' => $date,
-                'value' => $cashAcc
-            ];
-            //
-            $frgnQuantity = $data[$i]->buyForeignQuantity - $data[$i]->sellForeignQuantity;
-            $frgnAcc += $frgnQuantity;
-            $r['chart']['foreign'][] = [
-                'time' => $date,
-                'value' => $frgnAcc
-            ];
-            //
-            $j = $i > $size / 2 ? 1 : 2;
-            if ($frgnQuantity > 0) {
-                $frgnGains[0] += $frgnQuantity;
-                $frgnGains[$j] += $frgnQuantity;
-            } else {
-                $frgnLosses[0] -= $frgnQuantity;
-                $frgnLosses[$j] -= $frgnQuantity;
-            }
-            //
-            $buySignal = $data[$i]->buyQuantity > $data[$i]->sellQuantity && $data[$i]->buyCount < $data[$i]->sellCount;
-            $sellSignal = 1.5 * $data[$i]->buyQuantity < $data[$i]->sellQuantity && $data[$i]->buyCount > $data[$i]->sellCount;
-            if ($buySignal || $sellSignal) {
-                $r['chart']['signal'][] = [
-                    'time' => $date,
-                    'value' => 1,
-                    'color' => $buySignal ? 'lime' : 'red'
-                ];
-            }
         }
-        for ($i = 0; $i < 3; $i++) {
-            if ($i < 2) {
-                if ($priceLosses[$i] > 0)
-                    $r['rsi']['price'][$i] = 100 - (100 / (1 + ($priceGains[$i] / $priceLosses[$i])));
-                if ($cashLosses[$i] > 0)
-                    $r['rsi']['cash'][$i] = 100 - (100 / (1 + ($cashGains[$i] / $cashLosses[$i])));
-            }
-            if ($frgnLosses[$i] > 0)
-                $r['rsi']['foreign'][$i] = 100 - (100 / (1 + ($frgnGains[$i] / $frgnLosses[$i])));
-        }
-        return $r;
+        return $chart;
     }
-    private function getDataFireAntTimeframe(&$data, $tf)
-    {
-        $bars = [];
-        foreach ($data as $bar) {
-            $key = date('Y-' . $tf, $this->unix($bar->date));
-            $priceOpen = $bar->priceOpen / $bar->adjRatio;
-            $priceHigh = $bar->priceHigh / $bar->adjRatio;
-            $priceLow = $bar->priceLow / $bar->adjRatio;
-            $priceClose = $bar->priceClose / $bar->adjRatio;
-            if (!array_key_exists($key, $bars)) {
-                $bars[$key] = new stdClass();
-                $bars[$key]->date = $bar->date;
-                $bars[$key]->adjRatio = 1;
-                $bars[$key]->priceHigh = $priceHigh;
-                $bars[$key]->priceLow = $priceLow;
-                $bars[$key]->priceClose = $priceClose;
-                $bars[$key]->totalVolume = 0;
-                $bars[$key]->buyForeignQuantity = 0;
-                $bars[$key]->sellForeignQuantity = 0;
-                $bars[$key]->buyCount = 0;
-                $bars[$key]->sellCount = 0;
-                $bars[$key]->buyQuantity = 0;
-                $bars[$key]->sellQuantity = 0;
-            } else {
-                if ($priceHigh > $bars[$key]->priceHigh)
-                    $bars[$key]->priceHigh = $priceHigh;
-                if ($priceLow < $bars[$key]->priceLow)
-                    $bars[$key]->priceLow = $priceLow;
-            }
-            $bars[$key]->priceOpen = $priceOpen;
-            $bars[$key]->totalVolume += $bar->totalVolume;
-            $bars[$key]->buyForeignQuantity += $bar->buyForeignQuantity;
-            $bars[$key]->sellForeignQuantity += $bar->sellForeignQuantity;
-            $bars[$key]->buyCount += $bar->buyCount;
-            $bars[$key]->sellCount += $bar->sellCount;
-            $bars[$key]->buyQuantity += $bar->buyQuantity;
-            $bars[$key]->sellQuantity += $bar->sellQuantity;
-        }
-        $data = array_values($bars);
-    }
+    // public function getDataFireAnt($payload)
+    // {
+    //     $r = [
+    //         'chart' => ['ohlc' => [], 'price' => [], 'cash' => [], 'foreign' => [], 'gap' => [], 'signal' => []],
+    //         'rsi' => ['price' => [100, 0], 'cash' => [0, 0], 'foreign' => [0, 0, 0]]
+    //     ];
+    //     if (!$payload->symbol) return $r;
+    //     $startDate = date('Y-m-d', $payload->from);
+    //     $endDate = date("Y-m-d", $payload->to);
+    //     $client = new \GuzzleHttp\Client(['headers' => ['authorization' => self::FA_AUTH]]);
+    //     $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/historical-quotes?startDate={$startDate}&endDate={$endDate}&offset=0&limit=1000000";
+    //     $res = $client->get($url);
+    //     $data = json_decode($res->getBody());
+    //     // usort($data, function ($a, $b) {
+    //     //     return $a->date < $b->date;
+    //     // });
+    //     if ($payload->timeframe != 'D')  $this->getDataFireAntTimeframe($data, $payload->timeframe);
+    //     $size = count($data);
+    //     if ($size == 0) return $r;
+    //     $prevAvg = 0;
+    //     $prevHigh = 0;
+    //     $prevLow = 0;
+    //     $topAvg = 0;
+    //     $bottomAvg = 0;
+    //     $priceGains = [0, 0];
+    //     $priceLosses = [0, 0];
+    //     $cashAcc = 0;
+    //     $cashGains = [0, 0];
+    //     $cashLosses = [0, 0];
+    //     $frgnAcc = 0;
+    //     $frgnGains = [0, 0, 0];
+    //     $frgnLosses = [0, 0, 0];
+    //     for ($i = $size - 1; $i >= 0; $i--) {
+    //         $date = $this->unix($data[$i]->date);
+    //         if ($i < $size - 1) {
+    //             $preDate = $this->unix($data[$i + 1]->date);
+    //             if ($date == $preDate) continue;
+    //         }
+    //         $priceOpen = $data[$i]->priceOpen / $data[$i]->adjRatio;
+    //         $priceHigh = $data[$i]->priceHigh / $data[$i]->adjRatio;
+    //         $priceLow = $data[$i]->priceLow / $data[$i]->adjRatio;
+    //         $priceClose = $data[$i]->priceClose / $data[$i]->adjRatio;
+    //         $r['chart']['ohlc'][] = [
+    //             'time' => $date,
+    //             'open' => $priceOpen,
+    //             'high' => $priceHigh,
+    //             'low' => $priceLow,
+    //             'close' => $priceClose
+    //         ];
+    //         //
+    //         $avg = ($priceHigh + $priceLow + $priceClose) / 3;
+    //         $r['chart']['price'][] = [
+    //             'time' => $date,
+    //             'value' => $avg
+    //         ];
+    //         //
+    //         if (!$prevHigh) $prevHigh = $priceHigh;
+    //         $buyGap = $priceLow > $prevHigh;
+    //         $prevHigh = $priceHigh;
+    //         if (!$prevLow) $prevLow = $priceLow;
+    //         $sellGap = $priceHigh < $prevLow;
+    //         $prevLow = $priceLow;
+    //         if ($buyGap || $sellGap) {
+    //             $r['chart']['gap'][] = [
+    //                 'time' => $date,
+    //                 'value' => 1,
+    //                 'color' => $buyGap ? 'purple' : 'orange'
+    //             ];
+    //         }
+    //         //
+    //         if (!$topAvg) $topAvg = $avg;
+    //         if (!$bottomAvg) $bottomAvg = $avg;
+    //         if ($i > 3 * $size / 4) {
+    //             if ($avg > $topAvg) {
+    //                 $topAvg = $avg;
+    //                 $priceGains[0] = 0;
+    //                 $priceLosses[0] = 0;
+    //                 $cashGains[0] = 0;
+    //                 $cashLosses[0] = 0;
+    //             }
+    //             if ($avg < $bottomAvg) {
+    //                 $bottomAvg = $avg;
+    //                 $priceGains[1] = 0;
+    //                 $priceLosses[1] = 0;
+    //                 $cashGains[1] = 0;
+    //                 $cashLosses[1] = 0;
+    //             }
+    //         }
+    //         if (!$prevAvg) $prevAvg = $avg;
+    //         $change = $avg - $prevAvg;
+    //         $prevAvg = $avg;
+    //         $side = 0;
+    //         if ($change > 0) {
+    //             $side = 1;
+    //             $priceGains[0] += $change;
+    //             $priceGains[1] += $change;
+    //             $cashGains[0] += $data[$i]->totalVolume;
+    //             $cashGains[1] += $data[$i]->totalVolume;
+    //         } else if ($change < 0) {
+    //             $side = -1;
+    //             $priceLosses[0] -= $change;
+    //             $priceLosses[1] -= $change;
+    //             $cashLosses[0] += $data[$i]->totalVolume;
+    //             $cashLosses[1] += $data[$i]->totalVolume;
+    //         }
+    //         $cash = $side * $data[$i]->totalVolume;
+    //         $cashAcc += $cash;
+    //         $r['chart']['cash'][] = [
+    //             'time' => $date,
+    //             'value' => $cashAcc
+    //         ];
+    //         //
+    //         $frgnQuantity = $data[$i]->buyForeignQuantity - $data[$i]->sellForeignQuantity;
+    //         $frgnAcc += $frgnQuantity;
+    //         $r['chart']['foreign'][] = [
+    //             'time' => $date,
+    //             'value' => $frgnAcc
+    //         ];
+    //         //
+    //         $j = $i > $size / 2 ? 1 : 2;
+    //         if ($frgnQuantity > 0) {
+    //             $frgnGains[0] += $frgnQuantity;
+    //             $frgnGains[$j] += $frgnQuantity;
+    //         } else {
+    //             $frgnLosses[0] -= $frgnQuantity;
+    //             $frgnLosses[$j] -= $frgnQuantity;
+    //         }
+    //         //
+    //         $buySignal = $data[$i]->buyQuantity > $data[$i]->sellQuantity && $data[$i]->buyCount < $data[$i]->sellCount;
+    //         $sellSignal = 1.5 * $data[$i]->buyQuantity < $data[$i]->sellQuantity && $data[$i]->buyCount > $data[$i]->sellCount;
+    //         if ($buySignal || $sellSignal) {
+    //             $r['chart']['signal'][] = [
+    //                 'time' => $date,
+    //                 'value' => 1,
+    //                 'color' => $buySignal ? 'lime' : 'red'
+    //             ];
+    //         }
+    //     }
+    //     for ($i = 0; $i < 3; $i++) {
+    //         if ($i < 2) {
+    //             if ($priceLosses[$i] > 0)
+    //                 $r['rsi']['price'][$i] = 100 - (100 / (1 + ($priceGains[$i] / $priceLosses[$i])));
+    //             if ($cashLosses[$i] > 0)
+    //                 $r['rsi']['cash'][$i] = 100 - (100 / (1 + ($cashGains[$i] / $cashLosses[$i])));
+    //         }
+    //         if ($frgnLosses[$i] > 0)
+    //             $r['rsi']['foreign'][$i] = 100 - (100 / (1 + ($frgnGains[$i] / $frgnLosses[$i])));
+    //     }
+    //     return $r;
+    // }
+    // private function getDataFireAntTimeframe(&$data, $tf)
+    // {
+    //     $bars = [];
+    //     foreach ($data as $bar) {
+    //         $key = date('Y-' . $tf, $this->unix($bar->date));
+    //         $priceOpen = $bar->priceOpen / $bar->adjRatio;
+    //         $priceHigh = $bar->priceHigh / $bar->adjRatio;
+    //         $priceLow = $bar->priceLow / $bar->adjRatio;
+    //         $priceClose = $bar->priceClose / $bar->adjRatio;
+    //         if (!array_key_exists($key, $bars)) {
+    //             $bars[$key] = new stdClass();
+    //             $bars[$key]->date = $bar->date;
+    //             $bars[$key]->adjRatio = 1;
+    //             $bars[$key]->priceHigh = $priceHigh;
+    //             $bars[$key]->priceLow = $priceLow;
+    //             $bars[$key]->priceClose = $priceClose;
+    //             $bars[$key]->totalVolume = 0;
+    //             $bars[$key]->buyForeignQuantity = 0;
+    //             $bars[$key]->sellForeignQuantity = 0;
+    //             $bars[$key]->buyCount = 0;
+    //             $bars[$key]->sellCount = 0;
+    //             $bars[$key]->buyQuantity = 0;
+    //             $bars[$key]->sellQuantity = 0;
+    //         } else {
+    //             if ($priceHigh > $bars[$key]->priceHigh)
+    //                 $bars[$key]->priceHigh = $priceHigh;
+    //             if ($priceLow < $bars[$key]->priceLow)
+    //                 $bars[$key]->priceLow = $priceLow;
+    //         }
+    //         $bars[$key]->priceOpen = $priceOpen;
+    //         $bars[$key]->totalVolume += $bar->totalVolume;
+    //         $bars[$key]->buyForeignQuantity += $bar->buyForeignQuantity;
+    //         $bars[$key]->sellForeignQuantity += $bar->sellForeignQuantity;
+    //         $bars[$key]->buyCount += $bar->buyCount;
+    //         $bars[$key]->sellCount += $bar->sellCount;
+    //         $bars[$key]->buyQuantity += $bar->buyQuantity;
+    //         $bars[$key]->sellQuantity += $bar->sellQuantity;
+    //     }
+    //     $data = array_values($bars);
+    // }
 
-    public function getActiveVolume($payload)
-    {
-        $data = [];
-        if (!$payload->symbol) return $data;
-        $startDate = date('Y-m-d', $payload->from);
-        $endDate = date("Y-m-d", $payload->to);
-        $file = storage_path('app/cophieu/' . $payload->symbol . '.csv');
-        if (!file_exists($file)) return $data;
-        $fp = fopen($file, 'r');
-        $volume = 0;
-        while (!feof($fp)) {
-            $line = fgetcsv($fp);
-            if (!!$line) {
-                if ($line[0] < $startDate) continue;
-                if ($line[0] > $endDate) break;
-                $volume += +$line[1];
-                $data[] = [
-                    'time' => strtotime($line[0] . 'Z'),
-                    'value' => $volume,
-                ];
-            }
-        }
-        fclose($fp);
-        return $data;
-    }
+    // public function getActiveVolume($payload)
+    // {
+    //     $data = [];
+    //     if (!$payload->symbol) return $data;
+    //     $startDate = date('Y-m-d', $payload->from);
+    //     $endDate = date("Y-m-d", $payload->to);
+    //     $file = storage_path('app/cophieu/' . $payload->symbol . '.csv');
+    //     if (!file_exists($file)) return $data;
+    //     $fp = fopen($file, 'r');
+    //     $volume = 0;
+    //     while (!feof($fp)) {
+    //         $line = fgetcsv($fp);
+    //         if (!!$line) {
+    //             if ($line[0] < $startDate) continue;
+    //             if ($line[0] > $endDate) break;
+    //             $volume += +$line[1];
+    //             $data[] = [
+    //                 'time' => strtotime($line[0] . 'Z'),
+    //                 'value' => $volume,
+    //             ];
+    //         }
+    //     }
+    //     fclose($fp);
+    //     return $data;
+    // }
 
-    private function unix($str)
-    {
-        return strtotime(str_replace('/', '-', $str)) + self::TIME_ZONE;
-    }
+    // private function unix($str)
+    // {
+    //     return strtotime(str_replace('/', '-', $str)) + self::TIME_ZONE;
+    // }
     /**
      * Get chart tool
      *
@@ -300,94 +300,104 @@ class ShareService extends CoreService
         return $result;
     }
 
-    /**
-     * Get news
-     *
-     * @param $payload
-     * 
-     */
-    public function getEvents($payload)
-    {
-        $ret = [];
-        $startDate = date('Y-m-d', $payload->from);
-        $endDate = date("Y-m-d", $payload->to);
-        $client = new \GuzzleHttp\Client(['headers' => ['authorization' => self::FA_AUTH]]);
-        $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/timescale-marks?startDate={$startDate}&endDate={$endDate}";
-        $res = $client->get($url);
-        $rsp = json_decode($res->getBody());
-        $lastestDate = time();
-        foreach ($rsp as $news) {
-            $eventDate = $this->unix($news->date);
-            $ret[] = [
-                'time' => $eventDate,
-                'value' => 1,
-                'color' => $news->color,
-                'title' => $news->title
-            ];
-            $lastestDate = $eventDate;
-        }
-        $startDate = date("Y-m-d");
-        $endDate = date('Y-m-d', $this->unix('+1 year'));
-        $url = "https://restv2.fireant.vn/events/search?symbol={$payload->symbol}&orderBy=1&type=0&startDate={$startDate}&endDate={$endDate}&offset=0&limit=20";
-        $res = $client->get($url);
-        $rsp = json_decode($res->getBody());
-        foreach ($rsp as $news) {
-            $eventDate = $this->unix($news->recordDate);
-            if ($eventDate == $lastestDate) continue;
-            $ret[] = [
-                'time' => $eventDate,
-                'value' => 1,
-                'color' => $news->type == 1 ? '#A0248B' : ($news->type == 2 ? '#FF8040' : '#1D14D6'),
-                'title' => $news->title
-            ];
-        }
-        return $ret;
-    }
+    // /**
+    //  * Get news
+    //  *
+    //  * @param $payload
+    //  * 
+    //  */
+    // public function getEvents($payload)
+    // {
+    //     $ret = [];
+    //     $startDate = date('Y-m-d', $payload->from);
+    //     $endDate = date("Y-m-d", $payload->to);
+    //     $client = new \GuzzleHttp\Client(['headers' => ['authorization' => self::FA_AUTH]]);
+    //     $url = "https://restv2.fireant.vn/symbols/{$payload->symbol}/timescale-marks?startDate={$startDate}&endDate={$endDate}";
+    //     $res = $client->get($url);
+    //     $rsp = json_decode($res->getBody());
+    //     $lastestDate = time();
+    //     foreach ($rsp as $news) {
+    //         $eventDate = $this->unix($news->date);
+    //         $ret[] = [
+    //             'time' => $eventDate,
+    //             'value' => 1,
+    //             'color' => $news->color,
+    //             'title' => $news->title
+    //         ];
+    //         $lastestDate = $eventDate;
+    //     }
+    //     $startDate = date("Y-m-d");
+    //     $endDate = date('Y-m-d', $this->unix('+1 year'));
+    //     $url = "https://restv2.fireant.vn/events/search?symbol={$payload->symbol}&orderBy=1&type=0&startDate={$startDate}&endDate={$endDate}&offset=0&limit=20";
+    //     $res = $client->get($url);
+    //     $rsp = json_decode($res->getBody());
+    //     foreach ($rsp as $news) {
+    //         $eventDate = $this->unix($news->recordDate);
+    //         if ($eventDate == $lastestDate) continue;
+    //         $ret[] = [
+    //             'time' => $eventDate,
+    //             'value' => 1,
+    //             'color' => $news->type == 1 ? '#A0248B' : ($news->type == 2 ? '#FF8040' : '#1D14D6'),
+    //             'title' => $news->title
+    //         ];
+    //     }
+    //     return $ret;
+    // }
 
     /**
      * Clone Symbols
      *
      */
-    public function cloneSymbols()
-    {
-        return $this->transaction(function () {
-            $client = new \GuzzleHttp\Client();
-            $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/VN100";
-            $res = $client->get($url);
-            $vn100 = json_decode($res->getBody());
-            $vn100 = explode(",", " " . implode(", ", $vn100));
+    // public function cloneSymbols()
+    // {
+    //     return $this->transaction(function () {
+    //         $client = new \GuzzleHttp\Client();
+    //         $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/VN100";
+    //         $res = $client->get($url);
+    //         $vn100 = json_decode($res->getBody());
+    //         $vn100 = explode(",", " " . implode(", ", $vn100));
 
-            $index = ['^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
-            $nh = [' VCB', ' BID', ' CTG', ' VPB', ' MBB', ' ACB', ' STB', ' HDB', ' VIB', ' SSB', ' SHB', ' MSB', ' TPB', ' LPB', ' EIB', ' OCB'];
-            $ck = [' SSI', ' VND', ' VCI', ' SHS', ' HCM', ' VIX', ' MBS', ' FTS', ' BSI', ' CTS', ' VDS'];
-            $list = [
-                (object)['name' => 'vn100', 'symbols' => $vn100],
-                (object)['name' => 'index', 'symbols' => $index],
-                (object)['name' => 'nh', 'symbols' => $nh],
-                (object)['name' => 'ck', 'symbols' => $ck],
-            ];
-            $stt = true;
-            foreach ($list as $item) {
-                $stt &= !!ShareSymbol::updateOrCreate(['name' => $item->name], ['symbols' => $item->symbols]);
-            }
-            return ['isOk' => $stt];
-        });
+    //         $index = ['^LARGECAP', '^MIDCAP', '^SMALLCAP', '^BB', '^BDS', '^BH', '^BL', '^CBTS', '^CK', '^CNTT', '^CSSK', '^DVLTAUGT', '^DVTVHT', '^KK', '^NH', '^NLN', '^SPCS', '^SXHGD', '^SXNHC', '^SXPT', '^SXTBMM', '^TBD', '^TCK', '^TI', '^TPDU', '^VLXD', '^VTKB', '^XD', '^CAOSU', '^DAUKHI', '^DUOCPHAM', '^GIAODUC', '^HK', '^NANGLUONG', '^NHUA', '^PHANBON', '^THEP'];
+    //         $nh = [' VCB', ' BID', ' CTG', ' VPB', ' MBB', ' ACB', ' STB', ' HDB', ' VIB', ' SSB', ' SHB', ' MSB', ' TPB', ' LPB', ' EIB', ' OCB'];
+    //         $ck = [' SSI', ' VND', ' VCI', ' SHS', ' HCM', ' VIX', ' MBS', ' FTS', ' BSI', ' CTS', ' VDS'];
+    //         $list = [
+    //             (object)['name' => 'vn100', 'symbols' => $vn100],
+    //             (object)['name' => 'index', 'symbols' => $index],
+    //             (object)['name' => 'nh', 'symbols' => $nh],
+    //             (object)['name' => 'ck', 'symbols' => $ck],
+    //         ];
+    //         $stt = true;
+    //         foreach ($list as $item) {
+    //             $stt &= !!ShareSymbol::updateOrCreate(['name' => $item->name], ['symbols' => $item->symbols]);
+    //         }
+    //         return ['isOk' => $stt];
+    //     });
+    // }
+
+    /**
+     * Get Groups
+     *
+     */
+    public function getGroups()
+    {
+        return ShareSymbol::get('name')->pluck('name');
     }
 
     /**
      * Get Symbols
      *
      */
-    public function getSymbols()
+    public function getSymbols($payload)
     {
-        $symbols = ShareSymbol::get(array('name', 'symbols'))
-            ->pluck('symbols', 'name');
-        $holdSymbols = ShareOrder::opening()->get('symbol')->pluck('symbol');
-        $holdSymbols = $holdSymbols->map(function ($s) {
-            return ' ' . $s;
-        });
-        $symbols['hold'] = $holdSymbols;
-        return $symbols;
+        $group = $payload->group;
+        if ($group === 'HOLD') {
+            return ShareOrder::opening()->get('symbol')->pluck('symbol');
+        } else if (in_array($group, ['FILTER', 'WATCH'])) {
+            $filter = ShareSymbol::where('name', $group)->first();
+            return $filter ? $filter->symbols : [];
+        } else {
+            return $this->getGroupSymbols($group);
+        }
     }
 
     /**
@@ -459,8 +469,8 @@ class ShareService extends CoreService
     {
         if ($payload->isRemove) {
             $dt = StockDrawing::where('symbol', $payload->symbol)->where('name', $payload->name);
-            if ($payload->name == 'line' && !!$payload->point)
-                $dt = $dt->where('point', $payload->point);
+            // if ($payload->name == 'line' && !!$payload->point)
+            // $dt = $dt->where('point', $payload->point);
             $dt->delete();
         } else {
             for ($i = 0; $i < count($payload->points); $i++) {
@@ -485,14 +495,16 @@ class ShareService extends CoreService
         }
     }
 
-    public function scanStock($data, $longDate, $shortDate, $currDate)
+    public function scanStock($data, $longDate, $midDate, $shortDate, $currDate)
     {
         if ($data->s !== 'ok') return false;
-        $A = $B = $C = $D = $E = (object)[];
-        $temp1Date = ($shortDate + $currDate) / 2;
-        $temp2Date = (2 * $shortDate + $currDate) / 3;
-        $temp3Date = ($longDate + $shortDate) / 2;
-        $temp4Date = (2 * $longDate + $shortDate) / 3;
+        $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = (object)[];
+        $hsDate = ($shortDate + $currDate) / 2;
+        $lsDate = (2 * $shortDate + $currDate) / 3;
+        $hmDate = ($midDate + $shortDate) / 2;
+        $lmDate = (2 * $midDate + $shortDate) / 3;
+        $hlDate = ($longDate + $midDate) / 2;
+        $llDate = (2 * $longDate + $midDate) / 3;
         $last = count($data->t) - 1;
         for ($i = $last; $i >= 0; $i--) {
             $h = $data->h[$i];
@@ -501,45 +513,54 @@ class ShareService extends CoreService
             $pL = (object)['t' => date('Y-m-d', $t), 'p' => $l];
             $pH = (object)['t' => date('Y-m-d', $t), 'p' => $h];
             if ($i === $last) {
-                $A = $B = $C = $D = $E = $pL;
+                $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = $pL;
             } else {
                 if ($t >= $shortDate) {
-                    if ($t >= $temp1Date) {
-                        if ($h > $E->p) $D = $E = $pH;
+                    if ($t >= $hsDate) {
+                        if ($h > $Hc->p) $Ls = $Hc = $pH;
                     } else {
-                        if ($h > $C->p) $B = $C = $pH;
+                        if ($h > $Hs->p) $Lm = $Hs = $pH;
                     }
-                    if ($t >= $temp2Date) {
-                        if ($l < $D->p) $C = $D = $pL;
+                    if ($t >= $lsDate) {
+                        if ($l < $Ls->p) $Hs = $Ls = $pL;
+                    }
+                } else  if ($t >= $midDate) {
+                    if ($t >= $hmDate) {
+                        if ($h > $Hs->p) $Lm = $Hs = $pH;
+                    } else {
+                        if ($h > $Hm->p) $Ll = $Hm = $pH;
+                    }
+                    if ($t >= $lmDate) {
+                        if ($l < $Lm->p) $Hm = $Lm = $pL;
                     }
                 } else {
-                    if ($t >= $temp3Date) {
-                        if ($h > $C->p) $B = $C = $pH;
+                    if ($t >= $hlDate) {
+                        if ($h > $Hm->p) $Ll = $Hm = $pH;
                     } else {
-                        if ($h > $A->p) $A = $pH;
+                        if ($h > $Hl->p) $Hl = $pH;
                     }
-                    if ($t >= $temp4Date) {
-                        if ($l < $B->p) $A = $B = $pL;
+                    if ($t >= $llDate) {
+                        if ($l < $Ll->p) $Hl = $Ll = $pL;
                     }
                 }
             }
         }
-        return (object)['A' => $A, 'B' => $B, 'C' => $C, 'D' => $D, 'E' => $E];
+        return (object)['Hl' => $Hl, 'Ll' => $Ll, 'Hm' => $Hm, 'Lm' => $Lm, 'Hs' => $Hs, 'Ls' => $Ls, 'Hc' => $Hc];
     }
 
-    public function calcStock($symbol, $time1, $time2, $time3)
+    public function calcStock($symbol, $time1, $time2, $time3, $time4)
     {
-        if (!$time3) $time3 = time();
-        $data = $this->getStock($symbol, $time1, $time3);
-        $points = $this->scanStock($data, $time1, $time2, $time3);
-        // return $points;
+        $data = $this->getStock($symbol, $time1, $time4);
+        $points = $this->scanStock($data, $time1, $time2, $time3, $time4);
         if (!$points) return false;
-        $long = ($points->C->p - $points->B->p) / ($points->A->p - $points->B->p);
-        $short = ($points->E->p - $points->D->p) / ($points->C->p - $points->D->p);
-        return (object)['long' => $long, 'short' => $short];
+        $long = ($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p);
+        $mid = ($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p);
+        $short = ($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p);
+        $trend = $points->Lm->p > $points->Ll->p && $points->Ls->p > $points->Lm->p;
+        return (object)['long' => $long, 'mid' => $mid, 'short' => $short, 'trend' => $trend];
     }
 
-    public function getStockSymbols($group)
+    public function getGroupSymbols($group)
     {
         try {
             $client = new \GuzzleHttp\Client();
@@ -551,40 +572,47 @@ class ShareService extends CoreService
         }
     }
 
-    public function checkStock($symbol, $time1, $time2, $time3)
+    public function checkStock($symbol, $time1, $time2, $time3, $time4)
     {
-        $vnindex = $this->calcStock('VNINDEX', $time1, $time2, $time3);
-        $stock = $this->calcStock($symbol, $time1, $time2, $time3);
+        $vnindex = $this->calcStock('VNINDEX', $time1, $time2, $time3, $time4);
+        $stock = $this->calcStock($symbol, $time1, $time2, $time3, $time4);
+        $trend = $stock->trend && $vnindex->trend;
         $long = $stock->long > $vnindex->long;
+        $mid = $stock->mid > $vnindex->mid;
         $short = $stock->short > $vnindex->short;
-        $total = $long && $short;
+        $total = $trend && $long && $mid && $short;
         return (object)[
             'from' => date('Y-m-d', $time1),
-            'to' => date('Y-m-d', $time3),
+            'to' => date('Y-m-d', $time4),
             'VNINDEX' => $vnindex,
             $symbol => $stock,
             'check' => (object)[
+                'trend' => $trend,
                 'long' => $long,
+                'mid' => $mid,
                 'short' => $short,
                 'total' => $total,
             ]
         ];
     }
 
-    public function filterStock($group, $time1, $time2, $time3)
+    public function filterStock($group, $time1, $time2, $time3, $time4)
     {
         $checkResult = [];
-        $vnindex = $this->calcStock('VNINDEX', $time1, $time2, $time3);
-        $symbols = $this->getStockSymbols($group);
+        $vnindex = $this->calcStock('VNINDEX', $time1, $time2, $time3, $time4);
+        $symbols = $this->getGroupSymbols($group);
         if (empty($symbols)) return false;
         foreach ($symbols as $symbol) {
-            $stock = $this->calcStock($symbol, $time1, $time2, $time3);
-            $check = $stock->long > $vnindex->long && $stock->short > $vnindex->short;
+            $stock = $this->calcStock($symbol, $time1, $time2, $time3, $time4);
+            $check = $stock->trend && $vnindex->trend
+                && $stock->long > $vnindex->long
+                && $stock->mid > $vnindex->mid
+                && $stock->short > $vnindex->short;
             if ($check) $checkResult[] = $symbol;
         }
         return (object)[
             'from' => date('Y-m-d', $time1),
-            'to' => date('Y-m-d', $time3),
+            'to' => date('Y-m-d', $time4),
             'group' => $group,
             'symbols' => $checkResult
         ];

@@ -255,11 +255,14 @@ function connectPusher() {
                             if (route.name == "admin-comment")
                                 store.dispatch("adminComment/getComments");
                             break;
-                        case "filtered-share":
-                            if (route.name == "trading-share") {
-                                store.dispatch("tradingShare/getSymbols");
-                            }
-                            break;
+                        // case "filtered-share":
+                        //     if (route.name == "trading-share") {
+                        //         store.dispatch(
+                        //             "tradingShare/getSymbols",
+                        //             "FILTER"
+                        //         );
+                        //     }
+                        //     break;
                     }
                     store.dispatch("getNotify", notify);
                     store.dispatch("getNotifications");

@@ -11,16 +11,16 @@ class FilteredShareNotification extends CoreNotification
      *
      * @return void
      */
-    public function __construct($kind)
+    public function __construct($result)
     {
         $path = 'Notifications/FilteredShare.';
         $params = [
             'event' => 'filtered-share',
             'title' => trans($path . 'title'),
-            'body' => trans($path . 'body', ['kind' => trans($path . $kind)]),
+            'body' => $result ? trans($path . 'success', ['group' => $result->group, 'count' => count($result->symbols)]) : trans($path . 'failed'),
             'actions' => [
                 [
-                    'action' =>  trans($path . 'actionUrl', ['kind' => $kind]),
+                    'action' =>  trans($path . 'actionUrl'),
                     'title' => trans($path . 'actionTitle'),
                 ],
             ],

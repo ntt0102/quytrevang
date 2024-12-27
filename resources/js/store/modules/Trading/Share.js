@@ -1,6 +1,7 @@
 function initialState() {
     return {
-        symbols: {},
+        groups: [],
+        symbols: [],
         chart: {},
         isChartLoading: false,
     };
@@ -29,31 +30,31 @@ const actions = {
                     noLoading: true,
                 })
                 .then((response) => {
-                    commit("setChartData", response.data.chart);
                     commit("setChartLoading", false);
                     resolve(response.data);
                 });
         });
     },
-    cloneSymbols({ commit, dispatch, getters, state, rootGetters }) {
+    getGroups({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/share/clone-symbols", {}, { noLoading: true })
+                .post("trading/share/get-groups", {}, { noLoading: true })
                 .then((response) => {
-                    dispatch("getSymbols");
+                    commit("setGroups", response.data);
                     resolve();
                 });
         });
     },
-    getSymbols({ commit, dispatch, getters, state, rootGetters }) {
+    getSymbols({ commit, dispatch, getters, state, rootGetters }, group) {
         return new Promise((resolve, reject) => {
             axios
-                .get("trading/share/get-symbols", { noLoading: true })
+                .post(
+                    "trading/share/get-symbols",
+                    { group },
+                    { noLoading: true }
+                )
                 .then((response) => {
-                    commit("setSymbols", {
-                        ...state.symbols,
-                        ...response.data,
-                    });
+                    commit("setSymbols", response.data);
                     resolve();
                 });
         });
@@ -121,6 +122,9 @@ const mutations = {
     },
     setChartLoading(state, data) {
         state.isChartLoading = data;
+    },
+    setGroups(state, data) {
+        state.groups = data;
     },
     setSymbols(state, data) {
         state.symbols = data;

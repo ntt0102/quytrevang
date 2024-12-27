@@ -127,8 +127,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::group(['prefix' => 'share', 'middleware' => ['can:admin:access_share']], function () {
                     Route::get('/', 'ShareController@getChart');
                     Route::get('init-chart', 'ShareController@initChart');
-                    Route::post('clone-symbols', 'ShareController@cloneSymbols');
-                    Route::get('get-symbols', 'ShareController@getSymbols');
+                    Route::post('get-groups', 'ShareController@getGroups');
+                    Route::post('get-symbols', 'ShareController@getSymbols');
                     Route::post('filter', 'ShareController@filterSymbols');
                     Route::post('remove-filter-list', 'ShareController@removeFilterList');
                     Route::post('add-watchlist', 'ShareController@addWatchlist');

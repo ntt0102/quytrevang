@@ -276,18 +276,12 @@
             "title": "Cổ phiếu",
             "symbol": "Mã chứng khoán",
             "cloneSymbols": "Tạo danh sách mã",
-            "symbolKind": "Danh sách mã",
+            "group": "Nhóm ...",
             "chartShift": "Khung biểu đồ",
             "deleteWatchList": "Xoá tất cả các mã theo dõi",
             "filterSymbols": "Lọc cổ phiếu",
-            "symbolList": {
-                "vn100": "VN100",
-                "index": "Chỉ số",
-                "nh": "Ngân hàng",
-                "ck": "Chứng khoán",
-                "filterTop": "Lọc CP đỉnh",
-                "filterBottom": "Lọc CP đáy",
-                "filterBreak": "Lọc CP break",
+            "groups": {
+                "filter": "Lọc",
                 "watch": "Theo dõi",
                 "hold": "Nắm giữ"
             },
@@ -298,6 +292,7 @@
             "fullscreen": "Bật tắt toàn màn hình",
             "tradingview": "TradingView",
             "tools": {
+                "filterTime": "ThờI gian lọc",
                 "line": "Vẽ đường giá",
                 "target": "Xác định mục tiêu",
                 "uplps": "Đo LPS tăng",
@@ -308,7 +303,8 @@
                 "events": "Hiển thị tin tức"
             },
             "symbolFiltered": "Đã lọc mã chứng khoán",
-            "rangeWarning": "Chưa chọn khoảng thời gian lọc",
+            "filterGroupWarning": "Chưa chọn nhóm lọc",
+            "filterTimeWarning": "Chưa chọn khoảng thời gian lọc",
             "deleteAllLine": "Xoá tất cả đường giá",
             "event": "Sự kiện",
             "date": "Ngày {date}"

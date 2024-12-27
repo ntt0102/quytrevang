@@ -42,15 +42,15 @@ class ShareController extends CoreController
     }
 
     /**
-     * Clone the symbols
+     * Get Groups
      *
      * @param \Illuminate\Http\Request $request
      * 
      * @return \Illuminate\Http\Response
      */
-    public function cloneSymbols(Request $request)
+    public function getGroups(Request $request)
     {
-        $data = $this->shareService->cloneSymbols();
+        $data = $this->shareService->getGroups();
         return $this->sendResponse($data);
     }
     /**
@@ -62,7 +62,7 @@ class ShareController extends CoreController
      */
     public function getSymbols(Request $request)
     {
-        $data = $this->shareService->getSymbols();
+        $data = $this->shareService->getSymbols($this->payload);
         return $this->sendResponse($data);
     }
     /**

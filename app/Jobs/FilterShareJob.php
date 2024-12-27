@@ -18,12 +18,11 @@ class FilterShareJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    const F_TOP = "f_top";
-    const F_BOTTOM = "f_bottom";
-    const FOREIGN_RATIO = 2;
-    const CASH_RATIO = 2;
-
-    private $payload;
+    private $group;
+    private $time1;
+    private $time2;
+    private $time3;
+    private $time4;
     public $tries = 1;
     public $timeout = 3600;
 
@@ -32,9 +31,13 @@ class FilterShareJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($payload)
+    public function __construct($param)
     {
-        $this->payload = $payload;
+        $this->group = $param->group;
+        $this->time1 = $param->filterTimes[0];
+        $this->time2 = $param->filterTimes[1];
+        $this->time3 = $param->filterTimes[2];
+        $this->time4 = $param->filterTimes[3];
     }
 
     /**
@@ -44,44 +47,15 @@ class FilterShareJob implements ShouldQueue
      */
     public function handle()
     {
-        // \Log::info('Start filter');
-        $share = ShareSymbol::where('name', $this->payload->name)->first();
-        if (!$share) return false;
-        $rTop = [];
-        $rBottom = [];
+
         $shareService = app(ShareService::class);
-        foreach ($share->symbols as $symbol) {
-            $this->payload->symbol = trim($symbol);
-            $rsi = $shareService->getDataFireAnt($this->payload)['rsi'];
-            $fRSI = $rsi['foreign'];
-            if (
-                $fRSI[0] > 50 &&
-                $fRSI[2] > 60 &&
-                $fRSI[1] < $fRSI[2]
-            ) {
-                $pRSI = $rsi['price'];
-                $cRSI = $rsi['cash'];
-                if (
-                    $this->payload->kind == self::F_BOTTOM &&
-                    $fRSI[1] < 50 &&
-                    $pRSI[0] < 50 && $cRSI[0] > 45
-                )
-                    $rBottom[] = $symbol;
-                if (
-                    $this->payload->kind == self::F_TOP &&
-                    $pRSI[1] > 50 && $cRSI[1] > 55
-                )
-                    $rTop[] = $symbol;
-            }
+        $result = $shareService->filterStock($this->group, $this->time1, $this->time2, $this->time3, $this->time4);
+        if ($result) {
+            ShareSymbol::updateOrCreate(['name' => 'FILTER'], ['symbols' => $result->symbols]);
         }
-        if ($this->payload->kind == self::F_TOP)
-            ShareSymbol::updateOrCreate(['name' => self::F_TOP], ['symbols' => $rTop]);
-        if ($this->payload->kind == self::F_BOTTOM)
-            ShareSymbol::updateOrCreate(['name' => self::F_BOTTOM], ['symbols' => $rBottom]);
         Notification::send(
             User::permission('admin:access_share')->get(),
-            new FilteredShareNotification($this->payload->kind)
+            new FilteredShareNotification($result)
         );
-        // \Log::info('End filter');
     }
 }
