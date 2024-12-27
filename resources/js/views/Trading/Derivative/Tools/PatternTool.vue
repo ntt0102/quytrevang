@@ -429,7 +429,7 @@ function scanPhase({
     props.prices
         .filter((item) => {
             let cond = item.time >= S.time;
-            if (stopTime) cond &= item.time <= stopTime;
+            if (stopTime) cond = cond && item.time <= stopTime;
             return cond;
         })
         .every((item, i) => {

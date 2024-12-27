@@ -19,10 +19,10 @@ class FilterShareJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     private $group;
-    private $time1;
-    private $time2;
-    private $time3;
-    private $time4;
+    private $t1;
+    private $t2;
+    private $t3;
+    private $t4;
     public $tries = 1;
     public $timeout = 3600;
 
@@ -34,10 +34,10 @@ class FilterShareJob implements ShouldQueue
     public function __construct($param)
     {
         $this->group = $param->group;
-        $this->time1 = $param->filterTimes[0];
-        $this->time2 = $param->filterTimes[1];
-        $this->time3 = $param->filterTimes[2];
-        $this->time4 = $param->filterTimes[3];
+        $this->t1 = $param->filterTimes[0];
+        $this->t2 = $param->filterTimes[1];
+        $this->t3 = $param->filterTimes[2];
+        $this->t4 = $param->filterTimes[3];
     }
 
     /**
@@ -49,7 +49,7 @@ class FilterShareJob implements ShouldQueue
     {
 
         $shareService = app(ShareService::class);
-        $result = $shareService->filterStock($this->group, $this->time1, $this->time2, $this->time3, $this->time4);
+        $result = $shareService->filterStock($this->group, $this->t1, $this->t2, $this->t3, $this->t4);
         if ($result) {
             ShareSymbol::updateOrCreate(['name' => 'FILTER'], ['symbols' => $result->symbols]);
         }

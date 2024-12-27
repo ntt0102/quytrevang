@@ -137,11 +137,11 @@ class ShareService extends CoreService
     public function checkSymbol($payload)
     {
         $symbol = $payload->symbol;
-        $time1 = $payload->filterTimes[0];
-        $time2 = $payload->filterTimes[1];
-        $time3 = $payload->filterTimes[2];
-        $time4 = $payload->filterTimes[3];
-        return $this->checkStock($symbol, $time1, $time2, $time3, $time4);
+        $t1 = $payload->filterTimes[0];
+        $t2 = $payload->filterTimes[1];
+        $t3 = $payload->filterTimes[2];
+        $t4 = $payload->filterTimes[3];
+        return $this->checkStock($symbol, $t1, $t2, $t3, $t4);
     }
 
     /**
@@ -191,84 +191,6 @@ class ShareService extends CoreService
         return ['isOk' => !!$stt];
     }
 
-    public function getStock($symbol, $from, $to)
-    {
-        try {
-            $client = new \GuzzleHttp\Client();
-            $url = "https://dchart-api.vndirect.com.vn/dchart/history?resolution=1D&symbol={$symbol}&from={$from}&to={$to}";
-            $res = $client->get($url);
-            return json_decode($res->getBody());
-        } catch (\Throwable $th) {
-            return (object)['s' => 'ng'];
-        }
-    }
-
-    public function scanStock($data, $longDate, $midDate, $shortDate, $currDate)
-    {
-        if ($data->s !== 'ok') return false;
-        $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = (object)[];
-        $hsDate = ($shortDate + $currDate) / 2;
-        $lsDate = (2 * $shortDate + $currDate) / 3;
-        $hmDate = ($midDate + $shortDate) / 2;
-        $lmDate = (2 * $midDate + $shortDate) / 3;
-        $hlDate = ($longDate + $midDate) / 2;
-        $llDate = (2 * $longDate + $midDate) / 3;
-        $last = count($data->t) - 1;
-        for ($i = $last; $i >= 0; $i--) {
-            $h = $data->h[$i];
-            $l = $data->l[$i];
-            $t = $data->t[$i];
-            $pL = (object)['t' => date('Y-m-d', $t), 'p' => $l];
-            $pH = (object)['t' => date('Y-m-d', $t), 'p' => $h];
-            if ($i === $last) {
-                $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = $pL;
-            } else {
-                if ($t >= $shortDate) {
-                    if ($t >= $hsDate) {
-                        if ($h > $Hc->p) $Ls = $Hc = $pH;
-                    } else {
-                        if ($h > $Hs->p) $Lm = $Hs = $pH;
-                    }
-                    if ($t >= $lsDate) {
-                        if ($l < $Ls->p) $Hs = $Ls = $pL;
-                    }
-                } else  if ($t >= $midDate) {
-                    if ($t >= $hmDate) {
-                        if ($h > $Hs->p) $Lm = $Hs = $pH;
-                    } else {
-                        if ($h > $Hm->p) $Ll = $Hm = $pH;
-                    }
-                    if ($t >= $lmDate) {
-                        if ($l < $Lm->p) $Hm = $Lm = $pL;
-                    }
-                } else {
-                    if ($t >= $hlDate) {
-                        if ($h > $Hm->p) $Ll = $Hm = $pH;
-                    } else {
-                        if ($h > $Hl->p) $Hl = $pH;
-                    }
-                    if ($t >= $llDate) {
-                        if ($l < $Ll->p) $Hl = $Ll = $pL;
-                    }
-                }
-            }
-        }
-        return (object)['Hl' => $Hl, 'Ll' => $Ll, 'Hm' => $Hm, 'Lm' => $Lm, 'Hs' => $Hs, 'Ls' => $Ls, 'Hc' => $Hc];
-    }
-
-    public function calcStock($symbol, $time1, $time2, $time3, $time4)
-    {
-        $data = $this->getStock($symbol, $time1, $time4);
-        if ($data->s !== 'ok') return false;
-        $points = $this->scanStock($data, $time1, $time2, $time3, $time4);
-        if (!$points) return false;
-        $long = ($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p);
-        $mid = ($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p);
-        $short = ($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p);
-        $trend = $points->Lm->p > $points->Ll->p && $points->Ls->p > $points->Lm->p;
-        return (object)['long' => $long, 'mid' => $mid, 'short' => $short, 'trend' => $trend];
-    }
-
     public function getGroupSymbols($group)
     {
         try {
@@ -281,47 +203,137 @@ class ShareService extends CoreService
         }
     }
 
-    public function checkStock($symbol, $time1, $time2, $time3, $time4)
+    public function getStock($symbol, $from, $to)
     {
-        $vnindex = $this->calcStock('VNINDEX', $time1, $time2, $time3, $time4);
-        $stock = $this->calcStock($symbol, $time1, $time2, $time3, $time4);
-        $trend = $stock->trend && $vnindex->trend;
-        $long = $stock->long > $vnindex->long;
-        $mid = $stock->mid > $vnindex->mid;
-        $short = $stock->short > $vnindex->short;
-        $total = $trend && $long && $mid && $short;
+        try {
+            $client = new \GuzzleHttp\Client();
+            $url = "https://dchart-api.vndirect.com.vn/dchart/history?resolution=1D&symbol={$symbol}&from={$from}&to={$to}";
+            $res = $client->get($url);
+            return json_decode($res->getBody());
+        } catch (\Throwable $th) {
+            return (object)['s' => 'ng'];
+        }
+    }
+
+    public function scanStock($data, $longDate, $midDate, $shortDate, $currDate, $term)
+    {
+        if ($data->s !== 'ok') return false;
+        $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = (object)[];
+        $s1Date = ($shortDate + 2 * $currDate) / 3;
+        $s2Date = (2 * $shortDate + $currDate) / 3;
+        $m1Date = ($midDate + 2 * $shortDate) / 3;
+        $m2Date = (2 * $midDate + $shortDate) / 3;
+        if ($term === 3) {
+            $l1Date = ($longDate + 2 * $midDate) / 3;
+            $l2Date = (2 * $longDate + $midDate) / 3;
+        }
+        $last = count($data->t) - 1;
+        for ($i = $last; $i >= 0; $i--) {
+            $h = $data->h[$i];
+            $l = $data->l[$i];
+            $t = $data->t[$i];
+            $pL = (object)['t' => date('Y-m-d', $t), 'p' => $l];
+            $pH = (object)['t' => date('Y-m-d', $t), 'p' => $h];
+            if ($i === $last) {
+                $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = $pL;
+            } else {
+                if ($t >= $shortDate) {
+                    if ($t >= $s1Date) {
+                        if ($h > $Hc->p) $Ls = $Hc = $pH;
+                    }
+                    // if ($t >= $s2Date) {
+                    if ($l < $Ls->p) $Hs = $Ls = $pL;
+                    // }
+                    if ($t <= $s2Date) {
+                        if ($h > $Hs->p) $Lm = $Hs = $pH;
+                    }
+                } else  if ($t >= $midDate) {
+                    if ($t >= $m1Date) {
+                        if ($h > $Hs->p) $Lm = $Hs = $pH;
+                    }
+                    if ($term === 3 || $t >= $m2Date) {
+                        if ($l < $Lm->p) $Hm = $Lm = $pL;
+                    }
+                    if ($t <= $m2Date) {
+                        if ($h > $Hm->p) $Ll = $Hm = $pH;
+                    }
+                } else {
+                    if ($term === 3) {
+                        if ($t >= $l1Date) {
+                            if ($h > $Hm->p) $Ll = $Hm = $pH;
+                        }
+                        if ($t >= $l2Date) {
+                            if ($l < $Ll->p) $Hl = $Ll = $pL;
+                        }
+                        if ($t <= $l2Date) {
+                            if ($h > $Hl->p) $Hl = $pH;
+                        }
+                    }
+                }
+            }
+        }
+        return (object)['Hl' => $Hl, 'Ll' => $Ll, 'Hm' => $Hm, 'Lm' => $Lm, 'Hs' => $Hs, 'Ls' => $Ls, 'Hc' => $Hc];
+    }
+
+    public function calcStock($symbol, $t1, $t2, $t3, $t4, $term)
+    {
+        $data = $this->getStock($symbol, $term === 3 ? $t1 : $t2, $t4);
+        if ($data->s !== 'ok') return false;
+        $points = $this->scanStock($data, $t1, $t2, $t3, $t4, $term);
+        if (!$points) return false;
+        $calc = [
+            's' => ($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p),
+            'm' => ($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p)
+        ];
+        if ($term === 3) {
+            $calc['l'] = ($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p);
+        }
+        return (object)['term' => (object)$calc];
+    }
+
+    public function checkStock($symbol, $t1, $t2, $t3, $t4)
+    {
+        $term = $t1 ? 3 : 2;
+        $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
+        $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
+        $check = [
+            $stock->term->s > 0.7 && $stock->term->s > $vnindex->term->s,
+            $stock->term->m > 0.7 && $stock->term->m > $vnindex->term->m
+        ];
+        $result = [
+            'short' => $check[0],
+            'mid' => $check[1],
+        ];
+        if ($term === 3) {
+            $check[] = $stock->term->l > 0.7 && $stock->term->l > $vnindex->term->l;
+            $result['long'] = $check[2];
+        }
+        $sum = count(array_filter($check)) === count($check);
+        $result['sum'] = $sum;
+
         return (object)[
-            'from' => date('Y-m-d', $time1),
-            'to' => date('Y-m-d', $time4),
             'VNINDEX' => $vnindex,
             $symbol => $stock,
-            'check' => (object)[
-                'trend' => $trend,
-                'long' => $long,
-                'mid' => $mid,
-                'short' => $short,
-                'total' => $total,
-            ]
+            'check' => (object)$result
         ];
     }
 
-    public function filterStock($group, $time1, $time2, $time3, $time4)
+    public function filterStock($group, $t1, $t2, $t3, $t4)
     {
         $checkResult = [];
-        $vnindex = $this->calcStock('VNINDEX', $time1, $time2, $time3, $time4);
+        $term = $t1 ? 3 : 2;
+        $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
         $symbols = $this->getSymbols($group);
         if (empty($symbols)) return false;
         foreach ($symbols as $symbol) {
-            $stock = $this->calcStock($symbol, $time1, $time2, $time3, $time4);
-            $check = $stock->trend && $vnindex->trend
-                && $stock->long > $vnindex->long
-                && $stock->mid > $vnindex->mid
-                && $stock->short > $vnindex->short;
+            echo $symbol . ' ';
+            $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
+            $check = $stock->term->s > 0.7 && $stock->term->s > $vnindex->term->s
+                && $stock->term->m > 0.7 && $stock->term->m > $vnindex->term->m;
+            if ($term === 3) $check = $check && $stock->term->l > 0.7 && $stock->term->l > $vnindex->term->l;
             if ($check) $checkResult[] = $symbol;
         }
         return (object)[
-            'from' => date('Y-m-d', $time1),
-            'to' => date('Y-m-d', $time4),
             'group' => $group,
             'symbols' => $checkResult
         ];

@@ -68,7 +68,11 @@
                 ref="filterTimeToolRef"
                 :filterTimeSeries="state.series.filterTime"
             />
-            <CheckTool ref="checkToolRef" @checkSymbol="checkSymbol" />
+            <CheckTool
+                ref="checkToolRef"
+                :symbol="state.symbol"
+                @checkSymbol="checkSymbol"
+            />
         </div>
     </div>
 </template>
@@ -81,7 +85,6 @@ import CheckTool from "./Tools/CheckTool.vue";
 
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { DxAutocomplete } from "devextreme-vue/autocomplete";
-import { alert } from "devextreme/ui/dialog";
 import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
@@ -180,21 +183,21 @@ function drawChart() {
     });
     params.series.vnindex = params.chart.addCandlestickSeries({
         priceScaleId: "vnindex",
-        upColor: "#42946C",
-        downColor: "#BC3E4A",
+        upColor: "#30A165",
+        downColor: "#EC3F3F",
         borderVisible: false,
-        wickUpColor: "#42946C",
-        wickDownColor: "#BC3E4A",
+        wickUpColor: "#30A165",
+        wickDownColor: "#EC3F3F",
         priceFormat: { minMove: 0.01 },
         scaleMargins: { top: 0.1, bottom: 0.55 },
         lastValueVisible: false,
     });
     params.series.price = params.chart.addCandlestickSeries({
-        upColor: "#42946C",
-        downColor: "#BC3E4A",
+        upColor: "#30A165",
+        downColor: "#EC3F3F",
         borderVisible: false,
-        wickUpColor: "#42946C",
-        wickDownColor: "#BC3E4A",
+        wickUpColor: "#30A165",
+        wickDownColor: "#EC3F3F",
         priceFormat: { minMove: 0.01 },
     });
 }
@@ -290,10 +293,10 @@ function reloadChartData() {
 }
 function initChart() {
     store.dispatch("tradingShare/initChart").then((data) => {
-        filterTimeToolRef.value.load(data.filterTime);
         state.watchlist = data.watchlist;
         state.vpsUser = data.vpsUser;
         state.vpsUser = data.vpsSession;
+        setTimeout(() => filterTimeToolRef.value.load(data.filterTime), 3000);
     });
 }
 function getChartData(withVnindex = false, fromDate = null) {

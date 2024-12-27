@@ -31,7 +31,9 @@ function isSelected() {
     return filterTimeToolRef.value.classList.contains("selected");
 }
 function get() {
-    return filterTimes.map((item) => item.time);
+    let _filterTimes = filterTimes.map((item) => item.time);
+    if (_filterTimes.length === 3) _filterTimes.unshift(null);
+    return _filterTimes;
 }
 function filterTimeToolClick(e) {
     const selected = e.target.classList.contains("selected");
