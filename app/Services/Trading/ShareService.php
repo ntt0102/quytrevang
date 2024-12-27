@@ -282,11 +282,11 @@ class ShareService extends CoreService
         $points = $this->scanStock($data, $t1, $t2, $t3, $t4, $term);
         if (!$points) return false;
         $calc = [
-            's' => round(($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 1),
-            'm' => round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 1)
+            's' => round(($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2),
+            'm' => round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2)
         ];
         if ($term === 3) {
-            $calc['l'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 1);
+            $calc['l'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
         }
         return (object)['term' => (object)$calc];
     }
