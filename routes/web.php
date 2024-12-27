@@ -94,7 +94,6 @@ Route::get('test', function () {
     // $url = "https://restv2.fireant.vn/symbols/TPB/timescale-marks?startDate=2022-12-29&endDate=2037-01-01";
     // $s = json_decode($res->getBody());
     // $s = app(\App\Services\Trading\ShareService::class)->getDataSsiWithTimeframe($rsp, 'W');
-    // $s = app(\App\Services\Trading\ShareService::class)->removeFilterList($payload);
     // dd($filter);
     // $date = date('Y-m-d');
     // dd(get_global_value('openingMarketFlag'));

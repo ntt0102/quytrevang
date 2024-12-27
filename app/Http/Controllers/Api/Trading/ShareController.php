@@ -62,7 +62,19 @@ class ShareController extends CoreController
      */
     public function getSymbols(Request $request)
     {
-        $data = $this->shareService->getSymbols($this->payload);
+        $data = $this->shareService->getSymbols($this->payload->group);
+        return $this->sendResponse($data);
+    }
+    /**
+     * Check Symbol
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function checkSymbol(Request $request)
+    {
+        $data = $this->shareService->checkSymbol($this->payload);
         return $this->sendResponse($data);
     }
     /**
@@ -75,18 +87,6 @@ class ShareController extends CoreController
     public function filterSymbols(Request $request)
     {
         $data = $this->shareService->filterSymbols($this->payload);
-        return $this->sendResponse($data);
-    }
-    /**
-     * Remove Filter List
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function removeFilterList(Request $request)
-    {
-        $data = $this->shareService->removeFilterList($this->payload);
         return $this->sendResponse($data);
     }
     /**

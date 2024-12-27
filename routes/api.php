@@ -129,8 +129,8 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::get('init-chart', 'ShareController@initChart');
                     Route::post('get-groups', 'ShareController@getGroups');
                     Route::post('get-symbols', 'ShareController@getSymbols');
+                    Route::post('check', 'ShareController@checkSymbol');
                     Route::post('filter', 'ShareController@filterSymbols');
-                    Route::post('remove-filter-list', 'ShareController@removeFilterList');
                     Route::post('add-watchlist', 'ShareController@addWatchlist');
                     Route::post('delete-watchlist', 'ShareController@deleteWatchlist');
                     Route::post('draw-tools', 'ShareController@drawTools');

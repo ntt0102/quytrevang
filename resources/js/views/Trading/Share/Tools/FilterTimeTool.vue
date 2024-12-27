@@ -10,19 +10,13 @@
     </div>
 </template>
 <script setup>
-import { ref, inject, computed, watch } from "vue";
+import { ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const mf = inject("mf");
 const props = defineProps(["filterTimeSeries"]);
 const emit = defineEmits(["hideContext"]);
 const filterTimeToolRef = ref(null);
-// const symbol = computed(() => store.state.tradingShare.symbol);
-// const filterTimeStore = computed(
-//     () => store.state.tradingShare.chart.tools.filterTime,
-//     tools.filterTime
-// );
 let filterTimes = [];
 const colors = ["#F44336", "#FF9800", "#4CAF50", "#009688"];
 
@@ -33,10 +27,6 @@ defineExpose({
     get,
 });
 
-// watch(filterTimeStore, (data) => {
-//     if (data) load(data);
-// });
-
 function isSelected() {
     return filterTimeToolRef.value.classList.contains("selected");
 }
@@ -44,7 +34,6 @@ function get() {
     return filterTimes.map((item) => item.time);
 }
 function filterTimeToolClick(e) {
-    // emit("hideContext");
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -73,19 +62,11 @@ function draw({ time }) {
     if (index === 3) filterTimeToolRef.value.classList.remove("selected");
 }
 function load(data) {
-    // removefilterTimeTool(false);
-    // loadfilterTimeTool(data);
     for (let i = 0; i < data.length; i++) {
         filterTimes.push({ time: data[i], color: colors[i], value: 1 });
     }
     props.filterTimeSeries.setData(filterTimes);
 }
-// function loadfilterTimeTool(data) {
-//     for (let i = 0; i < data.length; i++) {
-//         filterTimes.push({ time: data[i], color: colors[i], value: 1 });
-//     }
-//     props.filterTimeSeries.setData(filterTimes);
-// }
 function removefilterTimeTool(withServer = true) {
     if (withServer)
         store.dispatch("tradingShare/drawTools", {

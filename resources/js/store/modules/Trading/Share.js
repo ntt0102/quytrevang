@@ -3,34 +3,31 @@ function initialState() {
         groups: [],
         symbols: [],
         chart: {},
-        isChartLoading: false,
+        isLoading: false,
     };
 }
 const getters = {};
 
 const actions = {
     getChartData({ commit, dispatch, getters, state, rootGetters }, params) {
-        commit("setChartLoading", true);
+        commit("setLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .get("trading/share", { params, noLoading: true })
                 .then((response) => {
                     commit("setChartData", response.data);
-                    commit("setChartLoading", false);
+                    commit("setLoading", false);
                     resolve(response.data.vnindex);
                 });
         });
     },
-    initChart({ commit, dispatch, getters, state, rootGetters }, params) {
-        commit("setChartLoading", true);
+    initChart({ commit, dispatch, getters, state, rootGetters }) {
+        commit("setLoading", true);
         return new Promise((resolve, reject) => {
             axios
-                .get("trading/share/init-chart", {
-                    params,
-                    noLoading: true,
-                })
+                .get("trading/share/init-chart", { noLoading: true })
                 .then((response) => {
-                    commit("setChartLoading", false);
+                    commit("setLoading", false);
                     resolve(response.data);
                 });
         });
@@ -46,6 +43,7 @@ const actions = {
         });
     },
     getSymbols({ commit, dispatch, getters, state, rootGetters }, group) {
+        if (!group) return commit("setSymbols", []);
         return new Promise((resolve, reject) => {
             axios
                 .post(
@@ -66,16 +64,11 @@ const actions = {
             });
         });
     },
-    removeFilterList({ commit, dispatch, getters, state, rootGetters }, param) {
+    checkSymbol({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios
-                .post("trading/share/remove-filter-list", param, {
-                    noLoading: true,
-                })
-                .then((response) => {
-                    dispatch("getSymbols");
-                    resolve();
-                });
+            axios.post("trading/share/check", param).then((response) => {
+                resolve(response.data);
+            });
         });
     },
     addWatchlist({ commit, dispatch, getters, state, rootGetters }, param) {
@@ -83,19 +76,16 @@ const actions = {
             axios
                 .post("trading/share/add-watchlist", param, { noLoading: true })
                 .then((response) => {
-                    dispatch("getSymbols");
-                    resolve();
+                    resolve(response.data);
                 });
         });
     },
-    deleteWatchlist({ commit, dispatch, getters, state, rootGetters }, param) {
+    deleteWatchlist({ commit, dispatch, getters, state, rootGetters }) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/share/delete-watchlist", param, {
-                    noLoading: true,
-                })
+                .post("trading/share/delete-watchlist", {}, { noLoading: true })
                 .then((response) => {
-                    dispatch("getSymbols");
+                    // dispatch("getSymbols");
                     resolve();
                 });
         });
@@ -120,8 +110,8 @@ const mutations = {
     setChartData(state, data) {
         state.chart = data;
     },
-    setChartLoading(state, data) {
-        state.isChartLoading = data;
+    setLoading(state, data) {
+        state.isLoading = data;
     },
     setGroups(state, data) {
         state.groups = data;
