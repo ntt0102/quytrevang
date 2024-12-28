@@ -5,7 +5,7 @@
         @click="checkToolClick"
         @contextmenu="checkToolContextmenu"
     >
-        <i class="far fa-shield-check"></i>
+        <i class="far fa-circle-check"></i>
     </div>
 </template>
 <script setup>
@@ -36,10 +36,10 @@ function checkToolContextmenu() {
     if (props.symbol in checkResult) showPopup(checkResult);
 }
 function showPopup(data) {
-    let html = JSON.stringify(data, undefined, 4);
+    let html = JSON.stringify(data.result, undefined, 4);
     alert(
         `<pre class='check-tool-popup'>${syntaxHighlight(html)}</pre>`,
-        t("trading.share.tools.check")
+        `${t("trading.share.tools.check")} ${data.symbol}`
     );
 }
 function syntaxHighlight(json) {

@@ -144,7 +144,15 @@ class ShareService extends CoreService
         $term = $t1 ? 3 : 2;
         $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
         $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
-        return $this->checkStock($vnindex, $stock, $term);
+        $check = (array)$this->checkStock($vnindex, $stock, $term);
+        $fromto = [
+            'from' => date('d/m/Y', $term === 3 ? $t1 : $t2),
+            'to' => date('d/m/Y', $t4),
+        ];
+        return [
+            'symbol' => $symbol,
+            'result' => $fromto + $check
+        ];
     }
 
     /**
@@ -235,8 +243,8 @@ class ShareService extends CoreService
             $h = $data->h[$i];
             $l = $data->l[$i];
             $t = $data->t[$i];
-            $pL = (object)['t' => date('Y-m-d', $t), 'p' => $l];
-            $pH = (object)['t' => date('Y-m-d', $t), 'p' => $h];
+            $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'p' => $h];
+            $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'p' => $l];
             if ($i === $last) {
                 $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = $pL;
             } else {
@@ -278,6 +286,32 @@ class ShareService extends CoreService
         return (object)['Hl' => $Hl, 'Ll' => $Ll, 'Hm' => $Hm, 'Lm' => $Lm, 'Hs' => $Hs, 'Ls' => $Ls, 'Hc' => $Hc];
     }
 
+    public function scanPivot($data, $stop)
+    {
+        $B = $M = (object)[];
+        $last = count($data->t) - 1;
+        for ($i = $last; $i >= 0; $i--) {
+            $h = $data->h[$i];
+            $l = $data->l[$i];
+            $t = $data->t[$i];
+            $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'p' => $h];
+            $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'p' => $l];
+            if ($i === $last) {
+                $B = (object)['H' => $pH, 'L' => $pL];
+                $M = clone $B;
+            } else {
+                if ($h > $B->H->p) $B->H = $pH;
+                if ($l < $B->L->p) {
+                    if ($B->H->p - $B->L->p > $M->H->p - $M->L->p) $M = clone $B;
+                    $B->H = $pL;
+                    $B->L = $pL;
+                }
+            }
+            if ($t === $stop) break;
+        }
+        return $M;
+    }
+
     public function calcStock($symbol, $t1, $t2, $t3, $t4, $term)
     {
         $data = $this->getStock($symbol, $term === 3 ? $t1 : $t2, $t4);
@@ -285,35 +319,38 @@ class ShareService extends CoreService
         $points = $this->scanStock($data, $t1, $t2, $t3, $t4, $term);
         if (!$points) return false;
         $calc = [
-            's' => round(($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2),
-            'm' => round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2)
+            'short' => round(($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2),
+            'mid' => round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2)
         ];
         if ($term === 3) {
-            $calc['l'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
+            $calc['long'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
         }
-        return (object)['symbol' => $symbol, 'term' => (object)$calc];
+        $pivot = $this->scanPivot($data, $points->Ls->t);
+        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'pivot' => $pivot->H->t === $points->Hc->t];
     }
 
     public function checkStock($vnindex, $stock, $term)
     {
         $check = [
-            $stock->term->s > 0.7 && $stock->term->s > $vnindex->term->s,
-            $stock->term->m > 0.7 && $stock->term->m > $vnindex->term->m
+            $stock->pivot,
+            $stock->term->short > 0.7 && $stock->term->short > $vnindex->term->short,
+            $stock->term->mid > 0.7 && $stock->term->mid > $vnindex->term->mid
         ];
         $result = [
-            'short' => $check[0],
-            'mid' => $check[1],
+            'pivot' => $check[0],
+            'short' => $check[1],
+            'mid' => $check[2],
         ];
         if ($term === 3) {
-            $check[] = $stock->term->l > 0.7 && $stock->term->l > $vnindex->term->l;
-            $result['long'] = $check[2];
+            $check[] = $stock->term->long > 0.7 && $stock->term->long > $vnindex->term->long;
+            $result['long'] = $check[3];
         }
         $sum = count(array_filter($check)) === count($check);
         $result['sum'] = $sum;
 
         return (object)[
-            $vnindex->symbol => $vnindex,
-            $stock->symbol => $stock,
+            $vnindex->symbol => $vnindex->term,
+            $stock->symbol => $stock->term,
             'result' => (object)$result
         ];
     }
@@ -335,5 +372,23 @@ class ShareService extends CoreService
             'group' => $group,
             'symbols' => $filteredSymbols
         ];
+    }
+
+    public function test()
+    {
+        $symbol = 'CTG';
+        $t1 = strtotime('2021-05-25');
+        $t2 = strtotime('2024-06-12');
+        $t3 = strtotime('2024-09-27');
+        $t4 = strtotime('2024-12-20');
+        $term = $t1 ? 3 : 2;
+        // ----------------------------
+        // $data = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
+        // ----------------------------
+        $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
+        $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
+        $data = $this->checkStock($vnindex, $stock, $term);
+        // ----------------------------
+        return $data;
     }
 }
