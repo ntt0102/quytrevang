@@ -141,7 +141,10 @@ class ShareService extends CoreService
         $t2 = $payload->filterTimes[1];
         $t3 = $payload->filterTimes[2];
         $t4 = $payload->filterTimes[3];
-        return $this->checkStock($symbol, $t1, $t2, $t3, $t4);
+        $term = $t1 ? 3 : 2;
+        $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
+        $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
+        return $this->checkStock($vnindex, $stock, $term);
     }
 
     /**
@@ -288,14 +291,11 @@ class ShareService extends CoreService
         if ($term === 3) {
             $calc['l'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
         }
-        return (object)['term' => (object)$calc];
+        return (object)['symbol' => $symbol, 'term' => (object)$calc];
     }
 
-    public function checkStock($symbol, $t1, $t2, $t3, $t4)
+    public function checkStock($vnindex, $stock, $term)
     {
-        $term = $t1 ? 3 : 2;
-        $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
-        $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
         $check = [
             $stock->term->s > 0.7 && $stock->term->s > $vnindex->term->s,
             $stock->term->m > 0.7 && $stock->term->m > $vnindex->term->m
@@ -312,15 +312,15 @@ class ShareService extends CoreService
         $result['sum'] = $sum;
 
         return (object)[
-            'VNINDEX' => $vnindex,
-            $symbol => $stock,
-            'check' => (object)$result
+            $vnindex->symbol => $vnindex,
+            $stock->symbol => $stock,
+            'result' => (object)$result
         ];
     }
 
     public function filterStock($group, $t1, $t2, $t3, $t4)
     {
-        $checkResult = [];
+        $filteredSymbols = [];
         $term = $t1 ? 3 : 2;
         $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
         $symbols = $this->getSymbols($group);
@@ -328,14 +328,12 @@ class ShareService extends CoreService
         foreach ($symbols as $symbol) {
             echo $symbol . ' ';
             $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
-            $check = $stock->term->s > 0.7 && $stock->term->s > $vnindex->term->s
-                && $stock->term->m > 0.7 && $stock->term->m > $vnindex->term->m;
-            if ($term === 3) $check = $check && $stock->term->l > 0.7 && $stock->term->l > $vnindex->term->l;
-            if ($check) $checkResult[] = $symbol;
+            $check = $this->checkStock($vnindex, $stock, $term);
+            if ($check->result->sum) $filteredSymbols[] = $symbol;
         }
         return (object)[
             'group' => $group,
-            'symbols' => $checkResult
+            'symbols' => $filteredSymbols
         ];
     }
 }

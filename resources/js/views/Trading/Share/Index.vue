@@ -16,6 +16,7 @@
                     location: 'before',
                     widget: 'dxDateBox',
                     options: {
+                        width: devices.phone ? '90' : '120',
                         type: 'date',
                         value: state.fromDate,
                         onValueChanged: fromDateChanged,
@@ -25,7 +26,7 @@
                     location: 'before',
                     widget: 'dxAutocomplete',
                     options: {
-                        width: '100',
+                        width: '90',
                         showClearButton: true,
                         openOnFieldClick: true,
                         minSearchLength: 0,
@@ -80,6 +81,7 @@ const store = useStore();
 const route = useRoute();
 const { t } = useI18n();
 const bus = inject("bus");
+const devices = inject("devices");
 const chartRef = ref(null);
 
 const groups = computed(() => store.state.tradingShare.groups);
