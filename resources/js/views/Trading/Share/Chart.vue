@@ -111,8 +111,8 @@ const symbols = computed(() => store.state.tradingShare.symbols);
 const chartFrom = computed(() => props.fromDate);
 const state = reactive({
     series: {},
-    symbol: route.query.symbol ?? "VNINDEX",
-    inputSymbol: route.query.symbol ?? "VNINDEX",
+    symbol: route.query.symbol ?? "VN30",
+    inputSymbol: route.query.symbol ?? "VN30",
     watchlist: [],
 });
 let params = {
