@@ -134,5 +134,10 @@ function filterClick() {
             width: 23px !important;
         }
     }
+    .dx-icon-clear {
+        margin-top: -9px !important;
+        width: 18px !important;
+        height: 18px !important;
+    }
 }
 </style>
