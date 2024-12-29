@@ -323,13 +323,13 @@ class ShareService extends CoreService
             'mid' => round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2)
         ];
         $range = [
-            $points->Hs->p - $points->Ls->p,
-            $points->Hm->p - $points->Lm->p
+            round($points->Hs->p - $points->Ls->p, 2),
+            round($points->Hm->p - $points->Lm->p, 2)
 
         ];
         if ($term === 3) {
             $calc['long'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
-            $range[2] = $points->Hl->p - $points->Ll->p;
+            $range[2] = round($points->Hl->p - $points->Ll->p, 2);
         }
         $ascRange = $range;
         sort($ascRange);
@@ -364,7 +364,7 @@ class ShareService extends CoreService
             $vnindex->symbol => $vnindex->term,
             $stock->symbol => $stock->term,
             'result' => (object)$result,
-            'range' => $stock->range,
+            'compress' => $stock->range,
             'points' => $stock->points,
         ];
     }
