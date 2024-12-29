@@ -333,11 +333,10 @@ class ShareService extends CoreService
         }
         $ascRange = $range;
         sort($ascRange);
-        
         $compress = $range === $ascRange;
         $pivotPoint = $this->scanPivot($data, $points->Ls->t);
         $pivot = abs($pivotPoint->H->i - $points->Hc->i) <= 5;
-        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'compress' => $compress, 'pivot' => $pivot];
+        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'compress' => $compress, 'pivot' => $pivot, 'points' => $points, 'range' => $range];
     }
 
     public function checkStock($vnindex, $stock, $term)
@@ -364,6 +363,8 @@ class ShareService extends CoreService
         return (object)[
             $vnindex->symbol => $vnindex->term,
             $stock->symbol => $stock->term,
+            'points' => $stock->points,
+            'range' => $stock->range,
             'result' => (object)$result
         ];
     }
