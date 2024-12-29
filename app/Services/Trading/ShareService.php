@@ -363,10 +363,10 @@ class ShareService extends CoreService
         $result['sum'] = $sum;
 
         return (object)[
-            $vnindex->symbol => $vnindex->term,
-            $stock->symbol => $stock->term,
             'result' => (object)$result,
             'compress' => $stock->range,
+            $stock->symbol => $stock->term,
+            $vnindex->symbol => $vnindex->term,
             'points' => $stock->points,
         ];
     }
