@@ -318,24 +318,26 @@ class ShareService extends CoreService
         if ($data->s !== 'ok') return false;
         $points = $this->scanStock($data, $t1, $t2, $t3, $t4, $term);
         if (!$points) return false;
+        $pivotPoint = $this->scanPivot($data, $points->Ls->t);
+        $pivot = abs($pivotPoint->H->i - $points->Hc->i) <= 5;
         $calc = [
             'short' => round(($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2),
             'mid' => round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2)
         ];
         $range = [
-            round($points->Hs->p - $points->Ls->p, 2),
-            round($points->Hm->p - $points->Lm->p, 2)
+            'immed' => round($pivotPoint->H->p - $pivotPoint->L->p, 2),
+            'short' => round($points->Hs->p - $points->Ls->p, 2),
+            'mid' => round($points->Hm->p - $points->Lm->p, 2)
 
         ];
         if ($term === 3) {
             $calc['long'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
-            $range[2] = round($points->Hl->p - $points->Ll->p, 2);
+            $range['long'] = round($points->Hl->p - $points->Ll->p, 2);
         }
         $ascRange = $range;
-        sort($ascRange);
+        asort($ascRange);
         $compress = $range === $ascRange;
-        $pivotPoint = $this->scanPivot($data, $points->Ls->t);
-        $pivot = abs($pivotPoint->H->i - $points->Hc->i) <= 5;
+        
         return (object)['symbol' => $symbol, 'term' => (object)$calc, 'compress' => $compress, 'pivot' => $pivot, 'points' => $points, 'range' => $range];
     }
 
