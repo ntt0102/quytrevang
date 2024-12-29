@@ -252,9 +252,9 @@ class ShareService extends CoreService
                     if ($t >= $s1Date) {
                         if ($h > $Hc->p) $Ls = $Hc = $pH;
                     }
-                    // if ($t >= $s2Date) {
-                    if ($l < $Ls->p) $Hs = $Ls = $pL;
-                    // }
+                    if ($t <= $s1Date && $t >= $s2Date) {
+                        if ($l < $Ls->p) $Hs = $Ls = $pL;
+                    }
                     if ($t <= $s2Date) {
                         if ($h > $Hs->p) $Lm = $Hs = $pH;
                     }
@@ -262,7 +262,7 @@ class ShareService extends CoreService
                     if ($t >= $m1Date) {
                         if ($h > $Hs->p) $Lm = $Hs = $pH;
                     }
-                    if ($term === 3 || $t >= $m2Date) {
+                    if ($t <= $m1Date && $t >= $m2Date) {
                         if ($l < $Lm->p) $Hm = $Lm = $pL;
                     }
                     if ($t <= $m2Date) {
@@ -273,7 +273,7 @@ class ShareService extends CoreService
                         if ($t >= $l1Date) {
                             if ($h > $Hm->p) $Ll = $Hm = $pH;
                         }
-                        if ($t >= $l2Date) {
+                        if ($t <= $l1Date && $t >= $l2Date) {
                             if ($l < $Ll->p) $Hl = $Ll = $pL;
                         }
                         if ($t <= $l2Date) {
