@@ -367,7 +367,7 @@ class ShareService extends CoreService
             'compress' => $stock->range,
             $stock->symbol => $stock->term,
             $vnindex->symbol => $vnindex->term,
-            'points' => $stock->points,
+            // 'points' => $stock->points,
         ];
     }
 
