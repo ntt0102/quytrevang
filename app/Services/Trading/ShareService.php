@@ -322,29 +322,41 @@ class ShareService extends CoreService
             'short' => round(($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2),
             'mid' => round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2)
         ];
+        $range = [
+            $points->Hs->p - $points->Ls->p,
+            $points->Hm->p - $points->Lm->p
+
+        ];
         if ($term === 3) {
             $calc['long'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
+            $range[2] = $points->Hl->p - $points->Ll->p;
         }
+        $ascRange = $range;
+        sort($ascRange);
+        
+        $compress = $range === $ascRange;
         $pivotPoint = $this->scanPivot($data, $points->Ls->t);
         $pivot = abs($pivotPoint->H->i - $points->Hc->i) <= 5;
-        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'pivot' => $pivot];
+        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'compress' => $compress, 'pivot' => $pivot];
     }
 
     public function checkStock($vnindex, $stock, $term)
     {
         $check = [
             $stock->pivot,
+            $stock->compress,
             $stock->term->short > 0.7 && $stock->term->short > $vnindex->term->short,
             $stock->term->mid > 0.7 && $stock->term->mid > $vnindex->term->mid
         ];
         $result = [
             'pivot' => $check[0],
-            'short' => $check[1],
-            'mid' => $check[2],
+            'compress' => $check[1],
+            'short' => $check[2],
+            'mid' => $check[3],
         ];
         if ($term === 3) {
             $check[] = $stock->term->long > 0.7 && $stock->term->long > $vnindex->term->long;
-            $result['long'] = $check[3];
+            $result['long'] = $check[4];
         }
         $sum = count(array_filter($check)) === count($check);
         $result['sum'] = $sum;
