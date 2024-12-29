@@ -243,8 +243,8 @@ class ShareService extends CoreService
             $h = $data->h[$i];
             $l = $data->l[$i];
             $t = $data->t[$i];
-            $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'p' => $h];
-            $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'p' => $l];
+            $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $h];
+            $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $l];
             if ($i === $last) {
                 $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = $pL;
             } else {
@@ -294,8 +294,8 @@ class ShareService extends CoreService
             $h = $data->h[$i];
             $l = $data->l[$i];
             $t = $data->t[$i];
-            $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'p' => $h];
-            $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'p' => $l];
+            $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $h];
+            $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $l];
             if ($i === $last) {
                 $B = (object)['H' => $pH, 'L' => $pL];
                 $M = clone $B;
@@ -325,8 +325,9 @@ class ShareService extends CoreService
         if ($term === 3) {
             $calc['long'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
         }
-        $pivot = $this->scanPivot($data, $points->Ls->t);
-        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'pivot' => $pivot->H->t === $points->Hc->t];
+        $pivotPoint = $this->scanPivot($data, $points->Ls->t);
+        $pivot = abs($pivotPoint->H->i - $points->Hc->i) <= 5;
+        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'pivot' => $pivot];
     }
 
     public function checkStock($vnindex, $stock, $term)
