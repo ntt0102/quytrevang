@@ -38,7 +38,7 @@ function checkToolContextmenu() {
 function showPopup(data) {
     let html = JSON.stringify(data.result, undefined, 4);
     alert(
-        `<pre class='check-tool-popup'>${syntaxHighlight(html)}</pre>`,
+        `<div class='check-tool-popup'><pre>${syntaxHighlight(html)}</pre></div>`,
         `${t("trading.share.tools.check")} ${data.symbol}`
     );
 }
@@ -71,6 +71,8 @@ function syntaxHighlight(json) {
 .check-tool-popup {
     height: 500px;
     overflow-y: auto;
+    
+    pre {
     margin: 0px !important;
 
     .string {
@@ -87,6 +89,7 @@ function syntaxHighlight(json) {
     }
     .key {
         color: #e0ac6b;
+    }
     }
 }
 </style>
