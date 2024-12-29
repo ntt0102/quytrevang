@@ -229,7 +229,7 @@ class ShareService extends CoreService
     public function scanStock($data, $longDate, $midDate, $shortDate, $currDate, $term)
     {
         if ($data->s !== 'ok') return false;
-        $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = (object)[];
+        $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hi = (object)[];
         $s1Date = ($shortDate + 2 * $currDate) / 3;
         $s2Date = (2 * $shortDate + $currDate) / 3;
         $m1Date = ($midDate + 2 * $shortDate) / 3;
@@ -246,11 +246,11 @@ class ShareService extends CoreService
             $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $h];
             $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $l];
             if ($i === $last) {
-                $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hc = $pL;
+                $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hi = $pL;
             } else {
                 if ($t >= $shortDate) {
                     if ($t >= $s1Date) {
-                        if ($h > $Hc->p) $Ls = $Hc = $pH;
+                        if ($h > $Hi->p) $Ls = $Hi = $pH;
                     }
                     if ($t <= $s1Date && $t >= $s2Date) {
                         if ($l < $Ls->p) $Hs = $Ls = $pL;
@@ -283,7 +283,7 @@ class ShareService extends CoreService
                 }
             }
         }
-        return (object)['Hl' => $Hl, 'Ll' => $Ll, 'Hm' => $Hm, 'Lm' => $Lm, 'Hs' => $Hs, 'Ls' => $Ls, 'Hc' => $Hc];
+        return (object)['Hl' => $Hl, 'Ll' => $Ll, 'Hm' => $Hm, 'Lm' => $Lm, 'Hs' => $Hs, 'Ls' => $Ls, 'Hi' => $Hi];
     }
 
     public function scanPivot($data, $stop)
@@ -319,9 +319,9 @@ class ShareService extends CoreService
         $points = $this->scanStock($data, $t1, $t2, $t3, $t4, $term);
         if (!$points) return false;
         $pivotPoint = $this->scanPivot($data, $points->Ls->t);
-        $pivot = abs($pivotPoint->H->i - $points->Hc->i) <= 5;
+        $pivot = abs($pivotPoint->H->i - $points->Hi->i) <= 5;
         $calc = [
-            'short' => round(($points->Hc->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2),
+            'short' => round(($points->Hi->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2),
             'mid' => round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2)
         ];
         $range = [
