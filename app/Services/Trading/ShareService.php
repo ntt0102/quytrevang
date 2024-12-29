@@ -363,9 +363,9 @@ class ShareService extends CoreService
         return (object)[
             $vnindex->symbol => $vnindex->term,
             $stock->symbol => $stock->term,
+            'result' => (object)$result,
             'points' => $stock->points,
             'range' => $stock->range,
-            'result' => (object)$result
         ];
     }
 
