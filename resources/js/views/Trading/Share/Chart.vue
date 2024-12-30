@@ -367,7 +367,7 @@ function getChartData(withVnindex = false, fromDate = null) {
             if (withVnindex) {
                 params.series.vnindex.setData(vnindex.prices);
                 if(vnindex.reversal) {
-                    state.series.price.setMarkers([
+                    params.series.vnindex.setMarkers([
                         {
                             time: vnindex.reversal.time,
                             color: "#9C27B0"
