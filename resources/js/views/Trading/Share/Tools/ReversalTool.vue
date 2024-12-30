@@ -20,7 +20,7 @@ const reversalToolRef = ref(null);
 const prices = computed(() => store.state.tradingShare.prices);
 const toolStore = computed(() => store.state.tradingShare.tools.reversal);
 const TOOL_NAME = "reversal";
-const TOOL_COLOR = "#9C27B0";
+const TOOL_COLOR = "rgba(156, 39, 176, 0.7)";
 let series = {};
 let times = [];
 let reversal = null;

@@ -19,7 +19,12 @@ const emit = defineEmits(["hideContext"]);
 const filterTimeToolRef = ref(null);
 let series = {};
 let filterTimes = [];
-const colors = ["#F44336", "#FF9800", "#4CAF50", "#009688"];
+const colors = [
+    "rgba(244, 67, 54, 0.7)",
+    "rgba(255, 152, 0, 0.7)",
+    "rgba(76, 175, 80, 0.7)",
+    "rgba(0, 150, 136, 0.7)",
+];
 
 defineExpose({
     createSeries,

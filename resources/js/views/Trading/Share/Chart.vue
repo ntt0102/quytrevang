@@ -202,7 +202,7 @@ function drawChart() {
             fontSize: 40,
             horzAlign: "center",
             vertAlign: "center",
-            color: "rgba(54, 54, 64, 0.2)",
+            color: "rgba(54, 54, 64, 0.4)",
         },
     };
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
