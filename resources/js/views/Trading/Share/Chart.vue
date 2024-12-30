@@ -371,8 +371,6 @@ function getChartData(withVnindex = false, fromDate = null) {
                         {
                             time: vnindex.reversal.time,
                             color: "#9C27B0",
-                            position: 'belowBar',     // Dưới thanh nến
-                            shape: 'arrowUp',
                         }
                     ]);
                 }
