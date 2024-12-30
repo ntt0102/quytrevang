@@ -112,13 +112,11 @@ function scan(startTime, endTime) {
             else B.H.i = i;
             if (l < B.L.p) {
                 bTime = t;
-                if (c < B.L.p) {
-                    const _pr = B.H.p - B.L.p;
-                    const _ir = B.H.i - B.L.i;
-                    if (_pr > pr) pr = _pr;
-                    if (_ir > ir) ir = _ir;
-                    B = { H: pL, L: pL };
-                }
+                const _pr = B.H.p - B.L.p;
+                const _ir = B.H.i - B.L.i;
+                if (_pr > pr) pr = _pr;
+                if (_ir > ir) ir = _ir;
+                B = { H: pL, L: pL };
             }
         }
     }
