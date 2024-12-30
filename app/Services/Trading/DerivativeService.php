@@ -143,7 +143,7 @@ class DerivativeService extends CoreService
      */
     public function drawTools($payload)
     {
-        $symbol = 'VN30F1M';
+        $symbol = $payload->symbol;
         if ($payload->isRemove) {
             $dt = StockDrawing::where('symbol', $symbol)->where('name', $payload->name);
             if (isset($payload, $payload->point))

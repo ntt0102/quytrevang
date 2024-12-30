@@ -10,15 +10,20 @@
     </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const props = defineProps(["filterTimeSeries"]);
+const props = defineProps(["chart"]);
 const emit = defineEmits(["hideContext"]);
 const filterTimeToolRef = ref(null);
+let series = {};
 let filterTimes = [];
 const colors = ["#F44336", "#FF9800", "#4CAF50", "#009688"];
+
+onMounted(() => {
+    watch(() => props.chart, createSeries);
+});
 
 defineExpose({
     isSelected,
@@ -35,7 +40,17 @@ function get() {
     if (_filterTimes.length === 3) _filterTimes.unshift(null);
     return _filterTimes;
 }
+function createSeries(chart) {
+    if (!chart) return false;
+    series = chart.addHistogramSeries({
+        priceScaleId: "filterTime",
+        scaleMargins: { top: 0, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+}
 function filterTimeToolClick(e) {
+    emit("hideContext");
     const selected = e.target.classList.contains("selected");
     document
         .querySelectorAll(".tool-area > .command:not(.drawless)")
@@ -53,7 +68,7 @@ function draw({ time }) {
     const index = filterTimes.length;
     if (index && time <= filterTimes[index - 1].time) return false;
     filterTimes.push({ time, color: colors[index], value: 1 });
-    props.filterTimeSeries.setData(filterTimes);
+    series.setData(filterTimes);
     store.dispatch("tradingShare/drawTools", {
         isRemove: false,
         symbol: "",
@@ -67,7 +82,7 @@ function load(data) {
     for (let i = 0; i < data.length; i++) {
         filterTimes.push({ time: data[i], color: colors[i], value: 1 });
     }
-    props.filterTimeSeries.setData(filterTimes);
+    series.setData(filterTimes);
 }
 function removefilterTimeTool(withServer = true) {
     if (withServer)
@@ -76,7 +91,7 @@ function removefilterTimeTool(withServer = true) {
             symbol: "",
             name: "filterTime",
         });
-    props.filterTimeSeries.setData([]);
+    series.setData([]);
     filterTimes = [];
 }
 </script>

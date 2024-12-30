@@ -16,7 +16,7 @@ import { alert } from "devextreme/ui/dialog";
 const store = useStore();
 const { t } = useI18n();
 const props = defineProps(["symbol"]);
-const emit = defineEmits(["checkSymbol"]);
+const emit = defineEmits(["checkSymbol", "hideContext"]);
 let checkResult = {};
 
 defineExpose({
@@ -31,6 +31,7 @@ function check(params) {
 }
 function checkToolClick() {
     emit("checkSymbol");
+    emit("hideContext");
 }
 function checkToolContextmenu() {
     if (props.symbol in checkResult) showPopup(checkResult);

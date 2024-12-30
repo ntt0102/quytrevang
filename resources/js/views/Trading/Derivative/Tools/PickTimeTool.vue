@@ -22,6 +22,8 @@ const pickTimeStore = computed(
 );
 let pickTime = null;
 
+const symbol = "VN30F1M";
+
 defineExpose({
     isSelected,
     draw,
@@ -55,6 +57,7 @@ function pickTimeToolContextmenu(e) {
 function draw({ time }) {
     store.dispatch("tradingDerivative/drawTools", {
         isRemove: false,
+        symbol,
         name: "pickTime",
         points: [0],
         data: [time],
@@ -71,6 +74,7 @@ function removePickTimeTool(withServer = true) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
+            symbol,
             name: "pickTime",
         });
     props.pickTimeSeries.setData([]);

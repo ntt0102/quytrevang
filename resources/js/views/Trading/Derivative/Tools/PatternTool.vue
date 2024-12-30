@@ -31,6 +31,8 @@ const patternStore = computed(
 let points = {};
 let lines = {};
 
+const symbol = "VN30F1M";
+
 defineExpose({
     isSelected,
     draw,
@@ -565,6 +567,7 @@ function adjustPatternPoints() {
 function savePattern(isRemove = false) {
     let param = {
         isRemove,
+        symbol,
         name: "pattern",
         points: [],
         data: [],

@@ -23,6 +23,8 @@ const timeRangeStore = computed(
 );
 let timeRanges = [];
 
+const symbol = "VN30F1M";
+
 defineExpose({
     isSelected,
     draw,
@@ -52,6 +54,7 @@ function timeRangeToolContextmenu(e) {
 function draw({ time }) {
     let param = {
         isRemove: false,
+        symbol,
         name: "timeRange",
         points: [],
         data: [],
@@ -122,6 +125,7 @@ function removeTimeRangeTool(withServer = true) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
+            symbol,
             name: "timeRange",
         });
     props.timeRangeSeries.setData([]);

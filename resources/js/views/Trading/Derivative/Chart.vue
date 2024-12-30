@@ -111,6 +111,8 @@
             />
             <LineTool
                 ref="lineToolRef"
+                :symbol="config.vn30f1m"
+                storeModule="tradingDerivative"
                 :priceSeries="state.series.price"
                 @hideContext="hideContext"
             />
@@ -123,7 +125,10 @@
             />
             <TargetTool
                 ref="targetToolRef"
+                :symbol="config.vn30f1m"
+                storeModule="tradingDerivative"
                 :priceSeries="state.series.price"
+                :levels="[0.5, 1, 2, 4]"
                 @hideContext="hideContext"
             />
             <OrderTool

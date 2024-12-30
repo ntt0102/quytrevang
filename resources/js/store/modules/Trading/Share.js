@@ -2,7 +2,8 @@ function initialState() {
     return {
         groups: [],
         symbols: [],
-        chart: {},
+        prices: [],
+        tools: [],
         isLoading: false,
     };
 }
@@ -108,7 +109,8 @@ const actions = {
 
 const mutations = {
     setChartData(state, data) {
-        state.chart = data;
+        state.prices = data.prices;
+        state.tools = data.tools;
     },
     setLoading(state, data) {
         state.isLoading = data;

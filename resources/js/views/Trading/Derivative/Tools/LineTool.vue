@@ -24,11 +24,11 @@ import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const props = defineProps(["priceSeries"]);
+const props = defineProps(["symbol", "storeModule", "priceSeries"]);
 const emit = defineEmits(["hideContext"]);
 const lineToolRef = ref(null);
 const showLineContext = ref(false);
-const lineStore = computed(() => store.state.tradingDerivative.tools.line);
+const lineStore = computed(() => store.state[props.storeModule].tools.line);
 const lineTitle = ref("");
 const lineColor = ref("#F44336");
 let lines = [];
@@ -71,8 +71,9 @@ function draw({ price }) {
         const isExist = (ops.type = TYPE && price === +ops.price);
         if (isExist) {
             props.priceSeries.removePriceLine(line);
-            store.dispatch("tradingDerivative/drawTools", {
+            store.dispatch(`${props.storeModule}/drawTools`, {
                 isRemove: true,
+                symbol: props.symbol,
                 name: TYPE,
                 point: price,
             });
@@ -92,8 +93,9 @@ function draw({ price }) {
             draggable: true,
         };
         lines.push(props.priceSeries.createPriceLine(options));
-        store.dispatch("tradingDerivative/drawTools", {
+        store.dispatch(`${props.storeModule}/drawTools`, {
             isRemove: false,
+            symbol: props.symbol,
             name: TYPE,
             points: [price],
             data: [{ color, title }],
@@ -123,8 +125,9 @@ function loadLineTool(data) {
 function removeLineTool(withServer = true) {
     if (lines.length > 0) {
         if (withServer)
-            store.dispatch("tradingDerivative/drawTools", {
+            store.dispatch(`${props.storeModule}/drawTools`, {
                 isRemove: true,
+                symbol: props.symbol,
                 name: "line",
             });
         lines.forEach((line) => props.priceSeries.removePriceLine(line));
@@ -132,15 +135,17 @@ function removeLineTool(withServer = true) {
     }
 }
 function drag({ lineOptions, oldPrice, newPrice }) {
-    store.dispatch("tradingDerivative/drawTools", {
+    store.dispatch(`${props.storeModule}/drawTools`, {
         isRemove: true,
+        symbol: props.symbol,
         name: "line",
         point: oldPrice,
     });
     const color = lineOptions.color;
     const title = lineOptions.title;
-    store.dispatch("tradingDerivative/drawTools", {
+    store.dispatch(`${props.storeModule}/drawTools`, {
         isRemove: false,
+        symbol: props.symbol,
         name: "line",
         points: [newPrice],
         data: [{ color, title }],

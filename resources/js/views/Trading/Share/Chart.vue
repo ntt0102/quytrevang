@@ -66,12 +66,29 @@
             />
             <FilterTimeTool
                 ref="filterTimeToolRef"
-                :filterTimeSeries="state.series.filterTime"
+                :chart="state.chart"
+                @hideContext="hideContext"
             />
             <CheckTool
                 ref="checkToolRef"
                 :symbol="state.symbol"
                 @checkSymbol="checkSymbol"
+                @hideContext="hideContext"
+            />
+            <LineTool
+                ref="lineToolRef"
+                :symbol="state.symbol"
+                storeModule="tradingShare"
+                :priceSeries="state.series.price"
+                @hideContext="hideContext"
+            />
+            <TargetTool
+                ref="targetToolRef"
+                :symbol="state.symbol"
+                storeModule="tradingShare"
+                :priceSeries="state.series.price"
+                :levels="[1]"
+                @hideContext="hideContext"
             />
         </div>
     </div>
@@ -82,18 +99,18 @@ import FullscreenTool from "../Derivative/Tools/FullscreenTool.vue";
 import TradingviewTool from "../Derivative/Tools/TradingviewTool.vue";
 import FilterTimeTool from "./Tools/FilterTimeTool.vue";
 import CheckTool from "./Tools/CheckTool.vue";
+import LineTool from "../Derivative/Tools/LineTool.vue";
+import TargetTool from "../Derivative/Tools/TargetTool.vue";
 
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { DxAutocomplete } from "devextreme-vue/autocomplete";
 import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
-import { useI18n } from "vue-i18n";
 import { getUnixTime } from "date-fns";
 
 const store = useStore();
 const route = useRoute();
-const { t } = useI18n();
 const devices = inject("devices");
 const mf = inject("mf");
 const chartContainerRef = ref(null);
@@ -102,6 +119,8 @@ const symbolAutocompleteRef = ref(null);
 const fullscreenToolRef = ref(null);
 const filterTimeToolRef = ref(null);
 const checkToolRef = ref(null);
+const lineToolRef = ref(null);
+const targetToolRef = ref(null);
 
 const props = defineProps(["fromDate"]);
 const isLoading = computed(() => store.state.tradingShare.isLoading);
@@ -110,16 +129,13 @@ const inWatchlist = computed(() => state.watchlist.includes(state.symbol));
 const symbols = computed(() => store.state.tradingShare.symbols);
 const chartFrom = computed(() => props.fromDate);
 const state = reactive({
-    series: {},
     symbol: route.query.symbol ?? "VN30",
     inputSymbol: route.query.symbol ?? "VN30",
-    watchlist: [],
-});
-let params = {
     chart: {},
     series: {},
-    crosshair: {},
-};
+    watchlist: [],
+});
+let crosshair = {};
 
 onMounted(() => {
     initChart();
@@ -129,7 +145,7 @@ onMounted(() => {
     document.addEventListener("keydown", eventKeyPress);
 });
 
-watch(() => store.state.tradingShare.chart, loadChartData);
+watch(() => store.state.tradingShare.prices, loadChartData);
 
 defineExpose({
     getFilterTimes,
@@ -173,15 +189,9 @@ function drawChart() {
             color: "rgba(54, 54, 64, 0.2)",
         },
     };
-    params.chart = createChart(chartRef.value, CHART_OPTIONS);
-    params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
-    state.series.filterTime = params.chart.addHistogramSeries({
-        priceScaleId: "filterTime",
-        scaleMargins: { top: 0, bottom: 0 },
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
-    params.series.vnindex = params.chart.addCandlestickSeries({
+    state.chart = createChart(chartRef.value, CHART_OPTIONS);
+    state.chart.subscribeCrosshairMove(eventChartCrosshairMove);
+    state.series.vnindex = state.chart.addCandlestickSeries({
         priceScaleId: "vnindex",
         upColor: "#30A165",
         downColor: "#EC3F3F",
@@ -192,7 +202,7 @@ function drawChart() {
         scaleMargins: { top: 0.1, bottom: 0.55 },
         lastValueVisible: false,
     });
-    params.series.price = params.chart.addCandlestickSeries({
+    state.series.price = state.chart.addCandlestickSeries({
         upColor: "#30A165",
         downColor: "#EC3F3F",
         borderVisible: false,
@@ -207,8 +217,18 @@ function stopPropagationEvent(e) {
     e.stopPropagation();
 }
 function chartClick() {
+    hideContext();
+
     if (filterTimeToolRef.value.isSelected()) {
-        filterTimeToolRef.value.draw({ time: params.crosshair.time });
+        filterTimeToolRef.value.draw({ time: crosshair.time });
+    } else if (lineToolRef.value.isSelected()) {
+        lineToolRef.value.draw({
+            price: coordinateToPrice(crosshair.y),
+        });
+    } else if (targetToolRef.value.isSelected()) {
+        targetToolRef.value.draw({
+            price: coordinateToPrice(crosshair.y),
+        });
     }
 }
 function areaClick(e) {
@@ -219,23 +239,23 @@ function getFilterTimes() {
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
-        let price = e.seriesPrices.get(params.series.price);
-        params.crosshair.time = e.time;
-        params.crosshair.price = price;
+        let price = e.seriesPrices.get(state.series.price);
+        crosshair.time = e.time;
+        crosshair.price = price;
     } else {
         if (!devices.phone) {
-            params.crosshair.time = null;
-            params.crosshair.price = null;
+            crosshair.time = null;
+            crosshair.price = null;
         }
     }
     if (e.point != undefined) {
-        params.crosshair.x = e.point.x;
-        params.crosshair.y = e.point.y;
+        crosshair.x = e.point.x;
+        crosshair.y = e.point.y;
     }
 }
 function chartResize() {
     if (chartContainerRef.value) {
-        params.chart.resize(
+        state.chart.resize(
             chartContainerRef.value.offsetWidth,
             chartContainerRef.value.offsetHeight
         );
@@ -277,8 +297,8 @@ function addWatchlist() {
 }
 
 function loadChartData() {
-    params.series.price.setData(store.state.tradingShare.chart.price);
-    params.chart.applyOptions({ watermark: { text: state.symbol } });
+    state.series.price.setData(store.state.tradingShare.prices);
+    state.chart.applyOptions({ watermark: { text: state.symbol } });
 }
 function symbolChanged() {
     if (!state.inputSymbol || !state.inputSymbol.trim()) return false;
@@ -310,7 +330,7 @@ function getChartData(withVnindex = false, fromDate = null) {
             withVnindex,
         })
         .then((vnindex) => {
-            if (withVnindex) params.series.vnindex.setData(vnindex);
+            if (withVnindex) state.series.vnindex.setData(vnindex);
         });
 }
 function loadNextSymbol() {
@@ -333,6 +353,12 @@ function checkSymbol() {
     if (!state.symbol || state.symbol === "VNINDEX") return false;
     const filterTimes = getFilterTimes();
     checkToolRef.value.check({ symbol: state.symbol, filterTimes });
+}
+function hideContext() {
+    lineToolRef.value.hide();
+}
+function coordinateToPrice(y) {
+    return mf.fmtNum(state.series.price.coordinateToPrice(y));
 }
 </script>
 <style lang="scss">
@@ -400,6 +426,17 @@ function checkSymbol() {
 
             .command:not(:first-child) {
                 border-top: solid 2px #2a2e39 !important;
+            }
+
+            .context {
+                z-index: 0;
+                position: relative;
+
+                .contextmenu {
+                    position: absolute;
+                    top: 0px;
+                    left: 42px;
+                }
             }
 
             .tradingview {

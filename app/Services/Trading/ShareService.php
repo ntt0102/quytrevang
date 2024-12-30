@@ -38,8 +38,8 @@ class ShareService extends CoreService
     public function getChart($payload)
     {
         $data = [
-            'price' => $this->getChartData($payload->symbol, $payload->from),
-            // 'tools' => $this->getTools($payload),
+            'prices' => $this->getChartData($payload->symbol, $payload->from),
+            'tools' => $this->getTools($payload),
         ];
         if ($payload->withVnindex) {
             $data['vnindex'] = $this->getChartData("VNINDEX", $payload->from);
@@ -337,7 +337,7 @@ class ShareService extends CoreService
         $ascRange = $range;
         asort($ascRange);
         $compress = $range === $ascRange;
-        
+
         return (object)['symbol' => $symbol, 'term' => (object)$calc, 'compress' => $compress, 'pivot' => $pivot, 'points' => $points, 'range' => $range];
     }
 

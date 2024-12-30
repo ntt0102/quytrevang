@@ -40,6 +40,7 @@ let order = {};
 let lines = {};
 let isAutoOrdering = false;
 
+const symbol = "VN30F1M";
 const TP_DEFAULT = 3;
 const SL_DEFAULT = 2;
 
@@ -350,6 +351,7 @@ function drawOrderTool(kinds, isStore = true) {
     const TYPE = "order";
     let param = {
         isRemove: false,
+        symbol,
         name: TYPE,
         points: [],
         data: [],
@@ -415,6 +417,7 @@ function removeOrderTool(kinds, withServer = true) {
     if (withServer)
         store.dispatch("tradingDerivative/drawTools", {
             isRemove: true,
+            symbol,
             name: "order",
         });
     kinds.forEach((kind) => {

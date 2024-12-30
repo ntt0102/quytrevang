@@ -15,10 +15,10 @@ import { useStore } from "vuex";
 
 const store = useStore();
 const mf = inject("mf");
-const props = defineProps(["priceSeries"]);
+const props = defineProps(["symbol", "storeModule", "priceSeries", "levels"]);
 const emit = defineEmits(["hideContext"]);
 const targetToolRef = ref(null);
-const targetStore = computed(() => store.state.tradingDerivative.tools.target);
+const targetStore = computed(() => store.state[props.storeModule].tools.target);
 let lines = {};
 
 defineExpose({
@@ -60,6 +60,7 @@ function draw({ price }) {
     };
     let param = {
         isRemove: false,
+        symbol: props.symbol,
         name: TYPE,
         points: [],
         data: [price],
@@ -73,29 +74,37 @@ function draw({ price }) {
         lines[option.point] = props.priceSeries.createPriceLine(option);
         param.points.push(option.point);
         //
-        option.point = "X";
-        option.price = mf.fmtNum(a - 0.5 * ba);
-        option.title = mf.fmtNum(-0.5 * ba);
-        option.color = "#2196F3";
-        lines[option.point] = props.priceSeries.createPriceLine(option);
+        if (props.levels.includes(0.5)) {
+            option.point = "X";
+            option.price = mf.fmtNum(a - 0.5 * ba);
+            option.title = mf.fmtNum(-0.5 * ba);
+            option.color = "#2196F3";
+            lines[option.point] = props.priceSeries.createPriceLine(option);
+        }
         //
-        option.point = "Y";
-        option.price = mf.fmtNum(a - ba);
-        option.title = mf.fmtNum(-ba);
-        option.color = "#673AB7";
-        lines[option.point] = props.priceSeries.createPriceLine(option);
+        if (props.levels.includes(1)) {
+            option.point = "Y";
+            option.price = mf.fmtNum(a - ba);
+            option.title = mf.fmtNum(-ba);
+            option.color = "#673AB7";
+            lines[option.point] = props.priceSeries.createPriceLine(option);
+        }
         //
-        option.point = "Z";
-        option.price = mf.fmtNum(a - 2 * ba);
-        option.title = mf.fmtNum(-2 * ba);
-        option.color = "#9C27B0";
-        lines[option.point] = props.priceSeries.createPriceLine(option);
+        if (props.levels.includes(2)) {
+            option.point = "Z";
+            option.price = mf.fmtNum(a - 2 * ba);
+            option.title = mf.fmtNum(-2 * ba);
+            option.color = "#9C27B0";
+            lines[option.point] = props.priceSeries.createPriceLine(option);
+        }
         //
-        option.point = "W";
-        option.price = mf.fmtNum(a - 4 * ba);
-        option.title = mf.fmtNum(-4 * ba);
-        option.color = "#E91E63";
-        lines[option.point] = props.priceSeries.createPriceLine(option);
+        if (props.levels.includes(4)) {
+            option.point = "W";
+            option.price = mf.fmtNum(a - 4 * ba);
+            option.title = mf.fmtNum(-4 * ba);
+            option.color = "#E91E63";
+            lines[option.point] = props.priceSeries.createPriceLine(option);
+        }
         //
         targetToolRef.value.classList.remove("selected");
     } else {
@@ -105,7 +114,7 @@ function draw({ price }) {
         lines[option.point] = props.priceSeries.createPriceLine(option);
         param.points.push(option.point);
     }
-    store.dispatch("tradingDerivative/drawTools", param);
+    store.dispatch(`${props.storeModule}/drawTools`, param);
 }
 function load(points) {
     removeTargetTool(false);
@@ -135,44 +144,57 @@ function loadTargetTool(points) {
     option.color = "#F44336";
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
-    option.point = "X";
-    option.price = mf.fmtNum(a - 0.5 * ba);
-    option.title = mf.fmtNum(-0.5 * ba);
-    option.color = "#2196F3";
-    lines[option.point] = props.priceSeries.createPriceLine(option);
+    if (props.levels.includes(0.5)) {
+        option.point = "X";
+        option.price = mf.fmtNum(a - 0.5 * ba);
+        option.title = mf.fmtNum(-0.5 * ba);
+        option.color = "#2196F3";
+        lines[option.point] = props.priceSeries.createPriceLine(option);
+    }
     //
-    option.point = "Y";
-    option.price = mf.fmtNum(a - ba);
-    option.title = mf.fmtNum(-ba);
-    option.color = "#673AB7";
-    lines[option.point] = props.priceSeries.createPriceLine(option);
+    if (props.levels.includes(1)) {
+        option.point = "Y";
+        option.price = mf.fmtNum(a - ba);
+        option.title = mf.fmtNum(-ba);
+        option.color = "#673AB7";
+        lines[option.point] = props.priceSeries.createPriceLine(option);
+    }
     //
-    option.point = "Z";
-    option.price = mf.fmtNum(a - 2 * ba);
-    option.title = mf.fmtNum(-2 * ba);
-    option.color = "#9C27B0";
-    lines[option.point] = props.priceSeries.createPriceLine(option);
+    if (props.levels.includes(2)) {
+        option.point = "Z";
+        option.price = mf.fmtNum(a - 2 * ba);
+        option.title = mf.fmtNum(-2 * ba);
+        option.color = "#9C27B0";
+        lines[option.point] = props.priceSeries.createPriceLine(option);
+    }
     //
-    option.point = "W";
-    option.price = mf.fmtNum(a - 4 * ba);
-    option.title = mf.fmtNum(-4 * ba);
-    option.color = "#E91E63";
-    lines[option.point] = props.priceSeries.createPriceLine(option);
+    if (props.levels.includes(4)) {
+        option.point = "W";
+        option.price = mf.fmtNum(a - 4 * ba);
+        option.title = mf.fmtNum(-4 * ba);
+        option.color = "#E91E63";
+        lines[option.point] = props.priceSeries.createPriceLine(option);
+    }
 }
 function removeTargetTool(withServer = true) {
     if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
+        store.dispatch(`${props.storeModule}/drawTools`, {
             isRemove: true,
+            symbol: props.symbol,
             name: "target",
         });
     if (mf.isSet(lines.A)) {
         props.priceSeries.removePriceLine(lines.A);
         if (mf.isSet(lines.B)) {
             props.priceSeries.removePriceLine(lines.B);
-            props.priceSeries.removePriceLine(lines.X);
-            props.priceSeries.removePriceLine(lines.Y);
-            props.priceSeries.removePriceLine(lines.Z);
-            props.priceSeries.removePriceLine(lines.W);
+            if (props.levels.includes(0.5))
+                props.priceSeries.removePriceLine(lines.X);
+            if (props.levels.includes(1))
+                props.priceSeries.removePriceLine(lines.Y);
+            if (props.levels.includes(2))
+                props.priceSeries.removePriceLine(lines.Z);
+            if (props.levels.includes(4))
+                props.priceSeries.removePriceLine(lines.W);
         }
     }
     lines = {};
@@ -181,6 +203,7 @@ function drag({ lineOptions, newPrice }) {
     if (mf.isSet(lines.B)) {
         let param = {
             isRemove: false,
+            symbol: props.symbol,
             name: "target",
             points: [],
             data: [],
@@ -225,39 +248,47 @@ function drag({ lineOptions, newPrice }) {
         param.points.push(point);
         param.data.push(b);
         //
-        point = "X";
-        changeOptions = {
-            price: mf.fmtNum(a - 0.5 * ba),
-            title: mf.fmtNum(-0.5 * ba),
-        };
-        if (lineOptions.point === point) delete changeOptions.price;
-        lines[point].applyOptions(changeOptions);
+        if (props.levels.includes(0.5)) {
+            point = "X";
+            changeOptions = {
+                price: mf.fmtNum(a - 0.5 * ba),
+                title: mf.fmtNum(-0.5 * ba),
+            };
+            if (lineOptions.point === point) delete changeOptions.price;
+            lines[point].applyOptions(changeOptions);
+        }
         //
-        point = "Y";
-        changeOptions = {
-            price: mf.fmtNum(a - ba),
-            title: mf.fmtNum(-ba),
-        };
-        if (lineOptions.point === point) delete changeOptions.price;
-        lines[point].applyOptions(changeOptions);
+        if (props.levels.includes(1)) {
+            point = "Y";
+            changeOptions = {
+                price: mf.fmtNum(a - ba),
+                title: mf.fmtNum(-ba),
+            };
+            if (lineOptions.point === point) delete changeOptions.price;
+            lines[point].applyOptions(changeOptions);
+        }
         //
-        point = "Z";
-        changeOptions = {
-            price: mf.fmtNum(a - 2 * ba),
-            title: mf.fmtNum(-2 * ba),
-        };
-        if (lineOptions.point === point) delete changeOptions.price;
-        lines[point].applyOptions(changeOptions);
+        if (props.levels.includes(2)) {
+            point = "Z";
+            changeOptions = {
+                price: mf.fmtNum(a - 2 * ba),
+                title: mf.fmtNum(-2 * ba),
+            };
+            if (lineOptions.point === point) delete changeOptions.price;
+            lines[point].applyOptions(changeOptions);
+        }
         //
-        point = "W";
-        changeOptions = {
-            price: mf.fmtNum(a - 4 * ba),
-            title: mf.fmtNum(-4 * ba),
-        };
-        if (lineOptions.point === point) delete changeOptions.price;
-        lines[point].applyOptions(changeOptions);
+        if (props.levels.includes(4)) {
+            point = "W";
+            changeOptions = {
+                price: mf.fmtNum(a - 4 * ba),
+                title: mf.fmtNum(-4 * ba),
+            };
+            if (lineOptions.point === point) delete changeOptions.price;
+            lines[point].applyOptions(changeOptions);
+        }
         //
-        store.dispatch("tradingDerivative/drawTools", param);
+        store.dispatch(`${props.storeModule}/drawTools`, param);
     }
 }
 </script>
