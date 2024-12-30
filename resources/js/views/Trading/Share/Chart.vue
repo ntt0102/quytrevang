@@ -364,7 +364,17 @@ function getChartData(withVnindex = false, fromDate = null) {
             withVnindex,
         })
         .then((vnindex) => {
-            if (withVnindex) params.series.vnindex.setData(vnindex);
+            if (withVnindex) {
+                params.series.vnindex.setData(vnindex.prices);
+                if(vnindex.reversal) {
+                    state.series.price.setMarkers([
+                        {
+                            time: vnindex.reversal.time,
+                            color: "#9C27B0"
+                        }
+                    ]);
+                }
+            }
         });
 }
 function removeTools() {
