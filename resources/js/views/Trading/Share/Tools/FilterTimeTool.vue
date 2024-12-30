@@ -10,7 +10,7 @@
     </div>
 </template>
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -21,11 +21,8 @@ let series = {};
 let filterTimes = [];
 const colors = ["#F44336", "#FF9800", "#4CAF50", "#009688"];
 
-onMounted(() => {
-    watch(() => props.chart, createSeries);
-});
-
 defineExpose({
+    createSeries,
     isSelected,
     draw,
     load,

@@ -66,7 +66,6 @@
             />
             <FilterTimeTool
                 ref="filterTimeToolRef"
-                :chart="state.chart"
                 @hideContext="hideContext"
             />
             <CheckTool
@@ -107,10 +106,12 @@ import { DxAutocomplete } from "devextreme-vue/autocomplete";
 import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
+import { useI18n } from "vue-i18n";
 import { getUnixTime } from "date-fns";
 
 const store = useStore();
 const route = useRoute();
+const { t } = useI18n();
 const devices = inject("devices");
 const mf = inject("mf");
 const chartContainerRef = ref(null);
@@ -131,16 +132,20 @@ const chartFrom = computed(() => props.fromDate);
 const state = reactive({
     symbol: route.query.symbol ?? "VN30",
     inputSymbol: route.query.symbol ?? "VN30",
-    chart: {},
     series: {},
     watchlist: [],
 });
-let crosshair = {};
+let params = {
+    chart: {},
+    series: {},
+    crosshair: {},
+};
 
 onMounted(() => {
     initChart();
     getChartData(true);
     drawChart();
+    filterTimeToolRef.value.createSeries(params.chart);
     new ResizeObserver(chartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
 });
@@ -189,9 +194,10 @@ function drawChart() {
             color: "rgba(54, 54, 64, 0.2)",
         },
     };
-    state.chart = createChart(chartRef.value, CHART_OPTIONS);
-    state.chart.subscribeCrosshairMove(eventChartCrosshairMove);
-    state.series.vnindex = state.chart.addCandlestickSeries({
+    params.chart = createChart(chartRef.value, CHART_OPTIONS);
+    params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
+    params.chart.subscribeCustomPriceLineDragged(priceLineDrag);
+    params.series.vnindex = params.chart.addCandlestickSeries({
         priceScaleId: "vnindex",
         upColor: "#30A165",
         downColor: "#EC3F3F",
@@ -202,7 +208,7 @@ function drawChart() {
         scaleMargins: { top: 0.1, bottom: 0.55 },
         lastValueVisible: false,
     });
-    state.series.price = state.chart.addCandlestickSeries({
+    state.series.price = params.chart.addCandlestickSeries({
         upColor: "#30A165",
         downColor: "#EC3F3F",
         borderVisible: false,
@@ -220,14 +226,14 @@ function chartClick() {
     hideContext();
 
     if (filterTimeToolRef.value.isSelected()) {
-        filterTimeToolRef.value.draw({ time: crosshair.time });
+        filterTimeToolRef.value.draw({ time: params.crosshair.time });
     } else if (lineToolRef.value.isSelected()) {
         lineToolRef.value.draw({
-            price: coordinateToPrice(crosshair.y),
+            price: coordinateToPrice(params.crosshair.y),
         });
     } else if (targetToolRef.value.isSelected()) {
         targetToolRef.value.draw({
-            price: coordinateToPrice(crosshair.y),
+            price: coordinateToPrice(params.crosshair.y),
         });
     }
 }
@@ -240,22 +246,37 @@ function getFilterTimes() {
 function eventChartCrosshairMove(e) {
     if (e.time) {
         let price = e.seriesPrices.get(state.series.price);
-        crosshair.time = e.time;
-        crosshair.price = price;
+        params.crosshair.time = e.time;
+        params.crosshair.price = price;
     } else {
         if (!devices.phone) {
-            crosshair.time = null;
-            crosshair.price = null;
+            params.crosshair.time = null;
+            params.crosshair.price = null;
         }
     }
     if (e.point != undefined) {
-        crosshair.x = e.point.x;
-        crosshair.y = e.point.y;
+        params.crosshair.x = e.point.x;
+        params.crosshair.y = e.point.y;
+    }
+}
+function priceLineDrag(e) {
+    let line = e.customPriceLine;
+    let lineOptions = line.options();
+    lineOptions.price = mf.fmtNum(lineOptions.price);
+    const oldPrice = +e.fromPriceString;
+    const newPrice = lineOptions.price;
+    switch (lineOptions.lineType) {
+        case "line":
+            lineToolRef.value.drag({ lineOptions, oldPrice, newPrice });
+            break;
+        case "target":
+            targetToolRef.value.drag({ lineOptions, newPrice });
+            break;
     }
 }
 function chartResize() {
     if (chartContainerRef.value) {
-        state.chart.resize(
+        params.chart.resize(
             chartContainerRef.value.offsetWidth,
             chartContainerRef.value.offsetHeight
         );
@@ -298,7 +319,7 @@ function addWatchlist() {
 
 function loadChartData() {
     state.series.price.setData(store.state.tradingShare.prices);
-    state.chart.applyOptions({ watermark: { text: state.symbol } });
+    params.chart.applyOptions({ watermark: { text: state.symbol } });
 }
 function symbolChanged() {
     if (!state.inputSymbol || !state.inputSymbol.trim()) return false;
@@ -330,7 +351,7 @@ function getChartData(withVnindex = false, fromDate = null) {
             withVnindex,
         })
         .then((vnindex) => {
-            if (withVnindex) state.series.vnindex.setData(vnindex);
+            if (withVnindex) params.series.vnindex.setData(vnindex);
         });
 }
 function loadNextSymbol() {

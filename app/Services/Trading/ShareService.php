@@ -220,7 +220,9 @@ class ShareService extends CoreService
             $client = new \GuzzleHttp\Client();
             $url = "https://dchart-api.vndirect.com.vn/dchart/history?resolution=1D&symbol={$symbol}&from={$from}&to={$to}";
             $res = $client->get($url);
-            return json_decode($res->getBody());
+            $rsp = json_decode($res->getBody());
+            if (!$rsp) return (object)['s' => 'ng'];
+            return $rsp;
         } catch (\Throwable $th) {
             return (object)['s' => 'ng'];
         }
