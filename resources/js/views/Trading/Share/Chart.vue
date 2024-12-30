@@ -370,7 +370,9 @@ function getChartData(withVnindex = false, fromDate = null) {
                     params.series.vnindex.setMarkers([
                         {
                             time: vnindex.reversal.time,
-                            color: "#9C27B0"
+                            color: "#9C27B0",
+                            position: 'belowBar',     // Dưới thanh nến
+                            shape: 'arrowUp',
                         }
                     ]);
                 }
