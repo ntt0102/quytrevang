@@ -29,6 +29,21 @@ if (!function_exists('set_global_value')) {
     }
 }
 
+if (!function_exists('check_opening_market')) {
+    /**
+     * Check Opening Market
+     *
+     * @param DateTime $date
+     */
+    function check_opening_market($date)
+    {
+        if (in_array($date->format('w'), [0, 6])) return false;
+        $holidays = explode(",", get_global_value('holidays'));
+        if (in_array($date->format('Y-m-d'), $holidays)) return false;
+        return true;
+    }
+}
+
 if (!function_exists('in_trading_time')) {
     /**
      * Get start trading time.

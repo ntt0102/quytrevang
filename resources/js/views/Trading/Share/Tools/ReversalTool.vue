@@ -1,0 +1,152 @@
+<template>
+    <div
+        ref="reversalToolRef"
+        class="command"
+        :title="$t('trading.share.tools.reversal')"
+        @click="reversalToolClick"
+        @contextmenu="reversalToolContextmenu"
+    >
+        <i class="far fa-arrow-trend-down"></i>
+    </div>
+</template>
+<script setup>
+import { ref, computed, inject, watch } from "vue";
+import { useStore } from "vuex";
+
+const store = useStore();
+const props = defineProps(["symbol", "priceSeries"]);
+const emit = defineEmits(["hideContext"]);
+const reversalToolRef = ref(null);
+const prices = computed(() => store.state.tradingShare.prices);
+const toolStore = computed(() => store.state.tradingShare.tools.reversal);
+const TOOL_NAME = "reversal";
+const TOOL_COLOR = "#9C27B0";
+let series = {};
+let times = [];
+let reversal = null;
+let lineOption = {
+    lineType: TOOL_NAME,
+    color: TOOL_COLOR,
+    title: "R",
+    lineWidth: 1,
+    lineStyle: 1,
+    draggable: true,
+};
+let priceLine = null;
+
+defineExpose({
+    createSeries,
+    isSelected,
+    draw,
+});
+
+watch(toolStore, load);
+
+function isSelected() {
+    return reversalToolRef.value.classList.contains("selected");
+}
+function createSeries(chart) {
+    if (!chart) return false;
+    series = chart.addHistogramSeries({
+        priceScaleId: TOOL_NAME,
+        color: TOOL_COLOR,
+        scaleMargins: { top: 0, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+}
+function reversalToolClick(e) {
+    emit("hideContext");
+    const selected = e.target.classList.contains("selected");
+    document
+        .querySelectorAll(".tool-area > .command:not(.drawless)")
+        .forEach((el) => el.classList.remove("selected"));
+    if (!selected) {
+        removeReversalTool();
+        e.target.classList.add("selected");
+    }
+}
+function reversalToolContextmenu(e) {
+    removeReversalTool();
+    e.target.classList.remove("selected");
+}
+function draw({ time }) {
+    times.push({ time, value: 1 });
+    series.setData(times);
+    if (times.length === 2) {
+        reversal = scan(times[0].time, times[1].time);
+        loadReversalTool(reversal);
+        store.dispatch("tradingShare/drawTools", {
+            isRemove: false,
+            symbol: props.symbol,
+            name: TOOL_NAME,
+            points: [0],
+            data: [reversal],
+        });
+        times = [];
+        reversalToolRef.value.classList.remove("selected");
+    }
+}
+function scan(startTime, endTime) {
+    let B, bTime, pr, ir;
+    const _prices = prices.value;
+    const data = _prices.filter(
+        (item) => item.time >= startTime && item.time <= endTime
+    );
+    for (let i = 0; i < data.length; i++) {
+        const t = data[i].time;
+        const c = data[i].close;
+        const h = data[i].high;
+        const l = data[i].low;
+        const pH = { i, p: h };
+        const pL = { i, p: l };
+        if (i === 0) {
+            B = { H: pL, L: pL };
+            pr = 0;
+            ir = 0;
+            bTime = t;
+        } else {
+            if (h > B.H.p) B.H = pH;
+            else B.H.i = i;
+            if (l < B.L.p) {
+                bTime = t;
+                if (c < B.L.p) {
+                    const _pr = B.H.p - B.L.p;
+                    const _ir = B.H.i - B.L.i;
+                    if (_pr > pr) pr = _pr;
+                    if (_ir > ir) ir = _ir;
+                    B = { H: pL, L: pL };
+                }
+            }
+        }
+    }
+    const bIndex = _prices.findIndex((item) => item.time === bTime);
+    const time = _prices[bIndex + ir].time;
+    const price = B.L.p + pr;
+    return { time, price };
+}
+function load(data) {
+    console.log("loadReversalTool", data);
+    removeReversalTool(false);
+    if (data) loadReversalTool(data[0]);
+}
+function loadReversalTool(reversal) {
+    series.setData([{ time: reversal.time, value: 1 }]);
+    lineOption.price = reversal.price;
+    priceLine = props.priceSeries.createPriceLine(lineOption);
+}
+function removeReversalTool(withServer = true) {
+    if (withServer)
+        store.dispatch("tradingShare/drawTools", {
+            isRemove: true,
+            symbol: props.symbol,
+            name: TOOL_NAME,
+        });
+    series.setData([]);
+    if (priceLine) {
+        props.priceSeries.removePriceLine(priceLine);
+        priceLine = null;
+    }
+    reversal = {};
+}
+</script>

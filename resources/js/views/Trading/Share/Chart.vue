@@ -63,6 +63,8 @@
                 :vpsUser="state.vpsUser"
                 :vpsSession="state.vpsSession"
                 :chartContainerRef="chartContainerRef"
+                :symbol="state.symbol"
+                timeframe="1D"
             />
             <FilterTimeTool
                 ref="filterTimeToolRef"
@@ -72,6 +74,12 @@
                 ref="checkToolRef"
                 :symbol="state.symbol"
                 @checkSymbol="checkSymbol"
+                @hideContext="hideContext"
+            />
+            <ReversalTool
+                ref="reversalToolRef"
+                :symbol="state.symbol"
+                :priceSeries="state.series.price"
                 @hideContext="hideContext"
             />
             <LineTool
@@ -98,6 +106,7 @@ import FullscreenTool from "../Derivative/Tools/FullscreenTool.vue";
 import TradingviewTool from "../Derivative/Tools/TradingviewTool.vue";
 import FilterTimeTool from "./Tools/FilterTimeTool.vue";
 import CheckTool from "./Tools/CheckTool.vue";
+import ReversalTool from "./Tools/ReversalTool.vue";
 import LineTool from "../Derivative/Tools/LineTool.vue";
 import TargetTool from "../Derivative/Tools/TargetTool.vue";
 
@@ -120,6 +129,7 @@ const symbolAutocompleteRef = ref(null);
 const fullscreenToolRef = ref(null);
 const filterTimeToolRef = ref(null);
 const checkToolRef = ref(null);
+const reversalToolRef = ref(null);
 const lineToolRef = ref(null);
 const targetToolRef = ref(null);
 
@@ -146,6 +156,7 @@ onMounted(() => {
     getChartData(true);
     drawChart();
     filterTimeToolRef.value.createSeries(params.chart);
+    reversalToolRef.value.createSeries(params.chart);
     new ResizeObserver(chartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", eventKeyPress);
 });
@@ -227,6 +238,8 @@ function chartClick() {
 
     if (filterTimeToolRef.value.isSelected()) {
         filterTimeToolRef.value.draw({ time: params.crosshair.time });
+    } else if (reversalToolRef.value.isSelected()) {
+        reversalToolRef.value.draw({ time: params.crosshair.time });
     } else if (lineToolRef.value.isSelected()) {
         lineToolRef.value.draw({
             price: coordinateToPrice(params.crosshair.y),

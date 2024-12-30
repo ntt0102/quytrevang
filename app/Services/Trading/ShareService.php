@@ -62,9 +62,18 @@ class ShareService extends CoreService
                 'close' => $data->c[$i]
             ];
         }
+        $date = new \DateTime();
+        $date->modify('+1 day');
+        $dayCount = 0;
+        while ($dayCount <= 60) {
+            if (check_opening_market($date)) {
+                $chart[] = ['time' => $date->getTimestamp()];
+                $dayCount++;
+            }
+            $date->modify('+1 day');
+        }
         return $chart;
     }
-
     /**
      * Get chart tool
      *

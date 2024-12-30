@@ -44,17 +44,9 @@ class UpdateOpeningMarketJob implements ShouldQueue
     private function getLastOpeningDate()
     {
         $date = new \DateTime();
-        while (!$this->checkOpeningMarket($date)) {
+        while (!check_opening_market($date)) {
             $date->modify('-1 day');
         }
         return $date->format('Y-m-d');
-    }
-
-    private function checkOpeningMarket($date)
-    {
-        if (in_array($date->format('w'), [0, 6])) return false;
-        $holidays = explode(",", get_global_value('holidays'));
-        if (in_array($date->format('Y-m-d'), $holidays)) return false;
-        return true;
     }
 }

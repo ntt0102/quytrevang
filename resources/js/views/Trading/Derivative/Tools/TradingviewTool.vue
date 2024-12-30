@@ -15,11 +15,17 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
 
-const props = defineProps(["vpsUser", "vpsSession", "chartContainerRef"]);
+const props = defineProps([
+    "vpsUser",
+    "vpsSession",
+    "chartContainerRef",
+    "symbol",
+    "timeframe",
+]);
 const tradingviewRef = ref(null);
 const showTradingView = ref(false);
 const tradingViewSrc = computed(() => {
-    return `https://chart.vps.com.vn/tv/?u=${props.vpsUser}&s=${props.vpsSession}&symbol=VN30F1M&resolution=1&lang=vi`;
+    return `https://chart.vps.com.vn/tv/?u=${props.vpsUser}&s=${props.vpsSession}&symbol=${props.symbol}&resolution=${props.timeframe}&lang=vi`;
 });
 onMounted(() => {
     window.addEventListener("keydown", shortcutHandle);

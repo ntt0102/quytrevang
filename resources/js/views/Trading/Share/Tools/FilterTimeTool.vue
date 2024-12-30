@@ -14,7 +14,7 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const props = defineProps(["chart"]);
+const props = defineProps([]);
 const emit = defineEmits(["hideContext"]);
 const filterTimeToolRef = ref(null);
 let series = {};
@@ -53,12 +53,12 @@ function filterTimeToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
-        removefilterTimeTool();
+        removeFilterTimeTool();
         e.target.classList.add("selected");
     }
 }
 function filterTimeToolContextmenu(e) {
-    removefilterTimeTool();
+    removeFilterTimeTool();
     e.target.classList.remove("selected");
 }
 function draw({ time }) {
@@ -81,7 +81,7 @@ function load(data) {
     }
     series.setData(filterTimes);
 }
-function removefilterTimeTool(withServer = true) {
+function removeFilterTimeTool(withServer = true) {
     if (withServer)
         store.dispatch("tradingShare/drawTools", {
             isRemove: true,
