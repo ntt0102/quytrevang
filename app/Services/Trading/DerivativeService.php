@@ -127,9 +127,10 @@ class DerivativeService extends CoreService
     public function getTools()
     {
         $result = array();
-        $tools = StockDrawing::where('symbol', 'VN30F1M')->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
+        $symbol = 'VN30F1M';
+        $tools = StockDrawing::where('symbol', $symbol)->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
         foreach ($tools as $tool) {
-            if (!isset($result[$tool->name])) $result[$tool->name] = array();
+            if (!isset($result[$tool->name])) $result[$tool->name] = [];
             $result[$tool->name][$tool->point] = $tool->data;
         }
         return $result;

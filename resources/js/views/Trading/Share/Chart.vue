@@ -152,9 +152,9 @@ let params = {
 };
 
 onMounted(() => {
+    drawChart();
     initChart();
     getChartData(true);
-    drawChart();
     filterTimeToolRef.value.createSeries(params.chart);
     reversalToolRef.value.createSeries(params.chart);
     new ResizeObserver(chartResize).observe(chartContainerRef.value);
@@ -356,7 +356,7 @@ function initChart() {
 function getChartData(withVnindex = false, fromDate = null) {
     if (!state.symbol) return false;
     if (!fromDate) fromDate = chartFrom.value;
-    console.log(fromDate);
+    if (!withVnindex) removeTools();
     store
         .dispatch("tradingShare/getChartData", {
             symbol: state.symbol,
@@ -366,6 +366,11 @@ function getChartData(withVnindex = false, fromDate = null) {
         .then((vnindex) => {
             if (withVnindex) params.series.vnindex.setData(vnindex);
         });
+}
+function removeTools() {
+    reversalToolRef.value.remove();
+    lineToolRef.value.remove();
+    targetToolRef.value.remove();
 }
 function loadNextSymbol() {
     moveSymbolInGroup();

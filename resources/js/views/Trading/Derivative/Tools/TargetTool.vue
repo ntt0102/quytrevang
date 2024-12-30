@@ -25,6 +25,7 @@ defineExpose({
     isSelected,
     draw,
     drag,
+    remove,
 });
 
 watch(targetStore, (data) => {
@@ -175,6 +176,9 @@ function loadTargetTool(points) {
         option.color = "#E91E63";
         lines[option.point] = props.priceSeries.createPriceLine(option);
     }
+}
+function remove() {
+    removeTargetTool(false);
 }
 function removeTargetTool(withServer = true) {
     if (withServer)

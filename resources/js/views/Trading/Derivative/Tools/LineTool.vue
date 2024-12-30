@@ -38,6 +38,7 @@ defineExpose({
     hide,
     draw,
     drag,
+    remove,
 });
 
 watch(lineStore, (data) => {
@@ -121,6 +122,9 @@ function loadLineTool(data) {
         options.title = title;
         lines.push(props.priceSeries.createPriceLine(options));
     });
+}
+function remove() {
+    removeLineTool(false);
 }
 function removeLineTool(withServer = true) {
     if (lines.length > 0) {

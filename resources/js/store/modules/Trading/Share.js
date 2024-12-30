@@ -3,7 +3,7 @@ function initialState() {
         groups: [],
         symbols: [],
         prices: [],
-        tools: [],
+        tools: {},
         isLoading: false,
     };
 }
@@ -34,17 +34,20 @@ const actions = {
         });
     },
     getGroups({ commit, dispatch, getters, state, rootGetters }) {
+        commit("setLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .post("trading/share/get-groups", {}, { noLoading: true })
                 .then((response) => {
                     commit("setGroups", response.data);
+                    commit("setLoading", false);
                     resolve();
                 });
         });
     },
     getSymbols({ commit, dispatch, getters, state, rootGetters }, group) {
         if (!group) return commit("setSymbols", []);
+        commit("setLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .post(
@@ -54,6 +57,7 @@ const actions = {
                 )
                 .then((response) => {
                     commit("setSymbols", response.data);
+                    commit("setLoading", false);
                     resolve();
                 });
         });
@@ -86,7 +90,6 @@ const actions = {
             axios
                 .post("trading/share/delete-watchlist", {}, { noLoading: true })
                 .then((response) => {
-                    // dispatch("getSymbols");
                     resolve();
                 });
         });
@@ -96,7 +99,6 @@ const actions = {
             axios
                 .post("trading/share/draw-tools", param, { noLoading: true })
                 .then((response) => {
-                    // dispatch("getSymbols");
                     resolve();
                 });
         });

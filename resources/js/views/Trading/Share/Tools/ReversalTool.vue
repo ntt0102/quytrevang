@@ -10,7 +10,7 @@
     </div>
 </template>
 <script setup>
-import { ref, computed, inject, watch } from "vue";
+import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
@@ -38,9 +38,12 @@ defineExpose({
     createSeries,
     isSelected,
     draw,
+    remove,
 });
 
-watch(toolStore, load);
+watch(toolStore, (data) => {
+    if (data) load(data[0]);
+});
 
 function isSelected() {
     return reversalToolRef.value.classList.contains("selected");
@@ -72,7 +75,6 @@ function reversalToolContextmenu(e) {
 }
 function draw({ time }) {
     times.push({ time, value: 1 });
-    series.setData(times);
     if (times.length === 2) {
         reversal = scan(times[0].time, times[1].time);
         loadReversalTool(reversal);
@@ -85,7 +87,7 @@ function draw({ time }) {
         });
         times = [];
         reversalToolRef.value.classList.remove("selected");
-    }
+    } else series.setData(times);
 }
 function scan(startTime, endTime) {
     let B, bTime, pr, ir;
@@ -126,27 +128,30 @@ function scan(startTime, endTime) {
     return { time, price };
 }
 function load(data) {
-    console.log("loadReversalTool", data);
     removeReversalTool(false);
-    if (data) loadReversalTool(data[0]);
+    loadReversalTool(data);
 }
 function loadReversalTool(reversal) {
     series.setData([{ time: reversal.time, value: 1 }]);
     lineOption.price = reversal.price;
     priceLine = props.priceSeries.createPriceLine(lineOption);
 }
+function remove() {
+    removeReversalTool(false);
+}
 function removeReversalTool(withServer = true) {
-    if (withServer)
+    if (withServer) {
         store.dispatch("tradingShare/drawTools", {
             isRemove: true,
             symbol: props.symbol,
             name: TOOL_NAME,
         });
+    }
+    reversal = {};
     series.setData([]);
     if (priceLine) {
         props.priceSeries.removePriceLine(priceLine);
         priceLine = null;
     }
-    reversal = {};
 }
 </script>

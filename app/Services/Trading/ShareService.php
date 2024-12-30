@@ -83,12 +83,13 @@ class ShareService extends CoreService
     public function getTools($payload)
     {
         $result = array();
-        $ss = StockDrawing::where('symbol', $payload->symbol)->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
-        foreach ($ss as $d) {
-            if (!isset($result[$d->name])) $result[$d->name] = array();
-            $result[$d->name][$d->point] = $d->data;
+        $symbol = $payload->symbol;
+        $tools = StockDrawing::where('symbol', $symbol)->orderByRaw("name ASC, point ASC")->get(['name', 'point', 'data']);
+        foreach ($tools as $tool) {
+            if (!isset($result[$tool->name])) $result[$tool->name] = [];
+            $result[$tool->name][$tool->point] = $tool->data;
         }
-        return $result;
+        return (object)$result;
     }
 
     /**
