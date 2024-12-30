@@ -37,13 +37,12 @@ class ShareService extends CoreService
      */
     public function getChart($payload)
     {
-        $symbol = $payload->symbol;
         $data = [
-            'prices' => $this->getChartData($symbol, $payload->from),
+            'prices' => $this->getChartData($payload->symbol, $payload->from),
             'tools' => $this->getTools($payload),
         ];
         if ($payload->withVnindex) {
-            $reversal = StockDrawing::where('symbol', $symbol)
+            $reversal = StockDrawing::where('symbol', 'VNINDEX')
             ->where('name', 'reversal')
             ->where('point', '0')->value('data');
             $data['vnindex'] = [
