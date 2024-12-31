@@ -66,11 +66,13 @@ function reversalToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         removeReversalTool();
+        emit("vnindexUpdated");
         e.target.classList.add("selected");
     }
 }
 function reversalToolContextmenu(e) {
     removeReversalTool();
+    emit("vnindexUpdated");
     e.target.classList.remove("selected");
 }
 function draw({ time }) {
@@ -152,6 +154,5 @@ function removeReversalTool(withServer = true) {
         props.priceSeries.removePriceLine(priceLine);
         priceLine = null;
     }
-    emit("vnindexUpdated");
 }
 </script>
