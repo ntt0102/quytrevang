@@ -58,7 +58,8 @@ function filterTimeToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
-        removeFilterTimeTool();
+        filterTimes.pop();
+        series.setData(filterTimes);
         e.target.classList.add("selected");
     }
 }
