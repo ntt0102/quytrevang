@@ -80,6 +80,7 @@
                 ref="reversalToolRef"
                 :symbol="state.symbol"
                 :priceSeries="state.series.price"
+                @vnindexUpdated="updateVnindexMarker"
                 @hideContext="hideContext"
             />
             <LineTool
@@ -366,18 +367,23 @@ function getChartData(withVnindex = false, fromDate = null) {
         .then((vnindex) => {
             if (withVnindex) {
                 params.series.vnindex.setData(vnindex.prices);
-                if(vnindex.reversal) {
-                    params.series.vnindex.setMarkers([
-                        {
-                            time: vnindex.reversal.time,
-                            color: "#9C27B0",
-                            position: 'aboveBar',
-                            shape: 'circle',
-                        }
-                    ]);
+                if (vnindex.reversal) {
+                    updateVnindexMarker(vnindex.reversal.time);
                 }
             }
         });
+}
+function updateVnindexMarker(time) {
+    let markers = [];
+    if (time) {
+        markers.push({
+            time: time,
+            color: "#9C27B0",
+            position: "aboveBar",
+            shape: "circle",
+        });
+    }
+    params.series.vnindex.setMarkers(markers);
 }
 function removeTools() {
     reversalToolRef.value.remove();

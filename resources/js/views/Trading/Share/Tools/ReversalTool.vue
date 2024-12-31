@@ -15,7 +15,7 @@ import { useStore } from "vuex";
 
 const store = useStore();
 const props = defineProps(["symbol", "priceSeries"]);
-const emit = defineEmits(["hideContext"]);
+const emit = defineEmits(["vnindexUpdated", "hideContext"]);
 const reversalToolRef = ref(null);
 const prices = computed(() => store.state.tradingShare.prices);
 const toolStore = computed(() => store.state.tradingShare.tools.reversal);
@@ -85,6 +85,7 @@ function draw({ time }) {
             points: [0],
             data: [reversal],
         });
+        if (props.symbol === "VNINDEX") emit("vnindexUpdated", reversal.time);
         times = [];
         reversalToolRef.value.classList.remove("selected");
     } else series.setData(times);
@@ -151,5 +152,6 @@ function removeReversalTool(withServer = true) {
         props.priceSeries.removePriceLine(priceLine);
         priceLine = null;
     }
+    emit("vnindexUpdated");
 }
 </script>
