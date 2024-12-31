@@ -28,19 +28,16 @@ const actions = {
             axios
                 .get("trading/share/init-chart", { noLoading: true })
                 .then((response) => {
-                    commit("setLoading", false);
                     resolve(response.data);
                 });
         });
     },
     getGroups({ commit, dispatch, getters, state, rootGetters }) {
-        commit("setLoading", true);
         return new Promise((resolve, reject) => {
             axios
                 .post("trading/share/get-groups", {}, { noLoading: true })
                 .then((response) => {
                     commit("setGroups", response.data);
-                    commit("setLoading", false);
                     resolve();
                 });
         });
