@@ -76,21 +76,17 @@ const actions = {
             });
         });
     },
-    addWatchlist({ commit, dispatch, getters, state, rootGetters }, param) {
+    changeWatchlist({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
-                .post("trading/share/add-watchlist", param, { noLoading: true })
+                .post("trading/share/change-watchlist", param, {
+                    noLoading: true,
+                })
                 .then((response) => {
-                    resolve(response.data);
-                });
-        });
-    },
-    deleteWatchlist({ commit, dispatch, getters, state, rootGetters }) {
-        return new Promise((resolve, reject) => {
-            axios
-                .post("trading/share/delete-watchlist", {}, { noLoading: true })
-                .then((response) => {
-                    resolve();
+                    if (param.group === "WATCH") {
+                        commit("setSymbols", response.data.watchlist);
+                    }
+                    resolve(response.data.watchlist);
                 });
         });
     },

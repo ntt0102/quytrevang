@@ -29,11 +29,11 @@
                 ref="addWatchlistToolRef"
                 class="command far"
                 :class="{
-                    'fa-minus-circle': inWatchlist,
-                    'fa-plus-circle': !inWatchlist,
+                    'fa-heart-circle-minus': inWatchlist,
+                    'fa-heart-circle-plus': !inWatchlist,
                 }"
-                :title="$t('trading.share.addWatchlist')"
-                @click="addWatchlist"
+                :title="$t('trading.share.changeWatchlist')"
+                @click="changeWatchlist"
             ></div>
             <div
                 class="command"
@@ -134,7 +134,7 @@ const reversalToolRef = ref(null);
 const lineToolRef = ref(null);
 const targetToolRef = ref(null);
 
-const props = defineProps(["fromDate"]);
+const props = defineProps(["fromDate", "group"]);
 const isLoading = computed(() => store.state.tradingShare.isLoading);
 const showWatchlist = computed(() => state.symbol);
 const inWatchlist = computed(() => state.watchlist.includes(state.symbol));
@@ -167,7 +167,7 @@ watch(() => store.state.tradingShare.prices, loadChartData);
 defineExpose({
     getFilterTimes,
     getChartData,
-    clearWatchlist,
+    updateWatchlist,
 });
 
 function drawChart() {
@@ -307,7 +307,7 @@ function eventKeyPress(e) {
                 moveSymbolInGroup(false);
                 break;
             case "NumpadDecimal":
-                addWatchlist();
+                changeWatchlist();
                 break;
             case "Space":
                 state.inputSymbol = "";
@@ -316,17 +316,18 @@ function eventKeyPress(e) {
         }
     }
 }
-function clearWatchlist() {
-    state.watchlist = [];
+function updateWatchlist(data) {
+    state.watchlist = data;
 }
-function addWatchlist() {
+function changeWatchlist() {
     if (!state.symbol) return false;
     const param = {
+        multi: false,
+        group: props.group,
         symbol: state.symbol,
         add: !inWatchlist.value,
     };
-    store.dispatch("tradingShare/addWatchlist", param).then((data) => {
-        console.log("watchlist", data);
+    store.dispatch("tradingShare/changeWatchlist", param).then((data) => {
         state.watchlist = mf.isSet(data) ? data : [];
     });
 }

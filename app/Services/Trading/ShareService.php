@@ -187,38 +187,36 @@ class ShareService extends CoreService
     }
 
     /**
-     * Add Watchlist
+     * Update Watchlist
      *
      * @param $payload
      * 
      */
-    public function addWatchlist($payload)
+    public function changeWatchlist($payload)
     {
-        $symbol = $payload->symbol;
-        $watch = ShareSymbol::where('name', 'WATCH')->first();
-        if (!$watch) {
-            ShareSymbol::create(['name' => 'WATCH', 'symbols' => [$symbol]]);
-            return [$symbol];
+        if ($payload->multi) {
+            $symbols = [];
+            if ($payload->add) {
+                $filter = ShareSymbol::where('name', 'FILTER')->first();
+                $symbols = $filter->symbols;
+            }
+            $stt = ShareSymbol::updateOrCreate(['name' => 'WATCH'], ['symbols' => $symbols]);
+            return ['isOk' => !!$stt, 'watchlist' => $symbols];
         } else {
-            $symbols = $watch->symbols;
-            if ($payload->add) array_push($symbols, $symbol);
-            else $symbols = array_values(array_diff($symbols, [$symbol]));
-            $watch->symbols = $symbols;
-            $watch->save();
-            return $symbols;
+            $symbol = $payload->symbol;
+            $watch = ShareSymbol::where('name', 'WATCH')->first();
+            if (!$watch) {
+                ShareSymbol::create(['name' => 'WATCH', 'symbols' => [$symbol]]);
+                return ['watchlist' => [$symbol]];
+            } else {
+                $symbols = $watch->symbols;
+                if ($payload->add) array_push($symbols, $symbol);
+                else $symbols = array_values(array_diff($symbols, [$symbol]));
+                $watch->symbols = $symbols;
+                $watch->save();
+                return ['watchlist' => $symbols];
+            }
         }
-    }
-
-    /**
-     * Delete Watchlist
-     *
-     * @param $payload
-     * 
-     */
-    public function deleteWatchlist($payload)
-    {
-        $stt = ShareSymbol::updateOrCreate(['name' => 'WATCH'], ['symbols' => []]);
-        return ['isOk' => !!$stt];
     }
 
     public function getGroupSymbols($group)

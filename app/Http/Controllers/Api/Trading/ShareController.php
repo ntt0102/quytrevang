@@ -96,21 +96,9 @@ class ShareController extends CoreController
      * 
      * @return \Illuminate\Http\Response
      */
-    public function addWatchlist(Request $request)
+    public function changeWatchlist(Request $request)
     {
-        $data = $this->shareService->addWatchlist($this->payload);
-        return $this->sendResponse($data);
-    }
-    /**
-     * Delete Watchlist
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function deleteWatchlist(Request $request)
-    {
-        $data = $this->shareService->deleteWatchlist($this->payload);
+        $data = $this->shareService->changeWatchlist($this->payload);
         return $this->sendResponse($data);
     }
     /**

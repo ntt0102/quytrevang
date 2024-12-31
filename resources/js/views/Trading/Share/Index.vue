@@ -46,11 +46,15 @@
                 },
                 {
                     location: 'after',
-                    widget: 'dxButton',
+                    widget: 'dxDropDownButton',
                     options: {
-                        icon: 'far fa-trash-xmark small',
-                        hint: $t('trading.share.deleteWatchList'),
-                        onClick: deleteWatchlist,
+                        showArrowIcon: false,
+                        items: state.watchlistActions,
+                        displayExpr: 'text',
+                        keyExpr: 'value',
+                        icon: 'far fa-heart-circle-bolt small',
+                        dropDownOptions: { width: '220' },
+                        onItemClick: watchlistItemClick,
                     },
                 },
                 {
@@ -64,7 +68,7 @@
                 },
             ]"
         />
-        <Chart :fromDate="state.fromDate" ref="chartRef" />
+        <Chart :fromDate="state.fromDate" :group="state.group" ref="chartRef" />
     </div>
 </template>
 
@@ -90,6 +94,18 @@ const symbolsLength = computed(() => store.state.tradingShare.symbols.length);
 const state = reactive({
     group: route.query.list ?? "",
     fromDate: subYears(new Date(), 5),
+    watchlistActions: [
+        {
+            icon: "far fa-heart-circle-plus small",
+            text: t("trading.share.filterWatchList"),
+            value: true,
+        },
+        {
+            icon: "far fa-heart-circle-minus small",
+            text: t("trading.share.deleteWatchList"),
+            value: false,
+        },
+    ],
 });
 
 store.dispatch("tradingShare/getGroups");
@@ -103,12 +119,17 @@ function fromDateChanged({ value }) {
     state.fromDate = value;
     chartRef.value.getChartData(true, value);
 }
-function deleteWatchlist() {
-    bus.emit("checkPin", () =>
-        store.dispatch("tradingShare/deleteWatchlist").then(() => {
-            chartRef.value.clearWatchlist();
-        })
-    );
+function watchlistItemClick({ itemData }) {
+    bus.emit("checkPin", () => {
+        const param = {
+            multi: true,
+            group: state.group,
+            add: itemData.value,
+        };
+        store.dispatch("tradingShare/changeWatchlist", param).then((data) => {
+            chartRef.value.updateWatchlist(data);
+        });
+    });
 }
 function filterClick() {
     const group = state.group;
