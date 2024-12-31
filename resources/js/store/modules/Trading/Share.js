@@ -16,9 +16,11 @@ const actions = {
             axios
                 .get("trading/share", { params, noLoading: true })
                 .then((response) => {
-                    commit("setChartData", response.data);
-                    commit("setLoading", false);
                     resolve(response.data.vnindex);
+                    setTimeout(() => {
+                        commit("setChartData", response.data);
+                        commit("setLoading", false);
+                    }, 0);
                 });
         });
     },

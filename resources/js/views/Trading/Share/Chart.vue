@@ -358,7 +358,6 @@ function initChart() {
 function getChartData(withVnindex = false, fromDate = null) {
     if (!state.symbol) return false;
     if (!fromDate) fromDate = chartFrom.value;
-    if (!withVnindex) removeTools();
     store
         .dispatch("tradingShare/getChartData", {
             symbol: state.symbol,
@@ -371,7 +370,7 @@ function getChartData(withVnindex = false, fromDate = null) {
                 if (vnindex.reversal) {
                     updateVnindexMarker(vnindex.reversal.time);
                 }
-            }
+            } else removeTools();
         });
 }
 function updateVnindexMarker(time) {
