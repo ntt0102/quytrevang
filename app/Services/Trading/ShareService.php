@@ -43,8 +43,8 @@ class ShareService extends CoreService
         ];
         if ($payload->withVnindex) {
             $reversal = StockDrawing::where('symbol', 'VNINDEX')
-            ->where('name', 'reversal')
-            ->where('point', '0')->value('data');
+                ->where('name', 'reversal')
+                ->where('point', '0')->value('data');
             $data['vnindex'] = [
                 'prices' => $this->getChartData("VNINDEX", $payload->from),
                 'reversal' => $reversal,
@@ -125,7 +125,10 @@ class ShareService extends CoreService
      */
     public function getGroups()
     {
-        return ShareSymbol::get('name')->pluck('name');
+        $groups = ShareSymbol::pluck('name');
+        $hasHold = ShareOrder::opening()->exists();
+        if ($hasHold) $groups->push('HOLD');
+        return $groups;
     }
 
     /**
@@ -135,7 +138,7 @@ class ShareService extends CoreService
     public function getSymbols($group)
     {
         if ($group === 'HOLD') {
-            return ShareOrder::opening()->get('symbol')->pluck('symbol');
+            return ShareOrder::opening()->pluck('symbol');
         } else if (in_array($group, ['FILTER', 'WATCH'])) {
             $filter = ShareSymbol::where('name', $group)->first();
             return $filter ? $filter->symbols : [];

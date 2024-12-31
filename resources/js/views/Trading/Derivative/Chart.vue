@@ -77,7 +77,7 @@
                 :vpsUser="config.vpsUser"
                 :vpsSession="config.vpsSession"
                 :chartContainerRef="chartContainerRef"
-                :symbol="config.vn30f1m"
+                symbol="VN30F1M"
                 timeframe="1"
             />
             <ProgressTool
