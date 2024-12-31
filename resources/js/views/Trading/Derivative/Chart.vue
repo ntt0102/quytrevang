@@ -229,35 +229,6 @@ const orderToolRef = ref(null);
 const entryOrderRef = ref(null);
 const tpslOrderRef = ref(null);
 
-const CHART_OPTIONS = {
-    localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
-    rightPriceScale: {
-        visible: true,
-        scaleMargins: { top: 0.25, bottom: 0.25 },
-    },
-    leftPriceScale: { visible: false },
-    layout: {
-        backgroundColor: "#000000",
-        textColor: "#CCCCCC",
-    },
-    grid: {
-        vertLines: {
-            color: "#1B1E27",
-            style: 2,
-        },
-        horzLines: {
-            color: "#1B1E27",
-            style: 2,
-        },
-    },
-    crosshair: { mode: 0 },
-    timeScale: {
-        timeVisible: true,
-        rightOffset: 1000,
-        minBarSpacing: 0.01,
-        barSpacing: 0.05,
-    },
-};
 const CURRENT_DATE = format(new Date(), "yyyy-MM-dd");
 const TIME = {
     START: getUnixTime(new Date(`${CURRENT_DATE}T08:45:00Z`)),
@@ -337,6 +308,35 @@ defineExpose({
 });
 
 function drawChart() {
+    const CHART_OPTIONS = {
+        localization: { dateFormat: "dd/MM/yyyy", locale: "vi-VN" },
+        rightPriceScale: {
+            visible: true,
+            scaleMargins: { top: 0.25, bottom: 0.25 },
+        },
+        leftPriceScale: { visible: false },
+        layout: {
+            backgroundColor: "#000000",
+            textColor: "#CCCCCC",
+        },
+        grid: {
+            vertLines: {
+                color: "#1B1E27",
+                style: 2,
+            },
+            horzLines: {
+                color: "#1B1E27",
+                style: 2,
+            },
+        },
+        crosshair: { mode: 0 },
+        timeScale: {
+            timeVisible: true,
+            rightOffset: 1000,
+            minBarSpacing: 0.01,
+            barSpacing: 0.05,
+        },
+    };
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
     params.chart.subscribeCrosshairMove(chartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(priceLineDrag);

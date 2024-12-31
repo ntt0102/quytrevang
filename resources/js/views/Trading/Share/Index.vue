@@ -74,7 +74,7 @@
 
 <script setup>
 import Chart from "./Chart.vue";
-import { reactive, ref, inject, computed } from "vue";
+import { reactive, ref, inject, computed, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
@@ -109,6 +109,10 @@ const state = reactive({
 });
 
 store.dispatch("tradingShare/getGroups");
+
+onUnmounted(() => {
+    store.dispatch("tradingShare/resetState");
+});
 
 function groupChanged({ component }) {
     const value = component.option("value");
