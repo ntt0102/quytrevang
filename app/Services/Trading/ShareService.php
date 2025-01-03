@@ -355,8 +355,9 @@ class ShareService extends CoreService
             $range['long'] = round($points->Hl->p - $points->Ll->p, 2);
         }
         $ratios = [];
-        for ($i = 1; $i < count($range); $i++) {
-            $ratios[] = round($range[$i - 1] / $range[$i], 2);
+        $rangeArr = array_values($range);
+        for ($i = 1; $i < count($rangeArr); $i++) {
+            $ratios[] = round($rangeArr[$i - 1] / $rangeArr[$i], 2);
         }
         $ascRange = $range;
         asort($ascRange);
