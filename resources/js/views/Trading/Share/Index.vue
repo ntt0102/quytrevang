@@ -49,7 +49,7 @@
                     widget: 'dxDropDownButton',
                     options: {
                         showArrowIcon: false,
-                        items: state.dataSources,
+                        items: sources,
                         selectedItemKey: source,
                         stylingMode: 'text',
                         useSelectMode: true,
@@ -106,11 +106,11 @@ const chartRef = ref(null);
 const groups = computed(() => store.state.tradingShare.groups);
 const symbolsLength = computed(() => store.state.tradingShare.symbols.length);
 const source = computed(() => store.state.tradingShare.source);
+const sources = computed(() => store.state.tradingShare.sources);
 
 const state = reactive({
     group: route.query.list ?? "",
     fromDate: subYears(new Date(), 5),
-    dataSources: ["VND", "SHS"],
     watchlistActions: [
         {
             icon: "far fa-heart-circle-plus small",

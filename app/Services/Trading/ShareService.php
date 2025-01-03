@@ -25,6 +25,7 @@ class ShareService extends CoreService
         return [
             'vpsUser' => get_global_value('vpsUser'),
             'vpsSession' => get_global_value('vpsSession'),
+            'sources' => ['VND', 'PINE'],
             'source' => get_global_value('shareSource'),
             'filterTime' => $filterTime,
             'watchlist' => $watch ? $watch->symbols : []
@@ -74,7 +75,7 @@ class ShareService extends CoreService
         $last = count($data->t) - 1;
         for ($i = 0; $i <= $last; $i++) {
             $chart[] = [
-                'time' => strtotime(date("Y-m-d", $data->t[$i])),
+                'time' => $data->t[$i],
                 'open' => $data->o[$i],
                 'high' => $data->h[$i],
                 'low' => $data->l[$i],
@@ -254,9 +255,9 @@ class ShareService extends CoreService
                 case 'VND':
                     $host = 'dchart-api.vndirect.com.vn/dchart/history';
                     break;
-                case 'SHS':
-                    if ($symbol === 'VNINDEX') $symbol = 'VN';
-                    $host = "sboard.shs.com.vn/api/v1/tradingview/history";
+                    break;
+                case 'PINE':
+                    $host = 'charts.pinetree.vn/tv/history';
                     break;
             }
             $client = new \GuzzleHttp\Client();

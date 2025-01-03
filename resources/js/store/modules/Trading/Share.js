@@ -1,6 +1,7 @@
 function initialState() {
     return {
         source: "",
+        sources: [],
         groups: [],
         symbols: [],
         prices: [],
@@ -32,6 +33,7 @@ const actions = {
                 .get("trading/share/init-chart", { noLoading: true })
                 .then((response) => {
                     commit("setSource", response.data.source);
+                    commit("setSources", response.data.sources);
                     resolve(response.data);
                 });
         });
@@ -125,6 +127,9 @@ const mutations = {
     },
     setSource(state, data) {
         state.source = data;
+    },
+    setSources(state, data) {
+        state.sources = data;
     },
     setLoading(state, data) {
         state.isLoading = data;
