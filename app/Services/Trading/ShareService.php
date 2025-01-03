@@ -354,11 +354,15 @@ class ShareService extends CoreService
             $calc['long'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
             $range['long'] = round($points->Hl->p - $points->Ll->p, 2);
         }
+        $ratios = [];
+        for ($i = 1; $i < count($range); $i++) {
+            $ratios[] = round($range[$i - 1] / $range[$i], 2);
+        }
         $ascRange = $range;
         asort($ascRange);
         $compress = $range === $ascRange;
 
-        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'compress' => $compress, 'pivot' => $pivot, 'points' => $points, 'range' => $range];
+        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'compress' => $compress, 'pivot' => $pivot, 'points' => $points, 'ratios' => $ratios];
     }
 
     public function checkStock($vnindex, $stock, $isMid, $isLong)
@@ -386,9 +390,9 @@ class ShareService extends CoreService
 
         return (object)[
             'result' => (object)$result,
-            'compress' => $stock->range,
-            $stock->symbol => $stock->term,
-            $vnindex->symbol => $vnindex->term,
+            'compress' => $stock->ratios,
+            // $stock->symbol => $stock->term,
+            // $vnindex->symbol => $vnindex->term,
             // 'points' => $stock->points,
         ];
     }
