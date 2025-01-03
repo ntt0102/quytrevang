@@ -14,6 +14,15 @@
                 },
                 {
                     location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        icon: 'far fa-calendar small',
+                        hint: $t('trading.share.filterSymbols'),
+                        onClick: ()=>state.showDatePicker = true,
+                    },
+                },
+                {
+                    location: 'before',
                     widget: 'dxDateBox',
                     options: {
                         width: devices.phone ? '90' : '120',
@@ -83,6 +92,19 @@
                 },
             ]"
         />
+        <DxPopup 
+      :visible="state.showDatePicker" 
+      :closeOnOutsideClick="true" 
+      title="Chọn ngày"
+      @hiding="state.showDatePicker = false"
+    >
+      <DxDateBox 
+        :pickerType="'calendar'"
+        displayFormat="yyyy-MM-dd"
+        :value="state.fromDate"
+        @valueChanged="fromDateChanged" 
+      />
+    </DxPopup>
         <Chart :fromDate="state.fromDate" :group="state.group" ref="chartRef" />
     </div>
 </template>
@@ -110,6 +132,7 @@ const sources = computed(() => store.state.tradingShare.sources);
 
 const state = reactive({
     group: route.query.list ?? "",
+    showDatePicker: false,       
     fromDate: subYears(new Date(), 5),
     watchlistActions: [
         {
