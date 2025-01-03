@@ -117,6 +117,7 @@ import { reactive, ref, inject, watch, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
+import { toast } from "vue3-toastify";
 import { getUnixTime } from "date-fns";
 
 const store = useStore();
@@ -409,6 +410,9 @@ function moveSymbolInGroup(side = true) {
 function checkSymbol() {
     if (!state.symbol || state.symbol === "VNINDEX") return false;
     const filterTimes = getFilterTimes();
+    if (filterTimes.length < 2) {
+        return toast.warning(t("trading.share.filterTimeWarning"));
+    }
     checkToolRef.value.check({ symbol: state.symbol, filterTimes });
 }
 function hideContext() {

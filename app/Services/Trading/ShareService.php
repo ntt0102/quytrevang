@@ -156,17 +156,17 @@ class ShareService extends CoreService
     public function checkSymbol($payload)
     {
         $symbol = $payload->symbol;
-        $t1 = $payload->filterTimes[0];
-        $t2 = $payload->filterTimes[1];
-        $t3 = $payload->filterTimes[2];
-        $t4 = $payload->filterTimes[3];
-        $term = $t1 ? 3 : 2;
-        $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
-        $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
-        $check = (array)$this->checkStock($vnindex, $stock, $term);
+        $filterTimes = $payload->filterTimes;
+        $filterTimesCount = count($filterTimes);
+        if (!$symbol || $filterTimesCount < 2) return ['isOk' => false];
+        $isMid = $filterTimesCount >= 3;
+        $isLong = $filterTimesCount === 4;
+        $vnindex = $this->calcStock('VNINDEX', $filterTimes, $isMid, $isLong);
+        $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
+        $check = (array)$this->checkStock($vnindex, $stock, $isMid, $isLong);
         $fromto = [
-            'from' => date('d/m/Y', $term === 3 ? $t1 : $t2),
-            'to' => date('d/m/Y', $t4),
+            'from' => date('d/m/Y', end($filterTimes)),
+            'to' => date('d/m/Y', $filterTimes[0]),
         ];
         return [
             'symbol' => $symbol,
@@ -182,7 +182,9 @@ class ShareService extends CoreService
      */
     public function filterSymbols($payload)
     {
-        FilterShareJob::dispatch($payload);
+        $filterTimesCount = count($payload->filterTimes);
+        if (!$payload->group || $filterTimesCount < 2) return ['isOk' => false];
+        FilterShareJob::dispatch($payload->group, $payload->filterTimes);
         return ['isOk' => true];
     }
 
@@ -245,17 +247,19 @@ class ShareService extends CoreService
         }
     }
 
-    public function scanStock($data, $longDate, $midDate, $shortDate, $currDate, $term)
+    public function scanStock($data, $filterTimes, $isMid, $isLong)
     {
         if ($data->s !== 'ok') return false;
         $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hi = (object)[];
-        $s1Date = ($shortDate + 2 * $currDate) / 3;
-        $s2Date = (2 * $shortDate + $currDate) / 3;
-        $m1Date = ($midDate + 2 * $shortDate) / 3;
-        $m2Date = (2 * $midDate + $shortDate) / 3;
-        if ($term === 3) {
-            $l1Date = ($longDate + 2 * $midDate) / 3;
-            $l2Date = (2 * $longDate + $midDate) / 3;
+        $s1Date = ($filterTimes[1] + 2 * $filterTimes[0]) / 3;
+        $s2Date = (2 * $filterTimes[1] + $filterTimes[0]) / 3;
+        if ($isMid) {
+            $m1Date = ($filterTimes[2] + 2 * $filterTimes[1]) / 3;
+            $m2Date = (2 * $filterTimes[2] + $filterTimes[1]) / 3;
+        }
+        if ($isLong) {
+            $l1Date = ($filterTimes[3] + 2 * $filterTimes[2]) / 3;
+            $l2Date = (2 * $filterTimes[3] + $filterTimes[2]) / 3;
         }
         $last = count($data->t) - 1;
         for ($i = $last; $i >= 0; $i--) {
@@ -267,7 +271,7 @@ class ShareService extends CoreService
             if ($i === $last) {
                 $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hi = $pL;
             } else {
-                if ($t >= $shortDate) {
+                if ($t >= $filterTimes[1]) {
                     if ($t >= $s1Date) {
                         if ($h > $Hi->p) $Ls = $Hi = $pH;
                     }
@@ -277,7 +281,7 @@ class ShareService extends CoreService
                     if ($t <= $s2Date) {
                         if ($h > $Hs->p) $Lm = $Hs = $pH;
                     }
-                } else  if ($t >= $midDate) {
+                } else  if ($isMid && $t >= $filterTimes[2]) {
                     if ($t >= $m1Date) {
                         if ($h > $Hs->p) $Lm = $Hs = $pH;
                     }
@@ -287,17 +291,15 @@ class ShareService extends CoreService
                     if ($t <= $m2Date) {
                         if ($h > $Hm->p) $Ll = $Hm = $pH;
                     }
-                } else {
-                    if ($term === 3) {
-                        if ($t >= $l1Date) {
-                            if ($h > $Hm->p) $Ll = $Hm = $pH;
-                        }
-                        if ($t <= $l1Date && $t >= $l2Date) {
-                            if ($l < $Ll->p) $Hl = $Ll = $pL;
-                        }
-                        if ($t <= $l2Date) {
-                            if ($h > $Hl->p) $Hl = $pH;
-                        }
+                } else if ($isLong) {
+                    if ($t >= $l1Date) {
+                        if ($h > $Hm->p) $Ll = $Hm = $pH;
+                    }
+                    if ($t <= $l1Date && $t >= $l2Date) {
+                        if ($l < $Ll->p) $Hl = $Ll = $pL;
+                    }
+                    if ($t <= $l2Date) {
+                        if ($h > $Hl->p) $Hl = $pH;
                     }
                 }
             }
@@ -331,25 +333,24 @@ class ShareService extends CoreService
         return $M;
     }
 
-    public function calcStock($symbol, $t1, $t2, $t3, $t4, $term)
+    public function calcStock($symbol, $filterTimes, $isMid, $isLong)
     {
-        $data = $this->getStock($symbol, $term === 3 ? $t1 : $t2, $t4);
+        $data = $this->getStock($symbol, end($filterTimes), $filterTimes[0]);
         if ($data->s !== 'ok') return false;
-        $points = $this->scanStock($data, $t1, $t2, $t3, $t4, $term);
+        $points = $this->scanStock($data, $filterTimes, $isMid, $isLong);
         if (!$points) return false;
         $pivotPoint = $this->scanPivot($data, $points->Ls->t);
         $pivot = abs($pivotPoint->H->i - $points->Hi->i) <= 5;
-        $calc = [
-            'short' => round(($points->Hi->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2),
-            'mid' => round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2)
-        ];
+        $calc['short'] = round(($points->Hi->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2);
         $range = [
             'immed' => round($pivotPoint->H->p - $pivotPoint->L->p, 2),
             'short' => round($points->Hs->p - $points->Ls->p, 2),
-            'mid' => round($points->Hm->p - $points->Lm->p, 2)
-
         ];
-        if ($term === 3) {
+        if ($isMid) {
+            $calc['mid'] = round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2);
+            $range['mid'] = round($points->Hm->p - $points->Lm->p, 2);
+        }
+        if ($isLong) {
             $calc['long'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
             $range['long'] = round($points->Hl->p - $points->Ll->p, 2);
         }
@@ -360,21 +361,23 @@ class ShareService extends CoreService
         return (object)['symbol' => $symbol, 'term' => (object)$calc, 'compress' => $compress, 'pivot' => $pivot, 'points' => $points, 'range' => $range];
     }
 
-    public function checkStock($vnindex, $stock, $term)
+    public function checkStock($vnindex, $stock, $isMid, $isLong)
     {
         $check = [
             $stock->pivot,
             $stock->compress,
             $stock->term->short > 0.7 && $stock->term->short > $vnindex->term->short,
-            $stock->term->mid > 0.7 && $stock->term->mid > $vnindex->term->mid
         ];
         $result = [
             'pivot' => $check[0],
             'compress' => $check[1],
             'short' => $check[2],
-            'mid' => $check[3],
         ];
-        if ($term === 3) {
+        if ($isMid) {
+            $check[] = $stock->term->mid > 0.7 && $stock->term->mid > $vnindex->term->mid;
+            $result['mid'] = $check[3];
+        }
+        if ($isLong) {
             $check[] = $stock->term->long > 0.7 && $stock->term->long > $vnindex->term->long;
             $result['long'] = $check[4];
         }
@@ -390,17 +393,19 @@ class ShareService extends CoreService
         ];
     }
 
-    public function filterStock($group, $t1, $t2, $t3, $t4)
+    public function filterStock($group, $filterTimes)
     {
+        $filterTimesCount = count($filterTimes);
+        $isMid = $filterTimesCount >= 3;
+        $isLong = $filterTimesCount === 4;
         $filteredSymbols = [];
-        $term = $t1 ? 3 : 2;
-        $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
+        $vnindex = $this->calcStock('VNINDEX', $filterTimes, $isMid, $isLong);
         $symbols = $this->getSymbols($group);
         if (empty($symbols)) return false;
         foreach ($symbols as $symbol) {
             echo $symbol . ' ';
-            $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
-            $check = $this->checkStock($vnindex, $stock, $term);
+            $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
+            $check = $this->checkStock($vnindex, $stock, $isMid, $isLong);
             if ($check->result->sum) $filteredSymbols[] = $symbol;
         }
         return (object)[
@@ -412,17 +417,24 @@ class ShareService extends CoreService
     public function test()
     {
         $symbol = 'CTG';
-        $t1 = strtotime('2021-05-25');
-        $t2 = strtotime('2024-06-12');
-        $t3 = strtotime('2024-09-27');
-        $t4 = strtotime('2024-12-20');
-        $term = $t1 ? 3 : 2;
+        $filterTimes = [
+            strtotime('2024-12-20'),
+            strtotime('2023-11-01'),
+            // strtotime('2024-09-27'),
+            // strtotime('2024-06-12'),
+            // strtotime('2021-05-25')
+        ];
+        $filterTimesCount = count($filterTimes);
+        $isMid = $filterTimesCount >= 3;
+        $isLong = $filterTimesCount === 4;
         // ----------------------------
-        // $data = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
+        // $data = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
         // ----------------------------
-        $vnindex = $this->calcStock('VNINDEX', $t1, $t2, $t3, $t4, $term);
-        $stock = $this->calcStock($symbol, $t1, $t2, $t3, $t4, $term);
-        $data = $this->checkStock($vnindex, $stock, $term);
+        $vnindex = $this->calcStock('VNINDEX', $filterTimes, $isMid, $isLong);
+        $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
+        $data = $this->checkStock($vnindex, $stock, $isMid, $isLong);
+        // ----------------------------
+        // $data = FilterShareJob::dispatch('VNX50', $filterTimes);
         // ----------------------------
         return $data;
     }

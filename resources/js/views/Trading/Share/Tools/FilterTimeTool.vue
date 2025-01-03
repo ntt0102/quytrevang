@@ -39,8 +39,9 @@ function isSelected() {
 }
 function get() {
     let _filterTimes = filterTimes.map((item) => item.time);
-    if (_filterTimes.length === 3) _filterTimes.unshift(null);
-    return _filterTimes;
+    // if (_filterTimes.length === 3) _filterTimes.unshift(null);
+    // return _filterTimes;
+    return _filterTimes.reverse();
 }
 function createSeries(chart) {
     if (!chart) return false;

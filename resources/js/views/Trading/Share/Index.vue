@@ -137,11 +137,11 @@ function watchlistItemClick({ itemData }) {
 }
 function filterClick() {
     const group = state.group;
-    const filterTimes = chartRef.value.getFilterTimes();
     if (!group) {
         return toast.warning(t("trading.share.filterGroupWarning"));
     }
-    if (filterTimes.length !== 4) {
+    const filterTimes = chartRef.value.getFilterTimes();
+    if (filterTimes.length < 2) {
         return toast.warning(t("trading.share.filterTimeWarning"));
     }
     bus.emit("checkPin", () => {
