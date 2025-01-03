@@ -70,8 +70,8 @@ function syntaxHighlight(json) {
 </script>
 <style lang="scss">
 .check-tool-popup {
-    height: 500px;
-    overflow-y: auto;
+    // height: 500px;
+    // overflow-y: auto;
     margin: 0px !important;
 
     .string {
