@@ -78,5 +78,9 @@ class VariablesTableSeeder extends Seeder
             'name' => "derivativeSource",
             'value' => "FIREANT",
         ]);
+        Variable::create([
+            'name' => "shareSource",
+            'value' => "VND",
+        ]);
     }
 }

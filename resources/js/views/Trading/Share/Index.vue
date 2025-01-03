@@ -49,6 +49,21 @@
                     widget: 'dxDropDownButton',
                     options: {
                         showArrowIcon: false,
+                        items: state.dataSources,
+                        selectedItemKey: source,
+                        stylingMode: 'text',
+                        useSelectMode: true,
+                        width: '50',
+                        dropDownOptions: { width: '70' },
+                        elementAttr: { class: 'source' },
+                        onSelectionChanged: sourceSelect,
+                    },
+                },
+                {
+                    location: 'after',
+                    widget: 'dxDropDownButton',
+                    options: {
+                        showArrowIcon: false,
                         items: state.watchlistActions,
                         displayExpr: 'text',
                         keyExpr: 'value',
@@ -90,10 +105,12 @@ const chartRef = ref(null);
 
 const groups = computed(() => store.state.tradingShare.groups);
 const symbolsLength = computed(() => store.state.tradingShare.symbols.length);
+const source = computed(() => store.state.tradingShare.source);
 
 const state = reactive({
     group: route.query.list ?? "",
     fromDate: subYears(new Date(), 5),
+    dataSources: ["VND", "SHS"],
     watchlistActions: [
         {
             icon: "far fa-heart-circle-plus small",
@@ -122,6 +139,10 @@ function groupChanged({ component }) {
 function fromDateChanged({ value }) {
     state.fromDate = value;
     chartRef.value.getChartData(true, value);
+}
+function sourceSelect({ item }) {
+    store.dispatch("tradingShare/setSource", item);
+    chartRef.value.getChartData(true, state.fromDate);
 }
 function watchlistItemClick({ itemData }) {
     bus.emit("checkPin", () => {
@@ -157,6 +178,11 @@ function filterClick() {
         }
         .dx-texteditor-buttons-container {
             width: 23px !important;
+        }
+    }
+    .source {
+        .dx-button-content {
+            padding: 0 !important;
         }
     }
     .dx-icon-clear {

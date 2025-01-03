@@ -127,6 +127,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::group(['prefix' => 'share', 'middleware' => ['can:admin:access_share']], function () {
                     Route::get('/', 'ShareController@getChart');
                     Route::get('init-chart', 'ShareController@initChart');
+                    Route::post('set-source', 'ShareController@setSource');
                     Route::post('get-groups', 'ShareController@getGroups');
                     Route::post('get-symbols', 'ShareController@getSymbols');
                     Route::post('check', 'ShareController@checkSymbol');

@@ -25,10 +25,23 @@ class ShareService extends CoreService
         return [
             'vpsUser' => get_global_value('vpsUser'),
             'vpsSession' => get_global_value('vpsSession'),
+            'source' => get_global_value('shareSource'),
             'filterTime' => $filterTime,
             'watchlist' => $watch ? $watch->symbols : []
         ];
     }
+
+    /**
+     * Set Source
+     *
+     * @param $payload
+     * 
+     */
+    public function setSource($payload)
+    {
+        set_global_value('shareSource', $payload->source);
+    }
+
     /**
      * Get chart data
      *
@@ -61,7 +74,7 @@ class ShareService extends CoreService
         $last = count($data->t) - 1;
         for ($i = 0; $i <= $last; $i++) {
             $chart[] = [
-                'time' => $data->t[$i],
+                'time' => strtotime(date("Y-m-d", $data->t[$i])),
                 'open' => $data->o[$i],
                 'high' => $data->h[$i],
                 'low' => $data->l[$i],
@@ -236,8 +249,18 @@ class ShareService extends CoreService
     public function getStock($symbol, $from, $to)
     {
         try {
+            $source = get_global_value('shareSource');
+            switch ($source) {
+                case 'VND':
+                    $host = 'dchart-api.vndirect.com.vn/dchart/history';
+                    break;
+                case 'SHS':
+                    if ($symbol === 'VNINDEX') $symbol = 'VN';
+                    $host = "sboard.shs.com.vn/api/v1/tradingview/history";
+                    break;
+            }
             $client = new \GuzzleHttp\Client();
-            $url = "https://dchart-api.vndirect.com.vn/dchart/history?resolution=1D&symbol={$symbol}&from={$from}&to={$to}";
+            $url = "https://{$host}?resolution=1D&symbol={$symbol}&from={$from}&to={$to}";
             $res = $client->get($url);
             $rsp = json_decode($res->getBody());
             if (!$rsp) return (object)['s' => 'ng'];

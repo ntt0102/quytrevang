@@ -28,6 +28,20 @@ class ShareController extends CoreController
         $data = $this->shareService->initChart($this->payload);
         return $this->sendResponse($data);
     }
+
+    /**
+     * Set Source
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function setSource(Request $request)
+    {
+        $data = $this->shareService->setSource($this->payload);
+        return $this->sendResponse($data);
+    }
+
     /**
      * Get the Chart data
      *

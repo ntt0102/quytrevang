@@ -1,5 +1,6 @@
 function initialState() {
     return {
+        source: "",
         groups: [],
         symbols: [],
         prices: [],
@@ -30,8 +31,21 @@ const actions = {
             axios
                 .get("trading/share/init-chart", { noLoading: true })
                 .then((response) => {
+                    commit("setSource", response.data.source);
                     resolve(response.data);
                 });
+        });
+    },
+    setSource({ commit, dispatch, getters, state, rootGetters }, source) {
+        commit("setSource", source);
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "trading/share/set-source",
+                    { source },
+                    { noLoading: true }
+                )
+                .then((response) => resolve());
         });
     },
     getGroups({ commit, dispatch, getters, state, rootGetters }) {
@@ -108,6 +122,9 @@ const mutations = {
     setChartData(state, data) {
         state.prices = data.prices;
         state.tools = data.tools;
+    },
+    setSource(state, data) {
+        state.source = data;
     },
     setLoading(state, data) {
         state.isLoading = data;
