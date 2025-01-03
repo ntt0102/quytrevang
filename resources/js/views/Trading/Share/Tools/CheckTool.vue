@@ -9,6 +9,7 @@
     </div>
 </template>
 <script setup>
+import { watch } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 import { alert } from "devextreme/ui/dialog";
@@ -17,7 +18,12 @@ const store = useStore();
 const { t } = useI18n();
 const props = defineProps(["symbol"]);
 const emit = defineEmits(["checkSymbol", "hideContext"]);
-let checkResult = {};
+let checkResult = null;
+
+watch(
+    () => props.symbol,
+    () => (checkResult = null)
+);
 
 defineExpose({
     check,
@@ -34,7 +40,7 @@ function checkToolClick() {
     emit("hideContext");
 }
 function checkToolContextmenu() {
-    if (props.symbol in checkResult) showPopup(checkResult);
+    if (checkResult) showPopup(checkResult);
 }
 function showPopup(data) {
     let html = JSON.stringify(data.result, undefined, 4);
