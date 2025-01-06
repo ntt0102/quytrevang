@@ -72,14 +72,15 @@ class ShareService extends CoreService
         $to = time();
         $data = $this->getStock($symbol, $from, $to);
         if ($data->s !== 'ok') return [];
+        $isPine = get_global_value('shareSource') === 'PINE';
         $last = count($data->t) - 1;
         for ($i = 0; $i <= $last; $i++) {
             $chart[] = [
                 'time' => $data->t[$i],
-                'open' => $data->o[$i],
-                'high' => $data->h[$i],
-                'low' => $data->l[$i],
-                'close' => $data->c[$i]
+                'open' => $isPine ? $data->o[$i] / 1000 : $data->o[$i],
+                'high' => $isPine ? $data->h[$i] / 1000 : $data->h[$i],
+                'low' => $isPine ? $data->l[$i] / 1000 : $data->l[$i],
+                'close' => $isPine ? $data->c[$i] / 1000 : $data->c[$i]
             ];
         }
         $date = new \DateTime();
@@ -254,7 +255,6 @@ class ShareService extends CoreService
             switch ($source) {
                 case 'VND':
                     $host = 'dchart-api.vndirect.com.vn/dchart/history';
-                    break;
                     break;
                 case 'PINE':
                     $host = 'charts.pinetree.vn/tv/history';
