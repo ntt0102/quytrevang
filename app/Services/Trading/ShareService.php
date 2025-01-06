@@ -72,15 +72,15 @@ class ShareService extends CoreService
         $to = time();
         $data = $this->getStock($symbol, $from, $to);
         if ($data->s !== 'ok') return [];
-        $isPine = get_global_value('shareSource') === 'PINE' && strlen($symbol) <= 3;
+        $isAdjust = get_global_value('shareSource') === 'PINE' && strlen($symbol) <= 3;
         $last = count($data->t) - 1;
         for ($i = 0; $i <= $last; $i++) {
             $chart[] = [
                 'time' => $data->t[$i],
-                'open' => $isPine ? $data->o[$i] / 1000 : $data->o[$i],
-                'high' => $isPine ? $data->h[$i] / 1000 : $data->h[$i],
-                'low' => $isPine ? $data->l[$i] / 1000 : $data->l[$i],
-                'close' => $isPine ? $data->c[$i] / 1000 : $data->c[$i]
+                'open' => $isAdjust ? $data->o[$i] / 1000 : $data->o[$i],
+                'high' => $isAdjust ? $data->h[$i] / 1000 : $data->h[$i],
+                'low' => $isAdjust ? $data->l[$i] / 1000 : $data->l[$i],
+                'close' => $isAdjust ? $data->c[$i] / 1000 : $data->c[$i]
             ];
         }
         $date = new \DateTime();
