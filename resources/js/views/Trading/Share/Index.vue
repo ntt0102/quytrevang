@@ -102,7 +102,6 @@ const store = useStore();
 const route = useRoute();
 const { t } = useI18n();
 const bus = inject("bus");
-const devices = inject("devices");
 const chartRef = ref(null);
 
 const groups = computed(() => store.state.tradingShare.groups);
