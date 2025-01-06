@@ -34,12 +34,13 @@
                 }"
                 :title="$t('trading.share.changeWatchlist')"
                 @click="changeWatchlist"
+                @contextmenu="loadNextSymbol"
             ></div>
             <div
                 class="command"
                 :title="$t('trading.share.reload')"
-                @click="reloadChartData"
-                @contextmenu="loadNextSymbol"
+                @click="() => getChartData()"
+                @contextmenu="() => getChartData(true)"
             >
                 <i
                     class="far fa-sync-alt"
@@ -343,9 +344,6 @@ function symbolChanged() {
     if (state.symbol == state.inputSymbol) return false;
     state.symbol = state.inputSymbol;
     symbolAutocompleteRef.value.instance.blur();
-    getChartData();
-}
-function reloadChartData() {
     getChartData();
 }
 function initChart() {
