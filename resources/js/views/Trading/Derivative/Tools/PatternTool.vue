@@ -264,7 +264,7 @@ function refresh(autoAdjust = false) {
 function calculatePattern() {
     const { A, B, C } = points;
     const bc = B.price - C.price;
-    const side = bc > 0;
+    let side = bc > 0;
     const pickTime = props.pickTimeToolRef.get();
     const phase1 = scanPhase({
         phase: 1,
@@ -389,16 +389,30 @@ function calculatePattern() {
     const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
     const pStatus = `${p1Status}${p2Status}${p3Status}`;
     //
-    const X = s1Valid
-        ? phase3.breakIndex && T > T3
-            ? 2 * CD
-            : phase1.rEp
-        : BC;
-    const x = adjustTargetPrice(B.price, X, side);
+    let X, o;
+    if (s1Valid) {
+        if (phase3.breakIndex && T > T3) {
+            X = 2 * CD;
+            o = phase3.xBox.R.price;
+        } else {
+            X = phase1.rEp;
+            o = B.price;
+        }
+    } else {
+        if (s3Valid) {
+            X = BC;
+            o = B.price;
+        } else {
+            X = mf.fmtNum(phase1.S1.price - C.price, 1, true);
+            o = C.price;
+            side = !side;
+        }
+    }
+    const x = adjustTargetPrice(o, X, side);
     const mainTR = phase3.breakIndex ?? T;
     const scale = parseInt((mainTR - phase1.R.index) / phase1.tr);
     const Y = scale > 1 ? X * scale : X;
-    const y = adjustTargetPrice(B.price, Y, side);
+    const y = adjustTargetPrice(o, Y, side);
 
     return {
         progress,
@@ -429,6 +443,7 @@ function scanPhase({
     let R = mf.cloneDeep(end ?? {});
     S.index = props.timeToIndex(S.time);
     let box = {},
+        preBox = {},
         maxBox = {},
         xBox = {},
         breakIndex = null,
@@ -452,11 +467,18 @@ function scanPhase({
                 tr: 0,
             };
             lastIndex = index;
+            preBox = mf.cloneDeep(box);
             maxBox = mf.cloneDeep(box);
             xBox = mf.cloneDeep(box);
         }
         if (mf.cmp(price, side, box.R.price)) {
             if (box.pr > 0) {
+                const dis = mf.fmtNum(box.R.price - preBox.R.price, 1, true);
+                if (dis === 0.1 && box.tr > preBox.pr / 5) {
+                    const tr = box.tr;
+                    box = mf.cloneDeep(preBox);
+                    box.tr += tr;
+                }
                 if (box.pr > maxBox.pr) maxBox.pr = box.pr;
                 if (box.tr >= maxBox.tr) {
                     maxBox.tr = box.tr;
@@ -471,6 +493,7 @@ function scanPhase({
                     if (box.tr >= xBox.tr && box.pr >= xBox.pr)
                         xBox = mf.cloneDeep(box);
                 }
+                preBox = mf.cloneDeep(box);
             }
             box = {
                 R: { index, price },
