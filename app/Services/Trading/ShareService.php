@@ -72,7 +72,7 @@ class ShareService extends CoreService
         $to = time();
         $data = $this->getStock($symbol, $from, $to);
         if ($data->s !== 'ok') return [];
-        $isPine = get_global_value('shareSource') === 'PINE';
+        $isPine = get_global_value('shareSource') === 'PINE' && strlen($symbol) <= 3;
         $last = count($data->t) - 1;
         for ($i = 0; $i <= $last; $i++) {
             $chart[] = [
