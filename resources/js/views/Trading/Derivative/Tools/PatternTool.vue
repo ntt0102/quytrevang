@@ -359,7 +359,7 @@ function calculatePattern() {
             //
             DE >= phase1.pr || !exceptCase,
             pr3Valid,
-            s3Valid || exceptCase,
+            s3Valid,
             T > T3,
             exceptCase ? T > T3p : extraCond.every(Boolean) || T > T3p,
         ],
@@ -457,15 +457,12 @@ function scanPhase({
         }
         if (mf.cmp(price, side, box.R.price)) {
             if (box.pr > 0) {
-                if (
-                    box.pr > maxBox.pr ||
-                    (box.pr === maxBox.pr && box.tr >= maxBox.tr)
-                ) {
-                    maxBox.pr = box.pr;
+                if (box.pr > maxBox.pr) maxBox.pr = box.pr;
+                if (box.tr >= maxBox.tr) {
+                    maxBox.tr = box.tr;
                     maxBox.R = mf.cloneDeep(box.R);
                     maxBox.S = mf.cloneDeep(box.S);
                 }
-                if (box.tr > maxBox.tr) maxBox.tr = box.tr;
                 if (
                     phase === 1 &&
                     retracementPrice &&
