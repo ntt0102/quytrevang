@@ -14,19 +14,12 @@
                 },
                 {
                     location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-calendar small',
-                        hint: $t('trading.share.filterSymbols'),
-                        onClick: ()=>state.showDatePicker = true,
-                    },
-                },
-                {
-                    location: 'before',
                     widget: 'dxDateBox',
                     options: {
-                        width: devices.phone ? '90' : '120',
+                        width: '25',
                         type: 'date',
+                        elementAttr: { class: 'from-date' },
+                        hint: format(state.fromDate, 'dd/MM/yyyy'),
                         value: state.fromDate,
                         onValueChanged: fromDateChanged,
                     },
@@ -92,19 +85,6 @@
                 },
             ]"
         />
-        <DxPopup 
-      :visible="state.showDatePicker" 
-      :closeOnOutsideClick="true" 
-      title="Chọn ngày"
-      @hiding="state.showDatePicker = false"
-    >
-      <DxDateBox 
-        :pickerType="'calendar'"
-        displayFormat="yyyy-MM-dd"
-        :value="state.fromDate"
-        @valueChanged="fromDateChanged" 
-      />
-    </DxPopup>
         <Chart :fromDate="state.fromDate" :group="state.group" ref="chartRef" />
     </div>
 </template>
@@ -116,7 +96,7 @@ import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
-import { subYears } from "date-fns";
+import { format, subYears } from "date-fns";
 
 const store = useStore();
 const route = useRoute();
@@ -132,7 +112,6 @@ const sources = computed(() => store.state.tradingShare.sources);
 
 const state = reactive({
     group: route.query.list ?? "",
-    showDatePicker: false,       
     fromDate: subYears(new Date(), 5),
     watchlistActions: [
         {
@@ -195,6 +174,15 @@ function filterClick() {
 </script>
 <style lang="scss">
 .share-page {
+    .from-date {
+        &.dx-texteditor::after {
+            width: 0 !important;
+        }
+        .dx-texteditor-input-container {
+            width: 0px !important;
+            flex-grow: unset !important;
+        }
+    }
     .symbol-group {
         .dx-texteditor-input {
             text-transform: uppercase;
