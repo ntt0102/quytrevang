@@ -474,7 +474,11 @@ function scanPhase({
         if (mf.cmp(price, side, box.R.price)) {
             if (box.pr > 0) {
                 const dis = mf.fmtNum(box.R.price - preBox.R.price, 1, true);
-                if (dis === 0.1 && box.tr > preBox.pr / 5) {
+                if (
+                    dis === 0.1 &&
+                    box.pr < preBox.pr &&
+                    box.tr > preBox.tr / 5
+                ) {
                     const tr = box.tr;
                     box = mf.cloneDeep(preBox);
                     box.tr += tr;
