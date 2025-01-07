@@ -83,10 +83,7 @@ function checkAlert(newProgress, oldProgress) {
         ) {
             let text = "";
             if (newProgress.result) {
-                if ([2, 4].includes(newProgress.step))
-                    text = t("trading.derivative.progressOrder", newProgress);
-                else
-                    text = t("trading.derivative.progressSuccess", newProgress);
+                text = t("trading.derivative.progressSuccess", newProgress);
             } else text = t("trading.derivative.progressFail", newProgress);
             speakAlert(text);
         }
