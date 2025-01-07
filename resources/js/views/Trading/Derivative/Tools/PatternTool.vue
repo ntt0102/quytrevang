@@ -295,21 +295,21 @@ function calculatePattern() {
                 )
             ),
     });
-    if (phase1.xBox.tr >= phase2.tr) phase2.tr = phase1.xBox.tr;
+    if (phase1.X.tr >= phase2.tr) phase2.tr = phase1.X.tr;
 
     console.log("calculatePattern", [phase1, phase2, phase3]);
 
     //
     const BC = mf.fmtNum(bc, 1, true);
-    const CD = mf.fmtNum(C.price - phase3.xBox.R.price, 1, true);
-    const DE = mf.fmtNum(phase3.xBox.pr);
+    const CD = mf.fmtNum(C.price - phase3.X.R.price, 1, true);
+    const DE = mf.fmtNum(phase3.X.pr);
     const pr1Valid = BC >= phase1.pr;
     const pr2Valid = CD >= phase2.pr;
     const pr3Valid = DE >= phase3.pr;
 
     const s1Valid = !mf.cmp(C.price, !side, phase1.S1.price);
-    const s2Valid = !mf.cmp(phase3.xBox.R.price, side, phase2.S1.price);
-    const s3Valid = !mf.cmp(phase3.xBox.S.price, !side, phase3.S1.price);
+    const s2Valid = !mf.cmp(phase3.X.R.price, side, phase2.S1.price);
+    const s3Valid = !mf.cmp(phase3.X.S.price, !side, phase3.S1.price);
 
     const exceptCase = phase3.breakIndex || !s1Valid;
 
@@ -317,8 +317,8 @@ function calculatePattern() {
     const T1p = phase1.R.index + 5 * phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T2p = 2 * phase2.R.index - phase2.S1.index;
-    const T3 = phase3.xBox.R.index + phase3.tr;
-    const T3p = phase3.xBox.R.index + (exceptCase ? phase1.tr : phase2.tr);
+    const T3 = phase3.X.R.index + phase3.tr;
+    const T3p = phase3.X.R.index + (exceptCase ? phase1.tr : phase2.tr);
     const timeMark = [T1, T1p, T2, T2p, T3, T3p];
 
     const T = phase3.R.index;
@@ -379,7 +379,7 @@ function calculatePattern() {
             if (progress.result) {
                 progress.step = 4;
                 progress.result = progress.steps[3].every(Boolean);
-                if (progress.result) entry = phase3.xBox.R.price;
+                if (progress.result) entry = phase3.X.R.price;
             }
         }
     }
@@ -393,7 +393,7 @@ function calculatePattern() {
     if (s1Valid) {
         if (phase3.breakIndex && T > T3) {
             X = 2 * CD;
-            o = phase3.xBox.R.price;
+            o = phase3.X.R.price;
         } else {
             X = phase1.rEp;
             o = B.price;
@@ -536,13 +536,13 @@ function scanPhase({
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
-        rEp,
-        rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr, 1) : 0,
         S1: maxBox.S,
         R1: maxBox.R,
-        xBox,
         S,
         R,
+        X: xBox,
+        rEp,
+        rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr, 1) : 0,
         hasDouble: doubleTr >= maxBox.tr / 2,
         breakIndex,
     };
