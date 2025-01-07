@@ -102,6 +102,7 @@
                 :pickTimeToolRef="pickTimeToolRef"
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
+                @scrollChart="scrollChart"
                 @setProgress="setProgress"
                 @hideContext="hideContext"
             />
@@ -163,7 +164,7 @@
             >
                 TP/SL
             </div>
-            <div class="chart-top" @click="chartTopClick">
+            <div class="chart-top" @click="scrollChart">
                 <i class="far fa-angle-double-right" />
             </div>
         </div>
@@ -815,7 +816,7 @@ function entryOrderClick() {
 function tpslOrderClick() {
     orderToolRef.value.tpsl();
 }
-function chartTopClick() {
+function scrollChart() {
     params.chart.timeScale().scrollToRealTime();
 }
 function inSession() {
