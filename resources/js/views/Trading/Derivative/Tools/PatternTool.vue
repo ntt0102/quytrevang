@@ -357,6 +357,7 @@ function calculatePattern() {
         ],
         [
             //
+            phase3.X.R.index > T2,
             DE >= phase1.pr || !exceptCase,
             pr3Valid,
             s3Valid,

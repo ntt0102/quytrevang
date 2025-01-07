@@ -38,6 +38,7 @@ export default [
         name: "Bước vào lệnh 2",
         conds: [
             //
+            "D > T2",
             "DE > PR1",
             "DE > PR3",
             "E giữ hỗ trợ",
