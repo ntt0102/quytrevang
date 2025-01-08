@@ -148,7 +148,8 @@ function fromDateChanged({ value }) {
 }
 function sourceSelect({ item }) {
     store.dispatch("tradingShare/setSource", item);
-    chartRef.value.getChartData(true, state.fromDate);
+    if (source.value === "FIREANT") chartRef.value.connectSocket();
+    else chartRef.value.getChartData(true, state.fromDate);
 }
 function watchlistItemClick({ itemData }) {
     bus.emit("checkPin", () => {

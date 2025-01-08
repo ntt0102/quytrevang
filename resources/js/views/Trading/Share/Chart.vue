@@ -169,6 +169,7 @@ watch(() => store.state.tradingShare.prices, loadChartData);
 
 defineExpose({
     getFilterTimes,
+    connectSocket,
     getChartData,
     updateWatchlist,
 });
@@ -339,7 +340,7 @@ function changeWatchlist() {
 }
 
 function loadChartData(value) {
-    params.data.stock = value;
+    params.data.stock = mf.cloneDeep(value);
     state.series.stock.setData(params.data.stock);
     params.chart.applyOptions({ watermark: { text: state.symbol } });
 }
