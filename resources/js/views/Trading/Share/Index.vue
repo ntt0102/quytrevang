@@ -48,6 +48,7 @@
                     text: `(${symbolsLength})`,
                 },
                 {
+                    visible: filterProcess === 0,
                     location: 'after',
                     widget: 'dxDropDownButton',
                     options: {
