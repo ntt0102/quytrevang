@@ -57,8 +57,8 @@
                         selectedItemKey: source,
                         stylingMode: 'text',
                         useSelectMode: true,
-                        width: '50',
-                        dropDownOptions: { width: '70' },
+                        width: '90',
+                        dropDownOptions: { width: '100' },
                         elementAttr: { class: 'source' },
                         onSelectionChanged: sourceSelect,
                     },
@@ -156,7 +156,7 @@ function fromDateChanged({ value }) {
 }
 function sourceSelect({ item }) {
     store.dispatch("tradingShare/setSource", item);
-    if (source.value === "FIRE") chartRef.value.connectSocket();
+    if (source.value === "FIREANT") chartRef.value.connectSocket();
     else chartRef.value.getChartData(true, state.fromDate);
 }
 function watchlistItemClick({ itemData }) {

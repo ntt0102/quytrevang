@@ -28,7 +28,7 @@ class ShareService extends CoreService
         return [
             'vpsUser' => get_global_value('vpsUser'),
             'vpsSession' => get_global_value('vpsSession'),
-            'sources' => ['FIRE', 'VND'],
+            'sources' => ['FIREANT', 'VNDIRECT'],
             'source' => get_global_value('shareSource'),
             'filterTime' => $filterTime,
             'watchlist' => $watch ? $watch->symbols : [],
