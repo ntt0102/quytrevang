@@ -237,7 +237,7 @@ class ShareService extends CoreService
     {
         try {
             $client = new \GuzzleHttp\Client();
-            $url = "https://bgapidatafeed.vps.com.vn/getlistckindex/{$group}";
+            $url = "https://datafeedapi.aisec.com.vn/getlistckindex/{$group}";
             $res = $client->get($url);
             return json_decode($res->getBody());
         } catch (\Throwable $th) {
