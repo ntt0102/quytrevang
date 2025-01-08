@@ -83,7 +83,7 @@
             <ProgressTool
                 ref="progressToolRef"
                 :chartHeightEnough="state.chartHeightEnough"
-                @refreshPattern="refreshPattern"
+                @refreshPattern="() => refreshPattern(true)"
                 @hideContext="hideContext"
             />
             <ScanTool
@@ -108,7 +108,7 @@
             <PickTimeTool
                 ref="pickTimeToolRef"
                 :pickTimeSeries="state.series.pickTime"
-                @refreshPattern="refreshPattern"
+                @refreshPattern="() => refreshPattern()"
                 @hideContext="hideContext"
             />
             <LineTool
@@ -755,8 +755,8 @@ function getDnseData() {
 function patternScaned(points) {
     patternToolRef.value.load(points, { isSave: true });
 }
-function refreshPattern() {
-    patternToolRef.value.refresh();
+function refreshPattern(autoAdjust = false) {
+    patternToolRef.value.refresh(autoAdjust);
 }
 function hideContext() {
     progressToolRef.value.hide();
