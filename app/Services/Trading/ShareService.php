@@ -21,11 +21,11 @@ class ShareService extends CoreService
     public function initChart($payload)
     {
         $filterTime = StockDrawing::where('name', 'filterTime')->orderByRaw("point ASC")->pluck('data', 'point');
-        $watch = ShareSymbol::where('name', 'WATCH', 'MIRA', 'VSTK')->first();
+        $watch = ShareSymbol::where('name', 'WATCH')->first();
         return [
             'vpsUser' => get_global_value('vpsUser'),
             'vpsSession' => get_global_value('vpsSession'),
-            'sources' => ['VND', 'PINE'],
+            'sources' => ['VND', 'PINE', 'MIRA', 'VSTK'],
             'source' => get_global_value('shareSource'),
             'filterTime' => $filterTime,
             'watchlist' => $watch ? $watch->symbols : []
