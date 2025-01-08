@@ -79,6 +79,8 @@ function syntaxHighlight(json) {
     // height: 500px;
     // overflow-y: auto;
     margin: 0px !important;
+    font-size: 14px;
+    min-width: 210px;
 
     .string {
         color: #82a055;

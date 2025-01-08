@@ -252,14 +252,8 @@ class ShareService extends CoreService
         //X https://vstock.vn/mck/tvchart2/63791/history
         // https://kbbuddyiis.kbsec.com.vn/investment/stocks/AAM/data_day?sdate=14-03-2024&edate=09-01-2025
         try {
-            $source = get_global_value('shareSource');
-            switch ($source) {
-                case 'VNDIRECT':
-                    $host = 'dchart-api.vndirect.com.vn/dchart/history';
-                    break;
-            }
             $client = new \GuzzleHttp\Client();
-            $url = "https://{$host}?resolution=1D&symbol={$symbol}&from={$from}&to={$to}";
+            $url = "https://dchart-api.vndirect.com.vn/dchart/history?resolution=1D&symbol={$symbol}&from={$from}&to={$to}";
             $res = $client->get($url);
             $rsp = json_decode($res->getBody());
             if (!$rsp) return (object)['s' => 'ng'];
@@ -329,7 +323,7 @@ class ShareService extends CoreService
         return (object)['Hl' => $Hl, 'Ll' => $Ll, 'Hm' => $Hm, 'Lm' => $Lm, 'Hs' => $Hs, 'Ls' => $Ls, 'Hi' => $Hi];
     }
 
-    public function scanPivot($data, $stop)
+    public function scanBase($data, $stop)
     {
         $B = $M = (object)[];
         $last = count($data->t) - 1;
@@ -361,66 +355,75 @@ class ShareService extends CoreService
         if ($data->s !== 'ok') return false;
         $points = $this->scanStock($data, $filterTimes, $isMid, $isLong);
         if (!$points) return false;
-        $pivotPoint = $this->scanPivot($data, $points->Ls->t);
-        $pivot = abs($pivotPoint->H->i - $points->Hi->i) <= 5;
-        $calc['short'] = round(($points->Hi->p - $points->Ls->p) / ($points->Hs->p - $points->Ls->p), 2);
-        $range = [
-            'immed' => round($pivotPoint->H->p - $pivotPoint->L->p, 2),
-            'short' => round($points->Hs->p - $points->Ls->p, 2),
-        ];
+        $baseZone = $this->scanBase($data, $points->Ls->t);
+        $base = abs($baseZone->H->i - $points->Hi->i) <= 5;
+        //
+        $HiLs = $points->Hi->p - $points->Ls->p;
+        $HsLs = $points->Hs->p - $points->Ls->p;
+        $trend['short'] = round($HiLs / $HsLs, 2);
+        $immedRange = round($baseZone->H->p - $baseZone->L->p, 2);
+        $shortRange = round($HsLs, 2);
+        $compress['short'] = $immedRange < $shortRange;
         if ($isMid) {
-            $calc['mid'] = round(($points->Hs->p - $points->Lm->p) / ($points->Hm->p - $points->Lm->p), 2);
-            $range['mid'] = round($points->Hm->p - $points->Lm->p, 2);
+            $HsLm = $points->Hs->p - $points->Lm->p;
+            $HmLm = $points->Hm->p - $points->Lm->p;
+            $trend['mid'] = round($HsLm / $HmLm, 2);
+            $midRange = round($HmLm, 2);
+            $compress['mid'] = $shortRange < $midRange;
         }
         if ($isLong) {
-            $calc['long'] = round(($points->Hm->p - $points->Ll->p) / ($points->Hl->p - $points->Ll->p), 2);
-            $range['long'] = round($points->Hl->p - $points->Ll->p, 2);
+            $HmLl = $points->Hm->p - $points->Ll->p;
+            $HlLl = $points->Hl->p - $points->Ll->p;
+            $trend['long'] = round($HmLl / $HlLl, 2);
+            $longRange = round($HlLl, 2);
+            $compress['long'] = $midRange < $longRange;
         }
-        $ratios = [];
-        $prevKey = 'immed';
-        foreach ($range as $key => $value) {
-            if ($key !== 'immed') {
-                $ratios[$key] = round($range[$prevKey] / $value, 2);
-                $prevKey = $key;
-            }
-        }
-        $ascRange = $range;
-        asort($ascRange);
-        $compress = $range === $ascRange;
+        $compressConds = array_values($compress);
+        $compress['sum'] = count(array_filter($compressConds)) === count($compressConds);
 
-        return (object)['symbol' => $symbol, 'term' => (object)$calc, 'compress' => $compress, 'pivot' => $pivot, 'points' => $points, 'ratios' => $ratios];
+        return (object)[
+            'symbol' => $symbol,
+            'points' => $points,
+            'base' => $base,
+            'trend' => (object)$trend,
+            'compress' => (object)$compress,
+        ];
     }
 
     public function checkStock($vnindex, $stock, $isMid, $isLong)
     {
-        $check = [
-            $stock->pivot,
-            $stock->compress,
-            $stock->term->short > 0.7 && $stock->term->short > $vnindex->term->short,
-        ];
-        $result = [
-            'pivot' => $check[0],
-            'compress' => $check[1],
-            'short' => $check[2],
-        ];
+        $pivot['L-short'] = $stock->points->Ls->t <= $vnindex->points->Ls->t;
+        $pivot['H-short'] = $stock->points->Hs->t >= $vnindex->points->Hs->t;
+        $trend['short'] = $stock->trend->short > 0.7 && $stock->trend->short > $vnindex->trend->short;
         if ($isMid) {
-            $check[] = $stock->term->mid > 0.7 && $stock->term->mid > $vnindex->term->mid;
-            $result['mid'] = $check[3];
+            $pivot['L-mid'] = $stock->points->Lm->t <= $vnindex->points->Lm->t;
+            $pivot['H-mid'] = $stock->points->Hm->t >= $vnindex->points->Hm->t;
+            $trend['mid'] = $stock->trend->mid > 0.7 && $stock->trend->mid > $vnindex->trend->mid;
         }
         if ($isLong) {
-            $check[] = $stock->term->long > 0.7 && $stock->term->long > $vnindex->term->long;
-            $result['long'] = $check[4];
+            $pivot['L-long'] = $stock->points->Ll->t <= $vnindex->points->Ll->t;
+            $pivot['H-long'] = $stock->points->Hl->t >= $vnindex->points->Hl->t;
+            $trend['long'] = $stock->trend->long > 0.7 && $stock->trend->long > $vnindex->trend->long;
         }
-        $sum = count(array_filter($check)) === count($check);
-        $result['sum'] = $sum;
-
+        $pivotConds = array_values($pivot);
+        $pivotSum = count(array_filter($pivotConds)) === count($pivotConds);
+        $pivot['sum'] = $pivotSum;
+        $trendConds = array_values($trend);
+        $trendSum = count(array_filter($trendConds)) === count($trendConds);
+        $trend['sum'] = $trendSum;
+        //
         return (object)[
-            'result' => (object)$result,
-            'compress' => $stock->ratios,
-            // $stock->symbol => $stock->term,
-            // $vnindex->symbol => $vnindex->term,
-            // 'points' => $stock->points,
+            'pivot' => $pivot,
+            'trend' => $trend,
+            'compress' => $stock->compress,
+            'base' => $stock->base,
+            'sum' => $pivotSum && $trendSum && $stock->compress->sum && $stock->base,
         ];
+        // return (object)[
+        //     $stock->symbol => $stock->trend,
+        //     $vnindex->symbol => $vnindex->trend,
+        //     'points' => $stock->points,
+        // ];
     }
 
     public function filterStock($group, $filterTimes)
@@ -436,7 +439,7 @@ class ShareService extends CoreService
             echo $symbol . ' ';
             $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
             $check = $this->checkStock($vnindex, $stock, $isMid, $isLong);
-            if ($check->result->sum) $filteredSymbols[] = $symbol;
+            if ($check->sum) $filteredSymbols[] = $symbol;
         }
         return (object)[
             'group' => $group,
@@ -457,6 +460,8 @@ class ShareService extends CoreService
         $filterTimesCount = count($filterTimes);
         $isMid = $filterTimesCount >= 3;
         $isLong = $filterTimesCount === 4;
+        // ----------------------------
+        // $data = $this->getStock($symbol, end($filterTimes), $filterTimes[0]);
         // ----------------------------
         // $data = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
         // ----------------------------

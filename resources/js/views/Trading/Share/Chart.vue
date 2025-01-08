@@ -96,7 +96,7 @@
                 :symbol="state.symbol"
                 storeModule="tradingShare"
                 :priceSeries="state.series.stock"
-                :levels="[1]"
+                :levels="[1, 2]"
                 @hideContext="hideContext"
             />
         </div>
