@@ -335,15 +335,17 @@ class ShareService extends CoreService
             $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $h];
             $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $l];
             if ($i === $last) {
-                $B = (object)['H' => $pH, 'L' => $pL];
+                $B = (object)['H' => $pL, 'L' => $pL, 'ir' => 0];
                 $M = clone $B;
             } else {
                 if ($h > $B->H->p) $B->H = $pH;
                 if ($l < $B->L->p) {
-                    if ($B->H->p - $B->L->p > $M->H->p - $M->L->p) $M = clone $B;
+                    if ($B->ir > $M->ir) $M = clone $B;
                     $B->H = $pL;
                     $B->L = $pL;
+                    $B->ir = 0;
                 }
+                else $B->ir++;
             }
             if ($t === $stop) break;
         }
