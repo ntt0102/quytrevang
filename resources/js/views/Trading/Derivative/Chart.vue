@@ -102,7 +102,6 @@
                 :pickTimeToolRef="pickTimeToolRef"
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
-                @scrollChart="scrollChart"
                 @setProgress="setProgress"
                 @hideContext="hideContext"
             />

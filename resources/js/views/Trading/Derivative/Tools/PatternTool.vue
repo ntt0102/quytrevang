@@ -23,7 +23,7 @@ const props = defineProps([
     "timeToIndex",
     "indexToTime",
 ]);
-const emit = defineEmits(["scrollChart", "setProgress", "hideContext"]);
+const emit = defineEmits(["setProgress", "hideContext"]);
 const patternToolRef = ref(null);
 const patternStore = computed(
     () => store.state.tradingDerivative.tools.pattern
@@ -258,7 +258,6 @@ function refresh(autoAdjust = false) {
     if (mf.isSet(lines.C)) {
         if (autoAdjust) {
             adjustPatternPoints();
-            emit("scrollChart");
         }
         removePatternTool();
         loadPatternTool();
