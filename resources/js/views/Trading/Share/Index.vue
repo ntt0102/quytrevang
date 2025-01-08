@@ -28,12 +28,13 @@
                     location: 'before',
                     widget: 'dxAutocomplete',
                     options: {
-                        width: '90',
                         showClearButton: true,
                         openOnFieldClick: true,
                         minSearchLength: 0,
                         dataSource: groups,
                         value: state.group,
+                        width: '80',
+                        dropDownOptions: { width: '90' },
                         elementAttr: { class: 'symbol-group' },
                         placeholder: $t('trading.share.group'),
                         onEnterKey: groupChanged,
@@ -55,8 +56,8 @@
                         selectedItemKey: source,
                         stylingMode: 'text',
                         useSelectMode: true,
-                        width: '100',
-                        dropDownOptions: { width: '100' },
+                        width: '50',
+                        dropDownOptions: { width: '70' },
                         elementAttr: { class: 'source' },
                         onSelectionChanged: sourceSelect,
                     },
@@ -82,6 +83,11 @@
                         hint: $t('trading.share.filterSymbols'),
                         onClick: filterClick,
                     },
+                },
+                {
+                    visible: filterProcess > 0,
+                    location: 'after',
+                    text: `(${filterProcess}%)`,
                 },
             ]"
         />
@@ -113,6 +119,7 @@ const groups = computed(() => store.state.tradingShare.groups);
 const symbolsLength = computed(() => store.state.tradingShare.symbols.length);
 const source = computed(() => store.state.tradingShare.source);
 const sources = computed(() => store.state.tradingShare.sources);
+const filterProcess = computed(() => store.state.tradingShare.filterProcess);
 
 const state = reactive({
     group: route.query.list ?? "",
@@ -148,7 +155,7 @@ function fromDateChanged({ value }) {
 }
 function sourceSelect({ item }) {
     store.dispatch("tradingShare/setSource", item);
-    if (source.value === "FIREANT") chartRef.value.connectSocket();
+    if (source.value === "FIRE") chartRef.value.connectSocket();
     else chartRef.value.getChartData(true, state.fromDate);
 }
 function watchlistItemClick({ itemData }) {

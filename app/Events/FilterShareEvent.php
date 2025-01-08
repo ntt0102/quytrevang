@@ -11,13 +11,16 @@ class FilterShareEvent implements ShouldBroadcastNow
 {
     use InteractsWithSockets, SerializesModels;
 
+    public $filterProcess;
+
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct($filterProcess)
     {
+        $this->filterProcess = $filterProcess;
         // $this->dontBroadcastToCurrentUser();
     }
 
@@ -38,6 +41,16 @@ class FilterShareEvent implements ShouldBroadcastNow
      */
     public function broadcastAs()
     {
-        return 'filter-share';
+        return 'filtering-share';
+    }
+
+    /**
+     * Get the data to broadcast.
+     *
+     * @return array
+     */
+    public function broadcastWith()
+    {
+        return ['process' => $this->filterProcess];
     }
 }

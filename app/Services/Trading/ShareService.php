@@ -7,6 +7,7 @@ use App\Models\ShareSymbol;
 use App\Models\ShareOrder;
 use App\Models\StockDrawing;
 use App\Jobs\FilterShareJob;
+use App\Events\FilterShareEvent;
 
 class ShareService extends CoreService
 {
@@ -27,7 +28,7 @@ class ShareService extends CoreService
         return [
             'vpsUser' => get_global_value('vpsUser'),
             'vpsSession' => get_global_value('vpsSession'),
-            'sources' => ['FIREANT', 'VNDIRECT'],
+            'sources' => ['FIRE', 'VND'],
             'source' => get_global_value('shareSource'),
             'filterTime' => $filterTime,
             'watchlist' => $watch ? $watch->symbols : [],
@@ -435,11 +436,20 @@ class ShareService extends CoreService
         $vnindex = $this->calcStock('VNINDEX', $filterTimes, $isMid, $isLong);
         $symbols = $this->getSymbols($group);
         if (empty($symbols)) return false;
+        $total = count($symbols);
+        $index = 1;
+        $preProcess = 0;
         foreach ($symbols as $symbol) {
-            echo $symbol . ' ';
+            $process = intval(100 * $index / $total);
+            if ($process > $preProcess) {
+                echo $process . ' ';
+                event(new FilterShareEvent($process));
+                $preProcess = $process;
+            }
             $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
             $check = $this->checkStock($vnindex, $stock, $isMid, $isLong);
             if ($check->sum) $filteredSymbols[] = $symbol;
+            $index++;
         }
         return (object)[
             'group' => $group,

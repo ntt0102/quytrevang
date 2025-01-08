@@ -370,14 +370,14 @@ function initChart() {
         if (data.reversal) {
             updateVnindexMarker(data.reversal.time);
         }
-        if (props.source === "FIREANT") connectSocket();
+        if (props.source === "FIRE") connectSocket();
         else getChartData(true);
     });
 }
 function getChartData(withVnindex = false, fromDate = null) {
     if (!state.symbol) return false;
     if (!fromDate) fromDate = chartFrom.value;
-    if (props.source === "FIREANT") getChartSocket(withVnindex, fromDate);
+    if (props.source === "FIRE") getChartSocket(withVnindex, fromDate);
     else getChartServer(withVnindex, fromDate);
 }
 function getChartSocket(withVnindex = false, fromDate = null) {

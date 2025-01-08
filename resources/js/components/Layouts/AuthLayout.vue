@@ -218,13 +218,13 @@ function connectPusher() {
                     let notify = ["notification"];
                     switch (e.event) {
                         case "registered-user":
-                            if (route.name == "admin-user")
+                            if (route.name === "admin-user")
                                 store.dispatch("adminUser/getUsers");
                             break;
 
                         case "confirming-user":
                             notify.push("adminUser");
-                            if (route.name == "admin-user")
+                            if (route.name === "admin-user")
                                 store.dispatch("adminUser/getUsers");
                             break;
 
@@ -236,33 +236,33 @@ function connectPusher() {
                         case "paying-contract":
                         case "withdrawing-contract":
                             notify.push("adminContract");
-                            if (route.name == "admin-contract")
+                            if (route.name === "admin-contract")
                                 store.dispatch("adminContract/getContracts");
                             break;
 
                         case "paid-contract":
                         case "withdrawn-contract":
                             store.dispatch("auth/check", true);
-                            if (route.name == "overview") {
+                            if (route.name === "overview") {
                                 store.dispatch("userContract/getContracts");
                                 store.dispatch("adminContract/getSummary");
-                            } else if (route.name == "contract")
+                            } else if (route.name === "contract")
                                 store.dispatch("userContract/getContracts");
                             break;
 
                         case "sent-comment":
                             notify.push("adminComment");
-                            if (route.name == "admin-comment")
+                            if (route.name === "admin-comment")
                                 store.dispatch("adminComment/getComments");
                             break;
-                        // case "filtered-share":
-                        //     if (route.name == "trading-share") {
-                        //         store.dispatch(
-                        //             "tradingShare/getSymbols",
-                        //             "FILTER"
-                        //         );
-                        //     }
-                        //     break;
+                        case "filtered-share":
+                            if (route.name === "trading-share") {
+                                store.dispatch(
+                                    "tradingShare/setFilterProcess",
+                                    0
+                                );
+                            }
+                            break;
                     }
                     store.dispatch("getNotify", notify);
                     store.dispatch("getNotifications");
@@ -276,37 +276,44 @@ function connectPusher() {
     pusher.subscribe("private-admin-user").bind("update-user", () => {
         setTimeout(() => {
             store.dispatch("getNotify", ["adminUser"]);
-            if (route.name == "admin-user")
+            if (route.name === "admin-user")
                 store.dispatch("adminUser/getUsers");
         }, 2000);
     });
     pusher.subscribe("private-admin-contract").bind("update-contract", () => {
         setTimeout(() => {
             store.dispatch("getNotify", ["adminContract"]);
-            if (route.name == "admin-contract")
+            if (route.name === "admin-contract")
                 store.dispatch("adminContract/getContracts");
         }, 2000);
     });
     pusher.subscribe("private-admin-comment").bind("update-comment", () => {
         setTimeout(() => {
             store.dispatch("getNotify", ["adminComment"]);
-            if (route.name == "admin-comment")
+            if (route.name === "admin-comment")
                 store.dispatch("adminComment/getComments");
         }, 2000);
     });
     pusher.subscribe("private-trading-derivative").bind("update-status", () => {
         setTimeout(() => {
-            if (route.name == "trading-derivative") {
+            if (route.name === "trading-derivative") {
                 store.dispatch("tradingDerivative/getStatus");
                 store.dispatch("tradingShrstat/getTools");
             }
         }, 2000);
     });
     pusher
+        .subscribe("private-trading-share")
+        .bind("filtering-share", (data) => {
+            if (route.name === "trading-share") {
+                store.dispatch("tradingShare/setFilterProcess", data.process);
+            }
+        });
+    pusher
         .subscribe("private-trading-shrstats")
         .bind("update-statistic", () => {
             setTimeout(() => {
-                if (route.name == "trading-shrstats") {
+                if (route.name === "trading-shrstats") {
                     store.dispatch("tradingShrstat/getData");
                     store.dispatch("tradingShrstat/getSummary");
                     store.dispatch("tradingShrstat/getOpening");

@@ -7,6 +7,7 @@ function initialState() {
         prices: [],
         tools: {},
         isLoading: false,
+        filterProcess: 0,
     };
 }
 const getters = {};
@@ -81,6 +82,7 @@ const actions = {
     filterSymbols({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios.post("trading/share/filter", param).then((response) => {
+                commit("setFilterProcess", 0);
                 resolve(response.data);
             });
         });
@@ -126,6 +128,9 @@ const actions = {
         });
     },
 
+    setFilterProcess({ commit }, param) {
+        commit("setFilterProcess", param);
+    },
     resetState({ commit }) {
         commit("resetState");
     },
@@ -153,6 +158,9 @@ const mutations = {
     },
     setSymbols(state, data) {
         state.symbols = data;
+    },
+    setFilterProcess(state, data) {
+        state.filterProcess = data;
     },
     resetState(state) {
         state = Object.assign(state, initialState());
