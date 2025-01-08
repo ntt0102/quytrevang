@@ -17,10 +17,10 @@ const store = useStore();
 const props = defineProps(["symbol", "priceSeries"]);
 const emit = defineEmits(["vnindexUpdated", "hideContext"]);
 const reversalToolRef = ref(null);
-const prices = computed(() => store.state.tradingShare.prices);
 const toolStore = computed(() => store.state.tradingShare.tools.reversal);
 const TOOL_NAME = "reversal";
 const TOOL_COLOR = "rgba(156, 39, 176, 0.7)";
+const INDEX = "VNINDEX";
 let series = {};
 let times = [];
 let reversal = null;
@@ -75,10 +75,10 @@ function reversalToolContextmenu(e) {
     emit("vnindexUpdated");
     e.target.classList.remove("selected");
 }
-function draw({ time }) {
+function draw({ prices, time }) {
     times.push({ time, value: 1 });
     if (times.length === 2) {
-        reversal = scan(times[0].time, times[1].time);
+        reversal = scan(prices, times[0].time, times[1].time);
         loadReversalTool(reversal);
         store.dispatch("tradingShare/drawTools", {
             isRemove: false,
@@ -87,15 +87,14 @@ function draw({ time }) {
             points: [0],
             data: [reversal],
         });
-        if (props.symbol === "VNINDEX") emit("vnindexUpdated", reversal.time);
+        if (props.symbol === INDEX) emit("vnindexUpdated", reversal.time);
         times = [];
         reversalToolRef.value.classList.remove("selected");
     } else series.setData(times);
 }
-function scan(startTime, endTime) {
+function scan(prices, startTime, endTime) {
     let B, bTime, pr, ir;
-    const _prices = prices.value;
-    const data = _prices.filter(
+    const data = prices.filter(
         (item) => item.time >= startTime && item.time <= endTime
     );
     for (let i = 0; i < data.length; i++) {
@@ -123,8 +122,8 @@ function scan(startTime, endTime) {
             }
         }
     }
-    const bIndex = _prices.findIndex((item) => item.time === bTime);
-    const time = _prices[bIndex + ir].time;
+    const bIndex = prices.findIndex((item) => item.time === bTime);
+    const time = prices[bIndex + ir].time;
     const price = B.L.p + pr;
     return { time, price };
 }

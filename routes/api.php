@@ -133,6 +133,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('check', 'ShareController@checkSymbol');
                     Route::post('filter', 'ShareController@filterSymbols');
                     Route::post('change-watchlist', 'ShareController@changeWatchlist');
+                    Route::post('get-tools', 'ShareController@getTools');
                     Route::post('draw-tools', 'ShareController@drawTools');
                 });
                 Route::group(['prefix' => 'shrstat', 'middleware' => 'can:admin:statistic_share'], function () {

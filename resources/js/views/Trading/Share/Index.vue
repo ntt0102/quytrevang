@@ -55,8 +55,8 @@
                         selectedItemKey: source,
                         stylingMode: 'text',
                         useSelectMode: true,
-                        width: '50',
-                        dropDownOptions: { width: '70' },
+                        width: '100',
+                        dropDownOptions: { width: '100' },
                         elementAttr: { class: 'source' },
                         onSelectionChanged: sourceSelect,
                     },
@@ -85,7 +85,12 @@
                 },
             ]"
         />
-        <Chart :fromDate="state.fromDate" :group="state.group" ref="chartRef" />
+        <Chart
+            :source="source"
+            :fromDate="state.fromDate"
+            :group="state.group"
+            ref="chartRef"
+        />
     </div>
 </template>
 

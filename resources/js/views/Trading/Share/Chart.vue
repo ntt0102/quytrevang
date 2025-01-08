@@ -80,7 +80,7 @@
             <ReversalTool
                 ref="reversalToolRef"
                 :symbol="state.symbol"
-                :priceSeries="state.series.price"
+                :priceSeries="state.series.stock"
                 @vnindexUpdated="updateVnindexMarker"
                 @hideContext="hideContext"
             />
@@ -88,14 +88,14 @@
                 ref="lineToolRef"
                 :symbol="state.symbol"
                 storeModule="tradingShare"
-                :priceSeries="state.series.price"
+                :priceSeries="state.series.stock"
                 @hideContext="hideContext"
             />
             <TargetTool
                 ref="targetToolRef"
                 :symbol="state.symbol"
                 storeModule="tradingShare"
-                :priceSeries="state.series.price"
+                :priceSeries="state.series.stock"
                 :levels="[1]"
                 @hideContext="hideContext"
             />
@@ -119,7 +119,7 @@ import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
-import { getUnixTime } from "date-fns";
+import { format, getUnixTime } from "date-fns";
 
 const store = useStore();
 const route = useRoute();
@@ -136,7 +136,7 @@ const reversalToolRef = ref(null);
 const lineToolRef = ref(null);
 const targetToolRef = ref(null);
 
-const props = defineProps(["fromDate", "group"]);
+const props = defineProps(["source", "fromDate", "group"]);
 const isLoading = computed(() => store.state.tradingShare.isLoading);
 const showWatchlist = computed(() => state.symbol);
 const inWatchlist = computed(() => state.watchlist.includes(state.symbol));
@@ -149,15 +149,16 @@ const state = reactive({
     watchlist: [],
 });
 let params = {
+    index: "VNINDEX",
     chart: {},
-    series: {},
+    data: { index: [], stock: [] },
     crosshair: {},
+    socket: null,
 };
 
 onMounted(() => {
     drawChart();
     initChart();
-    getChartData(true);
     filterTimeToolRef.value.createSeries(params.chart);
     reversalToolRef.value.createSeries(params.chart);
     new ResizeObserver(chartResize).observe(chartContainerRef.value);
@@ -211,8 +212,8 @@ function drawChart() {
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
     params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(priceLineDrag);
-    params.series.vnindex = params.chart.addCandlestickSeries({
-        priceScaleId: "vnindex",
+    state.series.index = params.chart.addCandlestickSeries({
+        priceScaleId: "index",
         upColor: "#30A165",
         downColor: "#EC3F3F",
         borderVisible: false,
@@ -222,7 +223,7 @@ function drawChart() {
         scaleMargins: { top: 0.1, bottom: 0.55 },
         lastValueVisible: false,
     });
-    state.series.price = params.chart.addCandlestickSeries({
+    state.series.stock = params.chart.addCandlestickSeries({
         upColor: "#30A165",
         downColor: "#EC3F3F",
         borderVisible: false,
@@ -242,7 +243,10 @@ function chartClick() {
     if (filterTimeToolRef.value.isSelected()) {
         filterTimeToolRef.value.draw({ time: params.crosshair.time });
     } else if (reversalToolRef.value.isSelected()) {
-        reversalToolRef.value.draw({ time: params.crosshair.time });
+        reversalToolRef.value.draw({
+            prices: params.data.stock,
+            time: params.crosshair.time,
+        });
     } else if (lineToolRef.value.isSelected()) {
         lineToolRef.value.draw({
             price: coordinateToPrice(params.crosshair.y),
@@ -261,7 +265,7 @@ function getFilterTimes() {
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
-        let price = e.seriesPrices.get(state.series.price);
+        let price = e.seriesPrices.get(state.series.stock);
         params.crosshair.time = e.time;
         params.crosshair.price = price;
     } else {
@@ -334,9 +338,19 @@ function changeWatchlist() {
     });
 }
 
-function loadChartData() {
-    state.series.price.setData(store.state.tradingShare.prices);
+function loadChartData(value) {
+    params.data.stock = value;
+    state.series.stock.setData(params.data.stock);
     params.chart.applyOptions({ watermark: { text: state.symbol } });
+}
+function updateLatestCandle(series, newPrice) {
+    let latest = params.data[series].pop();
+    if (!latest) return false;
+    latest.high = Math.max(latest.high, newPrice);
+    latest.low = Math.max(latest.low, newPrice);
+    latest.close = newPrice;
+    params.data[series].push(latest);
+    state.series[series].update(latest);
 }
 function symbolChanged() {
     if (!state.inputSymbol || !state.inputSymbol.trim()) return false;
@@ -352,11 +366,33 @@ function initChart() {
         state.vpsUser = data.vpsUser;
         state.vpsUser = data.vpsSession;
         setTimeout(() => filterTimeToolRef.value.load(data.filterTime), 3000);
+        if (data.reversal) {
+            updateVnindexMarker(data.reversal.time);
+        }
+        if (props.source === "FIREANT") connectSocket();
+        else getChartData(true);
     });
 }
 function getChartData(withVnindex = false, fromDate = null) {
     if (!state.symbol) return false;
     if (!fromDate) fromDate = chartFrom.value;
+    if (props.source === "FIREANT") getChartSocket(withVnindex, fromDate);
+    else getChartServer(withVnindex, fromDate);
+}
+function getChartSocket(withVnindex = false, fromDate = null) {
+    if (params.socket.readyState === WebSocket.OPEN) {
+        const from = format(fromDate, "yyyy-MM-dd");
+        const to = format(new Date(), "yyyy-MM-dd");
+        let message = `{"arguments":["${state.symbol}","D","${from}","${to}"],"invocationId":"stock","target":"GetBars","type":1}`;
+        params.socket.send(message);
+        if (withVnindex) {
+            message = `{"arguments":["${params.index}","D","${from}","${to}"],"invocationId":"index","target":"GetBars","type":1}`;
+            params.socket.send(message);
+        }
+        removeTools();
+    }
+}
+function getChartServer(withVnindex = false, fromDate = null) {
     store
         .dispatch("tradingShare/getChartData", {
             symbol: state.symbol,
@@ -365,11 +401,10 @@ function getChartData(withVnindex = false, fromDate = null) {
         })
         .then((vnindex) => {
             if (withVnindex) {
-                params.series.vnindex.setData(vnindex.prices);
-                if (vnindex.reversal) {
-                    updateVnindexMarker(vnindex.reversal.time);
-                }
-            } else removeTools();
+                params.data.index = vnindex;
+                state.series.index.setData(vnindex);
+            }
+            removeTools();
         });
 }
 function updateVnindexMarker(time) {
@@ -382,7 +417,7 @@ function updateVnindexMarker(time) {
             shape: "circle",
         });
     }
-    params.series.vnindex.setMarkers(markers);
+    state.series.index.setMarkers(markers);
 }
 function removeTools() {
     reversalToolRef.value.remove();
@@ -406,18 +441,86 @@ function moveSymbolInGroup(side = true) {
     getChartData();
 }
 function checkSymbol() {
-    if (!state.symbol || state.symbol === "VNINDEX") return false;
+    if (!state.symbol || state.symbol === params.index) return false;
     const filterTimes = getFilterTimes();
     if (filterTimes.length < 2) {
         return toast.warning(t("trading.share.filterTimeWarning"));
     }
     checkToolRef.value.check({ symbol: state.symbol, filterTimes });
 }
+function connectSocket() {
+    let uri =
+        "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
+    params.socket = new WebSocket(uri);
+
+    params.socket.onopen = () => {
+        let message = '{"protocol":"json","version":1}';
+        params.socket.send(message);
+        getChartData(true);
+    };
+
+    params.socket.onmessage = (e) => {
+        const data = parseSocketMessage(e.data);
+        if (data.length == 0) return false;
+        data.forEach((item) => {
+            if (!item) return false;
+            if (item.type == 3) {
+                const prices = item.result.bars.map(
+                    ({ open, high, low, close, date }) => {
+                        const time = getUnixTime(new Date(date));
+                        return { open, high, low, close, time };
+                    }
+                );
+                if (item.invocationId === "stock") {
+                    store.dispatch("tradingShare/getTools", {
+                        symbol: state.symbol,
+                    });
+                    loadChartData(prices);
+                } else state.series.index.setData(prices);
+            } else if (item.type == 1 && item.target === "UpdateLastPrices") {
+                const _data = item.arguments[0];
+                const stock = _data.find((i) => i.symbol === state.symbol);
+                const index = _data.find((i) => i.symbol === params.index);
+
+                if (index) updateLatestCandle("index", index.last);
+                if (stock) updateLatestCandle("stock", stock.last);
+            }
+        });
+    };
+
+    params.socket.onerror = (e) => {
+        console.error("Lỗi kết nối WebSocket:", e);
+    };
+
+    params.socket.onclose = () => {
+        console.log("Đã đóng kết nối WebSocket");
+    };
+}
+function parseSocketMessage(msg) {
+    let result = [];
+    msg.split("").forEach((item) => {
+        const startPos = item.indexOf("{");
+        const endPos = item.lastIndexOf("}");
+        let temp = null;
+        if (startPos !== -1 && endPos !== -1 && endPos > startPos) {
+            const filteredData = item.substring(startPos, endPos + 1);
+            if (filteredData != "{}") {
+                try {
+                    temp = JSON.parse(filteredData);
+                } catch (error) {
+                    console.error("JSON parse error:", error);
+                }
+            }
+        }
+        result.push(temp);
+    });
+    return result;
+}
 function hideContext() {
     lineToolRef.value.hide();
 }
 function coordinateToPrice(y) {
-    return mf.fmtNum(state.series.price.coordinateToPrice(y));
+    return mf.fmtNum(state.series.stock.coordinateToPrice(y));
 }
 </script>
 <style lang="scss">

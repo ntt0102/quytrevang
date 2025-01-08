@@ -116,6 +116,18 @@ class ShareController extends CoreController
         return $this->sendResponse($data);
     }
     /**
+     * Get Tools
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getTools(Request $request)
+    {
+        $data = $this->shareService->getTools($this->payload);
+        return $this->sendResponse($data);
+    }
+    /**
      * Draw Tools
      *
      * @param \Illuminate\Http\Request $request

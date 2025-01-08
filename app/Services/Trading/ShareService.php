@@ -7,7 +7,6 @@ use App\Models\ShareSymbol;
 use App\Models\ShareOrder;
 use App\Models\StockDrawing;
 use App\Jobs\FilterShareJob;
-use App\Jobs\ExportShareJob;
 
 class ShareService extends CoreService
 {
@@ -22,13 +21,17 @@ class ShareService extends CoreService
     {
         $filterTime = StockDrawing::where('name', 'filterTime')->orderByRaw("point ASC")->pluck('data', 'point');
         $watch = ShareSymbol::where('name', 'WATCH')->first();
+        $reversal = StockDrawing::where('symbol', 'VNINDEX')
+            ->where('name', 'reversal')
+            ->where('point', '0')->value('data');
         return [
             'vpsUser' => get_global_value('vpsUser'),
             'vpsSession' => get_global_value('vpsSession'),
-            'sources' => ['VND', 'PINE'],
+            'sources' => ['FIREANT', 'VNDIRECT'],
             'source' => get_global_value('shareSource'),
             'filterTime' => $filterTime,
-            'watchlist' => $watch ? $watch->symbols : []
+            'watchlist' => $watch ? $watch->symbols : [],
+            'reversal' => $reversal,
         ];
     }
 
@@ -56,13 +59,7 @@ class ShareService extends CoreService
             'tools' => $this->getTools($payload),
         ];
         if ($payload->withVnindex) {
-            $reversal = StockDrawing::where('symbol', 'VNINDEX')
-                ->where('name', 'reversal')
-                ->where('point', '0')->value('data');
-            $data['vnindex'] = [
-                'prices' => $this->getChartData("VNINDEX", $payload->from),
-                'reversal' => $reversal,
-            ];
+            $data['vnindex'] = $this->getChartData("VNINDEX", $payload->from);
         }
         return $data;
     }
@@ -72,15 +69,14 @@ class ShareService extends CoreService
         $to = time();
         $data = $this->getStock($symbol, $from, $to);
         if ($data->s !== 'ok') return [];
-        $isAdjust = get_global_value('shareSource') === 'PINE' && strlen($symbol) <= 3;
         $last = count($data->t) - 1;
         for ($i = 0; $i <= $last; $i++) {
             $chart[] = [
                 'time' => $data->t[$i],
-                'open' => $isAdjust ? $data->o[$i] / 1000 : $data->o[$i],
-                'high' => $isAdjust ? $data->h[$i] / 1000 : $data->h[$i],
-                'low' => $isAdjust ? $data->l[$i] / 1000 : $data->l[$i],
-                'close' => $isAdjust ? $data->c[$i] / 1000 : $data->c[$i]
+                'open' => $data->o[$i],
+                'high' => $data->h[$i],
+                'low' => $data->l[$i],
+                'close' => $data->c[$i]
             ];
         }
         $date = new \DateTime();
@@ -250,6 +246,7 @@ class ShareService extends CoreService
 
     public function getStock($symbol, $from, $to)
     {
+        // 'charts.pinetree.vn/tv/history'
         // https://trading.vietcap.com.vn/api/chart/OHLCChart/gap-chart
         //X https://mastrade.masvn.com/api/v1/tradingview/history
         //X https://vstock.vn/mck/tvchart2/63791/history
@@ -257,11 +254,8 @@ class ShareService extends CoreService
         try {
             $source = get_global_value('shareSource');
             switch ($source) {
-                case 'VND':
+                case 'VNDIRECT':
                     $host = 'dchart-api.vndirect.com.vn/dchart/history';
-                    break;
-                case 'PINE':
-                    $host = 'charts.pinetree.vn/tv/history';
                     break;
             }
             $client = new \GuzzleHttp\Client();

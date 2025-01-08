@@ -34,6 +34,7 @@ const actions = {
                 .then((response) => {
                     commit("setSource", response.data.source);
                     commit("setSources", response.data.sources);
+                    commit("setLoading", false);
                     resolve(response.data);
                 });
         });
@@ -105,6 +106,16 @@ const actions = {
                 });
         });
     },
+    getTools({ commit, dispatch, getters, state, rootGetters }, param) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/share/get-tools", param, { noLoading: true })
+                .then((response) => {
+                    commit("setTools", response.data);
+                    resolve();
+                });
+        });
+    },
     drawTools({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
             axios
@@ -124,6 +135,9 @@ const mutations = {
     setChartData(state, data) {
         state.prices = data.prices;
         state.tools = data.tools;
+    },
+    setTools(state, data) {
+        state.tools = data;
     },
     setSource(state, data) {
         state.source = data;
