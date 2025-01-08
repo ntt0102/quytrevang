@@ -25,7 +25,7 @@ class ShareService extends CoreService
         return [
             'vpsUser' => get_global_value('vpsUser'),
             'vpsSession' => get_global_value('vpsSession'),
-            'sources' => ['VND', 'PINE', 'MIRA', 'VSTK'],
+            'sources' => ['VND', 'PINE'],
             'source' => get_global_value('shareSource'),
             'filterTime' => $filterTime,
             'watchlist' => $watch ? $watch->symbols : []
@@ -250,8 +250,9 @@ class ShareService extends CoreService
 
     public function getStock($symbol, $from, $to)
     {
-        // https://mastrade.masvn.com/api/v1/tradingview/history
-        // https://vstock.vn/mck/tvchart2/63791/history
+        // https://trading.vietcap.com.vn/api/chart/OHLCChart/gap-chart
+        //X https://mastrade.masvn.com/api/v1/tradingview/history
+        //X https://vstock.vn/mck/tvchart2/63791/history
         // https://kbbuddyiis.kbsec.com.vn/investment/stocks/AAM/data_day?sdate=14-03-2024&edate=09-01-2025
         try {
             $source = get_global_value('shareSource');
@@ -261,12 +262,6 @@ class ShareService extends CoreService
                     break;
                 case 'PINE':
                     $host = 'charts.pinetree.vn/tv/history';
-                    break;
-                case 'MIRA':
-                    $host = 'mastrade.masvn.com/api/v1/tradingview/history';
-                    break;
-                case 'VSTK':
-                    $host = 'vstock.vn/mck/tvchart2/63791/history';
                     break;
             }
             $client = new \GuzzleHttp\Client();
