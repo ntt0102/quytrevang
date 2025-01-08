@@ -263,10 +263,10 @@ class ShareService extends CoreService
                     $host = 'charts.pinetree.vn/tv/history';
                     break;
                 case 'MIRA':
-                    $host = 'https://mastrade.masvn.com/api/v1/tradingview/history';
+                    $host = 'mastrade.masvn.com/api/v1/tradingview/history';
                     break;
                 case 'VSTK':
-                    $host = 'https://vstock.vn/mck/tvchart2/63791/history';
+                    $host = 'vstock.vn/mck/tvchart2/63791/history';
                     break;
             }
             $client = new \GuzzleHttp\Client();
