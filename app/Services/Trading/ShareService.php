@@ -393,17 +393,14 @@ class ShareService extends CoreService
 
     public function checkStock($vnindex, $stock, $isMid, $isLong)
     {
-        $pivot['L-short'] = $stock->points->Ls->t <= $vnindex->points->Ls->t;
-        $pivot['H-short'] = $stock->points->Hs->t >= $vnindex->points->Hs->t;
+        $pivot['short'] = $stock->points->Ls->t <= $vnindex->points->Ls->t;
         $trend['short'] = $stock->trend->short > 0.7 && $stock->trend->short > $vnindex->trend->short;
         if ($isMid) {
-            $pivot['L-mid'] = $stock->points->Lm->t <= $vnindex->points->Lm->t;
-            $pivot['H-mid'] = $stock->points->Hm->t >= $vnindex->points->Hm->t;
+            $pivot['mid'] = $stock->points->Lm->t <= $vnindex->points->Lm->t;
             $trend['mid'] = $stock->trend->mid > 0.7 && $stock->trend->mid > $vnindex->trend->mid;
         }
         if ($isLong) {
-            $pivot['L-long'] = $stock->points->Ll->t <= $vnindex->points->Ll->t;
-            $pivot['H-long'] = $stock->points->Hl->t >= $vnindex->points->Hl->t;
+            $pivot['long'] = $stock->points->Ll->t <= $vnindex->points->Ll->t;
             $trend['long'] = $stock->trend->long > 0.7 && $stock->trend->long > $vnindex->trend->long;
         }
         $pivotConds = array_values($pivot);
