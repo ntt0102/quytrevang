@@ -480,11 +480,17 @@ function connectSocket() {
                 } else state.series.index.setData(prices);
             } else if (item.type == 1 && item.target === "UpdateLastPrices") {
                 const _data = item.arguments[0];
-                const stock = _data.find((i) => i.symbol === state.symbol);
                 const index = _data.find((i) => i.symbol === params.index);
+                const stock = _data.find((i) => i.symbol === state.symbol);
 
-                if (index) updateLatestCandle("index", index.last);
-                if (stock) updateLatestCandle("stock", stock.last);
+                if (index) {
+                    updateLatestCandle("index", index.last);
+                    console.log("index", index.last);
+                }
+                if (stock) {
+                    updateLatestCandle("stock", stock.last);
+                    console.log("stock", stock.last);
+                }
             }
         });
     };
