@@ -6,8 +6,8 @@ export default [
             "BC > PR1",
             "Break sau T1",
             "T > T1",
-            "Không Double",
             "T < T1'",
+            "Không Double",
         ],
     },
     {

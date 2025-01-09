@@ -338,8 +338,8 @@ function calculatePattern() {
             pr1Valid,
             !phase3.breakIndex || T1 < phase3.breakIndex,
             T > T1,
-            !phase3.hasDouble,
             T < T1p,
+            !phase3.hasDouble,
         ],
         [
             //
