@@ -344,8 +344,7 @@ class ShareService extends CoreService
                     $B->H = $pL;
                     $B->L = $pL;
                     $B->ir = 0;
-                }
-                else $B->ir++;
+                } else $B->ir++;
             }
             if ($t === $stop) break;
         }
@@ -413,11 +412,11 @@ class ShareService extends CoreService
         $trend['sum'] = $trendSum;
         //
         return (object)[
-            'pivot' => $pivot,
+            'sum' => $pivotSum && $trendSum && $stock->compress->sum && $stock->base,
             'trend' => $trend,
+            'pivot' => $pivot,
             'compress' => $stock->compress,
             'base' => $stock->base,
-            'sum' => $pivotSum && $trendSum && $stock->compress->sum && $stock->base,
         ];
         // return (object)[
         //     $stock->symbol => $stock->trend,
