@@ -183,7 +183,7 @@ watch(() => store.state.tradingShare.prices, loadChartData);
 
 defineExpose({
     getFilterTimes,
-    connectSocket,
+    initData,
     getChartData,
     updateWatchlist,
 });
@@ -390,9 +390,15 @@ function initChart() {
         if (data.reversal) {
             updateVnindexMarker(data.reversal.time);
         }
-        if (props.source === "FIREANT") connectSocket();
-        else getChartData(true);
+        initData();
     });
+}
+function initData() {
+    if (props.source === "FIREANT") connectSocket();
+    else {
+        getChartData(true);
+        disconnectSocket();
+    }
 }
 function getChartData(withVnindex = false, fromDate = null) {
     if (!state.symbol) return false;
