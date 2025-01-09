@@ -348,7 +348,7 @@ function updateLatestCandle(series, newPrice) {
     let latest = params.data[series].pop();
     if (!latest) return false;
     latest.high = Math.max(latest.high, newPrice);
-    latest.low = Math.max(latest.low, newPrice);
+    latest.low = Math.min(latest.low, newPrice);
     latest.close = newPrice;
     params.data[series].push(latest);
     state.series[series].update(latest);
