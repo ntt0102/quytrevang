@@ -114,7 +114,15 @@ import TargetTool from "../Derivative/Tools/TargetTool.vue";
 
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import { DxAutocomplete } from "devextreme-vue/autocomplete";
-import { reactive, ref, inject, watch, onMounted, computed } from "vue";
+import {
+    reactive,
+    ref,
+    computed,
+    inject,
+    watch,
+    onMounted,
+    onUnmounted,
+} from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
@@ -153,7 +161,7 @@ let params = {
     chart: {},
     data: { index: [], stock: [] },
     crosshair: {},
-    socket: null,
+    websocket: null,
 };
 
 onMounted(() => {
@@ -162,7 +170,13 @@ onMounted(() => {
     filterTimeToolRef.value.createSeries(params.chart);
     reversalToolRef.value.createSeries(params.chart);
     new ResizeObserver(chartResize).observe(chartContainerRef.value);
-    document.addEventListener("keydown", eventKeyPress);
+    document.addEventListener("keydown", chartShortcut);
+});
+
+onUnmounted(() => {
+    removeChart();
+    disconnectSocket();
+    document.removeEventListener("keydown", chartShortcut);
 });
 
 watch(() => store.state.tradingShare.prices, loadChartData);
@@ -232,6 +246,12 @@ function drawChart() {
         wickDownColor: "#EC3F3F",
         priceFormat: { minMove: 0.01 },
     });
+}
+function removeChart() {
+    if (params.chart) {
+        params.chart.remove();
+        params.chart = null;
+    }
 }
 
 function stopPropagationEvent(e) {
@@ -304,7 +324,7 @@ function chartResize() {
         fullscreenToolRef.value.checkFullscreen();
     }
 }
-function eventKeyPress(e) {
+function chartShortcut(e) {
     if (e.ctrlKey || e.metaKey) {
         switch (e.code) {
             case "Numpad0":
@@ -381,14 +401,14 @@ function getChartData(withVnindex = false, fromDate = null) {
     else getChartServer(withVnindex, fromDate);
 }
 function getChartSocket(withVnindex = false, fromDate = null) {
-    if (params.socket.readyState === WebSocket.OPEN) {
+    if (params.websocket.readyState === WebSocket.OPEN) {
         const from = format(fromDate, "yyyy-MM-dd");
         const to = format(new Date(), "yyyy-MM-dd");
         let message = `{"arguments":["${state.symbol}","D","${from}","${to}"],"invocationId":"stock","target":"GetBars","type":1}`;
-        params.socket.send(message);
+        params.websocket.send(message);
         if (withVnindex) {
             message = `{"arguments":["${params.index}","D","${from}","${to}"],"invocationId":"index","target":"GetBars","type":1}`;
-            params.socket.send(message);
+            params.websocket.send(message);
         }
         removeTools();
     }
@@ -452,15 +472,15 @@ function checkSymbol() {
 function connectSocket() {
     let uri =
         "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
-    params.socket = new WebSocket(uri);
+    params.websocket = new WebSocket(uri);
 
-    params.socket.onopen = () => {
+    params.websocket.onopen = () => {
         let message = '{"protocol":"json","version":1}';
-        params.socket.send(message);
+        params.websocket.send(message);
         getChartData(true);
     };
 
-    params.socket.onmessage = (e) => {
+    params.websocket.onmessage = (e) => {
         const data = parseSocketMessage(e.data);
         if (data.length == 0) return false;
         data.forEach((item) => {
@@ -488,13 +508,21 @@ function connectSocket() {
         });
     };
 
-    params.socket.onerror = (e) => {
+    params.websocket.onerror = (e) => {
         console.error("Lỗi kết nối WebSocket:", e);
     };
 
-    params.socket.onclose = () => {
+    params.websocket.onclose = () => {
         console.log("Đã đóng kết nối WebSocket");
     };
+}
+function disconnectSocket() {
+    if (params.websocket) {
+        if (params.websocket.readyState === WebSocket.OPEN) {
+            params.websocket.close();
+        }
+        params.websocket = null;
+    }
 }
 function parseSocketMessage(msg) {
     let result = [];
