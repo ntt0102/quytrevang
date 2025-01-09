@@ -482,15 +482,8 @@ function connectSocket() {
                 const _data = item.arguments[0];
                 const index = _data.find((i) => i.symbol === params.index);
                 const stock = _data.find((i) => i.symbol === state.symbol);
-
-                if (index) {
-                    updateLatestCandle("index", index.last);
-                    console.log("index", index.last);
-                }
-                if (stock) {
-                    updateLatestCandle("stock", stock.last);
-                    console.log("stock", stock.last);
-                }
+                if (index) updateLatestCandle("index", index.last);
+                if (stock) updateLatestCandle("stock", stock.last);
             }
         });
     };
