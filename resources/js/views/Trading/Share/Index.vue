@@ -156,7 +156,7 @@ function fromDateChanged({ value }) {
 }
 function sourceSelect({ item }) {
     store.dispatch("tradingShare/setSource", item);
-    chartRef.value.initData();
+    chartRef.value.initData(item);
 }
 function watchlistItemClick({ itemData }) {
     bus.emit("checkPin", () => {

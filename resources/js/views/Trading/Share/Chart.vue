@@ -393,8 +393,9 @@ function initChart() {
         initData();
     });
 }
-function initData() {
-    if (props.source === "FIREANT") connectSocket();
+function initData(source = null) {
+    if (!source) source = props.source;
+    if (source === "FIREANT") connectSocket();
     else {
         getChartData(true);
         disconnectSocket();
@@ -481,6 +482,7 @@ function connectSocket() {
     params.websocket = new WebSocket(uri);
 
     params.websocket.onopen = () => {
+        console.log("Đã kết nối tới WebSocket server");
         let message = '{"protocol":"json","version":1}';
         params.websocket.send(message);
         getChartData(true);
