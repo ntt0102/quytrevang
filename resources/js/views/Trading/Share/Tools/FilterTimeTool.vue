@@ -10,12 +10,15 @@
     </div>
 </template>
 <script setup>
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
 const props = defineProps([]);
 const emit = defineEmits(["hideContext"]);
+const filterTimeStore = computed(
+    () => store.state.tradingShare.config.filterTime
+);
 const filterTimeToolRef = ref(null);
 let series = {};
 let filterTimes = [];
@@ -30,8 +33,11 @@ defineExpose({
     createSeries,
     isSelected,
     draw,
-    load,
     get,
+});
+
+watch(filterTimeStore, (data) => {
+    if (data) setTimeout(() => load(data), 3000);
 });
 
 function isSelected() {
@@ -39,8 +45,6 @@ function isSelected() {
 }
 function get() {
     let _filterTimes = filterTimes.map((item) => item.time);
-    // if (_filterTimes.length === 3) _filterTimes.unshift(null);
-    // return _filterTimes;
     return _filterTimes.reverse();
 }
 function createSeries(chart) {

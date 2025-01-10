@@ -20,14 +20,16 @@ class ShareService extends CoreService
      */
     public function initChart($payload)
     {
+        $indexSymbol = get_global_value('shareIndex');
         $filterTime = StockDrawing::where('name', 'filterTime')->orderByRaw("point ASC")->pluck('data', 'point');
         $watch = ShareSymbol::where('name', 'WATCH')->first();
-        $reversal = StockDrawing::where('symbol', 'VNINDEX')
+        $reversal = StockDrawing::where('symbol', $indexSymbol)
             ->where('name', 'reversal')
             ->where('point', '0')->value('data');
         return [
             'vpsUser' => get_global_value('vpsUser'),
             'vpsSession' => get_global_value('vpsSession'),
+            'index' => $indexSymbol,
             'sources' => ['FIREANT', 'VNDIRECT'],
             'source' => get_global_value('shareSource'),
             'filterTime' => $filterTime,
@@ -59,8 +61,9 @@ class ShareService extends CoreService
             'prices' => $this->getChartData($payload->symbol, $payload->from),
             'tools' => $this->getTools($payload),
         ];
-        if ($payload->withVnindex) {
-            $data['vnindex'] = $this->getChartData("VNINDEX", $payload->from);
+        if ($payload->withIndex) {
+            $indexSymbol = get_global_value('shareIndex');
+            $data['index'] = $this->getChartData($indexSymbol, $payload->from);
         }
         return $data;
     }
@@ -167,15 +170,16 @@ class ShareService extends CoreService
      */
     public function checkSymbol($payload)
     {
+        $indexSymbol = get_global_value('shareIndex');
         $symbol = $payload->symbol;
         $filterTimes = $payload->filterTimes;
         $filterTimesCount = count($filterTimes);
         if (!$symbol || $filterTimesCount < 2) return ['isOk' => false];
         $isMid = $filterTimesCount >= 3;
         $isLong = $filterTimesCount === 4;
-        $vnindex = $this->calcStock('VNINDEX', $filterTimes, $isMid, $isLong);
+        $index = $this->calcStock($indexSymbol, $filterTimes, $isMid, $isLong);
         $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
-        $check = (array)$this->checkStock($vnindex, $stock, $isMid, $isLong);
+        $check = (array)$this->checkStock($index, $stock, $isMid, $isLong);
         $fromto = [
             'from' => date('d/m/Y', end($filterTimes)),
             'to' => date('d/m/Y', $filterTimes[0]),
@@ -392,17 +396,17 @@ class ShareService extends CoreService
         ];
     }
 
-    public function checkStock($vnindex, $stock, $isMid, $isLong)
+    public function checkStock($index, $stock, $isMid, $isLong)
     {
-        $pivot['short'] = $stock->points->Ls->t <= $vnindex->points->Ls->t;
-        $trend['short'] = $stock->trend->short > 0.7 && $stock->trend->short > $vnindex->trend->short;
+        $pivot['short'] = $stock->points->Ls->t <= $index->points->Ls->t;
+        $trend['short'] = $stock->trend->short > 0.7 && $stock->trend->short > $index->trend->short;
         if ($isMid) {
-            $pivot['mid'] = $stock->points->Lm->t <= $vnindex->points->Lm->t;
-            $trend['mid'] = $stock->trend->mid > 0.7 && $stock->trend->mid > $vnindex->trend->mid;
+            $pivot['mid'] = $stock->points->Lm->t <= $index->points->Lm->t;
+            $trend['mid'] = $stock->trend->mid > 0.7 && $stock->trend->mid > $index->trend->mid;
         }
         if ($isLong) {
-            $pivot['long'] = $stock->points->Ll->t <= $vnindex->points->Ll->t;
-            $trend['long'] = $stock->trend->long > 0.7 && $stock->trend->long > $vnindex->trend->long;
+            $pivot['long'] = $stock->points->Ll->t <= $index->points->Ll->t;
+            $trend['long'] = $stock->trend->long > 0.7 && $stock->trend->long > $index->trend->long;
         }
         $pivotConds = array_values($pivot);
         $pivotSum = count(array_filter($pivotConds)) === count($pivotConds);
@@ -420,18 +424,19 @@ class ShareService extends CoreService
         ];
         // return (object)[
         //     $stock->symbol => $stock->trend,
-        //     $vnindex->symbol => $vnindex->trend,
+        //     $index->symbol => $index->trend,
         //     'points' => $stock->points,
         // ];
     }
 
     public function filterStock($group, $filterTimes)
     {
+        $indexSymbol = get_global_value('shareIndex');
         $filterTimesCount = count($filterTimes);
         $isMid = $filterTimesCount >= 3;
         $isLong = $filterTimesCount === 4;
         $filteredSymbols = [];
-        $vnindex = $this->calcStock('VNINDEX', $filterTimes, $isMid, $isLong);
+        $index = $this->calcStock($indexSymbol, $filterTimes, $isMid, $isLong);
         $symbols = $this->getSymbols($group);
         if (empty($symbols)) return false;
         $total = count($symbols);
@@ -445,7 +450,7 @@ class ShareService extends CoreService
                 $preProcess = $process;
             }
             $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
-            $check = $this->checkStock($vnindex, $stock, $isMid, $isLong);
+            $check = $this->checkStock($index, $stock, $isMid, $isLong);
             if ($check->sum) $filteredSymbols[] = $symbol;
             $index++;
         }
@@ -457,6 +462,7 @@ class ShareService extends CoreService
 
     public function test()
     {
+        $indexSymbol = get_global_value('shareIndex');
         $symbol = 'CTG';
         $filterTimes = [
             strtotime('2024-12-20'),
@@ -473,9 +479,9 @@ class ShareService extends CoreService
         // ----------------------------
         // $data = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
         // ----------------------------
-        $vnindex = $this->calcStock('VNINDEX', $filterTimes, $isMid, $isLong);
+        $index = $this->calcStock($indexSymbol, $filterTimes, $isMid, $isLong);
         $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
-        $data = $this->checkStock($vnindex, $stock, $isMid, $isLong);
+        $data = $this->checkStock($index, $stock, $isMid, $isLong);
         // ----------------------------
         // $data = FilterShareJob::dispatch('VNX50', $filterTimes);
         // ----------------------------

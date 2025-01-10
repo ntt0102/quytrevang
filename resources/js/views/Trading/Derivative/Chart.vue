@@ -111,18 +111,18 @@
                 @refreshPattern="() => refreshPattern()"
                 @hideContext="hideContext"
             />
-            <LineTool
-                ref="lineToolRef"
-                :symbol="config.vn30f1m"
-                storeModule="tradingDerivative"
-                :priceSeries="state.series.price"
-                @hideContext="hideContext"
-            />
             <TimeRangeTool
                 ref="timeRangeToolRef"
                 :timeRangeSeries="state.series.timeRange"
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
+                @hideContext="hideContext"
+            />
+            <LineTool
+                ref="lineToolRef"
+                :symbol="config.vn30f1m"
+                storeModule="tradingDerivative"
+                :priceSeries="state.series.price"
                 @hideContext="hideContext"
             />
             <TargetTool

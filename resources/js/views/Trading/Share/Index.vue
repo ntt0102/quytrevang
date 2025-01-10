@@ -118,8 +118,8 @@ const chartRef = ref(null);
 
 const groups = computed(() => store.state.tradingShare.groups);
 const symbolsLength = computed(() => store.state.tradingShare.symbols.length);
-const source = computed(() => store.state.tradingShare.source);
-const sources = computed(() => store.state.tradingShare.sources);
+const source = computed(() => store.state.tradingShare.config.source);
+const sources = computed(() => store.state.tradingShare.config.sources);
 const filterProcess = computed(() => store.state.tradingShare.filterProcess);
 
 const state = reactive({
@@ -156,7 +156,6 @@ function fromDateChanged({ value }) {
 }
 function sourceSelect({ item }) {
     store.dispatch("tradingShare/setSource", item);
-    chartRef.value.initData(item);
 }
 function watchlistItemClick({ itemData }) {
     bus.emit("checkPin", () => {

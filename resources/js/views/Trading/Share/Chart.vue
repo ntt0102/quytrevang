@@ -61,8 +61,8 @@
             />
             <TradingviewTool
                 ref="tradingviewToolRef"
-                :vpsUser="state.vpsUser"
-                :vpsSession="state.vpsSession"
+                :vpsUser="config.vpsUser"
+                :vpsSession="config.vpsSession"
                 :chartContainerRef="chartContainerRef"
                 :symbol="state.symbol"
                 timeframe="1D"
@@ -81,7 +81,7 @@
                 ref="reversalToolRef"
                 :symbol="state.symbol"
                 :priceSeries="state.series.stock"
-                @vnindexUpdated="updateVnindexMarker"
+                @indexUpdated="updateIndexMarker"
                 @hideContext="hideContext"
             />
             <LineTool
@@ -144,20 +144,21 @@ const reversalToolRef = ref(null);
 const lineToolRef = ref(null);
 const targetToolRef = ref(null);
 
-const props = defineProps(["source", "fromDate", "group"]);
+const props = defineProps(["fromDate", "group"]);
 const isLoading = computed(() => store.state.tradingShare.isLoading);
+const config = computed(() => store.state.tradingShare.config);
 const showWatchlist = computed(() => state.symbol);
-const inWatchlist = computed(() => state.watchlist.includes(state.symbol));
+const inWatchlist = computed(() =>
+    config.value.watchlist.includes(state.symbol)
+);
 const symbols = computed(() => store.state.tradingShare.symbols);
 const chartFrom = computed(() => props.fromDate);
 const state = reactive({
     symbol: route.query.symbol ?? "VN30",
     inputSymbol: route.query.symbol ?? "VN30",
     series: {},
-    watchlist: [],
 });
 let params = {
-    index: "VNINDEX",
     chart: {},
     data: { index: [], stock: [] },
     crosshair: {},
@@ -180,10 +181,11 @@ onUnmounted(() => {
 });
 
 watch(() => store.state.tradingShare.prices, loadChartData);
+watch(() => config.value.source, initData);
+watch(() => config.value.reversal, updateIndexMarker);
 
 defineExpose({
     getFilterTimes,
-    initData,
     getChartData,
     updateWatchlist,
 });
@@ -344,7 +346,7 @@ function chartShortcut(e) {
     }
 }
 function updateWatchlist(data) {
-    state.watchlist = data;
+    config.value.watchlist = data;
 }
 function changeWatchlist() {
     if (!state.symbol) return false;
@@ -355,7 +357,7 @@ function changeWatchlist() {
         add: !inWatchlist.value,
     };
     store.dispatch("tradingShare/changeWatchlist", param).then((data) => {
-        state.watchlist = mf.isSet(data) ? data : [];
+        config.value.watchlist = mf.isSet(data) ? data : [];
     });
 }
 
@@ -382,64 +384,55 @@ function symbolChanged() {
     getChartData();
 }
 function initChart() {
-    store.dispatch("tradingShare/initChart").then((data) => {
-        state.watchlist = data.watchlist;
-        state.vpsUser = data.vpsUser;
-        state.vpsUser = data.vpsSession;
-        setTimeout(() => filterTimeToolRef.value.load(data.filterTime), 3000);
-        if (data.reversal) {
-            updateVnindexMarker(data.reversal.time);
-        }
-        initData();
-    });
+    store.dispatch("tradingShare/initChart");
 }
-function initData(source = null) {
-    if (!source) source = props.source;
+function initData(source) {
     if (source === "FIREANT") connectSocket();
     else {
         getChartData(true);
         disconnectSocket();
     }
 }
-function getChartData(withVnindex = false, fromDate = null) {
+function getChartData(withIndex = false, fromDate = null) {
     if (!state.symbol) return false;
     if (!fromDate) fromDate = chartFrom.value;
-    if (props.source === "FIREANT") getChartSocket(withVnindex, fromDate);
-    else getChartServer(withVnindex, fromDate);
+    if (config.value.source === "FIREANT") {
+        getChartSocket(withIndex, fromDate);
+    } else getChartServer(withIndex, fromDate);
 }
-function getChartSocket(withVnindex = false, fromDate = null) {
+function getChartSocket(withIndex = false, fromDate = null) {
     if (params.websocket.readyState === WebSocket.OPEN) {
         const from = format(fromDate, "yyyy-MM-dd");
         const to = format(new Date(), "yyyy-MM-dd");
         let message = `{"arguments":["${state.symbol}","D","${from}","${to}"],"invocationId":"stock","target":"GetBars","type":1}`;
         params.websocket.send(message);
-        if (withVnindex) {
-            message = `{"arguments":["${params.index}","D","${from}","${to}"],"invocationId":"index","target":"GetBars","type":1}`;
+        if (withIndex) {
+            message = `{"arguments":["${config.value.index}","D","${from}","${to}"],"invocationId":"index","target":"GetBars","type":1}`;
             params.websocket.send(message);
         }
         removeTools();
     }
 }
-function getChartServer(withVnindex = false, fromDate = null) {
+function getChartServer(withIndex = false, fromDate = null) {
     store
         .dispatch("tradingShare/getChartData", {
             symbol: state.symbol,
             from: getUnixTime(fromDate),
-            withVnindex,
+            withIndex,
         })
-        .then((vnindex) => {
-            if (withVnindex) {
-                params.data.index = vnindex;
-                state.series.index.setData(vnindex);
+        .then((index) => {
+            if (withIndex) {
+                params.data.index = index;
+                state.series.index.setData(index);
             }
             removeTools();
         });
 }
-function updateVnindexMarker(time) {
+function updateIndexMarker(reversal) {
     let markers = [];
-    if (time) {
+    if (reversal) {
         markers.push({
-            time: time,
+            time: reversal.time,
             color: "#9C27B0",
             position: "aboveBar",
             shape: "circle",
@@ -469,7 +462,7 @@ function moveSymbolInGroup(side = true) {
     getChartData();
 }
 function checkSymbol() {
-    if (!state.symbol || state.symbol === params.index) return false;
+    if (!state.symbol || state.symbol === config.value.index) return false;
     const filterTimes = getFilterTimes();
     if (filterTimes.length < 2) {
         return toast.warning(t("trading.share.filterTimeWarning"));
@@ -508,7 +501,9 @@ function connectSocket() {
                 } else state.series.index.setData(prices);
             } else if (item.type == 1 && item.target === "UpdateLastPrices") {
                 const _data = item.arguments[0];
-                const index = _data.find((i) => i.symbol === params.index);
+                const index = _data.find(
+                    (i) => i.symbol === config.value.index
+                );
                 const stock = _data.find((i) => i.symbol === state.symbol);
                 if (index) updateLatestCandle("index", index.last);
                 if (stock) updateLatestCandle("stock", stock.last);

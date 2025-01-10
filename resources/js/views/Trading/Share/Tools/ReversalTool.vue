@@ -15,12 +15,12 @@ import { useStore } from "vuex";
 
 const store = useStore();
 const props = defineProps(["symbol", "priceSeries"]);
-const emit = defineEmits(["vnindexUpdated", "hideContext"]);
+const emit = defineEmits(["indexUpdated", "hideContext"]);
 const reversalToolRef = ref(null);
 const toolStore = computed(() => store.state.tradingShare.tools.reversal);
+const indexSymbol = computed(() => store.state.tradingShare.config.index);
 const TOOL_NAME = "reversal";
 const TOOL_COLOR = "rgba(156, 39, 176, 0.7)";
-const INDEX = "VNINDEX";
 let series = {};
 let times = [];
 let reversal = null;
@@ -66,13 +66,13 @@ function reversalToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         removeReversalTool();
-        emit("vnindexUpdated");
+        emit("indexUpdated");
         e.target.classList.add("selected");
     }
 }
 function reversalToolContextmenu(e) {
     removeReversalTool();
-    emit("vnindexUpdated");
+    emit("indexUpdated");
     e.target.classList.remove("selected");
 }
 function draw({ prices, time }) {
@@ -87,7 +87,7 @@ function draw({ prices, time }) {
             points: [0],
             data: [reversal],
         });
-        if (props.symbol === INDEX) emit("vnindexUpdated", reversal.time);
+        if (props.symbol === indexSymbol.value) emit("indexUpdated", reversal);
         times = [];
         reversalToolRef.value.classList.remove("selected");
     } else series.setData(times);

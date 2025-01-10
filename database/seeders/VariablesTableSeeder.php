@@ -82,5 +82,9 @@ class VariablesTableSeeder extends Seeder
             'name' => "shareSource",
             'value' => "VND",
         ]);
+        Variable::create([
+            'name' => "shareIndex",
+            'value' => "VNINDEX",
+        ]);
     }
 }

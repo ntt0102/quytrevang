@@ -1,7 +1,6 @@
 function initialState() {
     return {
-        source: "",
-        sources: [],
+        config: { watchlist: [], sources: [] },
         groups: [],
         symbols: [],
         prices: [],
@@ -19,7 +18,7 @@ const actions = {
             axios
                 .get("trading/share", { params, noLoading: true })
                 .then((response) => {
-                    resolve(response.data.vnindex);
+                    resolve(response.data.index);
                     setTimeout(() => {
                         commit("setChartData", response.data);
                         commit("setLoading", false);
@@ -33,10 +32,9 @@ const actions = {
             axios
                 .get("trading/share/init-chart", { noLoading: true })
                 .then((response) => {
-                    commit("setSource", response.data.source);
-                    commit("setSources", response.data.sources);
+                    commit("setConfig", response.data);
                     commit("setLoading", false);
-                    resolve(response.data);
+                    resolve();
                 });
         });
     },
@@ -144,11 +142,11 @@ const mutations = {
     setTools(state, data) {
         state.tools = data;
     },
-    setSource(state, data) {
-        state.source = data;
+    setConfig(state, data) {
+        state.config = data;
     },
-    setSources(state, data) {
-        state.sources = data;
+    setSource(state, data) {
+        state.config.source = data;
     },
     setLoading(state, data) {
         state.isLoading = data;
