@@ -440,10 +440,10 @@ class ShareService extends CoreService
         $symbols = $this->getSymbols($group);
         if (empty($symbols)) return false;
         $total = count($symbols);
-        $index = 1;
+        $step = 1;
         $preProcess = 0;
         foreach ($symbols as $symbol) {
-            $process = intval(100 * $index / $total);
+            $process = intval(100 * $step / $total);
             if ($process > $preProcess) {
                 echo $process . ' ';
                 event(new FilterShareEvent($process));
@@ -452,7 +452,7 @@ class ShareService extends CoreService
             $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
             $check = $this->checkStock($index, $stock, $isMid, $isLong);
             if ($check->sum) $filteredSymbols[] = $symbol;
-            $index++;
+            $step++;
         }
         return (object)[
             'group' => $group,
