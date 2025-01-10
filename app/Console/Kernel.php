@@ -31,6 +31,7 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         $schedule->job(new UpdateHolidaysJob)->yearlyOn(1, 1, '01:00');
+        $schedule->command('tokens:delete-expired')->daily();
         $schedule->job(new CleanDatabaseJob)->daily();
         $schedule->job(new BackupDatabaseJob)->daily();
         $schedule->job(new UpdateOpeningMarketJob)->dailyAt('08:45');

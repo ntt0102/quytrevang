@@ -28,8 +28,6 @@ Route::get('migrate', function () {
     // set_time_limit(300);
     // exec('php ../artisan migrate:refresh --seed', $output, $return);
     // if ($return != 0) return dd($output);
-    // exec('php ../artisan passport:install --force', $output, $return);
-    // if ($return != 0) return dd($output);
     // return "Migrate done!";
 });
 

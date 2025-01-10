@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Foundation\Application;
 use App\Models\User;
 use App\Services\Special\WebauthnService;
+use Carbon\Carbon;
 
 
 class LoginService
@@ -127,20 +128,19 @@ class LoginService
      */
     private function createToken($user, $remember = false)
     {
-        $tokenResult = $user->createToken(config('app.name'));
-        $token = $tokenResult->token;
-        if ($remember)
-            $token->expires_at = date_create()->modify('+7 days');
-        else
-            $token->expires_at = date_create()->modify('+1 day');
-        $token->save();
+        $token = $user->createToken($user->code);
+        $expiresDays = $remember ? 7 : 1;
+        $expiresAt = Carbon::now()->addDays($expiresDays);
+        $token->accessToken->expires_at = $expiresAt;
+        $token->accessToken->save();
+
         return [
             'isOk' => true,
             'message' => null,
             'user' => $user->getAuthInfo(),
             'token' => [
-                'expires_at' => date_create($tokenResult->token->expires_at)->format('Y-m-d H:i:s'),
-                'access_token' => $tokenResult->accessToken
+                'expires_at' => $expiresAt->toDateTimeString(),
+                'access_token' => $token->plainTextToken,
             ],
             'isMaintenance' => $this->isMaintenance
         ];

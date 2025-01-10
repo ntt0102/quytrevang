@@ -162,7 +162,7 @@ function onDeleteClick() {
                         type: "LOGOUT",
                     });
                 }
-                store.dispatch("auth/clearData");
+                store.dispatch("auth/clearToken");
                 router.push({ name: "login" });
             }
         });

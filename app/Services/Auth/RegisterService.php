@@ -7,6 +7,7 @@ use App\Notifications\RegisteredUserNotification;
 use App\Services\CoreService;
 use App\Notifications\VerifyEmailNotification;
 use App\Models\User;
+use Carbon\Carbon;
 
 class RegisterService extends CoreService
 {
@@ -35,10 +36,10 @@ class RegisterService extends CoreService
             //
             $user->assignRole('user');
             //
-            $tokenResult = $user->createToken(config('app.name'));
-            $token = $tokenResult->token;
-            $token->expires_at = date_create()->modify('+1 day');
-            $token->save();
+            $token = $user->createToken(config('app.name'));
+            $expiresAt = Carbon::now()->addDays(1);
+            $token->accessToken->expires_at = $expiresAt;
+            $token->accessToken->save();
 
             Notification::send(
                 User::permission('admin:manage_users')->get(),
@@ -49,8 +50,8 @@ class RegisterService extends CoreService
                 'isOk' => true,
                 'user' => $user->getAuthInfo(),
                 'token' => [
-                    'expires_at' => date_create($tokenResult->token->expires_at)->format('Y-m-d H:i:s'),
-                    'access_token' => $tokenResult->accessToken
+                    'expires_at' => $expiresAt->toDateTimeString(),
+                    'access_token' => $token->plainTextToken,
                 ]
             ];
         });

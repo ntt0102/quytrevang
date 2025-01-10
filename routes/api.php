@@ -31,7 +31,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             Route::post('change', 'ResetPasswordController@changePassword')->name('password.reset');
             Route::post('validate-exist-email', 'ResetPasswordController@validateExistEmail');
         });
-        Route::group(['middleware' => 'auth:api'], function () {
+        Route::group(['middleware' => ['auth:sanctum', 'check.token.expiry']], function () {
             Route::group(['prefix' => 'email'], function () {
                 Route::post('resend', 'VerificationController@resend');
                 Route::post('verify/{id}', 'VerificationController@verify')->name('verification.verify');
@@ -44,7 +44,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
         });
     });
 
-    Route::group(['middleware' => 'auth:api'], function () {
+    Route::group(['middleware' => ['auth:sanctum', 'check.token.expiry']], function () {
         Route::group(['namespace' => 'User'], function () {
             Route::group(['prefix' => 'notifications'], function () {
                 Route::post('/', 'NotificationController@getNotifications');

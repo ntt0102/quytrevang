@@ -293,11 +293,11 @@ export default {
         return [
             {
                 name: lang.global.t("settings.command.selects.cache"),
-                value: "config:cache",
+                value: "config:cache,route:cache",
             },
             {
                 name: lang.global.t("settings.command.selects.resetMigrate"),
-                value: "migrate:refresh --seed,passport:install --force",
+                value: "migrate:refresh --seed",
             },
             {
                 name: lang.global.t("settings.command.selects.downMaintance"),

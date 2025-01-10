@@ -1,6 +1,8 @@
 import { useCookies } from "vue3-cookies";
-const { cookies } = useCookies();
 import { webauthnAuthenticate, webauthnRegister } from "../../plugins/webauthn";
+
+const { cookies } = useCookies();
+const COOKIE_NAME = "AccessToken";
 
 function initialState() {
     return {
@@ -17,19 +19,6 @@ function initialState() {
         },
         token: null,
     };
-}
-
-function setTokenCookie(token) {
-    cookies.set("AccessToken", token.access_token, new Date(token.expires_at));
-}
-
-function removeTokenCookie() {
-    console.log("clearToken");
-    cookies.remove("AccessToken");
-}
-
-function getTokenCookie() {
-    return cookies.get("AccessToken");
 }
 
 const getters = {
@@ -108,9 +97,7 @@ const actions = {
             axios.post("auth/password/change", param).then((response) => {
                 // console.log(response);
                 if (response.data.isOk) {
-                    setTokenCookie(response.data.token);
-
-                    commit("setState", response.data);
+                    dispatch("setState", response.data);
                 }
                 resolve(response.data.isOk);
             });
@@ -122,8 +109,7 @@ const actions = {
             axios.post("auth/create-account", param).then((response) => {
                 // console.log(response);
                 if (response.data.isOk) {
-                    setTokenCookie(response.data.token);
-                    commit("setState", response.data);
+                    dispatch("setState", response.data);
                 }
                 resolve(response.data.isOk);
             });
@@ -173,8 +159,7 @@ const actions = {
                             })
                             .then((response) => {
                                 if (response.data.isOk) {
-                                    setTokenCookie(response.data.token);
-                                    commit("setState", response.data);
+                                    dispatch("setState", response.data);
                                     resolve({
                                         isOk: response.data.isOk,
                                         isMaintenance:
@@ -226,8 +211,7 @@ const actions = {
         return new Promise((resolve, reject) => {
             axios.post("auth/login", param).then((response) => {
                 if (response.data.isOk) {
-                    setTokenCookie(response.data.token);
-                    commit("setState", response.data);
+                    dispatch("setState", response.data);
                     resolve({
                         isOk: response.data.isOk,
                         isMaintenance: response.data.isMaintenance,
@@ -246,15 +230,14 @@ const actions = {
         return new Promise((resolve) => {
             axios.post("auth/logout").then((response) => {
                 // console.log(response);
-                removeTokenCookie();
-                commit("resetState");
+                dispatch("clearToken");
                 resolve(true);
             });
         });
     },
     check({ commit, dispatch, state }, force = false) {
         if (!force && state.user.code) return Promise.resolve();
-        var access_token = getTokenCookie();
+        var access_token = cookies.get(COOKIE_NAME);
         if (!access_token) return Promise.resolve();
         commit("setToken", access_token);
         return new Promise((resolve) => {
@@ -265,10 +248,6 @@ const actions = {
                     resolve();
                 })
                 .catch((error) => {
-                    if (error.status == 401) {
-                        removeTokenCookie();
-                        commit("resetState");
-                    }
                     resolve();
                 });
         });
@@ -282,15 +261,20 @@ const actions = {
                 });
         });
     },
-    setAvatar: ({ commit }, avatar) => {
+    setAvatar({ commit }, avatar) {
         commit("setAvatar", avatar);
     },
-    setState: ({ commit, dispatch }, param) => {
-        setTokenCookie(param.token);
+    setState({ commit }, param) {
+        cookies.set(
+            COOKIE_NAME,
+            param.token.access_token,
+            new Date(param.token.expires_at)
+        );
         commit("setState", param);
     },
-    clearData: ({ commit }) => {
-        removeTokenCookie();
+    clearToken({ commit }) {
+        console.log("removeTokenCookie");
+        cookies.remove(COOKIE_NAME);
         commit("resetState");
     },
 };

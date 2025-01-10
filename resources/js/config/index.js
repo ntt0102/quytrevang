@@ -1,5 +1,6 @@
 import lang from "../lang";
 import store from "../store";
+import router from "../router";
 import crypto from "../plugins/crypto";
 import { toast } from "vue3-toastify";
 import mf from "../properties/functions";
@@ -83,10 +84,16 @@ axios.interceptors.response.use(
             error.response
         );
         store.dispatch("setSyncing", false);
-        if (error.response.config.url.includes("derivative")) {
-            store.dispatch("tradingDerivative/setLoading", false);
+        if (error.response) {
+            if (error.response.config.url.includes("derivative")) {
+                store.dispatch("tradingDerivative/setLoading", false);
+            }
+            if (error.response.status === 401) {
+                store.dispatch("auth/clearToken");
+                router.push({ name: "login" });
+            }
+            if (navigator.onLine) mf.handleError(error);
         }
-        if (navigator.onLine && !!error.response) mf.handleError(error);
         return Promise.reject(error);
     }
 );
