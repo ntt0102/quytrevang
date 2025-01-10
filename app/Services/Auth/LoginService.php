@@ -151,7 +151,7 @@ class LoginService
      */
     public function logout($payload)
     {
-        return request()->user()->token()->revoke();
+        return request()->user()->currentAccessToken()->delete();
     }
 
     /**
