@@ -70,7 +70,7 @@ function draw({ price }) {
         const a = +lines.A.options().price;
         const ba = price - a;
         option.point = "B";
-        option.title = mf.fmtNum(ba);
+        option.title = props.isPercent ? mf.fmtNum(100 * ba / a, 0) + "%" : mf.fmtNum(ba);
         option.color = "#F44336";
         lines[option.point] = props.priceSeries.createPriceLine(option);
         param.points.push(option.point);
@@ -78,7 +78,7 @@ function draw({ price }) {
         if (props.levels.includes(0.5)) {
             option.point = "X";
             option.price = mf.fmtNum(a - 0.5 * ba);
-            option.title = props.isPercent ? mf.fmtNum(100 * -0.5 * ba / a, 0) : mf.fmtNum(-0.5 * ba);
+            option.title = props.isPercent ? mf.fmtNum(100 * -0.5 * ba / a, 0) + "%" : mf.fmtNum(-0.5 * ba);
             option.color = "#2196F3";
             lines[option.point] = props.priceSeries.createPriceLine(option);
         }
@@ -86,7 +86,7 @@ function draw({ price }) {
         if (props.levels.includes(1)) {
             option.point = "Y";
             option.price = mf.fmtNum(a - ba);
-            option.title = props.isPercent ? mf.fmtNum(100 * -ba / a, 0) : mf.fmtNum(-ba);
+            option.title = props.isPercent ? mf.fmtNum(100 * -ba / a, 0) + "%" : mf.fmtNum(-ba);
             option.color = "#673AB7";
             lines[option.point] = props.priceSeries.createPriceLine(option);
         }
@@ -94,7 +94,7 @@ function draw({ price }) {
         if (props.levels.includes(2)) {
             option.point = "Z";
             option.price = mf.fmtNum(a - 2 * ba);
-            option.title = props.isPercent ? mf.fmtNum(100 * -2 * ba / a, 0) : mf.fmtNum(-2 * ba);
+            option.title = props.isPercent ? mf.fmtNum(100 * -2 * ba / a, 0) + "%" : mf.fmtNum(-2 * ba);
             option.color = "#9C27B0";
             lines[option.point] = props.priceSeries.createPriceLine(option);
         }
@@ -102,7 +102,7 @@ function draw({ price }) {
         if (props.levels.includes(4)) {
             option.point = "W";
             option.price = mf.fmtNum(a - 4 * ba);
-            option.title = props.isPercent ? mf.fmtNum(100 * -4 * ba / a, 0) : mf.fmtNum(-4 * ba);
+            option.title = props.isPercent ? mf.fmtNum(100 * -4 * ba / a, 0) + "%" : mf.fmtNum(-4 * ba);
             option.color = "#E91E63";
             lines[option.point] = props.priceSeries.createPriceLine(option);
         }
@@ -141,14 +141,14 @@ function loadTargetTool(points) {
     //
     option.point = "B";
     option.price = b;
-    option.title = mf.fmtNum(ba);
+    option.title = props.isPercent ? mf.fmtNum(100 * ba / a, 0) + "%" : mf.fmtNum(ba);
     option.color = "#F44336";
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
     if (props.levels.includes(0.5)) {
         option.point = "X";
         option.price = mf.fmtNum(a - 0.5 * ba);
-        option.title = props.isPercent ? mf.fmtNum(100 * -0.5 * ba / a, 0) : mf.fmtNum(-0.5 * ba);
+        option.title = props.isPercent ? mf.fmtNum(100 * -0.5 * ba / a, 0) + "%" : mf.fmtNum(-0.5 * ba);
         option.color = "#2196F3";
         lines[option.point] = props.priceSeries.createPriceLine(option);
     }
@@ -156,7 +156,7 @@ function loadTargetTool(points) {
     if (props.levels.includes(1)) {
         option.point = "Y";
         option.price = mf.fmtNum(a - ba);
-        option.title = props.isPercent ? mf.fmtNum(100 * -ba / a, 0) : mf.fmtNum(-ba);
+        option.title = props.isPercent ? mf.fmtNum(100 * -ba / a, 0) + "%" : mf.fmtNum(-ba);
         option.color = "#673AB7";
         lines[option.point] = props.priceSeries.createPriceLine(option);
     }
@@ -164,7 +164,7 @@ function loadTargetTool(points) {
     if (props.levels.includes(2)) {
         option.point = "Z";
         option.price = mf.fmtNum(a - 2 * ba);
-        option.title = props.isPercent ? mf.fmtNum(100 * -2 * ba / a, 0) : mf.fmtNum(-2 * ba);
+        option.title = props.isPercent ? mf.fmtNum(100 * -2 * ba / a, 0) + "%" : mf.fmtNum(-2 * ba);
         option.color = "#9C27B0";
         lines[option.point] = props.priceSeries.createPriceLine(option);
     }
@@ -172,7 +172,7 @@ function loadTargetTool(points) {
     if (props.levels.includes(4)) {
         option.point = "W";
         option.price = mf.fmtNum(a - 4 * ba);
-        option.title = props.isPercent ? mf.fmtNum(100 * -4 * ba / a, 0) : mf.fmtNum(-4 * ba);
+        option.title = props.isPercent ? mf.fmtNum(100 * -4 * ba / a, 0) + "%" : mf.fmtNum(-4 * ba);
         option.color = "#E91E63";
         lines[option.point] = props.priceSeries.createPriceLine(option);
     }
@@ -246,7 +246,7 @@ function drag({ lineOptions, newPrice }) {
         param.data.push(a);
         //
         point = "B";
-        changeOptions = { price: b, title: mf.fmtNum(ba) };
+        changeOptions = { price: b, title: props.isPercent ? mf.fmtNum(100 * ba / a, 0) + "%" : mf.fmtNum(ba) };
         if (lineOptions.point === point) delete changeOptions.price;
         lines[point].applyOptions(changeOptions);
         param.points.push(point);
@@ -256,7 +256,7 @@ function drag({ lineOptions, newPrice }) {
             point = "X";
             changeOptions = {
                 price: mf.fmtNum(a - 0.5 * ba),
-                title: props.isPercent ? mf.fmtNum(100 * -0.5 * ba / a, 0) : mf.fmtNum(-0.5 * ba),
+                title: props.isPercent ? mf.fmtNum(100 * -0.5 * ba / a, 0) + "%" : mf.fmtNum(-0.5 * ba),
             };
             if (lineOptions.point === point) delete changeOptions.price;
             lines[point].applyOptions(changeOptions);
@@ -266,7 +266,7 @@ function drag({ lineOptions, newPrice }) {
             point = "Y";
             changeOptions = {
                 price: mf.fmtNum(a - ba),
-                title: props.isPercent ? mf.fmtNum(100 * -ba / a, 0) : mf.fmtNum(-ba),
+                title: props.isPercent ? mf.fmtNum(100 * -ba / a, 0) + "%" : mf.fmtNum(-ba),
             };
             if (lineOptions.point === point) delete changeOptions.price;
             lines[point].applyOptions(changeOptions);
@@ -276,7 +276,7 @@ function drag({ lineOptions, newPrice }) {
             point = "Z";
             changeOptions = {
                 price: mf.fmtNum(a - 2 * ba),
-                title: props.isPercent ? mf.fmtNum(100 * -2 * ba / a, 0) : mf.fmtNum(-2 * ba),
+                title: props.isPercent ? mf.fmtNum(100 * -2 * ba / a, 0) + "%" : mf.fmtNum(-2 * ba),
             };
             if (lineOptions.point === point) delete changeOptions.price;
             lines[point].applyOptions(changeOptions);
@@ -286,7 +286,7 @@ function drag({ lineOptions, newPrice }) {
             point = "W";
             changeOptions = {
                 price: mf.fmtNum(a - 4 * ba),
-                title: props.isPercent ? mf.fmtNum(100 * -4 * ba / a, 0) : mf.fmtNum(-4 * ba),
+                title: props.isPercent ? mf.fmtNum(100 * -4 * ba / a, 0) + "%" : mf.fmtNum(-4 * ba),
             };
             if (lineOptions.point === point) delete changeOptions.price;
             lines[point].applyOptions(changeOptions);
