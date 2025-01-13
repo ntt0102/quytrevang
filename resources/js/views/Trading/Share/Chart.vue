@@ -97,6 +97,7 @@
                 storeModule="tradingShare"
                 :priceSeries="state.series.stock"
                 :levels="[1, 2]"
+                :isPercent="true"
                 @hideContext="hideContext"
             />
         </div>

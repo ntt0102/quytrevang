@@ -131,6 +131,7 @@
                 storeModule="tradingDerivative"
                 :priceSeries="state.series.price"
                 :levels="[0.5, 1, 2, 4]"
+                :isPercent="false"
                 @hideContext="hideContext"
             />
             <OrderTool
