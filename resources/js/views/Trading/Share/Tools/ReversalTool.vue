@@ -66,13 +66,13 @@ function reversalToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         removeReversalTool();
-        emit("indexUpdated");
+        if (props.symbol === indexSymbol.value) emit("indexUpdated");
         e.target.classList.add("selected");
     }
 }
 function reversalToolContextmenu(e) {
     removeReversalTool();
-    emit("indexUpdated");
+    if (props.symbol === indexSymbol.value) emit("indexUpdated");
     e.target.classList.remove("selected");
 }
 function draw({ prices, time }) {
