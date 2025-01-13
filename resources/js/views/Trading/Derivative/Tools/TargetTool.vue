@@ -70,6 +70,7 @@ function draw({ price }) {
         const a = +lines.A.options().price;
         const ba = price - a;
         option.point = "B";
+        option.ba = mf.fmtNum(ba);
         option.title = props.isPercent ? mf.fmtNum(100 * ba / a, 0) + "%" : mf.fmtNum(ba);
         option.color = "#F44336";
         lines[option.point] = props.priceSeries.createPriceLine(option);
@@ -141,6 +142,7 @@ function loadTargetTool(points) {
     //
     option.point = "B";
     option.price = b;
+    option.ba = mf.fmtNum(ba);
     option.title = props.isPercent ? mf.fmtNum(100 * ba / a, 0) + "%" : mf.fmtNum(ba);
     option.color = "#F44336";
     lines[option.point] = props.priceSeries.createPriceLine(option);
@@ -219,7 +221,7 @@ function drag({ lineOptions, newPrice }) {
         //
         point = "A";
         if (lineOptions.point === "A") {
-            ba = +lines.B.options().title;
+            ba = +lines.B.options().ba;
             b = a + ba;
         } else if (lineOptions.point !== "B") {
             let div = 0;
@@ -246,7 +248,7 @@ function drag({ lineOptions, newPrice }) {
         param.data.push(a);
         //
         point = "B";
-        changeOptions = { price: b, title: props.isPercent ? mf.fmtNum(100 * ba / a, 0) + "%" : mf.fmtNum(ba) };
+        changeOptions = { price: b, ba: mf.fmtNum(ba), title: props.isPercent ? mf.fmtNum(100 * ba / a, 0) + "%" : mf.fmtNum(ba) };
         if (lineOptions.point === point) delete changeOptions.price;
         lines[point].applyOptions(changeOptions);
         param.points.push(point);
