@@ -95,7 +95,7 @@
                 ref="targetToolRef"
                 :symbol="state.symbol"
                 storeModule="tradingShare"
-                :stockSeries="state.series.stock"
+                :priceSeries="state.series.stock"
                 :levels="[1, 2]"
                 :isPercent="true"
                 @hideContext="hideContext"
