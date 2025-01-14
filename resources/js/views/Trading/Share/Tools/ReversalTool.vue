@@ -105,7 +105,7 @@ function scan(prices, startTime, endTime) {
         const pH = { i, p: h };
         const pL = { i, p: l };
         if (i === 0) {
-            B = { H: pL, L: pL };
+            B = { H: pH, L: pH };
             pr = 0;
             ir = 0;
             bTime = t;
