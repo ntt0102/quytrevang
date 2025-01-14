@@ -181,7 +181,7 @@ onUnmounted(() => {
     document.removeEventListener("keydown", chartShortcut);
 });
 
-watch(() => store.state.tradingShare.prices, loadChartData);
+watch(() => store.state.tradingShare.prices, loadStockChart);
 watch(() => config.value.source, initData);
 watch(() => config.value.reversal, updateIndexMarker);
 
@@ -239,7 +239,6 @@ function drawChart() {
         wickDownColor: "#EC3F3F",
         priceFormat: { minMove: 0.01 },
         scaleMargins: { top: 0.1, bottom: 0.55 },
-        lastValueVisible: false,
     });
     state.series.stock = params.chart.addCandlestickSeries({
         upColor: "#30A165",
@@ -362,10 +361,14 @@ function changeWatchlist() {
     });
 }
 
-function loadChartData(value) {
+function loadStockChart(value) {
     params.data.stock = mf.cloneDeep(value);
     state.series.stock.setData(params.data.stock);
     params.chart.applyOptions({ watermark: { text: state.symbol } });
+}
+function loadIndexChart(value) {
+    params.data.index = value;
+    state.series.index.setData(value);
 }
 function updateLatestCandle(series, newPrice) {
     let latest = params.data[series].pop();
@@ -402,7 +405,7 @@ function getChartData(withIndex = false, fromDate = null) {
     } else getChartServer(withIndex, fromDate);
 }
 function getChartSocket(withIndex = false, fromDate = null) {
-    if (params.websocket.readyState === WebSocket.OPEN) {
+    if (params.websocket && params.websocket.readyState === WebSocket.OPEN) {
         const from = format(fromDate, "yyyy-MM-dd");
         const to = format(new Date(), "yyyy-MM-dd");
         let message = `{"arguments":["${state.symbol}","D","${from}","${to}"],"invocationId":"stock","target":"GetBars","type":1}`;
@@ -422,10 +425,7 @@ function getChartServer(withIndex = false, fromDate = null) {
             withIndex,
         })
         .then((index) => {
-            if (withIndex) {
-                params.data.index = index;
-                state.series.index.setData(index);
-            }
+            if (withIndex) loadIndexChart(index);
             removeTools();
         });
 }
@@ -498,16 +498,16 @@ function connectSocket() {
                     store.dispatch("tradingShare/getTools", {
                         symbol: state.symbol,
                     });
-                    loadChartData(prices);
-                } else state.series.index.setData(prices);
+                    loadStockChart(prices);
+                } else loadIndexChart(prices);
             } else if (item.type == 1 && item.target === "UpdateLastPrices") {
                 const _data = item.arguments[0];
-                const index = _data.find(
-                    (i) => i.symbol === config.value.index
+                const indexData = _data.find(
+                    (i) => i.symbol == config.value.index
                 );
-                const stock = _data.find((i) => i.symbol === state.symbol);
-                if (index) updateLatestCandle("index", index.last);
-                if (stock) updateLatestCandle("stock", stock.last);
+                const stockData = _data.find((i) => i.symbol == state.symbol);
+                if (indexData) updateLatestCandle("index", indexData.last);
+                if (stockData) updateLatestCandle("stock", stockData.last);
             }
         });
     };
