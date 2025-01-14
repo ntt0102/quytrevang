@@ -80,22 +80,22 @@
             <ReversalTool
                 ref="reversalToolRef"
                 :symbol="state.symbol"
-                :priceSeries="state.series.stock"
-                @indexUpdated="updateIndexMarker"
+                :indexSeries="state.series.index"
+                :stockSeries="state.series.stock"
                 @hideContext="hideContext"
             />
             <LineTool
                 ref="lineToolRef"
                 :symbol="state.symbol"
                 storeModule="tradingShare"
-                :priceSeries="state.series.stock"
+                :stockSeries="state.series.stock"
                 @hideContext="hideContext"
             />
             <TargetTool
                 ref="targetToolRef"
                 :symbol="state.symbol"
                 storeModule="tradingShare"
-                :priceSeries="state.series.stock"
+                :stockSeries="state.series.stock"
                 :levels="[1, 2]"
                 :isPercent="true"
                 @hideContext="hideContext"
@@ -185,7 +185,6 @@ onUnmounted(() => {
 watch(() => store.state.tradingShare.prices, loadStockChart);
 watch(() => config.value.whitespace, loadWhitespaceChart);
 watch(() => config.value.source, initData);
-watch(() => config.value.reversal, updateIndexMarker);
 
 defineExpose({
     getFilterTimes,
@@ -439,18 +438,6 @@ function getChartServer(withIndex = false, fromDate = null) {
             if (withIndex) loadIndexChart(index);
             removeTools();
         });
-}
-function updateIndexMarker(reversal) {
-    let markers = [];
-    if (reversal) {
-        markers.push({
-            time: reversal.time,
-            color: "#9C27B0",
-            position: "aboveBar",
-            shape: "circle",
-        });
-    }
-    state.series.index.setMarkers(markers);
 }
 function removeTools() {
     reversalToolRef.value.remove();

@@ -14,36 +14,41 @@ import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const props = defineProps(["symbol", "priceSeries"]);
-const emit = defineEmits(["indexUpdated", "hideContext"]);
+const props = defineProps(["symbol", "indexSeries", "stockSeries"]);
+const emit = defineEmits(["hideContext"]);
 const reversalToolRef = ref(null);
-const toolStore = computed(() => store.state.tradingShare.tools.reversal);
+const stockStore = computed(() => store.state.tradingShare.tools.reversal);
+const indexStore = computed(() => store.state.tradingShare.config.reversal);
 const indexSymbol = computed(() => store.state.tradingShare.config.index);
 const whitespace = computed(() => store.state.tradingShare.config.whitespace);
 const TOOL_NAME = "reversal";
-const TOOL_COLOR = "rgba(156, 39, 176, 0.7)";
-let series = {};
-let times = [];
-let reversal = null;
+const colors = {
+    index: "rgba(103, 58, 183, 0.7)",
+    stock: "rgba(156, 39, 176, 0.7)",
+};
+let reversalSeries = {};
+let drawTimes = [];
+let lines = { index: null, stock: null };
 let lineOption = {
-    lineType: TOOL_NAME,
-    color: TOOL_COLOR,
     title: "R",
     lineWidth: 1,
-    lineStyle: 1,
-    draggable: true,
+    lineStyle: 0,
+    draggable: false,
 };
-let priceLine = null;
 
 defineExpose({
     createSeries,
     isSelected,
     draw,
     remove,
+    loadIndex,
 });
 
-watch(toolStore, (data) => {
-    if (data) load(data[0]);
+watch(stockStore, (data) => {
+    if (data) loadStock(data[0]);
+});
+watch(indexStore, (data) => {
+    if (data) loadIndex(data);
 });
 
 function isSelected() {
@@ -51,9 +56,16 @@ function isSelected() {
 }
 function createSeries(chart) {
     if (!chart) return false;
-    series = chart.addHistogramSeries({
-        priceScaleId: TOOL_NAME,
-        color: TOOL_COLOR,
+    reversalSeries.stock = chart.addHistogramSeries({
+        priceScaleId: TOOL_NAME + "Stock",
+        color: colors.stock,
+        scaleMargins: { top: 0, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    reversalSeries.index = chart.addHistogramSeries({
+        priceScaleId: TOOL_NAME + "Index",
+        color: colors.index,
         scaleMargins: { top: 0, bottom: 0 },
         lastValueVisible: false,
         priceLineVisible: false,
@@ -66,21 +78,21 @@ function reversalToolClick(e) {
         .querySelectorAll(".tool-area > .command:not(.drawless)")
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
-        removeReversalTool();
-        if (props.symbol === indexSymbol.value) emit("indexUpdated");
+        removeReversalStockTool();
+        if (props.symbol === indexSymbol.value) removeReversalIndexTool();
         e.target.classList.add("selected");
     }
 }
 function reversalToolContextmenu(e) {
-    removeReversalTool();
-    if (props.symbol === indexSymbol.value) emit("indexUpdated");
+    removeReversalStockTool();
+    if (props.symbol === indexSymbol.value) removeReversalIndexTool();
     e.target.classList.remove("selected");
 }
 function draw({ prices, time }) {
-    times.push({ time, value: 1 });
-    if (times.length === 2) {
-        reversal = scan(prices, times[0].time, times[1].time);
-        loadReversalTool(reversal);
+    drawTimes.push({ time, value: 1 });
+    if (drawTimes.length === 2) {
+        const reversal = scan(prices, drawTimes[0].time, drawTimes[1].time);
+        loadReversalStockTool(reversal);
         store.dispatch("tradingShare/drawTools", {
             isRemove: false,
             symbol: props.symbol,
@@ -88,10 +100,10 @@ function draw({ prices, time }) {
             points: [0],
             data: [reversal],
         });
-        if (props.symbol === indexSymbol.value) emit("indexUpdated", reversal);
-        times = [];
+        if (props.symbol === indexSymbol.value) loadIndex(reversal);
+        drawTimes = [];
         reversalToolRef.value.classList.remove("selected");
-    } else series.setData(times);
+    } else reversalSeries.stock.setData(drawTimes);
 }
 function scan(prices, startTime, endTime) {
     let B, bTime, pr, ir;
@@ -128,19 +140,30 @@ function scan(prices, startTime, endTime) {
     const price = B.L.p + pr;
     return { time, price };
 }
-function load(data) {
-    removeReversalTool(false);
-    loadReversalTool(data);
+function loadStock(data) {
+    removeReversalStockTool(false);
+    loadReversalStockTool(data);
 }
-function loadReversalTool(reversal) {
-    series.setData([{ time: reversal.time, value: 1 }]);
-    lineOption.price = reversal.price;
-    priceLine = props.priceSeries.createPriceLine(lineOption);
+function loadReversalStockTool({ price, time }) {
+    reversalSeries.stock.setData([{ time, value: 1 }]);
+    lineOption.price = price;
+    lineOption.color = colors.stock;
+    lines.stock = props.stockSeries.createPriceLine(lineOption);
+}
+function loadIndex(data) {
+    removeReversalIndexTool(false);
+    loadReversalIndexTool(data);
+}
+function loadReversalIndexTool({ price, time }) {
+    reversalSeries.index.setData([{ time, value: 1 }]);
+    lineOption.price = price;
+    lineOption.color = colors.index;
+    lines.index = props.indexSeries.createPriceLine(lineOption);
 }
 function remove() {
-    removeReversalTool(false);
+    removeReversalStockTool(false);
 }
-function removeReversalTool(withServer = true) {
+function removeReversalStockTool(withServer = true) {
     if (withServer) {
         store.dispatch("tradingShare/drawTools", {
             isRemove: true,
@@ -148,11 +171,17 @@ function removeReversalTool(withServer = true) {
             name: TOOL_NAME,
         });
     }
-    reversal = {};
-    series.setData([]);
-    if (priceLine) {
-        props.priceSeries.removePriceLine(priceLine);
-        priceLine = null;
+    reversalSeries.stock.setData([]);
+    if (lines.stock) {
+        props.stockSeries.removePriceLine(lines.stock);
+        lines.stock = null;
+    }
+}
+function removeReversalIndexTool() {
+    reversalSeries.index.setData([]);
+    if (lines.index) {
+        props.indexSeries.removePriceLine(lines.index);
+        lines.index = null;
     }
 }
 </script>
