@@ -88,7 +88,7 @@
                 ref="lineToolRef"
                 :symbol="state.symbol"
                 storeModule="tradingShare"
-                :stockSeries="state.series.stock"
+                :priceSeries="state.series.stock"
                 @hideContext="hideContext"
             />
             <TargetTool
