@@ -394,7 +394,7 @@ function calculatePattern() {
     //
     let X, o;
     if (s1Valid) {
-        if (phase3.breakIndex && T > T3) {
+        if (phase3.breakIndex && phase3.X.tr > phase1.tr) {
             X = 2 * CD;
             o = phase3.X.R.price;
         } else {
