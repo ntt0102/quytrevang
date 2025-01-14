@@ -35,7 +35,24 @@ class ShareService extends CoreService
             'filterTime' => $filterTime,
             'watchlist' => $watch ? $watch->symbols : [],
             'reversal' => $reversal,
+            'whitespace' => $this->createChartWhitespace(),
         ];
+    }
+
+    private function createChartWhitespace()
+    {
+        $chart = [];
+        $date = new \DateTime();
+        $date->modify('+1 day');
+        $dayCount = 0;
+        while ($dayCount <= 60) {
+            if (check_opening_market($date)) {
+                $chart[] = ['time' => $date->getTimestamp()];
+                $dayCount++;
+            }
+            $date->modify('+1 day');
+        }
+        return $chart;
     }
 
     /**
@@ -83,16 +100,16 @@ class ShareService extends CoreService
                 'close' => $data->c[$i]
             ];
         }
-        $date = new \DateTime();
-        $date->modify('+1 day');
-        $dayCount = 0;
-        while ($dayCount <= 60) {
-            if (check_opening_market($date)) {
-                $chart[] = ['time' => $date->getTimestamp()];
-                $dayCount++;
-            }
-            $date->modify('+1 day');
-        }
+        // $date = new \DateTime();
+        // $date->modify('+1 day');
+        // $dayCount = 0;
+        // while ($dayCount <= 60) {
+        //     if (check_opening_market($date)) {
+        //         $chart[] = ['time' => $date->getTimestamp()];
+        //         $dayCount++;
+        //     }
+        //     $date->modify('+1 day');
+        // }
         return $chart;
     }
     /**

@@ -161,6 +161,7 @@ const state = reactive({
 });
 let params = {
     chart: {},
+    series: {},
     data: { index: [], stock: [] },
     crosshair: {},
     websocket: null,
@@ -182,6 +183,7 @@ onUnmounted(() => {
 });
 
 watch(() => store.state.tradingShare.prices, loadStockChart);
+watch(() => config.value.whitespace, loadWhitespaceChart);
 watch(() => config.value.source, initData);
 watch(() => config.value.reversal, updateIndexMarker);
 
@@ -230,6 +232,12 @@ function drawChart() {
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
     params.chart.subscribeCrosshairMove(eventChartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(priceLineDrag);
+    params.series.whitespace = params.chart.addHistogramSeries({
+        priceScaleId: "whitespace",
+        scaleMargins: { top: 0, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
     state.series.index = params.chart.addCandlestickSeries({
         priceScaleId: "index",
         upColor: "#30A165",
@@ -361,6 +369,9 @@ function changeWatchlist() {
     });
 }
 
+function loadWhitespaceChart(value) {
+    params.series.whitespace.setData(value);
+}
 function loadStockChart(value) {
     params.data.stock = mf.cloneDeep(value);
     state.series.stock.setData(params.data.stock);

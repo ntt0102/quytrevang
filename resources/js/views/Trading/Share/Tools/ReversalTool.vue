@@ -19,6 +19,7 @@ const emit = defineEmits(["indexUpdated", "hideContext"]);
 const reversalToolRef = ref(null);
 const toolStore = computed(() => store.state.tradingShare.tools.reversal);
 const indexSymbol = computed(() => store.state.tradingShare.config.index);
+const whitespace = computed(() => store.state.tradingShare.config.whitespace);
 const TOOL_NAME = "reversal";
 const TOOL_COLOR = "rgba(156, 39, 176, 0.7)";
 let series = {};
@@ -99,7 +100,6 @@ function scan(prices, startTime, endTime) {
     );
     for (let i = 0; i < data.length; i++) {
         const t = data[i].time;
-        const c = data[i].close;
         const h = data[i].high;
         const l = data[i].low;
         const pH = { i, p: h };
@@ -122,8 +122,9 @@ function scan(prices, startTime, endTime) {
             }
         }
     }
-    const bIndex = prices.findIndex((item) => item.time === bTime);
-    const time = prices[bIndex + ir].time;
+    const _prices = [...prices, ...whitespace.value];
+    const bIndex = _prices.findIndex((item) => item.time === bTime);
+    const time = _prices[bIndex + ir].time;
     const price = B.L.p + pr;
     return { time, price };
 }
