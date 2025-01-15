@@ -3,7 +3,7 @@ function initialState() {
         config: { watchlist: [], sources: [] },
         groups: [],
         symbols: [],
-        prices: [],
+        stock: [],
         tools: {},
         isLoading: false,
         filterProcess: 0,
@@ -136,7 +136,7 @@ const actions = {
 
 const mutations = {
     setChartData(state, data) {
-        state.prices = data.prices;
+        state.stock = data.stock;
         state.tools = data.tools;
     },
     setTools(state, data) {
