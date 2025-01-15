@@ -182,7 +182,7 @@ onUnmounted(() => {
     document.removeEventListener("keydown", chartShortcut);
 });
 
-watch(() => store.state.tradingShare.stock, loadStockChart);
+watch(() => store.state.tradingShare.prices, loadStockChart);
 watch(() => config.value.whitespace, loadWhitespaceChart);
 watch(() => config.value.source, initData);
 
