@@ -40,20 +40,22 @@ class ShareService extends CoreService
     }
 
     private function createChartWhitespace()
-    {
-        $chart = [];
-        $date = new \DateTime();
-        $date->modify('+1 day');
-        $dayCount = 0;
-        while ($dayCount <= 60) {
-            if (check_opening_market($date)) {
-                $chart[] = ['time' => $date->getTimestamp()];
-                $dayCount++;
-            }
-            $date->modify('+1 day');
+{
+    $chart = [];
+    $date = new \DateTime('now', new \DateTimeZone('UTC'));
+    $date->setTime(0, 0, 0);
+    $dayCount = 0;
+    while ($dayCount <= 60) {
+        if (check_opening_market($date)) {
+            $chart[] = ['time' => $date->getTimestamp()];
+            $dayCount++;
         }
-        return $chart;
+        $date->modify('+1 day');
+        $date->setTime(0, 0, 0);
     }
+    return $chart;
+}
+
 
     /**
      * Set Source
@@ -75,7 +77,7 @@ class ShareService extends CoreService
     public function getChart($payload)
     {
         $data = [
-            'prices' => $this->getChartData($payload->symbol, $payload->from),
+            'stock' => $this->getChartData($payload->symbol, $payload->from),
             'tools' => $this->getTools($payload),
         ];
         if ($payload->withIndex) {
