@@ -477,14 +477,14 @@ function scanPhase({
         if (mf.cmp(price, side, box.R.price)) {
             if (box.pr > 0) {
                 const dis = mf.fmtNum(box.R.price - preBox.R.price, 1, true);
-                if (
-                    dis === 0.1 &&
-                    box.pr < preBox.pr &&
-                    box.tr > preBox.tr / 5
-                ) {
-                    const tr = box.tr;
-                    box = mf.cloneDeep(preBox);
-                    box.tr += tr;
+                if (dis === 0.1 && box.tr > preBox.tr / 5) {
+                    const _box = { R: preBox.R };
+                    _box.tr = preBox.tr + box.tr;
+                    if (box.pr > preBox.pr) {
+                        _box.R = box.R;
+                        _box.pr = box.pr;
+                    }
+                    box = mf.cloneDeep(_box);
                 }
                 if (box.pr > maxBox.pr) maxBox.pr = box.pr;
                 if (box.tr >= maxBox.tr) {
