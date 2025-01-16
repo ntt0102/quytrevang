@@ -23,10 +23,10 @@ const filterTimeToolRef = ref(null);
 let series = {};
 let filterTimes = [];
 const colors = [
-    "rgba(244, 67, 54, 0.6)",
-    "rgba(255, 152, 0, 0.6)",
-    "rgba(76, 175, 80, 0.6)",
-    "rgba(0, 150, 136, 0.6)",
+    "rgba(244, 67, 54, 0.5)",
+    "rgba(255, 152, 0, 0.5)",
+    "rgba(76, 175, 80, 0.5)",
+    "rgba(0, 150, 136, 0.5)",
 ];
 
 defineExpose({

@@ -23,8 +23,8 @@ const indexSymbol = computed(() => store.state.tradingShare.config.index);
 const whitespace = computed(() => store.state.tradingShare.config.whitespace);
 const TOOL_NAME = "reversal";
 const colors = {
-    index: "rgba(103, 58, 183, 0.6)",
-    stock: "rgba(156, 39, 176, 0.6)",
+    index: "rgba(103, 58, 183, 0.5)",
+    stock: "rgba(156, 39, 176, 0.5)",
 };
 let reversalSeries = {};
 let drawTimes = [];
