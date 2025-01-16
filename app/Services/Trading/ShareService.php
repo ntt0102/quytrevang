@@ -76,7 +76,7 @@ class ShareService extends CoreService
     public function getChart($payload)
     {
         $data = [
-            'prices' => $this->getChartData($payload->symbol, $payload->from),
+            'stock' => $this->getChartData($payload->symbol, $payload->from),
             'tools' => $this->getTools($payload),
         ];
         if ($payload->withIndex) {

@@ -182,7 +182,7 @@ onUnmounted(() => {
     document.removeEventListener("keydown", chartShortcut);
 });
 
-watch(() => store.state.tradingShare.prices, loadStockChart);
+watch(() => store.state.tradingShare.stock, loadStockChart);
 watch(() => config.value.whitespace, loadWhitespaceChart);
 watch(() => config.value.source, initData);
 
@@ -274,7 +274,7 @@ function chartClick() {
         filterTimeToolRef.value.draw({ time: params.crosshair.time });
     } else if (reversalToolRef.value.isSelected()) {
         reversalToolRef.value.draw({
-            prices: params.data.stock,
+            stock: params.data.stock,
             time: params.crosshair.time,
         });
     } else if (lineToolRef.value.isSelected()) {

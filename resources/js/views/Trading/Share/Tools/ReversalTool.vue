@@ -23,8 +23,8 @@ const indexSymbol = computed(() => store.state.tradingShare.config.index);
 const whitespace = computed(() => store.state.tradingShare.config.whitespace);
 const TOOL_NAME = "reversal";
 const colors = {
-    index: "rgba(103, 58, 183, 0.7)",
-    stock: "rgba(156, 39, 176, 0.7)",
+    index: "rgba(103, 58, 183, 0.6)",
+    stock: "rgba(156, 39, 176, 0.6)",
 };
 let reversalSeries = {};
 let drawTimes = [];
@@ -88,10 +88,10 @@ function reversalToolContextmenu(e) {
     if (props.symbol === indexSymbol.value) removeReversalIndexTool();
     e.target.classList.remove("selected");
 }
-function draw({ prices, time }) {
+function draw({ stock, time }) {
     drawTimes.push({ time, value: 1 });
     if (drawTimes.length === 2) {
-        const reversal = scan(prices, drawTimes[0].time, drawTimes[1].time);
+        const reversal = scan(stock, drawTimes[0].time, drawTimes[1].time);
         loadReversalStockTool(reversal);
         store.dispatch("tradingShare/drawTools", {
             isRemove: false,
@@ -105,9 +105,9 @@ function draw({ prices, time }) {
         reversalToolRef.value.classList.remove("selected");
     } else reversalSeries.stock.setData(drawTimes);
 }
-function scan(prices, startTime, endTime) {
+function scan(stock, startTime, endTime) {
     let B, bTime, pr, ir;
-    const data = prices.filter(
+    const data = stock.filter(
         (item) => item.time >= startTime && item.time <= endTime
     );
     for (let i = 0; i < data.length; i++) {
@@ -134,7 +134,7 @@ function scan(prices, startTime, endTime) {
             }
         }
     }
-    const _prices = [...prices, ...whitespace.value];
+    const _prices = [...stock, ...whitespace.value];
     const bIndex = _prices.findIndex((item) => item.time === bTime);
     const time = _prices[bIndex + ir].time;
     const price = B.L.p + pr;
