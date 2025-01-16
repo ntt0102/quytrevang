@@ -345,10 +345,11 @@ function chartShortcut(e) {
             case "NumpadDecimal":
                 changeWatchlist();
                 break;
-            case "Space":
-                state.inputSymbol = "";
-                symbolAutocompleteRef.value.instance.focus();
-                break;
+        }
+    } else if (document.activeElement.tagName != "INPUT") {
+        if (e.keyCode >= 65 && e.keyCode <= 90) {
+            state.inputSymbol = "";
+            symbolAutocompleteRef.value.instance.focus();
         }
     }
 }
