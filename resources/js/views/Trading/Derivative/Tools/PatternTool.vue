@@ -476,7 +476,7 @@ function scanPhase({
         }
         if (mf.cmp(price, side, box.R.price)) {
             if (box.pr > 0) {
-                box = checkPreBox(box, preBox);
+                box = mergePreBox(box, preBox);
                 if (box.pr > maxBox.pr) maxBox.pr = box.pr;
                 if (box.tr >= maxBox.tr) {
                     maxBox.tr = box.tr;
@@ -545,18 +545,11 @@ function scanPhase({
         breakIndex,
     };
 }
-function checkPreBox(box, preBox) {
+function mergePreBox(box, preBox) {
     const dis = mf.fmtNum(box.R.price - preBox.R.price, 1, true);
-    if (dis === 0.1 && box.tr > preBox.tr / 5) {
-        const _box = { R: preBox.R };
+    if (dis === 0.1) {
+        let _box = box.pr > preBox.pr ? box : preBox;
         _box.tr = preBox.tr + box.tr;
-        if (box.pr > preBox.pr) {
-            _box.S = box.S;
-            _box.pr = box.pr;
-        } else {
-            _box.S = preBox.S;
-            _box.pr = preBox.pr;
-        }
         return mf.cloneDeep(_box);
     } else return box;
 }
