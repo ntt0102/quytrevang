@@ -481,7 +481,7 @@ function scanPhase({
                     const _box = { R: preBox.R };
                     _box.tr = preBox.tr + box.tr;
                     if (box.pr > preBox.pr) {
-                        _box.R = box.R;
+                        _box.S = box.S;
                         _box.pr = box.pr;
                     }
                     box = mf.cloneDeep(_box);
