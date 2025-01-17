@@ -74,7 +74,7 @@ class ShrstatService extends CoreService
         $totalProfit = 0;
         $totalCost = 0;
         $client = new \GuzzleHttp\Client();
-        $url = "https://bgapidatafeed.vps.com.vn/getliststockdata/";
+        $url = "https://datafeedapi.aisec.com.vn/getliststockdata/";
         $orders = ShareOrder::opening()->get();
         foreach ($orders as $order) {
             $res = $client->get($url . $order->symbol);
