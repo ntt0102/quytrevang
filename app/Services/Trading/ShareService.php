@@ -374,29 +374,29 @@ class ShareService extends CoreService
         //
         $HiLs = $points->Hi->p - $points->Ls->p;
         $HsLs = $points->Hs->p - $points->Ls->p;
-        $recovery['short'] = round($HiLs / $HsLs, 2);
+        $bounce['short'] = round($HiLs / $HsLs, 2);
         $immedRange = round($baseZone->H->p - $baseZone->L->p, 2);
         $shortRange = round($HsLs, 2);
-        $compress['short'] = $immedRange < $shortRange;
+        $shrink['short'] = $immedRange < $shortRange;
         $trend['short'] = $baseZone->L->p > $points->Ls->p;
         if ($isMid) {
             $HsLm = $points->Hs->p - $points->Lm->p;
             $HmLm = $points->Hm->p - $points->Lm->p;
-            $recovery['mid'] = round($HsLm / $HmLm, 2);
+            $bounce['mid'] = round($HsLm / $HmLm, 2);
             $midRange = round($HmLm, 2);
-            $compress['mid'] = $shortRange < $midRange;
+            $shrink['mid'] = $shortRange < $midRange;
             $trend['mid'] = $points->Ls->p > $points->Lm->p;
         }
         if ($isLong) {
             $HmLl = $points->Hm->p - $points->Ll->p;
             $HlLl = $points->Hl->p - $points->Ll->p;
-            $recovery['long'] = round($HmLl / $HlLl, 2);
+            $bounce['long'] = round($HmLl / $HlLl, 2);
             $longRange = round($HlLl, 2);
-            $compress['long'] = $midRange < $longRange;
+            $shrink['long'] = $midRange < $longRange;
             $trend['long'] = $points->Lm->p > $points->Ll->p;
         }
-        $compressConds = array_values($compress);
-        $compress['sum'] = count(array_filter($compressConds)) === count($compressConds);
+        $shrinkConds = array_values($shrink);
+        $shrink['sum'] = count(array_filter($shrinkConds)) === count($shrinkConds);
         $trendConds = array_values($trend);
         $trend['sum'] = count(array_filter($trendConds)) === count($trendConds);
 
@@ -404,8 +404,8 @@ class ShareService extends CoreService
             'symbol' => $symbol,
             'points' => $points,
             'base' => $base,
-            'recovery' => (object)$recovery,
-            'compress' => (object)$compress,
+            'bounce' => (object)$bounce,
+            'shrink' => (object)$shrink,
             'trend' => (object)$trend,
         ];
     }
@@ -413,33 +413,33 @@ class ShareService extends CoreService
     public function checkStock($index, $stock, $isMid, $isLong)
     {
         $pivot['short'] = $stock->points->Ls->t <= $index->points->Ls->t;
-        $recovery['short'] = $stock->recovery->short > 0.7 && $stock->recovery->short > $index->recovery->short;
+        $bounce['short'] = $stock->bounce->short > 0.7 && $stock->bounce->short > $index->bounce->short;
         if ($isMid) {
             $pivot['mid'] = $stock->points->Lm->t <= $index->points->Lm->t;
-            $recovery['mid'] = $stock->recovery->mid > 0.7 && $stock->recovery->mid > $index->recovery->mid;
+            $bounce['mid'] = $stock->bounce->mid > 0.7 && $stock->bounce->mid > $index->bounce->mid;
         }
         if ($isLong) {
             $pivot['long'] = $stock->points->Ll->t <= $index->points->Ll->t;
-            $recovery['long'] = $stock->recovery->long > 0.7 && $stock->recovery->long > $index->recovery->long;
+            $bounce['long'] = $stock->bounce->long > 0.7 && $stock->bounce->long > $index->bounce->long;
         }
         $pivotConds = array_values($pivot);
         $pivotSum = count(array_filter($pivotConds)) === count($pivotConds);
         $pivot['sum'] = $pivotSum;
-        $recoveryConds = array_values($recovery);
-        $recoverySum = count(array_filter($recoveryConds)) === count($recoveryConds);
-        $recovery['sum'] = $recoverySum;
+        $bounceConds = array_values($bounce);
+        $bounceSum = count(array_filter($bounceConds)) === count($bounceConds);
+        $bounce['sum'] = $bounceSum;
         //
         return (object)[
-            'sum' => $pivotSum && $recoverySum && $stock->compress->sum && $stock->trend->sum && $stock->base,
-            'recovery' => $recovery,
+            'sum' => $pivotSum && $bounceSum && $stock->shrink->sum && $stock->trend->sum && $stock->base,
+            'bounce' => $bounce,
             'pivot' => $pivot,
-            'compress' => $stock->compress,
+            'shrink' => $stock->shrink,
             'trend' => $stock->trend,
             'base' => $stock->base,
         ];
         // return (object)[
-        //     $stock->symbol => $stock->recovery,
-        //     $index->symbol => $index->recovery,
+        //     $stock->symbol => $stock->bounce,
+        //     $index->symbol => $index->bounce,
         //     'points' => $stock->points,
         // ];
     }
