@@ -616,6 +616,7 @@ function remove() {
     savePattern(true);
     props.pickTimeToolRef.remove();
     removePatternTool();
+    setTimeMark([]);
     emit("setProgress", {});
 }
 function removePatternTool() {
@@ -632,7 +633,6 @@ function removePatternTool() {
         }
     }
     lines = {};
-    setTimeMark([]);
 }
 function setTimeMark(data) {
     const colors = [
