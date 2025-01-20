@@ -374,65 +374,72 @@ class ShareService extends CoreService
         //
         $HiLs = $points->Hi->p - $points->Ls->p;
         $HsLs = $points->Hs->p - $points->Ls->p;
-        $trend['short'] = round($HiLs / $HsLs, 2);
+        $recovery['short'] = round($HiLs / $HsLs, 2);
         $immedRange = round($baseZone->H->p - $baseZone->L->p, 2);
         $shortRange = round($HsLs, 2);
         $compress['short'] = $immedRange < $shortRange;
+        $trend['short'] = $baseZone->L->p > $points->Ls->p;
         if ($isMid) {
             $HsLm = $points->Hs->p - $points->Lm->p;
             $HmLm = $points->Hm->p - $points->Lm->p;
-            $trend['mid'] = round($HsLm / $HmLm, 2);
+            $recovery['mid'] = round($HsLm / $HmLm, 2);
             $midRange = round($HmLm, 2);
             $compress['mid'] = $shortRange < $midRange;
+            $trend['mid'] = $points->Ls->p > $points->Lm->p;
         }
         if ($isLong) {
             $HmLl = $points->Hm->p - $points->Ll->p;
             $HlLl = $points->Hl->p - $points->Ll->p;
-            $trend['long'] = round($HmLl / $HlLl, 2);
+            $recovery['long'] = round($HmLl / $HlLl, 2);
             $longRange = round($HlLl, 2);
             $compress['long'] = $midRange < $longRange;
+            $trend['long'] = $points->Lm->p > $points->Ll->p;
         }
         $compressConds = array_values($compress);
         $compress['sum'] = count(array_filter($compressConds)) === count($compressConds);
+        $trendConds = array_values($trend);
+        $trend['sum'] = count(array_filter($trendConds)) === count($trendConds);
 
         return (object)[
             'symbol' => $symbol,
             'points' => $points,
             'base' => $base,
-            'trend' => (object)$trend,
+            'recovery' => (object)$recovery,
             'compress' => (object)$compress,
+            'trend' => (object)$trend,
         ];
     }
 
     public function checkStock($index, $stock, $isMid, $isLong)
     {
         $pivot['short'] = $stock->points->Ls->t <= $index->points->Ls->t;
-        $trend['short'] = $stock->trend->short > 0.7 && $stock->trend->short > $index->trend->short;
+        $recovery['short'] = $stock->recovery->short > 0.7 && $stock->recovery->short > $index->recovery->short;
         if ($isMid) {
             $pivot['mid'] = $stock->points->Lm->t <= $index->points->Lm->t;
-            $trend['mid'] = $stock->trend->mid > 0.7 && $stock->trend->mid > $index->trend->mid;
+            $recovery['mid'] = $stock->recovery->mid > 0.7 && $stock->recovery->mid > $index->recovery->mid;
         }
         if ($isLong) {
             $pivot['long'] = $stock->points->Ll->t <= $index->points->Ll->t;
-            $trend['long'] = $stock->trend->long > 0.7 && $stock->trend->long > $index->trend->long;
+            $recovery['long'] = $stock->recovery->long > 0.7 && $stock->recovery->long > $index->recovery->long;
         }
         $pivotConds = array_values($pivot);
         $pivotSum = count(array_filter($pivotConds)) === count($pivotConds);
         $pivot['sum'] = $pivotSum;
-        $trendConds = array_values($trend);
-        $trendSum = count(array_filter($trendConds)) === count($trendConds);
-        $trend['sum'] = $trendSum;
+        $recoveryConds = array_values($recovery);
+        $recoverySum = count(array_filter($recoveryConds)) === count($recoveryConds);
+        $recovery['sum'] = $recoverySum;
         //
         return (object)[
-            'sum' => $pivotSum && $trendSum && $stock->compress->sum && $stock->base,
-            'trend' => $trend,
+            'sum' => $pivotSum && $recoverySum && $stock->compress->sum && $stock->trend->sum && $stock->base,
+            'recovery' => $recovery,
             'pivot' => $pivot,
             'compress' => $stock->compress,
+            'trend' => $stock->trend,
             'base' => $stock->base,
         ];
         // return (object)[
-        //     $stock->symbol => $stock->trend,
-        //     $index->symbol => $index->trend,
+        //     $stock->symbol => $stock->recovery,
+        //     $index->symbol => $index->recovery,
         //     'points' => $stock->points,
         // ];
     }
