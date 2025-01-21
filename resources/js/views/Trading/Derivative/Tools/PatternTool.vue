@@ -108,7 +108,7 @@ function draw({ time, price }) {
                 lines[point].applyOptions(changeOptions);
                 //
                 point = "D";
-                changeOptions = { price: entry, title: "Entry " + pStatus };
+                changeOptions = { price: entry, title: "E " + pStatus };
                 lines[point].applyOptions(changeOptions);
                 //
                 point = "X";
@@ -151,7 +151,7 @@ function draw({ time, price }) {
                 //
                 option.point = "D";
                 option.price = entry;
-                option.title = "Entry " + pStatus;
+                option.title = "E " + pStatus;
                 option.color = "#9C27B0";
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
@@ -235,7 +235,7 @@ function loadPatternTool() {
     //
     option.point = "D";
     option.price = entry;
-    option.title = "Entry " + pStatus;
+    option.title = "E " + pStatus;
     option.color = "#9C27B0";
     option.draggable = false;
     lines[option.point] = props.priceSeries.createPriceLine(option);
@@ -693,7 +693,7 @@ function drag({ lineOptions }) {
         point = "D";
         changeOptions = {
             price: entry,
-            title: "Entry " + pStatus,
+            title: "E " + pStatus,
         };
         if (lineOptions.point === point) delete changeOptions.price;
         lines[point].applyOptions(changeOptions);
