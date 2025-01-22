@@ -14,6 +14,7 @@
 </template>
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
+import { getUnixTime } from "date-fns";
 
 const props = defineProps([
     "vpsUser",
@@ -24,8 +25,9 @@ const props = defineProps([
 ]);
 const tradingviewRef = ref(null);
 const showTradingView = ref(false);
+const updatedTime = ref(0);
 const tradingViewSrc = computed(() => {
-    return `https://chart.aisec.com.vn/tv/?u=${props.vpsUser}&s=${props.vpsSession}&symbol=${props.symbol}&resolution=${props.timeframe}&lang=vi`;
+    return `https://chart.vps.com.vn/tv/?u=${props.vpsUser}&s=${props.vpsSession}&symbol=${props.symbol}&resolution=${props.timeframe}&lang=vi&t=${updatedTime.value}`;
 });
 onMounted(() => {
     window.addEventListener("keydown", shortcutHandle);
@@ -40,6 +42,7 @@ function tradingviewClick(e) {
     e.stopPropagation();
 }
 function toggleTradingview() {
+    if (!showTradingView.value) updatedTime.value = getUnixTime(new Date());
     showTradingView.value = !showTradingView.value;
 }
 function updateChildSize() {
