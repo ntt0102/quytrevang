@@ -25,7 +25,7 @@ const props = defineProps([
 const tradingviewRef = ref(null);
 const showTradingView = ref(false);
 const tradingViewSrc = computed(() => {
-    return `https://chart.vps.com.vn/tv/?u=${props.vpsUser}&s=${props.vpsSession}&symbol=${props.symbol}&resolution=${props.timeframe}&lang=vi`;
+    return `https://chart.aisec.com.vn/tv/?u=${props.vpsUser}&s=${props.vpsSession}&symbol=${props.symbol}&resolution=${props.timeframe}&lang=vi`;
 });
 onMounted(() => {
     window.addEventListener("keydown", shortcutHandle);
