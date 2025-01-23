@@ -120,14 +120,14 @@
             />
             <LineTool
                 ref="lineToolRef"
-                :symbol="config.vn30f1m"
+                symbol="VN30F1M"
                 storeModule="tradingDerivative"
                 :priceSeries="state.series.price"
                 @hideContext="hideContext"
             />
             <TargetTool
                 ref="targetToolRef"
-                :symbol="config.vn30f1m"
+                symbol="VN30F1M"
                 storeModule="tradingDerivative"
                 :priceSeries="state.series.price"
                 :levels="[0.5, 1, 2, 4]"
