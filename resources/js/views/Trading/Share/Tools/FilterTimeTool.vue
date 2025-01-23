@@ -64,6 +64,9 @@ function filterTimeToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         filterTimes.pop();
+        const indexes = filterTimes.map((_, index) => index);
+        const times = filterTimes.map((item) => item.time);
+        saveFilterTime({ isRemove: false, points: indexes, data: times });
         series.setData(filterTimes);
         e.target.classList.add("selected");
     }
@@ -77,13 +80,7 @@ function draw({ time }) {
     if (index && time <= filterTimes[index - 1].time) return false;
     filterTimes.push({ time, color: colors[index], value: 1 });
     series.setData(filterTimes);
-    store.dispatch("tradingShare/drawTools", {
-        isRemove: false,
-        symbol: "",
-        name: "filterTime",
-        points: [index],
-        data: [time],
-    });
+    saveFilterTime({ isRemove: false, points: [index], data: [time] });
     if (index === 3) filterTimeToolRef.value.classList.remove("selected");
 }
 function load(data) {
@@ -93,13 +90,20 @@ function load(data) {
     series.setData(filterTimes);
 }
 function removeFilterTimeTool(withServer = true) {
-    if (withServer)
-        store.dispatch("tradingShare/drawTools", {
-            isRemove: true,
-            symbol: "",
-            name: "filterTime",
-        });
+    if (withServer) saveFilterTime({ isRemove: true });
     series.setData([]);
     filterTimes = [];
+}
+function saveFilterTime({ isRemove, points, data }) {
+    let param = {
+        isRemove,
+        symbol: "",
+        name: "filterTime",
+    };
+    if (!isRemove) {
+        param.points = points;
+        param.data = data;
+    }
+    store.dispatch("tradingShare/drawTools", param);
 }
 </script>
