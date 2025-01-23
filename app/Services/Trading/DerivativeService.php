@@ -147,8 +147,9 @@ class DerivativeService extends CoreService
         $symbol = $payload->symbol;
         if ($payload->isRemove) {
             $dt = StockDrawing::where('symbol', $symbol)->where('name', $payload->name);
-            if (isset($payload, $payload->point))
+            if (isset($payload, $payload->point)) {
                 $dt = $dt->where('point', $payload->point);
+            }
             $dt->delete();
         } else {
             for ($i = 0; $i < count($payload->points); $i++) {

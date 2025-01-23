@@ -64,9 +64,7 @@ function filterTimeToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         filterTimes.pop();
-        const indexes = filterTimes.map((_, index) => index);
-        const times = filterTimes.map((item) => item.time);
-        saveFilterTime({ isRemove: false, points: indexes, data: times });
+        saveFilterTime({ isRemove: true, removePoint: filterTimes.length });
         series.setData(filterTimes);
         e.target.classList.add("selected");
     }
@@ -94,13 +92,15 @@ function removeFilterTimeTool(withServer = true) {
     series.setData([]);
     filterTimes = [];
 }
-function saveFilterTime({ isRemove, points, data }) {
+function saveFilterTime({ isRemove, points, data, removePoint }) {
     let param = {
         isRemove,
         symbol: "",
         name: "filterTime",
     };
-    if (!isRemove) {
+    if (isRemove) {
+        param.point = removePoint;
+    } else {
         param.points = points;
         param.data = data;
     }
