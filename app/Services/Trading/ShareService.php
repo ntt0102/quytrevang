@@ -192,8 +192,8 @@ class ShareService extends CoreService
         $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
         $check = (array)$this->checkStock($index, $stock, $isMid, $isLong);
         $fromto = [
-            'from' => date('d/m/Y', end($filterTimes)),
-            'to' => date('d/m/Y', $filterTimes[0]),
+            'start' => date('d/m/Y', end($filterTimes)),
+            'end' => date('d/m/Y', $filterTimes[0]),
         ];
         return [
             'symbol' => $symbol,
