@@ -392,10 +392,11 @@ function calculatePattern() {
     const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
     const pStatus = `${p1Status}${p2Status}${p3Status}`;
     //
-    let X, o;
+    let X, Y, o;
     if (s1Valid) {
         if (phase3.breakIndex && phase3.X.tr > phase1.tr) {
-            X = 2 * CD;
+            X = CD;
+            Y = 2 * X;
             o = phase3.X.R.price;
         } else {
             X = phase1.rEp;
@@ -411,10 +412,12 @@ function calculatePattern() {
             side = !side;
         }
     }
+    if (!Y) {
+        const mainTR = phase3.breakIndex ?? T;
+        const scale = parseInt((mainTR - phase1.R.index) / phase1.tr);
+        Y = scale > 1 ? X * scale : X;
+    }
     const x = adjustTargetPrice(o, X, side);
-    const mainTR = phase3.breakIndex ?? T;
-    const scale = parseInt((mainTR - phase1.R.index) / phase1.tr);
-    const Y = scale > 1 ? X * scale : X;
     const y = adjustTargetPrice(o, Y, side);
 
     return {
