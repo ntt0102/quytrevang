@@ -254,6 +254,7 @@ let params = {
     websocket: null,
     socketStop: false,
     socketUpdatedAt: subSeconds(new Date(), 61),
+    hasProgress: false,
 };
 const state = reactive({
     prices: [],
@@ -378,7 +379,8 @@ function removeChart() {
     }
 }
 function chartClick(e) {
-    hideContext();
+    console.log("params.hasProgress", params.hasProgress);
+    hideContext(params.hasProgress);
     toggleOrderButton(false);
 
     if (scanToolRef.value.isSelected()) {
@@ -759,14 +761,15 @@ function patternScaned(points) {
 function refreshPattern(autoAdjust = false) {
     patternToolRef.value.refresh(autoAdjust);
 }
-function hideContext() {
-    progressToolRef.value.hide();
+function hideContext(progressIgnore = false) {
+    if (!progressIgnore) progressToolRef.value.hide();
     scanToolRef.value.hide();
     lineToolRef.value.hide();
 }
 function setProgress(value) {
     if (!devices.phone) progressToolRef.value.hide(mf.isSet(value));
     progressToolRef.value.set(value);
+    params.hasProgress = !!value.step;
 }
 function orderChanged(hasOrder) {
     state.hasOrderLine = hasOrder;
