@@ -15,6 +15,7 @@
                 <DxAutocomplete
                     ref="symbolAutocompleteRef"
                     :data-source="symbols"
+                    item-template="symbol-item"
                     :show-clear-button="true"
                     :openOnFieldClick="true"
                     :minSearchLength="0"
@@ -22,7 +23,11 @@
                     v-model="state.inputSymbol"
                     @change="symbolChanged"
                     @itemClick="symbolChanged"
-                />
+                >
+                    <template #symbol-item="{ data, index }">
+                        {{ index + 1 }}. {{ data }}
+                    </template>
+                </DxAutocomplete>
             </div>
             <div
                 v-show="showWatchlist"
