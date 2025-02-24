@@ -5,7 +5,7 @@ export default {
             conds: [
                 //
                 "BC > PR1",
-                "Break sau T1",
+                "C giữ hỗ trợ",
                 "T > T1",
                 "T < T1'",
                 "Không Double",
@@ -18,8 +18,6 @@ export default {
                 "C > T1",
                 "EPR1 < 3",
                 "EPR2 < EPR1",
-                "C giữ hỗ trợ",
-                "Chưa break",
                 "T2 > T1",
                 "T2' < T2",
                 "T < T2'",
@@ -31,7 +29,6 @@ export default {
                 //
                 "BC > nữa TR1",
                 "CD > PR2",
-                "Break sau T2",
                 "T > T2",
             ],
         },
@@ -40,7 +37,6 @@ export default {
             conds: [
                 //
                 "D > T2",
-                "DE > PR1",
                 "DE > PR3",
                 "E giữ hỗ trợ",
                 "T > T3",
