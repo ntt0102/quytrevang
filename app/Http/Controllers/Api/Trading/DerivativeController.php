@@ -69,6 +69,19 @@ class DerivativeController extends CoreController
     }
 
     /**
+     * Set Auto Scan
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function setPatternType(Request $request)
+    {
+        $data = $this->derivativeService->setPatternType($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Set Source
      *
      * @param \Illuminate\Http\Request $request

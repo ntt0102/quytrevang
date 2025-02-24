@@ -28,6 +28,9 @@ const patternToolRef = ref(null);
 const patternStore = computed(
     () => store.state.tradingDerivative.tools.pattern
 );
+const patternType = computed(
+    () => store.state.tradingDerivative.config.patternType
+);
 let points = {};
 let lines = {};
 
@@ -256,7 +259,7 @@ function loadPatternTool() {
 }
 function refresh(autoAdjust = false) {
     if (mf.isSet(lines.C)) {
-        if (autoAdjust) {
+        if (autoAdjust && patternType.value) {
             adjustPatternPoints();
         }
         removePatternTool();
@@ -264,6 +267,183 @@ function refresh(autoAdjust = false) {
     }
 }
 function calculatePattern() {
+    if (patternType.value) return calcContinuePattern();
+    else return calcReversalPattern();
+}
+function calcContinuePattern() {
+    const { A, B, C } = points;
+    const bc = B.price - C.price;
+    let side = bc > 0;
+    const pickTime = props.pickTimeToolRef.get();
+    const phase1 = scanPhase({
+        phase: 1,
+        side,
+        start: A,
+        end: B,
+        retracementPrice: C.price,
+        stopTime: pickTime,
+    });
+    let phase2 = scanPhase({
+        phase: 2,
+        side: !side,
+        start: phase1.R,
+        end: C,
+        stopTime: pickTime,
+    });
+    const phase3 = scanPhase({
+        phase: 3,
+        side,
+        start: phase2.R,
+        breakPrice: B.price,
+        stopTime:
+            pickTime ??
+            props.indexToTime(
+                Math.max(
+                    phase1.R.index + 6 * phase1.tr,
+                    phase2.R.index + phase2.tr
+                )
+            ),
+    });
+    if (phase1.X.tr >= phase2.tr) phase2.tr = phase1.X.tr;
+
+    console.log("calculatePattern", [phase1, phase2, phase3]);
+
+    //
+    const BC = mf.fmtNum(bc, 1, true);
+    const CD = mf.fmtNum(C.price - phase3.X.R.price, 1, true);
+    const DE = mf.fmtNum(phase3.X.pr);
+    const pr1Valid = BC >= phase1.pr;
+    const pr2Valid = CD >= phase2.pr;
+    const pr3Valid = DE >= phase3.pr;
+
+    const s1Valid = !mf.cmp(C.price, !side, phase1.S1.price);
+    const s2Valid = !mf.cmp(phase3.X.R.price, side, phase2.S1.price);
+    const s3Valid = !mf.cmp(phase3.X.S.price, !side, phase3.S1.price);
+
+    const exceptCase = phase3.breakIndex || !s1Valid;
+
+    const T1 = phase1.R.index + phase1.tr;
+    const T1p = phase1.R.index + 5 * phase1.tr;
+    const T2 = phase2.R.index + phase2.tr;
+    const T2p = 2 * phase2.R.index - phase2.S1.index;
+    const T3 = phase3.X.R.index + phase3.tr;
+    const T3p = phase3.X.R.index + (exceptCase ? phase1.tr : phase2.tr);
+    const timeMark = [T1, T1p, T2, T2p, T3, T3p];
+
+    const T = phase3.R.index;
+
+    let entry,
+        progress = {};
+    const extraCond = [
+        phase2.R.index > T1,
+        phase1.rEpr < 3,
+        phase2.rEpr < phase1.rEpr,
+    ];
+    progress.steps = [
+        [
+            //
+            pr1Valid,
+            !phase3.breakIndex || T1 < phase3.breakIndex,
+            T > T1,
+            T < T1p,
+            !phase3.hasDouble,
+        ],
+        [
+            //
+            ...extraCond,
+            s1Valid,
+            !phase3.breakIndex,
+            T2 > T1,
+            T2p < T2,
+            T < T2p,
+        ],
+        [
+            //
+            phase2.R.index - phase1.R.index > 0.5 * phase1.tr,
+            pr2Valid,
+            !phase3.breakIndex || T2 < phase3.breakIndex,
+            T > T2,
+        ],
+        [
+            //
+            phase3.X.R.index > T2,
+            DE >= phase1.pr || !exceptCase,
+            pr3Valid,
+            s3Valid,
+            T > T3,
+            exceptCase ? T > T3p : extraCond.every(Boolean) || T > T3p,
+        ],
+    ];
+    progress.step = 1;
+    progress.result = progress.steps[0].every(Boolean);
+    entry = phase1.R1.price;
+    if (progress.result) {
+        if (T <= T2) {
+            progress.step = 2;
+            progress.result = progress.steps[1].every(Boolean);
+            entry = phase2.S1.price;
+        } else {
+            progress.step = 3;
+            progress.result = progress.steps[2].every(Boolean);
+            entry = phase3.R1.price;
+            if (progress.result) {
+                progress.step = 4;
+                progress.result = progress.steps[3].every(Boolean);
+                if (progress.result) entry = phase3.X.R.price;
+            }
+        }
+    }
+    //
+    const p1Status = s1Valid ? (pr1Valid ? 1 : 0) : 2;
+    const p2Status = s2Valid ? (pr2Valid ? 1 : 0) : 2;
+    const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
+    const pStatus = `${p1Status}${p2Status}${p3Status}`;
+    //
+    let X, Y, o;
+    if (s1Valid) {
+        if (phase3.breakIndex && phase3.X.tr > phase1.tr) {
+            X = CD;
+            Y = 2 * X;
+            o = phase3.X.R.price;
+        } else {
+            X = phase1.rEp;
+            o = B.price;
+        }
+    } else {
+        if (s3Valid) {
+            X = BC;
+            o = B.price;
+        } else {
+            X = mf.fmtNum(phase1.S1.price - C.price, 1, true);
+            o = C.price;
+            side = !side;
+        }
+    }
+    if (!Y) {
+        const mainTR = phase3.breakIndex ?? T;
+        const scale = parseInt((mainTR - phase1.R.index) / phase1.tr);
+        Y = scale > 1 ? X * scale : X;
+    }
+    const x = adjustTargetPrice(o, X, side);
+    const y = adjustTargetPrice(o, Y, side);
+
+    return {
+        progress,
+        timeMark,
+        info: {
+            rEpr1: phase1.rEpr,
+            rEpr2: phase2.rEpr,
+            rEpr3: phase3.rEpr,
+            entry,
+            pStatus,
+            x,
+            X,
+            y,
+            Y,
+        },
+    };
+}
+function calcReversalPattern() {
     const { A, B, C } = points;
     const bc = B.price - C.price;
     let side = bc > 0;

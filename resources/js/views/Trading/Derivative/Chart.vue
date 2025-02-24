@@ -91,6 +91,7 @@
                 :prices="state.prices"
                 :timeToIndex="timeToIndex"
                 @scaned="patternScaned"
+                @patternTypeChanged="() => refreshPattern()"
                 @removePattern="() => patternToolRef.remove()"
                 @hideContext="hideContext"
             />
@@ -763,7 +764,6 @@ function refreshPattern(autoAdjust = false) {
 }
 function hideContext(progressIgnore = false) {
     if (!progressIgnore) progressToolRef.value.hide();
-    scanToolRef.value.hide();
     lineToolRef.value.hide();
 }
 function setProgress(value) {

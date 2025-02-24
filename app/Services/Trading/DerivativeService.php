@@ -73,6 +73,7 @@ class DerivativeService extends CoreService
                 'vpsSession' => get_global_value('vpsSession'),
                 'lastOpeningDate' => get_global_value('lastOpeningDate'),
                 'autoRefresh' => get_global_value('autoRefreshFlag') == "1",
+                'patternType' => get_global_value('derPatternType') == "1",
                 'volInvalid' =>  $volInvalid,
             ],
             'status' => $this->getStatus($payload)
@@ -105,6 +106,18 @@ class DerivativeService extends CoreService
     {
         $status = $payload->autoRefresh ? '1' : '0';
         set_global_value('autoRefreshFlag', $status);
+    }
+
+    /**
+     * Set Auto Scan
+     *
+     * @param $payload
+     * 
+     */
+    public function setPatternType($payload)
+    {
+        $status = $payload->patternType ? '1' : '0';
+        set_global_value('derPatternType', $status);
     }
 
     /**

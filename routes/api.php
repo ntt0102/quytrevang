@@ -106,6 +106,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::get('/vps', 'DerivativeController@getVpsData');
                     Route::get('init-chart', 'DerivativeController@initChart');
                     Route::post('set-auto-refresh', 'DerivativeController@setAutoRefresh');
+                    Route::post('set-pattern-type', 'DerivativeController@setPatternType');
                     Route::post('set-source', 'DerivativeController@setSource');
                     Route::get('get-tools', 'DerivativeController@getTools');
                     Route::post('login-vps', 'DerivativeController@loginVps');

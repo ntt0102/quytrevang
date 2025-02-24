@@ -65,6 +65,18 @@ const actions = {
                 .then((response) => resolve());
         });
     },
+    setPatternType({ commit, dispatch, getters, state }, patternType) {
+        commit("setPatternType", patternType);
+        return new Promise((resolve, reject) => {
+            axios
+                .post(
+                    "trading/derivative/set-pattern-type",
+                    { patternType },
+                    { noLoading: true }
+                )
+                .then((response) => resolve());
+        });
+    },
     setSource({ commit, dispatch, getters, state, rootGetters }, source) {
         commit("setSource", source);
         return new Promise((resolve, reject) => {
@@ -218,6 +230,9 @@ const mutations = {
     },
     setAutoRefresh(state, autoRefresh) {
         state.config.autoRefresh = autoRefresh;
+    },
+    setPatternType(state, patternType) {
+        state.config.patternType = patternType;
     },
     setSource(state, source) {
         state.config.source = source;
