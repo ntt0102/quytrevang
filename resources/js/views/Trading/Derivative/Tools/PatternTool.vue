@@ -282,7 +282,7 @@ function calcContinuePattern() {
     });
     const phase2 = scanPhase({
         side: !side,
-        start: B,
+        start: phase1.R,
         end: { time: Math.min(pickTime ?? C.time, C.time) },
     });
     const stopTime = props.indexToTime(
@@ -290,7 +290,7 @@ function calcContinuePattern() {
     );
     const phase3 = scanPhase({
         side,
-        start: C,
+        start: phase2.R,
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
     });
 
@@ -416,7 +416,7 @@ function calcReversalPattern() {
     });
     const phase2 = scanPhase({
         side: !side,
-        start: B,
+        start: phase1.R,
         end: { time: pickTime, price: C.price },
     });
     const D = {
@@ -425,7 +425,7 @@ function calcReversalPattern() {
     };
     const phase3 = scanPhase({
         side,
-        start: C,
+        start: phase2.R,
         end: { time: Math.min(pickTime ?? D.time, D.time) },
     });
     const stopTime = props.indexToTime(
@@ -453,7 +453,8 @@ function calcReversalPattern() {
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T3 = phase4.ext.R.index + Math.max(phase3.tr, phase4.tr);
-    const timeMark = [T1, T2, T3];
+    const T4 = props.timeToIndex(B.time);
+    const timeMark = [T1, T2, T3, T4];
 
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
 
@@ -470,6 +471,7 @@ function calcReversalPattern() {
             pr2Valid,
             s2Valid,
             T > T2,
+            !phase2.hasDouble,
         ],
         [
             //
@@ -604,8 +606,7 @@ function scanPhase({ side, start, end }) {
         ext: extBox,
         rEp,
         rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr, 1) : 0,
-        hasDouble: maxBox.tr > 0 ? doubleTr >= maxBox.tr / 2 : false,
-        doubleTr,
+        hasDouble: doubleTr > maxBox.tr / 2,
     };
 }
 function mergePreBox(box, preBox) {

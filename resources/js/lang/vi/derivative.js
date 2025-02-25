@@ -60,6 +60,7 @@ export default {
                 "CD > PR2",
                 "Hỗ trợ D",
                 "T > T2",
+                "Không Double",
             ],
         },
         {
