@@ -499,8 +499,8 @@ function calcReversalPattern() {
     X = -BC;
     Y = X;
     o = C.price;
-    const x = adjustTargetPrice(o, X, side);
-    const y = adjustTargetPrice(o, Y, side);
+    const x = adjustTargetPrice(o, X, !side);
+    const y = adjustTargetPrice(o, Y, !side);
 
     return {
         progress,
