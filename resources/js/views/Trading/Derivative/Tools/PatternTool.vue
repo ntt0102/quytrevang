@@ -604,7 +604,7 @@ function scanPhase({ side, start, end }) {
         ext: extBox,
         rEp,
         rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr, 1) : 0,
-        hasDouble: doubleTr >= maxBox.tr / 2,
+        hasDouble: maxBox.tr > 0 ? doubleTr >= maxBox.tr / 2 : false,
         doubleTr,
     };
 }
