@@ -453,8 +453,7 @@ function calcReversalPattern() {
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T3 = phase4.ext.R.index + Math.max(phase3.tr, phase4.tr);
-    const T4 = props.timeToIndex(B.time);
-    const timeMark = [T1, T2, T3, T4];
+    const timeMark = [T1, T2, T3];
 
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
 
