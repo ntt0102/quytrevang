@@ -278,26 +278,20 @@ function calcContinuePattern() {
     const phase1 = scanPhase({
         side,
         start: A,
-        end: { time: pickTime ?? B.time },
+        end: { time: Math.min(pickTime ?? B.time, B.time) },
     });
     const phase2 = scanPhase({
         side: !side,
-        start: phase1.R,
-        end: { time: pickTime ?? C.time },
+        start: B,
+        end: { time: Math.min(pickTime ?? C.time, C.time) },
     });
+    const stopTime = props.indexToTime(
+        Math.max(phase1.R.index + 6 * phase1.tr, phase2.R.index + phase2.tr)
+    );
     const phase3 = scanPhase({
         side,
-        start: phase2.R,
-        end: {
-            time:
-                pickTime ??
-                props.indexToTime(
-                    Math.max(
-                        phase1.R.index + 6 * phase1.tr,
-                        phase2.R.index + phase2.tr
-                    )
-                ),
-        },
+        start: C,
+        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
     });
 
     console.log("calcContinuePattern", [phase1, phase2, phase3]);
@@ -585,73 +579,82 @@ function scanPhase({
         if (end.time) cond = cond && item.time <= end.time;
         return cond;
     });
-    _prices.every((item, i) => {
-        const price = item.value;
-        if (start.price && mf.cmp(price, !side, start.price)) return false;
-        if (end.price && mf.cmp(price, side, end.price)) return false;
-        const index = props.timeToIndex(item.time);
-        if (index === -1) return false;
-        if (i === 0) {
-            box = {
-                R: { index, price },
-                S: { index, price },
-                pr: 0,
-                tr: 0,
-            };
-            lastIndex = index;
-            preBox = mf.cloneDeep(box);
-            maxBox = mf.cloneDeep(box);
-            // xBox = mf.cloneDeep(box);
-        }
-        if (mf.cmp(price, side, box.R.price)) {
-            if (box.pr > 0) {
-                box = mergePreBox(box, preBox);
-                if (box.pr > maxBox.pr) maxBox.pr = box.pr;
-                if (box.tr >= maxBox.tr) {
-                    maxBox.tr = box.tr;
-                    maxBox.R = mf.cloneDeep(box.R);
-                    maxBox.S = mf.cloneDeep(box.S);
-                }
-                // if (
-                //     phase === 1 &&
-                //     retracementPrice &&
-                //     !mf.cmp(box.S.price, !side, retracementPrice)
-                // ) {
-                //     if (box.tr >= xBox.tr && box.pr >= xBox.pr)
-                //         xBox = mf.cloneDeep(box);
-                // }
+    if (_prices.length > 0) {
+        _prices.every((item, i) => {
+            const price = item.value;
+            if (start.price && mf.cmp(price, !side, start.price)) return false;
+            if (end.price && mf.cmp(price, side, end.price)) return false;
+            const index = props.timeToIndex(item.time);
+            if (index === -1) return false;
+            if (i === 0) {
+                box = {
+                    R: { index, price },
+                    S: { index, price },
+                    pr: 0,
+                    tr: 0,
+                };
+                lastIndex = index;
                 preBox = mf.cloneDeep(box);
+                maxBox = mf.cloneDeep(box);
+                // xBox = mf.cloneDeep(box);
             }
-            box = {
-                R: { index, price },
-                S: { index, price },
-                pr: 0,
-                tr: 0,
-            };
-            // if (phase === 3 && breakPrice) {
-            //     if (!breakIndex && mf.cmp(price, side, breakPrice))
-            //         breakIndex = index;
-            // }
-        } else {
-            box.tr = index - box.R.index;
-            if (mf.cmp(price, !side, box.S.price)) {
-                box.S.index = index;
-                box.S.price = price;
-                box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
+            if (mf.cmp(price, side, box.R.price)) {
+                if (box.pr > 0) {
+                    box = mergePreBox(box, preBox);
+                    if (box.pr > maxBox.pr) maxBox.pr = box.pr;
+                    if (box.tr >= maxBox.tr) {
+                        maxBox.tr = box.tr;
+                        maxBox.R = mf.cloneDeep(box.R);
+                        maxBox.S = mf.cloneDeep(box.S);
+                    }
+                    // if (
+                    //     phase === 1 &&
+                    //     retracementPrice &&
+                    //     !mf.cmp(box.S.price, !side, retracementPrice)
+                    // ) {
+                    //     if (box.tr >= xBox.tr && box.pr >= xBox.pr)
+                    //         xBox = mf.cloneDeep(box);
+                    // }
+                    preBox = mf.cloneDeep(box);
+                }
+                box = {
+                    R: { index, price },
+                    S: { index, price },
+                    pr: 0,
+                    tr: 0,
+                };
+                // if (phase === 3 && breakPrice) {
+                //     if (!breakIndex && mf.cmp(price, side, breakPrice))
+                //         breakIndex = index;
+                // }
+            } else {
+                box.tr = index - box.R.index;
+                if (mf.cmp(price, !side, box.S.price)) {
+                    box.S.index = index;
+                    box.S.price = price;
+                    box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
+                }
             }
-        }
-        lastIndex = index;
-        if (price === start.price) {
-            doubleTr = mf.fmtNum(index - S.index, 1);
-        }
-        return true;
-    });
-    if (mf.isSet(box)) {
+            lastIndex = index;
+            if (price === start.price) {
+                doubleTr = mf.fmtNum(index - S.index, 1);
+            }
+            return true;
+        });
         extBox = box;
         R.price = box.R.price;
         R.index = lastIndex;
         R.time = props.indexToTime(R.index);
         rEp = mf.fmtNum(R.price - maxBox.R.price, 1, true);
+    } else {
+        R = mf.cloneDeep(S);
+        maxBox = {
+            R: R,
+            S: {},
+            pr: 0,
+            tr: 0,
+        };
+        extBox = maxBox;
     }
 
     return {
@@ -759,6 +762,7 @@ function removePatternTool() {
     lines = {};
 }
 function setTimeMark(data) {
+    console.log("setTimeMark", data);
     const colors = [
         "#F44336",
         "#F44336",

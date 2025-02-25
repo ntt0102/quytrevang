@@ -380,7 +380,6 @@ function removeChart() {
     }
 }
 function chartClick(e) {
-    console.log("params.hasProgress", params.hasProgress);
     hideContext(params.hasProgress);
     toggleOrderButton(false);
 
@@ -905,7 +904,7 @@ function timeToIndex(time) {
 function indexToTime(index) {
     if (index < params.whitespaces.length)
         return params.whitespaces[index].time;
-    else return false;
+    else return params.whitespaces.at(-1).time;
 }
 </script>
 <style lang="scss">
