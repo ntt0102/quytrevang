@@ -314,9 +314,9 @@ function calcContinuePattern() {
     const T2p = 2 * phase2.R.index - phase2.S1.index;
     const T3 = phase3.ext.R.index + phase3.tr;
     const T3p = phase3.ext.R.index + phase2.tr;
-    const timeMark = [T1, T1p, T2, T2p, T3, T3p];
+    const timeMark = [T1, T2, T3, T1p, T2p, T3p];
 
-    const T = phase3.R.index;
+    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
 
     let entry,
         progress = {};
@@ -412,7 +412,7 @@ function calcReversalPattern() {
     const phase1 = scanPhase({
         side,
         start: A,
-        end: { time: pickTime ?? B.time },
+        end: { time: Math.min(pickTime ?? B.time, B.time) },
     });
     const phase2 = scanPhase({
         side: !side,
@@ -424,23 +424,17 @@ function calcReversalPattern() {
         price: phase2.ext.S.price,
     };
     const phase3 = scanPhase({
-        side: side,
-        start: C,
-        end: { time: pickTime ?? D.time },
-    });
-    const phase4 = scanPhase({
         side,
+        start: C,
+        end: { time: Math.min(pickTime ?? D.time, D.time) },
+    });
+    const stopTime = props.indexToTime(
+        Math.max(phase1.R.index + 6 * phase1.tr, phase2.R.index + phase2.tr)
+    );
+    const phase4 = scanPhase({
+        side: !side,
         start: D,
-        end: {
-            time:
-                pickTime ??
-                props.indexToTime(
-                    Math.max(
-                        phase1.R.index + 6 * phase1.tr,
-                        phase2.R.index + phase2.tr
-                    )
-                ),
-        },
+        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
     });
 
     console.log("calcReversalPattern", [phase1, phase2, phase3, phase4]);
@@ -448,92 +442,62 @@ function calcReversalPattern() {
     //
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(C.price - D.price, 1, true);
-    const DE = mf.fmtNum(phase3.ext.pr);
+    const EF = mf.fmtNum(phase4.ext.pr);
     const pr1Valid = BC >= phase1.pr;
     const pr2Valid = CD >= phase2.pr;
-    const pr3Valid = DE >= phase3.pr;
+    const pr4Valid = EF >= Math.max(phase3.pr, phase4.pr);
 
-    const s1Valid = !mf.cmp(C.price, !side, phase1.S1.price);
-    const s2Valid = !mf.cmp(phase3.ext.R.price, side, phase2.S1.price);
-    const s3Valid = !mf.cmp(phase3.ext.S.price, !side, phase3.S1.price);
+    const s2Valid = !mf.cmp(D.price, side, phase2.S1.price);
+    const s4Valid = !mf.cmp(phase4.ext.S.price, side, phase4.S1.price);
 
     const T1 = phase1.R.index + phase1.tr;
-    const T1p = phase1.R.index + 5 * phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
-    const T2p = 2 * phase2.R.index - phase2.S1.index;
-    const T3 = phase3.ext.R.index + phase3.tr;
-    const T3p = phase3.ext.R.index + phase2.tr;
-    const timeMark = [T1, T1p, T2, T2p, T3, T3p];
+    const T3 = phase4.ext.R.index + Math.max(phase3.tr, phase4.tr);
+    const timeMark = [T1, T2, T3];
 
-    const T = phase3.R.index;
+    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
 
     let entry,
         progress = {};
-    const extraCond = [
-        phase2.R.index > T1,
-        phase1.rEpr < 3,
-        phase2.rEpr < phase1.rEpr,
-    ];
     progress.steps = [
         [
             //
             pr1Valid,
-            s1Valid,
             T > T1,
-            T < T1p,
-            !phase3.hasDouble,
         ],
         [
             //
-            ...extraCond,
-            T2 > T1,
-            T2p < T2,
-            T < T2p,
-        ],
-        [
-            //
-            phase2.R.index - phase1.R.index > 0.5 * phase1.tr,
             pr2Valid,
+            s2Valid,
             T > T2,
         ],
         [
             //
-            phase3.ext.R.index > T2,
-            pr3Valid,
-            s3Valid,
+            pr4Valid,
+            s4Valid,
             T > T3,
-            extraCond.every(Boolean) || T > T3p,
         ],
     ];
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
     entry = phase1.R1.price;
     if (progress.result) {
-        if (T <= T2) {
-            progress.step = 2;
-            progress.result = progress.steps[1].every(Boolean);
-            entry = phase2.S1.price;
-        } else {
+        progress.step = 2;
+        progress.result = progress.steps[1].every(Boolean);
+        entry = phase2.R1.price;
+        if (progress.result) {
             progress.step = 3;
             progress.result = progress.steps[2].every(Boolean);
-            entry = phase3.R1.price;
-            if (progress.result) {
-                progress.step = 4;
-                progress.result = progress.steps[3].every(Boolean);
-                if (progress.result) entry = phase3.ext.R.price;
-            }
+            if (progress.result) entry = phase4.ext.R.price;
         }
     }
     //
-    const p1Status = s1Valid ? (pr1Valid ? 1 : 0) : 2;
-    const p2Status = s2Valid ? (pr2Valid ? 1 : 0) : 2;
-    const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
-    const pStatus = `${p1Status}${p2Status}${p3Status}`;
+    const pStatus = "";
     //
     let X, Y, o;
-    X = phase1.rEp;
+    X = -BC;
     Y = X;
-    o = B.price;
+    o = C.price;
     const x = adjustTargetPrice(o, X, side);
     const y = adjustTargetPrice(o, Y, side);
 
@@ -572,8 +536,7 @@ function scanPhase({
         // xBox = {},
         // breakIndex = null,
         rEp,
-        doubleTr = 0,
-        lastIndex;
+        doubleTr = 0;
     const _prices = props.prices.filter((item) => {
         let cond = item.time >= start.time;
         if (end.time) cond = cond && item.time <= end.time;
@@ -593,7 +556,6 @@ function scanPhase({
                     pr: 0,
                     tr: 0,
                 };
-                lastIndex = index;
                 preBox = mf.cloneDeep(box);
                 maxBox = mf.cloneDeep(box);
                 // xBox = mf.cloneDeep(box);
@@ -635,7 +597,6 @@ function scanPhase({
                     box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                 }
             }
-            lastIndex = index;
             if (price === start.price) {
                 doubleTr = mf.fmtNum(index - S.index, 1);
             }
@@ -643,7 +604,7 @@ function scanPhase({
         });
         extBox = box;
         R.price = box.R.price;
-        R.index = lastIndex;
+        R.index = box.R.index;
         R.time = props.indexToTime(R.index);
         rEp = mf.fmtNum(R.price - maxBox.R.price, 1, true);
     } else {
@@ -765,10 +726,10 @@ function setTimeMark(data) {
     console.log("setTimeMark", data);
     const colors = [
         "#F44336",
-        "#F44336",
         "#4CAF50",
-        "#009688",
         "#FFEB3B",
+        "#F44336",
+        "#009688",
         "#FF9800",
     ];
     let result = [];

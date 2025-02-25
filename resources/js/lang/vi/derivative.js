@@ -5,7 +5,7 @@ export default {
             conds: [
                 //
                 "BC > PR1",
-                "C giữ hỗ trợ",
+                "Hỗ trợ C",
                 "T > T1",
                 "T < T1'",
                 "Không Double",
@@ -38,7 +38,7 @@ export default {
                 //
                 "D > T2",
                 "DE > PR3",
-                "E giữ hỗ trợ",
+                "Hỗ trợ E",
                 "T > T3",
                 "T > T3'",
             ],
@@ -50,46 +50,25 @@ export default {
             conds: [
                 //
                 "BC > PR1",
-                "Break sau T1",
                 "T > T1",
-                "T < T1'",
-                "Không Double",
-            ],
-        },
-        {
-            name: "Bước vào lệnh 1",
-            conds: [
-                //
-                "C > T1",
-                "EPR1 < 3",
-                "EPR2 < EPR1",
-                "C giữ hỗ trợ",
-                "Chưa break",
-                "T2 > T1",
-                "T2' < T2",
-                "T < T2'",
             ],
         },
         {
             name: "Bước kiểm tra 2",
             conds: [
                 //
-                "BC > nữa TR1",
                 "CD > PR2",
-                "Break sau T2",
+                "Hỗ trợ D",
                 "T > T2",
             ],
         },
         {
-            name: "Bước vào lệnh 3",
+            name: "Bước vào lệnh",
             conds: [
                 //
-                "D > T2",
-                "DE > PR1",
-                "DE > PR3",
-                "E giữ hỗ trợ",
+                "EF > PR34",
+                "Hỗ trợ F",
                 "T > T3",
-                "T > T3'",
             ],
         },
     ],

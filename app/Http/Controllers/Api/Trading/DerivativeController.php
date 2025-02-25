@@ -69,7 +69,7 @@ class DerivativeController extends CoreController
     }
 
     /**
-     * Set Auto Scan
+     * Set Set Pattern Type
      *
      * @param \Illuminate\Http\Request $request
      * 

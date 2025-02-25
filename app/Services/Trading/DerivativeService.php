@@ -109,7 +109,7 @@ class DerivativeService extends CoreService
     }
 
     /**
-     * Set Auto Scan
+     * Set Pattern Type
      *
      * @param $payload
      * 
