@@ -517,24 +517,13 @@ function calcReversalPattern() {
         },
     };
 }
-function scanPhase({
-    // phase,
-    side,
-    start,
-    end,
-    // breakPrice,
-    // retracementPrice,
-    // stopTime,
-    // stopPrice,
-}) {
+function scanPhase({ side, start, end }) {
     let S = { ...mf.cloneDeep(start), index: props.timeToIndex(start.time) },
         R = {},
         box = {},
         preBox = {},
         maxBox = {},
         extBox = {},
-        // xBox = {},
-        // breakIndex = null,
         rEp,
         doubleTr = 0;
     const _prices = props.prices.filter((item) => {
@@ -558,7 +547,6 @@ function scanPhase({
                 };
                 preBox = mf.cloneDeep(box);
                 maxBox = mf.cloneDeep(box);
-                // xBox = mf.cloneDeep(box);
             }
             if (mf.cmp(price, side, box.R.price)) {
                 if (box.pr > 0) {
@@ -569,14 +557,6 @@ function scanPhase({
                         maxBox.R = mf.cloneDeep(box.R);
                         maxBox.S = mf.cloneDeep(box.S);
                     }
-                    // if (
-                    //     phase === 1 &&
-                    //     retracementPrice &&
-                    //     !mf.cmp(box.S.price, !side, retracementPrice)
-                    // ) {
-                    //     if (box.tr >= xBox.tr && box.pr >= xBox.pr)
-                    //         xBox = mf.cloneDeep(box);
-                    // }
                     preBox = mf.cloneDeep(box);
                 }
                 box = {
@@ -585,10 +565,6 @@ function scanPhase({
                     pr: 0,
                     tr: 0,
                 };
-                // if (phase === 3 && breakPrice) {
-                //     if (!breakIndex && mf.cmp(price, side, breakPrice))
-                //         breakIndex = index;
-                // }
             } else {
                 box.tr = index - box.R.index;
                 if (mf.cmp(price, !side, box.S.price)) {
@@ -625,12 +601,11 @@ function scanPhase({
         R1: maxBox.R,
         S,
         R,
-        // X: xBox,
         ext: extBox,
         rEp,
         rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr, 1) : 0,
         hasDouble: doubleTr >= maxBox.tr / 2,
-        // breakIndex,
+        doubleTr,
     };
 }
 function mergePreBox(box, preBox) {

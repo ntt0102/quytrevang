@@ -59,11 +59,11 @@ function draw({ time }) {
     const data = time
         ? props.prices.filter((item) => !mf.cmp(item.time, true, time))
         : props.prices;
-    const points = leftScanPattern(data);
+    const points = scanPattern(data);
     if (mf.isSet(points)) emit("scaned", removeIndex(points));
     scanToolRef.value.classList.remove("selected");
 }
-function leftScanPattern(data) {
+function scanPattern(data) {
     let side;
     let [A, B, C, S] = Array(4).fill({});
     for (let i = data.length - 1; i >= 0; i--) {
