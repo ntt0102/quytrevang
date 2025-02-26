@@ -477,6 +477,7 @@ function calcReversalPattern() {
             pr4Valid,
             s4Valid,
             T > T3,
+            !phase4.hasDouble,
         ],
     ];
     progress.step = 1;

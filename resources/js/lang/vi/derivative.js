@@ -8,7 +8,7 @@ export default {
                 "Hỗ trợ C",
                 "T > T1",
                 "T < T1'",
-                "Không Double",
+                "Góc C đơn",
             ],
         },
         {
@@ -60,7 +60,7 @@ export default {
                 "CD > PR2",
                 "Hỗ trợ D",
                 "T > T2",
-                "Không Double",
+                "Góc B đơn",
             ],
         },
         {
@@ -70,6 +70,7 @@ export default {
                 "EF > PR34",
                 "Hỗ trợ F",
                 "T > T3",
+                "Góc D đơn",
             ],
         },
     ],
