@@ -51,6 +51,7 @@ export default {
                 //
                 "BC > PR1",
                 "T > T1",
+                "T < T1'",
             ],
         },
         {
@@ -70,6 +71,7 @@ export default {
                 "EF > PR34",
                 "Hỗ trợ F",
                 "T > T3",
+                "T < T3'",
                 "Góc D đơn",
             ],
         },

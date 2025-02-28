@@ -382,8 +382,8 @@ function calcContinuePattern() {
     const pStatus = `${p1Status}${p2Status}${p3Status}`;
     //
     let X, Y, o;
-    X = phase1.rEp;
-    Y = X;
+    Y = phase1.rEp;
+    X = Y / 2;
     o = B.price;
     const x = adjustTargetPrice(o, X, side);
     const y = adjustTargetPrice(o, Y, side);
@@ -452,10 +452,11 @@ function calcReversalPattern() {
     const s4Valid = !mf.cmp(phase4.ext.S.price, side, phase4.S1.price);
 
     const T1 = phase1.R.index + phase1.tr;
+    const T1p = phase1.R.index + 5 * phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T3 = phase4.ext.R.index + Math.max(phase3.tr, phase4.tr);
-    const T4 = phase4.ext.R.index + (phase4.pickIndex - phase2.R.index);
-    const timeMark = [T1, T2, T3, T4];
+    const T3p = phase4.ext.R.index + (phase4.pickIndex - phase2.R.index);
+    const timeMark = [T1, T2, T3, T1p, T3p];
 
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
 
@@ -466,6 +467,7 @@ function calcReversalPattern() {
             //
             pr1Valid,
             T > T1,
+            T < T1p,
         ],
         [
             //
@@ -479,6 +481,7 @@ function calcReversalPattern() {
             pr4Valid,
             s4Valid,
             T > T3,
+            T < T3p,
             !phase4.hasDouble,
         ],
     ];
@@ -498,12 +501,10 @@ function calcReversalPattern() {
     //
     const pStatus = "";
     //
-    let X, Y, o;
-    X = BC;
-    Y = X;
-    o = C.price;
-    const x = adjustTargetPrice(o, X, !side);
-    const y = adjustTargetPrice(o, Y, !side);
+    const X = BC,
+        Y = BC;
+    const x = adjustTargetPrice(D.price, BC, !side);
+    const y = adjustTargetPrice(C.price, BC, !side);
 
     return {
         progress,
@@ -578,7 +579,7 @@ function scanPhase({ side, start, end, pickPrice }) {
                     box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                 }
             }
-            if (pickPrice && mf.cmp(price, side, pickPrice)) {
+            if (!pickIndex && pickPrice && mf.cmp(price, side, pickPrice)) {
                 pickIndex = index;
             }
             if (price === start.price) {
@@ -711,9 +712,9 @@ function setTimeMark(data) {
         "#F44336",
         "#4CAF50",
         "#FFEB3B",
+        "#F44336",
         "#009688",
         "#FF9800",
-        "#F44336",
     ];
     let result = [];
     for (let i = 0; i < data.length; i++) {
