@@ -358,7 +358,7 @@ function calcContinuePattern() {
     ];
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
-    entry = phase1.R1.price;
+    entry = B.price;
     if (progress.result) {
         if (T <= T2) {
             progress.step = 2;
@@ -367,11 +367,10 @@ function calcContinuePattern() {
         } else {
             progress.step = 3;
             progress.result = progress.steps[2].every(Boolean);
-            entry = phase3.R1.price;
+            entry = phase3.ext.R.price;
             if (progress.result) {
                 progress.step = 4;
                 progress.result = progress.steps[3].every(Boolean);
-                if (progress.result) entry = phase3.ext.R.price;
             }
         }
     }
@@ -381,12 +380,12 @@ function calcContinuePattern() {
     const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
     const pStatus = `${p1Status}${p2Status}${p3Status}`;
     //
-    let X, Y, o;
-    Y = phase1.rEp;
-    X = Y / 2;
-    o = B.price;
-    const x = adjustTargetPrice(o, X, side);
-    const y = adjustTargetPrice(o, Y, side);
+    let X = mf.fmtNum(B.price - phase1.S1.price, 1, true);
+    let Y = phase1.rEp;
+    const x = adjustTargetPrice(C.price, X, side);
+    const y = adjustTargetPrice(B.price, Y, side);
+    X = mf.fmtNum(x - entry, 1, true);
+    Y = mf.fmtNum(y - entry, 1, true);
 
     return {
         progress,
@@ -460,7 +459,7 @@ function calcReversalPattern() {
 
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
 
-    let entry,
+    let entry = phase4.ext.R.price,
         progress = {};
     progress.steps = [
         [
@@ -487,24 +486,23 @@ function calcReversalPattern() {
     ];
     progress.step = 1;
     progress.result = progress.steps[0].every(Boolean);
-    entry = phase1.R1.price;
     if (progress.result) {
         progress.step = 2;
         progress.result = progress.steps[1].every(Boolean);
-        entry = phase2.R1.price;
         if (progress.result) {
             progress.step = 3;
             progress.result = progress.steps[2].every(Boolean);
-            if (progress.result) entry = phase4.ext.R.price;
         }
     }
     //
     const pStatus = "";
     //
-    const X = BC,
-        Y = BC;
-    const x = adjustTargetPrice(D.price, BC, !side);
-    const y = adjustTargetPrice(C.price, BC, !side);
+    let X = BC;
+    let Y = BC;
+    const x = adjustTargetPrice(D.price, X, !side);
+    const y = adjustTargetPrice(C.price, Y, !side);
+    X = mf.fmtNum(x - entry, 1, true);
+    Y = mf.fmtNum(y - entry, 1, true);
 
     return {
         progress,
