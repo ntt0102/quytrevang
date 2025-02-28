@@ -314,7 +314,7 @@ function calcContinuePattern() {
     const T2p = 2 * phase2.R.index - phase2.S1.index;
     const T3 = phase3.ext.R.index + phase3.tr;
     const T3p = phase3.ext.R.index + phase2.tr;
-    const timeMark = [T1, T2, T3, T1p, T2p, T3p];
+    const timeMark = [T1, T2, T3, T2p, T3p, T1p];
 
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
 
@@ -435,6 +435,7 @@ function calcReversalPattern() {
         side: !side,
         start: D,
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        pickPrice: C.price,
     });
 
     console.log("calcReversalPattern", [phase1, phase2, phase3, phase4]);
@@ -453,7 +454,8 @@ function calcReversalPattern() {
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T3 = phase4.ext.R.index + Math.max(phase3.tr, phase4.tr);
-    const timeMark = [T1, T2, T3];
+    const T4 = phase4.ext.R.index + (phase4.pickIndex - phase2.ext.R.index);
+    const timeMark = [T1, T2, T3, T4];
 
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
 
@@ -519,7 +521,7 @@ function calcReversalPattern() {
         },
     };
 }
-function scanPhase({ side, start, end }) {
+function scanPhase({ side, start, end, pickPrice }) {
     let S = { ...mf.cloneDeep(start), index: props.timeToIndex(start.time) },
         R = {},
         box = {},
@@ -527,6 +529,7 @@ function scanPhase({ side, start, end }) {
         maxBox = {},
         extBox = {},
         rEp,
+        pickIndex = null,
         doubleTr = 0;
     const _prices = props.prices.filter((item) => {
         let cond = item.time >= start.time;
@@ -575,6 +578,9 @@ function scanPhase({ side, start, end }) {
                     box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                 }
             }
+            if (pickPrice && mf.cmp(price, side, pickPrice)) {
+                pickIndex = index;
+            }
             if (price === start.price) {
                 doubleTr = mf.fmtNum(index - S.index, 1);
             }
@@ -606,6 +612,7 @@ function scanPhase({ side, start, end }) {
         ext: extBox,
         rEp,
         rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr, 1) : 0,
+        pickIndex,
         hasDouble: doubleTr > maxBox.tr / 2,
     };
 }
@@ -704,9 +711,9 @@ function setTimeMark(data) {
         "#F44336",
         "#4CAF50",
         "#FFEB3B",
-        "#F44336",
         "#009688",
         "#FF9800",
+        "#F44336",
     ];
     let result = [];
     for (let i = 0; i < data.length; i++) {
