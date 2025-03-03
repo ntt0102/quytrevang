@@ -197,7 +197,8 @@ class ShareService extends CoreService
         ];
         return [
             'symbol' => $symbol,
-            'result' => $fromto + $check
+            'result' => $check
+            // 'result' => $fromto + $check
         ];
     }
 
@@ -433,12 +434,18 @@ class ShareService extends CoreService
         $bounce['sum'] = $bounceSum;
         //
         return (object)[
+        'base' => [
             'sum' => $pivotSum && $bounceSum && $stock->shrink->sum && $stock->trend->sum && $stock->base,
             'bounce' => $bounce,
             'pivot' => $pivot,
             'shrink' => $stock->shrink,
             'trend' => $stock->trend,
             'base' => $stock->base,
+        ],
+        'ext' => [
+            'index'=> $index->points,
+            [$stock->symbol] => $stock->points
+        ]
         ];
         // return (object)[
         //     $stock->symbol => $stock->bounce,
