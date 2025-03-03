@@ -314,7 +314,7 @@ function calcContinuePattern() {
     const T2p = 2 * phase2.R.index - phase2.S1.index;
     const T3 = phase3.ext.R.index + phase3.tr;
     const T3p = phase3.ext.R.index + phase2.tr;
-    const timeMark = [T1, T2, T3, T2p, T3p, T1p];
+    const timeMark = [T1, T2, T3, T1p, T2p, T3p];
 
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
 
