@@ -434,32 +434,24 @@ class ShareService extends CoreService
         $bounce['sum'] = $bounceSum;
         //
         return (object)[
-        'check' => [
-            'sum' => $pivotSum && $bounceSum && $stock->shrink->sum && $stock->trend->sum && $stock->base,
-            'bounce' => $bounce,
-            'pivot' => $pivot,
-            'shrink' => $stock->shrink,
-            'trend' => $stock->trend,
-            'base' => $stock->base,
-        ],
-        'points' => [
-            $index->symbol => $this->getPoints($index->points),
-            $stock->symbol => $this->getPoints($stock->points)
-        ]
+            'check' => [
+                'sum' => $pivotSum && $bounceSum && $stock->shrink->sum && $stock->trend->sum && $stock->base,
+                'bounce' => $bounce,
+                'pivot' => $pivot,
+                'shrink' => $stock->shrink,
+                'trend' => $stock->trend,
+                'base' => $stock->base,
+            ],
+            'points' => [
+                $index->symbol => $this->getPoints($index->points),
+                $stock->symbol => $this->getPoints($stock->points)
+            ]
         ];
     }
 
     public function getPoints($points)
     {
         foreach ($points as $key => $point) {
-            // Đổi tên key d thành date và p thành price
-            $point->date = $point->d;
-            unset($point->d);
-        
-            $point->price = $point->p;
-            unset($point->p);
-        
-            // Xóa key t và i
             unset($point->t, $point->i);
         }
         return $points;
