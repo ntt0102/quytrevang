@@ -71,7 +71,7 @@ export default {
                 "EF > PR34",
                 "Hỗ trợ F",
                 "T > T3",
-                "T < T3'",
+                "PR4 < PR2",
                 "Góc D đơn",
             ],
         },
