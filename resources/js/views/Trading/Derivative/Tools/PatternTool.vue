@@ -472,6 +472,7 @@ function calcReversalPattern() {
             //
             pr2Valid,
             s2Valid,
+            T2 > T1,
             T > T2,
             !phase2.hasDouble,
         ],
@@ -479,6 +480,7 @@ function calcReversalPattern() {
             //
             pr4Valid,
             s4Valid,
+            T3 > T2,
             T > T3,
             phase4.ext.pr < phase2.ext.pr,
             !phase4.hasDouble,
