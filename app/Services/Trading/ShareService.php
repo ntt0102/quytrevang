@@ -299,8 +299,8 @@ class ShareService extends CoreService
             $h = $data->h[$i];
             $l = $data->l[$i];
             $t = $data->t[$i];
-            $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $h];
-            $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $l];
+            $pH = (object)['d' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $h];
+            $pL = (object)['d' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $l];
             if ($i === $last) {
                 $Hl = $Ll = $Hm = $Lm = $Hs = $Ls = $Hi = $pL;
             } else {
@@ -348,8 +348,8 @@ class ShareService extends CoreService
             $h = $data->h[$i];
             $l = $data->l[$i];
             $t = $data->t[$i];
-            $pH = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $h];
-            $pL = (object)['t1' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $l];
+            $pH = (object)['d' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $h];
+            $pL = (object)['d' => date('Y-m-d', $t), 't' => $t, 'i' => $i, 'p' => $l];
             if ($i === $last) {
                 $B = (object)['H' => $pL, 'L' => $pL, 'ir' => 0];
                 $M = clone $B;
@@ -443,10 +443,26 @@ class ShareService extends CoreService
             'base' => $stock->base,
         ],
         'points' => [
-            $index->symbol => $index->points,
-            $stock->symbol => $stock->points
+            $index->symbol => $this->getPoints($index->points),
+            $stock->symbol => $this->getPoints($stock->points)
         ]
         ];
+    }
+
+    public function getPoints($points)
+    {
+        foreach ($points as $key => $point) {
+            // Đổi tên key d thành date và p thành price
+            $point->date = $point->d;
+            unset($point->d);
+        
+            $point->price = $point->p;
+            unset($point->p);
+        
+            // Xóa key t và i
+            unset($point->t, $point->i);
+        }
+        return $points;
     }
 
     public function filterStock($group, $filterTimes)
