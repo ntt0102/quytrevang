@@ -70,6 +70,7 @@ export default {
             name: "Bước vào lệnh",
             conds: [
                 //
+                "EF < CD",
                 "EF > PR34",
                 "Hỗ trợ F",
                 "T3 > T2",

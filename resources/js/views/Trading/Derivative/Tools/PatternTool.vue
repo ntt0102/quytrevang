@@ -442,8 +442,8 @@ function calcReversalPattern() {
     //
     const AB = mf.fmtNum(A.price - B.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
-    const CD = mf.fmtNum(C.price - D.price, 1, true);
-    const EF = mf.fmtNum(phase4.ext.pr);
+    const CD = phase2.ext.pr;
+    const EF = phase4.ext.pr;
 
     const bcValid = BC > AB / 2;
 
@@ -487,6 +487,7 @@ function calcReversalPattern() {
         ],
         [
             //
+            EF < CD,
             pr4Valid,
             s4Valid,
             T3 > T2,
