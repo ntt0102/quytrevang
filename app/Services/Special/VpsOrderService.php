@@ -176,19 +176,22 @@ class VpsOrderService extends CoreService
 
     public function execute($payload)
     {
-        if (!$this->connection)
+        if (!$this->connection) {
             return ['isOk' => false, 'message' => 'notConnect'];
+        }
         //
         switch ($payload->action) {
             case 'entry':
                 $isNew = $payload->entryData->cmd == "new";
-                if ($isNew && $this->position != 0)
+                if ($isNew && $this->position != 0) {
                     return ['isOk' => false, 'message' => 'openedPosition'];
+                }
                 else return $this->conditionOrder($payload->action, $payload->entryData);
                 break;
             case 'tpsl':
-                if ($this->position == 0)
+                if ($this->position == 0) {
                     return ['isOk' => false, 'message' => 'unopenedPosition'];
+                }
                 else {
                     $tp = $this->order('tp', $payload->tpData);
                     if (!$tp['isOk']) return $tp;
@@ -196,6 +199,9 @@ class VpsOrderService extends CoreService
                 }
                 break;
             case 'tp':
+                if ($payload->tpData->cmd == "cancel" && $this->position != 0) {
+                    return ['isOk' => false, 'message' => 'openedPosition'];
+                }
                 $tp = $this->order($payload->action, $payload->tpData);
                 if ($tp['isOk'] && $payload->tpData->cmd == "cancel") {
                     set_global_value('entryOrderId', '');
@@ -204,6 +210,9 @@ class VpsOrderService extends CoreService
                 return $tp;
                 break;
             case 'sl':
+                if ($payload->slData->cmd == "delete" && $this->position != 0) {
+                    return ['isOk' => false, 'message' => 'openedPosition'];
+                }
                 $sl = $this->conditionOrder($payload->action, $payload->slData);
                 if ($sl['isOk'] && $payload->slData->cmd == "delete") {
                     set_global_value('entryOrderId', '');
