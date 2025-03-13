@@ -9,8 +9,8 @@
         <i
             class="far"
             :class="{
-                'fa-right-from-line': patternType,
-                'fa-left-from-line': !patternType,
+                'fa-square-question': !patternType,
+                [`fa-square-${patternType}`]: patternType,
             }"
         ></i>
     </div>
@@ -32,6 +32,7 @@ const scanToolRef = ref(null);
 const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
+const typeCount = 3;
 
 defineExpose({
     isSelected,
@@ -52,7 +53,8 @@ function scanToolClick(e) {
     }
 }
 function changePatternType() {
-    store.dispatch("tradingDerivative/setPatternType", !patternType.value);
+    const type = patternType.value >= typeCount ? 1 : patternType.value + 1;
+    store.dispatch("tradingDerivative/setPatternType", type);
     emit("patternTypeChanged");
 }
 function draw({ time }) {

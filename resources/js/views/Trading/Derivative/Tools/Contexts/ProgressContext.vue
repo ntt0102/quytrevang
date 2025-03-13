@@ -8,7 +8,7 @@
         />
         <div class="steps" :class="{ portrait: chartHeightEnough }">
             <div
-                v-for="(step, i) in steps[patternType]"
+                v-for="(step, i) in steps[patternType - 1]"
                 :key="i"
                 class="step"
                 :class="[
@@ -60,8 +60,8 @@ import { useStore } from "vuex";
 const store = useStore();
 const props = defineProps(["progress", "chartHeightEnough"]);
 const emit = defineEmits(["refreshPattern"]);
-const patternType = computed(() =>
-    store.state.tradingDerivative.config.patternType ? "continue" : "reversal"
+const patternType = computed(
+    () => store.state.tradingDerivative.config.patternType
 );
 const steps = ref([]);
 

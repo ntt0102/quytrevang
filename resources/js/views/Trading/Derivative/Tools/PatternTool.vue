@@ -259,7 +259,7 @@ function loadPatternTool() {
 }
 function refresh(autoAdjust = false) {
     if (mf.isSet(lines.C)) {
-        if (autoAdjust && patternType.value) {
+        if (autoAdjust && patternType.value !== 1) {
             adjustPatternPoints();
         }
         removePatternTool();
@@ -267,8 +267,19 @@ function refresh(autoAdjust = false) {
     }
 }
 function calculatePattern() {
-    if (patternType.value) return calcContinuePattern();
-    else return calcReversalPattern();
+    let result = {};
+    switch (patternType.value) {
+        case 1:
+            result = calcContinuePattern();
+            break;
+        case 2:
+            result = calcReversalPattern();
+            break;
+        case 3:
+            result = calcExtensionPattern();
+            break;
+    }
+    return result;
 }
 function calcContinuePattern() {
     const { A, B, C } = points;
@@ -520,6 +531,99 @@ function calcReversalPattern() {
         const extra = Math.max(phase5.pr, phase5.ext.pr);
         [y] = adjustTargetPrice(xp, 2 * extra, !side);
     }
+    const X = mf.fmtNum(x - entry, 1, true);
+    const Y = mf.fmtNum(y - entry, 1, true);
+
+    return {
+        progress,
+        timeMark,
+        info: {
+            rEpr1: phase1.rEpr,
+            rEpr2: phase2.rEpr,
+            rEpr3: phase3.rEpr,
+            entry,
+            pStatus,
+            x,
+            X,
+            y,
+            Y,
+        },
+    };
+}
+function calcExtensionPattern() {
+    const { A, B, C } = points;
+    const bc = B.price - C.price;
+    let side = bc > 0;
+    const pickTime = props.pickTimeToolRef.get();
+    const phase1 = scanPhase({
+        side,
+        start: A,
+        end: { time: Math.min(pickTime ?? B.time, B.time) },
+    });
+    const phase2 = scanPhase({
+        side: !side,
+        start: phase1.R,
+        end: { time: Math.min(pickTime ?? C.time, C.time) },
+    });
+    const stopTime = props.indexToTime(
+        Math.max(phase1.R.index + 6 * phase1.tr, phase2.R.index + phase2.tr)
+    );
+    const phase3 = scanPhase({
+        side,
+        start: phase2.R,
+        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        pick: { price: B.price },
+    });
+
+    console.log("calcExtensionPattern", [phase1, phase2, phase3]);
+
+    const BC = mf.fmtNum(bc, 1, true);
+    const DE = phase3.ext.pr;
+
+    const deValid = DE < BC;
+
+    const pr3Valid = DE >= Math.max(phase2.pr, phase3.pr);
+    const s3Valid = !mf.cmp(phase3.ext.S.price, !side, phase3.S1.price);
+
+    const gtType = phase2.R.index < (phase1.R.index + phase3.pick.index) / 2;
+
+    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
+    const T1 = 2 * phase3.ext.S.index - phase3.ext.R.index;
+    const T2 = phase3.ext.R.index + ((phase3.pick.index ?? T) - phase1.R.index);
+    const T3 = phase3.ext.R.index + Math.max(phase2.tr, phase3.tr);
+    const timeMark = [T1, T2, T3];
+    const isBreak =
+        mf.cmp(phase3.R1.price, side, B.price) && phase3.ext.tr < phase3.tr;
+    const entry = isBreak ? phase3.R1.price : phase3.ext.R.price;
+    const CD = mf.fmtNum(entry - C.price, 1, true);
+    let progress = {};
+    progress.steps = [
+        [
+            //
+            !!phase3.pick.index,
+            deValid,
+            pr3Valid,
+            s3Valid,
+            !phase3.hasDouble,
+        ],
+        [
+            //
+            gtType ? T < T1 : T > T1,
+            T < T2,
+            T > T3,
+        ],
+    ];
+    progress.step = 1;
+    progress.result = progress.steps[0].every(Boolean);
+    if (progress.result) {
+        progress.step = 2;
+        progress.result = progress.steps[1].every(Boolean);
+    }
+    //
+    const pStatus = "";
+    //
+    const [x] = adjustTargetPrice(entry, CD, side);
+    const y = x;
     const X = mf.fmtNum(x - entry, 1, true);
     const Y = mf.fmtNum(y - entry, 1, true);
 

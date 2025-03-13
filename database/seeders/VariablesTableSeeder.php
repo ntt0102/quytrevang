@@ -76,7 +76,7 @@ class VariablesTableSeeder extends Seeder
         ]);
         Variable::create([
             'name' => "derPatternType",
-            'value' => "0",
+            'value' => "1",
         ]);
         Variable::create([
             'name' => "derivativeSource",

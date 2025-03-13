@@ -73,7 +73,7 @@ class DerivativeService extends CoreService
                 'vpsSession' => get_global_value('vpsSession'),
                 'lastOpeningDate' => get_global_value('lastOpeningDate'),
                 'autoRefresh' => get_global_value('autoRefreshFlag') == "1",
-                'patternType' => get_global_value('derPatternType') == "1",
+                'patternType' => intval(get_global_value('derPatternType')),
                 'volInvalid' =>  $volInvalid,
             ],
             'status' => $this->getStatus($payload)
