@@ -588,7 +588,7 @@ function calcExtensionPattern() {
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
     const T1 = 2 * phase3.ext.S.index - phase3.ext.R.index;
     const T2 = phase3.ext.R.index + ((phase3.pick.index ?? T) - phase1.R.index);
-    const T3 = phase3.ext.R.index + Math.max(phase2.tr, phase3.tr);
+    const T3 = phase3.ext.R.index + phase3.tr;
     const timeMark = [T1, T2, T3];
     const isBreak =
         mf.cmp(phase3.R1.price, side, B.price) && phase3.ext.tr < phase3.tr;
