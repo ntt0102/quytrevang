@@ -105,7 +105,7 @@ class DerivativeService extends CoreService
     public function setAutoRefresh($payload)
     {
         $status = $payload->autoRefresh ? '1' : '0';
-        set_global_value('autoRefreshFlag', $status);
+        return set_global_value('autoRefreshFlag', $status);
     }
 
     /**
@@ -116,8 +116,7 @@ class DerivativeService extends CoreService
      */
     public function setPatternType($payload)
     {
-        $status = $payload->patternType ? '1' : '0';
-        set_global_value('derPatternType', $status);
+        return set_global_value('derPatternType', $payload->patternType);
     }
 
     /**
