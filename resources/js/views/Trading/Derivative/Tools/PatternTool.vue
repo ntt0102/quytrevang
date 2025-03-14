@@ -638,7 +638,7 @@ function calcExtensionPattern() {
     const pStatus = "";
     //
     const [x] = adjustTargetPrice(entry, CD, side);
-    const y = x;
+    const [y] = adjustTargetPrice(entry, 2 * CD, side);
     const X = mf.fmtNum(x - entry, 1, true);
     const Y = mf.fmtNum(y - entry, 1, true);
 
