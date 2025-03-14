@@ -259,7 +259,7 @@ function loadPatternTool() {
 }
 function refresh(autoAdjust = false) {
     if (mf.isSet(lines.C)) {
-        if (autoAdjust && patternType.value !== 1) {
+        if (autoAdjust && patternType.value !== 2) {
             adjustPatternPoints();
         }
         removePatternTool();
@@ -565,7 +565,9 @@ function calcExtensionPattern() {
         start: phase1.R,
         end: { time: Math.min(pickTime ?? C.time, C.time) },
     });
-    const stopTime = props.indexToTime(phase1.R.index + 6 * (phase1.R.index - phase1.S.index));
+    const stopTime = props.indexToTime(
+        phase1.R.index + 6 * (phase1.R.index - phase1.S.index)
+    );
     const phase3 = scanPhase({
         side,
         start: phase2.R,
