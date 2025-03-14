@@ -85,7 +85,7 @@ const extensionPattern = [
         name: "Bước kiểm tra",
         conds: [
             //
-            "Vượt nền 1",
+            "CD / BC > 0.8",
             "DE < BC",
             "DE > PR3",
             "Hỗ trợ E",
