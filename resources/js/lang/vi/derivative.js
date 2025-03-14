@@ -85,10 +85,10 @@ const extensionPattern = [
         name: "Bước kiểm tra",
         conds: [
             //
-            "CD / BC > 0.8",
-            "DE < BC",
-            "DE > PR3",
-            "Hỗ trợ E",
+            "T > T1",
+            "T < T1'",
+            "T > T2",
+            "CD / BC > 0.7",
             "Góc C đơn",
         ],
     },
@@ -96,8 +96,10 @@ const extensionPattern = [
         name: "Bước vào lệnh",
         conds: [
             //
-            "T thoả T1",
-            "T < T2",
+            "DE < BC",
+            "DE > PR3",
+            "Hỗ trợ E",
+            "T thoả T3'",
             "T > T3",
         ],
     },

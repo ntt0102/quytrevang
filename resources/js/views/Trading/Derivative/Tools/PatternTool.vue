@@ -610,16 +610,18 @@ function calcExtensionPattern() {
     progress.steps = [
         [
             //
-            CD / BC > 0.8,
-            deValid,
-            pr3Valid,
-            s3Valid,
+            T > T1,
+            T < T1p,
+            T > T2,
+            CD / BC > 0.7,
             !phase3.hasDouble,
         ],
         [
             //
-            gtType ? T < T1 : T > T1,
-            T < T2,
+            deValid,
+            pr3Valid,
+            s3Valid,
+            gtType ? T < T3p : T > T3p,
             T > T3,
         ],
     ];
