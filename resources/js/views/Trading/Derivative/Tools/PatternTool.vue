@@ -693,12 +693,9 @@ function scanPhase({ side, start, end, pick = {} }) {
             if (mf.cmp(price, side, box.R.price)) {
                 if (box.pr > 0) {
                     box = mergePreBox(box, preBox);
-                    if (box.pr > maxBox.pr) maxBox.pr = box.pr;
-                    if (box.tr >= maxBox.tr) {
-                        maxBox.tr = box.tr;
+                    if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) {
+                        maxBox = mf.cloneDeep(box);
                         maxBox.B = { index, time, price: box.R.price };
-                        maxBox.R = mf.cloneDeep(box.R);
-                        maxBox.S = mf.cloneDeep(box.S);
                     }
                     preBox = mf.cloneDeep(box);
                 }
