@@ -597,9 +597,12 @@ function calcExtensionPattern() {
         price: isBreak ? phase3.R1.price : phase3.ext.R.price,
         index: isBreak ? phase3.R1.index : phase3.ext.R.index,
     };
+    const E = {
+        index: isBreak ? phase3.S1.index : phase3.ext.S.index,
+    };
     const ir13 = (phase3.pick.index ?? D.index) - phase1.R.index;
     const T1p = D.index + ir13;
-    const T3p = 2 * phase3.ext.S.index - phase3.ext.R.index;
+    const T3p = 2 * E.index - D.index;
     const timeMark = [T1, T2, T3, T1p, T3p];
 
     const gtType = phase2.R.index < phase1.R.index + ir13 / 2;
