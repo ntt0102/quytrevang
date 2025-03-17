@@ -33,6 +33,7 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const typeCount = 3;
+const bcThreshold = 0.5;
 
 defineExpose({
     isSelected,
@@ -99,7 +100,7 @@ function scanPattern(data) {
         //
         if (C.index > A.index) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
-            if (bc >= 1) {
+            if (bc >= bcThreshold) {
                 if (A.index - S.index >= 2 * (C.index - B.index)) break;
                 const as = mf.fmtNum(A.price - S.price, 1, true);
                 if (as > bc) break;
