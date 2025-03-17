@@ -577,37 +577,35 @@ function calcExtensionPattern() {
 
     console.log("calcExtensionPattern", [phase1, phase2, phase3]);
 
-    const BC = mf.fmtNum(bc, 1, true);
-    const DE = phase3.ext.pr;
-
-    const deValid = DE < BC;
-
-    const pr3Valid = DE >= Math.max(phase2.pr, phase3.pr);
-    const s3Valid = !mf.cmp(phase3.ext.S.price, !side, phase3.S1.price);
-
     const isBreak =
-        (phase3.R1.price - C.price) / bc > 0.8 && phase3.ext.tr < phase3.tr;
-
-    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
-    const T1 = phase1.R.index + phase1.tr;
-    const T2 = phase2.R.index + phase2.tr;
-    const T3 = phase3.ext.R.index + phase3.tr;
-
+        (phase3.R1.price - C.price) / bc >= 0.786 && phase3.ext.tr < phase3.tr;
     const D = {
         price: isBreak ? phase3.R1.price : phase3.ext.R.price,
         index: isBreak ? phase3.R1.index : phase3.ext.R.index,
     };
     const E = {
+        price: isBreak ? phase3.S1.price : phase3.ext.S.price,
         index: isBreak ? phase3.S1.index : phase3.ext.S.index,
     };
+
+    const BC = mf.fmtNum(bc, 1, true);
+    const CD = mf.fmtNum(D.price - C.price, 1, true);
+    const DE = mf.fmtNum(E.price - D.price, 1, true);
+
+    const pr3Valid = DE >= phase3.pr;
+    const s3Valid = !mf.cmp(phase3.ext.S.price, !side, phase3.S1.price);
+
     const ir13 = (phase3.pick.index ?? D.index) - phase1.R.index;
+    const gtType = phase2.R.index < phase1.R.index + ir13 / 2;
+
+    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
+    const T1 = phase1.R.index + phase1.tr;
+    const T2 = phase2.R.index + phase2.tr;
+    const T3 = phase3.ext.R.index + phase3.tr;
     const T1p = D.index + ir13;
     const T3p = 2 * E.index - D.index;
     const timeMark = [T1, T2, T3, T1p, T3p];
 
-    const gtType = phase2.R.index < phase1.R.index + ir13 / 2;
-
-    const CD = mf.fmtNum(D.price - C.price, 1, true);
     const entry = D.price;
     let progress = {};
     progress.steps = [
@@ -621,7 +619,7 @@ function calcExtensionPattern() {
         ],
         [
             //
-            deValid,
+            DE < BC,
             pr3Valid,
             s3Valid,
             gtType ? T < T3p : T > T3p,
