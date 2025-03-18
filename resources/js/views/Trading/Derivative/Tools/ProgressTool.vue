@@ -65,7 +65,7 @@ function hide(status = false) {
     showProgressContext.value = status;
 }
 function set(value) {
-    if (autoRefresh.value) checkAlert(value, progress.value);
+    checkAlert(value, progress.value);
     progress.value = value;
 }
 function refreshPattern() {
