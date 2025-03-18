@@ -246,34 +246,33 @@ function drag({ lineOptions, newPrice }) {
         let ba = b - a;
         //
         point = "A";
-        if (lineOptions.point === "A") {
+        if (lineOptions.point === point) {
             ba = +lines.B.options().ba;
             b = a + ba;
-        } else if (lineOptions.point !== "B") {
-            let div = 0;
-            switch (lineOptions.point) {
-                case "X":
-                    div = 1.5;
-                    break;
-                case "Y":
-                    div = 2;
-                    break;
-                case "Z":
-                    div = 3;
-                    break;
-                case "W":
-                    div = 5;
-                    break;
-            }
-            ba = mf.fmtNum((b - newPrice) / div);
-            a = b - ba;
-            changeOptions = { price: a };
-            lines[point].applyOptions(changeOptions);
         }
         param.points.push(point);
         param.data.push(a);
         //
         point = "B";
+        if (!["A", "B"].includes(lineOptions.point)) {
+            let div = 0;
+            switch (lineOptions.point) {
+                case "X":
+                    div = 0.5;
+                    break;
+                case "Y":
+                    div = 1;
+                    break;
+                case "Z":
+                    div = 2;
+                    break;
+                case "W":
+                    div = 4;
+                    break;
+            }
+            ba = mf.fmtNum((a - newPrice) / div);
+            b = a + ba;
+        }
         changeOptions = {
             price: b,
             ba: mf.fmtNum(ba),
