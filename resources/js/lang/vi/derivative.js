@@ -88,7 +88,7 @@ const extensionPattern = [
             "T > T1",
             "T < T1'",
             "T > T2",
-            "CD / BC > 0.786",
+            "CD/BC > 0.786",
             "Góc C đơn",
         ],
     },
