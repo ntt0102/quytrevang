@@ -785,17 +785,21 @@ function adjustPatternPoints() {
     if (pickTime) return false;
     //
     const side = points.B.price - points.A.price > 0;
-    const lastPrice = props.prices.at(-1).value;
+    const lastBar = props.prices.at(-1);
 
-    if (mf.cmp(lastPrice, !side, points.C.price)) {
-        let cPriceNew = lastPrice;
+    if (mf.cmp(lastBar.value, !side, points.C.price)) {
+        let cTimeNew = lastBar.time;
+        let cPriceNew = lastBar.value;
         for (let i = props.prices.length - 1; i >= 0; i--) {
+            const time = props.prices[i].time;
             const price = props.prices[i].value;
             if (price === points.B.price) break;
+            cTimeNew = time;
             cPriceNew = side
                 ? Math.min(cPriceNew, price)
                 : Math.max(cPriceNew, price);
         }
+        points.C.time = cTimeNew;
         points.C.price = cPriceNew;
         savePattern();
     }
