@@ -751,7 +751,7 @@ function scanPhase({ side, start, end, pick = {} }) {
 }
 function mergePreBox(box, preBox) {
     const dis = mf.fmtNum(box.R.price - preBox.R.price, 1, true);
-    if (dis === 0.1) {
+    if (dis === 0.1 && dis < 0.1 * preBox.pr) {
         let _box = box.pr > preBox.pr ? box : preBox;
         _box.tr = preBox.tr + box.tr;
         return mf.cloneDeep(_box);
