@@ -700,8 +700,8 @@ function scanPhase({ side, start, end, pick = {} }) {
                     box = mergePreBox(box, preBox);
                     if (
                         (box.tr >= maxBox.tr && box.pr >= maxBox.pr) ||
-                        box.tr >= 3 * maxBox.tr ||
-                        box.pr >= 3 * maxBox.pr
+                        box.tr >= 2 * maxBox.tr ||
+                        box.pr >= 2 * maxBox.pr
                     ) {
                         maxBox = mf.cloneDeep(box);
                         maxBox.B = { index, time, price: box.R.price };
