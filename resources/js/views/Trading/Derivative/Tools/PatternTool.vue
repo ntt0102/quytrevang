@@ -578,7 +578,7 @@ function calcExtensionPattern() {
     console.log("calcExtensionPattern", [phase1, phase2, phase3]);
 
     const isBreak =
-        (phase3.R1.price - C.price) / bc >= 0.786 && phase3.ext.tr < phase3.tr;
+        (phase3.R1.price - C.price) / bc >= 0.7 && phase3.ext.tr < phase3.tr;
     const D = {
         price: isBreak ? phase3.R1.price : phase3.ext.R.price,
         index: isBreak ? phase3.R1.index : phase3.ext.R.index,
@@ -593,7 +593,6 @@ function calcExtensionPattern() {
     const DE = mf.fmtNum(E.price - D.price, 1, true);
 
     const pr3Valid = DE >= phase3.pr;
-    const s3Valid = !mf.cmp(phase3.ext.S.price, !side, phase3.S1.price);
 
     const ir13 = (phase3.pick.index ?? D.index) - phase1.R.index;
     const gtType = phase2.R.index < phase1.R.index + ir13 / 2;
@@ -614,14 +613,13 @@ function calcExtensionPattern() {
             T > T1,
             T < T1p,
             T > T2,
-            CD / BC >= 0.786,
+            CD / BC >= 0.7,
             !phase3.hasDouble,
         ],
         [
             //
             DE < BC,
             pr3Valid,
-            s3Valid,
             gtType ? T < T3p : T > T3p,
             T > T3,
         ],
@@ -633,7 +631,7 @@ function calcExtensionPattern() {
         progress.result = progress.steps[1].every(Boolean);
     }
     //
-    const pStatus = "";
+    const pStatus = mf.fmtNum(100 * (CD / BC), 1);
     //
     const [x] = adjustTargetPrice(entry, CD, side);
     const [y] = adjustTargetPrice(entry, 2 * CD, side);
