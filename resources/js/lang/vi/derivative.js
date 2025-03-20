@@ -98,6 +98,7 @@ const extensionPattern = [
             //
             "DE < BC",
             "DE > PR3",
+            "Góc E đơn",
             "T thoả T3'",
             "T > T3",
         ],

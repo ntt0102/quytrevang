@@ -582,11 +582,19 @@ function calcExtensionPattern() {
     const D = {
         price: isBreak ? phase3.R1.price : phase3.ext.R.price,
         index: isBreak ? phase3.R1.index : phase3.ext.R.index,
+        time: isBreak ? phase3.R1.time : phase3.ext.R.time,
     };
     const E = {
         price: isBreak ? phase3.S1.price : phase3.ext.S.price,
         index: isBreak ? phase3.S1.index : phase3.ext.S.index,
+        time: isBreak ? phase3.S1.time : phase3.ext.S.time,
     };
+
+    const phase4 = scanPhase({
+        side,
+        start: E,
+        end: { time: pickTime, price: D.price },
+    });
 
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
@@ -620,6 +628,7 @@ function calcExtensionPattern() {
             //
             DE < BC,
             pr3Valid,
+            !phase4.hasDouble,
             gtType ? T < T3p : T > T3p,
             T > T3,
         ],
