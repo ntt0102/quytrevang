@@ -575,8 +575,6 @@ function calcExtensionPattern() {
         pick: { price: B.price },
     });
 
-    console.log("calcExtensionPattern", [phase1, phase2, phase3]);
-
     const isBreak =
         (phase3.R1.price - C.price) / bc >= 0.7 && phase3.ext.tr < phase3.tr;
     const D = {
@@ -595,6 +593,8 @@ function calcExtensionPattern() {
         start: E,
         end: { time: pickTime, price: D.price },
     });
+
+    console.log("calcExtensionPattern", [phase1, phase2, phase3, phase4]);
 
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
@@ -718,6 +718,7 @@ function scanPhase({ side, start, end, pick = {} }) {
                 box.tr = index - box.R.index;
                 if (mf.cmp(price, !side, box.S.price)) {
                     box.S.index = index;
+                    box.S.time = time;
                     box.S.price = price;
                     box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                 }
