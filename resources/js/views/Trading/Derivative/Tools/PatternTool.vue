@@ -636,26 +636,26 @@ function calcExtensionPattern() {
         ],
         [
             //
-            CD < AB,
+            CD <= AB,
             CD >= BC / 2,
             pr2Valid,
             T > T2,
         ],
         [
             //
-            DE < BC,
+            DE <= BC,
             pr3Valid,
             T > T3,
         ],
         [
             //
-            EF < CD,
+            EF <= CD,
             pr4Valid,
             T > T4,
         ],
         [
             //
-            FG < DE,
+            FG <= DE,
             pr5Valid,
             T > T5,
         ],
