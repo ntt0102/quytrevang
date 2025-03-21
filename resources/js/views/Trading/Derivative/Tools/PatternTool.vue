@@ -636,12 +636,12 @@ function calcExtensionPattern() {
         ],
         [
             //
+            CD >= BC / 2,
             pr2Valid,
             T > T2,
         ],
         [
             //
-            CD / BC >= 0.5,
             pr3Valid,
             T > T3,
         ],

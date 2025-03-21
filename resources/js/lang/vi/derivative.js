@@ -93,6 +93,7 @@ const extensionPattern = [
         name: "Bước kiểm tra 2",
         conds: [
             //
+            "CD > BC/2",
             "CD > PR2",
             "T > T2",
         ],
@@ -101,7 +102,6 @@ const extensionPattern = [
         name: "Bước kiểm tra 3",
         conds: [
             //
-            "CD/BC >= 0.5",
             "DE > PR3",
             "T > T3",
         ],
