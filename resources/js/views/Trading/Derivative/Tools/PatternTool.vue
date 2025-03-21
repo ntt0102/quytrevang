@@ -572,6 +572,154 @@ function calcExtensionPattern() {
         side,
         start: phase2.R,
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+    });
+
+    const isBreak =
+        (phase3.R1.price - C.price) / bc >= 0.5 && phase3.ext.tr < phase3.tr;
+    const D = {
+        price: isBreak ? phase3.R1.price : phase3.ext.R.price,
+        index: isBreak ? phase3.R1.index : phase3.ext.R.index,
+        time: isBreak ? phase3.R1.time : phase3.ext.R.time,
+    };
+    const E = {
+        price: isBreak ? phase3.S1.price : phase3.ext.S.price,
+        index: isBreak ? phase3.S1.index : phase3.ext.S.index,
+        time: isBreak ? phase3.S1.time : phase3.ext.S.time,
+    };
+
+    const phase4 = scanPhase({
+        side: !side,
+        start: D,
+        end: { time: Math.min(pickTime ?? E.time, E.time) },
+    });
+
+    const phase5 = scanPhase({
+        side,
+        start: E,
+        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+    });
+
+    console.log("calcExtensionPattern", [
+        phase1,
+        phase2,
+        phase3,
+        phase4,
+        phase5,
+    ]);
+
+    const BC = mf.fmtNum(bc, 1, true);
+    const CD = mf.fmtNum(D.price - C.price, 1, true);
+    const DE = mf.fmtNum(E.price - D.price, 1, true);
+    const EF = mf.fmtNum(phase5.R.price - E.price, 1, true);
+
+    const pr1Valid = BC >= phase1.pr;
+    const pr2Valid = CD >= phase2.pr;
+    const pr3Valid = DE >= phase3.pr;
+    const pr4Valid = EF >= phase4.pr;
+    const pr5Valid = phase5.ext.pr >= phase5.pr;
+
+    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
+    const T1 = phase1.R.index + phase1.tr;
+    const T2 = phase2.R.index + phase2.tr;
+    const T3 = D.index + phase3.tr;
+    const T4 = E.index + phase4.tr;
+    const T5 = phase5.R.index + phase5.tr;
+    const timeMark = [T1, T2, T3, T4, T5];
+
+    const entry = D.price;
+    let progress = {};
+    progress.steps = [
+        [
+            //
+            pr1Valid,
+            T > T1,
+        ],
+        [
+            //
+            pr2Valid,
+            T > T2,
+        ],
+        [
+            //
+            CD / BC >= 0.5,
+            pr3Valid,
+            T > T3,
+        ],
+        [
+            //
+            pr4Valid,
+            T > T4,
+        ],
+        [
+            //
+            pr5Valid,
+            T > T5,
+        ],
+    ];
+    progress.step = 1;
+    progress.result = progress.steps[0].every(Boolean);
+    if (progress.result) {
+        progress.step = 2;
+        progress.result = progress.steps[1].every(Boolean);
+        if (progress.result) {
+            progress.step = 3;
+            progress.result = progress.steps[2].every(Boolean);
+            if (progress.result) {
+                progress.step = 4;
+                progress.result = progress.steps[3].every(Boolean);
+                if (progress.result) {
+                    progress.step = 5;
+                    progress.result = progress.steps[4].every(Boolean);
+                }
+            }
+        }
+    }
+    //
+    const pStatus = mf.fmtNum(100 * (CD / BC), 1);
+    //
+    const [x] = adjustTargetPrice(entry, CD, side);
+    const [y] = adjustTargetPrice(entry, 2 * CD, side);
+    const X = mf.fmtNum(x - entry, 1, true);
+    const Y = mf.fmtNum(y - entry, 1, true);
+
+    return {
+        progress,
+        timeMark,
+        info: {
+            rEpr1: phase1.rEpr,
+            rEpr2: phase2.rEpr,
+            rEpr3: phase3.rEpr,
+            entry,
+            pStatus,
+            x,
+            X,
+            y,
+            Y,
+        },
+    };
+}
+function calcExtensionPattern1() {
+    const { A, B, C } = points;
+    const bc = B.price - C.price;
+    let side = bc > 0;
+    const pickTime = props.pickTimeToolRef.get();
+    const phase1 = scanPhase({
+        side,
+        start: A,
+        end: { time: Math.min(pickTime ?? B.time, B.time) },
+    });
+    const phase2 = scanPhase({
+        side: !side,
+        start: phase1.R,
+        end: { time: Math.min(pickTime ?? C.time, C.time) },
+    });
+    const stopTime = props.indexToTime(
+        phase1.R.index + 6 * (phase1.R.index - phase1.S.index)
+    );
+    const phase3 = scanPhase({
+        side,
+        start: phase2.R,
+        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
         pick: { price: B.price },
     });
 
@@ -860,9 +1008,12 @@ function setTimeMark(data) {
         "#F44336",
         "#4CAF50",
         "#FFEB3B",
-        "#F44336",
-        "#009688",
-        "#FF9800",
+        "#00BCD4",
+        "#673AB7",
+        "#E91E63",
+        // "#F44336",
+        // "#009688",
+        // "#FF9800",
     ];
     let result = [];
     for (let i = 0; i < data.length; i++) {

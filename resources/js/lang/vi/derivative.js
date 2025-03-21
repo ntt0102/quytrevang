@@ -82,6 +82,49 @@ const reversalPattern = [
 
 const extensionPattern = [
     {
+        name: "Bước kiểm tra 1",
+        conds: [
+            //
+            "BC > PR1",
+            "T > T1",
+        ],
+    },
+    {
+        name: "Bước kiểm tra 2",
+        conds: [
+            //
+            "CD > PR2",
+            "T > T2",
+        ],
+    },
+    {
+        name: "Bước kiểm tra 3",
+        conds: [
+            //
+            "CD/BC >= 0.5",
+            "DE > PR3",
+            "T > T3",
+        ],
+    },
+    {
+        name: "Bước kiểm tra 4",
+        conds: [
+            //
+            "EF > PR4",
+            "T > T4",
+        ],
+    },
+    {
+        name: "Bước vào lệnh",
+        conds: [
+            //
+            "FG > PR5",
+            "T > T5",
+        ],
+    },
+];
+const extensionPattern1 = [
+    {
         name: "Bước kiểm tra",
         conds: [
             //

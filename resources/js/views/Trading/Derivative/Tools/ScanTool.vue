@@ -33,7 +33,7 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const typeCount = 3;
-const bcThreshold = 0.5;
+const bcThreshold = 1;
 
 defineExpose({
     isSelected,
