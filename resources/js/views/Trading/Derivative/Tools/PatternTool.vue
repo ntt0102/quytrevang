@@ -851,10 +851,12 @@ function scanPhase({ side, start, end, pick = {} }) {
                         box.tr >= 2 * maxBox.tr ||
                         box.pr >= 2 * maxBox.pr
                     ) {
-                        maxBox = mf.cloneDeep(box);
+                        maxBox.R = mf.cloneDeep(box.R);
+                        maxBox.S = mf.cloneDeep(box.S);
                         maxBox.B = { index, time, price: box.R.price };
                     }
-                    preBox = mf.cloneDeep(box);
+                    if (box.tr > maxBox.tr) maxBox.tr = box.tr;
+                    if (box.pr > maxBox.pr) maxBox.pr = box.pr;
                 }
                 box = {
                     R: { index, time, price },
