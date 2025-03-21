@@ -607,16 +607,18 @@ function calcExtensionPattern() {
         phase5,
     ]);
 
+    const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(phase5.R.price - E.price, 1, true);
+    const FG = phase5.ext.pr;
 
     const pr1Valid = BC >= phase1.pr;
     const pr2Valid = CD >= phase2.pr;
     const pr3Valid = DE >= phase3.pr;
     const pr4Valid = EF >= phase4.pr;
-    const pr5Valid = phase5.ext.pr >= phase5.pr;
+    const pr5Valid = FG >= phase5.pr;
 
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
     const T1 = phase1.R.index + phase1.tr;
@@ -636,22 +638,26 @@ function calcExtensionPattern() {
         ],
         [
             //
+            CD < AB,
             CD >= BC / 2,
             pr2Valid,
             T > T2,
         ],
         [
             //
+            DE < BC,
             pr3Valid,
             T > T3,
         ],
         [
             //
+            EF < CD,
             pr4Valid,
             T > T4,
         ],
         [
             //
+            FG < DE,
             pr5Valid,
             T > T5,
         ],

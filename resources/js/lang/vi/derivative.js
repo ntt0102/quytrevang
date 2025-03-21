@@ -93,6 +93,7 @@ const extensionPattern = [
         name: "Bước kiểm tra 2",
         conds: [
             //
+            "CD < AB",
             "CD > BC/2",
             "CD > PR2",
             "T > T2",
@@ -102,6 +103,7 @@ const extensionPattern = [
         name: "Bước kiểm tra 3",
         conds: [
             //
+            "DE < BC",
             "DE > PR3",
             "T > T3",
         ],
@@ -110,6 +112,7 @@ const extensionPattern = [
         name: "Bước kiểm tra 4",
         conds: [
             //
+            "EF < CD",
             "EF > PR4",
             "T > T4",
         ],
@@ -118,6 +121,7 @@ const extensionPattern = [
         name: "Bước vào lệnh",
         conds: [
             //
+            "FG < DE",
             "FG > PR5",
             "T > T5",
         ],
