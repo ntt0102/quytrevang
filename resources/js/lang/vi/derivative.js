@@ -113,6 +113,7 @@ const extensionPattern = [
         conds: [
             //
             "EF < CD",
+            "EF > DE/2",
             "EF > PR4",
             "T > T4",
         ],
