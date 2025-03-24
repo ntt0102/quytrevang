@@ -586,17 +586,17 @@ function calcExtensionPattern() {
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
     });
 
-    const isBreak =
-        (phase3.R1.price - C.price) / bc >= 0.5 && phase3.ext.tr < phase3.tr;
+    const isBreak1 =
+        Math.abs(phase3.R1.price - C.price) / BC >= 0.5 && phase3.ext.tr < phase3.tr;
     const D = {
-        price: isBreak ? phase3.R1.price : phase3.ext.R.price,
-        index: isBreak ? phase3.R1.index : phase3.ext.R.index,
-        time: isBreak ? phase3.R1.time : phase3.ext.R.time,
+        price: isBreak1 ? phase3.R1.price : phase3.ext.R.price,
+        index: isBreak1 ? phase3.R1.index : phase3.ext.R.index,
+        time: isBreak1 ? phase3.R1.time : phase3.ext.R.time,
     };
     const E = {
-        price: isBreak ? phase3.S1.price : phase3.ext.S.price,
-        index: isBreak ? phase3.S1.index : phase3.ext.S.index,
-        time: isBreak ? phase3.S1.time : phase3.ext.S.time,
+        price: isBreak1 ? phase3.S1.price : phase3.ext.S.price,
+        index: isBreak1 ? phase3.S1.index : phase3.ext.S.index,
+        time: isBreak1 ? phase3.S1.time : phase3.ext.S.time,
     };
 
     const phase4 = scanPhase({
@@ -619,12 +619,21 @@ function calcExtensionPattern() {
         phase5,
     ]);
 
+    const isBreak2 =
+        Math.abs(phase5.R1.price - E.price) / DE >= 0.5 && phase5.ext.tr < phase5.tr;
+
+    const F = {
+        price: isBreak2 ? phase5.S1.price : phase5.ext.S.price,
+        index: isBreak2 ? phase5.S1.index : phase5.ext.S.index,
+        time: isBreak2 ? phase5.S1.time : phase5.ext.S.time,
+    };    
+
     const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
-    const EF = mf.fmtNum(phase5.R.price - E.price, 1, true);
-    const FG = phase5.ext.pr;
+    const EF = mf.fmtNum(F.price - E.price, 1, true);
+    const FG = isBreak2 ? phase5.pr : phase5.ext.pr;
 
     const pr1Valid = BC >= phase1.pr;
     const pr2Valid = CD >= phase2.pr;
