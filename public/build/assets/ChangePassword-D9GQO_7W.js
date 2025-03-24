@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/ChangePassword-D9GQO_7W.js
-import{b as c,e as u,h as i,i as p,j as h,o as _,bS as m}from"./app-BMdw5pp6.js";/* empty css            */const d={class:"change-password-page"},b={__name:"ChangePassword",setup(l){const o=i(),s=p(),a=h();function n(e){const{token:t}=a.query;e.token=t,o.dispatch("auth/changePassword",e).then(r=>{r?s.push({name:"overview"}):s.push({name:"reset-password"})})}return(e,t)=>(_(),c("div",d,[u(m,{hasEmail:!0,onOnSubmit:n})]))}};export{b as default};
-========
-import{b as c,e as u,h as i,i as p,j as h,o as _,bS as m}from"./app-B_ZqL3KA.js";/* empty css            */const d={class:"change-password-page"},b={__name:"ChangePassword",setup(l){const o=i(),s=p(),a=h();function n(e){const{token:t}=a.query;e.token=t,o.dispatch("auth/changePassword",e).then(r=>{r?s.push({name:"overview"}):s.push({name:"reset-password"})})}return(e,t)=>(_(),c("div",d,[u(m,{hasEmail:!0,onOnSubmit:n})]))}};export{b as default};
->>>>>>>> parent of 180329f84 (ps add x2 y2):public/build/assets/ChangePassword-Itj2CELH.js

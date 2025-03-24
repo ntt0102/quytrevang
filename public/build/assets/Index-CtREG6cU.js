@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:public/build/assets/Index-CtREG6cU.js
-import{h as a,r as t,a as i}from"./app-BMdw5pp6.js";const p={__name:"Index",setup(l,{expose:o}){const s=a();t(null);const r=t(null),n=i({componentName:null,filename:null,isPreview:!1});function c(e){s.dispatch("setSyncing",!0),n.componentName=e.component,n.isPreview=e.isPreview,setTimeout(()=>r.value.create(e),0)}return o({download:c}),(e,u)=>null}};export{p as _};
-========
-import{h as a,r as t,a as i}from"./app-B_ZqL3KA.js";const p={__name:"Index",setup(l,{expose:o}){const s=a();t(null);const r=t(null),n=i({componentName:null,filename:null,isPreview:!1});function c(e){s.dispatch("setSyncing",!0),n.componentName=e.component,n.isPreview=e.isPreview,setTimeout(()=>r.value.create(e),0)}return o({download:c}),(e,u)=>null}};export{p as _};
->>>>>>>> parent of 180329f84 (ps add x2 y2):public/build/assets/Index-CycCx37t.js
