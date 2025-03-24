@@ -584,6 +584,7 @@ function calcExtensionPattern() {
         side,
         start: phase2.R,
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        pick: { price: B.price },
     });
 
     const isBreak =
@@ -609,6 +610,7 @@ function calcExtensionPattern() {
         side,
         start: E,
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        pick: { price: D.price },
     });
 
     console.log("calcExtensionPattern", [
@@ -659,6 +661,7 @@ function calcExtensionPattern() {
             //
             DE <= BC,
             pr3Valid,
+            !!phase3.pick.index || D.index >= T2,
             T > T3,
         ],
         [
@@ -666,12 +669,14 @@ function calcExtensionPattern() {
             EF <= CD,
             EF >= DE / 2,
             pr4Valid,
+            
             T > T4,
         ],
         [
             //
             FG <= DE,
             pr5Valid,
+            !!phase5.pick.index || phase5.ext.R.index >= T4, 
             T > T5,
         ],
     ];
