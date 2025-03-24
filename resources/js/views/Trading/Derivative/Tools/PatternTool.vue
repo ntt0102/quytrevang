@@ -579,7 +579,7 @@ function calcExtensionPattern() {
         start: phase1.R,
         end: { time: Math.min(pickTime ?? C.time, C.time) },
     });
-    const stopTime = props.indexToTime(3 * phase2.R.index - 2 * phase1.S.index);
+    const stopTime = props.indexToTime(4 * phase2.R.index - 3 * phase1.S.index);
     const phase3 = scanPhase({
         side,
         start: phase2.R,
