@@ -213,7 +213,7 @@ function loadPatternTool() {
     const {
         progress,
         timeMark,
-        info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x, X, y, Y },
+        info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x: [x1, x2], X: [X1, X2], y: [y1, y2], Y: [Y1, Y2] },
     } = calculatePattern();
     emit("setProgress", progress);
     setTimeMark(timeMark);
@@ -243,16 +243,30 @@ function loadPatternTool() {
     option.draggable = false;
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
-    option.point = "Y";
-    option.price = mf.fmtNum(y);
-    option.title = `Y ${mf.fmtNum(Y)}`;
+    option.point = "Y1";
+    option.price = mf.fmtNum(y1);
+    option.title = `Y1 ${mf.fmtNum(Y1)}`;
     option.color = "#E91E63";
     option.draggable = false;
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
-    option.point = "X";
-    option.price = mf.fmtNum(x);
-    option.title = `X ${mf.fmtNum(X)}`;
+    option.point = "X1";
+    option.price = mf.fmtNum(x1);
+    option.title = `X1 ${mf.fmtNum(X1)}`;
+    option.color = "#2196F3";
+    option.draggable = false;
+    lines[option.point] = props.priceSeries.createPriceLine(option);
+    //
+    option.point = "Y2";
+    option.price = mf.fmtNum(y2);
+    option.title = `Y2 ${mf.fmtNum(Y2)}`;
+    option.color = "#E91E63";
+    option.draggable = false;
+    lines[option.point] = props.priceSeries.createPriceLine(option);
+    //
+    option.point = "X2";
+    option.price = mf.fmtNum(x2);
+    option.title = `X2 ${mf.fmtNum(X2)}`;
     option.color = "#2196F3";
     option.draggable = false;
     lines[option.point] = props.priceSeries.createPriceLine(option);
@@ -572,17 +586,17 @@ function calcExtensionPattern() {
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
     });
 
-    const isBreak1 =
-        Math.abs(phase3.R1.price - C.price) / BC >= 0.5 && phase3.ext.tr < phase3.tr;
+    const isBreak =
+        (phase3.R1.price - C.price) / bc >= 0.5 && phase3.ext.tr < phase3.tr;
     const D = {
-        price: isBreak1 ? phase3.R1.price : phase3.ext.R.price,
-        index: isBreak1 ? phase3.R1.index : phase3.ext.R.index,
-        time: isBreak1 ? phase3.R1.time : phase3.ext.R.time,
+        price: isBreak ? phase3.R1.price : phase3.ext.R.price,
+        index: isBreak ? phase3.R1.index : phase3.ext.R.index,
+        time: isBreak ? phase3.R1.time : phase3.ext.R.time,
     };
     const E = {
-        price: isBreak1 ? phase3.S1.price : phase3.ext.S.price,
-        index: isBreak1 ? phase3.S1.index : phase3.ext.S.index,
-        time: isBreak1 ? phase3.S1.time : phase3.ext.S.time,
+        price: isBreak ? phase3.S1.price : phase3.ext.S.price,
+        index: isBreak ? phase3.S1.index : phase3.ext.S.index,
+        time: isBreak ? phase3.S1.time : phase3.ext.S.time,
     };
 
     const phase4 = scanPhase({
@@ -605,21 +619,12 @@ function calcExtensionPattern() {
         phase5,
     ]);
 
-    const isBreak2 =
-        Math.abs(phase5.R1.price - E.price) / DE >= 0.5 && phase5.ext.tr < phase5.tr;
-
-    const F = {
-        price: isBreak2 ? phase5.S1.price : phase5.ext.S.price,
-        index: isBreak2 ? phase5.S1.index : phase5.ext.S.index,
-        time: isBreak2 ? phase5.S1.time : phase5.ext.S.time,
-    };    
-
     const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
-    const EF = mf.fmtNum(F.price - E.price, 1, true);
-    const FG = isBreak2 ? phase5.pr : phase5.ext.pr;
+    const EF = mf.fmtNum(phase5.R.price - E.price, 1, true);
+    const FG = phase5.ext.pr;
 
     const pr1Valid = BC >= phase1.pr;
     const pr2Valid = CD >= phase2.pr;
@@ -691,10 +696,14 @@ function calcExtensionPattern() {
     //
     const pStatus = mf.fmtNum(100 * (CD / BC), 1);
     //
-    const [x] = adjustTargetPrice(entry, CD, side);
-    const [y] = adjustTargetPrice(entry, 2 * CD, side);
-    const X = mf.fmtNum(x - entry, 1, true);
-    const Y = mf.fmtNum(y - entry, 1, true);
+    const [x1] = adjustTargetPrice(entry, CD, side);
+    const [y1] = adjustTargetPrice(entry, 2 * CD, side);
+    const X1 = mf.fmtNum(x1 - entry, 1, true);
+    const Y1 = mf.fmtNum(y1 - entry, 1, true);
+    const [x2] = adjustTargetPrice(entry, EF, side);
+    const [y2] = adjustTargetPrice(entry, 2 * EF, side);
+    const X2 = mf.fmtNum(x2 - entry, 1, true);
+    const Y2 = mf.fmtNum(y2 - entry, 1, true);
 
     return {
         progress,
@@ -705,10 +714,10 @@ function calcExtensionPattern() {
             rEpr3: phase3.rEpr,
             entry,
             pStatus,
-            x,
-            X,
-            y,
-            Y,
+            x: [x1, x2],
+            X: [X1, X2],
+            y: [y1, y2],
+            Y: [Y1, Y2],
         },
     };
 }
@@ -804,10 +813,14 @@ function calcExtensionPattern1() {
     //
     const pStatus = mf.fmtNum(100 * (CD / BC), 1);
     //
-    const [x] = adjustTargetPrice(entry, CD, side);
-    const [y] = adjustTargetPrice(entry, 2 * CD, side);
-    const X = mf.fmtNum(x - entry, 1, true);
-    const Y = mf.fmtNum(y - entry, 1, true);
+    const [x1] = adjustTargetPrice(entry, CD, side);
+    const [y1] = adjustTargetPrice(entry, 2 * CD, side);
+    const X1 = mf.fmtNum(x1 - entry, 1, true);
+    const Y1 = mf.fmtNum(y1 - entry, 1, true);
+    const [x2] = adjustTargetPrice(entry, EF, side);
+    const [y2] = adjustTargetPrice(entry, 2 * EF, side);
+    const X2 = mf.fmtNum(x2 - entry, 1, true);
+    const Y2 = mf.fmtNum(y2 - entry, 1, true);
 
     return {
         progress,
@@ -818,10 +831,10 @@ function calcExtensionPattern1() {
             rEpr3: phase3.rEpr,
             entry,
             pStatus,
-            x,
-            X,
-            y,
-            Y,
+            x: [x1, x2],
+            X: [X1, X2],
+            y: [y1, y2],
+            Y: [Y1, Y2],
         },
     };
 }
@@ -1011,8 +1024,10 @@ function removePatternTool() {
             if (mf.isSet(lines.C)) {
                 props.priceSeries.removePriceLine(lines.C);
                 props.priceSeries.removePriceLine(lines.D);
-                props.priceSeries.removePriceLine(lines.X);
-                props.priceSeries.removePriceLine(lines.Y);
+                props.priceSeries.removePriceLine(lines.X1);
+                props.priceSeries.removePriceLine(lines.Y1);
+                props.priceSeries.removePriceLine(lines.X2);
+                props.priceSeries.removePriceLine(lines.Y2);
             }
         }
     }
