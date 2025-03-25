@@ -691,6 +691,7 @@ function calcExtensionPattern() {
         ],
         [
             //
+            ![B.price, D.price].includes(F.price),
             FG <= DE,
             pr5Valid,
             !!phase5.pick.index || phase5.ext.R.index >= T4,

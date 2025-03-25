@@ -123,6 +123,7 @@ const extensionPattern = [
         name: "Bước vào lệnh",
         conds: [
             //
+            "F ≠ B ≠ D",
             "FG < DE",
             "FG > PR5",
             "Tf > T4",
