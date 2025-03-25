@@ -608,12 +608,13 @@ function calcExtensionPattern() {
         price: isBreak ? phase3.S1.price : phase3.ext.S.price,
         index: isBreak ? phase3.S1.index : phase3.ext.S.index,
         time: isBreak ? phase3.S1.time : phase3.ext.S.time,
+        tAfter: isBreak ? phase3.S1.tAfter : phase3.ext.S.tAfter,
     };
 
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: { time: Math.min(pickTime ?? E.time, E.time), price: E.price },
+        end: { time: Math.min(pickTime ?? E.tAfter, E.tAfter), price: E.price },
     });
 
     const phase5 = scanPhase({
@@ -917,7 +918,10 @@ function scanPhase({ side, start, end, pick = {} }) {
                     box.S.index = index;
                     box.S.time = time;
                     box.S.price = price;
+                    box.S.tAfter = time;
                     box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
+                } else if (price === box.S.price) {
+                    box.S.tAfter = time;
                 }
             }
             if (end.price && price === end.price && price === box.R.price) {
