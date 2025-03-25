@@ -582,12 +582,12 @@ function calcExtensionPattern() {
     const phase1 = scanPhase({
         side,
         start: A,
-        end: { time: Math.min(pickTime ?? B.time, B.time) },
+        end: { time: Math.min(pickTime ?? B.time, B.time), price: B.price },
     });
     const phase2 = scanPhase({
         side: !side,
         start: phase1.R,
-        end: { time: Math.min(pickTime ?? C.time, C.time) },
+        end: { time: Math.min(pickTime ?? C.time, C.time), price: C.price },
     });
     const stopTime = props.indexToTime(4 * phase2.R.index - 3 * phase1.S.index);
     const phase3 = scanPhase({
@@ -613,7 +613,7 @@ function calcExtensionPattern() {
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: { time: Math.min(pickTime ?? E.time, E.time) },
+        end: { time: Math.min(pickTime ?? E.time, E.time), price: E.price },
     });
 
     const phase5 = scanPhase({
@@ -901,7 +901,6 @@ function scanPhase({ side, start, end, pick = {} }) {
                     ) {
                         maxBox.R = mf.cloneDeep(box.R);
                         maxBox.S = mf.cloneDeep(box.S);
-                        maxBox.B = { index, time, price: box.R.price };
                     }
                     if (box.tr > maxBox.tr) maxBox.tr = box.tr;
                     if (box.pr > maxBox.pr) maxBox.pr = box.pr;
@@ -919,6 +918,12 @@ function scanPhase({ side, start, end, pick = {} }) {
                     box.S.time = time;
                     box.S.price = price;
                     box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
+                }
+            }
+            if (end.price && price === end.price && price === box.R.price) {
+                if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) {
+                    maxBox = mf.cloneDeep(box);
+                    maxBox.tr = 2 * maxBox.tr;
                 }
             }
             if (pick.price && !pick.index && mf.cmp(price, side, pick.price)) {
@@ -947,7 +952,6 @@ function scanPhase({ side, start, end, pick = {} }) {
     return {
         tr: maxBox.tr,
         pr: maxBox.pr,
-        B: maxBox.B,
         S1: maxBox.S,
         R1: maxBox.R,
         S,
