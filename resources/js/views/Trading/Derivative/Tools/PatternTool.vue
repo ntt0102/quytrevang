@@ -213,7 +213,17 @@ function loadPatternTool() {
     const {
         progress,
         timeMark,
-        info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x: [x1, x2], X: [X1, X2], y: [y1, y2], Y: [Y1, Y2] },
+        info: {
+            rEpr1,
+            rEpr2,
+            rEpr3,
+            entry,
+            pStatus,
+            x: [x1, x2],
+            X: [X1, X2],
+            y: [y1, y2],
+            Y: [Y1, Y2],
+        },
     } = calculatePattern();
     emit("setProgress", progress);
     setTimeMark(timeMark);
@@ -613,6 +623,12 @@ function calcExtensionPattern() {
         pick: { price: D.price },
     });
 
+    const F = {
+        price: phase5.R.price,
+        index: phase5.R.index,
+        time: phase5.R.time,
+    };
+
     console.log("calcExtensionPattern", [
         phase1,
         phase2,
@@ -625,7 +641,7 @@ function calcExtensionPattern() {
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
-    const EF = mf.fmtNum(phase5.R.price - E.price, 1, true);
+    const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = phase5.ext.pr;
 
     const pr1Valid = BC >= phase1.pr;
@@ -639,7 +655,7 @@ function calcExtensionPattern() {
     const T2 = phase2.R.index + phase2.tr;
     const T3 = D.index + phase3.tr;
     const T4 = E.index + phase4.tr;
-    const T5 = phase5.R.index + phase5.tr;
+    const T5 = F.index + phase5.tr;
     const timeMark = [T1, T2, T3, T4, T5];
 
     const entry = D.price;
@@ -669,14 +685,14 @@ function calcExtensionPattern() {
             EF <= CD,
             EF >= DE / 2,
             pr4Valid,
-            
+
             T > T4,
         ],
         [
             //
             FG <= DE,
             pr5Valid,
-            !!phase5.pick.index || phase5.ext.R.index >= T4, 
+            !!phase5.pick.index || phase5.ext.R.index >= T4,
             T > T5,
         ],
     ];
@@ -701,12 +717,12 @@ function calcExtensionPattern() {
     //
     const pStatus = mf.fmtNum(100 * (CD / BC), 1);
     //
-    const [x1] = adjustTargetPrice(entry, CD, side);
-    const [y1] = adjustTargetPrice(entry, 2 * CD, side);
+    const [x1] = adjustTargetPrice(D.price, CD, side);
+    const [y1] = adjustTargetPrice(D.price, 2 * CD, side);
     const X1 = mf.fmtNum(x1 - entry, 1, true);
     const Y1 = mf.fmtNum(y1 - entry, 1, true);
-    const [x2] = adjustTargetPrice(entry, EF, side);
-    const [y2] = adjustTargetPrice(entry, 2 * EF, side);
+    const [x2] = adjustTargetPrice(F.price, EF, side);
+    const [y2] = adjustTargetPrice(F.price, 2 * EF, side);
     const X2 = mf.fmtNum(x2 - entry, 1, true);
     const Y2 = mf.fmtNum(y2 - entry, 1, true);
 
