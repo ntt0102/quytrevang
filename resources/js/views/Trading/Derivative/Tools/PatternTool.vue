@@ -672,9 +672,9 @@ function calcExtensionPattern() {
     });
 
     const F = {
-        price: phase5.R.price,
-        index: phase5.R.index,
-        time: phase5.R.time,
+        price: phase5.ext.R.price,
+        index: phase5.ext.R.index,
+        time: phase5.ext.R.time,
     };
 
     console.log("calcExtensionPattern", [
