@@ -103,6 +103,7 @@ const extensionPattern = [
         name: "Bước kiểm tra 3",
         conds: [
             //
+            "TR3 < TR1",
             "DE < BC",
             "DE > PR3",
             "Td > T2",
@@ -113,6 +114,7 @@ const extensionPattern = [
         name: "Bước kiểm tra 4",
         conds: [
             //
+            "TR4 < TR2",
             "EF < CD",
             "EF > DE/2",
             "EF > PR4",
@@ -124,6 +126,7 @@ const extensionPattern = [
         conds: [
             //
             "F ≠ D ≠ B",
+            "TR5 < TR3",
             "FG < DE",
             "FG > PR5",
             "Tf > T4",
