@@ -88,7 +88,17 @@ function draw({ time, price }) {
                 const {
                     progress,
                     timeMark,
-                    info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x, X, y, Y },
+                    info: {
+                        rEpr1,
+                        rEpr2,
+                        rEpr3,
+                        entry,
+                        pStatus,
+                        x: [x1, x2],
+                        X: [X1, X2],
+                        y: [y1, y2],
+                        Y: [Y1, Y2],
+                    },
                 } = calculatePattern();
                 _progress = progress;
                 _timeMark = timeMark;
@@ -114,17 +124,30 @@ function draw({ time, price }) {
                 changeOptions = { price: entry, title: "E " + pStatus };
                 lines[point].applyOptions(changeOptions);
                 //
-                point = "X";
+                point = "X1";
                 changeOptions = {
-                    price: mf.fmtNum(x),
-                    title: `X ${mf.fmtNum(X)}`,
+                    price: mf.fmtNum(x1),
+                    title: `X1 ${mf.fmtNum(X1)}`,
                 };
                 lines[point].applyOptions(changeOptions);
                 //
-                point = "Y";
+                point = "Y1";
                 changeOptions = {
-                    price: mf.fmtNum(y),
-                    title: `Y ${mf.fmtNum(Y)}`,
+                    price: mf.fmtNum(y1),
+                    title: `Y1 ${mf.fmtNum(Y1)}`,
+                };
+                //
+                point = "X2";
+                changeOptions = {
+                    price: mf.fmtNum(x2),
+                    title: `X2 ${mf.fmtNum(X2)}`,
+                };
+                lines[point].applyOptions(changeOptions);
+                //
+                point = "Y2";
+                changeOptions = {
+                    price: mf.fmtNum(y2),
+                    title: `Y2 ${mf.fmtNum(Y2)}`,
                 };
                 lines[point].applyOptions(changeOptions);
             } else {
@@ -132,7 +155,17 @@ function draw({ time, price }) {
                 const {
                     progress,
                     timeMark,
-                    info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x, X, y, Y },
+                    info: {
+                        rEpr1,
+                        rEpr2,
+                        rEpr3,
+                        entry,
+                        pStatus,
+                        x: [x1, x2],
+                        X: [X1, X2],
+                        y: [y1, y2],
+                        Y: [Y1, Y2],
+                    },
                 } = calculatePattern();
                 _progress = progress;
                 _timeMark = timeMark;
@@ -159,16 +192,30 @@ function draw({ time, price }) {
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
                 //
-                option.point = "Y";
-                option.price = mf.fmtNum(y);
-                option.title = `Y ${mf.fmtNum(Y)}`;
+                option.point = "Y1";
+                option.price = mf.fmtNum(y1);
+                option.title = `Y1 ${mf.fmtNum(Y1)}`;
                 option.color = "#E91E63";
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
                 //
-                option.point = "X";
-                option.price = mf.fmtNum(x);
-                option.title = `X ${mf.fmtNum(X)}`;
+                option.point = "X1";
+                option.price = mf.fmtNum(x1);
+                option.title = `X1 ${mf.fmtNum(X1)}`;
+                option.color = "#2196F3";
+                option.draggable = false;
+                lines[option.point] = props.priceSeries.createPriceLine(option);
+                //
+                option.point = "Y2";
+                option.price = mf.fmtNum(y2);
+                option.title = `Y2 ${mf.fmtNum(Y2)}`;
+                option.color = "#E91E63";
+                option.draggable = false;
+                lines[option.point] = props.priceSeries.createPriceLine(option);
+                //
+                option.point = "X2";
+                option.price = mf.fmtNum(x2);
+                option.title = `X2 ${mf.fmtNum(X2)}`;
                 option.color = "#2196F3";
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
@@ -1112,7 +1159,17 @@ function drag({ lineOptions }) {
         const {
             progress,
             timeMark,
-            info: { rEpr1, rEpr2, rEpr3, entry, pStatus, x, X, y, Y },
+            info: {
+                rEpr1,
+                rEpr2,
+                rEpr3,
+                entry,
+                pStatus,
+                x: [x1, x2],
+                X: [X1, X2],
+                y: [y1, y2],
+                Y: [Y1, Y2],
+            },
         } = calculatePattern();
         emit("setProgress", progress);
         setTimeMark(timeMark);
@@ -1137,17 +1194,31 @@ function drag({ lineOptions }) {
         if (lineOptions.point === point) delete changeOptions.price;
         lines[point].applyOptions(changeOptions);
         //
-        point = "X";
+        point = "X1";
         changeOptions = {
-            price: mf.fmtNum(x),
-            title: `X ${mf.fmtNum(X)}`,
+            price: mf.fmtNum(x1),
+            title: `X1 ${mf.fmtNum(X1)}`,
         };
         lines[point].applyOptions(changeOptions);
         //
-        point = "Y";
+        point = "Y1";
         changeOptions = {
-            price: mf.fmtNum(y),
-            title: `Y ${mf.fmtNum(Y)}`,
+            price: mf.fmtNum(y1),
+            title: `Y1 ${mf.fmtNum(Y1)}`,
+        };
+        lines[point].applyOptions(changeOptions);
+        //
+        point = "X2";
+        changeOptions = {
+            price: mf.fmtNum(x2),
+            title: `X2 ${mf.fmtNum(X2)}`,
+        };
+        lines[point].applyOptions(changeOptions);
+        //
+        point = "Y2";
+        changeOptions = {
+            price: mf.fmtNum(y2),
+            title: `Y2 ${mf.fmtNum(Y2)}`,
         };
         lines[point].applyOptions(changeOptions);
     }
