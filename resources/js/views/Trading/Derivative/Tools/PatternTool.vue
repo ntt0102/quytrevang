@@ -692,7 +692,6 @@ function calcExtensionPattern() {
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = phase5.ext.pr;
 
-    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T3 = D.index + (isBreak ? phase3.tr1 : phase3.tr);
@@ -706,7 +705,7 @@ function calcExtensionPattern() {
         [
             //
             BC >= phase1.pr,
-            T >= T1,
+            phase2.R.index >= T1,
         ],
         [
             //
@@ -714,13 +713,13 @@ function calcExtensionPattern() {
             CD >= BC / 2,
             CD >= phase2.pr,
             !!phase3.pick.index || D.index >= T2,
-            T >= T2,
+            D.index >= T2,
         ],
         [
             //
             DE <= BC,
             DE >= phase3.pr,
-            T >= T3,
+            E.index >= T3,
         ],
         [
             //
@@ -729,14 +728,14 @@ function calcExtensionPattern() {
             EF >= phase4.pr,
             phase4.tr <= phase2.tr,
             !!phase5.pick.index || phase5.ext.R.index >= T4,
-            T >= T4,
+            F.index >= T4,
         ],
         [
             //
             ![B.price, D.price].includes(F.price),
             FG <= DE,
             FG >= phase5.pr,
-            T >= T5,
+            phase5.ext.S.iAfter >= T5,
         ],
     ];
     progress.step = 1;
@@ -938,21 +937,25 @@ function scanPhase({ side, start, end, pick = {} }) {
             if (mf.cmp(price, side, box.R.price)) {
                 if (box.pr > 0) {
                     box = mergePreBox(box, preBox);
-                    const tempBox = mf.cloneDeep(maxBox);
-                    if (
-                        (box.tr >= maxBox.tr && box.pr >= maxBox.pr) ||
-                        box.tr >= 2 * maxBox.tr ||
-                        box.pr >= 2 * maxBox.pr
-                    ) {
-                        maxBox.R = mf.cloneDeep(box.R);
-                        maxBox.S = mf.cloneDeep(box.S);
+                    if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) {
+                        pMaxBox = mf.cloneDeep(maxBox);
+                        maxBox = mf.cloneDeep(box);
                     }
-                    if (box.tr > maxBox.tr) maxBox.tr = box.tr;
-                    if (box.pr > maxBox.pr) maxBox.pr = box.pr;
+                    // const tempBox = mf.cloneDeep(maxBox);
+                    // if (
+                    //     (box.tr >= maxBox.tr && box.pr >= maxBox.pr) ||
+                    //     box.tr >= 2 * maxBox.tr ||
+                    //     box.pr >= 2 * maxBox.pr
+                    // ) {
+                    //     maxBox.R = mf.cloneDeep(box.R);
+                    //     maxBox.S = mf.cloneDeep(box.S);
+                    // }
+                    // if (box.tr > maxBox.tr) maxBox.tr = box.tr;
+                    // if (box.pr > maxBox.pr) maxBox.pr = box.pr;
 
-                    if (JSON.stringify(maxBox) !== JSON.stringify(tempBox)) {
-                        pMaxBox = tempBox;
-                    }
+                    // if (JSON.stringify(maxBox) !== JSON.stringify(tempBox)) {
+                    //     pMaxBox = tempBox;
+                    // }
                 }
                 box = {
                     R: { index, time, price },
@@ -961,15 +964,18 @@ function scanPhase({ side, start, end, pick = {} }) {
                     tr: 0,
                 };
             } else {
-                box.tr = index - box.R.index;
                 if (mf.cmp(price, !side, box.S.price)) {
+                    box.S.price = price;
                     box.S.index = index;
                     box.S.time = time;
-                    box.S.price = price;
+                    box.S.iAfter = index;
                     box.S.tAfter = time;
                     box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
+                    box.tr = index - box.R.index;
                 } else if (price === box.S.price) {
+                    box.S.iAfter = index;
                     box.S.tAfter = time;
+                    box.tr = index - box.R.index;
                 }
             }
             if (end.price && price === end.price && price === box.R.price) {
