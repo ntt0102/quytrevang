@@ -104,6 +104,7 @@ const extensionPattern = [
         conds: [
             //
             "TR3 < TR1",
+            "PR3 < PR1",
             "DE < BC",
             "DE > PR3",
             "Td > T2",
@@ -115,6 +116,7 @@ const extensionPattern = [
         conds: [
             //
             "TR4 < TR2",
+            "PR4 < PR2",
             "EF < CD",
             "EF > DE/2",
             "EF > PR4",
@@ -127,6 +129,7 @@ const extensionPattern = [
             //
             "F ≠ D ≠ B",
             "TR5 < TR3",
+            "PR5 < PR3",
             "FG < DE",
             "FG > PR5",
             "Tf > T4",
