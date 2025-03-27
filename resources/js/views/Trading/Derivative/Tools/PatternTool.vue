@@ -645,16 +645,12 @@ function calcExtensionPattern() {
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = phase5.ext.pr;
 
-    const pr1Valid = BC >= phase1.pr;
-    const pr2Valid = CD >= phase2.pr;
-    const pr3Valid = DE >= phase3.pr;
-    const pr4Valid = EF >= phase4.pr;
-    const pr5Valid = FG >= phase5.pr;
+    const TR3 = isBreak ? phase3.tr1 : phase3.tr;
 
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
-    const T3 = D.index + phase3.tr;
+    const T3 = D.index + TR3;
     const T4 = E.index + phase4.tr;
     const T5 = F.index + phase5.tr;
     const timeMark = [T1, T2, T3, T4, T5];
@@ -664,40 +660,40 @@ function calcExtensionPattern() {
     progress.steps = [
         [
             //
-            pr1Valid,
-            T > T1,
+            BC >= phase1.pr,
+            T >= T1,
         ],
         [
             //
             CD <= AB,
             CD >= BC / 2,
-            pr2Valid,
-            T > T2,
+            CD >= phase2.pr,
+            T >= T2,
         ],
         [
             //
-            phase3.tr < phase1.tr,
+            TR3 <= phase1.tr,
             DE <= BC,
-            pr3Valid,
+            DE >= phase3.pr,
             !!phase3.pick.index || D.index >= T2,
-            T > T3,
+            T >= T3,
         ],
         [
             //
-            phase4.tr < phase2.tr,
+            phase4.tr <= phase2.tr,
             EF <= CD,
             EF >= DE / 2,
-            pr4Valid,
-            T > T4,
+            EF >= phase4.pr,
+            T >= T4,
         ],
         [
             //
             ![B.price, D.price].includes(F.price),
-            phase5.tr < phase3.tr,
+            phase5.tr <= TR3,
             FG <= DE,
-            pr5Valid,
+            FG >= phase5.pr,
             !!phase5.pick.index || phase5.ext.R.index >= T4,
-            T > T5,
+            T >= T5,
         ],
     ];
     progress.step = 1;
@@ -869,6 +865,7 @@ function scanPhase({ side, start, end, pick = {} }) {
         box = {},
         preBox = {},
         maxBox = {},
+        pMaxBox = {},
         extBox = {},
         rEp,
         doubleTr = 0;
@@ -898,6 +895,7 @@ function scanPhase({ side, start, end, pick = {} }) {
             if (mf.cmp(price, side, box.R.price)) {
                 if (box.pr > 0) {
                     box = mergePreBox(box, preBox);
+                    const tempBox = mf.cloneDeep(maxBox);
                     if (
                         (box.tr >= maxBox.tr && box.pr >= maxBox.pr) ||
                         box.tr >= 2 * maxBox.tr ||
@@ -908,6 +906,10 @@ function scanPhase({ side, start, end, pick = {} }) {
                     }
                     if (box.tr > maxBox.tr) maxBox.tr = box.tr;
                     if (box.pr > maxBox.pr) maxBox.pr = box.pr;
+
+                    if (JSON.stringify(maxBox) !== JSON.stringify(tempBox)) {
+                        pMaxBox = tempBox;
+                    }
                 }
                 box = {
                     R: { index, time, price },
@@ -965,6 +967,8 @@ function scanPhase({ side, start, end, pick = {} }) {
         pr: maxBox.pr,
         S1: maxBox.S,
         R1: maxBox.R,
+        tr1: pMaxBox.tr,
+        pr1: pMaxBox.pr,
         S,
         R,
         ext: extBox,
