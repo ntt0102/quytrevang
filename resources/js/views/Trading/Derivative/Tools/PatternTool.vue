@@ -980,16 +980,16 @@ function scanPhase({ side, start, end, pick = {} }) {
                     box.tr = index - box.R.index;
                 }
             }
-            if (end.price && price === end.price && price === box.R.price) {
-                if (
-                    box.tr >= maxBox.tr / (maxBox.touch ? 2 : 1) &&
-                    box.pr >= maxBox.pr
-                ) {
-                    maxBox = mf.cloneDeep(box);
-                    maxBox.tr = 2 * maxBox.tr;
-                    maxBox.touch = true;
-                }
-            }
+            // if (end.price && price === end.price && price === box.R.price) {
+            //     if (
+            //         box.tr >= maxBox.tr / (maxBox.touch ? 2 : 1) &&
+            //         box.pr >= maxBox.pr
+            //     ) {
+            //         maxBox = mf.cloneDeep(box);
+            //         maxBox.tr = 2 * maxBox.tr;
+            //         maxBox.touch = true;
+            //     }
+            // }
             if (pick.price && !pick.index && mf.cmp(price, side, pick.price)) {
                 pick.index = index;
                 pick.time = time;

@@ -96,12 +96,12 @@ function scanPattern(data) {
             A = { index, time, price };
             S = mf.cloneDeep(A);
         } else S.index = index;
-        if (mf.cmp(price, side, S.price)) S = { index, time, price };
+        if (mf.cmp(price, side, S.price, true)) S = { index, time, price };
         //
         if (C.index > A.index) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
             if (bc >= bcThreshold) {
-                if (A.index - S.index >= 2 * (C.index - B.index)) break;
+                if (A.index - S.index >= C.index - B.index) break;
                 const as = mf.fmtNum(A.price - S.price, 1, true);
                 if (as > bc) break;
             }
