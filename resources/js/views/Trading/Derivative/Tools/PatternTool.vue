@@ -707,21 +707,21 @@ function calcExtensionPattern() {
         [
             //
             BC >= phase1.pr,
-            phase2.R.index >= T1,
+            phase2.R.index > T1,
         ],
         [
             //
             CD <= AB,
             CD >= BC / 2,
             CD >= phase2.pr,
-            D.index >= T2,
+            D.index > T2,
         ],
         [
             //
             DE <= BC,
             DE >= phase3.pr,
             TR3 <= phase1.tr,
-            E.index >= T3,
+            E.index > T3,
         ],
         [
             //
@@ -729,7 +729,7 @@ function calcExtensionPattern() {
             EF >= DE / 2,
             EF >= phase4.pr,
             phase4.tr <= phase2.tr,
-            F.index >= T4,
+            F.index > T4,
         ],
         [
             //
@@ -737,7 +737,7 @@ function calcExtensionPattern() {
             FG <= DE,
             FG >= phase5.pr,
             phase5.tr <= TR3,
-            phase5.ext.S.index >= T5,
+            phase5.ext.S.index > T5,
         ],
     ];
     progress.step = 1;
@@ -1136,19 +1136,29 @@ function setTimeMark(data) {
         // "#FF9800",
     ];
     let result = [];
-    for (let i = 0; i < data.length; i++) {
-        let time = props.indexToTime(data[i]);
+    const uniqueData = makeUnique(data);
+    uniqueData.forEach((item, i) => {
+        let time = props.indexToTime(item);
         if (time) {
-            if (data.indexOf(data[i]) !== data.lastIndexOf(data[i])) time += i;
             result.push({
                 time,
                 value: 1,
                 color: colors[i],
             });
         }
-    }
+    });
     if (result.length) result.sort((a, b) => a.time - b.time);
     props.timeMarkSeries.setData(result);
+}
+function makeUnique(arr) {
+    const uniqueSet = new Set();
+    return arr.map((item) => {
+        while (uniqueSet.has(item)) {
+            item++;
+        }
+        uniqueSet.add(item);
+        return item;
+    });
 }
 function drag({ lineOptions }) {
     if (mf.isSet(lines.C)) {
