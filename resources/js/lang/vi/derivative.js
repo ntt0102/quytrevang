@@ -105,6 +105,7 @@ const extensionPattern = [
             //
             "DE < BC",
             "DE > PR3",
+            "TR3 < TR1",
             "Te > T3",
         ],
     },
@@ -126,6 +127,7 @@ const extensionPattern = [
             "F ≠ D ≠ B",
             "FG < DE",
             "FG > PR5",
+            "TR5 < TR3",
             "Tg > T5",
         ],
     },

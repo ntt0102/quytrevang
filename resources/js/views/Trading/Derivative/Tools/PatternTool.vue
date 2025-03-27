@@ -692,9 +692,11 @@ function calcExtensionPattern() {
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = phase5.ext.pr;
 
+    const TR3 = isBreak ? phase3.tr1 : phase3.tr;
+
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
-    const T3 = D.index + (isBreak ? phase3.tr1 : phase3.tr);
+    const T3 = D.index + TR3;
     const T4 = E.index + phase4.tr;
     const T5 = F.index + phase5.tr;
     const timeMark = [T1, T2, T3, T4, T5];
@@ -712,13 +714,13 @@ function calcExtensionPattern() {
             CD <= AB,
             CD >= BC / 2,
             CD >= phase2.pr,
-            !!phase3.pick.index || D.index >= T2,
             D.index >= T2,
         ],
         [
             //
             DE <= BC,
             DE >= phase3.pr,
+            TR3 <= phase1.tr,
             E.index >= T3,
         ],
         [
@@ -727,7 +729,6 @@ function calcExtensionPattern() {
             EF >= DE / 2,
             EF >= phase4.pr,
             phase4.tr <= phase2.tr,
-            !!phase5.pick.index || phase5.ext.R.index >= T4,
             F.index >= T4,
         ],
         [
@@ -735,6 +736,7 @@ function calcExtensionPattern() {
             ![B.price, D.price].includes(F.price),
             FG <= DE,
             FG >= phase5.pr,
+            phase5.tr <= TR3,
             phase5.ext.S.iAfter >= T5,
         ],
     ];
@@ -936,11 +938,11 @@ function scanPhase({ side, start, end, pick = {} }) {
             }
             if (mf.cmp(price, side, box.R.price)) {
                 if (box.pr > 0) {
-                    box = mergePreBox(box, preBox);
                     if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) {
                         pMaxBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
                     }
+                    // box = mergePreBox(box, preBox);
                     // const tempBox = mf.cloneDeep(maxBox);
                     // if (
                     //     (box.tr >= maxBox.tr && box.pr >= maxBox.pr) ||
