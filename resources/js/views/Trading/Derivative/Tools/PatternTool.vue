@@ -737,7 +737,7 @@ function calcExtensionPattern() {
             FG <= DE,
             FG >= phase5.pr,
             phase5.tr <= TR3,
-            phase5.ext.S.iAfter >= T5,
+            phase5.ext.S.index >= T5,
         ],
     ];
     progress.step = 1;
@@ -968,14 +968,14 @@ function scanPhase({ side, start, end, pick = {} }) {
             } else {
                 if (mf.cmp(price, !side, box.S.price)) {
                     box.S = { index, time, price };
-                    box.S.iAfter = index;
+                    // box.S.iAfter = index;
                     box.S.tAfter = time;
                     box.pr = mf.fmtNum(price - box.R.price, 1, true);
                     box.tr = index - box.R.index;
                 } else if (price === box.S.price) {
-                    box.S.iAfter = index;
+                    // box.S.iAfter = index;
                     box.S.tAfter = time;
-                    box.tr = index - box.R.index;
+                    // box.tr = index - box.R.index;
                 }
             }
             // if (end.price && price === end.price && price === box.R.price) {
