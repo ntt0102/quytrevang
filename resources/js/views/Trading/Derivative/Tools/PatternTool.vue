@@ -645,13 +645,10 @@ function calcExtensionPattern() {
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = phase5.ext.pr;
 
-    const TR3 = isBreak ? phase3.tr1 : phase3.tr;
-    const PR3 = isBreak ? phase3.pr1 : phase3.pr;
-
     const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
-    const T3 = D.index + TR3;
+    const T3 = D.index + (isBreak ? phase3.tr1 : phase3.tr);
     const T4 = E.index + phase4.tr;
     const T5 = F.index + phase5.tr;
     const timeMark = [T1, T2, T3, T4, T5];
@@ -673,8 +670,6 @@ function calcExtensionPattern() {
         ],
         [
             //
-            TR3 <= phase1.tr,
-            PR3 <= phase1.pr,
             DE <= BC,
             DE >= phase3.pr,
             !!phase3.pick.index || D.index >= T2,
@@ -682,18 +677,15 @@ function calcExtensionPattern() {
         ],
         [
             //
-            phase4.tr <= phase2.tr,
-            phase4.pr <= phase2.pr,
             EF <= CD,
             EF >= DE / 2,
             EF >= phase4.pr,
+            phase4.tr <= phase2.tr,
             T >= T4,
         ],
         [
             //
             ![B.price, D.price].includes(F.price),
-            phase5.tr <= TR3,
-            phase5.pr <= PR3,
             FG <= DE,
             FG >= phase5.pr,
             !!phase5.pick.index || phase5.ext.R.index >= T4,
