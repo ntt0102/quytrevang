@@ -713,13 +713,13 @@ function calcExtensionPattern() {
             CD <= AB,
             CD >= BC / 2,
             CD >= phase2.pr,
+            !!phase3.pick.index || D.index >= T2,
             T >= T2,
         ],
         [
             //
             DE <= BC,
             DE >= phase3.pr,
-            !!phase3.pick.index || D.index >= T2,
             T >= T3,
         ],
         [
@@ -728,6 +728,7 @@ function calcExtensionPattern() {
             EF >= DE / 2,
             EF >= phase4.pr,
             phase4.tr <= phase2.tr,
+            !!phase5.pick.index || phase5.ext.R.index >= T4,
             T >= T4,
         ],
         [
@@ -735,7 +736,6 @@ function calcExtensionPattern() {
             ![B.price, D.price].includes(F.price),
             FG <= DE,
             FG >= phase5.pr,
-            !!phase5.pick.index || phase5.ext.R.index >= T4,
             T >= T5,
         ],
     ];
