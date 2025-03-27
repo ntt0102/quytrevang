@@ -88,7 +88,7 @@ function refreshPattern() {
         color: white;
         text-align: left;
         margin-top: 10px;
-        line-height: 21px;
+        line-height: 20px;
         font-size: 15px;
         min-height: 50px;
 
@@ -98,7 +98,7 @@ function refreshPattern() {
 
         .step {
             border-radius: 5px;
-            padding: 5px;
+            padding: 3px 5px;
             width: 170px;
 
             &.success {
@@ -112,7 +112,7 @@ function refreshPattern() {
             .name {
                 padding-left: 5px;
                 font-weight: bold;
-                font-size: larger;
+                font-size: 17px;
             }
 
             .condition {
