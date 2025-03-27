@@ -688,7 +688,6 @@ function calcExtensionPattern() {
             EF <= CD,
             EF >= DE / 2,
             pr4Valid,
-
             T > T4,
         ],
         [
