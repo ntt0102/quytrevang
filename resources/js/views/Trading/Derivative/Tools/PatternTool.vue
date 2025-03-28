@@ -182,41 +182,41 @@ function draw({ time, price }) {
                 //
                 option.point = "C";
                 option.title = `C ${rEpr3}`;
-                option.color = "#FFEB3B";
+                option.color = "#8000FF";
                 lines[option.point] = props.priceSeries.createPriceLine(option);
                 //
                 option.point = "D";
                 option.price = entry;
                 option.title = "E " + pStatus;
-                option.color = "#9C27B0";
+                option.color = "#00FFFF";
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
                 //
                 option.point = "Y1";
                 option.price = mf.fmtNum(y1);
                 option.title = `Y1 ${mf.fmtNum(Y1)}`;
-                option.color = "#E91E63";
+                option.color = "#FF7F00";
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
                 //
                 option.point = "X1";
                 option.price = mf.fmtNum(x1);
                 option.title = `X1 ${mf.fmtNum(X1)}`;
-                option.color = "#2196F3";
+                option.color = "#FF1493";
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
                 //
                 option.point = "Y2";
                 option.price = mf.fmtNum(y2);
                 option.title = `Y2 ${mf.fmtNum(Y2)}`;
-                option.color = "#E91E63";
+                option.color = "#FF7F00";
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
                 //
                 option.point = "X2";
                 option.price = mf.fmtNum(x2);
                 option.title = `X2 ${mf.fmtNum(X2)}`;
-                option.color = "#2196F3";
+                option.color = "#FF1493";
                 option.draggable = false;
                 lines[option.point] = props.priceSeries.createPriceLine(option);
             }
@@ -227,14 +227,14 @@ function draw({ time, price }) {
         } else {
             option.point = "B";
             option.title = "B 0";
-            option.color = "#4CAF50";
+            option.color = "#FF0000";
             lines[option.point] = props.priceSeries.createPriceLine(option);
             points.B = { price };
         }
     } else {
         option.point = "A";
         option.title = "A 0";
-        option.color = "#F44336";
+        option.color = "#FFFF00";
         lines[option.point] = props.priceSeries.createPriceLine(option);
         points = { A: { time, price } };
     }
@@ -277,54 +277,54 @@ function loadPatternTool() {
     //
     option.point = "A";
     option.title = `A ${rEpr1}`;
-    option.color = "#F44336";
+    option.color = "#FFFF00";
     option.price = A.price;
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
     option.point = "B";
     option.title = `B ${rEpr2}`;
-    option.color = "#4CAF50";
+    option.color = "#FF0000";
     option.price = B.price;
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
     option.point = "C";
     option.price = C.price;
     option.title = `C ${rEpr3}`;
-    option.color = "#FFEB3B";
+    option.color = "#8000FF";
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
     option.point = "D";
     option.price = entry;
-    option.title = "E " + pStatus;
-    option.color = "#9C27B0";
+    option.title = "D " + pStatus;
+    option.color = "#00FFFF";
     option.draggable = false;
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
     option.point = "Y1";
     option.price = mf.fmtNum(y1);
     option.title = `Y1 ${mf.fmtNum(Y1)}`;
-    option.color = "#E91E63";
+    option.color = "#FF7F00";
     option.draggable = false;
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
     option.point = "X1";
     option.price = mf.fmtNum(x1);
     option.title = `X1 ${mf.fmtNum(X1)}`;
-    option.color = "#2196F3";
+    option.color = "#FF1493";
     option.draggable = false;
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
     option.point = "Y2";
     option.price = mf.fmtNum(y2);
     option.title = `Y2 ${mf.fmtNum(Y2)}`;
-    option.color = "#E91E63";
+    option.color = "#FF7F00";
     option.draggable = false;
     lines[option.point] = props.priceSeries.createPriceLine(option);
     //
     option.point = "X2";
     option.price = mf.fmtNum(x2);
     option.title = `X2 ${mf.fmtNum(X2)}`;
-    option.color = "#2196F3";
+    option.color = "#FF1493";
     option.draggable = false;
     lines[option.point] = props.priceSeries.createPriceLine(option);
 }
@@ -1125,15 +1125,12 @@ function removePatternTool() {
 function setTimeMark(data) {
     console.log("setTimeMark", data);
     const colors = [
-        "#F44336",
-        "#4CAF50",
-        "#FFEB3B",
-        "#00BCD4",
-        "#673AB7",
-        "#E91E63",
-        // "#F44336",
-        // "#009688",
-        // "#FF9800",
+        "#FFFF00",
+        "#FF0000",
+        "#8000FF",
+        "#00FFFF",
+        "#00FF00",
+        "#FF7F00",
     ];
     let result = [];
     const uniqueData = makeUnique(data);
