@@ -118,15 +118,16 @@ function scanPattern(data) {
         if (mf.cmp(price, !side, A.price)) {
             A = { index, time, price };
             S = mf.cloneDeep(A);
-        } else S.index = index;
+        }
         if (mf.cmp(price, side, S.price, true)) S = { index, time, price };
         //
         if (C.index > A.index) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
             if (bc >= bcThreshold) {
-                if (A.index - S.index >= C.index - B.index) break;
-                const as = mf.fmtNum(A.price - S.price, 1, true);
-                if (as > bc) break;
+                if (A.index - S.index >= C.index - B.index) {
+                    const as = mf.fmtNum(A.price - S.price, 1, true);
+                    if (as > bc) break;
+                }
             }
         }
     }
@@ -387,7 +388,7 @@ function calcExtensionPattern() {
     return {
         progress,
         timeMark,
-        points: ps,
+        points: makeUnique(ps),
         target: {
             x: [x1, x2],
             X: [X1, X2],
@@ -581,8 +582,7 @@ function setTimeMark(data) {
         "#FF7F00",
     ];
     let result = [];
-    const uniqueData = makeUnique(data);
-    uniqueData.forEach((item, i) => {
+    data.forEach((item, i) => {
         let time = props.indexToTime(item);
         if (time) {
             result.push({
@@ -592,17 +592,21 @@ function setTimeMark(data) {
             });
         }
     });
-    if (result.length) result.sort((a, b) => a.time - b.time);
+    if (result.length) {
+        result = makeUnique(result);
+        result.sort((a, b) => a.time - b.time);
+    }
     series.timeMark.setData(result);
 }
 function makeUnique(arr) {
     const uniqueSet = new Set();
     return arr.map((item) => {
-        while (uniqueSet.has(item)) {
-            item++;
+        let newItem = { ...item };
+        while (uniqueSet.has(newItem.time)) {
+            newItem.time++;
         }
-        uniqueSet.add(item);
-        return item;
+        uniqueSet.add(newItem.time);
+        return newItem;
     });
 }
 </script>
