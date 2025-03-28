@@ -237,7 +237,7 @@ function calcExtensionPattern() {
     });
 
     const isBreak =
-        (phase3.R1.price - C.price) / bc >= 0.5 && phase3.ext.tr < phase3.tr;
+        (phase3.R1.price - C.price) / bc >= 0.5 && phase3.ext.tr < phase3.tr && phase3.ext.pr < phase3.pr;
     const D = {
         price: isBreak ? phase3.R1.price : phase3.ext.R.price,
         index: isBreak ? phase3.R1.index : phase3.ext.R.index,
