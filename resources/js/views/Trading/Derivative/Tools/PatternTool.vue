@@ -31,7 +31,7 @@ const patternType = computed(
 );
 const symbol = "VN30F1M";
 const bcThreshold = 1;
-let points = {};
+let scanPoints = {};
 let lines = {};
 let series = {};
 
@@ -79,17 +79,17 @@ function patternToolContextmenu(e) {
     remove();
 }
 function draw({ time, price }) {
-    let ps = {};
+    let points = {};
     if (mf.isSet(lines.X1)) {
-        ps = mf.cloneDeep(points);
-        ps.A = { time, price };
+        points = mf.cloneDeep(scanPoints);
+        points.A = { time, price };
     } else {
         const data = time
             ? props.prices.filter((item) => !mf.cmp(item.time, true, time))
             : props.prices;
-        ps = removeIndex(scanPattern(data));
+        points = removeIndex(scanPattern(data));
     }
-    load(ps, { isSave: true });
+    load(points, { isSave: true });
     patternToolRef.value.classList.remove("selected");
 }
 function scanPattern(data) {
@@ -145,9 +145,9 @@ function removeIndex(obj) {
     return result;
 }
 function load(data, { isSave = false, isCheck = false } = {}) {
-    points = mf.cloneDeep(data);
+    scanPoints = mf.cloneDeep(data);
     if (isSave) savePattern();
-    const isLoad = isCheck ? checkPointsValid(points) : true;
+    const isLoad = isCheck ? checkPointsValid(scanPoints) : true;
     if (isLoad) {
         removePatternTool();
         loadPatternTool();
@@ -163,8 +163,8 @@ function loadPatternTool() {
     };
     const {
         target: {
-            x: [x1, x2],
-            X: [X1, X2],
+            x: [x1],
+            X: [X1],
             y: [y1, y2],
             Y: [Y1, Y2],
         },
@@ -188,13 +188,6 @@ function loadPatternTool() {
     option.price = mf.fmtNum(y2);
     option.title = `Y2 ${mf.fmtNum(Y2)}`;
     option.color = "#FF1493";
-    option.draggable = false;
-    lines[option.point] = series.pattern.createPriceLine(option);
-    //
-    option.point = "X2";
-    option.price = mf.fmtNum(x2);
-    option.title = `X2 ${mf.fmtNum(X2)}`;
-    option.color = "#FF7F00";
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
 }
@@ -226,7 +219,7 @@ function calculatePattern() {
     return result;
 }
 function calcExtensionPattern() {
-    const { A, B, C } = points;
+    const { A, B, C } = scanPoints;
     const bc = B.price - C.price;
     let side = bc > 0;
     const pickTime = props.pickTimeToolRef.get();
@@ -245,7 +238,6 @@ function calcExtensionPattern() {
         side,
         start: phase2.R,
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
-        pick: { price: B.price },
     });
 
     const isBreak =
@@ -272,7 +264,6 @@ function calcExtensionPattern() {
         side,
         start: E,
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
-        pick: { price: D.price },
     });
 
     const F = {
@@ -363,18 +354,14 @@ function calcExtensionPattern() {
         }
     }
     //
-    const pStatus = mf.fmtNum(100 * (CD / BC), 1);
-    //
     const [x1] = adjustTargetPrice(D.price, CD, side);
     const [y1] = adjustTargetPrice(D.price, 2 * CD, side);
     const X1 = mf.fmtNum(x1 - entry, 1, true);
     const Y1 = mf.fmtNum(y1 - entry, 1, true);
-    const [x2] = adjustTargetPrice(F.price, EF, side);
     const [y2] = adjustTargetPrice(F.price, 2 * EF, side);
-    const X2 = mf.fmtNum(x2 - entry, 1, true);
     const Y2 = mf.fmtNum(y2 - entry, 1, true);
 
-    const ps = [
+    const points = [
         { time: A.time, value: A.price, color: "#FF7F00" },
         { time: phase1.R.time, value: phase1.R.price, color: "#FF0000" },
         { time: phase2.R.time, value: phase2.R.price, color: "#FF1493" },
@@ -391,25 +378,22 @@ function calcExtensionPattern() {
     return {
         progress,
         timeMark,
-        points: makeUnique(ps),
+        points: makeUnique(points),
         target: {
-            x: [x1, x2],
-            X: [X1, X2],
+            x: [x1],
+            X: [X1],
             y: [y1, y2],
             Y: [Y1, Y2],
         },
     };
 }
-function scanPhase({ side, start, end, pick = {} }) {
+function scanPhase({ side, start, end }) {
     let S = { ...mf.cloneDeep(start), index: props.timeToIndex(start.time) },
         R = {},
         box = {},
-        preBox = {},
         maxBox = {},
         pMaxBox = {},
-        extBox = {},
-        rEp,
-        doubleTr = 0;
+        extBox = {};
     const _prices = props.prices.filter((item) => {
         let cond = item.time >= start.time;
         if (end.time) cond = cond && item.time <= end.time;
@@ -430,7 +414,6 @@ function scanPhase({ side, start, end, pick = {} }) {
                     pr: 0,
                     tr: 0,
                 };
-                preBox = mf.cloneDeep(box);
                 maxBox = mf.cloneDeep(box);
             }
             if (mf.cmp(price, side, box.R.price)) {
@@ -455,13 +438,6 @@ function scanPhase({ side, start, end, pick = {} }) {
                 } else if (price === box.S.price) {
                     box.S.tAfter = time;
                 }
-            }
-            if (pick.price && !pick.index && mf.cmp(price, side, pick.price)) {
-                pick.index = index;
-                pick.time = time;
-            }
-            if (price === start.price) {
-                doubleTr = mf.fmtNum(index - S.index, 1);
             }
             return true;
         });
@@ -489,10 +465,6 @@ function scanPhase({ side, start, end, pick = {} }) {
         S,
         R,
         ext: extBox,
-        rEp,
-        rEpr: maxBox.pr ? mf.fmtNum(rEp / maxBox.pr, 1) : 0,
-        pick,
-        hasDouble: doubleTr > maxBox.tr / 2,
     };
 }
 function checkPointsValid({ A: { time } }) {
@@ -522,23 +494,23 @@ function adjustPatternPoints() {
     const pickTime = props.pickTimeToolRef.get();
     if (pickTime) return false;
     //
-    const side = points.B.price - points.A.price > 0;
+    const side = scanPoints.B.price - scanPoints.A.price > 0;
     const lastBar = props.prices.at(-1);
 
-    if (mf.cmp(lastBar.value, !side, points.C.price)) {
+    if (mf.cmp(lastBar.value, !side, scanPoints.C.price)) {
         let cTimeNew = lastBar.time;
         let cPriceNew = lastBar.value;
         for (let i = props.prices.length - 1; i >= 0; i--) {
             const time = props.prices[i].time;
             const price = props.prices[i].value;
-            if (price === points.B.price) break;
+            if (price === scanPoints.B.price) break;
             cTimeNew = time;
             cPriceNew = side
                 ? Math.min(cPriceNew, price)
                 : Math.max(cPriceNew, price);
         }
-        points.C.time = cTimeNew;
-        points.C.price = cPriceNew;
+        scanPoints.C.time = cTimeNew;
+        scanPoints.C.price = cPriceNew;
         savePattern();
     }
 }
@@ -551,11 +523,11 @@ function savePattern(isRemove = false) {
         data: [],
     };
     if (!isRemove) {
-        Object.entries(points).forEach(([key, value]) => {
+        Object.entries(scanPoints).forEach(([key, value]) => {
             param.points.push(key);
             param.data.push(value);
         });
-    } else points = {};
+    } else scanPoints = {};
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function remove() {
