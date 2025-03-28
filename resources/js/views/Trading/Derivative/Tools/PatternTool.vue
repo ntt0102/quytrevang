@@ -71,7 +71,6 @@ function patternToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        remove();
     }
 }
 function patternToolContextmenu(e) {
@@ -79,14 +78,18 @@ function patternToolContextmenu(e) {
     emit("hideContext");
     remove();
 }
-function draw({ time }) {
-    const data = time
-        ? props.prices.filter((item) => !mf.cmp(item.time, true, time))
-        : props.prices;
-    const points = scanPattern(data);
-    if (mf.isSet(points)) {
-        load(removeIndex(points), { isSave: true });
+function draw({ time, price }) {
+    let ps = {};
+    if (mf.isSet(lines.X1)) {
+        ps = mf.cloneDeep(points);
+        ps.A = { time, price };
+    } else {
+        const data = time
+            ? props.prices.filter((item) => !mf.cmp(item.time, true, time))
+            : props.prices;
+        ps = removeIndex(scanPattern(data));
     }
+    load(ps, { isSave: true });
     patternToolRef.value.classList.remove("selected");
 }
 function scanPattern(data) {

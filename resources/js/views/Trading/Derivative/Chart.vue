@@ -380,7 +380,10 @@ function chartClick(e) {
     //     scanToolRef.value.draw({ time: params.crosshair.time });
     // } else
     if (patternToolRef.value.isSelected()) {
-        patternToolRef.value.draw({ time: params.crosshair.time });
+        patternToolRef.value.draw({
+            time: params.crosshair.time,
+            price: coordinateToPrice(params.crosshair.y),
+        });
     } else if (pickTimeToolRef.value.isSelected()) {
         pickTimeToolRef.value.draw({ time: params.crosshair.time });
     } else if (lineToolRef.value.isSelected()) {
