@@ -86,7 +86,7 @@
                 @refreshPattern="() => refreshPattern(true)"
                 @hideContext="hideContext"
             />
-            <ScanTool
+            <!-- <ScanTool
                 ref="scanToolRef"
                 :prices="state.prices"
                 :timeToIndex="timeToIndex"
@@ -94,12 +94,10 @@
                 @patternTypeChanged="() => refreshPattern()"
                 @removePattern="() => patternToolRef.remove()"
                 @hideContext="hideContext"
-            />
+            /> -->
             <PatternTool
                 ref="patternToolRef"
                 :prices="state.prices"
-                :priceSeries="state.series.price"
-                :timeMarkSeries="state.series.timeMark"
                 :pickTimeToolRef="pickTimeToolRef"
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
@@ -176,7 +174,7 @@
 import FullscreenTool from "./Tools/FullscreenTool.vue";
 import TradingviewTool from "./Tools/TradingviewTool.vue";
 import ProgressTool from "./Tools/ProgressTool.vue";
-import ScanTool from "./Tools/ScanTool.vue";
+// import ScanTool from "./Tools/PatternTool.vue";
 import PatternTool from "./Tools/PatternTool.vue";
 import PickTimeTool from "./Tools/PickTimeTool.vue";
 import LineTool from "./Tools/LineTool.vue";
@@ -221,7 +219,7 @@ const reloadToolRef = ref(null);
 const fullscreenToolRef = ref(null);
 const tradingviewToolRef = ref(null);
 const progressToolRef = ref(null);
-const scanToolRef = ref(null);
+// const scanToolRef = ref(null);
 const patternToolRef = ref(null);
 const pickTimeToolRef = ref(null);
 const lineToolRef = ref(null);
@@ -293,6 +291,7 @@ initChart();
 onMounted(() => {
     checkChartSize();
     drawChart();
+    patternToolRef.value.createSeries(params.chart);
     new ResizeObserver(chartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", chartShortcut);
 });
@@ -362,12 +361,6 @@ function drawChart() {
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    state.series.timeMark = params.chart.addHistogramSeries({
-        priceScaleId: "timeMark",
-        scaleMargins: { top: 0, bottom: 0 },
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
     state.series.price = params.chart.addLineSeries({
         color: "#F5F5F5",
         priceFormat: { minMove: 0.1 },
@@ -383,13 +376,11 @@ function chartClick(e) {
     hideContext(params.hasProgress);
     toggleOrderButton(false);
 
-    if (scanToolRef.value.isSelected()) {
-        scanToolRef.value.draw({ time: params.crosshair.time });
-    } else if (patternToolRef.value.isSelected()) {
-        patternToolRef.value.draw({
-            time: params.crosshair.time,
-            price: coordinateToPrice(params.crosshair.y),
-        });
+    // if (scanToolRef.value.isSelected()) {
+    //     scanToolRef.value.draw({ time: params.crosshair.time });
+    // } else
+    if (patternToolRef.value.isSelected()) {
+        patternToolRef.value.draw({ time: params.crosshair.time });
     } else if (pickTimeToolRef.value.isSelected()) {
         pickTimeToolRef.value.draw({ time: params.crosshair.time });
     } else if (lineToolRef.value.isSelected()) {
@@ -755,9 +746,9 @@ function getDnseData() {
         params.socketUpdatedAt = new Date();
     }
 }
-function patternScaned(points) {
-    patternToolRef.value.load(points, { isSave: true });
-}
+// function patternScaned(points) {
+//     patternToolRef.value.load(points, { isSave: true });
+// }
 function refreshPattern(autoAdjust = false) {
     patternToolRef.value.refresh(autoAdjust);
 }

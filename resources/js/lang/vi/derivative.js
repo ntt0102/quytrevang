@@ -86,7 +86,7 @@ const extensionPattern = [
         conds: [
             //
             "BC > PR1",
-            "Tc > Tvàng",
+            "Tc > Tđỏ",
         ],
     },
     {
@@ -96,7 +96,7 @@ const extensionPattern = [
             "CD < AB",
             "CD > BC/2",
             "CD > PR2",
-            "Td > Tđỏ",
+            "Td > Thồng",
         ],
     },
     {

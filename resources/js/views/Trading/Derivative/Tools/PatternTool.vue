@@ -1,7 +1,7 @@
 <template>
     <div
         ref="patternToolRef"
-        class="command"
+        class="context command"
         :title="$t('trading.derivative.patternTool')"
         @click="patternToolClick"
         @contextmenu="patternToolContextmenu"
@@ -17,8 +17,6 @@ const store = useStore();
 const mf = inject("mf");
 const props = defineProps([
     "prices",
-    "priceSeries",
-    "timeMarkSeries",
     "pickTimeToolRef",
     "timeToIndex",
     "indexToTime",
@@ -31,26 +29,39 @@ const patternStore = computed(
 const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
+const symbol = "VN30F1M";
+const bcThreshold = 1;
 let points = {};
 let lines = {};
-
-const symbol = "VN30F1M";
+let series = {};
 
 defineExpose({
     isSelected,
+    createSeries,
     draw,
     load,
     refresh,
     remove,
-    drag,
 });
-
 watch(patternStore, (data) => {
     if (data) setTimeout(() => load(data, { isCheck: true }), 0);
 });
 
 function isSelected() {
     return patternToolRef.value.classList.contains("selected");
+}
+function createSeries(chart) {
+    if (!chart) return false;
+    series.pattern = chart.addLineSeries({
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
+    series.timeMark = chart.addHistogramSeries({
+        priceScaleId: "timeMark",
+        scaleMargins: { top: 0, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
 }
 function patternToolClick(e) {
     emit("hideContext");
@@ -60,7 +71,7 @@ function patternToolClick(e) {
         .forEach((el) => el.classList.remove("selected"));
     if (!selected) {
         e.target.classList.add("selected");
-        props.pickTimeToolRef.remove();
+        remove();
     }
 }
 function patternToolContextmenu(e) {
@@ -68,176 +79,66 @@ function patternToolContextmenu(e) {
     emit("hideContext");
     remove();
 }
-function draw({ time, price }) {
-    const TYPE = "pattern";
-    let option = {
-        lineType: TYPE,
-        price,
-        lineWidth: 1,
-        lineStyle: 1,
-        draggable: true,
-    };
-    if (mf.isSet(lines.A)) {
-        if (mf.isSet(lines.B)) {
-            let _timeMark, _progress;
-
-            if (mf.isSet(lines.C)) {
-                let point, changeOptions;
-
-                points.A = { time, price };
-                const {
-                    progress,
-                    timeMark,
-                    info: {
-                        rEpr1,
-                        rEpr2,
-                        rEpr3,
-                        entry,
-                        pStatus,
-                        x: [x1, x2],
-                        X: [X1, X2],
-                        y: [y1, y2],
-                        Y: [Y1, Y2],
-                    },
-                } = calculatePattern();
-                _progress = progress;
-                _timeMark = timeMark;
-                //
-                point = "A";
-                changeOptions = {
-                    price,
-                    title: `A ${rEpr1}`,
-                };
-                lines[point].applyOptions(changeOptions);
-                //
-                point = "B";
-                changeOptions = {
-                    title: `B ${rEpr2}`,
-                };
-                lines[point].applyOptions(changeOptions);
-                //
-                point = "C";
-                changeOptions = { title: `C ${rEpr3}` };
-                lines[point].applyOptions(changeOptions);
-                //
-                point = "D";
-                changeOptions = { price: entry, title: "E " + pStatus };
-                lines[point].applyOptions(changeOptions);
-                //
-                point = "X1";
-                changeOptions = {
-                    price: mf.fmtNum(x1),
-                    title: `X1 ${mf.fmtNum(X1)}`,
-                };
-                lines[point].applyOptions(changeOptions);
-                //
-                point = "Y1";
-                changeOptions = {
-                    price: mf.fmtNum(y1),
-                    title: `Y1 ${mf.fmtNum(Y1)}`,
-                };
-                //
-                point = "X2";
-                changeOptions = {
-                    price: mf.fmtNum(x2),
-                    title: `X2 ${mf.fmtNum(X2)}`,
-                };
-                lines[point].applyOptions(changeOptions);
-                //
-                point = "Y2";
-                changeOptions = {
-                    price: mf.fmtNum(y2),
-                    title: `Y2 ${mf.fmtNum(Y2)}`,
-                };
-                lines[point].applyOptions(changeOptions);
-            } else {
-                points.C = { price };
-                const {
-                    progress,
-                    timeMark,
-                    info: {
-                        rEpr1,
-                        rEpr2,
-                        rEpr3,
-                        entry,
-                        pStatus,
-                        x: [x1, x2],
-                        X: [X1, X2],
-                        y: [y1, y2],
-                        Y: [Y1, Y2],
-                    },
-                } = calculatePattern();
-                _progress = progress;
-                _timeMark = timeMark;
-                //
-                let point = "A";
-                lines[point].applyOptions({
-                    title: `A ${rEpr1}`,
-                });
-                //
-                point = "B";
-                lines[point].applyOptions({
-                    title: `B ${rEpr2}`,
-                });
-                //
-                option.point = "C";
-                option.title = `C ${rEpr3}`;
-                option.color = "#8000FF";
-                lines[option.point] = props.priceSeries.createPriceLine(option);
-                //
-                option.point = "D";
-                option.price = entry;
-                option.title = "E " + pStatus;
-                option.color = "#00FFFF";
-                option.draggable = false;
-                lines[option.point] = props.priceSeries.createPriceLine(option);
-                //
-                option.point = "Y1";
-                option.price = mf.fmtNum(y1);
-                option.title = `Y1 ${mf.fmtNum(Y1)}`;
-                option.color = "#FF7F00";
-                option.draggable = false;
-                lines[option.point] = props.priceSeries.createPriceLine(option);
-                //
-                option.point = "X1";
-                option.price = mf.fmtNum(x1);
-                option.title = `X1 ${mf.fmtNum(X1)}`;
-                option.color = "#FF1493";
-                option.draggable = false;
-                lines[option.point] = props.priceSeries.createPriceLine(option);
-                //
-                option.point = "Y2";
-                option.price = mf.fmtNum(y2);
-                option.title = `Y2 ${mf.fmtNum(Y2)}`;
-                option.color = "#FF7F00";
-                option.draggable = false;
-                lines[option.point] = props.priceSeries.createPriceLine(option);
-                //
-                option.point = "X2";
-                option.price = mf.fmtNum(x2);
-                option.title = `X2 ${mf.fmtNum(X2)}`;
-                option.color = "#FF1493";
-                option.draggable = false;
-                lines[option.point] = props.priceSeries.createPriceLine(option);
-            }
-            savePattern();
-            emit("setProgress", _progress);
-            setTimeMark(_timeMark);
-            patternToolRef.value.classList.remove("selected");
-        } else {
-            option.point = "B";
-            option.title = "B 0";
-            option.color = "#FF0000";
-            lines[option.point] = props.priceSeries.createPriceLine(option);
-            points.B = { price };
-        }
-    } else {
-        option.point = "A";
-        option.title = "A 0";
-        option.color = "#FFFF00";
-        lines[option.point] = props.priceSeries.createPriceLine(option);
-        points = { A: { time, price } };
+function draw({ time }) {
+    const data = time
+        ? props.prices.filter((item) => !mf.cmp(item.time, true, time))
+        : props.prices;
+    const points = scanPattern(data);
+    if (mf.isSet(points)) {
+        load(removeIndex(points), { isSave: true });
     }
+    patternToolRef.value.classList.remove("selected");
+}
+function scanPattern(data) {
+    let side;
+    let [A, B, C, S] = Array(4).fill({});
+    for (let i = data.length - 1; i >= 0; i--) {
+        const price = data[i].value;
+        const time = data[i].time;
+        const index = props.timeToIndex(time);
+        if (index === -1) break;
+        if (i === data.length - 1) {
+            C = { index, time, price };
+            [B, A, S] = Array(3)
+                .fill(null)
+                .map(() => mf.cloneDeep(C));
+        }
+        if (side === undefined) {
+            if (price === C.price) continue;
+            side = price > C.price;
+        }
+        if (mf.cmp(price, side, B.price)) {
+            if (mf.cmp(A.price, !side, C.price)) {
+                [C, B] = [B, A].map((item) => mf.cloneDeep(item));
+                A = { index, time, price };
+                S = mf.cloneDeep(A);
+                side = !side;
+            } else B = { index, time, price };
+        }
+        if (mf.cmp(price, !side, A.price)) {
+            A = { index, time, price };
+            S = mf.cloneDeep(A);
+        } else S.index = index;
+        if (mf.cmp(price, side, S.price, true)) S = { index, time, price };
+        //
+        if (C.index > A.index) {
+            const bc = mf.fmtNum(B.price - C.price, 1, true);
+            if (bc >= bcThreshold) {
+                if (A.index - S.index >= C.index - B.index) break;
+                const as = mf.fmtNum(A.price - S.price, 1, true);
+                if (as > bc) break;
+            }
+        }
+    }
+    return { A, B, C };
+}
+function removeIndex(obj) {
+    const result = {};
+    Object.entries(obj).forEach(([key, value]) => {
+        const { index, ...rest } = value;
+        result[key] = rest;
+    });
+    return result;
 }
 function load(data, { isSave = false, isCheck = false } = {}) {
     points = mf.cloneDeep(data);
@@ -254,82 +155,47 @@ function loadPatternTool() {
         lineType: TYPE,
         lineWidth: 1,
         lineStyle: 1,
-        draggable: true,
+        draggable: false,
     };
-    const { A, B, C } = points;
     const {
-        progress,
-        timeMark,
-        info: {
-            rEpr1,
-            rEpr2,
-            rEpr3,
-            entry,
-            pStatus,
+        target: {
             x: [x1, x2],
             X: [X1, X2],
             y: [y1, y2],
             Y: [Y1, Y2],
         },
     } = calculatePattern();
-    emit("setProgress", progress);
-    setTimeMark(timeMark);
-    //
-    option.point = "A";
-    option.title = `A ${rEpr1}`;
-    option.color = "#FFFF00";
-    option.price = A.price;
-    lines[option.point] = props.priceSeries.createPriceLine(option);
-    //
-    option.point = "B";
-    option.title = `B ${rEpr2}`;
-    option.color = "#FF0000";
-    option.price = B.price;
-    lines[option.point] = props.priceSeries.createPriceLine(option);
-    //
-    option.point = "C";
-    option.price = C.price;
-    option.title = `C ${rEpr3}`;
-    option.color = "#8000FF";
-    lines[option.point] = props.priceSeries.createPriceLine(option);
-    //
-    option.point = "D";
-    option.price = entry;
-    option.title = "D " + pStatus;
-    option.color = "#00FFFF";
-    option.draggable = false;
-    lines[option.point] = props.priceSeries.createPriceLine(option);
     //
     option.point = "Y1";
     option.price = mf.fmtNum(y1);
     option.title = `Y1 ${mf.fmtNum(Y1)}`;
-    option.color = "#FF7F00";
+    option.color = "#00FFFF";
     option.draggable = false;
-    lines[option.point] = props.priceSeries.createPriceLine(option);
+    lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "X1";
     option.price = mf.fmtNum(x1);
     option.title = `X1 ${mf.fmtNum(X1)}`;
-    option.color = "#FF1493";
+    option.color = "#8000FF";
     option.draggable = false;
-    lines[option.point] = props.priceSeries.createPriceLine(option);
+    lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "Y2";
     option.price = mf.fmtNum(y2);
     option.title = `Y2 ${mf.fmtNum(Y2)}`;
-    option.color = "#FF7F00";
+    option.color = "#FF1493";
     option.draggable = false;
-    lines[option.point] = props.priceSeries.createPriceLine(option);
+    lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "X2";
     option.price = mf.fmtNum(x2);
     option.title = `X2 ${mf.fmtNum(X2)}`;
-    option.color = "#FF1493";
+    option.color = "#FF7F00";
     option.draggable = false;
-    lines[option.point] = props.priceSeries.createPriceLine(option);
+    lines[option.point] = series.pattern.createPriceLine(option);
 }
 function refresh(autoAdjust = false) {
-    if (mf.isSet(lines.C)) {
+    if (mf.isSet(lines.X1)) {
         if (autoAdjust && patternType.value !== 2) {
             adjustPatternPoints();
         }
@@ -341,285 +207,19 @@ function calculatePattern() {
     let result = {};
     switch (patternType.value) {
         case 1:
-            result = calcContinuePattern();
+            // result = calcContinuePattern();
             break;
         case 2:
-            result = calcReversalPattern();
+            // result = calcReversalPattern();
             break;
         case 3:
             result = calcExtensionPattern();
             break;
     }
+    emit("setProgress", result.progress);
+    setTimeMark(result.timeMark);
+    series.pattern.setData(result.points);
     return result;
-}
-function calcContinuePattern() {
-    const { A, B, C } = points;
-    const bc = B.price - C.price;
-    let side = bc > 0;
-    const pickTime = props.pickTimeToolRef.get();
-    const phase1 = scanPhase({
-        side,
-        start: A,
-        end: { time: Math.min(pickTime ?? B.time, B.time) },
-    });
-    const phase2 = scanPhase({
-        side: !side,
-        start: phase1.R,
-        end: { time: Math.min(pickTime ?? C.time, C.time) },
-    });
-    const stopTime = props.indexToTime(
-        Math.max(phase1.R.index + 6 * phase1.tr, phase2.R.index + phase2.tr)
-    );
-    const phase3 = scanPhase({
-        side,
-        start: phase2.R,
-        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
-    });
-
-    console.log("calcContinuePattern", [phase1, phase2, phase3]);
-
-    //
-    const BC = mf.fmtNum(bc, 1, true);
-    const CD = mf.fmtNum(C.price - phase3.ext.R.price, 1, true);
-    const DE = mf.fmtNum(phase3.ext.pr);
-    const pr1Valid = BC >= phase1.pr;
-    const pr2Valid = CD >= phase2.pr;
-    const pr3Valid = DE >= phase3.pr;
-
-    const s1Valid = !mf.cmp(C.price, !side, phase1.S1.price);
-    const s2Valid = !mf.cmp(phase3.ext.R.price, side, phase2.S1.price);
-    const s3Valid = !mf.cmp(phase3.ext.S.price, !side, phase3.S1.price);
-
-    const T1 = phase1.R.index + phase1.tr;
-    const T1p = phase1.R.index + 5 * phase1.tr;
-    const T2 = phase2.R.index + phase2.tr;
-    const T2p = 2 * phase2.R.index - phase2.S1.index;
-    const T3 = phase3.ext.R.index + phase3.tr;
-    const T3p = phase3.ext.R.index + phase2.tr;
-    const timeMark = [T1, T2, T3, T1p, T2p, T3p];
-
-    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
-
-    let entry,
-        progress = {};
-    const extraCond = [
-        phase2.R.index > T1,
-        phase1.rEpr < 3,
-        phase2.rEpr < phase1.rEpr,
-    ];
-    progress.steps = [
-        [
-            //
-            pr1Valid,
-            s1Valid,
-            T > T1,
-            T < T1p,
-            !phase3.hasDouble,
-        ],
-        [
-            //
-            ...extraCond,
-            T2 > T1,
-            T2p < T2,
-            T < T2p,
-        ],
-        [
-            //
-            phase2.R.index - phase1.R.index > 0.5 * phase1.tr,
-            pr2Valid,
-            T > T2,
-        ],
-        [
-            //
-            phase3.ext.R.index > T2,
-            pr3Valid,
-            s3Valid,
-            T > T3,
-            extraCond.every(Boolean) || T > T3p,
-        ],
-    ];
-    progress.step = 1;
-    progress.result = progress.steps[0].every(Boolean);
-    entry = B.price;
-    if (progress.result) {
-        if (T <= T2) {
-            progress.step = 2;
-            progress.result = progress.steps[1].every(Boolean);
-            entry = phase2.S1.price;
-        } else {
-            progress.step = 3;
-            progress.result = progress.steps[2].every(Boolean);
-            entry = phase3.ext.R.price;
-            if (progress.result) {
-                progress.step = 4;
-                progress.result = progress.steps[3].every(Boolean);
-            }
-        }
-    }
-    //
-    const p1Status = s1Valid ? (pr1Valid ? 1 : 0) : 2;
-    const p2Status = s2Valid ? (pr2Valid ? 1 : 0) : 2;
-    const p3Status = s3Valid ? (pr3Valid ? 1 : 0) : 2;
-    const pStatus = `${p1Status}${p2Status}${p3Status}`;
-    //
-    let X = mf.fmtNum(B.price - phase1.S1.price, 1, true);
-    let Y = phase1.rEp;
-    const [x] = adjustTargetPrice(C.price, X, side);
-    const [y] = adjustTargetPrice(B.price, Y, side);
-    X = mf.fmtNum(x - entry, 1, true);
-    Y = mf.fmtNum(y - entry, 1, true);
-
-    return {
-        progress,
-        timeMark,
-        info: {
-            rEpr1: phase1.rEpr,
-            rEpr2: phase2.rEpr,
-            rEpr3: phase3.rEpr,
-            entry,
-            pStatus,
-            x,
-            X,
-            y,
-            Y,
-        },
-    };
-}
-function calcReversalPattern() {
-    const { A, B, C } = points;
-    const bc = B.price - C.price;
-    let side = bc > 0;
-    const pickTime = props.pickTimeToolRef.get();
-    const phase1 = scanPhase({
-        side,
-        start: A,
-        end: { time: Math.min(pickTime ?? B.time, B.time) },
-    });
-    const phase2 = scanPhase({
-        side: !side,
-        start: phase1.R,
-        end: { time: pickTime, price: C.price },
-    });
-    const D = {
-        time: props.indexToTime(phase2.ext.S.index),
-        price: phase2.ext.S.price,
-    };
-    const phase3 = scanPhase({
-        side,
-        start: phase2.R,
-        end: { time: Math.min(pickTime ?? D.time, D.time) },
-    });
-    const stopTime = props.indexToTime(
-        Math.max(phase1.R.index + 6 * phase1.tr, phase2.R.index + phase2.tr)
-    );
-    const phase4 = scanPhase({
-        side: !side,
-        start: D,
-        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
-        pick: { price: C.price },
-    });
-
-    console.log("calcReversalPattern", [phase1, phase2, phase3, phase4]);
-
-    //
-    const AB = mf.fmtNum(A.price - B.price, 1, true);
-    const BC = mf.fmtNum(bc, 1, true);
-    const CD = phase2.ext.pr;
-    const EF = phase4.ext.pr;
-
-    const bcValid = BC > AB / 2;
-
-    const pr1Valid = BC >= phase1.pr;
-    const pr2Valid = CD >= phase2.pr;
-    const pr4Valid = EF >= Math.max(phase3.pr, phase4.pr);
-
-    const s2Valid = !mf.cmp(D.price, side, phase2.S1.price);
-    const s4Valid = !mf.cmp(phase4.ext.S.price, side, phase4.S1.price);
-
-    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
-    const T1 = phase1.R.index + phase1.tr;
-    const T1p = phase1.R.index + 5 * phase1.tr;
-    const T2 = phase2.R.index + phase2.tr;
-    const T3 = phase4.ext.R.index + Math.max(phase3.tr, phase4.tr);
-    const T3p =
-        phase4.ext.R.index + ((phase4.pick.index ?? T) - phase2.R.index);
-    const timeMark = [T1, T2, T3, T1p, T3p];
-
-    const isBreak =
-        phase4.pick.index &&
-        mf.cmp(phase4.R1.price, !side, C.price) &&
-        phase4.ext.tr < phase4.tr;
-    let entry = isBreak ? phase4.R1.price : phase4.ext.R.price,
-        progress = {};
-    progress.steps = [
-        [
-            //
-            bcValid,
-            pr1Valid,
-            T > T1,
-            T < T1p,
-        ],
-        [
-            //
-            pr2Valid,
-            s2Valid,
-            T2 > T1,
-            T > T2,
-            !phase2.hasDouble,
-        ],
-        [
-            //
-            EF < CD,
-            pr4Valid,
-            s4Valid,
-            T3 > T2,
-            T > T3,
-            phase4.ext.pr < phase2.ext.pr,
-            !phase4.hasDouble,
-        ],
-    ];
-    progress.step = 1;
-    progress.result = progress.steps[0].every(Boolean);
-    if (progress.result) {
-        progress.step = 2;
-        progress.result = progress.steps[1].every(Boolean);
-        if (progress.result) {
-            progress.step = 3;
-            progress.result = progress.steps[2].every(Boolean);
-        }
-    }
-    //
-    const pStatus = "";
-    //
-    const [x, xp] = adjustTargetPrice(bcValid ? C.price : D.price, BC, !side);
-    let y = x;
-    if (isBreak) {
-        const phase5 = scanPhase({
-            side: !side,
-            start: { time: phase4.B.time },
-            end: { time: pickTime, price: phase4.ext.R.price },
-        });
-        const extra = Math.max(phase5.pr, phase5.ext.pr);
-        [y] = adjustTargetPrice(xp, 2 * extra, !side);
-    }
-    const X = mf.fmtNum(x - entry, 1, true);
-    const Y = mf.fmtNum(y - entry, 1, true);
-
-    return {
-        progress,
-        timeMark,
-        info: {
-            rEpr1: phase1.rEpr,
-            rEpr2: phase2.rEpr,
-            rEpr3: phase3.rEpr,
-            entry,
-            pStatus,
-            x,
-            X,
-            y,
-            Y,
-        },
-    };
 }
 function calcExtensionPattern() {
     const { A, B, C } = points;
@@ -770,132 +370,25 @@ function calcExtensionPattern() {
     const X2 = mf.fmtNum(x2 - entry, 1, true);
     const Y2 = mf.fmtNum(y2 - entry, 1, true);
 
-    return {
-        progress,
-        timeMark,
-        info: {
-            rEpr1: phase1.rEpr,
-            rEpr2: phase2.rEpr,
-            rEpr3: phase3.rEpr,
-            entry,
-            pStatus,
-            x: [x1, x2],
-            X: [X1, X2],
-            y: [y1, y2],
-            Y: [Y1, Y2],
+    const ps = [
+        { time: A.time, value: A.price, color: "#FF7F00" },
+        { time: phase1.R.time, value: phase1.R.price, color: "#FF0000" },
+        { time: phase2.R.time, value: phase2.R.price, color: "#FF1493" },
+        { time: D.time, value: D.price, color: "#8000FF" },
+        { time: E.time, value: E.price, color: "#00FFFF" },
+        { time: F.time, value: F.price, color: "#00FF00" },
+        {
+            time: phase5.ext.S.time,
+            value: phase5.ext.S.price,
+            color: "#00FF00",
         },
-    };
-}
-function calcExtensionPattern1() {
-    const { A, B, C } = points;
-    const bc = B.price - C.price;
-    let side = bc > 0;
-    const pickTime = props.pickTimeToolRef.get();
-    const phase1 = scanPhase({
-        side,
-        start: A,
-        end: { time: Math.min(pickTime ?? B.time, B.time) },
-    });
-    const phase2 = scanPhase({
-        side: !side,
-        start: phase1.R,
-        end: { time: Math.min(pickTime ?? C.time, C.time) },
-    });
-    const stopTime = props.indexToTime(
-        phase1.R.index + 6 * (phase1.R.index - phase1.S.index)
-    );
-    const phase3 = scanPhase({
-        side,
-        start: phase2.R,
-        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
-        pick: { price: B.price },
-    });
-
-    const isBreak =
-        (phase3.R1.price - C.price) / bc >= 0.7 && phase3.ext.tr < phase3.tr;
-    const D = {
-        price: isBreak ? phase3.R1.price : phase3.ext.R.price,
-        index: isBreak ? phase3.R1.index : phase3.ext.R.index,
-        time: isBreak ? phase3.R1.time : phase3.ext.R.time,
-    };
-    const E = {
-        price: isBreak ? phase3.S1.price : phase3.ext.S.price,
-        index: isBreak ? phase3.S1.index : phase3.ext.S.index,
-        time: isBreak ? phase3.S1.time : phase3.ext.S.time,
-    };
-
-    const phase4 = scanPhase({
-        side,
-        start: E,
-        end: { time: pickTime, price: D.price },
-    });
-
-    console.log("calcExtensionPattern", [phase1, phase2, phase3, phase4]);
-
-    const BC = mf.fmtNum(bc, 1, true);
-    const CD = mf.fmtNum(D.price - C.price, 1, true);
-    const DE = mf.fmtNum(E.price - D.price, 1, true);
-
-    const pr3Valid = DE >= phase3.pr;
-
-    const ir13 = (phase3.pick.index ?? D.index) - phase1.R.index;
-    const gtType = phase2.R.index < phase1.R.index + ir13 / 2;
-
-    const T = props.timeToIndex(pickTime ?? props.prices.at(-1).time);
-    const T1 = phase1.R.index + phase1.tr;
-    const T2 = phase2.R.index + phase2.tr;
-    const T3 = phase3.ext.R.index + phase3.tr;
-    const T1p = D.index + ir13;
-    const T3p = 2 * E.index - D.index;
-    const timeMark = [T1, T2, T3, T1p, T3p];
-
-    const entry = D.price;
-    let progress = {};
-    progress.steps = [
-        [
-            //
-            T > T1,
-            T < T1p,
-            T > T2,
-            CD / BC >= 0.7,
-            !phase3.hasDouble,
-        ],
-        [
-            //
-            DE < BC,
-            pr3Valid,
-            !phase4.hasDouble,
-            gtType ? T < T3p : T > T3p,
-            T > T3,
-        ],
     ];
-    progress.step = 1;
-    progress.result = progress.steps[0].every(Boolean);
-    if (progress.result) {
-        progress.step = 2;
-        progress.result = progress.steps[1].every(Boolean);
-    }
-    //
-    const pStatus = mf.fmtNum(100 * (CD / BC), 1);
-    //
-    const [x1] = adjustTargetPrice(entry, CD, side);
-    const [y1] = adjustTargetPrice(entry, 2 * CD, side);
-    const X1 = mf.fmtNum(x1 - entry, 1, true);
-    const Y1 = mf.fmtNum(y1 - entry, 1, true);
-    const [x2] = adjustTargetPrice(entry, EF, side);
-    const [y2] = adjustTargetPrice(entry, 2 * EF, side);
-    const X2 = mf.fmtNum(x2 - entry, 1, true);
-    const Y2 = mf.fmtNum(y2 - entry, 1, true);
 
     return {
         progress,
         timeMark,
-        info: {
-            rEpr1: phase1.rEpr,
-            rEpr2: phase2.rEpr,
-            rEpr3: phase3.rEpr,
-            entry,
-            pStatus,
+        points: ps,
+        target: {
             x: [x1, x2],
             X: [X1, X2],
             y: [y1, y2],
@@ -942,22 +435,6 @@ function scanPhase({ side, start, end, pick = {} }) {
                         pMaxBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
                     }
-                    // box = mergePreBox(box, preBox);
-                    // const tempBox = mf.cloneDeep(maxBox);
-                    // if (
-                    //     (box.tr >= maxBox.tr && box.pr >= maxBox.pr) ||
-                    //     box.tr >= 2 * maxBox.tr ||
-                    //     box.pr >= 2 * maxBox.pr
-                    // ) {
-                    //     maxBox.R = mf.cloneDeep(box.R);
-                    //     maxBox.S = mf.cloneDeep(box.S);
-                    // }
-                    // if (box.tr > maxBox.tr) maxBox.tr = box.tr;
-                    // if (box.pr > maxBox.pr) maxBox.pr = box.pr;
-
-                    // if (JSON.stringify(maxBox) !== JSON.stringify(tempBox)) {
-                    //     pMaxBox = tempBox;
-                    // }
                 }
                 box = {
                     R: { index, time, price },
@@ -968,26 +445,13 @@ function scanPhase({ side, start, end, pick = {} }) {
             } else {
                 if (mf.cmp(price, !side, box.S.price)) {
                     box.S = { index, time, price };
-                    // box.S.iAfter = index;
                     box.S.tAfter = time;
                     box.pr = mf.fmtNum(price - box.R.price, 1, true);
                     box.tr = index - box.R.index;
                 } else if (price === box.S.price) {
-                    // box.S.iAfter = index;
                     box.S.tAfter = time;
-                    // box.tr = index - box.R.index;
                 }
             }
-            // if (end.price && price === end.price && price === box.R.price) {
-            //     if (
-            //         box.tr >= maxBox.tr / (maxBox.touch ? 2 : 1) &&
-            //         box.pr >= maxBox.pr
-            //     ) {
-            //         maxBox = mf.cloneDeep(box);
-            //         maxBox.tr = 2 * maxBox.tr;
-            //         maxBox.touch = true;
-            //     }
-            // }
             if (pick.price && !pick.index && mf.cmp(price, side, pick.price)) {
                 pick.index = index;
                 pick.time = time;
@@ -1026,14 +490,6 @@ function scanPhase({ side, start, end, pick = {} }) {
         pick,
         hasDouble: doubleTr > maxBox.tr / 2,
     };
-}
-function mergePreBox(box, preBox) {
-    const dis = mf.fmtNum(box.R.price - preBox.R.price, 1, true);
-    if (dis === 0.1 && dis < 0.1 * preBox.pr) {
-        let _box = box.pr > preBox.pr ? box : preBox;
-        _box.tr = preBox.tr + box.tr;
-        return mf.cloneDeep(_box);
-    } else return box;
 }
 function checkPointsValid({ A: { time } }) {
     return time >= props.prices[0].time && time < props.prices.at(-1).time;
@@ -1104,29 +560,21 @@ function remove() {
     removePatternTool();
     setTimeMark([]);
     emit("setProgress", {});
+    series.pattern.setData([]);
 }
 function removePatternTool() {
-    if (mf.isSet(lines.A)) {
-        props.priceSeries.removePriceLine(lines.A);
-        if (mf.isSet(lines.B)) {
-            props.priceSeries.removePriceLine(lines.B);
-            if (mf.isSet(lines.C)) {
-                props.priceSeries.removePriceLine(lines.C);
-                props.priceSeries.removePriceLine(lines.D);
-                props.priceSeries.removePriceLine(lines.X1);
-                props.priceSeries.removePriceLine(lines.Y1);
-                props.priceSeries.removePriceLine(lines.X2);
-                props.priceSeries.removePriceLine(lines.Y2);
-            }
-        }
+    if (mf.isSet(lines.X1)) {
+        series.pattern.removePriceLine(lines.X1);
+        series.pattern.removePriceLine(lines.Y1);
+        series.pattern.removePriceLine(lines.X2);
+        series.pattern.removePriceLine(lines.Y2);
     }
     lines = {};
 }
 function setTimeMark(data) {
-    console.log("setTimeMark", data);
     const colors = [
-        "#FFFF00",
         "#FF0000",
+        "#FF1493",
         "#8000FF",
         "#00FFFF",
         "#00FF00",
@@ -1145,7 +593,7 @@ function setTimeMark(data) {
         }
     });
     if (result.length) result.sort((a, b) => a.time - b.time);
-    props.timeMarkSeries.setData(result);
+    series.timeMark.setData(result);
 }
 function makeUnique(arr) {
     const uniqueSet = new Set();
@@ -1156,84 +604,5 @@ function makeUnique(arr) {
         uniqueSet.add(item);
         return item;
     });
-}
-function drag({ lineOptions }) {
-    if (mf.isSet(lines.C)) {
-        let point, changeOptions;
-        points = {
-            A: {
-                time: points.A.time,
-                price: +lines.A.options().price,
-            },
-            B: { price: +lines.B.options().price },
-            C: { price: +lines.C.options().price },
-        };
-        savePattern();
-        const {
-            progress,
-            timeMark,
-            info: {
-                rEpr1,
-                rEpr2,
-                rEpr3,
-                entry,
-                pStatus,
-                x: [x1, x2],
-                X: [X1, X2],
-                y: [y1, y2],
-                Y: [Y1, Y2],
-            },
-        } = calculatePattern();
-        emit("setProgress", progress);
-        setTimeMark(timeMark);
-        //
-        point = "A";
-        changeOptions = { title: `A ${rEpr1}` };
-        lines[point].applyOptions(changeOptions);
-        //
-        point = "B";
-        changeOptions = { title: `B ${rEpr2}` };
-        lines[point].applyOptions(changeOptions);
-        //
-        point = "C";
-        changeOptions = { title: `C ${rEpr3}` };
-        lines[point].applyOptions(changeOptions);
-        //
-        point = "D";
-        changeOptions = {
-            price: entry,
-            title: "E " + pStatus,
-        };
-        if (lineOptions.point === point) delete changeOptions.price;
-        lines[point].applyOptions(changeOptions);
-        //
-        point = "X1";
-        changeOptions = {
-            price: mf.fmtNum(x1),
-            title: `X1 ${mf.fmtNum(X1)}`,
-        };
-        lines[point].applyOptions(changeOptions);
-        //
-        point = "Y1";
-        changeOptions = {
-            price: mf.fmtNum(y1),
-            title: `Y1 ${mf.fmtNum(Y1)}`,
-        };
-        lines[point].applyOptions(changeOptions);
-        //
-        point = "X2";
-        changeOptions = {
-            price: mf.fmtNum(x2),
-            title: `X2 ${mf.fmtNum(X2)}`,
-        };
-        lines[point].applyOptions(changeOptions);
-        //
-        point = "Y2";
-        changeOptions = {
-            price: mf.fmtNum(y2),
-            title: `Y2 ${mf.fmtNum(Y2)}`,
-        };
-        lines[point].applyOptions(changeOptions);
-    }
 }
 </script>
