@@ -53,6 +53,7 @@ function isSelected() {
 function createSeries(chart) {
     if (!chart) return false;
     series.pattern = chart.addLineSeries({
+        color: "#F5F5F5",
         lastValueVisible: false,
         priceLineVisible: false,
     });
@@ -80,7 +81,7 @@ function patternToolContextmenu(e) {
 }
 function draw({ time, price }) {
     let points = {};
-    if (mf.isSet(lines.X1)) {
+    if (mf.isSet(lines.X)) {
         points = mf.cloneDeep(scanPoints);
         points.A = { time, price };
     } else {
@@ -162,37 +163,32 @@ function loadPatternTool() {
         draggable: false,
     };
     const {
-        target: {
-            x: [x1],
-            X: [X1],
-            y: [y1, y2],
-            Y: [Y1, Y2],
-        },
+        target: [[x, X], [y, Y], [z, Z]],
     } = calculatePattern();
     //
-    option.point = "Y1";
-    option.price = mf.fmtNum(y1);
-    option.title = `Y1 ${mf.fmtNum(Y1)}`;
-    option.color = "#00FFFF";
+    option.point = "X";
+    option.price = mf.fmtNum(x);
+    option.title = `X ${mf.fmtNum(X)}`;
+    option.color = "#FF1493";
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
-    option.point = "X1";
-    option.price = mf.fmtNum(x1);
-    option.title = `X1 ${mf.fmtNum(X1)}`;
+    option.point = "Y";
+    option.price = mf.fmtNum(y);
+    option.title = `Y ${mf.fmtNum(Y)}`;
     option.color = "#8000FF";
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
-    option.point = "Y2";
-    option.price = mf.fmtNum(y2);
-    option.title = `Y2 ${mf.fmtNum(Y2)}`;
-    option.color = "#FF1493";
+    option.point = "Z";
+    option.price = mf.fmtNum(z);
+    option.title = `Z ${mf.fmtNum(Z)}`;
+    option.color = "#00FFFF";
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
 }
 function refresh(autoAdjust = false) {
-    if (mf.isSet(lines.X1)) {
+    if (mf.isSet(lines.X)) {
         if (autoAdjust && patternType.value !== 2) {
             adjustPatternPoints();
         }
@@ -296,7 +292,6 @@ function calcExtensionPattern() {
     const T5 = F.index + phase5.tr;
     const timeMark = [T1, T2, T3, T4, T5];
 
-    const entry = D.price;
     let progress = {};
     progress.steps = [
         [
@@ -335,32 +330,12 @@ function calcExtensionPattern() {
             phase5.ext.S.index > T5,
         ],
     ];
-    progress.step = 1;
-    progress.result = progress.steps[0].every(Boolean);
-    if (progress.result) {
-        progress.step = 2;
-        progress.result = progress.steps[1].every(Boolean);
-        if (progress.result) {
-            progress.step = 3;
-            progress.result = progress.steps[2].every(Boolean);
-            if (progress.result) {
-                progress.step = 4;
-                progress.result = progress.steps[3].every(Boolean);
-                if (progress.result) {
-                    progress.step = 5;
-                    progress.result = progress.steps[4].every(Boolean);
-                }
-            }
-        }
+    for (let i = 0; i < progress.steps.length; i++) {
+        progress.step = i + 1;
+        progress.result = progress.steps[i].every(Boolean);
+        if (!progress.result) break;
     }
     //
-    const [x1] = adjustTargetPrice(D.price, CD, side);
-    const [y1] = adjustTargetPrice(D.price, 2 * CD, side);
-    const X1 = mf.fmtNum(x1 - entry, 1, true);
-    const Y1 = mf.fmtNum(y1 - entry, 1, true);
-    const [y2] = adjustTargetPrice(F.price, 2 * EF, side);
-    const Y2 = mf.fmtNum(y2 - entry, 1, true);
-
     const points = [
         { time: A.time, value: A.price, color: "#FF7F00" },
         { time: phase1.R.time, value: phase1.R.price, color: "#FF0000" },
@@ -368,23 +343,26 @@ function calcExtensionPattern() {
         { time: D.time, value: D.price, color: "#8000FF" },
         { time: E.time, value: E.price, color: "#00FFFF" },
         { time: F.time, value: F.price, color: "#00FF00" },
-        {
-            time: phase5.ext.S.time,
-            value: phase5.ext.S.price,
-            color: "#00FF00",
-        },
+        { time: phase5.ext.S.time, value: phase5.ext.S.price },
     ];
+    //
+    const entry = D.price;
+    const [x] = adjustTargetPrice(F.price, 2 * EF, side);
+    const X = mf.fmtNum(x - entry, 1, true);
+    const [y] = adjustTargetPrice(D.price, CD, side);
+    const Y = mf.fmtNum(y - entry, 1, true);
+    const [z] = adjustTargetPrice(D.price, 2 * CD, side);
+    const Z = mf.fmtNum(z - entry, 1, true);
 
     return {
-        progress,
         timeMark,
+        progress,
         points: makeUnique(points),
-        target: {
-            x: [x1],
-            X: [X1],
-            y: [y1, y2],
-            Y: [Y1, Y2],
-        },
+        target: [
+            [x, X],
+            [y, Y],
+            [z, Z],
+        ],
     };
 }
 function scanPhase({ side, start, end }) {
@@ -443,7 +421,6 @@ function scanPhase({ side, start, end }) {
         });
         extBox = mf.cloneDeep(box);
         R = mf.cloneDeep(box.R);
-        rEp = mf.fmtNum(R.price - maxBox.R.price, 1, true);
     } else {
         R = mf.cloneDeep(S);
         maxBox = {
@@ -539,11 +516,10 @@ function remove() {
     series.pattern.setData([]);
 }
 function removePatternTool() {
-    if (mf.isSet(lines.X1)) {
-        series.pattern.removePriceLine(lines.X1);
-        series.pattern.removePriceLine(lines.Y1);
-        series.pattern.removePriceLine(lines.X2);
-        series.pattern.removePriceLine(lines.Y2);
+    if (mf.isSet(lines.X)) {
+        series.pattern.removePriceLine(lines.X);
+        series.pattern.removePriceLine(lines.Y);
+        series.pattern.removePriceLine(lines.Z);
     }
     lines = {};
 }
