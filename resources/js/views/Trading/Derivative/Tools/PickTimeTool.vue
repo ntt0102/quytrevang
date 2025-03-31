@@ -68,7 +68,7 @@ function draw({ time }) {
 }
 function load(time) {
     pickTime = time;
-    props.pickTimeSeries.setData([{ time, value: 1, color: "#FFFF00" }]);
+    props.pickTimeSeries.setData([{ time, value: 1, color: "#007FFF" }]);
 }
 function removePickTimeTool(withServer = true) {
     if (withServer)

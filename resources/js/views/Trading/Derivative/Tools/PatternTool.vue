@@ -237,7 +237,8 @@ function calcExtensionPattern() {
     });
 
     const isBreak =
-        (phase3.R1.price - C.price) / bc >= 0.5 && !(phase3.ext.tr >= phase3.tr && phase3.ext.pr >= phase3.pr);
+        (phase3.R1.price - C.price) / bc >= 0.5 &&
+        !(phase3.ext.tr >= phase3.tr && phase3.ext.pr >= phase3.pr);
     const D = {
         price: isBreak ? phase3.R1.price : phase3.ext.R.price,
         index: isBreak ? phase3.R1.index : phase3.ext.R.index,
@@ -268,12 +269,26 @@ function calcExtensionPattern() {
         time: phase5.ext.R.time,
     };
 
+    const G = {
+        price: phase5.ext.S.price,
+        index: phase5.ext.S.index,
+        time: phase5.ext.S.time,
+        tAfter: phase5.ext.S.tAfter,
+    };
+
+    const phase6 = scanPhase({
+        side: !side,
+        start: F,
+        end: { time: Math.min(pickTime ?? G.tAfter, G.tAfter), price: G.price },
+    });
+
     console.log("calcExtensionPattern", [
         phase1,
         phase2,
         phase3,
         phase4,
         phase5,
+        phase6,
     ]);
 
     const AB = mf.fmtNum(B.price - A.price, 1, true);
@@ -290,7 +305,8 @@ function calcExtensionPattern() {
     const T3 = D.index + TR3;
     const T4 = E.index + phase4.tr;
     const T5 = F.index + phase5.tr;
-    const timeMark = [T1, T2, T3, T4, T5];
+    const T6 = G.index + phase6.tr;
+    const timeMark = [T1, T2, T3, T4, T5, T6];
 
     let progress = {};
     progress.steps = [
@@ -337,13 +353,14 @@ function calcExtensionPattern() {
     }
     //
     const points = [
-        { time: A.time, value: A.price, color: "#FF7F00" },
-        { time: phase1.R.time, value: phase1.R.price, color: "#FF0000" },
-        { time: phase2.R.time, value: phase2.R.price, color: "#FF1493" },
-        { time: D.time, value: D.price, color: "#8000FF" },
-        { time: E.time, value: E.price, color: "#00FFFF" },
-        { time: F.time, value: F.price, color: "#00FF00" },
-        { time: phase5.ext.S.time, value: phase5.ext.S.price },
+        { time: A.time, value: A.price, color: "#FFFF00" },
+        { time: phase1.R.time, value: phase1.R.price, color: "#FF7F00" },
+        { time: phase2.R.time, value: phase2.R.price, color: "#FF0000" },
+        { time: D.time, value: D.price, color: "#FF1493" },
+        { time: E.time, value: E.price, color: "#8000FF" },
+        { time: F.time, value: F.price, color: "#00FFFF" },
+        { time: G.time, value: G.price, color: "#00FF00" },
+        { time: phase6.ext.S.time, value: phase6.ext.S.price },
     ];
     //
     const entry = D.price;
@@ -525,6 +542,7 @@ function removePatternTool() {
 }
 function setTimeMark(data) {
     const colors = [
+        "#FFFF00",
         "#FF0000",
         "#FF1493",
         "#8000FF",
