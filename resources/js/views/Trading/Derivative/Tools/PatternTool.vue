@@ -413,9 +413,10 @@ function scanPhase({ side, start, end }) {
             }
             if (mf.cmp(price, side, box.R.price)) {
                 if (box.pr > 0) {
-                    if (box.tr >= maxBox.tr && box.pr >= maxBox.pr) {
+                    if (box.pr >= maxBox.pr) {
                         pMaxBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
+                        if (box.tr < maxBox.tr) maxBox.tr = pMaxBox.tr;
                     }
                 }
                 box = {
