@@ -86,7 +86,7 @@ const extensionPattern = [
         conds: [
             //
             "BC > PR1",
-            "Tc > Tđỏ",
+            "Tc > Tcam",
         ],
     },
     {
@@ -96,7 +96,7 @@ const extensionPattern = [
             "CD < AB",
             "CD > BC/2",
             "CD > PR2",
-            "Td > Thồng",
+            "Td > Tđỏ",
         ],
     },
     {
@@ -106,7 +106,7 @@ const extensionPattern = [
             "DE < BC",
             "DE > PR3",
             "TR3 < TR1",
-            "Te > Ttím",
+            "Te > Thồng",
         ],
     },
     {
@@ -117,7 +117,7 @@ const extensionPattern = [
             "EF > DE/2",
             "EF > PR4",
             "TR4 < TR2",
-            "Tf > Tlam",
+            "Tf > Ttím",
         ],
     },
     {
@@ -128,7 +128,7 @@ const extensionPattern = [
             "FG < DE",
             "FG > PR5",
             "TR5 < TR3",
-            "Tg > Tlục",
+            "Tg > Tlam",
         ],
     },
 ];
