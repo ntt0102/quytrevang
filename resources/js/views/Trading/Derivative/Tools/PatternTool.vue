@@ -222,12 +222,12 @@ function calcExtensionPattern() {
     const phase1 = scanPhase({
         side,
         start: A,
-        end: { time: Math.min(pickTime ?? B.time, B.time), price: B.price },
+        end: { time: Math.min(pickTime ?? B.time, B.time) },
     });
     const phase2 = scanPhase({
         side: !side,
         start: phase1.R,
-        end: { time: Math.min(pickTime ?? C.time, C.time), price: C.price },
+        end: { time: Math.min(pickTime ?? C.time, C.time) },
     });
     const stopTime = props.indexToTime(4 * phase2.R.index - 3 * phase1.S.index);
     const phase3 = scanPhase({
@@ -254,7 +254,7 @@ function calcExtensionPattern() {
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: { time: Math.min(pickTime ?? E.tAfter, E.tAfter), price: E.price },
+        end: { time: Math.min(pickTime ?? E.tAfter, E.tAfter) },
     });
 
     const phase5 = scanPhase({
@@ -279,7 +279,7 @@ function calcExtensionPattern() {
     const phase6 = scanPhase({
         side: !side,
         start: F,
-        end: { time: Math.min(pickTime ?? G.tAfter, G.tAfter), price: G.price },
+        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
     });
 
     console.log("calcExtensionPattern", [
@@ -542,7 +542,7 @@ function removePatternTool() {
 }
 function setTimeMark(data) {
     const colors = [
-        "#FFFF00",
+        "#FF7F00",
         "#FF0000",
         "#FF1493",
         "#8000FF",
