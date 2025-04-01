@@ -128,10 +128,9 @@ function scanPattern(data) {
         if (C.index > A.index) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
             if (bc >= bcThreshold) {
-                if (A.index - S.index >= C.index - B.index) {
-                    const as = mf.fmtNum(A.price - S.price, 1, true);
-                    if (as > bc) break;
-                }
+                if (A.index - S.index >= C.index - B.index) break;
+                const as = mf.fmtNum(A.price - S.price, 1, true);
+                if (as > bc) break;
             }
         }
     }
