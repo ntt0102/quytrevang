@@ -31,6 +31,7 @@ const continuePattern = [
         name: "Bước kiểm tra 4",
         conds: [
             //
+            "F ≠ D ≠ B",
             "EF < CD",
             "EF > DE/2",
             "EF > PR4",
@@ -42,7 +43,7 @@ const continuePattern = [
         name: "Bước vào lệnh",
         conds: [
             //
-            "F ≠ D ≠ B",
+            "G ≠ E",
             "FG < DE",
             "FG > PR5",
             "TR5 < TR3",
@@ -72,6 +73,7 @@ const reversalPattern = [
         name: "Bước kiểm tra 3",
         conds: [
             //
+            "E ≠ C",
             "DE < BC",
             "DE >= CD/2",
             "DE > PR3",
@@ -83,7 +85,7 @@ const reversalPattern = [
         name: "Bước vào lệnh",
         conds: [
             //
-            "E ≠ C",
+            "F ≠ D",
             "EF < CD",
             "EF > PR4",
             "TR4 < TR2",

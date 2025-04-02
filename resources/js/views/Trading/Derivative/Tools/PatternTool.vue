@@ -342,6 +342,7 @@ function calcContinuePattern() {
         ],
         [
             //
+            ![B.price, D.price].includes(F.price),
             EF <= CD,
             EF >= DE / 2,
             EF >= phase4.pr,
@@ -350,7 +351,7 @@ function calcContinuePattern() {
         ],
         [
             //
-            ![B.price, D.price].includes(F.price),
+            ![E.price].includes(G.price),
             FG <= DE,
             FG >= phase5.pr,
             phase5.tr <= TR3,
@@ -395,7 +396,6 @@ function calcContinuePattern() {
 }
 function calcReversalPattern() {
     const { A, B } = scanPoints;
-    // const bc = B.price - C.price;
     const ab = A.price - B.price;
     let side = ab > 0;
     const pickTime = props.pickTimeToolRef.get();
@@ -404,11 +404,6 @@ function calcReversalPattern() {
         start: A,
         end: { time: Math.min(pickTime ?? B.time, B.time) },
     });
-    // const phase2 = scanPhase({
-    //     side: !side,
-    //     start: phase1.R,
-    //     end: { time: Math.min(pickTime ?? C.time, C.time) },
-    // });
     const stopTime = props.indexToTime(6 * phase1.R.index - 5 * phase1.S.index);
     const phase2 = scanPhase({
         side,
@@ -419,12 +414,6 @@ function calcReversalPattern() {
     const isBreak =
         phase2.R1.price - B.price > phase1.pr &&
         !(phase2.ext.tr >= phase2.tr && phase2.ext.pr >= phase2.pr);
-
-    // const phase3 = scanPhase({
-    //     side,
-    //     start: phase2.R,
-    //     end: { time: Math.min(pickTime ?? stopTime, stopTime) },
-    // });
 
     const C = {
         price: isBreak ? phase2.R1.price : phase2.ext.R.price,
@@ -469,52 +458,6 @@ function calcReversalPattern() {
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
     });
 
-    // const isBreak =
-    //     phase2.R1.price - C.price > phase1.pr &&
-    //     !(phase2.ext.tr >= phase2.tr && phase2.ext.pr >= phase2.pr);
-    // const D = {
-    //     price: isBreak ? phase3.R1.price : phase3.ext.R.price,
-    //     index: isBreak ? phase3.R1.index : phase3.ext.R.index,
-    //     time: isBreak ? phase3.R1.time : phase3.ext.R.time,
-    // };
-    // const E = {
-    //     price: isBreak ? phase3.S1.price : phase3.ext.S.price,
-    //     index: isBreak ? phase3.S1.index : phase3.ext.S.index,
-    //     time: isBreak ? phase3.S1.time : phase3.ext.S.time,
-    //     tAfter: isBreak ? phase3.S1.tAfter : phase3.ext.S.tAfter,
-    // };
-
-    // const phase4 = scanPhase({
-    //     side: !side,
-    //     start: D,
-    //     end: { time: Math.min(pickTime ?? E.tAfter, E.tAfter) },
-    // });
-
-    // const phase5 = scanPhase({
-    //     side,
-    //     start: E,
-    //     end: { time: Math.min(pickTime ?? stopTime, stopTime) },
-    // });
-
-    // const F = {
-    //     price: phase5.ext.R.price,
-    //     index: phase5.ext.R.index,
-    //     time: phase5.ext.R.time,
-    // };
-
-    // const G = {
-    //     price: phase5.ext.S.price,
-    //     index: phase5.ext.S.index,
-    //     time: phase5.ext.S.time,
-    //     tAfter: phase5.ext.S.tAfter,
-    // };
-
-    // const phase6 = scanPhase({
-    //     side: !side,
-    //     start: F,
-    //     end: { time: Math.min(pickTime ?? stopTime, stopTime) },
-    // });
-
     console.log("calcContinuePattern", [
         phase1,
         phase2,
@@ -527,9 +470,7 @@ function calcReversalPattern() {
     const BC = mf.fmtNum(C.price - B.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
-    // const EF = mf.fmtNum(F.price - E.price, 1, true);
     const EF = phase4.ext.pr;
-    // const FG = phase5.ext.pr;
 
     const TR2 = isBreak ? phase2.tr1 : phase2.tr;
 
@@ -555,6 +496,7 @@ function calcReversalPattern() {
         ],
         [
             //
+            ![C.price].includes(E.price),
             DE <= BC,
             DE >= CD / 2,
             DE >= phase3.pr,
@@ -563,7 +505,7 @@ function calcReversalPattern() {
         ],
         [
             //
-            ![C.price].includes(E.price),
+            ![D.price].includes(F.price),
             EF <= CD,
             EF >= phase4.pr,
             phase4.tr <= TR2,
