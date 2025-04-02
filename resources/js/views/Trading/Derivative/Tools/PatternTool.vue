@@ -138,7 +138,7 @@ function scanPattern(data) {
             A = { index, time, price };
             S = mf.cloneDeep(A);
         }
-        if (mf.cmp(price, side, S.price, true)) S = { index, time, price };
+        if (mf.cmp(price, side, S.price)) S = { index, time, price };
         //
         if (C.index > A.index) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
