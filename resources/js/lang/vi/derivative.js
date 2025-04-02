@@ -45,8 +45,8 @@ const continuePattern = [
         conds: [
             //
             "G ≠ E",
-            "FG > FR5",
             "FG < DE",
+            "FG > FR5",
             "FG > PR5",
             "TR5 < TR3",
             "Tg > Tlam",
