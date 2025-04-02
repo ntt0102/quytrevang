@@ -1,5 +1,19 @@
 <template>
     <div
+        ref="selectPatternRef"
+        class="context command"
+        :title="$t('trading.derivative.selectPatternTool')"
+        @click="changePatternType"
+    >
+        <i
+            class="far"
+            :class="{
+                'fa-square-question': !patternType,
+                [`fa-square-${patternType}`]: patternType,
+            }"
+        ></i>
+    </div>
+    <div
         ref="patternToolRef"
         class="context command"
         :title="$t('trading.derivative.patternTool')"
@@ -30,6 +44,7 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const symbol = "VN30F1M";
+const patternTypeCount = 2;
 const bcThreshold = 1;
 let scanPoints = {};
 let lines = {};
@@ -199,13 +214,10 @@ function calculatePattern() {
     let result = {};
     switch (patternType.value) {
         case 1:
-            // result = calcContinuePattern();
+            result = calcContinuePattern();
             break;
         case 2:
-            // result = calcReversalPattern();
-            break;
-        case 3:
-            result = calcExtensionPattern();
+            result = calcReversalPattern();
             break;
     }
     emit("setProgress", result.progress);
@@ -213,7 +225,7 @@ function calculatePattern() {
     series.pattern.setData(result.points);
     return result;
 }
-function calcExtensionPattern() {
+function calcContinuePattern() {
     const { A, B, C } = scanPoints;
     const bc = B.price - C.price;
     let side = bc > 0;
@@ -281,7 +293,7 @@ function calcExtensionPattern() {
         end: { time: Math.min(pickTime ?? stopTime, stopTime) },
     });
 
-    console.log("calcExtensionPattern", [
+    console.log("calcContinuePattern", [
         phase1,
         phase2,
         phase3,
@@ -305,7 +317,7 @@ function calcExtensionPattern() {
     const T4 = E.index + phase4.tr;
     const T5 = F.index + phase5.tr;
     const T6 = G.index + phase6.tr;
-    const timeMark = [T1, T2, T3, T4, T5, T6];
+    const timeMark = [T6, T5, T4, T3, T2, T1];
 
     let progress = {};
     progress.steps = [
@@ -368,6 +380,218 @@ function calcExtensionPattern() {
     const [y] = adjustTargetPrice(D.price, CD, side);
     const Y = mf.fmtNum(y - entry, 1, true);
     const [z] = adjustTargetPrice(D.price, 2 * CD, side);
+    const Z = mf.fmtNum(z - entry, 1, true);
+
+    return {
+        timeMark,
+        progress,
+        points: makeUnique(points),
+        target: [
+            [x, X],
+            [y, Y],
+            [z, Z],
+        ],
+    };
+}
+function calcReversalPattern() {
+    const { A, B } = scanPoints;
+    // const bc = B.price - C.price;
+    const ab = A.price - B.price;
+    let side = ab > 0;
+    const pickTime = props.pickTimeToolRef.get();
+    const phase1 = scanPhase({
+        side: !side,
+        start: A,
+        end: { time: Math.min(pickTime ?? B.time, B.time) },
+    });
+    // const phase2 = scanPhase({
+    //     side: !side,
+    //     start: phase1.R,
+    //     end: { time: Math.min(pickTime ?? C.time, C.time) },
+    // });
+    const stopTime = props.indexToTime(6 * phase1.R.index - 5 * phase1.S.index);
+    const phase2 = scanPhase({
+        side,
+        start: phase1.R,
+        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+    });
+
+    const isBreak =
+        phase2.R1.price - B.price > phase1.pr &&
+        !(phase2.ext.tr >= phase2.tr && phase2.ext.pr >= phase2.pr);
+
+    // const phase3 = scanPhase({
+    //     side,
+    //     start: phase2.R,
+    //     end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+    // });
+
+    const C = {
+        price: isBreak ? phase2.R1.price : phase2.ext.R.price,
+        index: isBreak ? phase2.R1.index : phase2.ext.R.index,
+        time: isBreak ? phase2.R1.time : phase2.ext.R.time,
+    };
+    const D = {
+        price: isBreak ? phase2.S1.price : phase2.ext.S.price,
+        index: isBreak ? phase2.S1.index : phase2.ext.S.index,
+        time: isBreak ? phase2.S1.time : phase2.ext.S.time,
+        tAfter: isBreak ? phase2.S1.tAfter : phase2.ext.S.tAfter,
+    };
+
+    const phase3 = scanPhase({
+        side: !side,
+        start: C,
+        end: { time: Math.min(pickTime ?? D.tAfter, D.tAfter) },
+    });
+
+    const phase4 = scanPhase({
+        side,
+        start: D,
+        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+    });
+
+    const E = {
+        price: phase4.ext.R.price,
+        index: phase4.ext.R.index,
+        time: phase4.ext.R.time,
+    };
+
+    const F = {
+        price: phase4.ext.S.price,
+        index: phase4.ext.S.index,
+        time: phase4.ext.S.time,
+        tAfter: phase4.ext.S.tAfter,
+    };
+
+    const phase5 = scanPhase({
+        side: !side,
+        start: E,
+        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+    });
+
+    // const isBreak =
+    //     phase2.R1.price - C.price > phase1.pr &&
+    //     !(phase2.ext.tr >= phase2.tr && phase2.ext.pr >= phase2.pr);
+    // const D = {
+    //     price: isBreak ? phase3.R1.price : phase3.ext.R.price,
+    //     index: isBreak ? phase3.R1.index : phase3.ext.R.index,
+    //     time: isBreak ? phase3.R1.time : phase3.ext.R.time,
+    // };
+    // const E = {
+    //     price: isBreak ? phase3.S1.price : phase3.ext.S.price,
+    //     index: isBreak ? phase3.S1.index : phase3.ext.S.index,
+    //     time: isBreak ? phase3.S1.time : phase3.ext.S.time,
+    //     tAfter: isBreak ? phase3.S1.tAfter : phase3.ext.S.tAfter,
+    // };
+
+    // const phase4 = scanPhase({
+    //     side: !side,
+    //     start: D,
+    //     end: { time: Math.min(pickTime ?? E.tAfter, E.tAfter) },
+    // });
+
+    // const phase5 = scanPhase({
+    //     side,
+    //     start: E,
+    //     end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+    // });
+
+    // const F = {
+    //     price: phase5.ext.R.price,
+    //     index: phase5.ext.R.index,
+    //     time: phase5.ext.R.time,
+    // };
+
+    // const G = {
+    //     price: phase5.ext.S.price,
+    //     index: phase5.ext.S.index,
+    //     time: phase5.ext.S.time,
+    //     tAfter: phase5.ext.S.tAfter,
+    // };
+
+    // const phase6 = scanPhase({
+    //     side: !side,
+    //     start: F,
+    //     end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+    // });
+
+    console.log("calcContinuePattern", [
+        phase1,
+        phase2,
+        phase3,
+        phase4,
+        phase5,
+    ]);
+
+    const AB = mf.fmtNum(ab, 1, true);
+    const BC = mf.fmtNum(C.price - B.price, 1, true);
+    const CD = mf.fmtNum(D.price - C.price, 1, true);
+    const DE = mf.fmtNum(E.price - D.price, 1, true);
+    // const EF = mf.fmtNum(F.price - E.price, 1, true);
+    const EF = phase4.ext.pr;
+    // const FG = phase5.ext.pr;
+
+    const TR2 = isBreak ? phase2.tr1 : phase2.tr;
+
+    const T1 = phase1.R.index + phase1.tr;
+    const T2 = C.index + TR2;
+    const T3 = D.index + phase3.tr;
+    const T4 = E.index + phase4.tr;
+    const T5 = F.index + phase5.tr;
+    const timeMark = [T5, T4, T3, T2, T1];
+
+    let progress = {};
+    progress.steps = [
+        [
+            //
+            BC >= phase1.pr,
+            C.index > T1,
+        ],
+        [
+            //
+            CD <= AB,
+            CD >= phase2.pr,
+            D.index > T2,
+        ],
+        [
+            //
+            DE <= BC,
+            DE >= CD / 2,
+            DE >= phase3.pr,
+            phase3.tr <= phase1.tr,
+            E.index > T3,
+        ],
+        [
+            //
+            ![C.price].includes(E.price),
+            EF <= CD,
+            EF >= phase4.pr,
+            phase4.tr <= TR2,
+            phase4.ext.S.index > T4,
+        ],
+    ];
+    for (let i = 0; i < progress.steps.length; i++) {
+        progress.step = i + 1;
+        progress.result = progress.steps[i].every(Boolean);
+        if (!progress.result) break;
+    }
+    //
+    const points = [
+        { time: A.time, value: A.price, color: "#FF7F00" },
+        { time: phase1.R.time, value: phase1.R.price, color: "#FF0000" },
+        { time: C.time, value: C.price, color: "#FF1493" },
+        { time: D.time, value: D.price, color: "#8000FF" },
+        { time: E.time, value: E.price, color: "#00FFFF" },
+        { time: F.time, value: F.price, color: "#00FF00" },
+        { time: phase5.ext.S.time, value: phase5.ext.S.price },
+    ];
+    //
+    const entry = C.price;
+    const [x] = adjustTargetPrice(E.price, 2 * DE, side);
+    const X = mf.fmtNum(x - entry, 1, true);
+    const [y] = adjustTargetPrice(C.price, BC, side);
+    const Y = mf.fmtNum(y - entry, 1, true);
+    const [z] = adjustTargetPrice(C.price, 2 * BC, side);
     const Z = mf.fmtNum(z - entry, 1, true);
 
     return {
@@ -542,12 +766,11 @@ function removePatternTool() {
 }
 function setTimeMark(data) {
     const colors = [
-        "#FF7F00",
-        "#FF0000",
-        "#FF1493",
-        "#8000FF",
-        "#00FFFF",
         "#00FF00",
+        "#00FFFF",
+        "#8000FF",
+        "#FF1493",
+        "#FF0000",
         "#FF7F00",
     ];
     let result = [];
@@ -577,5 +800,11 @@ function makeUnique(arr) {
         uniqueSet.add(newItem.time);
         return newItem;
     });
+}
+function changePatternType() {
+    const type =
+        patternType.value >= patternTypeCount ? 1 : patternType.value + 1;
+    store.dispatch("tradingDerivative/setPatternType", type);
+    refresh();
 }
 </script>
