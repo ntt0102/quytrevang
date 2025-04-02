@@ -22,6 +22,7 @@ const continuePattern = [
         conds: [
             //
             "DE < BC",
+            "DE > DR3",
             "DE > PR3",
             "TR3 < TR1",
             "Te > Thồng",
@@ -44,6 +45,7 @@ const continuePattern = [
         conds: [
             //
             "G ≠ E",
+            "FG > FR5",
             "FG < DE",
             "FG > PR5",
             "TR5 < TR3",
@@ -87,6 +89,7 @@ const reversalPattern = [
             //
             "F ≠ D",
             "EF < CD",
+            "EF > ER4",
             "EF > PR4",
             "TR4 < TR2",
             "Tf > Tlam",

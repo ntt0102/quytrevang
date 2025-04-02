@@ -309,6 +309,9 @@ function calcContinuePattern() {
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = phase5.ext.pr;
 
+    const DR3 = mf.fmtNum(phase3.R1.price - D.price, 1, true);
+    const FR5 = mf.fmtNum(phase5.R1.price - F.price, 1, true);
+
     const TR3 = isBreak ? phase3.tr1 : phase3.tr;
 
     const T1 = phase1.R.index + phase1.tr;
@@ -336,13 +339,14 @@ function calcContinuePattern() {
         [
             //
             DE <= BC,
+            DE >= DR3,
             DE >= phase3.pr,
             TR3 <= phase1.tr,
             E.index > T3,
         ],
         [
             //
-            ![B.price, D.price].includes(F.price),
+            F.price !== D.price && F.price !== B.price,
             EF <= CD,
             EF >= DE / 2,
             EF >= phase4.pr,
@@ -351,8 +355,9 @@ function calcContinuePattern() {
         ],
         [
             //
-            ![E.price].includes(G.price),
+            G.price !== E.price,
             FG <= DE,
+            FG >= FR5,
             FG >= phase5.pr,
             phase5.tr <= TR3,
             phase5.ext.S.index > T5,
@@ -472,6 +477,8 @@ function calcReversalPattern() {
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = phase4.ext.pr;
 
+    const ER4 = mf.fmtNum(phase4.R1.price - E.price, 1, true);
+
     const TR2 = isBreak ? phase2.tr1 : phase2.tr;
 
     const T1 = phase1.R.index + phase1.tr;
@@ -496,7 +503,7 @@ function calcReversalPattern() {
         ],
         [
             //
-            ![C.price].includes(E.price),
+            E.price !== C.price,
             DE <= BC,
             DE >= CD / 2,
             DE >= phase3.pr,
@@ -505,8 +512,9 @@ function calcReversalPattern() {
         ],
         [
             //
-            ![D.price].includes(F.price),
+            F.price !== D.price,
             EF <= CD,
+            EF >= ER4,
             EF >= phase4.pr,
             phase4.tr <= TR2,
             phase4.ext.S.index > T4,
@@ -552,7 +560,7 @@ function scanPhase({ side, start, end }) {
         R = {},
         box = {},
         maxBox = {},
-        pMaxBox = {},
+        preBox = {},
         extBox = {};
     const _prices = props.prices.filter((item) => {
         let cond = item.time >= start.time;
@@ -579,9 +587,9 @@ function scanPhase({ side, start, end }) {
             if (mf.cmp(price, side, box.R.price)) {
                 if (box.pr > 0) {
                     if (box.pr >= maxBox.pr) {
-                        pMaxBox = mf.cloneDeep(maxBox);
+                        preBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
-                        if (box.tr < maxBox.tr) maxBox.tr = pMaxBox.tr;
+                        if (maxBox.tr < preBox.tr) maxBox.tr = preBox.tr;
                     }
                 }
                 box = {
@@ -620,8 +628,8 @@ function scanPhase({ side, start, end }) {
         pr: maxBox.pr,
         S1: maxBox.S,
         R1: maxBox.R,
-        tr1: pMaxBox.tr,
-        pr1: pMaxBox.pr,
+        tr1: preBox.tr,
+        pr1: preBox.pr,
         S,
         R,
         ext: extBox,
