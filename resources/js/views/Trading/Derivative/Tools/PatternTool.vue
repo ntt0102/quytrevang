@@ -240,7 +240,7 @@ function calcContinuePattern() {
         start: B,
         end: { time: Math.min(pickTime ?? C.time, C.time) },
     });
-    const stopTime = props.indexToTime(4 * phase2.R.index - 3 * phase1.S.index);
+    const stopTime = props.indexToTime(6 * phase2.R.index - 5 * phase1.S.index);
     const phase3 = scanPhase({
         side,
         start: C,
