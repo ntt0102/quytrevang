@@ -34,7 +34,7 @@ const continuePattern = [
             //
             "F ≠ D ≠ B",
             "EF < CD",
-            "EF > DE/2",
+            "EF > 2DE/3",
             "EF > PR4",
             "TR4 < TR2",
             "Tf > Ttím",
@@ -77,7 +77,7 @@ const reversalPattern = [
             //
             "E ≠ C",
             "DE < BC",
-            "DE >= CD/2",
+            "DE >= 2CD/3",
             "DE > PR3",
             "TR3 < TR1",
             "Te > Ttím",

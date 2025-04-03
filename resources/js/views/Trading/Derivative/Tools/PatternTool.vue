@@ -348,7 +348,7 @@ function calcContinuePattern() {
             //
             F.price !== D.price && F.price !== B.price,
             EF <= CD,
-            EF >= DE / 2,
+            EF >= (2 * DE) / 3,
             EF >= phase4.pr,
             phase4.tr <= phase2.tr,
             F.index > T4,
@@ -504,7 +504,7 @@ function calcReversalPattern() {
             //
             E.price !== C.price,
             DE <= BC,
-            DE >= CD / 2,
+            DE >= (2 * CD) / 3,
             DE >= phase3.pr,
             phase3.tr <= phase1.tr,
             E.index > T3,
