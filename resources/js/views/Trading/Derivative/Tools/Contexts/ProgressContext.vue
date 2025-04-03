@@ -88,18 +88,23 @@ function refreshPattern() {
         color: white;
         text-align: left;
         margin-top: 10px;
-        line-height: 20px;
+        line-height: 19px;
         font-size: 15px;
         min-height: 50px;
 
         &.portrait {
             flex-direction: column !important;
+
+            .step {
+                padding: 3px 5px !important;
+                width: 160px !important;
+            }
         }
 
         .step {
             border-radius: 5px;
-            padding: 3px 5px;
-            width: 170px;
+            padding: 3px 0px;
+            width: 145px;
 
             &.success {
                 background: rgba(0, 60, 0, 0.5);

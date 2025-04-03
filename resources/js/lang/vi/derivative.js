@@ -41,7 +41,7 @@ const continuePattern = [
         ],
     },
     {
-        name: "Bước vào lệnh",
+        name: "Bước kiểm tra 5",
         conds: [
             //
             "G ≠ E",
@@ -50,6 +50,15 @@ const continuePattern = [
             "FG > PR5",
             "TR5 < TR3",
             "Tg > Tlam",
+        ],
+    },
+    {
+        name: "Bước vào lệnh",
+        conds: [
+            //
+            "GH > PR6",
+            "TR6 < TR4",
+            "Th > Tlục",
         ],
     },
 ];
@@ -84,7 +93,7 @@ const reversalPattern = [
         ],
     },
     {
-        name: "Bước vào lệnh",
+        name: "Bước kiểm tra 4",
         conds: [
             //
             "F ≠ D",
@@ -93,6 +102,15 @@ const reversalPattern = [
             "EF > PR4",
             "TR4 < TR2",
             "Tf > Tlam",
+        ],
+    },
+    {
+        name: "Bước vào lệnh",
+        conds: [
+            //
+            "FG > PR5",
+            "TR5 < TR3",
+            "Tg > Tlục",
         ],
     },
 ];

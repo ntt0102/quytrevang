@@ -24,7 +24,6 @@
     </div>
 </template>
 <script setup>
-import Timeline from "pusher-js/types/src/core/timeline/timeline";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 
@@ -254,12 +253,16 @@ function calcContinuePattern() {
     const D = {
         price: isBreak ? phase3.R1.price : phase3.ext.R.price,
         index: isBreak ? phase3.R1.index : phase3.ext.R.index,
+        index1: isBreak ? phase3.R1.index1 : phase3.ext.R.index1,
         time: isBreak ? phase3.R1.time : phase3.ext.R.time,
+        time1: isBreak ? phase3.R1.time1 : phase3.ext.R.time1,
     };
     const E = {
         price: isBreak ? phase3.S1.price : phase3.ext.S.price,
         index: isBreak ? phase3.S1.index : phase3.ext.S.index,
+        index1: isBreak ? phase3.S1.index1 : phase3.ext.S.index1,
         time: isBreak ? phase3.S1.time : phase3.ext.S.time,
+        time1: isBreak ? phase3.S1.time1 : phase3.ext.S.time1,
     };
 
     const phase4 = scanPhase({
@@ -277,13 +280,17 @@ function calcContinuePattern() {
     const F = {
         price: phase5.ext.R.price,
         index: phase5.ext.R.index,
+        index1: phase5.ext.R.index1,
         time: phase5.ext.R.time,
+        time1: phase5.ext.R.time1,
     };
 
     const G = {
         price: phase5.ext.S.price,
         index: phase5.ext.S.index,
+        index1: phase5.ext.S.index1,
         time: phase5.ext.S.time,
+        time1: phase5.ext.S.time1,
     };
 
     const phase6 = scanPhase({
@@ -307,6 +314,7 @@ function calcContinuePattern() {
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = phase5.ext.pr;
+    const GH = phase6.ext.pr;
 
     // let DR3 = mf.fmtNum(phase3.R1.price - D.price, 1, true);
     // if (DR3 / CD < 0.1) DR3 = mf.fmtNum(phase3.pre.R.price - D.price, 1, true);
@@ -328,14 +336,14 @@ function calcContinuePattern() {
         [
             //
             BC >= phase1.pr,
-            phase2.R.index > T1,
+            phase2.R.index1 > T1,
         ],
         [
             //
             CD <= AB,
             CD >= BC / 2,
             CD >= phase2.pr,
-            D.index > T2,
+            D.index1 > T2,
         ],
         [
             //
@@ -343,7 +351,7 @@ function calcContinuePattern() {
             // DE >= DR3,
             DE >= phase3.pr,
             // TR3 <= phase1.tr,
-            E.index > T3,
+            E.index1 > T3,
         ],
         [
             //
@@ -352,7 +360,7 @@ function calcContinuePattern() {
             EF >= (2 * DE) / 3,
             EF >= phase4.pr,
             phase4.tr <= phase2.tr,
-            F.index > T4,
+            F.index1 > T4,
         ],
         [
             //
@@ -361,7 +369,13 @@ function calcContinuePattern() {
             FG >= FR5,
             FG >= phase5.pr,
             phase5.tr <= TR3,
-            phase5.ext.S.index > T5,
+            phase5.ext.S.index1 > T5,
+        ],
+        [
+            //
+            GH >= phase6.pr,
+            phase6.tr <= phase4.tr,
+            phase6.ext.S.index1 > T6,
         ],
     ];
     for (let i = 0; i < progress.steps.length; i++) {
@@ -372,13 +386,13 @@ function calcContinuePattern() {
     //
     const points = [
         { time: A.time, value: A.price, color: "#FFFF00" },
-        { time: phase1.R.time, value: phase1.R.price, color: "#FF7F00" },
-        { time: phase2.R.time, value: phase2.R.price, color: "#FF0000" },
-        { time: D.time, value: D.price, color: "#FF1493" },
-        { time: E.time, value: E.price, color: "#8000FF" },
-        { time: F.time, value: F.price, color: "#00FFFF" },
-        { time: G.time, value: G.price, color: "#00FF00" },
-        { time: phase6.ext.S.time, value: phase6.ext.S.price },
+        { time: phase1.R.time1, value: phase1.R.price, color: "#FF7F00" },
+        { time: phase2.R.time1, value: phase2.R.price, color: "#FF0000" },
+        { time: D.time1, value: D.price, color: "#FF1493" },
+        { time: E.time1, value: E.price, color: "#8000FF" },
+        { time: F.time1, value: F.price, color: "#00FFFF" },
+        { time: G.time1, value: G.price, color: "#00FF00" },
+        { time: phase6.ext.S.time1, value: phase6.ext.S.price },
     ];
     //
     const entry = D.price;
@@ -483,6 +497,7 @@ function calcReversalPattern() {
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = phase4.ext.pr;
+    const FG = phase5.ext.pr;
 
     // let ER4 = mf.fmtNum(phase4.R1.price - E.price, 1, true);
     // if (ER4 / DE < 0.1) ER4 = mf.fmtNum(phase4.pre.R.price - E.price, 1, true);
@@ -526,6 +541,12 @@ function calcReversalPattern() {
             EF >= phase4.pr,
             phase4.tr <= TR2,
             phase4.ext.S.index1 > T4,
+        ],
+        [
+            //
+            FG >= phase5.pr,
+            phase5.tr <= phase3.tr,
+            phase5.ext.S.index1 > T5,
         ],
     ];
     for (let i = 0; i < progress.steps.length; i++) {
@@ -603,7 +624,13 @@ function scanPhase({ side, start, end }) {
                 }
                 const isREqual = price === box.R.price;
                 box = {
-                    R: { index, time, price, index1: isREqual ? box.R.index1 : index, time1: isREqual ? box.R.time1 : time },
+                    R: {
+                        index,
+                        time,
+                        price,
+                        index1: isREqual ? box.R.index1 : index,
+                        time1: isREqual ? box.R.time1 : time,
+                    },
                     S: { index, time, price, index1: index, time1: time },
                     pr: 0,
                     tr: 0,
