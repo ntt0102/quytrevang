@@ -24,6 +24,7 @@
     </div>
 </template>
 <script setup>
+import Timeline from "pusher-js/types/src/core/timeline/timeline";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 
@@ -423,12 +424,16 @@ function calcReversalPattern() {
     const C = {
         price: isBreak ? phase2.R1.price : phase2.ext.R.price,
         index: isBreak ? phase2.R1.index : phase2.ext.R.index,
+        index1: isBreak ? phase2.R1.index1 : phase2.ext.R.index1,
         time: isBreak ? phase2.R1.time : phase2.ext.R.time,
+        time1: isBreak ? phase2.R1.time1 : phase2.ext.R.time1,
     };
     const D = {
         price: isBreak ? phase2.S1.price : phase2.ext.S.price,
         index: isBreak ? phase2.S1.index : phase2.ext.S.index,
+        index1: isBreak ? phase2.S1.index1 : phase2.ext.S.index1,
         time: isBreak ? phase2.S1.time : phase2.ext.S.time,
+        time1: isBreak ? phase2.S1.time1 : phase2.ext.S.time1,
     };
 
     const phase3 = scanPhase({
@@ -446,13 +451,17 @@ function calcReversalPattern() {
     const E = {
         price: phase4.ext.R.price,
         index: phase4.ext.R.index,
+        index1: phase4.ext.R.index1,
         time: phase4.ext.R.time,
+        time1: phase4.ext.R.time1,
     };
 
     const F = {
         price: phase4.ext.S.price,
         index: phase4.ext.S.index,
+        index1: phase4.ext.S.index1,
         time: phase4.ext.S.time,
+        time1: phase4.ext.S.time1,
     };
 
     const phase5 = scanPhase({
@@ -492,13 +501,13 @@ function calcReversalPattern() {
         [
             //
             BC >= phase1.pr,
-            C.index > T1,
+            C.index1 > T1,
         ],
         [
             //
             CD <= AB,
             CD >= phase2.pr,
-            D.index > T2,
+            D.index1 > T2,
         ],
         [
             //
@@ -507,7 +516,7 @@ function calcReversalPattern() {
             DE >= (2 * CD) / 3,
             DE >= phase3.pr,
             phase3.tr <= phase1.tr,
-            E.index > T3,
+            E.index1 > T3,
         ],
         [
             //
@@ -516,7 +525,7 @@ function calcReversalPattern() {
             // EF >= ER4,
             EF >= phase4.pr,
             phase4.tr <= TR2,
-            phase4.ext.S.index > T4,
+            phase4.ext.S.index1 > T4,
         ],
     ];
     for (let i = 0; i < progress.steps.length; i++) {
@@ -527,12 +536,12 @@ function calcReversalPattern() {
     //
     const points = [
         { time: A.time, value: A.price, color: "#FF7F00" },
-        { time: B.time, value: B.price, color: "#FF0000" },
-        { time: C.time, value: C.price, color: "#FF1493" },
-        { time: D.time, value: D.price, color: "#8000FF" },
-        { time: E.time, value: E.price, color: "#00FFFF" },
-        { time: F.time, value: F.price, color: "#00FF00" },
-        { time: phase5.ext.S.time, value: phase5.ext.S.price },
+        { time: phase1.R.time1, value: B.price, color: "#FF0000" },
+        { time: C.time1, value: C.price, color: "#FF1493" },
+        { time: D.time1, value: D.price, color: "#8000FF" },
+        { time: E.time1, value: E.price, color: "#00FFFF" },
+        { time: F.time1, value: F.price, color: "#00FF00" },
+        { time: phase5.ext.S.time1, value: phase5.ext.S.price },
     ];
     //
     const entry = C.price;
@@ -576,8 +585,8 @@ function scanPhase({ side, start, end }) {
             if (index === -1) return false;
             if (i === 0 || (start.price && price === start.price)) {
                 box = {
-                    R: { index, time, price },
-                    S: { index, time, price },
+                    R: { index, time, price, index1: index, time1: time },
+                    S: { index, time, price, index1: index, time1: time },
                     pr: 0,
                     tr: 0,
                 };
@@ -592,9 +601,10 @@ function scanPhase({ side, start, end }) {
                         if (maxBox.pr < preBox.pr) maxBox.pr = preBox.pr;
                     }
                 }
+                const isREqual = price === box.R.price;
                 box = {
-                    R: { index, time, price },
-                    S: { index, time, price },
+                    R: { index, time, price, index1: isREqual ? box.R.index1 : index, time1: isREqual ? box.R.time1 : time },
+                    S: { index, time, price, index1: index, time1: time },
                     pr: 0,
                     tr: 0,
                 };
@@ -603,8 +613,12 @@ function scanPhase({ side, start, end }) {
                     if (price !== box.S.price) {
                         box.pr = mf.fmtNum(price - box.R.price, 1, true);
                         box.tr = index - box.R.index;
+                        box.S.price = price;
+                        box.S.index1 = index;
+                        box.S.time1 = time;
                     }
-                    box.S = { index, time, price };
+                    box.S.index = index;
+                    box.S.time = time;
                 }
             }
             return true;
