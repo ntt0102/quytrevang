@@ -371,7 +371,7 @@ function calcContinuePattern() {
         ],
         [
             //
-            G.price !== E.price,
+            // G.price !== E.price,
             FG <= DE,
             FG >= FR5,
             FG >= PR5,
@@ -549,7 +549,7 @@ function calcReversalPattern() {
         ],
         [
             //
-            F.price !== D.price,
+            // F.price !== D.price,
             EF <= CD,
             // EF >= ER4,
             EF >= PR4,
