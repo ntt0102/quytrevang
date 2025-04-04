@@ -32,7 +32,7 @@ const continuePattern = [
         name: "Bước tím",
         conds: [
             //
-            "P ≠ P.đỏ ≠ P.vàng",
+            "P ≠ P.đỏ.vàng",
             "S < S.đỏ",
             "S > S.hồng/2",
             "TR < TR.đỏ",
