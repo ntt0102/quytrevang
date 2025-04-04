@@ -506,7 +506,8 @@ function calcReversalPattern() {
     // let ER4 = mf.fmtNum(phase4.R1.price - E.price, 1, true);
     // if (ER4 / DE < 0.1) ER4 = mf.fmtNum(phase4.pre.R.price - E.price, 1, true);
 
-    const TR2 = isBreak ? phase2.pre.tr : phase2.tr;
+    const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
+    const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
 
     const T1 = phase1.R.index + phase1.tr;
     const T2 = C.index + TR2;
@@ -543,7 +544,7 @@ function calcReversalPattern() {
             EF <= CD,
             // EF >= ER4,
             EF >= phase4.pr,
-            phase4.tr <= TR2,
+            TR4 <= TR2,
             phase4.ext.S.index1 > T4,
         ],
         [
