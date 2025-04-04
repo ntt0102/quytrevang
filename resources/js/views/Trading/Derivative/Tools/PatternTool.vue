@@ -530,7 +530,7 @@ function calcReversalPattern() {
             DE <= BC,
             DE >= (2 * CD) / 3,
             DE >= phase3.pr,
-            phase3.tr <= phase1.tr,
+            // phase3.tr <= phase1.tr,
             E.index1 > T3,
         ],
         [

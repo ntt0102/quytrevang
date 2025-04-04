@@ -88,7 +88,7 @@ const reversalPattern = [
             "DE < BC",
             "DE >= 2CD/3",
             "DE > PR3",
-            "TR3 < TR1",
+            // "TR3 < TR1",
             "Te > Ttím",
         ],
     },
