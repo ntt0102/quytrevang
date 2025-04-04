@@ -244,7 +244,7 @@ function calcContinuePattern() {
     const phase3 = scanPhase({
         side,
         start: C,
-        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        end: { time: pickTime ?? stopTime },
     });
 
     const isBreak =
@@ -274,7 +274,7 @@ function calcContinuePattern() {
     const phase5 = scanPhase({
         side,
         start: E,
-        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        end: { time: pickTime ?? stopTime },
     });
 
     const F = {
@@ -296,7 +296,7 @@ function calcContinuePattern() {
     const phase6 = scanPhase({
         side: !side,
         start: F,
-        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        end: { time: pickTime ?? stopTime },
     });
 
     console.log("calcContinuePattern", [
@@ -428,7 +428,7 @@ function calcReversalPattern() {
     const phase2 = scanPhase({
         side,
         start: B,
-        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        end: { time: pickTime ?? stopTime },
     });
 
     const isBreak =
@@ -459,7 +459,7 @@ function calcReversalPattern() {
     const phase4 = scanPhase({
         side,
         start: D,
-        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        end: { time: pickTime ?? stopTime },
     });
 
     const E = {
@@ -481,7 +481,7 @@ function calcReversalPattern() {
     const phase5 = scanPhase({
         side: !side,
         start: E,
-        end: { time: Math.min(pickTime ?? stopTime, stopTime) },
+        end: { time: pickTime ?? stopTime },
     });
 
     console.log("calcReversalPattern", [
