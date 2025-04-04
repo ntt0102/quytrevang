@@ -464,7 +464,7 @@ function calcReversalPattern() {
 
     const isBreak2 =
         mf.fmtNum(D.price - phase4.R1.price, 1, true) >= phase3.pr &&
-        !(phase2.ext.tr >= phase2.tr && phase2.ext.pr >= phase2.pr);
+        !(phase4.ext.tr >= phase4.tr && phase4.ext.pr >= phase4.pr);
 
     const E = {
         price: isBreak2 ? phase4.R1.price : phase4.ext.R.price,
