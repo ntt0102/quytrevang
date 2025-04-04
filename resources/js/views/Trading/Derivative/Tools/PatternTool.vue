@@ -431,23 +431,23 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak =
+    const isBreak1 =
         mf.fmtNum(B.price - phase2.R1.price, 1, true) >= phase1.pr &&
         !(phase2.ext.tr >= phase2.tr && phase2.ext.pr >= phase2.pr);
 
     const C = {
-        price: isBreak ? phase2.R1.price : phase2.ext.R.price,
-        index: isBreak ? phase2.R1.index : phase2.ext.R.index,
-        index1: isBreak ? phase2.R1.index1 : phase2.ext.R.index1,
-        time: isBreak ? phase2.R1.time : phase2.ext.R.time,
-        time1: isBreak ? phase2.R1.time1 : phase2.ext.R.time1,
+        price: isBreak1 ? phase2.R1.price : phase2.ext.R.price,
+        index: isBreak1 ? phase2.R1.index : phase2.ext.R.index,
+        index1: isBreak1 ? phase2.R1.index1 : phase2.ext.R.index1,
+        time: isBreak1 ? phase2.R1.time : phase2.ext.R.time,
+        time1: isBreak1 ? phase2.R1.time1 : phase2.ext.R.time1,
     };
     const D = {
-        price: isBreak ? phase2.S1.price : phase2.ext.S.price,
-        index: isBreak ? phase2.S1.index : phase2.ext.S.index,
-        index1: isBreak ? phase2.S1.index1 : phase2.ext.S.index1,
-        time: isBreak ? phase2.S1.time : phase2.ext.S.time,
-        time1: isBreak ? phase2.S1.time1 : phase2.ext.S.time1,
+        price: isBreak1 ? phase2.S1.price : phase2.ext.S.price,
+        index: isBreak1 ? phase2.S1.index : phase2.ext.S.index,
+        index1: isBreak1 ? phase2.S1.index1 : phase2.ext.S.index1,
+        time: isBreak1 ? phase2.S1.time : phase2.ext.S.time,
+        time1: isBreak1 ? phase2.S1.time1 : phase2.ext.S.time1,
     };
 
     const phase3 = scanPhase({
@@ -462,20 +462,24 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
+    const isBreak2 =
+        mf.fmtNum(D.price - phase4.R1.price, 1, true) >= phase3.pr &&
+        !(phase2.ext.tr >= phase2.tr && phase2.ext.pr >= phase2.pr);
+
     const E = {
-        price: phase4.ext.R.price,
-        index: phase4.ext.R.index,
-        index1: phase4.ext.R.index1,
-        time: phase4.ext.R.time,
-        time1: phase4.ext.R.time1,
+        price: isBreak2 ? phase4.R1.price : phase4.ext.R.price,
+        index: isBreak2 ? phase4.R1.index : phase4.ext.R.index,
+        index1: isBreak2 ? phase4.R1.index1 : phase4.ext.R.index1,
+        time: isBreak2 ? phase4.R1.time : phase4.ext.R.time,
+        time1: isBreak2 ? phase4.R1.time1 : phase4.ext.R.time1,
     };
 
     const F = {
-        price: phase4.ext.S.price,
-        index: phase4.ext.S.index,
-        index1: phase4.ext.S.index1,
-        time: phase4.ext.S.time,
-        time1: phase4.ext.S.time1,
+        price: isBreak2 ? phase4.S1.price : phase4.ext.S.price,
+        index: isBreak2 ? phase4.S1.index : phase4.ext.S.index,
+        index1: isBreak2 ? phase4.S1.index1 : phase4.ext.S.index1,
+        time: isBreak2 ? phase4.S1.time : phase4.ext.S.time,
+        time1: isBreak2 ? phase4.S1.time1 : phase4.ext.S.time1,
     };
 
     const phase5 = scanPhase({
