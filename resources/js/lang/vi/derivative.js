@@ -3,8 +3,8 @@ const continuePattern = [
         name: "Bước cam",
         conds: [
             //
-            "S > PR.vàng",
-            "T > T.cam",
+            "S > PR",
+            "T > TR",
         ],
     },
     {
@@ -13,8 +13,8 @@ const continuePattern = [
             //
             "S < S.vàng",
             "S > S.cam/2",
-            "S > PR.cam",
-            "T > T.đỏ",
+            "S > PR",
+            "T > TR",
         ],
     },
     {
@@ -23,9 +23,9 @@ const continuePattern = [
             //
             "S < S.cam",
             // "DE > DR3",
-            "S > PR.đỏ",
+            "S > PR",
             // "TR3 < TR1",
-            "T > T.hồng",
+            "T > TR",
         ],
     },
     {
@@ -35,9 +35,9 @@ const continuePattern = [
             "P ≠ P.đỏ ≠ P.vàng",
             "S < S.đỏ",
             "S > S.hồng/2",
-            "S > PR.hồng",
+            "S > PR",
             "TR < TR.đỏ",
-            "T > T.tím",
+            "T > TR",
         ],
     },
     {
@@ -47,18 +47,18 @@ const continuePattern = [
             // "G ≠ E",
             "S < S.hồng",
             // "FG > FR5",
-            "S > PR.tím",
+            "S > PR",
             "TR < TR.hồng",
-            "T > T.lam",
+            "T > TR",
         ],
     },
     {
         name: "Bước lục",
         conds: [
             //
-            "S > PR.lam",
+            "S > PR",
             "TR < TR.tím",
-            "T > T.lục",
+            "T > TR",
         ],
     },
 ];
@@ -67,8 +67,8 @@ const reversalPattern = [
         name: "Bước đỏ",
         conds: [
             //
-            "S > PR.cam",
-            "T > T.đỏ",
+            "S > PR",
+            "T > TR",
         ],
     },
     {
@@ -76,8 +76,8 @@ const reversalPattern = [
         conds: [
             //
             "S < S.cam",
-            "S > PR.đỏ",
-            "T > T.hồng",
+            "S > PR",
+            "T > TR",
         ],
     },
     {
@@ -87,9 +87,9 @@ const reversalPattern = [
             "P ≠ P.đỏ",
             "S < S.đỏ",
             "S >= S.hồng/2",
-            "S > PR.hồng",
+            "S > PR",
             // "TR3 < TR1",
-            "T > T.tím",
+            "T > TR",
         ],
     },
     {
@@ -99,18 +99,18 @@ const reversalPattern = [
             // "F ≠ D",
             "S < S.hồng",
             // "EF > ER4",
-            "S > PR.tím",
+            "S > PR",
             "TR < TR.hồng",
-            "T > T.lam",
+            "T > TR",
         ],
     },
     {
         name: "Bước lục",
         conds: [
             //
-            "S > PR.lam",
+            "S > PR",
             "TR < TR.tím",
-            "T > T.lục",
+            "T > TR",
         ],
     },
 ];
