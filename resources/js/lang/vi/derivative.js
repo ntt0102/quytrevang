@@ -1,116 +1,116 @@
 const continuePattern = [
     {
-        name: "Bước kiểm tra 1",
+        name: "Bước cam",
         conds: [
             //
-            "BC > PR1",
-            "Tc > Tcam",
+            "S > PR.vàng",
+            "T > T.cam",
         ],
     },
     {
-        name: "Bước kiểm tra 2",
+        name: "Bước đỏ",
         conds: [
             //
-            "CD < AB",
-            "CD > BC/2",
-            "CD > PR2",
-            "Td > Tđỏ",
+            "S < S.vàng",
+            "S > S.cam/2",
+            "S > PR.cam",
+            "T > T.đỏ",
         ],
     },
     {
-        name: "Bước kiểm tra 3",
+        name: "Bước hồng",
         conds: [
             //
-            "DE < BC",
+            "S < S.cam",
             // "DE > DR3",
-            "DE > PR3",
+            "S > PR.đỏ",
             // "TR3 < TR1",
-            "Te > Thồng",
+            "T > T.hồng",
         ],
     },
     {
-        name: "Bước kiểm tra 4",
+        name: "Bước tím",
         conds: [
             //
-            "F ≠ D ≠ B",
-            "EF < CD",
-            "EF > 2DE/3",
-            "EF > PR4",
-            "TR4 < TR2",
-            "Tf > Ttím",
+            "P ≠ P.đỏ ≠ P.vàng",
+            "S < S.đỏ",
+            "S > S.hồng/2",
+            "S > PR.hồng",
+            "TR < TR.đỏ",
+            "T > T.tím",
         ],
     },
     {
-        name: "Bước kiểm tra 5",
+        name: "Bước lam",
         conds: [
             //
             // "G ≠ E",
-            "FG < DE",
-            "FG > FR5",
-            "FG > PR5",
-            "TR5 < TR3",
-            "Tg > Tlam",
+            "S < S.hồng",
+            // "FG > FR5",
+            "S > PR.tím",
+            "TR < TR.hồng",
+            "T > T.lam",
         ],
     },
     {
-        name: "Bước vào lệnh",
+        name: "Bước lục",
         conds: [
             //
-            "GH > PR6",
-            "TR6 < TR4",
-            "Th > Tlục",
+            "S > PR.lam",
+            "TR < TR.tím",
+            "T > T.lục",
         ],
     },
 ];
 const reversalPattern = [
     {
-        name: "Bước kiểm tra 1",
+        name: "Bước đỏ",
         conds: [
             //
-            "BC > PR1",
-            "Tc > Tđỏ",
+            "S > PR.cam",
+            "T > T.đỏ",
         ],
     },
     {
-        name: "Bước kiểm tra 2",
+        name: "Bước hồng",
         conds: [
             //
-            "CD < AB",
-            "CD > PR2",
-            "Td > Thồng",
+            "S < S.cam",
+            "S > PR.đỏ",
+            "T > T.hồng",
         ],
     },
     {
-        name: "Bước kiểm tra 3",
+        name: "Bước tím",
         conds: [
             //
-            "E ≠ C",
-            "DE < BC",
-            "DE >= 2CD/3",
-            "DE > PR3",
+            "P ≠ P.đỏ",
+            "S < S.đỏ",
+            "S >= S.hồng/2",
+            "S > PR.hồng",
             // "TR3 < TR1",
-            "Te > Ttím",
+            "T > T.tím",
         ],
     },
     {
-        name: "Bước kiểm tra 4",
+        name: "Bước lam",
         conds: [
             //
             // "F ≠ D",
-            "EF < CD",
+            "S < S.hồng",
             // "EF > ER4",
-            "EF > PR4",
-            "TR4 < TR2",
-            "Tf > Tlam",
+            "S > PR.tím",
+            "TR < TR.hồng",
+            "T > T.lam",
         ],
     },
     {
-        name: "Bước vào lệnh",
+        name: "Bước lục",
         conds: [
             //
-            "FG > PR5",
-            "TR5 < TR3",
-            "Tg > Tlục",
+            "S > PR.lam",
+            "TR < TR.tím",
+            "T > T.lục",
         ],
     },
 ];

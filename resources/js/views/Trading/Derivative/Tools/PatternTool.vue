@@ -364,7 +364,7 @@ function calcContinuePattern() {
             //
             F.price !== D.price && F.price !== B.price,
             EF <= CD,
-            EF >= (2 * DE) / 3,
+            EF >= DE / 2,
             EF >= phase4.pr,
             phase4.tr <= phase2.tr,
             F.index1 > T4,
@@ -373,7 +373,7 @@ function calcContinuePattern() {
             //
             // G.price !== E.price,
             FG <= DE,
-            FG >= FR5,
+            // FG >= FR5,
             FG >= PR5,
             TR5 <= TR3,
             G.index1 > T5,
@@ -542,7 +542,7 @@ function calcReversalPattern() {
             //
             E.price !== C.price,
             DE <= BC,
-            DE >= (2 * CD) / 3,
+            DE >= CD / 2,
             DE >= phase3.pr,
             // phase3.tr <= phase1.tr,
             E.index1 > T3,
