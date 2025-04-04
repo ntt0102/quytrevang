@@ -282,19 +282,19 @@ function calcContinuePattern() {
         !(phase5.ext.tr >= phase5.tr && phase5.ext.pr >= phase5.pr);
 
     const F = {
-        price: isBreak2 ? phase3.R1.price : phase5.ext.R.price,
-        index: isBreak2 ? phase3.R1.index : phase5.ext.R.index,
-        index1: isBreak2 ? phase3.R1.index1 : phase5.ext.R.index1,
-        time: isBreak2 ? phase3.R1.time : phase5.ext.R.time,
-        time1: isBreak2 ? phase3.R1.time1 : phase5.ext.R.time1,
+        price: isBreak2 ? phase5.R1.price : phase5.ext.R.price,
+        index: isBreak2 ? phase5.R1.index : phase5.ext.R.index,
+        index1: isBreak2 ? phase5.R1.index1 : phase5.ext.R.index1,
+        time: isBreak2 ? phase5.R1.time : phase5.ext.R.time,
+        time1: isBreak2 ? phase5.R1.time1 : phase5.ext.R.time1,
     };
 
     const G = {
-        price: isBreak2 ? phase3.S1.price : phase5.ext.S.price,
-        index: isBreak2 ? phase3.S1.index : phase5.ext.S.index,
-        index1: isBreak2 ? phase3.S1.index1 : phase5.ext.S.index1,
-        time: isBreak2 ? phase3.S1.time : phase5.ext.S.time,
-        time1: isBreak2 ? phase3.S1.time1 : phase5.ext.S.time1,
+        price: isBreak2 ? phase5.S1.price : phase5.ext.S.price,
+        index: isBreak2 ? phase5.S1.index : phase5.ext.S.index,
+        index1: isBreak2 ? phase5.S1.index1 : phase5.ext.S.index1,
+        time: isBreak2 ? phase5.S1.time : phase5.ext.S.time,
+        time1: isBreak2 ? phase5.S1.time1 : phase5.ext.S.time1,
     };
 
     const phase6 = scanPhase({
