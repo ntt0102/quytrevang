@@ -317,7 +317,7 @@ function calcContinuePattern() {
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
-    const FG = phase5.ext.pr;
+    const FG = mf.fmtNum(G.price - F.price, 1, true);
     const GH = phase6.ext.pr;
 
     // let DR3 = mf.fmtNum(phase3.R1.price - D.price, 1, true);
@@ -507,7 +507,7 @@ function calcReversalPattern() {
     const BC = mf.fmtNum(C.price - B.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
-    const EF = phase4.ext.pr;
+    const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = phase5.ext.pr;
 
     // let ER4 = mf.fmtNum(phase4.R1.price - E.price, 1, true);
