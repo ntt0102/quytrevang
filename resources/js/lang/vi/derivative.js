@@ -35,8 +35,8 @@ const continuePattern = [
             "P ≠ P.đỏ ≠ P.vàng",
             "S < S.đỏ",
             "S > S.hồng/2",
-            "S > PR",
             "TR < TR.đỏ",
+            "S > PR",
             "T > TR",
         ],
     },
@@ -46,9 +46,9 @@ const continuePattern = [
             //
             // "G ≠ E",
             "S < S.hồng",
+            "TR < TR.hồng",
             // "FG > FR5",
             "S > PR",
-            "TR < TR.hồng",
             "T > TR",
         ],
     },
@@ -56,8 +56,8 @@ const continuePattern = [
         name: "Bước lục",
         conds: [
             //
-            "S > PR",
             "TR < TR.tím",
+            "S > PR",
             "T > TR",
         ],
     },
@@ -86,7 +86,7 @@ const reversalPattern = [
             //
             "P ≠ P.đỏ",
             "S < S.đỏ",
-            "S >= S.hồng/2",
+            "S > S.hồng/2",
             "S > PR",
             // "TR3 < TR1",
             "T > TR",
@@ -98,9 +98,9 @@ const reversalPattern = [
             //
             // "F ≠ D",
             "S < S.hồng",
+            "TR < TR.hồng",
             // "EF > ER4",
             "S > PR",
-            "TR < TR.hồng",
             "T > TR",
         ],
     },
@@ -108,8 +108,8 @@ const reversalPattern = [
         name: "Bước lục",
         conds: [
             //
-            "S > PR",
             "TR < TR.tím",
+            "S > PR",
             "T > TR",
         ],
     },

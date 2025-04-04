@@ -364,9 +364,9 @@ function calcContinuePattern() {
             //
             F.price !== D.price && F.price !== B.price,
             EF <= CD,
+            phase4.tr <= phase2.tr,
             EF >= DE / 2,
             EF >= phase4.pr,
-            phase4.tr <= phase2.tr,
             F.index1 > T4,
         ],
         [
@@ -374,14 +374,14 @@ function calcContinuePattern() {
             // G.price !== E.price,
             FG <= DE,
             // FG >= FR5,
-            FG >= PR5,
             TR5 <= TR3,
+            FG >= PR5,
             G.index1 > T5,
         ],
         [
             //
-            GH >= phase6.pr,
             phase6.tr <= phase4.tr,
+            GH >= phase6.pr,
             phase6.ext.S.index1 > T6,
         ],
     ];
@@ -552,14 +552,14 @@ function calcReversalPattern() {
             // F.price !== D.price,
             EF <= CD,
             // EF >= ER4,
-            EF >= PR4,
             TR4 <= TR2,
+            EF >= PR4,
             F.index1 > T4,
         ],
         [
             //
-            FG >= phase5.pr,
             phase5.tr <= phase3.tr,
+            FG >= phase5.pr,
             phase5.ext.S.index1 > T5,
         ],
     ];
