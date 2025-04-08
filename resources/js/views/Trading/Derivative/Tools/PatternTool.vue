@@ -299,7 +299,7 @@ function calcContinuePattern() {
 
     const phase6 = scanPhase({
         side: !side,
-        start: F,
+        start: { time: F.time },
         end: { time: pickTime ?? stopTime },
     });
 
@@ -497,7 +497,7 @@ function calcReversalPattern() {
 
     const phase5 = scanPhase({
         side: !side,
-        start: E,
+        start: { time: E.time },
         end: { time: pickTime ?? stopTime },
     });
 
