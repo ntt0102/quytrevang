@@ -362,6 +362,7 @@ function calcContinuePattern() {
         ],
         [
             //
+            DE >= CD / 2,
             DE >= PR3,
             DE <= BC,
             E.index1 > T3,
