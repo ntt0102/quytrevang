@@ -3,62 +3,60 @@ const continuePattern = [
         name: "Bước cam",
         conds: [
             //
-            "S > PR",
-            "T > TR",
+            "P > Pmin",
+            "T > Tmin",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            "S < S.vàng",
-            "S > S.cam/2",
-            "S > PR",
-            "T > TR",
+            "P > P.cam/2",
+            "P > Pmin",
+            "P < Pmax",
+            "T > Tmin",
+            "T < Tmax",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            "S < S.cam",
-            // "DE > DR3",
-            "S > PR",
-            // "TR3 < TR1",
-            "T > TR",
+            "P > Pmin",
+            "P < Pmax",
+            "T > Tmin",
+            "T < Tmax",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "P ≠ P.đỏ.vàng",
-            "S < S.đỏ",
-            "S > S.hồng/2",
-            "TR < TR.đỏ",
-            "S > PR",
-            "T > TR",
+            "R ≠ R.đỏ.vàng",
+            "P > P.hồng/2",
+            "P > Pmin",
+            "P < Pmax",
+            "T > Tmin",
+            "T < Tmax",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            // "G ≠ E",
-            "S < S.hồng",
-            "TR < TR.hồng",
-            // "FG > FR5",
-            "S > PR",
-            "T > TR",
+            "P > Pmin",
+            "P < Pmax",
+            "T > Tmin",
+            "T < Tmax",
         ],
     },
     {
         name: "Bước lục",
         conds: [
             //
-            "TR < TR.tím",
-            "S > PR",
-            "T > TR",
+            "P > Pmin",
+            "T > Tmin",
+            "T < Tmax",
         ],
     },
 ];
@@ -67,50 +65,49 @@ const reversalPattern = [
         name: "Bước đỏ",
         conds: [
             //
-            "S > PR",
-            "T > TR",
+            "P > Pmin",
+            "T > Tmin",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            "S < S.cam",
-            "S > PR",
-            "T > TR",
+            "P > Pmin",
+            "P < Pmax",
+            "T > Tmin",
+            "T < Tmax",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "P ≠ P.đỏ",
-            "S < S.đỏ",
-            "S > S.hồng/2",
-            "S > PR",
-            // "TR3 < TR1",
-            "T > TR",
+            "R ≠ R.đỏ",
+            "P > P.hồng/2",
+            "P > Pmin",
+            "P < Pmax",
+            "T > Tmin",
+            "T < Tmax",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            // "F ≠ D",
-            "S < S.hồng",
-            "TR < TR.hồng",
-            // "EF > ER4",
-            "S > PR",
-            "T > TR",
+            "P > Pmin",
+            "P < Pmax",
+            "T > Tmin",
+            "T < Tmax",
         ],
     },
     {
         name: "Bước lục",
         conds: [
             //
-            "TR < TR.tím",
-            "S > PR",
-            "T > TR",
+            "P > Pmin",
+            "T > Tmin",
+            "T < Tmax",
         ],
     },
 ];
