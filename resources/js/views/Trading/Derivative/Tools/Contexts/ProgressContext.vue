@@ -88,7 +88,7 @@ function refreshPattern() {
         color: white;
         text-align: left;
         margin-top: 10px;
-        line-height: 19px;
+        line-height: 18px;
         font-size: 15px;
         min-height: 50px;
 
