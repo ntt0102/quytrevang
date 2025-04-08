@@ -379,6 +379,7 @@ function calcContinuePattern() {
         ],
         [
             //
+            FG >= EF / 2,
             FG >= PR5,
             FG <= DE,
             G.index1 > T5,
@@ -564,6 +565,7 @@ function calcReversalPattern() {
         ],
         [
             //
+            EF >= DE / 2,
             EF >= PR4,
             EF <= CD,
             F.index1 > T4,

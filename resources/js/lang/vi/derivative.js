@@ -45,6 +45,7 @@ const continuePattern = [
         name: "Bước lam",
         conds: [
             //
+            "P > P.tím/2",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",
@@ -97,6 +98,7 @@ const reversalPattern = [
         name: "Bước lam",
         conds: [
             //
+            "P > P.tím/2",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",
