@@ -546,6 +546,7 @@ function calcReversalPattern() {
         ],
         [
             //
+            CD >= BC / 2,
             CD >= PR2,
             CD <= AB,
             D.index1 > T2,

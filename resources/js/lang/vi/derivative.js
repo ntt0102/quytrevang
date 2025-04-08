@@ -73,6 +73,7 @@ const reversalPattern = [
         name: "Bước hồng",
         conds: [
             //
+            "P > P.đỏ/2",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",
