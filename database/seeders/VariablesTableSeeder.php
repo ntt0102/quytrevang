@@ -63,12 +63,12 @@ class VariablesTableSeeder extends Seeder
             'value' => "",
         ]);
         Variable::create([
-            'name' => "dnseAccess",
-            'value' => "",
+            'name' => "tpDefault",
+            'value' => "5",
         ]);
         Variable::create([
-            'name' => "dnseTrading",
-            'value' => "",
+            'name' => "slDefault",
+            'value' => "3",
         ]);
         Variable::create([
             'name' => "autoRefreshFlag",

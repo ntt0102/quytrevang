@@ -41,8 +41,12 @@ let lines = {};
 let isAutoOrdering = false;
 
 const symbol = "VN30F1M";
-const TP_DEFAULT = 3;
-const SL_DEFAULT = 2;
+const TP_DEFAULT = computed(
+    () => store.state.tradingDerivative.config.tpDefault
+);
+const SL_DEFAULT = computed(
+    () => store.state.tradingDerivative.config.slDefault
+);
 
 defineExpose({
     show,

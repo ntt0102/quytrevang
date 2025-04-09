@@ -30,6 +30,8 @@ class OrderDerivativeJob implements ShouldQueue
     public function handle()
     {
         $symbol = 'VN30F1M';
+        $tpDefault = intval(get_global_value('tpDefault'));
+        $slDefault = intval(get_global_value('slDefault'));
         $vos = new VpsOrderService();
         if (!$vos->connection) return false;
         if ($vos->orderId['entry']) {
@@ -39,8 +41,8 @@ class OrderDerivativeJob implements ShouldQueue
                 $entryLine = $entry->data;
                 $tpLine = $entryLine;
                 $slLine = $entryLine;
-                $tpPrice = $entryLine->price + $entryLine->side * 3;
-                $slPrice = $entryLine->price - $entryLine->side * 2;
+                $tpPrice = $entryLine->price + $entryLine->side * $tpDefault;
+                $slPrice = $entryLine->price - $entryLine->side * $slDefault;
                 //
                 $tp = $vos->order('tp', ["cmd" => "new", "price" => $tpPrice]);
                 if (!$tp['isOk']) return false;
