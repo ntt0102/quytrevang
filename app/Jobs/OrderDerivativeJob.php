@@ -30,8 +30,8 @@ class OrderDerivativeJob implements ShouldQueue
     public function handle()
     {
         $symbol = 'VN30F1M';
-        $tpDefault = intval(get_global_value('tpDefault'));
-        $slDefault = intval(get_global_value('slDefault'));
+        $tpDefault = floatval(get_global_value('tpDefault'));
+        $slDefault = floatval(get_global_value('slDefault'));
         $vos = new VpsOrderService();
         if (!$vos->connection) return false;
         if ($vos->orderId['entry']) {

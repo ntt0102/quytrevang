@@ -75,8 +75,8 @@ class DerivativeService extends CoreService
                 'autoRefresh' => get_global_value('autoRefreshFlag') == "1",
                 'patternType' => intval(get_global_value('derPatternType')),
                 'volInvalid' =>  $volInvalid,
-                'tpDefault' => intval(get_global_value('tpDefault')),
-                'slDefault' => intval(get_global_value('slDefault')),
+                'tpDefault' => floatval(get_global_value('tpDefault')),
+                'slDefault' => floatval(get_global_value('slDefault')),
             ],
             'status' => $this->getStatus($payload)
         ];

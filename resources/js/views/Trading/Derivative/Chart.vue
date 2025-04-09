@@ -331,7 +331,7 @@ function drawChart() {
                 style: 2,
             },
         },
-        crosshair: { mode: 0 },
+        crosshair: { mode: 1 },
         timeScale: {
             timeVisible: true,
             rightOffset: 1000,
