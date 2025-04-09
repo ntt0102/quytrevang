@@ -2,7 +2,7 @@
     <CorePopup
         ref="popupRef"
         :width="250"
-        :height="350"
+        :height="260"
         class="der-setting-popup"
         :title="$t('trading.derivative.buttons.setting')"
         :toolbarItems="[
@@ -21,13 +21,18 @@
     >
         <form @submit.prevent="onSubmit">
             <button ref="submitRef" class="display-none" />
-            <DxForm ref="formRef" :form-data="state.formData">
+            <DxForm
+                ref="formRef"
+                labelLocation="left"
+                :form-data="state.formData"
+            >
                 <DxItem
                     name="tpDefault"
                     data-field="tpDefault"
                     editor-type="dxNumberBox"
                     :editor-options="{
                         stylingMode: 'outlined',
+                        showSpinButtons: true,
                     }"
                     :validation-rules="state.validationRules.tpDefault"
                     :label="{
@@ -40,21 +45,13 @@
                     editor-type="dxNumberBox"
                     :editor-options="{
                         stylingMode: 'outlined',
+                        showSpinButtons: true,
                     }"
                     :validation-rules="state.validationRules.slDefault"
                     :label="{
                         text: $t('trading.derivative.settingPopup.slDefault'),
                     }"
                 />
-                <!-- <DxItem
-                    item-type="button"
-                    :button-options="{
-                        width: '100%',
-                        type: 'default',
-                        text: $t('buttons.save'),
-                        useSubmitBehavior: true,
-                    }"
-                /> -->
             </DxForm>
         </form>
     </CorePopup>
