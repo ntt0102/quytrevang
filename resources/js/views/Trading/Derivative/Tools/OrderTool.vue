@@ -41,10 +41,10 @@ let lines = {};
 let isAutoOrdering = false;
 
 const symbol = "VN30F1M";
-const TP_DEFAULT = computed(
+const tpDefault = computed(
     () => store.state.tradingDerivative.config.tpDefault
 );
-const SL_DEFAULT = computed(
+const slDefault = computed(
     () => store.state.tradingDerivative.config.slDefault
 );
 
@@ -173,8 +173,8 @@ function entry() {
     }
 }
 function tpsl() {
-    order.tp = order.entry + order.side * TP_DEFAULT;
-    order.sl = order.entry - order.side * SL_DEFAULT;
+    order.tp = order.entry + order.side * tpDefault.value;
+    order.sl = order.entry - order.side * slDefault.value;
     store
         .dispatch("tradingDerivative/executeOrder", {
             action: "tpsl",
@@ -317,8 +317,8 @@ function scan(lastPrice) {
                 if (!isAutoOrdering) {
                     isAutoOrdering = true;
                     setTimeout(() => {
-                        order.tp = order.entry + order.side * TP_DEFAULT;
-                        order.sl = order.entry - order.side * SL_DEFAULT;
+                        order.tp = order.entry + order.side * tpDefault.value;
+                        order.sl = order.entry - order.side * slDefault.value;
                         store
                             .dispatch("tradingDerivative/executeOrder", {
                                 action: "tpsl",

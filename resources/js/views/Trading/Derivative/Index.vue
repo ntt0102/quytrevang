@@ -6,6 +6,15 @@
                     location: 'before',
                     widget: 'dxButton',
                     options: {
+                        icon: 'far fa-gear small',
+                        hint: $t('trading.derivative.buttons.setting'),
+                        onClick: setting,
+                    },
+                },
+                {
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
                         icon: 'far fa-file-chart-pie small',
                         hint: $t('trading.derivative.buttons.report'),
                         onClick: report,
@@ -57,11 +66,13 @@
         />
         <Chart ref="chartRef" />
     </div>
+    <SettingPopup ref="settingPopupRef" />
     <VpsOtpPopup ref="vpsOtpPopupRef" />
 </template>
 
 <script setup>
 import Chart from "./Chart.vue";
+import SettingPopup from "./SettingPopup.vue";
 import VpsOtpPopup from "./VpsOtpPopup.vue";
 import { ref, inject, computed } from "vue";
 import { useStore } from "vuex";
@@ -72,6 +83,7 @@ const { t } = useI18n();
 const bus = inject("bus");
 const source = computed(() => store.state.tradingDerivative.config.source);
 const chartRef = ref(null);
+const settingPopupRef = ref(null);
 const vpsOtpPopupRef = ref(null);
 const exportTypes = ref([
     {
@@ -91,6 +103,9 @@ const dataSource = ref([
     { name: "VPS", icon: "far fa-database small" },
 ]);
 
+function setting() {
+    settingPopupRef.value.show();
+}
 function report() {
     bus.emit("checkPin", () => store.dispatch("tradingDerivative/report"));
 }

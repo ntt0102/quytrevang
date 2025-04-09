@@ -191,13 +191,15 @@ const actions = {
                 });
         });
     },
-    loginDnse({ commit, dispatch, getters, state, rootGetters }) {
+    setting({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            axios
-                .post("trading/derivative/login-dnse", null)
-                .then((response) => {
-                    resolve();
-                });
+            console.log("setting", param);
+            axios.post("trading/derivative/setting", param).then((response) => {
+                if (response.data.isOk) {
+                    commit("setting", param);
+                }
+                resolve(response.data.isOk);
+            });
         });
     },
     setLoading({ commit }, state) {
@@ -239,6 +241,10 @@ const mutations = {
     },
     setTools(state, data) {
         state.tools = data;
+    },
+    setting(state, data) {
+        state.config.tpDefault = data.tpDefault;
+        state.config.slDefault = data.slDefault;
     },
     resetState(state) {
         state = Object.assign(state, initialState());

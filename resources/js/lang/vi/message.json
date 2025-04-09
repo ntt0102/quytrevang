@@ -206,13 +206,9 @@
             "unknown": "Lỗi chưa xác định",
             "progressFail": "Bước {step} chưa đạt.",
             "progressSuccess": "Bước {step} thành công, hãy chuẩn bị vào lệnh!",
-            "copyistStatusPopup": {
-                "title": "Trạng thái đặt lệnh",
-                "account": "Tài khoản",
-                "vpsCode": "Mã VPS",
-                "connection": "Kết nối",
-                "position": "Vị thế",
-                "closePosition": "Đóng vị thế"
+            "settingPopup": {
+                "tpDefault": "TP mặc định",
+                "slDefault": "SL mặc định"
             },
             "buttons": {
                 "report": "Báo cáo",
@@ -221,7 +217,7 @@
                 "sourceSelect": "Chọn nguồn dữ liệu",
                 "downloadExport": "Tải tệp CSV",
                 "cloneExport": "Tạo tệp CSV",
-                "loginDnse": "Đăng nhập DNSE"
+                "setting": "Cài đặt"
             },
             "progressContext": {
                 "refreshPattern": "Làm mới"

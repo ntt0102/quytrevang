@@ -103,7 +103,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
             Route::group(['namespace' => 'Trading', 'prefix' => 'trading'], function () {
                 Route::group(['prefix' => 'derivative', 'middleware' => ['can:admin:order_derivative']], function () {
                     Route::get('/', 'DerivativeController@getChartData');
-                    Route::get('/vps', 'DerivativeController@getVpsData');
+                    Route::get('vps', 'DerivativeController@getVpsData');
                     Route::get('init-chart', 'DerivativeController@initChart');
                     Route::post('set-auto-refresh', 'DerivativeController@setAutoRefresh');
                     Route::post('set-pattern-type', 'DerivativeController@setPatternType');
@@ -116,7 +116,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('draw-tools', 'DerivativeController@drawTools');
                     Route::post('report', 'DerivativeController@report');
                     Route::post('export', 'DerivativeController@export');
-                    Route::post('login-dnse', 'DerivativeController@loginDnse');
+                    Route::post('setting', 'DerivativeController@setting');
                 });
                 Route::group(['prefix' => 'derstat', 'middleware' => 'can:admin:statistic_derivative'], function () {
                     Route::post('/', 'DerstatController@fetch');

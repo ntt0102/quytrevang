@@ -360,14 +360,18 @@ class DerivativeService extends CoreService
     }
 
     /**
-     * loginDnse
+     * setting
      * 
      * @param $payload
      * 
      */
-    public function loginDnse($payload)
+    public function setting($payload)
     {
-        LoginDnseJob::dispatch();
-        return ['isOk' => true];
+        if (
+            set_global_value('tpDefault', $payload->tpDefault) &&
+            set_global_value('slDefault', $payload->slDefault)
+        )
+            return ['isOk' => true];
+        else return ['isOk' => false];
     }
 }

@@ -213,15 +213,15 @@ class DerivativeController extends CoreController
     }
 
     /**
-     * loginDnse
+     * setting
      *
      * @param Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\Response
      */
-    public function loginDnse(Request $request)
+    public function setting(Request $request)
     {
-        $data = $this->derivativeService->loginDnse($this->payload);
+        $data = $this->derivativeService->setting($this->payload);
         return $this->sendResponse($data);
     }
 }
