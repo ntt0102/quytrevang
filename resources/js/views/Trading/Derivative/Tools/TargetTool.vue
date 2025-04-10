@@ -222,85 +222,88 @@ function drag({ lineOptions, newPrice }) {
         let b = +lines.B.options().price;
         let ba = b - a;
         //
-        point = "A";
-        if (lineOptions.point === point) {
-            ba = +lines.B.options().ba;
-            b = a + ba;
-        }
-        param.points.push(point);
-        param.data.push(a);
-        //
-        point = "B";
-        if (!["A", "B"].includes(lineOptions.point)) {
-            let div = 0;
-            switch (lineOptions.point) {
-                case "X":
-                    div = 0.5;
-                    break;
-                case "Y":
-                    div = 1;
-                    break;
-                case "Z":
-                    div = 2;
-                    break;
-                case "W":
-                    div = 4;
-                    break;
+        if (lineOptions.point !== "X") {
+            point = "A";
+            if (lineOptions.point === point) {
+                ba = +lines.B.options().ba;
+                b = a + ba;
             }
-            ba = mf.fmtNum((a - newPrice) / div);
-            b = a + ba;
+            param.points.push(point);
+            param.data.push(a);
+            //
+            point = "B";
+            if (!["A", "B", "X"].includes(lineOptions.point)) {
+                let div = 0;
+                switch (lineOptions.point) {
+                    case "Y":
+                        div = 1;
+                        break;
+                    case "Z":
+                        div = 2;
+                        break;
+                    case "W":
+                        div = 4;
+                        break;
+                }
+                ba = mf.fmtNum((a - newPrice) / div);
+                b = a + ba;
+            }
+            changeOptions = {
+                price: b,
+                ba: mf.fmtNum(ba),
+                title: titleFormat(1, ba, a),
+            };
+            if (lineOptions.point === point) delete changeOptions.price;
+            lines[point].applyOptions(changeOptions);
+            param.points.push(point);
+            param.data.push(b);
+            //
+            if (props.levels.includes(1)) {
+                point = "Y";
+                changeOptions = {
+                    price: mf.fmtNum(a - ba),
+                    title: titleFormat(-1, ba, a),
+                };
+                if (lineOptions.point === point) delete changeOptions.price;
+                lines[point].applyOptions(changeOptions);
+            }
+            //
+            if (props.levels.includes(2)) {
+                point = "Z";
+                changeOptions = {
+                    price: mf.fmtNum(a - 2 * ba),
+                    title: titleFormat(-2, ba, a),
+                };
+                if (lineOptions.point === point) delete changeOptions.price;
+                lines[point].applyOptions(changeOptions);
+            }
+            //
+            if (props.levels.includes(4)) {
+                point = "W";
+                changeOptions = {
+                    price: mf.fmtNum(a - 4 * ba),
+                    title: titleFormat(-4, ba, a),
+                };
+                if (lineOptions.point === point) delete changeOptions.price;
+                lines[point].applyOptions(changeOptions);
+            }
+            //
+            store.dispatch(`${props.storeModule}/drawTools`, param);
         }
-        changeOptions = {
-            price: b,
-            ba: mf.fmtNum(ba),
-            title: titleFormat(1, ba, a),
-        };
-        if (lineOptions.point === point) delete changeOptions.price;
-        lines[point].applyOptions(changeOptions);
-        param.points.push(point);
-        param.data.push(b);
-        //
+
         if (props.levels.includes(0.5)) {
             point = "X";
+            let div = -0.5;
+            if (lineOptions.point === point) {
+                div = mf.fmtNum((newPrice - a) / ba, 2);
+            }
             changeOptions = {
-                price: mf.fmtNum(a - 0.5 * ba),
-                title: titleFormat(-0.5, ba, a),
+                price: mf.fmtNum(a + div * ba),
+                title: titleFormat(div, ba, a),
             };
             if (lineOptions.point === point) delete changeOptions.price;
             lines[point].applyOptions(changeOptions);
         }
-        //
-        if (props.levels.includes(1)) {
-            point = "Y";
-            changeOptions = {
-                price: mf.fmtNum(a - ba),
-                title: titleFormat(-1, ba, a),
-            };
-            if (lineOptions.point === point) delete changeOptions.price;
-            lines[point].applyOptions(changeOptions);
-        }
-        //
-        if (props.levels.includes(2)) {
-            point = "Z";
-            changeOptions = {
-                price: mf.fmtNum(a - 2 * ba),
-                title: titleFormat(-2, ba, a),
-            };
-            if (lineOptions.point === point) delete changeOptions.price;
-            lines[point].applyOptions(changeOptions);
-        }
-        //
-        if (props.levels.includes(4)) {
-            point = "W";
-            changeOptions = {
-                price: mf.fmtNum(a - 4 * ba),
-                title: titleFormat(-4, ba, a),
-            };
-            if (lineOptions.point === point) delete changeOptions.price;
-            lines[point].applyOptions(changeOptions);
-        }
-        //
-        store.dispatch(`${props.storeModule}/drawTools`, param);
     }
 }
 function titleFormat(multiplier, ba, a) {
@@ -309,7 +312,9 @@ function titleFormat(multiplier, ba, a) {
     title += props.isPercent
         ? mf.fmtNum((100 * base) / a, 0) + " %"
         : mf.fmtNum(base);
-    if (props.showPercent) title += " (" + -multiplier * 100 + " %)";
+    if (props.showPercent) {
+        title += " (" + mf.fmtNum(-multiplier * 100, 0) + " %)";
+    }
     return title;
 }
 </script>
