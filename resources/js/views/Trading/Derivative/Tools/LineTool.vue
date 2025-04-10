@@ -24,7 +24,7 @@ import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const props = defineProps(["symbol", "storeModule", "priceSeries"]);
+const props = defineProps(["symbol", "storeModule", "drawPriceLine"]);
 const emit = defineEmits(["hideContext"]);
 const lineToolRef = ref(null);
 const showLineContext = ref(false);
@@ -71,7 +71,7 @@ function draw({ price }) {
         const ops = line.options();
         const isExist = (ops.type = TYPE && price === +ops.price);
         if (isExist) {
-            props.priceSeries.removePriceLine(line);
+            props.drawPriceLine(line, true);
             store.dispatch(`${props.storeModule}/drawTools`, {
                 isRemove: true,
                 symbol: props.symbol,
@@ -93,7 +93,7 @@ function draw({ price }) {
             lineStyle: 1,
             draggable: true,
         };
-        lines.push(props.priceSeries.createPriceLine(options));
+        lines.push(props.drawPriceLine(options));
         store.dispatch(`${props.storeModule}/drawTools`, {
             isRemove: false,
             symbol: props.symbol,
@@ -120,7 +120,7 @@ function loadLineTool(data) {
         options.price = +price;
         options.color = color;
         options.title = title;
-        lines.push(props.priceSeries.createPriceLine(options));
+        lines.push(props.drawPriceLine(options));
     });
 }
 function remove() {
@@ -134,7 +134,7 @@ function removeLineTool(withServer = true) {
                 symbol: props.symbol,
                 name: "line",
             });
-        lines.forEach((line) => props.priceSeries.removePriceLine(line));
+        lines.forEach((line) => props.drawPriceLine(line, true));
         lines = [];
     }
 }

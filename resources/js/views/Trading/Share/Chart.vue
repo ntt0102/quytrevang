@@ -103,6 +103,7 @@
                 :priceSeries="state.series.stock"
                 :levels="[1, 2]"
                 :isPercent="true"
+                :showPercent="false"
                 @hideContext="hideContext"
             />
         </div>

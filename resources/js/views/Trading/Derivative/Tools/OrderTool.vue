@@ -22,7 +22,7 @@ const mf = inject("mf");
 const props = defineProps([
     "position",
     "prices",
-    "priceSeries",
+    "drawPriceLine",
     "inSession",
     "TIME",
 ]);
@@ -395,7 +395,7 @@ function drawOrderTool(kinds, isStore = true) {
                 title: title,
                 draggable: kind === "entry" && order.tp ? false : true,
             };
-            lines[kind] = props.priceSeries.createPriceLine(options);
+            lines[kind] = props.drawPriceLine(options);
             if (kind === "entry") {
                 param.points.push("side");
                 param.data.push(order.side);
@@ -426,7 +426,7 @@ function removeOrderTool(kinds, withServer = true) {
         });
     kinds.forEach((kind) => {
         if (mf.isSet(lines[kind])) {
-            props.priceSeries.removePriceLine(lines[kind]);
+            props.drawPriceLine(lines[kind], true);
             delete lines[kind];
         }
     });

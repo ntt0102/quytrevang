@@ -15,18 +15,20 @@ import { useStore } from "vuex";
 
 const store = useStore();
 const mf = inject("mf");
-const props = defineProps(["timeRangeSeries", "timeToIndex", "indexToTime"]);
+const props = defineProps(["timeToIndex", "indexToTime"]);
 const emit = defineEmits(["hideContext"]);
 const timeRangeToolRef = ref(null);
 const timeRangeStore = computed(
     () => store.state.tradingDerivative.tools.timeRange
 );
 let timeRanges = [];
+let series = {};
 
 const symbol = "VN30F1M";
 
 defineExpose({
     isSelected,
+    createSeries,
     draw,
 });
 
@@ -36,6 +38,15 @@ watch(timeRangeStore, (data) => {
 
 function isSelected() {
     return timeRangeToolRef.value.classList.contains("selected");
+}
+function createSeries(chart) {
+    if (!chart) return false;
+    series.timeRange = chart.addHistogramSeries({
+        priceScaleId: "timeRange",
+        scaleMargins: { top: 0, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
 }
 function timeRangeToolClick(e) {
     emit("hideContext");
@@ -94,7 +105,7 @@ function draw({ time }) {
             timeRangeToolRef.value.classList.remove("selected");
             break;
     }
-    props.timeRangeSeries.setData(timeRanges);
+    series.timeRange.setData(timeRanges);
     store.dispatch("tradingDerivative/drawTools", param);
 }
 function load(data) {
@@ -119,7 +130,7 @@ function loadTimeRangeTool(data) {
         { time: end, value: 1, color: "lime" },
     ];
     timeRanges = timeRange;
-    props.timeRangeSeries.setData(timeRange);
+    series.timeRange.setData(timeRange);
 }
 function removeTimeRangeTool(withServer = true) {
     if (withServer)
@@ -128,7 +139,7 @@ function removeTimeRangeTool(withServer = true) {
             symbol,
             name: "timeRange",
         });
-    props.timeRangeSeries.setData([]);
+    series.timeRange.setData([]);
     timeRanges = [];
 }
 </script>

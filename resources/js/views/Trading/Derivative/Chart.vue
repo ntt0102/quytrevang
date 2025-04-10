@@ -86,15 +86,6 @@
                 @refreshPattern="() => refreshPattern(true)"
                 @hideContext="hideContext"
             />
-            <!-- <ScanTool
-                ref="scanToolRef"
-                :prices="state.prices"
-                :timeToIndex="timeToIndex"
-                @scaned="patternScaned"
-                @patternTypeChanged="() => refreshPattern()"
-                @removePattern="() => patternToolRef.remove()"
-                @hideContext="hideContext"
-            /> -->
             <PatternTool
                 ref="patternToolRef"
                 :prices="state.prices"
@@ -106,13 +97,11 @@
             />
             <PickTimeTool
                 ref="pickTimeToolRef"
-                :pickTimeSeries="state.series.pickTime"
                 @refreshPattern="() => refreshPattern()"
                 @hideContext="hideContext"
             />
             <TimeRangeTool
                 ref="timeRangeToolRef"
-                :timeRangeSeries="state.series.timeRange"
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
                 @hideContext="hideContext"
@@ -121,16 +110,17 @@
                 ref="lineToolRef"
                 symbol="VN30F1M"
                 storeModule="tradingDerivative"
-                :priceSeries="state.series.price"
+                :drawPriceLine="drawPriceLine"
                 @hideContext="hideContext"
             />
             <TargetTool
                 ref="targetToolRef"
                 symbol="VN30F1M"
                 storeModule="tradingDerivative"
-                :priceSeries="state.series.price"
+                :drawPriceLine="drawPriceLine"
                 :levels="[0.5, 1, 2, 4]"
                 :isPercent="false"
+                :showPercent="true"
                 @hideContext="hideContext"
             />
             <OrderTool
@@ -138,7 +128,7 @@
                 ref="orderToolRef"
                 :position="status.position"
                 :prices="state.prices"
-                :priceSeries="state.series.price"
+                :drawPriceLine="drawPriceLine"
                 :inSession="inSession"
                 :TIME="state.TIME"
                 @getTools="getTools"
@@ -174,7 +164,6 @@
 import FullscreenTool from "./Tools/FullscreenTool.vue";
 import TradingviewTool from "./Tools/TradingviewTool.vue";
 import ProgressTool from "./Tools/ProgressTool.vue";
-// import ScanTool from "./Tools/PatternTool.vue";
 import PatternTool from "./Tools/PatternTool.vue";
 import PickTimeTool from "./Tools/PickTimeTool.vue";
 import LineTool from "./Tools/LineTool.vue";
@@ -219,7 +208,6 @@ const reloadToolRef = ref(null);
 const fullscreenToolRef = ref(null);
 const tradingviewToolRef = ref(null);
 const progressToolRef = ref(null);
-// const scanToolRef = ref(null);
 const patternToolRef = ref(null);
 const pickTimeToolRef = ref(null);
 const lineToolRef = ref(null);
@@ -245,6 +233,7 @@ const SOCKET_ENDPOINT = {
 
 let params = {
     chart: {},
+    series: {},
     whitespaces: [],
     crosshair: {},
     interval: null,
@@ -257,7 +246,6 @@ let params = {
 };
 const state = reactive({
     prices: [],
-    series: {},
     chartDate: route.query.date ?? CURRENT_DATE,
     clock: format(new Date(), "HH:mm:ss"),
     chartHeightEnough: false,
@@ -292,6 +280,8 @@ onMounted(() => {
     checkChartSize();
     drawChart();
     patternToolRef.value.createSeries(params.chart);
+    timeRangeToolRef.value.createSeries(params.chart);
+    pickTimeToolRef.value.createSeries(params.chart);
     new ResizeObserver(chartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", chartShortcut);
 });
@@ -342,26 +332,14 @@ function drawChart() {
     params.chart = createChart(chartRef.value, CHART_OPTIONS);
     params.chart.subscribeCrosshairMove(chartCrosshairMove);
     params.chart.subscribeCustomPriceLineDragged(priceLineDrag);
-    state.series.whitespace = params.chart.addHistogramSeries({
+    params.series.whitespace = params.chart.addHistogramSeries({
         priceScaleId: "whitespace",
         scaleMargins: { top: 0, bottom: 0 },
         color: "#808080",
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    state.series.timeRange = params.chart.addHistogramSeries({
-        priceScaleId: "timeRange",
-        scaleMargins: { top: 0, bottom: 0 },
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
-    state.series.pickTime = params.chart.addHistogramSeries({
-        priceScaleId: "pickTime",
-        scaleMargins: { top: 0, bottom: 0 },
-        lastValueVisible: false,
-        priceLineVisible: false,
-    });
-    state.series.price = params.chart.addLineSeries({
+    params.series.price = params.chart.addLineSeries({
         color: "#F5F5F5",
         priceFormat: { minMove: 0.1 },
     });
@@ -376,26 +354,16 @@ function chartClick(e) {
     hideContext(params.hasProgress);
     toggleOrderButton(false);
 
-    // if (scanToolRef.value.isSelected()) {
-    //     scanToolRef.value.draw({ time: params.crosshair.time });
-    // } else
     if (patternToolRef.value.isSelected()) {
-        patternToolRef.value.draw({
-            time: params.crosshair.time,
-            price: coordinateToPrice(params.crosshair.y),
-        });
+        patternToolRef.value.draw(params.crosshair);
     } else if (pickTimeToolRef.value.isSelected()) {
-        pickTimeToolRef.value.draw({ time: params.crosshair.time });
+        pickTimeToolRef.value.draw(params.crosshair);
     } else if (lineToolRef.value.isSelected()) {
-        lineToolRef.value.draw({
-            price: coordinateToPrice(params.crosshair.y),
-        });
+        lineToolRef.value.draw(params.crosshair);
     } else if (timeRangeToolRef.value.isSelected()) {
-        timeRangeToolRef.value.draw({ time: params.crosshair.time });
+        timeRangeToolRef.value.draw(params.crosshair);
     } else if (targetToolRef.value.isSelected()) {
-        targetToolRef.value.draw({
-            price: coordinateToPrice(params.crosshair.y),
-        });
+        targetToolRef.value.draw(params.crosshair);
     }
 }
 function chartContextmenu(e) {
@@ -424,7 +392,8 @@ function checkChartSize() {
 }
 function chartCrosshairMove(e) {
     if (e.time) {
-        let price = e.seriesPrices.get(state.series.price);
+        let price = e.seriesPrices.get(params.series.price);
+        if (!price) price = coordinateToPrice(e.point.y);
         params.crosshair.time = e.time;
         params.crosshair.price = price;
     } else {
@@ -487,10 +456,10 @@ function setChartData(chartData) {
                 createWhitespaceData(state.chartDate)
             );
         }
-        state.series.whitespace.setData(params.whitespaces);
+        params.series.whitespace.setData(params.whitespaces);
 
         state.prices = mergeChartData(state.prices, chartData.price);
-        state.series.price.setData(state.prices);
+        params.series.price.setData(state.prices);
     }
 }
 function updateChartData(data, source = null) {
@@ -517,13 +486,13 @@ function updateChartData(data, source = null) {
             params.whitespaces,
             createWhitespaceData(CURRENT_DATE)
         );
-        state.series.whitespace.setData(params.whitespaces);
+        params.series.whitespace.setData(params.whitespaces);
         //
         state.prices = mergeChartData(state.prices, prices);
-        state.series.price.setData(state.prices);
+        params.series.price.setData(state.prices);
     } else {
         state.prices.push(prices[0]);
-        state.series.price.update(prices[0]);
+        params.series.price.update(prices[0]);
     }
 }
 function createWhitespaceData(date) {
@@ -876,7 +845,7 @@ function getAccountInfo() {
     });
 }
 function coordinateToPrice(y) {
-    return mf.fmtNum(state.series.price.coordinateToPrice(y));
+    return mf.fmtNum(params.series.price.coordinateToPrice(y));
 }
 function timeToIndex(time) {
     let index = params.whitespaces.findIndex((item) => item.time === time);
@@ -899,6 +868,10 @@ function indexToTime(index) {
     if (index < params.whitespaces.length)
         return params.whitespaces[index].time;
     else return params.whitespaces.at(-1).time;
+}
+function drawPriceLine(data, isRemove = false) {
+    if (isRemove) params.series.price.removePriceLine(data);
+    else return params.series.price.createPriceLine(data);
 }
 </script>
 <style lang="scss">

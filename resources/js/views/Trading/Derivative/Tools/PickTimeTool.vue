@@ -14,18 +14,20 @@ import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const props = defineProps(["pickTimeSeries"]);
+// const props = defineProps([]);
 const emit = defineEmits(["refreshPattern", "hideContext"]);
 const pickTimeToolRef = ref(null);
 const pickTimeStore = computed(
     () => store.state.tradingDerivative.tools.pickTime
 );
 let pickTime = null;
+let series = {};
 
 const symbol = "VN30F1M";
 
 defineExpose({
     isSelected,
+    createSeries,
     draw,
     remove: removePickTimeTool,
     get,
@@ -37,6 +39,15 @@ watch(pickTimeStore, (data) => {
 
 function isSelected() {
     return pickTimeToolRef.value.classList.contains("selected");
+}
+function createSeries(chart) {
+    if (!chart) return false;
+    series.pickTime = chart.addHistogramSeries({
+        priceScaleId: "pickTime",
+        scaleMargins: { top: 0, bottom: 0 },
+        lastValueVisible: false,
+        priceLineVisible: false,
+    });
 }
 function get() {
     return pickTime;
@@ -68,7 +79,7 @@ function draw({ time }) {
 }
 function load(time) {
     pickTime = time;
-    props.pickTimeSeries.setData([{ time, value: 1, color: "#007FFF" }]);
+    series.pickTime.setData([{ time, value: 1, color: "#007FFF" }]);
 }
 function removePickTimeTool(withServer = true) {
     if (withServer)
@@ -77,7 +88,7 @@ function removePickTimeTool(withServer = true) {
             symbol,
             name: "pickTime",
         });
-    props.pickTimeSeries.setData([]);
+    series.pickTime.setData([]);
     pickTime = null;
 }
 </script>
