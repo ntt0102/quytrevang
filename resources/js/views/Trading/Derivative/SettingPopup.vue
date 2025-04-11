@@ -1,7 +1,7 @@
 <template>
     <CorePopup
         ref="popupRef"
-        :width="250"
+        :width="300"
         :height="260"
         class="der-setting-popup"
         :title="$t('trading.derivative.buttons.setting')"
