@@ -746,9 +746,7 @@ function orderChanged(hasOrder) {
 }
 function toggleOrderButton(show) {
     if (show) {
-        orderToolRef.value.show({
-            price: coordinateToPrice(params.crosshair.y),
-        });
+        orderToolRef.value.show(params.crosshair);
     } else {
         entryOrderRef.value.style.display = "none";
         tpslOrderRef.value.style.display = "none";
