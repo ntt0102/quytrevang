@@ -62,6 +62,13 @@
                     }"
                 ></i>
             </div>
+            <div
+                class="command"
+                :title="$t('trading.derivative.buttons.setting')"
+                @click="showSetting"
+            >
+                <i class="far fa-square-sliders-vertical"></i>
+            </div>
         </div>
         <div
             class="area tool-area"
@@ -201,6 +208,7 @@ const { t } = useI18n();
 const mf = inject("mf");
 const devices = inject("devices");
 const filters = inject("filters");
+const emit = defineEmits(["showSetting"]);
 const chartContainerRef = ref(null);
 const chartRef = ref(null);
 const connectionRef = ref(null);
@@ -802,6 +810,9 @@ function resetChart() {
     params.socketUpdatedAt = subSeconds(new Date(), 61);
     connectSocket();
     getChartData();
+}
+function showSetting() {
+    emit("showSetting");
 }
 function initChart() {
     store.dispatch("tradingDerivative/initChart").then(() => {

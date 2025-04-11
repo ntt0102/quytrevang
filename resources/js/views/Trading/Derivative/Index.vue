@@ -64,7 +64,7 @@
                 },
             ]"
         />
-        <Chart ref="chartRef" />
+        <Chart ref="chartRef" @showSetting="setting" />
     </div>
     <SettingPopup ref="settingPopupRef" />
     <VpsOtpPopup ref="vpsOtpPopupRef" />
