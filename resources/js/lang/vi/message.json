@@ -163,6 +163,7 @@
             "connection": "Trạng thái kết nối VPS",
             "position": "Vị thế đang mở",
             "accountInfo": "Thông tin tài khoản",
+            "matchedOrders": "Các lệnh đã khớp",
             "nav": "Tài sản",
             "maxVol": "Sức mua",
             "vm": "Lợi nhuận",
@@ -209,6 +210,14 @@
             "settingPopup": {
                 "tpDefault": "TP mặc định",
                 "slDefault": "SL mặc định"
+            },
+            "matchedOrdersPopup": {
+                "orderTime": "Thời gian",
+                "side": "Loại lệnh",
+                "volume": "KL đặt",
+                "matchVolume": "KL khớp",
+                "showPrice": "Giá đặt",
+                "avgPrice": "Giá khớp"
             },
             "buttons": {
                 "report": "Báo cáo",

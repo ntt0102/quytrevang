@@ -64,16 +64,22 @@
                 },
             ]"
         />
-        <Chart ref="chartRef" @showSetting="setting" />
+        <Chart
+            ref="chartRef"
+            @showSetting="showSetting"
+            @showMatchedOrders="showMatchedOrders"
+        />
     </div>
     <SettingPopup ref="settingPopupRef" />
+    <MatchedOrdersPopup ref="matchedOrdersPopupRef" />
     <VpsOtpPopup ref="vpsOtpPopupRef" />
 </template>
 
 <script setup>
 import Chart from "./Chart.vue";
-import SettingPopup from "./SettingPopup.vue";
-import VpsOtpPopup from "./VpsOtpPopup.vue";
+import SettingPopup from "./Popups/SettingPopup.vue";
+import MatchedOrdersPopup from "./Popups/MatchedOrdersPopup.vue";
+import VpsOtpPopup from "./Popups/VpsOtpPopup.vue";
 import { ref, inject, computed } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
@@ -84,6 +90,7 @@ const bus = inject("bus");
 const source = computed(() => store.state.tradingDerivative.config.source);
 const chartRef = ref(null);
 const settingPopupRef = ref(null);
+const matchedOrdersPopupRef = ref(null);
 const vpsOtpPopupRef = ref(null);
 const exportTypes = ref([
     {
@@ -103,8 +110,11 @@ const dataSource = ref([
     { name: "VPS", icon: "far fa-database small" },
 ]);
 
-function setting() {
+function showSetting() {
     settingPopupRef.value.show();
+}
+function showMatchedOrders() {
+    matchedOrdersPopupRef.value.show();
 }
 function report() {
     bus.emit("checkPin", () => store.dispatch("tradingDerivative/report"));

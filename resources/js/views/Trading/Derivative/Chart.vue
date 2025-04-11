@@ -35,6 +35,7 @@
                 }"
                 :title="$t('trading.derivative.position')"
                 @click="getAccountInfo"
+                @contextmenu="showMatchedOrders"
             >
                 {{ status.position }}
             </div>
@@ -208,7 +209,7 @@ const { t } = useI18n();
 const mf = inject("mf");
 const devices = inject("devices");
 const filters = inject("filters");
-const emit = defineEmits(["showSetting"]);
+const emit = defineEmits(["showSetting", "showMatchedOrders"]);
 const chartContainerRef = ref(null);
 const chartRef = ref(null);
 const connectionRef = ref(null);
@@ -812,6 +813,9 @@ function resetChart() {
 function showSetting() {
     emit("showSetting");
 }
+function showMatchedOrders() {
+    emit("showMatchedOrders");
+}
 function initChart() {
     store.dispatch("tradingDerivative/initChart").then(() => {
         connectSocket();
@@ -853,6 +857,7 @@ function getAccountInfo() {
         alert(html, t("trading.derivative.accountInfo"));
     });
 }
+function getMatchedOrders() {}
 function coordinateToPrice(y) {
     return mf.fmtNum(params.series.price.coordinateToPrice(y));
 }

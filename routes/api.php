@@ -112,6 +112,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('login-vps', 'DerivativeController@loginVps');
                     Route::get('get-status', 'DerivativeController@getStatus');
                     Route::get('get-account-info', 'DerivativeController@getAccountInfo');
+                    Route::get('get-matched-orders', 'DerivativeController@getMatchedOrders');
                     Route::post('execute-order', 'DerivativeController@executeOrder');
                     Route::post('draw-tools', 'DerivativeController@drawTools');
                     Route::post('report', 'DerivativeController@report');

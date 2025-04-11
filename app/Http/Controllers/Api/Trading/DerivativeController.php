@@ -147,6 +147,19 @@ class DerivativeController extends CoreController
     }
 
     /**
+     * Get Matched Orders
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getMatchedOrders(Request $request)
+    {
+        $data = $this->derivativeService->getMatchedOrders($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Execute Order
      *
      * @param \Illuminate\Http\Request $request

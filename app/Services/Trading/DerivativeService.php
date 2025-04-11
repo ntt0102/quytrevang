@@ -207,6 +207,18 @@ class DerivativeService extends CoreService
     }
 
     /**
+     * Get Matched Orders
+     *
+     * @param $payload
+     * 
+     */
+    public function getMatchedOrders($payload)
+    {
+        $vos = new VpsOrderService();
+        return $vos->getMatchedOrders();
+    }
+
+    /**
      * Execute Order
      *
      * @param $payload

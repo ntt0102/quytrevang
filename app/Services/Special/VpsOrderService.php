@@ -174,6 +174,30 @@ class VpsOrderService extends CoreService
         ];
     }
 
+    public function getMatchedOrders()
+    {
+        if (!$this->connection) return false;
+        $payload = [
+            "group" => "Q",
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
+            "c" => "H",
+            "data" => [
+                "type" => "string",
+                "cmd" => "Web.Order.FullAllOrder",
+                "p1" => "1",
+                "p2" => "6",
+                "p3" => $this->formatAccount() . ",ALL,ALL",
+                "p4" => "MATCH",
+            ],
+        ];
+        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        if ($rsp->rc != 1) return false;
+        return $rsp->data;
+    }
+
     public function execute($payload)
     {
         if (!$this->connection) {
@@ -185,14 +209,12 @@ class VpsOrderService extends CoreService
                 $isNew = $payload->entryData->cmd == "new";
                 if ($isNew && $this->position != 0) {
                     return ['isOk' => false, 'message' => 'openedPosition'];
-                }
-                else return $this->conditionOrder($payload->action, $payload->entryData);
+                } else return $this->conditionOrder($payload->action, $payload->entryData);
                 break;
             case 'tpsl':
                 if ($this->position == 0) {
                     return ['isOk' => false, 'message' => 'unopenedPosition'];
-                }
-                else {
+                } else {
                     $tp = $this->order('tp', $payload->tpData);
                     if (!$tp['isOk']) return $tp;
                     return $this->conditionOrder('sl', $payload->slData);
