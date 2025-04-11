@@ -248,8 +248,10 @@ function calcContinuePattern() {
     });
 
     const isBreak1 =
-        mf.fmtNum(C.price - phase3.R1.price, 1, true) >= phase2.pr &&
-        !(phase3.ext.tr >= phase3.tr && phase3.ext.pr >= phase3.pr);
+        mf.fmtNum(phase3.R1.price - C.price, 1, true) >= phase2.pr &&
+        phase3.R1.index1 - phase2.R.index >= phase2.tr &&
+        phase3.ext.pr < phase3.pr &&
+        phase3.ext.tr < phase3.tr;
     const D = {
         price: isBreak1 ? phase3.R1.price : phase3.ext.R.price,
         index: isBreak1 ? phase3.R1.index : phase3.ext.R.index,
@@ -278,8 +280,10 @@ function calcContinuePattern() {
     });
 
     const isBreak2 =
-        mf.fmtNum(E.price - phase5.R1.price, 1, true) >= phase4.pr &&
-        !(phase5.ext.tr >= phase5.tr && phase5.ext.pr >= phase5.pr);
+        mf.fmtNum(phase5.R1.price - E.price, 1, true) >= phase4.pr &&
+        phase5.R1.index1 - phase4.R.index >= phase4.tr &&
+        phase5.ext.pr < phase5.pr &&
+        phase5.ext.tr < phase5.tr;
 
     const F = {
         price: isBreak2 ? phase5.R1.price : phase5.ext.R.price,
@@ -446,8 +450,10 @@ function calcReversalPattern() {
     });
 
     const isBreak1 =
-        mf.fmtNum(B.price - phase2.R1.price, 1, true) >= phase1.pr &&
-        !(phase2.ext.tr >= phase2.tr && phase2.ext.pr >= phase2.pr);
+        mf.fmtNum(phase2.R1.price - B.price, 1, true) >= phase1.pr &&
+        phase2.R1.index1 - phase1.R.index >= phase1.tr &&
+        phase2.ext.pr < phase2.pr &&
+        phase2.ext.tr < phase2.tr;
 
     const C = {
         price: isBreak1 ? phase2.R1.price : phase2.ext.R.price,
@@ -477,8 +483,10 @@ function calcReversalPattern() {
     });
 
     const isBreak2 =
-        mf.fmtNum(D.price - phase4.R1.price, 1, true) >= phase3.pr &&
-        !(phase4.ext.tr >= phase4.tr && phase4.ext.pr >= phase4.pr);
+        mf.fmtNum(phase4.R1.price - D.price, 1, true) >= phase3.pr &&
+        phase4.R1.index1 - phase3.R.index >= phase3.tr &&
+        phase4.ext.pr < phase4.pr &&
+        phase4.ext.tr < phase4.tr;
 
     const E = {
         price: isBreak2 ? phase4.R1.price : phase4.ext.R.price,
@@ -529,7 +537,6 @@ function calcReversalPattern() {
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     const PR2 = isBreak1 ? phase2.pre.pr : phase2.pr;
-    const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
     const PR4 = isBreak2 ? phase4.pre.pr : phase4.pr;
 
     const T1 = phase1.R.index + phase1.tr;
@@ -644,7 +651,7 @@ function scanPhase({ side, start, end }) {
             }
             if (mf.cmp(price, side, box.R.price, true)) {
                 if (box.pr > 0) {
-                    if (box.pr >= maxBox.pr || box.tr >= 5 * maxBox.tr) {
+                    if (box.pr >= maxBox.pr || box.tr >= maxBox.tr) {
                         preBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
                         if (maxBox.tr < preBox.tr) maxBox.tr = preBox.tr;
