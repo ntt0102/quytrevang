@@ -11,7 +11,7 @@ const continuePattern = [
         name: "Bước đỏ",
         conds: [
             //
-            "P > 0.618xP.cam",
+            "P > 0.618P.cam",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",
@@ -22,7 +22,7 @@ const continuePattern = [
         name: "Bước hồng",
         conds: [
             //
-            "P > 0.618xP.đỏ",
+            "P > 0.618P.đỏ",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",
@@ -34,7 +34,7 @@ const continuePattern = [
         conds: [
             //
             "R ≠ R.đỏ.vàng",
-            "P > 0.618xP.hồng",
+            "P > 0.618P.hồng",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",
@@ -45,7 +45,7 @@ const continuePattern = [
         name: "Bước lam",
         conds: [
             //
-            "P > 0.618xP.tím",
+            "P > 0.618P.tím",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",
@@ -75,7 +75,7 @@ const reversalPattern = [
         name: "Bước hồng",
         conds: [
             //
-            "P > 0.618xP.đỏ",
+            "P > 0.618P.đỏ",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",
@@ -87,7 +87,7 @@ const reversalPattern = [
         conds: [
             //
             "R ≠ R.đỏ",
-            "P > 0.618xP.hồng",
+            "P > 0.618P.hồng",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",
@@ -98,7 +98,7 @@ const reversalPattern = [
         name: "Bước lam",
         conds: [
             //
-            "P > 0.618xP.tím",
+            "P > 0.618P.tím",
             "P > Pmin",
             "P < Pmax",
             "T > Tmin",

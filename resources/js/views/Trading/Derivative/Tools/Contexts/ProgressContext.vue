@@ -89,7 +89,7 @@ function refreshPattern() {
         text-align: left;
         margin-top: 10px;
         line-height: 18px;
-        font-size: 15px;
+        font-size: 14px;
         min-height: 50px;
 
         &.portrait {
