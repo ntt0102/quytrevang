@@ -3,61 +3,61 @@ const continuePattern = [
         name: "Bước cam",
         conds: [
             //
-            "P > Pmin",
             "T > Tmin",
+            "P > Pmin",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            "P > 61,8%P.cam",
-            "P > Pmin",
-            "P < Pmax",
             "T > Tmin",
+            "P > Pmin",
+            "P > 61,8%P.cam",
             "T < Tmax",
+            "P < Pmax",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            "P > 61,8%P.đỏ",
-            "P > Pmin",
-            "P < Pmax",
             "T > Tmin",
+            "P > Pmin",
+            "P > 61,8%P.đỏ",
             "T < Tmax",
+            "P < Pmax",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "R ≠ R.đỏ.vàng",
-            "P > 61,8%P.hồng",
-            "P > Pmin",
-            "P < Pmax",
             "T > Tmin",
+            "P > Pmin",
+            "P > 61,8%P.hồng",
             "T < Tmax",
+            "P < Pmax",
+            "R ≠ R.đỏ.vàng",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            "P > 61,8%P.tím",
-            "P > Pmin",
-            "P < Pmax",
             "T > Tmin",
+            "P > Pmin",
+            "P > 61,8%P.tím",
             "T < Tmax",
+            "P < Pmax",
         ],
     },
     {
         name: "Bước lục",
         conds: [
             //
-            "P > Pmin",
             "T > Tmin",
+            "P > Pmin",
             "T < Tmax",
         ],
     },
@@ -67,50 +67,50 @@ const reversalPattern = [
         name: "Bước đỏ",
         conds: [
             //
-            "P > Pmin",
             "T > Tmin",
+            "P > Pmin",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            "P > 61,8%P.đỏ",
-            "P > Pmin",
-            "P < Pmax",
             "T > Tmin",
+            "P > Pmin",
+            "P > 61,8%P.đỏ",
             "T < Tmax",
+            "P < Pmax",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "R ≠ R.đỏ",
-            "P > 61,8%P.hồng",
-            "P > Pmin",
-            "P < Pmax",
             "T > Tmin",
+            "P > Pmin",
+            "P > 61,8%P.hồng",
             "T < Tmax",
+            "P < Pmax",
+            "R ≠ R.đỏ",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            "P > 61,8%P.tím",
-            "P > Pmin",
-            "P < Pmax",
             "T > Tmin",
+            "P > Pmin",
+            "P > 61,8%P.tím",
             "T < Tmax",
+            "P < Pmax",
         ],
     },
     {
         name: "Bước lục",
         conds: [
             //
-            "P > Pmin",
             "T > Tmin",
+            "P > Pmin",
             "T < Tmax",
         ],
     },

@@ -301,11 +301,37 @@ function calcContinuePattern() {
         time1: isBreak2 ? phase5.S1.time1 : phase5.ext.S.time1,
     };
 
+    // const phase6 = scanPhase({
+    //     side: !side,
+    //     start: { time: F.time },
+    //     end: { time: pickTime ?? stopTime },
+    // });
+
     const phase6 = scanPhase({
         side: !side,
-        start: { time: F.time },
+        start: F,
+        end: { time: Math.min(pickTime ?? G.time, G.time) },
+    });
+
+    const phase7 = scanPhase({
+        side,
+        start: G,
         end: { time: pickTime ?? stopTime },
     });
+
+    const isBreak3 =
+        mf.fmtNum(phase7.R1.price - E.price, 1, true) >= phase6.pr &&
+        phase7.R1.index1 - phase6.R.index >= phase6.tr &&
+        phase7.ext.pr < phase7.pr &&
+        phase7.ext.tr < phase7.tr;
+
+    const H = {
+        price: isBreak3 ? phase7.R1.price : phase7.ext.R.price,
+        index: isBreak3 ? phase7.R1.index : phase7.ext.R.index,
+        index1: isBreak3 ? phase7.R1.index1 : phase7.ext.R.index1,
+        time: isBreak3 ? phase7.R1.time : phase7.ext.R.time,
+        time1: isBreak3 ? phase7.R1.time1 : phase7.ext.R.time1,
+    };
 
     console.log("calcContinuePattern", [
         phase1,
@@ -314,6 +340,7 @@ function calcContinuePattern() {
         phase4,
         phase5,
         phase6,
+        phase7,
     ]);
 
     const AB = mf.fmtNum(B.price - A.price, 1, true);
@@ -322,7 +349,7 @@ function calcContinuePattern() {
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = mf.fmtNum(G.price - F.price, 1, true);
-    const GH = phase6.ext.pr;
+    const GH = mf.fmtNum(H.price - G.price, 1, true);
 
     const Tab = phase1.R.index1 - phase1.S.index;
     const Tbc = phase2.R.index1 - phase2.S.index;
@@ -330,12 +357,7 @@ function calcContinuePattern() {
     const Tde = E.index1 - D.index;
     const Tef = F.index1 - E.index;
     const Tfg = G.index1 - F.index;
-    const Tgh = phase6.ext.S.index1 - phase6.ext.R.index;
-
-    // let DR3 = mf.fmtNum(phase3.R1.price - D.price, 1, true);
-    // if (DR3 / CD < 0.1) DR3 = mf.fmtNum(phase3.pre.R.price - D.price, 1, true);
-    // let FR5 = mf.fmtNum(phase5.R1.price - F.price, 1, true);
-    // if (FR5 / EF < 0.1) FR5 = mf.fmtNum(phase5.pre.R.price - F.price, 1, true);
+    const Tgh = H.index1 - G.index;
 
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
     const PR3 = isBreak1 ? phase3.pre.pr : phase3.pr;
@@ -353,46 +375,46 @@ function calcContinuePattern() {
     progress.steps = [
         [
             //
-            BC >= phase1.pr,
             phase2.R.index1 > T1,
+            BC >= phase1.pr,
         ],
         [
             //
-            CD >= 0.618 * BC,
-            CD >= phase2.pr,
-            CD <= AB,
             D.index1 > T2,
+            CD >= phase2.pr,
+            CD >= 0.618 * BC,
             Tcd <= Tab,
+            CD <= AB,
         ],
         [
             //
-            DE >= 0.618 * CD,
-            DE >= PR3,
-            DE <= BC,
             E.index1 > T3,
+            DE >= PR3,
+            DE >= 0.618 * CD,
             Tde <= Tbc,
+            DE <= BC,
         ],
         [
             //
-            F.price !== D.price && F.price !== B.price,
-            EF >= 0.618 * DE,
-            EF >= phase4.pr,
-            EF <= CD,
             F.index1 > T4,
+            EF >= phase4.pr,
+            EF >= 0.618 * DE,
             Tef <= Tcd,
+            EF <= CD,
+            F.price !== D.price && F.price !== B.price,
         ],
         [
             //
-            FG >= 0.618 * EF,
-            FG >= PR5,
-            FG <= DE,
             G.index1 > T5,
+            FG >= PR5,
+            FG >= 0.618 * EF,
             Tfg <= Tde,
+            FG <= DE,
         ],
         [
             //
+            H.index1 > T6,
             GH >= phase6.pr,
-            phase6.ext.S.index1 > T6,
             Tgh <= Tef,
         ],
     ];
@@ -410,7 +432,7 @@ function calcContinuePattern() {
         { time: E.time1, value: E.price, color: "#8000FF" },
         { time: F.time1, value: F.price, color: "#00FFFF" },
         { time: G.time1, value: G.price, color: "#00FF00" },
-        { time: phase6.ext.S.time1, value: phase6.ext.S.price },
+        { time: H.time1, value: H.price },
     ];
     //
     const entry = D.price;
@@ -506,9 +528,29 @@ function calcReversalPattern() {
 
     const phase5 = scanPhase({
         side: !side,
-        start: { time: E.time },
+        start: E,
+        end: { time: Math.min(pickTime ?? F.time, F.time) },
+    });
+
+    const phase6 = scanPhase({
+        side,
+        start: F,
         end: { time: pickTime ?? stopTime },
     });
+
+    const isBreak3 =
+        mf.fmtNum(phase6.R1.price - F.price, 1, true) >= phase5.pr &&
+        phase6.R1.index1 - phase5.R.index >= phase5.tr &&
+        phase6.ext.pr < phase6.pr &&
+        phase6.ext.tr < phase6.tr;
+
+    const G = {
+        price: isBreak3 ? phase6.R1.price : phase6.ext.R.price,
+        index: isBreak3 ? phase6.R1.index : phase6.ext.R.index,
+        index1: isBreak3 ? phase6.R1.index1 : phase6.ext.R.index1,
+        time: isBreak3 ? phase6.R1.time : phase6.ext.R.time,
+        time1: isBreak3 ? phase6.R1.time1 : phase6.ext.R.time1,
+    };
 
     console.log("calcReversalPattern", [
         phase1,
@@ -516,6 +558,7 @@ function calcReversalPattern() {
         phase3,
         phase4,
         phase5,
+        phase6,
     ]);
 
     const AB = mf.fmtNum(ab, 1, true);
@@ -523,17 +566,14 @@ function calcReversalPattern() {
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
-    const FG = phase5.ext.pr;
+    const FG = mf.fmtNum(G.price - F.price, 1, true);
 
     const Tab = phase1.R.index1 - phase1.S.index;
     const Tbc = C.index1 - phase2.S.index;
     const Tcd = D.index1 - C.index;
     const Tde = E.index1 - D.index;
     const Tef = F.index1 - E.index;
-    const Tfg = phase5.ext.S.index1 - phase5.ext.R.index;
-
-    // let ER4 = mf.fmtNum(phase4.R1.price - E.price, 1, true);
-    // if (ER4 / DE < 0.1) ER4 = mf.fmtNum(phase4.pre.R.price - E.price, 1, true);
+    const Tfg = G.index1 - F.index;
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     const PR2 = isBreak1 ? phase2.pre.pr : phase2.pr;
@@ -550,38 +590,38 @@ function calcReversalPattern() {
     progress.steps = [
         [
             //
-            BC >= phase1.pr,
             C.index1 > T1,
+            BC >= phase1.pr,
         ],
         [
             //
-            CD >= 0.618 * BC,
-            CD >= PR2,
-            CD <= AB,
             D.index1 > T2,
+            CD >= PR2,
+            CD >= 0.618 * BC,
             Tcd <= Tab,
+            CD <= AB,
         ],
         [
             //
-            E.price !== C.price,
-            DE >= 0.618 * CD,
-            DE >= phase3.pr,
-            DE <= BC,
             E.index1 > T3,
+            DE >= phase3.pr,
+            DE >= 0.618 * CD,
             Tde <= Tbc,
+            DE <= BC,
+            E.price !== C.price,
         ],
         [
             //
-            EF >= 0.618 * DE,
-            EF >= PR4,
-            EF <= CD,
             F.index1 > T4,
+            EF >= PR4,
+            EF >= 0.618 * DE,
             Tef <= Tcd,
+            EF <= CD,
         ],
         [
             //
+            G.index1 > T5,
             FG >= phase5.pr,
-            phase5.ext.S.index1 > T5,
             Tfg <= Tde,
         ],
     ];
@@ -598,7 +638,7 @@ function calcReversalPattern() {
         { time: D.time1, value: D.price, color: "#8000FF" },
         { time: E.time1, value: E.price, color: "#00FFFF" },
         { time: F.time1, value: F.price, color: "#00FF00" },
-        { time: phase5.ext.S.time1, value: phase5.ext.S.price },
+        { time: G.time1, value: G.price },
     ];
     //
     const entry = C.price;
