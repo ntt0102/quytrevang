@@ -14,7 +14,7 @@ import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
-const props = defineProps(["symbol", "indexSeries", "stockSeries"]);
+const props = defineProps(["symbol", "drawIndexLine", "drawStockLine"]);
 const emit = defineEmits(["hideContext"]);
 const reversalToolRef = ref(null);
 const stockStore = computed(() => store.state.tradingShare.tools.reversal);
@@ -148,7 +148,7 @@ function loadReversalStockTool({ price, time }) {
     reversalSeries.stock.setData([{ time, value: 1 }]);
     lineOption.price = price;
     lineOption.color = colors.stock;
-    lines.stock = props.stockSeries.createPriceLine(lineOption);
+    lines.stock = props.drawStockLine(lineOption);
 }
 function loadIndex(data) {
     removeReversalIndexTool(false);
@@ -158,7 +158,7 @@ function loadReversalIndexTool({ price, time }) {
     reversalSeries.index.setData([{ time, value: 1 }]);
     lineOption.price = price;
     lineOption.color = colors.index;
-    lines.index = props.indexSeries.createPriceLine(lineOption);
+    lines.index = props.drawIndexLine(lineOption);
 }
 function remove() {
     removeReversalStockTool(false);
@@ -173,14 +173,14 @@ function removeReversalStockTool(withServer = true) {
     }
     reversalSeries.stock.setData([]);
     if (lines.stock) {
-        props.stockSeries.removePriceLine(lines.stock);
+        props.drawStockLine(lines.stock, true);
         lines.stock = null;
     }
 }
 function removeReversalIndexTool() {
     reversalSeries.index.setData([]);
     if (lines.index) {
-        props.indexSeries.removePriceLine(lines.index);
+        props.drawIndexLine(lines.index, true);
         lines.index = null;
     }
 }

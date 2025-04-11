@@ -85,22 +85,22 @@
             <ReversalTool
                 ref="reversalToolRef"
                 :symbol="state.symbol"
-                :indexSeries="state.series.index"
-                :stockSeries="state.series.stock"
+                :drawIndexLine="drawIndexLine"
+                :drawStockLine="drawStockLine"
                 @hideContext="hideContext"
             />
             <LineTool
                 ref="lineToolRef"
                 :symbol="state.symbol"
                 storeModule="tradingShare"
-                :priceSeries="state.series.stock"
+                :drawPriceLine="drawStockLine"
                 @hideContext="hideContext"
             />
             <TargetTool
                 ref="targetToolRef"
                 :symbol="state.symbol"
                 storeModule="tradingShare"
-                :priceSeries="state.series.stock"
+                :drawPriceLine="drawStockLine"
                 :levels="[1, 2]"
                 :isPercent="true"
                 :showPercent="false"
@@ -243,7 +243,7 @@ function drawChart() {
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    state.series.index = params.chart.addCandlestickSeries({
+    params.series.index = params.chart.addCandlestickSeries({
         priceScaleId: "index",
         upColor: "#30A165",
         downColor: "#EC3F3F",
@@ -253,7 +253,7 @@ function drawChart() {
         priceFormat: { minMove: 0.01 },
         scaleMargins: { top: 0.1, bottom: 0.55 },
     });
-    state.series.stock = params.chart.addCandlestickSeries({
+    params.series.stock = params.chart.addCandlestickSeries({
         upColor: "#30A165",
         downColor: "#EC3F3F",
         borderVisible: false,
@@ -301,7 +301,7 @@ function getFilterTimes() {
 }
 function eventChartCrosshairMove(e) {
     if (e.time) {
-        let price = e.seriesPrices.get(state.series.stock);
+        let price = e.seriesPrices.get(params.series.stock);
         params.crosshair.time = e.time;
         params.crosshair.price = price;
     } else {
@@ -380,12 +380,12 @@ function loadWhitespaceChart(value) {
 }
 function loadStockChart(value) {
     params.data.stock = mf.cloneDeep(value);
-    state.series.stock.setData(params.data.stock);
+    params.series.stock.setData(params.data.stock);
     params.chart.applyOptions({ watermark: { text: state.symbol } });
 }
 function loadIndexChart(value) {
     params.data.index = value;
-    state.series.index.setData(value);
+    params.series.index.setData(value);
 }
 function updateLatestCandle(series, newPrice) {
     let latest = params.data[series].pop();
@@ -557,7 +557,15 @@ function hideContext() {
     lineToolRef.value.hide();
 }
 function coordinateToPrice(y) {
-    return mf.fmtNum(state.series.stock.coordinateToPrice(y));
+    return mf.fmtNum(params.series.stock.coordinateToPrice(y));
+}
+function drawIndexLine(data, isRemove = false) {
+    if (isRemove) params.series.index.removePriceLine(data);
+    else return params.series.index.createPriceLine(data);
+}
+function drawStockLine(data, isRemove = false) {
+    if (isRemove) params.series.stock.removePriceLine(data);
+    else return params.series.stock.createPriceLine(data);
 }
 </script>
 <style lang="scss">
