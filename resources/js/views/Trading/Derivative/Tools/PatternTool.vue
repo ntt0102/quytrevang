@@ -358,7 +358,7 @@ function calcContinuePattern() {
         ],
         [
             //
-            CD >= BC / 2,
+            CD >= 0.618 * BC,
             CD >= phase2.pr,
             CD <= AB,
             D.index1 > T2,
@@ -366,7 +366,7 @@ function calcContinuePattern() {
         ],
         [
             //
-            DE >= CD / 2,
+            DE >= 0.618 * CD,
             DE >= PR3,
             DE <= BC,
             E.index1 > T3,
@@ -375,7 +375,7 @@ function calcContinuePattern() {
         [
             //
             F.price !== D.price && F.price !== B.price,
-            EF >= DE / 2,
+            EF >= 0.618 * DE,
             EF >= phase4.pr,
             EF <= CD,
             F.index1 > T4,
@@ -383,7 +383,7 @@ function calcContinuePattern() {
         ],
         [
             //
-            FG >= EF / 2,
+            FG >= 0.618 * EF,
             FG >= PR5,
             FG <= DE,
             G.index1 > T5,
@@ -555,7 +555,7 @@ function calcReversalPattern() {
         ],
         [
             //
-            CD >= BC / 2,
+            CD >= 0.618 * BC,
             CD >= PR2,
             CD <= AB,
             D.index1 > T2,
@@ -564,7 +564,7 @@ function calcReversalPattern() {
         [
             //
             E.price !== C.price,
-            DE >= CD / 2,
+            DE >= 0.618 * CD,
             DE >= phase3.pr,
             DE <= BC,
             E.index1 > T3,
@@ -572,7 +572,7 @@ function calcReversalPattern() {
         ],
         [
             //
-            EF >= DE / 2,
+            EF >= 0.618 * DE,
             EF >= PR4,
             EF <= CD,
             F.index1 > T4,
