@@ -34,6 +34,7 @@ class OrderDerivativeJob implements ShouldQueue
         $activeOrders = DerivativeOrder::active()->get();
         if (count($activeOrders) === 0) return false;
         $lastPrice = $this->getLastPrice();
+        if (!$lastPrice) return false;
         $activeOrders->each(function ($order) use ($lastPrice, $tpDefault, $slDefault) {
             $sideBool = $order->side > 0;
             $vos = new VpsOrderService();
@@ -94,9 +95,9 @@ class OrderDerivativeJob implements ShouldQueue
             $res = $client->get($url);
             $rsp = json_decode($res->getBody());
             if (count($rsp) === 1) return $rsp[0]->lastPrice;
-            else return [];
+            else return null;
         } catch (\Throwable $th) {
-            return [];
+            return null;
         }
     }
 }
