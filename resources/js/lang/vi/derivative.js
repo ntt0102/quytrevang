@@ -13,7 +13,7 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 61,8%P.cam",
+            "P > 61,8%",
             "T < Tmax",
             "P < Pmax",
         ],
@@ -24,7 +24,7 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 61,8%P.đỏ",
+            "P > 61,8%",
             "T < Tmax",
             "P < Pmax",
         ],
@@ -35,7 +35,7 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 61,8%P.hồng",
+            "P > 61,8%",
             "T < Tmax",
             "P < Pmax",
             "R ≠ R.đỏ.vàng",
@@ -47,7 +47,7 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 61,8%P.tím",
+            "P > 61,8%",
             "T < Tmax",
             "P < Pmax",
         ],
@@ -77,7 +77,7 @@ const reversalPattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 61,8%P.đỏ",
+            "P > 61,8%",
             "T < Tmax",
             "P < Pmax",
         ],
@@ -88,7 +88,7 @@ const reversalPattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 61,8%P.hồng",
+            "P > 61,8%",
             "T < Tmax",
             "P < Pmax",
             "R ≠ R.đỏ",
@@ -100,7 +100,7 @@ const reversalPattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 61,8%P.tím",
+            "P > 61,8%",
             "T < Tmax",
             "P < Pmax",
         ],
