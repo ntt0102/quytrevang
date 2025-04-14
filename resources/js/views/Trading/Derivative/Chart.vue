@@ -744,6 +744,7 @@ function setProgress(value) {
 }
 function orderChanged(hasOrder) {
     state.hasOrderLine = hasOrder;
+    console.log("state.hasOrderLine", state.hasOrderLine);
 }
 function toggleOrderButton(show) {
     if (show) {

@@ -8,7 +8,7 @@
                     options: {
                         icon: 'far fa-gear small',
                         hint: $t('trading.derivative.buttons.setting'),
-                        onClick: setting,
+                        onClick: showSetting,
                     },
                 },
                 {

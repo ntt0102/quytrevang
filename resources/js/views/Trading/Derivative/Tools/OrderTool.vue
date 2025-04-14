@@ -35,8 +35,9 @@ const emit = defineEmits([
 ]);
 const orderToolRef = ref(null);
 const isOrderWarning = ref(false);
-const orderStore = computed(() => store.state.tradingDerivative.tools.order);
-let order = {};
+const orderStore = computed(() => store.state.tradingDerivative.config.orders);
+let putOrder = {};
+let orders = ref({});
 let lines = {};
 let isAutoOrdering = false;
 
@@ -59,47 +60,85 @@ defineExpose({
 });
 
 watch(orderStore, (data) => {
-    if (data) load(data);
+    if (mf.isSet(data)) load(data);
 });
 
-function has() {
-    return mf.isSet(lines.entry) || mf.isSet(lines.tp);
-}
+watch(
+    () => Object.keys(orders.value).length,
+    (newLen) => emit("orderChanged", newLen > 0)
+);
+
 function show({ price }) {
     if (price && props.inSession()) {
         const currentSeconds = getUnixTime(addHours(new Date(), 7));
-        if (!mf.isSet(lines.entry)) {
-            let _price = null,
-                _side = 0;
-            if (!props.position) {
-                if (
-                    currentSeconds > props.TIME.ATO &&
-                    currentSeconds < props.TIME.ATC
-                ) {
-                    _price = price;
-                    _side = _price >= props.prices.at(-1).value ? 1 : -1;
-                    order.side = _side;
-                    order.entry = _price;
-                }
-            } else {
-                if (currentSeconds < props.TIME.ATO) _price = "ATO";
-                else if (currentSeconds > props.TIME.ATC) _price = "ATC";
-                if (_price) {
-                    order.entry = _price;
-                    _side = -props.position;
-                }
-            }
-            if (_side) {
-                emit("showEntry", { side: _side, price: _price });
-            }
-        } else if (!mf.isSet(lines.tp) && props.position) {
+        // let _price = null,
+        // _side = 0;
+        if (!props.position) {
             if (
                 currentSeconds > props.TIME.ATO &&
                 currentSeconds < props.TIME.ATC
             ) {
-                emit("showTpSl", { side: props.position });
+                // _price = price;
+                putOrder.side = price >= props.prices.at(-1).value ? 1 : -1;
+                // putOrder.side = _side;
+                // putOrder.entry = _price;
+                putOrder.price = price;
+                emit("showEntry", {
+                    side: putOrder.side,
+                    price: putOrder.price,
+                });
+            }
+        } else {
+            if (!orders.value.length) {
+                let _price = "";
+                if (currentSeconds < props.TIME.ATO) _price = "ATO";
+                else if (currentSeconds > props.TIME.ATC) _price = "ATC";
+                if (_price) {
+                    // putOrder.price = _price;
+                    // _side = -props.position;
+                    emit("showEntry", { side: -props.position, price: _price });
+                }
+            } else {
+                if (
+                    currentSeconds > props.TIME.ATO &&
+                    currentSeconds < props.TIME.ATC
+                ) {
+                    emit("showTpSl", { side: props.position });
+                }
             }
         }
+        // if (!mf.isSet(lines.entry)) {
+        //     let _price = null,
+        //         _side = 0;
+        //     if (!props.position) {
+        //         if (
+        //             currentSeconds > props.TIME.ATO &&
+        //             currentSeconds < props.TIME.ATC
+        //         ) {
+        //             _price = price;
+        //             _side = _price >= props.prices.at(-1).value ? 1 : -1;
+        //             putOrder.side = _side;
+        //             putOrder.entry = _price;
+        //         }
+        //     } else {
+        //         if (currentSeconds < props.TIME.ATO) _price = "ATO";
+        //         else if (currentSeconds > props.TIME.ATC) _price = "ATC";
+        //         if (_price) {
+        //             putOrder.entry = _price;
+        //             _side = -props.position;
+        //         }
+        //     }
+        //     if (_side) {
+        //         emit("showEntry", { side: _side, price: _price });
+        //     }
+        // } else if (!mf.isSet(lines.tp) && props.position) {
+        //     if (
+        //         currentSeconds > props.TIME.ATO &&
+        //         currentSeconds < props.TIME.ATC
+        //     ) {
+        //         emit("showTpSl", { side: props.position });
+        //     }
+        // }
     }
 }
 function entry() {
@@ -159,13 +198,15 @@ function entry() {
                     action: "entry",
                     entryData: {
                         cmd: "new",
-                        side: order.side,
-                        price: order.entry,
+                        side: putOrder.side,
+                        price: putOrder.price,
                     },
                 })
                 .then((resp) => {
                     if (resp.isOk) {
-                        drawOrderTool(["entry"]);
+                        orders.value[resp.order.id] = resp.order;
+                        lines[resp.order.id] = {};
+                        drawOrderTool(["entry"], resp.order);
                         toast.success(t("trading.derivative.newEntrySuccess"));
                     } else toastOrderError(resp.message);
                 });
@@ -173,67 +214,79 @@ function entry() {
     }
 }
 function tpsl() {
-    order.tp = order.entry + order.side * tpDefault.value;
-    order.sl = order.entry - order.side * slDefault.value;
+    const pendingOrders = getOrderByStatus(0);
+    if (pendingOrders.length !== 1) return false;
+    const order = pendingOrders[0];
+    const tpPrice = order.entry_price + order.side * tpDefault.value;
+    const slPrice = order.entry_price - order.side * slDefault.value;
     store
         .dispatch("tradingDerivative/executeOrder", {
             action: "tpsl",
+            orderId: order.id,
             tpData: {
                 cmd: "new",
-                price: order.tp,
+                price: tpPrice,
             },
             slData: {
                 cmd: "new",
-                price: order.sl,
+                price: slPrice,
             },
         })
         .then((resp) => {
             if (resp.isOk) {
-                lines.entry.applyOptions({ draggable: false });
-                drawOrderTool(["tp", "sl"]);
+                lines[order.id].entry.applyOptions({ draggable: false });
+                drawOrderTool(["tp", "sl"], resp.order);
                 toast.success(t("trading.derivative.newTpSlSuccess"));
             } else toastOrderError(resp.message);
         });
 }
 function cancel() {
-    if (mf.isSet(lines.entry)) {
-        if (mf.isSet(lines.tp)) {
-            store
-                .dispatch("tradingDerivative/executeOrder", {
-                    action: "exit",
-                    tpData: { cmd: "cancel" },
-                    slData: { cmd: "delete" },
-                    exitData: {
-                        cmd: "new",
-                        price: "MTL",
-                    },
-                })
-                .then((resp) => {
-                    if (resp.isOk) {
-                        removeOrderTool(["entry", "tp", "sl"]);
-                        toast.success(t("trading.derivative.exitSuccess"));
-                    } else {
-                        toastOrderError(resp.message);
-                    }
-                });
-        } else {
-            store
-                .dispatch("tradingDerivative/executeOrder", {
-                    action: "entry",
-                    entryData: { cmd: "delete" },
-                })
-                .then((resp) => {
-                    if (resp.isOk) {
-                        removeOrderTool(["entry"]);
-                        toast.success(
-                            t("trading.derivative.deleteEntrySuccess")
-                        );
-                    } else {
-                        toastOrderError(resp.message);
-                    }
-                });
+    Object.values(orders.value).forEach((order) => {
+        switch (order.status) {
+            case 0:
+                store
+                    .dispatch("tradingDerivative/executeOrder", {
+                        action: "entry",
+                        entryData: {
+                            cmd: "delete",
+                            orderNo: order.entry_no,
+                        },
+                    })
+                    .then((resp) => {
+                        if (resp.isOk) {
+                            removeOrderTool(["entry"], order.id);
+                            delete orders.value[order.id];
+                            toast.success(
+                                t("trading.derivative.deleteEntrySuccess")
+                            );
+                        } else {
+                            toastOrderError(resp.message);
+                        }
+                    });
+                break;
+            case 1:
+                store
+                    .dispatch("tradingDerivative/executeOrder", {
+                        action: "exit",
+                        tpData: { cmd: "cancel", orderNo: order.tp_no },
+                        slData: { cmd: "delete", orderNo: order.sl_no },
+                        exitData: {
+                            cmd: "new",
+                            price: "MTL",
+                        },
+                    })
+                    .then((resp) => {
+                        if (resp.isOk) {
+                            removeOrderTool(["entry", "tp", "sl"], order.id);
+                            delete orders.value[order.id];
+                            toast.success(t("trading.derivative.exitSuccess"));
+                        } else {
+                            toastOrderError(resp.message);
+                        }
+                    });
+                break;
         }
-    } else emit("getTools");
+    });
 }
 function cancelWithoutClose() {
     if (props.inSession()) {
@@ -241,219 +294,329 @@ function cancelWithoutClose() {
             const currentSeconds = getUnixTime(addHours(new Date(), 7));
             if (currentSeconds > props.TIME.ATC - 5 * 60) {
                 isOrderWarning.value = true;
-                if (
-                    currentSeconds > props.TIME.ATC - 15 &&
-                    mf.isSet(lines.tp)
-                ) {
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "cancel",
-                            tpData: { cmd: "cancel" },
-                            slData: { cmd: "delete" },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderTool(["entry", "tp", "sl"]);
-                                toast.success(
-                                    t(
-                                        "trading.derivative.autoCancelTpSlSuccess"
-                                    )
-                                );
-                            } else toastOrderError(resp.message);
-                        });
+                if (currentSeconds > props.TIME.ATC - 15) {
+                    const openingOrders = getOrderByStatus(1);
+                    openingOrders.forEach((order) => {
+                        store
+                            .dispatch("tradingDerivative/executeOrder", {
+                                action: "cancel",
+                                tpData: { cmd: "cancel", orderNo: order.tp_no },
+                                slData: { cmd: "delete", orderNo: order.sl_no },
+                            })
+                            .then((resp) => {
+                                if (resp.isOk) {
+                                    removeOrderTool(
+                                        ["entry", "tp", "sl"],
+                                        order.id
+                                    );
+                                    delete orders.value[order.id];
+                                    toast.success(
+                                        t(
+                                            "trading.derivative.autoCancelTpSlSuccess"
+                                        )
+                                    );
+                                } else toastOrderError(resp.message);
+                            });
+                    });
                 }
             }
         }
     }
 }
 function scan(lastPrice) {
-    if (mf.isSet(lines.entry)) {
-        const side = order.side > 0;
-        if (mf.isSet(lines.tp)) {
-            if (mf.cmp(lastPrice, side, order.tp, true)) {
-                if (!isAutoOrdering) {
-                    isAutoOrdering = true;
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "sl",
-                            slData: {
-                                cmd: "delete",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderTool(["entry", "tp", "sl"]);
-                                toast.success(
-                                    t("trading.derivative.deleteTpSuccess")
-                                );
-                            } else toastOrderError(resp.message);
-                            isAutoOrdering = false;
-                        });
+    Object.values(orders.value).forEach((order) => {
+        const sideBool = order.side > 0;
+        switch (order.status) {
+            case 0:
+                if (mf.cmp(lastPrice, sideBool, order.entry_price, true)) {
+                    if (!isAutoOrdering) {
+                        isAutoOrdering = true;
+                        setTimeout(() => {
+                            const tpPrice =
+                                order.entry_price +
+                                order.side * tpDefault.value;
+                            const slPrice =
+                                order.entry_price -
+                                order.side * slDefault.value;
+                            store
+                                .dispatch("tradingDerivative/executeOrder", {
+                                    action: "tpsl",
+                                    orderId: order.id,
+                                    tpData: {
+                                        cmd: "new",
+                                        price: tpPrice,
+                                    },
+                                    slData: {
+                                        cmd: "new",
+                                        price: slPrice,
+                                    },
+                                })
+                                .then((resp) => {
+                                    if (resp.isOk) {
+                                        orders.value[order.id] = resp.order;
+                                        lines[order.id].entry.applyOptions({
+                                            draggable: false,
+                                        });
+                                        drawOrderTool(["tp", "sl"], resp.order);
+                                        Object.keys(orders.value).forEach(
+                                            (id) => {
+                                                if (
+                                                    Number(id) !== order.id &&
+                                                    orders.value[id].status ===
+                                                        0
+                                                ) {
+                                                    removeOrderTool(
+                                                        ["entry"],
+                                                        id
+                                                    );
+                                                    delete orders.value[id];
+                                                }
+                                            }
+                                        );
+
+                                        toast.success(
+                                            t(
+                                                "trading.derivative.autoNewTpSlSuccess"
+                                            )
+                                        );
+                                    } else toastOrderError(resp.message);
+                                    isAutoOrdering = false;
+                                });
+                        }, 1000);
+                    }
                 }
-            }
-            if (mf.cmp(lastPrice, !side, order.sl, true)) {
-                if (!isAutoOrdering) {
-                    isAutoOrdering = true;
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "tp",
-                            tpData: {
-                                cmd: "cancel",
-                            },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                removeOrderTool(["entry", "tp", "sl"]);
-                                toast.success(
-                                    t("trading.derivative.deleteSlSuccess")
-                                );
-                            } else toastOrderError(resp.message);
-                            isAutoOrdering = false;
-                        });
-                }
-            }
-        } else {
-            if (mf.cmp(lastPrice, side, order.entry, true)) {
-                if (!isAutoOrdering) {
-                    isAutoOrdering = true;
-                    setTimeout(() => {
-                        order.tp = order.entry + order.side * tpDefault.value;
-                        order.sl = order.entry - order.side * slDefault.value;
+                break;
+            case 1:
+                if (mf.cmp(lastPrice, sideBool, order.tp_price, true)) {
+                    if (!isAutoOrdering) {
+                        isAutoOrdering = true;
                         store
                             .dispatch("tradingDerivative/executeOrder", {
-                                action: "tpsl",
-                                tpData: {
-                                    cmd: "new",
-                                    price: order.tp,
-                                },
+                                action: "sl",
                                 slData: {
-                                    cmd: "new",
-                                    price: order.sl,
+                                    cmd: "delete",
+                                    orderNo: order.sl_no,
                                 },
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
-                                    lines.entry.applyOptions({
-                                        draggable: false,
-                                    });
-                                    drawOrderTool(["tp", "sl"]);
+                                    removeOrderTool(
+                                        ["entry", "tp", "sl"],
+                                        order.id
+                                    );
+                                    delete orders.value[order.id];
                                     toast.success(
-                                        t(
-                                            "trading.derivative.autoNewTpSlSuccess"
-                                        )
+                                        t("trading.derivative.deleteTpSuccess")
                                     );
                                 } else toastOrderError(resp.message);
                                 isAutoOrdering = false;
                             });
-                    }, 1000);
+                    }
                 }
-            }
+                if (mf.cmp(lastPrice, !sideBool, order.sl_price, true)) {
+                    if (!isAutoOrdering) {
+                        isAutoOrdering = true;
+                        store
+                            .dispatch("tradingDerivative/executeOrder", {
+                                action: "tp",
+                                tpData: {
+                                    cmd: "cancel",
+                                    orderNo: order.tp_no,
+                                },
+                            })
+                            .then((resp) => {
+                                if (resp.isOk) {
+                                    removeOrderTool(
+                                        ["entry", "tp", "sl"],
+                                        order.id
+                                    );
+                                    delete orders.value[order.id];
+                                    toast.success(
+                                        t("trading.derivative.deleteSlSuccess")
+                                    );
+                                } else toastOrderError(resp.message);
+                                isAutoOrdering = false;
+                            });
+                    }
+                }
+                break;
         }
-    }
+    });
+    // if (mf.isSet(lines.entry)) {
+    //     const side = putOrder.side > 0;
+    //     if (mf.isSet(lines.tp)) {
+    //         if (mf.cmp(lastPrice, side, putOrder.tp, true)) {
+    //             if (!isAutoOrdering) {
+    //                 isAutoOrdering = true;
+    //                 store
+    //                     .dispatch("tradingDerivative/executeOrder", {
+    //                         action: "sl",
+    //                         slData: {
+    //                             cmd: "delete",
+    //                         },
+    //                     })
+    //                     .then((resp) => {
+    //                         if (resp.isOk) {
+    //                             removeOrderTool(["entry", "tp", "sl"]);
+    //                             toast.success(
+    //                                 t("trading.derivative.deleteTpSuccess")
+    //                             );
+    //                         } else toastOrderError(resp.message);
+    //                         isAutoOrdering = false;
+    //                     });
+    //             }
+    //         }
+    //         if (mf.cmp(lastPrice, !side, putOrder.sl, true)) {
+    //             if (!isAutoOrdering) {
+    //                 isAutoOrdering = true;
+    //                 store
+    //                     .dispatch("tradingDerivative/executeOrder", {
+    //                         action: "tp",
+    //                         tpData: {
+    //                             cmd: "cancel",
+    //                         },
+    //                     })
+    //                     .then((resp) => {
+    //                         if (resp.isOk) {
+    //                             removeOrderTool(["entry", "tp", "sl"]);
+    //                             toast.success(
+    //                                 t("trading.derivative.deleteSlSuccess")
+    //                             );
+    //                         } else toastOrderError(resp.message);
+    //                         isAutoOrdering = false;
+    //                     });
+    //             }
+    //         }
+    //     } else {
+    //         if (mf.cmp(lastPrice, side, putOrder.entry, true)) {
+    //             if (!isAutoOrdering) {
+    //                 isAutoOrdering = true;
+    //                 setTimeout(() => {
+    //                     putOrder.tp =
+    //                         putOrder.entry + putOrder.side * tpDefault.value;
+    //                     putOrder.sl =
+    //                         putOrder.entry - putOrder.side * slDefault.value;
+    //                     store
+    //                         .dispatch("tradingDerivative/executeOrder", {
+    //                             action: "tpsl",
+    //                             tpData: {
+    //                                 cmd: "new",
+    //                                 price: putOrder.tp,
+    //                             },
+    //                             slData: {
+    //                                 cmd: "new",
+    //                                 price: putOrder.sl,
+    //                             },
+    //                         })
+    //                         .then((resp) => {
+    //                             if (resp.isOk) {
+    //                                 lines.entry.applyOptions({
+    //                                     draggable: false,
+    //                                 });
+    //                                 drawOrderTool(["tp", "sl"]);
+    //                                 toast.success(
+    //                                     t(
+    //                                         "trading.derivative.autoNewTpSlSuccess"
+    //                                     )
+    //                                 );
+    //                             } else toastOrderError(resp.message);
+    //                             isAutoOrdering = false;
+    //                         });
+    //                 }, 1000);
+    //             }
+    //         }
+    //     }
+    // }
 }
-function drawOrderTool(kinds, isStore = true) {
-    const TYPE = "order";
-    let param = {
-        isRemove: false,
-        symbol,
-        name: TYPE,
-        points: [],
-        data: [],
-    };
+function load(data) {
+    orders.value = mf.cloneDeep(data);
+    Object.values(orders.value).forEach((order) => {
+        let kinds = ["entry"];
+        if (order.tp_price) {
+            kinds.push("tp", "sl");
+        }
+        removeOrderTool(["entry", "tp", "sl"], order.id);
+        drawOrderTool(kinds, order);
+    });
+}
+function drawOrderTool(kinds, order) {
     let color, title;
     kinds.forEach((kind) => {
         switch (kind) {
             case "entry":
                 color = "yellow";
-                title = order.side > 0 ? "LONG" : "SHORT";
+                title = `${order.side > 0 ? "LONG" : "SHORT"}[${order.id}]`;
                 break;
             case "tp":
                 color = "lime";
-                title = mf.fmtNum(order.tp - order.entry, 1, true);
+                title = `TP[${order.id}] ${mf.fmtNum(
+                    order.tp_price - order.entry_price,
+                    1,
+                    true
+                )}`;
                 break;
             case "sl":
                 color = "red";
-                title = mf.fmtNum(order.sl - order.entry, 1, true);
+                title = `SL[${order.id}] ${mf.fmtNum(
+                    order.sl_price - order.entry_price,
+                    1,
+                    true
+                )}`;
                 break;
         }
-        if (mf.isSet(lines[kind])) {
-            lines[kind].applyOptions({
-                price: order[kind],
-                title: title,
-            });
-            param.points.push(kind);
-            param.data.push(order[kind]);
+        if (!mf.isSet(lines[order.id])) lines[order.id] = {};
+        if (mf.isSet(lines[order.id][kind])) {
+            lines[order.id][kind].applyOptions({ title: title });
         } else {
             const options = {
-                lineType: TYPE,
+                lineType: "order",
                 kind: kind,
-                side: order.side,
-                price: order[kind],
+                price: order[`${kind}_price`],
                 color: color,
                 lineWidth: 1,
                 lineStyle: 0,
                 title: title,
-                draggable: kind === "entry" && order.tp ? false : true,
+                draggable: kind === "entry" && order.tp_price ? false : true,
             };
-            lines[kind] = props.drawPriceLine(options);
-            if (kind === "entry") {
-                param.points.push("side");
-                param.data.push(order.side);
+            lines[order.id][kind] = props.drawPriceLine(options);
+        }
+    });
+}
+function removeOrderTool(kinds, orderId) {
+    if (mf.isSet(lines[orderId])) {
+        kinds.forEach((kind) => {
+            if (mf.isSet(lines[orderId][kind])) {
+                props.drawPriceLine(lines[orderId][kind], true);
             }
-            param.points.push(kind);
-            param.data.push(order[kind]);
-        }
-    });
-    if (isStore) store.dispatch("tradingDerivative/drawTools", param);
-    emit("orderChanged", has());
-}
-function load(data) {
-    order = mf.cloneDeep(data);
-    let kinds = ["entry"];
-    if ("tp" in order) {
-        kinds.push("tp", "sl");
-    }
-    removeOrderTool(["entry", "tp", "sl"], false);
-    drawOrderTool(kinds, false);
-    emit("orderChanged", has());
-}
-function removeOrderTool(kinds, withServer = true) {
-    if (withServer)
-        store.dispatch("tradingDerivative/drawTools", {
-            isRemove: true,
-            symbol,
-            name: "order",
         });
-    kinds.forEach((kind) => {
-        if (mf.isSet(lines[kind])) {
-            props.drawPriceLine(lines[kind], true);
-            delete lines[kind];
-        }
-    });
-    emit("orderChanged", has());
+        delete lines[orderId];
+    }
 }
 function drag({ line, lineOptions, oldPrice, newPrice }) {
     if (newPrice !== oldPrice) {
         const kind = lineOptions.kind;
-        const isChanged = kind !== "entry" || !props.position;
+        const changeValid = kind !== "entry" || !props.position;
         //
-        if (isChanged) {
+        if (changeValid) {
             const dataKey = `${kind}Data`;
             const toastKey = `change${kind[0].toUpperCase()}${kind.slice(
                 1
             )}Success`;
+            const orderNo = getOrderNo(kind, oldPrice);
+            if (!orderNo) return false;
             store
                 .dispatch("tradingDerivative/executeOrder", {
                     action: kind,
                     [dataKey]: {
                         cmd: "change",
+                        orderNo,
                         price: newPrice,
                     },
                 })
                 .then((resp) => {
                     if (resp.isOk) {
-                        order[kind] = newPrice;
-                        drawOrderTool([kind]);
+                        orders.value[resp.order.id] = resp.order;
+                        drawOrderTool([kind], resp.order);
                         toast.success(t(`trading.derivative.${toastKey}`));
                     } else {
                         line.applyOptions({ price: oldPrice });
@@ -465,6 +628,18 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
             toast.show(t("trading.derivative.noChangeOrderLine"));
         }
     }
+}
+function getOrderNo(kind, price) {
+    return Object.values(orders.value).find(
+        (order) => order[`${kind}_price`] === price
+    )?.[`${kind}_no`];
+}
+function getOrderByStatus(status, isHas = false) {
+    const order = Object.values(orders.value).filter(
+        (order) => order.status === status
+    );
+    if (isHas) return order.length > 0;
+    else return order;
 }
 function toastOrderError(error) {
     if (!error) error = "unknown";

@@ -26,12 +26,6 @@ class VpsOrderService extends CoreService
         $this->vpsUser = get_global_value('vpsUser');
         $this->vpsPass = get_global_value('vpsPass');
         $this->vpsSession = get_global_value('vpsSession');
-        $this->orderId = [
-            'entry' => get_global_value('entryOrderId'),
-            'tp' => get_global_value('tpOrderId'),
-            'sl' => get_global_value('slOrderId'),
-            'exit' => get_global_value('exitOrderId'),
-        ];
         if ($otpCode) $this->loginVps($otpCode);
         else $this->getPosition();
     }
@@ -198,79 +192,11 @@ class VpsOrderService extends CoreService
         return $rsp->data;
     }
 
-    public function execute($payload)
+    public function conditionOrder($data, $isEntry = false)
     {
-        if (!$this->connection) {
-            return ['isOk' => false, 'message' => 'notConnect'];
-        }
-        //
-        switch ($payload->action) {
-            case 'entry':
-                $isNew = $payload->entryData->cmd == "new";
-                if ($isNew && $this->position != 0) {
-                    return ['isOk' => false, 'message' => 'openedPosition'];
-                } else return $this->conditionOrder($payload->action, $payload->entryData);
-                break;
-            case 'tpsl':
-                if ($this->position == 0) {
-                    return ['isOk' => false, 'message' => 'unopenedPosition'];
-                } else {
-                    $tp = $this->order('tp', $payload->tpData);
-                    if (!$tp['isOk']) return $tp;
-                    return $this->conditionOrder('sl', $payload->slData);
-                }
-                break;
-            case 'tp':
-                if ($payload->tpData->cmd == "cancel" && $this->position != 0) {
-                    return ['isOk' => false, 'message' => 'openedPosition'];
-                }
-                $tp = $this->order($payload->action, $payload->tpData);
-                if ($tp['isOk'] && $payload->tpData->cmd == "cancel") {
-                    set_global_value('entryOrderId', '');
-                    set_global_value('slOrderId', '');
-                }
-                return $tp;
-                break;
-            case 'sl':
-                if ($payload->slData->cmd == "delete" && $this->position != 0) {
-                    return ['isOk' => false, 'message' => 'openedPosition'];
-                }
-                $sl = $this->conditionOrder($payload->action, $payload->slData);
-                if ($sl['isOk'] && $payload->slData->cmd == "delete") {
-                    set_global_value('entryOrderId', '');
-                    set_global_value('tpOrderId', '');
-                }
-                return $sl;
-                break;
-            case 'cancel':
-                $tp = $this->order('tp', $payload->tpData);
-                if (!$tp['isOk']) return $tp;
-                $sl = $this->conditionOrder('sl', $payload->slData);
-                if ($sl['isOk']) set_global_value('entryOrderId', '');
-                return $sl;
-                break;
-            case 'exit':
-                if (isset($payload->tpData)) {
-                    $tp = $this->order('tp', $payload->tpData);
-                    if (!$tp['isOk']) return $tp;
-                }
-                if (isset($payload->slData)) {
-                    $sl = $this->conditionOrder('sl', $payload->slData);
-                    if (!$sl['isOk']) return $sl;
-                }
-                set_global_value('entryOrderId', '');
-                if ($this->position == 0) return ['isOk' => true];
-                else return $this->order('exit', $payload->exitData);
-                break;
-        }
-    }
-
-    public function conditionOrder($type, $data)
-    {
-        $isSl = $type == "sl";
         $isNew = $data->cmd == "new";
-        $isNotDelete = $data->cmd != 'delete';
-        $side = $isSl ? -$this->position : ($isNew ? $data->side : $this->position);
+        $isNotDelete = $data->cmd != "delete";
+        $side = $isEntry ? ($isNew ? $data->side : $this->position) : -$this->position;
         $payload = [
             "group" => "O",
             "user" => $this->vpsUser,
@@ -280,10 +206,10 @@ class VpsOrderService extends CoreService
                 "cmd" => "co.stop.order." . $data->cmd,
                 "accountNo" => $this->formatAccount(),
                 "pin" => "",
-                "orderId" => $this->orderId[$type],
+                "orderId" => $data->orderNo,
                 "channel" => "H",
                 "priceType" => "MTL",
-                "quantity" => strval($isSl ? (abs($this->position)) : $this->orderVolume),
+                "quantity" => strval($isEntry ? $this->orderVolume : abs($this->position)),
                 "relation" => $isNotDelete ? $this->formatRelation($side) : "",
                 "side" => $isNew ? $this->formatSide($side) : "",
                 "stopOrderType" => "stop",
@@ -294,21 +220,15 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core_ext.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1) {
-            if ($isNotDelete)
-                return ['isOk' => false, 'message' => 'failOrder'];
-            else return ['isOk' => true];
-        }
-        $isOk = set_global_value($type . 'OrderId', $isNotDelete ? $rsp->data->stopOrderID : '');
-        if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
-        return ['isOk' => true];
+        if ($rsp->rc != 1 && $isNotDelete) return false;
+        return $rsp->data->stopOrderID;
     }
 
-    public function order($type, $data)
+    public function order($data)
     {
         $isNew = $data->cmd == "new";
-        $isNotCancel = $data->cmd != "cancel";
-        $price = $isNotCancel ? $this->formatPrice($data->price) : "";
+        $isNotDelete = $data->cmd != "cancel";
+        $price = $isNotDelete ? $this->formatPrice($data->price) : "";
         $side = $isNew ? $this->formatSide(-$this->position) : "";
         $account = $this->formatAccount();
         $refId = $this->createRefId();
@@ -318,14 +238,14 @@ class VpsOrderService extends CoreService
             "user" => $this->vpsUser,
             "session" => $this->vpsSession,
             "c" => "H",
-            "checksum" => $isNotCancel ? $this->createCheckSum($isNew, $price, $side, $account, $refId) : "",
+            "checksum" => $isNotDelete ? $this->createCheckSum($isNew, $price, $side, $account, $refId) : "",
             "language" => "vi",
             "data" => [
                 "type" => "string",
                 "cmd" => "Web." . $data->cmd . "Order",
                 "account" => $account,
                 "pin" => "",
-                "orderNo" => $this->orderId[$type],
+                "orderNo" => $data->orderNo,
                 "price" => $price,
                 "nprice" => $price,
                 "side" => $side,
@@ -341,14 +261,8 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1) {
-            if ($isNotCancel)
-                return ['isOk' => false, 'message' => 'failOrder'];
-            else return ['isOk' => true];
-        }
-        $isOk = set_global_value($type . 'OrderId', $isNotCancel ? $rsp->data[0]->orderNo : '');
-        if (!$isOk) return ['isOk' => false, 'message' => 'failSave'];
-        return ['isOk' => true];
+        if ($rsp->rc != 1 && $isNotDelete) return false;
+        return $rsp->data[0]->orderNo;
     }
 
     public function formatAccount()

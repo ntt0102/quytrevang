@@ -32,13 +32,6 @@ class UpdateOpeningMarketJob implements ShouldQueue
 
         $isOpeningMarket = $date == date('Y-m-d');
         set_global_value('openingMarketFlag', $isOpeningMarket ? '1' : '0');
-
-        if ($isOpeningMarket) {
-            set_global_value('entryOrderId', '');
-            set_global_value('tpOrderId', '');
-            set_global_value('slOrderId', '');
-            set_global_value('exitOrderId', '');
-        }
     }
 
     private function getLastOpeningDate()

@@ -47,22 +47,6 @@ class VariablesTableSeeder extends Seeder
             'value' => "",
         ]);
         Variable::create([
-            'name' => "entryOrderId",
-            'value' => "",
-        ]);
-        Variable::create([
-            'name' => "tpOrderId",
-            'value' => "",
-        ]);
-        Variable::create([
-            'name' => "slOrderId",
-            'value' => "",
-        ]);
-        Variable::create([
-            'name' => "exitOrderId",
-            'value' => "",
-        ]);
-        Variable::create([
             'name' => "tpDefault",
             'value' => "5",
         ]);

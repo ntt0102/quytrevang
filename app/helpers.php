@@ -29,6 +29,22 @@ if (!function_exists('set_global_value')) {
     }
 }
 
+if (!function_exists('cmp')) {
+    /**
+     * Compare
+     * @param string $value1
+     * @param string $side
+     * @param string $value2
+     * @param string $eq
+     * @return bool
+     */
+    function cmp($value1, $side, $value2, $eq = false)
+    {
+        if ($side) return $eq ? $value1 >= $value2 : $value1 > $value2;
+        else return $eq ? $value1 <= $value2 : $value1 < $value2;
+    }
+}
+
 if (!function_exists('check_opening_market')) {
     /**
      * Check Opening Market
