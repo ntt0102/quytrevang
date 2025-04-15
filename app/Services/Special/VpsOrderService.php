@@ -206,7 +206,7 @@ class VpsOrderService extends CoreService
                 "cmd" => "co.stop.order." . $data->cmd,
                 "accountNo" => $this->formatAccount(),
                 "pin" => "",
-                "orderId" => $data->orderNo ?? null,
+                "orderId" => $data->orderNo ?? "",
                 "channel" => "H",
                 "priceType" => "MTL",
                 "quantity" => strval($isEntry ? $this->orderVolume : abs($this->position)),
@@ -221,7 +221,7 @@ class VpsOrderService extends CoreService
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
         if ($rsp->rc != 1 && $isNotDelete) return false;
-        return $rsp->data->stopOrderID ?? null;
+        return $rsp->data->stopOrderID ?? "";
     }
 
     public function order($data)
@@ -245,7 +245,7 @@ class VpsOrderService extends CoreService
                 "cmd" => "Web." . $data->cmd . "Order",
                 "account" => $account,
                 "pin" => "",
-                "orderNo" => $data->orderNo ?? null,
+                "orderNo" => $data->orderNo ?? "",
                 "price" => $price,
                 "nprice" => $price,
                 "side" => $side,
@@ -262,7 +262,7 @@ class VpsOrderService extends CoreService
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
         if ($rsp->rc != 1 && $isNotDelete) return false;
-        return $rsp->data[0]->orderNo ?? null;
+        return $rsp->data[0]->orderNo ?? "";
     }
 
     public function formatAccount()
