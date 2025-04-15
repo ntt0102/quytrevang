@@ -274,7 +274,7 @@ params.interval = setInterval(() => {
     if (inSession()) {
         if (orderToolRef.value) orderToolRef.value.cancelWithoutClose();
         if (differenceInSeconds(new Date(), new Date(params.refreshAt)) > 10) {
-            if (config.value.autoRefresh) patternToolRef.value.refresh(true);
+            if (config.value.autoRefresh) patternToolRef.value.refresh();
             params.refreshAt = new Date();
         }
         if (differenceInSeconds(new Date(), new Date(params.statusAt)) > 20) {
@@ -727,9 +727,6 @@ function getDnseData() {
         params.socketUpdatedAt = new Date();
     }
 }
-// function patternScaned(points) {
-//     patternToolRef.value.load(points, { isSave: true });
-// }
 function refreshPattern(autoAdjust = false) {
     patternToolRef.value.refresh(autoAdjust);
 }
