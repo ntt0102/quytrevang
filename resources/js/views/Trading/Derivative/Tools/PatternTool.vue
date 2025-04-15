@@ -301,12 +301,6 @@ function calcContinuePattern() {
         time1: isBreak2 ? phase5.S1.time1 : phase5.ext.S.time1,
     };
 
-    // const phase6 = scanPhase({
-    //     side: !side,
-    //     start: { time: F.time },
-    //     end: { time: pickTime ?? stopTime },
-    // });
-
     const phase6 = scanPhase({
         side: !side,
         start: F,
@@ -781,23 +775,21 @@ function adjustPatternPoints() {
     const pickTime = props.pickTimeToolRef.get();
     if (pickTime) return false;
     //
-    const side = scanPoints.B.price - scanPoints.A.price > 0;
-    const lastBar = props.prices.at(-1);
-
-    if (mf.cmp(lastBar.value, !side, scanPoints.C.price)) {
-        let cTimeNew = lastBar.time;
-        let cPriceNew = lastBar.value;
-        for (let i = props.prices.length - 1; i >= 0; i--) {
-            const time = props.prices[i].time;
-            const price = props.prices[i].value;
-            if (price === scanPoints.B.price) break;
-            cTimeNew = time;
-            cPriceNew = side
-                ? Math.min(cPriceNew, price)
-                : Math.max(cPriceNew, price);
+    const side = scanPoints.B.price > scanPoints.A.price;
+    const cIndex = props.prices.findIndex(
+        (bar) => bar.time === scanPoints.C.time
+    );
+    let newPoint = mf.cloneDeep(scanPoints.C);
+    for (let i = cIndex; i < props.prices.length; i++) {
+        const time = props.prices[i].time;
+        const price = props.prices[i].value;
+        if (mf.cmp(price, !side, newPoint.price)) {
+            newPoint.time = time;
+            newPoint.price = price;
         }
-        scanPoints.C.time = cTimeNew;
-        scanPoints.C.price = cPriceNew;
+    }
+    if (newPoint.time !== scanPoints.C.time) {
+        scanPoints.C = newPoint;
         savePattern();
     }
 }
