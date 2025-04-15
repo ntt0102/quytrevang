@@ -71,17 +71,12 @@ watch(
 function show({ price }) {
     if (price && props.inSession()) {
         const currentSeconds = getUnixTime(addHours(new Date(), 7));
-        // let _price = null,
-        // _side = 0;
         if (!props.position) {
             if (
                 currentSeconds > props.TIME.ATO &&
                 currentSeconds < props.TIME.ATC
             ) {
-                // _price = price;
                 putOrder.side = price >= props.prices.at(-1).value ? 1 : -1;
-                // putOrder.side = _side;
-                // putOrder.entry = _price;
                 putOrder.price = price;
                 emit("showEntry", {
                     side: putOrder.side,
@@ -94,8 +89,6 @@ function show({ price }) {
                 if (currentSeconds < props.TIME.ATO) _price = "ATO";
                 else if (currentSeconds > props.TIME.ATC) _price = "ATC";
                 if (_price) {
-                    // putOrder.price = _price;
-                    // _side = -props.position;
                     emit("showEntry", { side: -props.position, price: _price });
                 }
             } else {
@@ -107,38 +100,6 @@ function show({ price }) {
                 }
             }
         }
-        // if (!mf.isSet(lines.entry)) {
-        //     let _price = null,
-        //         _side = 0;
-        //     if (!props.position) {
-        //         if (
-        //             currentSeconds > props.TIME.ATO &&
-        //             currentSeconds < props.TIME.ATC
-        //         ) {
-        //             _price = price;
-        //             _side = _price >= props.prices.at(-1).value ? 1 : -1;
-        //             putOrder.side = _side;
-        //             putOrder.entry = _price;
-        //         }
-        //     } else {
-        //         if (currentSeconds < props.TIME.ATO) _price = "ATO";
-        //         else if (currentSeconds > props.TIME.ATC) _price = "ATC";
-        //         if (_price) {
-        //             putOrder.entry = _price;
-        //             _side = -props.position;
-        //         }
-        //     }
-        //     if (_side) {
-        //         emit("showEntry", { side: _side, price: _price });
-        //     }
-        // } else if (!mf.isSet(lines.tp) && props.position) {
-        //     if (
-        //         currentSeconds > props.TIME.ATO &&
-        //         currentSeconds < props.TIME.ATC
-        //     ) {
-        //         emit("showTpSl", { side: props.position });
-        //     }
-        // }
     }
 }
 function entry() {
@@ -442,91 +403,6 @@ function scan(lastPrice) {
                 break;
         }
     });
-    // if (mf.isSet(lines.entry)) {
-    //     const side = putOrder.side > 0;
-    //     if (mf.isSet(lines.tp)) {
-    //         if (mf.cmp(lastPrice, side, putOrder.tp, true)) {
-    //             if (!isAutoOrdering) {
-    //                 isAutoOrdering = true;
-    //                 store
-    //                     .dispatch("tradingDerivative/executeOrder", {
-    //                         action: "sl",
-    //                         slData: {
-    //                             cmd: "delete",
-    //                         },
-    //                     })
-    //                     .then((resp) => {
-    //                         if (resp.isOk) {
-    //                             removeOrderTool(["entry", "tp", "sl"]);
-    //                             toast.success(
-    //                                 t("trading.derivative.deleteTpSuccess")
-    //                             );
-    //                         } else toastOrderError(resp.message);
-    //                         isAutoOrdering = false;
-    //                     });
-    //             }
-    //         }
-    //         if (mf.cmp(lastPrice, !side, putOrder.sl, true)) {
-    //             if (!isAutoOrdering) {
-    //                 isAutoOrdering = true;
-    //                 store
-    //                     .dispatch("tradingDerivative/executeOrder", {
-    //                         action: "tp",
-    //                         tpData: {
-    //                             cmd: "cancel",
-    //                         },
-    //                     })
-    //                     .then((resp) => {
-    //                         if (resp.isOk) {
-    //                             removeOrderTool(["entry", "tp", "sl"]);
-    //                             toast.success(
-    //                                 t("trading.derivative.deleteSlSuccess")
-    //                             );
-    //                         } else toastOrderError(resp.message);
-    //                         isAutoOrdering = false;
-    //                     });
-    //             }
-    //         }
-    //     } else {
-    //         if (mf.cmp(lastPrice, side, putOrder.entry, true)) {
-    //             if (!isAutoOrdering) {
-    //                 isAutoOrdering = true;
-    //                 setTimeout(() => {
-    //                     putOrder.tp =
-    //                         putOrder.entry + putOrder.side * tpDefault.value;
-    //                     putOrder.sl =
-    //                         putOrder.entry - putOrder.side * slDefault.value;
-    //                     store
-    //                         .dispatch("tradingDerivative/executeOrder", {
-    //                             action: "tpsl",
-    //                             tpData: {
-    //                                 cmd: "new",
-    //                                 price: putOrder.tp,
-    //                             },
-    //                             slData: {
-    //                                 cmd: "new",
-    //                                 price: putOrder.sl,
-    //                             },
-    //                         })
-    //                         .then((resp) => {
-    //                             if (resp.isOk) {
-    //                                 lines.entry.applyOptions({
-    //                                     draggable: false,
-    //                                 });
-    //                                 drawOrderTool(["tp", "sl"]);
-    //                                 toast.success(
-    //                                     t(
-    //                                         "trading.derivative.autoNewTpSlSuccess"
-    //                                     )
-    //                                 );
-    //                             } else toastOrderError(resp.message);
-    //                             isAutoOrdering = false;
-    //                         });
-    //                 }, 1000);
-    //             }
-    //         }
-    //     }
-    // }
 }
 function load(data) {
     orders.value = mf.cloneDeep(data);
