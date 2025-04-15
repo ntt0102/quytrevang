@@ -179,7 +179,7 @@
             "lineTool": "Vẽ đường ngang",
             "timeRangeTool": "Xác định thời gian",
             "targetTool": "Xác định TP",
-            "orderTool": "Huỷ lệnh và đóng vị thế",
+            "orderTool": "Quản lý vị thế",
             "newEntrySuccess": "Đặt lệnh Entry thành công",
             "changeEntrySuccess": "Sửa lệnh Entry thành công",
             "deleteEntrySuccess": "Huỷ lệnh Entry thành công",
@@ -207,6 +207,15 @@
             "unknown": "Lỗi chưa xác định",
             "progressFail": "Bước {step} chưa đạt.",
             "progressSuccess": "Bước {step} thành công, hãy chuẩn bị vào lệnh!",
+            "buttons": {
+                "report": "Báo cáo",
+                "export": "Xuất dữ liệu",
+                "loginVps": "Đăng nhập VPS",
+                "sourceSelect": "Chọn nguồn dữ liệu",
+                "downloadExport": "Tải tệp CSV",
+                "cloneExport": "Tạo tệp CSV",
+                "setting": "Cài đặt"
+            },
             "settingPopup": {
                 "tpDefault": "TP mặc định",
                 "slDefault": "SL mặc định"
@@ -219,24 +228,15 @@
                 "showPrice": "Giá đặt",
                 "avgPrice": "Giá khớp"
             },
-            "buttons": {
-                "report": "Báo cáo",
-                "export": "Xuất dữ liệu",
-                "loginVps": "Đăng nhập VPS",
-                "sourceSelect": "Chọn nguồn dữ liệu",
-                "downloadExport": "Tải tệp CSV",
-                "cloneExport": "Tạo tệp CSV",
-                "setting": "Cài đặt"
-            },
             "progressContext": {
                 "refreshPattern": "Làm mới"
             },
-            "scanContext": {
-                "leftScan": "Quét ngược",
-                "rightScan": "Quét thuận"
-            },
-            "patternContext": {
-                "noPattern": "Không có mẫu hình"
+            "orderContext": {
+                "closeAllOrders": "Đóng tất cả",
+                "id": "ID",
+                "side": "Lệnh",
+                "price": "Giá đặt",
+                "closeOrder": "Đóng lệnh"
             }
         },
         "derstats": {

@@ -132,7 +132,6 @@
                 @hideContext="hideContext"
             />
             <OrderTool
-                v-show="showCancelOrder"
                 ref="orderToolRef"
                 :position="status.position"
                 :prices="state.prices"
@@ -142,7 +141,6 @@
                 @getTools="getTools"
                 @showEntry="showEntryButton"
                 @showTpSl="showTpSlButton"
-                @orderChanged="orderChanged"
                 @hideContext="hideContext"
             />
         </div>
@@ -259,15 +257,11 @@ const state = reactive({
     clock: format(new Date(), "HH:mm:ss"),
     chartHeightEnough: false,
     isSocketWarning: false,
-    hasOrderLine: false,
     TIME,
 });
 const status = computed(() => store.state.tradingDerivative.status);
 const config = computed(() => store.state.tradingDerivative.config);
 const isLoading = computed(() => store.state.tradingDerivative.isLoading);
-const showCancelOrder = computed(
-    () => status.value.position || status.value.pending || state.hasOrderLine
-);
 
 params.interval = setInterval(() => {
     state.clock = format(new Date(), "HH:mm:ss");
@@ -739,10 +733,6 @@ function setProgress(value) {
     progressToolRef.value.set(value);
     params.hasProgress = !!value.step;
 }
-function orderChanged(hasOrder) {
-    state.hasOrderLine = hasOrder;
-    console.log("state.hasOrderLine", state.hasOrderLine);
-}
 function toggleOrderButton(show) {
     if (show) {
         orderToolRef.value.show(params.crosshair);
@@ -961,10 +951,6 @@ function drawPriceLine(data, isRemove = false) {
                     position: absolute;
                     z-index: 3;
                 }
-            }
-
-            .cancel-order {
-                color: red;
             }
         }
 

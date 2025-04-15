@@ -1,8 +1,9 @@
 <template>
     <CoreContext class="pattern-context">
         <DxButton
-            icon="refresh"
             type="success"
+            stylingMode="outlined"
+            icon="refresh"
             :text="$t('trading.derivative.progressContext.refreshPattern')"
             @click="refreshPattern"
         />

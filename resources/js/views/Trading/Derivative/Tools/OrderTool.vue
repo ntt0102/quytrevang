@@ -1,14 +1,25 @@
 <template>
     <div
         ref="orderToolRef"
-        class="cancel-order command"
+        class="cancel-order context command"
+        :class="{ red: hasOrder }"
         :title="$t('trading.derivative.orderTool')"
-        @click="cancel"
+        @click="toggleOrderContext"
+        @contextmenu="closeAllOrders"
     >
-        <i class="far fa-trash-alt" :class="{ blink: isOrderWarning }"> </i>
+        <i class="far fa-gavel" :class="{ blink: isOrderWarning }"> </i>
+        <OrderContext
+            v-show="showOrderContext"
+            class="contextmenu"
+            :orders="orders"
+            @closeOrder="closeOrder"
+            @closeAllOrders="closeAllOrders"
+        >
+        </OrderContext>
     </div>
 </template>
 <script setup>
+import OrderContext from "./Contexts/OrderContext.vue";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
@@ -26,34 +37,32 @@ const props = defineProps([
     "inSession",
     "TIME",
 ]);
-const emit = defineEmits([
-    "getTools",
-    "showEntry",
-    "showTpSl",
-    "orderChanged",
-    "hideContext",
-]);
+const emit = defineEmits(["getTools", "showEntry", "showTpSl", "hideContext"]);
 const orderToolRef = ref(null);
 const isOrderWarning = ref(false);
+const showOrderContext = ref(false);
+const orders = ref({});
 const orderStore = computed(() => store.state.tradingDerivative.config.orders);
-let putOrder = {};
-let orders = ref({});
-let lines = {};
-let isAutoOrdering = false;
-
-const symbol = "VN30F1M";
 const tpDefault = computed(
     () => store.state.tradingDerivative.config.tpDefault
 );
 const slDefault = computed(
     () => store.state.tradingDerivative.config.slDefault
 );
+const hasOrder = computed(
+    () =>
+        store.state.tradingDerivative.status.position ||
+        store.state.tradingDerivative.status.pending ||
+        Object.keys(orders.value).length > 0
+);
+let putOrder = {};
+let lines = {};
+let isAutoOrdering = false;
 
 defineExpose({
     show,
     entry,
     tpsl,
-    cancel,
     cancelWithoutClose,
     scan,
     drag,
@@ -62,11 +71,6 @@ defineExpose({
 watch(orderStore, (data) => {
     if (mf.isSet(data)) load(data);
 });
-
-watch(
-    () => Object.keys(orders.value).length,
-    (newLen) => emit("orderChanged", newLen > 0)
-);
 
 function show({ price }) {
     if (price && props.inSession()) {
@@ -201,53 +205,54 @@ function tpsl() {
             } else toastOrderError(resp.message);
         });
 }
-function cancel() {
-    Object.values(orders.value).forEach((order) => {
-        switch (order.status) {
-            case 0:
-                store
-                    .dispatch("tradingDerivative/executeOrder", {
-                        action: "entry",
-                        entryData: {
-                            cmd: "delete",
-                            orderNo: order.entry_no,
-                        },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            removeOrderTool(["entry"], order.id);
-                            delete orders.value[order.id];
-                            toast.success(
-                                t("trading.derivative.deleteEntrySuccess")
-                            );
-                        } else {
-                            toastOrderError(resp.message);
-                        }
-                    });
-                break;
-            case 1:
-                store
-                    .dispatch("tradingDerivative/executeOrder", {
-                        action: "exit",
-                        tpData: { cmd: "cancel", orderNo: order.tp_no },
-                        slData: { cmd: "delete", orderNo: order.sl_no },
-                        exitData: {
-                            cmd: "new",
-                            price: "MTL",
-                        },
-                    })
-                    .then((resp) => {
-                        if (resp.isOk) {
-                            removeOrderTool(["entry", "tp", "sl"], order.id);
-                            delete orders.value[order.id];
-                            toast.success(t("trading.derivative.exitSuccess"));
-                        } else {
-                            toastOrderError(resp.message);
-                        }
-                    });
-                break;
-        }
-    });
+function closeAllOrders() {
+    Object.values(orders.value).forEach((order) => closeOrder(order));
+}
+function closeOrder(order) {
+    switch (order.status) {
+        case 0:
+            store
+                .dispatch("tradingDerivative/executeOrder", {
+                    action: "entry",
+                    entryData: {
+                        cmd: "delete",
+                        orderNo: order.entry_no,
+                    },
+                })
+                .then((resp) => {
+                    if (resp.isOk) {
+                        removeOrderTool(["entry"], order.id);
+                        delete orders.value[order.id];
+                        toast.success(
+                            t("trading.derivative.deleteEntrySuccess")
+                        );
+                    } else {
+                        toastOrderError(resp.message);
+                    }
+                });
+            break;
+        case 1:
+            store
+                .dispatch("tradingDerivative/executeOrder", {
+                    action: "exit",
+                    tpData: { cmd: "cancel", orderNo: order.tp_no },
+                    slData: { cmd: "delete", orderNo: order.sl_no },
+                    exitData: {
+                        cmd: "new",
+                        price: "MTL",
+                    },
+                })
+                .then((resp) => {
+                    if (resp.isOk) {
+                        removeOrderTool(["entry", "tp", "sl"], order.id);
+                        delete orders.value[order.id];
+                        toast.success(t("trading.derivative.exitSuccess"));
+                    } else {
+                        toastOrderError(resp.message);
+                    }
+                });
+            break;
+    }
 }
 function cancelWithoutClose() {
     if (props.inSession()) {
@@ -521,4 +526,22 @@ function toastOrderError(error) {
     if (!error) error = "unknown";
     toast.error(t(`trading.derivative.${error}`));
 }
+function toggleOrderContext() {
+    const oldValue = showOrderContext.value;
+    emit("hideContext");
+    showOrderContext.value = !oldValue;
+}
 </script>
+<style lang="scss">
+.cancel-order {
+    .triangle {
+        bottom: 5px;
+        top: unset !important;
+    }
+
+    .contextmenu {
+        bottom: 0px;
+        top: unset !important;
+    }
+}
+</style>
