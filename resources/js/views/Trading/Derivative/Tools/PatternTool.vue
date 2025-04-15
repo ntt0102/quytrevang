@@ -434,7 +434,7 @@ function calcContinuePattern() {
     const X = mf.fmtNum(x - entry, 1, true);
     const [y] = adjustTargetPrice(D.price, 2 * CD, side);
     const Y = mf.fmtNum(y - entry, 1, true);
-    const [z] = B.price + (side ? 1 : -1) * BC;
+    const z = B.price + (side ? 1 : -1) * BC;
     const Z = mf.fmtNum(z - entry, 1, true);
 
     return {
@@ -640,7 +640,7 @@ function calcReversalPattern() {
     const X = mf.fmtNum(x - entry, 1, true);
     const [y] = adjustTargetPrice(C.price, 2 * BC, side);
     const Y = mf.fmtNum(y - entry, 1, true);
-    const [z] = A.price;
+    const z = A.price;
     const Z = mf.fmtNum(z - entry, 1, true);
 
     return {
