@@ -60,6 +60,7 @@ let lines = {};
 let isAutoOrdering = false;
 
 defineExpose({
+    hide,
     show,
     entry,
     tpsl,
@@ -71,7 +72,9 @@ defineExpose({
 watch(orderStore, (data) => {
     if (mf.isSet(data)) load(data);
 });
-
+function hide(status = false) {
+    showOrderContext.value = status;
+}
 function show({ price }) {
     if (price && props.inSession()) {
         const currentSeconds = getUnixTime(addHours(new Date(), 7));

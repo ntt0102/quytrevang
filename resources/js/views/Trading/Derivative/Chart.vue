@@ -727,6 +727,7 @@ function refreshPattern(autoAdjust = false) {
 function hideContext(progressIgnore = false) {
     if (!progressIgnore) progressToolRef.value.hide();
     lineToolRef.value.hide();
+    orderToolRef.value.hide();
 }
 function setProgress(value) {
     if (!devices.phone) progressToolRef.value.hide(mf.isSet(value));
