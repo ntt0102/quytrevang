@@ -376,14 +376,8 @@ class DerivativeService extends CoreService
                         if (isset($payload->tpData) && isset($payload->slData)) {
                             $tpNo = $vos->order($payload->tpData);
                             // $tpNo = $payload->tpData->orderNo;
-                            if (!$tpNo) {
-                                return ['isOk' => false, 'message' => 'failOrder'];
-                            }
                             $slNo = $vos->conditionOrder($payload->slData);
                             // $slNo = $payload->slData->orderNo;
-                            if (!$slNo) {
-                                return ['isOk' => false, 'message' => 'failOrder'];
-                            }
                             $order = DerivativeOrder::where('tp_no', $payload->tpData->orderNo)
                                 ->where('sl_no', $payload->slData->orderNo)->first();
                             if (!$order->save()) {
