@@ -357,16 +357,11 @@ class DerivativeService extends CoreService
                     case 'cancel':
                         $tpNo = $vos->order($payload->tpData);
                         // $tpNo = $payload->tpData->orderNo;
-                        if (!$tpNo) {
-                            return ['isOk' => false, 'message' => 'failOrder'];
-                        }
                         $slNo = $vos->conditionOrder($payload->slData);
                         // $slNo = $payload->slData->orderNo;
-                        if (!$slNo) {
-                            return ['isOk' => false, 'message' => 'failOrder'];
-                        }
                         $order = DerivativeOrder::where('tp_no', $payload->tpData->orderNo)
                             ->where('sl_no', $payload->slData->orderNo)->first();
+                        $order->fill(['status' => 2]);
                         if (!$order->save()) {
                             return ['isOk' => false, 'message' => 'failSave'];
                         }
@@ -380,6 +375,7 @@ class DerivativeService extends CoreService
                             // $slNo = $payload->slData->orderNo;
                             $order = DerivativeOrder::where('tp_no', $payload->tpData->orderNo)
                                 ->where('sl_no', $payload->slData->orderNo)->first();
+                            $order->fill(['status' => 2]);
                             if (!$order->save()) {
                                 return ['isOk' => false, 'message' => 'failSave'];
                             }
