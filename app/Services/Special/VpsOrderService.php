@@ -221,7 +221,7 @@ class VpsOrderService extends CoreService
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
         if ($rsp->rc != 1 && $isNotDelete) return false;
-        return $rsp->data->stopOrderID;
+        return $rsp->data->stopOrderID ?? null;
     }
 
     public function order($data)
@@ -262,7 +262,7 @@ class VpsOrderService extends CoreService
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
         if ($rsp->rc != 1 && $isNotDelete) return false;
-        return $rsp->data[0]->orderNo;
+        return $rsp->data[0]->orderNo ?? null;
     }
 
     public function formatAccount()
