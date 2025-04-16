@@ -19,7 +19,7 @@ const continuePattern = [
         ],
     },
     {
-        name: "Bước hồng",
+        name: "Bước hồng ->",
         conds: [
             //
             "T > Tmin",
@@ -43,7 +43,7 @@ const continuePattern = [
         ],
     },
     {
-        name: "Bước lam",
+        name: "Bước lam ->",
         conds: [
             //
             "T > Tmin",
@@ -52,15 +52,6 @@ const continuePattern = [
             "P > 130%-Ptím",
             // "T < Tmax",
             "P < Pmax",
-        ],
-    },
-    {
-        name: "Bước lục",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-            // "T < Tmax",
         ],
     },
 ];
@@ -74,7 +65,7 @@ const reversalPattern = [
         ],
     },
     {
-        name: "Bước hồng",
+        name: "Bước hồng ->",
         conds: [
             //
             "T > Tmin",
@@ -99,7 +90,7 @@ const reversalPattern = [
         ],
     },
     {
-        name: "Bước lam",
+        name: "Bước lam ->",
         conds: [
             //
             "T > Tmin",
@@ -108,15 +99,6 @@ const reversalPattern = [
             "P > 130%-Ptím",
             // "T < Tmax",
             "P < Pmax",
-        ],
-    },
-    {
-        name: "Bước lục",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-            // "T < Tmax",
         ],
     },
 ];

@@ -369,12 +369,6 @@ function calcContinuePattern() {
             // Tfg <= Tde,
             FG <= DE,
         ],
-        [
-            //
-            H.index1 > T6,
-            GH >= phase6.pr,
-            // Tgh <= Tef,
-        ],
     ];
     for (let i = 0; i < progress.steps.length; i++) {
         progress.step = i + 1;
@@ -537,12 +531,6 @@ function calcReversalPattern() {
             rDEF >= 1.3 - rCDE,
             // Tef <= Tcd,
             EF <= CD,
-        ],
-        [
-            //
-            G.index1 > T5,
-            FG >= phase5.pr,
-            // Tfg <= Tde,
         ],
     ];
     for (let i = 0; i < progress.steps.length; i++) {
