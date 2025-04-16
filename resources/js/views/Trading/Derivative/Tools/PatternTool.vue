@@ -360,14 +360,15 @@ function calcContinuePattern() {
     // const Tgh = H.index1 - G.index;
 
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
+    const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
     // const PR3 = isBreak1 ? phase3.pre.pr : phase3.pr;
-    const PR5 = isBreak2 ? phase5.pre.pr : phase5.pr;
+    // const PR5 = isBreak2 ? phase5.pre.pr : phase5.pr;
 
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
     const T3 = D.index + TR3;
     const T4 = E.index + phase4.tr;
-    const T5 = F.index + PR5;
+    const T5 = F.index + TR5;
     const T6 = G.index + phase6.tr;
     const timeMark = [T6, T5, T4, T3, T2, T1];
 
@@ -592,12 +593,13 @@ function calcReversalPattern() {
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     // const PR2 = isBreak1 ? phase2.pre.pr : phase2.pr;
-    const PR4 = isBreak2 ? phase4.pre.pr : phase4.pr;
+    const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
+    // const PR4 = isBreak2 ? phase4.pre.pr : phase4.pr;
 
     const T1 = phase1.R.index + phase1.tr;
     const T2 = C.index + TR2;
     const T3 = D.index + phase3.tr;
-    const T4 = E.index + PR4;
+    const T4 = E.index + TR4;
     const T5 = F.index + phase5.tr;
     const timeMark = [T5, T4, T3, T2, T1];
 
@@ -605,6 +607,8 @@ function calcReversalPattern() {
     const rB1CD = CD / B1C;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
+
+    console.log("rB1CD", rB1CD);
 
     let progress = {};
     progress.steps = [
