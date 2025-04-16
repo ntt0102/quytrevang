@@ -254,21 +254,7 @@ function calcContinuePattern() {
         phase3.ext.tr < phase3.tr;
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
-    // const D = {
-    //     price: isBreak1 ? phase3.R1.price : phase3.ext.R.price,
-    //     index: isBreak1 ? phase3.R1.index : phase3.ext.R.index,
-    //     index1: isBreak1 ? phase3.R1.index1 : phase3.ext.R.index1,
-    //     time: isBreak1 ? phase3.R1.time : phase3.ext.R.time,
-    //     time1: isBreak1 ? phase3.R1.time1 : phase3.ext.R.time1,
-    // };
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
-    // const E = {
-    //     price: isBreak1 ? phase3.S1.price : phase3.ext.S.price,
-    //     index: isBreak1 ? phase3.S1.index : phase3.ext.S.index,
-    //     index1: isBreak1 ? phase3.S1.index1 : phase3.ext.S.index1,
-    //     time: isBreak1 ? phase3.S1.time : phase3.ext.S.time,
-    //     time1: isBreak1 ? phase3.S1.time1 : phase3.ext.S.time1,
-    // };
 
     const phase4 = scanPhase({
         side: !side,
@@ -289,22 +275,7 @@ function calcContinuePattern() {
         phase5.ext.tr < phase5.tr;
 
     const F = isBreak2 ? phase5.R1 : phase5.ext.R;
-    // const F = {
-    //     price: isBreak2 ? phase5.R1.price : phase5.ext.R.price,
-    //     index: isBreak2 ? phase5.R1.index : phase5.ext.R.index,
-    //     index1: isBreak2 ? phase5.R1.index1 : phase5.ext.R.index1,
-    //     time: isBreak2 ? phase5.R1.time : phase5.ext.R.time,
-    //     time1: isBreak2 ? phase5.R1.time1 : phase5.ext.R.time1,
-    // };
-
     const G = isBreak2 ? phase5.S1 : phase5.ext.S;
-    // const G = {
-    //     price: isBreak2 ? phase5.S1.price : phase5.ext.S.price,
-    //     index: isBreak2 ? phase5.S1.index : phase5.ext.S.index,
-    //     index1: isBreak2 ? phase5.S1.index1 : phase5.ext.S.index1,
-    //     time: isBreak2 ? phase5.S1.time : phase5.ext.S.time,
-    //     time1: isBreak2 ? phase5.S1.time1 : phase5.ext.S.time1,
-    // };
 
     const phase6 = scanPhase({
         side: !side,
@@ -325,13 +296,6 @@ function calcContinuePattern() {
         phase7.ext.tr < phase7.tr;
 
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
-    // const H = {
-    //     price: isBreak3 ? phase7.R1.price : phase7.ext.R.price,
-    //     index: isBreak3 ? phase7.R1.index : phase7.ext.R.index,
-    //     index1: isBreak3 ? phase7.R1.index1 : phase7.ext.R.index1,
-    //     time: isBreak3 ? phase7.R1.time : phase7.ext.R.time,
-    //     time1: isBreak3 ? phase7.R1.time1 : phase7.ext.R.time1,
-    // };
 
     console.log("calcContinuePattern", [
         phase1,
@@ -361,8 +325,6 @@ function calcContinuePattern() {
 
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
-    // const PR3 = isBreak1 ? phase3.pre.pr : phase3.pr;
-    // const PR5 = isBreak2 ? phase5.pre.pr : phase5.pr;
 
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
@@ -486,21 +448,7 @@ function calcReversalPattern() {
         phase2.ext.tr < phase2.tr;
 
     const C = isBreak1 ? phase2.R1 : phase2.ext.R;
-    // const C = {
-    //     price: isBreak1 ? phase2.R1.price : phase2.ext.R.price,
-    //     index: isBreak1 ? phase2.R1.index : phase2.ext.R.index,
-    //     index1: isBreak1 ? phase2.R1.index1 : phase2.ext.R.index1,
-    //     time: isBreak1 ? phase2.R1.time : phase2.ext.R.time,
-    //     time1: isBreak1 ? phase2.R1.time1 : phase2.ext.R.time1,
-    // };
     const D = isBreak1 ? phase2.S1 : phase2.ext.S;
-    // const D = {
-    //     price: isBreak1 ? phase2.S1.price : phase2.ext.S.price,
-    //     index: isBreak1 ? phase2.S1.index : phase2.ext.S.index,
-    //     index1: isBreak1 ? phase2.S1.index1 : phase2.ext.S.index1,
-    //     time: isBreak1 ? phase2.S1.time : phase2.ext.S.time,
-    //     time1: isBreak1 ? phase2.S1.time1 : phase2.ext.S.time1,
-    // };
 
     const phase3 = scanPhase({
         side: !side,
@@ -521,22 +469,7 @@ function calcReversalPattern() {
         phase4.ext.tr < phase4.tr;
 
     const E = isBreak2 ? phase4.R1 : phase4.ext.R;
-    // const E = {
-    //     price: isBreak2 ? phase4.R1.price : phase4.ext.R.price,
-    //     index: isBreak2 ? phase4.R1.index : phase4.ext.R.index,
-    //     index1: isBreak2 ? phase4.R1.index1 : phase4.ext.R.index1,
-    //     time: isBreak2 ? phase4.R1.time : phase4.ext.R.time,
-    //     time1: isBreak2 ? phase4.R1.time1 : phase4.ext.R.time1,
-    // };
-
     const F = isBreak2 ? phase4.S1 : phase4.ext.S;
-    // const F = {
-    //     price: isBreak2 ? phase4.S1.price : phase4.ext.S.price,
-    //     index: isBreak2 ? phase4.S1.index : phase4.ext.S.index,
-    //     index1: isBreak2 ? phase4.S1.index1 : phase4.ext.S.index1,
-    //     time: isBreak2 ? phase4.S1.time : phase4.ext.S.time,
-    //     time1: isBreak2 ? phase4.S1.time1 : phase4.ext.S.time1,
-    // };
 
     const phase5 = scanPhase({
         side: !side,
@@ -557,13 +490,6 @@ function calcReversalPattern() {
         phase6.ext.tr < phase6.tr;
 
     const G = isBreak3 ? phase6.R1 : phase6.ext.R;
-    // const G = {
-    //     price: isBreak3 ? phase6.R1.price : phase6.ext.R.price,
-    //     index: isBreak3 ? phase6.R1.index : phase6.ext.R.index,
-    //     index1: isBreak3 ? phase6.R1.index1 : phase6.ext.R.index1,
-    //     time: isBreak3 ? phase6.R1.time : phase6.ext.R.time,
-    //     time1: isBreak3 ? phase6.R1.time1 : phase6.ext.R.time1,
-    // };
 
     console.log("calcReversalPattern", [
         phase1,
@@ -589,9 +515,7 @@ function calcReversalPattern() {
     // const Tfg = G.index1 - F.index;
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
-    // const PR2 = isBreak1 ? phase2.pre.pr : phase2.pr;
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
-    // const PR4 = isBreak2 ? phase4.pre.pr : phase4.pr;
 
     const T1 = phase1.R.index + phase1.tr;
     const T2 = C.index + TR2;
