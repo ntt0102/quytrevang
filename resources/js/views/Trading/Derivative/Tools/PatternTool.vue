@@ -574,11 +574,8 @@ function calcReversalPattern() {
         phase6,
     ]);
 
-    const B1 = isBreak1 ? phase2.pre.S : phase2.S1;
-
     const AB = mf.fmtNum(ab, 1, true);
     const BC = mf.fmtNum(C.price - B.price, 1, true);
-    const B1C = mf.fmtNum(C.price - B1.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
@@ -604,11 +601,8 @@ function calcReversalPattern() {
     const timeMark = [T5, T4, T3, T2, T1];
 
     const rBCD = CD / BC;
-    const rB1CD = CD / B1C;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
-
-    console.log("rB1CD", rB1CD);
 
     let progress = {};
     progress.steps = [
@@ -623,7 +617,6 @@ function calcReversalPattern() {
             // CD >= PR2,
             rBCD >= 0.7,
             rBCD >= 0.5,
-            rB1CD >= 0.5,
             // Tcd <= Tab,
             CD <= AB,
         ],
