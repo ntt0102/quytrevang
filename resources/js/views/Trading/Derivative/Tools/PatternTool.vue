@@ -365,6 +365,11 @@ function calcContinuePattern() {
     const T6 = G.index + phase6.tr;
     const timeMark = [T6, T5, T4, T3, T2, T1];
 
+    const rBCD = CD / BC;
+    const rCDE = DE / CD;
+    const rDEF = EF / DE;
+    const rEFG = FG / EF;
+
     let progress = {};
     progress.steps = [
         [
@@ -376,7 +381,7 @@ function calcContinuePattern() {
             //
             D.index1 > T2,
             CD >= phase2.pr,
-            CD >= 0.618 * BC,
+            rBCD >= 0.5,
             Tcd <= Tab,
             CD <= AB,
         ],
@@ -384,7 +389,8 @@ function calcContinuePattern() {
             //
             E.index1 > T3,
             DE >= PR3,
-            DE >= 0.618 * CD,
+            rCDE >= 0.5,
+            rCDE >= 1.3 - rBCD,
             Tde <= Tbc,
             DE <= BC,
         ],
@@ -392,7 +398,7 @@ function calcContinuePattern() {
             //
             F.index1 > T4,
             EF >= phase4.pr,
-            EF >= 0.618 * DE,
+            rDEF >= 0.5,
             Tef <= Tcd,
             EF <= CD,
             F.price !== D.price && F.price !== B.price,
@@ -401,7 +407,8 @@ function calcContinuePattern() {
             //
             G.index1 > T5,
             FG >= PR5,
-            FG >= 0.618 * EF,
+            rEFG >= 0.5,
+            rEFG >= 1.3 - rDEF,
             Tfg <= Tde,
             FG <= DE,
         ],
@@ -580,6 +587,11 @@ function calcReversalPattern() {
     const T5 = F.index + phase5.tr;
     const timeMark = [T5, T4, T3, T2, T1];
 
+    const rBCD = CD / BC;
+    const rCDE = DE / CD;
+    const rDEF = EF / DE;
+    const rEFG = FG / EF;
+
     let progress = {};
     progress.steps = [
         [
@@ -591,7 +603,7 @@ function calcReversalPattern() {
             //
             D.index1 > T2,
             CD >= PR2,
-            CD >= 0.618 * BC,
+            rBCD >= 0.7,
             Tcd <= Tab,
             CD <= AB,
         ],
@@ -599,7 +611,7 @@ function calcReversalPattern() {
             //
             E.index1 > T3,
             DE >= phase3.pr,
-            DE >= 0.618 * CD,
+            rCDE >= 0.5,
             Tde <= Tbc,
             DE <= BC,
             E.price !== C.price,
@@ -608,7 +620,8 @@ function calcReversalPattern() {
             //
             F.index1 > T4,
             EF >= PR4,
-            EF >= 0.618 * DE,
+            rDEF >= 0.5,
+            rDEF >= 1.3 - rCDE,
             Tef <= Tcd,
             EF <= CD,
         ],
