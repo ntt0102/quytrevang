@@ -358,7 +358,7 @@ function calcContinuePattern() {
             rDEF >= 0.5,
             // Tef <= Tcd,
             EF <= CD,
-            F.price !== D.price && F.price !== B.price,
+            // F.price !== D.price && F.price !== B.price,
         ],
         [
             //
@@ -521,7 +521,7 @@ function calcReversalPattern() {
             rCDE >= 0.5,
             // Tde <= Tbc,
             DE <= BC,
-            E.price !== C.price,
+            // E.price !== C.price,
         ],
         [
             //

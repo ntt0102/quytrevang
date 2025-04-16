@@ -39,7 +39,7 @@ const continuePattern = [
             "P > 50%",
             // "T < Tmax",
             "P < Pmax",
-            "R ≠ R.đỏ.vàng",
+            // "R ≠ R.đỏ.vàng",
         ],
     },
     {
@@ -86,7 +86,7 @@ const reversalPattern = [
             "P > 50%",
             // "T < Tmax",
             "P < Pmax",
-            "R ≠ R.đỏ",
+            // "R ≠ R.đỏ",
         ],
     },
     {
