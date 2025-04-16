@@ -80,6 +80,8 @@ const reversalPattern = [
             "T > Tmin",
             // "P > Pmin",
             "P > 70%",
+            "P > 50%",
+            "P > 50%1",
             // "T < Tmax",
             "P < Pmax",
         ],
