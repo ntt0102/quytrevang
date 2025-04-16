@@ -380,43 +380,43 @@ function calcContinuePattern() {
         [
             //
             D.index1 > T2,
-            CD >= phase2.pr,
+            // CD >= phase2.pr,
             rBCD >= 0.5,
-            Tcd <= Tab,
+            // Tcd <= Tab,
             CD <= AB,
         ],
         [
             //
             E.index1 > T3,
-            DE >= PR3,
+            // DE >= PR3,
             rCDE >= 0.5,
             rCDE >= 1.3 - rBCD,
-            Tde <= Tbc,
+            // Tde <= Tbc,
             DE <= BC,
         ],
         [
             //
             F.index1 > T4,
-            EF >= phase4.pr,
+            // EF >= phase4.pr,
             rDEF >= 0.5,
-            Tef <= Tcd,
+            // Tef <= Tcd,
             EF <= CD,
             F.price !== D.price && F.price !== B.price,
         ],
         [
             //
             G.index1 > T5,
-            FG >= PR5,
+            // FG >= PR5,
             rEFG >= 0.5,
             rEFG >= 1.3 - rDEF,
-            Tfg <= Tde,
+            // Tfg <= Tde,
             FG <= DE,
         ],
         [
             //
             H.index1 > T6,
             GH >= phase6.pr,
-            Tgh <= Tef,
+            // Tgh <= Tef,
         ],
     ];
     for (let i = 0; i < progress.steps.length; i++) {
@@ -590,7 +590,6 @@ function calcReversalPattern() {
     const rBCD = CD / BC;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
-    const rEFG = FG / EF;
 
     let progress = {};
     progress.steps = [
@@ -602,34 +601,34 @@ function calcReversalPattern() {
         [
             //
             D.index1 > T2,
-            CD >= PR2,
+            // CD >= PR2,
             rBCD >= 0.7,
-            Tcd <= Tab,
+            // Tcd <= Tab,
             CD <= AB,
         ],
         [
             //
             E.index1 > T3,
-            DE >= phase3.pr,
+            // DE >= phase3.pr,
             rCDE >= 0.5,
-            Tde <= Tbc,
+            // Tde <= Tbc,
             DE <= BC,
             E.price !== C.price,
         ],
         [
             //
             F.index1 > T4,
-            EF >= PR4,
+            // EF >= PR4,
             rDEF >= 0.5,
             rDEF >= 1.3 - rCDE,
-            Tef <= Tcd,
+            // Tef <= Tcd,
             EF <= CD,
         ],
         [
             //
             G.index1 > T5,
             FG >= phase5.pr,
-            Tfg <= Tde,
+            // Tfg <= Tde,
         ],
     ];
     for (let i = 0; i < progress.steps.length; i++) {
