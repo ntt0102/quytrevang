@@ -197,6 +197,7 @@ class VpsOrderService extends CoreService
         $isNew = $data->cmd == "new";
         $isNotDelete = $data->cmd != "delete";
         $side = $isEntry ? ($isNew ? $data->side : $this->position) : -$this->position;
+        $account = $this->formatAccount();
         $payload = [
             "group" => "O",
             "user" => $this->vpsUser,
@@ -204,7 +205,7 @@ class VpsOrderService extends CoreService
             "language" => "vi",
             "data" => [
                 "cmd" => "co.stop.order." . $data->cmd,
-                "accountNo" => $this->formatAccount(),
+                "accountNo" => $account,
                 "pin" => "",
                 "orderId" => $data->orderNo ?? "",
                 "channel" => "H",
@@ -263,6 +264,52 @@ class VpsOrderService extends CoreService
         $rsp = json_decode($res->getBody());
         if ($rsp->rc != 1 && $isNotDelete) return false;
         return $rsp->data[0]->orderNo ?? "";
+    }
+
+    public function cancelAllConditionOrders()
+    {
+        $extInfo = "4051301374|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0";
+        $account = $this->formatAccount();
+        $payload = [
+            "group" => "O",
+            "extInfo" => $extInfo,
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
+            "language" => "vi",
+            "data" => [
+                "cmd" => "co.order.cancel.all",
+                "accountNo" => $account,
+                "symbol" => "ALL",
+            ]
+        ];
+        $url = "https://smartpro.vps.com.vn/handler/core_ext.vpbs";
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        return $rsp->rc == 1;
+    }
+
+    public function cancelAllOrders()
+    {
+        $extInfo = "4051301374|Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36 Edg/135.0.0.0";
+        $account = $this->formatAccount();
+        $payload = [
+            "group" => "FD",
+            "extInfo" => $extInfo,
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
+            "c" => "H",
+            "data" => [
+                "cmd" => "Web.cancelAllOrder",
+                "account" => $account,
+                "orderType" => "0",
+                "pin" => "",
+                "symbol" => "ALL",
+            ]
+        ];
+        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        return $rsp->rc == 1;
     }
 
     public function formatAccount()

@@ -209,7 +209,21 @@ function tpsl() {
         });
 }
 function closeAllOrders() {
-    Object.values(orders.value).forEach((order) => closeOrder(order));
+    const allOrders = Object.values(orders.value);
+    if (allOrders.length) {
+        allOrders.forEach((order) => closeOrder(order));
+    } else {
+        store
+            .dispatch("tradingDerivative/executeOrder", {
+                action: "cancel",
+                forceData: { cmd: "force" },
+            })
+            .then((resp) => {
+                if (resp.isOk)
+                    toast.success(t("trading.derivative.forceSuccess"));
+                else toastOrderError(resp.message);
+            });
+    }
 }
 function closeOrder(order) {
     switch (order.status) {
@@ -237,13 +251,10 @@ function closeOrder(order) {
         case 1:
             store
                 .dispatch("tradingDerivative/executeOrder", {
-                    action: "exit",
+                    action: "cancel",
                     tpData: { cmd: "cancel", orderNo: order.tp_no },
                     slData: { cmd: "delete", orderNo: order.sl_no },
-                    exitData: {
-                        cmd: "new",
-                        price: "MTL",
-                    },
+                    exitData: { cmd: "new", price: "MTL" },
                 })
                 .then((resp) => {
                     if (resp.isOk) {
