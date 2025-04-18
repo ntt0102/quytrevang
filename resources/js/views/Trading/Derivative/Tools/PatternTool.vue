@@ -245,7 +245,9 @@ function calcContinuePattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak1 = phase3.ext.pr < phase3.pr && phase3.ext.tr < phase3.tr;
+    const isBreak1 =
+        (phase3.ext.pr < phase3.pr || phase3.ext.tr < 0.8 * phase3.tr) &&
+        (phase3.ext.tr < phase3.tr || phase3.ext.pr < 0.8 * phase3.pr);
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
@@ -262,7 +264,9 @@ function calcContinuePattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak2 = phase5.ext.pr < phase5.pr && phase5.ext.tr < phase5.tr;
+    const isBreak2 =
+        (phase5.ext.pr < phase5.pr || phase5.ext.tr < 0.8 * phase5.tr) &&
+        (phase5.ext.tr < phase5.tr || phase5.ext.pr < 0.8 * phase5.pr);
 
     const F = isBreak2 ? phase5.R1 : phase5.ext.R;
     const G = isBreak2 ? phase5.S1 : phase5.ext.S;
@@ -279,7 +283,9 @@ function calcContinuePattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak3 = phase7.ext.pr < phase7.pr && phase7.ext.tr < phase7.tr;
+    const isBreak3 =
+        (phase7.ext.pr < phase7.pr || phase7.ext.tr < 0.8 * phase7.tr) &&
+        (phase7.ext.tr < phase7.tr || phase7.ext.pr < 0.8 * phase7.pr);
 
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
 
@@ -427,7 +433,9 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak1 = phase2.ext.pr < phase2.pr && phase2.ext.tr < phase2.tr;
+    const isBreak1 =
+        (phase2.ext.pr < phase2.pr || phase2.ext.tr < 0.8 * phase2.tr) &&
+        (phase2.ext.tr < phase2.tr || phase2.ext.pr < 0.8 * phase2.pr);
 
     const C = isBreak1 ? phase2.R1 : phase2.ext.R;
     const D = isBreak1 ? phase2.S1 : phase2.ext.S;
@@ -444,7 +452,9 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak2 = phase4.ext.pr < phase4.pr && phase4.ext.tr < phase4.tr;
+    const isBreak2 =
+        (phase4.ext.pr < phase4.pr || phase4.ext.tr < 0.8 * phase4.tr) &&
+        (phase4.ext.tr < phase4.tr || phase4.ext.pr < 0.8 * phase4.pr);
 
     const E = isBreak2 ? phase4.R1 : phase4.ext.R;
     const F = isBreak2 ? phase4.S1 : phase4.ext.S;
@@ -461,7 +471,9 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak3 = phase6.ext.pr < phase6.pr && phase6.ext.tr < phase6.tr;
+    const isBreak3 =
+        (phase6.ext.pr < phase6.pr || phase6.ext.tr < 0.8 * phase6.tr) &&
+        (phase6.ext.tr < phase6.tr || phase6.ext.pr < 0.8 * phase6.pr);
 
     const G = isBreak3 ? phase6.R1 : phase6.ext.R;
 
