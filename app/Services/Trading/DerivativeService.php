@@ -307,23 +307,16 @@ class DerivativeService extends CoreService
                         return ['isOk' => true, 'order' => $order];
                         break;
                     case 'tp':
-                        if ($payload->tpData->cmd === "cancel" && $vos->position !== 0) {
-                            return ['isOk' => false, 'message' => 'openedPosition'];
-                        }
                         $tpNo = $vos->order($payload->tpData);
                         // $tpNo = $payload->tpData->orderNo;
                         if (!$tpNo) {
                             return ['isOk' => false, 'message' => 'failOrder'];
                         }
-                        $order = DerivativeOrder::where('tp_no', $payload->tpData->orderNo)->first();
+                        $order = DerivativeOrder::find($payload->orderId);
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
                         }
-                        if ($payload->tpData->cmd === "cancel") {
-                            $data = ['status' => 2];
-                        } else {
-                            $data = ['tp_price' => $payload->tpData->price];
-                        }
+                        $data = ['tp_price' => $payload->tpData->price];
                         $order->fill($data);
                         if (!$order->save()) {
                             return ['isOk' => false, 'message' => 'failSave'];
@@ -331,23 +324,16 @@ class DerivativeService extends CoreService
                         return ['isOk' => true, 'order' => $order];
                         break;
                     case 'sl':
-                        if ($payload->slData->cmd === "delete" && $vos->position !== 0) {
-                            return ['isOk' => false, 'message' => 'openedPosition'];
-                        }
                         $slNo = $vos->conditionOrder($payload->slData);
                         // $slNo = $payload->slData->orderNo;
                         if (!$slNo) {
                             return ['isOk' => false, 'message' => 'failOrder'];
                         }
-                        $order = DerivativeOrder::where('sl_no', $payload->slData->orderNo)->first();
+                        $order = DerivativeOrder::find($payload->orderId);
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
                         }
-                        if ($payload->slData->cmd === "delete") {
-                            $data = ['status' => 2];
-                        } else {
-                            $data = ['sl_price' => $payload->slData->price];
-                        }
+                        $data = ['sl_price' => $payload->slData->price];
                         $order->fill($data);
                         if (!$order->save()) {
                             return ['isOk' => false, 'message' => 'failSave'];
@@ -363,21 +349,14 @@ class DerivativeService extends CoreService
                                 }
                             }
                         }
-                        if (isset($payload->tpData) && isset($payload->slData)) {
-                            $tpNo = $vos->order($payload->tpData);
-                            // $tpNo = $payload->tpData->orderNo;
-                            $slNo = $vos->conditionOrder($payload->slData);
-                            // $slNo = $payload->slData->orderNo;
-                            $order = DerivativeOrder::where('tp_no', $payload->tpData->orderNo)
-                                ->where('sl_no', $payload->slData->orderNo)->first();
+                        $vos->cancelAllConditionOrders();
+                        $vos->cancelAllOrders();
+                        if (isset($payload->orderId)) {
+                            $order = DerivativeOrder::find($payload->orderId);
                             $order->fill(['status' => 2]);
                             if (!$order->save()) {
                                 return ['isOk' => false, 'message' => 'failSave'];
                             }
-                        }
-                        if (isset($payload->forceData)) {
-                            $vos->cancelAllConditionOrders();
-                            $vos->cancelAllOrders();
                         }
                         return ['isOk' => true];
                         break;

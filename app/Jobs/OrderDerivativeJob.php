@@ -65,19 +65,17 @@ class OrderDerivativeJob implements ShouldQueue
                 if ($order->status === 1) {
                     $isOrdered = false;
                     if (cmp($lastPrice, $sideBool, $order->tp_price, true)) {
-                        $slNo = $vos->conditionOrder(["cmd" => "delete", "orderNo" => $order->sl_no]);
-                        if (!$slNo) return;
                         $isOrdered = true;
                     }
                     if (cmp($lastPrice, !$sideBool, $order->sl_price, true)) {
-                        $tpNo = $vos->order(["cmd" => "cancel", "orderNo" => $order->tp_no]);
-                        if (!$tpNo) return;
                         $isOrdered = true;
                     }
                     if (!$isOrdered) return;
-                    $order = DerivativeOrder::where('tp_no', $order->tp_no)
-                        ->where('sl_no', $order->sl_no)->first();
-                    if (!$order->save()) return;
+                    $vos->cancelAllConditionOrders();
+                    $vos->cancelAllOrders();
+                    $order = DerivativeOrder::find($order->id);
+                    $order->fill(['status' => 2]);
+                    $order->save();
                 }
             }
         });
