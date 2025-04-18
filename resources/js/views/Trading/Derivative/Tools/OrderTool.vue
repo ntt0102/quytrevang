@@ -20,7 +20,7 @@
 </template>
 <script setup>
 import OrderContext from "./Contexts/OrderContext.vue";
-import { ref, inject, computed, watch } from "vue";
+import { ref, inject, computed, watch, onMounted, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
 import { toast } from "vue3-toastify";
@@ -68,7 +68,13 @@ defineExpose({
     scan,
     drag,
 });
+onMounted(() => {
+    window.addEventListener("keydown", shortcutHandle);
+});
 
+onUnmounted(() => {
+    window.removeEventListener("keydown", shortcutHandle);
+});
 watch(orderStore, (data) => {
     if (mf.isSet(data)) load(data);
 });
@@ -544,6 +550,12 @@ function toggleOrderContext() {
     const oldValue = showOrderContext.value;
     emit("hideContext");
     showOrderContext.value = !oldValue;
+}
+function shortcutHandle(e) {
+    if (e.key === "F4") {
+        toggleOrderContext();
+        e.preventDefault();
+    }
 }
 </script>
 <style lang="scss">
