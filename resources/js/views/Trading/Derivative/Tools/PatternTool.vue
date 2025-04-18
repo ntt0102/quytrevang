@@ -203,9 +203,7 @@ function loadPatternTool() {
 }
 function refresh(autoAdjust = false) {
     if (mf.isSet(lines.X)) {
-        if (autoAdjust && patternType.value !== 2) {
-            adjustPatternPoints();
-        }
+        if (autoAdjust) adjustPatternPoints();
         removePatternTool();
         loadPatternTool();
     }

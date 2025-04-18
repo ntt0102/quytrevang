@@ -41,10 +41,10 @@ class Kernel extends ConsoleKernel
             $schedule->job(new ReportTradingJob)->dailyAt('14:47');
             // $schedule->job(new ExportDerVpsJob)->dailyAt('14:48');
             $schedule->command('clone:data --type=export')->dailyAt('14:48');
-            if (in_trading_time()) {
-                $schedule->job(new OrderDerivativeJob)->everyMinute();
-                // $schedule->command('clone:data --type=scan')->everyMinute();
-            }
+            // if (in_trading_time()) {
+            // $schedule->job(new OrderDerivativeJob)->everyMinute();
+            // $schedule->command('clone:data --type=scan')->everyMinute();
+            // }
         }
         $schedule->command('queue:work --stop-when-empty')->everyMinute();
     }
