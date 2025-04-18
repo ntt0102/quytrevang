@@ -316,12 +316,15 @@ function calcContinuePattern() {
 
     const T1 = phase1.R.index + phase1.tr;
     const T2 = phase2.R.index + phase2.tr;
+    const T2s = phase2.R.index + (phase2.R.index - phase2.R.index1);
     const T3 = D.index + TR3;
     const T4 = E.index + phase4.tr;
+    const T4s = E.index + (phase4.R.index - phase4.R.index1);
     const T5 = F.index + TR5;
     const T6 = G.index + phase6.tr;
     const timeMark = [T6, T5, T4, T3, T2, T1];
 
+    const rABC = BC / AB;
     const rBCD = CD / BC;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
@@ -333,10 +336,12 @@ function calcContinuePattern() {
             //
             phase2.R.index1 > T1,
             BC >= phase1.pr,
+            rABC >= 0.3,
         ],
         [
             //
             D.index1 > T2,
+            D.index1 > T2s,
             // CD >= phase2.pr,
             rBCD >= 0.5,
             // Tcd <= Tab,
@@ -354,6 +359,7 @@ function calcContinuePattern() {
         [
             //
             F.index1 > T4,
+            F.index1 > T4s,
             // EF >= phase4.pr,
             rDEF >= 0.5,
             // Tef <= Tcd,
@@ -488,12 +494,15 @@ function calcReversalPattern() {
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
 
     const T1 = phase1.R.index + phase1.tr;
+    const T1s = phase1.R.index + (phase1.R.index - phase1.R.index1);
     const T2 = C.index + TR2;
     const T3 = D.index + phase3.tr;
+    const T3s = D.index + (phase3.R.index - phase3.R.index1);
     const T4 = E.index + TR4;
     const T5 = F.index + phase5.tr;
     const timeMark = [T5, T4, T3, T2, T1];
 
+    const rABC = BC / AB;
     const rBCD = CD / BC;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
@@ -503,7 +512,9 @@ function calcReversalPattern() {
         [
             //
             C.index1 > T1,
+            C.index1 > T1s,
             BC >= phase1.pr,
+            rABC >= 0.3,
         ],
         [
             //
@@ -517,6 +528,7 @@ function calcReversalPattern() {
         [
             //
             E.index1 > T3,
+            E.index1 > T3s,
             // DE >= phase3.pr,
             rCDE >= 0.5,
             // Tde <= Tbc,

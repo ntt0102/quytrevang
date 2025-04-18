@@ -5,6 +5,7 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P > 30%",
         ],
     },
     {
@@ -12,6 +13,7 @@ const continuePattern = [
         conds: [
             //
             "T > Tmin",
+            "T > Ts",
             // "P > Pmin",
             "P > 50%",
             // "T < Tmax",
@@ -35,6 +37,7 @@ const continuePattern = [
         conds: [
             //
             "T > Tmin",
+            "T > Ts",
             // "P > Pmin",
             "P > 50%",
             // "T < Tmax",
@@ -61,7 +64,9 @@ const reversalPattern = [
         conds: [
             //
             "T > Tmin",
+            "T > Ts",
             "P > Pmin",
+            "P > 30%",
         ],
     },
     {
@@ -81,6 +86,7 @@ const reversalPattern = [
         conds: [
             //
             "T > Tmin",
+            "T > Ts",
             // "P > Pmin",
             "P > 50%",
             // "T < Tmax",
