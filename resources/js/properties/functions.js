@@ -69,6 +69,9 @@ export default {
         if (side) return eq ? value1 >= value2 : value1 > value2;
         else return eq ? value1 <= value2 : value1 < value2;
     },
+    capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+    },
     checkPinDataGrid(e, dataGridInstance) {
         // let items = e.component.option("toolbarItems");
         // items[0].options.onClick = () => {

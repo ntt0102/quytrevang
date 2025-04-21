@@ -349,14 +349,17 @@ class DerivativeService extends CoreService
                                 }
                             }
                         }
-                        $vos->cancelAllConditionOrders();
-                        $vos->cancelAllOrders();
                         if (isset($payload->orderId)) {
                             $order = DerivativeOrder::find($payload->orderId);
+                            $vos->order(['cmd' => 'cancel', 'orderNo' => $order->tp_no]);
+                            $vos->conditionOrder(['cmd' => 'delete', 'orderNo' => $order->sl_no]);
                             $order->fill(['status' => 2]);
                             if (!$order->save()) {
                                 return ['isOk' => false, 'message' => 'failSave'];
                             }
+                        } else {
+                            $vos->cancelAllConditionOrders();
+                            $vos->cancelAllOrders();
                         }
                         return ['isOk' => true];
                         break;

@@ -223,6 +223,7 @@ function closeAllOrders() {
         store
             .dispatch("tradingDerivative/executeOrder", {
                 action: "cancel",
+                exitData: { cmd: "new", price: "MTL" },
             })
             .then((resp) => {
                 if (resp.isOk)
@@ -371,12 +372,12 @@ function scan(lastPrice) {
                 }
                 break;
             case 1:
-                let cmd = "";
+                let kind = "";
                 if (mf.cmp(lastPrice, sideBool, order.tp_price, true)) {
-                    cmd = "Tp";
+                    kind = "tp";
                 }
                 if (mf.cmp(lastPrice, !sideBool, order.sl_price, true)) {
-                    cmd = "Sl";
+                    kind = "sl";
                 }
                 if (cmd) {
                     if (!isAutoOrdering) {
@@ -395,7 +396,9 @@ function scan(lastPrice) {
                                     delete orders.value[order.id];
                                     toast.success(
                                         t(
-                                            `trading.derivative.delete${cmd}Success`
+                                            `trading.derivative.delete${mf.capitalize(
+                                                kind
+                                            )}Success`
                                         )
                                     );
                                 } else toastOrderError(resp.message);
@@ -478,9 +481,7 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
         //
         if (changeValid) {
             const dataKey = `${kind}Data`;
-            const toastKey = `change${kind[0].toUpperCase()}${kind.slice(
-                1
-            )}Success`;
+            const toastKey = `change${mf.capitalize(kind)}Success`;
             const order = getOrderByKind(kind, oldPrice);
 
             if (!mf.isSet(order)) return false;
