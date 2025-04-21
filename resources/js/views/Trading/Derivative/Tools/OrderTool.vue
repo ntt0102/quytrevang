@@ -490,7 +490,7 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
                     orderId: order.id,
                     [dataKey]: {
                         cmd: "change",
-                        orderNo: order[`${kind}_no`],
+                        orderNo: String(order[`${kind}_no`]),
                         price: newPrice,
                     },
                 })
