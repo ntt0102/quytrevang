@@ -208,6 +208,7 @@ function tpsl() {
         })
         .then((resp) => {
             if (resp.isOk) {
+                orders.value[order.id] = resp.order;
                 lines[order.id].entry.applyOptions({ draggable: false });
                 drawOrderTool(["tp", "sl"], resp.order);
                 toast.success(t("trading.derivative.newTpSlSuccess"));
@@ -495,7 +496,7 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
                 })
                 .then((resp) => {
                     if (resp.isOk) {
-                        orders.value[resp.order.id] = resp.order;
+                        orders.value[order.id] = resp.order;
                         drawOrderTool([kind], resp.order);
                         toast.success(t(`trading.derivative.${toastKey}`));
                     } else {

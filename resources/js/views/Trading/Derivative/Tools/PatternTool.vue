@@ -45,7 +45,7 @@ const patternType = computed(
 );
 const symbol = "VN30F1M";
 const patternTypeCount = 2;
-const bcThreshold = 1;
+const scanThreshold = 1;
 const phaseThreshold = 0.9;
 let scanPoints = {};
 let lines = {};
@@ -135,7 +135,7 @@ function scanPattern(data) {
                 side = !side;
             } else B = { index, time, price };
         }
-        if (mf.cmp(price, !side, A.price)) {
+        if (mf.cmp(price, !side, A.price, true)) {
             A = { index, time, price };
             S = mf.cloneDeep(A);
         }
@@ -143,7 +143,7 @@ function scanPattern(data) {
         //
         if (C.index > A.index) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
-            if (bc >= bcThreshold) {
+            if (bc >= scanThreshold) {
                 if (A.index - S.index >= C.index - B.index) break;
                 const as = mf.fmtNum(A.price - S.price, 1, true);
                 if (as > bc) break;
