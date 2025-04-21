@@ -90,6 +90,62 @@ class VpsOrderService extends CoreService
         }
     }
 
+    public function getPendingOrders()
+    {
+        return array_merge($this->getPendingLO(), $this->getPendingSL());
+    }
+    public function getPendingLO()
+    {
+        if (!$this->connection) return [];
+        $payload = [
+            "group" => "Q",
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
+            "c" => "H",
+            "data" => [
+                "type" => "string",
+                "cmd" => "Web.Order.FullAllOrder",
+                "p1" => "1",
+                "p2" => "1",
+                "p3" => $this->formatAccount() . ",ALL,ALL",
+                "p4" => "PENDING"
+            ]
+        ];
+        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        if ($rsp->rc != 1) return [];
+        return $rsp->data;
+    }
+
+    public function getPendingSL()
+    {
+        if (!$this->connection) return [];
+        $payload = [
+            "group" => "B",
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
+            "data" => [
+                "type" => "cursor",
+                "cmd" => "list_condition_order",
+                "p1" => $this->formatAccount(),
+                "p2" => "",
+                "p3" => $this->todayFormat(),
+                "p4" => $this->todayFormat(),
+                "p5" => "PENDING_TRIGGER",
+                "p6" => "",
+                "p7" => "",
+                "p8" => "1",
+                "p9" => "1"
+            ]
+        ];
+        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        if ($rsp->rc != 1) return [];
+        return $rsp->data;
+    }
+
     public function hasOrder()
     {
         if (!$this->connection) return false;

@@ -14,9 +14,13 @@
             <div
                 ref="connectionRef"
                 class="command"
-                :class="{ yellow: status.pending, red: config.volInvalid }"
+                :class="{
+                    yellow: status.pendingOrders.length > 0,
+                    red: config.volInvalid,
+                }"
                 :title="$t('trading.derivative.connection')"
                 @click="getStatus"
+                @contextmenu="showPendingOrders"
             >
                 <i
                     class="far"
@@ -207,7 +211,11 @@ const { t } = useI18n();
 const mf = inject("mf");
 const devices = inject("devices");
 const filters = inject("filters");
-const emit = defineEmits(["showSetting", "showMatchedOrders"]);
+const emit = defineEmits([
+    "showSetting",
+    "showPendingOrders",
+    "showMatchedOrders",
+]);
 const chartContainerRef = ref(null);
 const chartRef = ref(null);
 const connectionRef = ref(null);
@@ -801,6 +809,9 @@ function resetChart() {
 }
 function showSetting() {
     emit("showSetting");
+}
+function showPendingOrders() {
+    emit("showPendingOrders");
 }
 function showMatchedOrders() {
     emit("showMatchedOrders");

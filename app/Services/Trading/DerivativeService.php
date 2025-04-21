@@ -95,7 +95,7 @@ class DerivativeService extends CoreService
         return [
             'connection' => $vos->connection,
             'position' => $vos->position,
-            'pending' => $vos->hasOrder() || $vos->hasConditionOrder(),
+            'pendingOrders' => $vos->getPendingOrders(),
         ];
     }
 
@@ -204,7 +204,7 @@ class DerivativeService extends CoreService
             'status' => [
                 'connection' => $vos->connection,
                 'position' => $vos->position,
-                'pending' => $vos->hasOrder() || $vos->hasConditionOrder()
+                'pendingOrders' => $vos->getPendingOrders(),
             ]
         ];
     }

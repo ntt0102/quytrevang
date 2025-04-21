@@ -67,10 +67,12 @@
         <Chart
             ref="chartRef"
             @showSetting="showSetting"
+            @showPendingOrders="showPendingOrders"
             @showMatchedOrders="showMatchedOrders"
         />
     </div>
     <SettingPopup ref="settingPopupRef" />
+    <PendingOrdersPopup ref="pendingOrdersPopupRef" />
     <MatchedOrdersPopup ref="matchedOrdersPopupRef" />
     <VpsOtpPopup ref="vpsOtpPopupRef" />
 </template>
@@ -78,6 +80,7 @@
 <script setup>
 import Chart from "./Chart.vue";
 import SettingPopup from "./Popups/SettingPopup.vue";
+import PendingOrdersPopup from "./Popups/PendingOrdersPopup.vue";
 import MatchedOrdersPopup from "./Popups/MatchedOrdersPopup.vue";
 import VpsOtpPopup from "./Popups/VpsOtpPopup.vue";
 import { ref, inject, computed } from "vue";
@@ -90,6 +93,7 @@ const bus = inject("bus");
 const source = computed(() => store.state.tradingDerivative.config.source);
 const chartRef = ref(null);
 const settingPopupRef = ref(null);
+const pendingOrdersPopupRef = ref(null);
 const matchedOrdersPopupRef = ref(null);
 const vpsOtpPopupRef = ref(null);
 const exportTypes = ref([
@@ -112,6 +116,9 @@ const dataSource = ref([
 
 function showSetting() {
     settingPopupRef.value.show();
+}
+function showPendingOrders() {
+    pendingOrdersPopupRef.value.show();
 }
 function showMatchedOrders() {
     matchedOrdersPopupRef.value.show();

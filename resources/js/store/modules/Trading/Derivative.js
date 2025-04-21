@@ -1,6 +1,6 @@
 function initialState() {
     return {
-        status: { connection: false, position: 0, pending: false },
+        status: { connection: false, position: 0, pendingOrders: [] },
         config: {},
         tools: [],
         chartData: [],

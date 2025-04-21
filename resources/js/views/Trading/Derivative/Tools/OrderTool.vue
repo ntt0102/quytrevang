@@ -52,7 +52,7 @@ const slDefault = computed(
 const hasOrder = computed(
     () =>
         store.state.tradingDerivative.status.position ||
-        store.state.tradingDerivative.status.pending ||
+        store.state.tradingDerivative.status.pendingOrders.length > 0 ||
         Object.keys(orders.value).length > 0
 );
 let putOrder = {};
@@ -188,9 +188,9 @@ function entry() {
     }
 }
 function tpsl() {
-    const pendingOrders = getOrderByStatus(0);
-    if (pendingOrders.length !== 1) return false;
-    const order = pendingOrders[0];
+    const entryOrders = getOrderByStatus(0);
+    if (entryOrders.length !== 1) return false;
+    const order = entryOrders[0];
     const tpPrice = order.entry_price + order.side * tpDefault.value;
     const slPrice = order.entry_price - order.side * slDefault.value;
     store
