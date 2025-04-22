@@ -289,7 +289,7 @@ class DerivativeService extends CoreService
                         if (!$tpNo) {
                             return ['isOk' => false, 'message' => 'failOrder'];
                         }
-                        $slNo = $vos->conditionOrder(['cmd' => 'new', 'price' => $slPrice]);
+                        $slNo = $vos->conditionOrder((object)['cmd' => 'new', 'price' => $slPrice]);
                         // $slNo = 'sl' . rand(1, 100);
                         if (!$slNo) {
                             return ['isOk' => false, 'message' => 'failOrder'];
