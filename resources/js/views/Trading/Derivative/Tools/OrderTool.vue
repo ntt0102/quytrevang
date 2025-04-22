@@ -61,6 +61,7 @@ defineExpose({
     cancelWithoutClose,
     scan,
     drag,
+    closeAllOrders,
 });
 onMounted(() => {
     window.addEventListener("keydown", shortcutHandle);
@@ -211,54 +212,27 @@ function closeAllOrders() {
             })
             .then((resp) => {
                 if (resp.isOk)
-                    toast.success(t("trading.derivative.toasts.forceSuccess"));
+                    toast.success(t("trading.derivative.toasts.cancelSuccess"));
                 else toastOrderError(resp.message);
             });
     }
 }
 function closeOrder(order) {
-    switch (order.status) {
-        case 0:
-            store
-                .dispatch("tradingDerivative/executeOrder", {
-                    action: "entry",
-                    data: {
-                        cmd: "delete",
-                        orderNo: order.entry_no,
-                    },
-                })
-                .then((resp) => {
-                    if (resp.isOk) {
-                        removeOrderTool(["entry"], order.id);
-                        delete orders.value[order.id];
-                        toast.success(
-                            t("trading.derivative.toasts.deleteEntrySuccess")
-                        );
-                    } else {
-                        toastOrderError(resp.message);
-                    }
-                });
-            break;
-        case 1:
-            store
-                .dispatch("tradingDerivative/executeOrder", {
-                    action: "cancel",
-                    orderId: order.id,
-                    exit: "MTL",
-                })
-                .then((resp) => {
-                    if (resp.isOk) {
-                        removeOrderTool(["entry", "tp", "sl"], order.id);
-                        delete orders.value[order.id];
-                        toast.success(
-                            t("trading.derivative.toasts.exitSuccess")
-                        );
-                    } else {
-                        toastOrderError(resp.message);
-                    }
-                });
-            break;
-    }
+    store
+        .dispatch("tradingDerivative/executeOrder", {
+            action: "cancel",
+            orderId: order.id,
+            exit: order.status === 1 ? "MTL" : "",
+        })
+        .then((resp) => {
+            if (resp.isOk) {
+                removeOrderTool(["entry", "tp", "sl"], order.id);
+                delete orders.value[order.id];
+                toast.success(t("trading.derivative.toasts.cancelSuccess"));
+            } else {
+                toastOrderError(resp.message);
+            }
+        });
 }
 function cancelWithoutClose() {
     if (props.inSession()) {
@@ -283,7 +257,7 @@ function cancelWithoutClose() {
                                     delete orders.value[order.id];
                                     toast.success(
                                         t(
-                                            "trading.derivative.toasts.autoCancelTpSlSuccess"
+                                            "trading.derivative.toasts.cancelNotExitSuccess"
                                         )
                                     );
                                 } else toastOrderError(resp.message);
@@ -333,7 +307,7 @@ function scan(lastPrice) {
 
                                         toast.success(
                                             t(
-                                                "trading.derivative.toasts.autoNewTpSlSuccess"
+                                                "trading.derivative.toasts.newTpSlSuccess"
                                             )
                                         );
                                     } else toastOrderError(resp.message);

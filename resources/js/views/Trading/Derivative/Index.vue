@@ -72,7 +72,10 @@
         />
     </div>
     <SettingPopup ref="settingPopupRef" />
-    <PendingOrdersPopup ref="pendingOrdersPopupRef" />
+    <PendingOrdersPopup
+        ref="pendingOrdersPopupRef"
+        @closeAllOrders="closeAllOrders"
+    />
     <MatchedOrdersPopup ref="matchedOrdersPopupRef" />
     <VpsOtpPopup ref="vpsOtpPopupRef" />
 </template>
@@ -142,6 +145,9 @@ function exportItemClick({ itemData }) {
 function sourceSelect({ item: { name } }) {
     chartRef.value.connectSocket();
     store.dispatch("tradingDerivative/setSource", name);
+}
+function closeAllOrders() {
+    chartRef.value.closeAllOrders();
 }
 </script>
 <style lang="scss">

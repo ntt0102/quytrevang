@@ -251,7 +251,6 @@ class DerivativeService extends CoreService
                 switch ($payload->action) {
                     case 'entry':
                         $isNew = $payload->data->cmd === "new";
-                        $isNotDelete = $payload->data->cmd !== "delete";
                         if ($isNew && $vos->position !== 0) {
                             return ['isOk' => false, 'message' => 'openedPosition'];
                         }
@@ -261,10 +260,11 @@ class DerivativeService extends CoreService
                             return ['isOk' => false, 'message' => 'failOrder'];
                         }
                         $key = ['entry_no' => $entryNo];
-                        $data = [];
-                        $data['status'] = $isNotDelete ? 0 : 2;
-                        if ($isNew) $data['side'] = $payload->data->side;
-                        if ($isNotDelete) $data['entry_price'] = $payload->data->price;
+                        $data = [
+                            'status' => 0,
+                            'entry_price' => $payload->data->price,
+                            'side' => $payload->data->side
+                        ];
                         $order = DerivativeOrder::updateOrCreate($key, $data);
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
@@ -345,7 +345,7 @@ class DerivativeService extends CoreService
                         return ['isOk' => true, 'order' => $order];
                         break;
                     case 'cancel':
-                        if (isset($payload->exit)) {
+                        if (isset($payload->exit) && $payload->exit !== '') {
                             if ($vos->position !== 0) {
                                 $exitNo = $vos->order(['cmd' => 'new', 'price' => $payload->exit]);
                                 if (!$exitNo) {
@@ -355,8 +355,13 @@ class DerivativeService extends CoreService
                         }
                         if (isset($payload->orderId)) {
                             $order = DerivativeOrder::find($payload->orderId);
-                            $vos->order(['cmd' => 'cancel', 'orderNo' => $order->tp_no]);
-                            $vos->conditionOrder(['cmd' => 'delete', 'orderNo' => $order->sl_no]);
+                            $vos->conditionOrder(['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
+                            if ($order->tp_no) {
+                                $vos->order(['cmd' => 'cancel', 'orderNo' => $order->tp_no]);
+                            }
+                            if ($order->sl_no) {
+                                $vos->conditionOrder(['cmd' => 'delete', 'orderNo' => $order->sl_no]);
+                            }
                             $order->fill(['status' => 2]);
                             if (!$order->save()) {
                                 return ['isOk' => false, 'message' => 'failSave'];

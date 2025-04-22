@@ -308,6 +308,7 @@ watch(() => store.state.tradingDerivative.chartData, setChartData);
 
 defineExpose({
     connectSocket,
+    closeAllOrders,
 });
 
 function drawChart() {
@@ -856,6 +857,9 @@ function getAccountInfo() {
         html += "</div>";
         alert(html, t("trading.derivative.accountInfoPopup.title"));
     });
+}
+function closeAllOrders() {
+    orderToolRef.value.closeAllOrders();
 }
 function coordinateToPrice(y) {
     return mf.fmtNum(params.series.price.coordinateToPrice(y));

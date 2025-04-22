@@ -3,6 +3,17 @@
         ref="popupRef"
         class="der-matched-orders-popup"
         :title="$t('trading.derivative.pendingOrdersPopup.title')"
+        :toolbarItems="[
+            {
+                toolbar: 'bottom',
+                location: 'after',
+                widget: 'dxButton',
+                options: {
+                    text: $t('trading.derivative.orderContext.closeAllOrders'),
+                    onClick: closeAllOrders,
+                },
+            },
+        ]"
         @shown="onShown"
         @hidden="onHidden"
     >
@@ -29,15 +40,15 @@ import { ref } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
+const emit = defineEmits(["closeAllOrders"]);
 const popupRef = ref(null);
 const orders = ref([]);
 const columns = [
-    { field: "orderTime", minWidth: 100 },
+    { field: "time", minWidth: 100 },
+    { field: "type", minWidth: 100 },
     { field: "side", minWidth: 100 },
     { field: "volume", minWidth: 100 },
-    { field: "matchVolume", minWidth: 100 },
-    { field: "showPrice", minWidth: 100 },
-    { field: "avgPrice", minWidth: 100 },
+    { field: "price", minWidth: 100 },
 ];
 
 function show() {
@@ -48,6 +59,10 @@ function onShown() {
     orders.value = store.state.tradingDerivative.status.pendingOrders;
 }
 function onHidden() {}
+
+function closeAllOrders() {
+    emit("closeAllOrders");
+}
 
 defineExpose({
     show,
