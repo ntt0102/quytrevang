@@ -2,7 +2,7 @@
     <CorePopup
         ref="popupRef"
         class="der-matched-orders-popup"
-        :title="$t('trading.derivative.matchedOrders')"
+        :title="$t('trading.derivative.matchedOrdersPopup.title')"
         @shown="onShown"
         @hidden="onHidden"
     >

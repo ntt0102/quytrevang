@@ -2,7 +2,7 @@
     <CorePopup
         ref="popupRef"
         class="der-matched-orders-popup"
-        :title="$t('trading.derivative.pendingOrders')"
+        :title="$t('trading.derivative.pendingOrdersPopup.title')"
         @shown="onShown"
         @hidden="onHidden"
     >
@@ -16,7 +16,7 @@
                 :data-field="column.field"
                 :minWidth="column.minWidth"
                 :caption="
-                    $t(`trading.derivative.matchedOrdersPopup.${column.field}`)
+                    $t(`trading.derivative.pendingOrdersPopup.${column.field}`)
                 "
             />
         </DxDataGrid>

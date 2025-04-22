@@ -2,7 +2,7 @@
     <div
         ref="pickTimeToolRef"
         class="command"
-        :title="$t('trading.derivative.pickTimeTool')"
+        :title="$t('trading.derivative.tools.pickTime')"
         @click="pickTimeToolClick"
         @contextmenu="pickTimeToolContextmenu"
     >

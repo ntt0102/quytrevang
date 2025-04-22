@@ -5,7 +5,7 @@
             green: progress.result === true,
             red: progress.result === false,
         }"
-        :title="$t('trading.derivative.progressTool')"
+        :title="$t('trading.derivative.tools.progress')"
         @click="toggleProgressContext"
         @contextmenu="toggleAutoRefresh"
     >
@@ -83,8 +83,12 @@ function checkAlert(newProgress, oldProgress) {
         ) {
             let text = "";
             if (newProgress.result) {
-                text = t("trading.derivative.progressSuccess", newProgress);
-            } else text = t("trading.derivative.progressFail", newProgress);
+                text = t(
+                    "trading.derivative.toasts.progressSuccess",
+                    newProgress
+                );
+            } else
+                text = t("trading.derivative.toasts.progressFail", newProgress);
             speakAlert(text);
         }
     }

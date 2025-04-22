@@ -2,7 +2,7 @@
     <div
         ref="selectPatternRef"
         class="context command"
-        :title="$t('trading.derivative.selectPatternTool')"
+        :title="$t('trading.derivative.tools.selectPattern')"
         @click="changePatternType"
     >
         <i
@@ -16,7 +16,7 @@
     <div
         ref="patternToolRef"
         class="context command"
-        :title="$t('trading.derivative.patternTool')"
+        :title="$t('trading.derivative.tools.pattern')"
         @click="patternToolClick"
         @contextmenu="patternToolContextmenu"
     >

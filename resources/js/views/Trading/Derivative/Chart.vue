@@ -842,22 +842,21 @@ function getAccountInfo() {
         let html = "";
         html += '<div style="width: 200px;">';
         html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.derivative.nav"
+            "trading.derivative.accountInfoPopup.nav"
         )}</div><div>: ${filters.currency(data.nav)}</div></div>`;
         html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.derivative.maxVol"
+            "trading.derivative.accountInfoPopup.maxVol"
         )}</div><div>: ${filters.numberVnFormat(data.maxVol)}</div></div>`;
         html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.derivative.vm"
+            "trading.derivative.accountInfoPopup.vm"
         )}</div><div>: ${filters.currency(data.vm)}</div></div>`;
         html += `<div style="display: flex;"><div style="flex: 0 0 75px;">${t(
-            "trading.derivative.fee"
+            "trading.derivative.accountInfoPopup.fee"
         )}</div><div>: ${filters.currency(data.fee)}</div></div>`;
         html += "</div>";
-        alert(html, t("trading.derivative.accountInfo"));
+        alert(html, t("trading.derivative.accountInfoPopup.title"));
     });
 }
-function getMatchedOrders() {}
 function coordinateToPrice(y) {
     return mf.fmtNum(params.series.price.coordinateToPrice(y));
 }

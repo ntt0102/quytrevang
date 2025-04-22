@@ -1,7 +1,7 @@
 <template>
     <div
         class="command"
-        :title="$t('trading.derivative.fullscreenTool')"
+        :title="$t('trading.derivative.tools.fullscreen')"
         @click="toggleFullscreen"
     >
         <i
@@ -36,9 +36,9 @@ function toggleFullscreen() {
     if (document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen();
 }
-function checkFullscreen(){
+function checkFullscreen() {
     if (props.chartContainerRef.classList.contains("fullscreen")) {
-            setFullscreen();
+        setFullscreen();
     }
 }
 function fullscreenChange() {

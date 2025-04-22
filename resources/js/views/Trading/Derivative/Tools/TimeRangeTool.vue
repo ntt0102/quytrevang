@@ -2,7 +2,7 @@
     <div
         ref="timeRangeToolRef"
         class="command"
-        :title="$t('trading.derivative.timeRangeTool')"
+        :title="$t('trading.derivative.tools.timeRange')"
         @click="timeRangeToolClick"
         @contextmenu="timeRangeToolContextmenu"
     >

@@ -4,7 +4,7 @@
             type="success"
             stylingMode="outlined"
             icon="refresh"
-            :text="$t('trading.derivative.progressContext.refreshPattern')"
+            :text="$t('buttons.refresh')"
             @click="refreshPattern"
         />
         <div class="steps" :class="{ portrait: chartHeightEnough }">

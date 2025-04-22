@@ -162,53 +162,50 @@
             "title": "Phái sinh",
             "connection": "Trạng thái kết nối VPS",
             "position": "Vị thế đang mở",
-            "accountInfo": "Thông tin tài khoản",
-            "pendingOrders": "Các lệnh đặt chờ",
-            "matchedOrders": "Các lệnh đã khớp",
-            "nav": "Tài sản",
-            "maxVol": "Sức mua",
-            "vm": "Lợi nhuận",
-            "fee": "Phí",
             "date": "Dữ liệu của ngày",
             "reload": "Tải lại dữ liệu",
-            "fullscreenTool": "Bật tắt toàn màn hình (F11)",
-            "tradingviewTool": "TradingView (F2)",
-            "progressTool": "Tiến trình mẫu hình (F3)",
-            "selectPatternTool": "Chọn mẫu hình",
-            "patternTool": "Vẽ mẫu hình",
-            "pickTimeTool": "Chọn thời gian dừng",
-            "lineTool": "Vẽ đường ngang",
-            "timeRangeTool": "Xác định thời gian",
-            "targetTool": "Xác định TP",
-            "orderTool": "Quản lý vị thế (F4)",
-            "newEntrySuccess": "Đặt lệnh Entry thành công",
-            "changeEntrySuccess": "Sửa lệnh Entry thành công",
-            "deleteEntrySuccess": "Huỷ lệnh Entry thành công",
-            "newTpSlSuccess": "Đặt lệnh TP/SL thành công",
-            "autoNewTpSlSuccess": "Tự động đặt lệnh TP/SL thành công",
-            "changeTpSuccess": "Sửa lệnh TP thành công",
-            "deleteTpSuccess": "Đã khớp lệnh TP và đóng vị thế",
-            "changeSlSuccess": "Sửa lệnh SL thành công",
-            "deleteSlSuccess": "Đã khớp lệnh SL và đóng vị thế",
-            "exitSuccess": "Đóng vị thế thành công",
-            "forceSuccess": "Huỷ tất cả lệnh trên broker thành công",
-            "atoOrderSuccess": "Đặt lệnh ATO thành công",
-            "atcOrderSuccess": "Đặt lệnh ATC thành công",
-            "autoCancelTpSlSuccess": "Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế",
-            "cancelOrder": "Huỷ lệnh?",
-            "atoOrder": "Đặt lệnh ATO?",
-            "atcOrder": "Đặt lệnh ATC?",
-            "cancelConfirm": "Xác nhận",
-            "noChangeOrderLine": "Không được thay đổi",
-            "notConnect": "Chưa kết nối tài khoản VPS",
-            "invalidVolume": "Số hợp đồng vượt quá sức mua",
-            "openedPosition": "Đã mở vị thế",
-            "unopenedPosition": "Chưa mở vị thế",
-            "failOrder": "Đặt lệnh thất bại",
-            "failSave": "Lưu lệnh thất bại",
-            "unknown": "Lỗi chưa xác định",
-            "progressFail": "Bước {step} chưa đạt.",
-            "progressSuccess": "Bước {step} thành công, hãy chuẩn bị vào lệnh!",
+            "tools": {
+                "fullscreen": "Bật tắt toàn màn hình (F11)",
+                "tradingview": "TradingView (F2)",
+                "progress": "Tiến trình mẫu hình (F3)",
+                "selectPattern": "Chọn mẫu hình",
+                "pattern": "Vẽ mẫu hình",
+                "pickTime": "Chọn thời gian dừng",
+                "line": "Vẽ đường ngang",
+                "timeRange": "Xác định thời gian",
+                "target": "Thước đo giá",
+                "order": "Quản lý vị thế (F4)"
+            },
+            "toasts": {
+                "newEntrySuccess": "Đặt lệnh Entry thành công",
+                "changeEntrySuccess": "Sửa lệnh Entry thành công",
+                "deleteEntrySuccess": "Huỷ lệnh Entry thành công",
+                "newTpSlSuccess": "Đặt lệnh TP/SL thành công",
+                "autoNewTpSlSuccess": "Tự động đặt lệnh TP/SL thành công",
+                "changeTpSuccess": "Sửa lệnh TP thành công",
+                "deleteTpSuccess": "Đã khớp lệnh TP và đóng vị thế",
+                "changeSlSuccess": "Sửa lệnh SL thành công",
+                "deleteSlSuccess": "Đã khớp lệnh SL và đóng vị thế",
+                "exitSuccess": "Đóng vị thế thành công",
+                "forceSuccess": "Huỷ tất cả lệnh trên broker thành công",
+                "atoOrderSuccess": "Đặt lệnh ATO thành công",
+                "atcOrderSuccess": "Đặt lệnh ATC thành công",
+                "autoCancelTpSlSuccess": "Đã tự động huỷ lệnh do tới phiên ATC, nhưng vẫn giữ vị thế",
+                "noChangeOrderLine": "Không được thay đổi",
+                "notConnect": "Chưa kết nối tài khoản VPS",
+                "invalidVolume": "Số hợp đồng vượt quá sức mua",
+                "openedPosition": "Đã mở vị thế",
+                "unopenedPosition": "Chưa mở vị thế",
+                "failOrder": "Đặt lệnh thất bại",
+                "failSave": "Lưu lệnh thất bại",
+                "unknown": "Lỗi chưa xác định",
+                "progressFail": "Bước {step} chưa đạt.",
+                "progressSuccess": "Bước {step} thành công, hãy chuẩn bị vào lệnh!"
+            },
+            "confirms": {
+                "atoOrder": "Đặt lệnh ATO?",
+                "atcOrder": "Đặt lệnh ATC?"
+            },
             "buttons": {
                 "report": "Báo cáo",
                 "export": "Xuất dữ liệu",
@@ -218,11 +215,19 @@
                 "cloneExport": "Tạo tệp CSV",
                 "setting": "Cài đặt"
             },
+            "accountInfoPopup": {
+                "title": "Thông tin tài khoản",
+                "nav": "Tài sản",
+                "maxVol": "Sức mua",
+                "vm": "Lợi nhuận",
+                "fee": "Phí"
+            },
             "settingPopup": {
                 "tpDefault": "TP mặc định",
                 "slDefault": "SL mặc định"
             },
             "pendingOrdersPopup": {
+                "title": "Các lệnh đang đặt",
                 "orderTime": "Thời gian",
                 "side": "Loại lệnh",
                 "volume": "KL đặt",
@@ -231,6 +236,7 @@
                 "avgPrice": "Giá khớp"
             },
             "matchedOrdersPopup": {
+                "title": "Các lệnh đã khớp",
                 "orderTime": "Thời gian",
                 "side": "Loại lệnh",
                 "volume": "KL đặt",
@@ -238,15 +244,12 @@
                 "showPrice": "Giá đặt",
                 "avgPrice": "Giá khớp"
             },
-            "progressContext": {
-                "refreshPattern": "Làm mới"
-            },
             "orderContext": {
-                "closeAllOrders": "Đóng tất cả",
                 "id": "ID",
                 "side": "Lệnh",
                 "price": "Giá đặt",
-                "closeOrder": "Đóng lệnh"
+                "closeOrder": "Đóng lệnh",
+                "closeAllOrders": "Đóng tất cả"
             }
         },
         "derstats": {
@@ -736,7 +739,8 @@
         "chooseFile": "Chọn tệp",
         "backup": "Sao lưu",
         "restore": "Khôi phục",
-        "reload": "Tải lại"
+        "reload": "Tải lại",
+        "refresh": "Làm mới"
     },
     "messages": {
         "success": {

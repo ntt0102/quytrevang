@@ -1,7 +1,7 @@
 <template>
     <div
         class="tradingview command far fa-chart-candlestick"
-        :title="$t('trading.derivative.tradingviewTool')"
+        :title="$t('trading.derivative.tools.tradingview')"
         @click="tradingviewClick"
     >
         <iframe

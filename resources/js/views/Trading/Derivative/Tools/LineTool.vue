@@ -2,7 +2,7 @@
     <div
         ref="lineToolRef"
         class="context command"
-        :title="$t('trading.derivative.lineTool')"
+        :title="$t('trading.derivative.tools.line')"
         @click="lineToolClick"
         @contextmenu="lineToolContextmenu"
     >

@@ -2,7 +2,7 @@
     <div
         ref="targetToolRef"
         class="command"
-        :title="$t('trading.derivative.targetTool')"
+        :title="$t('trading.derivative.tools.target')"
         @click="targetToolClick"
         @contextmenu="targetToolContextmenu"
     >

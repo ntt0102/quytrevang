@@ -3,7 +3,7 @@
         ref="orderToolRef"
         class="cancel-order context command"
         :class="{ red: hasOrder }"
-        :title="$t('trading.derivative.orderTool')"
+        :title="$t('trading.derivative.tools.order')"
         @click="toggleOrderContext"
         @contextmenu="closeAllOrders"
     >
@@ -114,7 +114,7 @@ function entry() {
         const currentSeconds = getUnixTime(addHours(new Date(), 7));
         if (currentSeconds < props.TIME.ATO) {
             let result = confirm(
-                t("trading.derivative.atoOrder"),
+                t("trading.derivative.confirms.atoOrder"),
                 t("titles.confirm")
             );
             result.then((dialogResult) => {
@@ -127,7 +127,9 @@ function entry() {
                         .then((resp) => {
                             if (resp.isOk)
                                 toast.success(
-                                    t("trading.derivative.atoOrderSuccess")
+                                    t(
+                                        "trading.derivative.toasts.atoOrderSuccess"
+                                    )
                                 );
                             else toastOrderError(resp.message);
                         });
@@ -135,7 +137,7 @@ function entry() {
             });
         } else if (currentSeconds > props.TIME.ATC) {
             let result = confirm(
-                t("trading.derivative.atcOrder"),
+                t("trading.derivative.confirms.atcOrder"),
                 t("titles.confirm")
             );
             result.then((dialogResult) => {
@@ -148,7 +150,9 @@ function entry() {
                         .then((resp) => {
                             if (resp.isOk)
                                 toast.success(
-                                    t("trading.derivative.atcOrderSuccess")
+                                    t(
+                                        "trading.derivative.toasts.atcOrderSuccess"
+                                    )
                                 );
                             else toastOrderError(resp.message);
                         });
@@ -169,7 +173,9 @@ function entry() {
                         orders.value[resp.order.id] = resp.order;
                         lines[resp.order.id] = {};
                         drawOrderTool(["entry"], resp.order);
-                        toast.success(t("trading.derivative.newEntrySuccess"));
+                        toast.success(
+                            t("trading.derivative.toasts.newEntrySuccess")
+                        );
                     } else toastOrderError(resp.message);
                 });
         }
@@ -189,7 +195,7 @@ function tpsl() {
                 orders.value[order.id] = resp.order;
                 lines[order.id].entry.applyOptions({ draggable: false });
                 drawOrderTool(["tp", "sl"], resp.order);
-                toast.success(t("trading.derivative.newTpSlSuccess"));
+                toast.success(t("trading.derivative.toasts.newTpSlSuccess"));
             } else toastOrderError(resp.message);
         });
 }
@@ -205,7 +211,7 @@ function closeAllOrders() {
             })
             .then((resp) => {
                 if (resp.isOk)
-                    toast.success(t("trading.derivative.forceSuccess"));
+                    toast.success(t("trading.derivative.toasts.forceSuccess"));
                 else toastOrderError(resp.message);
             });
     }
@@ -226,7 +232,7 @@ function closeOrder(order) {
                         removeOrderTool(["entry"], order.id);
                         delete orders.value[order.id];
                         toast.success(
-                            t("trading.derivative.deleteEntrySuccess")
+                            t("trading.derivative.toasts.deleteEntrySuccess")
                         );
                     } else {
                         toastOrderError(resp.message);
@@ -244,7 +250,9 @@ function closeOrder(order) {
                     if (resp.isOk) {
                         removeOrderTool(["entry", "tp", "sl"], order.id);
                         delete orders.value[order.id];
-                        toast.success(t("trading.derivative.exitSuccess"));
+                        toast.success(
+                            t("trading.derivative.toasts.exitSuccess")
+                        );
                     } else {
                         toastOrderError(resp.message);
                     }
@@ -275,7 +283,7 @@ function cancelWithoutClose() {
                                     delete orders.value[order.id];
                                     toast.success(
                                         t(
-                                            "trading.derivative.autoCancelTpSlSuccess"
+                                            "trading.derivative.toasts.autoCancelTpSlSuccess"
                                         )
                                     );
                                 } else toastOrderError(resp.message);
@@ -325,7 +333,7 @@ function scan(lastPrice) {
 
                                         toast.success(
                                             t(
-                                                "trading.derivative.autoNewTpSlSuccess"
+                                                "trading.derivative.toasts.autoNewTpSlSuccess"
                                             )
                                         );
                                     } else toastOrderError(resp.message);
@@ -360,7 +368,7 @@ function scan(lastPrice) {
                                     delete orders.value[order.id];
                                     toast.success(
                                         t(
-                                            `trading.derivative.delete${mf.capitalize(
+                                            `trading.derivative.toasts.delete${mf.capitalize(
                                                 kind
                                             )}Success`
                                         )
@@ -462,7 +470,9 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
                     if (resp.isOk) {
                         orders.value[order.id] = resp.order;
                         drawOrderTool([kind], resp.order);
-                        toast.success(t(`trading.derivative.${toastKey}`));
+                        toast.success(
+                            t(`trading.derivative.toasts.${toastKey}`)
+                        );
                     } else {
                         line.applyOptions({ price: oldPrice });
                         toastOrderError(resp.message);
@@ -470,7 +480,7 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
                 });
         } else {
             line.applyOptions({ price: oldPrice });
-            toast.show(t("trading.derivative.noChangeOrderLine"));
+            toast.show(t("trading.derivative.toasts.noChangeOrderLine"));
         }
     }
 }
@@ -488,7 +498,7 @@ function getOrderByStatus(status, isHas = false) {
 }
 function toastOrderError(error) {
     if (!error) error = "unknown";
-    toast.error(t(`trading.derivative.${error}`));
+    toast.error(t(`trading.derivative.toasts.${error}`));
 }
 function toggleOrderContext() {
     const oldValue = showOrderContext.value;
