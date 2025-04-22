@@ -263,8 +263,8 @@ class DerivativeService extends CoreService
                         $data = [
                             'status' => 0,
                             'entry_price' => $payload->data->price,
-                            'side' => $payload->data->side
                         ];
+                        if ($isNew) $data['side'] = $payload->data->side;
                         $order = DerivativeOrder::updateOrCreate($key, $data);
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
