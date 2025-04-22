@@ -250,21 +250,21 @@ class DerivativeService extends CoreService
                 //
                 switch ($payload->action) {
                     case 'entry':
-                        $isNew = $payload->entryData->cmd === "new";
-                        $isNotDelete = $payload->entryData->cmd !== "delete";
+                        $isNew = $payload->data->cmd === "new";
+                        $isNotDelete = $payload->data->cmd !== "delete";
                         if ($isNew && $vos->position !== 0) {
                             return ['isOk' => false, 'message' => 'openedPosition'];
                         }
-                        $entryNo = $vos->conditionOrder($payload->entryData, true);
-                        // $entryNo = $isNew ? 'entry' . rand(1, 100) : $payload->entryData->orderNo;
+                        $entryNo = $vos->conditionOrder($payload->data, true);
+                        // $entryNo = $isNew ? 'entry' . rand(1, 100) : $payload->data->orderNo;
                         if (!$entryNo) {
                             return ['isOk' => false, 'message' => 'failOrder'];
                         }
                         $key = ['entry_no' => $entryNo];
                         $data = [];
                         $data['status'] = $isNotDelete ? 0 : 2;
-                        if ($isNew) $data['side'] = $payload->entryData->side;
-                        if ($isNotDelete) $data['entry_price'] = $payload->entryData->price;
+                        if ($isNew) $data['side'] = $payload->data->side;
+                        if ($isNotDelete) $data['entry_price'] = $payload->data->price;
                         $order = DerivativeOrder::updateOrCreate($key, $data);
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
@@ -276,24 +276,28 @@ class DerivativeService extends CoreService
                         if ($vos->position === 0) {
                             return ['isOk' => false, 'message' => 'unopenedPosition'];
                         }
-                        $tpNo = $vos->order($payload->tpData);
-                        // $tpNo = 'tp' . rand(1, 100);
-                        if (!$tpNo) {
-                            return ['isOk' => false, 'message' => 'failOrder'];
-                        }
-                        $slNo = $vos->conditionOrder($payload->slData);
-                        // $slNo = 'sl' . rand(1, 100);
-                        if (!$slNo) {
-                            return ['isOk' => false, 'message' => 'failOrder'];
-                        }
+                        $tpDefault = floatval(get_global_value('tpDefault'));
+                        $slDefault = floatval(get_global_value('slDefault'));
                         $order = DerivativeOrder::find($payload->orderId);
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
                         }
+                        $tpPrice = $order->entry_price + $order->side * $tpDefault;
+                        $slPrice = $order->entry_price - $order->side * $slDefault;
+                        $tpNo = $vos->order(['cmd' => 'new', 'price' => $tpPrice]);
+                        // $tpNo = 'tp' . rand(1, 100);
+                        if (!$tpNo) {
+                            return ['isOk' => false, 'message' => 'failOrder'];
+                        }
+                        $slNo = $vos->conditionOrder(['cmd' => 'new', 'price' => $slPrice]);
+                        // $slNo = 'sl' . rand(1, 100);
+                        if (!$slNo) {
+                            return ['isOk' => false, 'message' => 'failOrder'];
+                        }
                         $data = [
                             'status'    => 1,
-                            'tp_price'  => $payload->tpData->price,
-                            'sl_price'  => $payload->slData->price,
+                            'tp_price'  => $tpPrice,
+                            'sl_price'  => $slPrice,
                             'tp_no'     => $tpNo,
                             'sl_no'     => $slNo,
                         ];
@@ -307,8 +311,8 @@ class DerivativeService extends CoreService
                         return ['isOk' => true, 'order' => $order];
                         break;
                     case 'tp':
-                        $tpNo = $vos->order($payload->tpData);
-                        // $tpNo = $payload->tpData->orderNo;
+                        $tpNo = $vos->order($payload->data);
+                        // $tpNo = $payload->data->orderNo;
                         if (!$tpNo) {
                             return ['isOk' => false, 'message' => 'failOrder'];
                         }
@@ -316,7 +320,7 @@ class DerivativeService extends CoreService
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
                         }
-                        $data = ['tp_price' => $payload->tpData->price];
+                        $data = ['tp_price' => $payload->data->price];
                         $order->fill($data);
                         if (!$order->save()) {
                             return ['isOk' => false, 'message' => 'failSave'];
@@ -324,8 +328,8 @@ class DerivativeService extends CoreService
                         return ['isOk' => true, 'order' => $order];
                         break;
                     case 'sl':
-                        $slNo = $vos->conditionOrder($payload->slData);
-                        // $slNo = $payload->slData->orderNo;
+                        $slNo = $vos->conditionOrder($payload->data);
+                        // $slNo = $payload->data->orderNo;
                         if (!$slNo) {
                             return ['isOk' => false, 'message' => 'failOrder'];
                         }
@@ -333,7 +337,7 @@ class DerivativeService extends CoreService
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
                         }
-                        $data = ['sl_price' => $payload->slData->price];
+                        $data = ['sl_price' => $payload->data->price];
                         $order->fill($data);
                         if (!$order->save()) {
                             return ['isOk' => false, 'message' => 'failSave'];
@@ -341,9 +345,9 @@ class DerivativeService extends CoreService
                         return ['isOk' => true, 'order' => $order];
                         break;
                     case 'cancel':
-                        if (isset($payload->exitData)) {
+                        if (isset($payload->exit)) {
                             if ($vos->position !== 0) {
-                                $exitNo = $vos->order($payload->exitData);
+                                $exitNo = $vos->order(['cmd' => 'new', 'price' => $payload->exit]);
                                 if (!$exitNo) {
                                     return ['isOk' => false, 'message' => 'failOrder'];
                                 }

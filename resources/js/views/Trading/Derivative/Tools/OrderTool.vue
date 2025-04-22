@@ -43,12 +43,6 @@ const isOrderWarning = ref(false);
 const showOrderContext = ref(false);
 const orders = ref({});
 const orderStore = computed(() => store.state.tradingDerivative.config.orders);
-const tpDefault = computed(
-    () => store.state.tradingDerivative.config.tpDefault
-);
-const slDefault = computed(
-    () => store.state.tradingDerivative.config.slDefault
-);
 const hasOrder = computed(
     () =>
         store.state.tradingDerivative.status.position ||
@@ -127,11 +121,8 @@ function entry() {
                 if (dialogResult) {
                     store
                         .dispatch("tradingDerivative/executeOrder", {
-                            action: "exit",
-                            exitData: {
-                                cmd: "new",
-                                price: "ATO",
-                            },
+                            action: "cancel",
+                            exit: "ATO",
                         })
                         .then((resp) => {
                             if (resp.isOk)
@@ -151,11 +142,8 @@ function entry() {
                 if (dialogResult) {
                     store
                         .dispatch("tradingDerivative/executeOrder", {
-                            action: "exit",
-                            exitData: {
-                                cmd: "new",
-                                price: "ATC",
-                            },
+                            action: "cancel",
+                            exit: "ATC",
                         })
                         .then((resp) => {
                             if (resp.isOk)
@@ -170,7 +158,7 @@ function entry() {
             store
                 .dispatch("tradingDerivative/executeOrder", {
                     action: "entry",
-                    entryData: {
+                    data: {
                         cmd: "new",
                         side: putOrder.side,
                         price: putOrder.price,
@@ -191,20 +179,10 @@ function tpsl() {
     const entryOrders = getOrderByStatus(0);
     if (entryOrders.length !== 1) return false;
     const order = entryOrders[0];
-    const tpPrice = order.entry_price + order.side * tpDefault.value;
-    const slPrice = order.entry_price - order.side * slDefault.value;
     store
         .dispatch("tradingDerivative/executeOrder", {
             action: "tpsl",
             orderId: order.id,
-            tpData: {
-                cmd: "new",
-                price: tpPrice,
-            },
-            slData: {
-                cmd: "new",
-                price: slPrice,
-            },
         })
         .then((resp) => {
             if (resp.isOk) {
@@ -223,7 +201,7 @@ function closeAllOrders() {
         store
             .dispatch("tradingDerivative/executeOrder", {
                 action: "cancel",
-                exitData: { cmd: "new", price: "MTL" },
+                exit: "MTL",
             })
             .then((resp) => {
                 if (resp.isOk)
@@ -238,7 +216,7 @@ function closeOrder(order) {
             store
                 .dispatch("tradingDerivative/executeOrder", {
                     action: "entry",
-                    entryData: {
+                    data: {
                         cmd: "delete",
                         orderNo: order.entry_no,
                     },
@@ -260,7 +238,7 @@ function closeOrder(order) {
                 .dispatch("tradingDerivative/executeOrder", {
                     action: "cancel",
                     orderId: order.id,
-                    exitData: { cmd: "new", price: "MTL" },
+                    exit: "MTL",
                 })
                 .then((resp) => {
                     if (resp.isOk) {
@@ -317,24 +295,10 @@ function scan(lastPrice) {
                     if (!isAutoOrdering) {
                         isAutoOrdering = true;
                         setTimeout(() => {
-                            const tpPrice =
-                                order.entry_price +
-                                order.side * tpDefault.value;
-                            const slPrice =
-                                order.entry_price -
-                                order.side * slDefault.value;
                             store
                                 .dispatch("tradingDerivative/executeOrder", {
                                     action: "tpsl",
                                     orderId: order.id,
-                                    tpData: {
-                                        cmd: "new",
-                                        price: tpPrice,
-                                    },
-                                    slData: {
-                                        cmd: "new",
-                                        price: slPrice,
-                                    },
                                 })
                                 .then((resp) => {
                                     if (resp.isOk) {
@@ -480,7 +444,6 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
         const changeValid = kind !== "entry" || !props.position;
         //
         if (changeValid) {
-            const dataKey = `${kind}Data`;
             const toastKey = `change${mf.capitalize(kind)}Success`;
             const order = getOrderByKind(kind, oldPrice);
 
@@ -489,7 +452,7 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
                 .dispatch("tradingDerivative/executeOrder", {
                     action: kind,
                     orderId: order.id,
-                    [dataKey]: {
+                    data: {
                         cmd: "change",
                         orderNo: String(order[`${kind}_no`]),
                         price: newPrice,
