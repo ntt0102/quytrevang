@@ -46,9 +46,9 @@ const orders = ref([]);
 const columns = [
     { field: "time", minWidth: 100 },
     { field: "type", minWidth: 70 },
-    { field: "side", minWidth: 70 },
+    { field: "side", minWidth: 90 },
     { field: "volume", minWidth: 70 },
-    { field: "price", minWidth: 150 },
+    { field: "price", minWidth: 130 },
 ];
 
 function show() {
