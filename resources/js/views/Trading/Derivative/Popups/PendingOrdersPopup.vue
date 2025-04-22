@@ -45,10 +45,10 @@ const popupRef = ref(null);
 const orders = ref([]);
 const columns = [
     { field: "time", minWidth: 100 },
-    { field: "type", minWidth: 100 },
-    { field: "side", minWidth: 100 },
-    { field: "volume", minWidth: 100 },
-    { field: "price", minWidth: 100 },
+    { field: "type", minWidth: 70 },
+    { field: "side", minWidth: 70 },
+    { field: "volume", minWidth: 70 },
+    { field: "price", minWidth: 150 },
 ];
 
 function show() {
