@@ -47,7 +47,7 @@ const emit = defineEmits(["closeOrder", "closeAllOrders"]);
 const dataSource = computed(() =>
     Object.values(props.orders).map((order) => ({
         id: order.id,
-        side: order.side > 0 ? "LONG" : "SHORT",
+        side: order.side > 0 ? "L" : "S",
         price: order.entry_price,
     }))
 );
