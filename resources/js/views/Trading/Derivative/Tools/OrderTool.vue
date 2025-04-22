@@ -324,7 +324,7 @@ function scan(lastPrice) {
                 if (mf.cmp(lastPrice, !sideBool, order.sl_price, true)) {
                     kind = "sl";
                 }
-                if (cmd) {
+                if (kind) {
                     if (!isAutoOrdering) {
                         isAutoOrdering = true;
                         store
