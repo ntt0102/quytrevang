@@ -18,7 +18,7 @@
         @hidden="onHidden"
     >
         <DxDataGrid
-            :data-source="orders"
+            :data-source="pendingOrders"
             key-expr="orderNo"
             :show-borders="true"
         >
@@ -36,13 +36,15 @@
 <script setup>
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import CorePopup from "../../../../components/Popups/CorePopup.vue";
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
 const emit = defineEmits(["closeAllOrders"]);
+const pendingOrders = computed(
+    () => store.state.tradingDerivative.status.pendingOrders
+);
 const popupRef = ref(null);
-const orders = ref([]);
 const columns = [
     { field: "time", minWidth: 100 },
     { field: "type", minWidth: 70 },
@@ -55,9 +57,7 @@ function show() {
     popupRef.value.show();
 }
 
-function onShown() {
-    orders.value = store.state.tradingDerivative.status.pendingOrders;
-}
+function onShown() {}
 function onHidden() {}
 
 function closeAllOrders() {
