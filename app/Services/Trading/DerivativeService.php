@@ -284,7 +284,7 @@ class DerivativeService extends CoreService
                         }
                         $tpPrice = $order->entry_price + $order->side * $tpDefault;
                         $slPrice = $order->entry_price - $order->side * $slDefault;
-                        $tpNo = $vos->order(['cmd' => 'new', 'price' => $tpPrice]);
+                        $tpNo = $vos->order((object)['cmd' => 'new', 'price' => $tpPrice]);
                         // $tpNo = 'tp' . rand(1, 100);
                         if (!$tpNo) {
                             return ['isOk' => false, 'message' => 'failOrder'];
@@ -347,7 +347,7 @@ class DerivativeService extends CoreService
                     case 'cancel':
                         if (isset($payload->exit) && $payload->exit !== '') {
                             if ($vos->position !== 0) {
-                                $exitNo = $vos->order(['cmd' => 'new', 'price' => $payload->exit]);
+                                $exitNo = $vos->order((object)['cmd' => 'new', 'price' => $payload->exit]);
                                 if (!$exitNo) {
                                     return ['isOk' => false, 'message' => 'failOrder'];
                                 }
@@ -355,12 +355,12 @@ class DerivativeService extends CoreService
                         }
                         if (isset($payload->orderId)) {
                             $order = DerivativeOrder::find($payload->orderId);
-                            $vos->conditionOrder(['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
+                            $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
                             if ($order->tp_no) {
-                                $vos->order(['cmd' => 'cancel', 'orderNo' => $order->tp_no]);
+                                $vos->order((object)['cmd' => 'cancel', 'orderNo' => $order->tp_no]);
                             }
                             if ($order->sl_no) {
-                                $vos->conditionOrder(['cmd' => 'delete', 'orderNo' => $order->sl_no]);
+                                $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->sl_no]);
                             }
                             $order->fill(['status' => 2]);
                             if (!$order->save()) {
