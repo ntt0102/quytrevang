@@ -12,18 +12,10 @@
                 cell-template="commandCellTemplate"
             />
             <DxColumn
-                data-field="id"
-                :caption="$t('trading.derivative.orderContext.id')"
-            />
-            <DxColumn
-                :width="90"
-                data-field="side"
-                :caption="$t('trading.derivative.orderContext.side')"
-            />
-            <DxColumn
-                :width="90"
-                data-field="price"
-                :caption="$t('trading.derivative.orderContext.price')"
+                v-for="column in columns"
+                :data-field="column.field"
+                :minWidth="column.minWidth"
+                :caption="$t(`trading.derivative.orderContext.${column.field}`)"
             />
             <template #commandCellTemplate="{ data }">
                 <DxButton
@@ -59,6 +51,11 @@ const dataSource = computed(() =>
         price: order.entry_price,
     }))
 );
+const columns = [
+    { field: "id", minWidth: 50 },
+    { field: "side", minWidth: 90 },
+    { field: "price", minWidth: 100 },
+];
 
 function closeAllOrders() {
     emit("closeAllOrders");

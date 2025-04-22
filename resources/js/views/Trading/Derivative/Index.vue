@@ -2,15 +2,15 @@
     <div class="derivative-page content-block dx-card responsive-paddings">
         <DxToolbar
             :items="[
-                {
-                    location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-gear small',
-                        hint: $t('trading.derivative.buttons.setting'),
-                        onClick: showSetting,
-                    },
-                },
+                // {
+                //     location: 'before',
+                //     widget: 'dxButton',
+                //     options: {
+                //         icon: 'far fa-gear small',
+                //         hint: $t('trading.derivative.buttons.setting'),
+                //         onClick: showSetting,
+                //     },
+                // },
                 {
                     location: 'before',
                     widget: 'dxButton',

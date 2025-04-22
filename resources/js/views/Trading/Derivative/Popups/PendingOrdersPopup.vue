@@ -13,8 +13,11 @@
         >
             <DxColumn
                 v-for="column in columns"
-                :data-field="column"
-                :caption="$t(`trading.derivative.pendingOrdersPopup.${column}`)"
+                :data-field="column.field"
+                :minWidth="column.minWidth"
+                :caption="
+                    $t(`trading.derivative.matchedOrdersPopup.${column.field}`)
+                "
             />
         </DxDataGrid>
     </CorePopup>
@@ -29,12 +32,12 @@ const store = useStore();
 const popupRef = ref(null);
 const orders = ref([]);
 const columns = [
-    "orderTime",
-    "side",
-    "volume",
-    "matchVolume",
-    "showPrice",
-    "avgPrice",
+    { field: "orderTime", minWidth: 100 },
+    { field: "side", minWidth: 100 },
+    { field: "volume", minWidth: 100 },
+    { field: "matchVolume", minWidth: 100 },
+    { field: "showPrice", minWidth: 100 },
+    { field: "avgPrice", minWidth: 100 },
 ];
 
 function show() {

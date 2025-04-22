@@ -72,7 +72,7 @@
                 :title="$t('trading.derivative.buttons.setting')"
                 @click="showSetting"
             >
-                <i class="far fa-square-sliders-vertical"></i>
+                <i class="far fa-gear"></i>
             </div>
         </div>
         <div
