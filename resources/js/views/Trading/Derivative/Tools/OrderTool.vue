@@ -99,13 +99,12 @@ function show({ price }) {
                 if (_price) {
                     emit("showEntry", { side: -props.position, price: _price });
                 }
-            } else {
-                if (
-                    currentSeconds > props.TIME.ATO &&
-                    currentSeconds < props.TIME.ATC
-                ) {
-                    emit("showTpSl", { side: props.position });
-                }
+            }
+            if (
+                currentSeconds > props.TIME.ATO &&
+                currentSeconds < props.TIME.ATC
+            ) {
+                emit("showTpSl", { side: props.position });
             }
         }
     }
