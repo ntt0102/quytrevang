@@ -385,6 +385,7 @@ function calcContinuePattern() {
     for (let i = 0; i < progress.steps.length; i++) {
         progress.step = i + 1;
         progress.result = progress.steps[i].every(Boolean);
+        if ([2, 4].includes(i) && progress.result) break;
         if (!progress.result) break;
     }
     //
@@ -409,12 +410,15 @@ function calcContinuePattern() {
     const t = (F.price + G.price) / 2;
     const T = mf.fmtNum(t - entry, 1, true);
     //
-    const order = {
-        side: x > entry ? 1 : -1,
-        price: entry,
-        tpPrice: x,
-        slPrice: E.price,
-    };
+    let order = {};
+    if (progress.result) {
+        order = {
+            side: x > entry ? 1 : -1,
+            price: entry,
+            tpPrice: x,
+            slPrice: E.price,
+        };
+    }
 
     return {
         timeMark,
@@ -562,6 +566,7 @@ function calcReversalPattern() {
     for (let i = 0; i < progress.steps.length; i++) {
         progress.step = i + 1;
         progress.result = progress.steps[i].every(Boolean);
+        if ([1, 3].includes(i) && progress.result) break;
         if (!progress.result) break;
     }
     //
@@ -585,12 +590,15 @@ function calcReversalPattern() {
     const t = (E.price + F.price) / 2;
     const T = mf.fmtNum(t - entry, 1, true);
     //
-    const order = {
-        side: x > entry ? 1 : -1,
-        price: entry,
-        tpPrice: x,
-        slPrice: D.price,
-    };
+    let order = {};
+    if (progress.result) {
+        order = {
+            side: x > entry ? 1 : -1,
+            price: entry,
+            tpPrice: x,
+            slPrice: D.price,
+        };
+    }
 
     return {
         timeMark,
