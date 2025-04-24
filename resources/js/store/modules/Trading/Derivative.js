@@ -6,6 +6,7 @@ function initialState() {
         chartData: [],
         chartDate: null,
         isLoading: false,
+        pattern: {},
     };
 }
 

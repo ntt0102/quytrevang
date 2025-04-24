@@ -750,7 +750,7 @@ function setOrderInfo(value) {
 }
 function toggleOrderButton(show) {
     if (show) {
-        orderToolRef.value.show(params.crosshair);
+        orderToolRef.value.show();
     } else {
         entryOrderRef.value.style.display = "none";
         tpslOrderRef.value.style.display = "none";

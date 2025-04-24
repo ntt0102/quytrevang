@@ -50,13 +50,13 @@
                 </div>
             </div>
         </div>
-        <DxButton
+        <!-- <DxButton
             type="danger"
             stylingMode="outlined"
             icon="far fa-gavel"
             :text="$t('trading.derivative.buttons.ordering')"
             @click="entryOrder"
-        />
+        /> -->
     </CoreContext>
 </template>
 

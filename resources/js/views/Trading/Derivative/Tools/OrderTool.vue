@@ -80,8 +80,8 @@ function setPatternOrder(value) {
 function hide(status = false) {
     showOrderContext.value = status;
 }
-function show({ price }) {
-    if (price && props.inSession()) {
+function show() {
+    if (props.inSession()) {
         const currentSeconds = getUnixTime(addHours(new Date(), 7));
         if (!props.position) {
             if (
