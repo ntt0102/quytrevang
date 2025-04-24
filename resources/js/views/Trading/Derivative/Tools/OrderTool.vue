@@ -88,7 +88,7 @@ function show({ price }) {
                 currentSeconds > props.TIME.ATO &&
                 currentSeconds < props.TIME.ATC
             ) {
-                emit("showEntry", patternOrder);
+                if (mf.isSet(patternOrder)) emit("showEntry", patternOrder);
             }
         } else {
             if (!orders.value.length) {
