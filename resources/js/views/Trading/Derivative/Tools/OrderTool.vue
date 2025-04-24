@@ -354,7 +354,7 @@ function load(data) {
     orders.value = mf.cloneDeep(data);
     Object.values(orders.value).forEach((order) => {
         let kinds = ["entry"];
-        if (order.tp_price) {
+        if (order.status === 1) {
             kinds.push("tp", "sl");
         }
         removeOrderTool(["entry", "tp", "sl"], order.id);
@@ -398,7 +398,8 @@ function drawOrderTool(kinds, order) {
                 lineWidth: 1,
                 lineStyle: 0,
                 title: title,
-                draggable: kind === "entry" && order.tp_price ? false : true,
+                draggable:
+                    kind === "entry" && order.status === 1 ? false : true,
             };
             lines[order.id][kind] = props.drawPriceLine(options);
         }
