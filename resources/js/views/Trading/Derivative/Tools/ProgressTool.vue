@@ -24,6 +24,7 @@
             :progress="progress"
             :chartHeightEnough="chartHeightEnough"
             @refreshPattern="refreshPattern"
+            @entryOrder="entryOrder"
         >
         </ProgressContext>
     </div>
@@ -38,7 +39,7 @@ const store = useStore();
 const { t } = useI18n();
 const mf = inject("mf");
 const props = defineProps(["chartHeightEnough"]);
-const emit = defineEmits(["refreshPattern", "hideContext"]);
+const emit = defineEmits(["refreshPattern", "entryOrder", "hideContext"]);
 const progress = ref({});
 const showProgressContext = ref(false);
 const autoRefresh = computed(
@@ -70,6 +71,9 @@ function set(value) {
 }
 function refreshPattern() {
     emit("refreshPattern");
+}
+function entryOrder() {
+    emit("entryOrder");
 }
 function toggleAutoRefresh() {
     store.dispatch("tradingDerivative/setAutoRefresh", !autoRefresh.value);

@@ -50,6 +50,13 @@
                 </div>
             </div>
         </div>
+        <DxButton
+            type="danger"
+            stylingMode="outlined"
+            icon="far fa-gavel"
+            :text="$t('trading.derivative.buttons.ordering')"
+            @click="entryOrder"
+        />
     </CoreContext>
 </template>
 
@@ -60,7 +67,7 @@ import { useStore } from "vuex";
 
 const store = useStore();
 const props = defineProps(["progress", "chartHeightEnough"]);
-const emit = defineEmits(["refreshPattern"]);
+const emit = defineEmits(["refreshPattern", "entryOrder"]);
 const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
@@ -78,6 +85,9 @@ function loadProgress() {
 
 function refreshPattern() {
     emit("refreshPattern");
+}
+function entryOrder() {
+    emit("entryOrder");
 }
 </script>
 

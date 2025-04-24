@@ -35,7 +35,7 @@ const props = defineProps([
     "timeToIndex",
     "indexToTime",
 ]);
-const emit = defineEmits(["setProgress", "hideContext"]);
+const emit = defineEmits(["setProgress", "setOrderInfo", "hideContext"]);
 const patternToolRef = ref(null);
 const patternStore = computed(
     () => store.state.tradingDerivative.tools.pattern
@@ -48,14 +48,12 @@ const patternTypeCount = 2;
 const scanThreshold = 1;
 const phaseThreshold = 0.9;
 let scanPoints = {};
-let orderInfo = {};
 let lines = {};
 let series = {};
 
 defineExpose({
     isSelected,
     createSeries,
-    getOrderInfo,
     draw,
     load,
     refresh,
@@ -81,9 +79,6 @@ function createSeries(chart) {
         lastValueVisible: false,
         priceLineVisible: false,
     });
-}
-function getOrderInfo() {
-    return orderInfo;
 }
 function patternToolClick(e) {
     emit("hideContext");
@@ -232,9 +227,9 @@ function calculatePattern() {
             break;
     }
     emit("setProgress", result.progress);
+    emit("setOrderInfo", result.order);
     setTimeMark(result.timeMark);
     series.pattern.setData(result.points);
-    orderInfo = result.order;
     return result;
 }
 function calcContinuePattern() {
@@ -776,8 +771,8 @@ function remove() {
     removePatternTool();
     setTimeMark([]);
     emit("setProgress", {});
+    emit("setOrderInfo", {});
     series.pattern.setData([]);
-    orderInfo = {};
 }
 function removePatternTool() {
     if (mf.isSet(lines.X)) {

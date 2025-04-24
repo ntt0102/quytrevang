@@ -35,7 +35,6 @@ const props = defineProps([
     "prices",
     "drawPriceLine",
     "inSession",
-    "getPatternOrder",
     "TIME",
 ]);
 const emit = defineEmits(["getTools", "showEntry", "showTpSl", "hideContext"]);
@@ -50,7 +49,7 @@ const hasOrder = computed(
         store.state.tradingDerivative.status.pendingOrders.length > 0 ||
         Object.keys(orders.value).length > 0
 );
-let putOrder = {};
+let patternOrder = {};
 let lines = {};
 let isAutoOrdering = false;
 
@@ -63,6 +62,7 @@ defineExpose({
     scan,
     drag,
     closeAllOrders,
+    setPatternOrder,
 });
 onMounted(() => {
     window.addEventListener("keydown", shortcutHandle);
@@ -74,6 +74,9 @@ onUnmounted(() => {
 watch(orderStore, (data) => {
     if (mf.isSet(data)) load(data);
 });
+function setPatternOrder(value) {
+    patternOrder = value;
+}
 function hide(status = false) {
     showOrderContext.value = status;
 }
@@ -85,12 +88,7 @@ function show({ price }) {
                 currentSeconds > props.TIME.ATO &&
                 currentSeconds < props.TIME.ATC
             ) {
-                putOrder.side = price >= props.prices.at(-1).value ? 1 : -1;
-                putOrder.price = price;
-                emit("showEntry", {
-                    side: putOrder.side,
-                    price: putOrder.price,
-                });
+                emit("showEntry", patternOrder);
             }
         } else {
             if (!orders.value.length) {
@@ -160,7 +158,6 @@ function entry() {
                 }
             });
         } else {
-            const patternOrder = props.getPatternOrder();
             if (!mf.isSet(patternOrder)) return false;
             store
                 .dispatch("tradingDerivative/executeOrder", {

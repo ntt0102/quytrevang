@@ -96,6 +96,7 @@
                 ref="progressToolRef"
                 :chartHeightEnough="state.chartHeightEnough"
                 @refreshPattern="() => refreshPattern(true)"
+                @entryOrder="entryOrder"
                 @hideContext="hideContext"
             />
             <PatternTool
@@ -105,6 +106,7 @@
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
                 @setProgress="setProgress"
+                @setOrderInfo="setOrderInfo"
                 @hideContext="hideContext"
             />
             <PickTimeTool
@@ -141,7 +143,6 @@
                 :prices="state.prices"
                 :drawPriceLine="drawPriceLine"
                 :inSession="inSession"
-                :getPatternOrder="getOrderInfo"
                 :TIME="state.TIME"
                 @getTools="getTools"
                 @showEntry="showEntryButton"
@@ -153,7 +154,7 @@
             <div
                 ref="entryOrderRef"
                 class="order-button entry"
-                @click="entryOrderClick"
+                @click="entryOrder"
             >
                 Entry
             </div>
@@ -744,6 +745,9 @@ function setProgress(value) {
     progressToolRef.value.set(value);
     params.hasProgress = !!value.step;
 }
+function setOrderInfo(value) {
+    orderToolRef.value.setPatternOrder(value);
+}
 function toggleOrderButton(show) {
     if (show) {
         orderToolRef.value.show(params.crosshair);
@@ -781,7 +785,7 @@ function showTpSlButton({ side }) {
     tpslOrderRef.value.style.background = side > 0 ? "green" : "red";
     tpslOrderRef.value.style.display = "block";
 }
-function entryOrderClick() {
+function entryOrder() {
     orderToolRef.value.entry();
 }
 function tpslOrderClick() {
@@ -858,9 +862,6 @@ function getAccountInfo() {
         html += "</div>";
         alert(html, t("trading.derivative.accountInfoPopup.title"));
     });
-}
-function getOrderInfo() {
-    return patternToolRef.value.getOrderInfo();
 }
 function closeAllOrders() {
     orderToolRef.value.closeAllOrders();
