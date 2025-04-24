@@ -141,6 +141,7 @@
                 :prices="state.prices"
                 :drawPriceLine="drawPriceLine"
                 :inSession="inSession"
+                :getPatternOrder="getOrderInfo"
                 :TIME="state.TIME"
                 @getTools="getTools"
                 @showEntry="showEntryButton"
@@ -857,6 +858,9 @@ function getAccountInfo() {
         html += "</div>";
         alert(html, t("trading.derivative.accountInfoPopup.title"));
     });
+}
+function getOrderInfo() {
+    return patternToolRef.value.getOrderInfo();
 }
 function closeAllOrders() {
     orderToolRef.value.closeAllOrders();

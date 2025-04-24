@@ -35,15 +35,23 @@ class OrderDerivativeJob implements ShouldQueue
         if (count($activeOrders) === 0) return false;
         $lastPrice = $this->getLastPrice();
         if (!$lastPrice) return false;
-        $activeOrders->each(function ($order) use ($lastPrice, $tpDefault, $slDefault) {
+        $vos = new VpsOrderService();
+        $activeOrders->each(function ($order) use ($vos, $lastPrice, $tpDefault, $slDefault) {
             $sideBool = $order->side > 0;
-            $vos = new VpsOrderService();
             if (!$vos->connection) return;
             if ($vos->position !== 0) {
                 if ($order->status === 0) {
                     if (cmp($lastPrice, $sideBool, $order->entry_price, true)) {
-                        $tpPrice = $order->entry_price + $order->side * $tpDefault;
-                        $slPrice = $order->entry_price - $order->side * $slDefault;
+                        if ($order->tp_price) {
+                            $tpPrice = $order->tp_price;
+                        } else {
+                            $tpPrice = $order->entry_price + $order->side * $tpDefault;
+                        }
+                        if ($order->sl_price) {
+                            $slPrice = $order->sl_price;
+                        } else {
+                            $slPrice = $order->entry_price - $order->side * $slDefault;
+                        }
                         $tpNo = $vos->order(["cmd" => "new", "price" => $tpPrice]);
                         if (!$tpNo) return;
                         $slNo = $vos->conditionOrder(["cmd" => "new", "price" => $slPrice]);
@@ -57,23 +65,21 @@ class OrderDerivativeJob implements ShouldQueue
                         ];
                         $order->fill($data);
                         if (!$order->save()) return;
-                        DerivativeOrder::where('id', '!=', $order->id)
-                            ->where('status', 0)->update(['status' => 2]);
+                        $this->deleteOtherOrders($vos, $order->id);
                     }
                 }
             } else {
                 if ($order->status === 1) {
                     $isOrdered = false;
                     if (cmp($lastPrice, $sideBool, $order->tp_price, true)) {
+                        $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->sl_no]);
                         $isOrdered = true;
                     }
                     if (cmp($lastPrice, !$sideBool, $order->sl_price, true)) {
+                        $vos->order((object)['cmd' => 'cancel', 'orderNo' => $order->tp_no]);
                         $isOrdered = true;
                     }
                     if (!$isOrdered) return;
-                    $vos->cancelAllConditionOrders();
-                    $vos->cancelAllOrders();
-                    $order = DerivativeOrder::find($order->id);
                     $order->fill(['status' => 2]);
                     $order->save();
                 }
@@ -84,7 +90,7 @@ class OrderDerivativeJob implements ShouldQueue
     /**
      * Get Last Price
      */
-    public function getLastPrice()
+    private function getLastPrice()
     {
         try {
             $vn30f1m = get_global_value('vn30f1m');
@@ -97,5 +103,14 @@ class OrderDerivativeJob implements ShouldQueue
         } catch (\Throwable $th) {
             return null;
         }
+    }
+    private function deleteOtherOrders($vos, $orderId)
+    {
+        DerivativeOrder::where('id', '!=', $orderId)->where('status', 0)->get()
+            ->each(function ($order) use ($vos) {
+                $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
+                $order->status = 2;
+                $order->save();
+            });
     }
 }

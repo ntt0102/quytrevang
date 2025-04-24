@@ -35,6 +35,7 @@ const props = defineProps([
     "prices",
     "drawPriceLine",
     "inSession",
+    "getPatternOrder",
     "TIME",
 ]);
 const emit = defineEmits(["getTools", "showEntry", "showTpSl", "hideContext"]);
@@ -159,14 +160,12 @@ function entry() {
                 }
             });
         } else {
+            const patternOrder = props.getPatternOrder();
+            if (!mf.isSet(patternOrder)) return false;
             store
                 .dispatch("tradingDerivative/executeOrder", {
                     action: "entry",
-                    data: {
-                        cmd: "new",
-                        side: putOrder.side,
-                        price: putOrder.price,
-                    },
+                    data: { ...{ cmd: "new" }, ...patternOrder },
                 })
                 .then((resp) => {
                     if (resp.isOk) {
@@ -319,10 +318,10 @@ function scan(lastPrice) {
             case 1:
                 let kind = "";
                 if (mf.cmp(lastPrice, sideBool, order.tp_price, true)) {
-                    kind = "tp";
+                    kind = "sl";
                 }
                 if (mf.cmp(lastPrice, !sideBool, order.sl_price, true)) {
-                    kind = "sl";
+                    kind = "tp";
                 }
                 if (kind) {
                     if (!isAutoOrdering) {
@@ -331,6 +330,7 @@ function scan(lastPrice) {
                             .dispatch("tradingDerivative/executeOrder", {
                                 action: "cancel",
                                 orderId: order.id,
+                                kind,
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
@@ -341,9 +341,7 @@ function scan(lastPrice) {
                                     delete orders.value[order.id];
                                     toast.success(
                                         t(
-                                            `trading.derivative.toasts.delete${mf.capitalize(
-                                                kind
-                                            )}Success`
+                                            "trading.derivative.toasts.cancelSuccess"
                                         )
                                     );
                                 } else toastOrderError(resp.message);

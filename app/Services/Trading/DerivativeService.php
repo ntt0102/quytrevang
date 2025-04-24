@@ -264,7 +264,11 @@ class DerivativeService extends CoreService
                             'status' => 0,
                             'entry_price' => $payload->data->price,
                         ];
-                        if ($isNew) $data['side'] = $payload->data->side;
+                        if ($isNew) {
+                            $data['side'] = $payload->data->side;
+                            $data['tp_price'] = $payload->data->tpPrice;
+                            $data['sl_price'] = $payload->data->slPrice;
+                        }
                         $order = DerivativeOrder::updateOrCreate($key, $data);
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
@@ -276,14 +280,22 @@ class DerivativeService extends CoreService
                         if ($vos->position === 0) {
                             return ['isOk' => false, 'message' => 'unopenedPosition'];
                         }
-                        $tpDefault = floatval(get_global_value('tpDefault'));
-                        $slDefault = floatval(get_global_value('slDefault'));
                         $order = DerivativeOrder::find($payload->orderId);
                         if (!$order) {
                             return ['isOk' => false, 'message' => 'failSave'];
                         }
-                        $tpPrice = $order->entry_price + $order->side * $tpDefault;
-                        $slPrice = $order->entry_price - $order->side * $slDefault;
+                        if ($order->tp_price) {
+                            $tpPrice = $order->tp_price;
+                        } else {
+                            $tpDefault = floatval(get_global_value('tpDefault'));
+                            $tpPrice = $order->entry_price + $order->side * $tpDefault;
+                        }
+                        if ($order->sl_price) {
+                            $slPrice = $order->sl_price;
+                        } else {
+                            $slDefault = floatval(get_global_value('slDefault'));
+                            $slPrice = $order->entry_price - $order->side * $slDefault;
+                        }
                         $tpNo = $vos->order((object)['cmd' => 'new', 'price' => $tpPrice]);
                         // $tpNo = 'tp' . rand(1, 100);
                         if (!$tpNo) {
@@ -306,8 +318,7 @@ class DerivativeService extends CoreService
                             return ['isOk' => false, 'message' => 'failSave'];
                         }
                         //
-                        DerivativeOrder::where('id', '!=', $payload->orderId)
-                            ->where('status', 0)->update(['status' => 2]);
+                        $this->deleteOtherOrders($vos, $payload->orderId);
                         return ['isOk' => true, 'order' => $order];
                         break;
                     case 'tp':
@@ -355,12 +366,16 @@ class DerivativeService extends CoreService
                         }
                         if (isset($payload->orderId)) {
                             $order = DerivativeOrder::find($payload->orderId);
-                            $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
-                            if ($order->tp_no) {
-                                $vos->order((object)['cmd' => 'cancel', 'orderNo' => $order->tp_no]);
-                            }
-                            if ($order->sl_no) {
-                                $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->sl_no]);
+                            if ($order->status === 0) {
+                                $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
+                            } else {
+                                $kinds = isset($payload->kind) ? [$payload->kind] : ['tp', 'sl'];
+                                if (in_array('tp', $kinds)) {
+                                    $vos->order((object)['cmd' => 'cancel', 'orderNo' => $order->tp_no]);
+                                }
+                                if (in_array('sl', $kinds)) {
+                                    $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->sl_no]);
+                                }
                             }
                             $order->fill(['status' => 2]);
                             if (!$order->save()) {
@@ -375,6 +390,16 @@ class DerivativeService extends CoreService
                 }
             }
         );
+    }
+
+    private function deleteOtherOrders($vos, $orderId)
+    {
+        DerivativeOrder::where('id', '!=', $orderId)->where('status', 0)->get()
+            ->each(function ($order) use ($vos) {
+                $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
+                $order->status = 2;
+                $order->save();
+            });
     }
 
     /**

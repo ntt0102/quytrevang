@@ -48,12 +48,14 @@ const patternTypeCount = 2;
 const scanThreshold = 1;
 const phaseThreshold = 0.9;
 let scanPoints = {};
+let orderInfo = {};
 let lines = {};
 let series = {};
 
 defineExpose({
     isSelected,
     createSeries,
+    getOrderInfo,
     draw,
     load,
     refresh,
@@ -79,6 +81,9 @@ function createSeries(chart) {
         lastValueVisible: false,
         priceLineVisible: false,
     });
+}
+function getOrderInfo() {
+    return orderInfo;
 }
 function patternToolClick(e) {
     emit("hideContext");
@@ -178,7 +183,7 @@ function loadPatternTool() {
         draggable: false,
     };
     const {
-        target: [[x, X], [y, Y], [z, Z]],
+        target: [[x, X], [y, Y], [z, Z], [t, T]],
     } = calculatePattern();
     //
     option.point = "X";
@@ -199,6 +204,13 @@ function loadPatternTool() {
     option.price = mf.fmtNum(z);
     option.title = `Z ${mf.fmtNum(Z)}`;
     option.color = "#00FFFF";
+    option.draggable = false;
+    lines[option.point] = series.pattern.createPriceLine(option);
+    //
+    option.point = "T";
+    option.price = mf.fmtNum(t);
+    option.title = `T ${mf.fmtNum(T)}`;
+    option.color = "#FF7F00";
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
 }
@@ -222,6 +234,7 @@ function calculatePattern() {
     emit("setProgress", result.progress);
     setTimeMark(result.timeMark);
     series.pattern.setData(result.points);
+    orderInfo = result.order;
     return result;
 }
 function calcContinuePattern() {
@@ -312,15 +325,6 @@ function calcContinuePattern() {
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = mf.fmtNum(G.price - F.price, 1, true);
-    const GH = mf.fmtNum(H.price - G.price, 1, true);
-
-    // const Tab = phase1.R.index1 - phase1.S.index;
-    // const Tbc = phase2.R.index1 - phase2.S.index;
-    // const Tcd = D.index1 - phase3.S.index;
-    // const Tde = E.index1 - D.index;
-    // const Tef = F.index1 - E.index;
-    // const Tfg = G.index1 - F.index;
-    // const Tgh = H.index1 - G.index;
 
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
@@ -353,37 +357,28 @@ function calcContinuePattern() {
             //
             D.index1 > T2,
             D.index1 > T2s,
-            // CD >= phase2.pr,
             rBCD >= 0.5,
-            // Tcd <= Tab,
             CD <= AB,
         ],
         [
             //
             E.index1 > T3,
-            // DE >= PR3,
             rCDE >= 0.5,
             rCDE >= 1.3 - rBCD,
-            // Tde <= Tbc,
             DE <= BC,
         ],
         [
             //
             F.index1 > T4,
             F.index1 > T4s,
-            // EF >= phase4.pr,
             rDEF >= 0.5,
-            // Tef <= Tcd,
             EF <= CD,
-            // F.price !== D.price && F.price !== B.price,
         ],
         [
             //
             G.index1 > T5,
-            // FG >= PR5,
             rEFG >= 0.5,
             rEFG >= 1.3 - rDEF,
-            // Tfg <= Tde,
             FG <= DE,
         ],
     ];
@@ -411,15 +406,26 @@ function calcContinuePattern() {
     const Y = mf.fmtNum(y - entry, 1, true);
     const z = B.price + (side ? 1 : -1) * BC;
     const Z = mf.fmtNum(z - entry, 1, true);
+    const t = (F.price + G.price) / 2;
+    const T = mf.fmtNum(t - entry, 1, true);
+    //
+    const order = {
+        side: x > entry ? 1 : -1,
+        price: entry,
+        tpPrice: x,
+        slPrice: E.price,
+    };
 
     return {
         timeMark,
         progress,
+        order,
         points: makeUnique(points),
         target: [
             [x, X],
             [y, Y],
             [z, Z],
+            [t, T],
         ],
     };
 }
@@ -504,14 +510,6 @@ function calcReversalPattern() {
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
-    const FG = mf.fmtNum(G.price - F.price, 1, true);
-
-    // const Tab = phase1.R.index1 - phase1.S.index;
-    // const Tbc = C.index1 - phase2.S.index;
-    // const Tcd = D.index1 - C.index;
-    // const Tde = E.index1 - D.index;
-    // const Tef = F.index1 - E.index;
-    // const Tfg = G.index1 - F.index;
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
@@ -542,29 +540,22 @@ function calcReversalPattern() {
         [
             //
             D.index1 > T2,
-            // CD >= PR2,
             rBCD >= 0.7,
             rBCD >= 0.5,
-            // Tcd <= Tab,
             CD <= AB,
         ],
         [
             //
             E.index1 > T3,
             E.index1 > T3s,
-            // DE >= phase3.pr,
             rCDE >= 0.5,
-            // Tde <= Tbc,
             DE <= BC,
-            // E.price !== C.price,
         ],
         [
             //
             F.index1 > T4,
-            // EF >= PR4,
             rDEF >= 0.5,
             rDEF >= 1.3 - rCDE,
-            // Tef <= Tcd,
             EF <= CD,
         ],
     ];
@@ -591,15 +582,26 @@ function calcReversalPattern() {
     const Y = mf.fmtNum(y - entry, 1, true);
     const z = A.price;
     const Z = mf.fmtNum(z - entry, 1, true);
+    const t = (E.price + F.price) / 2;
+    const T = mf.fmtNum(t - entry, 1, true);
+    //
+    const order = {
+        side: x > entry ? 1 : -1,
+        price: entry,
+        tpPrice: x,
+        slPrice: D.price,
+    };
 
     return {
         timeMark,
         progress,
+        order,
         points: makeUnique(points),
         target: [
             [x, X],
             [y, Y],
             [z, Z],
+            [t, T],
         ],
     };
 }
@@ -767,12 +769,14 @@ function remove() {
     setTimeMark([]);
     emit("setProgress", {});
     series.pattern.setData([]);
+    orderInfo = {};
 }
 function removePatternTool() {
     if (mf.isSet(lines.X)) {
         series.pattern.removePriceLine(lines.X);
         series.pattern.removePriceLine(lines.Y);
         series.pattern.removePriceLine(lines.Z);
+        series.pattern.removePriceLine(lines.T);
     }
     lines = {};
 }
