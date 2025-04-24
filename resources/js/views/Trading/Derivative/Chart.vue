@@ -89,7 +89,6 @@
                 ref="progressToolRef"
                 :chartHeightEnough="state.chartHeightEnough"
                 @refreshPattern="() => refreshPattern(true)"
-                @entryOrder="entryOrder"
                 @hideContext="hideContext"
             />
             <PatternTool
@@ -138,26 +137,10 @@
                 :inSession="inSession"
                 :TIME="state.TIME"
                 @getTools="getTools"
-                @showEntry="showEntryButton"
-                @showTpSl="showTpSlButton"
                 @hideContext="hideContext"
             />
         </div>
         <div>
-            <div
-                ref="entryOrderRef"
-                class="order-button entry"
-                @click="entryOrder"
-            >
-                Entry
-            </div>
-            <div
-                ref="tpslOrderRef"
-                class="order-button tpsl"
-                @click="tpslOrderClick"
-            >
-                TP/SL
-            </div>
             <div class="chart-top" @click="scrollChart">
                 <i class="far fa-angle-double-right" />
             </div>
@@ -220,8 +203,6 @@ const lineToolRef = ref(null);
 const timeRangeToolRef = ref(null);
 const targetToolRef = ref(null);
 const orderToolRef = ref(null);
-const entryOrderRef = ref(null);
-const tpslOrderRef = ref(null);
 
 const CURRENT_DATE = format(new Date(), "yyyy-MM-dd");
 const TIME = {
@@ -737,49 +718,6 @@ function setProgress(value) {
 function setOrderInfo(value) {
     orderToolRef.value.setPatternOrder(value);
 }
-function toggleOrderButton(show) {
-    if (show) {
-        orderToolRef.value.show();
-    } else {
-        entryOrderRef.value.style.display = "none";
-        tpslOrderRef.value.style.display = "none";
-    }
-}
-function showEntryButton({ side, price }) {
-    entryOrderRef.value.style.left =
-        +(
-            params.crosshair.x +
-            (params.crosshair.x > innerWidth - 71 ? -71 : 1)
-        ) + "px";
-    entryOrderRef.value.style.top =
-        +(
-            params.crosshair.y +
-            (params.crosshair.y > innerHeight - 61 ? -61 : 1)
-        ) + "px";
-    entryOrderRef.value.style.background = side > 0 ? "green" : "red";
-    entryOrderRef.value.innerText = `${side > 0 ? "LONG" : "SHORT"} ${price}`;
-    entryOrderRef.value.style.display = "block";
-}
-function showTpSlButton({ side }) {
-    tpslOrderRef.value.style.left =
-        +(
-            params.crosshair.x +
-            (params.crosshair.x > innerWidth - 61 ? -61 : 1)
-        ) + "px";
-    tpslOrderRef.value.style.top =
-        +(
-            params.crosshair.y +
-            (params.crosshair.y > innerHeight - 51 ? -51 : 1)
-        ) + "px";
-    tpslOrderRef.value.style.background = side > 0 ? "green" : "red";
-    tpslOrderRef.value.style.display = "block";
-}
-function entryOrder() {
-    orderToolRef.value.entry();
-}
-function tpslOrderClick() {
-    orderToolRef.value.tpsl();
-}
 function scrollChart() {
     params.chart.timeScale().scrollToRealTime();
 }
@@ -1018,31 +956,6 @@ function drawPriceLine(data, isRemove = false) {
                     }
                 }
             }
-        }
-    }
-
-    .order-button {
-        position: absolute;
-        display: none;
-        padding: 5px;
-        text-align: center;
-        border-radius: 7px;
-        color: black;
-        background: silver;
-        z-index: 3;
-        cursor: pointer;
-
-        &.entry {
-            width: 70px;
-            height: 55px;
-            color: white !important;
-        }
-
-        &.tpsl {
-            width: 60px;
-            height: 50px;
-            line-height: 40px;
-            color: white !important;
         }
     }
 

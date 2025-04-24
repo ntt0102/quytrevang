@@ -186,6 +186,7 @@
                 "cancelNotExitSuccess": "Đã huỷ lệnh nhưng không đóng vị thế",
                 "atoOrderSuccess": "Đặt lệnh ATO thành công",
                 "atcOrderSuccess": "Đặt lệnh ATC thành công",
+                "noPutOrder": "Không đủ điều kiện đặt lệnh",
                 "noChangeOrderLine": "Không được thay đổi",
                 "notConnect": "Chưa kết nối tài khoản VPS",
                 "invalidVolume": "Số hợp đồng vượt quá sức mua",
@@ -208,8 +209,7 @@
                 "sourceSelect": "Chọn nguồn dữ liệu",
                 "downloadExport": "Tải tệp CSV",
                 "cloneExport": "Tạo tệp CSV",
-                "setting": "Cài đặt",
-                "ordering": "Đặt lệnh"
+                "setting": "Cài đặt"
             },
             "accountInfoPopup": {
                 "title": "Thông tin tài khoản",
@@ -244,7 +244,8 @@
                 "side": "Lệnh",
                 "price": "Giá",
                 "closeOrder": "Đóng lệnh",
-                "closeAllOrders": "Đóng tất cả"
+                "closeAll": "Đóng tất cả",
+                "putOrder": "Đặt"
             }
         },
         "derstats": {

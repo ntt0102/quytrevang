@@ -14,6 +14,7 @@
             :orders="orders"
             @closeOrder="closeOrder"
             @closeAllOrders="closeAllOrders"
+            @putOrder="putOrder"
         >
         </OrderContext>
     </div>
@@ -55,13 +56,10 @@ let isAutoOrdering = false;
 
 defineExpose({
     hide,
-    show,
-    entry,
-    tpsl,
-    cancelWithoutClose,
     scan,
     drag,
     closeAllOrders,
+    cancelWithoutClose,
     setPatternOrder,
 });
 onMounted(() => {
@@ -80,35 +78,8 @@ function setPatternOrder(value) {
 function hide(status = false) {
     showOrderContext.value = status;
 }
-function show() {
-    if (props.inSession()) {
-        const currentSeconds = getUnixTime(addHours(new Date(), 7));
-        if (!props.position) {
-            if (
-                currentSeconds > props.TIME.ATO &&
-                currentSeconds < props.TIME.ATC
-            ) {
-                if (mf.isSet(patternOrder)) emit("showEntry", patternOrder);
-            }
-        } else {
-            if (!orders.value.length) {
-                let _price = "";
-                if (currentSeconds < props.TIME.ATO) _price = "ATO";
-                else if (currentSeconds > props.TIME.ATC) _price = "ATC";
-                if (_price) {
-                    emit("showEntry", { side: -props.position, price: _price });
-                }
-            }
-            if (
-                currentSeconds > props.TIME.ATO &&
-                currentSeconds < props.TIME.ATC
-            ) {
-                emit("showTpSl", { side: props.position });
-            }
-        }
-    }
-}
-function entry() {
+function putOrder() {
+    let isExecuted = false;
     if (props.inSession()) {
         const currentSeconds = getUnixTime(addHours(new Date(), 7));
         if (currentSeconds < props.TIME.ATO) {
@@ -118,6 +89,7 @@ function entry() {
             );
             result.then((dialogResult) => {
                 if (dialogResult) {
+                    isExecuted = true;
                     store
                         .dispatch("tradingDerivative/executeOrder", {
                             action: "cancel",
@@ -141,6 +113,7 @@ function entry() {
             );
             result.then((dialogResult) => {
                 if (dialogResult) {
+                    isExecuted = true;
                     store
                         .dispatch("tradingDerivative/executeOrder", {
                             action: "cancel",
@@ -158,42 +131,58 @@ function entry() {
                 }
             });
         } else {
-            if (!mf.isSet(patternOrder)) return false;
-            store
-                .dispatch("tradingDerivative/executeOrder", {
-                    action: "entry",
-                    data: { ...{ cmd: "new" }, ...patternOrder },
-                })
-                .then((resp) => {
-                    if (resp.isOk) {
-                        orders.value[resp.order.id] = resp.order;
-                        lines[resp.order.id] = {};
-                        drawOrderTool(["entry"], resp.order);
-                        toast.success(
-                            t("trading.derivative.toasts.newEntrySuccess")
-                        );
-                    } else toastOrderError(resp.message);
-                });
+            if (!props.position) {
+                if (mf.isSet(patternOrder)) {
+                    isExecuted = true;
+                    store
+                        .dispatch("tradingDerivative/executeOrder", {
+                            action: "entry",
+                            data: { ...{ cmd: "new" }, ...patternOrder },
+                        })
+                        .then((resp) => {
+                            if (resp.isOk) {
+                                orders.value[resp.order.id] = resp.order;
+                                lines[resp.order.id] = {};
+                                drawOrderTool(["entry"], resp.order);
+                                toast.success(
+                                    t(
+                                        "trading.derivative.toasts.newEntrySuccess"
+                                    )
+                                );
+                            } else toastOrderError(resp.message);
+                        });
+                }
+            } else {
+                const entryOrders = getOrderByStatus(0);
+                if (entryOrders.length === 1) {
+                    const order = entryOrders[0];
+                    isExecuted = true;
+                    store
+                        .dispatch("tradingDerivative/executeOrder", {
+                            action: "tpsl",
+                            orderId: order.id,
+                        })
+                        .then((resp) => {
+                            if (resp.isOk) {
+                                orders.value[order.id] = resp.order;
+                                lines[order.id].entry.applyOptions({
+                                    draggable: false,
+                                });
+                                drawOrderTool(["tp", "sl"], resp.order);
+                                toast.success(
+                                    t(
+                                        "trading.derivative.toasts.newTpSlSuccess"
+                                    )
+                                );
+                            } else toastOrderError(resp.message);
+                        });
+                }
+            }
         }
     }
-}
-function tpsl() {
-    const entryOrders = getOrderByStatus(0);
-    if (entryOrders.length !== 1) return false;
-    const order = entryOrders[0];
-    store
-        .dispatch("tradingDerivative/executeOrder", {
-            action: "tpsl",
-            orderId: order.id,
-        })
-        .then((resp) => {
-            if (resp.isOk) {
-                orders.value[order.id] = resp.order;
-                lines[order.id].entry.applyOptions({ draggable: false });
-                drawOrderTool(["tp", "sl"], resp.order);
-                toast.success(t("trading.derivative.toasts.newTpSlSuccess"));
-            } else toastOrderError(resp.message);
-        });
+    if (!isExecuted) {
+        toast.warning(t("trading.derivative.toasts.noPutOrder"));
+    }
 }
 function closeAllOrders() {
     const allOrders = Object.values(orders.value);

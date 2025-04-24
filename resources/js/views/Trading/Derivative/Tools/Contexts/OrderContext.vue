@@ -26,13 +26,31 @@
                 />
             </template>
         </DxDataGrid>
-        <DxButton
-            class="close-all"
-            type="danger"
-            stylingMode="outlined"
-            icon="trash"
-            :text="$t('trading.derivative.orderContext.closeAllOrders')"
-            @click="closeAllOrders"
+        <DxToolbar
+            :items="[
+                {
+                    location: 'before',
+                    widget: 'dxButton',
+                    options: {
+                        type: 'danger',
+                        stylingMode: 'outlined',
+                        icon: 'far fa-gavel',
+                        text: $t('trading.derivative.orderContext.putOrder'),
+                        onClick: putOrder,
+                    },
+                },
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        type: 'danger',
+                        stylingMode: 'outlined',
+                        icon: 'trash',
+                        text: $t('trading.derivative.orderContext.closeAll'),
+                        onClick: closeAllOrders,
+                    },
+                },
+            ]"
         />
     </CoreContext>
 </template>
@@ -43,7 +61,7 @@ import CoreContext from "./CoreContext.vue";
 import { computed } from "vue";
 
 const props = defineProps(["orders"]);
-const emit = defineEmits(["closeOrder", "closeAllOrders"]);
+const emit = defineEmits(["closeOrder", "closeAllOrders", "putOrder"]);
 const dataSource = computed(() =>
     Object.values(props.orders).map((order) => ({
         id: order.id,
@@ -64,13 +82,17 @@ function closeOrder(id) {
     const order = props.orders[id];
     emit("closeOrder", order);
 }
+function putOrder() {
+    emit("putOrder");
+}
 </script>
 
 <style lang="scss">
 .order-context {
     width: 320px;
-    .close-all {
-        margin-top: 15px;
+
+    .dx-toolbar {
+        padding: 0 10px;
     }
 }
 </style>
