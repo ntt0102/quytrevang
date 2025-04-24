@@ -9,7 +9,7 @@
                 location: 'after',
                 widget: 'dxButton',
                 options: {
-                    text: $t('trading.derivative.orderContext.closeAllOrders'),
+                    text: $t('trading.derivative.orderContext.closeAll'),
                     onClick: closeAllOrders,
                 },
             },
