@@ -308,8 +308,6 @@ class DerivativeService extends CoreService
                         }
                         $data = [
                             'status'    => 1,
-                            'tp_price'  => $tpPrice,
-                            'sl_price'  => $slPrice,
                             'tp_no'     => $tpNo,
                             'sl_no'     => $slNo,
                         ];
