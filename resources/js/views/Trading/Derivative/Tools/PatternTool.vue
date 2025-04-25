@@ -377,14 +377,22 @@ function calcContinuePattern() {
             FG <= DE,
         ],
     ];
+    let tempResult = [];
     for (let i = 0; i < progress.steps.length; i++) {
-        progress.step = i + 1;
-        progress.result = progress.steps[i].every(Boolean);
-        if (progress.result) {
-            if (i === 4) break;
-            if (i === 2) break;
+        const result = progress.steps[i].every(Boolean);
+        tempResult.push(result);
+        if (!result) {
+            progress.step = i + 1;
+            progress.result = false;
+            break;
         }
-        if (!progress.result) break;
+    }
+    if (tempResult[4]) {
+        progress.step = 5;
+        progress.result = true;
+    } else if (tempResult[2]) {
+        progress.step = 3;
+        progress.result = true;
     }
     //
     const points = [
@@ -561,14 +569,22 @@ function calcReversalPattern() {
             EF <= CD,
         ],
     ];
+    let tempResult = [];
     for (let i = 0; i < progress.steps.length; i++) {
-        progress.step = i + 1;
-        progress.result = progress.steps[i].every(Boolean);
-        if (progress.result) {
-            if (i === 3) break;
-            if (i === 1) break;
+        const result = progress.steps[i].every(Boolean);
+        tempResult.push(result);
+        if (!result) {
+            progress.step = i + 1;
+            progress.result = false;
+            break;
         }
-        if (!progress.result) break;
+    }
+    if (tempResult[3]) {
+        progress.step = 4;
+        progress.result = true;
+    } else if (tempResult[1]) {
+        progress.step = 2;
+        progress.result = true;
     }
     //
     const points = [
