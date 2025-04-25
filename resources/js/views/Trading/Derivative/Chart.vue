@@ -336,7 +336,6 @@ function removeChart() {
 }
 function chartClick(e) {
     hideContext(params.hasProgress);
-    toggleOrderButton(false);
 
     if (patternToolRef.value.isSelected()) {
         patternToolRef.value.draw(params.crosshair);
@@ -351,7 +350,6 @@ function chartClick(e) {
     }
 }
 function chartContextmenu(e) {
-    toggleOrderButton(true);
     e.preventDefault();
 }
 function areaClick(e) {
