@@ -406,23 +406,26 @@ function calcContinuePattern() {
         { time: H.time1, value: H.price },
     ];
     //
-    const entry = D.price;
+    const refPrice = D.price;
     const [x] = adjustTargetPrice(D.price, CD, side);
-    const X = mf.fmtNum(x - entry, 1);
+    const X = mf.fmtNum(x - refPrice, 1);
     const [y] = adjustTargetPrice(D.price, 2 * CD, side);
-    const Y = mf.fmtNum(y - entry, 1);
+    const Y = mf.fmtNum(y - refPrice, 1);
     const z = B.price + (side ? 1 : -1) * BC;
-    const Z = mf.fmtNum(z - entry, 1);
+    const Z = mf.fmtNum(z - refPrice, 1);
     const t = (F.price + G.price) / 2;
-    const T = mf.fmtNum(t - entry, 1);
+    const T = mf.fmtNum(t - refPrice, 1);
     //
+    const dBreak = mf.cmp(F.price, side, D.price);
+    const entry = dBreak ? F.price : D.price;
+    const sl = dBreak ? G.price : E.price;
     let order = {};
     if (progress.result) {
         order = {
             side: x > entry ? 1 : -1,
             price: entry,
             tpPrice: x,
-            slPrice: E.price,
+            slPrice: sl,
         };
     }
 
@@ -597,23 +600,26 @@ function calcReversalPattern() {
         { time: G.time1, value: G.price },
     ];
     //
-    const entry = C.price;
+    const refPrice = C.price;
     const [x] = adjustTargetPrice(C.price, BC, side);
-    const X = mf.fmtNum(x - entry, 1);
+    const X = mf.fmtNum(x - refPrice, 1);
     const [y] = adjustTargetPrice(C.price, 2 * BC, side);
-    const Y = mf.fmtNum(y - entry, 1);
+    const Y = mf.fmtNum(y - refPrice, 1);
     const z = A.price;
-    const Z = mf.fmtNum(z - entry, 1);
+    const Z = mf.fmtNum(z - refPrice, 1);
     const t = (E.price + F.price) / 2;
-    const T = mf.fmtNum(t - entry, 1);
+    const T = mf.fmtNum(t - refPrice, 1);
     //
+    const eBreak = mf.cmp(E.price, side, C.price);
+    const entry = eBreak ? E.price : C.price;
+    const sl = eBreak ? F.price : D.price;
     let order = {};
     if (progress.result) {
         order = {
             side: x > entry ? 1 : -1,
             price: entry,
             tpPrice: x,
-            slPrice: D.price,
+            slPrice: sl,
         };
     }
 
