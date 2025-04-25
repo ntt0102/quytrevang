@@ -380,7 +380,10 @@ function calcContinuePattern() {
     for (let i = 0; i < progress.steps.length; i++) {
         progress.step = i + 1;
         progress.result = progress.steps[i].every(Boolean);
-        if ([2, 4].includes(i) && progress.result) break;
+        if (progress.result) {
+            if (i === 4) break;
+            if (i === 2) break;
+        }
         if (!progress.result) break;
     }
     //
@@ -561,7 +564,10 @@ function calcReversalPattern() {
     for (let i = 0; i < progress.steps.length; i++) {
         progress.step = i + 1;
         progress.result = progress.steps[i].every(Boolean);
-        if ([1, 3].includes(i) && progress.result) break;
+        if (progress.result) {
+            if (i === 3) break;
+            if (i === 1) break;
+        }
         if (!progress.result) break;
     }
     //
