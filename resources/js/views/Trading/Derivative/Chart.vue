@@ -98,7 +98,7 @@
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
                 @setProgress="setProgress"
-                @setOrderInfo="setOrderInfo"
+                @setPatternOrder="setPatternOrder"
                 @hideContext="hideContext"
             />
             <PickTimeTool
@@ -713,7 +713,7 @@ function setProgress(value) {
     progressToolRef.value.set(value);
     params.hasProgress = !!value.step;
 }
-function setOrderInfo(value) {
+function setPatternOrder(value) {
     orderToolRef.value.setPatternOrder(value);
 }
 function scrollChart() {

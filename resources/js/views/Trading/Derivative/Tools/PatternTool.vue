@@ -35,7 +35,7 @@ const props = defineProps([
     "timeToIndex",
     "indexToTime",
 ]);
-const emit = defineEmits(["setProgress", "setOrderInfo", "hideContext"]);
+const emit = defineEmits(["setProgress", "setPatternOrder", "hideContext"]);
 const patternToolRef = ref(null);
 const patternStore = computed(
     () => store.state.tradingDerivative.tools.pattern
@@ -227,7 +227,7 @@ function calculatePattern() {
             break;
     }
     emit("setProgress", result.progress);
-    emit("setOrderInfo", result.order);
+    emit("setPatternOrder", result.order);
     setTimeMark(result.timeMark);
     series.pattern.setData(result.points);
     return result;
@@ -793,7 +793,7 @@ function remove() {
     removePatternTool();
     setTimeMark([]);
     emit("setProgress", {});
-    emit("setOrderInfo", {});
+    emit("setPatternOrder", {});
     series.pattern.setData([]);
 }
 function removePatternTool() {
