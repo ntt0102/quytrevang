@@ -320,6 +320,7 @@ function calcContinuePattern() {
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const FG = mf.fmtNum(G.price - F.price, 1, true);
+    const EG = mf.fmtNum(G.price - E.price, 1, true);
 
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
@@ -339,6 +340,7 @@ function calcContinuePattern() {
     const rCDE = DE / CD;
     const rDEF = EF / DE;
     const rEFG = FG / EF;
+    const rDEG = EG / DE;
 
     let progress = {};
     progress.steps = [
@@ -374,6 +376,7 @@ function calcContinuePattern() {
             G.index1 > T5,
             rEFG >= 0.5,
             rEFG >= 1.3 - rDEF,
+            rDEG < 0.5,
             FG <= DE,
         ],
     ];
@@ -523,6 +526,7 @@ function calcReversalPattern() {
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
+    const DF = mf.fmtNum(F.price - D.price, 1, true);
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
@@ -540,6 +544,7 @@ function calcReversalPattern() {
     const rBCD = CD / BC;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
+    const rCDF = DF / CD;
 
     let progress = {};
     progress.steps = [
@@ -569,6 +574,7 @@ function calcReversalPattern() {
             F.index1 > T4,
             rDEF >= 0.5,
             rDEF >= 1.3 - rCDE,
+            rCDF < 0.5,
             EF <= CD,
         ],
     ];
