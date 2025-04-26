@@ -363,6 +363,7 @@ function calcContinuePattern() {
             rCDE >= 0.5,
             rCDE >= 1.3 - rBCD,
             DE <= BC,
+            rDEG < 0.5,
         ],
         [
             //
@@ -376,7 +377,6 @@ function calcContinuePattern() {
             G.index1 > T5,
             rEFG >= 0.5,
             rEFG >= 1.3 - rDEF,
-            rDEG < 0.5,
             FG <= DE,
         ],
     ];
@@ -559,8 +559,9 @@ function calcReversalPattern() {
             //
             D.index1 > T2,
             rBCD >= 0.7,
-            rBCD >= 0.5,
+            // rBCD >= 0.5,
             CD <= AB,
+            rCDF < 0.5,
         ],
         [
             //
@@ -574,7 +575,6 @@ function calcReversalPattern() {
             F.index1 > T4,
             rDEF >= 0.5,
             rDEF >= 1.3 - rCDE,
-            rCDF < 0.5,
             EF <= CD,
         ],
     ];
