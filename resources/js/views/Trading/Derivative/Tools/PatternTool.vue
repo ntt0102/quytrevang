@@ -141,7 +141,7 @@ function scanPattern(data) {
         }
         if (mf.cmp(price, side, S.price)) S = { index, time, price };
         //
-        if (C.index > A.index) {
+        if (C.index > A.index && mf.cmp(C.price, side, A.price)) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
             if (bc >= scanThreshold) {
                 if (A.index - S.index >= C.index - B.index) break;
