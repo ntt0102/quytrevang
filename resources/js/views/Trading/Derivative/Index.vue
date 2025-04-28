@@ -22,15 +22,6 @@
                 },
                 {
                     location: 'before',
-                    widget: 'dxButton',
-                    options: {
-                        icon: 'far fa-arrow-right-to-arc small',
-                        hint: $t('trading.derivative.buttons.loginVps'),
-                        onClick: loginVps,
-                    },
-                },
-                {
-                    location: 'before',
                     widget: 'dxDropDownButton',
                     options: {
                         splitButton: true,
@@ -68,6 +59,7 @@
             ref="chartRef"
             @showPendingOrders="showPendingOrders"
             @showMatchedOrders="showMatchedOrders"
+            @showVpsOtpPopup="loginVps"
         />
     </div>
     <SettingPopup ref="settingPopupRef" />

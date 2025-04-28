@@ -19,7 +19,7 @@
                     red: config.volInvalid,
                 }"
                 :title="$t('trading.derivative.connection')"
-                @click="getStatus"
+                @click="connectBroker"
                 @contextmenu="showPendingOrders"
             >
                 <i
@@ -189,7 +189,11 @@ const { t } = useI18n();
 const mf = inject("mf");
 const devices = inject("devices");
 const filters = inject("filters");
-const emit = defineEmits(["showPendingOrders", "showMatchedOrders"]);
+const emit = defineEmits([
+    "showPendingOrders",
+    "showMatchedOrders",
+    "showVpsOtpPopup",
+]);
 const chartContainerRef = ref(null);
 const chartRef = ref(null);
 const connectionRef = ref(null);
@@ -758,6 +762,13 @@ function getChartData() {
         .then((hasData) => {
             if (hasData) getTools();
         });
+}
+function connectBroker() {
+    if (status.value.connection) getStatus();
+    else showVpsOtpPopup();
+}
+function showVpsOtpPopup() {
+    emit("showVpsOtpPopup");
 }
 function getStatus() {
     store.dispatch("tradingDerivative/getStatus");
