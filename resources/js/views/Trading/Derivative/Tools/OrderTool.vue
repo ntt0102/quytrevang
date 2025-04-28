@@ -5,7 +5,6 @@
         :class="{ red: hasOrder }"
         :title="$t('trading.derivative.tools.order')"
         @click="toggleOrderContext"
-        @contextmenu="closeAllOrders"
     >
         <i class="far fa-gavel" :class="{ blink: isOrderWarning }"> </i>
         <OrderContext
