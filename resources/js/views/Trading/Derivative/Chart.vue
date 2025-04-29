@@ -486,13 +486,13 @@ function createWhitespaceData(date) {
     const amEnd = getUnixTime(new Date(`${date}T11:30:00Z`));
     const pmStart = getUnixTime(new Date(`${date}T13:00:00Z`));
     const pmEnd = getUnixTime(new Date(`${date}T14:30:00Z`));
-    const pm13h00 = getUnixTime(new Date(`${date}T13:00:00Z`));
+    const pm11h30 = getUnixTime(new Date(`${date}T11:30:00Z`));
     const pm14h00 = getUnixTime(new Date(`${date}T14:00:00Z`));
     let data = [];
     for (let sec = amStart; sec <= pmEnd; sec++) {
         if (sec > amEnd && sec < pmStart) continue;
         let item = { time: sec };
-        if (sec === pm13h00 || sec === pm14h00 || sec === pmEnd) item.value = 1;
+        if (sec === pm11h30 || sec === pm14h00 || sec === pmEnd) item.value = 1;
         data.push(item);
     }
     if (state.chartDate === CURRENT_DATE) {
