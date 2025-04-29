@@ -29,6 +29,7 @@
         <DxToolbar
             :items="[
                 {
+                    disabled: canOrder === 'none',
                     location: 'before',
                     widget: 'dxButton',
                     options: {
@@ -60,7 +61,7 @@ import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import CoreContext from "./CoreContext.vue";
 import { computed } from "vue";
 
-const props = defineProps(["orders"]);
+const props = defineProps(["orders", "canOrder"]);
 const emit = defineEmits(["closeOrder", "closeAllOrders", "putOrder"]);
 const dataSource = computed(() =>
     Object.values(props.orders).map((order) => ({
