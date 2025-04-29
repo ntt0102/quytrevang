@@ -982,6 +982,10 @@ function drawPriceLine(data, isRemove = false) {
         border: 1px solid #2b2b43;
         z-index: 2;
         cursor: pointer;
+
+        &:hover {
+            background: #2a2e39 !important;
+        }
     }
 }
 </style>
