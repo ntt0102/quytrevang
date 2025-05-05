@@ -37,7 +37,7 @@ const props = defineProps([
     "inSession",
     "TIME",
 ]);
-const emit = defineEmits(["getTools", "showEntry", "showTpSl", "hideContext"]);
+const emit = defineEmits(["hideContext"]);
 const orderToolRef = ref(null);
 const isOrderWarning = ref(false);
 const showOrderContext = ref(false);

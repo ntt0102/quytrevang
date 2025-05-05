@@ -136,7 +136,6 @@
                 :drawPriceLine="drawPriceLine"
                 :inSession="inSession"
                 :TIME="state.TIME"
-                @getTools="getTools"
                 @hideContext="hideContext"
             />
         </div>
@@ -448,26 +447,25 @@ function setChartData(chartData) {
         params.series.price.setData(state.prices);
     }
 }
-function updateChartData(data, source = null) {
+function updateChartData(data, isGetTools = false) {
     if (data.length === 0) return false;
-    const _source = source ?? config.value.source;
+    const source = config.value.source;
     let prices = [];
     data.forEach((item) => {
         let time, value;
-        if (_source === "FIREANT") {
+        if (source === "FIREANT") {
             time = getUnixTime(addHours(new Date(item.date), 7));
             value = item.price;
-        } else if (_source === "VPS") {
+        } else if (source === "VPS") {
             time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
             value = item.lastPrice;
-        } else if (_source === "DNSE") {
+        } else if (source === "DNSE") {
             time = getUnixTime(addHours(new Date(item.time), 7));
             value = item.matchPrice;
         }
         prices.push({ time, value });
     });
     if (prices.length > 1) {
-        getTools();
         params.whitespaces = mergeChartData(
             params.whitespaces,
             createWhitespaceData(CURRENT_DATE)
@@ -480,6 +478,7 @@ function updateChartData(data, source = null) {
         state.prices.push(prices[0]);
         params.series.price.update(prices[0]);
     }
+    if (isGetTools) getTools();
 }
 function createWhitespaceData(date) {
     const amStart = getUnixTime(new Date(`${date}T09:00:00Z`));
@@ -590,7 +589,7 @@ function configFIREANTSocket() {
             if (item.type === 3) {
                 const date = item.result[0].date.slice(0, 10);
                 if (date === CURRENT_DATE) {
-                    updateChartData(item.result);
+                    updateChartData(item.result, true);
                     console.log("FIREANT", item.result);
                 }
                 store.dispatch("tradingDerivative/setLoading", false);
@@ -658,7 +657,7 @@ function getVpsData() {
         fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
             .then((response) => response.json())
             .then((data) => {
-                updateChartData(data, "VPS");
+                updateChartData(data, true);
                 console.log("VPS: ", data);
             });
         params.socketUpdatedAt = new Date();
@@ -699,7 +698,7 @@ function getDnseData() {
             .then((response) => response.json())
             .then((data) => {
                 console.log("DNSE: ", data.data.GetTicksBySymbol.data);
-                updateChartData(data.data.GetTicksBySymbol.data, "DNSE");
+                updateChartData(data.data.GetTicksBySymbol.data, true);
             });
 
         params.socketUpdatedAt = new Date();
