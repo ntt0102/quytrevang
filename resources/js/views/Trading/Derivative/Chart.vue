@@ -216,7 +216,7 @@ const TIME = {
 };
 const SOCKET_ENDPOINT = {
     FIREANT:
-        "wss://tradestation.fireant.vn/quote?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg",
+        "wss://tradestation.fireant.vn/quote-lite?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg",
     VPS: "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket",
     DNSE: "wss://datafeed.dnse.com.vn/wss",
 };
@@ -447,14 +447,18 @@ function setChartData(chartData) {
         params.series.price.setData(state.prices);
     }
 }
-function updateChartData(data, isGetTools = false) {
+function updateChartData(data, lastTime) {
     if (data.length === 0) return false;
     const source = config.value.source;
-    let prices = [];
-    data.forEach((item) => {
+    const seen = new Map();
+    const prices = data.map((item) => {
         let time, value;
         if (source === "FIREANT") {
             time = getUnixTime(addHours(new Date(item.date), 7));
+            const offset = Math.trunc(lastTime) === time ? 0.5 : 0;
+            const count = seen.get(time) || 0;
+            seen.set(time, count + 1);
+            time += offset + count * 0.01;
             value = item.price;
         } else if (source === "VPS") {
             time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
@@ -463,22 +467,21 @@ function updateChartData(data, isGetTools = false) {
             time = getUnixTime(addHours(new Date(item.time), 7));
             value = item.matchPrice;
         }
-        prices.push({ time, value });
+        return { time, value };
     });
-    if (prices.length > 1) {
+    if (lastTime) {
+        state.prices = [...state.prices, ...prices];
+        prices.forEach((item) => params.series.price.update(item));
+    } else {
+        getTools();
         params.whitespaces = mergeChartData(
             params.whitespaces,
             createWhitespaceData(CURRENT_DATE)
         );
         params.series.whitespace.setData(params.whitespaces);
-        //
-        state.prices = mergeChartData(state.prices, prices);
+        state.prices = prices;
         params.series.price.setData(state.prices);
-    } else {
-        state.prices.push(prices[0]);
-        params.series.price.update(prices[0]);
     }
-    if (isGetTools) getTools();
 }
 function createWhitespaceData(date) {
     const amStart = getUnixTime(new Date(`${date}T09:00:00Z`));
@@ -589,8 +592,8 @@ function configFIREANTSocket() {
             if (item.type === 3) {
                 const date = item.result[0].date.slice(0, 10);
                 if (date === CURRENT_DATE) {
-                    updateChartData(item.result, true);
-                    console.log("FIREANT", item.result);
+                    console.log("FIREANT-first", item.result);
+                    updateChartData(item.result);
                 }
                 store.dispatch("tradingDerivative/setLoading", false);
             } else if (
@@ -600,7 +603,13 @@ function configFIREANTSocket() {
             ) {
                 console.log("FIREANT", item.arguments[1]);
                 orderToolRef.value.scan(item.arguments[1].at(-1).price);
-                updateChartData(item.arguments[1]);
+                let updatedData = item.arguments[1];
+                updatedData.sort((a, b) =>
+                    a.date === b.date
+                        ? a.id - b.id
+                        : new Date(a.date) - new Date(b.date)
+                );
+                updateChartData(updatedData, state.prices.at(-1).time);
             }
         });
     };
@@ -643,7 +652,7 @@ function configVpsSocket() {
                     if (data.id === 3220) {
                         console.log("VPS", data);
                         orderToolRef.value.scan(data.lastPrice);
-                        updateChartData([data]);
+                        updateChartData([data], state.prices.at(-1).time);
                     }
                 }
             }
@@ -657,7 +666,7 @@ function getVpsData() {
         fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
             .then((response) => response.json())
             .then((data) => {
-                updateChartData(data, true);
+                updateChartData(data);
                 console.log("VPS: ", data);
             });
         params.socketUpdatedAt = new Date();
@@ -679,7 +688,7 @@ function configDnseSocket() {
             const time = new Date(tick.time.seconds.low * 1000);
             tick.time = time.toISOString();
             console.log("DNSE: ", tick);
-            updateChartData([tick]);
+            updateChartData([tick], state.prices.at(-1).time);
         }
     });
 }
@@ -698,7 +707,7 @@ function getDnseData() {
             .then((response) => response.json())
             .then((data) => {
                 console.log("DNSE: ", data.data.GetTicksBySymbol.data);
-                updateChartData(data.data.GetTicksBySymbol.data, true);
+                updateChartData(data.data.GetTicksBySymbol.data);
             });
 
         params.socketUpdatedAt = new Date();
@@ -803,7 +812,9 @@ function coordinateToPrice(y) {
     return mf.fmtNum(params.series.price.coordinateToPrice(y));
 }
 function timeToIndex(time) {
-    let index = params.whitespaces.findIndex((item) => item.time === time);
+    let index = params.whitespaces.findIndex(
+        (item) => item.time === Math.trunc(time)
+    );
     if (index === -1) {
         try {
             const date = format(new Date(time * 1000), "yyyy-MM-dd");
