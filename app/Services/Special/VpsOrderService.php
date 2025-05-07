@@ -247,8 +247,8 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core_ext.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1 && $isNotDelete) return false;
-        return $rsp->data->stopOrderID ?? "";
+        if ($rsp->rc != 1 && $isNotDelete) return (object)['isOk' => false, 'error' => $rsp->rs];
+        return (object)['isOk' => true, 'orderNo' => $rsp->data->stopOrderID ?? ""];
     }
 
     public function order($data)
@@ -288,8 +288,8 @@ class VpsOrderService extends CoreService
         $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1 && $isNotDelete) return false;
-        return $rsp->data[0]->orderNo ?? "";
+        if ($rsp->rc != 1 && $isNotDelete) return (object)['isOk' => false, 'error' => $rsp->rs];
+        return (object)['isOk' => true, 'orderNo' => $rsp->data[0]->orderNo ?? ""];
     }
 
     public function cancelAllConditionOrders()

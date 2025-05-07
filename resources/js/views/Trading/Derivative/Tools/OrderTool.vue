@@ -95,13 +95,13 @@ function putOrder() {
                             exit: "ATO",
                         })
                         .then((resp) => {
-                            if (resp.isOk)
+                            if (resp.isOk) {
                                 toast.success(
                                     t(
                                         "trading.derivative.toasts.atoOrderSuccess"
                                     )
                                 );
-                            else toastOrderError(resp.message);
+                            } else toastOrderError(resp);
                         });
                 }
             });
@@ -119,13 +119,13 @@ function putOrder() {
                             exit: "ATC",
                         })
                         .then((resp) => {
-                            if (resp.isOk)
+                            if (resp.isOk) {
                                 toast.success(
                                     t(
                                         "trading.derivative.toasts.atcOrderSuccess"
                                     )
                                 );
-                            else toastOrderError(resp.message);
+                            } else toastOrderError(resp);
                         });
                 }
             });
@@ -148,7 +148,7 @@ function putOrder() {
                                         "trading.derivative.toasts.newEntrySuccess"
                                     )
                                 );
-                            } else toastOrderError(resp.message);
+                            } else toastOrderError(resp);
                         });
                 }
             } else {
@@ -173,7 +173,7 @@ function putOrder() {
                                         "trading.derivative.toasts.newTpSlSuccess"
                                     )
                                 );
-                            } else toastOrderError(resp.message);
+                            } else toastOrderError(resp);
                         });
                 }
             }
@@ -194,9 +194,9 @@ function closeAllOrders() {
                 exit: "MTL",
             })
             .then((resp) => {
-                if (resp.isOk)
+                if (resp.isOk) {
                     toast.success(t("trading.derivative.toasts.cancelSuccess"));
-                else toastOrderError(resp.message);
+                } else toastOrderError(resp);
             });
     }
 }
@@ -212,9 +212,7 @@ function closeOrder(order) {
                 removeOrderTool(["entry", "tp", "sl"], order.id);
                 delete orders.value[order.id];
                 toast.success(t("trading.derivative.toasts.cancelSuccess"));
-            } else {
-                toastOrderError(resp.message);
-            }
+            } else toastOrderError(resp);
         });
 }
 function cancelWithoutClose() {
@@ -243,7 +241,7 @@ function cancelWithoutClose() {
                                             "trading.derivative.toasts.cancelNotExitSuccess"
                                         )
                                     );
-                                } else toastOrderError(resp.message);
+                                } else toastOrderError(resp);
                             });
                     });
                 }
@@ -293,7 +291,7 @@ function scan(lastPrice) {
                                                 "trading.derivative.toasts.newTpSlSuccess"
                                             )
                                         );
-                                    } else toastOrderError(resp.message);
+                                    } else toastOrderError(resp);
                                     isAutoOrdering = false;
                                 });
                         }, 1000);
@@ -329,7 +327,7 @@ function scan(lastPrice) {
                                             "trading.derivative.toasts.cancelSuccess"
                                         )
                                     );
-                                } else toastOrderError(resp.message);
+                                } else toastOrderError(resp);
                                 isAutoOrdering = false;
                             });
                     }
@@ -432,7 +430,7 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
                         );
                     } else {
                         line.applyOptions({ price: oldPrice });
-                        toastOrderError(resp.message);
+                        toastOrderError(resp);
                     }
                 });
         } else {
@@ -450,11 +448,10 @@ function getOrderByStatus(status, isHas = false) {
     const order = Object.values(orders.value).filter(
         (order) => order.status === status
     );
-    if (isHas) return order.length > 0;
-    else return order;
+    return isHas ? order.length > 0 : order;
 }
-function toastOrderError(error) {
-    if (!error) error = "unknown";
+function toastOrderError(data) {
+    let error = data.error ?? data.message ?? "unknown";
     toast.error(t(`trading.derivative.toasts.${error}`));
 }
 function toggleOrderContext() {
