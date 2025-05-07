@@ -13,7 +13,6 @@ class ExportDerFirenAntJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    const SHIFT_TIME = 7 * 60 * 60;
     public $timeout = 3600;
     private $data;
 
@@ -44,7 +43,7 @@ class ExportDerFirenAntJob implements ShouldQueue
         $fp = fopen($file, 'w');
         foreach ($data as $item) {
             $line = [];
-            $line[] = strtotime($item->date) + self::SHIFT_TIME;
+            $line[] = $item->date;
             $line[] = $item->price;
             $line[] = $item->volume;
             fputcsv($fp, $line);
