@@ -43,9 +43,11 @@ class ExportDerFirenAntJob implements ShouldQueue
         $fp = fopen($file, 'w');
         foreach ($data as $item) {
             $line = [];
+            $line[] = $item->id;
             $line[] = $item->date;
             $line[] = $item->price;
             $line[] = $item->volume;
+            $line[] = $item->side;
             fputcsv($fp, $line);
         }
         fclose($fp);
