@@ -42,11 +42,8 @@ class FilterShareJob implements ShouldQueue
     public function handle()
     {
 
-        $filterTimesCount = count($this->filterTimes);
-        $isMid = $filterTimesCount >= 3;
-        $isLong = $filterTimesCount === 4;
         $shareService = app(ShareService::class);
-        $result = $shareService->filterStock($this->group, $this->filterTimes, $isMid, $isLong);
+        $result = $shareService->filterStock($this->group, $this->filterTimes);
         if ($result) {
             ShareSymbol::updateOrCreate(['name' => 'FILTER'], ['symbols' => $result->symbols]);
         }

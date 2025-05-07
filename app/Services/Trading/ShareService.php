@@ -191,14 +191,19 @@ class ShareService extends CoreService
         $index = $this->calcStock($indexSymbol, $filterTimes, $isMid, $isLong);
         $stock = $this->calcStock($symbol, $filterTimes, $isMid, $isLong);
         $check = (array)$this->checkStock($index, $stock, $isMid, $isLong);
-        $fromto = [
-            'start' => date('d/m/Y', end($filterTimes)),
-            'end' => date('d/m/Y', $filterTimes[0]),
-        ];
+        // $fromto = [
+        //     'start' => date('d/m/Y', end($filterTimes)),
+        //     'end' => date('d/m/Y', $filterTimes[0]),
+        // ];
         return [
             'symbol' => $symbol,
-            'result' => $check
-            // 'result' => $fromto + $check
+            'result' => [
+                'check' => $check,
+                'points' => [
+                    $index->symbol => $this->getPoints($index->points),
+                    $stock->symbol => $this->getPoints($stock->points)
+                ]
+            ]
         ];
     }
 
@@ -434,24 +439,18 @@ class ShareService extends CoreService
         $bounce['sum'] = $bounceSum;
         //
         return (object)[
-            'check' => [
-                'sum' => $pivotSum && $bounceSum && $stock->shrink->sum && $stock->trend->sum && $stock->base,
-                'bounce' => $bounce,
-                'pivot' => $pivot,
-                'shrink' => $stock->shrink,
-                'trend' => $stock->trend,
-                'base' => $stock->base,
-            ],
-            'points' => [
-                $index->symbol => $this->getPoints($index->points),
-                $stock->symbol => $this->getPoints($stock->points)
-            ]
+            'sum' => $pivotSum && $bounceSum && $stock->shrink->sum && $stock->trend->sum && $stock->base,
+            'bounce' => $bounce,
+            'pivot' => $pivot,
+            'shrink' => $stock->shrink,
+            'trend' => $stock->trend,
+            'base' => $stock->base,
         ];
     }
 
     public function getPoints($points)
     {
-        foreach ($points as $key => $point) {
+        foreach ($points as $point) {
             unset($point->t, $point->i);
         }
         return $points;
