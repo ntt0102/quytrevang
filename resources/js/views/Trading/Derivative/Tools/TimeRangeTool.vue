@@ -142,4 +142,60 @@ function removeTimeRangeTool(withServer = true) {
     series.timeRange.setData([]);
     timeRanges = [];
 }
+function getTimeDistance(X, Y) {
+    const SESSIONS = [
+        [32400, 41400], // 09:00 – 11:30
+        [46800, 52200], // 13:00 – 14:30
+    ];
+
+    if (Y <= X) return 0;
+
+    const timeInDayX = X % 86400;
+    const timeInDayY = Y % 86400;
+
+    let total = 0;
+
+    for (const [start, end] of SESSIONS) {
+        const overlapStart = Math.max(timeInDayX, start);
+        const overlapEnd = Math.min(timeInDayY, end);
+
+        if (overlapEnd > overlapStart) {
+            total += overlapEnd - overlapStart;
+        }
+    }
+
+    return total;
+}
+function getYFromXAndDuration(X, durationSec) {
+    const SESSIONS = [
+        [32400, 41400], // 09:00 – 11:30
+        [46800, 52200], // 13:00 – 14:30
+    ];
+    const SECONDS_IN_DAY = 86400;
+
+    const baseDay = Math.floor(X / SECONDS_IN_DAY) * SECONDS_IN_DAY;
+    const timeInDay = X % SECONDS_IN_DAY;
+
+    let remaining = durationSec;
+    let current = timeInDay;
+
+    for (const [start, end] of SESSIONS) {
+        if (current >= end) continue; // đã qua phiên này
+
+        const sessionStart = Math.max(current, start);
+        const sessionEnd = end;
+        const available = sessionEnd - sessionStart;
+
+        if (remaining <= available) {
+            const Y_timeInDay = sessionStart + remaining;
+            return baseDay + Y_timeInDay;
+        }
+
+        remaining -= available;
+        current = end; // chuyển sang phiên sau
+    }
+
+    // Nếu đến đây mà vẫn chưa đủ duration thì không thể tìm Y trong ngày
+    return null;
+}
 </script>

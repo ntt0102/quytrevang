@@ -450,15 +450,16 @@ function setChartData(chartData) {
 function updateChartData(data, lastTime) {
     if (data.length === 0) return false;
     const source = config.value.source;
-    const seen = new Map();
+    // const seen = new Map();
     const prices = data.map((item) => {
         let time, value;
         if (source === "FIREANT") {
+            // time = getUnixTime(addHours(new Date(item.date), 7));
+            // const offset = Math.trunc(lastTime) === time ? 0.5 : 0;
+            // const count = seen.get(time) || 0;
+            // seen.set(time, count + 1);
+            // time += offset + count * 0.01;
             time = getUnixTime(addHours(new Date(item.date), 7));
-            const offset = Math.trunc(lastTime) === time ? 0.5 : 0;
-            const count = seen.get(time) || 0;
-            seen.set(time, count + 1);
-            time += offset + count * 0.01;
             value = item.price;
         } else if (source === "VPS") {
             time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
@@ -469,19 +470,30 @@ function updateChartData(data, lastTime) {
         }
         return { time, value };
     });
-    if (lastTime) {
-        state.prices = [...state.prices, ...prices];
-        prices.forEach((item) => params.series.price.update(item));
-    } else {
+    // if (lastTime) {
+    //     state.prices = [...state.prices, ...prices];
+
+    //     prices.forEach((item) => params.series.price.update(item));
+    // } else {
+    //     getTools();
+    //     params.whitespaces = mergeChartData(
+    //         params.whitespaces,
+    //         createWhitespaceData(CURRENT_DATE)
+    //     );
+    //     params.series.whitespace.setData(params.whitespaces);
+    //     state.prices = prices;
+    //     params.series.price.setData(state.prices);
+    // }
+    if (!lastTime) {
         getTools();
         params.whitespaces = mergeChartData(
             params.whitespaces,
             createWhitespaceData(CURRENT_DATE)
         );
         params.series.whitespace.setData(params.whitespaces);
-        state.prices = prices;
-        params.series.price.setData(state.prices);
     }
+    state.prices = mergeChartData(state.prices, prices);
+    params.series.price.setData(state.prices);
 }
 function createWhitespaceData(date) {
     const amStart = getUnixTime(new Date(`${date}T09:00:00Z`));
