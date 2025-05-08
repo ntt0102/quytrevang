@@ -31,6 +31,7 @@ const store = useStore();
 const mf = inject("mf");
 const props = defineProps([
     "prices",
+    "bars",
     "pickTimeToolRef",
     "timeToIndex",
     "indexToTime",
@@ -102,63 +103,73 @@ function draw({ time, price }) {
         points.A = { time, price };
     } else {
         const data = time
-            ? props.prices.filter((item) => !mf.cmp(item.time, true, time))
-            : props.prices;
-        points = removeIndex(scanPattern(data));
+            ? props.bars.filter((item) => !mf.cmp(item.time, true, time))
+            : props.bars;
+        points = scanPattern(data);
     }
     load(points, { isSave: true });
     patternToolRef.value.classList.remove("selected");
 }
 function scanPattern(data) {
+    let start;
     let side;
     let [A, B, C, S] = Array(4).fill({});
-    for (let i = data.length - 1; i >= 0; i--) {
-        const price = data[i].value;
-        const time = data[i].time;
-        const index = props.timeToIndex(time);
-        if (index === -1) break;
-        if (i === data.length - 1) {
-            C = { index, time, price };
+    for (let ix = data.length - 1; ix >= 0; ix--) {
+        const high = data[ix].high;
+        const low = data[ix].low;
+        const t = data[ix].time;
+        const d = data[ix].date;
+        const i = props.timeToIndex(t);
+        if (ix === data.length - 1) {
+            start = { time: { t, d, i }, high, low };
+        }
+        if (side === undefined) {
+            if (
+                (high <= start.high && low >= start.low) ||
+                (high > start.high && low < start.low)
+            ) {
+                continue;
+            }
+            if (high > start.high && low >= start.low) side = true;
+            if (low < start.low && high <= start.high) side = false;
+            C = {
+                price: side ? start.low : start.high,
+                time: start.time,
+            };
             [B, A, S] = Array(3)
                 .fill(null)
                 .map(() => mf.cloneDeep(C));
         }
-        if (side === undefined) {
-            if (price === C.price) continue;
-            side = price > C.price;
-        }
-        if (mf.cmp(price, side, B.price)) {
+        const top = side ? high : low;
+        const bottom = side ? low : high;
+        if (mf.cmp(top, side, B.price)) {
             if (mf.cmp(A.price, !side, C.price)) {
                 [C, B] = [B, A].map((item) => mf.cloneDeep(item));
-                A = { index, time, price };
+                A = { time: { t, d, i }, price: top };
                 S = mf.cloneDeep(A);
                 side = !side;
-            } else B = { index, time, price };
+            } else B = { time: { t, d, i }, price: top };
         }
-        if (mf.cmp(price, !side, A.price, true)) {
-            A = { index, time, price };
+        if (mf.cmp(bottom, !side, A.price, true)) {
+            A = { time: { t, d, i }, price: bottom };
             S = mf.cloneDeep(A);
         }
-        if (mf.cmp(price, side, S.price)) S = { index, time, price };
+        if (mf.cmp(top, side, S.price)) S = { time: { t, d, i }, price: top };
         //
-        if (C.index > A.index && mf.cmp(C.price, side, A.price)) {
+        if (C.time.i > A.time.i && mf.cmp(C.price, side, A.price)) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
             if (bc >= scanThreshold) {
-                if (A.index - S.index >= C.index - B.index) break;
+                if (A.time.i - S.time.i >= C.time.i - B.time.i) break;
                 const as = mf.fmtNum(A.price - S.price, 1, true);
                 if (as > bc) break;
             }
         }
     }
+    delete A.time.i;
+    delete B.time.i;
+    delete C.time.i;
+    console.log("scanPattern", { A, B, C });
     return { A, B, C };
-}
-function removeIndex(obj) {
-    const result = {};
-    Object.entries(obj).forEach(([key, value]) => {
-        const { index, ...rest } = value;
-        result[key] = rest;
-    });
-    return result;
 }
 function load(data, { isSave = false, isCheck = false } = {}) {
     scanPoints = mf.cloneDeep(data);
@@ -233,21 +244,27 @@ function calculatePattern() {
     return result;
 }
 function calcContinuePattern() {
+    console.log("scanPoints", scanPoints);
     const { A, B, C } = scanPoints;
     const bc = B.price - C.price;
     let side = bc > 0;
     const pickTime = props.pickTimeToolRef.get();
+    console.log("phase1");
     const phase1 = scanPhase({
         side,
         start: A,
-        end: { time: Math.min(pickTime ?? B.time, B.time) },
+        end: { time: Math.min(pickTime ?? B.time.t, B.time.t) },
     });
+    console.log("phase2");
     const phase2 = scanPhase({
         side: !side,
         start: B,
-        end: { time: Math.min(pickTime ?? C.time, C.time) },
+        end: { time: Math.min(pickTime ?? C.time.t, C.time.t) },
     });
-    const stopTime = props.indexToTime(6 * phase2.R.index - 5 * phase1.S.index);
+    const stopTime = props.indexToTime(
+        6 * phase2.R.time.i - 5 * phase1.S.time.i
+    );
+    console.log("phase3");
     const phase3 = scanPhase({
         side,
         start: C,
@@ -262,13 +279,13 @@ function calcContinuePattern() {
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
-
+    console.log("phase4");
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: { time: Math.min(pickTime ?? E.time, E.time) },
+        end: { time: Math.min(pickTime ?? E.time.t, E.time.t) },
     });
-
+    console.log("phase5", E);
     const phase5 = scanPhase({
         side,
         start: E,
@@ -283,13 +300,14 @@ function calcContinuePattern() {
 
     const F = isBreak2 ? phase5.R1 : phase5.ext.R;
     const G = isBreak2 ? phase5.S1 : phase5.ext.S;
-
+    console.log("check", { phase1, phase2, phase3, phase4, phase5 });
+    console.log("phase6");
     const phase6 = scanPhase({
         side: !side,
         start: F,
-        end: { time: Math.min(pickTime ?? G.time, G.time) },
+        end: { time: Math.min(pickTime ?? G.time.t, G.time.t) },
     });
-
+    console.log("phase7");
     const phase7 = scanPhase({
         side,
         start: G,
@@ -325,14 +343,14 @@ function calcContinuePattern() {
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
 
-    const T1 = phase1.R.index + phase1.tr;
-    const T2 = phase2.R.index + phase2.tr;
-    const T2s = phase2.R.index + (phase2.R.index - phase2.R.index1);
-    const T3 = D.index + TR3;
-    const T4 = E.index + phase4.tr;
-    const T4s = E.index + (phase4.R.index - phase4.R.index1);
-    const T5 = F.index + TR5;
-    const T6 = G.index + phase6.tr;
+    const T1 = phase1.R.time.i + phase1.tr;
+    const T2 = phase2.R.time.i + phase2.tr;
+    const T2s = phase2.R.time.i + (phase2.R.time.i - phase2.R.time1.i);
+    const T3 = D.time.i + TR3;
+    const T4 = E.time.i + phase4.tr;
+    const T4s = E.time.i + (phase4.R.time.i - phase4.R.time1.i);
+    const T5 = F.time.i + TR5;
+    const T6 = G.time.i + phase6.tr;
     const timeMark = [T6, T5, T4, T3, T2, T1];
 
     const rABC = BC / AB;
@@ -346,20 +364,20 @@ function calcContinuePattern() {
     progress.steps = [
         [
             //
-            phase2.R.index1 > T1,
+            phase2.R.time1.i > T1,
             BC >= phase1.pr,
             rABC >= 0.3,
         ],
         [
             //
-            D.index1 > T2,
-            D.index1 > T2s,
+            D.time1.i > T2,
+            D.time1.i > T2s,
             rBCD >= 0.5,
             CD <= AB,
         ],
         [
             //
-            E.index1 > T3,
+            E.time1.i > T3,
             rCDE >= 0.5,
             rCDE >= 1.3 - rBCD,
             DE <= BC,
@@ -367,14 +385,14 @@ function calcContinuePattern() {
         ],
         [
             //
-            F.index1 > T4,
-            F.index1 > T4s,
+            F.time1.i > T4,
+            F.time1.i > T4s,
             rDEF >= 0.5,
             EF <= CD,
         ],
         [
             //
-            G.index1 > T5,
+            G.time1.i > T5,
             rEFG >= 0.5,
             rEFG >= 1.3 - rDEF,
             FG <= DE,
@@ -399,14 +417,14 @@ function calcContinuePattern() {
     }
     //
     const points = [
-        { time: A.time, value: A.price, color: "#FFFF00" },
-        { time: phase1.R.time1, value: phase1.R.price, color: "#FF7F00" },
-        { time: phase2.R.time1, value: phase2.R.price, color: "#FF0000" },
-        { time: D.time1, value: D.price, color: "#FF1493" },
-        { time: E.time1, value: E.price, color: "#8000FF" },
-        { time: F.time1, value: F.price, color: "#00FFFF" },
-        { time: G.time1, value: G.price, color: "#00FF00" },
-        { time: H.time1, value: H.price },
+        { time: A.time.t, value: A.price, color: "#FFFF00" },
+        { time: phase1.R.time1.t, value: phase1.R.price, color: "#FF7F00" },
+        { time: phase2.R.time1.t, value: phase2.R.price, color: "#FF0000" },
+        { time: D.time1.t, value: D.price, color: "#FF1493" },
+        { time: E.time1.t, value: E.price, color: "#8000FF" },
+        { time: F.time1.t, value: F.price, color: "#00FFFF" },
+        { time: G.time1.t, value: G.price, color: "#00FF00" },
+        { time: H.time1.t, value: H.price },
     ];
     //
     const refPrice = D.price;
@@ -453,9 +471,11 @@ function calcReversalPattern() {
     const phase1 = scanPhase({
         side: !side,
         start: A,
-        end: { time: Math.min(pickTime ?? B.time, B.time) },
+        end: { time: Math.min(pickTime ?? B.time.t, B.time.t) },
     });
-    const stopTime = props.indexToTime(6 * phase1.R.index - 5 * phase1.S.index);
+    const stopTime = props.indexToTime(
+        6 * phase1.R.time.i - 5 * phase1.S.time.i
+    );
     const phase2 = scanPhase({
         side,
         start: B,
@@ -474,7 +494,7 @@ function calcReversalPattern() {
     const phase3 = scanPhase({
         side: !side,
         start: C,
-        end: { time: Math.min(pickTime ?? D.time, D.time) },
+        end: { time: Math.min(pickTime ?? D.time.t, D.time.t) },
     });
 
     const phase4 = scanPhase({
@@ -495,7 +515,7 @@ function calcReversalPattern() {
     const phase5 = scanPhase({
         side: !side,
         start: E,
-        end: { time: Math.min(pickTime ?? F.time, F.time) },
+        end: { time: Math.min(pickTime ?? F.time.t, F.time.t) },
     });
 
     const phase6 = scanPhase({
@@ -531,13 +551,13 @@ function calcReversalPattern() {
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
 
-    const T1 = phase1.R.index + phase1.tr;
-    const T1s = phase1.R.index + (phase1.R.index - phase1.R.index1);
-    const T2 = C.index + TR2;
-    const T3 = D.index + phase3.tr;
-    const T3s = D.index + (phase3.R.index - phase3.R.index1);
-    const T4 = E.index + TR4;
-    const T5 = F.index + phase5.tr;
+    const T1 = phase1.R.time.i + phase1.tr;
+    const T1s = phase1.R.time.i + (phase1.R.time.i - phase1.R.time1.i);
+    const T2 = C.time.i + TR2;
+    const T3 = D.time.i + phase3.tr;
+    const T3s = D.time.i + (phase3.R.time.i - phase3.R.time1.i);
+    const T4 = E.time.i + TR4;
+    const T5 = F.time.i + phase5.tr;
     const timeMark = [T5, T4, T3, T2, T1];
 
     const rABC = BC / AB;
@@ -550,14 +570,14 @@ function calcReversalPattern() {
     progress.steps = [
         [
             //
-            C.index1 > T1,
-            C.index1 > T1s,
+            C.time1.i > T1,
+            C.time1.i > T1s,
             BC >= phase1.pr,
             rABC >= 0.3,
         ],
         [
             //
-            D.index1 > T2,
+            D.time1.i > T2,
             rBCD >= 0.7,
             // rBCD >= 0.5,
             CD <= AB,
@@ -565,14 +585,14 @@ function calcReversalPattern() {
         ],
         [
             //
-            E.index1 > T3,
-            E.index1 > T3s,
+            E.time1.i > T3,
+            E.time1.i > T3s,
             rCDE >= 0.5,
             DE <= BC,
         ],
         [
             //
-            F.index1 > T4,
+            F.time1.i > T4,
             rDEF >= 0.5,
             rDEF >= 1.3 - rCDE,
             EF <= CD,
@@ -597,13 +617,13 @@ function calcReversalPattern() {
     }
     //
     const points = [
-        { time: A.time, value: A.price, color: "#FF7F00" },
-        { time: phase1.R.time1, value: B.price, color: "#FF0000" },
-        { time: C.time1, value: C.price, color: "#FF1493" },
-        { time: D.time1, value: D.price, color: "#8000FF" },
-        { time: E.time1, value: E.price, color: "#00FFFF" },
-        { time: F.time1, value: F.price, color: "#00FF00" },
-        { time: G.time1, value: G.price },
+        { time: A.time.t, value: A.price, color: "#FF7F00" },
+        { time: phase1.R.time1.t, value: B.price, color: "#FF0000" },
+        { time: C.time1.t, value: C.price, color: "#FF1493" },
+        { time: D.time1.t, value: D.price, color: "#8000FF" },
+        { time: E.time1.t, value: E.price, color: "#00FFFF" },
+        { time: F.time1.t, value: F.price, color: "#00FF00" },
+        { time: G.time1.t, value: G.price },
     ];
     //
     const refPrice = C.price;
@@ -643,35 +663,49 @@ function calcReversalPattern() {
     };
 }
 function scanPhase({ side, start, end }) {
-    let S = { ...mf.cloneDeep(start), index: props.timeToIndex(start.time) },
+    let S = mf.cloneDeep(start),
         R = {},
         box = {},
         maxBox = {},
         preBox = {},
         extBox = {};
-    const _prices = props.prices.filter((item) => {
-        let cond = item.time >= start.time;
+    S.time.i = props.timeToIndex(S.time.t);
+    const bars = props.bars.filter((item) => {
+        let cond = item.time >= start.time.t;
         if (end.time) cond = cond && item.time <= end.time;
         return cond;
     });
-    if (_prices.length > 0) {
-        _prices.every((item, i) => {
-            const price = item.value;
-            if (start.price && mf.cmp(price, !side, start.price)) return false;
-            if (end.price && mf.cmp(price, side, end.price)) return false;
-            const time = item.time;
-            const index = props.timeToIndex(time);
-            if (index === -1) return false;
-            if (i === 0 || (start.price && price === start.price)) {
+    if (bars.length > 0) {
+        bars.every((item, ix) => {
+            const high = side ? item.high : item.low;
+            const low = side ? item.low : item.high;
+            const t = item.time;
+            const d = item.date;
+            const i = props.timeToIndex(t);
+            if (ix === 0 || (start.price && low === start.price)) {
                 box = {
-                    R: { index, time, price, index1: index, time1: time },
-                    S: { index, time, price, index1: index, time1: time },
+                    R: {
+                        price: high,
+                        time1: { t, d, i },
+                        time: { t, d, i },
+                    },
+                    S: {
+                        price: high,
+                        time1: { t, d, i },
+                        time: { t, d, i },
+                    },
                     pr: 0,
                     tr: 0,
                 };
                 maxBox = mf.cloneDeep(box);
             }
-            if (mf.cmp(price, side, box.R.price, true)) {
+            if (start.price && mf.cmp(low, !side, start.price)) {
+                return false;
+            }
+            if (end.price && mf.cmp(high, side, end.price)) {
+                return false;
+            }
+            if (mf.cmp(high, side, box.R.price, true)) {
                 if (box.pr > 0) {
                     if (
                         (box.pr >= maxBox.pr &&
@@ -685,30 +719,30 @@ function scanPhase({ side, start, end }) {
                         if (maxBox.pr < preBox.pr) maxBox.pr = preBox.pr;
                     }
                 }
-                const isREqual = price === box.R.price;
+                const isREqual = high === box.R.price;
                 box = {
                     R: {
-                        index,
-                        time,
-                        price,
-                        index1: isREqual ? box.R.index1 : index,
-                        time1: isREqual ? box.R.time1 : time,
+                        price: high,
+                        time1: isREqual ? box.R.time1 : { t, d, i },
+                        time: { t, d, i },
                     },
-                    S: { index, time, price, index1: index, time1: time },
+                    S: {
+                        price: high,
+                        time1: { t, d, i },
+                        time: { t, d, i },
+                    },
                     pr: 0,
                     tr: 0,
                 };
             } else {
-                if (mf.cmp(price, !side, box.S.price, true)) {
-                    if (price !== box.S.price) {
-                        box.pr = mf.fmtNum(price - box.R.price, 1, true);
-                        box.tr = index - box.R.index;
-                        box.S.price = price;
-                        box.S.index1 = index;
-                        box.S.time1 = time;
+                if (mf.cmp(low, !side, box.S.price, true)) {
+                    if (low !== box.S.price) {
+                        box.S.price = low;
+                        box.S.time1 = { t, d, i };
+                        box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
+                        box.tr = box.S.time1.i - box.R.time.i;
                     }
-                    box.S.index = index;
-                    box.S.time = time;
+                    box.S.time = { t, d, i };
                 }
             }
             return true;
@@ -728,18 +762,19 @@ function scanPhase({ side, start, end }) {
     }
 
     return {
-        tr: maxBox.tr,
-        pr: maxBox.pr,
-        S1: maxBox.S,
-        R1: maxBox.R,
-        pre: preBox,
         S,
         R,
+        S1: maxBox.S,
+        R1: maxBox.R,
+        tr: maxBox.tr,
+        pr: maxBox.pr,
+        pre: preBox,
         ext: extBox,
     };
 }
-function checkPointsValid({ A: { time } }) {
-    return time >= props.prices[0].time && time < props.prices.at(-1).time;
+function checkPointsValid({ A }) {
+    const aTime = A.time.t;
+    return aTime >= props.bars[0].time && aTime < props.bars.at(-1).time;
 }
 function adjustTargetPrice(price, range, side) {
     const target = price + (side ? 1 : -1) * range;
@@ -766,19 +801,20 @@ function adjustPatternPoints() {
     if (pickTime) return false;
     //
     const side = scanPoints.B.price > scanPoints.A.price;
-    const cIndex = props.prices.findIndex(
-        (bar) => bar.time === scanPoints.C.time
+    const cIndex = props.bars.findIndex(
+        (bar) => bar.time === scanPoints.C.time.t
     );
     let newPoint = mf.cloneDeep(scanPoints.C);
-    for (let i = cIndex; i < props.prices.length; i++) {
-        const time = props.prices[i].time;
-        const price = props.prices[i].value;
+    for (let i = cIndex; i < props.bars.length; i++) {
+        const t = props.bars[i].time;
+        const d = props.bars[i].date;
+        const price = side ? props.bars[i].low : props.bars[i].high;
         if (mf.cmp(price, !side, newPoint.price)) {
-            newPoint.time = time;
+            newPoint.time = { t, d };
             newPoint.price = price;
         }
     }
-    if (newPoint.time !== scanPoints.C.time) {
+    if (newPoint.time.t !== scanPoints.C.time.t) {
         scanPoints.C = newPoint;
         savePattern();
     }

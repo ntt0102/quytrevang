@@ -30,13 +30,7 @@ import { getUnixTime, addHours } from "date-fns";
 const store = useStore();
 const { t } = useI18n();
 const mf = inject("mf");
-const props = defineProps([
-    "position",
-    "prices",
-    "drawPriceLine",
-    "inSession",
-    "TIME",
-]);
+const props = defineProps(["position", "drawPriceLine", "inSession", "TIME"]);
 const emit = defineEmits(["hideContext"]);
 const orderToolRef = ref(null);
 const isOrderWarning = ref(false);

@@ -22,16 +22,17 @@ class DerivativeService extends CoreService
      */
     public function getChartData($payload)
     {
-        $data = ['price' => []];
+        $data = [];
         $file = storage_path('app/phaisinh/' . $payload->date . '.csv');
         if (!file_exists($file)) return $data;
         $fp = fopen($file, 'r');
         while (!feof($fp)) {
             $line = fgetcsv($fp);
-            if (!!$line) {
-                $data['price'][] = [
-                    'time' => +$line[0],
-                    'value' => +$line[1],
+            if ($line) {
+                $data[] = [
+                    'id' => +$line[0],
+                    'date' => $line[1],
+                    'price' => +$line[2],
                 ];
             }
         }

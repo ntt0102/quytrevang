@@ -93,7 +93,7 @@
             />
             <PatternTool
                 ref="patternToolRef"
-                :prices="state.prices"
+                :bars="state.bars"
                 :pickTimeToolRef="pickTimeToolRef"
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
@@ -132,7 +132,6 @@
             <OrderTool
                 ref="orderToolRef"
                 :position="status.position"
-                :prices="state.prices"
                 :drawPriceLine="drawPriceLine"
                 :inSession="inSession"
                 :TIME="state.TIME"
@@ -222,6 +221,7 @@ const SOCKET_ENDPOINT = {
 };
 
 let params = {
+    ohlcMap: new Map(),
     chart: {},
     series: {},
     whitespaces: [],
@@ -326,10 +326,18 @@ function drawChart() {
         lastValueVisible: false,
         priceLineVisible: false,
     });
-    params.series.price = params.chart.addLineSeries({
-        color: "#F5F5F5",
+    params.series.price = params.chart.addCandlestickSeries({
+        upColor: "#F5F5F5",
+        downColor: "#F5F5F5",
+        borderVisible: false,
+        wickUpColor: "#F5F5F5",
+        wickDownColor: "#F5F5F5",
         priceFormat: { minMove: 0.1 },
     });
+    // params.series.price = params.chart.addLineSeries({
+    //     color: "#F5F5F5",
+    //     priceFormat: { minMove: 0.1 },
+    // });
 }
 function removeChart() {
     if (params.chart) {
@@ -433,67 +441,48 @@ function chartShortcut(e) {
             break;
     }
 }
-function setChartData(chartData) {
+function setChartData(ticks) {
     if (!(state.chartDate === CURRENT_DATE && inSession())) {
-        if (chartData.price.length > 0) {
+        if (ticks.length > 0) {
             params.whitespaces = mergeChartData(
                 params.whitespaces,
                 createWhitespaceData(state.chartDate)
             );
         }
         params.series.whitespace.setData(params.whitespaces);
-
-        state.prices = mergeChartData(state.prices, chartData.price);
-        params.series.price.setData(state.prices);
+        //
+        setCandlestick(ticks);
     }
 }
-function updateChartData(data, lastTime) {
-    if (data.length === 0) return false;
-    const source = config.value.source;
-    // const seen = new Map();
-    const prices = data.map((item) => {
-        let time, value;
-        if (source === "FIREANT") {
-            // time = getUnixTime(addHours(new Date(item.date), 7));
-            // const offset = Math.trunc(lastTime) === time ? 0.5 : 0;
-            // const count = seen.get(time) || 0;
-            // seen.set(time, count + 1);
-            // time += offset + count * 0.01;
-            time = getUnixTime(addHours(new Date(item.date), 7));
-            value = item.price;
-        } else if (source === "VPS") {
-            time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
-            value = item.lastPrice;
-        } else if (source === "DNSE") {
-            time = getUnixTime(addHours(new Date(item.time), 7));
-            value = item.matchPrice;
-        }
-        return { time, value };
-    });
-    // if (lastTime) {
-    //     state.prices = [...state.prices, ...prices];
-
-    //     prices.forEach((item) => params.series.price.update(item));
-    // } else {
-    //     getTools();
-    //     params.whitespaces = mergeChartData(
-    //         params.whitespaces,
-    //         createWhitespaceData(CURRENT_DATE)
-    //     );
-    //     params.series.whitespace.setData(params.whitespaces);
-    //     state.prices = prices;
-    //     params.series.price.setData(state.prices);
-    // }
-    if (!lastTime) {
+function updateChartData(ticks, isFirst) {
+    // if (data.length === 0) return false;
+    // const source = config.value.source;
+    // const prices = data.map((item) => {
+    //     let time, value;
+    //     if (source === "FIREANT") {
+    //         time = getUnixTime(addHours(new Date(item.date), 7));
+    //         value = item.price;
+    //     } else if (source === "VPS") {
+    //         time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
+    //         value = item.lastPrice;
+    //     } else if (source === "DNSE") {
+    //         time = getUnixTime(addHours(new Date(item.time), 7));
+    //         value = item.matchPrice;
+    //     }
+    //     return { time, value };
+    // });
+    // state.bars = mergeChartData(state.bars, prices);
+    // params.series.price.setData(state.bars);
+    if (isFirst) {
         getTools();
         params.whitespaces = mergeChartData(
             params.whitespaces,
             createWhitespaceData(CURRENT_DATE)
         );
         params.series.whitespace.setData(params.whitespaces);
-    }
-    state.prices = mergeChartData(state.prices, prices);
-    params.series.price.setData(state.prices);
+        //
+        setCandlestick(ticks);
+    } else updateCandlestick(ticks);
 }
 function createWhitespaceData(date) {
     const amStart = getUnixTime(new Date(`${date}T09:00:00Z`));
@@ -605,7 +594,7 @@ function configFIREANTSocket() {
                 const date = item.result[0].date.slice(0, 10);
                 if (date === CURRENT_DATE) {
                     console.log("FIREANT-first", item.result);
-                    updateChartData(item.result);
+                    updateChartData(item.result, true);
                 }
                 store.dispatch("tradingDerivative/setLoading", false);
             } else if (
@@ -621,7 +610,7 @@ function configFIREANTSocket() {
                         ? a.id - b.id
                         : new Date(a.date) - new Date(b.date)
                 );
-                updateChartData(updatedData, state.prices.at(-1).time);
+                updateChartData(updatedData);
             }
         });
     };
@@ -664,7 +653,7 @@ function configVpsSocket() {
                     if (data.id === 3220) {
                         console.log("VPS", data);
                         orderToolRef.value.scan(data.lastPrice);
-                        updateChartData([data], state.prices.at(-1).time);
+                        updateChartData([data]);
                     }
                 }
             }
@@ -678,7 +667,7 @@ function getVpsData() {
         fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
             .then((response) => response.json())
             .then((data) => {
-                updateChartData(data);
+                updateChartData(data, true);
                 console.log("VPS: ", data);
             });
         params.socketUpdatedAt = new Date();
@@ -700,7 +689,7 @@ function configDnseSocket() {
             const time = new Date(tick.time.seconds.low * 1000);
             tick.time = time.toISOString();
             console.log("DNSE: ", tick);
-            updateChartData([tick], state.prices.at(-1).time);
+            updateChartData([tick]);
         }
     });
 }
@@ -719,7 +708,7 @@ function getDnseData() {
             .then((response) => response.json())
             .then((data) => {
                 console.log("DNSE: ", data.data.GetTicksBySymbol.data);
-                updateChartData(data.data.GetTicksBySymbol.data);
+                updateChartData(data.data.GetTicksBySymbol.data, true);
             });
 
         params.socketUpdatedAt = new Date();
@@ -758,7 +747,7 @@ function dateSelectChange() {
 }
 function resetChart() {
     params.whitespaces = [];
-    state.prices = [];
+    state.bars = [];
     params.socketUpdatedAt = subSeconds(new Date(), 61);
     connectSocket();
     getChartData();
@@ -850,6 +839,68 @@ function indexToTime(index) {
 function drawPriceLine(data, isRemove = false) {
     if (isRemove) params.series.price.removePriceLine(data);
     else return params.series.price.createPriceLine(data);
+}
+function setCandlestick(ticks) {
+    ticks.forEach(({ date, price }) => {
+        const time = getUnixTime(addHours(new Date(date), 7));
+        if (!params.ohlcMap.has(time)) {
+            const bar = {
+                date,
+                time,
+                open: price,
+                high: price,
+                low: price,
+                close: price,
+            };
+            params.ohlcMap.set(time, bar);
+        } else {
+            const bar = params.ohlcMap.get(time);
+            bar.high = Math.max(bar.high, price);
+            bar.low = Math.min(bar.low, price);
+            bar.open = price;
+            bar.close = price;
+        }
+    });
+    const bars = Array.from(params.ohlcMap.values()).sort(
+        (a, b) => new Date(a.time) - new Date(b.time)
+    );
+    params.series.price.setData(bars);
+    state.bars = bars;
+}
+function updateCandlestick(ticks) {
+    ticks
+        .sort((a, b) =>
+            a.date === b.date
+                ? a.id - b.id
+                : new Date(a.date) - new Date(b.date)
+        )
+        .forEach(({ date, price }) => {
+            const time = getUnixTime(addHours(new Date(date), 7));
+            if (!params.ohlcMap.has(time)) {
+                const bar = {
+                    time,
+                    open: price,
+                    high: price,
+                    low: price,
+                    close: price,
+                };
+                params.series.price.update(bar);
+                params.ohlcMap.set(time, bar);
+            } else {
+                try {
+                    const bar = params.ohlcMap.get(time);
+                    bar.high = Math.max(bar.high, price);
+                    bar.low = Math.min(bar.low, price);
+                    bar.open = price;
+                    bar.close = price;
+                    params.series.price.update(bar);
+                } catch (error) {
+                    return;
+                }
+            }
+        });
+    const bars = Array.from(params.ohlcMap.values());
+    state.bars = bars;
 }
 </script>
 <style lang="scss">
