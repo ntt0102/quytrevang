@@ -178,7 +178,6 @@ function scanPattern(data) {
     delete A.time.i;
     delete B.time.i;
     delete C.time.i;
-    console.log("scanPattern", { A, B, C });
     return { A, B, C };
 }
 function load(data, { isSave = false, isCheck = false } = {}) {
@@ -254,18 +253,15 @@ function calculatePattern() {
     return result;
 }
 function calcContinuePattern() {
-    console.log("scanPoints", scanPoints);
     const { A, B, C } = scanPoints;
     const bc = B.price - C.price;
     let side = bc > 0;
     const pickTime = props.pickTimeToolRef.get();
-    console.log("phase1");
     const phase1 = scanPhase({
         side,
         start: A,
         end: { time: Math.min(pickTime ?? B.time.t, B.time.t) },
     });
-    console.log("phase2");
     const phase2 = scanPhase({
         side: !side,
         start: B,
@@ -274,7 +270,6 @@ function calcContinuePattern() {
     const stopTime = props.indexToTime(
         6 * phase2.R.time.i - 5 * phase1.S.time.i
     );
-    console.log("phase3");
     const phase3 = scanPhase({
         side,
         start: C,
@@ -289,13 +284,11 @@ function calcContinuePattern() {
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
-    console.log("phase4");
     const phase4 = scanPhase({
         side: !side,
         start: D,
         end: { time: Math.min(pickTime ?? E.time.t, E.time.t) },
     });
-    console.log("phase5", E);
     const phase5 = scanPhase({
         side,
         start: E,
@@ -310,14 +303,11 @@ function calcContinuePattern() {
 
     const F = isBreak2 ? phase5.R1 : phase5.ext.R;
     const G = isBreak2 ? phase5.S1 : phase5.ext.S;
-    console.log("check", { phase1, phase2, phase3, phase4, phase5 });
-    console.log("phase6");
     const phase6 = scanPhase({
         side: !side,
         start: F,
         end: { time: Math.min(pickTime ?? G.time.t, G.time.t) },
     });
-    console.log("phase7");
     const phase7 = scanPhase({
         side,
         start: G,
@@ -462,6 +452,7 @@ function calcContinuePattern() {
             tpPrice: x,
             slPrice: sl,
         };
+        console.log("order", order);
     }
 
     return {
