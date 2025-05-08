@@ -52,6 +52,16 @@ let scanPoints = {};
 let lines = {};
 let series = {};
 
+const colorMap = {
+    yellow: "rgba(255, 255, 0, 0.7)",
+    orange: "rgba(255, 127, 0, 0.7)",
+    red: "rgba(255, 0, 0, 0.7)",
+    pink: "rgba(255, 20, 147, 0.7)",
+    purple: "rgba(128, 0, 255, 0.7)",
+    cyan: "rgba(0, 255, 255, 0.7)",
+    green: "rgba(0, 255, 0, 0.7)",
+};
+
 defineExpose({
     isSelected,
     createSeries,
@@ -417,13 +427,17 @@ function calcContinuePattern() {
     }
     //
     const points = [
-        { time: A.time.t, value: A.price, color: "#FFFF00" },
-        { time: phase1.R.time1.t, value: phase1.R.price, color: "#FF7F00" },
-        { time: phase2.R.time1.t, value: phase2.R.price, color: "#FF0000" },
-        { time: D.time1.t, value: D.price, color: "#FF1493" },
-        { time: E.time1.t, value: E.price, color: "#8000FF" },
-        { time: F.time1.t, value: F.price, color: "#00FFFF" },
-        { time: G.time1.t, value: G.price, color: "#00FF00" },
+        { time: A.time.t, value: A.price, color: colorMap.yellow },
+        {
+            time: phase1.R.time1.t,
+            value: phase1.R.price,
+            color: colorMap.orange,
+        },
+        { time: phase2.R.time1.t, value: phase2.R.price, color: colorMap.red },
+        { time: D.time1.t, value: D.price, color: colorMap.pink },
+        { time: E.time1.t, value: E.price, color: colorMap.purple },
+        { time: F.time1.t, value: F.price, color: colorMap.cyan },
+        { time: G.time1.t, value: G.price, color: colorMap.green },
         { time: H.time1.t, value: H.price },
     ];
     //
@@ -617,12 +631,12 @@ function calcReversalPattern() {
     }
     //
     const points = [
-        { time: A.time.t, value: A.price, color: "#FF7F00" },
-        { time: phase1.R.time1.t, value: B.price, color: "#FF0000" },
-        { time: C.time1.t, value: C.price, color: "#FF1493" },
-        { time: D.time1.t, value: D.price, color: "#8000FF" },
-        { time: E.time1.t, value: E.price, color: "#00FFFF" },
-        { time: F.time1.t, value: F.price, color: "#00FF00" },
+        { time: A.time.t, value: A.price, color: colorMap.orange },
+        { time: phase1.R.time1.t, value: B.price, color: colorMap.red },
+        { time: C.time1.t, value: C.price, color: colorMap.pink },
+        { time: D.time1.t, value: D.price, color: colorMap.purple },
+        { time: E.time1.t, value: E.price, color: colorMap.cyan },
+        { time: F.time1.t, value: F.price, color: colorMap.green },
         { time: G.time1.t, value: G.price },
     ];
     //
@@ -855,12 +869,12 @@ function removePatternTool() {
 }
 function setTimeMark(data) {
     const colors = [
-        "#00FF00",
-        "#00FFFF",
-        "#8000FF",
-        "#FF1493",
-        "#FF0000",
-        "#FF7F00",
+        colorMap.green,
+        colorMap.cyan,
+        colorMap.purple,
+        colorMap.pink,
+        colorMap.red,
+        colorMap.orange,
     ];
     let result = [];
     data.forEach((item, i) => {
