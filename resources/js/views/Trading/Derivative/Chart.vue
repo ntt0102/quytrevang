@@ -813,9 +813,7 @@ function coordinateToPrice(y) {
     return mf.fmtNum(params.series.price.coordinateToPrice(y));
 }
 function timeToIndex(time) {
-    let index = params.whitespaces.findIndex(
-        (item) => item.time === Math.trunc(time)
-    );
+    let index = params.whitespaces.findIndex((item) => item.time === time);
     if (index === -1) {
         try {
             const date = format(new Date(time * 1000), "yyyy-MM-dd");
