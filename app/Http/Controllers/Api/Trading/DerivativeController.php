@@ -237,4 +237,17 @@ class DerivativeController extends CoreController
         $data = $this->derivativeService->setting($this->payload);
         return $this->sendResponse($data);
     }
+
+    /**
+     * Clean Old Orders
+     *
+     * @param Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function cleanOldOrders(Request $request)
+    {
+        $data = $this->derivativeService->cleanOldOrders($this->payload);
+        return $this->sendResponse($data);
+    }
 }

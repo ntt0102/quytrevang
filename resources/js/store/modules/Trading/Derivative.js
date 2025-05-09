@@ -203,13 +203,21 @@ const actions = {
     },
     setting({ commit, dispatch, getters, state, rootGetters }, param) {
         return new Promise((resolve, reject) => {
-            console.log("setting", param);
             axios.post("trading/derivative/setting", param).then((response) => {
                 if (response.data.isOk) {
                     commit("setting", param);
                 }
                 resolve(response.data.isOk);
             });
+        });
+    },
+    cleanOldOrders({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .post("trading/derivative/clean-old-orders", null)
+                .then((response) => {
+                    resolve();
+                });
         });
     },
     setLoading({ commit }, state) {

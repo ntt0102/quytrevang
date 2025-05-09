@@ -118,6 +118,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                     Route::post('report', 'DerivativeController@report');
                     Route::post('export', 'DerivativeController@export');
                     Route::post('setting', 'DerivativeController@setting');
+                    Route::post('clean-old-orders', 'DerivativeController@cleanOldOrders');
                 });
                 Route::group(['prefix' => 'derstat', 'middleware' => 'can:admin:statistic_derivative'], function () {
                     Route::post('/', 'DerstatController@fetch');

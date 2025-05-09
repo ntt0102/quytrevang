@@ -5,6 +5,7 @@
         :class="{ red: hasOrder }"
         :title="$t('trading.derivative.tools.order')"
         @click="toggleOrderContext"
+        @contextmenu="cleanOldOrders"
     >
         <i class="far fa-gavel" :class="{ blink: isOrderWarning }"> </i>
         <OrderContext
@@ -432,6 +433,9 @@ function drag({ line, lineOptions, oldPrice, newPrice }) {
             toast.show(t("trading.derivative.toasts.noChangeOrderLine"));
         }
     }
+}
+function cleanOldOrders() {
+    store.dispatch("tradingDerivative/cleanOldOrders");
 }
 function getOrderByKind(kind, price) {
     return Object.values(orders.value).find(
