@@ -387,6 +387,7 @@ function calcContinuePattern() {
             rCDE >= 0.5,
             rCDE >= 1.25 - rBCD,
             DE <= BC,
+            FEEs < 0.5,
             rDEG < 0.5,
         ],
         [
@@ -395,7 +396,6 @@ function calcContinuePattern() {
             F.time1.i > T4s,
             rDEF >= 0.5,
             EF <= CD,
-            FEEs < 0.5,
         ],
         [
             //
@@ -598,6 +598,7 @@ function calcReversalPattern() {
             D.time1.i > T2,
             rBCD >= 0.7,
             CD <= AB,
+            EDDs < 0.5,
             rCDF < 0.5,
         ],
         [
@@ -606,7 +607,6 @@ function calcReversalPattern() {
             E.time1.i > T3s,
             rCDE >= 0.5,
             DE <= BC,
-            EDDs < 0.5,
         ],
         [
             //
@@ -740,10 +740,13 @@ function scanPhase({ side, start, end }) {
                     }
                 }
                 const isREqual = high === box.R.price;
+                const price1R = side
+                    ? Math.min(box.R.price1, box.S.price)
+                    : Math.max(box.R.price1, box.S.price);
                 box = {
                     R: {
                         price: high,
-                        price: isREqual ? box.S.price : high,
+                        price1: isREqual ? price1R : high,
                         time: { t, d, i },
                         time1: isREqual ? box.R.time1 : { t, d, i },
                     },
