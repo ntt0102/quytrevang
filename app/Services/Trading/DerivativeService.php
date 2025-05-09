@@ -10,7 +10,6 @@ use App\Models\DerivativeOrder;
 use App\Jobs\ReportTradingJob;
 use App\Jobs\ExportDerDnseJob;
 use App\Jobs\ExportDerVpsJob;
-use Illuminate\Support\Facades\DB;
 
 class DerivativeService extends CoreService
 {
@@ -547,7 +546,7 @@ class DerivativeService extends CoreService
         if (DerivativeOrder::active()->exists()) {
             return ['isOk' => false];
         }
-        DB::table('derivative_orders')->truncate();
+        DerivativeOrder::truncate();
         return ['isOk' => true];
     }
 }
