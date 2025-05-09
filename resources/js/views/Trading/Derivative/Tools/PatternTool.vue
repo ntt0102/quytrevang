@@ -335,8 +335,10 @@ function calcContinuePattern() {
     const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
+    const CCs = mf.fmtNum(phase2.R.price1 - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
+    const EEs = mf.fmtNum(phase4.R.price1 - E.price, 1, true);
     const FG = mf.fmtNum(G.price - F.price, 1, true);
     const EG = mf.fmtNum(G.price - E.price, 1, true);
 
@@ -355,8 +357,10 @@ function calcContinuePattern() {
 
     const rABC = BC / AB;
     const rBCD = CD / BC;
+    const DCCs = CCs / CD;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
+    const FEEs = EEs / EF;
     const rEFG = FG / EF;
     const rDEG = EG / DE;
 
@@ -374,6 +378,7 @@ function calcContinuePattern() {
             D.time1.i > T2s,
             rBCD >= 0.5,
             CD <= AB,
+            DCCs < 0.5,
             D.price !== F.price,
         ],
         [
@@ -390,6 +395,7 @@ function calcContinuePattern() {
             F.time1.i > T4s,
             rDEF >= 0.5,
             EF <= CD,
+            FEEs < 0.5,
         ],
         [
             //
@@ -549,8 +555,10 @@ function calcReversalPattern() {
 
     const AB = mf.fmtNum(ab, 1, true);
     const BC = mf.fmtNum(C.price - B.price, 1, true);
+    const BBs = mf.fmtNum(phase1.R.price1 - B.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
+    const DDs = mf.fmtNum(phase3.R.price1 - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const DF = mf.fmtNum(F.price - D.price, 1, true);
 
@@ -567,8 +575,10 @@ function calcReversalPattern() {
     const timeMark = [T5, T4, T3, T2, T1];
 
     const rABC = BC / AB;
+    const CBBs = BBs / BC;
     const rBCD = CD / BC;
     const rCDE = DE / CD;
+    const EDDs = DDs / DE;
     const rDEF = EF / DE;
     const rCDF = DF / CD;
 
@@ -580,6 +590,7 @@ function calcReversalPattern() {
             C.time1.i > T1s,
             BC >= phase1.pr,
             rABC >= 0.3,
+            CBBs < 0.5,
             C.price !== E.price,
         ],
         [
@@ -595,6 +606,7 @@ function calcReversalPattern() {
             E.time1.i > T3s,
             rCDE >= 0.5,
             DE <= BC,
+            EDDs < 0.5,
         ],
         [
             //
@@ -692,13 +704,15 @@ function scanPhase({ side, start, end }) {
                 box = {
                     R: {
                         price: high,
-                        time1: { t, d, i },
+                        price1: high,
                         time: { t, d, i },
+                        time1: { t, d, i },
                     },
                     S: {
                         price: high,
-                        time1: { t, d, i },
+                        price1: high,
                         time: { t, d, i },
+                        time1: { t, d, i },
                     },
                     pr: 0,
                     tr: 0,
@@ -729,26 +743,33 @@ function scanPhase({ side, start, end }) {
                 box = {
                     R: {
                         price: high,
-                        time1: isREqual ? box.R.time1 : { t, d, i },
+                        price: isREqual ? box.S.price : high,
                         time: { t, d, i },
+                        time1: isREqual ? box.R.time1 : { t, d, i },
                     },
                     S: {
                         price: high,
-                        time1: { t, d, i },
+                        price1: high,
                         time: { t, d, i },
+                        time1: { t, d, i },
                     },
                     pr: 0,
                     tr: 0,
                 };
             } else {
                 if (mf.cmp(low, !side, box.S.price, true)) {
+                    box.S.time = { t, d, i };
                     if (low !== box.S.price) {
                         box.S.price = low;
+                        box.S.price1 = low;
                         box.S.time1 = { t, d, i };
                         box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                         box.tr = box.S.time1.i - box.R.time.i;
                     }
-                    box.S.time = { t, d, i };
+                } else {
+                    if (mf.cmp(high, side, box.S.price1)) {
+                        box.S.price1 = high;
+                    }
                 }
             }
             return true;
@@ -815,7 +836,7 @@ function adjustPatternPoints() {
         const t = props.bars[i].time;
         const d = props.bars[i].date;
         const price = side ? props.bars[i].low : props.bars[i].high;
-        if (mf.cmp(price, !side, newPoint.price)) {
+        if (mf.cmp(price, !side, newPoint.price, true)) {
             newPoint.time = { t, d };
             newPoint.price = price;
         }
