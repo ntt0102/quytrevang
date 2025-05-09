@@ -374,6 +374,7 @@ function calcContinuePattern() {
             D.time1.i > T2s,
             rBCD >= 0.5,
             CD <= AB,
+            D.price !== F.price,
         ],
         [
             //
@@ -579,12 +580,12 @@ function calcReversalPattern() {
             C.time1.i > T1s,
             BC >= phase1.pr,
             rABC >= 0.3,
+            C.price !== E.price,
         ],
         [
             //
             D.time1.i > T2,
             rBCD >= 0.7,
-            // rBCD >= 0.5,
             CD <= AB,
             rCDF < 0.5,
         ],
