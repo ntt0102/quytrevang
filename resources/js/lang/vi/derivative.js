@@ -24,7 +24,7 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > 50",
-            "P > 130-Pđỏ",
+            "P > 125-Pđỏ",
             "P < Pmax",
             "Plam < 50",
         ],
@@ -45,7 +45,7 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > 50",
-            "P > 130-Ptím",
+            "P > 125-Ptím",
             // "Pe < 50",
             "P < Pmax",
         ],
@@ -89,7 +89,7 @@ const reversalPattern = [
             //
             "T > Tmin",
             "P > 50",
-            "P > 130-Ptím",
+            "P > 125-Ptím",
             "P < Pmax",
         ],
     },

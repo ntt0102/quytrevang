@@ -379,7 +379,7 @@ function calcContinuePattern() {
             //
             E.time1.i > T3,
             rCDE >= 0.5,
-            rCDE >= 1.3 - rBCD,
+            rCDE >= 1.25 - rBCD,
             DE <= BC,
             rDEG < 0.5,
         ],
@@ -394,7 +394,7 @@ function calcContinuePattern() {
             //
             G.time1.i > T5,
             rEFG >= 0.5,
-            rEFG >= 1.3 - rDEF,
+            rEFG >= 1.25 - rDEF,
             FG <= DE,
         ],
     ];
@@ -599,7 +599,7 @@ function calcReversalPattern() {
             //
             F.time1.i > T4,
             rDEF >= 0.5,
-            rDEF >= 1.3 - rCDE,
+            rDEF >= 1.25 - rCDE,
             EF <= CD,
         ],
     ];
