@@ -335,7 +335,6 @@ function calcContinuePattern() {
     const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
-    const CCs = mf.fmtNum(phase2.R.price1 - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const EEs = mf.fmtNum(phase4.R.price1 - E.price, 1, true);
@@ -357,10 +356,9 @@ function calcContinuePattern() {
 
     const rABC = BC / AB;
     const rBCD = CD / BC;
-    const DCCs = CCs / CD;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
-    const FEEs = EEs / EF;
+    const rDEEs = EEs / DE;
     const rEFG = FG / EF;
     const rDEG = EG / DE;
 
@@ -378,7 +376,6 @@ function calcContinuePattern() {
             D.time1.i > T2s,
             rBCD >= 0.5,
             CD <= AB,
-            DCCs < 0.5,
             D.price !== F.price,
         ],
         [
@@ -387,7 +384,7 @@ function calcContinuePattern() {
             rCDE >= 0.5,
             rCDE >= 1.25 - rBCD,
             DE <= BC,
-            FEEs < 0.5,
+            rDEEs < 0.5,
             rDEG < 0.5,
         ],
         [
@@ -555,7 +552,6 @@ function calcReversalPattern() {
 
     const AB = mf.fmtNum(ab, 1, true);
     const BC = mf.fmtNum(C.price - B.price, 1, true);
-    const BBs = mf.fmtNum(phase1.R.price1 - B.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const DDs = mf.fmtNum(phase3.R.price1 - D.price, 1, true);
@@ -575,10 +571,9 @@ function calcReversalPattern() {
     const timeMark = [T5, T4, T3, T2, T1];
 
     const rABC = BC / AB;
-    const CBBs = BBs / BC;
     const rBCD = CD / BC;
     const rCDE = DE / CD;
-    const EDDs = DDs / DE;
+    const rCDDs = DDs / DE;
     const rDEF = EF / DE;
     const rCDF = DF / CD;
 
@@ -590,7 +585,6 @@ function calcReversalPattern() {
             C.time1.i > T1s,
             BC >= phase1.pr,
             rABC >= 0.3,
-            CBBs < 0.5,
             C.price !== E.price,
         ],
         [
@@ -598,7 +592,7 @@ function calcReversalPattern() {
             D.time1.i > T2,
             rBCD >= 0.7,
             CD <= AB,
-            EDDs < 0.5,
+            rCDDs < 0.5,
             rCDF < 0.5,
         ],
         [
