@@ -573,7 +573,7 @@ function calcReversalPattern() {
     const rABC = BC / AB;
     const rBCD = CD / BC;
     const rCDE = DE / CD;
-    const rCDDs = DDs / DE;
+    const rCDDs = DDs / CD;
     const rDEF = EF / DE;
     const rCDF = DF / CD;
 
