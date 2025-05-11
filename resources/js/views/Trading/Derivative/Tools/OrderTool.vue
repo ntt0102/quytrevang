@@ -73,110 +73,105 @@ function hide(status = false) {
     showOrderContext.value = status;
 }
 function putOrder() {
-    let isExecuted = false;
+    let isExecutable = false;
+    let doActions = () => {};
     if (props.inSession()) {
         const currentSeconds = getUnixTime(addHours(new Date(), 7));
         if (currentSeconds < props.TIME.ATO) {
-            let result = confirm(
-                t("trading.derivative.confirms.atoOrder"),
-                t("titles.confirm")
-            );
-            result.then((dialogResult) => {
-                if (dialogResult) {
-                    isExecuted = true;
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "cancel",
-                            exit: "ATO",
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                toast.success(
-                                    t(
-                                        "trading.derivative.toasts.atoOrderSuccess"
-                                    )
-                                );
-                            } else toastOrderError(resp);
-                        });
-                }
-            });
+            isExecutable = true;
+            doActions = () => {
+                store
+                    .dispatch("tradingDerivative/executeOrder", {
+                        action: "cancel",
+                        exit: "ATO",
+                    })
+                    .then((resp) => {
+                        if (resp.isOk) {
+                            toast.success(
+                                t("trading.derivative.toasts.atoOrderSuccess")
+                            );
+                        } else toastOrderError(resp);
+                    });
+            };
         } else if (currentSeconds > props.TIME.ATC) {
-            let result = confirm(
-                t("trading.derivative.confirms.atcOrder"),
-                t("titles.confirm")
-            );
-            result.then((dialogResult) => {
-                if (dialogResult) {
-                    isExecuted = true;
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "cancel",
-                            exit: "ATC",
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                toast.success(
-                                    t(
-                                        "trading.derivative.toasts.atcOrderSuccess"
-                                    )
-                                );
-                            } else toastOrderError(resp);
-                        });
-                }
-            });
+            isExecutable = true;
+            doActions = () => {
+                store
+                    .dispatch("tradingDerivative/executeOrder", {
+                        action: "cancel",
+                        exit: "ATC",
+                    })
+                    .then((resp) => {
+                        if (resp.isOk) {
+                            toast.success(
+                                t("trading.derivative.toasts.atcOrderSuccess")
+                            );
+                        } else toastOrderError(resp);
+                    });
+            };
         } else {
             if (!props.position) {
                 if (mf.isSet(patternOrder)) {
-                    isExecuted = true;
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "entry",
-                            data: { ...{ cmd: "new" }, ...patternOrder },
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                orders.value[resp.order.id] = resp.order;
-                                lines[resp.order.id] = {};
-                                drawOrderTool(["entry"], resp.order);
-                                toast.success(
-                                    t(
-                                        "trading.derivative.toasts.newEntrySuccess"
-                                    )
-                                );
-                            } else toastOrderError(resp);
-                        });
+                    isExecutable = true;
+                    doActions = () => {
+                        store
+                            .dispatch("tradingDerivative/executeOrder", {
+                                action: "entry",
+                                data: { ...{ cmd: "new" }, ...patternOrder },
+                            })
+                            .then((resp) => {
+                                if (resp.isOk) {
+                                    orders.value[resp.order.id] = resp.order;
+                                    lines[resp.order.id] = {};
+                                    drawOrderTool(["entry"], resp.order);
+                                    toast.success(
+                                        t(
+                                            "trading.derivative.toasts.newEntrySuccess"
+                                        )
+                                    );
+                                } else toastOrderError(resp);
+                            });
+                    };
                 }
             } else {
                 const entryOrders = getOrderByStatus(0);
                 if (entryOrders.length === 1) {
                     const order = entryOrders[0];
-                    isExecuted = true;
-                    store
-                        .dispatch("tradingDerivative/executeOrder", {
-                            action: "tpsl",
-                            orderId: order.id,
-                        })
-                        .then((resp) => {
-                            if (resp.isOk) {
-                                orders.value[order.id] = resp.order;
-                                lines[order.id].entry.applyOptions({
-                                    draggable: false,
-                                });
-                                drawOrderTool(["tp", "sl"], resp.order);
-                                toast.success(
-                                    t(
-                                        "trading.derivative.toasts.newTpSlSuccess"
-                                    )
-                                );
-                            } else toastOrderError(resp);
-                        });
+                    isExecutable = true;
+                    doActions = () => {
+                        store
+                            .dispatch("tradingDerivative/executeOrder", {
+                                action: "tpsl",
+                                orderId: order.id,
+                            })
+                            .then((resp) => {
+                                if (resp.isOk) {
+                                    orders.value[order.id] = resp.order;
+                                    lines[order.id].entry.applyOptions({
+                                        draggable: false,
+                                    });
+                                    drawOrderTool(["tp", "sl"], resp.order);
+                                    toast.success(
+                                        t(
+                                            "trading.derivative.toasts.newTpSlSuccess"
+                                        )
+                                    );
+                                } else toastOrderError(resp);
+                            });
+                    };
                 }
             }
         }
     }
-    if (!isExecuted) {
-        toast.warning(t("trading.derivative.toasts.noPutOrder"));
-    }
+    if (isExecutable) {
+        let result = confirm(
+            t("trading.derivative.toasts.orderConfirm"),
+            t("titles.confirm")
+        );
+        result.then((dialogResult) => {
+            if (dialogResult) doActions();
+        });
+    } else toast.warning(t("trading.derivative.toasts.noPutOrder"));
 }
 function closeAllOrders() {
     const allOrders = Object.values(orders.value);
