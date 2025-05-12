@@ -1,4 +1,4 @@
-Chạy lệnh 1 trong các lệnh dưới trong thư mục hiện tại
+Chạy 1 trong các lệnh dưới trong thư mục hiện tại
 
 # npm i protobufjs-cli --save-dev
 
