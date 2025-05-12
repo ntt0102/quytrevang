@@ -41,17 +41,6 @@ class DerivativeService extends CoreService
     }
 
     /**
-     * Get VPS data
-     *
-     * @param $payload
-     * 
-     */
-    public function getVpsData()
-    {
-        return $this->cloneVpsData();
-    }
-
-    /**
      * Init Chart
      *
      * @param $payload
@@ -396,6 +385,17 @@ class DerivativeService extends CoreService
     }
 
     /**
+     * Get VPS data
+     *
+     * @param $payload
+     * 
+     */
+    public function getVpsData()
+    {
+        return $this->cloneVpsData();
+    }
+
+    /**
      * Vps data
      */
     public function cloneVpsData()
@@ -414,19 +414,14 @@ class DerivativeService extends CoreService
     }
 
     /**
-     * Vps data
+     * Get DNSE data
+     *
+     * @param $payload
+     * 
      */
-    public function testVpsData()
+    public function getDnseData()
     {
-        try {
-            $client = new \GuzzleHttp\Client();
-            $url = "https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M";
-            // $url = "https://datafeedapi.aisec.com.vn/getpschartintraday/VN30F1M";
-            $res = $client->get($url);
-            return (array)json_decode($res->getBody());
-        } catch (\Throwable $th) {
-            return [];
-        }
+        return $this->cloneDnseData();
     }
 
     /**
@@ -439,29 +434,25 @@ class DerivativeService extends CoreService
         try {
             $client = new \GuzzleHttp\Client();
             $data = [
-                'json' => [
-                    'operationName' => 'GetTicksBySymbol',
-                    'query' => "query GetTicksBySymbol {
-                        GetTicksBySymbol(symbol: \"{$vn30f1m}\", date: \"{$date}\", limit: 10000) {
-                            data {
-                                symbol
+                "json" => [
+                    "operationName" => "GetKrxTicksBySymbols",
+                    "query" => "query GetKrxTicksBySymbols {
+                        GetKrxTicksBySymbols(symbols: \"VN30F2505\", date: \"2025-5-12\", limit: 100000, board: 2) {
+                            ticks {
                                 matchPrice
-                                matchQtty
-                                time
-                                side
+                                sendingTime
                             }
                         }
                     }",
-                    'variables' => (object)[]
+                    "variables" => (object)[],
                 ],
             ];
-
-            $req = $client->post('https://services.entrade.com.vn/price-api/query', $data);
-            $data = json_decode($req->getBody())->data->GetTicksBySymbol->data;
+            $req = $client->post('https://api.dnse.com.vn/price-api/query', $data);
+            $data = json_decode($req->getBody())->data->GetKrxTicksBySymbols->ticks;
             // usort($data, function ($a, $b) {
             //     return $b->time < $a->time;
             // });
-            return $data;
+            return (array)$data;
         } catch (\Throwable $th) {
             return [];
         }

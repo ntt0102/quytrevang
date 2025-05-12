@@ -104,6 +104,7 @@ Route::group(['namespace' => 'Api', 'middleware' => 'throttle'], function () {
                 Route::group(['prefix' => 'derivative', 'middleware' => ['can:admin:order_derivative']], function () {
                     Route::get('/', 'DerivativeController@getChartData');
                     Route::get('vps', 'DerivativeController@getVpsData');
+                    Route::get('dnse', 'DerivativeController@getDnseData');
                     Route::get('init-chart', 'DerivativeController@initChart');
                     Route::post('set-auto-refresh', 'DerivativeController@setAutoRefresh');
                     Route::post('set-pattern-type', 'DerivativeController@setPatternType');

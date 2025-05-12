@@ -42,6 +42,19 @@ const actions = {
                 });
         });
     },
+    getDnseData({ commit, dispatch, getters, state, rootGetters }) {
+        commit("setLoading", true);
+        return new Promise((resolve, reject) => {
+            axios
+                .get("trading/derivative/dnse", {
+                    noLoading: true,
+                })
+                .then((response) => {
+                    commit("setLoading", false);
+                    resolve(response.data);
+                });
+        });
+    },
     initChart({ commit, dispatch, getters, state, rootGetters }) {
         commit("setLoading", true);
         return new Promise((resolve, reject) => {

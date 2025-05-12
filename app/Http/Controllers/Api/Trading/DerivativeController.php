@@ -30,19 +30,6 @@ class DerivativeController extends CoreController
     }
 
     /**
-     * Get the VPS data
-     *
-     * @param \Illuminate\Http\Request $request
-     * 
-     * @return \Illuminate\Http\Response
-     */
-    public function getVpsData(Request $request)
-    {
-        $data = $this->derivativeService->getVpsData();
-        return $this->sendResponse($data);
-    }
-
-    /**
      * Init Chart
      *
      * @param \Illuminate\Http\Request $request
@@ -183,6 +170,32 @@ class DerivativeController extends CoreController
     {
         $data = $this->derivativeService->setVpsSession($request);
         return $this->sendResponseWithoutEncrypt($data);
+    }
+
+    /**
+     * Get the VPS data
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getVpsData(Request $request)
+    {
+        $data = $this->derivativeService->getVpsData();
+        return $this->sendResponse($data);
+    }
+
+    /**
+     * Get the DNSE data
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getDnseData(Request $request)
+    {
+        $data = $this->derivativeService->getDnseData();
+        return $this->sendResponse($data);
     }
 
     /**

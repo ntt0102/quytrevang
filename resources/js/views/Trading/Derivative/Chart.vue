@@ -175,6 +175,7 @@ import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import {
     format,
+    formatISO,
     getUnixTime,
     addHours,
     subSeconds,
@@ -217,7 +218,7 @@ const SOCKET_ENDPOINT = {
     FIREANT:
         "wss://tradestation.fireant.vn/quote-lite?access_token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg",
     VPS: "wss://datafeed.vps.com.vn/socket.io/?EIO=3&transport=websocket",
-    DNSE: "wss://datafeed.dnse.com.vn/wss",
+    DNSE: "wss://datafeed-krx.dnse.com.vn/wss",
 };
 
 let params = {
@@ -519,7 +520,6 @@ function mergeChartData(data1, data2) {
 async function connectSocket() {
     if (inSession()) {
         await disconnectSocket();
-        console.log("params.websocket", params.websocket);
         const source = config.value.source;
         const enpoint = SOCKET_ENDPOINT[source];
         const closeHandler = () => {
@@ -664,25 +664,26 @@ function getVpsData() {
     if (
         differenceInSeconds(new Date(), new Date(params.socketUpdatedAt)) > 60
     ) {
-        fetch("https://bddatafeed.vps.com.vn/getpschartintraday/VN30F1M")
-            .then((response) => response.json())
-            .then((data) => {
-                updateChartData(data, true);
-                console.log("VPS: ", data);
-            });
+        store.dispatch("tradingDerivative/getVpsData").then((data) => {
+            updateChartData(data, true);
+            console.log("VPS-first: ", data);
+        });
         params.socketUpdatedAt = new Date();
     }
 }
 function configDnseSocket() {
     params.websocket.on("connect", () => {
         if (params.websocket.connected) {
-            const topic = `quotes/stock/tick/${config.value.vn30f1m}`;
+            const topic = `quotes/krx/mdds/tick/v1/roundlot/symbol/${config.value.vn30f1m}`;
+            // const topic = `quotes/stock/tick/${config.value.vn30f1m}`;
             params.websocket.subscribe(topic);
+            // console.log("DNSE connected", topic);
         }
     });
     params.websocket.on("message", (_, message) => {
         state.isSocketWarning = false;
         var encapMsg = decodeEncapMessage(message);
+        console.log("encapMsg", encapMsg);
         if (encapMsg.type === 41) {
             let tick = decodeTick(encapMsg.payload);
             orderToolRef.value.scan(tick.matchPrice);
@@ -697,20 +698,10 @@ function getDnseData() {
     if (
         differenceInSeconds(new Date(), new Date(params.socketUpdatedAt)) > 60
     ) {
-        fetch("https://services.entrade.com.vn/price-api/query", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                operationName: "GetTicksBySymbol",
-                query: `query GetTicksBySymbol {GetTicksBySymbol(symbol: "${config.value.vn30f1m}", date: "${CURRENT_DATE}", limit: 10000) {data {symbol matchPrice matchQtty time side}}}`,
-            }),
-        })
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("DNSE: ", data.data.GetTicksBySymbol.data);
-                updateChartData(data.data.GetTicksBySymbol.data, true);
-            });
-
+        store.dispatch("tradingDerivative/getDnseData").then((data) => {
+            updateChartData(data, true);
+            console.log("DNSE-first: ", data);
+        });
         params.socketUpdatedAt = new Date();
     }
 }
@@ -839,8 +830,24 @@ function drawPriceLine(data, isRemove = false) {
     else return params.series.price.createPriceLine(data);
 }
 function setCandlestick(ticks) {
-    ticks.forEach(({ date, price }) => {
-        const time = getUnixTime(addHours(new Date(date), 7));
+    ticks.forEach((tick) => {
+        let date, time, price;
+        switch (config.value.source) {
+            case "FIREANT":
+                date = addHours(new Date(tick.date), 7);
+                price = tick.price;
+                break;
+            case "VPS":
+                date = new Date(`${CURRENT_DATE}T${tick.time}Z`);
+                price = tick.lastPrice;
+                break;
+            case "DNSE":
+                date = addHours(new Date(tick.sendingTime), 7);
+                price = tick.matchPrice;
+                break;
+        }
+        time = getUnixTime(date);
+        date = formatISO(date);
         if (!params.ohlcMap.has(time)) {
             const bar = {
                 date,
@@ -866,39 +873,72 @@ function setCandlestick(ticks) {
     state.bars = bars;
 }
 function updateCandlestick(ticks) {
-    ticks
-        .sort((a, b) =>
-            a.date === b.date
-                ? a.id - b.id
-                : new Date(a.date) - new Date(b.date)
-        )
-        .forEach(({ date, price }) => {
-            const time = getUnixTime(addHours(new Date(date), 7));
-            if (!params.ohlcMap.has(time)) {
-                const bar = {
-                    time,
-                    open: price,
-                    high: price,
-                    low: price,
-                    close: price,
-                };
+    switch (config.value.source) {
+        case "FIREANT":
+            ticks.sort((a, b) =>
+                a.date === b.date
+                    ? a.id - b.id
+                    : new Date(a.date) - new Date(b.date)
+            );
+            break;
+        case "VPS":
+            ticks.sort((a, b) =>
+                a.time === b.time
+                    ? Number(a.sID) - Number(b.sID)
+                    : toSeconds(a.time) - toSeconds(b.time)
+            );
+            break;
+        case "DNSE":
+            break;
+    }
+    ticks.forEach((tick) => {
+        let date, time, price;
+        switch (config.value.source) {
+            case "FIREANT":
+                date = addHours(new Date(tick.date), 7);
+                price = tick.price;
+                break;
+            case "VPS":
+                date = new Date(`${CURRENT_DATE}T${tick.time}Z`);
+                price = tick.lastPrice;
+                break;
+            case "DNSE":
+                date = addHours(new Date(tick.time), 7);
+                price = tick.matchPrice;
+                break;
+        }
+        time = getUnixTime(date);
+        date = formatISO(date);
+        if (!params.ohlcMap.has(time)) {
+            const bar = {
+                date,
+                time,
+                open: price,
+                high: price,
+                low: price,
+                close: price,
+            };
+            params.series.price.update(bar);
+            params.ohlcMap.set(time, bar);
+        } else {
+            try {
+                const bar = params.ohlcMap.get(time);
+                bar.high = Math.max(bar.high, price);
+                bar.low = Math.min(bar.low, price);
+                bar.open = price;
+                bar.close = price;
                 params.series.price.update(bar);
-                params.ohlcMap.set(time, bar);
-            } else {
-                try {
-                    const bar = params.ohlcMap.get(time);
-                    bar.high = Math.max(bar.high, price);
-                    bar.low = Math.min(bar.low, price);
-                    bar.open = price;
-                    bar.close = price;
-                    params.series.price.update(bar);
-                } catch (error) {
-                    return;
-                }
+            } catch (error) {
+                return;
             }
-        });
+        }
+    });
     const bars = Array.from(params.ohlcMap.values());
     state.bars = bars;
+}
+function toSeconds(time) {
+    const [h, m, s] = time.split(":").map(Number);
+    return h * 3600 + m * 60 + s;
 }
 </script>
 <style lang="scss">
