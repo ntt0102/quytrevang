@@ -1,3 +1,5 @@
+Chạy lệnh 1 trong các lệnh dưới trong thư mục hiện tại
+
 # npm i protobufjs-cli --save-dev
 
 npx pbjs -t static-module -w es6 -o index.js messages.proto
