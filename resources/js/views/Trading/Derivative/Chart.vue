@@ -159,7 +159,8 @@ import OrderTool from "./Tools/OrderTool.vue";
 
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import mqtt from "mqtt";
-import { decodeEncapMessage, decodeTick } from "../../../plugins/dnse";
+// import { decodeEncapMessage, decodeTick } from "../../../plugins/dnse/index";
+import { models as dnseModels } from "../../../plugins/dnse/index";
 import { alert } from "devextreme/ui/dialog";
 import {
     ref,
@@ -682,7 +683,8 @@ function configDnseSocket() {
     });
     params.websocket.on("message", (_, message) => {
         state.isSocketWarning = false;
-        var encapMsg = decodeEncapMessage(message);
+        // var encapMsg = decodeEncapMessage(message);
+        var encapMsg = dnseModels.EncapMessage.decode(message);
         console.log("encapMsg", encapMsg);
         if (encapMsg.type === 41) {
             let tick = decodeTick(encapMsg.payload);

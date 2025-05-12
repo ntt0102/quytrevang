@@ -5,6 +5,12 @@ package models;
 message EncapMessage {
   int32 type = 1;
   bytes payload = 2;
+  EventContext context = 3;
+}
+
+message EventContext {
+  int32 action = 1;
+  string source = 2;
 }
 
 message Tick {

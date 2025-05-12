@@ -1,706 +1,1086 @@
-export function encodeEncapMessage(message) {
-  let bb = popByteBuffer();
-  _encodeEncapMessage(message, bb);
-  return toUint8Array(bb);
-}
+/*eslint-disable block-scoped-var, id-length, no-control-regex, no-magic-numbers, no-prototype-builtins, no-redeclare, no-shadow, no-var, sort-vars*/
+import * as $protobuf from "protobufjs/minimal";
 
-function _encodeEncapMessage(message, bb) {
-  // optional int32 type = 1;
-  let $type = message.type;
-  if ($type !== undefined) {
-    writeVarint32(bb, 8);
-    writeVarint64(bb, intToLong($type));
-  }
+// Common aliases
+const $Reader = $protobuf.Reader, $Writer = $protobuf.Writer, $util = $protobuf.util;
 
-  // optional bytes payload = 2;
-  let $payload = message.payload;
-  if ($payload !== undefined) {
-    writeVarint32(bb, 18);
-    writeVarint32(bb, $payload.length), writeBytes(bb, $payload);
-  }
-}
+// Exported root namespace
+const $root = $protobuf.roots["default"] || ($protobuf.roots["default"] = {});
 
-export function decodeEncapMessage(binary) {
-  return _decodeEncapMessage(wrapByteBuffer(binary));
-}
+export const models = $root.models = (() => {
 
-function _decodeEncapMessage(bb) {
-  let message = {};
+    /**
+     * Namespace models.
+     * @exports models
+     * @namespace
+     */
+    const models = {};
 
-  end_of_message: while (!isAtEnd(bb)) {
-    let tag = readVarint32(bb);
+    models.EncapMessage = (function() {
 
-    switch (tag >>> 3) {
-      case 0:
-        break end_of_message;
+        /**
+         * Properties of an EncapMessage.
+         * @memberof models
+         * @interface IEncapMessage
+         * @property {number|null} [type] EncapMessage type
+         * @property {Uint8Array|null} [payload] EncapMessage payload
+         * @property {models.IEventContext|null} [context] EncapMessage context
+         */
 
-      // optional int32 type = 1;
-      case 1: {
-        message.type = readVarint32(bb);
-        break;
-      }
-
-      // optional bytes payload = 2;
-      case 2: {
-        message.payload = readBytes(bb, readVarint32(bb));
-        break;
-      }
-
-      default:
-        skipUnknownField(bb, tag & 7);
-    }
-  }
-
-  return message;
-}
-
-export function encodeTick(message) {
-  let bb = popByteBuffer();
-  _encodeTick(message, bb);
-  return toUint8Array(bb);
-}
-
-function _encodeTick(message, bb) {
-  // optional string symbol = 1;
-  let $symbol = message.symbol;
-  if ($symbol !== undefined) {
-    writeVarint32(bb, 10);
-    writeString(bb, $symbol);
-  }
-
-  // optional double matchPrice = 2;
-  let $matchPrice = message.matchPrice;
-  if ($matchPrice !== undefined) {
-    writeVarint32(bb, 17);
-    writeDouble(bb, $matchPrice);
-  }
-
-  // optional double matchQtty = 3;
-  let $matchQtty = message.matchQtty;
-  if ($matchQtty !== undefined) {
-    writeVarint32(bb, 25);
-    writeDouble(bb, $matchQtty);
-  }
-
-  // optional Timestamp time = 4;
-  let $time = message.time;
-  if ($time !== undefined) {
-    writeVarint32(bb, 34);
-    let nested = popByteBuffer();
-    _encodeTimestamp($time, nested);
-    writeVarint32(bb, nested.limit);
-    writeByteBuffer(bb, nested);
-    pushByteBuffer(nested);
-  }
-
-  // optional int32 side = 5;
-  let $side = message.side;
-  if ($side !== undefined) {
-    writeVarint32(bb, 40);
-    writeVarint64(bb, intToLong($side));
-  }
-
-  // optional int32 session = 6;
-  let $session = message.session;
-  if ($session !== undefined) {
-    writeVarint32(bb, 48);
-    writeVarint64(bb, intToLong($session));
-  }
-}
-
-export function decodeTick(binary) {
-  return _decodeTick(wrapByteBuffer(binary));
-}
-
-function _decodeTick(bb) {
-  let message = {};
-
-  end_of_message: while (!isAtEnd(bb)) {
-    let tag = readVarint32(bb);
-
-    switch (tag >>> 3) {
-      case 0:
-        break end_of_message;
-
-      // optional string symbol = 1;
-      case 1: {
-        message.symbol = readString(bb, readVarint32(bb));
-        break;
-      }
-
-      // optional double matchPrice = 2;
-      case 2: {
-        message.matchPrice = readDouble(bb);
-        break;
-      }
-
-      // optional double matchQtty = 3;
-      case 3: {
-        message.matchQtty = readDouble(bb);
-        break;
-      }
-
-      // optional Timestamp time = 4;
-      case 4: {
-        let limit = pushTemporaryLength(bb);
-        message.time = _decodeTimestamp(bb);
-        bb.limit = limit;
-        break;
-      }
-
-      // optional int32 side = 5;
-      case 5: {
-        message.side = readVarint32(bb);
-        break;
-      }
-
-      // optional int32 session = 6;
-      case 6: {
-        message.session = readVarint32(bb);
-        break;
-      }
-
-      default:
-        skipUnknownField(bb, tag & 7);
-    }
-  }
-
-  return message;
-}
-
-export function encodeTimestamp(message) {
-  let bb = popByteBuffer();
-  _encodeTimestamp(message, bb);
-  return toUint8Array(bb);
-}
-
-function _encodeTimestamp(message, bb) {
-  // optional int64 seconds = 1;
-  let $seconds = message.seconds;
-  if ($seconds !== undefined) {
-    writeVarint32(bb, 8);
-    writeVarint64(bb, $seconds);
-  }
-
-  // optional int32 nanos = 2;
-  let $nanos = message.nanos;
-  if ($nanos !== undefined) {
-    writeVarint32(bb, 16);
-    writeVarint64(bb, intToLong($nanos));
-  }
-}
-
-export function decodeTimestamp(binary) {
-  return _decodeTimestamp(wrapByteBuffer(binary));
-}
-
-function _decodeTimestamp(bb) {
-  let message = {};
-
-  end_of_message: while (!isAtEnd(bb)) {
-    let tag = readVarint32(bb);
-
-    switch (tag >>> 3) {
-      case 0:
-        break end_of_message;
-
-      // optional int64 seconds = 1;
-      case 1: {
-        message.seconds = readVarint64(bb, /* unsigned */ false);
-        break;
-      }
-
-      // optional int32 nanos = 2;
-      case 2: {
-        message.nanos = readVarint32(bb);
-        break;
-      }
-
-      default:
-        skipUnknownField(bb, tag & 7);
-    }
-  }
-
-  return message;
-}
-
-function pushTemporaryLength(bb) {
-  let length = readVarint32(bb);
-  let limit = bb.limit;
-  bb.limit = bb.offset + length;
-  return limit;
-}
-
-function skipUnknownField(bb, type) {
-  switch (type) {
-    case 0: while (readByte(bb) & 0x80) { } break;
-    case 2: skip(bb, readVarint32(bb)); break;
-    case 5: skip(bb, 4); break;
-    case 1: skip(bb, 8); break;
-    default: throw new Error("Unimplemented type: " + type);
-  }
-}
-
-function stringToLong(value) {
-  return {
-    low: value.charCodeAt(0) | (value.charCodeAt(1) << 16),
-    high: value.charCodeAt(2) | (value.charCodeAt(3) << 16),
-    unsigned: false,
-  };
-}
-
-function longToString(value) {
-  let low = value.low;
-  let high = value.high;
-  return String.fromCharCode(
-    low & 0xFFFF,
-    low >>> 16,
-    high & 0xFFFF,
-    high >>> 16);
-}
-
-// The code below was modified from https://github.com/protobufjs/bytebuffer.js
-// which is under the Apache License 2.0.
-
-let f32 = new Float32Array(1);
-let f32_u8 = new Uint8Array(f32.buffer);
-
-let f64 = new Float64Array(1);
-let f64_u8 = new Uint8Array(f64.buffer);
-
-function intToLong(value) {
-  value |= 0;
-  return {
-    low: value,
-    high: value >> 31,
-    unsigned: value >= 0,
-  };
-}
-
-let bbStack = [];
-
-function popByteBuffer() {
-  const bb = bbStack.pop();
-  if (!bb) return { bytes: new Uint8Array(64), offset: 0, limit: 0 };
-  bb.offset = bb.limit = 0;
-  return bb;
-}
-
-function pushByteBuffer(bb) {
-  bbStack.push(bb);
-}
-
-function wrapByteBuffer(bytes) {
-  return { bytes, offset: 0, limit: bytes.length };
-}
-
-function toUint8Array(bb) {
-  let bytes = bb.bytes;
-  let limit = bb.limit;
-  return bytes.length === limit ? bytes : bytes.subarray(0, limit);
-}
-
-function skip(bb, offset) {
-  if (bb.offset + offset > bb.limit) {
-    throw new Error('Skip past limit');
-  }
-  bb.offset += offset;
-}
-
-function isAtEnd(bb) {
-  return bb.offset >= bb.limit;
-}
-
-function grow(bb, count) {
-  let bytes = bb.bytes;
-  let offset = bb.offset;
-  let limit = bb.limit;
-  let finalOffset = offset + count;
-  if (finalOffset > bytes.length) {
-    let newBytes = new Uint8Array(finalOffset * 2);
-    newBytes.set(bytes);
-    bb.bytes = newBytes;
-  }
-  bb.offset = finalOffset;
-  if (finalOffset > limit) {
-    bb.limit = finalOffset;
-  }
-  return offset;
-}
-
-function advance(bb, count) {
-  let offset = bb.offset;
-  if (offset + count > bb.limit) {
-    throw new Error('Read past limit');
-  }
-  bb.offset += count;
-  return offset;
-}
-
-function readBytes(bb, count) {
-  let offset = advance(bb, count);
-  return bb.bytes.subarray(offset, offset + count);
-}
-
-function writeBytes(bb, buffer) {
-  let offset = grow(bb, buffer.length);
-  bb.bytes.set(buffer, offset);
-}
-
-function readString(bb, count) {
-  // Sadly a hand-coded UTF8 decoder is much faster than subarray+TextDecoder in V8
-  let offset = advance(bb, count);
-  let fromCharCode = String.fromCharCode;
-  let bytes = bb.bytes;
-  let invalid = '\uFFFD';
-  let text = '';
-
-  for (let i = 0; i < count; i++) {
-    let c1 = bytes[i + offset], c2, c3, c4, c;
-
-    // 1 byte
-    if ((c1 & 0x80) === 0) {
-      text += fromCharCode(c1);
-    }
-
-    // 2 bytes
-    else if ((c1 & 0xE0) === 0xC0) {
-      if (i + 1 >= count) text += invalid;
-      else {
-        c2 = bytes[i + offset + 1];
-        if ((c2 & 0xC0) !== 0x80) text += invalid;
-        else {
-          c = ((c1 & 0x1F) << 6) | (c2 & 0x3F);
-          if (c < 0x80) text += invalid;
-          else {
-            text += fromCharCode(c);
-            i++;
-          }
+        /**
+         * Constructs a new EncapMessage.
+         * @memberof models
+         * @classdesc Represents an EncapMessage.
+         * @implements IEncapMessage
+         * @constructor
+         * @param {models.IEncapMessage=} [properties] Properties to set
+         */
+        function EncapMessage(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
         }
-      }
-    }
 
-    // 3 bytes
-    else if ((c1 & 0xF0) == 0xE0) {
-      if (i + 2 >= count) text += invalid;
-      else {
-        c2 = bytes[i + offset + 1];
-        c3 = bytes[i + offset + 2];
-        if (((c2 | (c3 << 8)) & 0xC0C0) !== 0x8080) text += invalid;
-        else {
-          c = ((c1 & 0x0F) << 12) | ((c2 & 0x3F) << 6) | (c3 & 0x3F);
-          if (c < 0x0800 || (c >= 0xD800 && c <= 0xDFFF)) text += invalid;
-          else {
-            text += fromCharCode(c);
-            i += 2;
-          }
-        }
-      }
-    }
+        /**
+         * EncapMessage type.
+         * @member {number} type
+         * @memberof models.EncapMessage
+         * @instance
+         */
+        EncapMessage.prototype.type = 0;
 
-    // 4 bytes
-    else if ((c1 & 0xF8) == 0xF0) {
-      if (i + 3 >= count) text += invalid;
-      else {
-        c2 = bytes[i + offset + 1];
-        c3 = bytes[i + offset + 2];
-        c4 = bytes[i + offset + 3];
-        if (((c2 | (c3 << 8) | (c4 << 16)) & 0xC0C0C0) !== 0x808080) text += invalid;
-        else {
-          c = ((c1 & 0x07) << 0x12) | ((c2 & 0x3F) << 0x0C) | ((c3 & 0x3F) << 0x06) | (c4 & 0x3F);
-          if (c < 0x10000 || c > 0x10FFFF) text += invalid;
-          else {
-            c -= 0x10000;
-            text += fromCharCode((c >> 10) + 0xD800, (c & 0x3FF) + 0xDC00);
-            i += 3;
-          }
-        }
-      }
-    }
+        /**
+         * EncapMessage payload.
+         * @member {Uint8Array} payload
+         * @memberof models.EncapMessage
+         * @instance
+         */
+        EncapMessage.prototype.payload = $util.newBuffer([]);
 
-    else text += invalid;
-  }
+        /**
+         * EncapMessage context.
+         * @member {models.IEventContext|null|undefined} context
+         * @memberof models.EncapMessage
+         * @instance
+         */
+        EncapMessage.prototype.context = null;
 
-  return text;
-}
+        /**
+         * Creates a new EncapMessage instance using the specified properties.
+         * @function create
+         * @memberof models.EncapMessage
+         * @static
+         * @param {models.IEncapMessage=} [properties] Properties to set
+         * @returns {models.EncapMessage} EncapMessage instance
+         */
+        EncapMessage.create = function create(properties) {
+            return new EncapMessage(properties);
+        };
 
-function writeString(bb, text) {
-  // Sadly a hand-coded UTF8 encoder is much faster than TextEncoder+set in V8
-  let n = text.length;
-  let byteCount = 0;
+        /**
+         * Encodes the specified EncapMessage message. Does not implicitly {@link models.EncapMessage.verify|verify} messages.
+         * @function encode
+         * @memberof models.EncapMessage
+         * @static
+         * @param {models.IEncapMessage} message EncapMessage message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        EncapMessage.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.type != null && Object.hasOwnProperty.call(message, "type"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.type);
+            if (message.payload != null && Object.hasOwnProperty.call(message, "payload"))
+                writer.uint32(/* id 2, wireType 2 =*/18).bytes(message.payload);
+            if (message.context != null && Object.hasOwnProperty.call(message, "context"))
+                $root.models.EventContext.encode(message.context, writer.uint32(/* id 3, wireType 2 =*/26).fork()).ldelim();
+            return writer;
+        };
 
-  // Write the byte count first
-  for (let i = 0; i < n; i++) {
-    let c = text.charCodeAt(i);
-    if (c >= 0xD800 && c <= 0xDBFF && i + 1 < n) {
-      c = (c << 10) + text.charCodeAt(++i) - 0x35FDC00;
-    }
-    byteCount += c < 0x80 ? 1 : c < 0x800 ? 2 : c < 0x10000 ? 3 : 4;
-  }
-  writeVarint32(bb, byteCount);
+        /**
+         * Encodes the specified EncapMessage message, length delimited. Does not implicitly {@link models.EncapMessage.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof models.EncapMessage
+         * @static
+         * @param {models.IEncapMessage} message EncapMessage message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        EncapMessage.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
 
-  let offset = grow(bb, byteCount);
-  let bytes = bb.bytes;
-
-  // Then write the bytes
-  for (let i = 0; i < n; i++) {
-    let c = text.charCodeAt(i);
-    if (c >= 0xD800 && c <= 0xDBFF && i + 1 < n) {
-      c = (c << 10) + text.charCodeAt(++i) - 0x35FDC00;
-    }
-    if (c < 0x80) {
-      bytes[offset++] = c;
-    } else {
-      if (c < 0x800) {
-        bytes[offset++] = ((c >> 6) & 0x1F) | 0xC0;
-      } else {
-        if (c < 0x10000) {
-          bytes[offset++] = ((c >> 12) & 0x0F) | 0xE0;
-        } else {
-          bytes[offset++] = ((c >> 18) & 0x07) | 0xF0;
-          bytes[offset++] = ((c >> 12) & 0x3F) | 0x80;
-        }
-        bytes[offset++] = ((c >> 6) & 0x3F) | 0x80;
-      }
-      bytes[offset++] = (c & 0x3F) | 0x80;
-    }
-  }
-}
-
-function writeByteBuffer(bb, buffer) {
-  let offset = grow(bb, buffer.limit);
-  let from = bb.bytes;
-  let to = buffer.bytes;
-
-  // This for loop is much faster than subarray+set on V8
-  for (let i = 0, n = buffer.limit; i < n; i++) {
-    from[i + offset] = to[i];
-  }
-}
-
-function readByte(bb) {
-  return bb.bytes[advance(bb, 1)];
-}
-
-function writeByte(bb, value) {
-  let offset = grow(bb, 1);
-  bb.bytes[offset] = value;
-}
-
-function readFloat(bb) {
-  let offset = advance(bb, 4);
-  let bytes = bb.bytes;
-
-  // Manual copying is much faster than subarray+set in V8
-  f32_u8[0] = bytes[offset++];
-  f32_u8[1] = bytes[offset++];
-  f32_u8[2] = bytes[offset++];
-  f32_u8[3] = bytes[offset++];
-  return f32[0];
-}
-
-function writeFloat(bb, value) {
-  let offset = grow(bb, 4);
-  let bytes = bb.bytes;
-  f32[0] = value;
-
-  // Manual copying is much faster than subarray+set in V8
-  bytes[offset++] = f32_u8[0];
-  bytes[offset++] = f32_u8[1];
-  bytes[offset++] = f32_u8[2];
-  bytes[offset++] = f32_u8[3];
-}
-
-function readDouble(bb) {
-  let offset = advance(bb, 8);
-  let bytes = bb.bytes;
-
-  // Manual copying is much faster than subarray+set in V8
-  f64_u8[0] = bytes[offset++];
-  f64_u8[1] = bytes[offset++];
-  f64_u8[2] = bytes[offset++];
-  f64_u8[3] = bytes[offset++];
-  f64_u8[4] = bytes[offset++];
-  f64_u8[5] = bytes[offset++];
-  f64_u8[6] = bytes[offset++];
-  f64_u8[7] = bytes[offset++];
-  return f64[0];
-}
-
-function writeDouble(bb, value) {
-  let offset = grow(bb, 8);
-  let bytes = bb.bytes;
-  f64[0] = value;
-
-  // Manual copying is much faster than subarray+set in V8
-  bytes[offset++] = f64_u8[0];
-  bytes[offset++] = f64_u8[1];
-  bytes[offset++] = f64_u8[2];
-  bytes[offset++] = f64_u8[3];
-  bytes[offset++] = f64_u8[4];
-  bytes[offset++] = f64_u8[5];
-  bytes[offset++] = f64_u8[6];
-  bytes[offset++] = f64_u8[7];
-}
-
-function readInt32(bb) {
-  let offset = advance(bb, 4);
-  let bytes = bb.bytes;
-  return (
-    bytes[offset] |
-    (bytes[offset + 1] << 8) |
-    (bytes[offset + 2] << 16) |
-    (bytes[offset + 3] << 24)
-  );
-}
-
-function writeInt32(bb, value) {
-  let offset = grow(bb, 4);
-  let bytes = bb.bytes;
-  bytes[offset] = value;
-  bytes[offset + 1] = value >> 8;
-  bytes[offset + 2] = value >> 16;
-  bytes[offset + 3] = value >> 24;
-}
-
-function readInt64(bb, unsigned) {
-  return {
-    low: readInt32(bb),
-    high: readInt32(bb),
-    unsigned,
-  };
-}
-
-function writeInt64(bb, value) {
-  writeInt32(bb, value.low);
-  writeInt32(bb, value.high);
-}
-
-function readVarint32(bb) {
-  let c = 0;
-  let value = 0;
-  let b;
-  do {
-    b = readByte(bb);
-    if (c < 32) value |= (b & 0x7F) << c;
-    c += 7;
-  } while (b & 0x80);
-  return value;
-}
-
-function writeVarint32(bb, value) {
-  value >>>= 0;
-  while (value >= 0x80) {
-    writeByte(bb, (value & 0x7f) | 0x80);
-    value >>>= 7;
-  }
-  writeByte(bb, value);
-}
-
-function readVarint64(bb, unsigned) {
-  let part0 = 0;
-  let part1 = 0;
-  let part2 = 0;
-  let b;
-
-  b = readByte(bb); part0 = (b & 0x7F); if (b & 0x80) {
-    b = readByte(bb); part0 |= (b & 0x7F) << 7; if (b & 0x80) {
-      b = readByte(bb); part0 |= (b & 0x7F) << 14; if (b & 0x80) {
-        b = readByte(bb); part0 |= (b & 0x7F) << 21; if (b & 0x80) {
-
-          b = readByte(bb); part1 = (b & 0x7F); if (b & 0x80) {
-            b = readByte(bb); part1 |= (b & 0x7F) << 7; if (b & 0x80) {
-              b = readByte(bb); part1 |= (b & 0x7F) << 14; if (b & 0x80) {
-                b = readByte(bb); part1 |= (b & 0x7F) << 21; if (b & 0x80) {
-
-                  b = readByte(bb); part2 = (b & 0x7F); if (b & 0x80) {
-                    b = readByte(bb); part2 |= (b & 0x7F) << 7;
-                  }
+        /**
+         * Decodes an EncapMessage message from the specified reader or buffer.
+         * @function decode
+         * @memberof models.EncapMessage
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {models.EncapMessage} EncapMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        EncapMessage.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.models.EncapMessage();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.type = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.payload = reader.bytes();
+                        break;
+                    }
+                case 3: {
+                        message.context = $root.models.EventContext.decode(reader, reader.uint32());
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
                 }
-              }
             }
-          }
+            return message;
+        };
+
+        /**
+         * Decodes an EncapMessage message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof models.EncapMessage
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {models.EncapMessage} EncapMessage
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        EncapMessage.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies an EncapMessage message.
+         * @function verify
+         * @memberof models.EncapMessage
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        EncapMessage.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.type != null && message.hasOwnProperty("type"))
+                if (!$util.isInteger(message.type))
+                    return "type: integer expected";
+            if (message.payload != null && message.hasOwnProperty("payload"))
+                if (!(message.payload && typeof message.payload.length === "number" || $util.isString(message.payload)))
+                    return "payload: buffer expected";
+            if (message.context != null && message.hasOwnProperty("context")) {
+                let error = $root.models.EventContext.verify(message.context);
+                if (error)
+                    return "context." + error;
+            }
+            return null;
+        };
+
+        /**
+         * Creates an EncapMessage message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof models.EncapMessage
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {models.EncapMessage} EncapMessage
+         */
+        EncapMessage.fromObject = function fromObject(object) {
+            if (object instanceof $root.models.EncapMessage)
+                return object;
+            let message = new $root.models.EncapMessage();
+            if (object.type != null)
+                message.type = object.type | 0;
+            if (object.payload != null)
+                if (typeof object.payload === "string")
+                    $util.base64.decode(object.payload, message.payload = $util.newBuffer($util.base64.length(object.payload)), 0);
+                else if (object.payload.length >= 0)
+                    message.payload = object.payload;
+            if (object.context != null) {
+                if (typeof object.context !== "object")
+                    throw TypeError(".models.EncapMessage.context: object expected");
+                message.context = $root.models.EventContext.fromObject(object.context);
+            }
+            return message;
+        };
+
+        /**
+         * Creates a plain object from an EncapMessage message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof models.EncapMessage
+         * @static
+         * @param {models.EncapMessage} message EncapMessage
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        EncapMessage.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.type = 0;
+                if (options.bytes === String)
+                    object.payload = "";
+                else {
+                    object.payload = [];
+                    if (options.bytes !== Array)
+                        object.payload = $util.newBuffer(object.payload);
+                }
+                object.context = null;
+            }
+            if (message.type != null && message.hasOwnProperty("type"))
+                object.type = message.type;
+            if (message.payload != null && message.hasOwnProperty("payload"))
+                object.payload = options.bytes === String ? $util.base64.encode(message.payload, 0, message.payload.length) : options.bytes === Array ? Array.prototype.slice.call(message.payload) : message.payload;
+            if (message.context != null && message.hasOwnProperty("context"))
+                object.context = $root.models.EventContext.toObject(message.context, options);
+            return object;
+        };
+
+        /**
+         * Converts this EncapMessage to JSON.
+         * @function toJSON
+         * @memberof models.EncapMessage
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        EncapMessage.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for EncapMessage
+         * @function getTypeUrl
+         * @memberof models.EncapMessage
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        EncapMessage.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/models.EncapMessage";
+        };
+
+        return EncapMessage;
+    })();
+
+    models.EventContext = (function() {
+
+        /**
+         * Properties of an EventContext.
+         * @memberof models
+         * @interface IEventContext
+         * @property {number|null} [action] EventContext action
+         * @property {string|null} [source] EventContext source
+         */
+
+        /**
+         * Constructs a new EventContext.
+         * @memberof models
+         * @classdesc Represents an EventContext.
+         * @implements IEventContext
+         * @constructor
+         * @param {models.IEventContext=} [properties] Properties to set
+         */
+        function EventContext(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
         }
-      }
-    }
-  }
 
-  return {
-    low: part0 | (part1 << 28),
-    high: (part1 >>> 4) | (part2 << 24),
-    unsigned,
-  };
-}
+        /**
+         * EventContext action.
+         * @member {number} action
+         * @memberof models.EventContext
+         * @instance
+         */
+        EventContext.prototype.action = 0;
 
-function writeVarint64(bb, value) {
-  let part0 = value.low >>> 0;
-  let part1 = ((value.low >>> 28) | (value.high << 4)) >>> 0;
-  let part2 = value.high >>> 24;
+        /**
+         * EventContext source.
+         * @member {string} source
+         * @memberof models.EventContext
+         * @instance
+         */
+        EventContext.prototype.source = "";
 
-  // ref: src/google/protobuf/io/coded_stream.cc
-  let size =
-    part2 === 0 ?
-      part1 === 0 ?
-        part0 < 1 << 14 ?
-          part0 < 1 << 7 ? 1 : 2 :
-          part0 < 1 << 21 ? 3 : 4 :
-        part1 < 1 << 14 ?
-          part1 < 1 << 7 ? 5 : 6 :
-          part1 < 1 << 21 ? 7 : 8 :
-      part2 < 1 << 7 ? 9 : 10;
+        /**
+         * Creates a new EventContext instance using the specified properties.
+         * @function create
+         * @memberof models.EventContext
+         * @static
+         * @param {models.IEventContext=} [properties] Properties to set
+         * @returns {models.EventContext} EventContext instance
+         */
+        EventContext.create = function create(properties) {
+            return new EventContext(properties);
+        };
 
-  let offset = grow(bb, size);
-  let bytes = bb.bytes;
+        /**
+         * Encodes the specified EventContext message. Does not implicitly {@link models.EventContext.verify|verify} messages.
+         * @function encode
+         * @memberof models.EventContext
+         * @static
+         * @param {models.IEventContext} message EventContext message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        EventContext.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.action != null && Object.hasOwnProperty.call(message, "action"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int32(message.action);
+            if (message.source != null && Object.hasOwnProperty.call(message, "source"))
+                writer.uint32(/* id 2, wireType 2 =*/18).string(message.source);
+            return writer;
+        };
 
-  switch (size) {
-    case 10: bytes[offset + 9] = (part2 >>> 7) & 0x01;
-    case 9: bytes[offset + 8] = size !== 9 ? part2 | 0x80 : part2 & 0x7F;
-    case 8: bytes[offset + 7] = size !== 8 ? (part1 >>> 21) | 0x80 : (part1 >>> 21) & 0x7F;
-    case 7: bytes[offset + 6] = size !== 7 ? (part1 >>> 14) | 0x80 : (part1 >>> 14) & 0x7F;
-    case 6: bytes[offset + 5] = size !== 6 ? (part1 >>> 7) | 0x80 : (part1 >>> 7) & 0x7F;
-    case 5: bytes[offset + 4] = size !== 5 ? part1 | 0x80 : part1 & 0x7F;
-    case 4: bytes[offset + 3] = size !== 4 ? (part0 >>> 21) | 0x80 : (part0 >>> 21) & 0x7F;
-    case 3: bytes[offset + 2] = size !== 3 ? (part0 >>> 14) | 0x80 : (part0 >>> 14) & 0x7F;
-    case 2: bytes[offset + 1] = size !== 2 ? (part0 >>> 7) | 0x80 : (part0 >>> 7) & 0x7F;
-    case 1: bytes[offset] = size !== 1 ? part0 | 0x80 : part0 & 0x7F;
-  }
-}
+        /**
+         * Encodes the specified EventContext message, length delimited. Does not implicitly {@link models.EventContext.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof models.EventContext
+         * @static
+         * @param {models.IEventContext} message EventContext message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        EventContext.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
 
-function readVarint32ZigZag(bb) {
-  let value = readVarint32(bb);
+        /**
+         * Decodes an EventContext message from the specified reader or buffer.
+         * @function decode
+         * @memberof models.EventContext
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {models.EventContext} EventContext
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        EventContext.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.models.EventContext();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.action = reader.int32();
+                        break;
+                    }
+                case 2: {
+                        message.source = reader.string();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
 
-  // ref: src/google/protobuf/wire_format_lite.h
-  return (value >>> 1) ^ -(value & 1);
-}
+        /**
+         * Decodes an EventContext message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof models.EventContext
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {models.EventContext} EventContext
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        EventContext.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
 
-function writeVarint32ZigZag(bb, value) {
-  // ref: src/google/protobuf/wire_format_lite.h
-  writeVarint32(bb, (value << 1) ^ (value >> 31));
-}
+        /**
+         * Verifies an EventContext message.
+         * @function verify
+         * @memberof models.EventContext
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        EventContext.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.action != null && message.hasOwnProperty("action"))
+                if (!$util.isInteger(message.action))
+                    return "action: integer expected";
+            if (message.source != null && message.hasOwnProperty("source"))
+                if (!$util.isString(message.source))
+                    return "source: string expected";
+            return null;
+        };
 
-function readVarint64ZigZag(bb) {
-  let value = readVarint64(bb, /* unsigned */ false);
-  let low = value.low;
-  let high = value.high;
-  let flip = -(low & 1);
+        /**
+         * Creates an EventContext message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof models.EventContext
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {models.EventContext} EventContext
+         */
+        EventContext.fromObject = function fromObject(object) {
+            if (object instanceof $root.models.EventContext)
+                return object;
+            let message = new $root.models.EventContext();
+            if (object.action != null)
+                message.action = object.action | 0;
+            if (object.source != null)
+                message.source = String(object.source);
+            return message;
+        };
 
-  // ref: src/google/protobuf/wire_format_lite.h
-  return {
-    low: ((low >>> 1) | (high << 31)) ^ flip,
-    high: (high >>> 1) ^ flip,
-    unsigned: false,
-  };
-}
+        /**
+         * Creates a plain object from an EventContext message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof models.EventContext
+         * @static
+         * @param {models.EventContext} message EventContext
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        EventContext.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.action = 0;
+                object.source = "";
+            }
+            if (message.action != null && message.hasOwnProperty("action"))
+                object.action = message.action;
+            if (message.source != null && message.hasOwnProperty("source"))
+                object.source = message.source;
+            return object;
+        };
 
-function writeVarint64ZigZag(bb, value) {
-  let low = value.low;
-  let high = value.high;
-  let flip = high >> 31;
+        /**
+         * Converts this EventContext to JSON.
+         * @function toJSON
+         * @memberof models.EventContext
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        EventContext.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
 
-  // ref: src/google/protobuf/wire_format_lite.h
-  writeVarint64(bb, {
-    low: (low << 1) ^ flip,
-    high: ((high << 1) | (low >>> 31)) ^ flip,
-    unsigned: false,
-  });
-}
+        /**
+         * Gets the default type url for EventContext
+         * @function getTypeUrl
+         * @memberof models.EventContext
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        EventContext.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/models.EventContext";
+        };
+
+        return EventContext;
+    })();
+
+    models.Tick = (function() {
+
+        /**
+         * Properties of a Tick.
+         * @memberof models
+         * @interface ITick
+         * @property {string|null} [symbol] Tick symbol
+         * @property {number|null} [matchPrice] Tick matchPrice
+         * @property {number|null} [matchQtty] Tick matchQtty
+         * @property {models.ITimestamp|null} [time] Tick time
+         * @property {number|null} [side] Tick side
+         * @property {number|null} [session] Tick session
+         */
+
+        /**
+         * Constructs a new Tick.
+         * @memberof models
+         * @classdesc Represents a Tick.
+         * @implements ITick
+         * @constructor
+         * @param {models.ITick=} [properties] Properties to set
+         */
+        function Tick(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Tick symbol.
+         * @member {string} symbol
+         * @memberof models.Tick
+         * @instance
+         */
+        Tick.prototype.symbol = "";
+
+        /**
+         * Tick matchPrice.
+         * @member {number} matchPrice
+         * @memberof models.Tick
+         * @instance
+         */
+        Tick.prototype.matchPrice = 0;
+
+        /**
+         * Tick matchQtty.
+         * @member {number} matchQtty
+         * @memberof models.Tick
+         * @instance
+         */
+        Tick.prototype.matchQtty = 0;
+
+        /**
+         * Tick time.
+         * @member {models.ITimestamp|null|undefined} time
+         * @memberof models.Tick
+         * @instance
+         */
+        Tick.prototype.time = null;
+
+        /**
+         * Tick side.
+         * @member {number} side
+         * @memberof models.Tick
+         * @instance
+         */
+        Tick.prototype.side = 0;
+
+        /**
+         * Tick session.
+         * @member {number} session
+         * @memberof models.Tick
+         * @instance
+         */
+        Tick.prototype.session = 0;
+
+        /**
+         * Creates a new Tick instance using the specified properties.
+         * @function create
+         * @memberof models.Tick
+         * @static
+         * @param {models.ITick=} [properties] Properties to set
+         * @returns {models.Tick} Tick instance
+         */
+        Tick.create = function create(properties) {
+            return new Tick(properties);
+        };
+
+        /**
+         * Encodes the specified Tick message. Does not implicitly {@link models.Tick.verify|verify} messages.
+         * @function encode
+         * @memberof models.Tick
+         * @static
+         * @param {models.ITick} message Tick message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Tick.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.symbol != null && Object.hasOwnProperty.call(message, "symbol"))
+                writer.uint32(/* id 1, wireType 2 =*/10).string(message.symbol);
+            if (message.matchPrice != null && Object.hasOwnProperty.call(message, "matchPrice"))
+                writer.uint32(/* id 2, wireType 1 =*/17).double(message.matchPrice);
+            if (message.matchQtty != null && Object.hasOwnProperty.call(message, "matchQtty"))
+                writer.uint32(/* id 3, wireType 1 =*/25).double(message.matchQtty);
+            if (message.time != null && Object.hasOwnProperty.call(message, "time"))
+                $root.models.Timestamp.encode(message.time, writer.uint32(/* id 4, wireType 2 =*/34).fork()).ldelim();
+            if (message.side != null && Object.hasOwnProperty.call(message, "side"))
+                writer.uint32(/* id 5, wireType 0 =*/40).int32(message.side);
+            if (message.session != null && Object.hasOwnProperty.call(message, "session"))
+                writer.uint32(/* id 6, wireType 0 =*/48).int32(message.session);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Tick message, length delimited. Does not implicitly {@link models.Tick.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof models.Tick
+         * @static
+         * @param {models.ITick} message Tick message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Tick.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Tick message from the specified reader or buffer.
+         * @function decode
+         * @memberof models.Tick
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {models.Tick} Tick
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Tick.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.models.Tick();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.symbol = reader.string();
+                        break;
+                    }
+                case 2: {
+                        message.matchPrice = reader.double();
+                        break;
+                    }
+                case 3: {
+                        message.matchQtty = reader.double();
+                        break;
+                    }
+                case 4: {
+                        message.time = $root.models.Timestamp.decode(reader, reader.uint32());
+                        break;
+                    }
+                case 5: {
+                        message.side = reader.int32();
+                        break;
+                    }
+                case 6: {
+                        message.session = reader.int32();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Tick message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof models.Tick
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {models.Tick} Tick
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Tick.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Tick message.
+         * @function verify
+         * @memberof models.Tick
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Tick.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.symbol != null && message.hasOwnProperty("symbol"))
+                if (!$util.isString(message.symbol))
+                    return "symbol: string expected";
+            if (message.matchPrice != null && message.hasOwnProperty("matchPrice"))
+                if (typeof message.matchPrice !== "number")
+                    return "matchPrice: number expected";
+            if (message.matchQtty != null && message.hasOwnProperty("matchQtty"))
+                if (typeof message.matchQtty !== "number")
+                    return "matchQtty: number expected";
+            if (message.time != null && message.hasOwnProperty("time")) {
+                let error = $root.models.Timestamp.verify(message.time);
+                if (error)
+                    return "time." + error;
+            }
+            if (message.side != null && message.hasOwnProperty("side"))
+                if (!$util.isInteger(message.side))
+                    return "side: integer expected";
+            if (message.session != null && message.hasOwnProperty("session"))
+                if (!$util.isInteger(message.session))
+                    return "session: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a Tick message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof models.Tick
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {models.Tick} Tick
+         */
+        Tick.fromObject = function fromObject(object) {
+            if (object instanceof $root.models.Tick)
+                return object;
+            let message = new $root.models.Tick();
+            if (object.symbol != null)
+                message.symbol = String(object.symbol);
+            if (object.matchPrice != null)
+                message.matchPrice = Number(object.matchPrice);
+            if (object.matchQtty != null)
+                message.matchQtty = Number(object.matchQtty);
+            if (object.time != null) {
+                if (typeof object.time !== "object")
+                    throw TypeError(".models.Tick.time: object expected");
+                message.time = $root.models.Timestamp.fromObject(object.time);
+            }
+            if (object.side != null)
+                message.side = object.side | 0;
+            if (object.session != null)
+                message.session = object.session | 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Tick message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof models.Tick
+         * @static
+         * @param {models.Tick} message Tick
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Tick.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                object.symbol = "";
+                object.matchPrice = 0;
+                object.matchQtty = 0;
+                object.time = null;
+                object.side = 0;
+                object.session = 0;
+            }
+            if (message.symbol != null && message.hasOwnProperty("symbol"))
+                object.symbol = message.symbol;
+            if (message.matchPrice != null && message.hasOwnProperty("matchPrice"))
+                object.matchPrice = options.json && !isFinite(message.matchPrice) ? String(message.matchPrice) : message.matchPrice;
+            if (message.matchQtty != null && message.hasOwnProperty("matchQtty"))
+                object.matchQtty = options.json && !isFinite(message.matchQtty) ? String(message.matchQtty) : message.matchQtty;
+            if (message.time != null && message.hasOwnProperty("time"))
+                object.time = $root.models.Timestamp.toObject(message.time, options);
+            if (message.side != null && message.hasOwnProperty("side"))
+                object.side = message.side;
+            if (message.session != null && message.hasOwnProperty("session"))
+                object.session = message.session;
+            return object;
+        };
+
+        /**
+         * Converts this Tick to JSON.
+         * @function toJSON
+         * @memberof models.Tick
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Tick.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for Tick
+         * @function getTypeUrl
+         * @memberof models.Tick
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        Tick.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/models.Tick";
+        };
+
+        return Tick;
+    })();
+
+    models.Timestamp = (function() {
+
+        /**
+         * Properties of a Timestamp.
+         * @memberof models
+         * @interface ITimestamp
+         * @property {number|Long|null} [seconds] Timestamp seconds
+         * @property {number|null} [nanos] Timestamp nanos
+         */
+
+        /**
+         * Constructs a new Timestamp.
+         * @memberof models
+         * @classdesc Represents a Timestamp.
+         * @implements ITimestamp
+         * @constructor
+         * @param {models.ITimestamp=} [properties] Properties to set
+         */
+        function Timestamp(properties) {
+            if (properties)
+                for (let keys = Object.keys(properties), i = 0; i < keys.length; ++i)
+                    if (properties[keys[i]] != null)
+                        this[keys[i]] = properties[keys[i]];
+        }
+
+        /**
+         * Timestamp seconds.
+         * @member {number|Long} seconds
+         * @memberof models.Timestamp
+         * @instance
+         */
+        Timestamp.prototype.seconds = $util.Long ? $util.Long.fromBits(0,0,false) : 0;
+
+        /**
+         * Timestamp nanos.
+         * @member {number} nanos
+         * @memberof models.Timestamp
+         * @instance
+         */
+        Timestamp.prototype.nanos = 0;
+
+        /**
+         * Creates a new Timestamp instance using the specified properties.
+         * @function create
+         * @memberof models.Timestamp
+         * @static
+         * @param {models.ITimestamp=} [properties] Properties to set
+         * @returns {models.Timestamp} Timestamp instance
+         */
+        Timestamp.create = function create(properties) {
+            return new Timestamp(properties);
+        };
+
+        /**
+         * Encodes the specified Timestamp message. Does not implicitly {@link models.Timestamp.verify|verify} messages.
+         * @function encode
+         * @memberof models.Timestamp
+         * @static
+         * @param {models.ITimestamp} message Timestamp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Timestamp.encode = function encode(message, writer) {
+            if (!writer)
+                writer = $Writer.create();
+            if (message.seconds != null && Object.hasOwnProperty.call(message, "seconds"))
+                writer.uint32(/* id 1, wireType 0 =*/8).int64(message.seconds);
+            if (message.nanos != null && Object.hasOwnProperty.call(message, "nanos"))
+                writer.uint32(/* id 2, wireType 0 =*/16).int32(message.nanos);
+            return writer;
+        };
+
+        /**
+         * Encodes the specified Timestamp message, length delimited. Does not implicitly {@link models.Timestamp.verify|verify} messages.
+         * @function encodeDelimited
+         * @memberof models.Timestamp
+         * @static
+         * @param {models.ITimestamp} message Timestamp message or plain object to encode
+         * @param {$protobuf.Writer} [writer] Writer to encode to
+         * @returns {$protobuf.Writer} Writer
+         */
+        Timestamp.encodeDelimited = function encodeDelimited(message, writer) {
+            return this.encode(message, writer).ldelim();
+        };
+
+        /**
+         * Decodes a Timestamp message from the specified reader or buffer.
+         * @function decode
+         * @memberof models.Timestamp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @param {number} [length] Message length if known beforehand
+         * @returns {models.Timestamp} Timestamp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Timestamp.decode = function decode(reader, length, error) {
+            if (!(reader instanceof $Reader))
+                reader = $Reader.create(reader);
+            let end = length === undefined ? reader.len : reader.pos + length, message = new $root.models.Timestamp();
+            while (reader.pos < end) {
+                let tag = reader.uint32();
+                if (tag === error)
+                    break;
+                switch (tag >>> 3) {
+                case 1: {
+                        message.seconds = reader.int64();
+                        break;
+                    }
+                case 2: {
+                        message.nanos = reader.int32();
+                        break;
+                    }
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+                }
+            }
+            return message;
+        };
+
+        /**
+         * Decodes a Timestamp message from the specified reader or buffer, length delimited.
+         * @function decodeDelimited
+         * @memberof models.Timestamp
+         * @static
+         * @param {$protobuf.Reader|Uint8Array} reader Reader or buffer to decode from
+         * @returns {models.Timestamp} Timestamp
+         * @throws {Error} If the payload is not a reader or valid buffer
+         * @throws {$protobuf.util.ProtocolError} If required fields are missing
+         */
+        Timestamp.decodeDelimited = function decodeDelimited(reader) {
+            if (!(reader instanceof $Reader))
+                reader = new $Reader(reader);
+            return this.decode(reader, reader.uint32());
+        };
+
+        /**
+         * Verifies a Timestamp message.
+         * @function verify
+         * @memberof models.Timestamp
+         * @static
+         * @param {Object.<string,*>} message Plain object to verify
+         * @returns {string|null} `null` if valid, otherwise the reason why it is not
+         */
+        Timestamp.verify = function verify(message) {
+            if (typeof message !== "object" || message === null)
+                return "object expected";
+            if (message.seconds != null && message.hasOwnProperty("seconds"))
+                if (!$util.isInteger(message.seconds) && !(message.seconds && $util.isInteger(message.seconds.low) && $util.isInteger(message.seconds.high)))
+                    return "seconds: integer|Long expected";
+            if (message.nanos != null && message.hasOwnProperty("nanos"))
+                if (!$util.isInteger(message.nanos))
+                    return "nanos: integer expected";
+            return null;
+        };
+
+        /**
+         * Creates a Timestamp message from a plain object. Also converts values to their respective internal types.
+         * @function fromObject
+         * @memberof models.Timestamp
+         * @static
+         * @param {Object.<string,*>} object Plain object
+         * @returns {models.Timestamp} Timestamp
+         */
+        Timestamp.fromObject = function fromObject(object) {
+            if (object instanceof $root.models.Timestamp)
+                return object;
+            let message = new $root.models.Timestamp();
+            if (object.seconds != null)
+                if ($util.Long)
+                    (message.seconds = $util.Long.fromValue(object.seconds)).unsigned = false;
+                else if (typeof object.seconds === "string")
+                    message.seconds = parseInt(object.seconds, 10);
+                else if (typeof object.seconds === "number")
+                    message.seconds = object.seconds;
+                else if (typeof object.seconds === "object")
+                    message.seconds = new $util.LongBits(object.seconds.low >>> 0, object.seconds.high >>> 0).toNumber();
+            if (object.nanos != null)
+                message.nanos = object.nanos | 0;
+            return message;
+        };
+
+        /**
+         * Creates a plain object from a Timestamp message. Also converts values to other types if specified.
+         * @function toObject
+         * @memberof models.Timestamp
+         * @static
+         * @param {models.Timestamp} message Timestamp
+         * @param {$protobuf.IConversionOptions} [options] Conversion options
+         * @returns {Object.<string,*>} Plain object
+         */
+        Timestamp.toObject = function toObject(message, options) {
+            if (!options)
+                options = {};
+            let object = {};
+            if (options.defaults) {
+                if ($util.Long) {
+                    let long = new $util.Long(0, 0, false);
+                    object.seconds = options.longs === String ? long.toString() : options.longs === Number ? long.toNumber() : long;
+                } else
+                    object.seconds = options.longs === String ? "0" : 0;
+                object.nanos = 0;
+            }
+            if (message.seconds != null && message.hasOwnProperty("seconds"))
+                if (typeof message.seconds === "number")
+                    object.seconds = options.longs === String ? String(message.seconds) : message.seconds;
+                else
+                    object.seconds = options.longs === String ? $util.Long.prototype.toString.call(message.seconds) : options.longs === Number ? new $util.LongBits(message.seconds.low >>> 0, message.seconds.high >>> 0).toNumber() : message.seconds;
+            if (message.nanos != null && message.hasOwnProperty("nanos"))
+                object.nanos = message.nanos;
+            return object;
+        };
+
+        /**
+         * Converts this Timestamp to JSON.
+         * @function toJSON
+         * @memberof models.Timestamp
+         * @instance
+         * @returns {Object.<string,*>} JSON object
+         */
+        Timestamp.prototype.toJSON = function toJSON() {
+            return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+        };
+
+        /**
+         * Gets the default type url for Timestamp
+         * @function getTypeUrl
+         * @memberof models.Timestamp
+         * @static
+         * @param {string} [typeUrlPrefix] your custom typeUrlPrefix(default "type.googleapis.com")
+         * @returns {string} The default type url
+         */
+        Timestamp.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+            if (typeUrlPrefix === undefined) {
+                typeUrlPrefix = "type.googleapis.com";
+            }
+            return typeUrlPrefix + "/models.Timestamp";
+        };
+
+        return Timestamp;
+    })();
+
+    return models;
+})();
+
+export { $root as default };
