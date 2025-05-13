@@ -440,9 +440,9 @@ class DerivativeService extends CoreService
                         GetKrxTicksBySymbols(symbols: \"{$vn30f1m}\", date: \"{$date}\", limit: 100000, board: 2) {
                             ticks {
                                 totalVolumeTraded
+                                sendingTime
                                 matchPrice
                                 matchQtty
-                                sendingTime
                             }
                         }
                     }",

@@ -43,7 +43,8 @@ class ExportDerDnseJob implements ShouldQueue
         $fp = fopen($file, 'w');
         foreach ($data as $item) {
             $line = [];
-            $line[] = strtotime($item->time) + self::SHIFT_TIME;
+            $line[] = $item->totalVolumeTraded;
+            $line[] = $item->sendingTime;
             $line[] = $item->matchPrice;
             $line[] = $item->matchQtty;
             fputcsv($fp, $line);
