@@ -451,9 +451,9 @@ class DerivativeService extends CoreService
             ];
             $req = $client->post('https://api.dnse.com.vn/price-api/query', $data);
             $data = json_decode($req->getBody())->data->GetKrxTicksBySymbols->ticks;
-            // usort($data, function ($a, $b) {
-            //     return $b->time < $a->time;
-            // });
+            usort($data, function ($a, $b) {
+                return $b->sendingTime < $a->sendingTime;
+            });
             return (array)$data;
         } catch (\Throwable $th) {
             return [];

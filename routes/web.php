@@ -54,7 +54,8 @@ Route::get('test', function () {
     // $s = 'THO';
     // $s = app(\App\Services\Trading\DerivativeService::class)->getHolidays();
     // $s = get_holidays('2025');
-    $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData();
+    $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData('2025-05-12');
+    $s = $s[0];
     // $s = app(\App\Services\Trading\ShareService::class)->getStock('VN30', 1578058160, 1694649600);
     // $s = app(\App\Services\Trading\ShareService::class)->getStock('CTG', '2021-05-25', '2024-12-24');
     // $s = app(\App\Services\Trading\ShareService::class)->calcStock('CTG', strtotime('2021-05-25'), strtotime('2024-06-12'), strtotime('2024-09-27'), strtotime('2024-12-20'));
