@@ -335,6 +335,7 @@ function calcContinuePattern() {
     const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
+    const CCs = mf.fmtNum(phase2.R.price1 - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const EEs = mf.fmtNum(phase4.R.price1 - E.price, 1, true);
@@ -346,16 +347,15 @@ function calcContinuePattern() {
 
     const T1 = phase1.R.time.i + phase1.tr;
     const T2 = phase2.R.time.i + phase2.tr;
-    const T2s = phase2.R.time.i + (phase2.R.time.i - phase2.R.time1.i);
     const T3 = D.time.i + TR3;
     const T4 = E.time.i + phase4.tr;
-    const T4s = E.time.i + (phase4.R.time.i - phase4.R.time1.i);
     const T5 = F.time.i + TR5;
     const T6 = G.time.i + phase6.tr;
     const timeMark = [T6, T5, T4, T3, T2, T1];
 
     const rABC = BC / AB;
     const rBCD = CD / BC;
+    const rBCCs = CCs / BC;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
     const rDEEs = EEs / DE;
@@ -369,11 +369,11 @@ function calcContinuePattern() {
             phase2.R.time1.i > T1,
             BC >= phase1.pr,
             rABC >= 0.3,
+            rBCCs < 0.5,
         ],
         [
             //
             D.time1.i > T2,
-            D.time1.i > T2s,
             CD >= phase2.pr,
             rBCD >= 0.5,
             CD <= AB,
@@ -393,7 +393,6 @@ function calcContinuePattern() {
         [
             //
             F.time1.i > T4,
-            F.time1.i > T4s,
             EF >= phase4.pr,
             rDEF >= 0.5,
             EF <= CD,
@@ -567,10 +566,8 @@ function calcReversalPattern() {
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
 
     const T1 = phase1.R.time.i + phase1.tr;
-    const T1s = phase1.R.time.i + (phase1.R.time.i - phase1.R.time1.i);
     const T2 = C.time.i + TR2;
     const T3 = D.time.i + phase3.tr;
-    const T3s = D.time.i + (phase3.R.time.i - phase3.R.time1.i);
     const T4 = E.time.i + TR4;
     const T5 = F.time.i + phase5.tr;
     const timeMark = [T5, T4, T3, T2, T1];
@@ -587,7 +584,6 @@ function calcReversalPattern() {
         [
             //
             C.time1.i > T1,
-            C.time1.i > T1s,
             BC >= phase1.pr,
             rABC >= 0.3,
             C.price !== E.price,
@@ -605,7 +601,6 @@ function calcReversalPattern() {
         [
             //
             E.time1.i > T3,
-            E.time1.i > T3s,
             DE >= phase3.pr,
             rCDE >= 0.5,
             DE <= BC,
