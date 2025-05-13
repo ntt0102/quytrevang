@@ -335,10 +335,6 @@ function drawChart() {
         wickDownColor: "#F5F5F5",
         priceFormat: { minMove: 0.1 },
     });
-    // params.series.price = params.chart.addLineSeries({
-    //     color: "#F5F5F5",
-    //     priceFormat: { minMove: 0.1 },
-    // });
 }
 function removeChart() {
     if (params.chart) {
@@ -442,9 +438,9 @@ function chartShortcut(e) {
             break;
     }
 }
-function setChartData(ticks) {
+function setChartData(data) {
     if (!(state.chartDate === CURRENT_DATE && inSession())) {
-        if (ticks.length > 0) {
+        if (data.ticks.length > 0) {
             params.whitespaces = mergeChartData(
                 params.whitespaces,
                 createWhitespaceData(state.chartDate)
@@ -452,7 +448,7 @@ function setChartData(ticks) {
         }
         params.series.whitespace.setData(params.whitespaces);
         //
-        setCandlestick(ticks);
+        setCandlestick(data.ticks);
     }
 }
 function updateChartData(ticks, isFirst) {
