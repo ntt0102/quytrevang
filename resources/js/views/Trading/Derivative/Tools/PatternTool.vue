@@ -388,7 +388,7 @@ function calcContinuePattern() {
             DE <= BC,
             rDEEs < 0.5,
             rDEF >= 0.5,
-            rDEG < 0.5,
+            rDEG <= 0.5,
         ],
         [
             //
@@ -596,7 +596,7 @@ function calcReversalPattern() {
             CD <= AB,
             rCDDs < 0.5,
             rCDE >= 0.5,
-            rCDF < 0.5,
+            rCDF <= 0.5,
         ],
         [
             //
