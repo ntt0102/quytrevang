@@ -15,13 +15,17 @@ class ExportDerDnseJob implements ShouldQueue
 
     const SHIFT_TIME = 7 * 60 * 60;
     public $timeout = 3600;
+    private $date;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct() {}
+    public function __construct($date)
+    {
+        $this->date = $date;
+    }
 
     /**
      * Execute the job.
@@ -30,7 +34,7 @@ class ExportDerDnseJob implements ShouldQueue
      */
     public function handle()
     {
-        $data = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData();
+        $data = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData($this->date);
         if (!count($data)) return false;
 
         $date = substr($data[0]->time, 0, 10);

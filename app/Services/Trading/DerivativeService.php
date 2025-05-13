@@ -427,10 +427,10 @@ class DerivativeService extends CoreService
     /**
      * Vps data
      */
-    public function cloneDnseData()
+    public function cloneDnseData($date = null)
     {
+        if (!$date) $date = date("Y-m-d");
         $vn30f1m = get_global_value('vn30f1m');
-        $date = date("Y-m-d");
         try {
             $client = new \GuzzleHttp\Client();
             $data = [
@@ -439,7 +439,9 @@ class DerivativeService extends CoreService
                     "query" => "query GetKrxTicksBySymbols {
                         GetKrxTicksBySymbols(symbols: \"{$vn30f1m}\", date: \"{$date}\", limit: 100000, board: 2) {
                             ticks {
+                                totalVolumeTraded
                                 matchPrice
+                                matchQtty
                                 sendingTime
                             }
                         }
@@ -496,7 +498,7 @@ class DerivativeService extends CoreService
                     break;
 
                 case 'DNSE':
-                    ExportDerDnseJob::dispatch();
+                    ExportDerDnseJob::dispatch($payload->date);
                     $ret['isOk'] = true;
                     break;
 

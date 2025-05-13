@@ -93,53 +93,7 @@ message MarketMakingContract {}
 message ETFIndexComposition {}
 message ELWUnderlyingAssets {}
 message StockInfo {}
-message MarketIndex {
-  enum MarketId {
-    MARKET_ID_UNSPECIFIED = 0;
-    MARKET_ID_1 = 1;
-    MARKET_ID_2 = 2;
-  }
-
-  enum TradingSessionId {
-    TRADING_SESSION_UNSPECIFIED = 0;
-    TRADING_SESSION_1 = 1;
-    TRADING_SESSION_2 = 2;
-  }
-
-  enum MarketIndexClass {
-    MARKET_INDEX_CLASS_UNSPECIFIED = 0;
-    MARKET_INDEX_CLASS_1 = 1;
-    MARKET_INDEX_CLASS_2 = 2;
-  }
-
-  MarketId marketId = 1;
-  TradingSessionId tradingSessionId = 2;
-  MarketIndexClass marketIndexClass = 3;
-  string indexTypeCode = 4;
-  string currencyCode = 5;
-  Timestamp transactTime = 6;
-  double valueIndexes = 7;
-  uint64 totalVolumeTraded = 8;
-  double grossTradeAmount = 9;
-  uint64 contauctAccTrdVol = 10;
-  double contauctAccTrdVal = 11;
-  uint64 blkTrdAccTrdVol = 12;
-  double blkTrdAccTrdVal = 13;
-  uint32 fluctuationUpperLimitIssueCount = 14;
-  uint32 fluctuationUpIssueCount = 15;
-  uint32 fluctuationSteadinessIssueCount = 16;
-  uint32 fluctuationDownIssueCount = 17;
-  uint32 fluctuationLowerLimitIssueCount = 18;
-  uint64 fluctuationUpIssueVolume = 19;
-  uint64 fluctuationSteadinessIssueVolume = 20;
-  uint64 fluctuationDownIssueVolume = 21;
-  double highestValueIndexes = 22;
-  double lowestValueIndexes = 23;
-  double changedValue = 24;
-  double changedRatio = 25;
-  double priorValueIndexes = 26;
-  string indexName = 27;
-}
+message MarketIndex {}
 message BoardEvent {}
 message SymbolBoardEvent {}
 message Tick {
