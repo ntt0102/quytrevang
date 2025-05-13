@@ -385,7 +385,7 @@ function calcContinuePattern() {
             rCDE >= 1.25 - rBCD,
             DE <= BC,
             rDEEs < 0.5,
-            F.time1.i > T4s,
+            rDEF >= 0.5,
             rDEG < 0.5,
         ],
         [
@@ -594,7 +594,7 @@ function calcReversalPattern() {
             rBCD >= 0.7,
             CD <= AB,
             rCDDs < 0.5,
-            E.time1.i > T3s,
+            rCDE >= 0.5,
             rCDF < 0.5,
         ],
         [
