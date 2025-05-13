@@ -37,7 +37,7 @@ class ExportDerDnseJob implements ShouldQueue
         $data = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData($this->date);
         if (!count($data)) return false;
 
-        $date = substr($data[0]->time, 0, 10);
+        $date = substr($data[0]->sendingTime, 0, 10);
         $file = storage_path('app/phaisinh/' . $date . '.csv');
 
         $fp = fopen($file, 'w');
