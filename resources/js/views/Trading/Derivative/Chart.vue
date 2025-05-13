@@ -159,8 +159,7 @@ import OrderTool from "./Tools/OrderTool.vue";
 
 import { createChart } from "../../../plugins/lightweight-charts.esm.development";
 import mqtt from "mqtt";
-// import { decodeEncapMessage, decodeTick } from "../../../plugins/dnse/index";
-import { models as dnseModels } from "../../../plugins/dnse/index";
+import { mdds_pb } from "../../../plugins/dnse/mdds_pb.js";
 import { alert } from "devextreme/ui/dialog";
 import {
     ref,
@@ -457,24 +456,6 @@ function setChartData(ticks) {
     }
 }
 function updateChartData(ticks, isFirst) {
-    // if (data.length === 0) return false;
-    // const source = config.value.source;
-    // const prices = data.map((item) => {
-    //     let time, value;
-    //     if (source === "FIREANT") {
-    //         time = getUnixTime(addHours(new Date(item.date), 7));
-    //         value = item.price;
-    //     } else if (source === "VPS") {
-    //         time = getUnixTime(new Date(`${CURRENT_DATE}T${item.time}Z`));
-    //         value = item.lastPrice;
-    //     } else if (source === "DNSE") {
-    //         time = getUnixTime(addHours(new Date(item.time), 7));
-    //         value = item.matchPrice;
-    //     }
-    //     return { time, value };
-    // });
-    // state.bars = mergeChartData(state.bars, prices);
-    // params.series.price.setData(state.bars);
     if (isFirst) {
         getTools();
         params.whitespaces = mergeChartData(
@@ -485,6 +466,102 @@ function updateChartData(ticks, isFirst) {
         //
         setCandlestick(ticks);
     } else updateCandlestick(ticks);
+}
+function setCandlestick(ticks) {
+    ticks.forEach((tick) => {
+        let date, time, price;
+        switch (config.value.source) {
+            case "FIREANT":
+                date = addHours(new Date(tick.date), 7);
+                price = tick.price;
+                break;
+            case "VPS":
+                date = new Date(`${CURRENT_DATE}T${tick.time}Z`);
+                price = tick.lastPrice;
+                break;
+            case "DNSE":
+                date = addHours(new Date(tick.sendingTime), 7);
+                price = tick.matchPrice;
+                break;
+        }
+        time = getUnixTime(date);
+        date = formatISO(date);
+        if (!params.ohlcMap.has(time)) {
+            const bar = {
+                date,
+                time,
+                open: price,
+                high: price,
+                low: price,
+                close: price,
+            };
+            params.ohlcMap.set(time, bar);
+        } else {
+            const bar = params.ohlcMap.get(time);
+            bar.high = Math.max(bar.high, price);
+            bar.low = Math.min(bar.low, price);
+            bar.open = price;
+            bar.close = price;
+        }
+    });
+    const bars = Array.from(params.ohlcMap.values()).sort(
+        (a, b) => new Date(a.time) - new Date(b.time)
+    );
+    params.series.price.setData(bars);
+    state.bars = bars;
+}
+function updateCandlestick(ticks) {
+    if (config.value.source === "FIREANT") {
+        ticks.sort((a, b) =>
+            a.date === b.date
+                ? a.id - b.id
+                : new Date(a.date) - new Date(b.date)
+        );
+    }
+    ticks.forEach((tick) => {
+        let date, time, price;
+        switch (config.value.source) {
+            case "FIREANT":
+                date = addHours(new Date(tick.date), 7);
+                price = tick.price;
+                break;
+            case "VPS":
+                date = new Date(`${CURRENT_DATE}T${tick.time}Z`);
+                price = tick.lastPrice;
+                break;
+            case "DNSE":
+                date = addHours(new Date(tick.sendingtime), 7);
+                price = tick.matchprice;
+                break;
+        }
+        time = getUnixTime(date);
+        date = formatISO(date);
+        if (!params.ohlcMap.has(time)) {
+            const bar = {
+                date,
+                time,
+                open: price,
+                high: price,
+                low: price,
+                close: price,
+            };
+            params.series.price.update(bar);
+            params.ohlcMap.set(time, bar);
+        } else {
+            try {
+                const bar = params.ohlcMap.get(time);
+                bar.high = Math.max(bar.high, price);
+                bar.low = Math.min(bar.low, price);
+                bar.open = price;
+                bar.close = price;
+                params.series.price.update(bar);
+            } catch (error) {
+                return;
+            }
+        }
+    });
+    const bars = Array.from(params.ohlcMap.values());
+    state.bars = bars;
 }
 function createWhitespaceData(date) {
     const amStart = getUnixTime(new Date(`${date}T09:00:00Z`));
@@ -675,26 +752,45 @@ function getVpsData() {
 function configDnseSocket() {
     params.websocket.on("connect", () => {
         if (params.websocket.connected) {
-            const topic = `quotes/krx/mdds/tick/v1/roundlot/symbol/${config.value.vn30f1m}`;
-            // const topic = `quotes/stock/tick/${config.value.vn30f1m}`;
-            params.websocket.subscribe(topic);
-            // console.log("DNSE connected", topic);
+            const topics = [
+                `quotes/krx/mdds/tick/v1/roundlot/symbol/${config.value.vn30f1m}`,
+            ];
+            params.websocket.subscribe(topics);
+            console.log("DNSE connected");
         }
     });
     params.websocket.on("message", (_, message) => {
         state.isSocketWarning = false;
-        // var encapMsg = decodeEncapMessage(message);
-        var encapMsg = dnseModels.EncapMessage.decode(message);
-        console.log("encapMsg", encapMsg);
-        if (encapMsg.type === 41) {
-            let tick = decodeTick(encapMsg.payload);
-            orderToolRef.value.scan(tick.matchPrice);
-            const time = new Date(tick.time.seconds.low * 1000);
-            tick.time = time.toISOString();
+        const encapMsg = convertKrxMDDS(message);
+        if (encapMsg.type === mdds_pb.Wrapper.KindCase.TICK) {
+            let tick = encapMsg.payload;
+            orderToolRef.value.scan(tick.matchprice);
+            const time = new Date(tick.sendingtime.seconds * 1000);
+            tick.sendingtime = time.toISOString();
             console.log("DNSE: ", tick);
             updateChartData([tick]);
         }
     });
+}
+function convertKrxMDDS(data) {
+    try {
+        const binaryData = new Uint8Array(data);
+        const message = mdds_pb.Wrapper.deserializeBinary(binaryData);
+
+        if (!message) return;
+
+        const kindCase = message.getKindCase();
+        const payloadMap = {
+            [mdds_pb.Wrapper.KindCase.TICK]: message.getTick()?.toObject(),
+        };
+
+        return kindCase in payloadMap
+            ? { type: kindCase, payload: payloadMap[kindCase] }
+            : undefined;
+    } catch (error) {
+        console.error("An error occurred while parsing the message:", r, error);
+        return;
+    }
 }
 function getDnseData() {
     if (
@@ -830,113 +926,6 @@ function indexToTime(index) {
 function drawPriceLine(data, isRemove = false) {
     if (isRemove) params.series.price.removePriceLine(data);
     else return params.series.price.createPriceLine(data);
-}
-function setCandlestick(ticks) {
-    ticks.forEach((tick) => {
-        let date, time, price;
-        switch (config.value.source) {
-            case "FIREANT":
-                date = addHours(new Date(tick.date), 7);
-                price = tick.price;
-                break;
-            case "VPS":
-                date = new Date(`${CURRENT_DATE}T${tick.time}Z`);
-                price = tick.lastPrice;
-                break;
-            case "DNSE":
-                date = addHours(new Date(tick.sendingTime), 7);
-                price = tick.matchPrice;
-                break;
-        }
-        time = getUnixTime(date);
-        date = formatISO(date);
-        if (!params.ohlcMap.has(time)) {
-            const bar = {
-                date,
-                time,
-                open: price,
-                high: price,
-                low: price,
-                close: price,
-            };
-            params.ohlcMap.set(time, bar);
-        } else {
-            const bar = params.ohlcMap.get(time);
-            bar.high = Math.max(bar.high, price);
-            bar.low = Math.min(bar.low, price);
-            bar.open = price;
-            bar.close = price;
-        }
-    });
-    const bars = Array.from(params.ohlcMap.values()).sort(
-        (a, b) => new Date(a.time) - new Date(b.time)
-    );
-    params.series.price.setData(bars);
-    state.bars = bars;
-}
-function updateCandlestick(ticks) {
-    switch (config.value.source) {
-        case "FIREANT":
-            ticks.sort((a, b) =>
-                a.date === b.date
-                    ? a.id - b.id
-                    : new Date(a.date) - new Date(b.date)
-            );
-            break;
-        case "VPS":
-            ticks.sort((a, b) =>
-                a.time === b.time
-                    ? Number(a.sID) - Number(b.sID)
-                    : toSeconds(a.time) - toSeconds(b.time)
-            );
-            break;
-        case "DNSE":
-            break;
-    }
-    ticks.forEach((tick) => {
-        let date, time, price;
-        switch (config.value.source) {
-            case "FIREANT":
-                date = addHours(new Date(tick.date), 7);
-                price = tick.price;
-                break;
-            case "VPS":
-                date = new Date(`${CURRENT_DATE}T${tick.time}Z`);
-                price = tick.lastPrice;
-                break;
-            case "DNSE":
-                date = addHours(new Date(tick.time), 7);
-                price = tick.matchPrice;
-                break;
-        }
-        time = getUnixTime(date);
-        date = formatISO(date);
-        if (!params.ohlcMap.has(time)) {
-            const bar = {
-                date,
-                time,
-                open: price,
-                high: price,
-                low: price,
-                close: price,
-            };
-            params.series.price.update(bar);
-            params.ohlcMap.set(time, bar);
-        } else {
-            try {
-                const bar = params.ohlcMap.get(time);
-                bar.high = Math.max(bar.high, price);
-                bar.low = Math.min(bar.low, price);
-                bar.open = price;
-                bar.close = price;
-                params.series.price.update(bar);
-            } catch (error) {
-                return;
-            }
-        }
-    });
-    const bars = Array.from(params.ohlcMap.values());
-    state.bars = bars;
 }
 function toSeconds(time) {
     const [h, m, s] = time.split(":").map(Number);

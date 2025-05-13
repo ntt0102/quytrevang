@@ -1,9 +1,31 @@
 Chạy 1 trong các lệnh dưới trong thư mục hiện tại
 
-# npm i protobufjs-cli --save-dev
+# 1. protoc
 
-npx pbjs -t static-module -w es6 -o index.js messages.proto
+Run:
+npm install -g protoc-gen-js
 
-# npm i protobufjs --save-dev
+Add enviroment:
+%AppData%\npm
 
-npx pbjs --es6 index.js messages.proto
+Run:
+npm install google-protobuf
+
+Run:
+protoc --js_out=import_style=commonjs,binary:. mdds.proto
+
+Replace:
+line 1:
+import \* as jspb from "google-protobuf";
+line end:
+export const mdds_pb = proto.proto.mdds.v1;
+
+# 2. npm i protobufjs-cli --save-dev
+
+Run:
+npx pbjs -t static-module -w es6 -o index.js mdds.proto
+
+# 3. npm i protobufjs --save-dev
+
+Run:
+npx pbjs --es6 index.js mdds.proto

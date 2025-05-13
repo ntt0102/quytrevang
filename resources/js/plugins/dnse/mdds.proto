@@ -1,0 +1,170 @@
+syntax = "proto3";
+
+package proto.mdds.v1;
+
+message Wrapper {
+  oneof kind {
+    SecurityDefinition securityDefinition = 1;
+    SecurityStatus securityStatus = 2;
+    SecurityInformationNotification securityInformationNotification = 3;
+    SymbolClosingInformation symbolClosingInformation = 4;
+    VolatilityInterruption volatilityInterruption = 5;
+    MarketMakerInformation marketMakerInformation = 6;
+    SymbolEvent symbolEvent = 7;
+    IndexConstituentsInformation indexConstituentsInformation = 8;
+    RandomEnd randomEnd = 9;
+    Price price = 10;
+    PriceRecovery priceRecovery = 11;
+    Index index = 12;
+    InvestorPerIndustry investorPerIndustry = 13;
+    InvestorPerSymbol investorPerSymbol = 14;
+    TopNMembersPerSymbol topNMembersPerSymbol = 15;
+    OpenInterest openInterest = 16;
+    DeemTradePrice deemTradePrice = 17;
+    ForeignerOrderLimit foreignerOrderLimit = 18;
+    PriceLimitExpansion priceLimitExpansion = 19;
+    ETFiNav etfINav = 20;
+    ETFiIndex etfIIndex = 21;
+    ETFTrackingError etfTrackingError = 22;
+    TopNSymbolsWithTradingQuantity topNSymbolsWithTradingQuantity = 23;
+    TopNSymbolsWithCurrentPrice topNSymbolsWithCurrentPrice = 24;
+    TopNSymbolsWithHighRatioOfPrice topNSymbolsWithHighRatioOfPrice = 25;
+    TopNSymbolsWithLowRatioOfPrice topNSymbolsWithLowRatioOfPrice = 26;
+    TradingResultOfForeignInvestor tradingResultOfForeignInvestor = 27;
+    Disclosure disclosure = 28;
+    Timestamp timestamp = 29;
+    DelistedInstrument delistedInstrument = 30;
+    CouponPaymentDate couponPaymentDate = 31;
+    ChangeOfContract changeOfContract = 32;
+    InstrumentDerivatives instrumentDerivatives = 33;
+    InstrumentSBR instrumentSbr = 34;
+    TradingSchedule tradingSchedule = 35;
+    Holiday holiday = 36;
+    MemberTrader memberTrader = 37;
+    MarketMakingContract marketMakingContract = 38;
+    ETFIndexComposition etfIndexComposition = 39;
+    ELWUnderlyingAssets elwUnderlyingAssets = 40;
+    StockInfo stockInfo = 41;
+    MarketIndex marketIndex = 42;
+    BoardEvent boardEvent = 43;
+    SymbolBoardEvent symbolBoardEvent = 44;
+    Tick tick = 45;
+    TopPrice topPrice = 46;
+  }
+}
+
+message SecurityDefinition {}
+message SecurityStatus {}
+message SecurityInformationNotification {}
+message SymbolClosingInformation {}
+message VolatilityInterruption {}
+message MarketMakerInformation {}
+message SymbolEvent {}
+message IndexConstituentsInformation {}
+message RandomEnd {}
+message Price {}
+message PriceRecovery {}
+message Index {}
+message InvestorPerIndustry {}
+message InvestorPerSymbol {}
+message TopNMembersPerSymbol {}
+message OpenInterest {}
+message DeemTradePrice {}
+message ForeignerOrderLimit {}
+message PriceLimitExpansion {}
+message ETFiNav {}
+message ETFiIndex {}
+message ETFTrackingError {}
+message TopNSymbolsWithTradingQuantity {}
+message TopNSymbolsWithCurrentPrice {}
+message TopNSymbolsWithHighRatioOfPrice {}
+message TopNSymbolsWithLowRatioOfPrice {}
+message TradingResultOfForeignInvestor {}
+message Disclosure {}
+message DelistedInstrument {}
+message CouponPaymentDate {}
+message ChangeOfContract {}
+message InstrumentDerivatives {}
+message InstrumentSBR {}
+message TradingSchedule {}
+message Holiday {}
+message MemberTrader {}
+message MarketMakingContract {}
+message ETFIndexComposition {}
+message ELWUnderlyingAssets {}
+message StockInfo {}
+message MarketIndex {
+  enum MarketId {
+    MARKET_ID_UNSPECIFIED = 0;
+    MARKET_ID_1 = 1;
+    MARKET_ID_2 = 2;
+  }
+
+  enum TradingSessionId {
+    TRADING_SESSION_UNSPECIFIED = 0;
+    TRADING_SESSION_1 = 1;
+    TRADING_SESSION_2 = 2;
+  }
+
+  enum MarketIndexClass {
+    MARKET_INDEX_CLASS_UNSPECIFIED = 0;
+    MARKET_INDEX_CLASS_1 = 1;
+    MARKET_INDEX_CLASS_2 = 2;
+  }
+
+  MarketId marketId = 1;
+  TradingSessionId tradingSessionId = 2;
+  MarketIndexClass marketIndexClass = 3;
+  string indexTypeCode = 4;
+  string currencyCode = 5;
+  Timestamp transactTime = 6;
+  double valueIndexes = 7;
+  uint64 totalVolumeTraded = 8;
+  double grossTradeAmount = 9;
+  uint64 contauctAccTrdVol = 10;
+  double contauctAccTrdVal = 11;
+  uint64 blkTrdAccTrdVol = 12;
+  double blkTrdAccTrdVal = 13;
+  uint32 fluctuationUpperLimitIssueCount = 14;
+  uint32 fluctuationUpIssueCount = 15;
+  uint32 fluctuationSteadinessIssueCount = 16;
+  uint32 fluctuationDownIssueCount = 17;
+  uint32 fluctuationLowerLimitIssueCount = 18;
+  uint64 fluctuationUpIssueVolume = 19;
+  uint64 fluctuationSteadinessIssueVolume = 20;
+  uint64 fluctuationDownIssueVolume = 21;
+  double highestValueIndexes = 22;
+  double lowestValueIndexes = 23;
+  double changedValue = 24;
+  double changedRatio = 25;
+  double priorValueIndexes = 26;
+  string indexName = 27;
+}
+message BoardEvent {}
+message SymbolBoardEvent {}
+message Tick {
+  enum Side {
+    SIDE_UNSPECIFIED = 0;
+    SIDE_BUY = 1;
+    SIDE_SELL = 2;
+  }
+
+  int32 marketId = 1;
+  int32 boardId = 2;
+  string isin = 3;
+  string symbol = 4;
+  double matchPrice = 5;
+  double matchQtty = 6;
+  Timestamp sendingTime = 7;
+  int32 boardIdOriginal = 8;
+  int32 tradingSessionId = 9;
+  uint64 totalVolumeTraded = 10;
+  double grossTradeAmount = 11;
+  Side side = 12;
+}
+message TopPrice {}
+
+message Timestamp {
+  int64 seconds = 1;
+  int32 nanos = 2;
+}
