@@ -339,7 +339,11 @@ class DerivativeService extends CoreService
                             if ($order->status === 0) {
                                 $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
                             } else {
-                                $kinds = isset($payload->kind) ? [$payload->kind] : ['tp', 'sl'];
+                                $hasKind = isset($payload->kind);
+                                $kinds = $hasKind ? [$payload->kind] : ['tp', 'sl'];
+                                if ($hasKind && $vos->position !== 0) {
+                                    return ['isOk' => false, 'message' => 'unclosedPosition'];
+                                }
                                 if (in_array('tp', $kinds)) {
                                     $vos->order((object)['cmd' => 'cancel', 'orderNo' => $order->tp_no]);
                                 }
