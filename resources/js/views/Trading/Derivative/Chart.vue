@@ -448,7 +448,7 @@ function setChartData(data) {
         }
         params.series.whitespace.setData(params.whitespaces);
         //
-        setCandlestick(data.ticks);
+        setCandlestick(data.ticks, "FIREANT");
     }
 }
 function updateChartData(ticks, isFirst) {
@@ -463,10 +463,11 @@ function updateChartData(ticks, isFirst) {
         setCandlestick(ticks);
     } else updateCandlestick(ticks);
 }
-function setCandlestick(ticks) {
+function setCandlestick(ticks, source = null) {
+    if (!source) source = config.value.source;
     ticks.forEach((tick) => {
         let date, time, price;
-        switch (config.value.source) {
+        switch (source) {
             case "FIREANT":
                 date = addHours(new Date(tick.date), 7);
                 price = tick.price;
