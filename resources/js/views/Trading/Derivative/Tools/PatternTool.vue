@@ -374,6 +374,7 @@ function calcContinuePattern() {
             //
             D.time1.i > T2,
             D.time1.i > T2s,
+            CD >= phase2.pr,
             rBCD >= 0.5,
             CD <= AB,
             D.price !== F.price,
@@ -381,6 +382,7 @@ function calcContinuePattern() {
         [
             //
             E.time1.i > T3,
+            DE >= phase3.pr,
             rCDE >= 0.5,
             rCDE >= 1.25 - rBCD,
             DE <= BC,
@@ -392,12 +394,14 @@ function calcContinuePattern() {
             //
             F.time1.i > T4,
             F.time1.i > T4s,
+            EF >= phase4.pr,
             rDEF >= 0.5,
             EF <= CD,
         ],
         [
             //
             G.time1.i > T5,
+            FG >= phase5.pr,
             rEFG >= 0.5,
             rEFG >= 1.25 - rDEF,
             FG <= DE,
@@ -591,6 +595,7 @@ function calcReversalPattern() {
         [
             //
             D.time1.i > T2,
+            CD >= phase2.pr,
             rBCD >= 0.7,
             CD <= AB,
             rCDDs < 0.5,
@@ -601,12 +606,14 @@ function calcReversalPattern() {
             //
             E.time1.i > T3,
             E.time1.i > T3s,
+            DE >= phase3.pr,
             rCDE >= 0.5,
             DE <= BC,
         ],
         [
             //
             F.time1.i > T4,
+            EF >= phase4.pr,
             rDEF >= 0.5,
             rDEF >= 1.25 - rCDE,
             EF <= CD,
