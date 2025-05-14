@@ -447,13 +447,14 @@ function calcContinuePattern() {
     //
     const dBreak = mf.cmp(F.price, side, D.price);
     const entry = dBreak ? F.price : D.price;
+    const tp = Z < X ? x : Z > Y ? y : z;
     const sl = dBreak ? G.price : E.price;
     let order = {};
     if (progress.result) {
         order = {
             side: x > entry ? 1 : -1,
             price: entry,
-            tpPrice: x,
+            tpPrice: tp,
             slPrice: sl,
         };
         console.log("order", order);
@@ -647,13 +648,14 @@ function calcReversalPattern() {
     //
     const eBreak = mf.cmp(E.price, side, C.price);
     const entry = eBreak ? E.price : C.price;
+    const tp = Z < X ? x : Z > Y ? y : z;
     const sl = eBreak ? F.price : D.price;
     let order = {};
     if (progress.result) {
         order = {
             side: x > entry ? 1 : -1,
             price: entry,
-            tpPrice: x,
+            tpPrice: tp,
             slPrice: sl,
         };
     }
