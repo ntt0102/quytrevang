@@ -48,7 +48,6 @@ const patternType = computed(
 const symbol = "VN30F1M";
 const patternTypeCount = 2;
 const scanThreshold = 1;
-const phaseThreshold = 0.9;
 let scanPoints = {};
 let lines = {};
 let series = {};
@@ -771,14 +770,9 @@ function scanPhase({ side, start, end }) {
 }
 function checkBoxValid(box1, box2, isNot = false) {
     const check =
-        //     (box.pr >= maxBox.pr &&
-        //         box.tr >= phaseThreshold * maxBox.tr) ||
-        //     (box.tr >= maxBox.tr &&
-        //         box.pr >= phaseThreshold * maxBox.pr)
         // (box1.pr >= box2.pr && box1.tr >= box2.tr) ||
-        // (box1.pr >= 2 * box2.pr && box1.tr >= box2.tr / 2) ||
-        // (box1.tr >= 2 * box2.tr && box1.pr >= box2.pr / 2);
-        (box1.pr >= box2.pr && box1.tr >= box2.tr) ||
+        (box1.pr >= box2.pr && box1.tr >= 0.9 * box2.tr) ||
+        (box1.tr >= box2.tr && box1.pr >= 0.9 * box2.pr) ||
         box1.pr >= 2 * box2.pr ||
         box1.tr >= 2 * box2.tr;
     return isNot ? !check : check;
