@@ -724,11 +724,16 @@ function scanPhase({ side, start, end }) {
             if (mf.cmp(high, side, box.R.price, true)) {
                 if (box.pr > 0) {
                     if (
-                        (box.pr >= maxBox.pr &&
-                            box.tr >= phaseThreshold * maxBox.tr) ||
-                        (box.tr >= maxBox.tr &&
-                            box.pr >= phaseThreshold * maxBox.pr)
+                        (box.pr >= maxBox.pr && box.tr >= maxBox.tr) ||
+                        (box.pr >= 2 * maxBox.pr && box.tr >= maxBox.tr / 2) ||
+                        (box.tr >= 2 * maxBox.tr && box.pr >= maxBox.pr / 2)
                     ) {
+                        // if (
+                        //     (box.pr >= maxBox.pr &&
+                        //         box.tr >= phaseThreshold * maxBox.tr) ||
+                        //     (box.tr >= maxBox.tr &&
+                        //         box.pr >= phaseThreshold * maxBox.pr)
+                        // ) {
                         preBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
                         if (maxBox.tr < preBox.tr) maxBox.tr = preBox.tr;
