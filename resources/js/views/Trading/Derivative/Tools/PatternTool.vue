@@ -110,7 +110,7 @@ function draw({ time, price }) {
     let points = {};
     if (mf.isSet(lines.X)) {
         points = mf.cloneDeep(scanPoints);
-        points.A = { time, price };
+        points.A = { time: { t: time }, price };
     } else {
         const data = time
             ? props.bars.filter((item) => !mf.cmp(item.time, true, time))
