@@ -309,7 +309,7 @@ function drawChart() {
                 style: 2,
             },
         },
-        crosshair: { mode: 1 },
+        crosshair: { mode: 0 },
         timeScale: {
             timeVisible: true,
             rightOffset: 1000,
@@ -382,8 +382,8 @@ function checkChartSize() {
 }
 function chartCrosshairMove(e) {
     if (e.time) {
-        let price = e.seriesPrices.get(params.series.price);
-        if (!price) price = coordinateToPrice(e.point.y);
+        // let price = e.seriesPrices.get(params.series.price);
+        let price = coordinateToPrice(e.point.y);
         params.crosshair.time = e.time;
         params.crosshair.price = price;
     } else {

@@ -26,6 +26,7 @@
 <script setup>
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
+import { formatISO } from "date-fns";
 
 const store = useStore();
 const mf = inject("mf");
@@ -110,7 +111,9 @@ function draw({ time, price }) {
     let points = {};
     if (mf.isSet(lines.X)) {
         points = mf.cloneDeep(scanPoints);
-        points.A = { time: { t: time }, price };
+        const date = formatISO(new Date(time * 1000));
+        points.A = { time: { t: time, d: date }, price };
+        console.log("points", points);
     } else {
         const data = time
             ? props.bars.filter((item) => !mf.cmp(item.time, true, time))
