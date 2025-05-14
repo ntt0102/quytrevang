@@ -279,11 +279,7 @@ function calcContinuePattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak1 =
-        (phase3.ext.pr < phase3.pr ||
-            phase3.ext.tr < phaseThreshold * phase3.tr) &&
-        (phase3.ext.tr < phase3.tr ||
-            phase3.ext.pr < phaseThreshold * phase3.pr);
+    const isBreak1 = checkBoxValid(phase3.ext, phase3, true);
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
@@ -298,11 +294,7 @@ function calcContinuePattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak2 =
-        (phase5.ext.pr < phase5.pr ||
-            phase5.ext.tr < phaseThreshold * phase5.tr) &&
-        (phase5.ext.tr < phase5.tr ||
-            phase5.ext.pr < phaseThreshold * phase5.pr);
+    const isBreak2 = checkBoxValid(phase5.ext, phase5, true);
 
     const F = isBreak2 ? phase5.R1 : phase5.ext.R;
     const G = isBreak2 ? phase5.S1 : phase5.ext.S;
@@ -317,11 +309,7 @@ function calcContinuePattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak3 =
-        (phase7.ext.pr < phase7.pr ||
-            phase7.ext.tr < phaseThreshold * phase7.tr) &&
-        (phase7.ext.tr < phase7.tr ||
-            phase7.ext.pr < phaseThreshold * phase7.pr);
+    const isBreak3 = checkBoxValid(phase7.ext, phase7, true);
 
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
 
@@ -495,11 +483,7 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak1 =
-        (phase2.ext.pr < phase2.pr ||
-            phase2.ext.tr < phaseThreshold * phase2.tr) &&
-        (phase2.ext.tr < phase2.tr ||
-            phase2.ext.pr < phaseThreshold * phase2.pr);
+    const isBreak1 = checkBoxValid(phase2.ext, phase2, true);
 
     const C = isBreak1 ? phase2.R1 : phase2.ext.R;
     const D = isBreak1 ? phase2.S1 : phase2.ext.S;
@@ -516,11 +500,7 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak2 =
-        (phase4.ext.pr < phase4.pr ||
-            phase4.ext.tr < phaseThreshold * phase4.tr) &&
-        (phase4.ext.tr < phase4.tr ||
-            phase4.ext.pr < phaseThreshold * phase4.pr);
+    const isBreak2 = checkBoxValid(phase4.ext, phase4, true);
 
     const E = isBreak2 ? phase4.R1 : phase4.ext.R;
     const F = isBreak2 ? phase4.S1 : phase4.ext.S;
@@ -537,11 +517,7 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak3 =
-        (phase6.ext.pr < phase6.pr ||
-            phase6.ext.tr < phaseThreshold * phase6.tr) &&
-        (phase6.ext.tr < phase6.tr ||
-            phase6.ext.pr < phaseThreshold * phase6.pr);
+    const isBreak3 = checkBoxValid(phase6.ext, phase6, true);
 
     const G = isBreak3 ? phase6.R1 : phase6.ext.R;
 
@@ -723,17 +699,7 @@ function scanPhase({ side, start, end }) {
             }
             if (mf.cmp(high, side, box.R.price, true)) {
                 if (box.pr > 0) {
-                    if (
-                        (box.pr >= maxBox.pr && box.tr >= maxBox.tr) ||
-                        box.pr >= 2 * maxBox.pr ||
-                        box.tr >= 2 * maxBox.tr
-                    ) {
-                        // if (
-                        //     (box.pr >= maxBox.pr &&
-                        //         box.tr >= phaseThreshold * maxBox.tr) ||
-                        //     (box.tr >= maxBox.tr &&
-                        //         box.pr >= phaseThreshold * maxBox.pr)
-                        // ) {
+                    if (checkBoxValid(box, maxBox)) {
                         preBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
                         if (maxBox.tr < preBox.tr) maxBox.tr = preBox.tr;
@@ -802,6 +768,20 @@ function scanPhase({ side, start, end }) {
         pre: preBox,
         ext: extBox,
     };
+}
+function checkBoxValid(box1, box2, isNot = false) {
+    const check =
+        //     (box.pr >= maxBox.pr &&
+        //         box.tr >= phaseThreshold * maxBox.tr) ||
+        //     (box.tr >= maxBox.tr &&
+        //         box.pr >= phaseThreshold * maxBox.pr)
+        // (box1.pr >= box2.pr && box1.tr >= box2.tr) ||
+        // (box1.pr >= 2 * box2.pr && box1.tr >= box2.tr / 2) ||
+        // (box1.tr >= 2 * box2.tr && box1.pr >= box2.pr / 2);
+        (box1.pr >= box2.pr && box1.tr >= box2.tr) ||
+        box1.pr >= 2 * box2.pr ||
+        box1.tr >= 2 * box2.tr;
+    return isNot ? !check : check;
 }
 function checkPointsValid({ A }) {
     const aTime = A.time.t;
