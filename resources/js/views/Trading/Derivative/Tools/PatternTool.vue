@@ -432,13 +432,14 @@ function calcContinuePattern() {
     const Y = mf.fmtNum(y - refPrice, 1);
     const z = B.price + (side ? 1 : -1) * BC;
     const Z = mf.fmtNum(z - refPrice, 1);
-    const t = (F.price + G.price) / 2;
+    const dBreak = mf.cmp(D.price, side, B.price);
+    const t = (dBreak ? D.price + E.price : F.price + G.price) / 2;
     const T = mf.fmtNum(t - refPrice, 1);
     //
-    const dBreak = mf.cmp(F.price, side, D.price);
-    const entry = dBreak ? F.price : D.price;
+    const fBreak = mf.cmp(F.price, side, D.price);
+    const entry = fBreak ? F.price : D.price;
     const tp = Z < X ? x : Z > Y ? y : z;
-    const sl = dBreak ? G.price : E.price;
+    const sl = fBreak ? G.price : E.price;
     let order = {};
     if (progress.result) {
         order = {
