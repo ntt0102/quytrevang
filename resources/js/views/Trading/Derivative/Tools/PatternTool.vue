@@ -725,8 +725,8 @@ function scanPhase({ side, start, end }) {
                 if (box.pr > 0) {
                     if (
                         (box.pr >= maxBox.pr && box.tr >= maxBox.tr) ||
-                        (box.pr >= 2 * maxBox.pr && box.tr >= maxBox.tr / 2) ||
-                        (box.tr >= 2 * maxBox.tr && box.pr >= maxBox.pr / 2)
+                        box.pr >= 2 * maxBox.pr ||
+                        box.tr >= 2 * maxBox.tr
                     ) {
                         // if (
                         //     (box.pr >= maxBox.pr &&
