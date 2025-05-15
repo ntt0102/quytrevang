@@ -377,7 +377,7 @@ function calcContinuePattern() {
             rCDE >= 1.25 - rBCD,
             DE <= BC,
             rDEEs < 0.5,
-            rDEF >= 0.5,
+            dBreak ? fBreak : rDEF >= 0.5,
             dBreak && fBreak ? rEFG >= 1.25 - rDEF : rDEG <= 0.5,
         ],
         [
