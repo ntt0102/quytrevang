@@ -351,6 +351,9 @@ function calcContinuePattern() {
     const rEFG = FG / EF;
     const rDEG = EG / DE;
 
+    const dBreak = mf.cmp(D.price, side, B.price);
+    const fBreak = mf.cmp(F.price, side, D.price);
+
     let progress = {};
     progress.steps = [
         [
@@ -375,7 +378,7 @@ function calcContinuePattern() {
             DE <= BC,
             rDEEs < 0.5,
             rDEF >= 0.5,
-            rDEG <= 0.5,
+            dBreak && fBreak ? rEFG >= 1.25 - rDEF : rDEG <= 0.5,
         ],
         [
             //
@@ -431,11 +434,9 @@ function calcContinuePattern() {
     const Y = mf.fmtNum(y - refPrice, 1);
     const z = B.price + (side ? 1 : -1) * BC;
     const Z = mf.fmtNum(z - refPrice, 1);
-    const dBreak = mf.cmp(D.price, side, B.price);
     const t = (dBreak ? D.price + E.price : F.price + G.price) / 2;
     const T = mf.fmtNum(t - refPrice, 1);
     //
-    const fBreak = mf.cmp(F.price, side, D.price);
     const entry = fBreak ? F.price : D.price;
     const tp = Z < X ? x : Z > Y ? y : z;
     const sl = fBreak ? G.price : E.price;
