@@ -71,7 +71,7 @@ defineExpose({
     remove,
 });
 watch(patternStore, (data) => {
-    if (data) setTimeout(() => load(data, { isCheck: true }), 0);
+    if (data) setTimeout(() => load(data, { isCheck: true }), 1000);
 });
 
 function isSelected() {
