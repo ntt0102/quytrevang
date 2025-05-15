@@ -26,7 +26,6 @@ const continuePattern = [
             "T > Tmin",
             "P > 50",
             "P > 125-Pđỏ",
-            "P < Pmax",
             "Ps < 50",
             "Ptím OK",
             "Plam OK",
@@ -37,12 +36,14 @@ const continuePattern = [
         conds: [
             //
             "T > Tmin",
+            "P > Pmin",
             "P > 50",
             "P < Pmax",
+            "Phồng < Pmax",
         ],
     },
     {
-        name: "Bước lam ->",
+        name: "Bước lam",
         conds: [
             //
             "T > Tmin",
@@ -85,7 +86,7 @@ const reversalPattern = [
         ],
     },
     {
-        name: "Bước lam ->",
+        name: "Bước lam",
         conds: [
             //
             "T > Tmin",

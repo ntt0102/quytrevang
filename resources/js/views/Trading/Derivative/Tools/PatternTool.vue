@@ -69,7 +69,9 @@ defineExpose({
     remove,
 });
 watch(patternStore, (data) => {
-    load(data, { isCheck: true });
+    setTimeout(() => {
+        load(data, { isCheck: true });
+    }, 0);
 });
 
 function isSelected() {
@@ -375,16 +377,21 @@ function calcContinuePattern() {
             E.time1.i > T3,
             rCDE >= 0.5,
             rCDE >= 1.25 - rBCD,
-            DE <= BC,
             rDEEs < 0.5,
-            dBreak ? fBreak : rDEF >= 0.5,
-            dBreak && fBreak ? rEFG >= 1.25 - rDEF : rDEG <= 0.5,
+            dBreak
+                ? DE <= BC
+                    ? fBreak
+                    : !fBreak && EF >= phase4.pr
+                : EF >= phase4.pr,
+            (!dBreak && fBreak ? rEFG >= 0.5 : true) && rEFG >= 1.25 - rDEF,
         ],
         [
             //
             F.time1.i > T4,
+            EF >= phase4.pr,
             rDEF >= 0.5,
             EF <= CD,
+            DE <= BC,
         ],
         [
             //
@@ -427,17 +434,16 @@ function calcContinuePattern() {
         { time: H.time1.t, value: H.price },
     ];
     //
-    const refPrice = D.price;
-    const [x] = adjustTargetPrice(D.price, CD, side);
-    const X = mf.fmtNum(x - refPrice, 1);
-    const [y] = adjustTargetPrice(D.price, 2 * CD, side);
-    const Y = mf.fmtNum(y - refPrice, 1);
-    const z = B.price + (side ? 1 : -1) * BC;
-    const Z = mf.fmtNum(z - refPrice, 1);
-    const t = (dBreak ? D.price + E.price : F.price + G.price) / 2;
-    const T = mf.fmtNum(t - refPrice, 1);
-    //
     const entry = fBreak ? F.price : D.price;
+    const [x] = adjustTargetPrice(D.price, CD, side);
+    const X = mf.fmtNum(x - entry, 1);
+    const [y] = adjustTargetPrice(D.price, 2 * CD, side);
+    const Y = mf.fmtNum(y - entry, 1);
+    const z = B.price + (side ? 1 : -1) * BC;
+    const Z = mf.fmtNum(z - entry, 1);
+    const t = (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2;
+    const T = mf.fmtNum(t - entry, 1);
+    //
     const tp = Z < X ? x : Z > Y ? y : z;
     const sl = fBreak ? G.price : E.price;
     let order = {};
