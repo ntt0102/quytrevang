@@ -781,6 +781,7 @@ function isTimeInChart(time) {
     if (!props.bars.length) return false;
     const first = props.bars[0]?.time;
     const last = props.bars.at(-1)?.time;
+    console.log("isTimeInChart", { time, first, last });
     if (typeof first !== "number" || typeof last !== "number") return false;
     return time >= first && time <= last;
 }
