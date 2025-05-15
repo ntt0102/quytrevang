@@ -449,11 +449,11 @@ function setChartData(data) {
         params.series.whitespace.setData(params.whitespaces);
         //
         setCandlestick(data.ticks, "FIREANT");
+        getTools();
     }
 }
 function updateChartData(ticks, isFirst) {
     if (isFirst) {
-        getTools();
         params.whitespaces = mergeChartData(
             params.whitespaces,
             createWhitespaceData(CURRENT_DATE)
@@ -461,6 +461,7 @@ function updateChartData(ticks, isFirst) {
         params.series.whitespace.setData(params.whitespaces);
         //
         setCandlestick(ticks);
+        getTools();
     } else updateCandlestick(ticks);
 }
 function setCandlestick(ticks, source = null) {
@@ -853,11 +854,7 @@ function initChart() {
     });
 }
 function getChartData() {
-    store
-        .dispatch("tradingDerivative/getChartData", state.chartDate)
-        .then((hasData) => {
-            if (hasData) getTools();
-        });
+    store.dispatch("tradingDerivative/getChartData", state.chartDate);
 }
 function connectBroker() {
     if (status.value.connection) getStatus();
@@ -923,10 +920,6 @@ function indexToTime(index) {
 function drawPriceLine(data, isRemove = false) {
     if (isRemove) params.series.price.removePriceLine(data);
     else return params.series.price.createPriceLine(data);
-}
-function toSeconds(time) {
-    const [h, m, s] = time.split(":").map(Number);
-    return h * 3600 + m * 60 + s;
 }
 </script>
 <style lang="scss">

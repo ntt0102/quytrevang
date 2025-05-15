@@ -31,7 +31,6 @@ import { formatISO } from "date-fns";
 const store = useStore();
 const mf = inject("mf");
 const props = defineProps([
-    "prices",
     "bars",
     "pickTimeToolRef",
     "timeToIndex",
@@ -66,12 +65,11 @@ defineExpose({
     isSelected,
     createSeries,
     draw,
-    load,
     refresh,
     remove,
 });
 watch(patternStore, (data) => {
-    if (data) setTimeout(() => load(data, { isCheck: true }), 1000);
+    load(data, { isCheck: true });
 });
 
 function isSelected() {
@@ -183,9 +181,10 @@ function scanPattern(data) {
     return { A, B, C };
 }
 function load(data, { isSave = false, isCheck = false } = {}) {
+    if (!mf.isSet(data)) return false;
     scanPoints = mf.cloneDeep(data);
     if (isSave) savePattern();
-    const isLoad = isCheck ? checkPointsValid(scanPoints) : true;
+    const isLoad = isCheck ? isTimeInChart(scanPoints.A.time.t) : true;
     if (isLoad) {
         removePatternTool();
         loadPatternTool();
@@ -777,9 +776,12 @@ function checkBoxValid(box1, box2, isNot = false) {
         box1.pr >= 2 * box2.pr;
     return isNot ? !check : check;
 }
-function checkPointsValid({ A }) {
-    const aTime = A.time.t;
-    return aTime >= props.bars[0].time && aTime < props.bars.at(-1).time;
+function isTimeInChart(time) {
+    if (!props.bars.length) return false;
+    const first = props.bars[0]?.time;
+    const last = props.bars.at(-1)?.time;
+    if (typeof first !== "number" || typeof last !== "number") return false;
+    return time >= first && time <= last;
 }
 function adjustTargetPrice(price, range, side) {
     const target = price + (side ? 1 : -1) * range;
