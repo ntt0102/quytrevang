@@ -509,6 +509,7 @@ function setCandlestick(ticks, source = null) {
     state.bars = bars;
 }
 function updateCandlestick(ticks) {
+    if (params.ohlcMap.size === 0) return false;
     if (config.value.source === "FIREANT") {
         ticks.sort((a, b) =>
             a.date === b.date
