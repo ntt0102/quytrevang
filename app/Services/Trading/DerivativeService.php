@@ -405,14 +405,19 @@ class DerivativeService extends CoreService
     public function getVn30f1mSymbol()
     {
         $client = new \GuzzleHttp\Client();
-        $url = "https://api.dnse.com.vn/chart-api/symbols?type=derivativeMapping";
+        $url = "https://spwapidatafeed.vps.com.vn/pslistdatamap";
         $res = $client->get($url);
         $rsp = json_decode($res->getBody());
-        $result = array_filter($rsp->mapping, function ($item) {
-            return $item->symbolType === 'VN30F1M';
-        });
-        $symbols = array_column($result, 'symbol');
-        return $symbols[0] ?? null;
+        return $rsp->VN30F1M ?? null;
+        // $client = new \GuzzleHttp\Client();
+        // $url = "https://api.dnse.com.vn/chart-api/symbols?type=derivativeMapping";
+        // $res = $client->get($url);
+        // $rsp = json_decode($res->getBody());
+        // $result = array_filter($rsp->mapping, function ($item) {
+        //     return $item->symbolType === 'VN30F1M';
+        // });
+        // $symbols = array_column($result, 'symbol');
+        // return $symbols[0] ?? null;
     }
 
     /**
