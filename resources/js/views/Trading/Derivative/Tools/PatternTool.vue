@@ -648,6 +648,7 @@ function calcReversalPattern() {
             tpPrice: tp,
             slPrice: sl,
         };
+        console.log("order", order);
     }
 
     return {
