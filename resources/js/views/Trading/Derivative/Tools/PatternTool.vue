@@ -434,7 +434,9 @@ function calcContinuePattern() {
         { time: H.time1.t, value: H.price },
     ];
     //
-    const entry = fBreak ? F.price : D.price;
+    const orderSide = side ? 1 : -1;
+    const refPrice = fBreak ? F.price : D.price;
+    const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
     const [x] = adjustTargetPrice(D.price, CD, side);
     const X = mf.fmtNum(x - entry, 1);
     const [y] = adjustTargetPrice(D.price, 2 * CD, side);
@@ -444,12 +446,12 @@ function calcContinuePattern() {
     const t = (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2;
     const T = mf.fmtNum(t - entry, 1);
     //
-    const tp = Z < X ? x : Z > Y ? y : z;
+    const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
     const sl = fBreak ? G.price : E.price;
     let order = {};
     if (progress.result) {
         order = {
-            side: x > entry ? 1 : -1,
+            side: orderSide,
             price: entry,
             tpPrice: tp,
             slPrice: sl,
@@ -624,23 +626,24 @@ function calcReversalPattern() {
         { time: G.time1.t, value: G.price },
     ];
     //
-    const refPrice = C.price;
+    const orderSide = side ? 1 : -1;
+    const refPrice = eBreak ? E.price : C.price;
+    const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
     const [x] = adjustTargetPrice(C.price, BC, side);
-    const X = mf.fmtNum(x - refPrice, 1);
+    const X = mf.fmtNum(x - entry, 1);
     const [y] = adjustTargetPrice(C.price, 2 * BC, side);
-    const Y = mf.fmtNum(y - refPrice, 1);
+    const Y = mf.fmtNum(y - entry, 1);
     const z = A.price;
-    const Z = mf.fmtNum(z - refPrice, 1);
+    const Z = mf.fmtNum(z - entry, 1);
     const t = (E.price + F.price) / 2;
-    const T = mf.fmtNum(t - refPrice, 1);
+    const T = mf.fmtNum(t - entry, 1);
     //
-    const entry = eBreak ? E.price : C.price;
-    const tp = Z < X ? x : Z > Y ? y : z;
+    const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
     const sl = eBreak ? F.price : D.price;
     let order = {};
     if (progress.result) {
         order = {
-            side: x > entry ? 1 : -1,
+            side: orderSide,
             price: entry,
             tpPrice: tp,
             slPrice: sl,
@@ -809,6 +812,9 @@ function adjustTargetPrice(price, range, side) {
         } else if (decimal >= 0.3 && decimal <= 0.4) {
             adjusted = Math.floor(target) + 0.5;
         }
+    }
+    if (adjusted !== target) {
+        adjusted = mf.fmtNum(adjusted, 1);
     }
 
     return [adjusted, target];
