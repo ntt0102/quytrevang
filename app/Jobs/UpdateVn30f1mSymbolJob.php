@@ -25,9 +25,7 @@ class UpdateVn30f1mSymbolJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Execute the job.
@@ -36,10 +34,7 @@ class UpdateVn30f1mSymbolJob implements ShouldQueue
      */
     public function handle()
     {
-        $client = new \GuzzleHttp\Client();
-        $url = "https://spwapidatafeed.vps.com.vn/pslistdata";
-        $res = $client->get($url);
-        $symbol = json_decode($res->getBody())[0];
+        $symbol = app(\App\Services\Trading\DerivativeService::class)->getVn30f1mSymbol();
         set_global_value('vn30f1m', $symbol);
     }
 }
