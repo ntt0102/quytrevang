@@ -561,6 +561,8 @@ function calcReversalPattern() {
     const rDEF = EF / DE;
     const rCDF = DF / CD;
 
+    const eBreak = mf.cmp(E.price, side, C.price);
+
     let progress = {};
     progress.steps = [
         [
@@ -576,12 +578,13 @@ function calcReversalPattern() {
             rBCD >= 0.7,
             CD <= AB,
             rCDDs < 0.5,
-            rCDE >= 0.5,
-            rCDF <= 0.5,
+            DE >= phase3.pr,
+            (eBreak ? rDEF >= 0.5 : true) && rDEF >= 1.25 - rCDE,
         ],
         [
             //
             E.time1.i > T3,
+            DE >= phase3.pr,
             rCDE >= 0.5,
             DE <= BC,
         ],
@@ -631,7 +634,6 @@ function calcReversalPattern() {
     const t = (E.price + F.price) / 2;
     const T = mf.fmtNum(t - refPrice, 1);
     //
-    const eBreak = mf.cmp(E.price, side, C.price);
     const entry = eBreak ? E.price : C.price;
     const tp = Z < X ? x : Z > Y ? y : z;
     const sl = eBreak ? F.price : D.price;

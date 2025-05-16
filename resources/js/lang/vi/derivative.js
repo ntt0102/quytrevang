@@ -72,8 +72,8 @@ const reversalPattern = [
             "P > 70",
             "P < Pmax",
             "Ps < 50",
-            "Ptím > 50",
-            "Plam < 50",
+            "Ptím OK",
+            "Plam OK",
         ],
     },
     {
@@ -81,6 +81,7 @@ const reversalPattern = [
         conds: [
             //
             "T > Tmin",
+            "P > Pmin",
             "P > 50",
             "P < Pmax",
         ],
