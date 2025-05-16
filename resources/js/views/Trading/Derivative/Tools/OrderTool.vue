@@ -349,16 +349,14 @@ function drawOrderTool(kinds, order) {
                 color = "lime";
                 title = `TP[${order.id}] ${mf.fmtNum(
                     order.tp_price - order.entry_price,
-                    1,
-                    true
+                    1
                 )}`;
                 break;
             case "sl":
                 color = "red";
                 title = `SL[${order.id}] ${mf.fmtNum(
                     order.sl_price - order.entry_price,
-                    1,
-                    true
+                    1
                 )}`;
                 break;
         }
