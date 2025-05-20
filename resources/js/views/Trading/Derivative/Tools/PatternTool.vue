@@ -383,7 +383,7 @@ function calcContinuePattern() {
                     ? fBreak
                     : !fBreak && EF >= phase4.pr
                 : EF >= phase4.pr,
-            (!dBreak && fBreak ? rEFG >= 0.5 : true) && rEFG >= 1.25 - rDEF,
+            (dBreak !== fBreak ? rEFG >= 0.5 : true) && rEFG >= 1.25 - rDEF,
         ],
         [
             //
