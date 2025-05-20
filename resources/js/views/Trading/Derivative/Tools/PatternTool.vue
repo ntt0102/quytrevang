@@ -399,6 +399,7 @@ function calcContinuePattern() {
         [
             //
             G.time1.i > T5,
+            FG >= phase5.pr,
             rEFG >= 0.5,
             rEFG >= 1.25 - rDEF,
             FG <= DE,
@@ -598,6 +599,7 @@ function calcReversalPattern() {
         [
             //
             F.time1.i > T4,
+            EF >= phase4.pr,
             rDEF >= 0.5,
             rDEF >= 1.25 - rCDE,
             EF <= CD,
