@@ -362,7 +362,7 @@ function calcContinuePattern() {
             //
             phase2.R.time1.i > T1,
             BC >= phase1.pr,
-            (dBreak && fBreak ? rABC <= 0.5 : true) && rABC >= 0.3,
+            (dBreak && fBreak ? rABC <= 0.7 : true) && rABC >= 0.3,
             rBCCs < 0.5,
         ],
         [
