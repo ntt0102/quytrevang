@@ -362,7 +362,7 @@ function calcContinuePattern() {
             //
             phase2.R.time1.i > T1,
             BC >= phase1.pr,
-            rABC >= 0.3,
+            (dBreak && fBreak ? rABC <= 0.7 : true) && rABC >= 0.3,
             rBCCs < 0.5,
         ],
         [
@@ -576,6 +576,7 @@ function calcReversalPattern() {
             C.time1.i > T1,
             BC >= phase1.pr,
             rABC >= 0.3,
+            rABC <= 0.7,
             C.price !== E.price,
         ],
         [

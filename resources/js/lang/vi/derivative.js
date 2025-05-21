@@ -63,6 +63,7 @@ const reversalPattern = [
             "T > Tmin",
             "P > Pmin",
             "P > 30",
+            "P < 70",
             "P ≠ Ptím",
         ],
     },
