@@ -5,7 +5,8 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P OK",
+            "P > 30",
+            "P < 70",
             "Ps < 50",
         ],
     },
