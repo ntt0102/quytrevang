@@ -719,7 +719,7 @@ function scanPhase({ side, start, end }) {
                 return false;
             }
             if (mf.cmp(high, side, box.R.price, true)) {
-                if (high !== box.R.price && box.pr > 0) {
+                if (box.pr > 0) {
                     if (checkBoxValid(box, maxBox)) {
                         preBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
