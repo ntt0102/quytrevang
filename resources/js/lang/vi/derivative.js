@@ -5,8 +5,7 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 30",
-            "P < 70",
+            "P OK",
             "Ps < 50",
         ],
     },
@@ -63,8 +62,7 @@ const reversalPattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 30",
-            "P < 70",
+            "P OK",
             "P ≠ Ptím",
         ],
     },

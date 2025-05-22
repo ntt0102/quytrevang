@@ -362,8 +362,7 @@ function calcContinuePattern() {
             //
             phase2.R.time1.i > T1,
             BC >= phase1.pr,
-            rABC >= 0.3,
-            rABC <= 0.7,
+            (!dBreak || !fBreak || rABC <= 0.7) && rABC >= 0.3,
             rBCCs < 0.5,
         ],
         [
@@ -385,7 +384,7 @@ function calcContinuePattern() {
                     ? fBreak
                     : !fBreak && EF >= phase4.pr
                 : EF >= phase4.pr,
-            (dBreak !== fBreak ? rEFG >= 0.5 : true) &&
+            (G.time1.i > T5 || rEFG >= 0.5) &&
                 FG >= phase5.pr &&
                 rEFG >= 1.25 - rDEF,
         ],
@@ -576,8 +575,7 @@ function calcReversalPattern() {
             //
             C.time1.i > T1,
             BC >= phase1.pr,
-            rABC >= 0.3,
-            rABC <= 0.7,
+            rABC >= 0.3 && rABC <= 0.7,
             C.price !== E.price,
         ],
         [
