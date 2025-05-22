@@ -263,12 +263,12 @@ function calcContinuePattern() {
     const phase1 = scanPhase({
         side,
         start: A,
-        end: { time: Math.min(pickTime ?? B.time.t, B.time.t) },
+        end: { time: Math.min(pickTime ?? B.time.t, B.time.t), price: B.price },
     });
     const phase2 = scanPhase({
         side: !side,
         start: B,
-        end: { time: Math.min(pickTime ?? C.time.t, C.time.t) },
+        end: { time: Math.min(pickTime ?? C.time.t, C.time.t), price: C.price },
     });
     const stopTime = props.indexToTime(
         6 * phase2.R.time.i - 5 * phase1.S.time.i
@@ -286,7 +286,7 @@ function calcContinuePattern() {
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: { time: Math.min(pickTime ?? E.time.t, E.time.t) },
+        end: { time: Math.min(pickTime ?? E.time.t, E.time.t), price: E.price },
     });
     const phase5 = scanPhase({
         side,
@@ -301,7 +301,7 @@ function calcContinuePattern() {
     const phase6 = scanPhase({
         side: !side,
         start: F,
-        end: { time: Math.min(pickTime ?? G.time.t, G.time.t) },
+        end: { time: Math.min(pickTime ?? G.time.t, G.time.t), price: G.price },
     });
     const phase7 = scanPhase({
         side,
@@ -485,7 +485,7 @@ function calcReversalPattern() {
     const phase1 = scanPhase({
         side: !side,
         start: A,
-        end: { time: Math.min(pickTime ?? B.time.t, B.time.t) },
+        end: { time: Math.min(pickTime ?? B.time.t, B.time.t), price: B.price },
     });
     const stopTime = props.indexToTime(
         6 * phase1.R.time.i - 5 * phase1.S.time.i
@@ -504,7 +504,7 @@ function calcReversalPattern() {
     const phase3 = scanPhase({
         side: !side,
         start: C,
-        end: { time: Math.min(pickTime ?? D.time.t, D.time.t) },
+        end: { time: Math.min(pickTime ?? D.time.t, D.time.t), price: D.price },
     });
 
     const phase4 = scanPhase({
@@ -521,7 +521,7 @@ function calcReversalPattern() {
     const phase5 = scanPhase({
         side: !side,
         start: E,
-        end: { time: Math.min(pickTime ?? F.time.t, F.time.t) },
+        end: { time: Math.min(pickTime ?? F.time.t, F.time.t), price: F.price },
     });
 
     const phase6 = scanPhase({
@@ -688,22 +688,22 @@ function scanPhase({ side, start, end }) {
     });
     if (bars.length > 0) {
         bars.every((item, ix) => {
-            const high = side ? item.high : item.low;
-            const low = side ? item.low : item.high;
+            const top = side ? item.high : item.low;
+            const bottom = side ? item.low : item.high;
             const t = item.time;
             const d = item.date;
             const i = props.timeToIndex(t);
-            if (ix === 0 || (start.price && low === start.price)) {
+            if (ix === 0 || (start.price && bottom === start.price)) {
                 box = {
                     R: {
-                        price: high,
-                        price1: high,
+                        price: top,
+                        price1: top,
                         time: { t, d, i },
                         time1: { t, d, i },
                     },
                     S: {
-                        price: high,
-                        price1: high,
+                        price: top,
+                        price1: top,
                         time: { t, d, i },
                         time1: { t, d, i },
                     },
@@ -712,14 +712,14 @@ function scanPhase({ side, start, end }) {
                 };
                 maxBox = mf.cloneDeep(box);
             }
-            if (start.price && mf.cmp(low, !side, start.price)) {
+            if (start.price && mf.cmp(bottom, !side, start.price)) {
                 return false;
             }
-            if (end.price && mf.cmp(high, side, end.price)) {
+            if (end.price && mf.cmp(top, side, end.price)) {
                 return false;
             }
-            if (mf.cmp(high, side, box.R.price, true)) {
-                if (box.pr > 0) {
+            if (mf.cmp(top, side, box.R.price, true)) {
+                if (box.pr > 0 && (!end.price || top !== end.price)) {
                     if (checkBoxValid(box, maxBox)) {
                         preBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
@@ -727,20 +727,20 @@ function scanPhase({ side, start, end }) {
                         if (maxBox.pr < preBox.pr) maxBox.pr = preBox.pr;
                     }
                 }
-                const isREqual = high === box.R.price;
+                const isREqual = top === box.R.price;
                 const price1R = side
                     ? Math.min(box.R.price1, box.S.price)
                     : Math.max(box.R.price1, box.S.price);
                 box = {
                     R: {
-                        price: high,
-                        price1: isREqual ? price1R : high,
+                        price: top,
+                        price1: isREqual ? price1R : top,
                         time: { t, d, i },
                         time1: isREqual ? box.R.time1 : { t, d, i },
                     },
                     S: {
-                        price: high,
-                        price1: high,
+                        price: top,
+                        price1: top,
                         time: { t, d, i },
                         time1: { t, d, i },
                     },
@@ -748,18 +748,18 @@ function scanPhase({ side, start, end }) {
                     tr: 0,
                 };
             } else {
-                if (mf.cmp(low, !side, box.S.price, true)) {
+                if (mf.cmp(bottom, !side, box.S.price, true)) {
                     box.S.time = { t, d, i };
-                    if (low !== box.S.price) {
-                        box.S.price = low;
-                        box.S.price1 = low;
+                    if (bottom !== box.S.price) {
+                        box.S.price = bottom;
+                        box.S.price1 = bottom;
                         box.S.time1 = { t, d, i };
                         box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                         box.tr = box.S.time1.i - box.R.time.i;
                     }
                 } else {
-                    if (mf.cmp(high, side, box.S.price1)) {
-                        box.S.price1 = high;
+                    if (mf.cmp(top, side, box.S.price1)) {
+                        box.S.price1 = top;
                     }
                 }
             }
