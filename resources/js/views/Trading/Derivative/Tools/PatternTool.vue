@@ -585,7 +585,7 @@ function calcReversalPattern() {
             CD <= AB,
             rCDDs < 0.5,
             DE >= phase3.pr,
-            (eBreak ? rDEF >= 0.5 : true) &&
+            (F.time1.i > T4 || rDEF >= 0.5) &&
                 EF >= phase4.pr &&
                 rDEF >= 1.25 - rCDE,
         ],
