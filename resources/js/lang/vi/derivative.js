@@ -18,6 +18,7 @@ const continuePattern = [
             "P > Pmin",
             "P > 50",
             "P < Pmax",
+            "P > Pvàng *",
         ],
     },
     {
@@ -40,6 +41,7 @@ const continuePattern = [
             "P > Pmin",
             "P > 50 *",
             "P < Pmax *",
+            "P > Pđỏ *",
             "P ≠ Pđỏ",
         ],
     },

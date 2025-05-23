@@ -375,8 +375,9 @@ function calcContinuePattern() {
                 CD >= phase2.pr,
                 rBCD >= 0.5,
                 CD <= AB,
+                dBreak,
             ],
-            excludes: [],
+            excludes: [4],
         },
         {
             conds: [
@@ -397,6 +398,7 @@ function calcContinuePattern() {
                 EF >= phase4.pr,
                 rDEF >= 0.5,
                 EF <= CD,
+                fBreak,
                 F.price !== D.price,
             ],
             excludes: [0, 2, 3],
@@ -415,6 +417,9 @@ function calcContinuePattern() {
     ];
     if (!(dBreak && fBreak)) {
         progressSteps[0].excludes.push(3);
+    }
+    if (!(dBreak && DE <= BC)) {
+        progressSteps[3].excludes.push(4);
     }
     if (rEFG >= 0.5) {
         progressSteps[4].excludes.push(0);
