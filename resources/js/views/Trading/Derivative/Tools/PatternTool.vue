@@ -412,11 +412,12 @@ function calcContinuePattern() {
                 rEFG >= 1.25 - rDEF,
                 FG <= DE,
             ],
-            excludes: [4],
+            excludes: [],
         },
     ];
     if (!(dBreak && fBreak)) {
         progressSteps[0].excludes.push(3);
+        progressSteps[4].excludes.push(4);
     }
     if (!(dBreak && DE <= BC)) {
         progressSteps[3].excludes.push(4);
