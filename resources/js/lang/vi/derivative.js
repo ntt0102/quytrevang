@@ -37,7 +37,7 @@ const continuePattern = [
         conds: [
             //
             "T > Tmin *",
-            "P > Pmin *",
+            "P > Pmin",
             "P > 50 *",
             "P < Pmax *",
             "P ≠ Pđỏ",

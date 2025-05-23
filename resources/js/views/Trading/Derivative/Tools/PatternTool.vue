@@ -416,9 +416,6 @@ function calcContinuePattern() {
     if (!(dBreak && fBreak)) {
         progressSteps[0].excludes.push(3);
     }
-    if (dBreak && (DE <= BC || fBreak)) {
-        progressSteps[3].excludes.push(1);
-    }
     if (rEFG >= 0.5) {
         progressSteps[4].excludes.push(0);
     }
@@ -803,12 +800,9 @@ function checkProgress(steps) {
     let progress = { steps, step: 0, result: true };
     progress.steps.map((step, idx) => {
         step.result = isStepValid(step);
-        if (!step.result) {
+        if (progress.result) {
             progress.step = idx + 1;
-            progress.result = false;
-        } else if (idx === steps.length - 1) {
-            progress.step = steps.length;
-            progress.result = true;
+            progress.result = step.result;
         }
         return step;
     });
