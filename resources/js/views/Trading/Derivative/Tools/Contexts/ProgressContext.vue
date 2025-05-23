@@ -24,7 +24,7 @@
                     class="name"
                     :class="[
                         progress.steps
-                            ? progress.steps[i].every(Boolean)
+                            ? progress.steps[i].result
                                 ? 'success'
                                 : 'fail'
                             : '',
@@ -39,7 +39,7 @@
                         class="condition"
                         :class="[
                             progress.steps
-                                ? progress.steps[i][j]
+                                ? progress.steps[i].conds[j]
                                     ? 'success'
                                     : 'fail'
                                 : '',

@@ -279,7 +279,7 @@ function calcContinuePattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak1 = checkBoxValid(phase3.ext, phase3, true);
+    const isBreak1 = isBoxValid(phase3.ext, phase3, true);
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
@@ -294,7 +294,7 @@ function calcContinuePattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak2 = checkBoxValid(phase5.ext, phase5, true);
+    const isBreak2 = isBoxValid(phase5.ext, phase5, true);
 
     const F = isBreak2 ? phase5.R1 : phase5.ext.R;
     const G = isBreak2 ? phase5.S1 : phase5.ext.S;
@@ -309,7 +309,7 @@ function calcContinuePattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak3 = checkBoxValid(phase7.ext, phase7, true);
+    const isBreak3 = isBoxValid(phase7.ext, phase7, true);
 
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
 
@@ -356,72 +356,77 @@ function calcContinuePattern() {
     const dBreak = mf.cmp(D.price, side, B.price);
     const fBreak = mf.cmp(F.price, side, D.price);
 
-    let progress = {};
-    progress.steps = [
-        [
-            //
-            phase2.R.time1.i > T1,
-            BC >= phase1.pr,
-            (!dBreak || !fBreak || rABC <= 0.7) && rABC >= 0.3,
-            rBCCs < 0.5,
-        ],
-        [
-            //
-            D.time1.i > T2,
-            CD >= phase2.pr,
-            rBCD >= 0.5,
-            CD <= AB,
-            D.price !== F.price,
-        ],
-        [
-            //
-            E.time1.i > T3,
-            rCDE >= 0.5,
-            rCDE >= 1.25 - rBCD,
-            rDEEs < 0.5,
-            dBreak
-                ? DE <= BC
-                    ? fBreak
-                    : !fBreak && EF >= phase4.pr
-                : EF >= phase4.pr,
-            (G.time1.i > T5 || rEFG >= 0.5) &&
-                FG >= phase5.pr &&
+    const progressSteps = [
+        {
+            conds: [
+                //
+                phase2.R.time1.i > T1,
+                BC >= phase1.pr,
+                rABC >= 0.3,
+                rABC <= 0.7,
+                rBCCs < 0.5,
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                D.time1.i > T2,
+                CD >= phase2.pr,
+                rBCD >= 0.5,
+                CD <= AB,
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                E.time1.i > T3,
+                DE >= phase3.pr,
+                rCDE >= 0.5,
+                rCDE >= 1.25 - rBCD,
+                DE <= BC,
+                rDEEs < 0.5,
+            ],
+            excludes: [1, 4],
+        },
+        {
+            conds: [
+                //
+                F.time1.i > T4,
+                EF >= phase4.pr,
+                rDEF >= 0.5,
+                EF <= CD,
+                F.price !== D.price,
+            ],
+            excludes: [0, 2, 3],
+        },
+        {
+            conds: [
+                //
+                G.time1.i > T5,
+                FG >= phase5.pr,
+                rEFG >= 0.5,
                 rEFG >= 1.25 - rDEF,
-        ],
-        [
-            //
-            F.time1.i > T4,
-            EF >= phase4.pr,
-            rDEF >= 0.5,
-            EF <= CD,
-            DE <= BC,
-        ],
-        [
-            //
-            G.time1.i > T5,
-            FG >= phase5.pr,
-            rEFG >= 0.5,
-            rEFG >= 1.25 - rDEF,
-            FG <= DE,
-        ],
+                FG <= DE,
+            ],
+            excludes: [4],
+        },
     ];
-    let tempResult = [];
-    for (let i = 0; i < progress.steps.length; i++) {
-        const result = progress.steps[i].every(Boolean);
-        tempResult.push(result);
-        if (!result) {
-            progress.step = i + 1;
-            progress.result = false;
-            break;
-        }
+    if (!(dBreak && fBreak)) {
+        progressSteps[0].excludes.push(3);
     }
-    if (tempResult[4]) {
-        progress.step = 5;
-        progress.result = true;
-    } else if (tempResult[2]) {
-        progress.step = 3;
-        progress.result = true;
+    if (dBreak && (DE <= BC || fBreak)) {
+        progressSteps[3].excludes.push(1);
     }
+    if (rEFG >= 0.5) {
+        progressSteps[4].excludes.push(0);
+    }
+    if (G.time1.i > T5) {
+        progressSteps[4].excludes.push(2);
+    }
+
+    const progress = checkProgress(progressSteps);
     //
     const points = [
         { time: A.time.t, value: A.price, color: colorMap.yellow },
@@ -495,7 +500,7 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak1 = checkBoxValid(phase2.ext, phase2, true);
+    const isBreak1 = isBoxValid(phase2.ext, phase2, true);
 
     const C = isBreak1 ? phase2.R1 : phase2.ext.R;
     const D = isBreak1 ? phase2.S1 : phase2.ext.S;
@@ -512,7 +517,7 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak2 = checkBoxValid(phase4.ext, phase4, true);
+    const isBreak2 = isBoxValid(phase4.ext, phase4, true);
 
     const E = isBreak2 ? phase4.R1 : phase4.ext.R;
     const F = isBreak2 ? phase4.S1 : phase4.ext.S;
@@ -529,7 +534,7 @@ function calcReversalPattern() {
         end: { time: pickTime ?? stopTime },
     });
 
-    const isBreak3 = checkBoxValid(phase6.ext, phase6, true);
+    const isBreak3 = isBoxValid(phase6.ext, phase6, true);
 
     const G = isBreak3 ? phase6.R1 : phase6.ext.R;
 
@@ -568,60 +573,58 @@ function calcReversalPattern() {
     const rCDF = DF / CD;
 
     const eBreak = mf.cmp(E.price, side, C.price);
-
-    let progress = {};
-    progress.steps = [
-        [
-            //
-            C.time1.i > T1,
-            BC >= phase1.pr,
-            rABC >= 0.3 && rABC <= 0.7,
-            C.price !== E.price,
-        ],
-        [
-            //
-            D.time1.i > T2,
-            rBCD >= 0.7,
-            CD <= AB,
-            rCDDs < 0.5,
-            DE >= phase3.pr,
-            (F.time1.i > T4 || rDEF >= 0.5) &&
-                EF >= phase4.pr &&
+    const progressSteps = [
+        {
+            conds: [
+                //
+                C.time1.i > T1,
+                BC >= phase1.pr,
+                rABC >= 0.3,
+                rABC <= 0.7,
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                D.time1.i > T2,
+                CD >= phase2.pr,
+                rBCD >= 0.7,
+                CD <= AB,
+                rCDE >= 0.5,
+            ],
+            excludes: [1],
+        },
+        {
+            conds: [
+                //
+                E.time1.i > T3,
+                DE >= phase3.pr,
+                rCDE >= 0.5,
+                DE <= BC,
+                E.price !== C.price,
+            ],
+            excludes: [0, 2, 3],
+        },
+        {
+            conds: [
+                //
+                F.time1.i > T4,
+                EF >= phase4.pr,
+                rDEF >= 0.5,
                 rDEF >= 1.25 - rCDE,
-        ],
-        [
-            //
-            E.time1.i > T3,
-            DE >= phase3.pr,
-            rCDE >= 0.5,
-            DE <= BC,
-        ],
-        [
-            //
-            F.time1.i > T4,
-            EF >= phase4.pr,
-            rDEF >= 0.5,
-            rDEF >= 1.25 - rCDE,
-            EF <= CD,
-        ],
+                EF <= CD,
+            ],
+            excludes: [4],
+        },
     ];
-    let tempResult = [];
-    for (let i = 0; i < progress.steps.length; i++) {
-        const result = progress.steps[i].every(Boolean);
-        tempResult.push(result);
-        if (!result) {
-            progress.step = i + 1;
-            progress.result = false;
-            break;
-        }
+    if (rDEF >= 0.5) {
+        progressSteps[3].excludes.push(0);
     }
-    if (tempResult[3]) {
-        progress.step = 4;
-        progress.result = true;
-    } else if (tempResult[1]) {
-        progress.step = 2;
-        progress.result = true;
+    if (F.time1.i > T4) {
+        progressSteps[3].excludes.push(1);
     }
+    const progress = checkProgress(progressSteps);
     //
     const points = [
         { time: A.time.t, value: A.price, color: colorMap.orange },
@@ -718,7 +721,7 @@ function scanPhase({ side, start, end }) {
             }
             if (mf.cmp(top, side, box.R.price, true)) {
                 if (box.pr > 0 && (!end.price || top !== end.price)) {
-                    if (checkBoxValid(box, maxBox)) {
+                    if (isBoxValid(box, maxBox)) {
                         preBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
                         if (maxBox.tr < preBox.tr) maxBox.tr = preBox.tr;
@@ -788,13 +791,31 @@ function scanPhase({ side, start, end }) {
         ext: extBox,
     };
 }
-function checkBoxValid(box1, box2, isNot = false) {
+function isBoxValid(box1, box2, isNot = false) {
     const check =
         // (box1.pr >= box2.pr && box1.tr >= box2.tr) ||
         (box1.pr >= box2.pr && box1.tr >= 0.8 * box2.tr) ||
         (box1.tr >= box2.tr && box1.pr >= 0.8 * box2.pr) ||
         box1.pr >= 2 * box2.pr;
     return isNot ? !check : check;
+}
+function checkProgress(steps) {
+    let progress = { steps, step: 0, result: true };
+    progress.steps.map((step, idx) => {
+        step.result = isStepValid(step);
+        if (!step.result) {
+            progress.step = idx + 1;
+            progress.result = false;
+        } else if (idx === steps.length - 1) {
+            progress.step = steps.length;
+            progress.result = true;
+        }
+        return step;
+    });
+    return progress;
+}
+function isStepValid({ conds, excludes }) {
+    return conds.every((val, idx) => (excludes.includes(idx) ? true : val));
 }
 function isTimeInChart(time) {
     if (!props.bars.length) return false;

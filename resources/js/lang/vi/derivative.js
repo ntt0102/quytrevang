@@ -5,7 +5,8 @@ const continuePattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P OK",
+            "P > 30",
+            "P < 70 *",
             "Ps < 50",
         ],
     },
@@ -17,41 +18,40 @@ const continuePattern = [
             "P > Pmin",
             "P > 50",
             "P < Pmax",
-            "P ≠ Ptím",
         ],
     },
     {
-        name: "Bước hồng ->",
+        name: "Bước hồng",
         conds: [
             //
             "T > Tmin",
+            "P > Pmin *",
             "P > 50",
             "P > 125-Pđỏ",
+            "P < Pmax *",
             "Ps < 50",
-            "Ptím OK",
-            "Plam OK",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "T > Tmin",
-            "P > Pmin",
-            "P > 50",
-            "P < Pmax",
-            "Phồng < Pmax",
+            "T > Tmin *",
+            "P > Pmin *",
+            "P > 50 *",
+            "P < Pmax *",
+            "P ≠ Pđỏ",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            "T > Tmin",
+            "T > Tmin *",
             "P > Pmin",
-            "P > 50",
+            "P > 50 *",
             "P > 125-Ptím",
-            "P < Pmax",
+            "P < Pmax *",
         ],
     },
 ];
@@ -62,41 +62,41 @@ const reversalPattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P OK",
-            "P ≠ Ptím",
+            "P > 30",
+            "P < 70",
         ],
     },
     {
-        name: "Bước hồng ->",
+        name: "Bước hồng",
         conds: [
             //
             "T > Tmin",
+            "P > Pmin *",
             "P > 70",
             "P < Pmax",
             "Ps < 50",
-            "Ptím OK",
-            "Plam OK",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "T > Tmin",
+            "T > Tmin *",
             "P > Pmin",
-            "P > 50",
-            "P < Pmax",
+            "P > 50 *",
+            "P < Pmax *",
+            "P ≠ Pđỏ",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            "T > Tmin",
+            "T > Tmin *",
             "P > Pmin",
-            "P > 50",
+            "P > 50 *",
             "P > 125-Ptím",
-            "P < Pmax",
+            "P < Pmax *",
         ],
     },
 ];
