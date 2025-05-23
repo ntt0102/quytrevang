@@ -98,7 +98,7 @@ function refreshPattern() {
 
             .step {
                 padding: 3px 5px !important;
-                width: 160px !important;
+                width: 140px !important;
             }
         }
 
