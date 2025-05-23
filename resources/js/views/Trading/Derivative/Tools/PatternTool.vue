@@ -412,7 +412,7 @@ function calcContinuePattern() {
                 rEFG >= 1.25 - rDEF,
                 FG <= DE,
             ],
-            excludes: [4],
+            excludes: [],
         },
     ];
     if (!(dBreak && fBreak)) {
@@ -617,7 +617,7 @@ function calcReversalPattern() {
                 rDEF >= 1.25 - rCDE,
                 EF <= CD,
             ],
-            excludes: [4],
+            excludes: [],
         },
     ];
     if (rDEF >= 0.5) {
