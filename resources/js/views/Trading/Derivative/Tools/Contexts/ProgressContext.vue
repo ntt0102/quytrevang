@@ -89,7 +89,7 @@ function refreshPattern() {
         color: white;
         text-align: left;
         margin-top: 10px;
-        line-height: 18px;
+        line-height: 17px;
         font-size: 14px;
         min-height: 50px;
 
@@ -118,7 +118,7 @@ function refreshPattern() {
             .name {
                 padding-left: 5px;
                 font-weight: bold;
-                font-size: 17px;
+                font-size: 16px;
             }
 
             .condition {
