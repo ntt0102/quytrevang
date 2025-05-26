@@ -355,7 +355,6 @@ function calcContinuePattern() {
     const rDEF = EF / DE;
     const rDEEs = EEs / DE;
     const rEFG = FG / EF;
-    const rDEG = EG / DE;
 
     const dBreak = mf.cmp(D.price, side, B.price);
     const fBreak = mf.cmp(F.price, side, D.price);
@@ -406,7 +405,7 @@ function calcContinuePattern() {
                 fBreak,
                 F.price !== D.price,
             ],
-            excludes: [0, 2, 3],
+            excludes: [3],
         },
         {
             conds: [
@@ -427,6 +426,12 @@ function calcContinuePattern() {
     }
     if (!(dBreak && DE <= BC)) {
         progressSteps[3].excludes.push(4);
+    }
+    if (rDEF >= 0.5) {
+        progressSteps[3].excludes.push(0);
+    }
+    if (F.time1.i > T4) {
+        progressSteps[3].excludes.push(2);
     }
     if (rEFG >= 0.5) {
         progressSteps[4].excludes.push(0);
@@ -582,7 +587,6 @@ function calcReversalPattern() {
     const rCDE = DE / CD;
     const rCDDs = DDs / CD;
     const rDEF = EF / DE;
-    const rCDF = DF / CD;
 
     const eBreak = mf.cmp(E.price, side, C.price);
     const progressSteps = [
@@ -603,7 +607,7 @@ function calcReversalPattern() {
                 CD >= phase2.pr,
                 rBCD >= 0.7,
                 CD <= AB,
-                rCDE >= 0.5,
+                rCDDs < 0.5,
             ],
             excludes: [1],
         },
@@ -616,7 +620,7 @@ function calcReversalPattern() {
                 DE <= BC,
                 E.price !== C.price,
             ],
-            excludes: [0, 2, 3],
+            excludes: [3],
         },
         {
             conds: [
@@ -631,11 +635,17 @@ function calcReversalPattern() {
             excludes: [4],
         },
     ];
+    if (rCDE >= 0.5) {
+        progressSteps[2].excludes.push(0);
+    }
+    if (E.time1.i > T3) {
+        progressSteps[2].excludes.push(2);
+    }
     if (rDEF >= 0.5) {
         progressSteps[3].excludes.push(0);
     }
     if (F.time1.i > T4) {
-        progressSteps[3].excludes.push(1);
+        progressSteps[3].excludes.push(2);
     }
     const progress = checkProgress(progressSteps);
     //
