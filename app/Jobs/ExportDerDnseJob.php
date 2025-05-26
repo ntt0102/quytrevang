@@ -22,7 +22,7 @@ class ExportDerDnseJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($date)
+    public function __construct($date = null)
     {
         $this->date = $date;
     }

@@ -10,7 +10,7 @@ use App\Jobs\CleanDatabaseJob;
 use App\Jobs\UpdateOpeningMarketJob;
 use App\Jobs\UpdateVn30f1mSymbolJob;
 use App\Jobs\ReportTradingJob;
-use App\Jobs\ExportDerVpsJob;
+use App\Jobs\ExportDerDnseJob;
 use App\Jobs\OrderDerivativeJob;
 
 class Kernel extends ConsoleKernel
@@ -39,8 +39,8 @@ class Kernel extends ConsoleKernel
 
         if (get_global_value('openingMarketFlag') == '1') {
             $schedule->job(new ReportTradingJob)->dailyAt('14:47');
-            // $schedule->job(new ExportDerVpsJob)->dailyAt('14:48');
-            $schedule->command('clone:data --type=export')->dailyAt('14:48');
+            $schedule->job(new ExportDerDnseJob)->dailyAt('14:47');
+            // $schedule->command('clone:data --type=export')->dailyAt('14:48');
             if (in_trading_time()) {
                 $schedule->job(new OrderDerivativeJob)->everyMinute();
                 // $schedule->command('clone:data --type=scan')->everyMinute();
