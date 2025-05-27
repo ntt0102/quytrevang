@@ -54,7 +54,8 @@ const continuePattern = [
             "P > 50 *",
             "P+ > 125",
             "P < Pmax *",
-            "dT ∈ dThồng",
+            "T > Thồng/3",
+            "T < Thồng",
         ],
     },
 ];
@@ -100,7 +101,8 @@ const reversalPattern = [
             "P > 50 *",
             "P+ > 125",
             "P < Pmax",
-            "dT ∈ dThồng",
+            "T > Thồng/3",
+            "T < Thồng",
         ],
     },
 ];

@@ -333,6 +333,9 @@ function calcContinuePattern() {
     const FG = mf.fmtNum(G.price - F.price, 1, true);
     const EG = mf.fmtNum(G.price - E.price, 1, true);
 
+    const dTde = E.time1.i - D.time.i;
+    const dTfg = G.time1.i - F.time.i;
+
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
 
@@ -343,9 +346,6 @@ function calcContinuePattern() {
     const T5 = F.time.i + TR5;
     const T6 = G.time.i + phase6.tr;
     const timeMark = [T6, T5, T4, T3, T2, T1];
-
-    const dT34 = T4 - T3;
-    const dT56 = T6 - T5;
 
     const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -413,7 +413,8 @@ function calcContinuePattern() {
                 rEFG >= 0.5,
                 rEFG >= 1.25 - rDEF,
                 FG <= DE,
-                dT56 >= dT34 / 2 && dT56 <= dT34,
+                dTfg >= dTde / 3,
+                dTfg <= dTde,
             ],
             excludes: [],
         },
@@ -567,6 +568,9 @@ function calcReversalPattern() {
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const DF = mf.fmtNum(F.price - D.price, 1, true);
 
+    const dTcd = D.time1.i - C.time.i;
+    const dTef = F.time1.i - E.time.i;
+
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
 
@@ -576,9 +580,6 @@ function calcReversalPattern() {
     const T4 = E.time.i + TR4;
     const T5 = F.time.i + phase5.tr;
     const timeMark = [T5, T4, T3, T2, T1];
-
-    const dT23 = T3 - T2;
-    const dT45 = T5 - T4;
 
     const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -628,7 +629,8 @@ function calcReversalPattern() {
                 rDEF >= 0.5,
                 rDEF >= 1.25 - rCDE,
                 EF <= CD,
-                dT45 >= dT23 / 2 && dT45 <= dT23,
+                dTef >= dTcd / 3,
+                dTef <= dTcd,
             ],
             excludes: [],
         },
