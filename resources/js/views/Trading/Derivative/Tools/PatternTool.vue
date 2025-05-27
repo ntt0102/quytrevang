@@ -412,16 +412,16 @@ function calcContinuePattern() {
                 FG >= phase5.pr,
                 rEFG >= 0.5,
                 rEFG >= 1.25 - rDEF,
-                FG <= DE,
                 dTfg >= dTde / 3,
                 dTfg <= dTde,
+                FG <= DE,
             ],
             excludes: [],
         },
     ];
     if (!(dBreak && fBreak)) {
         progressSteps[0].excludes.push(3);
-        progressSteps[4].excludes.push(4);
+        progressSteps[4].excludes.push(6);
     }
     if (!(dBreak && DE <= BC)) {
         progressSteps[3].excludes.push(4);
@@ -628,9 +628,9 @@ function calcReversalPattern() {
                 EF >= phase4.pr,
                 rDEF >= 0.5,
                 rDEF >= 1.25 - rCDE,
-                EF <= CD,
                 dTef >= dTcd / 3,
                 dTef <= dTcd,
+                EF <= CD,
             ],
             excludes: [],
         },
