@@ -344,7 +344,6 @@ function calcContinuePattern() {
     const T6 = G.time.i + phase6.tr;
     const timeMark = [T6, T5, T4, T3, T2, T1];
 
-    const dT12 = T2 - T1;
     const dT34 = T4 - T3;
     const dT56 = T6 - T5;
 
@@ -391,7 +390,6 @@ function calcContinuePattern() {
                 rCDE >= 1.25 - rBCD,
                 DE <= BC,
                 rDEEs < 0.5,
-                dT34 <= dT12,
             ],
             excludes: [1, 4],
         },
@@ -415,7 +413,7 @@ function calcContinuePattern() {
                 rEFG >= 0.5,
                 rEFG >= 1.25 - rDEF,
                 FG <= DE,
-                dT56 <= dT34,
+                dT56 >= dT34 / 2 && dT56 <= dT34,
             ],
             excludes: [],
         },
@@ -630,7 +628,7 @@ function calcReversalPattern() {
                 rDEF >= 0.5,
                 rDEF >= 1.25 - rCDE,
                 EF <= CD,
-                dT45 <= dT23,
+                dT45 >= dT23 / 2 && dT45 <= dT23,
             ],
             excludes: [4],
         },
