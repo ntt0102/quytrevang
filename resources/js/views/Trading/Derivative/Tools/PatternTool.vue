@@ -567,7 +567,6 @@ function calcReversalPattern() {
 
     const dT2 = C.time1.i - phase1.R.time.i;
     const dT3 = D.time1.i - C.time.i;
-    console.log("isTimeNotEqual", isTimeNotEqual(dT2, dT3));
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
@@ -969,6 +968,7 @@ function isTimeNotEqual(a, b, threshold = 0.8) {
     const minVal = Math.min(a, b);
     const maxVal = Math.max(a, b);
     if (maxVal === 0) return true;
+    console.log("isTimeNotEqual", minVal / maxVal);
     return minVal / maxVal <= threshold;
 }
 </script>
