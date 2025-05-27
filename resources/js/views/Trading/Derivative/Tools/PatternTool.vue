@@ -334,6 +334,8 @@ function calcContinuePattern() {
 
     const dT2 = phase2.R.time1.i - phase1.R.time.i;
     const dT3 = D.time1.i - phase2.R.time.i;
+    const dT4 = E.time1.i - D.time.i;
+    const dT6 = G.time1.i - F.time.i;
 
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
@@ -412,6 +414,7 @@ function calcContinuePattern() {
                 FG >= phase5.pr,
                 rEFG >= 0.5,
                 rEFG >= 1.25 - rDEF,
+                dT6 <= dT4,
                 FG <= DE,
             ],
             excludes: [],
@@ -419,7 +422,7 @@ function calcContinuePattern() {
     ];
     if (!(dBreak && fBreak)) {
         progressSteps[0].excludes.push(3);
-        progressSteps[4].excludes.push(6);
+        progressSteps[4].excludes.push(5);
     }
     if (!(dBreak && DE <= BC)) {
         progressSteps[3].excludes.push(4);
@@ -567,6 +570,7 @@ function calcReversalPattern() {
 
     const dT2 = C.time1.i - phase1.R.time.i;
     const dT3 = D.time1.i - C.time.i;
+    const dT5 = F.time1.i - E.time.i;
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
@@ -626,6 +630,7 @@ function calcReversalPattern() {
                 EF >= phase4.pr,
                 rDEF >= 0.5,
                 rDEF >= 1.25 - rCDE,
+                dT5 <= dT3,
                 EF <= CD,
             ],
             excludes: [],
