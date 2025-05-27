@@ -412,7 +412,7 @@ function calcContinuePattern() {
                 FG >= phase5.pr,
                 rEFG >= 0.5,
                 rEFG >= 1.25 - rDEF,
-                dTfg >= dTde / 3,
+                // dTfg >= dTde / 3,
                 dTfg <= dTde,
                 FG <= DE,
             ],
