@@ -630,7 +630,7 @@ function calcReversalPattern() {
                 EF <= CD,
                 dT45 >= dT23 / 2 && dT45 <= dT23,
             ],
-            excludes: [4],
+            excludes: [],
         },
     ];
     if (rCDE >= 0.5) {

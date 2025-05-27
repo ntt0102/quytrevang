@@ -99,7 +99,7 @@ const reversalPattern = [
             "P > Pmin",
             "P > 50 *",
             "P+ > 125",
-            "P < Pmax *",
+            "P < Pmax",
             "dT ∈ dThồng",
         ],
     },
