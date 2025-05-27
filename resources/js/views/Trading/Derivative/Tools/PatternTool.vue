@@ -453,7 +453,7 @@ function calcContinuePattern() {
     const progress = checkProgress(progressSteps);
     //
     const points = buildViewPoints(
-        [A, B, C, D, E, F, G, H],
+        [A, phase1.R, phase2.R, D, E, F, G, H],
         ["yellow", "orange", "red", "pink", "purple", "cyan", "green", "green"]
     );
     //
@@ -651,7 +651,7 @@ function calcReversalPattern() {
     const progress = checkProgress(progressSteps);
     //
     const points = buildViewPoints(
-        [A, B, C, D, E, F, G],
+        [A, phase1.R, C, D, E, F, G],
         ["orange", "red", "pink", "purple", "cyan", "green", "green"]
     );
     //
@@ -840,7 +840,7 @@ function calcContinueLitePattern() {
     const progress = checkProgress(progressSteps);
     //
     const points = buildViewPoints(
-        [A, B, C, D, E, F, G, H],
+        [A, phase1.R, phase2.R, D, E, F, G, H],
         ["yellow", "orange", "red", "pink", "purple", "cyan", "green", "green"]
     );
     //
@@ -1012,7 +1012,7 @@ function calcReversalLitePattern() {
     const progress = checkProgress(progressSteps);
     //
     const points = buildViewPoints(
-        [A, B, C, D, E, F, G],
+        [A, phase1.R, C, D, E, F, G],
         ["orange", "red", "pink", "purple", "cyan", "green", "green"]
     );
     //
@@ -1180,16 +1180,18 @@ function isBoxValid(box1, box2, isNot = false) {
     return isNot ? !check : check;
 }
 function buildViewPoints(points, colors) {
-    return points.map((p, idx) => {
+    const viewPoints = [];
+    points.forEach((p, idx) => {
         const point = {
-            time: p.time?.t,
             value: p.price,
+            color: colorMap[colors[idx]],
         };
-        if (colors[idx]) {
-            point.color = colorMap[colors[idx]];
+        if (idx !== 0) {
+            viewPoints.push({ ...point, time: p.time1.t });
         }
-        return point;
+        viewPoints.push({ ...point, time: p.time.t });
     });
+    return viewPoints;
 }
 function checkProgress(steps) {
     let progress = { steps, step: 0, result: true };
