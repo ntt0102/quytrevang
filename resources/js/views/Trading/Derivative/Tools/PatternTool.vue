@@ -331,10 +331,9 @@ function calcContinuePattern() {
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const EEs = mf.fmtNum(phase4.R.price1 - E.price, 1, true);
     const FG = mf.fmtNum(G.price - F.price, 1, true);
-    const EG = mf.fmtNum(G.price - E.price, 1, true);
 
-    const dTde = E.time1.i - D.time.i;
-    const dTfg = G.time1.i - F.time.i;
+    const dT2 = phase2.R.time1.i - phase1.R.time.i;
+    const dT3 = D.time1.i - phase2.R.time.i;
 
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
@@ -373,6 +372,7 @@ function calcContinuePattern() {
         {
             conds: [
                 //
+                isTimeNotEqual(dT2, dT3),
                 D.time1.i > T2,
                 CD >= phase2.pr,
                 rBCD >= 0.5,
@@ -412,8 +412,6 @@ function calcContinuePattern() {
                 FG >= phase5.pr,
                 rEFG >= 0.5,
                 rEFG >= 1.25 - rDEF,
-                // dTfg >= dTde / 3,
-                dTfg <= dTde,
                 FG <= DE,
             ],
             excludes: [],
@@ -566,10 +564,10 @@ function calcReversalPattern() {
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const DDs = mf.fmtNum(phase3.R.price1 - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
-    const DF = mf.fmtNum(F.price - D.price, 1, true);
 
-    const dTcd = D.time1.i - C.time.i;
-    const dTef = F.time1.i - E.time.i;
+    const dT2 = C.time1.i - phase1.R.time.i;
+    const dT3 = D.time1.i - C.time.i;
+    console.log("isTimeNotEqual", isTimeNotEqual(dT2, dT3));
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
@@ -602,6 +600,7 @@ function calcReversalPattern() {
         {
             conds: [
                 //
+                isTimeNotEqual(dT2, dT3),
                 D.time1.i > T2,
                 CD >= phase2.pr,
                 rBCD >= 0.7,
@@ -628,8 +627,6 @@ function calcReversalPattern() {
                 EF >= phase4.pr,
                 rDEF >= 0.5,
                 rDEF >= 1.25 - rCDE,
-                dTef >= dTcd / 3,
-                dTef <= dTcd,
                 EF <= CD,
             ],
             excludes: [],
@@ -967,5 +964,11 @@ function changePatternType() {
         patternType.value >= patternTypeCount ? 1 : patternType.value + 1;
     store.dispatch("tradingDerivative/setPatternType", type);
     refresh();
+}
+function isTimeNotEqual(a, b, threshold = 0.8) {
+    const minVal = Math.min(a, b);
+    const maxVal = Math.max(a, b);
+    if (maxVal === 0) return true;
+    return minVal / maxVal <= threshold;
 }
 </script>

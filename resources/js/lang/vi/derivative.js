@@ -14,6 +14,7 @@ const continuePattern = [
         name: "Bước đỏ",
         conds: [
             //
+            "T ≠ Tcam",
             "T > Tmin",
             "P > Pmin",
             "P > 50",
@@ -53,8 +54,6 @@ const continuePattern = [
             "P > Pmin",
             "P > 50 *",
             "P+ > 125",
-            // "T > Tmax/3",
-            "T < Tmax",
             "P < Pmax *",
         ],
     },
@@ -74,6 +73,7 @@ const reversalPattern = [
         name: "Bước hồng",
         conds: [
             //
+            "T ≠ Tđỏ",
             "T > Tmin",
             "P > Pmin *",
             "P > 70",
@@ -100,8 +100,6 @@ const reversalPattern = [
             "P > Pmin",
             "P > 50 *",
             "P+ > 125",
-            "T > Tmax/3",
-            "T < Tmax",
             "P < Pmax",
         ],
     },
