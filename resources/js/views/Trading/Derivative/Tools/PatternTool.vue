@@ -374,14 +374,14 @@ function calcContinuePattern() {
         {
             conds: [
                 //
-                isTimeNotEqual(dT2, dT3),
                 D.time1.i > T2,
                 CD >= phase2.pr,
                 rBCD >= 0.5,
                 CD <= AB,
                 dBreak,
+                isTimeNotEqual(dT2, dT3),
             ],
-            excludes: [5],
+            excludes: [4],
         },
         {
             conds: [
@@ -603,14 +603,14 @@ function calcReversalPattern() {
         {
             conds: [
                 //
-                isTimeNotEqual(dT2, dT3),
                 D.time1.i > T2,
                 CD >= phase2.pr,
                 rBCD >= 0.7,
                 CD <= AB,
                 rCDDs < 0.5,
+                isTimeNotEqual(dT2, dT3),
             ],
-            excludes: [2],
+            excludes: [1],
         },
         {
             conds: [
@@ -972,7 +972,8 @@ function isTimeNotEqual(a, b, threshold = 0.8) {
     const minVal = Math.min(a, b);
     const maxVal = Math.max(a, b);
     if (maxVal === 0) return true;
-    console.log("isTimeNotEqual", minVal / maxVal);
-    return minVal / maxVal <= threshold;
+    const ratio = minVal / maxVal;
+    console.log("isTimeNotEqual", ratio);
+    return ratio <= threshold;
 }
 </script>
