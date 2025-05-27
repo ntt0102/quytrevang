@@ -23,7 +23,7 @@
                 <div
                     class="name"
                     :class="[
-                        progress.steps
+                        progress.steps && progress.steps[i]
                             ? progress.steps[i].result
                                 ? 'success'
                                 : 'fail'
@@ -38,7 +38,7 @@
                         :key="j"
                         class="condition"
                         :class="[
-                            progress.steps
+                            progress.steps && progress.steps[i]
                                 ? progress.steps[i].conds[j]
                                     ? 'success'
                                     : 'fail'

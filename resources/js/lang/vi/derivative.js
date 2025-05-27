@@ -106,5 +106,77 @@ const reversalPattern = [
         ],
     },
 ];
+const continueLitePattern = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T ≄ Tvàng",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T ≄ Tcam",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T ≄ Tđỏ",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "T ≄ Thồng",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "T ≄ Ttím",
+        ],
+    },
+];
+const reversalLitePattern = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T ≄ Tcam",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T ≄ Tđỏ",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "T ≄ Thồng",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "T ≄ Ttím",
+        ],
+    },
+];
 
-export default [continuePattern, reversalPattern];
+export default [
+    continuePattern,
+    reversalPattern,
+    continueLitePattern,
+    reversalLitePattern,
+];

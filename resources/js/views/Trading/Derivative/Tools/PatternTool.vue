@@ -1,18 +1,16 @@
 <template>
-    <div
-        ref="selectPatternRef"
-        class="context command"
-        :title="$t('trading.derivative.tools.selectPattern')"
-        @click="changePatternType"
-    >
-        <i
-            class="far"
-            :class="{
-                'fa-square-question': !patternType,
-                [`fa-square-${patternType}`]: patternType,
-            }"
-        ></i>
-    </div>
+    <DxDropDownButton
+        :items="patternTypes"
+        :drop-down-options="{ wrapperAttr: { class: 'select-pattern-popup' } }"
+        :icon="`far fa-${
+            patternType ? `square-${patternType}` : 'square-question'
+        } pattern`"
+        :hint="$t('trading.derivative.tools.selectPattern')"
+        stylingMode="text"
+        :showArrowIcon="false"
+        :elementAttr="{ class: 'select-pattern command' }"
+        @item-click="changePatternType"
+    />
     <div
         ref="patternToolRef"
         class="context command"
@@ -24,6 +22,7 @@
     </div>
 </template>
 <script setup>
+import DxDropDownButton from "devextreme-vue/drop-down-button";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { formatISO } from "date-fns";
@@ -45,7 +44,7 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const symbol = "VN30F1M";
-const patternTypeCount = 2;
+const patternTypes = [1, 2, 3, 4];
 const scanThreshold = 1;
 let scanPoints = {};
 let lines = {};
@@ -163,20 +162,25 @@ function scanPattern(data) {
             } else B = { time: { t, d, i }, price: top };
         }
         if (mf.cmp(bottom, !side, A.price, true)) {
-            A = { time: { t, d, i }, price: bottom };
-            S = mf.cloneDeep(A);
+            if (bottom === A.price) {
+                A.time1 = { t, d, i };
+            } else {
+                A = { time1: { t, d, i }, time: { t, d, i }, price: bottom };
+            }
+            S = { time: A.time1, price: A.price };
         }
         if (mf.cmp(top, side, S.price)) S = { time: { t, d, i }, price: top };
         //
         if (C.time.i > A.time.i && mf.cmp(C.price, side, A.price)) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
             if (bc >= scanThreshold) {
-                if (A.time.i - S.time.i >= C.time.i - B.time.i) break;
+                if (A.time1.i - S.time.i >= C.time.i - B.time.i) break;
                 const as = mf.fmtNum(A.price - S.price, 1, true);
                 if (as > bc) break;
             }
         }
     }
+    delete A.time1;
     delete A.time.i;
     delete B.time.i;
     delete C.time.i;
@@ -247,6 +251,12 @@ function calculatePattern() {
             break;
         case 2:
             result = calcReversalPattern();
+            break;
+        case 3:
+            result = calcContinueLitePattern();
+            break;
+        case 4:
+            result = calcReversalLitePattern();
             break;
     }
     emit("setProgress", result.progress);
@@ -442,20 +452,10 @@ function calcContinuePattern() {
 
     const progress = checkProgress(progressSteps);
     //
-    const points = [
-        { time: A.time.t, value: A.price, color: colorMap.yellow },
-        {
-            time: phase1.R.time1.t,
-            value: phase1.R.price,
-            color: colorMap.orange,
-        },
-        { time: phase2.R.time1.t, value: phase2.R.price, color: colorMap.red },
-        { time: D.time1.t, value: D.price, color: colorMap.pink },
-        { time: E.time1.t, value: E.price, color: colorMap.purple },
-        { time: F.time1.t, value: F.price, color: colorMap.cyan },
-        { time: G.time1.t, value: G.price, color: colorMap.green },
-        { time: H.time1.t, value: H.price },
-    ];
+    const points = buildViewPoints(
+        [A, B, C, D, E, F, G, H],
+        ["yellow", "orange", "red", "pink", "purple", "cyan", "green", "green"]
+    );
     //
     const orderSide = side ? 1 : -1;
     const refPrice = fBreak ? F.price : D.price;
@@ -650,15 +650,371 @@ function calcReversalPattern() {
     }
     const progress = checkProgress(progressSteps);
     //
-    const points = [
-        { time: A.time.t, value: A.price, color: colorMap.orange },
-        { time: phase1.R.time1.t, value: B.price, color: colorMap.red },
-        { time: C.time1.t, value: C.price, color: colorMap.pink },
-        { time: D.time1.t, value: D.price, color: colorMap.purple },
-        { time: E.time1.t, value: E.price, color: colorMap.cyan },
-        { time: F.time1.t, value: F.price, color: colorMap.green },
-        { time: G.time1.t, value: G.price },
+    const points = buildViewPoints(
+        [A, B, C, D, E, F, G],
+        ["orange", "red", "pink", "purple", "cyan", "green", "green"]
+    );
+    //
+    const orderSide = side ? 1 : -1;
+    const refPrice = eBreak ? E.price : C.price;
+    const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
+    const [x] = adjustTargetPrice(C.price, BC, side);
+    const X = mf.fmtNum(x - entry, 1);
+    const [y] = adjustTargetPrice(C.price, 2 * BC, side);
+    const Y = mf.fmtNum(y - entry, 1);
+    const z = A.price;
+    const Z = mf.fmtNum(z - entry, 1);
+    const t = (E.price + F.price) / 2;
+    const T = mf.fmtNum(t - entry, 1);
+    //
+    const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
+    const sl = eBreak ? F.price : D.price;
+    let order = {};
+    if (progress.result) {
+        order = {
+            side: orderSide,
+            price: entry,
+            tpPrice: tp,
+            slPrice: sl,
+        };
+        console.log("order", order);
+    }
+
+    return {
+        timeMark,
+        progress,
+        order,
+        points: makeUnique(points),
+        target: [
+            [x, X],
+            [y, Y],
+            [z, Z],
+            [t, T],
+        ],
+    };
+}
+function calcContinueLitePattern() {
+    const { A, B, C } = scanPoints;
+    const bc = B.price - C.price;
+    let side = bc > 0;
+    const pickTime = props.pickTimeToolRef.get();
+    const phase1 = scanPhase({
+        side,
+        start: A,
+        end: { time: Math.min(pickTime ?? B.time.t, B.time.t), price: B.price },
+    });
+    const phase2 = scanPhase({
+        side: !side,
+        start: B,
+        end: { time: Math.min(pickTime ?? C.time.t, C.time.t), price: C.price },
+    });
+    const stopTime = props.indexToTime(
+        6 * phase2.R.time.i - 5 * phase1.S.time.i
+    );
+    const phase3 = scanPhase({
+        side,
+        start: C,
+        end: { time: pickTime ?? stopTime },
+    });
+
+    const isBreak1 = isBoxValid(phase3.ext, phase3, true);
+
+    const D = isBreak1 ? phase3.R1 : phase3.ext.R;
+    const E = isBreak1 ? phase3.S1 : phase3.ext.S;
+    const phase4 = scanPhase({
+        side: !side,
+        start: D,
+        end: { time: Math.min(pickTime ?? E.time.t, E.time.t), price: E.price },
+    });
+    const phase5 = scanPhase({
+        side,
+        start: E,
+        end: { time: pickTime ?? stopTime },
+    });
+
+    const isBreak2 = isBoxValid(phase5.ext, phase5, true);
+
+    const F = isBreak2 ? phase5.R1 : phase5.ext.R;
+    const G = isBreak2 ? phase5.S1 : phase5.ext.S;
+    const phase6 = scanPhase({
+        side: !side,
+        start: F,
+        end: { time: Math.min(pickTime ?? G.time.t, G.time.t), price: G.price },
+    });
+    const phase7 = scanPhase({
+        side,
+        start: G,
+        end: { time: pickTime ?? stopTime },
+    });
+
+    const isBreak3 = isBoxValid(phase7.ext, phase7, true);
+
+    const H = isBreak3 ? phase7.R1 : phase7.ext.R;
+
+    console.log("calcContinueLitePattern", [
+        phase1,
+        phase2,
+        phase3,
+        phase4,
+        phase5,
+        phase6,
+        phase7,
+    ]);
+
+    const AB = mf.fmtNum(B.price - A.price, 1, true);
+    const BC = mf.fmtNum(bc, 1, true);
+    const CD = mf.fmtNum(D.price - C.price, 1, true);
+    const CCs = mf.fmtNum(phase2.R.price1 - C.price, 1, true);
+    const DE = mf.fmtNum(E.price - D.price, 1, true);
+    const EF = mf.fmtNum(F.price - E.price, 1, true);
+    const EEs = mf.fmtNum(phase4.R.price1 - E.price, 1, true);
+    const FG = mf.fmtNum(G.price - F.price, 1, true);
+
+    const dT1 = phase1.R.time1.i - phase1.S.time.i;
+    const dT2 = phase2.R.time1.i - phase2.S.time.i;
+    const dT3 = D.time1.i - phase3.S.time.i;
+    const dT4 = E.time1.i - D.time.i;
+    const dT5 = F.time1.i - E.time.i;
+    const dT6 = G.time1.i - F.time.i;
+
+    const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
+    const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
+
+    const T1 = phase1.R.time.i + phase1.tr;
+    const T2 = phase2.R.time.i + phase2.tr;
+    const T3 = D.time.i + TR3;
+    const T4 = E.time.i + phase4.tr;
+    const T5 = F.time.i + TR5;
+    const T6 = G.time.i + phase6.tr;
+    const timeMark = [T6, T5, T4, T3, T2, T1];
+
+    const rABC = BC / AB;
+    const rBCD = CD / BC;
+    const rBCCs = CCs / BC;
+    const rCDE = DE / CD;
+    const rDEF = EF / DE;
+    const rDEEs = EEs / DE;
+    const rEFG = FG / EF;
+
+    const dBreak = mf.cmp(D.price, side, B.price);
+    const fBreak = mf.cmp(F.price, side, D.price);
+
+    const progressSteps = [
+        {
+            conds: [
+                //
+                isTimeNotEqual(dT1, dT2),
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                isTimeNotEqual(dT2, dT3),
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                isTimeNotEqual(dT3, dT4),
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                isTimeNotEqual(dT4, dT5),
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                isTimeNotEqual(dT5, dT6),
+            ],
+            excludes: [],
+        },
     ];
+
+    const progress = checkProgress(progressSteps);
+    //
+    const points = buildViewPoints(
+        [A, B, C, D, E, F, G, H],
+        ["yellow", "orange", "red", "pink", "purple", "cyan", "green", "green"]
+    );
+    //
+    const orderSide = side ? 1 : -1;
+    const refPrice = fBreak ? F.price : D.price;
+    const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
+    const [x] = adjustTargetPrice(D.price, CD, side);
+    const X = mf.fmtNum(x - entry, 1);
+    const [y] = adjustTargetPrice(D.price, 2 * CD, side);
+    const Y = mf.fmtNum(y - entry, 1);
+    const z = B.price + (side ? 1 : -1) * BC;
+    const Z = mf.fmtNum(z - entry, 1);
+    const t = (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2;
+    const T = mf.fmtNum(t - entry, 1);
+    //
+    const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
+    const sl = fBreak ? G.price : E.price;
+    let order = {};
+    if (progress.result) {
+        order = {
+            side: orderSide,
+            price: entry,
+            tpPrice: tp,
+            slPrice: sl,
+        };
+        console.log("order", order);
+    }
+
+    return {
+        timeMark,
+        progress,
+        order,
+        points: makeUnique(points),
+        target: [
+            [x, X],
+            [y, Y],
+            [z, Z],
+            [t, T],
+        ],
+    };
+}
+function calcReversalLitePattern() {
+    const { A, B } = scanPoints;
+    const ab = A.price - B.price;
+    let side = ab > 0;
+    const pickTime = props.pickTimeToolRef.get();
+    const phase1 = scanPhase({
+        side: !side,
+        start: A,
+        end: { time: Math.min(pickTime ?? B.time.t, B.time.t), price: B.price },
+    });
+    const stopTime = props.indexToTime(
+        6 * phase1.R.time.i - 5 * phase1.S.time.i
+    );
+    const phase2 = scanPhase({
+        side,
+        start: B,
+        end: { time: pickTime ?? stopTime },
+    });
+
+    const isBreak1 = isBoxValid(phase2.ext, phase2, true);
+
+    const C = isBreak1 ? phase2.R1 : phase2.ext.R;
+    const D = isBreak1 ? phase2.S1 : phase2.ext.S;
+
+    const phase3 = scanPhase({
+        side: !side,
+        start: C,
+        end: { time: Math.min(pickTime ?? D.time.t, D.time.t), price: D.price },
+    });
+
+    const phase4 = scanPhase({
+        side,
+        start: D,
+        end: { time: pickTime ?? stopTime },
+    });
+
+    const isBreak2 = isBoxValid(phase4.ext, phase4, true);
+
+    const E = isBreak2 ? phase4.R1 : phase4.ext.R;
+    const F = isBreak2 ? phase4.S1 : phase4.ext.S;
+
+    const phase5 = scanPhase({
+        side: !side,
+        start: E,
+        end: { time: Math.min(pickTime ?? F.time.t, F.time.t), price: F.price },
+    });
+
+    const phase6 = scanPhase({
+        side,
+        start: F,
+        end: { time: pickTime ?? stopTime },
+    });
+
+    const isBreak3 = isBoxValid(phase6.ext, phase6, true);
+
+    const G = isBreak3 ? phase6.R1 : phase6.ext.R;
+
+    console.log("calcReversalPattern", [
+        phase1,
+        phase2,
+        phase3,
+        phase4,
+        phase5,
+        phase6,
+    ]);
+
+    const AB = mf.fmtNum(ab, 1, true);
+    const BC = mf.fmtNum(C.price - B.price, 1, true);
+    const CD = mf.fmtNum(D.price - C.price, 1, true);
+    const DE = mf.fmtNum(E.price - D.price, 1, true);
+    const DDs = mf.fmtNum(phase3.R.price1 - D.price, 1, true);
+    const EF = mf.fmtNum(F.price - E.price, 1, true);
+
+    const dT1 = phase1.R.time1.i - phase1.S.time.i;
+    const dT2 = C.time1.i - phase2.S.time.i;
+    const dT3 = D.time1.i - C.time.i;
+    const dT4 = E.time1.i - D.time.i;
+    const dT5 = F.time1.i - E.time.i;
+
+    const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
+    const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
+
+    const T1 = phase1.R.time.i + phase1.tr;
+    const T2 = C.time.i + TR2;
+    const T3 = D.time.i + phase3.tr;
+    const T4 = E.time.i + TR4;
+    const T5 = F.time.i + phase5.tr;
+    const timeMark = [T5, T4, T3, T2, T1];
+
+    const rABC = BC / AB;
+    const rBCD = CD / BC;
+    const rCDE = DE / CD;
+    const rCDDs = DDs / CD;
+    const rDEF = EF / DE;
+
+    const eBreak = mf.cmp(E.price, side, C.price);
+    const progressSteps = [
+        {
+            conds: [
+                //
+                isTimeNotEqual(dT1, dT2),
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                isTimeNotEqual(dT2, dT3),
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                isTimeNotEqual(dT3, dT4),
+            ],
+            excludes: [],
+        },
+        {
+            conds: [
+                //
+                isTimeNotEqual(dT4, dT5),
+            ],
+            excludes: [],
+        },
+    ];
+
+    const progress = checkProgress(progressSteps);
+    //
+    const points = buildViewPoints(
+        [A, B, C, D, E, F, G],
+        ["orange", "red", "pink", "purple", "cyan", "green", "green"]
+    );
     //
     const orderSide = side ? 1 : -1;
     const refPrice = eBreak ? E.price : C.price;
@@ -823,6 +1179,18 @@ function isBoxValid(box1, box2, isNot = false) {
         box1.pr >= 2 * box2.pr;
     return isNot ? !check : check;
 }
+function buildViewPoints(points, colors) {
+    return points.map((p, idx) => {
+        const point = {
+            time: p.time?.t,
+            value: p.price,
+        };
+        if (colors[idx]) {
+            point.color = colorMap[colors[idx]];
+        }
+        return point;
+    });
+}
 function checkProgress(steps) {
     let progress = { steps, step: 0, result: true };
     progress.steps.map((step, idx) => {
@@ -962,11 +1330,15 @@ function makeUnique(arr) {
         return newItem;
     });
 }
-function changePatternType() {
-    const type =
-        patternType.value >= patternTypeCount ? 1 : patternType.value + 1;
-    store.dispatch("tradingDerivative/setPatternType", type);
-    refresh();
+function changePatternType({ itemData }) {
+    console.log("changePatternType", itemData);
+    store
+        .dispatch("tradingDerivative/setPatternType", itemData)
+        .then((isOk) => {
+            if (isOk) {
+                refresh();
+            }
+        });
 }
 function isTimeNotEqual(a, b, threshold = 0.8) {
     const minVal = Math.min(a, b);
@@ -977,3 +1349,20 @@ function isTimeNotEqual(a, b, threshold = 0.8) {
     return ratio <= threshold;
 }
 </script>
+<style lang="scss">
+.select-pattern {
+    .dx-button-content {
+        padding: 5px !important;
+        .pattern {
+            color: #bbbbbb !important;
+            font-size: 17px !important;
+        }
+    }
+}
+.select-pattern-popup {
+    .dx-list-item-content {
+        line-height: 8px !important;
+        padding: 10px !important;
+    }
+}
+</style>

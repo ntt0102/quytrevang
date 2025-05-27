@@ -80,6 +80,10 @@ const actions = {
         });
     },
     setPatternType({ commit, dispatch, getters, state }, patternType) {
+        const oldPatternType = state.config.patternType;
+        if (patternType === oldPatternType) {
+            return Promise.resolve(false);
+        }
         commit("setPatternType", patternType);
         return new Promise((resolve, reject) => {
             axios
@@ -88,7 +92,12 @@ const actions = {
                     { patternType },
                     { noLoading: true }
                 )
-                .then((response) => resolve());
+                .then((response) => {
+                    if (!response.data) {
+                        commit("setPatternType", oldPatternType);
+                    }
+                    resolve(response.data);
+                });
         });
     },
     setSource({ commit, dispatch, getters, state, rootGetters }, source) {
