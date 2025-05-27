@@ -19,7 +19,7 @@ const continuePattern = [
             "P > 50",
             "P < Pmax",
             "P > Pvàng *",
-            "T ≠ Tcam",
+            "T ≄ Tcam",
         ],
     },
     {
@@ -79,7 +79,7 @@ const reversalPattern = [
             "P > 70",
             "P < Pmax",
             "Ps < 50",
-            "T ≠ Tđỏ",
+            "T ≄ Tđỏ",
         ],
     },
     {
