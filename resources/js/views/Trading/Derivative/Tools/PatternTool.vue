@@ -811,6 +811,7 @@ function calcContinueLitePattern() {
             conds: [
                 //
                 isTimeNotEqual(dT2, dT3),
+                dT3 > dT2,
             ],
             excludes: [],
         },
@@ -825,6 +826,7 @@ function calcContinueLitePattern() {
             conds: [
                 //
                 isTimeNotEqual(dT4, dT5),
+                dT5 > dT4,
             ],
             excludes: [],
         },
@@ -836,6 +838,12 @@ function calcContinueLitePattern() {
             excludes: [],
         },
     ];
+    if (rBCD < 0.8) {
+        progressSteps[1].excludes.push(1);
+    }
+    if (rDEF < 0.8) {
+        progressSteps[3].excludes.push(1);
+    }
 
     const progress = checkProgress(progressSteps);
     //
@@ -997,6 +1005,7 @@ function calcReversalLitePattern() {
             conds: [
                 //
                 isTimeNotEqual(dT3, dT4),
+                dT4 > dT3,
             ],
             excludes: [],
         },
@@ -1008,6 +1017,9 @@ function calcReversalLitePattern() {
             excludes: [],
         },
     ];
+    if (rCDE < 0.8) {
+        progressSteps[2].excludes.push(1);
+    }
 
     const progress = checkProgress(progressSteps);
     //

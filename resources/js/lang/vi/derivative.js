@@ -119,6 +119,7 @@ const continueLitePattern = [
         conds: [
             //
             "T ≄ Tcam",
+            "T > Tcam",
         ],
     },
     {
@@ -133,6 +134,7 @@ const continueLitePattern = [
         conds: [
             //
             "T ≄ Thồng",
+            "T > Thồng",
         ],
     },
     {
@@ -163,6 +165,7 @@ const reversalLitePattern = [
         conds: [
             //
             "T ≄ Thồng",
+            "T > Thồng",
         ],
     },
     {
