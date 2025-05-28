@@ -138,8 +138,9 @@ function scanPattern(data) {
         const t = data[ix].time;
         const d = data[ix].date;
         const i = props.timeToIndex(t);
+        const time = { t, d, i };
         if (ix === data.length - 1) {
-            start = { time: { t, d, i }, high, low };
+            start = { time, high, low };
         }
         if (side === undefined) {
             if (
@@ -151,8 +152,9 @@ function scanPattern(data) {
             if (high > start.high && low >= start.low) side = true;
             if (low < start.low && high <= start.high) side = false;
             C = {
-                price: side ? start.low : start.high,
+                time1: start.time,
                 time: start.time,
+                price: side ? start.low : start.high,
             };
             [B, A, S] = Array(3)
                 .fill(null)
@@ -163,20 +165,20 @@ function scanPattern(data) {
         if (mf.cmp(top, side, B.price)) {
             if (mf.cmp(A.price, !side, C.price)) {
                 [C, B] = [B, A].map((item) => mf.cloneDeep(item));
-                A = { time: { t, d, i }, price: top };
+                A = { time1: time, time, price: top };
                 S = mf.cloneDeep(A);
                 side = !side;
-            } else B = { time: { t, d, i }, price: top };
+            } else B = { time1: time, time, price: top };
         }
         if (mf.cmp(bottom, !side, A.price, true)) {
             if (bottom === A.price) {
-                A.time1 = { t, d, i };
+                A.time1 = time;
             } else {
-                A = { time1: { t, d, i }, time: { t, d, i }, price: bottom };
+                A = { time1: time, time, price: bottom };
             }
             S = { time: A.time1, price: A.price };
         }
-        if (mf.cmp(top, side, S.price)) S = { time: { t, d, i }, price: top };
+        if (mf.cmp(top, side, S.price)) S = { time, price: top };
         //
         if (C.time.i > A.time.i && mf.cmp(C.price, side, A.price)) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
