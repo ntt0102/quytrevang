@@ -1,7 +1,14 @@
 <template>
     <DxDropDownButton
         :items="patternTypes"
-        :drop-down-options="{ wrapperAttr: { class: 'select-pattern-popup' } }"
+        :drop-down-options="{
+            wrapperAttr: { class: 'select-pattern-popup' },
+            position: {
+                my: 'top left',
+                at: 'top right',
+                of: '.select-pattern',
+            },
+        }"
         :icon="`far fa-${
             patternType ? `square-${patternType}` : 'square-question'
         } pattern`"
