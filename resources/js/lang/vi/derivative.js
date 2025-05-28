@@ -111,6 +111,7 @@ const continueLitePattern = [
         name: "Bước cam",
         conds: [
             //
+            "P > Pmin",
             "T ≄ Tvàng",
         ],
     },
@@ -118,6 +119,7 @@ const continueLitePattern = [
         name: "Bước đỏ",
         conds: [
             //
+            "P > Pmin",
             "T ≄ Tcam",
             "T > Tcam",
         ],
@@ -126,6 +128,7 @@ const continueLitePattern = [
         name: "Bước hồng",
         conds: [
             //
+            "P > Pmin",
             "T ≄ Tđỏ",
         ],
     },
@@ -133,6 +136,7 @@ const continueLitePattern = [
         name: "Bước tím",
         conds: [
             //
+            "P > Pmin",
             "T ≄ Thồng",
             "T > Thồng",
         ],
@@ -141,6 +145,7 @@ const continueLitePattern = [
         name: "Bước lam",
         conds: [
             //
+            "P > Pmin",
             "T ≄ Ttím",
         ],
     },
@@ -150,6 +155,7 @@ const reversalLitePattern = [
         name: "Bước đỏ",
         conds: [
             //
+            "P > Pmin",
             "T ≄ Tcam",
         ],
     },
@@ -157,6 +163,7 @@ const reversalLitePattern = [
         name: "Bước hồng",
         conds: [
             //
+            "P > Pmin",
             "T ≄ Tđỏ",
         ],
     },
@@ -164,6 +171,7 @@ const reversalLitePattern = [
         name: "Bước tím",
         conds: [
             //
+            "P > Pmin",
             "T ≄ Thồng",
             "T > Thồng",
         ],
@@ -172,6 +180,7 @@ const reversalLitePattern = [
         name: "Bước lam",
         conds: [
             //
+            "P > Pmin",
             "T ≄ Ttím",
         ],
     },
