@@ -113,6 +113,7 @@ const continueLitePattern = [
             //
             "T > Tmin",
             "P > Pmin",
+            "T ≄ Tvàng *",
         ],
     },
     {
@@ -158,14 +159,16 @@ const reversalLitePattern = [
         name: "Bước đỏ",
         conds: [
             //
+            "T > Tmin",
             "P > Pmin",
-            "T ≄ Tcam",
+            "T ≄ Tcam *",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
+            "T > Tmin",
             "P > Pmin",
             "T ≄ Tđỏ",
         ],
@@ -174,15 +177,17 @@ const reversalLitePattern = [
         name: "Bước tím",
         conds: [
             //
+            "T > Tmin *",
             "P > Pmin",
             "T ≄ Thồng",
-            "T > Thồng",
+            "T > Thồng *",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
+            "T > Tmin *",
             "P > Pmin",
             "T ≄ Ttím",
         ],
