@@ -111,23 +111,25 @@ const continueLitePattern = [
         name: "Bước cam",
         conds: [
             //
+            "T > Tmin",
             "P > Pmin",
-            "T ≄ Tvàng",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
+            "T > Tmin",
             "P > Pmin",
             "T ≄ Tcam",
-            "T > Tcam",
+            "T > Tcam *",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
+            "T > Tmin",
             "P > Pmin",
             "T ≄ Tđỏ",
         ],
@@ -136,15 +138,16 @@ const continueLitePattern = [
         name: "Bước tím",
         conds: [
             //
+            "T > Tmin *",
             "P > Pmin",
             "T ≄ Thồng",
-            "T > Thồng",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
+            "T > Tmin *",
             "P > Pmin",
             "T ≄ Ttím",
         ],

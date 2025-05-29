@@ -812,14 +812,15 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
+                phase2.R.time1.i > T1,
                 BC >= phase1.pr,
-                isTimeNotEqual(dT1, dT2),
             ],
             excludes: [],
         },
         {
             conds: [
                 //
+                D.time1.i > T2,
                 CD >= phase2.pr,
                 isTimeNotEqual(dT2, dT3),
                 dT3 > dT2,
@@ -829,6 +830,7 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
+                E.time1.i > T3,
                 DE >= phase3.pr,
                 isTimeNotEqual(dT3, dT4),
             ],
@@ -837,26 +839,24 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
+                F.time1.i > T4,
                 EF >= phase4.pr,
                 isTimeNotEqual(dT4, dT5),
-                dT5 > dT4,
             ],
-            excludes: [],
+            excludes: [0],
         },
         {
             conds: [
                 //
+                G.time1.i > T5,
                 FG >= phase5.pr,
                 isTimeNotEqual(dT5, dT6),
             ],
-            excludes: [],
+            excludes: [0],
         },
     ];
     if (rBCD < 0.8) {
-        progressSteps[1].excludes.push(2);
-    }
-    if (rDEF < 0.8) {
-        progressSteps[3].excludes.push(2);
+        progressSteps[1].excludes.push(3);
     }
 
     const progress = checkProgress(progressSteps);
@@ -1203,7 +1203,6 @@ function scanPhase({ side, start, end }) {
 }
 function isBoxValid(box1, box2, isNot = false) {
     const check =
-        // (box1.pr >= box2.pr && box1.tr >= box2.tr) ||
         (box1.pr >= box2.pr && box1.tr >= 0.8 * box2.tr) ||
         (box1.tr >= box2.tr && box1.pr >= 0.8 * box2.pr) ||
         box1.pr >= 2 * box2.pr;
