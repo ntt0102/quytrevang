@@ -1015,7 +1015,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                dT2 >= phase2.pr / trThreshold,
+                dT3 >= phase2.pr / trThreshold,
                 CD >= phase2.pr,
                 isTimeNotEqual(dT2, dT3),
             ],
