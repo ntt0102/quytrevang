@@ -832,7 +832,7 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
-                dT4 >= phase3.tr / trThreshold,
+                dT4 >= TR3 / trThreshold,
                 DE >= phase3.pr,
                 isTimeNotEqual(dT3, dT4),
             ],
@@ -850,7 +850,7 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
-                dT6 >= phase5.tr / trThreshold,
+                dT6 >= TR5 / trThreshold,
                 FG >= phase5.pr,
                 isTimeNotEqual(dT5, dT6),
             ],
@@ -963,7 +963,7 @@ function calcReversalLitePattern() {
 
     const G = isBreak3 ? phase6.R1 : phase6.ext.R;
 
-    console.log("calcReversalPattern", [
+    console.log("calcReversalLitePattern", [
         phase1,
         phase2,
         phase3,
@@ -1001,6 +1001,9 @@ function calcReversalLitePattern() {
     const rCDDs = DDs / CD;
     const rDEF = EF / DE;
 
+    console.log("dT3", dT3);
+    console.log("phase2.tr", phase2.tr);
+
     const eBreak = mf.cmp(E.price, side, C.price);
     const progressSteps = [
         {
@@ -1015,7 +1018,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                dT3 >= phase2.tr / trThreshold,
+                dT3 >= TR2 / trThreshold,
                 CD >= phase2.pr,
                 isTimeNotEqual(dT2, dT3),
             ],
@@ -1034,7 +1037,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                dT5 >= phase4.tr / trThreshold,
+                dT5 >= TR4 / trThreshold,
                 EF >= phase4.pr,
                 isTimeNotEqual(dT4, dT5),
             ],
