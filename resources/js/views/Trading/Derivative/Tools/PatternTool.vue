@@ -1006,7 +1006,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                dT2 >= phase1.pr / trThreshold,
+                dT2 >= phase1.tr / trThreshold,
                 BC >= phase1.pr,
                 isTimeNotEqual(dT1, dT2),
             ],
@@ -1015,7 +1015,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                dT3 >= phase2.pr / trThreshold,
+                dT3 >= phase2.tr / trThreshold,
                 CD >= phase2.pr,
                 isTimeNotEqual(dT2, dT3),
             ],
@@ -1024,7 +1024,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                dT4 >= phase3.pr / trThreshold,
+                dT4 >= phase3.tr / trThreshold,
                 DE >= phase3.pr,
                 isTimeNotEqual(dT3, dT4),
                 dT4 > dT3,
@@ -1034,7 +1034,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                dT5 >= phase4.pr / trThreshold,
+                dT5 >= phase4.tr / trThreshold,
                 EF >= phase4.pr,
                 isTimeNotEqual(dT4, dT5),
             ],
