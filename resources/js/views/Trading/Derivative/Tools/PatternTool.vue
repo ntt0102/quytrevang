@@ -53,6 +53,7 @@ const patternType = computed(
 const symbol = "VN30F1M";
 const patternTypes = [1, 2, 3, 4];
 const scanThreshold = 1;
+const trThreshold = 0.7;
 let scanPoints = {};
 let lines = {};
 let series = {};
@@ -812,7 +813,7 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
-                phase2.R.time1.i > T1,
+                phase1.tr / dT2 >= trThreshold,
                 BC >= phase1.pr,
                 isTimeNotEqual(dT1, dT2),
             ],
@@ -821,7 +822,7 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
-                D.time1.i > T2,
+                phase2.tr / dT3 >= trThreshold,
                 CD >= phase2.pr,
                 isTimeNotEqual(dT2, dT3),
                 dT3 > dT2,
@@ -831,7 +832,7 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
-                E.time1.i > T3,
+                phase3.tr / dT4 >= trThreshold,
                 DE >= phase3.pr,
                 isTimeNotEqual(dT3, dT4),
             ],
@@ -840,7 +841,7 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
-                F.time1.i > T4,
+                phase4.tr / dT5 >= trThreshold,
                 EF >= phase4.pr,
                 isTimeNotEqual(dT4, dT5),
             ],
@@ -849,7 +850,7 @@ function calcContinueLitePattern() {
         {
             conds: [
                 //
-                G.time1.i > T5,
+                phase5.tr / dT6 >= trThreshold,
                 FG >= phase5.pr,
                 isTimeNotEqual(dT5, dT6),
             ],
@@ -1005,7 +1006,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                C.time1.i > T1,
+                phase1.tr / dT2 >= trThreshold,
                 BC >= phase1.pr,
                 isTimeNotEqual(dT1, dT2),
             ],
@@ -1014,7 +1015,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                D.time1.i > T2,
+                phase2.tr / dT3 >= trThreshold,
                 CD >= phase2.pr,
                 isTimeNotEqual(dT2, dT3),
             ],
@@ -1023,7 +1024,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                E.time1.i > T3,
+                phase3.tr / dT4 >= trThreshold,
                 DE >= phase3.pr,
                 isTimeNotEqual(dT3, dT4),
                 dT4 > dT3,
@@ -1033,7 +1034,7 @@ function calcReversalLitePattern() {
         {
             conds: [
                 //
-                F.time1.i > T4,
+                phase4.tr / dT5 >= trThreshold,
                 EF >= phase4.pr,
                 isTimeNotEqual(dT4, dT5),
             ],
