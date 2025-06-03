@@ -113,6 +113,7 @@ const continueLitePattern = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P > 30",
             "T ≄ Tvàng *",
         ],
     },
@@ -162,6 +163,7 @@ const reversalLitePattern = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P > 30",
             "T ≄ Tcam *",
         ],
     },

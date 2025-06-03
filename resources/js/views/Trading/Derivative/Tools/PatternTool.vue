@@ -815,9 +815,10 @@ function calcContinueLitePattern() {
                 //
                 dT2 >= phase1.tr / trThreshold,
                 BC >= phase1.pr,
+                rABC >= 0.3,
                 isTimeNotEqual(dT1, dT2),
             ],
-            excludes: [2],
+            excludes: [3],
         },
         {
             conds: [
@@ -1009,9 +1010,10 @@ function calcReversalLitePattern() {
                 //
                 dT2 >= phase1.tr / trThreshold,
                 BC >= phase1.pr,
+                rABC >= 0.3,
                 isTimeNotEqual(dT1, dT2),
             ],
-            excludes: [2],
+            excludes: [3],
         },
         {
             conds: [
