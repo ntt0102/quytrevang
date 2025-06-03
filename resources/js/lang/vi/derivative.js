@@ -135,6 +135,7 @@ const continueLitePattern = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P > 75 *",
             "T ≄ Tđỏ",
         ],
     },

@@ -837,6 +837,7 @@ function calcContinueLitePattern() {
                 //
                 dT4 >= TR3 / trThreshold,
                 DE >= phase3.pr,
+                rCDE >= 0.75,
                 isTimeNotEqual(dT3, dT4),
             ],
             excludes: [],
@@ -865,6 +866,7 @@ function calcContinueLitePattern() {
         progressSteps[1].excludes.push(3, 5);
     }
     if (dT2 > dT1 || (rBCD >= 0.75 && dT3 > dT2)) {
+        progressSteps[2].excludes.push(2);
         progressSteps[3].excludes.push(3);
     }
     const progress = checkProgress(progressSteps);
