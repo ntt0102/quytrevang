@@ -834,7 +834,7 @@ function calcContinueLitePattern() {
                 dT3 >= phase2.tr / trThreshold,
                 CD >= phase2.pr,
                 rBCD >= 0.5,
-                rBCD >= 0.75,
+                rBCD >= 0.7,
                 isTimeNotEqual(dT2, dT3),
                 dT3 > dT2,
             ],
@@ -845,7 +845,7 @@ function calcContinueLitePattern() {
                 //
                 dT4 >= TR3 / trThreshold,
                 DE >= phase3.pr,
-                rCDE >= 0.75,
+                rCDE >= 0.7,
                 isTimeNotEqual(dT3, dT4),
             ],
             condsExc: [],
