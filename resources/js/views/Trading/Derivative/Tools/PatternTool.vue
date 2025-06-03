@@ -823,6 +823,7 @@ function calcContinueLitePattern() {
                 //
                 dT2 >= phase1.tr / trThreshold,
                 BC >= phase1.pr,
+                rBCCs < 0.5,
                 isTimeNotEqual(dT1, dT2),
                 dT2 > dT1,
             ],
