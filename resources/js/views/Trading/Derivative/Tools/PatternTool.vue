@@ -890,7 +890,7 @@ function calcContinueLitePattern() {
     const X = mf.fmtNum(x - entry, 1);
     const [y] = adjustTargetPrice(D.price, 2 * CD, side);
     const Y = mf.fmtNum(y - entry, 1);
-    const z = B.price + (side ? 1 : -1) * BC;
+    const z = mf.fmtNum(B.price + orderSide * BC, 1);
     const Z = mf.fmtNum(z - entry, 1);
     const t = (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2;
     const T = mf.fmtNum(t - entry, 1);
