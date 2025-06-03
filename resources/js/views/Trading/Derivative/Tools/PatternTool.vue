@@ -824,10 +824,11 @@ function calcContinueLitePattern() {
                 //
                 dT3 >= phase2.tr / trThreshold,
                 CD >= phase2.pr,
+                rBCD >= 0.5,
                 isTimeNotEqual(dT2, dT3),
                 dT3 > dT2,
             ],
-            excludes: [],
+            excludes: [4],
         },
         {
             conds: [
@@ -857,9 +858,6 @@ function calcContinueLitePattern() {
             excludes: [0],
         },
     ];
-    if (rBCD < 0.8) {
-        progressSteps[1].excludes.push(3);
-    }
 
     const progress = checkProgress(progressSteps);
     //
@@ -1020,6 +1018,7 @@ function calcReversalLitePattern() {
                 //
                 dT3 >= TR2 / trThreshold,
                 CD >= phase2.pr,
+                rBCD >= 0.5,
                 isTimeNotEqual(dT2, dT3),
             ],
             excludes: [],
@@ -1032,7 +1031,7 @@ function calcReversalLitePattern() {
                 isTimeNotEqual(dT3, dT4),
                 dT4 > dT3,
             ],
-            excludes: [0],
+            excludes: [0, 3],
         },
         {
             conds: [
@@ -1044,9 +1043,6 @@ function calcReversalLitePattern() {
             excludes: [0],
         },
     ];
-    if (rCDE < 0.8) {
-        progressSteps[2].excludes.push(3);
-    }
 
     const progress = checkProgress(progressSteps);
     //
