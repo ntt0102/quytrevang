@@ -816,8 +816,9 @@ function calcContinueLitePattern() {
                 dT2 >= phase1.tr / trThreshold,
                 BC >= phase1.pr,
                 isTimeNotEqual(dT1, dT2),
+                dT2 > dT1,
             ],
-            excludes: [2],
+            excludes: [2, 3],
         },
         {
             conds: [
@@ -825,10 +826,11 @@ function calcContinueLitePattern() {
                 dT3 >= phase2.tr / trThreshold,
                 CD >= phase2.pr,
                 rBCD >= 0.5,
+                rBCD >= 0.75,
                 isTimeNotEqual(dT2, dT3),
                 dT3 > dT2,
             ],
-            excludes: [4],
+            excludes: [],
         },
         {
             conds: [
@@ -845,6 +847,7 @@ function calcContinueLitePattern() {
                 dT5 >= phase4.tr / trThreshold,
                 EF >= phase4.pr,
                 isTimeNotEqual(dT4, dT5),
+                fBreak,
             ],
             excludes: [0],
         },
@@ -858,7 +861,12 @@ function calcContinueLitePattern() {
             excludes: [0],
         },
     ];
-
+    if (dT2 > dT1 || fBreak) {
+        progressSteps[1].excludes.push(3, 5);
+    }
+    if (dT2 > dT1 || (rBCD >= 0.75 && dT3 > dT2)) {
+        progressSteps[3].excludes.push(3);
+    }
     const progress = checkProgress(progressSteps);
     //
     const points = buildViewPoints(

@@ -114,6 +114,7 @@ const continueLitePattern = [
             "T > Tmin",
             "P > Pmin",
             "T ≄ Tvàng *",
+            "T > Tvàng *",
         ],
     },
     {
@@ -123,6 +124,7 @@ const continueLitePattern = [
             "T > Tmin",
             "P > Pmin",
             "P > 50",
+            "P > 75 *",
             "T ≄ Tcam",
             "T > Tcam *",
         ],
@@ -143,6 +145,7 @@ const continueLitePattern = [
             "T > Tmin *",
             "P > Pmin",
             "T ≄ Thồng",
+            "P > Pđỏ *",
         ],
     },
     {
