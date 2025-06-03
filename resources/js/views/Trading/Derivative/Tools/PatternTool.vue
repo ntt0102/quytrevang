@@ -1086,7 +1086,7 @@ function calcReversalLitePattern() {
     const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
     const [x] = adjustTargetPrice(C.price, BC, side);
     const X = mf.fmtNum(x - entry, 1);
-    const [y] = mf.fmtNum(adjustTargetPrice(C.price, 2 * BC, side), 1);
+    const [y] = adjustTargetPrice(C.price, 2 * BC, side);
     const Y = mf.fmtNum(y - entry, 1);
     const z = A.price;
     const Z = mf.fmtNum(z - entry, 1);
@@ -1354,6 +1354,7 @@ function remove() {
 }
 function removePatternTool() {
     if (mf.isSet(lines.X)) {
+        series.pattern.removePriceLine(lines.O);
         series.pattern.removePriceLine(lines.X);
         series.pattern.removePriceLine(lines.Y);
         series.pattern.removePriceLine(lines.Z);
