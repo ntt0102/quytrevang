@@ -389,7 +389,7 @@ function calcContinuePattern() {
                 rABC <= 0.7,
                 rBCCs < 0.5,
             ],
-            excludes: [],
+            condsExc: [],
         },
         {
             conds: [
@@ -401,7 +401,7 @@ function calcContinuePattern() {
                 dBreak,
                 isTimeNotEqual(dT2, dT3),
             ],
-            excludes: [4],
+            condsExc: [4],
         },
         {
             conds: [
@@ -413,7 +413,7 @@ function calcContinuePattern() {
                 DE <= BC,
                 rDEEs < 0.5,
             ],
-            excludes: [1, 4],
+            condsExc: [1, 4],
         },
         {
             conds: [
@@ -425,7 +425,7 @@ function calcContinuePattern() {
                 fBreak,
                 F.price !== D.price,
             ],
-            excludes: [3],
+            condsExc: [3],
         },
         {
             conds: [
@@ -437,27 +437,27 @@ function calcContinuePattern() {
                 dT6 <= dT4,
                 FG <= DE,
             ],
-            excludes: [],
+            condsExc: [],
         },
     ];
     if (!(dBreak && fBreak)) {
-        progressSteps[0].excludes.push(3);
-        progressSteps[4].excludes.push(5);
+        progressSteps[0].condsExc.push(3);
+        progressSteps[4].condsExc.push(5);
     }
     if (!(dBreak && DE <= BC)) {
-        progressSteps[3].excludes.push(4);
+        progressSteps[3].condsExc.push(4);
     }
     if (rDEF >= 0.5) {
-        progressSteps[3].excludes.push(0);
+        progressSteps[3].condsExc.push(0);
     }
     if (F.time1.i > T4) {
-        progressSteps[3].excludes.push(2);
+        progressSteps[3].condsExc.push(2);
     }
     if (rEFG >= 0.5) {
-        progressSteps[4].excludes.push(0);
+        progressSteps[4].condsExc.push(0);
     }
     if (G.time1.i > T5) {
-        progressSteps[4].excludes.push(2);
+        progressSteps[4].condsExc.push(2);
     }
 
     const progress = checkProgress(progressSteps);
@@ -608,7 +608,7 @@ function calcReversalPattern() {
                 rABC >= 0.3,
                 rABC <= 0.7,
             ],
-            excludes: [],
+            condsExc: [],
         },
         {
             conds: [
@@ -620,7 +620,7 @@ function calcReversalPattern() {
                 rCDDs < 0.5,
                 isTimeNotEqual(dT2, dT3),
             ],
-            excludes: [1],
+            condsExc: [1],
         },
         {
             conds: [
@@ -631,7 +631,7 @@ function calcReversalPattern() {
                 DE <= BC,
                 E.price !== C.price,
             ],
-            excludes: [3],
+            condsExc: [3],
         },
         {
             conds: [
@@ -643,20 +643,20 @@ function calcReversalPattern() {
                 dT5 <= dT3,
                 EF <= CD,
             ],
-            excludes: [],
+            condsExc: [],
         },
     ];
     if (rCDE >= 0.5) {
-        progressSteps[2].excludes.push(0);
+        progressSteps[2].condsExc.push(0);
     }
     if (E.time1.i > T3) {
-        progressSteps[2].excludes.push(2);
+        progressSteps[2].condsExc.push(2);
     }
     if (rDEF >= 0.5) {
-        progressSteps[3].excludes.push(0);
+        progressSteps[3].condsExc.push(0);
     }
     if (F.time1.i > T4) {
-        progressSteps[3].excludes.push(2);
+        progressSteps[3].condsExc.push(2);
     }
     const progress = checkProgress(progressSteps);
     //
@@ -818,7 +818,7 @@ function calcContinueLitePattern() {
                 isTimeNotEqual(dT1, dT2),
                 dT2 > dT1,
             ],
-            excludes: [2, 3],
+            condsExc: [2, 3],
         },
         {
             conds: [
@@ -830,7 +830,7 @@ function calcContinueLitePattern() {
                 isTimeNotEqual(dT2, dT3),
                 dT3 > dT2,
             ],
-            excludes: [],
+            condsExc: [],
         },
         {
             conds: [
@@ -840,7 +840,7 @@ function calcContinueLitePattern() {
                 rCDE >= 0.75,
                 isTimeNotEqual(dT3, dT4),
             ],
-            excludes: [],
+            condsExc: [],
         },
         {
             conds: [
@@ -850,7 +850,7 @@ function calcContinueLitePattern() {
                 isTimeNotEqual(dT4, dT5),
                 fBreak,
             ],
-            excludes: [0],
+            condsExc: [0],
         },
         {
             conds: [
@@ -859,15 +859,22 @@ function calcContinueLitePattern() {
                 FG >= phase5.pr,
                 isTimeNotEqual(dT5, dT6),
             ],
-            excludes: [0],
+            condsExc: [0],
         },
     ];
-    if (dT2 > dT1 || fBreak) {
-        progressSteps[1].excludes.push(3, 5);
-    }
-    if (dT2 > dT1 || (rBCD >= 0.75 && dT3 > dT2)) {
-        progressSteps[2].excludes.push(2);
-        progressSteps[3].excludes.push(3);
+    if (dT2 > dT1) {
+        progressSteps[1].stepExc = true;
+        progressSteps[2].stepExc = true;
+        progressSteps[3].stepExc = true;
+        progressSteps[4].stepExc = true;
+    } else {
+        if (fBreak) {
+            progressSteps[1].condsExc.push(3, 5);
+        }
+        if (rBCD >= 0.75 && dT3 > dT2) {
+            progressSteps[2].condsExc.push(2);
+            progressSteps[3].condsExc.push(3);
+        }
     }
     const progress = checkProgress(progressSteps);
     //
@@ -877,7 +884,7 @@ function calcContinueLitePattern() {
     );
     //
     const orderSide = side ? 1 : -1;
-    const refPrice = fBreak ? F.price : D.price;
+    const refPrice = dT2 > dT1 ? phase2.S.price : fBreak ? F.price : D.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
     const [x] = adjustTargetPrice(D.price, CD, side);
     const X = mf.fmtNum(x - entry, 1);
@@ -888,8 +895,9 @@ function calcContinueLitePattern() {
     const t = (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2;
     const T = mf.fmtNum(t - entry, 1);
     //
-    const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
-    const sl = fBreak ? G.price : E.price;
+    const tp =
+        dT2 > dT1 ? z : mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
+    const sl = dT2 > dT1 ? C.price : fBreak ? G.price : E.price;
     let order = {};
     if (progress.result) {
         order = {
@@ -1021,7 +1029,7 @@ function calcReversalLitePattern() {
                 BC >= phase1.pr,
                 isTimeNotEqual(dT1, dT2),
             ],
-            excludes: [2],
+            condsExc: [2],
         },
         {
             conds: [
@@ -1031,7 +1039,7 @@ function calcReversalLitePattern() {
                 rBCD >= 0.5,
                 isTimeNotEqual(dT2, dT3),
             ],
-            excludes: [],
+            condsExc: [],
         },
         {
             conds: [
@@ -1041,7 +1049,7 @@ function calcReversalLitePattern() {
                 isTimeNotEqual(dT3, dT4),
                 dT4 > dT3,
             ],
-            excludes: [0, 3],
+            condsExc: [0, 3],
         },
         {
             conds: [
@@ -1050,7 +1058,7 @@ function calcReversalLitePattern() {
                 EF >= phase4.pr,
                 isTimeNotEqual(dT4, dT5),
             ],
-            excludes: [0],
+            condsExc: [0],
         },
     ];
 
@@ -1249,8 +1257,9 @@ function checkProgress(steps) {
     });
     return progress;
 }
-function isStepValid({ conds, excludes }) {
-    return conds.every((val, idx) => (excludes.includes(idx) ? true : val));
+function isStepValid({ conds, condsExc, stepExc }) {
+    if (stepExc) return true;
+    return conds.every((val, idx) => (condsExc.includes(idx) ? true : val));
 }
 function isTimeInChart(time) {
     if (!props.bars.length) return false;
