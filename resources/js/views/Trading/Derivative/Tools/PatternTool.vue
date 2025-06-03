@@ -884,7 +884,7 @@ function calcContinueLitePattern() {
     );
     //
     const orderSide = side ? 1 : -1;
-    const refPrice = dT2 > dT1 ? phase2.S.price : fBreak ? F.price : D.price;
+    const refPrice = dT2 > dT1 ? phase2.S1.price : fBreak ? F.price : D.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
     const [x] = adjustTargetPrice(D.price, CD, side);
     const X = mf.fmtNum(x - entry, 1);
