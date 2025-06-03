@@ -215,33 +215,41 @@ function loadPatternTool() {
         draggable: false,
     };
     const {
+        entry,
         target: [[x, X], [y, Y], [z, Z], [t, T]],
     } = calculatePattern();
     //
+    option.point = "O";
+    option.price = entry;
+    option.title = "O";
+    option.color = "#007FFF";
+    option.draggable = false;
+    lines[option.point] = series.pattern.createPriceLine(option);
+    //
     option.point = "X";
-    option.price = mf.fmtNum(x);
-    option.title = `X ${mf.fmtNum(X)}`;
+    option.price = x;
+    option.title = `X ${X}`;
     option.color = "#FF1493";
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "Y";
-    option.price = mf.fmtNum(y);
-    option.title = `Y ${mf.fmtNum(Y)}`;
+    option.price = y;
+    option.title = `Y ${Y}`;
     option.color = "#8000FF";
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "Z";
-    option.price = mf.fmtNum(z);
-    option.title = `Z ${mf.fmtNum(Z)}`;
+    option.price = z;
+    option.title = `Z ${Z}`;
     option.color = "#00FFFF";
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "T";
-    option.price = mf.fmtNum(t);
-    option.title = `T ${mf.fmtNum(T)}`;
+    option.price = t;
+    option.title = `T ${T}`;
     option.color = "#FF7F00";
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
@@ -892,7 +900,10 @@ function calcContinueLitePattern() {
     const Y = mf.fmtNum(y - entry, 1);
     const z = mf.fmtNum(B.price + orderSide * BC, 1);
     const Z = mf.fmtNum(z - entry, 1);
-    const t = (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2;
+    const t = mf.fmtNum(
+        (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2,
+        1
+    );
     const T = mf.fmtNum(t - entry, 1);
     //
     const tp =
@@ -914,6 +925,7 @@ function calcContinueLitePattern() {
         progress,
         order,
         points: makeUnique(points),
+        entry,
         target: [
             [x, X],
             [y, Y],
@@ -1074,11 +1086,11 @@ function calcReversalLitePattern() {
     const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
     const [x] = adjustTargetPrice(C.price, BC, side);
     const X = mf.fmtNum(x - entry, 1);
-    const [y] = adjustTargetPrice(C.price, 2 * BC, side);
+    const [y] = mf.fmtNum(adjustTargetPrice(C.price, 2 * BC, side), 1);
     const Y = mf.fmtNum(y - entry, 1);
     const z = A.price;
     const Z = mf.fmtNum(z - entry, 1);
-    const t = (E.price + F.price) / 2;
+    const t = mf.fmtNum((E.price + F.price) / 2, 1);
     const T = mf.fmtNum(t - entry, 1);
     //
     const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
@@ -1099,6 +1111,7 @@ function calcReversalLitePattern() {
         progress,
         order,
         points: makeUnique(points),
+        entry,
         target: [
             [x, X],
             [y, Y],
