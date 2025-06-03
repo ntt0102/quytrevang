@@ -827,7 +827,7 @@ function calcContinueLitePattern() {
                 isTimeNotEqual(dT1, dT2),
                 dT2 > dT1,
             ],
-            condsExc: [2, 3],
+            condsExc: [3, 4],
         },
         {
             conds: [
