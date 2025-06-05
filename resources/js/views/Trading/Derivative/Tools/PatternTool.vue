@@ -1411,7 +1411,7 @@ function changePatternType({ itemData }) {
             }
         });
 }
-function isTimeNotEqual(a, b, threshold = 0.8) {
+function isTimeNotEqual(a, b, threshold = 0.9) {
     const minVal = Math.min(a, b);
     const maxVal = Math.max(a, b);
     if (maxVal === 0) return true;
