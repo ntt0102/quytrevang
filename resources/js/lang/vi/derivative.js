@@ -177,6 +177,7 @@ const reversalLitePattern = [
             "T > Tmin",
             "P > Pmin",
             "P > 50",
+            "Ps < 50",
             "T ≄ Tđỏ",
         ],
     },
