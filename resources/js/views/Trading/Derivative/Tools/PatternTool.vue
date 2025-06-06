@@ -874,7 +874,7 @@ function calcContinueLitePattern() {
     ];
     if (dT2 > dT1) {
         if (!dBreak) {
-            setExcStep(progressSteps, 1, 2, 3, 4);
+            setExcStep(progressSteps, [1, 2, 3, 4]);
         }
     } else {
         if (!(rCDE >= 0.7 && fBreak)) {
