@@ -128,7 +128,7 @@ const continueLitePattern = [
             "P > 70 *",
             "T ≄ Tcam",
             "T > Tcam *",
-            "P < Pđỏ *",
+            "P < Pvàng *",
         ],
     },
     {
