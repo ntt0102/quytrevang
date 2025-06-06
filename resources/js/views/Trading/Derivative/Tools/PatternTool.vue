@@ -397,7 +397,7 @@ function calcContinuePattern() {
                 rABC <= 0.7,
                 rBCCs < 0.5,
             ],
-            condsExc: [],
+            excConds: [],
         },
         {
             conds: [
@@ -409,7 +409,7 @@ function calcContinuePattern() {
                 dBreak,
                 isTimeNotEqual(dT2, dT3),
             ],
-            condsExc: [4],
+            excConds: [4],
         },
         {
             conds: [
@@ -421,7 +421,7 @@ function calcContinuePattern() {
                 DE <= BC,
                 rDEEs < 0.5,
             ],
-            condsExc: [1, 4],
+            excConds: [1, 4],
         },
         {
             conds: [
@@ -433,7 +433,7 @@ function calcContinuePattern() {
                 fBreak,
                 F.price !== D.price,
             ],
-            condsExc: [3],
+            excConds: [3],
         },
         {
             conds: [
@@ -445,27 +445,27 @@ function calcContinuePattern() {
                 dT6 <= dT4,
                 FG <= DE,
             ],
-            condsExc: [],
+            excConds: [],
         },
     ];
     if (!(dBreak && fBreak)) {
-        progressSteps[0].condsExc.push(3);
-        progressSteps[4].condsExc.push(5);
+        progressSteps[0].excConds.push(3);
+        progressSteps[4].excConds.push(5);
     }
     if (!(dBreak && DE <= BC)) {
-        progressSteps[3].condsExc.push(4);
+        progressSteps[3].excConds.push(4);
     }
     if (rDEF >= 0.5) {
-        progressSteps[3].condsExc.push(0);
+        progressSteps[3].excConds.push(0);
     }
     if (F.time1.i > T4) {
-        progressSteps[3].condsExc.push(2);
+        progressSteps[3].excConds.push(2);
     }
     if (rEFG >= 0.5) {
-        progressSteps[4].condsExc.push(0);
+        progressSteps[4].excConds.push(0);
     }
     if (G.time1.i > T5) {
-        progressSteps[4].condsExc.push(2);
+        progressSteps[4].excConds.push(2);
     }
 
     const progress = checkProgress(progressSteps);
@@ -616,7 +616,7 @@ function calcReversalPattern() {
                 rABC >= 0.3,
                 rABC <= 0.7,
             ],
-            condsExc: [],
+            excConds: [],
         },
         {
             conds: [
@@ -628,7 +628,7 @@ function calcReversalPattern() {
                 rCDDs < 0.5,
                 isTimeNotEqual(dT2, dT3),
             ],
-            condsExc: [1],
+            excConds: [1],
         },
         {
             conds: [
@@ -639,7 +639,7 @@ function calcReversalPattern() {
                 DE <= BC,
                 E.price !== C.price,
             ],
-            condsExc: [3],
+            excConds: [3],
         },
         {
             conds: [
@@ -651,20 +651,20 @@ function calcReversalPattern() {
                 dT5 <= dT3,
                 EF <= CD,
             ],
-            condsExc: [],
+            excConds: [],
         },
     ];
     if (rCDE >= 0.5) {
-        progressSteps[2].condsExc.push(0);
+        progressSteps[2].excConds.push(0);
     }
     if (E.time1.i > T3) {
-        progressSteps[2].condsExc.push(2);
+        progressSteps[2].excConds.push(2);
     }
     if (rDEF >= 0.5) {
-        progressSteps[3].condsExc.push(0);
+        progressSteps[3].excConds.push(0);
     }
     if (F.time1.i > T4) {
-        progressSteps[3].condsExc.push(2);
+        progressSteps[3].excConds.push(2);
     }
     const progress = checkProgress(progressSteps);
     //
@@ -827,7 +827,7 @@ function calcContinueLitePattern() {
                 isTimeNotEqual(dT1, dT2),
                 dT2 > dT1,
             ],
-            condsExc: [3, 4],
+            excConds: [3, 4],
         },
         {
             conds: [
@@ -839,7 +839,7 @@ function calcContinueLitePattern() {
                 isTimeNotEqual(dT2, dT3),
                 dT3 > dT2,
             ],
-            condsExc: [],
+            excConds: [3, 5],
         },
         {
             conds: [
@@ -850,7 +850,7 @@ function calcContinueLitePattern() {
                 isTimeNotEqual(dT3, dT4),
                 dT4 > dT3,
             ],
-            condsExc: [4],
+            excConds: [2, 4],
         },
         {
             conds: [
@@ -860,7 +860,7 @@ function calcContinueLitePattern() {
                 isTimeNotEqual(dT4, dT5),
                 fBreak,
             ],
-            condsExc: [0],
+            excConds: [0, 3],
         },
         {
             conds: [
@@ -869,21 +869,20 @@ function calcContinueLitePattern() {
                 FG >= phase5.pr,
                 isTimeNotEqual(dT5, dT6),
             ],
-            condsExc: [0],
+            excConds: [0],
         },
     ];
     if (dT2 > dT1) {
-        progressSteps[1].stepExc = true;
-        progressSteps[2].stepExc = true;
-        progressSteps[3].stepExc = true;
-        progressSteps[4].stepExc = true;
-    } else {
-        if (fBreak) {
-            progressSteps[1].condsExc.push(3, 5);
+        if (!dBreak) {
+            setExcStep(progressSteps, 1, 2, 3, 4);
         }
-        if (rBCD >= 0.75 && dT3 > dT2) {
-            progressSteps[2].condsExc.push(2);
-            progressSteps[3].condsExc.push(3);
+    } else {
+        if (!(rCDE >= 0.7 && fBreak)) {
+            removeExcConds(progressSteps[1].excConds, [3, 5]);
+        }
+        if (!(rBCD >= 0.7 && dT3 > dT2)) {
+            removeExcConds(progressSteps[2].excConds, 2);
+            removeExcConds(progressSteps[3].excConds, 3);
         }
     }
     const progress = checkProgress(progressSteps);
@@ -1043,7 +1042,7 @@ function calcReversalLitePattern() {
                 BC >= phase1.pr,
                 isTimeNotEqual(dT1, dT2),
             ],
-            condsExc: [2],
+            excConds: [2],
         },
         {
             conds: [
@@ -1054,7 +1053,7 @@ function calcReversalLitePattern() {
                 rCDDs < 0.5,
                 isTimeNotEqual(dT2, dT3),
             ],
-            condsExc: [],
+            excConds: [],
         },
         {
             conds: [
@@ -1064,7 +1063,7 @@ function calcReversalLitePattern() {
                 isTimeNotEqual(dT3, dT4),
                 dT4 > dT3,
             ],
-            condsExc: [0, 3],
+            excConds: [0, 3],
         },
         {
             conds: [
@@ -1073,7 +1072,7 @@ function calcReversalLitePattern() {
                 EF >= phase4.pr,
                 isTimeNotEqual(dT4, dT5),
             ],
-            condsExc: [0],
+            excConds: [0],
         },
     ];
 
@@ -1273,9 +1272,9 @@ function checkProgress(steps) {
     });
     return progress;
 }
-function isStepValid({ conds, condsExc, stepExc }) {
-    if (stepExc) return true;
-    return conds.every((val, idx) => (condsExc.includes(idx) ? true : val));
+function isStepValid({ conds, excConds, isExcStep }) {
+    if (isExcStep) return true;
+    return conds.every((val, idx) => (excConds.includes(idx) ? true : val));
 }
 function isTimeInChart(time) {
     if (!props.bars.length) return false;
@@ -1419,6 +1418,23 @@ function isTimeNotEqual(a, b, threshold = 0.9) {
     const ratio = minVal / maxVal;
     console.log("isTimeNotEqual", ratio);
     return ratio <= threshold;
+}
+function removeExcConds(excConds, items) {
+    if (!Array.isArray(items)) {
+        items = [items];
+    }
+
+    for (const item of items) {
+        const index = excConds.indexOf(item);
+        if (index !== -1) {
+            excConds.splice(index, 1);
+        }
+    }
+}
+function setExcStep(progressSteps, items) {
+    for (const item of items) {
+        progressSteps[item].isExcStep = true;
+    }
 }
 </script>
 <style lang="scss">
