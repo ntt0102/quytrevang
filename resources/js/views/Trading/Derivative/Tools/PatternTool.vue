@@ -838,6 +838,7 @@ function calcContinueLitePattern() {
                 rBCD >= 0.7,
                 isTimeNotEqual(dT2, dT3),
                 dT3 > dT2,
+                !dBreak,
             ],
             excConds: [3, 5],
         },
@@ -875,7 +876,7 @@ function calcContinueLitePattern() {
     if (dT2 > dT1) {
         if (!dBreak) {
             setExcStep(progressSteps, [1, 2, 3, 4]);
-        }
+        } else removeExcConds(progressSteps[1].excConds, 6);
     } else {
         if (!(rCDE >= 0.7 && fBreak)) {
             removeExcConds(progressSteps[1].excConds, [3, 5]);
