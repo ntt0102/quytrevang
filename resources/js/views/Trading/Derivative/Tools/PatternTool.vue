@@ -848,8 +848,9 @@ function calcContinueLitePattern() {
                 DE >= phase3.pr,
                 rCDE >= 0.7,
                 isTimeNotEqual(dT3, dT4),
+                dT4 > dT3,
             ],
-            condsExc: [],
+            condsExc: [4],
         },
         {
             conds: [
