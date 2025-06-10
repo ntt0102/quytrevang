@@ -1,6 +1,6 @@
 <template>
     <CoreContext class="pattern-context">
-        <div v-if="pattern?.name">
+        <div v-if="progress.pattern">
             <DxButton
                 type="success"
                 stylingMode="outlined"
@@ -30,7 +30,7 @@
                     class="name"
                     :class="[
                         progress.steps && progress.steps[i]
-                            ? progress.steps[i].result
+                            ? progress.steps[i].every(Boolean)
                                 ? 'success'
                                 : 'fail'
                             : '',
@@ -67,9 +67,11 @@ const props = defineProps(["progress", "chartHeightEnough"]);
 const emit = defineEmits(["refreshPattern"]);
 const patterns = ref({});
 const pattern = computed(() => {
-    return patterns.value[props.progress.pattern - 1]?.[
-        props.progress.subPattern || []
-    ];
+    return (
+        patterns.value[props.progress.pattern - 1]?.[
+            props.progress.subPattern
+        ] || {}
+    );
 });
 
 onMounted(() => {

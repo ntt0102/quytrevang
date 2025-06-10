@@ -32,7 +32,7 @@
 import DxDropDownButton from "devextreme-vue/drop-down-button";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
-import { formatISO, sub } from "date-fns";
+import { formatISO, setDate, sub } from "date-fns";
 
 const store = useStore();
 const mf = inject("mf");
@@ -184,9 +184,17 @@ function scanPattern(data) {
         if (C.time.i > A.time.i && mf.cmp(C.price, side, A.price)) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
             if (bc >= scanThreshold) {
-                if (A.time1.i - S.time.i >= C.time.i - B.time.i) break;
+                // if (A.time1.i - S.time.i >= C.time.i - B.time.i) break;
                 const as = mf.fmtNum(A.price - S.price, 1, true);
-                if (as > bc) break;
+                // if (as > bc) break;
+                if (
+                    isBoxValid(
+                        { pr: bc, tr: C.time.i - B.time.i },
+                        { pr: as, tr: A.time1.i - S.time.i },
+                        true
+                    )
+                )
+                    break;
             }
         }
     }
@@ -1332,14 +1340,14 @@ function checkProgress(subPattern, steps) {
         result: true,
     };
     progress.steps.map((step, idx) => {
-        step.result = step.every(Boolean);
         // step.result = isStepValid(step);
         if (progress.result) {
             progress.step = idx + 1;
-            progress.result = step.result;
+            progress.result = step.every(Boolean);
         }
         return step;
     });
+    console.log("checkProgress", progress);
     return progress;
 }
 // function isStepValid({ conds, excConds, isExcStep }) {
