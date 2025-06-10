@@ -106,7 +106,7 @@ const reversalPattern = [
         ],
     },
 ];
-const continueLitePattern = [
+const continueSub0 = [
     {
         name: "Bước cam",
         conds: [
@@ -114,8 +114,17 @@ const continueLitePattern = [
             "T > Tmin",
             "P > Pmin",
             "Ps < 50",
-            "T ≄ Tvàng *",
-            "T > Tvàng *",
+        ],
+    },
+];
+const continueSub1 = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "Ps < 50",
         ],
     },
     {
@@ -124,11 +133,8 @@ const continueLitePattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 50",
-            "P > 70 *",
+            "P > 70",
             "T ≄ Tcam",
-            "T > Tcam *",
-            "P < Pvàng *",
         ],
     },
     {
@@ -137,29 +143,147 @@ const continueLitePattern = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 70 *",
             "T ≄ Tđỏ",
-            "T > Tđỏ *",
+        ],
+    },
+];
+const continueSub2 = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "Ps < 50",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T ≄ Tcam",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P > 70",
+            "T ≄ Tđỏ",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "T > Tmin *",
             "P > Pmin",
             "T ≄ Thồng",
-            "P > Pđỏ *",
+            "P > Pđỏ",
+        ],
+    },
+];
+const continueSub3 = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "Ps < 50",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T ≄ Tcam",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P > Tcam",
+            "T ≄ Tđỏ",
+        ],
+    },
+];
+const continueSub4 = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "Ps < 50",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T ≄ Tcam",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P < Tcam",
+            "T ≄ Tđỏ",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "P > Pmin",
+            "T ≄ Thồng",
+            "P > Pđỏ",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            "T > Tmin *",
             "P > Pmin",
+            "P < Thồng",
             "T ≄ Ttím",
         ],
+    },
+];
+const continueLitePattern = [
+    {
+        name: "Mẫu hình cam dài",
+        steps: continueSub0,
+    },
+    {
+        name: "Mẫu hình đỏ dài",
+        steps: continueSub1,
+    },
+    {
+        name: "Mẫu hình đỏ ngắn",
+        steps: continueSub2,
+    },
+    {
+        name: "Mẫu hình 2 nền",
+        steps: continueSub3,
+    },
+    {
+        name: "Mẫu hình 3 nền",
+        steps: continueSub4,
     },
 ];
 const reversalLitePattern = [

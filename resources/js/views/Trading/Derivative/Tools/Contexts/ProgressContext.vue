@@ -1,15 +1,21 @@
 <template>
     <CoreContext class="pattern-context">
-        <DxButton
-            type="success"
-            stylingMode="outlined"
-            icon="refresh"
-            :text="$t('buttons.refresh')"
-            @click="refreshPattern"
-        />
+        <div v-if="pattern?.name">
+            <DxButton
+                type="success"
+                stylingMode="outlined"
+                icon="refresh"
+                :text="$t('buttons.refresh')"
+                @click="refreshPattern"
+            />
+            <div class="pattern-name">
+                {{ pattern?.name }}
+            </div>
+        </div>
+        <div v-else>{{ $t("trading.derivative.noPattern") }}</div>
         <div class="steps" :class="{ portrait: chartHeightEnough }">
             <div
-                v-for="(step, i) in steps[patternType - 1]"
+                v-for="(step, i) in pattern?.steps"
                 :key="i"
                 class="step"
                 :class="[
@@ -39,7 +45,7 @@
                         class="condition"
                         :class="[
                             progress.steps && progress.steps[i]
-                                ? progress.steps[i].conds[j]
+                                ? progress.steps[i][j]
                                     ? 'success'
                                     : 'fail'
                                 : '',
@@ -56,15 +62,15 @@
 <script setup>
 import CoreContext from "./CoreContext.vue";
 import { ref, computed, onMounted } from "vue";
-import { useStore } from "vuex";
 
-const store = useStore();
 const props = defineProps(["progress", "chartHeightEnough"]);
 const emit = defineEmits(["refreshPattern"]);
-const patternType = computed(
-    () => store.state.tradingDerivative.config.patternType
-);
-const steps = ref([]);
+const patterns = ref({});
+const pattern = computed(() => {
+    return patterns.value[props.progress.pattern - 1]?.[
+        props.progress.subPattern || []
+    ];
+});
 
 onMounted(() => {
     loadProgress();
@@ -72,7 +78,7 @@ onMounted(() => {
 
 function loadProgress() {
     import(`../../../../../lang/${window.lang}/derivative.js`).then((e) => {
-        steps.value = e.default || [];
+        patterns.value = e.default || [];
     });
 }
 
@@ -83,6 +89,14 @@ function refreshPattern() {
 
 <style lang="scss">
 .pattern-context {
+    min-width: 145px;
+    min-height: 20px;
+
+    .pattern-name {
+        font-weight: bold;
+        margin-top: 10px;
+    }
+
     .steps {
         display: flex;
         flex-direction: row;
@@ -91,7 +105,6 @@ function refreshPattern() {
         margin-top: 10px;
         line-height: 17px;
         font-size: 14px;
-        min-height: 50px;
 
         &.portrait {
             flex-direction: column !important;

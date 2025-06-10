@@ -32,7 +32,7 @@
 import DxDropDownButton from "devextreme-vue/drop-down-button";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
-import { formatISO } from "date-fns";
+import { formatISO, sub } from "date-fns";
 
 const store = useStore();
 const mf = inject("mf");
@@ -817,76 +817,138 @@ function calcContinueLitePattern() {
     const dBreak = mf.cmp(D.price, side, B.price);
     const fBreak = mf.cmp(F.price, side, D.price);
 
-    const progressSteps = [
-        {
-            conds: [
-                //
-                dT2 >= phase1.tr / trThreshold,
-                BC >= phase1.pr,
-                rBCCs < 0.5,
-                isTimeNotEqual(dT1, dT2),
-                dT2 > dT1,
-            ],
-            excConds: [3, 4],
-        },
-        {
-            conds: [
-                //
-                dT3 >= phase2.tr / trThreshold,
-                CD >= phase2.pr,
-                rBCD >= 0.5,
-                rBCD >= 0.7,
-                isTimeNotEqual(dT2, dT3),
-                dT3 > dT2,
-                !dBreak,
-            ],
-            excConds: [3, 5, 6],
-        },
-        {
-            conds: [
-                //
-                dT4 >= TR3 / trThreshold,
-                DE >= phase3.pr,
-                rCDE >= 0.7,
-                isTimeNotEqual(dT3, dT4),
-                dT4 > dT3,
-            ],
-            excConds: [2, 4],
-        },
-        {
-            conds: [
-                //
-                dT5 >= phase4.tr / trThreshold,
-                EF >= phase4.pr,
-                isTimeNotEqual(dT4, dT5),
-                fBreak,
-            ],
-            excConds: [0, 3],
-        },
-        {
-            conds: [
-                //
-                dT6 >= TR5 / trThreshold,
-                FG >= phase5.pr,
-                isTimeNotEqual(dT5, dT6),
-            ],
-            excConds: [0],
-        },
-    ];
-    if (dT2 > dT1) {
-        if (!dBreak) {
-            setExcStep(progressSteps, [1, 2, 3, 4]);
-        } else removeExcConds(progressSteps[1].excConds, 6);
-    } else {
-        if (!(rCDE >= 0.7 && fBreak)) {
-            removeExcConds(progressSteps[1].excConds, [3, 5]);
-        }
-        if (!(rBCD >= 0.7 && dT3 > dT2)) {
-            removeExcConds(progressSteps[2].excConds, 2);
-            removeExcConds(progressSteps[3].excConds, 3);
-        }
+    let subPattern;
+    if (dT2 > dT1) subPattern = 0;
+    else if (!dBreak) subPattern = dT3 > dT2 ? 1 : 2;
+    else subPattern = dT4 > dT2 ? 3 : 4;
+
+    let progressSteps;
+
+    switch (subPattern) {
+        case 0:
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    rBCCs < 0.5,
+                ],
+            ];
+            break;
+
+        case 1:
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    rBCCs < 0.5,
+                ],
+                [
+                    // red
+                    dT3 >= phase2.tr / trThreshold,
+                    CD >= phase2.pr,
+                    rBCD >= 0.7,
+                    isTimeNotEqual(dT2, dT3),
+                ],
+                [
+                    // pink
+                    dT4 >= TR3 / trThreshold,
+                    DE >= phase3.pr,
+                    isTimeNotEqual(dT3, dT4),
+                ],
+            ];
+            break;
+        case 2:
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    rBCCs < 0.5,
+                ],
+                [
+                    // red
+                    dT3 >= phase2.tr / trThreshold,
+                    CD >= phase2.pr,
+                    isTimeNotEqual(dT2, dT3),
+                ],
+                [
+                    // pink
+                    dT4 >= TR3 / trThreshold,
+                    DE >= phase3.pr,
+                    rCDE >= 0.7,
+                    isTimeNotEqual(dT3, dT4),
+                ],
+                [
+                    // purple
+                    EF >= phase4.pr,
+                    isTimeNotEqual(dT4, dT5),
+                    fBreak,
+                ],
+            ];
+            break;
+        case 3:
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    rBCCs < 0.5,
+                ],
+                [
+                    // red
+                    dT3 >= phase2.tr / trThreshold,
+                    CD >= phase2.pr,
+                    isTimeNotEqual(dT2, dT3),
+                ],
+                [
+                    // pink
+                    dT4 >= TR3 / trThreshold,
+                    DE >= phase3.pr,
+                    DE >= BC,
+                    isTimeNotEqual(dT3, dT4),
+                ],
+            ];
+            break;
+        case 4:
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    rBCCs < 0.5,
+                ],
+                [
+                    // red
+                    dT3 >= phase2.tr / trThreshold,
+                    CD >= phase2.pr,
+                    isTimeNotEqual(dT2, dT3),
+                ],
+                [
+                    // pink
+                    dT4 >= TR3 / trThreshold,
+                    DE >= phase3.pr,
+                    DE < BC,
+                    isTimeNotEqual(dT3, dT4),
+                ],
+                [
+                    // purple
+                    EF >= phase4.pr,
+                    isTimeNotEqual(dT4, dT5),
+                    fBreak,
+                ],
+                [
+                    // cyan
+                    FG >= phase5.pr,
+                    FG < DE,
+                    isTimeNotEqual(dT5, dT6),
+                ],
+            ];
+            break;
     }
-    const progress = checkProgress(progressSteps);
+
+    const progress = checkProgress(subPattern, progressSteps);
     //
     const points = buildViewPoints(
         [A, phase1.R, phase2.R, D, E, F, G, H],
@@ -1261,10 +1323,17 @@ function buildViewPoints(points, colors) {
     });
     return viewPoints;
 }
-function checkProgress(steps) {
-    let progress = { steps, step: 0, result: true };
+function checkProgress(subPattern, steps) {
+    let progress = {
+        pattern: patternType.value,
+        subPattern,
+        steps,
+        step: 0,
+        result: true,
+    };
     progress.steps.map((step, idx) => {
-        step.result = isStepValid(step);
+        step.result = step.every(Boolean);
+        // step.result = isStepValid(step);
         if (progress.result) {
             progress.step = idx + 1;
             progress.result = step.result;
@@ -1273,10 +1342,10 @@ function checkProgress(steps) {
     });
     return progress;
 }
-function isStepValid({ conds, excConds, isExcStep }) {
-    if (isExcStep) return true;
-    return conds.every((val, idx) => (excConds.includes(idx) ? true : val));
-}
+// function isStepValid({ conds, excConds, isExcStep }) {
+//     if (isExcStep) return true;
+//     return conds.every((val, idx) => (excConds.includes(idx) ? true : val));
+// }
 function isTimeInChart(time) {
     if (!props.bars.length) return false;
     const first = props.bars[0]?.time;
@@ -1403,7 +1472,6 @@ function makeUnique(arr) {
     });
 }
 function changePatternType({ itemData }) {
-    console.log("changePatternType", itemData);
     store
         .dispatch("tradingDerivative/setPatternType", itemData)
         .then((isOk) => {
