@@ -840,7 +840,7 @@ function calcContinueLitePattern() {
                 dT3 > dT2,
                 !dBreak,
             ],
-            excConds: [3, 5],
+            excConds: [3, 5, 6],
         },
         {
             conds: [
