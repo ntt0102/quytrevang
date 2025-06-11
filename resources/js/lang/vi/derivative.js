@@ -203,6 +203,7 @@ const continueSub3 = [
             "T > Tmin",
             "P > Pmin",
             "T ≄ Tcam",
+            "T > Tcam",
         ],
     },
     {
@@ -233,6 +234,7 @@ const continueSub4 = [
             "T > Tmin",
             "P > Pmin",
             "T ≄ Tcam",
+            "T > Tcam",
         ],
     },
     {
@@ -251,6 +253,7 @@ const continueSub4 = [
             //
             "P > Pmin",
             "T ≄ Thồng",
+            "T > Thồng",
             "P > Pđỏ",
         ],
     },

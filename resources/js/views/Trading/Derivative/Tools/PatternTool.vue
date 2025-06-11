@@ -909,6 +909,7 @@ function calcContinueLitePattern() {
                     dT3 >= phase2.tr / trThreshold,
                     CD >= phase2.pr,
                     isTimeNotEqual(dT2, dT3),
+                    dT3 > dT2,
                 ],
                 [
                     // pink
@@ -932,6 +933,7 @@ function calcContinueLitePattern() {
                     dT3 >= phase2.tr / trThreshold,
                     CD >= phase2.pr,
                     isTimeNotEqual(dT2, dT3),
+                    dT3 > dT2,
                 ],
                 [
                     // pink
@@ -944,6 +946,7 @@ function calcContinueLitePattern() {
                     // purple
                     EF >= phase4.pr,
                     isTimeNotEqual(dT4, dT5),
+                    dT5 > dT4,
                     fBreak,
                 ],
                 [
