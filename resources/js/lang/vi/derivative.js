@@ -354,6 +354,7 @@ const reversalSub1 = [
             "P > Pmin",
             "T ≄ Thồng",
             "T < Thồng",
+            "P > Pđỏ",
         ],
     },
     {
