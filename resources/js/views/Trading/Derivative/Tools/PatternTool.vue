@@ -1024,7 +1024,7 @@ function calcReversalLitePattern() {
     );
     const phase2 = scanPhase({
         side,
-        start: B,
+        start: { time: B.time },
         end: { time: pickTime ?? stopTime },
     });
 
@@ -1104,53 +1104,78 @@ function calcReversalLitePattern() {
     const rCDDs = DDs / CD;
     const rDEF = EF / DE;
 
-    console.log("dT3", dT3);
-    console.log("phase2.tr", phase2.tr);
-
+    const dBreak = mf.cmp(D.price, !side, B.price);
     const eBreak = mf.cmp(E.price, side, C.price);
-    const progressSteps = [
-        {
-            conds: [
-                //
-                dT2 >= phase1.tr / trThreshold,
-                BC >= phase1.pr,
-                isTimeNotEqual(dT1, dT2),
-            ],
-            excConds: [2],
-        },
-        {
-            conds: [
-                //
-                dT3 >= TR2 / trThreshold,
-                CD >= phase2.pr,
-                rBCD >= 0.5,
-                rCDDs < 0.5,
-                isTimeNotEqual(dT2, dT3),
-            ],
-            excConds: [],
-        },
-        {
-            conds: [
-                //
-                dT4 >= phase3.tr / trThreshold,
-                DE >= phase3.pr,
-                isTimeNotEqual(dT3, dT4),
-                dT4 > dT3,
-            ],
-            excConds: [0, 3],
-        },
-        {
-            conds: [
-                //
-                dT5 >= TR4 / trThreshold,
-                EF >= phase4.pr,
-                isTimeNotEqual(dT4, dT5),
-            ],
-            excConds: [0],
-        },
-    ];
 
-    const progress = checkProgress(progressSteps);
+    let subPattern;
+    if (dBreak) subPattern = dT3 > dT2 ? 0 : 1;
+    else subPattern = dT3 > dT2 ? 2 : 3;
+
+    let progressSteps;
+    switch (subPattern) {
+        case 0:
+        case 2:
+            progressSteps = [
+                [
+                    // red
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    dT2 < dT1,
+                ],
+                [
+                    // pink
+                    dT3 >= TR2 / trThreshold,
+                    CD >= phase2.pr,
+                    isTimeNotEqual(dT2, dT3),
+                ],
+                [
+                    // purple
+                    dT4 >= phase3.tr / trThreshold,
+                    DE >= phase3.pr,
+                    isTimeNotEqual(dT3, dT4),
+                    dT4 > dT3,
+                ],
+                [
+                    // cyan
+                    EF >= phase4.pr,
+                    isTimeNotEqual(dT4, dT5),
+                ],
+            ];
+            break;
+
+        case 1:
+        case 3:
+            progressSteps = [
+                [
+                    // red
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    dT2 < dT1,
+                ],
+                [
+                    // pink
+                    dT3 >= TR2 / trThreshold,
+                    CD >= phase2.pr,
+                    isTimeNotEqual(dT2, dT3),
+                ],
+                [
+                    // purple
+                    dT4 >= phase3.tr / trThreshold,
+                    DE >= phase3.pr,
+                    isTimeNotEqual(dT3, dT4),
+                    dT4 < dT3,
+                    eBreak,
+                ],
+                [
+                    // cyan
+                    EF >= phase4.pr,
+                    isTimeNotEqual(dT4, dT5),
+                ],
+            ];
+            break;
+    }
+
+    const progress = checkProgress(subPattern, progressSteps);
     //
     const points = buildViewPoints(
         [A, phase1.R, C, D, E, F, G],

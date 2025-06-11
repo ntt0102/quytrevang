@@ -289,7 +289,101 @@ const continueLitePattern = [
         steps: continueSub4,
     },
 ];
+const reversalSub0 = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T < Tcam",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T ≄ Tđỏ",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T ≄ Thồng",
+            "T > Thồng",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P > Pmin",
+            "T ≄ Ttím",
+        ],
+    },
+];
+const reversalSub1 = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T < Tcam",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T ≄ Tđỏ",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T ≄ Thồng",
+            "T < Thồng",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P > Pmin",
+            "T ≄ Ttím",
+        ],
+    },
+];
 const reversalLitePattern = [
+    {
+        name: "Mẫu hình rũ chậm",
+        steps: reversalSub0,
+    },
+    {
+        name: "Mẫu hình rũ nhanh",
+        steps: reversalSub1,
+    },
+    {
+        name: "Mẫu hình hồi chậm",
+        steps: reversalSub0,
+    },
+    {
+        name: "Mẫu hình hồi nhanh",
+        steps: reversalSub1,
+    },
+];
+const reversalLitePattern1 = [
     {
         name: "Bước đỏ",
         conds: [
