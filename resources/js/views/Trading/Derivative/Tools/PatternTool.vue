@@ -486,9 +486,9 @@ function calcContinuePattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = fBreak ? F.price : D.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
-    const [x] = adjustTargetPrice(D.price, CD, side);
+    const x = adjustTargetPrice(D.price, CD, orderSide);
     const X = mf.fmtNum(x - entry, 1);
-    const [y] = adjustTargetPrice(D.price, 2 * CD, side);
+    const y = adjustTargetPrice(D.price, 2 * CD, orderSide);
     const Y = mf.fmtNum(y - entry, 1);
     const z = B.price + (side ? 1 : -1) * BC;
     const Z = mf.fmtNum(z - entry, 1);
@@ -684,9 +684,9 @@ function calcReversalPattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = eBreak ? E.price : C.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
-    const [x] = adjustTargetPrice(C.price, BC, side);
+    const x = adjustTargetPrice(C.price, BC, orderSide);
     const X = mf.fmtNum(x - entry, 1);
-    const [y] = adjustTargetPrice(C.price, 2 * BC, side);
+    const y = adjustTargetPrice(C.price, 2 * BC, orderSide);
     const Y = mf.fmtNum(y - entry, 1);
     const z = A.price;
     const Z = mf.fmtNum(z - entry, 1);
@@ -965,13 +965,13 @@ function calcContinueLitePattern() {
     //
     const orderSide = side ? 1 : -1;
     const refPrice = dT2 > dT1 ? phase2.S1.price : fBreak ? F.price : D.price;
-    const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
-    const [x] = adjustTargetPrice(D.price, CD, side);
-    const X = mf.fmtNum(x - entry, 1);
-    const [y] = adjustTargetPrice(D.price, 2 * CD, side);
-    const Y = mf.fmtNum(y - entry, 1);
-    const z = mf.fmtNum(B.price + orderSide * BC, 1);
-    const Z = mf.fmtNum(z - entry, 1);
+    const entry = mf.fmtNum(refPrice + orderSide * 0.1);
+    const x = adjustTargetPrice(D.price, CD, orderSide);
+    const X = mf.fmtNum(x - entry);
+    const y = adjustTargetPrice(D.price, 2 * CD, orderSide);
+    const Y = mf.fmtNum(y - entry);
+    const z = mf.fmtNum(B.price + orderSide * BC);
+    const Z = mf.fmtNum(z - entry);
     const t = mf.fmtNum(
         (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2,
         1
@@ -1156,15 +1156,15 @@ function calcReversalLitePattern() {
     //
     const orderSide = side ? 1 : -1;
     const refPrice = eBreak ? E.price : C.price;
-    const entry = mf.fmtNum(refPrice + orderSide * 0.1, 1);
-    const [x] = adjustTargetPrice(C.price, BC, side);
-    const X = mf.fmtNum(x - entry, 1);
-    const [y] = adjustTargetPrice(C.price, 2 * BC, side);
-    const Y = mf.fmtNum(y - entry, 1);
+    const entry = mf.fmtNum(refPrice + orderSide * 0.1);
+    const x = adjustTargetPrice(C.price, BC, orderSide);
+    const X = mf.fmtNum(x - entry);
+    const y = adjustTargetPrice(C.price, 2 * BC, orderSide);
+    const Y = mf.fmtNum(y - entry);
     const z = A.price;
-    const Z = mf.fmtNum(z - entry, 1);
-    const t = mf.fmtNum((E.price + F.price) / 2, 1);
-    const T = mf.fmtNum(t - entry, 1);
+    const Z = mf.fmtNum(z - entry);
+    const t = mf.fmtNum((E.price + F.price) / 2);
+    const T = mf.fmtNum(t - entry);
     //
     const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
     const sl = eBreak ? F.price : D.price;
@@ -1362,10 +1362,10 @@ function isTimeInChart(time) {
     return time >= first && time <= last;
 }
 function adjustTargetPrice(price, range, side) {
-    const target = price + (side ? 1 : -1) * range;
+    const target = price + side * range;
     let decimal = mf.fmtNum(target % 1);
     let adjusted = target;
-    if (side) {
+    if (side > 0) {
         if (decimal >= 0.1 && decimal <= 0.2) {
             adjusted = Math.floor(target);
         } else if (decimal >= 0.6 && decimal <= 0.7) {
@@ -1378,11 +1378,7 @@ function adjustTargetPrice(price, range, side) {
             adjusted = Math.floor(target) + 0.5;
         }
     }
-    if (adjusted !== target) {
-        adjusted = mf.fmtNum(adjusted, 1);
-    }
-
-    return [adjusted, target];
+    return mf.fmtNum(adjusted);
 }
 function adjustPatternPoints() {
     const pickTime = props.pickTimeToolRef.get();
