@@ -97,6 +97,7 @@ function refreshPattern() {
     .pattern-name {
         font-weight: bold;
         margin-top: 10px;
+        line-height: 20px;
     }
 
     .steps {

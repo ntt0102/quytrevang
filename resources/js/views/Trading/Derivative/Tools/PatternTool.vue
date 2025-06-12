@@ -1,23 +1,25 @@
 <template>
-    <DxDropDownButton
-        :items="patternTypes"
-        :drop-down-options="{
-            wrapperAttr: { class: 'select-pattern-popup' },
-            position: {
-                my: 'top left',
-                at: 'top right',
-                of: '.select-pattern',
-            },
-        }"
-        :icon="`far fa-${
-            patternType ? `square-${patternType}` : 'square-question'
-        } pattern`"
-        :hint="$t('trading.derivative.tools.selectPattern')"
-        stylingMode="text"
-        :showArrowIcon="false"
-        :elementAttr="{ class: 'select-pattern command' }"
-        @item-click="changePatternType"
-    />
+    <div @contextmenu="togglePatternType">
+        <DxDropDownButton
+            :items="patternTypes"
+            :drop-down-options="{
+                wrapperAttr: { class: 'select-pattern-popup' },
+                position: {
+                    my: 'top left',
+                    at: 'top right',
+                    of: '.select-pattern',
+                },
+            }"
+            :icon="`far fa-${
+                patternType ? `square-${patternType}` : 'square-question'
+            } pattern`"
+            :hint="$t('trading.derivative.tools.selectPattern')"
+            stylingMode="text"
+            :showArrowIcon="false"
+            :elementAttr="{ class: 'select-pattern command' }"
+            @item-click="changePatternType"
+        />
+    </div>
     <div
         ref="patternToolRef"
         class="context command"
@@ -51,7 +53,7 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const symbol = "VN30F1M";
-const patternTypes = [1, 2, 3, 4];
+const patternTypes = [1, 2];
 const scanThreshold = 1;
 const trThreshold = 0.7;
 let scanPoints = {};
@@ -273,15 +275,9 @@ function calculatePattern() {
     let result = {};
     switch (patternType.value) {
         case 1:
-            result = calcContinuePattern();
-            break;
-        case 2:
-            result = calcReversalPattern();
-            break;
-        case 3:
             result = calcContinueLitePattern();
             break;
-        case 4:
+        case 2:
             result = calcReversalLitePattern();
             break;
     }
@@ -1507,6 +1503,19 @@ function makeUnique(arr) {
 function changePatternType({ itemData }) {
     store
         .dispatch("tradingDerivative/setPatternType", itemData)
+        .then((isOk) => {
+            if (isOk) {
+                refresh();
+            }
+        });
+}
+function togglePatternType() {
+    const nextType =
+        patternType.value === patternTypes[0]
+            ? patternTypes[1]
+            : patternTypes[0];
+    store
+        .dispatch("tradingDerivative/setPatternType", nextType)
         .then((isOk) => {
             if (isOk) {
                 refresh();

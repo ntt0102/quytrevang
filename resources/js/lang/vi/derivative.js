@@ -427,9 +427,4 @@ const reversalLitePattern1 = [
     },
 ];
 
-export default [
-    continuePattern,
-    reversalPattern,
-    continueLitePattern,
-    reversalLitePattern,
-];
+export default [continueLitePattern, reversalLitePattern];
