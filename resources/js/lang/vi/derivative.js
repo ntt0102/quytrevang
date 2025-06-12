@@ -113,6 +113,7 @@ const continueSub0 = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P < 70",
             "Ps < 50",
         ],
     },
