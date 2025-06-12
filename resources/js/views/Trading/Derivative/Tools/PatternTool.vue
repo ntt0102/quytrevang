@@ -184,17 +184,17 @@ function scanPattern(data) {
         if (C.time.i > A.time.i && mf.cmp(C.price, side, A.price)) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
             if (bc >= scanThreshold) {
-                // if (A.time1.i - S.time.i >= C.time.i - B.time.i) break;
+                if (A.time1.i - S.time.i >= C.time.i - B.time.i) break;
                 const as = mf.fmtNum(A.price - S.price, 1, true);
-                // if (as > bc) break;
-                if (
-                    isBoxValid(
-                        { pr: bc, tr: C.time.i - B.time.i },
-                        { pr: as, tr: A.time1.i - S.time.i },
-                        true
-                    )
-                )
-                    break;
+                if (as > bc) break;
+                // if (
+                //     isBoxValid(
+                //         { pr: bc, tr: C.time.i - B.time.i },
+                //         { pr: as, tr: A.time1.i - S.time.i },
+                //         true
+                //     )
+                // )
+                //     break;
             }
         }
     }
