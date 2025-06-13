@@ -1117,7 +1117,7 @@ function calcReversalLitePattern() {
                     // red
                     dT2 >= phase1.tr / trThreshold,
                     BC >= phase1.pr,
-                    dT2 < dT1,
+                    // dT2 < dT1,
                 ],
                 [
                     // pink
@@ -1147,7 +1147,7 @@ function calcReversalLitePattern() {
                     // red
                     dT2 >= phase1.tr / trThreshold,
                     BC >= phase1.pr,
-                    dT2 < dT1,
+                    // dT2 < dT1,
                 ],
                 [
                     // pink

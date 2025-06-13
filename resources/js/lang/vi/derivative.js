@@ -297,7 +297,7 @@ const reversalSub0 = [
             //
             "T > Tmin",
             "P > Pmin",
-            "T < Tcam",
+            // "T < Tcam",
         ],
     },
     {
@@ -335,7 +335,7 @@ const reversalSub1 = [
             //
             "T > Tmin",
             "P > Pmin",
-            "T < Tcam",
+            // "T < Tcam",
         ],
     },
     {
