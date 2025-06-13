@@ -882,13 +882,13 @@ function calcContinueLitePattern() {
                     // pink
                     dT4 >= TR3 / trThreshold,
                     DE >= phase3.pr,
-                    rCDE >= 0.7,
+                    rCDE >= 0.5,
                     isTimeNotEqual(dT3, dT4),
                 ],
                 [
                     // purple
-                    EF >= phase4.pr,
-                    isTimeNotEqual(dT4, dT5),
+                    // EF >= phase4.pr,
+                    // isTimeNotEqual(dT4, dT5),
                     fBreak,
                 ],
             ];
@@ -1105,8 +1105,13 @@ function calcReversalLitePattern() {
     const eBreak = mf.cmp(E.price, side, C.price);
 
     let subPattern;
-    if (dBreak) subPattern = dT3 > dT2 ? 0 : 1;
-    else subPattern = dT3 > dT2 ? 2 : 3;
+    if (dBreak) {
+        if (dT3 > dT2) subPattern = 0;
+        else {
+            if (dT2 > dT1) subPattern = 1;
+            else subPattern = 2;
+        }
+    } else subPattern = dT3 > dT2 ? 3 : 4;
 
     let progressSteps;
     switch (subPattern) {
