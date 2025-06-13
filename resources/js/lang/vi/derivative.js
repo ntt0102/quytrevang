@@ -285,11 +285,11 @@ const reversalLitePattern = [
         steps: reversalSub0,
     },
     {
-        name: "Mẫu hình đỏ dài rũ",
+        name: "Mẫu hình rũ nhanh, đỏ dài",
         steps: reversalSub1,
     },
     {
-        name: "Mẫu hình rũ nhanh",
+        name: "Mẫu hình rũ nhanh, đỏ ngắn",
         steps: reversalSub2,
     },
     {
