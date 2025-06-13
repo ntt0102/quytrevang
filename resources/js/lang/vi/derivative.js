@@ -189,45 +189,6 @@ const reversalSub0 = [
             //
             "T > Tmin",
             "P > Pmin",
-            // "T < Tcam",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-            "T ≄ Tđỏ",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-            "T ≄ Thồng",
-            "T > Thồng",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P > Pmin",
-            "T ≄ Ttím",
-        ],
-    },
-];
-const reversalSub1 = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-            // "T < Tcam",
         ],
     },
     {
@@ -240,6 +201,7 @@ const reversalSub1 = [
         ],
     },
 ];
+
 const reversalSub2 = [
     {
         name: "Bước đỏ",
@@ -247,7 +209,6 @@ const reversalSub2 = [
             //
             "T > Tmin",
             "P > Pmin",
-            // "T < Tcam",
         ],
     },
     {
@@ -263,19 +224,34 @@ const reversalSub2 = [
         name: "Bước tím",
         conds: [
             //
-            "T > Tmin",
-            "P > Pmin",
-            "T ≄ Thồng",
-            "T < Thồng",
             "P > Pđỏ",
         ],
     },
+];
+const reversalSub4 = [
     {
-        name: "Bước lam",
+        name: "Bước đỏ",
         conds: [
             //
+            "T > Tmin",
             "P > Pmin",
-            "T ≄ Ttím",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P > 50",
+            "T ≄ Tđỏ",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "P > Pđỏ",
         ],
     },
 ];
@@ -286,7 +262,7 @@ const reversalLitePattern = [
     },
     {
         name: "Mẫu hình rũ nhanh, đỏ dài",
-        steps: reversalSub1,
+        steps: reversalSub0,
     },
     {
         name: "Mẫu hình rũ nhanh, đỏ ngắn",
@@ -298,7 +274,7 @@ const reversalLitePattern = [
     },
     {
         name: "Mẫu hình hồi nhanh",
-        steps: reversalSub2,
+        steps: reversalSub4,
     },
 ];
 

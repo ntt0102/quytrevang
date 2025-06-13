@@ -1114,13 +1114,29 @@ function calcReversalLitePattern() {
     let progressSteps;
     switch (subPattern) {
         case 0:
+        case 1:
         case 3:
             progressSteps = [
                 [
                     // red
                     dT2 >= phase1.tr / trThreshold,
                     BC >= phase1.pr,
-                    // dT2 < dT1,
+                ],
+                [
+                    // pink
+                    dT3 >= TR2 / trThreshold,
+                    CD >= phase2.pr,
+                    isTimeNotEqual(dT2, dT3),
+                ],
+            ];
+            break;
+
+        case 2:
+            progressSteps = [
+                [
+                    // red
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
                 ],
                 [
                     // pink
@@ -1130,62 +1146,28 @@ function calcReversalLitePattern() {
                 ],
                 [
                     // purple
-                    dT4 >= phase3.tr / trThreshold,
-                    DE >= phase3.pr,
-                    isTimeNotEqual(dT3, dT4),
-                    dT4 > dT3,
-                ],
-                [
-                    // cyan
-                    EF >= phase4.pr,
-                    isTimeNotEqual(dT4, dT5),
+                    eBreak,
                 ],
             ];
             break;
 
-        case 1:
-            progressSteps = [
-                [
-                    // red
-                    dT2 >= phase1.tr / trThreshold,
-                    BC >= phase1.pr,
-                    // dT2 < dT1,
-                ],
-                [
-                    // pink
-                    dT3 >= TR2 / trThreshold,
-                    CD >= phase2.pr,
-                    isTimeNotEqual(dT2, dT3),
-                ],
-            ];
-            break;
-        case 2:
         case 4:
             progressSteps = [
                 [
                     // red
                     dT2 >= phase1.tr / trThreshold,
                     BC >= phase1.pr,
-                    // dT2 < dT1,
                 ],
                 [
                     // pink
                     dT3 >= TR2 / trThreshold,
                     CD >= phase2.pr,
+                    rBCD >= 0.5,
                     isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple
-                    dT4 >= phase3.tr / trThreshold,
-                    DE >= phase3.pr,
-                    isTimeNotEqual(dT3, dT4),
-                    dT4 < dT3,
                     eBreak,
-                ],
-                [
-                    // cyan
-                    EF >= phase4.pr,
-                    isTimeNotEqual(dT4, dT5),
                 ],
             ];
             break;
