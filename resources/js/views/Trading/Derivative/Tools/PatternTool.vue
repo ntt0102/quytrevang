@@ -1106,17 +1106,15 @@ function calcReversalLitePattern() {
 
     let subPattern;
     if (dBreak) {
-        if (dT3 > dT2) subPattern = 0;
-        else {
-            if (dT2 > dT1) subPattern = 1;
-            else subPattern = 2;
-        }
-    } else subPattern = dT3 > dT2 ? 3 : 4;
+        subPattern = dT3 > dT2 ? 0 : dT2 > dT1 ? 1 : 2;
+    } else {
+        subPattern = dT3 > dT2 ? 3 : 4;
+    }
 
     let progressSteps;
     switch (subPattern) {
         case 0:
-        case 2:
+        case 3:
             progressSteps = [
                 [
                     // red
@@ -1146,7 +1144,23 @@ function calcReversalLitePattern() {
             break;
 
         case 1:
-        case 3:
+            progressSteps = [
+                [
+                    // red
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    // dT2 < dT1,
+                ],
+                [
+                    // pink
+                    dT3 >= TR2 / trThreshold,
+                    CD >= phase2.pr,
+                    isTimeNotEqual(dT2, dT3),
+                ],
+            ];
+            break;
+        case 2:
+        case 4:
             progressSteps = [
                 [
                     // red

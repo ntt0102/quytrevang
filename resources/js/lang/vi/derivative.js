@@ -239,6 +239,26 @@ const reversalSub1 = [
             "T ≄ Tđỏ",
         ],
     },
+];
+const reversalSub2 = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            // "T < Tcam",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T ≄ Tđỏ",
+        ],
+    },
     {
         name: "Bước tím",
         conds: [
@@ -265,8 +285,12 @@ const reversalLitePattern = [
         steps: reversalSub0,
     },
     {
-        name: "Mẫu hình rũ nhanh",
+        name: "Mẫu hình đỏ dài rũ",
         steps: reversalSub1,
+    },
+    {
+        name: "Mẫu hình rũ nhanh",
+        steps: reversalSub2,
     },
     {
         name: "Mẫu hình hồi chậm",
@@ -274,7 +298,7 @@ const reversalLitePattern = [
     },
     {
         name: "Mẫu hình hồi nhanh",
-        steps: reversalSub1,
+        steps: reversalSub2,
     },
 ];
 
