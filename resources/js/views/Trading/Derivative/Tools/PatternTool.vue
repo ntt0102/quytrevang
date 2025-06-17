@@ -915,6 +915,7 @@ function calcContinueLitePattern() {
                     DE >= phase3.pr,
                     DE >= BC,
                     isTimeNotEqual(dT3, dT4),
+                    dT4 > phase5.R.time1.i - phase5.S.time.i,
                 ],
             ];
             break;

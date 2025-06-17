@@ -108,6 +108,7 @@ const continueSub3 = [
             "P > Pmin",
             "P > Pcam",
             "T ≄ Tđỏ",
+            "T > Ttím",
         ],
     },
 ];
