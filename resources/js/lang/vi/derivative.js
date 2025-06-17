@@ -7,6 +7,7 @@ const continueSub0 = [
             "P > Pmin",
             "P < 70",
             "Ps < 50",
+            "T ≄ Tvàng",
         ],
     },
 ];
