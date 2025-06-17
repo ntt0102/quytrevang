@@ -837,7 +837,7 @@ function calcContinueLitePattern() {
                     BC >= phase1.pr,
                     rABC <= 0.7,
                     rBCCs < 0.5,
-                    isTimeNotEqual(dT1, dT2),
+                    // isTimeNotEqual(dT1, dT2),
                 ],
             ];
             break;
