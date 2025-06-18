@@ -5,6 +5,7 @@ namespace App\Services\Trading;
 use App\Services\CoreService;
 use App\Services\Special\VpsOrderService;
 use Illuminate\Support\Facades\Artisan;
+use App\Models\Parameter;
 use App\Models\StockDrawing;
 use App\Models\DerivativeOrder;
 use App\Jobs\ReportTradingJob;
@@ -51,8 +52,9 @@ class DerivativeService extends CoreService
         $vos = new VpsOrderService();
         $volInvalid = false;
         if ($vos->connection && !$vos->position) {
-            $maxVol = $vos->getAccountInfo()->maxVol;
-            $volInvalid = $maxVol === 0;
+            $maxVolume = $vos->getAccountInfo()->maxVol;
+            $orderVolume = (int) Parameter::getValue('orderVolume');
+            $volInvalid = $maxVolume < $orderVolume;
         }
         return [
             'config' => [
