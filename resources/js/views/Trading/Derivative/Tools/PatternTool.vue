@@ -733,6 +733,8 @@ function calcContinueLitePattern() {
     const stopTime = props.indexToTime(
         6 * phase2.R.time.i - 5 * phase1.S.time.i
     );
+    if (stopTime < C.time.t) return false;
+
     const phase3 = scanPhase({
         side,
         start: C,
