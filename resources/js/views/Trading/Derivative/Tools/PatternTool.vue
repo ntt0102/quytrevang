@@ -877,6 +877,7 @@ function calcContinueLitePattern() {
                     // red
                     dT3 >= phase2.tr / trThreshold,
                     CD >= phase2.pr,
+                    CD > CCs,
                     isTimeNotEqual(dT2, dT3),
                 ],
                 [
