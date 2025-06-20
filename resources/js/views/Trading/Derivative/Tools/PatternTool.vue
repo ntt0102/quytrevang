@@ -541,7 +541,8 @@ function calcContinueLitePattern() {
     );
     //
     const orderSide = side ? 1 : -1;
-    const refPrice = dT2 > dT1 ? phase2.S1.price : fBreak ? F.price : D.price;
+    const refPrice =
+        subPattern == 0 ? phase2.S1.price : fBreak ? F.price : D.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
     const x = adjustTargetPrice(D.price, CD, orderSide);
     const X = mf.fmtNum(x - entry);
@@ -550,14 +551,22 @@ function calcContinueLitePattern() {
     const z = mf.fmtNum(B.price + orderSide * BC);
     const Z = mf.fmtNum(z - entry);
     const t = mf.fmtNum(
-        (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2,
+        (subPattern == 0 || (dBreak && !fBreak)
+            ? D.price + E.price
+            : F.price + G.price) / 2,
         1
     );
     const T = mf.fmtNum(t - entry, 1);
     //
     const tp =
-        dT2 > dT1 ? z : mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
-    const sl = dT2 > dT1 ? C.price : fBreak ? G.price : E.price;
+        subPattern == 0
+            ? z
+            : mf.cmp(Z, !side, X)
+            ? x
+            : mf.cmp(Z, side, Y)
+            ? y
+            : z;
+    const sl = subPattern == 0 ? C.price : fBreak ? G.price : E.price;
     let order = {};
     if (progress.result) {
         order = {
