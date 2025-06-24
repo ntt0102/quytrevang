@@ -359,6 +359,7 @@ function calcContinueLitePattern() {
 
     const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
+    const BBs = mf.fmtNum(phase1.R.price1 - B.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const CCs = mf.fmtNum(phase2.R.price1 - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
@@ -411,6 +412,7 @@ function calcContinueLitePattern() {
                     BC >= phase1.pr,
                     rABC <= 0.7,
                     rBCCs < 0.5,
+                    phase2.pr > BBs,
                     // isTimeNotEqual(dT1, dT2),
                 ],
             ];
