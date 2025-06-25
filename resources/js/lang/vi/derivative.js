@@ -67,9 +67,8 @@ const continueSub2 = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 50",
             "T ≄ Tđỏ",
-            "T > Tđỏ",
+            "T/P dài",
         ],
     },
     {
