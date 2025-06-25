@@ -244,8 +244,8 @@ const reversalSub4 = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 50",
             "T ≄ Tđỏ",
+            "T/P dài",
         ],
     },
     {
