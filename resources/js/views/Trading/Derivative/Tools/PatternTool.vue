@@ -275,10 +275,10 @@ function calculatePattern() {
     let result = {};
     switch (patternType.value) {
         case 1:
-            result = calcContinueLitePattern();
+            result = calcContinuePattern();
             break;
         case 2:
-            result = calcReversalLitePattern();
+            result = calcReversalPattern();
             break;
     }
     emit("setProgress", result.progress);
@@ -287,7 +287,7 @@ function calculatePattern() {
     series.pattern.setData(result.points);
     return result;
 }
-function calcContinueLitePattern() {
+function calcContinuePattern() {
     const { A, B, C } = scanPoints;
     const bc = B.price - C.price;
     let side = bc > 0;
@@ -347,7 +347,7 @@ function calcContinueLitePattern() {
 
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
 
-    console.log("calcContinueLitePattern", [
+    console.log("calcContinuePattern", [
         phase1,
         phase2,
         phase3,
@@ -413,7 +413,6 @@ function calcContinueLitePattern() {
                     rABC <= 0.7,
                     rBCCs < 0.5,
                     phase2.pr > BBs,
-                    // isTimeNotEqual(dT1, dT2),
                 ],
             ];
             break;
@@ -462,11 +461,10 @@ function calcContinueLitePattern() {
                     DE >= phase3.pr,
                     rCDE >= 0.5,
                     isTimeNotEqual(dT3, dT4),
+                    dT4 > dT3,
                 ],
                 [
                     // purple
-                    // EF >= phase4.pr,
-                    // isTimeNotEqual(dT4, dT5),
                     fBreak,
                 ],
             ];
@@ -594,7 +592,7 @@ function calcContinueLitePattern() {
         ],
     };
 }
-function calcReversalLitePattern() {
+function calcReversalPattern() {
     const { A, B } = scanPoints;
     const ab = A.price - B.price;
     let side = ab > 0;
@@ -651,7 +649,7 @@ function calcReversalLitePattern() {
 
     const G = isBreak3 ? phase6.R1 : phase6.ext.R;
 
-    console.log("calcReversalLitePattern", [
+    console.log("calcReversalPattern", [
         phase1,
         phase2,
         phase3,

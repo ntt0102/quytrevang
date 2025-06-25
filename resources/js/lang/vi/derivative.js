@@ -8,7 +8,6 @@ const continueSub0 = [
             "P < 70",
             "Ps < 50",
             "Pm > Psvàng",
-            // "T ≄ Tvàng",
         ],
     },
 ];
@@ -70,14 +69,13 @@ const continueSub2 = [
             "P > Pmin",
             "P > 50",
             "T ≄ Tđỏ",
+            "T > Tđỏ",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            // "P > Pmin",
-            // "T ≄ Thồng",
             "P > Pđỏ",
         ],
     },
@@ -164,7 +162,7 @@ const continueSub4 = [
         ],
     },
 ];
-const continueLitePattern = [
+const continuePattern = [
     {
         name: "Mẫu hình cam dài",
         steps: continueSub0,
@@ -259,7 +257,7 @@ const reversalSub4 = [
         ],
     },
 ];
-const reversalLitePattern = [
+const reversalPattern = [
     {
         name: "Mẫu hình rũ chậm",
         steps: reversalSub0,
@@ -282,4 +280,4 @@ const reversalLitePattern = [
     },
 ];
 
-export default [continueLitePattern, reversalLitePattern];
+export default [continuePattern, reversalPattern];
