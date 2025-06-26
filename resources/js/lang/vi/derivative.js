@@ -57,6 +57,7 @@ const continueSub2 = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P > 50",
             "P > Pscam",
             "T ≄ Tcam",
         ],
