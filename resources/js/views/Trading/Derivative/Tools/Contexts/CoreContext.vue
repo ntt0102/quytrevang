@@ -13,6 +13,7 @@
 <script setup>
 function stopPropagationEvent(e) {
     e.stopPropagation();
+    e.preventDefault();
 }
 </script>
 
