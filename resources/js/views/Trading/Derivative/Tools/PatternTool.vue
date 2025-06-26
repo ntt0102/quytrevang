@@ -446,13 +446,13 @@ function calcContinuePattern() {
                     // orange
                     dT2 >= phase1.tr / trThreshold,
                     BC >= phase1.pr,
+                    rABC >= 0.5,
                     rBCCs < 0.5,
                 ],
                 [
                     // red
                     dT3 >= phase2.tr / trThreshold,
                     CD >= phase2.pr,
-                    rBCD >= 0.5,
                     CD > CCs,
                     isTimeNotEqual(dT2, dT3),
                 ],
