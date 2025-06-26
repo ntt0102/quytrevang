@@ -1,5 +1,9 @@
 <template>
-    <div class="core-context" @click="stopPropagationEvent">
+    <div
+        class="core-context"
+        @click="stopPropagationEvent"
+        @contextmenu="stopPropagationEvent"
+    >
         <div class="triangle-shadow"></div>
         <div class="triangle"></div>
         <slot />
