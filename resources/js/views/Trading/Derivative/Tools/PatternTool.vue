@@ -398,8 +398,8 @@ function calcContinuePattern() {
 
     let subPattern;
     if (dT2 > dT1) subPattern = 0;
-    else if (!dBreak) subPattern = dT3 > dT2 ? 1 : 2;
-    else subPattern = dT4 > dT2 ? 3 : 4;
+    else if (!dBreak) subPattern = dT3 > dT2 ? 1 : dT4 > dT3 ? 2 : 3;
+    else subPattern = dT4 > dT2 ? 4 : 5;
 
     let progressSteps;
 
@@ -461,7 +461,7 @@ function calcContinuePattern() {
                     dT4 >= TR3 / trThreshold,
                     DE >= phase3.pr,
                     isTimeNotEqual(dT3, dT4),
-                    dT4 > dT3 || rCDE >= 0.9,
+                    dT4 > dT3 || rCDE >= 0.8,
                 ],
                 [
                     // purple
@@ -470,6 +470,35 @@ function calcContinuePattern() {
             ];
             break;
         case 3:
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    rABC >= 0.5,
+                    rBCCs < 0.5,
+                ],
+                [
+                    // red
+                    dT3 >= phase2.tr / trThreshold,
+                    CD >= phase2.pr,
+                    CD > CCs,
+                    isTimeNotEqual(dT2, dT3),
+                ],
+                [
+                    // pink
+                    dT4 >= TR3 / trThreshold,
+                    DE >= phase3.pr,
+                    rCDE >= 0.8,
+                    isTimeNotEqual(dT3, dT4),
+                ],
+                [
+                    // purple
+                    fBreak,
+                ],
+            ];
+            break;
+        case 4:
             progressSteps = [
                 [
                     // orange
@@ -494,7 +523,7 @@ function calcContinuePattern() {
                 ],
             ];
             break;
-        case 4:
+        case 5:
             progressSteps = [
                 [
                     // orange
