@@ -35,7 +35,7 @@ class Kernel extends ConsoleKernel
         $schedule->job(new CleanDatabaseJob)->daily();
         $schedule->job(new BackupDatabaseJob)->daily();
         $schedule->job(new UpdateOpeningMarketJob)->dailyAt('08:45');
-        $schedule->job(new UpdateVn30f1mSymbolJob)->dailyAt('08:45');
+        $schedule->job(new UpdateVn30f1mSymbolJob)->dailyAt('09:00');
 
         if (get_global_value('openingMarketFlag') == '1') {
             $schedule->job(new ReportTradingJob)->dailyAt('14:47');
