@@ -691,32 +691,31 @@ function calcReversalPattern() {
     const eBreak = mf.cmp(E.price, side, C.price);
 
     let subPattern;
-    if (dBreak) {
-        subPattern = dT3 > dT2 ? 0 : dT2 > dT1 ? 1 : 2;
-    } else {
-        subPattern = dT3 > dT2 ? 3 : 4;
-    }
+    if (dT2 > dT1) subPattern = !dBreak ? 0 : 1;
+    else if (!dBreak) subPattern = dT3 > dT2 ? 2 : 3;
+    else subPattern = dT3 > dT2 ? 4 : 5;
 
     let progressSteps;
     switch (subPattern) {
         case 0:
+            progressSteps = [
+                [
+                    // red
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                    rABC >= 0.5,
+                ],
+            ];
+            break;
         case 1:
-        case 3:
             progressSteps = [
                 [
                     // red
                     dT2 >= phase1.tr / trThreshold,
                     BC >= phase1.pr,
                 ],
-                [
-                    // pink
-                    dT3 >= TR2 / trThreshold,
-                    CD >= phase2.pr,
-                    isTimeNotEqual(dT2, dT3),
-                ],
             ];
             break;
-
         case 2:
             progressSteps = [
                 [
@@ -730,13 +729,28 @@ function calcReversalPattern() {
                     CD >= phase2.pr,
                     isTimeNotEqual(dT2, dT3),
                 ],
+            ];
+            break;
+        case 3:
+            progressSteps = [
+                [
+                    // red
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                ],
+                [
+                    // pink
+                    dT3 >= TR2 / trThreshold,
+                    CD >= phase2.pr,
+                    rBCD >= 0.7,
+                    isTimeNotEqual(dT2, dT3),
+                ],
                 [
                     // purple
                     eBreak,
                 ],
             ];
             break;
-
         case 4:
             progressSteps = [
                 [
@@ -749,7 +763,21 @@ function calcReversalPattern() {
                     dT3 >= TR2 / trThreshold,
                     CD >= phase2.pr,
                     isTimeNotEqual(dT2, dT3),
-                    dT3 > dT2 || rBCD >= 0.9,
+                ],
+            ];
+            break;
+        case 5:
+            progressSteps = [
+                [
+                    // red
+                    dT2 >= phase1.tr / trThreshold,
+                    BC >= phase1.pr,
+                ],
+                [
+                    // pink
+                    dT3 >= TR2 / trThreshold,
+                    CD >= phase2.pr,
+                    isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple

@@ -108,7 +108,7 @@ const continueSub3 = [
             "P > Pmin",
             "P > Pcam",
             "T ≄ Tđỏ",
-            "T > Ttím",
+            "T > Tnow",
         ],
     },
 ];
@@ -191,19 +191,20 @@ const reversalSub0 = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P > 50",
         ],
     },
+];
+const reversalSub1 = [
     {
-        name: "Bước hồng",
+        name: "Bước đỏ",
         conds: [
             //
             "T > Tmin",
             "P > Pmin",
-            "T ≄ Tđỏ",
         ],
     },
 ];
-
 const reversalSub2 = [
     {
         name: "Bước đỏ",
@@ -219,6 +220,26 @@ const reversalSub2 = [
             //
             "T > Tmin",
             "P > Pmin",
+            "T ≄ Tđỏ",
+        ],
+    },
+];
+const reversalSub3 = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P > 70",
             "T ≄ Tđỏ",
         ],
     },
@@ -246,7 +267,25 @@ const reversalSub4 = [
             "T > Tmin",
             "P > Pmin",
             "T ≄ Tđỏ",
-            "T/P dài",
+        ],
+    },
+];
+const reversalSub5 = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "T ≄ Tđỏ",
         ],
     },
     {
@@ -259,24 +298,28 @@ const reversalSub4 = [
 ];
 const reversalPattern = [
     {
-        name: "Mẫu hình rũ chậm",
+        name: "Mẫu hình đỏ dài",
         steps: reversalSub0,
     },
     {
-        name: "Mẫu hình rũ nhanh, đỏ dài",
-        steps: reversalSub0,
+        name: "Mẫu hình đỏ dài rũ",
+        steps: reversalSub1,
     },
     {
-        name: "Mẫu hình rũ nhanh, đỏ ngắn",
+        name: "Mẫu hình hồng dài",
         steps: reversalSub2,
     },
     {
-        name: "Mẫu hình hồi chậm",
-        steps: reversalSub0,
+        name: "Mẫu hình hồng ngắn",
+        steps: reversalSub3,
     },
     {
-        name: "Mẫu hình hồi nhanh",
+        name: "Mẫu hình hồng dài rũ",
         steps: reversalSub4,
+    },
+    {
+        name: "Mẫu hình hồng ngắn rũ",
+        steps: reversalSub5,
     },
 ];
 
