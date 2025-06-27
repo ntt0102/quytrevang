@@ -797,11 +797,11 @@ function calcReversalPattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = eBreak ? E.price : C.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const x = adjustTargetPrice(C.price, BC, orderSide);
+    const x = adjustTargetPrice(C.price, CD, orderSide);
     const X = mf.fmtNum(x - entry);
-    const y = adjustTargetPrice(C.price, 2 * BC, orderSide);
+    const y = adjustTargetPrice(C.price, 2 * CD, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = A.price;
+    const z = mf.fmtNum(C.price + orderSide * BC);
     const Z = mf.fmtNum(z - entry);
     const t = mf.fmtNum((E.price + F.price) / 2);
     const T = mf.fmtNum(t - entry);
