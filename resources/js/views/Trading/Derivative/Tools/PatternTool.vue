@@ -587,22 +587,22 @@ function calcContinuePattern() {
     );
     const T = mf.fmtNum(t - entry, 1);
     //
-    const tp =
-        subPattern == 0
-            ? z
-            : mf.cmp(Z, !side, X)
-            ? x
-            : mf.cmp(Z, side, Y)
-            ? y
-            : z;
-    const sl = subPattern == 0 ? C.price : fBreak ? G.price : E.price;
     let order = {};
     if (progress.result) {
+        const tp =
+            subPattern == 0
+                ? z
+                : mf.cmp(Z, !side, X)
+                ? x
+                : mf.cmp(Z, side, Y)
+                ? y
+                : z;
+        const sl = subPattern == 0 ? C.price : fBreak ? G.price : E.price;
         order = {
             side: orderSide,
             price: entry,
             tpPrice: tp,
-            slPrice: sl,
+            slPrice: mf.fmtNum(sl - orderSide * 0.1),
         };
         console.log("order", order);
     }
@@ -835,15 +835,15 @@ function calcReversalPattern() {
     const t = mf.fmtNum((E.price + F.price) / 2);
     const T = mf.fmtNum(t - entry);
     //
-    const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
-    const sl = eBreak ? F.price : D.price;
     let order = {};
     if (progress.result) {
+        const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
+        const sl = eBreak ? F.price : D.price;
         order = {
             side: orderSide,
             price: entry,
             tpPrice: tp,
-            slPrice: sl,
+            slPrice: mf.fmtNum(sl - orderSide * 0.1),
         };
         console.log("order", order);
     }
