@@ -55,7 +55,7 @@ const patternType = computed(
 const symbol = "VN30F1M";
 const patternTypes = [1, 2];
 const scanThreshold = 1;
-const trThreshold = 0.8;
+const trThreshold = 1.25;
 let scanPoints = {};
 let lines = {};
 let series = {};
@@ -408,7 +408,7 @@ function calcContinuePattern() {
             progressSteps = [
                 [
                     // orange
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                     rABC <= 0.7,
                     rBCCs < 0.5,
@@ -421,7 +421,7 @@ function calcContinuePattern() {
             progressSteps = [
                 [
                     // orange
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                     rBCCs < 0.5,
                 ],
@@ -444,7 +444,7 @@ function calcContinuePattern() {
             progressSteps = [
                 [
                     // orange
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                     rABC >= 0.5,
                     rBCCs < 0.5,
@@ -473,7 +473,7 @@ function calcContinuePattern() {
             progressSteps = [
                 [
                     // orange
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                     rABC >= 0.5,
                     rBCCs < 0.5,
@@ -502,7 +502,7 @@ function calcContinuePattern() {
             progressSteps = [
                 [
                     // orange
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                     rBCCs < 0.5,
                 ],
@@ -527,7 +527,7 @@ function calcContinuePattern() {
             progressSteps = [
                 [
                     // orange
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                     rBCCs < 0.5,
                 ],
@@ -730,7 +730,7 @@ function calcReversalPattern() {
             progressSteps = [
                 [
                     // red
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                     rABC >= 0.5,
                 ],
@@ -740,7 +740,7 @@ function calcReversalPattern() {
             progressSteps = [
                 [
                     // red
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                 ],
             ];
@@ -749,7 +749,7 @@ function calcReversalPattern() {
             progressSteps = [
                 [
                     // red
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                 ],
                 [
@@ -764,7 +764,7 @@ function calcReversalPattern() {
             progressSteps = [
                 [
                     // red
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                 ],
                 [
@@ -784,13 +784,14 @@ function calcReversalPattern() {
             progressSteps = [
                 [
                     // red
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                 ],
                 [
                     // pink
                     dT3 >= TR2 / trThreshold,
                     CD >= phase2.pr,
+                    rBCD < 1.5,
                     isTimeNotEqual(dT2, dT3),
                 ],
             ];
@@ -799,13 +800,14 @@ function calcReversalPattern() {
             progressSteps = [
                 [
                     // red
-                    dT2 >= phase1.tr / trThreshold,
+                    dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                 ],
                 [
                     // pink
                     dT3 >= TR2 / trThreshold,
                     CD >= phase2.pr,
+                    rBCD < 1.5,
                     isTimeNotEqual(dT2, dT3),
                 ],
                 [

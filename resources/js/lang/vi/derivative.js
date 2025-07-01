@@ -308,6 +308,7 @@ const reversalSub4 = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P < 150",
             "T ≄ Tđỏ",
         ],
     },
@@ -327,6 +328,7 @@ const reversalSub5 = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P < 150",
             "T ≄ Tđỏ",
         ],
     },
