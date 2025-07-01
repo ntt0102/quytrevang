@@ -55,7 +55,7 @@ const patternType = computed(
 const symbol = "VN30F1M";
 const patternTypes = [1, 2];
 const scanThreshold = 1;
-const trThreshold = 0.7;
+const trThreshold = 0.8;
 let scanPoints = {};
 let lines = {};
 let series = {};
@@ -892,7 +892,7 @@ function scanPhase({ side, start, end }) {
                     },
                     S: {
                         price: top,
-                        price1: top,
+                        // price1: top,
                         time: { t, d, i },
                         time1: { t, d, i },
                     },
@@ -929,7 +929,7 @@ function scanPhase({ side, start, end }) {
                     },
                     S: {
                         price: top,
-                        price1: top,
+                        // price1: top,
                         time: { t, d, i },
                         time1: { t, d, i },
                     },
@@ -941,16 +941,17 @@ function scanPhase({ side, start, end }) {
                     box.S.time = { t, d, i };
                     if (bottom !== box.S.price) {
                         box.S.price = bottom;
-                        box.S.price1 = bottom;
+                        // box.S.price1 = bottom;
                         box.S.time1 = { t, d, i };
                         box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                         box.tr = box.S.time1.i - box.R.time.i;
                     }
-                } else {
-                    if (mf.cmp(top, side, box.S.price1)) {
-                        box.S.price1 = top;
-                    }
                 }
+                // else {
+                //     if (mf.cmp(top, side, box.S.price1)) {
+                //         box.S.price1 = top;
+                //     }
+                // }
             }
             return true;
         });
