@@ -791,7 +791,7 @@ function calcReversalPattern() {
                     // pink
                     dT3 >= TR2 / trThreshold,
                     CD >= phase2.pr,
-                    rBCD <= 1.5,
+                    rBCD < 1.5,
                     isTimeNotEqual(dT2, dT3),
                 ],
             ];
@@ -807,7 +807,7 @@ function calcReversalPattern() {
                     // pink
                     dT3 >= TR2 / trThreshold,
                     CD >= phase2.pr,
-                    rBCD <= 1.5,
+                    rBCD < 1.5,
                     isTimeNotEqual(dT2, dT3),
                 ],
                 [
