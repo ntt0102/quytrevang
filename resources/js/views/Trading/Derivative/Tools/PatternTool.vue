@@ -738,6 +738,10 @@ function calcReversalPattern() {
                     // purple
                     eBreak,
                 ],
+                [
+                    // aqua
+                    EF >= phase3.pr,
+                ],
             ];
             break;
         case 1:
@@ -754,6 +758,10 @@ function calcReversalPattern() {
                 [
                     // purple
                     eBreak,
+                ],
+                [
+                    // aqua
+                    EF >= phase3.pr,
                 ],
             ];
             break;
@@ -773,6 +781,10 @@ function calcReversalPattern() {
                 [
                     // purple
                     eBreak,
+                ],
+                [
+                    // aqua
+                    EF >= phase3.pr,
                 ],
             ];
             break;
@@ -794,6 +806,10 @@ function calcReversalPattern() {
                     // purple
                     eBreak,
                 ],
+                [
+                    // aqua
+                    EF >= phase3.pr,
+                ],
             ];
             break;
         case 4:
@@ -814,6 +830,10 @@ function calcReversalPattern() {
                     // purple
                     eBreak,
                 ],
+                [
+                    // aqua
+                    EF >= phase3.pr,
+                ],
             ];
             break;
         case 5:
@@ -833,6 +853,10 @@ function calcReversalPattern() {
                 [
                     // purple
                     eBreak,
+                ],
+                [
+                    // aqua
+                    EF >= phase3.pr,
                 ],
             ];
             break;
