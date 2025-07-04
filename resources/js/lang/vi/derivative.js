@@ -234,7 +234,13 @@ const reversalSub0 = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 50",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "P > Pđỏ",
         ],
     },
 ];
@@ -245,6 +251,13 @@ const reversalSub1 = [
             //
             "T > Tmin",
             "P > Pmin",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "P > Pđỏ",
         ],
     },
 ];
@@ -311,6 +324,13 @@ const reversalSub4 = [
             "P > Pmin",
             "P < 150",
             "T ≄ Tđỏ",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "P > Pđỏ",
         ],
     },
 ];

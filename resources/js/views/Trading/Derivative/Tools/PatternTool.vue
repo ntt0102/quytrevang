@@ -733,7 +733,10 @@ function calcReversalPattern() {
                     // red
                     dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
-                    rABC >= 0.5,
+                ],
+                [
+                    // purple
+                    eBreak,
                 ],
             ];
             break;
@@ -743,6 +746,10 @@ function calcReversalPattern() {
                     // red
                     dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
+                ],
+                [
+                    // purple
+                    eBreak,
                 ],
             ];
             break;
@@ -794,6 +801,10 @@ function calcReversalPattern() {
                     CD >= phase2.pr,
                     rBCD < 1.5,
                     isTimeNotEqual(dT2, dT3),
+                ],
+                [
+                    // purple
+                    eBreak,
                 ],
             ];
             break;
