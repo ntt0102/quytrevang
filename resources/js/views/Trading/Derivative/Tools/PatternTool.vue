@@ -511,6 +511,7 @@ function calcContinuePattern() {
                     // red
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
+                    rBCD < 2,
                     isTimeNotEqual(dT2, dT3),
                     dT3 > dT2,
                 ],
@@ -536,6 +537,7 @@ function calcContinuePattern() {
                     // red
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
+                    rBCD < 2,
                     isTimeNotEqual(dT2, dT3),
                     dT3 > dT2,
                 ],
@@ -549,6 +551,7 @@ function calcContinuePattern() {
                 [
                     // purple
                     EF >= phase4.pr,
+                    rDEF < 2,
                     isTimeNotEqual(dT4, dT5),
                     dT5 > dT4,
                     fBreak,

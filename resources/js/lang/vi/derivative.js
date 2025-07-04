@@ -135,6 +135,7 @@ const continueSub4 = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P < 200",
             "T ≄ Tcam",
             "T > Tcam",
         ],
@@ -167,6 +168,7 @@ const continueSub5 = [
             //
             "T > Tmin",
             "P > Pmin",
+            "P < 200",
             "T ≄ Tcam",
             "T > Tcam",
         ],
@@ -186,6 +188,7 @@ const continueSub5 = [
         conds: [
             //
             "P > Pmin",
+            "P < 200",
             "T ≄ Thồng",
             "T > Thồng",
             "P > Pđỏ",
