@@ -860,7 +860,7 @@ function calcReversalPattern() {
     let order = {};
     if (progress.result) {
         const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
-        const sl = F.price;
+        const sl = dBreak ? B.price : D.price;
         order = {
             side: orderSide,
             price: entry,
