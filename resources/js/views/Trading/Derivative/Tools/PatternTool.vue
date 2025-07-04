@@ -748,6 +748,10 @@ function calcReversalPattern() {
                     BC >= phase1.pr,
                 ],
                 [
+                    // pink
+                    rBCD < 1.5,
+                ],
+                [
                     // purple
                     eBreak,
                 ],

@@ -254,6 +254,13 @@ const reversalSub1 = [
         ],
     },
     {
+        name: "Bước hồng",
+        conds: [
+            //
+            "P < 150",
+        ],
+    },
+    {
         name: "Bước tím",
         conds: [
             //
