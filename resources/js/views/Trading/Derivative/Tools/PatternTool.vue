@@ -740,7 +740,7 @@ function calcReversalPattern() {
                 ],
                 [
                     // aqua
-                    EF >= phase3.pr,
+                    EF > phase3.pr,
                 ],
             ];
             break;
@@ -761,7 +761,7 @@ function calcReversalPattern() {
                 ],
                 [
                     // aqua
-                    EF >= phase3.pr,
+                    EF > phase3.pr,
                 ],
             ];
             break;
@@ -784,7 +784,7 @@ function calcReversalPattern() {
                 ],
                 [
                     // aqua
-                    EF >= phase3.pr,
+                    EF > phase3.pr,
                 ],
             ];
             break;
@@ -808,7 +808,7 @@ function calcReversalPattern() {
                 ],
                 [
                     // aqua
-                    EF >= phase3.pr,
+                    EF > phase3.pr,
                 ],
             ];
             break;
@@ -832,7 +832,7 @@ function calcReversalPattern() {
                 ],
                 [
                     // aqua
-                    EF >= phase3.pr,
+                    EF > phase3.pr,
                 ],
             ];
             break;
@@ -856,7 +856,7 @@ function calcReversalPattern() {
                 ],
                 [
                     // aqua
-                    EF >= phase3.pr,
+                    EF > phase3.pr,
                 ],
             ];
             break;
