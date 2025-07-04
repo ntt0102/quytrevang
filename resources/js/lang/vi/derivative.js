@@ -279,6 +279,13 @@ const reversalSub2 = [
             "T ≄ Tđỏ",
         ],
     },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "P > Pđỏ",
+        ],
+    },
 ];
 const reversalSub3 = [
     {

@@ -766,6 +766,10 @@ function calcReversalPattern() {
                     CD >= phase2.pr,
                     isTimeNotEqual(dT2, dT3),
                 ],
+                [
+                    // purple
+                    eBreak,
+                ],
             ];
             break;
         case 3:
