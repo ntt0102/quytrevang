@@ -846,7 +846,7 @@ function calcReversalPattern() {
     );
     //
     const orderSide = side ? 1 : -1;
-    const refPrice = eBreak ? E.price : C.price;
+    const refPrice = E.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
     const x = adjustTargetPrice(C.price, CD, orderSide);
     const X = mf.fmtNum(x - entry);
@@ -860,7 +860,7 @@ function calcReversalPattern() {
     let order = {};
     if (progress.result) {
         const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
-        const sl = eBreak ? F.price : D.price;
+        const sl = F.price;
         order = {
             side: orderSide,
             price: entry,
