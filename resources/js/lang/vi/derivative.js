@@ -246,13 +246,6 @@ const reversalSub0 = [
             "P > Pđỏ",
         ],
     },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P > Pmhồng",
-        ],
-    },
 ];
 const reversalSub1 = [
     {
@@ -275,13 +268,6 @@ const reversalSub1 = [
         conds: [
             //
             "P > Pđỏ",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P > Pmhồng",
         ],
     },
 ];
@@ -308,13 +294,6 @@ const reversalSub2 = [
         conds: [
             //
             "P > Pđỏ",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P > Pmhồng",
         ],
     },
 ];
@@ -344,13 +323,6 @@ const reversalSub3 = [
             "P > Pđỏ",
         ],
     },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P > Pmhồng",
-        ],
-    },
 ];
 const reversalSub4 = [
     {
@@ -378,13 +350,6 @@ const reversalSub4 = [
             "P > Pđỏ",
         ],
     },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P > Pmhồng",
-        ],
-    },
 ];
 const reversalSub5 = [
     {
@@ -410,13 +375,6 @@ const reversalSub5 = [
         conds: [
             //
             "P > Pđỏ",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P > Pmhồng",
         ],
     },
 ];
