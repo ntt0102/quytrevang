@@ -462,7 +462,6 @@ function calcContinuePattern() {
                     dT4 >= TR3 * trThreshold,
                     DE >= phase3.pr,
                     isTimeNotEqual(dT3, dT4),
-                    dT4 > dT3 || rCDE >= 0.8,
                 ],
                 [
                     // purple
@@ -490,7 +489,7 @@ function calcContinuePattern() {
                     // pink
                     dT4 >= TR3 * trThreshold,
                     DE >= phase3.pr,
-                    rCDE >= 0.8,
+                    rCDE >= 0.5,
                     isTimeNotEqual(dT3, dT4),
                 ],
                 [
