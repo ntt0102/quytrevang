@@ -398,8 +398,9 @@ function calcContinuePattern() {
 
     let subPattern;
     if (dT2 > dT1) subPattern = 0;
-    else if (!dBreak) subPattern = dT3 > dT2 ? 1 : dT4 > dT3 ? 2 : 3;
-    else subPattern = dT4 > dT2 ? 4 : 5;
+    else if (!dBreak)
+        subPattern = dT3 > dT2 ? 1 : dT4 > dT3 ? 2 : FG < DE ? 3 : 4;
+    else subPattern = dT4 > dT2 ? 5 : 6;
 
     let progressSteps;
 
@@ -470,6 +471,7 @@ function calcContinuePattern() {
             ];
             break;
         case 3:
+        case 4:
             progressSteps = [
                 [
                     // orange
@@ -498,7 +500,7 @@ function calcContinuePattern() {
                 ],
             ];
             break;
-        case 4:
+        case 5:
             progressSteps = [
                 [
                     // orange
@@ -524,7 +526,7 @@ function calcContinuePattern() {
                 ],
             ];
             break;
-        case 5:
+        case 6:
             progressSteps = [
                 [
                     // orange

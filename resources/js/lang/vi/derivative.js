@@ -107,7 +107,7 @@ const continueSub3 = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P > 80",
+            "P > 50",
             "T ≄ Tđỏ",
         ],
     },
@@ -119,7 +119,7 @@ const continueSub3 = [
         ],
     },
 ];
-const continueSub4 = [
+const continueSub5 = [
     {
         name: "Bước cam",
         conds: [
@@ -152,7 +152,7 @@ const continueSub4 = [
         ],
     },
 ];
-const continueSub5 = [
+const continueSub6 = [
     {
         name: "Bước cam",
         conds: [
@@ -218,16 +218,20 @@ const continuePattern = [
         steps: continueSub2,
     },
     {
-        name: "Mẫu hình hồng ngắn",
+        name: "Mẫu hình hồng ngắn lam nông",
+        steps: continueSub3,
+    },
+    {
+        name: "Mẫu hình hồng ngắn lam sâu",
         steps: continueSub3,
     },
     {
         name: "Mẫu hình 2 nền",
-        steps: continueSub4,
+        steps: continueSub5,
     },
     {
         name: "Mẫu hình 3 nền",
-        steps: continueSub5,
+        steps: continueSub6,
     },
 ];
 const reversalSub0 = [
