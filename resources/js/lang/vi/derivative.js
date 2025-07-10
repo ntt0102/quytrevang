@@ -177,7 +177,6 @@ const continueSub6 = [
         name: "Bước hồng",
         conds: [
             //
-            "T > Tmin",
             "P > Pmin",
             "P < Pcam",
             "T ≄ Tđỏ",

@@ -544,7 +544,6 @@ function calcContinuePattern() {
                 ],
                 [
                     // pink
-                    dT4 >= TR3 * trThreshold,
                     DE >= phase3.pr,
                     DE < BC,
                     isTimeNotEqual(dT3, dT4),
