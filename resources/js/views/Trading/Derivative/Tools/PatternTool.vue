@@ -11,7 +11,7 @@
                 },
             }"
             :icon="`far fa-${
-                patternType ? `square-${patternType}` : 'square-question'
+                patternType === 1 ? `copyright` : 'registered'
             } pattern`"
             :hint="$t('trading.derivative.tools.selectPattern')"
             stylingMode="text"
@@ -34,7 +34,7 @@
 import DxDropDownButton from "devextreme-vue/drop-down-button";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
-import { formatISO, setDate, sub } from "date-fns";
+import { formatISO } from "date-fns";
 
 const store = useStore();
 const mf = inject("mf");
@@ -397,15 +397,22 @@ function calcContinuePattern() {
     const fBreak = mf.cmp(F.price, side, D.price);
 
     let subPattern;
-    if (dT2 > dT1) subPattern = 0;
+    if (dT2 > dT1) subPattern = "longOrange";
     else if (!dBreak)
-        subPattern = dT3 > dT2 ? 1 : dT4 > dT3 ? 2 : FG < DE ? 3 : 4;
-    else subPattern = dT4 > dT2 ? 5 : 6;
+        subPattern =
+            dT3 > dT2
+                ? "longRed"
+                : dT4 > dT3
+                ? "longPink"
+                : FG < DE
+                ? "shallowCyan"
+                : "deepCyan";
+    else subPattern = dT4 > dT2 ? "twoBase" : "threeBase";
 
     let progressSteps;
 
     switch (subPattern) {
-        case 0:
+        case "longOrange":
             progressSteps = [
                 [
                     // orange
@@ -419,7 +426,7 @@ function calcContinuePattern() {
             ];
             break;
 
-        case 1:
+        case "longRed":
             progressSteps = [
                 [
                     // orange
@@ -442,7 +449,7 @@ function calcContinuePattern() {
                 ],
             ];
             break;
-        case 2:
+        case "longPink":
             progressSteps = [
                 [
                     // orange
@@ -470,8 +477,8 @@ function calcContinuePattern() {
                 ],
             ];
             break;
-        case 3:
-        case 4:
+        case "shallowCyan":
+        case "deepCyan":
             progressSteps = [
                 [
                     // orange
@@ -500,7 +507,7 @@ function calcContinuePattern() {
                 ],
             ];
             break;
-        case 5:
+        case "twoBase":
             progressSteps = [
                 [
                     // orange
@@ -525,7 +532,7 @@ function calcContinuePattern() {
                 ],
             ];
             break;
-        case 6:
+        case "threeBase":
             progressSteps = [
                 [
                     // orange

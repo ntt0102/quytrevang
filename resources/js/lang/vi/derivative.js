@@ -1,4 +1,4 @@
-const continueSub0 = [
+const longOrange = [
     {
         name: "Bước cam",
         conds: [
@@ -12,7 +12,7 @@ const continueSub0 = [
         ],
     },
 ];
-const continueSub1 = [
+const longRed = [
     {
         name: "Bước cam",
         conds: [
@@ -42,7 +42,7 @@ const continueSub1 = [
         ],
     },
 ];
-const continueSub2 = [
+const longPink = [
     {
         name: "Bước cam",
         conds: [
@@ -80,7 +80,7 @@ const continueSub2 = [
         ],
     },
 ];
-const continueSub3 = [
+const shortPink = [
     {
         name: "Bước cam",
         conds: [
@@ -119,7 +119,7 @@ const continueSub3 = [
         ],
     },
 ];
-const continueSub5 = [
+const twoBase = [
     {
         name: "Bước cam",
         conds: [
@@ -151,7 +151,7 @@ const continueSub5 = [
         ],
     },
 ];
-const continueSub6 = [
+const threeBase = [
     {
         name: "Bước cam",
         conds: [
@@ -202,36 +202,36 @@ const continueSub6 = [
         ],
     },
 ];
-const continuePattern = [
-    {
+const continuePattern = {
+    longOrange: {
         name: "Mẫu hình cam dài",
-        steps: continueSub0,
+        steps: longOrange,
     },
-    {
+    longRed: {
         name: "Mẫu hình đỏ dài",
-        steps: continueSub1,
+        steps: longRed,
     },
-    {
+    longPink: {
         name: "Mẫu hình hồng dài",
-        steps: continueSub2,
+        steps: longPink,
     },
-    {
-        name: "Mẫu hình hồng ngắn lam nông",
-        steps: continueSub3,
+    shallowCyan: {
+        name: "Mẫu hình hồng ngắn - lam nông",
+        steps: shortPink,
     },
-    {
-        name: "Mẫu hình hồng ngắn lam sâu",
-        steps: continueSub3,
+    deepCyan: {
+        name: "Mẫu hình hồng ngắn - lam sâu",
+        steps: shortPink,
     },
-    {
+    twoBase: {
         name: "Mẫu hình 2 nền",
-        steps: continueSub5,
+        steps: twoBase,
     },
-    {
+    threeBase: {
         name: "Mẫu hình 3 nền",
-        steps: continueSub6,
+        steps: threeBase,
     },
-];
+};
 const reversalSub0 = [
     {
         name: "Bước đỏ",
