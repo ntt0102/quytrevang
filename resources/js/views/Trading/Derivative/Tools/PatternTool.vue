@@ -3,6 +3,7 @@
         <DxDropDownButton
             :items="patternTypes"
             :drop-down-options="{
+                width: 33,
                 wrapperAttr: { class: 'select-pattern-popup' },
                 position: {
                     my: 'top left',
@@ -1210,23 +1211,6 @@ function isTimeNotEqual(a, b, threshold = 0.9) {
     const ratio = minVal / maxVal;
     console.log("isTimeNotEqual", ratio);
     return ratio <= threshold;
-}
-function removeExcConds(excConds, items) {
-    if (!Array.isArray(items)) {
-        items = [items];
-    }
-
-    for (const item of items) {
-        const index = excConds.indexOf(item);
-        if (index !== -1) {
-            excConds.splice(index, 1);
-        }
-    }
-}
-function setExcStep(progressSteps, items) {
-    for (const item of items) {
-        progressSteps[item].isExcStep = true;
-    }
 }
 </script>
 <style lang="scss">
