@@ -584,9 +584,13 @@ function calcContinuePattern() {
         ["yellow", "orange", "red", "pink", "purple", "cyan", "green", "green"]
     );
     //
+    const islongOrange = subPattern === "longOrange";
     const orderSide = side ? 1 : -1;
-    const refPrice =
-        subPattern == 0 ? phase2.S1.price : fBreak ? F.price : D.price;
+    const refPrice = islongOrange
+        ? phase2.S1.price
+        : fBreak
+        ? F.price
+        : D.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
     const x = adjustTargetPrice(D.price, CD, orderSide);
     const X = mf.fmtNum(x - entry);
@@ -595,7 +599,7 @@ function calcContinuePattern() {
     const z = mf.fmtNum(B.price + orderSide * BC);
     const Z = mf.fmtNum(z - entry);
     const t = mf.fmtNum(
-        (subPattern == 0 || (dBreak && !fBreak)
+        (islongOrange || (dBreak && !fBreak)
             ? D.price + E.price
             : F.price + G.price) / 2,
         1
@@ -604,15 +608,14 @@ function calcContinuePattern() {
     //
     let order = {};
     if (progress.result) {
-        const tp =
-            subPattern == 0
-                ? z
-                : mf.cmp(Z, !side, X)
-                ? x
-                : mf.cmp(Z, side, Y)
-                ? y
-                : z;
-        const sl = subPattern == 0 ? C.price : fBreak ? G.price : E.price;
+        const tp = islongOrange
+            ? z
+            : mf.cmp(Z, !side, X)
+            ? x
+            : mf.cmp(Z, side, Y)
+            ? y
+            : z;
+        const sl = islongOrange ? C.price : fBreak ? G.price : E.price;
         order = {
             side: orderSide,
             price: entry,
