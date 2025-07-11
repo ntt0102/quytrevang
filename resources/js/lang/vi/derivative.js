@@ -1,4 +1,4 @@
-const longOrange = [
+const longOrangeContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -12,7 +12,7 @@ const longOrange = [
         ],
     },
 ];
-const longRed = [
+const longRedContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -42,7 +42,7 @@ const longRed = [
         ],
     },
 ];
-const longPink = [
+const longPinkContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -80,7 +80,7 @@ const longPink = [
         ],
     },
 ];
-const shortPink = [
+const shortPinkContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -119,7 +119,7 @@ const shortPink = [
         ],
     },
 ];
-const twoBase = [
+const twoBaseContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -151,7 +151,7 @@ const twoBase = [
         ],
     },
 ];
-const threeBase = [
+const threeBaseContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -205,34 +205,34 @@ const threeBase = [
 const continuePattern = {
     longOrange: {
         name: "Mẫu hình cam dài",
-        steps: longOrange,
+        steps: longOrangeContinue,
     },
     longRed: {
         name: "Mẫu hình đỏ dài",
-        steps: longRed,
+        steps: longRedContinue,
     },
     longPink: {
         name: "Mẫu hình hồng dài",
-        steps: longPink,
+        steps: longPinkContinue,
     },
     shallowCyan: {
         name: "Mẫu hình hồng ngắn - lam nông",
-        steps: shortPink,
+        steps: shortPinkContinue,
     },
     deepCyan: {
         name: "Mẫu hình hồng ngắn - lam sâu",
-        steps: shortPink,
+        steps: shortPinkContinue,
     },
     twoBase: {
         name: "Mẫu hình 2 nền",
-        steps: twoBase,
+        steps: twoBaseContinue,
     },
     threeBase: {
         name: "Mẫu hình 3 nền",
-        steps: threeBase,
+        steps: threeBaseContinue,
     },
 };
-const reversalSub0 = [
+const longRedReversal = [
     {
         name: "Bước đỏ",
         conds: [
@@ -249,7 +249,7 @@ const reversalSub0 = [
         ],
     },
 ];
-const reversalSub1 = [
+const shakeLongRedReversal = [
     {
         name: "Bước đỏ",
         conds: [
@@ -273,7 +273,7 @@ const reversalSub1 = [
         ],
     },
 ];
-const reversalSub2 = [
+const longPinkReversal = [
     {
         name: "Bước đỏ",
         conds: [
@@ -299,7 +299,7 @@ const reversalSub2 = [
         ],
     },
 ];
-const reversalSub3 = [
+const shortPinkReversal = [
     {
         name: "Bước đỏ",
         conds: [
@@ -326,7 +326,34 @@ const reversalSub3 = [
         ],
     },
 ];
-const reversalSub4 = [
+const shakeLongPurpleReversal = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P < 150",
+            "T ≄ Tđỏ",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "P > 70",
+        ],
+    },
+];
+const shakeShortPurpleReversal = [
     {
         name: "Bước đỏ",
         conds: [
@@ -353,58 +380,31 @@ const reversalSub4 = [
         ],
     },
 ];
-const reversalSub5 = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-            "P < 150",
-            "T ≄ Tđỏ",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "P > Pđỏ",
-        ],
-    },
-];
-const reversalPattern = [
-    {
+const reversalPattern = {
+    longRed: {
         name: "Mẫu hình đỏ dài",
-        steps: reversalSub0,
+        steps: longRedReversal,
     },
-    {
-        name: "Mẫu hình đỏ dài rũ",
-        steps: reversalSub1,
+    shakeLongRed: {
+        name: "Mẫu hình rũ đỏ dài",
+        steps: shakeLongRedReversal,
     },
-    {
+    longPink: {
         name: "Mẫu hình hồng dài",
-        steps: reversalSub2,
+        steps: longPinkReversal,
     },
-    {
+    shortPink: {
         name: "Mẫu hình hồng ngắn",
-        steps: reversalSub3,
+        steps: shortPinkReversal,
     },
-    {
-        name: "Mẫu hình hồng dài rũ",
-        steps: reversalSub4,
+    shakeLongPurple: {
+        name: "Mẫu hình rũ tím dài",
+        steps: shakeLongPurpleReversal,
     },
-    {
-        name: "Mẫu hình hồng ngắn rũ",
-        steps: reversalSub5,
+    shakeShortPurple: {
+        name: "Mẫu hình rũ tím ngắn",
+        steps: shakeShortPurpleReversal,
     },
-];
+};
 
 export default { C: continuePattern, R: reversalPattern };

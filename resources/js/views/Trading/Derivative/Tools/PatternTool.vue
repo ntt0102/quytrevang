@@ -735,13 +735,13 @@ function calcReversalPattern() {
     const eBreak = mf.cmp(E.price, side, C.price);
 
     let subPattern;
-    if (dT2 > dT1) subPattern = !dBreak ? 0 : 1;
-    else if (!dBreak) subPattern = dT3 > dT2 ? 2 : 3;
-    else subPattern = dT3 > dT2 ? 4 : 5;
+    if (dT2 > dT1) subPattern = !dBreak ? "longRed" : "shakeLongRed";
+    else if (!dBreak) subPattern = dT3 > dT2 ? "longPink" : "shortPink";
+    else subPattern = dT4 > dT3 ? "shakeLongPurple" : "shakeShortPurple";
 
     let progressSteps;
     switch (subPattern) {
-        case 0:
+        case "longRed":
             progressSteps = [
                 [
                     // red
@@ -754,7 +754,7 @@ function calcReversalPattern() {
                 ],
             ];
             break;
-        case 1:
+        case "shakeLongRed":
             progressSteps = [
                 [
                     // red
@@ -771,7 +771,7 @@ function calcReversalPattern() {
                 ],
             ];
             break;
-        case 2:
+        case "longPink":
             progressSteps = [
                 [
                     // red
@@ -790,7 +790,7 @@ function calcReversalPattern() {
                 ],
             ];
             break;
-        case 3:
+        case "shortPink":
             progressSteps = [
                 [
                     // red
@@ -810,7 +810,7 @@ function calcReversalPattern() {
                 ],
             ];
             break;
-        case 4:
+        case "shakeLongPurple":
             progressSteps = [
                 [
                     // red
@@ -826,11 +826,11 @@ function calcReversalPattern() {
                 ],
                 [
                     // purple
-                    eBreak,
+                    rCDE >= 0.7,
                 ],
             ];
             break;
-        case 5:
+        case "shakeShortPurple":
             progressSteps = [
                 [
                     // red
