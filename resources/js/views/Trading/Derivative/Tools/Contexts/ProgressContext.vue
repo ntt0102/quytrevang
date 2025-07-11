@@ -68,9 +68,8 @@ const emit = defineEmits(["refreshPattern"]);
 const patterns = ref({});
 const pattern = computed(() => {
     return (
-        patterns.value[props.progress.pattern - 1]?.[
-            props.progress.subPattern
-        ] || {}
+        patterns.value[props.progress.pattern]?.[props.progress.subPattern] ||
+        {}
     );
 });
 

@@ -11,7 +11,11 @@
                 },
             }"
             :icon="`far fa-${
-                patternType === 1 ? `copyright` : 'registered'
+                patternType === 'C'
+                    ? `copyright`
+                    : patternType === 'R'
+                    ? 'registered'
+                    : 'circle-question'
             } pattern`"
             :hint="$t('trading.derivative.tools.selectPattern')"
             stylingMode="text"
@@ -53,7 +57,7 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const symbol = "VN30F1M";
-const patternTypes = [1, 2];
+const patternTypes = ["C", "R"];
 const scanThreshold = 1;
 const trThreshold = 1.25;
 let scanPoints = {};
@@ -274,10 +278,10 @@ function refresh(autoAdjust = false) {
 function calculatePattern() {
     let result = {};
     switch (patternType.value) {
-        case 1:
+        case "C":
             result = calcContinuePattern();
             break;
-        case 2:
+        case "R":
             result = calcReversalPattern();
             break;
     }

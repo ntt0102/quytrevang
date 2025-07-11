@@ -407,4 +407,4 @@ const reversalPattern = [
     },
 ];
 
-export default [continuePattern, reversalPattern];
+export default { C: continuePattern, R: reversalPattern };
