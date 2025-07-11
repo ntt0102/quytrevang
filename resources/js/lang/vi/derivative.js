@@ -137,7 +137,6 @@ const continueSub5 = [
             "P > Pmin",
             "P < 200",
             "T ≄ Tcam",
-            "T > Tcam",
         ],
     },
     {

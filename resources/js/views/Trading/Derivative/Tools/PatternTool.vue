@@ -514,7 +514,6 @@ function calcContinuePattern() {
                     CD >= phase2.pr,
                     rBCD < 2,
                     isTimeNotEqual(dT2, dT3),
-                    dT3 > dT2,
                 ],
                 [
                     // pink
