@@ -79,6 +79,13 @@ const longPinkContinue = [
             "P > Pđỏ",
         ],
     },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
+        ],
+    },
 ];
 const shortPinkContinue = [
     {
@@ -116,6 +123,13 @@ const shortPinkContinue = [
         conds: [
             //
             "P > Pđỏ",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
         ],
     },
 ];

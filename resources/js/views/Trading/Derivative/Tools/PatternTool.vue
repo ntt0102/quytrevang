@@ -480,6 +480,10 @@ function calcContinuePattern() {
                     // purple
                     fBreak,
                 ],
+                [
+                    // cyan
+                    FG < DE,
+                ],
             ];
             break;
         case "shallowCyan":
@@ -509,6 +513,10 @@ function calcContinuePattern() {
                 [
                     // purple
                     fBreak,
+                ],
+                [
+                    // cyan
+                    FG < DE,
                 ],
             ];
             break;
