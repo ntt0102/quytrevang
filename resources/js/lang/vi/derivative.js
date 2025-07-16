@@ -180,8 +180,8 @@ const threeBaseContinue = [
         conds: [
             //
             "T > Tmin",
-            "P > Pmin",
             "T > Tsum-",
+            "P > Pmin",
             "P < 200",
             // "T ≄ Tcam",
             // "T > Tcam",
@@ -200,6 +200,7 @@ const threeBaseContinue = [
         name: "Bước tím",
         conds: [
             //
+            "T > Tsum-",
             "P > Pmin",
             "P < 200",
             // "T ≄ Thồng",
