@@ -181,6 +181,7 @@ const threeBaseContinue = [
             //
             "T > Tmin",
             "P > Pmin",
+            "T > Tsum-",
             "P < 200",
             // "T ≄ Tcam",
             // "T > Tcam",
