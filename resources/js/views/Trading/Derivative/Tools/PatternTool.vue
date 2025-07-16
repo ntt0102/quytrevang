@@ -73,6 +73,7 @@ const colorMap = {
     purple: "rgba(128, 0, 255, 0.7)",
     cyan: "rgba(0, 255, 255, 0.7)",
     green: "rgba(0, 255, 0, 0.7)",
+    blue: "rgba(0, 127, 255, 0.7)",
 };
 
 defineExpose({
@@ -231,41 +232,48 @@ function loadPatternTool() {
     };
     const {
         entry,
-        target: [[x, X], [y, Y], [z, Z], [t, T]],
+        target: [[x, X], [y, Y], [z, Z], [w, W], [t, T]],
     } = calculatePattern();
     //
     option.point = "O";
     option.price = entry;
     option.title = "O";
-    option.color = "#007FFF";
+    option.color = colorMap.blue;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "X";
     option.price = x;
     option.title = `X ${X}`;
-    option.color = "#FF1493";
+    option.color = colorMap.pink;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "Y";
     option.price = y;
     option.title = `Y ${Y}`;
-    option.color = "#8000FF";
+    option.color = colorMap.purple;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "Z";
     option.price = z;
     option.title = `Z ${Z}`;
-    option.color = "#00FFFF";
+    option.color = colorMap.red;
+    option.draggable = false;
+    lines[option.point] = series.pattern.createPriceLine(option);
+    //
+    option.point = "W";
+    option.price = w;
+    option.title = `Z ${W}`;
+    option.color = colorMap.cyan;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "T";
     option.price = t;
     option.title = `T ${T}`;
-    option.color = "#FF7F00";
+    option.color = colorMap.orange;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
 }
@@ -606,8 +614,10 @@ function calcContinuePattern() {
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(D.price, 2 * CD, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = mf.fmtNum(B.price + orderSide * BC);
+    const z = adjustTargetPrice(D.price, 4 * CD, orderSide);
     const Z = mf.fmtNum(z - entry);
+    const w = mf.fmtNum(B.price + orderSide * BC);
+    const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
         (islongOrange || (dBreak && !fBreak)
             ? D.price + E.price
@@ -619,12 +629,12 @@ function calcContinuePattern() {
     let order = {};
     if (progress.result) {
         const tp = islongOrange
-            ? z
-            : mf.cmp(Z, !side, X)
+            ? w
+            : mf.cmp(W, !side, X)
             ? x
-            : mf.cmp(Z, side, Y)
+            : mf.cmp(W, side, Y)
             ? y
-            : z;
+            : w;
         const sl = islongOrange ? C.price : fBreak ? G.price : E.price;
         order = {
             side: orderSide,
@@ -645,6 +655,7 @@ function calcContinuePattern() {
             [x, X],
             [y, Y],
             [z, Z],
+            [w, W],
             [t, T],
         ],
     };
@@ -879,14 +890,16 @@ function calcReversalPattern() {
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(C.price, 2 * CD, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = mf.fmtNum(C.price + orderSide * BC);
+    const z = adjustTargetPrice(C.price, 4 * CD, orderSide);
     const Z = mf.fmtNum(z - entry);
+    const w = mf.fmtNum(C.price + orderSide * BC);
+    const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum((E.price + F.price) / 2);
     const T = mf.fmtNum(t - entry);
     //
     let order = {};
     if (progress.result) {
-        const tp = mf.cmp(Z, !side, X) ? x : mf.cmp(Z, side, Y) ? y : z;
+        const tp = mf.cmp(W, !side, X) ? x : mf.cmp(W, side, Y) ? y : w;
         const sl = dBreak ? B.price : D.price;
         order = {
             side: orderSide,
@@ -907,6 +920,7 @@ function calcReversalPattern() {
             [x, X],
             [y, Y],
             [z, Z],
+            [w, W],
             [t, T],
         ],
     };
@@ -1154,6 +1168,7 @@ function removePatternTool() {
         series.pattern.removePriceLine(lines.X);
         series.pattern.removePriceLine(lines.Y);
         series.pattern.removePriceLine(lines.Z);
+        series.pattern.removePriceLine(lines.W);
         series.pattern.removePriceLine(lines.T);
     }
     lines = {};
