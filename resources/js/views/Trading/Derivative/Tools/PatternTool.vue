@@ -558,28 +558,28 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     rBCD < 2,
-                    isTimeNotEqual(dT2, dT3),
-                    dT3 > dT2,
+                    // isTimeNotEqual(dT2, dT3),
+                    // dT3 > dT2,
                 ],
                 [
                     // pink
                     DE >= phase3.pr,
                     DE < BC,
-                    isTimeNotEqual(dT3, dT4),
+                    // isTimeNotEqual(dT3, dT4),
                 ],
                 [
                     // purple
                     EF >= phase4.pr,
                     rDEF < 2,
-                    isTimeNotEqual(dT4, dT5),
-                    dT5 > dT4,
+                    // isTimeNotEqual(dT4, dT5),
+                    // dT5 > dT4,
                     fBreak,
                 ],
                 [
                     // cyan
                     FG >= phase5.pr,
                     FG < DE,
-                    isTimeNotEqual(dT5, dT6),
+                    // isTimeNotEqual(dT5, dT6),
                 ],
             ];
             break;

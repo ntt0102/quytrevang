@@ -182,8 +182,8 @@ const threeBaseContinue = [
             "T > Tmin",
             "P > Pmin",
             "P < 200",
-            "T ≄ Tcam",
-            "T > Tcam",
+            // "T ≄ Tcam",
+            // "T > Tcam",
         ],
     },
     {
@@ -192,7 +192,7 @@ const threeBaseContinue = [
             //
             "P > Pmin",
             "P < Pcam",
-            "T ≄ Tđỏ",
+            // "T ≄ Tđỏ",
         ],
     },
     {
@@ -201,8 +201,8 @@ const threeBaseContinue = [
             //
             "P > Pmin",
             "P < 200",
-            "T ≄ Thồng",
-            "T > Thồng",
+            // "T ≄ Thồng",
+            // "T > Thồng",
             "P > Pđỏ",
         ],
     },
@@ -212,7 +212,7 @@ const threeBaseContinue = [
             //
             "P > Pmin",
             "P < Phồng",
-            "T ≄ Ttím",
+            // "T ≄ Ttím",
         ],
     },
 ];
