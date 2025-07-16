@@ -27,9 +27,10 @@ const longRedContinue = [
         conds: [
             //
             "T > Tmin",
+            "T > Tsum-",
             "P > Pmin",
             "P > 70",
-            "T ≄ Tcam",
+            // "T ≄ Tcam",
         ],
     },
     {
@@ -38,7 +39,7 @@ const longRedContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            "T ≄ Tđỏ",
+            // "T ≄ Tđỏ",
         ],
     },
 ];
@@ -58,9 +59,10 @@ const longPinkContinue = [
         conds: [
             //
             "T > Tmin",
+            "T > Tsum-",
             "P > Pmin",
             "P > Pscam",
-            "T ≄ Tcam",
+            // "T ≄ Tcam",
         ],
     },
     {
@@ -69,7 +71,7 @@ const longPinkContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            "T ≄ Tđỏ",
+            // "T ≄ Tđỏ",
         ],
     },
     {
@@ -103,9 +105,10 @@ const shortPinkContinue = [
         conds: [
             //
             "T > Tmin",
+            "T > Tsum-",
             "P > Pmin",
             "P > Pscam",
-            "T ≄ Tcam",
+            // "T ≄ Tcam",
         ],
     },
     {
@@ -115,7 +118,7 @@ const shortPinkContinue = [
             "T > Tmin",
             "P > Pmin",
             "P > 50",
-            "T ≄ Tđỏ",
+            // "T ≄ Tđỏ",
         ],
     },
     {
@@ -148,9 +151,10 @@ const twoBaseContinue = [
         conds: [
             //
             "T > Tmin",
+            "T > Tsum-",
             "P > Pmin",
             "P < 200",
-            "T ≄ Tcam",
+            // "T ≄ Tcam",
         ],
     },
     {
@@ -160,7 +164,7 @@ const twoBaseContinue = [
             "T > Tmin",
             "P > Pmin",
             "P > Pcam",
-            "T ≄ Tđỏ",
+            // "T ≄ Tđỏ",
             "T > Tnow",
         ],
     },
@@ -303,8 +307,9 @@ const longPinkReversal = [
         conds: [
             //
             "T > Tmin",
+            "T > Tsum-",
             "P > Pmin",
-            "T ≄ Tđỏ",
+            // "T ≄ Tđỏ",
         ],
     },
     {
@@ -329,9 +334,10 @@ const shortPinkReversal = [
         conds: [
             //
             "T > Tmin",
+            "T > Tsum-",
             "P > Pmin",
             "P > 70",
-            "T ≄ Tđỏ",
+            // "T ≄ Tđỏ",
         ],
     },
     {
@@ -356,9 +362,10 @@ const shakeLongPurpleReversal = [
         conds: [
             //
             "T > Tmin",
+            "T > Tsum-",
             "P > Pmin",
             "P < 150",
-            "T ≄ Tđỏ",
+            // "T ≄ Tđỏ",
         ],
     },
     {
@@ -383,9 +390,10 @@ const shakeShortPurpleReversal = [
         conds: [
             //
             "T > Tmin",
+            "T > Tsum-",
             "P > Pmin",
             "P < 150",
-            "T ≄ Tđỏ",
+            // "T ≄ Tđỏ",
         ],
     },
     {
