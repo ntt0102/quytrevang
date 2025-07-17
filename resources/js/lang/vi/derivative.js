@@ -11,6 +11,13 @@ const longOrangeContinue = [
             "Pp > Pbvàng",
         ],
     },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T < Tmax",
+        ],
+    },
 ];
 const longRedContinue = [
     {

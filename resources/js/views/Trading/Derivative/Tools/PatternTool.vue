@@ -436,6 +436,10 @@ function calcContinuePattern() {
                     phase2.pr > phase1.pr,
                     phase2.pr > BBs,
                 ],
+                [
+                    // red
+                    dT3 <= phase2.R.time1.i - phase2.S1.time.i,
+                ],
             ];
             break;
 
