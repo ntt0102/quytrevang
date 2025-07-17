@@ -27,7 +27,7 @@ const longRedContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsum > Tvàng",
+            "Tsu > Tvàng",
             "P > Pmin",
             "P > 70",
             // "T ≄ Tcam",
@@ -59,7 +59,7 @@ const longPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsum > Tvàng",
+            "Tsu > Tvàng",
             "P > Pmin",
             "P > Pscam",
             // "T ≄ Tcam",
@@ -105,7 +105,7 @@ const shortPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsum > Tvàng",
+            "Tsu > Tvàng",
             "P > Pmin",
             "P > Pscam",
             // "T ≄ Tcam",
@@ -151,7 +151,7 @@ const twoBaseContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsum > Tvàng",
+            "Tsu > Tvàng",
             "P > Pmin",
             "P < 200",
             // "T ≄ Tcam",
@@ -184,7 +184,7 @@ const threeBaseContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsum > Tvàng",
+            "Tsu > Tvàng",
             "P > Pmin",
             "P < 200",
             // "T ≄ Tcam",
@@ -204,7 +204,7 @@ const threeBaseContinue = [
         name: "Bước tím",
         conds: [
             //
-            "Tsum > Tđỏ",
+            "Tsu > Tđỏ",
             "P > Pmin",
             "P < 200",
             // "T ≄ Thồng",
@@ -307,7 +307,7 @@ const longPinkReversal = [
         conds: [
             //
             "T > Tmin",
-            "Tsum > Tcam",
+            "Tsu > Tcam",
             "P > Pmin",
             // "T ≄ Tđỏ",
         ],
@@ -334,7 +334,7 @@ const shortPinkReversal = [
         conds: [
             //
             "T > Tmin",
-            "Tsum > Tcam",
+            "Tsu > Tcam",
             "P > Pmin",
             "P > 70",
             // "T ≄ Tđỏ",
@@ -362,7 +362,7 @@ const shakeLongPurpleReversal = [
         conds: [
             //
             "T > Tmin",
-            "Tsum > Tcam",
+            "Tsu > Tcam",
             "P > Pmin",
             "P < 150",
             // "T ≄ Tđỏ",
@@ -390,7 +390,7 @@ const shakeShortPurpleReversal = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsum-",
+            "T > Tsu-",
             "P > Pmin",
             "P < 150",
             // "T ≄ Tđỏ",
