@@ -27,7 +27,7 @@ const longRedContinue = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsum-",
+            "Tsum > Tvàng",
             "P > Pmin",
             "P > 70",
             // "T ≄ Tcam",
@@ -59,7 +59,7 @@ const longPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsum-",
+            "Tsum > Tvàng",
             "P > Pmin",
             "P > Pscam",
             // "T ≄ Tcam",
@@ -105,7 +105,7 @@ const shortPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsum-",
+            "Tsum > Tvàng",
             "P > Pmin",
             "P > Pscam",
             // "T ≄ Tcam",
@@ -151,7 +151,7 @@ const twoBaseContinue = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsum-",
+            "Tsum > Tvàng",
             "P > Pmin",
             "P < 200",
             // "T ≄ Tcam",
@@ -184,7 +184,7 @@ const threeBaseContinue = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsum-",
+            "Tsum > Tvàng",
             "P > Pmin",
             "P < 200",
             // "T ≄ Tcam",
@@ -204,7 +204,7 @@ const threeBaseContinue = [
         name: "Bước tím",
         conds: [
             //
-            "T > Tsum-",
+            "Tsum > Tđỏ",
             "P > Pmin",
             "P < 200",
             // "T ≄ Thồng",
@@ -307,7 +307,7 @@ const longPinkReversal = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsum-",
+            "Tsum > Tcam",
             "P > Pmin",
             // "T ≄ Tđỏ",
         ],
@@ -334,7 +334,7 @@ const shortPinkReversal = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsum-",
+            "Tsum > Tcam",
             "P > Pmin",
             "P > 70",
             // "T ≄ Tđỏ",
@@ -362,7 +362,7 @@ const shakeLongPurpleReversal = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsum-",
+            "Tsum > Tcam",
             "P > Pmin",
             "P < 150",
             // "T ≄ Tđỏ",
