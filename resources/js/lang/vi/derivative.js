@@ -397,7 +397,7 @@ const shakeShortPurpleReversal = [
         conds: [
             //
             "T > Tmin",
-            "T > Ts-",
+            "Ts > Tcam",
             "P > Pmin",
             "P < 150",
             // "T ≄ Tđỏ",
