@@ -6,9 +6,9 @@ const longOrangeContinue = [
             "T > Tmin",
             "P > Pmin",
             "P < 70",
-            "Ps < 50",
-            "Pm > Pmvàng",
-            "Pm > Psvàng",
+            "Pb < 50",
+            "Pp > Ppvàng",
+            "Pp > Pbvàng",
         ],
     },
 ];
@@ -19,7 +19,7 @@ const longRedContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            "Ps < 50",
+            "Pb < 50",
         ],
     },
     {
@@ -27,7 +27,7 @@ const longRedContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsu > Tvàng",
+            "Ts > Tvàng",
             "P > Pmin",
             "P > 70",
             // "T ≄ Tcam",
@@ -51,7 +51,7 @@ const longPinkContinue = [
             "T > Tmin",
             "P > Pmin",
             "P > 50",
-            "Ps < 50",
+            "Pb < 50",
         ],
     },
     {
@@ -59,9 +59,9 @@ const longPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsu > Tvàng",
+            "Ts > Tvàng",
             "P > Pmin",
-            "P > Pscam",
+            "P > Pbcam",
             // "T ≄ Tcam",
         ],
     },
@@ -97,7 +97,7 @@ const shortPinkContinue = [
             "T > Tmin",
             "P > Pmin",
             "P > 50",
-            "Ps < 50",
+            "Pb < 50",
         ],
     },
     {
@@ -105,9 +105,9 @@ const shortPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsu > Tvàng",
+            "Ts > Tvàng",
             "P > Pmin",
-            "P > Pscam",
+            "P > Pbcam",
             // "T ≄ Tcam",
         ],
     },
@@ -143,7 +143,7 @@ const twoBaseContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            "Ps < 50",
+            "Pb < 50",
         ],
     },
     {
@@ -151,7 +151,7 @@ const twoBaseContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsu > Tvàng",
+            "Ts > Tvàng",
             "P > Pmin",
             "P < 200",
             // "T ≄ Tcam",
@@ -176,7 +176,7 @@ const threeBaseContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            "Ps < 50",
+            "Pb < 50",
         ],
     },
     {
@@ -184,7 +184,7 @@ const threeBaseContinue = [
         conds: [
             //
             "T > Tmin",
-            "Tsu > Tvàng",
+            "Ts > Tvàng",
             "P > Pmin",
             "P < 200",
             // "T ≄ Tcam",
@@ -204,7 +204,7 @@ const threeBaseContinue = [
         name: "Bước tím",
         conds: [
             //
-            "Tsu > Tđỏ",
+            "Ts > Tđỏ",
             "P > Pmin",
             "P < 200",
             // "T ≄ Thồng",
@@ -307,7 +307,7 @@ const longPinkReversal = [
         conds: [
             //
             "T > Tmin",
-            "Tsu > Tcam",
+            "Ts > Tcam",
             "P > Pmin",
             // "T ≄ Tđỏ",
         ],
@@ -334,7 +334,7 @@ const shortPinkReversal = [
         conds: [
             //
             "T > Tmin",
-            "Tsu > Tcam",
+            "Ts > Tcam",
             "P > Pmin",
             "P > 70",
             // "T ≄ Tđỏ",
@@ -362,7 +362,7 @@ const shakeLongPurpleReversal = [
         conds: [
             //
             "T > Tmin",
-            "Tsu > Tcam",
+            "Ts > Tcam",
             "P > Pmin",
             "P < 150",
             // "T ≄ Tđỏ",
@@ -390,7 +390,7 @@ const shakeShortPurpleReversal = [
         conds: [
             //
             "T > Tmin",
-            "T > Tsu-",
+            "T > Ts-",
             "P > Pmin",
             "P < 150",
             // "T ≄ Tđỏ",
