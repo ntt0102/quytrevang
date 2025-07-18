@@ -818,7 +818,6 @@ function calcReversalPattern() {
                 ],
                 [
                     // purple
-                    dT4 >= dT2 - dT3,
                     eBreak,
                 ],
             ];
@@ -860,7 +859,6 @@ function calcReversalPattern() {
                 ],
                 [
                     // purple
-                    dT4 >= dT2 - dT3,
                     rCDE >= 0.7,
                 ],
             ];
@@ -881,7 +879,6 @@ function calcReversalPattern() {
                 ],
                 [
                     // purple
-                    dT4 >= dT2 - dT3,
                     eBreak,
                 ],
             ];

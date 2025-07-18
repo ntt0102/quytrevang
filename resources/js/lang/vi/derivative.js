@@ -322,7 +322,6 @@ const longPinkReversal = [
         name: "Bước tím",
         conds: [
             //
-            "Ts > Tđỏ",
             "P > Pđỏ",
         ],
     },
@@ -378,7 +377,6 @@ const shakeLongPurpleReversal = [
         name: "Bước tím",
         conds: [
             //
-            "Ts > Tđỏ",
             "P > 70",
         ],
     },
@@ -406,7 +404,6 @@ const shakeShortPurpleReversal = [
         name: "Bước tím",
         conds: [
             //
-            "Ts > Tđỏ",
             "P > Pđỏ",
         ],
     },
