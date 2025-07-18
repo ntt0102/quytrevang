@@ -314,7 +314,6 @@ const longPinkReversal = [
         conds: [
             //
             "T > Tmin",
-            "Ts > Tcam",
             "P > Pmin",
             // "T ≄ Tđỏ",
         ],
@@ -323,6 +322,7 @@ const longPinkReversal = [
         name: "Bước tím",
         conds: [
             //
+            "Ts > Tđỏ",
             "P > Pđỏ",
         ],
     },
@@ -341,7 +341,6 @@ const shortPinkReversal = [
         conds: [
             //
             "T > Tmin",
-            "Ts > Tcam",
             "P > Pmin",
             "P > 70",
             // "T ≄ Tđỏ",
@@ -351,6 +350,7 @@ const shortPinkReversal = [
         name: "Bước tím",
         conds: [
             //
+            "Ts > Tđỏ",
             "P > Pđỏ",
         ],
     },
@@ -369,7 +369,6 @@ const shakeLongPurpleReversal = [
         conds: [
             //
             "T > Tmin",
-            "Ts > Tcam",
             "P > Pmin",
             "P < 150",
             // "T ≄ Tđỏ",
@@ -379,6 +378,7 @@ const shakeLongPurpleReversal = [
         name: "Bước tím",
         conds: [
             //
+            "Ts > Tđỏ",
             "P > 70",
         ],
     },
@@ -397,7 +397,6 @@ const shakeShortPurpleReversal = [
         conds: [
             //
             "T > Tmin",
-            "Ts > Tcam",
             "P > Pmin",
             "P < 150",
             // "T ≄ Tđỏ",
@@ -407,6 +406,7 @@ const shakeShortPurpleReversal = [
         name: "Bước tím",
         conds: [
             //
+            "Ts > Tđỏ",
             "P > Pđỏ",
         ],
     },

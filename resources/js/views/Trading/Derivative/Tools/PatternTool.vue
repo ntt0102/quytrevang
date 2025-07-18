@@ -813,12 +813,12 @@ function calcReversalPattern() {
                 [
                     // pink
                     dT3 >= TR2 * trThreshold,
-                    dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple
+                    dT4 >= dT2 - dT3,
                     eBreak,
                 ],
             ];
@@ -833,13 +833,13 @@ function calcReversalPattern() {
                 [
                     // pink
                     dT3 >= TR2 * trThreshold,
-                    dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
                     // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple
+                    dT4 >= dT2 - dT3,
                     eBreak,
                 ],
             ];
@@ -854,13 +854,13 @@ function calcReversalPattern() {
                 [
                     // pink
                     dT3 >= TR2 * trThreshold,
-                    dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     rBCD < 1.5,
                     // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple
+                    dT4 >= dT2 - dT3,
                     rCDE >= 0.7,
                 ],
             ];
@@ -875,13 +875,13 @@ function calcReversalPattern() {
                 [
                     // pink
                     dT3 >= TR2 * trThreshold,
-                    dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     rBCD < 1.5,
                     // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple
+                    dT4 >= dT2 - dT3,
                     eBreak,
                 ],
             ];
