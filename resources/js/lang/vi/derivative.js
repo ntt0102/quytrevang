@@ -56,7 +56,6 @@ const longRedContinue = [
         conds: [
             //
             "T > Tmin",
-            "Ts > Tvàng",
             "P > Pmin",
             "P > 70",
             // "T ≄ Tcam",
@@ -69,6 +68,43 @@ const longRedContinue = [
             "T > Tmin",
             "P > Pmin",
             // "T ≄ Tđỏ",
+        ],
+    },
+];
+const breakLongRedContinue = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "Pb < 50",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P > 70",
+            // "T ≄ Tcam",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            // "T ≄ Tđỏ",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "P > Pđỏ",
         ],
     },
 ];
@@ -263,6 +299,10 @@ const continuePattern = {
     longRed: {
         name: "Mẫu hình đỏ dài",
         steps: longRedContinue,
+    },
+    breakLongRed: {
+        name: "Mẫu hình đỏ dài xác nhận",
+        steps: breakLongRedContinue,
     },
     longPink: {
         name: "Mẫu hình hồng dài",

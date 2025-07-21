@@ -412,16 +412,14 @@ function calcContinuePattern() {
     let subPattern;
     if (dT2 > dT1)
         subPattern = DE < phase2.pr ? "longOrange" : "deepLongOrange";
-    else if (!dBreak)
-        subPattern =
-            dT3 > dT2
-                ? "longRed"
-                : dT4 > dT3
-                ? "longPink"
-                : FG < DE
-                ? "shallowCyan"
-                : "deepCyan";
-    else subPattern = dT4 > dT2 ? "twoBase" : "threeBase";
+    else if (!dBreak) {
+        if (dT3 > dT2)
+            subPattern = dT3 >= dT1 - dT2 ? "longRed" : "breakLongRed";
+        else {
+            subPattern =
+                dT4 > dT3 ? "longPink" : FG < DE ? "shallowCyan" : "deepCyan";
+        }
+    } else subPattern = dT4 > dT2 ? "twoBase" : "threeBase";
 
     let progressSteps;
 
@@ -474,7 +472,6 @@ function calcContinuePattern() {
                 [
                     // red
                     dT3 >= phase2.tr * trThreshold,
-                    dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
                     // isTimeNotEqual(dT2, dT3),
@@ -487,6 +484,35 @@ function calcContinuePattern() {
                 ],
             ];
             break;
+
+        case "breakLongRed":
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr * trThreshold,
+                    BC >= phase1.pr,
+                    rBCCs < 0.5,
+                ],
+                [
+                    // red
+                    dT3 >= phase2.tr * trThreshold,
+                    CD >= phase2.pr,
+                    rBCD >= 0.7,
+                    // isTimeNotEqual(dT2, dT3),
+                ],
+                [
+                    // pink
+                    dT4 >= TR3 * trThreshold,
+                    DE >= phase3.pr,
+                    // isTimeNotEqual(dT3, dT4),
+                ],
+                [
+                    // purple
+                    fBreak,
+                ],
+            ];
+            break;
+
         case "longPink":
             progressSteps = [
                 [
