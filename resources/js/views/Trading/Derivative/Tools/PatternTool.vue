@@ -410,7 +410,8 @@ function calcContinuePattern() {
     const fBreak = mf.cmp(F.price, side, D.price);
 
     let subPattern;
-    if (dT2 > dT1) subPattern = "longOrange";
+    if (dT2 > dT1)
+        subPattern = DE < phase2.pr ? "longOrange" : "deepLongOrange";
     else if (!dBreak)
         subPattern =
             dT3 > dT2
@@ -439,6 +440,25 @@ function calcContinuePattern() {
                 [
                     // red
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
+                ],
+            ];
+            break;
+
+        case "deepLongOrange":
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr * trThreshold,
+                    BC >= phase1.pr,
+                    rABC <= 0.7,
+                    rBCCs < 0.5,
+                    phase2.pr > phase1.pr,
+                    phase2.pr > BBs,
+                ],
+                [
+                    // red
+                    dT3 <= phase2.R.time1.i - phase2.S1.time.i,
+                    mf.cmp(D.price, side, B.price),
                 ],
             ];
             break;

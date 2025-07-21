@@ -19,6 +19,28 @@ const longOrangeContinue = [
         ],
     },
 ];
+const deepLongOrangeContinue = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P < 70",
+            "Pb < 50",
+            "Pp > Ppvàng",
+            "Pp > Pbvàng",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T < Tmax",
+            "P > P1cam",
+        ],
+    },
+];
 const longRedContinue = [
     {
         name: "Bước cam",
@@ -233,6 +255,10 @@ const continuePattern = {
     longOrange: {
         name: "Mẫu hình cam dài",
         steps: longOrangeContinue,
+    },
+    deepLongOrange: {
+        name: "Mẫu hình cam dài - hồng sâu",
+        steps: deepLongOrangeContinue,
     },
     longRed: {
         name: "Mẫu hình đỏ dài",
