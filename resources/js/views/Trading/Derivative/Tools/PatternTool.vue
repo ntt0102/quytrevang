@@ -458,7 +458,7 @@ function calcContinuePattern() {
                 [
                     // red
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
-                    mf.cmp(D.price, side, B.price),
+                    mf.cmp(D.price, side, phase2.S1.price),
                 ],
             ];
             break;
