@@ -548,6 +548,7 @@ function updateCandlestick(ticks) {
             };
             params.series.price.update(bar);
             params.ohlcMap.set(time, bar);
+            state.bars.push(bar);
         } else {
             try {
                 const bar = params.ohlcMap.get(time);
@@ -556,15 +557,13 @@ function updateCandlestick(ticks) {
                 bar.open = price;
                 bar.close = price;
                 params.series.price.update(bar);
+                state.bars.pop();
+                state.bars.push(bar);
             } catch (error) {
                 return;
             }
         }
     });
-    const bars = Array.from(params.ohlcMap.values()).sort(
-        (a, b) => new Date(a.time) - new Date(b.time)
-    );
-    state.bars = bars;
 }
 function createWhitespaceData(date) {
     const amStart = getUnixTime(new Date(`${date}T09:00:00Z`));
