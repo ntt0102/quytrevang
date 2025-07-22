@@ -839,7 +839,7 @@ function dateSelectChange() {
 }
 function resetChart() {
     params.whitespaces = [];
-    state.bars = [];
+    params.ohlcMap.clear();
     params.socketUpdatedAt = subSeconds(new Date(), 61);
     connectSocket();
     getChartData();
