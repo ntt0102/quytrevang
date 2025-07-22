@@ -175,7 +175,7 @@ import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import {
     format,
-    formatISO,
+    // formatISO,
     getUnixTime,
     addHours,
     subSeconds,
@@ -483,7 +483,8 @@ function setCandlestick(ticks, source = null) {
                 break;
         }
         time = getUnixTime(date);
-        date = formatISO(date);
+        date = format(date, "yyyy/MM/dd hh:mm:ss");
+        // date = formatISO(date);
         if (!params.ohlcMap.has(time)) {
             const bar = {
                 date,
@@ -534,7 +535,8 @@ function updateCandlestick(ticks) {
                 break;
         }
         time = getUnixTime(date);
-        date = formatISO(date);
+        date = format(date, "yyyy/MM/dd hh:mm:ss");
+        // date = formatISO(date);
         if (!params.ohlcMap.has(time)) {
             const bar = {
                 date,
@@ -559,7 +561,9 @@ function updateCandlestick(ticks) {
             }
         }
     });
-    const bars = Array.from(params.ohlcMap.values());
+    const bars = Array.from(params.ohlcMap.values()).sort(
+        (a, b) => new Date(a.time) - new Date(b.time)
+    );
     state.bars = bars;
 }
 function createWhitespaceData(date) {
