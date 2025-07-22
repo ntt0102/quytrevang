@@ -509,6 +509,7 @@ function calcContinuePattern() {
                 [
                     // purple
                     fBreak,
+                    mf.cmp(F.price, !side, B.price, true),
                 ],
             ];
             break;

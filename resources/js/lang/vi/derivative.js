@@ -105,6 +105,7 @@ const breakLongRedContinue = [
         conds: [
             //
             "P > Pđỏ",
+            "P < Pvàng",
         ],
     },
 ];
