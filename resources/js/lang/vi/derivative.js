@@ -294,7 +294,7 @@ const continuePattern = {
         steps: longOrangeContinue,
     },
     deepLongOrange: {
-        name: "Mẫu hình cam dài - hồng sâu",
+        name: "Mẫu hình cam dài xác nhận",
         steps: deepLongOrangeContinue,
     },
     longRed: {
