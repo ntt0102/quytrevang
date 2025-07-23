@@ -4,7 +4,7 @@
             <div class="header">
                 <img
                     class="logo"
-                    src="../../../images/vertical-828x465.png"
+                    src="../../../images/logo-nobg.png"
                     :alt="$appName"
                 />
                 <div class="title">{{ $route.meta.title }}</div>
@@ -70,8 +70,7 @@ onMounted(() => {
             text-align: center;
 
             .logo {
-                width: 150px;
-                margin-bottom: 20px;
+                width: 80px;
             }
 
             .title {

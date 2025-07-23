@@ -15,13 +15,9 @@
         <DxLoadPanel
             :position="{ of: '#root' }"
             :visible="isSyncing"
-            :show-pane="false"
-            height="200"
-            width="200"
-            maxHeight="200"
-            maxWidth="200"
-            :wrapperAttr="{ class: 'load-panel' }"
-            indicatorSrc="../images/android-chrome-reverse-512x512.svg"
+            :show-indicator="true"
+            :show-pane="true"
+            :shading="true"
             shading-color="rgba(0,0,0,0.4)"
         />
         <Chatbot />
@@ -118,9 +114,5 @@ body {
     display: flex;
     height: 100%;
     width: 100%;
-}
-.load-panel .dx-loadindicator {
-    width: 120px;
-    height: 120px;
 }
 </style>

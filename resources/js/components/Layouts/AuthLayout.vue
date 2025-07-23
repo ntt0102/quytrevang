@@ -56,7 +56,7 @@
                             <template #default>
                                 <div class="logo" :class="{ small: isXSmall }">
                                     <img
-                                        src="../../../images/android-chrome-reverse-512x512.png"
+                                        src="../../../images/logo-nobg.png"
                                         :alt="$appName"
                                     />
                                     <div>{{ $appName }}</div>
@@ -394,11 +394,16 @@ watch(
 
         & > img {
             overflow: hidden;
-            border-radius: 20%;
             height: 35px;
             width: 35px;
-            margin: 0 4px;
-            background: white;
+            margin: 0 3px;
+        }
+
+        & > div {
+            color: $on-accent;
+            font-size: 18px;
+            margin-top: 3px;
+            text-transform: uppercase;
         }
 
         &.small {

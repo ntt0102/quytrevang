@@ -219,7 +219,7 @@ function getCount(routeName) {
                     }
 
                     &.dx-state-selected > .dx-treeview-item * {
-                        color: $base-accent;
+                        color: $on-accent;
                     }
 
                     &:not(.dx-state-focused)
