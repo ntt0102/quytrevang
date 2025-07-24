@@ -347,6 +347,7 @@ const longRedReversal = [
         conds: [
             //
             "P < Phồng",
+            "Pb < 50",
         ],
     },
 ];
@@ -378,6 +379,7 @@ const shakeLongRedReversal = [
         conds: [
             //
             "P < Phồng",
+            "Pb < 50",
         ],
     },
 ];
@@ -411,6 +413,7 @@ const longPinkReversal = [
         conds: [
             //
             "P < Phồng",
+            "Pb < 50",
         ],
     },
 ];
@@ -446,6 +449,7 @@ const shortPinkReversal = [
         conds: [
             //
             "P < Phồng",
+            "Pb < 50",
         ],
     },
 ];
@@ -507,6 +511,7 @@ const shakeShortPurpleReversal = [
         conds: [
             //
             "P < Phồng",
+            "Pb < 50",
         ],
     },
 ];

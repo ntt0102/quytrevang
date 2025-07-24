@@ -787,6 +787,7 @@ function calcReversalPattern() {
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const DDs = mf.fmtNum(phase3.R.price1 - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
+    const FFs = mf.fmtNum(phase5.R.price1 - F.price, 1, true);
 
     const dT1 = phase1.R.time1.i - phase1.S.time.i;
     const dT2 = C.time1.i - phase2.S.time.i;
@@ -809,6 +810,7 @@ function calcReversalPattern() {
     const rCDE = DE / CD;
     const rCDDs = DDs / CD;
     const rDEF = EF / DE;
+    const rEFFs = FFs / EF;
 
     const dBreak = mf.cmp(D.price, !side, B.price);
     const eBreak = mf.cmp(E.price, side, C.price);
@@ -834,6 +836,7 @@ function calcReversalPattern() {
                 [
                     // cyan
                     EF < CD,
+                    rEFFs < 0.5,
                 ],
             ];
             break;
@@ -855,6 +858,7 @@ function calcReversalPattern() {
                 [
                     // cyan
                     EF < CD,
+                    rEFFs < 0.5,
                 ],
             ];
             break;
@@ -878,6 +882,7 @@ function calcReversalPattern() {
                 [
                     // cyan
                     EF < CD,
+                    rEFFs < 0.5,
                 ],
             ];
             break;
@@ -903,6 +908,7 @@ function calcReversalPattern() {
                 [
                     // cyan
                     EF < CD,
+                    rEFFs < 0.5,
                 ],
             ];
             break;
@@ -947,6 +953,7 @@ function calcReversalPattern() {
                 [
                     // cyan
                     EF < CD,
+                    rEFFs < 0.5,
                 ],
             ];
             break;
