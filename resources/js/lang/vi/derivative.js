@@ -7,8 +7,8 @@ const longOrangeContinue = [
             "P > Pmin",
             "P < 70",
             "Pb < 50",
-            "Pp > Ppvàng",
-            "Pp > Pbvàng",
+            "Tm > Tmvàng",
+            "Pm > Pbvàng",
         ],
     },
     {
@@ -28,8 +28,8 @@ const deepLongOrangeContinue = [
             "P > Pmin",
             "P < 70",
             "Pb < 50",
-            "Pp > Ppvàng",
-            "Pp > Pbvàng",
+            "Tm > Tmvàng",
+            "Pm > Pbvàng",
         ],
     },
     {
