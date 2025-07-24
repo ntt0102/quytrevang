@@ -342,6 +342,13 @@ const longRedReversal = [
             "P > Pđỏ",
         ],
     },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
+        ],
+    },
 ];
 const shakeLongRedReversal = [
     {
@@ -364,6 +371,13 @@ const shakeLongRedReversal = [
         conds: [
             //
             "P > Pđỏ",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
         ],
     },
 ];
@@ -392,6 +406,13 @@ const longPinkReversal = [
             "P > Pđỏ",
         ],
     },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
+        ],
+    },
 ];
 const shortPinkReversal = [
     {
@@ -418,6 +439,13 @@ const shortPinkReversal = [
             //
             "Ts > Tđỏ",
             "P > Pđỏ",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
         ],
     },
 ];
@@ -472,6 +500,13 @@ const shakeShortPurpleReversal = [
         conds: [
             //
             "P > Pđỏ",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
         ],
     },
 ];

@@ -831,6 +831,10 @@ function calcReversalPattern() {
                     // purple
                     eBreak,
                 ],
+                [
+                    // cyan
+                    EF < CD,
+                ],
             ];
             break;
         case "shakeLongRed":
@@ -847,6 +851,10 @@ function calcReversalPattern() {
                 [
                     // purple
                     eBreak,
+                ],
+                [
+                    // cyan
+                    EF < CD,
                 ],
             ];
             break;
@@ -866,6 +874,10 @@ function calcReversalPattern() {
                 [
                     // purple
                     eBreak,
+                ],
+                [
+                    // cyan
+                    EF < CD,
                 ],
             ];
             break;
@@ -887,6 +899,10 @@ function calcReversalPattern() {
                     // purple
                     dT4 >= dT2 - dT3,
                     eBreak,
+                ],
+                [
+                    // cyan
+                    EF < CD,
                 ],
             ];
             break;
@@ -927,6 +943,10 @@ function calcReversalPattern() {
                 [
                     // purple
                     eBreak,
+                ],
+                [
+                    // cyan
+                    EF < CD,
                 ],
             ];
             break;
