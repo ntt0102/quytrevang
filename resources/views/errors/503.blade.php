@@ -37,7 +37,7 @@ $representUser = (int) App\Models\Parameter::getValue('representUser');
 $contactUser = App\Models\User::where('code', $representUser)->first();
 ?>
 <center>
-    <img width="300" src="../../../images/vertical-828x465.png" />
+    <img width="300" src="../../../images/logo-brandname.png" />
 
     <h1>Hệ thống đang bảo trì!</h1>
     <div>

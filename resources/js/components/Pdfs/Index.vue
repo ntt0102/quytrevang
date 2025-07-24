@@ -18,7 +18,7 @@
         >
             <section class="pdf-layer3">
                 <img
-                    src="../../../images/vertical-828x465.png"
+                    src="../../../images/logo-brandname.png"
                     :alt="$appName"
                 />
             </section>
@@ -26,7 +26,7 @@
                 <img
                     v-for="index in 56"
                     :key="index"
-                    src="../../../images/horizontal-828x465.png"
+                    src="../../../images/logo-brandname.png"
                     :alt="$appName"
                 />
             </section>
