@@ -67,6 +67,7 @@ const longRedContinue = [
             //
             "T > Tmin",
             "P > Pmin",
+            "Pb < 50",
             // "T ≄ Tđỏ",
         ],
     },
@@ -152,6 +153,7 @@ const longPinkContinue = [
         conds: [
             //
             "P < Phồng",
+            "Pb < 50",
         ],
     },
 ];
@@ -199,6 +201,7 @@ const shortPinkContinue = [
         conds: [
             //
             "P < Phồng",
+            "Pb < 50",
         ],
     },
 ];

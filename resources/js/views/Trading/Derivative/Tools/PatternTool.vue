@@ -379,6 +379,7 @@ function calcContinuePattern() {
     const EF = mf.fmtNum(F.price - E.price, 1, true);
     const EEs = mf.fmtNum(phase4.R.price1 - E.price, 1, true);
     const FG = mf.fmtNum(G.price - F.price, 1, true);
+    const GGs = mf.fmtNum(phase6.R.price1 - G.price, 1, true);
 
     const dT1 = phase1.R.time1.i - phase1.S.time.i;
     const dT2 = phase2.R.time1.i - phase2.S.time.i;
@@ -405,6 +406,7 @@ function calcContinuePattern() {
     const rDEF = EF / DE;
     const rDEEs = EEs / DE;
     const rEFG = FG / EF;
+    const rFGGs = GGs / FG;
 
     const dBreak = mf.cmp(D.price, side, B.price);
     const fBreak = mf.cmp(F.price, side, D.price);
@@ -480,6 +482,7 @@ function calcContinuePattern() {
                     // pink
                     dT4 >= TR3 * trThreshold,
                     DE >= phase3.pr,
+                    rDEEs < 0.5,
                     // isTimeNotEqual(dT3, dT4),
                 ],
             ];
@@ -544,6 +547,7 @@ function calcContinuePattern() {
                 [
                     // cyan
                     FG < DE,
+                    rFGGs < 0.5,
                 ],
             ];
             break;
@@ -579,6 +583,7 @@ function calcContinuePattern() {
                 [
                     // cyan
                     FG < DE,
+                    rFGGs < 0.5,
                 ],
             ];
             break;
