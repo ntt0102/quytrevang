@@ -290,39 +290,39 @@ const threeBaseContinue = [
 ];
 const continuePattern = {
     longOrange: {
-        name: "Mẫu hình cam dài",
+        name: "Mẫu hình tiếp diễn </br>cam dài",
         steps: longOrangeContinue,
     },
     deepLongOrange: {
-        name: "Mẫu hình cam dài xác nhận",
+        name: "Mẫu hình tiếp diễn </br>cam dài xác nhận",
         steps: deepLongOrangeContinue,
     },
     longRed: {
-        name: "Mẫu hình đỏ dài",
+        name: "Mẫu hình tiếp diễn </br>đỏ dài",
         steps: longRedContinue,
     },
     breakLongRed: {
-        name: "Mẫu hình đỏ dài xác nhận",
+        name: "Mẫu hình tiếp diễn </br>đỏ dài xác nhận",
         steps: breakLongRedContinue,
     },
     longPink: {
-        name: "Mẫu hình hồng dài",
+        name: "Mẫu hình tiếp diễn </br>hồng dài",
         steps: longPinkContinue,
     },
     shallowCyan: {
-        name: "Mẫu hình hồng ngắn - lam nông",
+        name: "Mẫu hình tiếp diễn </br>hồng ngắn - lam nông",
         steps: shortPinkContinue,
     },
     deepCyan: {
-        name: "Mẫu hình hồng ngắn - lam sâu",
+        name: "Mẫu hình tiếp diễn </br>hồng ngắn - lam sâu",
         steps: shortPinkContinue,
     },
     twoBase: {
-        name: "Mẫu hình 2 nền",
+        name: "Mẫu hình tiếp diễn </br>2 nền",
         steps: twoBaseContinue,
     },
     threeBase: {
-        name: "Mẫu hình 3 nền",
+        name: "Mẫu hình tiếp diễn </br>3 nền",
         steps: threeBaseContinue,
     },
 };
@@ -517,27 +517,27 @@ const shakeShortPurpleReversal = [
 ];
 const reversalPattern = {
     longRed: {
-        name: "Mẫu hình đỏ dài",
+        name: "Mẫu hình đảo chiều </br>đỏ dài",
         steps: longRedReversal,
     },
     shakeLongRed: {
-        name: "Mẫu hình rũ đỏ dài",
+        name: "Mẫu hình đảo chiều </br>rũ đỏ dài",
         steps: shakeLongRedReversal,
     },
     longPink: {
-        name: "Mẫu hình hồng dài",
+        name: "Mẫu hình đảo chiều </br>hồng dài",
         steps: longPinkReversal,
     },
     shortPink: {
-        name: "Mẫu hình hồng ngắn",
+        name: "Mẫu hình đảo chiều </br>hồng ngắn",
         steps: shortPinkReversal,
     },
     shakeLongPurple: {
-        name: "Mẫu hình rũ tím dài",
+        name: "Mẫu hình đảo chiều </br>rũ tím dài",
         steps: shakeLongPurpleReversal,
     },
     shakeShortPurple: {
-        name: "Mẫu hình rũ tím ngắn",
+        name: "Mẫu hình đảo chiều </br>rũ tím ngắn",
         steps: shakeShortPurpleReversal,
     },
 };

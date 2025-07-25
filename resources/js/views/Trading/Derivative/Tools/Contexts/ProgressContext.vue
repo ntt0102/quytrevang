@@ -8,9 +8,7 @@
                 :text="$t('buttons.refresh')"
                 @click="refreshPattern"
             />
-            <div class="pattern-name">
-                {{ pattern?.name }}
-            </div>
+            <div class="pattern-name" v-html="pattern?.name"></div>
         </div>
         <div v-else>{{ $t("trading.derivative.noPattern") }}</div>
         <div class="steps" :class="{ portrait: chartHeightEnough }">
