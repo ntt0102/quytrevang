@@ -432,7 +432,7 @@ function calcContinuePattern() {
                     // orange
                     dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
-                    rABC <= 0.65,
+                    rABC <= 0.7,
                     rBCCs < 0.5,
                     phase2.tr > phase1.tr,
                     phase2.pr > BBs,
@@ -450,7 +450,7 @@ function calcContinuePattern() {
                     // orange
                     dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
-                    rABC <= 0.65,
+                    rABC <= 0.7,
                     rBCCs < 0.5,
                     phase2.tr > phase1.tr,
                     phase2.pr > BBs,
