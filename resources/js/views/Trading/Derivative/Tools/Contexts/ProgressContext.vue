@@ -88,7 +88,7 @@ function refreshPattern() {
 
 <style lang="scss">
 .pattern-context {
-    min-width: 145px;
+    min-width: 165px;
     min-height: 20px;
 
     .pattern-name {
