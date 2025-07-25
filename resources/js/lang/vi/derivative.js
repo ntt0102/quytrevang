@@ -5,7 +5,7 @@ const longOrangeContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P < 70",
+            "P < 65",
             "Pb < 50",
             "Tm > Tmvàng",
             "Pm > Pbvàng",
@@ -26,7 +26,7 @@ const deepLongOrangeContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            "P < 70",
+            "P < 65",
             "Pb < 50",
             "Tm > Tmvàng",
             "Pm > Pbvàng",
