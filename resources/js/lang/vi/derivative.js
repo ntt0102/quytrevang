@@ -66,7 +66,7 @@ const longRedContinue = [
         conds: [
             //
             "T > Tmin",
-            "P > Pmin",
+            // "P > Pmin",
             "Pb < 50",
             // "T ≄ Tđỏ",
         ],
@@ -97,7 +97,7 @@ const breakLongRedContinue = [
         conds: [
             //
             "T > Tmin",
-            "P > Pmin",
+            // "P > Pmin",
             // "T ≄ Tđỏ",
         ],
     },
@@ -137,7 +137,7 @@ const longPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "P > Pmin",
+            // "P > Pmin",
             // "T ≄ Tđỏ",
         ],
     },
@@ -184,7 +184,7 @@ const shortPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "P > Pmin",
+            // "P > Pmin",
             "P > 50",
             // "T ≄ Tđỏ",
         ],
@@ -231,7 +231,7 @@ const twoBaseContinue = [
         conds: [
             //
             "T > Tmin",
-            "P > Pmin",
+            // "P > Pmin",
             "P > Pcam",
             // "T ≄ Tđỏ",
             "T > Tnow",
@@ -264,7 +264,7 @@ const threeBaseContinue = [
         name: "Bước hồng",
         conds: [
             //
-            "P > Pmin",
+            // "P > Pmin",
             "P < Pcam",
             // "T ≄ Tđỏ",
         ],
@@ -285,7 +285,7 @@ const threeBaseContinue = [
         name: "Bước lam",
         conds: [
             //
-            "P > Pmin",
+            // "P > Pmin",
             "P < Phồng",
             // "T ≄ Ttím",
         ],

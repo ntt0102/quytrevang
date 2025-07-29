@@ -481,7 +481,7 @@ function calcContinuePattern() {
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
-                    DE >= phase3.pr,
+                    // DE >= phase3.pr,
                     rDEEs < 0.5,
                     // isTimeNotEqual(dT3, dT4),
                 ],
@@ -506,7 +506,7 @@ function calcContinuePattern() {
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
-                    DE >= phase3.pr,
+                    // DE >= phase3.pr,
                     // isTimeNotEqual(dT3, dT4),
                 ],
                 [
@@ -537,7 +537,7 @@ function calcContinuePattern() {
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
-                    DE >= phase3.pr,
+                    // DE >= phase3.pr,
                     // isTimeNotEqual(dT3, dT4),
                 ],
                 [
@@ -572,7 +572,7 @@ function calcContinuePattern() {
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
-                    DE >= phase3.pr,
+                    // DE >= phase3.pr,
                     rCDE >= 0.5,
                     // isTimeNotEqual(dT3, dT4),
                 ],
@@ -606,7 +606,7 @@ function calcContinuePattern() {
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
-                    DE >= phase3.pr,
+                    // DE >= phase3.pr,
                     DE >= BC,
                     // isTimeNotEqual(dT3, dT4),
                     dT4 > phase5.R.time1.i - phase5.S.time.i,
@@ -632,7 +632,7 @@ function calcContinuePattern() {
                 ],
                 [
                     // pink
-                    DE >= phase3.pr,
+                    // DE >= phase3.pr,
                     DE < BC,
                     // isTimeNotEqual(dT3, dT4),
                 ],
@@ -647,7 +647,7 @@ function calcContinuePattern() {
                 ],
                 [
                     // cyan
-                    FG >= phase5.pr,
+                    // FG >= phase5.pr,
                     FG < DE,
                     // isTimeNotEqual(dT5, dT6),
                 ],
