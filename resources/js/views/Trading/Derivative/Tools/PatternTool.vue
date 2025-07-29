@@ -1169,7 +1169,6 @@ function checkProgress(subPattern, steps) {
         }
         return step;
     });
-    console.log("checkProgress", progress);
     return progress;
 }
 // function isStepValid({ conds, excConds, isExcStep }) {
