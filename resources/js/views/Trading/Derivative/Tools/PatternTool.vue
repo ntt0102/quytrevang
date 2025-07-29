@@ -1,5 +1,5 @@
 <template>
-    <div @contextmenu="togglePatternType">
+    <div class="select-pattern command" @contextmenu="togglePatternType">
         <DxDropDownButton
             :items="patternTypes"
             :drop-down-options="{
@@ -21,7 +21,6 @@
             :hint="$t('trading.derivative.tools.selectPattern')"
             stylingMode="text"
             :showArrowIcon="false"
-            :elementAttr="{ class: 'select-pattern command' }"
             @item-click="changePatternType"
         />
     </div>
