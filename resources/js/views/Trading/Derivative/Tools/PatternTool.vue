@@ -1,5 +1,5 @@
 <template>
-    <div class="select-pattern command" @contextmenu="togglePatternType">
+    <div class="command" @contextmenu="togglePatternType">
         <DxDropDownButton
             :items="patternTypes"
             :drop-down-options="{
@@ -21,6 +21,7 @@
             :hint="$t('trading.derivative.tools.selectPattern')"
             stylingMode="text"
             :showArrowIcon="false"
+            :elementAttr="{ class: 'select-pattern' }"
             @item-click="changePatternType"
         />
     </div>
@@ -1319,17 +1320,20 @@ function togglePatternType() {
             }
         });
 }
-function isTimeNotEqual(a, b, threshold = 0.9) {
-    const minVal = Math.min(a, b);
-    const maxVal = Math.max(a, b);
-    if (maxVal === 0) return true;
-    const ratio = minVal / maxVal;
-    console.log("isTimeNotEqual", ratio);
-    return ratio <= threshold;
-}
+// function isTimeNotEqual(a, b, threshold = 0.9) {
+//     const minVal = Math.min(a, b);
+//     const maxVal = Math.max(a, b);
+//     if (maxVal === 0) return true;
+//     const ratio = minVal / maxVal;
+//     console.log("isTimeNotEqual", ratio);
+//     return ratio <= threshold;
+// }
 </script>
 <style lang="scss">
 .select-pattern {
+    width: 100%;
+    height: 100%;
+
     .dx-button-content {
         padding: 5px !important;
         .pattern {
