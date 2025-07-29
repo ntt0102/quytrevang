@@ -57,8 +57,8 @@
                 ref="reloadToolRef"
                 class="command"
                 :title="$t('trading.derivative.reload')"
-                @click="resetChart"
-                @contextmenu="getTools"
+                @click="reloadChart"
+                @contextmenu="resetChart"
             >
                 <i
                     class="far fa-sync-alt"
@@ -836,12 +836,15 @@ function dateSelectChange() {
     if (!state.chartDate) return false;
     getChartData();
 }
-function resetChart() {
-    params.whitespaces = [];
-    params.ohlcMap.clear();
+function reloadChart() {
     params.socketUpdatedAt = subSeconds(new Date(), 61);
     connectSocket();
     getChartData();
+}
+function resetChart() {
+    params.whitespaces = [];
+    params.ohlcMap.clear();
+    reloadChart();
 }
 function showPendingOrders() {
     emit("showPendingOrders");
