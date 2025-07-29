@@ -1331,8 +1331,8 @@ function togglePatternType() {
 </script>
 <style lang="scss">
 .select-pattern {
-    width: 100%;
-    height: 100%;
+    width: 100% !important;
+    height: 100% !important;
 
     .dx-button-content {
         padding: 5px !important;
