@@ -439,6 +439,7 @@ function calcContinuePattern() {
                 ],
                 [
                     // red
+                    rBCD >= 50,
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
                 ],
             ];
@@ -457,6 +458,7 @@ function calcContinuePattern() {
                 ],
                 [
                     // red
+                    rBCD >= 50,
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
                     mf.cmp(D.price, side, phase2.S1.price),
                 ],

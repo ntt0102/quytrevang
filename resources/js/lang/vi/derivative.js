@@ -15,6 +15,7 @@ const longOrangeContinue = [
         name: "Bước đỏ",
         conds: [
             //
+            "P > 50",
             "T < Tmax",
         ],
     },
@@ -36,6 +37,7 @@ const deepLongOrangeContinue = [
         name: "Bước đỏ",
         conds: [
             //
+            "P > 50",
             "T < Tmax",
             "P > P1cam",
         ],
