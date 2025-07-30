@@ -494,10 +494,7 @@ function calcContinuePattern() {
 
         case "confirmLongRed":
             const confirmedLR =
-                fBreak ||
-                (dT6 > dT5 &&
-                    mf.cmp(H.price, side, F.price) &&
-                    mf.cmp(H.price, side, D.price));
+                fBreak || (dT6 > dT5 && mf.cmp(H.price, side, F.price));
             progressSteps = [
                 [
                     // orange
@@ -815,11 +812,7 @@ function calcReversalPattern() {
     const dBreak = mf.cmp(D.price, !side, B.price);
     const eBreak = mf.cmp(E.price, side, C.price);
 
-    const confirmed =
-        eBreak ||
-        (dT5 > dT4 &&
-            mf.cmp(G.price, side, E.price) &&
-            mf.cmp(G.price, side, C.price));
+    const confirmed = eBreak || (dT5 > dT4 && mf.cmp(G.price, side, E.price));
 
     let subPattern;
     if (dT2 > dT1) subPattern = !dBreak ? "longRed" : "shakeLongRed";
