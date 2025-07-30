@@ -480,7 +480,7 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
-                    phase3.tr < phase1.tr,
+                    TR3 < phase1.tr,
                 ],
                 [
                     // pink
@@ -504,7 +504,7 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
-                    phase3.tr < phase1.tr,
+                    TR3 < phase1.tr,
                 ],
                 [
                     // pink
