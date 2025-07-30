@@ -849,6 +849,7 @@ function calcReversalPattern() {
                 [
                     // pink
                     rBCD < 1.5,
+                    rCDDs < 0.5,
                 ],
                 [
                     // purple
@@ -872,6 +873,7 @@ function calcReversalPattern() {
                     // pink
                     dT3 >= TR2 * trThreshold,
                     CD >= phase2.pr,
+                    rCDDs < 0.5,
                 ],
                 [
                     // purple
@@ -896,6 +898,7 @@ function calcReversalPattern() {
                     dT3 >= TR2 * trThreshold,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
+                    rCDDs < 0.5,
                 ],
                 [
                     // purple
@@ -921,6 +924,7 @@ function calcReversalPattern() {
                     dT3 >= TR2 * trThreshold,
                     CD >= phase2.pr,
                     rBCD < 1.5,
+                    rCDDs < 0.5,
                 ],
                 [
                     // purple
@@ -940,6 +944,7 @@ function calcReversalPattern() {
                     dT3 >= TR2 * trThreshold,
                     CD >= phase2.pr,
                     rBCD < 1.5,
+                    rCDDs < 0.5,
                 ],
                 [
                     // purple

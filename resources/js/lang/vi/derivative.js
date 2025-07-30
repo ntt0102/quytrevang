@@ -352,6 +352,7 @@ const shakeLongRedReversal = [
         conds: [
             //
             "P < 150",
+            "Pb < 50",
         ],
     },
     {
@@ -385,6 +386,7 @@ const longPinkReversal = [
             //
             "T > Tmin",
             "P > Pmin",
+            "Pb < 50",
         ],
     },
     {
@@ -419,6 +421,7 @@ const shortPinkReversal = [
             "T > Tmin",
             "P > Pmin",
             "P > 70",
+            "Pb < 50",
         ],
     },
     {
@@ -454,6 +457,7 @@ const shakeLongPurpleReversal = [
             "T > Tmin",
             "P > Pmin",
             "P < 150",
+            "Pb < 50",
         ],
     },
     {
@@ -480,6 +484,7 @@ const shakeShortPurpleReversal = [
             "T > Tmin",
             "P > Pmin",
             "P < 150",
+            "Pb < 50",
         ],
     },
     {
