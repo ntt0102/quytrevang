@@ -39,7 +39,7 @@ const confirmLongOrangeContinue = [
             //
             "P > 50",
             "T < Tmax",
-            "P > P1cam",
+            "Xác nhận",
         ],
     },
 ];
@@ -105,7 +105,7 @@ const confirmLongRedContinue = [
         name: "Bước tím",
         conds: [
             //
-            "P > Pđỏ",
+            "Xác nhận",
             "P < Pvàng",
         ],
     },
@@ -326,7 +326,7 @@ const longRedReversal = [
         name: "Bước tím",
         conds: [
             //
-            "P > Pđỏ",
+            "Xác nhận",
         ],
     },
     {
@@ -358,7 +358,7 @@ const shakeLongRedReversal = [
         name: "Bước tím",
         conds: [
             //
-            "P > Pđỏ",
+            "Xác nhận",
         ],
     },
     {
@@ -391,7 +391,7 @@ const longPinkReversal = [
         name: "Bước tím",
         conds: [
             //
-            "P > Pđỏ",
+            "Xác nhận",
         ],
     },
     {
@@ -426,7 +426,7 @@ const shortPinkReversal = [
         conds: [
             //
             "Ts > Tđỏ",
-            "P > Pđỏ",
+            "Xác nhận",
         ],
     },
     {
@@ -486,7 +486,7 @@ const shakeShortPurpleReversal = [
         name: "Bước tím",
         conds: [
             //
-            "P > Pđỏ",
+            "Xác nhận",
         ],
     },
     {
