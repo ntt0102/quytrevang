@@ -373,7 +373,7 @@ function calcContinuePattern() {
     const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
     const BBs = mf.fmtNum(phase1.R.price1 - B.price, 1, true);
-    const BmC = mf.fmtNum(C.price - phase2.S1.price, 1, true);
+    const CBm = mf.fmtNum(phase2.S1.price - C.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const CCs = mf.fmtNum(phase2.R.price1 - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
@@ -403,7 +403,7 @@ function calcContinuePattern() {
     const rABC = BC / AB;
     const rBCD = CD / BC;
     const rBCCs = CCs / BC;
-    const rBCBm = BmC / BC;
+    const rBCBm = CBm / BC;
     const rCDE = DE / CD;
     const rDEF = EF / DE;
     const rDEEs = EEs / DE;
@@ -441,7 +441,7 @@ function calcContinuePattern() {
                 ],
                 [
                     // red
-                    rBCBm >= 50,
+                    rBCBm >= 0.5,
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
                 ],
             ];
@@ -460,7 +460,7 @@ function calcContinuePattern() {
                 ],
                 [
                     // red
-                    rBCBm >= 50,
+                    rBCBm >= 0.5,
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
                     mf.cmp(D.price, side, phase2.S1.price),
                 ],
