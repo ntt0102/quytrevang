@@ -1121,7 +1121,7 @@ function isBoxValid(box1, box2, isNot = false) {
     const check =
         (box1.pr >= box2.pr && box1.tr >= 0.8 * box2.tr) ||
         (box1.tr >= box2.tr && box1.pr >= 0.8 * box2.pr) ||
-        (box1.pr >= 1.5 * box2.pr && box1.tr >= 0.5 * box2.tr) ||
+        (box1.pr >= 1.5 * box2.pr && box1.tr >= 0.4 * box2.tr) ||
         box1.pr >= 2 * box2.pr;
     return isNot ? !check : check;
 }
