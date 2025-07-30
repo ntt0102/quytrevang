@@ -20,7 +20,7 @@ const longOrangeContinue = [
         ],
     },
 ];
-const deepLongOrangeContinue = [
+const confirmLongOrangeContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -73,7 +73,7 @@ const longRedContinue = [
         ],
     },
 ];
-const breakLongRedContinue = [
+const confirmLongRedContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -284,28 +284,24 @@ const continuePattern = {
         name: "Mẫu hình tiếp diễn </br>cam dài",
         steps: longOrangeContinue,
     },
-    deepLongOrange: {
+    confirmLongOrange: {
         name: "Mẫu hình tiếp diễn </br>cam dài xác nhận",
-        steps: deepLongOrangeContinue,
+        steps: confirmLongOrangeContinue,
     },
     longRed: {
         name: "Mẫu hình tiếp diễn </br>đỏ dài",
         steps: longRedContinue,
     },
-    breakLongRed: {
+    confirmLongRed: {
         name: "Mẫu hình tiếp diễn </br>đỏ dài xác nhận",
-        steps: breakLongRedContinue,
+        steps: confirmLongRedContinue,
     },
     longPink: {
         name: "Mẫu hình tiếp diễn </br>hồng dài",
         steps: longPinkContinue,
     },
-    shallowCyan: {
-        name: "Mẫu hình tiếp diễn </br>hồng ngắn - lam nông",
-        steps: shortPinkContinue,
-    },
-    deepCyan: {
-        name: "Mẫu hình tiếp diễn </br>hồng ngắn - lam sâu",
+    shortPink: {
+        name: "Mẫu hình tiếp diễn </br>hồng ngắn",
         steps: shortPinkContinue,
     },
     twoBase: {

@@ -416,13 +416,12 @@ function calcContinuePattern() {
 
     let subPattern;
     if (dT2 > dT1)
-        subPattern = DE < phase2.pr ? "longOrange" : "deepLongOrange";
+        subPattern = DE < phase2.pr ? "longOrange" : "confirmLongOrange";
     else if (!dBreak) {
         if (dT3 > dT2)
-            subPattern = dT3 >= dT1 - dT2 ? "longRed" : "breakLongRed";
+            subPattern = dT3 >= dT1 - dT2 ? "longRed" : "confirmLongRed";
         else {
-            subPattern =
-                dT4 > dT3 ? "longPink" : FG < DE ? "shallowCyan" : "deepCyan";
+            subPattern = dT4 > dT3 ? "longPink" : "shortPink";
         }
     } else subPattern = dT4 > dT2 ? "twoBase" : "threeBase";
 
@@ -448,7 +447,7 @@ function calcContinuePattern() {
             ];
             break;
 
-        case "deepLongOrange":
+        case "confirmLongOrange":
             progressSteps = [
                 [
                     // orange
@@ -493,7 +492,7 @@ function calcContinuePattern() {
             ];
             break;
 
-        case "breakLongRed":
+        case "confirmLongRed":
             progressSteps = [
                 [
                     // orange
@@ -553,8 +552,7 @@ function calcContinuePattern() {
                 ],
             ];
             break;
-        case "shallowCyan":
-        case "deepCyan":
+        case "shortPink":
             progressSteps = [
                 [
                     // orange
@@ -1122,7 +1120,7 @@ function scanPhase({ side, start, end }) {
 function isBoxValid(box1, box2, isNot = false) {
     const check =
         (box1.pr >= box2.pr && box1.tr >= 0.6 * box2.tr) ||
-        (box1.tr >= box2.tr && box1.pr >= 0.6 * box2.pr) ||
+        (box1.tr >= box2.tr && box1.pr >= 0.8 * box2.pr) ||
         (box1.pr >= 1.5 * box2.pr && box1.tr >= 0.4 * box2.tr) ||
         box1.pr >= 2 * box2.pr;
     return isNot ? !check : check;
