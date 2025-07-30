@@ -390,6 +390,7 @@ function calcContinuePattern() {
     const dT6 = G.time1.i - F.time.i;
 
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
+    const PR3 = isBreak1 ? phase3.pre.pr : phase3.pr;
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
 
     const T1 = phase1.R.time.i + phase1.tr;
@@ -481,6 +482,7 @@ function calcContinuePattern() {
                     CD >= phase2.pr,
                     rBCD >= 0.7,
                     TR3 < phase1.tr,
+                    isBoxValid({ tr: TR3, pr: PR3 }, phase1, true),
                 ],
                 [
                     // pink
@@ -504,7 +506,7 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
-                    TR3 < phase1.tr,
+                    isBoxValid({ tr: TR3, pr: PR3 }, phase1, true),
                 ],
                 [
                     // pink

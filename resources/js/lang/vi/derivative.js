@@ -60,8 +60,7 @@ const longRedContinue = [
             "T > Tmin",
             "P > Pmin",
             "P > 70",
-            "Tm < Tmvàng",
-            // "T ≄ Tcam",
+            "Bm < Bmvàng",
         ],
     },
     {
@@ -71,7 +70,6 @@ const longRedContinue = [
             "T > Tmin",
             // "P > Pmin",
             "Pb < 50",
-            // "T ≄ Tđỏ",
         ],
     },
 ];
@@ -92,7 +90,7 @@ const breakLongRedContinue = [
             "T > Tmin",
             "P > Pmin",
             "P > 70",
-            "Tm < Tmvàng",
+            "Bm < Bmvàng",
         ],
     },
     {
