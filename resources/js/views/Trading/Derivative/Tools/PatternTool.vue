@@ -481,14 +481,12 @@ function calcContinuePattern() {
                     CD >= phase2.pr,
                     rBCD >= 0.7,
                     phase3.tr < phase1.tr,
-                    // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
                     // DE >= phase3.pr,
                     rDEEs < 0.5,
-                    // isTimeNotEqual(dT3, dT4),
                 ],
             ];
             break;
@@ -507,13 +505,11 @@ function calcContinuePattern() {
                     CD >= phase2.pr,
                     rBCD >= 0.7,
                     phase3.tr < phase1.tr,
-                    // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
                     // DE >= phase3.pr,
-                    // isTimeNotEqual(dT3, dT4),
                 ],
                 [
                     // purple
@@ -538,13 +534,11 @@ function calcContinuePattern() {
                     dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     CD > CCs,
-                    // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
                     // DE >= phase3.pr,
-                    // isTimeNotEqual(dT3, dT4),
                 ],
                 [
                     // purple
@@ -573,14 +567,12 @@ function calcContinuePattern() {
                     dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     CD > CCs,
-                    // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
                     // DE >= phase3.pr,
                     rCDE >= 0.5,
-                    // isTimeNotEqual(dT3, dT4),
                 ],
                 [
                     // purple
@@ -607,14 +599,12 @@ function calcContinuePattern() {
                     dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     rBCD < 2,
-                    // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
                     // DE >= phase3.pr,
                     DE >= BC,
-                    // isTimeNotEqual(dT3, dT4),
                     dT4 > phase5.R.time1.i - phase5.S.time.i,
                 ],
             ];
@@ -633,29 +623,23 @@ function calcContinuePattern() {
                     dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     rBCD < 2,
-                    // isTimeNotEqual(dT2, dT3),
-                    // dT3 > dT2,
                 ],
                 [
                     // pink
                     // DE >= phase3.pr,
                     DE < BC,
-                    // isTimeNotEqual(dT3, dT4),
                 ],
                 [
                     // purple
                     dT5 >= dT3 - dT4,
                     EF >= phase4.pr,
                     rDEF < 2,
-                    // isTimeNotEqual(dT4, dT5),
-                    // dT5 > dT4,
                     fBreak,
                 ],
                 [
                     // cyan
                     // FG >= phase5.pr,
                     FG < DE,
-                    // isTimeNotEqual(dT5, dT6),
                 ],
             ];
             break;
@@ -884,7 +868,6 @@ function calcReversalPattern() {
                     // pink
                     dT3 >= TR2 * trThreshold,
                     CD >= phase2.pr,
-                    // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple
@@ -909,7 +892,6 @@ function calcReversalPattern() {
                     dT3 >= TR2 * trThreshold,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
-                    // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple
@@ -935,7 +917,6 @@ function calcReversalPattern() {
                     dT3 >= TR2 * trThreshold,
                     CD >= phase2.pr,
                     rBCD < 1.5,
-                    // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple
@@ -955,7 +936,6 @@ function calcReversalPattern() {
                     dT3 >= TR2 * trThreshold,
                     CD >= phase2.pr,
                     rBCD < 1.5,
-                    // isTimeNotEqual(dT2, dT3),
                 ],
                 [
                     // purple
@@ -1325,14 +1305,6 @@ function togglePatternType() {
             }
         });
 }
-// function isTimeNotEqual(a, b, threshold = 0.9) {
-//     const minVal = Math.min(a, b);
-//     const maxVal = Math.max(a, b);
-//     if (maxVal === 0) return true;
-//     const ratio = minVal / maxVal;
-//     console.log("isTimeNotEqual", ratio);
-//     return ratio <= threshold;
-// }
 </script>
 <style lang="scss">
 .select-pattern {
