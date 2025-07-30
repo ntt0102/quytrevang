@@ -480,6 +480,7 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
+                    phase3.tr < phase1.tr,
                     // isTimeNotEqual(dT2, dT3),
                 ],
                 [
@@ -505,6 +506,7 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
+                    phase3.tr < phase1.tr,
                     // isTimeNotEqual(dT2, dT3),
                 ],
                 [
