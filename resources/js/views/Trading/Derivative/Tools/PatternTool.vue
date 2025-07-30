@@ -413,6 +413,7 @@ function calcContinuePattern() {
 
     const dBreak = mf.cmp(D.price, side, B.price);
     const fBreak = mf.cmp(F.price, side, D.price);
+    const hBreak = mf.cmp(H.price, side, F.price);
 
     let subPattern;
     if (dT2 > dT1)
@@ -654,12 +655,16 @@ function calcContinuePattern() {
         ["yellow", "orange", "red", "pink", "purple", "cyan", "green", "green"]
     );
     //
-    const islongOrange = subPattern === "longOrange";
+    const islongOrange = ["longOrange", "confirmLongOrange"].includes(
+        subPattern
+    );
     const orderSide = side ? 1 : -1;
     const refPrice = islongOrange
         ? phase2.S1.price
         : fBreak
-        ? F.price
+        ? hBreak
+            ? H.price
+            : F.price
         : D.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
     const x = adjustTargetPrice(D.price, CD, orderSide);
@@ -811,6 +816,7 @@ function calcReversalPattern() {
 
     const dBreak = mf.cmp(D.price, !side, B.price);
     const eBreak = mf.cmp(E.price, side, C.price);
+    const gBreak = mf.cmp(G.price, side, E.price);
 
     const confirmed = eBreak || (dT5 > dT4 && mf.cmp(G.price, side, E.price));
 
@@ -967,7 +973,7 @@ function calcReversalPattern() {
     );
     //
     const orderSide = side ? 1 : -1;
-    const refPrice = E.price;
+    const refPrice = gBreak ? G.price : E.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
     const x = adjustTargetPrice(C.price, CD, orderSide);
     const X = mf.fmtNum(x - entry);
