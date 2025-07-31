@@ -849,6 +849,10 @@ function calcContinuePattern() {
     const isRedBoxValid = isBoxValid({ tr: TR3, pr: PR3 }, phase1, true);
     const isPurpleBoxValid = isBoxValid({ tr: TR5, pr: PR5 }, phase1, true);
 
+    const confirmed =
+        mf.cmp(F.price, side, D.price, true) ||
+        (rDEF > 0.7 && dT6 > dT5 && mf.cmp(H.price, side, F.price, true));
+
     let subPattern;
     if (dT2 >= dT1) subPattern = DE < phase2.pr ? "orange" : "orangeConfirm";
     else if (!dBreak) {
@@ -960,11 +964,6 @@ function calcContinuePattern() {
             break;
 
         case "purple":
-            const confirmed =
-                mf.cmp(F.price, side, D.price, true) ||
-                (rDEF > 0.7 &&
-                    dT6 > dT5 &&
-                    mf.cmp(H.price, side, F.price, true));
             progressSteps = [
                 [
                     // orange
@@ -1530,7 +1529,8 @@ function calcReversalPattern() {
     const gBreak = mf.cmp(G.price, side, E.price);
 
     const confirmed =
-        eBreak || (rCDE > 0.7 && dT5 > dT4 && mf.cmp(G.price, side, E.price));
+        mf.cmp(E.price, side, C.price, true) ||
+        (rCDE > 0.7 && dT5 > dT4 && mf.cmp(G.price, side, E.price, true));
 
     let subPattern;
     if (dT2 >= dT1) subPattern = "red";
