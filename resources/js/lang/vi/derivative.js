@@ -6,7 +6,7 @@ const orangeContinue = [
             "T > Tmin",
             "P > Pmin",
             "P < 70",
-            "Pb < 50",
+            // "Pb < 50",
             "Bm > Bmvàng",
             "Pm > Pbvàng",
         ],
@@ -29,7 +29,7 @@ const orangeConfirmContinue = [
             "T > Tmin",
             "P > Pmin",
             "P < 70",
-            "Pb < 50",
+            // "Pb < 50",
             "Bm > Bmvàng",
             "Pm > Pbvàng",
         ],
@@ -64,15 +64,15 @@ const redContinue = [
             // "P > 70",
         ],
     },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            // "T > Tmin",
-            // "P > Pmin",
-            "Pb < 50",
-        ],
-    },
+    // {
+    //     name: "Bước hồng",
+    //     conds: [
+    //         //
+    //         // "T > Tmin",
+    //         // "P > Pmin",
+    //         "Pb < 50",
+    //     ],
+    // },
 ];
 const redConfirmContinue = [
     {
@@ -81,7 +81,7 @@ const redConfirmContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            "Pb < 50",
+            // "Pb < 50",
         ],
     },
     {
@@ -93,15 +93,15 @@ const redConfirmContinue = [
             // "P > 70",
         ],
     },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            // "T > Tmin",
-            // "P > Pmin",
-            "Pb < 50",
-        ],
-    },
+    // {
+    //     name: "Bước hồng",
+    //     conds: [
+    //         //
+    //         // "T > Tmin",
+    //         // "P > Pmin",
+    //         "Pb < 50",
+    //     ],
+    // },
     {
         name: "Bước tím",
         conds: [
@@ -125,7 +125,7 @@ const purpleContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            "Pb < 50",
+            // "Pb < 50",
         ],
     },
     {
@@ -138,15 +138,15 @@ const purpleContinue = [
             "Bm < Bmvàng",
         ],
     },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            // "T > Tmin",
-            // "P > Pmin",
-            "Pb < 50",
-        ],
-    },
+    // {
+    //     name: "Bước hồng",
+    //     conds: [
+    //         //
+    //         // "T > Tmin",
+    //         // "P > Pmin",
+    //         "Pb < 50",
+    //     ],
+    // },
     {
         name: "Bước tím",
         conds: [
@@ -289,7 +289,7 @@ const redReversal = [
         conds: [
             //
             "P < 150",
-            "Pb < 50",
+            // "Pb < 50",
         ],
     },
     {
@@ -322,7 +322,7 @@ const purpleReversal = [
         conds: [
             //
             "P < 150",
-            "Pb < 50",
+            // "Pb < 50",
             "Bm > Bmcam",
         ],
     },

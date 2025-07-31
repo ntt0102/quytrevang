@@ -874,7 +874,7 @@ function calcContinuePattern() {
                     dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                     rABC <= 0.7,
-                    rBCCs < 0.5,
+                    // rBCCs < 0.5,
                     isBoxValid(phase2, phase1),
                     phase2.pr > BBs,
                 ],
@@ -894,7 +894,7 @@ function calcContinuePattern() {
                     dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
                     rABC <= 0.7,
-                    rBCCs < 0.5,
+                    // rBCCs < 0.5,
                     isBoxValid(phase2, phase1),
                     phase2.pr > BBs,
                 ],
@@ -922,12 +922,12 @@ function calcContinuePattern() {
                     CD >= phase2.pr,
                     // rBCD >= 0.7,
                 ],
-                [
-                    // pink
-                    // dT4 >= TR3 * trThreshold,
-                    // DE >= phase3.pr,
-                    rDEEs < 0.5,
-                ],
+                // [
+                //     // pink
+                //     // dT4 >= TR3 * trThreshold,
+                //     // DE >= phase3.pr,
+                //     // rDEEs < 0.5,
+                // ],
             ];
             break;
 
@@ -937,7 +937,7 @@ function calcContinuePattern() {
                     // orange
                     dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
-                    rBCCs < 0.5,
+                    // rBCCs < 0.5,
                 ],
                 [
                     // red
@@ -945,12 +945,12 @@ function calcContinuePattern() {
                     CD >= phase2.pr,
                     // rBCD >= 0.7,
                 ],
-                [
-                    // pink
-                    // dT4 >= TR3 * trThreshold,
-                    // DE >= phase3.pr,
-                    rDEEs < 0.5,
-                ],
+                // [
+                //     // pink
+                //     // dT4 >= TR3 * trThreshold,
+                //     // DE >= phase3.pr,
+                //     // rDEEs < 0.5,
+                // ],
                 [
                     // purple
                     confirmed,
@@ -969,7 +969,7 @@ function calcContinuePattern() {
                     // orange
                     dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
-                    rBCCs < 0.5,
+                    // rBCCs < 0.5,
                 ],
                 [
                     // red
@@ -978,12 +978,12 @@ function calcContinuePattern() {
                     // rBCD >= 0.7,
                     isRedBoxValid,
                 ],
-                [
-                    // pink
-                    // dT4 >= TR3 * trThreshold,
-                    // DE >= phase3.pr,
-                    rDEEs < 0.5,
-                ],
+                // [
+                //     // pink
+                //     // dT4 >= TR3 * trThreshold,
+                //     // DE >= phase3.pr,
+                //     rDEEs < 0.5,
+                // ],
                 [
                     // purple
                     confirmed,
@@ -1548,7 +1548,7 @@ function calcReversalPattern() {
                 [
                     // pink
                     rBCD < 1.5,
-                    rCDDs < 0.5,
+                    // rCDDs < 0.5,
                 ],
                 [
                     // purple
@@ -1572,7 +1572,7 @@ function calcReversalPattern() {
                 [
                     // pink
                     rBCD < 1.5,
-                    rCDDs < 0.5,
+                    // rCDDs < 0.5,
                     isBoxValid(phase3, phase1),
                 ],
                 [
