@@ -495,7 +495,8 @@ function calcContinuePattern() {
 
         case "confirmLongRed":
             const confirmedLR =
-                fBreak || (dT6 > dT5 && mf.cmp(H.price, side, F.price));
+                fBreak ||
+                (rDEF > 0.7 && dT6 > dT5 && mf.cmp(H.price, side, F.price));
             progressSteps = [
                 [
                     // orange
@@ -818,7 +819,8 @@ function calcReversalPattern() {
     const eBreak = mf.cmp(E.price, side, C.price);
     const gBreak = mf.cmp(G.price, side, E.price);
 
-    const confirmed = eBreak || (dT5 > dT4 && mf.cmp(G.price, side, E.price));
+    const confirmed =
+        eBreak || (rCDE > 0.7 && dT5 > dT4 && mf.cmp(G.price, side, E.price));
 
     let subPattern;
     if (dT2 > dT1) subPattern = !dBreak ? "longRed" : "shakeLongRed";
@@ -1134,8 +1136,9 @@ function scanPhase({ side, start, end }) {
 }
 function isBoxValid(box1, box2, isNot = false) {
     const check =
-        (box1.pr >= box2.pr && box1.tr >= 0.6 * box2.tr) ||
         (box1.tr >= box2.tr && box1.pr >= 0.8 * box2.pr) ||
+        (box1.pr >= box2.pr && box1.tr >= 0.8 * box2.tr) ||
+        (box1.pr >= 1.25 * box2.pr && box1.tr >= 0.6 * box2.tr) ||
         (box1.pr >= 1.5 * box2.pr && box1.tr >= 0.4 * box2.tr) ||
         box1.pr >= 2 * box2.pr;
     return isNot ? !check : check;
