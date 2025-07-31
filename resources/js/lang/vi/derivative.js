@@ -138,7 +138,7 @@ const longPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "Ts > Tvàng",
+            "Pb < 50",
             // "P > Pmin",
         ],
     },
@@ -146,6 +146,7 @@ const longPinkContinue = [
         name: "Bước tím",
         conds: [
             //
+            "Ts > Tvàng",
             "Xác nhận",
         ],
     },
@@ -184,15 +185,16 @@ const shortPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "Ts > Tvàng",
             // "P > Pmin",
             "P > 50",
+            "Pb < 50",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
+            "Ts > Tvàng",
             "Xác nhận",
         ],
     },

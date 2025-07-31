@@ -548,11 +548,12 @@ function calcContinuePattern() {
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
-                    dT4 >= dT1 - dT2 - dT3,
+                    rDEEs < 0.5,
                     // DE >= phase3.pr,
                 ],
                 [
                     // purple
+                    dT5 >= dT1 - dT2 - dT3 - dT4,
                     mf.cmp(F.price, side, D.price, true),
                 ],
                 [
@@ -581,12 +582,13 @@ function calcContinuePattern() {
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
-                    dT4 >= dT1 - dT2 - dT3,
                     // DE >= phase3.pr,
                     rCDE >= 0.5,
+                    rDEEs < 0.5,
                 ],
                 [
                     // purple
+                    dT5 >= dT1 - dT2 - dT3 - dT4,
                     mf.cmp(F.price, side, D.price, true),
                 ],
                 [
