@@ -128,7 +128,6 @@ const longPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "Ts > Tvàng",
             "P > Pmin",
             "P > Pbcam",
             "Bm < Bmvàng",
@@ -139,6 +138,7 @@ const longPinkContinue = [
         conds: [
             //
             "T > Tmin",
+            "Ts > Tvàng",
             // "P > Pmin",
         ],
     },
@@ -146,7 +146,7 @@ const longPinkContinue = [
         name: "Bước tím",
         conds: [
             //
-            "P > Pđỏ",
+            "Xác nhận",
         ],
     },
     {
@@ -174,7 +174,6 @@ const shortPinkContinue = [
         conds: [
             //
             "T > Tmin",
-            "Ts > Tvàng",
             "P > Pmin",
             "P > Pbcam",
             "Bm < Bmvàng",
@@ -185,6 +184,7 @@ const shortPinkContinue = [
         conds: [
             //
             "T > Tmin",
+            "Ts > Tvàng",
             // "P > Pmin",
             "P > 50",
         ],
@@ -193,7 +193,7 @@ const shortPinkContinue = [
         name: "Bước tím",
         conds: [
             //
-            "P > Pđỏ",
+            "Xác nhận",
         ],
     },
     {
@@ -273,7 +273,7 @@ const threeBaseContinue = [
             "Ts > Tđỏ",
             "P > Pmin",
             "P < 200",
-            "P > Pđỏ",
+            "Xác nhận",
         ],
     },
     {

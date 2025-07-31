@@ -465,7 +465,7 @@ function calcContinuePattern() {
                     // red
                     rBCBm >= 0.5,
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
-                    mf.cmp(D.price, side, phase2.S1.price),
+                    mf.cmp(D.price, side, phase2.S1.price, true),
                     isRedBoxValid,
                 ],
             ];
@@ -498,8 +498,10 @@ function calcContinuePattern() {
 
         case "confirmLongRed":
             const confirmedLR =
-                fBreak ||
-                (rDEF > 0.7 && dT6 > dT5 && mf.cmp(H.price, side, F.price));
+                mf.cmp(F.price, side, D.price, true) ||
+                (rDEF > 0.7 &&
+                    dT6 > dT5 &&
+                    mf.cmp(H.price, side, F.price, true));
             progressSteps = [
                 [
                     // orange
@@ -539,7 +541,6 @@ function calcContinuePattern() {
                 [
                     // red
                     dT3 >= phase2.tr * trThreshold,
-                    dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     CD > CCs,
                     isRedBoxValid,
@@ -547,11 +548,12 @@ function calcContinuePattern() {
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
+                    dT4 >= dT1 - dT2 - dT3,
                     // DE >= phase3.pr,
                 ],
                 [
                     // purple
-                    fBreak,
+                    mf.cmp(F.price, side, D.price, true),
                 ],
                 [
                     // cyan
@@ -572,7 +574,6 @@ function calcContinuePattern() {
                 [
                     // red
                     dT3 >= phase2.tr * trThreshold,
-                    dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     CD > CCs,
                     isRedBoxValid,
@@ -580,12 +581,13 @@ function calcContinuePattern() {
                 [
                     // pink
                     dT4 >= TR3 * trThreshold,
+                    dT4 >= dT1 - dT2 - dT3,
                     // DE >= phase3.pr,
                     rCDE >= 0.5,
                 ],
                 [
                     // purple
-                    fBreak,
+                    mf.cmp(F.price, side, D.price, true),
                 ],
                 [
                     // cyan
