@@ -953,6 +953,7 @@ function calcContinuePattern() {
                     confirmed,
                     // mf.cmp(F.price, !side, B.price, true),
                     isPurpleBoxValid,
+                    dT5 >= dT1 - dT2 - dT3 - dT4,
                 ],
             ];
             break;

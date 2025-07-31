@@ -110,6 +110,7 @@ const purpleContinue = [
             //
             "Xác nhận",
             "Bm < Bmvàng",
+            "Ts > Tvàng",
         ],
     },
 ];
