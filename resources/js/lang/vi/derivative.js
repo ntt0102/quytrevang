@@ -62,7 +62,6 @@ const redContinue = [
             "T > Tmin",
             "P > Pmin",
             // "P > 70",
-            "Bm < Bmvàng",
         ],
     },
     {
@@ -71,6 +70,50 @@ const redContinue = [
             //
             // "T > Tmin",
             // "P > Pmin",
+            "Pb < 50",
+        ],
+    },
+];
+const redConfirmContinue = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "Pb < 50",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            // "P > 70",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            // "T > Tmin",
+            // "P > Pmin",
+            "Pb < 50",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
             "Pb < 50",
         ],
     },
@@ -111,6 +154,14 @@ const purpleContinue = [
             "Xác nhận",
             "Bm < Bmvàng",
             "Ts > Tvàng",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
+            "Pb < 50",
         ],
     },
 ];
@@ -206,6 +257,10 @@ const continuePattern = {
     red: {
         name: "Mẫu hình tiếp diễn </br>đỏ",
         steps: redContinue,
+    },
+    redConfirm: {
+        name: "Mẫu hình tiếp diễn </br>đỏ",
+        steps: redConfirmContinue,
     },
     purple: {
         name: "Mẫu hình tiếp diễn </br>tím",

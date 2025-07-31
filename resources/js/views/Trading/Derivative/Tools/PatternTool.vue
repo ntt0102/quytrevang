@@ -852,7 +852,12 @@ function calcContinuePattern() {
     let subPattern;
     if (dT2 >= dT1) subPattern = DE < phase2.pr ? "orange" : "orangeConfirm";
     else if (!dBreak) {
-        subPattern = dT3 + dT2 >= dT1 ? "red" : "purple";
+        subPattern =
+            dT3 + dT2 >= dT1
+                ? isRedBoxValid
+                    ? "red"
+                    : "redConfirm"
+                : "purple";
     } else subPattern = dT4 > dT2 ? "twoBase" : "threeBase";
 
     let progressSteps;
@@ -912,13 +917,44 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     // rBCD >= 0.7,
-                    isRedBoxValid,
                 ],
                 [
                     // pink
                     // dT4 >= TR3 * trThreshold,
                     // DE >= phase3.pr,
                     rDEEs < 0.5,
+                ],
+            ];
+            break;
+
+        case "redConfirm":
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr * trThreshold,
+                    BC >= phase1.pr,
+                    rBCCs < 0.5,
+                ],
+                [
+                    // red
+                    dT3 >= phase2.tr * trThreshold,
+                    CD >= phase2.pr,
+                    // rBCD >= 0.7,
+                ],
+                [
+                    // pink
+                    // dT4 >= TR3 * trThreshold,
+                    // DE >= phase3.pr,
+                    rDEEs < 0.5,
+                ],
+                [
+                    // purple
+                    confirmed,
+                ],
+                [
+                    // cyan
+                    FG < DE,
+                    rFGGs < 0.5,
                 ],
             ];
             break;
@@ -955,6 +991,11 @@ function calcContinuePattern() {
                     // mf.cmp(F.price, !side, B.price, true),
                     isPurpleBoxValid,
                     dT5 >= dT1 - dT2 - dT3 - dT4,
+                ],
+                [
+                    // cyan
+                    FG < DE,
+                    rFGGs < 0.5,
                 ],
             ];
             break;
