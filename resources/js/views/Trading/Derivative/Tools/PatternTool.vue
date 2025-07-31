@@ -40,6 +40,7 @@ import DxDropDownButton from "devextreme-vue/drop-down-button";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { formatISO } from "date-fns";
+import { is } from "date-fns/locale";
 
 const store = useStore();
 const mf = inject("mf");
@@ -849,9 +850,9 @@ function calcContinuePattern() {
     const isPurpleBoxValid = isBoxValid({ tr: TR5, pr: PR5 }, phase1, true);
 
     let subPattern;
-    if (dT2 > dT1) subPattern = DE < phase2.pr ? "orange" : "orangeConfirm";
+    if (dT2 >= dT1) subPattern = DE < phase2.pr ? "orange" : "orangeConfirm";
     else if (!dBreak) {
-        subPattern = dT3 + dT2 > dT1 ? "red" : "purple";
+        subPattern = dT3 + dT2 >= dT1 ? "red" : "purple";
     } else subPattern = dT4 > dT2 ? "twoBase" : "threeBase";
 
     let progressSteps;
@@ -1087,6 +1088,304 @@ function calcContinuePattern() {
         ],
     };
 }
+// function calcReversalPattern() {
+//     const { A, B } = scanPoints;
+//     const ab = A.price - B.price;
+//     let side = ab > 0;
+//     const pickTime = props.pickTimeToolRef.get();
+//     const phase1 = scanPhase({
+//         side: !side,
+//         start: A,
+//         end: { time: Math.min(pickTime ?? B.time.t, B.time.t), price: B.price },
+//     });
+//     const stopTime = props.indexToTime(
+//         6 * phase1.R.time.i - 5 * phase1.S.time.i
+//     );
+//     const phase2 = scanPhase({
+//         side,
+//         start: { time: B.time },
+//         end: { time: pickTime ?? stopTime },
+//     });
+
+//     const isBreak1 = isBoxValid(phase2.ext, phase2, true);
+
+//     const C = isBreak1 ? phase2.R1 : phase2.ext.R;
+//     const D = isBreak1 ? phase2.S1 : phase2.ext.S;
+
+//     const phase3 = scanPhase({
+//         side: !side,
+//         start: C,
+//         end: { time: Math.min(pickTime ?? D.time.t, D.time.t), price: D.price },
+//     });
+
+//     const phase4 = scanPhase({
+//         side,
+//         start: D,
+//         end: { time: pickTime ?? stopTime },
+//     });
+
+//     const isBreak2 = isBoxValid(phase4.ext, phase4, true);
+
+//     const E = isBreak2 ? phase4.R1 : phase4.ext.R;
+//     const F = isBreak2 ? phase4.S1 : phase4.ext.S;
+
+//     const phase5 = scanPhase({
+//         side: !side,
+//         start: E,
+//         end: { time: Math.min(pickTime ?? F.time.t, F.time.t), price: F.price },
+//     });
+
+//     const phase6 = scanPhase({
+//         side,
+//         start: F,
+//         end: { time: pickTime ?? stopTime },
+//     });
+
+//     const isBreak3 = isBoxValid(phase6.ext, phase6, true);
+
+//     const G = isBreak3 ? phase6.R1 : phase6.ext.R;
+
+//     console.log("calcReversalPattern", [
+//         phase1,
+//         phase2,
+//         phase3,
+//         phase4,
+//         phase5,
+//         phase6,
+//     ]);
+
+//     const AB = mf.fmtNum(ab, 1, true);
+//     const BC = mf.fmtNum(C.price - B.price, 1, true);
+//     const CD = mf.fmtNum(D.price - C.price, 1, true);
+//     const DE = mf.fmtNum(E.price - D.price, 1, true);
+//     const DDs = mf.fmtNum(phase3.R.price1 - D.price, 1, true);
+//     const EF = mf.fmtNum(F.price - E.price, 1, true);
+//     const FFs = mf.fmtNum(phase5.R.price1 - F.price, 1, true);
+
+//     const dT1 = phase1.R.time1.i - phase1.S.time.i;
+//     const dT2 = C.time1.i - phase2.S.time.i;
+//     const dT3 = D.time1.i - C.time.i;
+//     const dT4 = E.time1.i - D.time.i;
+//     const dT5 = F.time1.i - E.time.i;
+
+//     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
+//     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
+
+//     const T1 = phase1.R.time.i + phase1.tr;
+//     const T2 = C.time.i + TR2;
+//     const T3 = D.time.i + phase3.tr;
+//     const T4 = E.time.i + TR4;
+//     const T5 = F.time.i + phase5.tr;
+//     const timeMark = [T5, T4, T3, T2, T1];
+
+//     const rABC = BC / AB;
+//     const rBCD = CD / BC;
+//     const rCDE = DE / CD;
+//     const rCDDs = DDs / CD;
+//     const rDEF = EF / DE;
+//     const rEFFs = FFs / EF;
+
+//     const dBreak = mf.cmp(D.price, !side, B.price);
+//     const eBreak = mf.cmp(E.price, side, C.price);
+//     const gBreak = mf.cmp(G.price, side, E.price);
+
+//     const confirmed =
+//         eBreak || (rCDE > 0.7 && dT5 > dT4 && mf.cmp(G.price, side, E.price));
+
+//     let subPattern;
+//     if (dT2 > dT1) subPattern = !dBreak ? "longRed" : "shakeLongRed";
+//     else if (!dBreak) subPattern = dT3 > dT2 ? "longPink" : "shortPink";
+//     else subPattern = dT4 > dT3 ? "shakeLongPurple" : "shakeShortPurple";
+
+//     let progressSteps;
+//     switch (subPattern) {
+//         case "longRed":
+//             progressSteps = [
+//                 [
+//                     // red
+//                     dT2 >= phase1.tr * trThreshold,
+//                     BC >= phase1.pr,
+//                 ],
+//                 [
+//                     // purple
+//                     confirmed,
+//                 ],
+//                 [
+//                     // cyan
+//                     EF < CD,
+//                     rEFFs < 0.5,
+//                 ],
+//             ];
+//             break;
+//         case "shakeLongRed":
+//             progressSteps = [
+//                 [
+//                     // red
+//                     dT2 >= phase1.tr * trThreshold,
+//                     BC >= phase1.pr,
+//                 ],
+//                 [
+//                     // pink
+//                     rBCD < 1.5,
+//                     rCDDs < 0.5,
+//                 ],
+//                 [
+//                     // purple
+//                     confirmed,
+//                 ],
+//                 [
+//                     // cyan
+//                     EF < CD,
+//                     rEFFs < 0.5,
+//                 ],
+//             ];
+//             break;
+//         case "longPink":
+//             progressSteps = [
+//                 [
+//                     // red
+//                     dT2 >= phase1.tr * trThreshold,
+//                     BC >= phase1.pr,
+//                 ],
+//                 [
+//                     // pink
+//                     dT3 >= TR2 * trThreshold,
+//                     CD >= phase2.pr,
+//                     rCDDs < 0.5,
+//                 ],
+//                 [
+//                     // purple
+//                     confirmed,
+//                 ],
+//                 [
+//                     // cyan
+//                     EF < CD,
+//                     rEFFs < 0.5,
+//                 ],
+//             ];
+//             break;
+//         case "shortPink":
+//             progressSteps = [
+//                 [
+//                     // red
+//                     dT2 >= phase1.tr * trThreshold,
+//                     BC >= phase1.pr,
+//                 ],
+//                 [
+//                     // pink
+//                     dT3 >= TR2 * trThreshold,
+//                     CD >= phase2.pr,
+//                     rBCD >= 0.7,
+//                     rCDDs < 0.5,
+//                 ],
+//                 [
+//                     // purple
+//                     dT4 >= dT2 - dT3,
+//                     confirmed,
+//                 ],
+//                 [
+//                     // cyan
+//                     EF < CD,
+//                     rEFFs < 0.5,
+//                 ],
+//             ];
+//             break;
+//         case "shakeLongPurple":
+//             progressSteps = [
+//                 [
+//                     // red
+//                     dT2 >= phase1.tr * trThreshold,
+//                     BC >= phase1.pr,
+//                 ],
+//                 [
+//                     // pink
+//                     dT3 >= TR2 * trThreshold,
+//                     CD >= phase2.pr,
+//                     rBCD < 1.5,
+//                     rCDDs < 0.5,
+//                 ],
+//                 [
+//                     // purple
+//                     rCDE >= 0.7,
+//                 ],
+//             ];
+//             break;
+//         case "shakeShortPurple":
+//             progressSteps = [
+//                 [
+//                     // red
+//                     dT2 >= phase1.tr * trThreshold,
+//                     BC >= phase1.pr,
+//                 ],
+//                 [
+//                     // pink
+//                     dT3 >= TR2 * trThreshold,
+//                     CD >= phase2.pr,
+//                     rBCD < 1.5,
+//                     rCDDs < 0.5,
+//                 ],
+//                 [
+//                     // purple
+//                     confirmed,
+//                 ],
+//                 [
+//                     // cyan
+//                     EF < CD,
+//                     rEFFs < 0.5,
+//                 ],
+//             ];
+//             break;
+//     }
+
+//     const progress = checkProgress(subPattern, progressSteps);
+//     //
+//     const points = buildViewPoints(
+//         [A, phase1.R, C, D, E, F, G],
+//         ["orange", "red", "pink", "purple", "cyan", "green", "green"]
+//     );
+//     //
+//     const orderSide = side ? 1 : -1;
+//     const refPrice = gBreak ? G.price : E.price;
+//     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
+//     const x = adjustTargetPrice(C.price, CD, orderSide);
+//     const X = mf.fmtNum(x - entry);
+//     const y = adjustTargetPrice(C.price, 2 * CD, orderSide);
+//     const Y = mf.fmtNum(y - entry);
+//     const z = adjustTargetPrice(C.price, 4 * CD, orderSide);
+//     const Z = mf.fmtNum(z - entry);
+//     const w = mf.fmtNum(C.price + orderSide * BC);
+//     const W = mf.fmtNum(w - entry);
+//     const t = mf.fmtNum((E.price + F.price) / 2);
+//     const T = mf.fmtNum(t - entry);
+//     //
+//     let order = {};
+//     if (progress.result) {
+//         const tp = mf.cmp(W, !side, X) ? x : mf.cmp(W, side, Y) ? y : w;
+//         const sl = dBreak ? B.price : D.price;
+//         order = {
+//             side: orderSide,
+//             price: entry,
+//             tpPrice: tp,
+//             slPrice: mf.fmtNum(sl - orderSide * 0.1),
+//         };
+//         console.log("order", order);
+//     }
+
+//     return {
+//         timeMark,
+//         progress,
+//         order,
+//         points: makeUnique(points),
+//         entry,
+//         target: [
+//             [x, X],
+//             [y, Y],
+//             [z, Z],
+//             [w, W],
+//             [t, T],
+//         ],
+//     };
+// }
 function calcReversalPattern() {
     const { A, B } = scanPoints;
     const ab = A.price - B.price;
@@ -1168,6 +1467,7 @@ function calcReversalPattern() {
     const dT5 = F.time1.i - E.time.i;
 
     const TR2 = isBreak1 ? phase2.pre.tr : phase2.tr;
+    // const PR2 = isBreak1 ? phase2.pre.pr : phase2.pr;
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
 
     const T1 = phase1.R.time.i + phase1.tr;
@@ -1192,31 +1492,12 @@ function calcReversalPattern() {
         eBreak || (rCDE > 0.7 && dT5 > dT4 && mf.cmp(G.price, side, E.price));
 
     let subPattern;
-    if (dT2 > dT1) subPattern = !dBreak ? "longRed" : "shakeLongRed";
-    else if (!dBreak) subPattern = dT3 > dT2 ? "longPink" : "shortPink";
-    else subPattern = dT4 > dT3 ? "shakeLongPurple" : "shakeShortPurple";
+    if (dT2 >= dT1) subPattern = "red";
+    else subPattern = "purple";
 
     let progressSteps;
     switch (subPattern) {
-        case "longRed":
-            progressSteps = [
-                [
-                    // red
-                    dT2 >= phase1.tr * trThreshold,
-                    BC >= phase1.pr,
-                ],
-                [
-                    // purple
-                    confirmed,
-                ],
-                [
-                    // cyan
-                    EF < CD,
-                    rEFFs < 0.5,
-                ],
-            ];
-            break;
-        case "shakeLongRed":
+        case "red":
             progressSteps = [
                 [
                     // red
@@ -1239,7 +1520,8 @@ function calcReversalPattern() {
                 ],
             ];
             break;
-        case "longPink":
+
+        case "purple":
             progressSteps = [
                 [
                     // red
@@ -1248,83 +1530,13 @@ function calcReversalPattern() {
                 ],
                 [
                     // pink
-                    dT3 >= TR2 * trThreshold,
-                    CD >= phase2.pr,
-                    rCDDs < 0.5,
-                ],
-                [
-                    // purple
-                    confirmed,
-                ],
-                [
-                    // cyan
-                    EF < CD,
-                    rEFFs < 0.5,
-                ],
-            ];
-            break;
-        case "shortPink":
-            progressSteps = [
-                [
-                    // red
-                    dT2 >= phase1.tr * trThreshold,
-                    BC >= phase1.pr,
-                ],
-                [
-                    // pink
-                    dT3 >= TR2 * trThreshold,
-                    CD >= phase2.pr,
-                    rBCD >= 0.7,
-                    rCDDs < 0.5,
-                ],
-                [
-                    // purple
-                    dT4 >= dT2 - dT3,
-                    confirmed,
-                ],
-                [
-                    // cyan
-                    EF < CD,
-                    rEFFs < 0.5,
-                ],
-            ];
-            break;
-        case "shakeLongPurple":
-            progressSteps = [
-                [
-                    // red
-                    dT2 >= phase1.tr * trThreshold,
-                    BC >= phase1.pr,
-                ],
-                [
-                    // pink
-                    dT3 >= TR2 * trThreshold,
-                    CD >= phase2.pr,
                     rBCD < 1.5,
                     rCDDs < 0.5,
+                    isBoxValid(phase3, phase1),
                 ],
                 [
                     // purple
-                    rCDE >= 0.7,
-                ],
-            ];
-            break;
-        case "shakeShortPurple":
-            progressSteps = [
-                [
-                    // red
-                    dT2 >= phase1.tr * trThreshold,
-                    BC >= phase1.pr,
-                ],
-                [
-                    // pink
-                    dT3 >= TR2 * trThreshold,
-                    CD >= phase2.pr,
-                    rBCD < 1.5,
-                    rCDDs < 0.5,
-                ],
-                [
-                    // purple
+                    dT4 >= dT1 - dT2 - dT3,
                     confirmed,
                 ],
                 [

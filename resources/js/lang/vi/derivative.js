@@ -230,31 +230,6 @@ const redReversal = [
         ],
     },
     {
-        name: "Bước tím",
-        conds: [
-            //
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P < Phồng",
-            "Pb < 50",
-        ],
-    },
-];
-const shakeLongRedReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-        ],
-    },
-    {
         name: "Bước hồng",
         conds: [
             //
@@ -278,7 +253,7 @@ const shakeLongRedReversal = [
         ],
     },
 ];
-const longPinkReversal = [
+const purpleReversal = [
     {
         name: "Bước đỏ",
         conds: [
@@ -291,113 +266,16 @@ const longPinkReversal = [
         name: "Bước hồng",
         conds: [
             //
-            "T > Tmin",
-            "P > Pmin",
-            "Pb < 50",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P < Phồng",
-            "Pb < 50",
-        ],
-    },
-];
-const shortPinkReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-            "P > 70",
-            "Pb < 50",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "Ts > Tđỏ",
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "P < Phồng",
-            "Pb < 50",
-        ],
-    },
-];
-const shakeLongPurpleReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
             "P < 150",
             "Pb < 50",
+            "Bm > Bmcam",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "P > 70",
-        ],
-    },
-];
-const shakeShortPurpleReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "T > Tmin",
-            "P > Pmin",
-            "P < 150",
-            "Pb < 50",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
+            "Ts > Tcam",
             "Xác nhận",
         ],
     },
@@ -412,28 +290,12 @@ const shakeShortPurpleReversal = [
 ];
 const reversalPattern = {
     red: {
-        name: "Mẫu hình đảo chiều </br>đỏ dài",
+        name: "Mẫu hình đảo chiều </br>đỏ",
         steps: redReversal,
     },
-    shakeLongRed: {
-        name: "Mẫu hình đảo chiều </br>rũ đỏ dài",
-        steps: shakeLongRedReversal,
-    },
-    longPink: {
-        name: "Mẫu hình đảo chiều </br>hồng dài",
-        steps: longPinkReversal,
-    },
-    shortPink: {
-        name: "Mẫu hình đảo chiều </br>hồng ngắn",
-        steps: shortPinkReversal,
-    },
-    shakeLongPurple: {
-        name: "Mẫu hình đảo chiều </br>rũ tím dài",
-        steps: shakeLongPurpleReversal,
-    },
-    shakeShortPurple: {
-        name: "Mẫu hình đảo chiều </br>rũ tím ngắn",
-        steps: shakeShortPurpleReversal,
+    purple: {
+        name: "Mẫu hình đảo chiều </br>tím",
+        steps: purpleReversal,
     },
 };
 
