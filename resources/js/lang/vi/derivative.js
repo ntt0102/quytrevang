@@ -7,7 +7,7 @@ const longOrangeContinue = [
             "P > Pmin",
             "P < 70",
             "Pb < 50",
-            "Tm > Tmvàng",
+            "Bm > Bmvàng",
             "Pm > Pbvàng",
         ],
     },
@@ -17,6 +17,7 @@ const longOrangeContinue = [
             //
             "P > 50",
             "T < Tmax",
+            "Bm < Bmvàng",
         ],
     },
 ];
@@ -29,7 +30,7 @@ const confirmLongOrangeContinue = [
             "P > Pmin",
             "P < 70",
             "Pb < 50",
-            "Tm > Tmvàng",
+            "Bm > Bmvàng",
             "Pm > Pbvàng",
         ],
     },
@@ -40,6 +41,7 @@ const confirmLongOrangeContinue = [
             "P > 50",
             "T < Tmax",
             "Xác nhận",
+            "Bm < Bmvàng",
         ],
     },
 ];
@@ -129,6 +131,7 @@ const longPinkContinue = [
             "Ts > Tvàng",
             "P > Pmin",
             "P > Pbcam",
+            "Bm < Bmvàng",
         ],
     },
     {
@@ -174,6 +177,7 @@ const shortPinkContinue = [
             "Ts > Tvàng",
             "P > Pmin",
             "P > Pbcam",
+            "Bm < Bmvàng",
         ],
     },
     {
@@ -219,6 +223,7 @@ const twoBaseContinue = [
             "Ts > Tvàng",
             "P > Pmin",
             "P < 200",
+            "Bm < Bmvàng",
         ],
     },
     {
@@ -250,6 +255,7 @@ const threeBaseContinue = [
             "Ts > Tvàng",
             "P > Pmin",
             "P < 200",
+            "Bm < Bmvàng",
         ],
     },
     {

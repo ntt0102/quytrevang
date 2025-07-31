@@ -414,6 +414,8 @@ function calcContinuePattern() {
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
+    const isRedBoxValid = isBoxValid({ tr: TR3, pr: PR3 }, phase1, true);
+
     let subPattern;
     if (dT2 > dT1)
         subPattern = DE < phase2.pr ? "longOrange" : "confirmLongOrange";
@@ -436,13 +438,14 @@ function calcContinuePattern() {
                     BC >= phase1.pr,
                     rABC <= 0.7,
                     rBCCs < 0.5,
-                    phase2.tr > phase1.tr,
+                    isBoxValid(phase2, phase1),
                     phase2.pr > BBs,
                 ],
                 [
                     // red
                     rBCBm >= 0.5,
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
+                    isRedBoxValid,
                 ],
             ];
             break;
@@ -455,7 +458,7 @@ function calcContinuePattern() {
                     BC >= phase1.pr,
                     rABC <= 0.7,
                     rBCCs < 0.5,
-                    phase2.tr > phase1.tr,
+                    isBoxValid(phase2, phase1),
                     phase2.pr > BBs,
                 ],
                 [
@@ -463,6 +466,7 @@ function calcContinuePattern() {
                     rBCBm >= 0.5,
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
                     mf.cmp(D.price, side, phase2.S1.price),
+                    isRedBoxValid,
                 ],
             ];
             break;
@@ -481,7 +485,7 @@ function calcContinuePattern() {
                     CD >= phase2.pr,
                     rBCD >= 0.7,
                     TR3 < phase1.tr,
-                    isBoxValid({ tr: TR3, pr: PR3 }, phase1, true),
+                    isRedBoxValid,
                 ],
                 [
                     // pink
@@ -508,7 +512,7 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     rBCD >= 0.7,
-                    isBoxValid({ tr: TR3, pr: PR3 }, phase1, true),
+                    isRedBoxValid,
                 ],
                 [
                     // pink
@@ -538,6 +542,7 @@ function calcContinuePattern() {
                     dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     CD > CCs,
+                    isRedBoxValid,
                 ],
                 [
                     // pink
@@ -570,6 +575,7 @@ function calcContinuePattern() {
                     dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     CD > CCs,
+                    isRedBoxValid,
                 ],
                 [
                     // pink
@@ -602,6 +608,7 @@ function calcContinuePattern() {
                     dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     rBCD < 2,
+                    isRedBoxValid,
                 ],
                 [
                     // pink
@@ -626,6 +633,7 @@ function calcContinuePattern() {
                     dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     rBCD < 2,
+                    isRedBoxValid,
                 ],
                 [
                     // pink
