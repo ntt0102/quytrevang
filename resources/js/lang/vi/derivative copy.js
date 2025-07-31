@@ -1,4 +1,4 @@
-const orangeContinue = [
+const longOrangeContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -21,7 +21,7 @@ const orangeContinue = [
         ],
     },
 ];
-const orangeConfirmContinue = [
+const confirmLongOrangeContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -45,7 +45,7 @@ const orangeConfirmContinue = [
         ],
     },
 ];
-const redContinue = [
+const longRedContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -61,7 +61,7 @@ const redContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            // "P > 70",
+            "P > 70",
             "Bm < Bmvàng",
         ],
     },
@@ -69,13 +69,13 @@ const redContinue = [
         name: "Bước hồng",
         conds: [
             //
-            // "T > Tmin",
+            "T > Tmin",
             // "P > Pmin",
             "Pb < 50",
         ],
     },
 ];
-const purpleContinue = [
+const confirmLongRedContinue = [
     {
         name: "Bước cam",
         conds: [
@@ -91,7 +91,7 @@ const purpleContinue = [
             //
             "T > Tmin",
             "P > Pmin",
-            // "P > 70",
+            "P > 70",
             "Bm < Bmvàng",
         ],
     },
@@ -99,9 +99,8 @@ const purpleContinue = [
         name: "Bước hồng",
         conds: [
             //
-            // "T > Tmin",
+            "T > Tmin",
             // "P > Pmin",
-            "Pb < 50",
         ],
     },
     {
@@ -109,7 +108,102 @@ const purpleContinue = [
         conds: [
             //
             "Xác nhận",
+            "P < Pvàng",
+        ],
+    },
+];
+const longPinkContinue = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P > 50",
+            "Pb < 50",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P > Pbcam",
             "Bm < Bmvàng",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "Pb < 50",
+            // "P > Pmin",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "Ts > Tvàng",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
+            "Pb < 50",
+        ],
+    },
+];
+const shortPinkContinue = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P > 50",
+            "Pb < 50",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            "P > Pbcam",
+            "Bm < Bmvàng",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            // "P > Pmin",
+            "P > 50",
+            "Pb < 50",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "Ts > Tvàng",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "P < Phồng",
+            "Pb < 50",
         ],
     },
 ];
@@ -194,21 +288,29 @@ const threeBaseContinue = [
     },
 ];
 const continuePattern = {
-    orange: {
-        name: "Mẫu hình tiếp diễn </br>cam",
-        steps: orangeContinue,
+    longOrange: {
+        name: "Mẫu hình tiếp diễn </br>cam dài",
+        steps: longOrangeContinue,
     },
-    orangeConfirm: {
-        name: "Mẫu hình tiếp diễn </br>cam xác nhận",
-        steps: orangeConfirmContinue,
+    confirmLongOrange: {
+        name: "Mẫu hình tiếp diễn </br>cam dài xác nhận",
+        steps: confirmLongOrangeContinue,
     },
-    red: {
-        name: "Mẫu hình tiếp diễn </br>đỏ",
-        steps: redContinue,
+    longRed: {
+        name: "Mẫu hình tiếp diễn </br>đỏ dài",
+        steps: longRedContinue,
     },
-    purple: {
-        name: "Mẫu hình tiếp diễn </br>tím",
-        steps: purpleContinue,
+    confirmLongRed: {
+        name: "Mẫu hình tiếp diễn </br>đỏ dài xác nhận",
+        steps: confirmLongRedContinue,
+    },
+    longPink: {
+        name: "Mẫu hình tiếp diễn </br>hồng dài",
+        steps: longPinkContinue,
+    },
+    shortPink: {
+        name: "Mẫu hình tiếp diễn </br>hồng ngắn",
+        steps: shortPinkContinue,
     },
     twoBase: {
         name: "Mẫu hình tiếp diễn </br>2 nền",
@@ -219,7 +321,7 @@ const continuePattern = {
         steps: threeBaseContinue,
     },
 };
-const redReversal = [
+const longRedReversal = [
     {
         name: "Bước đỏ",
         conds: [
@@ -410,9 +512,9 @@ const shakeShortPurpleReversal = [
     },
 ];
 const reversalPattern = {
-    red: {
+    longRed: {
         name: "Mẫu hình đảo chiều </br>đỏ dài",
-        steps: redReversal,
+        steps: longRedReversal,
     },
     shakeLongRed: {
         name: "Mẫu hình đảo chiều </br>rũ đỏ dài",
