@@ -884,9 +884,9 @@ function calcContinuePattern() {
                 [
                     // red
                     rBCBm >= 0.5,
-                    dT3 <= phase2.R.time1.i - phase2.S1.time.i,
                     dT3 < dT2,
-                    isRedBoxValid,
+                    dT3 <= phase2.R.time1.i - phase2.S1.time.i,
+                    // isRedBoxValid,
                 ],
             ];
             break;
@@ -905,10 +905,10 @@ function calcContinuePattern() {
                 [
                     // red
                     rBCBm >= 0.5,
-                    dT3 <= phase2.R.time1.i - phase2.S1.time.i,
                     dT3 < dT2,
+                    dT3 <= phase2.R.time1.i - phase2.S1.time.i,
                     mf.cmp(D.price, side, phase2.S1.price, true),
-                    isRedBoxValid,
+                    // isRedBoxValid,
                 ],
             ];
             break;
@@ -919,7 +919,7 @@ function calcContinuePattern() {
                     // orange
                     dT2 >= phase1.tr * trThreshold,
                     BC >= phase1.pr,
-                    rBCCs < 0.5,
+                    // rBCCs < 0.5,
                 ],
                 [
                     // red
@@ -962,11 +962,11 @@ function calcContinuePattern() {
                     // purple
                     confirmed,
                 ],
-                [
-                    // cyan
-                    FG < DE,
-                    rFGGs < 0.5,
-                ],
+                // [
+                //     // cyan
+                //     FG < DE,
+                //     rFGGs < 0.5,
+                // ],
             ];
             break;
 
@@ -983,7 +983,7 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     // rBCD >= 0.7,
-                    isRedBoxValid,
+                    // isRedBoxValid,
                 ],
                 [
                     // pink
@@ -993,6 +993,8 @@ function calcContinuePattern() {
                 [
                     // purple
                     dT5 < dT4,
+                    // mf.cmp(F.price, side, D.price, true),
+                    confirmed,
                 ],
             ];
             break;
@@ -1020,6 +1022,8 @@ function calcContinuePattern() {
                 ],
                 [
                     // purple
+                    dT5 >= phase4.tr * trThreshold,
+                    EF >= phase4.pr,
                     // mf.cmp(F.price, !side, B.price, true),
                     // isPurpleBoxValid,
                     dT5 >= dT1 - dT2 - dT3 - dT4,

@@ -16,9 +16,9 @@ const orangeContinue = [
         conds: [
             //
             "P > 50",
-            "ΔT < Tmax",
             "ΔT < Tcam",
-            "Bm < Bmvàng",
+            // "Bm < Bmvàng",
+            "ΔT < Tmax",
         ],
     },
 ];
@@ -40,10 +40,10 @@ const orangeConfirmContinue = [
         conds: [
             //
             "P > 50",
-            "ΔT < Tmax",
             "ΔT < Tcam",
+            "ΔT < Tmax",
             "Xác nhận",
-            "Bm < Bmvàng",
+            // "Bm < Bmvàng",
         ],
     },
 ];
@@ -54,7 +54,7 @@ const redContinue = [
             //
             "ΔT > Tmin",
             "ΔP > Pmin",
-            "Pb < 50",
+            // "Pb < 50",
         ],
     },
     {
@@ -113,14 +113,14 @@ const redConfirmContinue = [
             "Xác nhận",
         ],
     },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "ΔP < Phồng",
-            "Pb < 50",
-        ],
-    },
+    // {
+    //     name: "Bước lam",
+    //     conds: [
+    //         //
+    //         "ΔP < Phồng",
+    //         "Pb < 50",
+    //     ],
+    // },
 ];
 const pinkContinue = [
     {
@@ -139,22 +139,24 @@ const pinkContinue = [
             "ΔT > Tmin",
             "ΔP > Pmin",
             // "P > 70",
-            "Bm < Bmvàng",
+            // "Bm < Bmvàng",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            "T > Tmin",
-            "P > Pmin",
+            "ΔT > Tmin",
+            "ΔP > Pmin",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "ΔP > Phồng",
+            "ΔT < Thồng",
+            // "P > Pđỏ",
+            "Xác nhận",
         ],
     },
 ];
@@ -182,8 +184,8 @@ const purpleContinue = [
         name: "Bước hồng",
         conds: [
             //
-            "T > Tmin",
-            "P > Pmin",
+            "ΔT > Tmin",
+            "ΔP > Pmin",
             // "Pb < 50",
         ],
     },
@@ -191,6 +193,8 @@ const purpleContinue = [
         name: "Bước tím",
         conds: [
             //
+            "ΔT > Tmin",
+            "ΔP > Pmin",
             // "Bm < Bmvàng",
             "Ts > Tvàng",
             "P > Pđỏ",
