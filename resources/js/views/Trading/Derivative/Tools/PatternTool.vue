@@ -882,6 +882,7 @@ function calcContinuePattern() {
                     // red
                     rBCBm >= 0.5,
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
+                    dT3 < dT2,
                     isRedBoxValid,
                 ],
             ];
@@ -902,6 +903,7 @@ function calcContinuePattern() {
                     // red
                     rBCBm >= 0.5,
                     dT3 <= phase2.R.time1.i - phase2.S1.time.i,
+                    dT3 < dT2,
                     mf.cmp(D.price, side, phase2.S1.price, true),
                     isRedBoxValid,
                 ],
@@ -922,12 +924,13 @@ function calcContinuePattern() {
                     CD >= phase2.pr,
                     // rBCD >= 0.7,
                 ],
-                // [
-                //     // pink
-                //     // dT4 >= TR3 * trThreshold,
-                //     // DE >= phase3.pr,
-                //     // rDEEs < 0.5,
-                // ],
+                [
+                    // pink
+                    // dT4 >= TR3 * trThreshold,
+                    // DE >= phase3.pr,
+                    // rDEEs < 0.5,
+                    dT4 < dT3,
+                ],
             ];
             break;
 
@@ -945,12 +948,13 @@ function calcContinuePattern() {
                     CD >= phase2.pr,
                     // rBCD >= 0.7,
                 ],
-                // [
-                //     // pink
-                //     // dT4 >= TR3 * trThreshold,
-                //     // DE >= phase3.pr,
-                //     // rDEEs < 0.5,
-                // ],
+                [
+                    // pink
+                    // dT4 >= TR3 * trThreshold,
+                    // DE >= phase3.pr,
+                    // rDEEs < 0.5,
+                    dT4 < dT3,
+                ],
                 [
                     // purple
                     confirmed,
@@ -995,6 +999,7 @@ function calcContinuePattern() {
                     // cyan
                     FG < DE,
                     rFGGs < 0.5,
+                    dT6 < dT5,
                 ],
             ];
             break;
