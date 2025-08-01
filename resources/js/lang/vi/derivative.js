@@ -122,6 +122,42 @@ const redConfirmContinue = [
         ],
     },
 ];
+const pinkContinue = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "ΔT > Tmin",
+            "ΔP > Pmin",
+            // "Pb < 50",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "ΔT > Tmin",
+            "ΔP > Pmin",
+            // "P > 70",
+            "Bm < Bmvàng",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "ΔP > Phồng",
+        ],
+    },
+];
 const purpleContinue = [
     {
         name: "Bước cam",
@@ -266,6 +302,10 @@ const continuePattern = {
     redConfirm: {
         name: "Mẫu hình tiếp diễn </br>đỏ",
         steps: redConfirmContinue,
+    },
+    pink: {
+        name: "Mẫu hình tiếp diễn </br>hồng",
+        steps: pinkContinue,
     },
     purple: {
         name: "Mẫu hình tiếp diễn </br>tím",

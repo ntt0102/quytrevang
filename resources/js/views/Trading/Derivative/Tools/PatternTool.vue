@@ -861,6 +861,8 @@ function calcContinuePattern() {
                 ? isRedBoxValid
                     ? "red"
                     : "redConfirm"
+                : dT4 + dT3 + dT2 >= dT1
+                ? "pink"
                 : "purple";
     } else subPattern = dT4 > dT2 ? "twoBase" : "threeBase";
 
@@ -963,6 +965,33 @@ function calcContinuePattern() {
                     // cyan
                     FG < DE,
                     rFGGs < 0.5,
+                ],
+            ];
+            break;
+
+        case "pink":
+            progressSteps = [
+                [
+                    // orange
+                    dT2 >= phase1.tr * trThreshold,
+                    BC >= phase1.pr,
+                    // rBCCs < 0.5,
+                ],
+                [
+                    // red
+                    dT3 >= phase2.tr * trThreshold,
+                    CD >= phase2.pr,
+                    // rBCD >= 0.7,
+                    isRedBoxValid,
+                ],
+                [
+                    // pink
+                    dT4 >= TR3 * trThreshold,
+                    DE >= phase3.pr,
+                ],
+                [
+                    // purple
+                    dT5 < dT4,
                 ],
             ];
             break;
