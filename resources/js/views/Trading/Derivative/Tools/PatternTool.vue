@@ -824,13 +824,13 @@ function calcContinuePattern() {
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
     const PR5 = isBreak2 ? phase5.pre.pr : phase5.pr;
 
+    let T0;
     const T1 = phase1.R.time.i + phase1.tr;
     const T2 = phase2.R.time.i + phase2.tr;
     const T3 = D.time.i + TR3;
     const T4 = E.time.i + phase4.tr;
     const T5 = F.time.i + TR5;
     const T6 = G.time.i + phase6.tr;
-    const timeMark = [T6, T5, T4, T3, T2, T1];
 
     const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -871,6 +871,7 @@ function calcContinuePattern() {
 
     switch (subPattern) {
         case "orange":
+            T0 = phase1.R.time.i + dT1;
             progressSteps = [
                 [
                     // orange
@@ -892,6 +893,7 @@ function calcContinuePattern() {
             break;
 
         case "orangeConfirm":
+            T0 = phase1.R.time.i + dT1;
             progressSteps = [
                 [
                     // orange
@@ -914,6 +916,7 @@ function calcContinuePattern() {
             break;
 
         case "red":
+            T0 = phase2.R.time.i + dT1 - dT2;
             progressSteps = [
                 [
                     // orange
@@ -938,6 +941,7 @@ function calcContinuePattern() {
             break;
 
         case "redConfirm":
+            T0 = phase2.R.time.i + dT1 - dT2;
             progressSteps = [
                 [
                     // orange
@@ -971,6 +975,7 @@ function calcContinuePattern() {
             break;
 
         case "pink":
+            T0 = D.time.i + dT1 - dT2 - dT3;
             progressSteps = [
                 [
                     // orange
@@ -1000,6 +1005,7 @@ function calcContinuePattern() {
             break;
 
         case "purple":
+            T0 = E.time.i + dT1 - dT2 - dT3 - dT4;
             progressSteps = [
                 [
                     // orange
@@ -1039,6 +1045,7 @@ function calcContinuePattern() {
             break;
 
         case "twoBase":
+            T0 = phase1.R.time.i + dT1;
             progressSteps = [
                 [
                     // orange
@@ -1064,6 +1071,7 @@ function calcContinuePattern() {
             ];
             break;
         case "threeBase":
+            T0 = phase1.R.time.i + dT1;
             progressSteps = [
                 [
                     // orange
@@ -1099,7 +1107,7 @@ function calcContinuePattern() {
             ];
             break;
     }
-
+    const timeMark = [T6, T5, T4, T3, T2, T1, T0];
     const progress = checkProgress(subPattern, progressSteps);
     //
     const points = buildViewPoints(
@@ -1938,6 +1946,7 @@ function setTimeMark(data) {
         colorMap.pink,
         colorMap.red,
         colorMap.orange,
+        colorMap.yellow,
     ];
     let result = [];
     data.forEach((item, i) => {
