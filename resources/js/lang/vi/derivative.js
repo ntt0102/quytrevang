@@ -3,19 +3,20 @@ const orangeContinue = [
         name: "Bước cam",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             "P < 70",
             // "Pb < 50",
             "Bm > Bmvàng",
             "Pm > Pbvàng",
+            "Ps1 > 50",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            "P > 50",
             "ΔT < Tcam",
             // "Bm < Bmvàng",
             "ΔT < Tmax",
@@ -27,19 +28,20 @@ const orangeConfirmContinue = [
         name: "Bước cam",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             "P < 70",
             // "Pb < 50",
             "Bm > Bmvàng",
             "Pm > Pbvàng",
+            "Ps1 > 50",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            "P > 50",
             "ΔT < Tcam",
             "ΔT < Tmax",
             "Xác nhận",
@@ -52,8 +54,9 @@ const redContinue = [
         name: "Bước cam",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             // "Pb < 50",
         ],
     },
@@ -61,8 +64,9 @@ const redContinue = [
         name: "Bước đỏ",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             // "P > 70",
         ],
     },
@@ -82,8 +86,9 @@ const redConfirmContinue = [
         name: "Bước cam",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             // "Pb < 50",
         ],
     },
@@ -91,8 +96,9 @@ const redConfirmContinue = [
         name: "Bước đỏ",
         conds: [
             //
-            "T > Tmin",
-            "P > Pmin",
+            // "T > Tmin",
+            // "P > Pmin",
+            "B > Bmin",
             // "P > 70",
         ],
     },
@@ -127,8 +133,9 @@ const pinkContinue = [
         name: "Bước cam",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             // "Pb < 50",
         ],
     },
@@ -136,8 +143,9 @@ const pinkContinue = [
         name: "Bước đỏ",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             // "P > 70",
             // "Bm < Bmvàng",
         ],
@@ -146,8 +154,9 @@ const pinkContinue = [
         name: "Bước hồng",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
         ],
     },
     {
@@ -165,8 +174,9 @@ const purpleContinue = [
         name: "Bước cam",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             // "Pb < 50",
         ],
     },
@@ -174,8 +184,9 @@ const purpleContinue = [
         name: "Bước đỏ",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             // "P > 70",
             // "Bm < Bmvàng",
         ],
@@ -184,8 +195,9 @@ const purpleContinue = [
         name: "Bước hồng",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             // "Pb < 50",
         ],
     },
@@ -193,11 +205,12 @@ const purpleContinue = [
         name: "Bước tím",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
             // "Bm < Bmvàng",
-            "Ts > Tvàng",
-            "P > Pđỏ",
+            "T > Tvàng",
+            "Xác nhận",
         ],
     },
     {
@@ -210,55 +223,68 @@ const purpleContinue = [
         ],
     },
 ];
-const twoBaseContinue = [
+const breakoutContinue = [
     {
         name: "Bước cam",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
-            "Pb < 50",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
+            // "Pb < 50",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            "ΔT > Tmin",
-            "Ts > Tvàng",
-            "ΔP > Pmin",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
+            // "T > Tvàng",
             "P < 200",
-            "Bm < Bmvàng",
+            // "Bm < Bmvàng",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            "ΔT > Tmin",
-            // "P > Pmin",
-            "ΔP > Pcam",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
+            "T > Tvàng",
+            // "ΔP > Pcam",
             "ΔT > Tnow",
         ],
     },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "ΔT < Thồng",
+        ],
+    },
 ];
-const threeBaseContinue = [
+const breakoutConfirmContinue = [
     {
         name: "Bước cam",
         conds: [
             //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
-            "Pb < 50",
+            // "ΔT > Tmin",
+            // "ΔP > Pmin",
+            "B > Bmin",
+            // "Pb < 50",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            "ΔT > Tmin",
-            // "Ts > Tvàng",
-            "ΔP > Pmin",
+            // "ΔP > Pmin",
+            // "ΔT > Tmin",
+            "B > Bmin",
+            // "T > Tvàng",
             "P < 200",
             // "Bm < Bmvàng",
         ],
@@ -268,15 +294,17 @@ const threeBaseContinue = [
         conds: [
             //
             // "P > Pmin",
-            "ΔP < Pcam",
+            // "ΔP < Pcam",
+            "B > Bmin",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            // "Ts > Tđỏ",
-            "ΔP > Pmin",
+            // "T > Tđỏ",
+            // "ΔP > Pmin",
+            "B > Bmin",
             "P < 200",
             "Xác nhận",
         ],
@@ -315,13 +343,13 @@ const continuePattern = {
         name: "Mẫu hình tiếp diễn </br>tím",
         steps: purpleContinue,
     },
-    twoBase: {
-        name: "Mẫu hình tiếp diễn </br>2 nền",
-        steps: twoBaseContinue,
+    breakout: {
+        name: "Mẫu hình tiếp diễn </br>bứt phá",
+        steps: breakoutContinue,
     },
-    threeBase: {
-        name: "Mẫu hình tiếp diễn </br>3 nền",
-        steps: threeBaseContinue,
+    breakoutConfirm: {
+        name: "Mẫu hình tiếp diễn </br>bứt phá xác nhận",
+        steps: breakoutConfirmContinue,
     },
 };
 const redReversal = [
@@ -379,7 +407,7 @@ const purpleReversal = [
         name: "Bước tím",
         conds: [
             //
-            "Ts > Tcam",
+            "T > Tcam",
             "Xác nhận",
         ],
     },
