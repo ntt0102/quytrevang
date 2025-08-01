@@ -257,10 +257,10 @@ const threeBaseContinue = [
         conds: [
             //
             "ΔT > Tmin",
-            "Ts > Tvàng",
+            // "Ts > Tvàng",
             "ΔP > Pmin",
             "P < 200",
-            "Bm < Bmvàng",
+            // "Bm < Bmvàng",
         ],
     },
     {
@@ -275,7 +275,7 @@ const threeBaseContinue = [
         name: "Bước tím",
         conds: [
             //
-            "Ts > Tđỏ",
+            // "Ts > Tđỏ",
             "ΔP > Pmin",
             "P < 200",
             "Xác nhận",

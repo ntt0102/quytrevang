@@ -1074,10 +1074,10 @@ function calcContinuePattern() {
                 [
                     // red
                     dT3 >= phase2.tr * trThreshold,
-                    dT3 >= dT1 - dT2,
+                    // dT3 >= dT1 - dT2,
                     CD >= phase2.pr,
                     rBCD < 2,
-                    isRedBoxValid,
+                    // isRedBoxValid,
                 ],
                 [
                     // pink
@@ -1086,7 +1086,7 @@ function calcContinuePattern() {
                 ],
                 [
                     // purple
-                    dT5 >= dT3 - dT4,
+                    // dT5 >= dT3 - dT4,
                     EF >= phase4.pr,
                     rDEF < 2,
                     fBreak,
