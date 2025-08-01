@@ -854,17 +854,18 @@ function calcContinuePattern() {
         (rDEF > 0.7 && dT6 > dT5 && mf.cmp(H.price, side, F.price, true));
 
     let subPattern;
-    if (dT2 >= dT1) subPattern = DE < phase2.pr ? "orange" : "orangeConfirm";
-    else if (!dBreak) {
-        subPattern =
-            dT3 + dT2 >= dT1
-                ? isRedBoxValid
-                    ? "red"
-                    : "redConfirm"
-                : dT4 + dT3 + dT2 >= dT1
-                ? "pink"
-                : "purple";
-    } else subPattern = dT4 > dT2 ? "twoBase" : "threeBase";
+    if (dBreak) subPattern = dT4 > dT2 ? "twoBase" : "threeBase";
+    else {
+        if (dT2 >= dT1) {
+            subPattern = DE < phase2.pr ? "orange" : "orangeConfirm";
+        } else if (dT3 + dT2 >= dT1) {
+            subPattern = isRedBoxValid ? "red" : "redConfirm";
+        } else if (dT4 + dT3 + dT2 >= dT1) {
+            subPattern = "pink";
+        } else {
+            subPattern = "purple";
+        }
+    }
 
     let progressSteps;
 
@@ -1022,7 +1023,7 @@ function calcContinuePattern() {
                     // mf.cmp(F.price, !side, B.price, true),
                     // isPurpleBoxValid,
                     dT5 >= dT1 - dT2 - dT3 - dT4,
-                    confirmed,
+                    mf.cmp(F.price, side, D.price, true),
                 ],
                 [
                     // cyan

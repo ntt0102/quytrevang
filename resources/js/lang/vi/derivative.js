@@ -193,7 +193,7 @@ const purpleContinue = [
             //
             // "Bm < Bmvàng",
             "Ts > Tvàng",
-            "Xác nhận",
+            "P > Pđỏ",
         ],
     },
     {
