@@ -175,33 +175,33 @@ const purpleContinue = [
             "ΔT > Tmin",
             "ΔP > Pmin",
             // "P > 70",
-            "Bm < Bmvàng",
+            // "Bm < Bmvàng",
         ],
     },
-    // {
-    //     name: "Bước hồng",
-    //     conds: [
-    //         //
-    //         // "T > Tmin",
-    //         // "P > Pmin",
-    //         "Pb < 50",
-    //     ],
-    // },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "T > Tmin",
+            "P > Pmin",
+            // "Pb < 50",
+        ],
+    },
     {
         name: "Bước tím",
         conds: [
             //
-            "Xác nhận",
-            "Bm < Bmvàng",
+            // "Bm < Bmvàng",
             "Ts > Tvàng",
+            "Xác nhận",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            "ΔP < Phồng",
-            "Pb < 50",
+            // "ΔP < Phồng",
+            // "Pb < 50",
             "ΔT < Ttím",
         ],
     },

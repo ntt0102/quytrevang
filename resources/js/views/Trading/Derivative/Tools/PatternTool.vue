@@ -1009,25 +1009,25 @@ function calcContinuePattern() {
                     dT3 >= phase2.tr * trThreshold,
                     CD >= phase2.pr,
                     // rBCD >= 0.7,
-                    isRedBoxValid,
+                    // isRedBoxValid,
                 ],
-                // [
-                //     // pink
-                //     // dT4 >= TR3 * trThreshold,
-                //     // DE >= phase3.pr,
-                //     rDEEs < 0.5,
-                // ],
+                [
+                    // pink
+                    dT4 >= TR3 * trThreshold,
+                    DE >= phase3.pr,
+                    // rDEEs < 0.5,
+                ],
                 [
                     // purple
-                    confirmed,
                     // mf.cmp(F.price, !side, B.price, true),
-                    isPurpleBoxValid,
+                    // isPurpleBoxValid,
                     dT5 >= dT1 - dT2 - dT3 - dT4,
+                    confirmed,
                 ],
                 [
                     // cyan
-                    FG < DE,
-                    rFGGs < 0.5,
+                    // FG < DE,
+                    // rFGGs < 0.5,
                     dT6 < dT5,
                 ],
             ];
