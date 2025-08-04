@@ -54,6 +54,7 @@ const redContinue = [
         conds: [
             //
             "B > Bmin",
+            "P < 200",
         ],
     },
     {
@@ -77,6 +78,7 @@ const redConfirmContinue = [
         conds: [
             //
             "B > Bmin",
+            "P < 200",
         ],
     },
     {
@@ -107,6 +109,7 @@ const pinkContinue = [
         conds: [
             //
             "B > Bmin",
+            "P < 200",
         ],
     },
     {
@@ -137,6 +140,7 @@ const purpleContinue = [
         conds: [
             //
             "B > Bmin",
+            "P < 200",
         ],
     },
     {
@@ -175,6 +179,7 @@ const cyanContinue = [
         conds: [
             //
             "B > Bmin",
+            "P < 200",
         ],
     },
     {
@@ -197,13 +202,60 @@ const cyanContinue = [
         conds: [
             //
             "B > Bmin",
-            "T > Tvàng",
         ],
     },
     {
         name: "Bước lục",
         conds: [
             //
+            "Xác nhận",
+        ],
+    },
+];
+const greenContinue = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "B > Bmin",
+            "P < 200",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "B > Bmin",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước lục",
+        conds: [
+            //
+            "B > Bmin",
+            "T > Tvàng",
             "Xác nhận",
         ],
     },
@@ -319,6 +371,10 @@ const continuePattern = {
     cyan: {
         name: "Mẫu hình tiếp diễn </br>lam",
         steps: cyanContinue,
+    },
+    green: {
+        name: "Mẫu hình tiếp diễn </br>lục",
+        steps: greenContinue,
     },
     // breakout: {
     //     name: "Mẫu hình tiếp diễn </br>bứt phá",
