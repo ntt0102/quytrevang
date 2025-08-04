@@ -3,11 +3,8 @@ const orangeContinue = [
         name: "Bước cam",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
             "P < 70",
-            // "Pb < 50",
             "Bm > Bmvàng",
             "Pm > Pbvàng",
             "Ps1 > 50",
@@ -18,7 +15,6 @@ const orangeContinue = [
         conds: [
             //
             "ΔT < Tcam",
-            // "Bm < Bmvàng",
             "ΔT < Tmax",
         ],
     },
@@ -28,11 +24,8 @@ const orangeConfirmContinue = [
         name: "Bước cam",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
             "P < 70",
-            // "Pb < 50",
             "Bm > Bmvàng",
             "Pm > Pbvàng",
             "Ps1 > 50",
@@ -45,7 +38,6 @@ const orangeConfirmContinue = [
             "ΔT < Tcam",
             "ΔT < Tmax",
             "Xác nhận",
-            // "Bm < Bmvàng",
         ],
     },
 ];
@@ -54,29 +46,20 @@ const redContinue = [
         name: "Bước cam",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "Pb < 50",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "P > 70",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            // "T > Tmin",
-            // "P > Pmin",
-            // "Pb < 50",
             "ΔT < Tđỏ",
         ],
     },
@@ -86,29 +69,20 @@ const redConfirmContinue = [
         name: "Bước cam",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "Pb < 50",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            // "T > Tmin",
-            // "P > Pmin",
             "B > Bmin",
-            // "P > 70",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            // "T > Tmin",
-            // "P > Pmin",
-            // "Pb < 50",
             "ΔT < Tđỏ",
         ],
     },
@@ -119,43 +93,26 @@ const redConfirmContinue = [
             "Xác nhận",
         ],
     },
-    // {
-    //     name: "Bước lam",
-    //     conds: [
-    //         //
-    //         "ΔP < Phồng",
-    //         "Pb < 50",
-    //     ],
-    // },
 ];
 const pinkContinue = [
     {
         name: "Bước cam",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "Pb < 50",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "P > 70",
-            // "Bm < Bmvàng",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
         ],
     },
@@ -163,8 +120,6 @@ const pinkContinue = [
         name: "Bước tím",
         conds: [
             //
-            "ΔT < Thồng",
-            // "P > Pđỏ",
             "Xác nhận",
         ],
     },
@@ -174,42 +129,28 @@ const purpleContinue = [
         name: "Bước cam",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "Pb < 50",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "P > 70",
-            // "Bm < Bmvàng",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "Pb < 50",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "Bm < Bmvàng",
-            "T > Tvàng",
             "Xác nhận",
         ],
     },
@@ -217,84 +158,29 @@ const purpleContinue = [
         name: "Bước lam",
         conds: [
             //
-            // "ΔP < Phồng",
-            // "Pb < 50",
             "ΔT < Ttím",
         ],
     },
 ];
-const breakoutContinue = [
+const cyanContinue = [
     {
         name: "Bước cam",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "Pb < 50",
         ],
     },
     {
         name: "Bước đỏ",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
             "B > Bmin",
-            // "T > Tvàng",
-            "P < 200",
-            // "Bm < Bmvàng",
         ],
     },
     {
         name: "Bước hồng",
         conds: [
             //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
-            "B > Bmin",
-            "T > Tvàng",
-            // "ΔP > Pcam",
-            "ΔT > Tnow",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "ΔT < Thồng",
-        ],
-    },
-];
-const breakoutConfirmContinue = [
-    {
-        name: "Bước cam",
-        conds: [
-            //
-            // "ΔT > Tmin",
-            // "ΔP > Pmin",
-            "B > Bmin",
-            // "Pb < 50",
-        ],
-    },
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            // "ΔP > Pmin",
-            // "ΔT > Tmin",
-            "B > Bmin",
-            // "T > Tvàng",
-            "P < 200",
-            // "Bm < Bmvàng",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            // "P > Pmin",
-            // "ΔP < Pcam",
             "B > Bmin",
         ],
     },
@@ -302,10 +188,7 @@ const breakoutConfirmContinue = [
         name: "Bước tím",
         conds: [
             //
-            // "T > Tđỏ",
-            // "ΔP > Pmin",
             "B > Bmin",
-            "P < 200",
             "Xác nhận",
         ],
     },
@@ -313,11 +196,101 @@ const breakoutConfirmContinue = [
         name: "Bước lam",
         conds: [
             //
-            // "P > Pmin",
-            "ΔP < Phồng",
+            "B > Bmin",
+            "T > Tvàng",
+        ],
+    },
+    {
+        name: "Bước lục",
+        conds: [
+            //
+            "Xác nhận",
         ],
     },
 ];
+// const breakoutContinue = [
+//     {
+//         name: "Bước cam",
+//         conds: [
+//             //
+//             "B > Bmin",
+//         ],
+//     },
+//     {
+//         name: "Bước đỏ",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "P < 200",
+//         ],
+//     },
+//     {
+//         name: "Bước hồng",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "T > Tvàng",
+//             "ΔT > Tnow",
+//         ],
+//     },
+//     {
+//         name: "Bước tím",
+//         conds: [
+//             //
+//             "ΔT < Thồng",
+//         ],
+//     },
+// ];
+// const breakoutConfirmContinue = [
+//     {
+//         name: "Bước cam",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             // "Pb < 50",
+//         ],
+//     },
+//     {
+//         name: "Bước đỏ",
+//         conds: [
+//             //
+//             // "ΔP > Pmin",
+//             // "ΔT > Tmin",
+//             "B > Bmin",
+//             // "T > Tvàng",
+//             "P < 200",
+//             // "Bm < Bmvàng",
+//         ],
+//     },
+//     {
+//         name: "Bước hồng",
+//         conds: [
+//             //
+//             // "P > Pmin",
+//             // "ΔP < Pcam",
+//             "B > Bmin",
+//         ],
+//     },
+//     {
+//         name: "Bước tím",
+//         conds: [
+//             //
+//             // "T > Tđỏ",
+//             // "ΔP > Pmin",
+//             "B > Bmin",
+//             "P < 200",
+//             "Xác nhận",
+//         ],
+//     },
+//     {
+//         name: "Bước lam",
+//         conds: [
+//             //
+//             // "P > Pmin",
+//             "ΔP < Phồng",
+//         ],
+//     },
+// ];
 const continuePattern = {
     orange: {
         name: "Mẫu hình tiếp diễn </br>cam",
@@ -343,14 +316,18 @@ const continuePattern = {
         name: "Mẫu hình tiếp diễn </br>tím",
         steps: purpleContinue,
     },
-    breakout: {
-        name: "Mẫu hình tiếp diễn </br>bứt phá",
-        steps: breakoutContinue,
+    cyan: {
+        name: "Mẫu hình tiếp diễn </br>lam",
+        steps: cyanContinue,
     },
-    breakoutConfirm: {
-        name: "Mẫu hình tiếp diễn </br>bứt phá xác nhận",
-        steps: breakoutConfirmContinue,
-    },
+    // breakout: {
+    //     name: "Mẫu hình tiếp diễn </br>bứt phá",
+    //     steps: breakoutContinue,
+    // },
+    // breakoutConfirm: {
+    //     name: "Mẫu hình tiếp diễn </br>bứt phá xác nhận",
+    //     steps: breakoutConfirmContinue,
+    // },
 };
 const redReversal = [
     {
