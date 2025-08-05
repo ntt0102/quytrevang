@@ -848,8 +848,6 @@ function calcContinuePattern() {
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
-    const isRedBoxValid = isBoxValid({ tr: TR3, pr: PR3 }, phase1, true);
-
     const purpleConfirmed =
         mf.cmp(F.price, side, D.price, true) ||
         (rDEF > 0.7 && dT6 > dT5 && mf.cmp(H.price, side, F.price, true));
@@ -862,11 +860,13 @@ function calcContinuePattern() {
     //         : "breakoutConfirm";
     // } else {
     if (dT2 >= dT1) {
-        subPattern = isBoxValid({ pr: DE, tr: dT4 }, phase2, true)
-            ? "orange"
-            : "orangeConfirm";
+        const isOrangeInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2);
+        subPattern = isOrangeInvalid ? "orangeConfirm" : "orange";
     } else if (dT3 + dT2 >= dT1) {
-        subPattern = isRedBoxValid ? "red" : "redConfirm";
+        const isRedInvalid = isBoxValid({ tr: TR3, pr: PR3 }, phase1);
+        const isPinkInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2);
+
+        subPattern = isRedInvalid || isPinkInvalid ? "redConfirm" : "red";
     } else if (dT4 + dT3 + dT2 >= dT1) {
         subPattern = "pink";
     } else if (dT5 + dT4 + dT3 + dT2 >= dT1) {
