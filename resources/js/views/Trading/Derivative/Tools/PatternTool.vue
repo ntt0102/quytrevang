@@ -1850,7 +1850,7 @@ function scanPhase({ side, start, end }) {
 }
 function isBoxValid(box1, box2, isNot = false) {
     const score = mf.fmtNum(
-        0.7 * (box1.pr / box2.pr) + 0.3 * (box1.tr / box2.tr),
+        0.6 * (box1.pr / box2.pr) + 0.4 * (box1.tr / box2.tr),
         2
     );
     return isNot ? score < 1.0 : score >= 1.0;
