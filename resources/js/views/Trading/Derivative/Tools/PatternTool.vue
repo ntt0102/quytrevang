@@ -860,11 +860,11 @@ function calcContinuePattern() {
     //         : "breakoutConfirm";
     // } else {
     if (dT2 >= dT1) {
-        const isOrangeInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2);
+        const isOrangeInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2, true);
         subPattern = isOrangeInvalid ? "orangeConfirm" : "orange";
     } else if (dT3 + dT2 >= dT1) {
         const isRedInvalid = isBoxValid({ tr: TR3, pr: PR3 }, phase1);
-        const isPinkInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2);
+        const isPinkInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2, true);
 
         subPattern = isRedInvalid || isPinkInvalid ? "redConfirm" : "red";
     } else if (dT4 + dT3 + dT2 >= dT1) {
