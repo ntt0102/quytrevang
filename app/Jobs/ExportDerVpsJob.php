@@ -38,14 +38,29 @@ class ExportDerVpsJob implements ShouldQueue
         $file = storage_path('app/phaisinh/' . $date . '.csv');
 
         $fp = fopen($file, 'w');
-        foreach ($data as $index => $item) {
+        foreach ($data as $item) {
             $line = [];
-            $line[] = $index;
-            $line[] = strtotime("{$date}T{$item->time}Z");
+            $line[] = $item->sID;
+            // $line[] = "{$date}T{$item->time}Z";
+            // $originTime = "{$date}T{$item->time}Z";
+            // $newTime = date("H:i:s", strtotime($originTime) - 7 * 3600);
+            // $line[] = "{$date}T{$newTime}Z";
+            // $parts = explode(':', $item->time);
+            // $hour = (int)$parts[0] - 7;
+            // $newTime = sprintf('%02d:%02d:%02d', $hour, (int)$parts[1], (int)$parts[2]);
+            $line[] = $this->subHour($date, $item->time);
             $line[] = $item->lastPrice;
             $line[] = $item->lastVol;
             fputcsv($fp, $line);
         }
         fclose($fp);
+    }
+
+    private function subHour($date, $time)
+    {
+        $parts = explode(':', $time);
+        $hour = (int)$parts[0] - 7;
+        $newTime = sprintf('%02d:%02d:%02d', $hour, (int)$parts[1], (int)$parts[2]);
+        return "{$date}T{$newTime}Z";
     }
 }
