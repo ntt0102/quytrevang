@@ -1010,6 +1010,10 @@ function calcContinuePattern() {
                     // cyan
                     dT6 < dT5,
                 ],
+                [
+                    // green
+                    greenConfirmed,
+                ],
             ];
             break;
 

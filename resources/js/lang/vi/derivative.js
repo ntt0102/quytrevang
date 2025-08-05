@@ -165,6 +165,13 @@ const purpleContinue = [
             "ΔT < Ttím",
         ],
     },
+    {
+        name: "Bước lục",
+        conds: [
+            //
+            "Xác nhận",
+        ],
+    },
 ];
 const cyanContinue = [
     {
