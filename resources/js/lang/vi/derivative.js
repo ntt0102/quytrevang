@@ -364,7 +364,7 @@ const continuePattern = {
         steps: redContinue,
     },
     redConfirm: {
-        name: "Mẫu hình tiếp diễn </br>đỏ",
+        name: "Mẫu hình tiếp diễn </br>đỏ xác nhận",
         steps: redConfirmContinue,
     },
     pink: {
