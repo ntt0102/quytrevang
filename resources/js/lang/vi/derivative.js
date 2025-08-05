@@ -62,6 +62,7 @@ const redContinue = [
         conds: [
             //
             "ΔT < Tđỏ",
+            "Xác nhận",
         ],
     },
 ];
@@ -86,6 +87,7 @@ const redConfirmContinue = [
         conds: [
             //
             "ΔT < Tđỏ",
+            "Xác nhận",
         ],
     },
     {
@@ -117,6 +119,7 @@ const pinkContinue = [
         conds: [
             //
             "B > Bmin",
+            "Xác nhận",
         ],
     },
     {
@@ -148,6 +151,7 @@ const purpleContinue = [
         conds: [
             //
             "B > Bmin",
+            "Xác nhận",
         ],
     },
     {
@@ -194,6 +198,7 @@ const cyanContinue = [
         conds: [
             //
             "B > Bmin",
+            "Xác nhận",
         ],
     },
     {
@@ -240,6 +245,7 @@ const greenContinue = [
         conds: [
             //
             "B > Bmin",
+            "Xác nhận",
         ],
     },
     {
@@ -350,6 +356,172 @@ const greenContinue = [
 //         ],
 //     },
 // ];
+const redReversal = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "P < 150",
+            "ΔT < Tđỏ",
+            "Xác nhận",
+        ],
+    },
+];
+const pinkReversal = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "B > Bmin",
+            "P < 150",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "Xác nhận",
+        ],
+    },
+];
+const purpleReversal = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "B > Bmin",
+            "P < 150",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "B > Bmin",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "ΔT < Ttím",
+        ],
+    },
+    {
+        name: "Bước lục",
+        conds: [
+            //
+            "Xác nhận",
+        ],
+    },
+];
+const cyanReversal = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "B > Bmin",
+            "P < 150",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "B > Bmin",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước lục",
+        conds: [
+            //
+            "Xác nhận",
+        ],
+    },
+];
+const greenReversal = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "B > Bmin",
+            "P < 150",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "B > Bmin",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "B > Bmin",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lục",
+        conds: [
+            //
+            "B > Bmin",
+            "T > Tvàng",
+            "Xác nhận",
+        ],
+    },
+];
 const continuePattern = {
     orange: {
         name: "Mẫu hình tiếp diễn </br>cam",
@@ -383,91 +555,28 @@ const continuePattern = {
         name: "Mẫu hình tiếp diễn </br>lục",
         steps: greenContinue,
     },
-    // breakout: {
-    //     name: "Mẫu hình tiếp diễn </br>bứt phá",
-    //     steps: breakoutContinue,
-    // },
-    // breakoutConfirm: {
-    //     name: "Mẫu hình tiếp diễn </br>bứt phá xác nhận",
-    //     steps: breakoutConfirmContinue,
-    // },
 };
-const redReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "P < 150",
-            // "Pb < 50",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "ΔP < Phồng",
-            "Pb < 50",
-        ],
-    },
-];
-const purpleReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "ΔT > Tmin",
-            "ΔP > Pmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "P < 150",
-            // "Pb < 50",
-            "Bm > Bmcam",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "T > Tcam",
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "ΔP < Phồng",
-            "Pb < 50",
-        ],
-    },
-];
+
 const reversalPattern = {
     red: {
         name: "Mẫu hình đảo chiều </br>đỏ",
         steps: redReversal,
     },
+    pink: {
+        name: "Mẫu hình đảo chiều </br>hồng",
+        steps: pinkReversal,
+    },
     purple: {
         name: "Mẫu hình đảo chiều </br>tím",
         steps: purpleReversal,
+    },
+    cyan: {
+        name: "Mẫu hình đảo chiều </br>lam",
+        steps: cyanReversal,
+    },
+    green: {
+        name: "Mẫu hình đảo chiều </br>lục",
+        steps: greenReversal,
     },
 };
 
