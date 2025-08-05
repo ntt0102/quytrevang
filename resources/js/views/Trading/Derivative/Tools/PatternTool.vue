@@ -863,9 +863,8 @@ function calcContinuePattern() {
         const isOrangeInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2, true);
         subPattern = isOrangeInvalid ? "orangeConfirm" : "orange";
     } else if (dT3 + dT2 >= dT1) {
-        const isRedInvalid = isBoxValid({ tr: TR3, pr: PR3 }, phase1);
+        const isRedInvalid = isBoxValid({ pr: PR3, tr: TR3 }, phase1);
         const isPinkInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2, true);
-
         subPattern = isRedInvalid || isPinkInvalid ? "redConfirm" : "red";
     } else if (dT4 + dT3 + dT2 >= dT1) {
         subPattern = "pink";
