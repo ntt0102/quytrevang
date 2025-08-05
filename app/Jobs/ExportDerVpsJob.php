@@ -38,8 +38,9 @@ class ExportDerVpsJob implements ShouldQueue
         $file = storage_path('app/phaisinh/' . $date . '.csv');
 
         $fp = fopen($file, 'w');
-        foreach ($data as $item) {
+        foreach ($data as $index => $item) {
             $line = [];
+            $line[] = $index;
             $line[] = strtotime("{$date}T{$item->time}Z");
             $line[] = $item->lastPrice;
             $line[] = $item->lastVol;
