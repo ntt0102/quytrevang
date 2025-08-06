@@ -864,24 +864,24 @@ function calcContinuePattern() {
     //         ? "breakout"
     //         : "breakoutConfirm";
     // } else {
-    if (dT2 >= dT1) {
-        const isOrangeInvalid = isBoxValid(phase2, phase1, true);
-        subPattern = isOrangeInvalid ? "orangeConfirm" : "orange";
-    } else if (dT3 + dT2 >= dT1) {
-        const isRedInvalid = isBoxValid({ pr: PR3, tr: TR3 }, phase1);
-        const isPinkInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2, true);
-        const isPinkLong = dT4 >= dT3;
-        subPattern =
-            isRedInvalid || isPinkInvalid || isPinkLong ? "redConfirm" : "red";
-    } else if (dT4 + dT3 + dT2 >= dT1) {
-        subPattern = "pink";
-    } else if (dT5 + dT4 + dT3 + dT2 >= dT1) {
-        subPattern = "purple";
-    } else if (dT6 + dT5 + dT4 + dT3 + dT2 >= dT1) {
-        subPattern = "cyan";
-    } else {
-        subPattern = "green";
-    }
+    // if (dT2 >= dT1) {
+    //     const isOrangeInvalid = isBoxValid(phase2, phase1, true);
+    //     subPattern = isOrangeInvalid ? "orangeConfirm" : "orange";
+    // } else if (dT3 + dT2 >= dT1) {
+    //     const isRedInvalid = isBoxValid({ pr: PR3, tr: TR3 }, phase1);
+    //     const isPinkInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2, true);
+    //     const isPinkLong = dT4 >= dT3;
+    //     subPattern =
+    //         isRedInvalid || isPinkInvalid || isPinkLong ? "redConfirm" : "red";
+    // } else if (dT4 + dT3 + dT2 >= dT1) {
+    //     subPattern = "pink";
+    // } else if (dT5 + dT4 + dT3 + dT2 >= dT1) {
+    //     subPattern = "purple";
+    // } else if (dT6 + dT5 + dT4 + dT3 + dT2 >= dT1) {
+    //     subPattern = "cyan";
+    // } else {
+    //     subPattern = "green";
+    // }
     // }
 
     let timeMark = [],
