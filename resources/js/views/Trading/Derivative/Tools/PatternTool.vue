@@ -800,17 +800,17 @@ function calcContinuePattern() {
         phase7,
     ]);
 
-    const AB = mf.fmtNum(B.price - A.price, 1, true);
+    // const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
-    const BBs = mf.fmtNum(phase1.R.price1 - B.price, 1, true);
-    const CBm = mf.fmtNum(phase2.S1.price - C.price, 1, true);
+    // const BBs = mf.fmtNum(phase1.R.price1 - B.price, 1, true);
+    // const CBm = mf.fmtNum(phase2.S1.price - C.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
-    const CCs = mf.fmtNum(phase2.R.price1 - C.price, 1, true);
+    // const CCs = mf.fmtNum(phase2.R.price1 - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
-    const EEs = mf.fmtNum(phase4.R.price1 - E.price, 1, true);
+    // const EEs = mf.fmtNum(phase4.R.price1 - E.price, 1, true);
     const FG = mf.fmtNum(G.price - F.price, 1, true);
-    const GGs = mf.fmtNum(phase6.R.price1 - G.price, 1, true);
+    // const GGs = mf.fmtNum(phase6.R.price1 - G.price, 1, true);
     const GH = mf.fmtNum(H.price - G.price, 1, true);
 
     const dT1 = phase1.R.time1.i - phase1.S.time.i;
@@ -826,7 +826,6 @@ function calcContinuePattern() {
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
     const PR5 = isBreak2 ? phase5.pre.pr : phase5.pr;
 
-    // let T0;
     // const T1 = phase1.R.time.i + phase1.tr;
     // const T2 = phase2.R.time.i + phase2.tr;
     // const T3 = D.time.i + TR3;
@@ -839,17 +838,17 @@ function calcContinuePattern() {
     const T6 = F.time.i + Math.max(phase4.tr, TR5);
     const timeMark = [T1, T4, T6];
 
-    const rABC = BC / AB;
+    // const rABC = BC / AB;
     const rBCD = CD / BC;
-    const rBCCs = CCs / BC;
-    const rBCBm = CBm / BC;
-    const rCDE = DE / CD;
+    // const rBCCs = CCs / BC;
+    // const rBCBm = CBm / BC;
+    // const rCDE = DE / CD;
     const rDEF = EF / DE;
-    const rDEEs = EEs / DE;
-    const rEFG = FG / EF;
-    const rFGGs = GGs / FG;
+    // const rDEEs = EEs / DE;
+    // const rEFG = FG / EF;
+    // const rFGGs = GGs / FG;
 
-    const dBreak = mf.cmp(D.price, side, B.price);
+    // const dBreak = mf.cmp(D.price, side, B.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
