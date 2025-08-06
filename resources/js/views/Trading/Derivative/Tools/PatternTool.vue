@@ -40,7 +40,6 @@ import DxDropDownButton from "devextreme-vue/drop-down-button";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 import { formatISO } from "date-fns";
-import { is } from "date-fns/locale";
 
 const store = useStore();
 const mf = inject("mf");
@@ -73,8 +72,8 @@ const colorMap = {
     pink: "rgba(255, 20, 147, 0.7)",
     purple: "rgba(128, 0, 255, 0.7)",
     cyan: "rgba(0, 255, 255, 0.7)",
-    green: "rgba(0, 255, 0, 0.7)",
     blue: "rgba(0, 127, 255, 0.7)",
+    green: "rgba(0, 255, 0, 0.7)",
 };
 
 defineExpose({
@@ -789,6 +788,7 @@ function calcContinuePattern() {
     const isBreak3 = isBoxValid(phase7.ext, phase7, true);
 
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
+    const I = isBreak3 ? phase7.S1 : phase7.ext.S;
 
     console.log("calcContinuePattern", [
         phase1,
@@ -1176,8 +1176,18 @@ function calcContinuePattern() {
     const progress = checkProgress("continue", progressSteps);
     //
     const points = buildViewPoints(
-        [A, phase1.R, phase2.R, D, E, F, G, H],
-        ["yellow", "orange", "red", "pink", "purple", "cyan", "green", "green"]
+        [A, phase1.R, phase2.R, D, E, F, G, H, I],
+        [
+            "yellow",
+            "orange",
+            "red",
+            "pink",
+            "purple",
+            "cyan",
+            "blue",
+            "green",
+            "green",
+        ]
     );
     //
     // const isOrange = ["orange", "orangeConfirm"].includes(subPattern);
@@ -1193,7 +1203,11 @@ function calcContinuePattern() {
     const w = mf.fmtNum(B.price + orderSide * BC);
     const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
-        (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2,
+        (fBreak
+            ? hBreak
+                ? H.price + I.price
+                : F.price + G.price
+            : D.price + E.price) / 2,
         1
     );
     const T = mf.fmtNum(t - entry, 1);
@@ -1201,7 +1215,7 @@ function calcContinuePattern() {
     let order = {};
     if (progress.result) {
         const tp = mf.cmp(W, !side, X) ? x : mf.cmp(W, side, Y) ? y : w;
-        const sl = fBreak ? G.price : E.price;
+        const sl = fBreak ? (hBreak ? I.price : G.price) : E.price;
         order = {
             side: orderSide,
             price: entry,

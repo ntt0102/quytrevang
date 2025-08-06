@@ -24,6 +24,7 @@ let pickTime = null;
 let series = {};
 
 const symbol = "VN30F1M";
+const color = "rgba(255, 0, 0, 0.7)";
 
 defineExpose({
     isSelected,
@@ -79,7 +80,7 @@ function draw({ time }) {
 }
 function load(time) {
     pickTime = time;
-    series.pickTime.setData([{ time, value: 1, color: "#007FFF" }]);
+    series.pickTime.setData([{ time, color, value: 1 }]);
 }
 function removePickTimeTool(withServer = true) {
     if (withServer)
