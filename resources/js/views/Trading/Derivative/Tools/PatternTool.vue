@@ -858,14 +858,14 @@ function calcContinuePattern() {
     const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
     const cyanConfirmed = G.time1.i > T6 || H.time1.i > T6;
 
-    let subPattern;
+    let subPattern = "continue";
     // if (dBreak) {
     //     subPattern = isBoxValid(phase4, phase2)
     //         ? "breakout"
     //         : "breakoutConfirm";
     // } else {
     if (dT2 >= dT1) {
-        const isOrangeInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2, true);
+        const isOrangeInvalid = isBoxValid(phase2, phase1, true);
         subPattern = isOrangeInvalid ? "orangeConfirm" : "orange";
     } else if (dT3 + dT2 >= dT1) {
         const isRedInvalid = isBoxValid({ pr: PR3, tr: TR3 }, phase1);
@@ -888,6 +888,42 @@ function calcContinuePattern() {
         progressSteps;
 
     switch (subPattern) {
+        case "continue":
+            timeMark.push(G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6);
+            progressSteps = [
+                [
+                    // orange
+                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
+                ],
+                [
+                    // red
+                    isBoxValid({ pr: CD, tr: dT3 }, phase2),
+                    rBCD < 2,
+                ],
+                [
+                    // pink
+                    isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
+                    pinkConfirmed,
+                ],
+                [
+                    // purple
+                    isBoxValid({ pr: EF, tr: dT5 }, phase4),
+                    purpleConfirmed,
+                ],
+                [
+                    // cyan
+                    isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
+                    cyanConfirmed,
+                ],
+                [
+                    // green
+                    isBoxValid({ pr: GH, tr: dT7 }, phase6),
+                    dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
+                    greenConfirmed,
+                ],
+            ];
+            break;
+
         case "orange":
             timeMark.push(phase1.R.time.i + dT1);
             progressSteps = [

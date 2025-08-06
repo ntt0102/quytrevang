@@ -286,6 +286,56 @@ const greenContinue = [
         ],
     },
 ];
+const continue1 = [
+    {
+        name: "Bước cam",
+        conds: [
+            //
+            "B > Bmin",
+        ],
+    },
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "B > Bmin",
+            "P < 200",
+        ],
+    },
+    {
+        name: "Bước hồng",
+        conds: [
+            //
+            "B > Bmin",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước tím",
+        conds: [
+            //
+            "B > Bmin",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "B > Bmin",
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lục",
+        conds: [
+            //
+            "B > Bmin",
+            "T > Tvàng",
+            "Xác nhận",
+        ],
+    },
+];
 // const breakoutContinue = [
 //     {
 //         name: "Bước cam",
@@ -369,6 +419,45 @@ const greenContinue = [
 //         ],
 //     },
 // ];
+const continuePattern = {
+    continue: {
+        name: "Mẫu hình tiếp diễn",
+        steps: continue1,
+    },
+    orange: {
+        name: "Mẫu hình tiếp diễn </br>cam",
+        steps: orangeContinue,
+    },
+    orangeConfirm: {
+        name: "Mẫu hình tiếp diễn </br>cam xác nhận",
+        steps: orangeConfirmContinue,
+    },
+    red: {
+        name: "Mẫu hình tiếp diễn </br>đỏ",
+        steps: redContinue,
+    },
+    redConfirm: {
+        name: "Mẫu hình tiếp diễn </br>đỏ xác nhận",
+        steps: redConfirmContinue,
+    },
+    pink: {
+        name: "Mẫu hình tiếp diễn </br>hồng",
+        steps: pinkContinue,
+    },
+    purple: {
+        name: "Mẫu hình tiếp diễn </br>tím",
+        steps: purpleContinue,
+    },
+    cyan: {
+        name: "Mẫu hình tiếp diễn </br>lam",
+        steps: cyanContinue,
+    },
+    green: {
+        name: "Mẫu hình tiếp diễn </br>lục",
+        steps: greenContinue,
+    },
+};
+
 const redReversal = [
     {
         name: "Bước đỏ",
@@ -535,40 +624,6 @@ const greenReversal = [
         ],
     },
 ];
-const continuePattern = {
-    orange: {
-        name: "Mẫu hình tiếp diễn </br>cam",
-        steps: orangeContinue,
-    },
-    orangeConfirm: {
-        name: "Mẫu hình tiếp diễn </br>cam xác nhận",
-        steps: orangeConfirmContinue,
-    },
-    red: {
-        name: "Mẫu hình tiếp diễn </br>đỏ",
-        steps: redContinue,
-    },
-    redConfirm: {
-        name: "Mẫu hình tiếp diễn </br>đỏ xác nhận",
-        steps: redConfirmContinue,
-    },
-    pink: {
-        name: "Mẫu hình tiếp diễn </br>hồng",
-        steps: pinkContinue,
-    },
-    purple: {
-        name: "Mẫu hình tiếp diễn </br>tím",
-        steps: purpleContinue,
-    },
-    cyan: {
-        name: "Mẫu hình tiếp diễn </br>lam",
-        steps: cyanContinue,
-    },
-    green: {
-        name: "Mẫu hình tiếp diễn </br>lục",
-        steps: greenContinue,
-    },
-};
 
 const reversalPattern = {
     red: {
