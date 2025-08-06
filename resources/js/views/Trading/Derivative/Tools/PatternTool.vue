@@ -1182,8 +1182,8 @@ function calcContinuePattern() {
             "red",
             "pink",
             "purple",
-            "cyan",
             "blue",
+            "cyan",
             "green",
             "green",
         ]
@@ -1881,7 +1881,7 @@ function calcReversalPattern() {
     //
     const points = buildViewPoints(
         [A, phase1.R, C, D, E, F, G, H],
-        ["orange", "red", "pink", "purple", "cyan", "blue", "green", "green"]
+        ["orange", "red", "pink", "purple", "blue", "cyan", "green", "green"]
     );
     //
     const orderSide = side ? 1 : -1;
