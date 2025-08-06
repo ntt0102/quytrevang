@@ -836,6 +836,8 @@ function calcContinuePattern() {
 
     const T4 = D.time.i + Math.max(phase2.tr, TR3);
     const T6 = F.time.i + Math.max(phase4.tr, TR5);
+    const T7 = G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6;
+    const timeMark = [T4, T6, T7];
 
     const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -858,7 +860,7 @@ function calcContinuePattern() {
     const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
     const cyanConfirmed = G.time1.i > T6 || H.time1.i > T6;
 
-    let subPattern = "continue";
+    // let subPattern = "continue";
     // if (dBreak) {
     //     subPattern = isBoxValid(phase4, phase2)
     //         ? "breakout"
@@ -884,279 +886,303 @@ function calcContinuePattern() {
     // }
     // }
 
-    let timeMark = [],
-        progressSteps;
+    const progressSteps = [
+        [
+            // orange
+            isBoxValid({ pr: BC, tr: dT2 }, phase1),
+        ],
+        [
+            // red
+            isBoxValid({ pr: CD, tr: dT3 }, phase2),
+            rBCD < 2,
+        ],
+        [
+            // pink
+            isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
+            pinkConfirmed,
+        ],
+        [
+            // purple
+            isBoxValid({ pr: EF, tr: dT5 }, phase4),
+            purpleConfirmed,
+        ],
+        [
+            // cyan
+            isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
+            cyanConfirmed,
+        ],
+        [
+            // green
+            isBoxValid({ pr: GH, tr: dT7 }, phase6),
+            dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
+            greenConfirmed,
+        ],
+    ];
 
-    switch (subPattern) {
-        case "continue":
-            timeMark.push(G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6);
-            progressSteps = [
-                [
-                    // orange
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // red
-                    isBoxValid({ pr: CD, tr: dT3 }, phase2),
-                    rBCD < 2,
-                ],
-                [
-                    // pink
-                    isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    isBoxValid({ pr: EF, tr: dT5 }, phase4),
-                    purpleConfirmed,
-                ],
-                [
-                    // cyan
-                    isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-                    cyanConfirmed,
-                ],
-                [
-                    // green
-                    isBoxValid({ pr: GH, tr: dT7 }, phase6),
-                    dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
-                    greenConfirmed,
-                ],
-            ];
-            break;
+    // switch (subPattern) {
+    //     case "continue":
+    //         timeMark.push(G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6);
+    //         progressSteps = [
+    //             [
+    //                 // orange
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: CD, tr: dT3 }, phase2),
+    //                 rBCD < 2,
+    //             ],
+    //             [
+    //                 // pink
+    //                 isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 isBoxValid({ pr: EF, tr: dT5 }, phase4),
+    //                 purpleConfirmed,
+    //             ],
+    //             [
+    //                 // cyan
+    //                 isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
+    //                 cyanConfirmed,
+    //             ],
+    //             [
+    //                 // green
+    //                 isBoxValid({ pr: GH, tr: dT7 }, phase6),
+    //                 dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
+    //                 greenConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        case "orange":
-            timeMark.push(phase1.R.time.i + dT1);
-            progressSteps = [
-                [
-                    // orange
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                    rABC <= 0.7,
-                    isBoxValid(phase2, phase1),
-                    phase2.pr > BBs,
-                    rBCBm >= 0.5,
-                ],
-                [
-                    // red
-                    dT3 < dT2,
-                    dT3 <= phase2.R.time1.i - phase2.S1.time.i,
-                ],
-            ];
-            break;
+    //     case "orange":
+    //         timeMark.push(phase1.R.time.i + dT1);
+    //         progressSteps = [
+    //             [
+    //                 // orange
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //                 rABC <= 0.7,
+    //                 isBoxValid(phase2, phase1),
+    //                 phase2.pr > BBs,
+    //                 rBCBm >= 0.5,
+    //             ],
+    //             [
+    //                 // red
+    //                 dT3 < dT2,
+    //                 dT3 <= phase2.R.time1.i - phase2.S1.time.i,
+    //             ],
+    //         ];
+    //         break;
 
-        case "orangeConfirm":
-            timeMark.push(phase1.R.time.i + dT1);
-            progressSteps = [
-                [
-                    // orange
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                    rABC <= 0.7,
-                    isBoxValid(phase2, phase1),
-                    phase2.pr > BBs,
-                    rBCBm >= 0.5,
-                ],
-                [
-                    // red
-                    dT3 < dT2,
-                    dT3 <= phase2.R.time1.i - phase2.S1.time.i,
-                    mf.cmp(D.price, side, phase2.S1.price, true),
-                ],
-            ];
-            break;
+    //     case "orangeConfirm":
+    //         timeMark.push(phase1.R.time.i + dT1);
+    //         progressSteps = [
+    //             [
+    //                 // orange
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //                 rABC <= 0.7,
+    //                 isBoxValid(phase2, phase1),
+    //                 phase2.pr > BBs,
+    //                 rBCBm >= 0.5,
+    //             ],
+    //             [
+    //                 // red
+    //                 dT3 < dT2,
+    //                 dT3 <= phase2.R.time1.i - phase2.S1.time.i,
+    //                 mf.cmp(D.price, side, phase2.S1.price, true),
+    //             ],
+    //         ];
+    //         break;
 
-        case "red":
-            timeMark.push(phase2.R.time.i + dT1 - dT2);
-            progressSteps = [
-                [
-                    // orange
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // red
-                    isBoxValid({ pr: CD, tr: dT3 }, phase2),
-                    rBCD < 2,
-                ],
-                [
-                    // pink
-                    dT4 < dT3,
-                    pinkConfirmed,
-                ],
-            ];
-            break;
+    //     case "red":
+    //         timeMark.push(phase2.R.time.i + dT1 - dT2);
+    //         progressSteps = [
+    //             [
+    //                 // orange
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: CD, tr: dT3 }, phase2),
+    //                 rBCD < 2,
+    //             ],
+    //             [
+    //                 // pink
+    //                 dT4 < dT3,
+    //                 pinkConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        case "redConfirm":
-            timeMark.push(phase2.R.time.i + dT1 - dT2);
-            progressSteps = [
-                [
-                    // orange
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // red
-                    isBoxValid({ pr: CD, tr: dT3 }, phase2),
-                    rBCD < 2,
-                ],
-                [
-                    // pink
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    purpleConfirmed,
-                ],
-                [
-                    // cyan
-                    cyanConfirmed,
-                ],
-                [
-                    // green
-                    greenConfirmed,
-                ],
-            ];
-            break;
+    //     case "redConfirm":
+    //         timeMark.push(phase2.R.time.i + dT1 - dT2);
+    //         progressSteps = [
+    //             [
+    //                 // orange
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: CD, tr: dT3 }, phase2),
+    //                 rBCD < 2,
+    //             ],
+    //             [
+    //                 // pink
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 purpleConfirmed,
+    //             ],
+    //             [
+    //                 // cyan
+    //                 cyanConfirmed,
+    //             ],
+    //             [
+    //                 // green
+    //                 greenConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        case "pink":
-            timeMark.push(D.time.i + dT1 - dT2 - dT3);
-            progressSteps = [
-                [
-                    // orange
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // red
-                    isBoxValid({ pr: CD, tr: dT3 }, phase2),
-                    rBCD < 2,
-                ],
-                [
-                    // pink
-                    isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    purpleConfirmed,
-                ],
-            ];
-            break;
+    //     case "pink":
+    //         timeMark.push(D.time.i + dT1 - dT2 - dT3);
+    //         progressSteps = [
+    //             [
+    //                 // orange
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: CD, tr: dT3 }, phase2),
+    //                 rBCD < 2,
+    //             ],
+    //             [
+    //                 // pink
+    //                 isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 purpleConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        case "purple":
-            timeMark.push(E.time.i + dT1 - dT2 - dT3 - dT4);
-            progressSteps = [
-                [
-                    // orange
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // red
-                    isBoxValid({ pr: CD, tr: dT3 }, phase2),
-                    rBCD < 2,
-                ],
-                [
-                    // pink
-                    isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    isBoxValid({ pr: EF, tr: dT5 }, phase4),
-                    purpleConfirmed,
-                ],
-                [
-                    // cyan
-                    dT6 < dT5,
-                ],
-                [
-                    // green
-                    greenConfirmed,
-                ],
-            ];
-            break;
+    //     case "purple":
+    //         timeMark.push(E.time.i + dT1 - dT2 - dT3 - dT4);
+    //         progressSteps = [
+    //             [
+    //                 // orange
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: CD, tr: dT3 }, phase2),
+    //                 rBCD < 2,
+    //             ],
+    //             [
+    //                 // pink
+    //                 isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 isBoxValid({ pr: EF, tr: dT5 }, phase4),
+    //                 purpleConfirmed,
+    //             ],
+    //             [
+    //                 // cyan
+    //                 dT6 < dT5,
+    //             ],
+    //             [
+    //                 // green
+    //                 greenConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        case "cyan":
-            timeMark.push(F.time.i + dT1 - dT2 - dT3 - dT4 - dT5);
-            progressSteps = [
-                [
-                    // orange
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // red
-                    isBoxValid({ pr: CD, tr: dT3 }, phase2),
-                    rBCD < 2,
-                ],
-                [
-                    // pink
-                    isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    isBoxValid({ pr: EF, tr: dT5 }, phase4),
-                    purpleConfirmed,
-                ],
-                [
-                    // cyan
-                    isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-                ],
-                [
-                    // green
-                    greenConfirmed,
-                ],
-            ];
-            break;
+    //     case "cyan":
+    //         timeMark.push(F.time.i + dT1 - dT2 - dT3 - dT4 - dT5);
+    //         progressSteps = [
+    //             [
+    //                 // orange
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: CD, tr: dT3 }, phase2),
+    //                 rBCD < 2,
+    //             ],
+    //             [
+    //                 // pink
+    //                 isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 isBoxValid({ pr: EF, tr: dT5 }, phase4),
+    //                 purpleConfirmed,
+    //             ],
+    //             [
+    //                 // cyan
+    //                 isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
+    //             ],
+    //             [
+    //                 // green
+    //                 greenConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        case "green":
-            timeMark.push(G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6);
-            progressSteps = [
-                [
-                    // orange
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // red
-                    isBoxValid({ pr: CD, tr: dT3 }, phase2),
-                    rBCD < 2,
-                ],
-                [
-                    // pink
-                    isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    isBoxValid({ pr: EF, tr: dT5 }, phase4),
-                    purpleConfirmed,
-                ],
-                [
-                    // cyan
-                    isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-                ],
-                [
-                    // green
-                    isBoxValid({ pr: GH, tr: dT7 }, phase6),
-                    dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
-                    greenConfirmed,
-                ],
-            ];
-            break;
-    }
-    timeMark.push(T4);
-    timeMark.push(T6);
-    const progress = checkProgress(subPattern, progressSteps);
+    //     case "green":
+    //         timeMark.push(G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6);
+    //         progressSteps = [
+    //             [
+    //                 // orange
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: CD, tr: dT3 }, phase2),
+    //                 rBCD < 2,
+    //             ],
+    //             [
+    //                 // pink
+    //                 isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 isBoxValid({ pr: EF, tr: dT5 }, phase4),
+    //                 purpleConfirmed,
+    //             ],
+    //             [
+    //                 // cyan
+    //                 isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
+    //             ],
+    //             [
+    //                 // green
+    //                 isBoxValid({ pr: GH, tr: dT7 }, phase6),
+    //                 dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
+    //                 greenConfirmed,
+    //             ],
+    //         ];
+    //         break;
+    // }
+    // timeMark.push(T4);
+    // timeMark.push(T6);
+    const progress = checkProgress("continue", progressSteps);
     //
     const points = buildViewPoints(
         [A, phase1.R, phase2.R, D, E, F, G, H],
         ["yellow", "orange", "red", "pink", "purple", "cyan", "green", "green"]
     );
     //
-    const isOrange = ["orange", "orangeConfirm"].includes(subPattern);
+    // const isOrange = ["orange", "orangeConfirm"].includes(subPattern);
     const orderSide = side ? 1 : -1;
-    const refPrice = isOrange
-        ? phase2.S1.price
-        : fBreak
-        ? hBreak
-            ? H.price
-            : F.price
-        : D.price;
+    const refPrice = fBreak ? (hBreak ? H.price : F.price) : D.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
     const x = adjustTargetPrice(D.price, CD, orderSide);
     const X = mf.fmtNum(x - entry);
@@ -1167,23 +1193,15 @@ function calcContinuePattern() {
     const w = mf.fmtNum(B.price + orderSide * BC);
     const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
-        (isOrange || (dBreak && !fBreak)
-            ? D.price + E.price
-            : F.price + G.price) / 2,
+        (dBreak && !fBreak ? D.price + E.price : F.price + G.price) / 2,
         1
     );
     const T = mf.fmtNum(t - entry, 1);
     //
     let order = {};
     if (progress.result) {
-        const tp = isOrange
-            ? w
-            : mf.cmp(W, !side, X)
-            ? x
-            : mf.cmp(W, side, Y)
-            ? y
-            : w;
-        const sl = isOrange ? C.price : fBreak ? G.price : E.price;
+        const tp = mf.cmp(W, !side, X) ? x : mf.cmp(W, side, Y) ? y : w;
+        const sl = fBreak ? G.price : E.price;
         order = {
             side: orderSide,
             price: entry,
@@ -2118,7 +2136,7 @@ function removePatternTool() {
     lines = {};
 }
 function setTimeMark(data) {
-    const colors = [colorMap.orange, colorMap.pink, colorMap.cyan];
+    const colors = [colorMap.pink, colorMap.cyan, colorMap.green];
     let result = [];
     data.forEach((item, i) => {
         let time = props.indexToTime(item);
