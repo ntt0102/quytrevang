@@ -1191,7 +1191,7 @@ function calcContinuePattern() {
     //
     // const isOrange = ["orange", "orangeConfirm"].includes(subPattern);
     const orderSide = side ? 1 : -1;
-    const refPrice = fBreak ? (hBreak ? H.price : F.price) : D.price;
+    const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
     const x = adjustTargetPrice(D.price, CD, orderSide);
     const X = mf.fmtNum(x - entry);
@@ -1214,7 +1214,7 @@ function calcContinuePattern() {
     let order = {};
     if (progress.result) {
         const tp = mf.cmp(W, !side, X) ? x : mf.cmp(W, side, Y) ? y : w;
-        const sl = fBreak ? (hBreak ? I.price : G.price) : E.price;
+        const sl = G.price;
         order = {
             side: orderSide,
             price: entry,
@@ -1593,6 +1593,7 @@ function calcReversalPattern() {
     const isBreak3 = isBoxValid(phase6.ext, phase6, true);
 
     const G = isBreak3 ? phase6.R1 : phase6.ext.R;
+    const H = isBreak3 ? phase6.S1 : phase6.ext.S;
 
     console.log("calcReversalPattern", [
         phase1,
@@ -1603,14 +1604,15 @@ function calcReversalPattern() {
         phase6,
     ]);
 
-    const AB = mf.fmtNum(ab, 1, true);
+    // const AB = mf.fmtNum(ab, 1, true);
     const BC = mf.fmtNum(C.price - B.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
-    const DDs = mf.fmtNum(phase3.R.price1 - D.price, 1, true);
+    // const DDs = mf.fmtNum(phase3.R.price1 - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
-    const FFs = mf.fmtNum(phase5.R.price1 - F.price, 1, true);
+    // const FFs = mf.fmtNum(phase5.R.price1 - F.price, 1, true);
     const FG = mf.fmtNum(G.price - F.price, 1, true);
+    // const GH = mf.fmtNum(H.price - G.price, 1, true);
 
     const dT1 = phase1.R.time1.i - phase1.S.time.i;
     const dT2 = C.time1.i - phase2.S.time.i;
@@ -1631,17 +1633,19 @@ function calcReversalPattern() {
     // const T5 = F.time.i + phase5.tr;
     // const timeMark = [T5, T4, T3, T2, T1];
 
+    const T1 = F.time.i + dT1 - dT2 - dT3 - dT4 - dT5;
     const T3 = C.time.i + Math.max(phase1.tr, TR2);
     const T5 = E.time.i + Math.max(phase3.tr, TR4);
+    const timeMark = [T1, T3, T5];
 
-    const rABC = BC / AB;
+    // const rABC = BC / AB;
     const rBCD = CD / BC;
     const rCDE = DE / CD;
-    const rCDDs = DDs / CD;
-    const rDEF = EF / DE;
-    const rEFFs = FFs / EF;
+    // const rCDDs = DDs / CD;
+    // const rDEF = EF / DE;
+    // const rEFFs = FFs / EF;
 
-    const dBreak = mf.cmp(D.price, !side, B.price);
+    // const dBreak = mf.cmp(D.price, !side, B.price);
     const eBreak = mf.cmp(E.price, side, C.price);
     const gBreak = mf.cmp(G.price, side, E.price);
 
@@ -1652,209 +1656,236 @@ function calcReversalPattern() {
     const pinkConfirmed = D.time1.i > T3 || E.time1.i > T3 || G.time1.i > T3;
     const cyanConfirmed = F.time1.i > T5 || G.time1.i > T5;
 
-    let timeMark = [],
-        subPattern;
+    // let subPattern;
 
-    if (dT2 >= dT1) {
-        subPattern = "red";
-    } else if (dT3 + dT2 >= dT1) {
-        subPattern = "pink";
-    } else if (dT4 + dT3 + dT2 >= dT1) {
-        subPattern = "purple";
-    } else if (dT5 + dT4 + dT3 + dT2 >= dT1) {
-        subPattern = "cyan";
-    } else {
-        subPattern = "green";
-    }
+    // if (dT2 >= dT1) {
+    //     subPattern = "red";
+    // } else if (dT3 + dT2 >= dT1) {
+    //     subPattern = "pink";
+    // } else if (dT4 + dT3 + dT2 >= dT1) {
+    //     subPattern = "purple";
+    // } else if (dT5 + dT4 + dT3 + dT2 >= dT1) {
+    //     subPattern = "cyan";
+    // } else {
+    //     subPattern = "green";
+    // }
 
-    let progressSteps;
-    switch (subPattern) {
-        case "red":
-            timeMark.push(phase1.R.time.i + dT1);
-            progressSteps = [
-                [
-                    // red
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // pink
-                    rBCD < 1.5,
-                    dT3 < dT2,
-                    pinkConfirmed,
-                ],
-            ];
-            break;
+    const progressSteps = [
+        [
+            // red
+            isBoxValid({ pr: BC, tr: dT2 }, phase1),
+        ],
+        [
+            // pink
+            isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
+            rBCD < 1.5,
+            pinkConfirmed,
+        ],
+        [
+            // purple
+            isBoxValid({ pr: DE, tr: dT4 }, phase3),
+            purpleConfirmed,
+        ],
+        [
+            // cyan
+            isBoxValid({ pr: EF, tr: dT5 }, { pr: PR4, tr: TR4 }),
+            cyanConfirmed,
+        ],
+        [
+            // green
+            isBoxValid({ pr: FG, tr: dT6 }, phase5),
+            dT6 >= dT1 - dT2 - dT3 - dT4 - dT5,
+            greenConfirmed,
+        ],
+    ];
 
-        case "pink":
-            timeMark.push(C.time.i + dT1 - dT2);
-            progressSteps = [
-                [
-                    // red
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // pink
-                    isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
-                    rBCD < 1.5,
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    purpleConfirmed,
-                ],
-            ];
-            break;
+    // switch (subPattern) {
+    //     case "red":
+    //         timeMark.push(phase1.R.time.i + dT1);
+    //         progressSteps = [
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // pink
+    //                 rBCD < 1.5,
+    //                 dT3 < dT2,
+    //                 pinkConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        case "purple":
-            timeMark.push(D.time.i + dT1 - dT2 - dT3);
-            progressSteps = [
-                [
-                    // red
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // pink
-                    isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
-                    rBCD < 1.5,
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    isBoxValid({ pr: DE, tr: dT4 }, phase3),
-                    purpleConfirmed,
-                ],
-                [
-                    // cyan
-                    dT5 < dT4,
-                ],
-                [
-                    // green
-                    greenConfirmed,
-                ],
-            ];
-            break;
+    //     case "pink":
+    //         timeMark.push(C.time.i + dT1 - dT2);
+    //         progressSteps = [
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // pink
+    //                 isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
+    //                 rBCD < 1.5,
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 purpleConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        case "cyan":
-            timeMark.push(E.time.i + dT1 - dT2 - dT3 - dT4);
-            progressSteps = [
-                [
-                    // red
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // pink
-                    isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
-                    rBCD < 1.5,
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    isBoxValid({ pr: DE, tr: dT4 }, phase3),
-                    purpleConfirmed,
-                ],
-                [
-                    // cyan
-                    isBoxValid({ pr: EF, tr: dT5 }, { pr: PR4, tr: TR4 }),
-                ],
-                [
-                    // green
-                    greenConfirmed,
-                ],
-            ];
-            break;
+    //     case "purple":
+    //         timeMark.push(D.time.i + dT1 - dT2 - dT3);
+    //         progressSteps = [
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // pink
+    //                 isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
+    //                 rBCD < 1.5,
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 isBoxValid({ pr: DE, tr: dT4 }, phase3),
+    //                 purpleConfirmed,
+    //             ],
+    //             [
+    //                 // cyan
+    //                 dT5 < dT4,
+    //             ],
+    //             [
+    //                 // green
+    //                 greenConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        case "green":
-            timeMark.push(F.time.i + dT1 - dT2 - dT3 - dT4 - dT5);
-            progressSteps = [
-                [
-                    // red
-                    isBoxValid({ pr: BC, tr: dT2 }, phase1),
-                ],
-                [
-                    // pink
-                    isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
-                    rBCD < 1.5,
-                    pinkConfirmed,
-                ],
-                [
-                    // purple
-                    isBoxValid({ pr: DE, tr: dT4 }, phase3),
-                    purpleConfirmed,
-                ],
-                [
-                    // cyan
-                    isBoxValid({ pr: EF, tr: dT5 }, { pr: PR4, tr: TR4 }),
-                    cyanConfirmed,
-                ],
-                [
-                    // green
-                    isBoxValid({ pr: FG, tr: dT6 }, phase5),
-                    dT6 >= dT1 - dT2 - dT3 - dT4 - dT5,
-                    greenConfirmed,
-                ],
-            ];
-            break;
-        // case "red":
-        //     progressSteps = [
-        //         [
-        //             // red
-        //             dT2 >= phase1.tr * trThreshold,
-        //             BC >= phase1.pr,
-        //         ],
-        //         [
-        //             // pink
-        //             rBCD < 1.5,
-        //             // rCDDs < 0.5,
-        //         ],
-        //         [
-        //             // purple
-        //             confirmed,
-        //         ],
-        //         [
-        //             // cyan
-        //             EF < CD,
-        //             rEFFs < 0.5,
-        //         ],
-        //     ];
-        //     break;
+    //     case "cyan":
+    //         timeMark.push(E.time.i + dT1 - dT2 - dT3 - dT4);
+    //         progressSteps = [
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // pink
+    //                 isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
+    //                 rBCD < 1.5,
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 isBoxValid({ pr: DE, tr: dT4 }, phase3),
+    //                 purpleConfirmed,
+    //             ],
+    //             [
+    //                 // cyan
+    //                 isBoxValid({ pr: EF, tr: dT5 }, { pr: PR4, tr: TR4 }),
+    //             ],
+    //             [
+    //                 // green
+    //                 greenConfirmed,
+    //             ],
+    //         ];
+    //         break;
 
-        // case "purple":
-        //     progressSteps = [
-        //         [
-        //             // red
-        //             dT2 >= phase1.tr * trThreshold,
-        //             BC >= phase1.pr,
-        //         ],
-        //         [
-        //             // pink
-        //             rBCD < 1.5,
-        //             // rCDDs < 0.5,
-        //             isBoxValid(phase3, phase1),
-        //         ],
-        //         [
-        //             // purple
-        //             dT4 >= dT1 - dT2 - dT3,
-        //             confirmed,
-        //         ],
-        //         [
-        //             // cyan
-        //             EF < CD,
-        //             rEFFs < 0.5,
-        //         ],
-        //     ];
-        //     break;
-    }
-    timeMark.push(T3);
-    timeMark.push(T5);
-    const progress = checkProgress(subPattern, progressSteps);
+    //     case "green":
+    //         timeMark.push(F.time.i + dT1 - dT2 - dT3 - dT4 - dT5);
+    //         progressSteps = [
+    //             [
+    //                 // red
+    //                 isBoxValid({ pr: BC, tr: dT2 }, phase1),
+    //             ],
+    //             [
+    //                 // pink
+    //                 isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
+    //                 rBCD < 1.5,
+    //                 pinkConfirmed,
+    //             ],
+    //             [
+    //                 // purple
+    //                 isBoxValid({ pr: DE, tr: dT4 }, phase3),
+    //                 purpleConfirmed,
+    //             ],
+    //             [
+    //                 // cyan
+    //                 isBoxValid({ pr: EF, tr: dT5 }, { pr: PR4, tr: TR4 }),
+    //                 cyanConfirmed,
+    //             ],
+    //             [
+    //                 // green
+    //                 isBoxValid({ pr: FG, tr: dT6 }, phase5),
+    //                 dT6 >= dT1 - dT2 - dT3 - dT4 - dT5,
+    //                 greenConfirmed,
+    //             ],
+    //         ];
+    //         break;
+    //     // case "red":
+    //     //     progressSteps = [
+    //     //         [
+    //     //             // red
+    //     //             dT2 >= phase1.tr * trThreshold,
+    //     //             BC >= phase1.pr,
+    //     //         ],
+    //     //         [
+    //     //             // pink
+    //     //             rBCD < 1.5,
+    //     //             // rCDDs < 0.5,
+    //     //         ],
+    //     //         [
+    //     //             // purple
+    //     //             confirmed,
+    //     //         ],
+    //     //         [
+    //     //             // cyan
+    //     //             EF < CD,
+    //     //             rEFFs < 0.5,
+    //     //         ],
+    //     //     ];
+    //     //     break;
+
+    //     // case "purple":
+    //     //     progressSteps = [
+    //     //         [
+    //     //             // red
+    //     //             dT2 >= phase1.tr * trThreshold,
+    //     //             BC >= phase1.pr,
+    //     //         ],
+    //     //         [
+    //     //             // pink
+    //     //             rBCD < 1.5,
+    //     //             // rCDDs < 0.5,
+    //     //             isBoxValid(phase3, phase1),
+    //     //         ],
+    //     //         [
+    //     //             // purple
+    //     //             dT4 >= dT1 - dT2 - dT3,
+    //     //             confirmed,
+    //     //         ],
+    //     //         [
+    //     //             // cyan
+    //     //             EF < CD,
+    //     //             rEFFs < 0.5,
+    //     //         ],
+    //     //     ];
+    //     //     break;
+    // }
+    // timeMark.push(T3);
+    // timeMark.push(T5);
+    const progress = checkProgress("reversal", progressSteps);
     //
     const points = buildViewPoints(
-        [A, phase1.R, C, D, E, F, G],
-        ["orange", "red", "pink", "purple", "cyan", "green", "green"]
+        [A, phase1.R, C, D, E, F, G, H],
+        ["orange", "red", "pink", "purple", "cyan", "blue", "green", "green"]
     );
     //
     const orderSide = side ? 1 : -1;
-    const refPrice = gBreak ? G.price : E.price;
+    const refPrice = G.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
     const x = adjustTargetPrice(C.price, CD, orderSide);
     const X = mf.fmtNum(x - entry);
@@ -1864,13 +1895,19 @@ function calcReversalPattern() {
     const Z = mf.fmtNum(z - entry);
     const w = mf.fmtNum(C.price + orderSide * BC);
     const W = mf.fmtNum(w - entry);
-    const t = mf.fmtNum((E.price + F.price) / 2);
+    const t = mf.fmtNum(
+        (eBreak
+            ? gBreak
+                ? G.price + H.price
+                : E.price + F.price
+            : C.price + D.price) / 2
+    );
     const T = mf.fmtNum(t - entry);
     //
     let order = {};
     if (progress.result) {
         const tp = mf.cmp(W, !side, X) ? x : mf.cmp(W, side, Y) ? y : w;
-        const sl = dBreak ? B.price : D.price;
+        const sl = F.price;
         order = {
             side: orderSide,
             price: entry,

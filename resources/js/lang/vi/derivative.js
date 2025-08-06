@@ -458,130 +458,173 @@ const continuePattern = {
     // },
 };
 
-const redReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "B > Bmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "P < 150",
-            "ΔT < Tđỏ",
-            "Xác nhận",
-        ],
-    },
-];
-const pinkReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "B > Bmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "B > Bmin",
-            "P < 150",
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "Xác nhận",
-        ],
-    },
-];
-const purpleReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "B > Bmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "B > Bmin",
-            "P < 150",
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "B > Bmin",
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "ΔT < Ttím",
-        ],
-    },
-    {
-        name: "Bước lục",
-        conds: [
-            //
-            "Xác nhận",
-        ],
-    },
-];
-const cyanReversal = [
-    {
-        name: "Bước đỏ",
-        conds: [
-            //
-            "B > Bmin",
-        ],
-    },
-    {
-        name: "Bước hồng",
-        conds: [
-            //
-            "B > Bmin",
-            "P < 150",
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước tím",
-        conds: [
-            //
-            "B > Bmin",
-            "Xác nhận",
-        ],
-    },
-    {
-        name: "Bước lam",
-        conds: [
-            //
-            "B > Bmin",
-        ],
-    },
-    {
-        name: "Bước lục",
-        conds: [
-            //
-            "Xác nhận",
-        ],
-    },
-];
-const greenReversal = [
+// const redReversal = [
+//     {
+//         name: "Bước đỏ",
+//         conds: [
+//             //
+//             "B > Bmin",
+//         ],
+//     },
+//     {
+//         name: "Bước hồng",
+//         conds: [
+//             //
+//             "P < 150",
+//             "ΔT < Tđỏ",
+//             "Xác nhận",
+//         ],
+//     },
+// ];
+// const pinkReversal = [
+//     {
+//         name: "Bước đỏ",
+//         conds: [
+//             //
+//             "B > Bmin",
+//         ],
+//     },
+//     {
+//         name: "Bước hồng",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "P < 150",
+//             "Xác nhận",
+//         ],
+//     },
+//     {
+//         name: "Bước tím",
+//         conds: [
+//             //
+//             "Xác nhận",
+//         ],
+//     },
+// ];
+// const purpleReversal = [
+//     {
+//         name: "Bước đỏ",
+//         conds: [
+//             //
+//             "B > Bmin",
+//         ],
+//     },
+//     {
+//         name: "Bước hồng",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "P < 150",
+//             "Xác nhận",
+//         ],
+//     },
+//     {
+//         name: "Bước tím",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "Xác nhận",
+//         ],
+//     },
+//     {
+//         name: "Bước lam",
+//         conds: [
+//             //
+//             "ΔT < Ttím",
+//         ],
+//     },
+//     {
+//         name: "Bước lục",
+//         conds: [
+//             //
+//             "Xác nhận",
+//         ],
+//     },
+// ];
+// const cyanReversal = [
+//     {
+//         name: "Bước đỏ",
+//         conds: [
+//             //
+//             "B > Bmin",
+//         ],
+//     },
+//     {
+//         name: "Bước hồng",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "P < 150",
+//             "Xác nhận",
+//         ],
+//     },
+//     {
+//         name: "Bước tím",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "Xác nhận",
+//         ],
+//     },
+//     {
+//         name: "Bước lam",
+//         conds: [
+//             //
+//             "B > Bmin",
+//         ],
+//     },
+//     {
+//         name: "Bước lục",
+//         conds: [
+//             //
+//             "Xác nhận",
+//         ],
+//     },
+// ];
+// const greenReversal = [
+//     {
+//         name: "Bước đỏ",
+//         conds: [
+//             //
+//             "B > Bmin",
+//         ],
+//     },
+//     {
+//         name: "Bước hồng",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "P < 150",
+//             "Xác nhận",
+//         ],
+//     },
+//     {
+//         name: "Bước tím",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "Xác nhận",
+//         ],
+//     },
+//     {
+//         name: "Bước lam",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "Xác nhận",
+//         ],
+//     },
+//     {
+//         name: "Bước lục",
+//         conds: [
+//             //
+//             "B > Bmin",
+//             "T > Tvàng",
+//             "Xác nhận",
+//         ],
+//     },
+// ];
+const reversal1 = [
     {
         name: "Bước đỏ",
         conds: [
@@ -626,26 +669,30 @@ const greenReversal = [
 ];
 
 const reversalPattern = {
-    red: {
-        name: "Mẫu hình đảo chiều </br>đỏ",
-        steps: redReversal,
+    reversal: {
+        name: "Mẫu hình đảo chiều",
+        steps: reversal1,
     },
-    pink: {
-        name: "Mẫu hình đảo chiều </br>hồng",
-        steps: pinkReversal,
-    },
-    purple: {
-        name: "Mẫu hình đảo chiều </br>tím",
-        steps: purpleReversal,
-    },
-    cyan: {
-        name: "Mẫu hình đảo chiều </br>lam",
-        steps: cyanReversal,
-    },
-    green: {
-        name: "Mẫu hình đảo chiều </br>lục",
-        steps: greenReversal,
-    },
+    // red: {
+    //     name: "Mẫu hình đảo chiều </br>đỏ",
+    //     steps: redReversal,
+    // },
+    // pink: {
+    //     name: "Mẫu hình đảo chiều </br>hồng",
+    //     steps: pinkReversal,
+    // },
+    // purple: {
+    //     name: "Mẫu hình đảo chiều </br>tím",
+    //     steps: purpleReversal,
+    // },
+    // cyan: {
+    //     name: "Mẫu hình đảo chiều </br>lam",
+    //     steps: cyanReversal,
+    // },
+    // green: {
+    //     name: "Mẫu hình đảo chiều </br>lục",
+    //     steps: greenReversal,
+    // },
 };
 
 export default { C: continuePattern, R: reversalPattern };
