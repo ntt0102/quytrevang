@@ -834,10 +834,10 @@ function calcContinuePattern() {
     // const T5 = F.time.i + TR5;
     // const T6 = G.time.i + phase6.tr;
 
+    const T1 = G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6;
     const T4 = D.time.i + Math.max(phase2.tr, TR3);
     const T6 = F.time.i + Math.max(phase4.tr, TR5);
-    const T7 = G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6;
-    const timeMark = [T4, T6, T7];
+    const timeMark = [T1, T4, T6];
 
     const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -2038,7 +2038,9 @@ function buildViewPoints(points, colors) {
         if (idx !== 0) {
             viewPoints.push({ ...point, time: p.time1.t });
         }
-        viewPoints.push({ ...point, time: p.time.t });
+        if (idx !== points.length - 1) {
+            viewPoints.push({ ...point, time: p.time.t });
+        }
     });
     return viewPoints;
 }
@@ -2150,7 +2152,11 @@ function removePatternTool() {
     lines = {};
 }
 function setTimeMark(data) {
-    const colors = [colorMap.pink, colorMap.cyan, colorMap.green];
+    const colors = [
+        colorMap[patternType.value === "C" ? "yellow" : "orange"],
+        colorMap.pink,
+        colorMap.cyan,
+    ];
     let result = [];
     data.forEach((item, i) => {
         let time = props.indexToTime(item);
@@ -2166,16 +2172,6 @@ function setTimeMark(data) {
         result = makeUnique(result);
         result.sort((a, b) => a.time - b.time);
     }
-    // let result = [];
-    // if (data) {
-    //     const color =
-    //         patternType.value === "C" ? colorMap.yellow : colorMap.orange;
-    //     result.push({
-    //         time: props.indexToTime(data),
-    //         value: 1,
-    //         color,
-    //     });
-    // }
     series.timeMark.setData(result);
 }
 function makeUnique(arr) {
