@@ -86,12 +86,25 @@ const redConfirmContinue = [
         name: "Bước hồng",
         conds: [
             //
-            "ΔT < Tđỏ",
             "Xác nhận",
         ],
     },
     {
         name: "Bước tím",
+        conds: [
+            //
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lam",
+        conds: [
+            //
+            "Xác nhận",
+        ],
+    },
+    {
+        name: "Bước lục",
         conds: [
             //
             "Xác nhận",

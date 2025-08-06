@@ -870,7 +870,9 @@ function calcContinuePattern() {
     } else if (dT3 + dT2 >= dT1) {
         const isRedInvalid = isBoxValid({ pr: PR3, tr: TR3 }, phase1);
         const isPinkInvalid = isBoxValid({ pr: DE, tr: dT4 }, phase2, true);
-        subPattern = isRedInvalid || isPinkInvalid ? "redConfirm" : "red";
+        const isPinkLong = dT4 >= dT3;
+        subPattern =
+            isRedInvalid || isPinkInvalid || isPinkLong ? "redConfirm" : "red";
     } else if (dT4 + dT3 + dT2 >= dT1) {
         subPattern = "pink";
     } else if (dT5 + dT4 + dT3 + dT2 >= dT1) {
@@ -959,12 +961,19 @@ function calcContinuePattern() {
                 ],
                 [
                     // pink
-                    dT4 < dT3,
                     pinkConfirmed,
                 ],
                 [
                     // purple
                     purpleConfirmed,
+                ],
+                [
+                    // cyan
+                    cyanConfirmed,
+                ],
+                [
+                    // green
+                    greenConfirmed,
                 ],
             ];
             break;
