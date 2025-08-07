@@ -854,8 +854,8 @@ function calcContinuePattern() {
 
     const purpleConfirmed =
         mf.cmp(F.price, side, D.price, true) ||
-        (rDEF > 0.5 && dT6 > dT5 && mf.cmp(H.price, side, F.price, true));
-    const cyanConfirmed = mf.cmp(H.price, side, F.price, true);
+        (rDEF > 0.5 && dT6 > dT5 && mf.cmp(H.price, side, F.price));
+    const cyanConfirmed = mf.cmp(H.price, side, F.price);
     const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
     const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
 
@@ -1651,8 +1651,8 @@ function calcReversalPattern() {
 
     const purpleConfirmed =
         mf.cmp(E.price, side, C.price, true) ||
-        (rCDE > 0.5 && dT5 > dT4 && mf.cmp(G.price, side, E.price, true));
-    const cyanConfirmed = mf.cmp(G.price, side, E.price, true);
+        (rCDE > 0.5 && dT5 > dT4 && mf.cmp(G.price, side, E.price));
+    const cyanConfirmed = mf.cmp(G.price, side, E.price);
     const pinkConfirmed = D.time1.i > T3 || E.time1.i > T3 || G.time1.i > T3;
     const blueConfirmed = F.time1.i > T5 || G.time1.i > T5;
 
