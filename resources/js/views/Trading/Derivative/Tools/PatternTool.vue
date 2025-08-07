@@ -2191,7 +2191,7 @@ function setTimeMark(data) {
     const colors = [
         colorMap[patternType.value === "C" ? "yellow" : "orange"],
         colorMap.pink,
-        colorMap.cyan,
+        colorMap.blue,
     ];
     let result = [];
     data.forEach((item, i) => {
