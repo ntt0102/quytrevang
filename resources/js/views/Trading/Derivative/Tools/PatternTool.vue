@@ -237,28 +237,28 @@ function loadPatternTool() {
     option.point = "O";
     option.price = entry;
     option.title = "O";
-    option.color = colorMap.blue;
+    option.color = colorMap.pink;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "X";
     option.price = x;
     option.title = `X ${X}`;
-    option.color = colorMap.pink;
+    option.color = colorMap.purple;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "Y";
     option.price = y;
     option.title = `Y ${Y}`;
-    option.color = colorMap.purple;
+    option.color = colorMap.blue;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "Z";
     option.price = z;
     option.title = `Z ${Z}`;
-    option.color = colorMap.red;
+    option.color = colorMap.cyan;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
