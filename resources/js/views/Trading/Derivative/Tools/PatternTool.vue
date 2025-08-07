@@ -231,7 +231,7 @@ function loadPatternTool() {
     };
     const {
         entry,
-        target: [[x, X], [y, Y], [z, Z], [w, W], [t, T]],
+        target: [[x, X], [y, Y], [z, Z], [t, T]],
     } = calculatePattern();
     //
     option.point = "O";
@@ -259,13 +259,6 @@ function loadPatternTool() {
     option.price = z;
     option.title = `Z ${Z}`;
     option.color = colorMap.red;
-    option.draggable = false;
-    lines[option.point] = series.pattern.createPriceLine(option);
-    //
-    option.point = "W";
-    option.price = w;
-    option.title = `Z ${W}`;
-    option.color = colorMap.cyan;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
@@ -1193,14 +1186,13 @@ function calcContinuePattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const x = adjustTargetPrice(D.price, CD, orderSide);
+    const range = (fBreak ? F.price : D.price) - C.price;
+    const x = adjustTargetPrice(G.price, 0.5 * range, orderSide);
     const X = mf.fmtNum(x - entry);
-    const y = adjustTargetPrice(D.price, 2 * CD, orderSide);
+    const y = adjustTargetPrice(G.price, range, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(D.price, 4 * CD, orderSide);
+    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
     const Z = mf.fmtNum(z - entry);
-    const w = mf.fmtNum(B.price + orderSide * BC);
-    const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
         (fBreak
             ? hBreak
@@ -1213,7 +1205,7 @@ function calcContinuePattern() {
     //
     let order = {};
     if (progress.result) {
-        const tp = mf.cmp(W, !side, X) ? x : mf.cmp(W, side, Y) ? y : w;
+        const tp = mf.cmp(H.price, !side, x) ? y : z;
         const sl = G.price;
         order = {
             side: orderSide,
@@ -1234,7 +1226,6 @@ function calcContinuePattern() {
             [x, X],
             [y, Y],
             [z, Z],
-            [w, W],
             [t, T],
         ],
     };
@@ -1887,14 +1878,13 @@ function calcReversalPattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = G.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const x = adjustTargetPrice(C.price, CD, orderSide);
+    const range = (eBreak ? E.price : C.price) - D.price;
+    const x = adjustTargetPrice(F.price, 0.5 * range, orderSide);
     const X = mf.fmtNum(x - entry);
-    const y = adjustTargetPrice(C.price, 2 * CD, orderSide);
+    const y = adjustTargetPrice(F.price, range, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(C.price, 4 * CD, orderSide);
+    const z = adjustTargetPrice(F.price, 1.5 * range, orderSide);
     const Z = mf.fmtNum(z - entry);
-    const w = mf.fmtNum(C.price + orderSide * BC);
-    const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
         (eBreak
             ? gBreak
@@ -1906,7 +1896,7 @@ function calcReversalPattern() {
     //
     let order = {};
     if (progress.result) {
-        const tp = mf.cmp(W, !side, X) ? x : mf.cmp(W, side, Y) ? y : w;
+        const tp = mf.cmp(G.price, !side, x) ? y : z;
         const sl = F.price;
         order = {
             side: orderSide,
@@ -1927,7 +1917,6 @@ function calcReversalPattern() {
             [x, X],
             [y, Y],
             [z, Z],
-            [w, W],
             [t, T],
         ],
     };
@@ -2098,10 +2087,6 @@ function checkProgress(subPattern, steps) {
     });
     return progress;
 }
-// function isStepValid({ conds, excConds, isExcStep }) {
-//     if (isExcStep) return true;
-//     return conds.every((val, idx) => (excConds.includes(idx) ? true : val));
-// }
 function isTimeInChart(time) {
     if (!props.bars.length) return false;
     const first = props.bars[0]?.time;
@@ -2110,7 +2095,7 @@ function isTimeInChart(time) {
     return time >= first && time <= last;
 }
 function adjustTargetPrice(price, range, side) {
-    const target = price + side * range;
+    const target = price + range;
     let decimal = mf.fmtNum(target % 1);
     let adjusted = target;
     if (side > 0) {
@@ -2182,7 +2167,6 @@ function removePatternTool() {
         series.pattern.removePriceLine(lines.X);
         series.pattern.removePriceLine(lines.Y);
         series.pattern.removePriceLine(lines.Z);
-        series.pattern.removePriceLine(lines.W);
         series.pattern.removePriceLine(lines.T);
     }
     lines = {};
