@@ -97,14 +97,14 @@
 //         ],
 //     },
 //     {
-//         name: "Bước lam",
+//         name: "Bước dương",
 //         conds: [
 //             //
 //             "Xác nhận",
 //         ],
 //     },
 //     {
-//         name: "Bước lục",
+//         name: "Bước lam",
 //         conds: [
 //             //
 //             "Xác nhận",
@@ -176,14 +176,14 @@
 //         ],
 //     },
 //     {
-//         name: "Bước lam",
+//         name: "Bước dương",
 //         conds: [
 //             //
 //             "ΔT < Ttím",
 //         ],
 //     },
 //     {
-//         name: "Bước lục",
+//         name: "Bước lam",
 //         conds: [
 //             //
 //             "Xác nhận",
@@ -223,14 +223,14 @@
 //         ],
 //     },
 //     {
-//         name: "Bước lam",
+//         name: "Bước dương",
 //         conds: [
 //             //
 //             "B > Bmin",
 //         ],
 //     },
 //     {
-//         name: "Bước lục",
+//         name: "Bước lam",
 //         conds: [
 //             //
 //             "Xác nhận",
@@ -270,14 +270,14 @@
 //         ],
 //     },
 //     {
-//         name: "Bước lam",
+//         name: "Bước dương",
 //         conds: [
 //             //
 //             "B > Bmin",
 //         ],
 //     },
 //     {
-//         name: "Bước lục",
+//         name: "Bước lam",
 //         conds: [
 //             //
 //             "B > Bmin",
@@ -319,7 +319,7 @@ const continue1 = [
         ],
     },
     {
-        name: "Bước lam",
+        name: "Bước dương",
         conds: [
             //
             "B > Bmin",
@@ -327,7 +327,7 @@ const continue1 = [
         ],
     },
     {
-        name: "Bước lục",
+        name: "Bước lam",
         conds: [
             //
             "B > Bmin",
@@ -411,7 +411,7 @@ const continue1 = [
 //         ],
 //     },
 //     {
-//         name: "Bước lam",
+//         name: "Bước dương",
 //         conds: [
 //             //
 //             // "P > Pmin",
@@ -527,14 +527,14 @@ const continuePattern = {
 //         ],
 //     },
 //     {
-//         name: "Bước lam",
+//         name: "Bước dương",
 //         conds: [
 //             //
 //             "ΔT < Ttím",
 //         ],
 //     },
 //     {
-//         name: "Bước lục",
+//         name: "Bước lam",
 //         conds: [
 //             //
 //             "Xác nhận",
@@ -567,14 +567,14 @@ const continuePattern = {
 //         ],
 //     },
 //     {
-//         name: "Bước lam",
+//         name: "Bước dương",
 //         conds: [
 //             //
 //             "B > Bmin",
 //         ],
 //     },
 //     {
-//         name: "Bước lục",
+//         name: "Bước lam",
 //         conds: [
 //             //
 //             "Xác nhận",
@@ -607,7 +607,7 @@ const continuePattern = {
 //         ],
 //     },
 //     {
-//         name: "Bước lam",
+//         name: "Bước dương",
 //         conds: [
 //             //
 //             "B > Bmin",
@@ -615,7 +615,7 @@ const continuePattern = {
 //         ],
 //     },
 //     {
-//         name: "Bước lục",
+//         name: "Bước lam",
 //         conds: [
 //             //
 //             "B > Bmin",
@@ -650,7 +650,7 @@ const reversal1 = [
         ],
     },
     {
-        name: "Bước lam",
+        name: "Bước dương",
         conds: [
             //
             "B > Bmin",
@@ -658,7 +658,7 @@ const reversal1 = [
         ],
     },
     {
-        name: "Bước lục",
+        name: "Bước lam",
         conds: [
             //
             "B > Bmin",

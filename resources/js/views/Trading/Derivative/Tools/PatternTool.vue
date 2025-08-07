@@ -855,9 +855,9 @@ function calcContinuePattern() {
     const purpleConfirmed =
         mf.cmp(F.price, side, D.price, true) ||
         (rDEF > 0.7 && dT6 > dT5 && mf.cmp(H.price, side, F.price, true));
-    const greenConfirmed = mf.cmp(H.price, side, F.price, true);
+    const cyanConfirmed = mf.cmp(H.price, side, F.price, true);
     const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
-    const cyanConfirmed = G.time1.i > T6 || H.time1.i > T6;
+    const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
 
     // let subPattern = "continue";
     // if (dBreak) {
@@ -906,15 +906,15 @@ function calcContinuePattern() {
             purpleConfirmed,
         ],
         [
-            // cyan
+            // blue
             isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            cyanConfirmed,
+            blueConfirmed,
         ],
         [
-            // green
+            // cyan
             isBoxValid({ pr: GH, tr: dT7 }, phase6),
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
-            greenConfirmed,
+            cyanConfirmed,
         ],
     ];
 
@@ -1652,9 +1652,9 @@ function calcReversalPattern() {
     const purpleConfirmed =
         mf.cmp(E.price, side, C.price, true) ||
         (rCDE > 0.7 && dT5 > dT4 && mf.cmp(G.price, side, E.price, true));
-    const greenConfirmed = mf.cmp(G.price, side, E.price, true);
+    const cyanConfirmed = mf.cmp(G.price, side, E.price, true);
     const pinkConfirmed = D.time1.i > T3 || E.time1.i > T3 || G.time1.i > T3;
-    const cyanConfirmed = F.time1.i > T5 || G.time1.i > T5;
+    const blueConfirmed = F.time1.i > T5 || G.time1.i > T5;
 
     // let subPattern;
 
@@ -1687,15 +1687,15 @@ function calcReversalPattern() {
             purpleConfirmed,
         ],
         [
-            // cyan
+            // blue
             isBoxValid({ pr: EF, tr: dT5 }, { pr: PR4, tr: TR4 }),
-            cyanConfirmed,
+            blueConfirmed,
         ],
         [
-            // green
+            // cyan
             isBoxValid({ pr: FG, tr: dT6 }, phase5),
             dT6 >= dT1 - dT2 - dT3 - dT4 - dT5,
-            greenConfirmed,
+            cyanConfirmed,
         ],
     ];
 
