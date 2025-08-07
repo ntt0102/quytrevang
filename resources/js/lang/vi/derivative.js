@@ -662,7 +662,7 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
-            "T > Tvàng",
+            "T > Tcam",
             "Xác nhận",
         ],
     },
