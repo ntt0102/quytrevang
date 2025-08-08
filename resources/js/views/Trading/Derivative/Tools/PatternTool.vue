@@ -845,8 +845,8 @@ function calcContinuePattern() {
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
-    const purpleConfirmed =
-        mf.cmp(F.price, side, D.price, true) || (!dBreak && !fBreak);
+    const purpleConfirmed = (dBreak && fBreak) || !dBreak;
+    // mf.cmp(F.price, side, D.price, true) || (!dBreak && !fBreak);
     // (rDEF > 0.5 && dT6 > dT5 && mf.cmp(H.price, side, F.price));
     const cyanConfirmed = hBreak;
     const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
