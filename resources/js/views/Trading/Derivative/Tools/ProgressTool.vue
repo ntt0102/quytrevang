@@ -1,9 +1,12 @@
 <template>
     <div
         class="context command"
-        :class="{
-            green: progress.result === true,
-            red: progress.result === false,
+        :style="{
+            color: progress.step
+                ? progress.result
+                    ? mc.CHART_COLOR_MAP.green
+                    : colorMap[progress.step]
+                : '',
         }"
         :title="$t('trading.derivative.tools.progress')"
         @click="toggleProgressContext"
@@ -37,9 +40,11 @@ import { useI18n } from "vue-i18n";
 const store = useStore();
 const { t } = useI18n();
 const mf = inject("mf");
+const mc = inject("mc");
 const props = defineProps(["chartHeightEnough"]);
 const emit = defineEmits(["refreshPattern", "hideContext"]);
 const progress = ref({});
+const colorMap = ref(Object.values(mc.CHART_COLOR_MAP));
 const showProgressContext = ref(false);
 const autoRefresh = computed(
     () => store.state.tradingDerivative.config.autoRefresh

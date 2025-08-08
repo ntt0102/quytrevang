@@ -139,11 +139,11 @@ function refreshPattern() {
             }
 
             .success {
-                color: lime;
+                color: rgba(0, 255, 0, 0.9);
             }
 
             .fail {
-                color: red;
+                color: rgba(255, 0, 0, 0.9);
             }
         }
     }

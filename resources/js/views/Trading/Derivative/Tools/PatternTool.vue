@@ -43,6 +43,7 @@ import { formatISO } from "date-fns";
 
 const store = useStore();
 const mf = inject("mf");
+const mc = inject("mc");
 const props = defineProps([
     "bars",
     "pickTimeToolRef",
@@ -60,21 +61,10 @@ const patternType = computed(
 const symbol = "VN30F1M";
 const patternTypes = ["C", "R"];
 const scanThreshold = 1;
-const trThreshold = 1;
+// const trThreshold = 1;
 let scanPoints = {};
 let lines = {};
 let series = {};
-
-const colorMap = {
-    yellow: "rgba(255, 255, 0, 0.7)",
-    orange: "rgba(255, 127, 0, 0.7)",
-    red: "rgba(255, 0, 0, 0.7)",
-    pink: "rgba(255, 20, 147, 0.7)",
-    purple: "rgba(128, 0, 255, 0.7)",
-    cyan: "rgba(0, 255, 255, 0.7)",
-    blue: "rgba(0, 127, 255, 0.7)",
-    green: "rgba(0, 255, 0, 0.7)",
-};
 
 defineExpose({
     isSelected,
@@ -237,35 +227,35 @@ function loadPatternTool() {
     option.point = "O";
     option.price = entry;
     option.title = "O";
-    option.color = colorMap.cyan;
+    option.color = mc.CHART_COLOR_MAP.cyan;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "X";
     option.price = x;
     option.title = `X ${X}`;
-    option.color = colorMap.blue;
+    option.color = mc.CHART_COLOR_MAP.blue;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "Y";
     option.price = y;
     option.title = `Y ${Y}`;
-    option.color = colorMap.purple;
+    option.color = mc.CHART_COLOR_MAP.purple;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "Z";
     option.price = z;
     option.title = `Z ${Z}`;
-    option.color = colorMap.pink;
+    option.color = mc.CHART_COLOR_MAP.pink;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
     option.point = "T";
     option.price = t;
     option.title = `T ${T}`;
-    option.color = colorMap.orange;
+    option.color = mc.CHART_COLOR_MAP.orange;
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
 }
@@ -2058,7 +2048,7 @@ function buildViewPoints(points, colors) {
     points.forEach((p, idx) => {
         const point = {
             value: p.price,
-            color: colorMap[colors[idx]],
+            color: mc.CHART_COLOR_MAP[colors[idx]],
         };
         if (idx !== 0) {
             viewPoints.push({ ...point, time: p.time1.t });
@@ -2173,9 +2163,9 @@ function removePatternTool() {
 }
 function setTimeMark(data) {
     const colors = [
-        colorMap[patternType.value === "C" ? "yellow" : "orange"],
-        colorMap.pink,
-        colorMap.blue,
+        mc.CHART_COLOR_MAP[patternType.value === "C" ? "yellow" : "orange"],
+        mc.CHART_COLOR_MAP.pink,
+        mc.CHART_COLOR_MAP.blue,
     ];
     let result = [];
     data.forEach((item, i) => {

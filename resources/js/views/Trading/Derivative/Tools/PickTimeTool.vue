@@ -10,12 +10,13 @@
     </div>
 </template>
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
 
 const store = useStore();
 // const props = defineProps([]);
 const emit = defineEmits(["refreshPattern", "hideContext"]);
+const mc = inject("mc");
 const pickTimeToolRef = ref(null);
 const pickTimeStore = computed(
     () => store.state.tradingDerivative.tools.pickTime
@@ -24,7 +25,6 @@ let pickTime = null;
 let series = {};
 
 const symbol = "VN30F1M";
-const color = "rgba(255, 0, 0, 0.7)";
 
 defineExpose({
     isSelected,
@@ -80,7 +80,9 @@ function draw({ time }) {
 }
 function load(time) {
     pickTime = time;
-    series.pickTime.setData([{ time, color, value: 1 }]);
+    series.pickTime.setData([
+        { time, color: mc.CHART_COLOR_MAP.red, value: 1 },
+    ]);
 }
 function removePickTimeTool(withServer = true) {
     if (withServer)

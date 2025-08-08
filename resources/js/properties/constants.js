@@ -8,4 +8,14 @@ export default {
     SCREEN: window.screen,
     MAX_SIZE_IMAGE_UPLOAD: 1000,
     LOGGEDIN_USERS_COOKIE_NAME: "loggedinUsers",
+    CHART_COLOR_MAP: {
+        yellow: "rgba(255, 255, 0, 0.9)",
+        orange: "rgba(255, 127, 0, 0.9)",
+        red: "rgba(255, 0, 0, 0.9)",
+        pink: "rgba(255, 20, 147, 0.9)",
+        purple: "rgba(128, 0, 255, 0.9)",
+        blue: "rgba(0, 127, 255, 0.9)",
+        cyan: "rgba(0, 255, 255, 0.9)",
+        green: "rgba(0, 255, 0, 0.9)",
+    },
 };
