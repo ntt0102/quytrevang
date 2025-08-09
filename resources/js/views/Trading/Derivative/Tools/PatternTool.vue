@@ -886,6 +886,7 @@ function calcContinuePattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
+            rDEF >= 0.7,
             purpleConfirmed,
         ],
         [
@@ -1632,7 +1633,7 @@ function calcReversalPattern() {
 
     const purpleConfirmed =
         mf.cmp(E.price, side, C.price, true) ||
-        (rCDE > 0.5 && dT5 > dT4 && mf.cmp(G.price, side, E.price));
+        (rCDE > 0.7 && dT5 > dT4 && mf.cmp(G.price, side, E.price));
     const cyanConfirmed = mf.cmp(G.price, side, E.price);
     const pinkConfirmed = D.time1.i > T3 || E.time1.i > T3 || G.time1.i > T3;
     const blueConfirmed = F.time1.i > T5 || G.time1.i > T5;
@@ -1665,6 +1666,7 @@ function calcReversalPattern() {
         [
             // purple
             isBoxValid({ pr: DE, tr: dT4 }, phase3),
+            rCDE >= 0.7,
             purpleConfirmed,
         ],
         [

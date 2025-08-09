@@ -315,6 +315,7 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
+            "P > 70",
             "Xác nhận",
         ],
     },
@@ -646,6 +647,7 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
+            "P > 70",
             "Xác nhận",
         ],
     },
