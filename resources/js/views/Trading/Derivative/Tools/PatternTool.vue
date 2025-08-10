@@ -11,13 +11,9 @@
                     of: '.select-pattern',
                 },
             }"
-            :icon="`far fa-${
-                patternType === 'C'
-                    ? `copyright`
-                    : patternType === 'R'
-                    ? 'registered'
-                    : 'circle-question'
-            } pattern`"
+            :icon="`far fa-circle-${(
+                patternType || 'question'
+            ).toLowerCase()} pattern`"
             :hint="$t('trading.derivative.tools.selectPattern')"
             stylingMode="text"
             :showArrowIcon="false"
@@ -59,7 +55,7 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const symbol = "VN30F1M";
-const patternTypes = ["C", "R"];
+const patternTypes = ["C", "R", "K"];
 const scanThreshold = 1;
 // const trThreshold = 1;
 let scanPoints = {};
@@ -182,9 +178,8 @@ function scanPattern(data) {
         if (C.time.i > A.time.i && mf.cmp(C.price, side, A.price)) {
             const bc = mf.fmtNum(B.price - C.price, 1, true);
             if (bc >= scanThreshold) {
-                // if (A.time1.i - S.time.i >= C.time.i - B.time.i) break;
                 const as = mf.fmtNum(A.price - S.price, 1, true);
-                // if (as > bc) break;
+                if (as > bc) break;
                 if (
                     isBoxValid(
                         { pr: as, tr: A.time1.i - S.time.i },
@@ -274,6 +269,9 @@ function calculatePattern() {
             break;
         case "R":
             result = calcReversalPattern();
+            break;
+        case "K":
+            result = calcKathyLienPattern();
             break;
     }
     emit("setProgress", result.progress);
@@ -1156,28 +1154,29 @@ function calcContinuePattern() {
     // }
     // timeMark.push(T4);
     // timeMark.push(T6);
-    const progress = checkProgress("continue", progressSteps);
+    const colors = [
+        "yellow",
+        "orange",
+        "red",
+        "pink",
+        "purple",
+        "blue",
+        "cyan",
+        "green",
+        "green",
+    ];
+    const progress = checkProgress("continue", progressSteps, colors);
     //
     const points = buildViewPoints(
         [A, phase1.R, phase2.R, D, E, F, G, H, I],
-        [
-            "yellow",
-            "orange",
-            "red",
-            "pink",
-            "purple",
-            "blue",
-            "cyan",
-            "green",
-            "green",
-        ]
+        colors
     );
     //
     // const isOrange = ["orange", "orangeConfirm"].includes(subPattern);
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = (fBreak ? F.price : D.price) - C.price;
+    const range = mf.fmtNum((fBreak ? F.price : D.price) - C.price, 1, true);
     const x = adjustTargetPrice(G.price, 0.5 * range, orderSide);
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(G.price, range, orderSide);
@@ -1860,17 +1859,24 @@ function calcReversalPattern() {
     // }
     // timeMark.push(T3);
     // timeMark.push(T5);
-    const progress = checkProgress("reversal", progressSteps);
+    const colors = [
+        "orange",
+        "red",
+        "pink",
+        "purple",
+        "blue",
+        "cyan",
+        "green",
+        "green",
+    ];
+    const progress = checkProgress("reversal", progressSteps, colors);
     //
-    const points = buildViewPoints(
-        [A, phase1.R, C, D, E, F, G, H],
-        ["orange", "red", "pink", "purple", "blue", "cyan", "green", "green"]
-    );
+    const points = buildViewPoints([A, phase1.R, C, D, E, F, G, H], colors);
     //
     const orderSide = side ? 1 : -1;
     const refPrice = G.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = (eBreak ? E.price : C.price) - D.price;
+    const range = mf.fmtNum((eBreak ? E.price : C.price) - D.price, 1, true);
     const x = adjustTargetPrice(F.price, 0.5 * range, orderSide);
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(F.price, range, orderSide);
@@ -1895,6 +1901,86 @@ function calcReversalPattern() {
             price: entry,
             tpPrice: tp,
             slPrice: mf.fmtNum(sl - orderSide * 0.1),
+        };
+        console.log("order", order);
+    }
+
+    return {
+        timeMark,
+        progress,
+        order,
+        points: makeUnique(points),
+        entry,
+        target: [
+            [x, X],
+            [y, Y],
+            [z, Z],
+            [t, T],
+        ],
+    };
+}
+function calcKathyLienPattern() {
+    const { A, B, C } = scanPoints;
+    const ab = A.price - B.price;
+    let side = ab > 0;
+    const phase1 = scanPhase({
+        side: !side,
+        start: A,
+        end: { time: B.time.t },
+    });
+    const phase2 = scanPhase({
+        side,
+        start: { time: B.time },
+        end: { time: C.time.t },
+    });
+
+    console.log("calcKathyLienPattern", [phase1, phase2]);
+
+    const AB = mf.fmtNum(ab, 1, true);
+    const BC = mf.fmtNum(C.price - B.price, 1, true);
+
+    const dT1 = phase1.R.time1.i - phase1.S.time.i;
+    const dT2 = phase2.R.time1.i - phase2.S.time.i;
+
+    const T1 = B.time.i + dT1;
+    const timeMark = [T1];
+
+    const rABC = BC / AB;
+
+    const progressSteps = [
+        [
+            // green
+            isBoxValid({ pr: BC, tr: dT2 }, phase1),
+            rABC > 0.75,
+        ],
+    ];
+    const colors = ["orange", "red", "red"];
+    const progress = checkProgress("kathylien", progressSteps, colors);
+    //
+    const points = buildViewPoints([A, phase1.R, C], colors);
+    //
+    const orderSide = side ? 1 : -1;
+    const refPrice = B.price;
+    const entry = refPrice;
+    const range = BC;
+    const x = B.price + orderSide * 0.5 * range;
+    const X = mf.fmtNum(x - entry);
+    const y = B.price - orderSide * 0.5 * range;
+    const Y = mf.fmtNum(y - entry);
+    const z = B.price - orderSide * range;
+    const Z = mf.fmtNum(z - entry);
+    const t = C.price;
+    const T = mf.fmtNum(t - entry);
+    //
+    let order = {};
+    if (progress.result) {
+        const tp = x;
+        const sl = z;
+        order = {
+            side: orderSide,
+            price: entry,
+            tpPrice: tp,
+            slPrice: sl,
         };
         console.log("order", order);
     }
@@ -2061,7 +2147,7 @@ function buildViewPoints(points, colors) {
     });
     return viewPoints;
 }
-function checkProgress(subPattern, steps) {
+function checkProgress(subPattern, steps, colors) {
     let progress = {
         pattern: patternType.value,
         subPattern,
@@ -2070,13 +2156,13 @@ function checkProgress(subPattern, steps) {
         result: true,
     };
     progress.steps.map((step, idx) => {
-        // step.result = isStepValid(step);
         if (progress.result) {
             progress.step = idx + 1;
             progress.result = step.every(Boolean);
         }
         return step;
     });
+    progress.color = progress.result ? "green" : colors[progress.step];
     return progress;
 }
 function isTimeInChart(time) {

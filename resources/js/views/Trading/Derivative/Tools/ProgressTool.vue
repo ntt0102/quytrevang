@@ -2,11 +2,7 @@
     <div
         class="context command"
         :style="{
-            color: progress.step
-                ? progress.result
-                    ? mc.CHART_COLOR_MAP.green
-                    : colorMap[progress.step]
-                : '',
+            color: progress.step ? mc.CHART_COLOR_MAP[progress.color] : '',
         }"
         :title="$t('trading.derivative.tools.progress')"
         @click="toggleProgressContext"

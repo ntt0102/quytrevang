@@ -697,4 +697,42 @@ const reversalPattern = {
     // },
 };
 
-export default { C: continuePattern, R: reversalPattern };
+const kathylien1 = [
+    {
+        name: "Bước đỏ",
+        conds: [
+            //
+            "B > Bmin",
+            "P > 75",
+        ],
+    },
+];
+
+const kathylienPattern = {
+    kathylien: {
+        name: "Mẫu hình Kathy Liên",
+        steps: kathylien1,
+    },
+    // red: {
+    //     name: "Mẫu hình đảo chiều </br>đỏ",
+    //     steps: redReversal,
+    // },
+    // pink: {
+    //     name: "Mẫu hình đảo chiều </br>hồng",
+    //     steps: pinkReversal,
+    // },
+    // purple: {
+    //     name: "Mẫu hình đảo chiều </br>tím",
+    //     steps: purpleReversal,
+    // },
+    // cyan: {
+    //     name: "Mẫu hình đảo chiều </br>lam",
+    //     steps: cyanReversal,
+    // },
+    // green: {
+    //     name: "Mẫu hình đảo chiều </br>lục",
+    //     steps: greenReversal,
+    // },
+};
+
+export default { C: continuePattern, R: reversalPattern, K: kathylienPattern };
