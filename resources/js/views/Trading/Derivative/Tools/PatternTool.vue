@@ -1950,7 +1950,7 @@ function calcKathyLienPattern() {
     const progressSteps = [
         [
             // green
-            isBoxValid({ pr: BC, tr: dT2 }, phase1),
+            // isBoxValid({ pr: BC, tr: dT2 }, phase1),
             rABC > 0.75,
         ],
     ];

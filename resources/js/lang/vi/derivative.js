@@ -702,7 +702,7 @@ const kathylien1 = [
         name: "Bước đỏ",
         conds: [
             //
-            "B > Bmin",
+            // "B > Bmin",
             "P > 75",
         ],
     },
