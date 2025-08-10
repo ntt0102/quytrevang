@@ -704,6 +704,7 @@ const kathylien1 = [
             //
             // "B > Bmin",
             "P > 75",
+            "ΔP > 3",
         ],
     },
 ];

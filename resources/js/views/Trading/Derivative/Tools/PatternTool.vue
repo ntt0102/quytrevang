@@ -1952,6 +1952,7 @@ function calcKathyLienPattern() {
             // green
             // isBoxValid({ pr: BC, tr: dT2 }, phase1),
             rABC > 0.75,
+            BC >= 3,
         ],
     ];
     const colors = ["orange", "red", "red"];
