@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('derivative_orders', function (Blueprint $table) {
             $table->id();
             $table->unsignedTinyInteger('status')->default(0);
+            $table->string('type');
             $table->tinyInteger('side');
             $table->float('entry_price', 6, 1);
             $table->float('tp_price', 6, 1);
