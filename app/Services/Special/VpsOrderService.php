@@ -224,6 +224,7 @@ class VpsOrderService extends CoreService
         $isNotDelete = $data->cmd != "delete";
         $side = $isEntry ? ($isNew ? $data->side : $this->position) : -$this->position;
         $account = $this->formatAccount();
+        $volume = strval($isEntry ? $this->orderVolume : abs($this->position));
         $payload = [
             "group" => "O",
             "user" => $this->vpsUser,
@@ -236,7 +237,7 @@ class VpsOrderService extends CoreService
                 "orderId" => (string)($data->orderNo ?? ""),
                 "channel" => "H",
                 "priceType" => "MTL",
-                "quantity" => strval($isEntry ? $this->orderVolume : abs($this->position)),
+                "quantity" => $volume,
                 "relation" => $isNotDelete ? $this->formatRelation($side) : "",
                 "side" => $isNew ? $this->formatSide($side) : "",
                 "stopOrderType" => "stop",
@@ -251,7 +252,7 @@ class VpsOrderService extends CoreService
         return (object)['isOk' => true, 'orderNo' => $rsp->data->stopOrderID ?? ""];
     }
 
-    public function order($data)
+    public function order($data, $isEntry = false)
     {
         $isNew = $data->cmd == "new";
         $isNotDelete = $data->cmd != "cancel";
@@ -259,7 +260,7 @@ class VpsOrderService extends CoreService
         $side = $isNew ? $this->formatSide(-$this->position) : "";
         $account = $this->formatAccount();
         $refId = $this->createRefId();
-        $volume = abs($this->position);
+        $volume = strval($isEntry ? $this->orderVolume : abs($this->position));
         $payload = [
             "group" => "FD",
             "user" => $this->vpsUser,

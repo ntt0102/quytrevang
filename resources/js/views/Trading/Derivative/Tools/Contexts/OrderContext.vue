@@ -65,12 +65,14 @@ const emit = defineEmits(["closeOrder", "closeAllOrders", "putOrder"]);
 const dataSource = computed(() =>
     Object.values(props.orders).map((order) => ({
         id: order.id,
+        type: order.type,
         side: order.side > 0 ? "L" : "S",
         price: order.entry_price,
     }))
 );
 const columns = [
     { field: "id", minWidth: 50 },
+    { field: "type", minWidth: 90 },
     { field: "side", minWidth: 90 },
     { field: "price", minWidth: 100 },
 ];

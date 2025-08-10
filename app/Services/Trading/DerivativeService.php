@@ -246,14 +246,20 @@ class DerivativeService extends CoreService
                         if ($isNew && $vos->position !== 0) {
                             return ['isOk' => false, 'message' => 'openedPosition'];
                         }
-                        $entryOrder = $vos->conditionOrder($payload->data, true);
+                        if($payload->data->type === 'stop') {
+                            $entryOrder = $vos->conditionOrder($payload->data, true);
+                        }
+                        else {
+                            $entryOrder = $vos->order($payload->data, true);
+                        }
                         if (!$entryOrder->isOk) return $entryOrder;
                         $key = ['entry_no' => $entryOrder->orderNo];
                         $data = [
-                            'status' => 0,
                             'entry_price' => $payload->data->price,
                         ];
                         if ($isNew) {
+                            $data['status'] = 0;
+                            $data['type'] = $payload->data->type;
                             $data['side'] = $payload->data->side;
                             $data['tp_price'] = $payload->data->tpPrice;
                             $data['sl_price'] = $payload->data->slPrice;
@@ -339,7 +345,12 @@ class DerivativeService extends CoreService
                         if (isset($payload->orderId)) {
                             $order = DerivativeOrder::find($payload->orderId);
                             if ($order->status === 0) {
-                                $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
+                                if ($order->type === 'stop') {
+                                    $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
+                                }
+                                else {
+                                    $vos->order((object)['cmd' => 'cancel', 'orderNo' => $order->entry_no], true);
+                                }
                             } else {
                                 $hasKind = isset($payload->kind);
                                 $kinds = $hasKind ? [$payload->kind] : ['tp', 'sl'];
