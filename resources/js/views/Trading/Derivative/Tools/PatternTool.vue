@@ -2177,7 +2177,7 @@ function isTimeInChart(time) {
     return time >= first && time <= last;
 }
 function adjustTargetPrice(price, range, side) {
-    const target = price + range;
+    const target = price + side * range;
     let decimal = mf.fmtNum(target % 1);
     let adjusted = target;
     if (side > 0) {
