@@ -1948,19 +1948,23 @@ function calcKathyLienPattern() {
     const timeMark = [T1];
 
     const rABC = BC / AB;
+    const confirmed1 = rABC >= 0.75;
+    const confirmed2 = isBoxValid(phase1, phase2) && 
+        mf.cmp(C.price, side, phase1.S1.price) && 
+        rABC >= 0.7;
 
     const progressSteps = [
         [
             // green
             // isBoxValid({ pr: BC, tr: dT2 }, phase1),
-            rABC > 0.75,
             BC >= 3,
+            confirmed1 || confirmed2,
         ],
     ];
     const colors = ["orange", "red", "red"];
     const progress = checkProgress("kathylien", progressSteps, colors);
     //
-    const points = buildViewPoints([A, phase1.R, C], colors);
+    const points = buildViewPoints([A, phase1.R, phase2.R], colors);
     //
     const orderSide = side ? 1 : -1;
     const refPrice = B.price;

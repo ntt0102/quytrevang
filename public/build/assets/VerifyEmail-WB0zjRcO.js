@@ -1,1 +1,0 @@
-import{h as u,i as a,j as i}from"./app-BCD8vQmV.js";/* empty css            */const c={__name:"VerifyEmail",setup(n){const t=u(),r=a(),s=i(),{url:e}=s.query;return e!=""&&t.dispatch("auth/verifyEmail",e).then(o=>{o&&r.push({name:"overview"})}),()=>{}}};export{c as default};
