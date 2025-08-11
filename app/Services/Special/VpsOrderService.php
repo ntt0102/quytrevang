@@ -54,6 +54,7 @@ class VpsOrderService extends CoreService
                 'body' => $this->build_query_string($payload)
             ]);
             $rsp = json_decode($res->getBody());
+            return $rsp;
             if ($rsp->rc == 1) {
                 $this->vpsSession = $rsp->data->sid;
                 $this->getPosition();

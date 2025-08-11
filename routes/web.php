@@ -31,8 +31,9 @@ Route::get('migrate', function () {
     // return "Migrate done!";
 });
 
-Route::get('test', function () {
+Route::get('test', function (\Illuminate\Http\Request $request) {
     set_time_limit(500);
+    $a = $request->query('a');
     // $s = \App\Models\StockDrawing::where('name', 'range')->orderByRaw("point ASC")->pluck('data', 'point');
     // $s = \App\Models\ShareOrder::opening()->get('symbol')->pluck('symbol');
     // $s = $s->map(function ($s) {
@@ -56,7 +57,7 @@ Route::get('test', function () {
     // $s = get_holidays('2025');
     // $s = app(\App\Services\Trading\DerivativeService::class)->getVn30f1mSymbol();
     // $s = app(\App\Services\Trading\DerivativeService::class)->cloneVpsData();
-    $s = app(\App\Services\Trading\DerivativeService::class)->getVn30f1mSymbol();
+    // $s = app(\App\Services\Trading\DerivativeService::class)->getVn30f1mSymbol();
     // $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData('2025-05-12');
     // $s = app(\App\Services\Trading\ShareService::class)->getStock('VN30', 1578058160, 1694649600);
     // $s = app(\App\Services\Trading\ShareService::class)->getStock('CTG', '2021-05-25', '2024-12-24');
@@ -98,7 +99,7 @@ Route::get('test', function () {
     // $s = \App\Models\ShareOrder::getProfitChart('quarter', '2023-03-04', '2024-03-04');
     // $o = \App\Models\ShareOrder::find(1);
     // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
-    // $s = app(\App\Services\Trading\StatisticService::class)->calculateProfit($o);
+    $s = app(\App\Services\Special\VpsOrderService::class)->loginVps($a);
     // $o = (object)[
     //     'receiver' => 1,
     //     'title' => 'test',
