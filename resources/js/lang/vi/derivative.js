@@ -703,8 +703,8 @@ const kathylien1 = [
         conds: [
             //
             // "B > Bmin",
-            "P > 75",
             "ΔP > 3",
+            "Xác nhận",
         ],
     },
 ];
