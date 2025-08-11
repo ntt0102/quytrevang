@@ -59,8 +59,9 @@ class VpsOrderService extends CoreService
                 $this->getPosition();
                 set_global_value('vpsSession', $rsp->data->sid);
             };
-        } catch (\Throwable $th) {
             return $rsp;
+        } catch (\Throwable $th) {
+            return;
         }
     }
 
