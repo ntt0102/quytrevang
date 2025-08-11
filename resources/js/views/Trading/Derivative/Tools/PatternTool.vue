@@ -1942,9 +1942,9 @@ function calcKathyLienPattern() {
     const BC = mf.fmtNum(C.price - B.price, 1, true);
 
     const dT1 = phase1.R.time1.i - phase1.S.time.i;
-    const dT2 = phase2.R.time1.i - phase2.S.time.i;
+    // const dT2 = phase2.R.time1.i - phase2.S.time.i;
 
-    const T1 = B.time.i + dT1;
+    const T1 = phase1.R.time.i + dT1;
     const timeMark = [T1];
 
     const rABC = BC / AB;
