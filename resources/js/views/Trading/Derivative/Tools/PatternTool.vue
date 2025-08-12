@@ -2244,7 +2244,7 @@ function remove() {
     savePattern(true);
     props.pickTimeToolRef.remove();
     removePatternTool();
-    setTimeMark([]);
+    setTimeMark({times: []});
     emit("setProgress", {});
     emit("setPatternOrder", {});
     series.pattern.setData([]);
