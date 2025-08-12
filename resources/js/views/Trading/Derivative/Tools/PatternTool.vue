@@ -815,9 +815,10 @@ function calcContinuePattern() {
     // const T6 = G.time.i + phase6.tr;
 
     const T1 = G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6;
+    const T2 = phase2.R.time.i + dT2;
     const T4 = D.time.i + Math.max(phase2.tr, TR3);
     const T6 = F.time.i + Math.max(phase4.tr, TR5);
-    const timeMark = [T1, T4, T6];
+    const timeMark = {times: [T1, T2, T4, T6], colors: ["yellow", "red", "pink", "blue"]};
 
     // const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -1618,7 +1619,7 @@ function calcReversalPattern() {
     const T1 = F.time.i + dT1 - dT2 - dT3 - dT4 - dT5;
     const T3 = C.time.i + Math.max(phase1.tr, TR2);
     const T5 = E.time.i + Math.max(phase3.tr, TR4);
-    const timeMark = [T1, T3, T5];
+    const timeMark = {times: [T1, T3, T5], colors: ["orange", "pink", "blue"]};
 
     // const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -1945,7 +1946,7 @@ function calcKathyLienPattern() {
     const dT2 = phase2.R.time1.i - phase2.S.time.i;
 
     const T1 = phase1.R.time.i + dT1;
-    const timeMark = [T1];
+    const timeMark = {times: [T1], colors: ["orange"]};
 
     const rABC = BC / AB;
     const confirmed1 = rABC >= 0.75;
@@ -2258,20 +2259,15 @@ function removePatternTool() {
     }
     lines = {};
 }
-function setTimeMark(data) {
-    const colors = [
-        mc.CHART_COLOR_MAP[patternType.value === "C" ? "yellow" : "orange"],
-        mc.CHART_COLOR_MAP.pink,
-        mc.CHART_COLOR_MAP.blue,
-    ];
+function setTimeMark({times, colors}) {
     let result = [];
-    data.forEach((item, i) => {
+    times.forEach((item, i) => {
         let time = props.indexToTime(item);
         if (time) {
             result.push({
                 time,
                 value: 1,
-                color: colors[i],
+                color: mc.CHART_COLOR_MAP[colors[i]],
             });
         }
     });
