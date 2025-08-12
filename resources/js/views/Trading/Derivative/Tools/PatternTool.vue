@@ -1942,7 +1942,7 @@ function calcKathyLienPattern() {
     const BC = mf.fmtNum(C.price - B.price, 1, true);
 
     const dT1 = phase1.R.time1.i - phase1.S.time.i;
-    // const dT2 = phase2.R.time1.i - phase2.S.time.i;
+    const dT2 = phase2.R.time1.i - phase2.S.time.i;
 
     const T1 = phase1.R.time.i + dT1;
     const timeMark = [T1];
@@ -1956,7 +1956,7 @@ function calcKathyLienPattern() {
     const progressSteps = [
         [
             // green
-            // isBoxValid({ pr: BC, tr: dT2 }, phase1),
+            isBoxValid({ pr: BC, tr: dT2 }, phase1),
             BC >= 3,
             confirmed1 || confirmed2,
         ],
