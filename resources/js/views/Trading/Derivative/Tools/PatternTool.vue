@@ -1957,6 +1957,7 @@ function calcKathyLienPattern() {
         [
             // green
             isBoxValid({ pr: BC, tr: dT2 }, phase1),
+            dT2 > dT1,
             BC >= 3,
             confirmed1 || confirmed2,
         ],
