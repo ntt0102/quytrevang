@@ -697,7 +697,7 @@ const reversalPattern = {
     // },
 };
 
-const kathylien1 = [
+const sideway1 = [
     {
         name: "Bước đỏ",
         conds: [
@@ -710,10 +710,10 @@ const kathylien1 = [
     },
 ];
 
-const kathylienPattern = {
+const sidewayPattern = {
     kathylien: {
-        name: "Mẫu hình Kathy Liên",
-        steps: kathylien1,
+        name: "Mẫu hình đi ngang",
+        steps: sideway1,
     },
     // red: {
     //     name: "Mẫu hình đảo chiều </br>đỏ",
@@ -737,4 +737,4 @@ const kathylienPattern = {
     // },
 };
 
-export default { C: continuePattern, R: reversalPattern, K: kathylienPattern };
+export default { C: continuePattern, R: reversalPattern, S: sidewayPattern };

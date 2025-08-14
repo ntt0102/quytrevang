@@ -55,7 +55,7 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const symbol = "VN30F1M";
-const patternTypes = ["C", "R", "K"];
+const patternTypes = ["C", "R", "S"];
 const scanThreshold = 1;
 // const trThreshold = 1;
 let scanPoints = {};
@@ -270,8 +270,8 @@ function calculatePattern() {
         case "R":
             result = calcReversalPattern();
             break;
-        case "K":
-            result = calcKathyLienPattern();
+        case "S":
+            result = calcSidewayPattern();
             break;
     }
     emit("setProgress", result.progress);
@@ -1922,7 +1922,7 @@ function calcReversalPattern() {
         ],
     };
 }
-function calcKathyLienPattern() {
+function calcSidewayPattern() {
     const { A, B, C } = scanPoints;
     const ab = A.price - B.price;
     let side = ab > 0;
@@ -1938,7 +1938,7 @@ function calcKathyLienPattern() {
         end: { time: C.time.t },
     });
 
-    console.log("calcKathyLienPattern", [phase1, phase2]);
+    console.log("calcSidewayPattern", [phase1, phase2]);
 
     const AB = mf.fmtNum(ab, 1, true);
     const BC = mf.fmtNum(C.price - B.price, 1, true);
@@ -1969,7 +1969,7 @@ function calcKathyLienPattern() {
         ],
     ];
     const colors = ["orange", "red", "red"];
-    const progress = checkProgress("kathylien", progressSteps, colors);
+    const progress = checkProgress("sideway", progressSteps, colors);
     //
     const points = buildViewPoints([A, phase1.R, phase2.R], colors);
     //
