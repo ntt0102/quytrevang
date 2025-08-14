@@ -1617,9 +1617,10 @@ function calcReversalPattern() {
     // const timeMark = [T5, T4, T3, T2, T1];
 
     const T1 = F.time.i + dT1 - dT2 - dT3 - dT4 - dT5;
+    const T2 = C.time.i + dT2;
     const T3 = C.time.i + Math.max(phase1.tr, TR2);
     const T5 = E.time.i + Math.max(phase3.tr, TR4);
-    const timeMark = {times: [T1, T3, T5], colors: ["orange", "pink", "blue"]};
+    const timeMark = {times: [T1, T2, T3, T5], colors: ["orange", "red", "pink", "blue"]};
 
     // const rABC = BC / AB;
     const rBCD = CD / BC;
