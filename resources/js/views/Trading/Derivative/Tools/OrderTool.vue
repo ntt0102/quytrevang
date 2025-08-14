@@ -244,7 +244,10 @@ function scan(lastPrice) {
         const sideBool = order.side > 0;
         switch (order.status) {
             case 0:
-                if (mf.cmp(lastPrice, sideBool, order.entry_price, true)) {
+                if (
+                    (order.type === "stop" && mf.cmp(lastPrice, sideBool, order.entry_price, true)) ||
+                    (order.type === "limit" && mf.cmp(lastPrice, !sideBool, order.entry_price, true))
+                ) {
                     if (!isAutoOrdering) {
                         isAutoOrdering = true;
                         setTimeout(() => {
