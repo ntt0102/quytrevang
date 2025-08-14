@@ -818,7 +818,7 @@ function calcContinuePattern() {
     const T2 = phase2.R.time.i + dT2;
     const T4 = D.time.i + Math.max(phase2.tr, TR3);
     const T6 = F.time.i + Math.max(phase4.tr, TR5);
-    const timeMark = {times: [T1, T2, T4, T6], colors: ["yellow", "red", "pink", "blue"]};
+    const timeMark = {times: [T1, T2, T4, T6], colors: ["yellow", "orange", "pink", "blue"]};
 
     // const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -1946,21 +1946,25 @@ function calcKathyLienPattern() {
     const dT2 = phase2.R.time1.i - phase2.S.time.i;
 
     const T1 = phase1.R.time.i + dT1;
-    const timeMark = {times: [T1], colors: ["orange"]};
+    const T2 = phase2.R.time.i + dT2;
+    const T3 = props.timeToIndex(props.bars.at(-1).time);
+    const timeMark = {times: [T1, T2], colors: ["orange", "red"]};
 
     const rABC = BC / AB;
-    const confirmed1 = rABC >= 0.75;
-    const confirmed2 = isBoxValid(phase1, phase2) && 
+    const confirmed1 = dT2 > dT1 && rABC >= 0.75;
+    const confirmed2 = dT2 > dT1 &&
+        isBoxValid(phase1, phase2) && 
         mf.cmp(C.price, side, phase1.S1.price) && 
         rABC >= 0.7;
+    const confirmed3 = dT2 < dT1;
 
     const progressSteps = [
         [
-            // green
+            // red
             isBoxValid({ pr: BC, tr: dT2 }, phase1),
-            dT2 > dT1,
             BC >= 3,
-            confirmed1 || confirmed2,
+            T2 > T3,
+            confirmed1 || confirmed2 || confirmed3,
         ],
     ];
     const colors = ["orange", "red", "red"];
