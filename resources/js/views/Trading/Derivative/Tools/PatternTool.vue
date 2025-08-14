@@ -1199,7 +1199,7 @@ function calcContinuePattern() {
         const tp = mf.cmp(H.price, !side, x) ? y : z;
         const sl = G.price;
         order = {
-            type: "stop",
+            type: "SL",
             side: orderSide,
             price: entry,
             tpPrice: tp,
@@ -1899,7 +1899,7 @@ function calcReversalPattern() {
         const tp = mf.cmp(G.price, !side, x) ? y : z;
         const sl = F.price;
         order = {
-            type: "stop",
+            type: "SL",
             side: orderSide,
             price: entry,
             tpPrice: tp,
@@ -1986,7 +1986,7 @@ function calcKathyLienPattern() {
         const tp = x;
         const sl = z;
         order = {
-            type: "limit",
+            type: "LO",
             side: orderSide,
             price: entry,
             tpPrice: tp,

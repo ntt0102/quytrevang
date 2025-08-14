@@ -245,8 +245,8 @@ function scan(lastPrice) {
         switch (order.status) {
             case 0:
                 if (
-                    (order.type === "stop" && mf.cmp(lastPrice, sideBool, order.entry_price, true)) ||
-                    (order.type === "limit" && mf.cmp(lastPrice, !sideBool, order.entry_price, true))
+                    (order.type === "SL" && mf.cmp(lastPrice, sideBool, order.entry_price, true)) ||
+                    (order.type === "LO" && mf.cmp(lastPrice, !sideBool, order.entry_price, true))
                 ) {
                     if (!isAutoOrdering) {
                         isAutoOrdering = true;
