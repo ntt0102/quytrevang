@@ -11,6 +11,7 @@ class DerivativeOrder extends CoreModel
     protected $visible = [
         'id',
         'status',
+        'type',
         'side',
         'entry_price',
         'tp_price',
@@ -22,6 +23,7 @@ class DerivativeOrder extends CoreModel
 
     protected $fillable = [
         'status',
+        'type',
         'side',
         'entry_price',
         'tp_price',
@@ -33,6 +35,7 @@ class DerivativeOrder extends CoreModel
 
     protected static $logAttributes = [
         'status',
+        'type',
         'side',
         'entry_price',
         'tp_price',

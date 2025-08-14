@@ -240,7 +240,8 @@
             },
             "orderContext": {
                 "id": "ID",
-                "side": "Lệnh",
+                "type": "Loại",
+                "side": "Chiều",
                 "price": "Giá",
                 "closeOrder": "Đóng lệnh",
                 "closeAll": "Đóng tất cả",
