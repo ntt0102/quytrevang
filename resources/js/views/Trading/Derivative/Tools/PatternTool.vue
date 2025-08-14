@@ -1957,7 +1957,7 @@ function calcKathyLienPattern() {
         isBoxValid(phase1, phase2) && 
         mf.cmp(C.price, side, phase1.S1.price) && 
         rABC >= 0.7;
-    const confirmed3 = dT2 < dT1;
+    const confirmed3 = dT2 < dT1 && T3 < T1;
 
     const progressSteps = [
         [
