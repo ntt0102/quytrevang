@@ -223,9 +223,9 @@ class VpsOrderService extends CoreService
     {
         $isNew = $data->cmd == "new";
         $isNotDelete = $data->cmd != "delete";
-        $side = $isEntry ? ($isNew ? $data->side : $this->position) : -$this->position;
+        $side = $this->formatSide($isEntry ? ($isNew ? $data->side : $this->position) : -$this->position);
         $account = $this->formatAccount();
-        $volume = strval($isEntry ? $this->orderVolume : abs($this->position));
+        $volume = $isEntry ? $this->orderVolume : abs($this->position);
         $payload = [
             "group" => "O",
             "user" => $this->vpsUser,
@@ -240,7 +240,7 @@ class VpsOrderService extends CoreService
                 "priceType" => "MTL",
                 "quantity" => $volume,
                 "relation" => $isNotDelete ? $this->formatRelation($side) : "",
-                "side" => $isNew ? $this->formatSide($side) : "",
+                "side" => $side,
                 "stopOrderType" => "stop",
                 "symbol" => $this->symbol,
                 "triggerPrice" => $isNotDelete ?  $this->formatPrice($data->price) : ""
@@ -258,10 +258,11 @@ class VpsOrderService extends CoreService
         $isNew = $data->cmd == "new";
         $isNotDelete = $data->cmd != "cancel";
         $price = $isNotDelete ? $this->formatPrice($data->price) : "";
-        $side = $isNew ? $this->formatSide(-$this->position) : "";
+        // $price = $this->formatPrice($data->price);
+        $side = $this->formatSide($isEntry ? ($isNew ? $data->side : $this->position) : -$this->position);
         $account = $this->formatAccount();
         $refId = $this->createRefId();
-        $volume = strval($isEntry ? $this->orderVolume : abs($this->position));
+        $volume = $isEntry ? $this->orderVolume : abs($this->position);
         $payload = [
             "group" => "FD",
             "user" => $this->vpsUser,
