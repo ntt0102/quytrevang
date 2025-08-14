@@ -81,7 +81,7 @@ function draw({ time }) {
 function load(time) {
     pickTime = time;
     series.pickTime.setData([
-        { time, color: mc.CHART_COLOR_MAP.red, value: 1 },
+        { time, color: mc.CHART_COLOR_MAP.green, value: 1 },
     ]);
 }
 function removePickTimeTool(withServer = true) {

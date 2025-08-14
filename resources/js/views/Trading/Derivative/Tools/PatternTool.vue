@@ -1926,6 +1926,7 @@ function calcKathyLienPattern() {
     const { A, B, C } = scanPoints;
     const ab = A.price - B.price;
     let side = ab > 0;
+    const pickTime = props.pickTimeToolRef.get();
     const phase1 = scanPhase({
         side: !side,
         start: A,
@@ -1947,7 +1948,7 @@ function calcKathyLienPattern() {
 
     const T1 = phase1.R.time.i + dT1;
     const T2 = phase2.R.time.i + dT2;
-    const T3 = props.timeToIndex(props.bars.at(-1).time);
+    const T3 = props.timeToIndex(pickTime ?? props.bars.at(-1).time);
     const timeMark = {times: [T1, T2], colors: ["orange", "red"]};
 
     const rABC = BC / AB;
