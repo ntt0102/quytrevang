@@ -711,7 +711,7 @@ const sideway1 = [
 ];
 
 const sidewayPattern = {
-    kathylien: {
+    sideway: {
         name: "Mẫu hình đi ngang",
         steps: sideway1,
     },
