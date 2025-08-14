@@ -1937,7 +1937,21 @@ function calcSidewayPattern() {
         start: { time: B.time },
         end: { time: C.time.t },
     });
+    const stopTime = props.indexToTime(
+        6 * phase2.R.time.i - 5 * phase1.S.time.i
+    );
 
+    const phase3 = scanPhase({
+        side: !side,
+        start: C,
+        end: { time: pickTime ?? stopTime },
+    });
+
+    const isBreak1 = isBoxValid(phase3.ext, phase3, true);
+
+    const D = isBreak1 ? phase3.R1 : phase3.ext.R;
+    const E = isBreak1 ? phase3.S1 : phase3.ext.S;
+    
     console.log("calcSidewayPattern", [phase1, phase2]);
 
     const AB = mf.fmtNum(ab, 1, true);
@@ -1968,10 +1982,10 @@ function calcSidewayPattern() {
             confirmed1 || confirmed2 || confirmed3,
         ],
     ];
-    const colors = ["orange", "red", "red"];
+    const colors = ["orange", "red", "pink", "purple", "purple"];
     const progress = checkProgress("sideway", progressSteps, colors);
     //
-    const points = buildViewPoints([A, phase1.R, phase2.R], colors);
+    const points = buildViewPoints([A, phase1.R, phase2.R, D, E], colors);
     //
     const orderSide = side ? 1 : -1;
     const refPrice = B.price;
