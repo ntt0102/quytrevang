@@ -704,6 +704,7 @@ const kathylien1 = [
             //
             "B > Bmin",
             "ΔP > 3",
+            "T > Tcuối",
             "Xác nhận",
         ],
     },
