@@ -818,7 +818,10 @@ function calcContinuePattern() {
     const T2 = phase2.R.time.i + dT2;
     const T4 = D.time.i + Math.max(phase2.tr, TR3);
     const T6 = F.time.i + Math.max(phase4.tr, TR5);
-    const timeMark = {times: [T1, T2, T4, T6], colors: ["yellow", "orange", "pink", "blue"]};
+    const timeMark = {
+        times: [T1, T2, T4, T6],
+        colors: ["yellow", "orange", "pink", "blue"],
+    };
 
     // const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -1199,7 +1202,7 @@ function calcContinuePattern() {
         const tp = mf.cmp(H.price, !side, x) ? y : z;
         const sl = G.price;
         order = {
-            type: "SL",
+            type: "SLO",
             side: orderSide,
             price: entry,
             tpPrice: tp,
@@ -1620,7 +1623,10 @@ function calcReversalPattern() {
     const T2 = C.time.i + dT2;
     const T3 = C.time.i + Math.max(phase1.tr, TR2);
     const T5 = E.time.i + Math.max(phase3.tr, TR4);
-    const timeMark = {times: [T1, T2, T3, T5], colors: ["orange", "red", "pink", "blue"]};
+    const timeMark = {
+        times: [T1, T2, T3, T5],
+        colors: ["orange", "red", "pink", "blue"],
+    };
 
     // const rABC = BC / AB;
     const rBCD = CD / BC;
@@ -1900,7 +1906,7 @@ function calcReversalPattern() {
         const tp = mf.cmp(G.price, !side, x) ? y : z;
         const sl = F.price;
         order = {
-            type: "SL",
+            type: "SLO",
             side: orderSide,
             price: entry,
             tpPrice: tp,
@@ -1952,7 +1958,7 @@ function calcSidewayPattern() {
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
-    
+
     console.log("calcSidewayPattern", [phase1, phase2]);
 
     const AB = mf.fmtNum(ab, 1, true);
@@ -1964,13 +1970,14 @@ function calcSidewayPattern() {
     const T1 = phase1.R.time.i + dT1;
     const T2 = phase2.R.time.i + dT2;
     const T3 = props.timeToIndex(pickTime ?? props.bars.at(-1).time);
-    const timeMark = {times: [T1, T2], colors: ["orange", "red"]};
+    const timeMark = { times: [T1, T2], colors: ["orange", "red"] };
 
     const rABC = BC / AB;
     const confirmed1 = dT2 > dT1 && rABC >= 0.75;
-    const confirmed2 = dT2 > dT1 &&
-        isBoxValid(phase1, phase2) && 
-        mf.cmp(C.price, side, phase1.S1.price) && 
+    const confirmed2 =
+        dT2 > dT1 &&
+        isBoxValid(phase1, phase2) &&
+        mf.cmp(C.price, side, phase1.S1.price) &&
         rABC >= 0.7;
     const confirmed3 = dT2 < dT1 && T3 < T1 && rABC < 0.4;
 
@@ -2264,7 +2271,7 @@ function remove() {
     savePattern(true);
     props.pickTimeToolRef.remove();
     removePatternTool();
-    setTimeMark({times: []});
+    setTimeMark({ times: [] });
     emit("setProgress", {});
     emit("setPatternOrder", {});
     series.pattern.setData([]);
@@ -2279,7 +2286,7 @@ function removePatternTool() {
     }
     lines = {};
 }
-function setTimeMark({times, colors}) {
+function setTimeMark({ times, colors }) {
     let result = [];
     times.forEach((item, i) => {
         let time = props.indexToTime(item);
