@@ -761,9 +761,11 @@ function calcSidewayPattern() {
 
     const dT1 = phase1.R.time1.i - phase1.S.time.i;
     const dT2 = phase2.R.time1.i - phase2.S.time.i;
+    const dT3 = D.time1.i - phase3.S.time.i;
+    const dT4 = E.time1.i - D.time.i;
 
-    const T1 = phase1.R.time.i + dT1;
-    const T2 = phase2.R.time.i + dT2;
+    const T1 = E.time.i + dT1 - dT2 - dT3 - dT4;
+    const T2 = E.time.i + dT2 - dT3 - dT4;
     const T3 = props.timeToIndex(pickTime ?? props.bars.at(-1).time);
     const timeMark = { times: [T1, T2], colors: ["orange", "red"] };
 
