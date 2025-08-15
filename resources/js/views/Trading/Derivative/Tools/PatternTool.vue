@@ -725,13 +725,16 @@ function calcSidewayPattern() {
         start: A,
         end: { time: B.time.t },
     });
-    const dT1 = phase1.R.time1.i - phase1.S.time.i;
-    const stopTime = props.indexToTime(phase1.R.time.i + 3 * dT1);
     const phase2 = scanPhase({
         side,
         start: { time: B.time },
         end: { time: C.time.t },
     });
+    const dT1 = phase1.R.time1.i - phase1.S.time.i;
+    const dT2 = phase2.R.time1.i - phase2.S.time.i;
+    const stopTime = props.indexToTime(
+        phase1.R.time.i + (dT2 > dT1 ? 4 : 2) * dT1
+    );
     const phase3 = scanPhase({
         side: !side,
         start: C,
@@ -748,7 +751,6 @@ function calcSidewayPattern() {
     const AB = mf.fmtNum(ab, 1, true);
     const BC = mf.fmtNum(C.price - B.price, 1, true);
 
-    const dT2 = phase2.R.time1.i - phase2.S.time.i;
     const dT3 = D.time1.i - phase3.S.time.i;
     const dT4 = E.time1.i - D.time.i;
 
