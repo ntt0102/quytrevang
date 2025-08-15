@@ -176,7 +176,7 @@ function scanPattern(data) {
         if (mf.cmp(top, side, S.price)) S = { time, price: top };
         //
         if (C.time.i > A.time.i && mf.cmp(C.price, side, A.price)) {
-            if (C.time.i - B.time.i > 100) {
+            if (C.time.i - B.time.i > 50) {
                 const bc = mf.fmtNum(B.price - C.price, 1, true);
                 if (bc >= scanThreshold) {
                     const as = mf.fmtNum(A.price - S.price, 1, true);
