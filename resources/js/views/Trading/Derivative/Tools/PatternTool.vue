@@ -305,7 +305,7 @@ function calcContinuePattern() {
 
     const phase3 = scanPhase({
         side,
-        start: C,
+        start: { time: C.time },
         end: { time: pickTime ?? stopTime },
     });
 
@@ -380,14 +380,7 @@ function calcContinuePattern() {
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
     const PR5 = isBreak2 ? phase5.pre.pr : phase5.pr;
 
-    // const T1 = phase1.R.time.i + phase1.tr;
-    // const T2 = phase2.R.time.i + phase2.tr;
-    // const T3 = D.time.i + TR3;
-    // const T4 = E.time.i + phase4.tr;
-    // const T5 = F.time.i + TR5;
-    // const T6 = G.time.i + phase6.tr;
-
-    const T1 = G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6;
+    const T1 = H.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6 - dT7;
     const T2 = phase2.R.time.i + dT2;
     const T4 = D.time.i + Math.max(phase2.tr, TR3);
     const T6 = F.time.i + Math.max(phase4.tr, TR5);
@@ -405,13 +398,16 @@ function calcContinuePattern() {
     // const rDEEs = EEs / DE;
     // const rEFG = FG / EF;
     // const rFGGs = GGs / FG;
+    const rFGH = GH / FG;
 
     // const dBreak = mf.cmp(D.price, side, B.price);
+    const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
-    // const purpleConfirmed = (dBreak && fBreak) || !dBreak;
-    const cyanConfirmed = hBreak && mf.cmp(H.price, side, D.price);
+    const purpleConfirmed = rDEF >= 0.7;
+    const cyanConfirmed =
+        (hBreak && mf.cmp(H.price, side, D.price)) || (eBreak && rFGH >= 0.7);
     const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
     const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
 
@@ -434,8 +430,7 @@ function calcContinuePattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            rDEF >= 0.7,
-            // purpleConfirmed,
+            purpleConfirmed,
         ],
         [
             // blue
@@ -606,7 +601,7 @@ function calcReversalPattern() {
     const TR4 = isBreak2 ? phase4.pre.tr : phase4.tr;
     const PR4 = isBreak2 ? phase4.pre.pr : phase4.pr;
 
-    const T1 = F.time.i + dT1 - dT2 - dT3 - dT4 - dT5;
+    const T1 = G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6;
     const T2 = C.time.i + dT2;
     const T3 = C.time.i + Math.max(phase1.tr, TR2);
     const T5 = E.time.i + Math.max(phase3.tr, TR4);

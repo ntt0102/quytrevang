@@ -316,8 +316,7 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "P > 70",
-            // "Xác nhận",
+            "Xác nhận",
         ],
     },
     {
