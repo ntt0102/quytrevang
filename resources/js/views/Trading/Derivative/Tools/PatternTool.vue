@@ -176,17 +176,19 @@ function scanPattern(data) {
         if (mf.cmp(top, side, S.price)) S = { time, price: top };
         //
         if (C.time.i > A.time.i && mf.cmp(C.price, side, A.price)) {
-            const bc = mf.fmtNum(B.price - C.price, 1, true);
-            if (bc >= scanThreshold) {
-                const as = mf.fmtNum(A.price - S.price, 1, true);
-                if (as > bc) break;
-                if (
-                    isBoxValid(
-                        { pr: as, tr: A.time1.i - S.time.i },
-                        { pr: bc, tr: C.time.i - B.time.i }
+            if (C.time.i - B.time.i > 100) {
+                const bc = mf.fmtNum(B.price - C.price, 1, true);
+                if (bc >= scanThreshold) {
+                    const as = mf.fmtNum(A.price - S.price, 1, true);
+                    if (as > bc) break;
+                    if (
+                        isBoxValid(
+                            { pr: as, tr: A.time1.i - S.time.i },
+                            { pr: bc, tr: C.time.i - B.time.i }
+                        )
                     )
-                )
-                    break;
+                        break;
+                }
             }
         }
     }
