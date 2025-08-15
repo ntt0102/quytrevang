@@ -407,7 +407,8 @@ function calcContinuePattern() {
 
     const purpleConfirmed = rDEF >= 0.7;
     const cyanConfirmed =
-        (hBreak && mf.cmp(H.price, side, D.price)) || (eBreak && rFGH >= 0.7);
+        (hBreak && mf.cmp(H.price, side, D.price)) ||
+        (eBreak && dT3 > dT2 && rFGH >= 0.7);
     const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
     const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
 
