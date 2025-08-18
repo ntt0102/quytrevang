@@ -397,17 +397,18 @@ function calcContinuePattern() {
     // const rFGGs = GGs / FG;
     const rFGH = GH / FG;
 
-    // const dBreak = mf.cmp(D.price, side, B.price);
+    const dBreak = mf.cmp(D.price, side, B.price);
     const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
-    const purpleConfirmed = rDEF >= 0.7;
+    const redConfirmed = (dBreak && rBCD <= 2) || (rBCD >= 0.5 && dT4 > dT3);
+    const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
+    const purpleConfirmed = fBreak || (rDEF >= 0.7 && dT6 > dT5);
+    const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
     const cyanConfirmed =
         (hBreak && mf.cmp(H.price, side, D.price)) ||
         (eBreak && dT3 > dT2 && rFGH >= 0.7);
-    const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
-    const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
 
     const progressSteps = [
         [
@@ -417,8 +418,7 @@ function calcContinuePattern() {
         [
             // red
             isBoxValid({ pr: CD, tr: dT3 }, phase2),
-            rBCD >= 0.5,
-            rBCD <= 2,
+            redConfirmed,
         ],
         [
             // pink
