@@ -6,14 +6,22 @@
         @shown="onShown"
         @hidden="onHidden"
     >
-        <DxDataGrid :data-source="orders" key-expr="id" :show-borders="true">
-            <DxColumn
-                v-for="column in columns"
-                :data-field="column.field"
-                :minWidth="column.minWidth"
-                :caption="$t(`trading.derivative.orderContext.${column.field}`)"
-            />
-        </DxDataGrid>
+        <DxScrollView>
+            <DxDataGrid
+                :data-source="orders"
+                key-expr="id"
+                :show-borders="true"
+            >
+                <DxColumn
+                    v-for="column in columns"
+                    :data-field="column.field"
+                    :minWidth="column.minWidth"
+                    :caption="
+                        $t(`trading.derivative.orderContext.${column.field}`)
+                    "
+                />
+            </DxDataGrid>
+        </DxScrollView>
     </CorePopup>
 </template>
 <script setup>

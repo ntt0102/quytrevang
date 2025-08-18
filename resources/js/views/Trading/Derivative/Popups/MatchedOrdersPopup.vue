@@ -6,20 +6,24 @@
         @shown="onShown"
         @hidden="onHidden"
     >
-        <DxDataGrid
-            :data-source="orders"
-            key-expr="orderNo"
-            :show-borders="true"
-        >
-            <DxColumn
-                v-for="column in columns"
-                :data-field="column.field"
-                :minWidth="column.minWidth"
-                :caption="
-                    $t(`trading.derivative.matchedOrdersPopup.${column.field}`)
-                "
-            />
-        </DxDataGrid>
+        <DxScrollView>
+            <DxDataGrid
+                :data-source="orders"
+                key-expr="orderNo"
+                :show-borders="true"
+            >
+                <DxColumn
+                    v-for="column in columns"
+                    :data-field="column.field"
+                    :minWidth="column.minWidth"
+                    :caption="
+                        $t(
+                            `trading.derivative.matchedOrdersPopup.${column.field}`
+                        )
+                    "
+                />
+            </DxDataGrid>
+        </DxScrollView>
     </CorePopup>
 </template>
 <script setup>
