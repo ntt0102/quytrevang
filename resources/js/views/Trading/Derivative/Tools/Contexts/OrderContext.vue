@@ -32,7 +32,7 @@
                     location: 'before',
                     widget: 'dxButton',
                     options: {
-                        type: 'danger',
+                        type: 'success',
                         stylingMode: 'outlined',
                         icon: 'far fa-gavel',
                         text: $t('trading.derivative.orderContext.putOrder'),
@@ -50,6 +50,17 @@
                         onClick: closeAllOrders,
                     },
                 },
+                {
+                    location: 'after',
+                    widget: 'dxButton',
+                    options: {
+                        type: 'normal',
+                        stylingMode: 'outlined',
+                        icon: 'far fa-history small',
+                        hint: t('models.contract.includeWithdrawn'),
+                        onClick: () => {},
+                    },
+                },
             ]"
         />
     </CoreContext>
@@ -58,10 +69,11 @@
 <script setup>
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import CoreContext from "./CoreContext.vue";
-import { computed } from "vue";
+import { ref, computed } from "vue";
 
 const props = defineProps(["orders"]);
 const emit = defineEmits(["closeOrder", "closeAllOrders", "putOrder"]);
+const isActive = ref(true);
 const dataSource = computed(() =>
     Object.values(props.orders).map((order) => ({
         id: order.id,

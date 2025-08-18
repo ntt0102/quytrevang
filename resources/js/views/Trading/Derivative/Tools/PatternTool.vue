@@ -788,11 +788,11 @@ function calcSidewayPattern() {
     const refPrice = B.price;
     const entry = refPrice;
     const range = BC;
-    const x = B.price + orderSide * 0.5 * range;
+    const x = mf.fmtNum(B.price + orderSide * 0.5 * range);
     const X = mf.fmtNum(x - entry);
-    const y = B.price - orderSide * 0.5 * range;
+    const y = mf.fmtNum(B.price - orderSide * 0.5 * range);
     const Y = mf.fmtNum(y - entry);
-    const z = B.price - orderSide * range;
+    const z = mf.fmtNum(B.price - orderSide * range);
     const Z = mf.fmtNum(z - entry);
     const t = C.price;
     const T = mf.fmtNum(t - entry);
