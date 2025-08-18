@@ -217,8 +217,9 @@ class VpsOrderService extends CoreService
         if ($rsp->rc != 1) return false;
         return array_map(function ($item) {
             return [
+                'orderNo' => $item->orderNo,
                 'orderTime' => $item->orderTime,
-                'side' => $item->side === 'B' ? 'LONG' : 'SHORT',
+                'side' => $item->side === 'B' ? 'L' : 'S',
                 'volume' => $item->volume,
                 'matchVolume' => $item->matchVolume,
                 'showPrice' => $item->showPrice,
