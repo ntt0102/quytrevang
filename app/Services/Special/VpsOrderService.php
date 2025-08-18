@@ -91,12 +91,38 @@ class VpsOrderService extends CoreService
         }
     }
 
-    public function getPendingOrders()
+    public function getAccountInfo()
     {
-        return array_merge($this->getPendingLO(), $this->getPendingSL());
+        if (!$this->connection) return false;
+        $payload = [
+            "group" => "Q",
+            "user" => $this->vpsUser,
+            "session" => $this->vpsSession,
+            "c" => "H",
+            "data" => [
+                "type" => "string",
+                "cmd" => "Web.Portfolio.AccountStatus",
+                "p1" => $this->formatAccount(),
+            ],
+        ];
+        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
+        $res = $this->client->post($url, ['json' => $payload]);
+        $rsp = json_decode($res->getBody());
+        if ($rsp->rc != 1) return false;
+        return (object)[
+            'maxVol' => intval($rsp->data->max_vol),
+            'fee' => intval($rsp->data->others),
+            'vm' => intval($rsp->data->vm),
+            'nav' => intval($rsp->data->nav),
+        ];
     }
 
-    public function getPendingSL()
+    public function getPendingOrders()
+    {
+        return array_merge($this->getPendingLO(), $this->getPendingSLO());
+    }
+
+    public function getPendingSLO()
     {
         if (!$this->connection) return [];
         $payload = [
@@ -126,7 +152,7 @@ class VpsOrderService extends CoreService
                 'orderNo' => $order->STOP_ORDER_ID,
                 'type' => 'SLO',
                 'time' => $order->CREATED_TIME,
-                'side' => $order->SIDE,
+                'side' => $order->SIDE === 'B' ? 'LONG' : 'SHORT',
                 'volume' => $order->QUANTITY,
                 'price' => $order->C_SO_PRICE,
 
@@ -160,38 +186,12 @@ class VpsOrderService extends CoreService
                 'orderNo' => $order->orderNo,
                 'type' => 'LO',
                 'time' => $order->orderTime,
-                'side' => $order->side,
+                'side' => $order->side === 'B' ? 'LONG' : 'SHORT',
                 'volume' => $order->volume,
                 'price' => $order->showPrice,
 
             ];
         }, $rsp->data);
-    }
-
-    public function getAccountInfo()
-    {
-        if (!$this->connection) return false;
-        $payload = [
-            "group" => "Q",
-            "user" => $this->vpsUser,
-            "session" => $this->vpsSession,
-            "c" => "H",
-            "data" => [
-                "type" => "string",
-                "cmd" => "Web.Portfolio.AccountStatus",
-                "p1" => $this->formatAccount(),
-            ],
-        ];
-        $url = "https://smartpro.vps.com.vn/handler/core.vpbs";
-        $res = $this->client->post($url, ['json' => $payload]);
-        $rsp = json_decode($res->getBody());
-        if ($rsp->rc != 1) return false;
-        return (object)[
-            'maxVol' => intval($rsp->data->max_vol),
-            'fee' => intval($rsp->data->others),
-            'vm' => intval($rsp->data->vm),
-            'nav' => intval($rsp->data->nav),
-        ];
     }
 
     public function getMatchedOrders()
@@ -219,7 +219,7 @@ class VpsOrderService extends CoreService
             return [
                 'orderNo' => $item->orderNo,
                 'orderTime' => $item->orderTime,
-                'side' => $item->side === 'B' ? 'L' : 'S',
+                'side' => $item->side === 'B' ? 'LONG' : 'SHORT',
                 'volume' => $item->volume,
                 'matchVolume' => $item->matchVolume,
                 'showPrice' => $item->showPrice,

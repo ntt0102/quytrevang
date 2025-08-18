@@ -80,7 +80,7 @@ const dataSource = computed(() =>
     Object.values(props.orders).map((order) => ({
         id: order.id,
         type: order.type,
-        side: order.side > 0 ? "L" : "S",
+        side: order.side > 0 ? "LONG" : "SHORT",
         price: order.entry_price,
     }))
 );
