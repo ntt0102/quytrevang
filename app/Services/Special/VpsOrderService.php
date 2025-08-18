@@ -124,11 +124,10 @@ class VpsOrderService extends CoreService
         return array_map(function ($order) {
             return [
                 'orderNo' => $order->STOP_ORDER_ID,
-                'type' => 'SL',
+                'type' => 'SLO',
                 'time' => $order->CREATED_TIME,
                 'side' => $order->SIDE,
                 'volume' => $order->QUANTITY,
-                // 'price' => $order->TRIGGER_PRICE,
                 'price' => $order->C_SO_PRICE,
 
             ];
@@ -216,7 +215,16 @@ class VpsOrderService extends CoreService
         $res = $this->client->post($url, ['json' => $payload]);
         $rsp = json_decode($res->getBody());
         if ($rsp->rc != 1) return false;
-        return $rsp->data;
+        return array_map(function ($item) {
+            return [
+                'orderTime' => $item->orderTime,
+                'side' => $item->side === 'B' ? 'LONG' : 'SHORT',
+                'volume' => $item->volume,
+                'matchVolume' => $item->matchVolume,
+                'showPrice' => $item->showPrice,
+                'avgPrice' => $item->avgPrice,
+            ];
+        }, $rsp->data);
     }
 
     public function conditionOrder($data, $isEntry = false)

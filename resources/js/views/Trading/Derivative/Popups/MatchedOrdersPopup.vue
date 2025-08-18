@@ -36,7 +36,7 @@ const columns = [
     { field: "side", minWidth: 100 },
     { field: "volume", minWidth: 100 },
     { field: "matchVolume", minWidth: 100 },
-    { field: "showPrice", minWidth: 100 },
+    { field: "showPrice", minWidth: 150 },
     { field: "avgPrice", minWidth: 100 },
 ];
 
