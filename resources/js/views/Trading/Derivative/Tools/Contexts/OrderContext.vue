@@ -14,7 +14,7 @@
             <DxColumn
                 v-for="column in columns"
                 :data-field="column.field"
-                :minWidth="column.minWidth"
+                :width="column.minWidth"
                 :caption="$t(`trading.derivative.orderContext.${column.field}`)"
             />
             <template #commandCellTemplate="{ data }">
