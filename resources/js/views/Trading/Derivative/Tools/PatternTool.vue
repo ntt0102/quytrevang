@@ -402,9 +402,10 @@ function calcContinuePattern() {
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
-    const redConfirmed = (dBreak && rBCD <= 2) || (rBCD >= 0.5 && dT4 > dT3);
+    const redConfirmed =
+        (dBreak && rBCD <= 2) || (rBCD >= 0.5 && dT5 + dT4 > dT3);
     const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
-    const purpleConfirmed = fBreak || (rDEF >= 0.7 && dT6 > dT5);
+    const purpleConfirmed = fBreak || (rDEF >= 0.7 && dT7 + dT6 > dT5);
     const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
     const cyanConfirmed =
         (hBreak && mf.cmp(H.price, side, D.price)) ||
