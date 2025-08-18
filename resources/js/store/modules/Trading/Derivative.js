@@ -162,6 +162,15 @@ const actions = {
                 });
         });
     },
+    getPuttedOrders({ commit, dispatch, getters, state, rootGetters }) {
+        return new Promise((resolve, reject) => {
+            axios
+                .get("trading/derivative/get-putted-orders")
+                .then((response) => {
+                    resolve(response.data);
+                });
+        });
+    },
     executeOrder({ commit, dispatch, getters, state, rootGetters }, data) {
         if (!state.status.connection)
             return Promise.resolve({ isOk: false, message: "notConnect" });

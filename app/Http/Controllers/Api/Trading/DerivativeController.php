@@ -147,6 +147,19 @@ class DerivativeController extends CoreController
     }
 
     /**
+     * Get Putted Orders
+     *
+     * @param \Illuminate\Http\Request $request
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function getPuttedOrders(Request $request)
+    {
+        $data = $this->derivativeService->getPuttedOrders($this->payload);
+        return $this->sendResponse($data);
+    }
+
+    /**
      * Execute Order
      *
      * @param \Illuminate\Http\Request $request

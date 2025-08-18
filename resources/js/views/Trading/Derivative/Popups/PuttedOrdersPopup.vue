@@ -1,23 +1,17 @@
 <template>
     <CorePopup
         ref="popupRef"
-        class="der-matched-orders-popup"
-        :title="$t('trading.derivative.matchedOrdersPopup.title')"
+        class="der-putted-orders-popup"
+        :title="$t('trading.derivative.orderContext.history')"
         @shown="onShown"
         @hidden="onHidden"
     >
-        <DxDataGrid
-            :data-source="orders"
-            key-expr="orderNo"
-            :show-borders="true"
-        >
+        <DxDataGrid :data-source="orders" key-expr="id" :show-borders="true">
             <DxColumn
                 v-for="column in columns"
                 :data-field="column.field"
                 :minWidth="column.minWidth"
-                :caption="
-                    $t(`trading.derivative.matchedOrdersPopup.${column.field}`)
-                "
+                :caption="$t(`trading.derivative.orderContext.${column.field}`)"
             />
         </DxDataGrid>
     </CorePopup>
@@ -32,12 +26,12 @@ const store = useStore();
 const popupRef = ref(null);
 const orders = ref([]);
 const columns = [
-    { field: "orderTime", minWidth: 100 },
-    { field: "side", minWidth: 100 },
-    { field: "volume", minWidth: 100 },
-    { field: "matchVolume", minWidth: 100 },
-    { field: "showPrice", minWidth: 150 },
-    { field: "avgPrice", minWidth: 100 },
+    { field: "id", minWidth: 50 },
+    { field: "type", minWidth: 90 },
+    { field: "side", minWidth: 90 },
+    { field: "price", minWidth: 100 },
+    { field: "tpPrice", minWidth: 100 },
+    { field: "slPrice", minWidth: 100 },
 ];
 
 function show() {
@@ -45,9 +39,19 @@ function show() {
 }
 
 function onShown() {
-    store.dispatch("tradingDerivative/getMatchedOrders").then((data) => {
-        orders.value = data;
+    store.dispatch("tradingDerivative/getPuttedOrders").then((data) => {
+        orders.value = formatData(Object.values(data));
     });
+}
+function formatData(data) {
+    return data.map((order) => ({
+        id: order.id,
+        type: order.type,
+        side: order.side > 0 ? "L" : "S",
+        price: order.entry_price,
+        tpPrice: order.tp_price,
+        slPrice: order.sl_price,
+    }));
 }
 function onHidden() {}
 

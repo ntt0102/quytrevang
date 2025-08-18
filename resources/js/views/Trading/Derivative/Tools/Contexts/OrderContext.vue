@@ -57,23 +57,25 @@
                         type: 'normal',
                         stylingMode: 'outlined',
                         icon: 'far fa-history small',
-                        hint: t('models.contract.includeWithdrawn'),
-                        onClick: () => {},
+                        hint: $t('trading.derivative.orderContext.history'),
+                        onClick: showPuttedOrders,
                     },
                 },
             ]"
         />
+        <PuttedOrdersPopup ref="puttedOrdersPopupRef" />
     </CoreContext>
 </template>
 
 <script setup>
+import PuttedOrdersPopup from "../../Popups/PuttedOrdersPopup.vue";
 import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import CoreContext from "./CoreContext.vue";
 import { ref, computed } from "vue";
 
 const props = defineProps(["orders"]);
 const emit = defineEmits(["closeOrder", "closeAllOrders", "putOrder"]);
-const isActive = ref(true);
+const puttedOrdersPopupRef = ref(null);
 const dataSource = computed(() =>
     Object.values(props.orders).map((order) => ({
         id: order.id,
@@ -102,6 +104,9 @@ function closeOrder(id) {
 }
 function putOrder() {
     emit("putOrder");
+}
+function showPuttedOrders() {
+    puttedOrdersPopupRef.value.show();
 }
 </script>
 
