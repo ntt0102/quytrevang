@@ -318,6 +318,9 @@ class DerivativeService extends CoreService
                         return ['isOk' => true, 'order' => $order];
                         break;
                     case 'tp':
+                        if ($vos->position === 0) {
+                            return ['isOk' => false, 'message' => 'unopenedPosition'];
+                        }
                         $tpOrder = $vos->order($payload->data);
                         if (!$tpOrder->isOk) return $tpOrder;
                         $order = DerivativeOrder::find($payload->orderId);
@@ -332,6 +335,9 @@ class DerivativeService extends CoreService
                         return ['isOk' => true, 'order' => $order];
                         break;
                     case 'sl':
+                        if ($vos->position === 0) {
+                            return ['isOk' => false, 'message' => 'unopenedPosition'];
+                        }
                         $slOrder = $vos->conditionOrder($payload->data);
                         if (!$slOrder->isOk) return $slOrder;
                         $order = DerivativeOrder::find($payload->orderId);

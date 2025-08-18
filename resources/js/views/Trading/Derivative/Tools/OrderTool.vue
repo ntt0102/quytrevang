@@ -447,8 +447,11 @@ function getOrderByStatus(status, isHas = false) {
     return isHas ? order.length > 0 : order;
 }
 function toastOrderError(data) {
-    let error = data.error ?? data.message ?? "unknown";
-    toast.error(t(`trading.derivative.toasts.${error}`));
+    if (data.error) toast.error(data.error);
+    else {
+        const message = data.message ?? "unknown";
+        toast.error(t(`trading.derivative.toasts.${message}`));
+    }
 }
 function toggleOrderContext() {
     const oldValue = showOrderContext.value;

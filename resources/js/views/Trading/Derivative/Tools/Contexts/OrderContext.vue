@@ -40,7 +40,7 @@
                     },
                 },
                 {
-                    location: 'after',
+                    location: 'center',
                     widget: 'dxButton',
                     options: {
                         type: 'danger',

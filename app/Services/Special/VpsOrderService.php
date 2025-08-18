@@ -232,7 +232,7 @@ class VpsOrderService extends CoreService
     {
         $isNew = $data->cmd == "new";
         $isNotDelete = $data->cmd != "delete";
-        $side = $this->formatSide($isEntry ? ($isNew ? $data->side : $this->position) : -$this->position);
+        $side = $isEntry ? ($isNew ? $data->side : $this->position) : -$this->position;
         $account = $this->formatAccount();
         $volume = $isEntry ? $this->orderVolume : abs($this->position);
         $payload = [
@@ -249,7 +249,7 @@ class VpsOrderService extends CoreService
                 "priceType" => "MTL",
                 "quantity" => $volume,
                 "relation" => $isNotDelete ? $this->formatRelation($side) : "",
-                "side" => $side,
+                "side" => $isNew ? $this->formatSide($side) : "",
                 "stopOrderType" => "stop",
                 "symbol" => $this->symbol,
                 "triggerPrice" => $isNotDelete ?  $this->formatPrice($data->price) : ""
@@ -267,8 +267,8 @@ class VpsOrderService extends CoreService
         $isNew = $data->cmd == "new";
         $isNotDelete = $data->cmd != "cancel";
         $price = $isNotDelete ? $this->formatPrice($data->price) : "";
-        // $price = $this->formatPrice($data->price);
-        $side = $this->formatSide($isEntry ? ($isNew ? $data->side : $this->position) : -$this->position);
+        $side = $isEntry ? ($isNew ? $data->side : $this->position) : -$this->position;
+        $sideString = $isNew ? $this->formatSide($side) : "";
         $account = $this->formatAccount();
         $refId = $this->createRefId();
         $volume = $isEntry ? $this->orderVolume : abs($this->position);
@@ -277,7 +277,7 @@ class VpsOrderService extends CoreService
             "user" => $this->vpsUser,
             "session" => $this->vpsSession,
             "c" => "H",
-            "checksum" => $isNotDelete ? $this->createCheckSum($isNew, $price, $side, $account, $refId) : "",
+            "checksum" => $isNotDelete ? $this->createCheckSum($isNew, $price, $sideString, $account, $refId) : "",
             "language" => "vi",
             "data" => [
                 "type" => "string",
@@ -287,7 +287,7 @@ class VpsOrderService extends CoreService
                 "orderNo" => (string)($data->orderNo ?? ""),
                 "price" => $price,
                 "nprice" => $price,
-                "side" => $side,
+                "side" => $sideString,
                 "volume" => $volume,
                 "nvol" => $volume,
                 "symbol" => $this->symbol,
@@ -364,12 +364,14 @@ class VpsOrderService extends CoreService
     {
         if ($side < 0) return "S";
         else if ($side > 0) return "B";
+        else return "";
     }
 
     public function formatRelation($side)
     {
         if ($side < 0) return "LTEQ";
-        if ($side > 0) return "GTEQ";
+        else if ($side > 0) return "GTEQ";
+        else return "";
     }
 
     public function createRefId()
