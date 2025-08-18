@@ -19,6 +19,7 @@ class DerivativeOrder extends CoreModel
         'entry_no',
         'tp_no',
         'sl_no',
+        'created_at',
     ];
 
     protected $fillable = [

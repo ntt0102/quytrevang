@@ -233,10 +233,7 @@ class DerivativeService extends CoreService
      */
     public function getPuttedOrders($payload)
     {
-        $orders = DerivativeOrder::all();
-        return $orders->mapWithKeys(function ($order) {
-            return [$order->id => $order];
-        });
+        return DerivativeOrder::orderBy('created_at', 'desc')->get();
     }
 
     /**

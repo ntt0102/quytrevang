@@ -29,13 +29,14 @@ import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import CorePopup from "../../../../components/Popups/CorePopup.vue";
 import { ref } from "vue";
 import { useStore } from "vuex";
+import { format } from "date-fns";
 
 const store = useStore();
 const popupRef = ref(null);
 const orders = ref([]);
 const columns = [
-    { field: "id", minWidth: 50 },
-    { field: "type", minWidth: 90 },
+    { field: "time", minWidth: 200 },
+    { field: "type", minWidth: 70 },
     { field: "side", minWidth: 90 },
     { field: "price", minWidth: 100 },
     { field: "tpPrice", minWidth: 100 },
@@ -48,14 +49,15 @@ function show() {
 
 function onShown() {
     store.dispatch("tradingDerivative/getPuttedOrders").then((data) => {
-        orders.value = formatData(Object.values(data));
+        orders.value = formatData(data);
     });
 }
 function formatData(data) {
     return data.map((order) => ({
         id: order.id,
+        time: format(new Date(order.created_at), "dd/MM/yyyy HH:mm:ss"),
         type: order.type,
-        side: order.side > 0 ? "L" : "S",
+        side: order.side > 0 ? "LONG" : "SHORT",
         price: order.entry_price,
         tpPrice: order.tp_price,
         slPrice: order.sl_price,

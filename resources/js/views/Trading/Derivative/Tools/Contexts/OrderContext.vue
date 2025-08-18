@@ -82,8 +82,6 @@ const dataSource = computed(() =>
         type: order.type,
         side: order.side > 0 ? "L" : "S",
         price: order.entry_price,
-        tpPrice: order.tp_price,
-        slPrice: order.sl_price,
     }))
 );
 const columns = [
@@ -91,8 +89,6 @@ const columns = [
     { field: "type", minWidth: 90 },
     { field: "side", minWidth: 90 },
     { field: "price", minWidth: 100 },
-    { field: "tpPrice", minWidth: 100 },
-    { field: "slPrice", minWidth: 100 },
 ];
 
 function closeAllOrders() {
