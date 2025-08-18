@@ -246,10 +246,9 @@ class DerivativeService extends CoreService
                         if ($isNew && $vos->position !== 0) {
                             return ['isOk' => false, 'message' => 'openedPosition'];
                         }
-                        if($payload->data->type === 'stop') {
+                        if ($payload->data->type === 'SLO') {
                             $entryOrder = $vos->conditionOrder($payload->data, true);
-                        }
-                        else {
+                        } else {
                             $entryOrder = $vos->order($payload->data, true);
                         }
                         if (!$entryOrder->isOk) return $entryOrder;
@@ -345,10 +344,9 @@ class DerivativeService extends CoreService
                         if (isset($payload->orderId)) {
                             $order = DerivativeOrder::find($payload->orderId);
                             if ($order->status === 0) {
-                                if ($order->type === 'stop') {
+                                if ($order->type === 'SLO') {
                                     $vos->conditionOrder((object)['cmd' => 'delete', 'orderNo' => $order->entry_no], true);
-                                }
-                                else {
+                                } else {
                                     $vos->order((object)['cmd' => 'cancel', 'orderNo' => $order->entry_no], true);
                                 }
                             } else {
