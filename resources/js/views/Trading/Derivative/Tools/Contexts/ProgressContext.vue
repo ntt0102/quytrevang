@@ -1,6 +1,6 @@
 <template>
     <CoreContext class="pattern-context">
-        <div v-if="progress.pattern">
+        <div v-if="progress">
             <DxButton
                 type="success"
                 stylingMode="outlined"
@@ -17,41 +17,51 @@
                 :key="i"
                 class="step"
                 :class="[
-                    progress.step && progress.step === i + 1
+                    progress && progress.step === i + 1
                         ? progress.result
+                            ? 'current-success'
+                            : 'current-fail'
+                        : '',
+                    progress
+                        ? getStepResult(progress.steps[i])
                             ? 'success'
                             : 'fail'
                         : '',
                 ]"
             >
-                <div
-                    class="name"
-                    :class="[
-                        progress.steps && progress.steps[i]
-                            ? progress.steps[i].every(Boolean)
-                                ? 'success'
-                                : 'fail'
-                            : '',
-                    ]"
-                >
-                    {{ i + 1 }}. {{ step.name }}
-                </div>
-                <div>
-                    <div
+                <div>{{ i + 1 }}. {{ step.name }}</div>
+                <ol class="conds">
+                    <li
                         v-for="(cond, j) in step.conds"
                         :key="j"
-                        class="condition"
+                        class="cond"
                         :class="[
-                            progress.steps && progress.steps[i]
-                                ? progress.steps[i][j]
+                            progress
+                                ? getCondResult(progress.steps[i][j])
                                     ? 'success'
                                     : 'fail'
                                 : '',
                         ]"
                     >
-                        {{ j + 1 }}. {{ cond }}
-                    </div>
-                </div>
+                        <div>{{ getCondName(cond) }}</div>
+                        <ul v-if="isObject(cond)" class="subs">
+                            <li
+                                v-for="(sub, k) in cond.subs"
+                                :key="j"
+                                class="sub"
+                                :class="[
+                                    progress
+                                        ? progress.steps[i][j][k]
+                                            ? 'success'
+                                            : 'fail'
+                                        : '',
+                                ]"
+                            >
+                                {{ sub }}
+                            </li>
+                        </ul>
+                    </li>
+                </ol>
             </div>
         </div>
     </CoreContext>
@@ -84,11 +94,23 @@ function loadProgress() {
 function refreshPattern() {
     emit("refreshPattern");
 }
+function getStepResult(step) {
+    return step.map((cond) => getCondResult(cond)).every(Boolean);
+}
+function getCondResult(cond) {
+    return Array.isArray(cond) ? cond.some(Boolean) : cond;
+}
+function getCondName(cond) {
+    return isObject(cond) ? cond.name : cond;
+}
+function isObject(val) {
+    return val && typeof val === "object" && !Array.isArray(val);
+}
 </script>
 
 <style lang="scss">
 .pattern-context {
-    min-width: 165px;
+    min-width: 180px;
     min-height: 20px;
 
     .pattern-name {
@@ -103,15 +125,16 @@ function refreshPattern() {
         color: white;
         text-align: left;
         margin-top: 10px;
-        line-height: 17px;
-        font-size: 14px;
+        line-height: 18px;
+        font-weight: bold;
+        font-size: 16px;
 
         &.portrait {
             flex-direction: column !important;
 
             .step {
                 padding: 3px 5px !important;
-                width: 140px !important;
+                width: 100% !important;
             }
         }
 
@@ -120,31 +143,31 @@ function refreshPattern() {
             padding: 3px 0px;
             width: 145px;
 
-            &.success {
+            &.current-success {
                 background: rgba(0, 60, 0, 0.5);
             }
 
-            &.fail {
+            &.current-fail {
                 background: rgba(60, 0, 0, 0.5);
             }
 
-            .name {
-                padding-left: 5px;
-                font-weight: bold;
-                font-size: 16px;
-            }
+            .conds {
+                padding-left: 35px;
+                margin: 0;
+                font-weight: normal;
+                font-size: 15px;
 
-            .condition {
-                padding-left: 25px;
+                .subs {
+                    padding-left: 15px;
+                }
             }
+        }
+        .success {
+            color: rgba(0, 255, 0, 0.9);
+        }
 
-            .success {
-                color: rgba(0, 255, 0, 0.9);
-            }
-
-            .fail {
-                color: rgba(255, 0, 0, 0.9);
-            }
+        .fail {
+            color: rgba(255, 0, 0, 0.9);
         }
     }
 }

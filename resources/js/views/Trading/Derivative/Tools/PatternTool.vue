@@ -379,11 +379,11 @@ function calcContinuePattern() {
 
     const T1 = H.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6 - dT7;
     const T2 = phase2.R.time.i + dT2;
-    const T4 = D.time.i + Math.max(phase2.tr, TR3);
-    const T6 = F.time.i + Math.max(phase4.tr, TR5);
+    const T3 = F.time.i + dT3 - dT4 - dT5;
+    const T4 = H.time.i + dT5 - dT6 - dT7;
     const timeMark = {
-        times: [T1, T2, T4, T6],
-        colors: ["yellow", "orange", "pink", "blue"],
+        times: [T1, T2, T3, T4],
+        colors: ["yellow", "red", "purple", "cyan"],
     };
 
     // const rABC = BC / AB;
@@ -395,53 +395,51 @@ function calcContinuePattern() {
     // const rDEEs = EEs / DE;
     // const rEFG = FG / EF;
     // const rFGGs = GGs / FG;
-    const rFGH = GH / FG;
+    // const rFGH = GH / FG;
 
-    const dBreak = mf.cmp(D.price, side, B.price);
-    const eBreak = mf.cmp(E.price, !side, C.price);
+    // const dBreak = mf.cmp(D.price, side, B.price);
+    // const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
-    const redConfirmed =
-        (dBreak && rBCD <= 2) ||
-        (rBCD >= 0.5 && dT5 + dT4 > dT3) ||
-        (eBreak && !dBreak && rBCD >= 0.7);
-    const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
-    const purpleConfirmed = fBreak || (rDEF >= 0.7 && dT7 + dT6 > dT5);
-    const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
-    const cyanConfirmed =
-        (hBreak && mf.cmp(H.price, side, D.price)) || (eBreak && rFGH >= 0.7);
+    // const redConfirmed =
+    //     (dBreak && rBCD <= 2) ||
+    //     (rBCD >= 0.5 && dT5 + dT4 > dT3) ||
+    //     (eBreak && !dBreak && rBCD >= 0.7);
+    // const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
+    // const purpleConfirmed = fBreak || (rDEF >= 0.7 && dT7 + dT6 > dT5);
+    // const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
+    // const cyanConfirmed =
+    //     (hBreak && mf.cmp(H.price, side, D.price)) || (eBreak && rFGH >= 0.7);
 
     const progressSteps = [
         [
-            // orange
-            isBoxValid({ pr: BC, tr: dT2 }, phase1),
-        ],
-        [
             // red
             isBoxValid({ pr: CD, tr: dT3 }, phase2),
-            redConfirmed,
+            rBCD >= 0.5,
+            rBCD <= 2,
         ],
         [
             // pink
             isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
-            pinkConfirmed,
         ],
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            purpleConfirmed,
+            rDEF >= 0.7,
+            dT5 >= dT3 - dT4,
         ],
         [
             // blue
             isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            blueConfirmed,
         ],
         [
             // cyan
             isBoxValid({ pr: GH, tr: dT7 }, phase6),
+            dT7 >= dT5 - dT6,
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
-            cyanConfirmed,
+            hBreak,
+            mf.cmp(H.price, side, D.price),
         ],
     ];
 
@@ -456,14 +454,13 @@ function calcContinuePattern() {
         "green",
         "green",
     ];
-    const progress = checkProgress("continue", progressSteps, colors);
+    const progress = checkProgress("continue", progressSteps, colors, 2);
     //
     const points = buildViewPoints(
         [A, phase1.R, phase2.R, D, E, F, G, H, I],
         colors
     );
     //
-    // const isOrange = ["orange", "orangeConfirm"].includes(subPattern);
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
@@ -601,11 +598,11 @@ function calcReversalPattern() {
 
     const T1 = G.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6;
     const T2 = C.time.i + dT2;
-    const T3 = C.time.i + Math.max(phase1.tr, TR2);
-    const T5 = E.time.i + Math.max(phase3.tr, TR4);
+    const T3 = E.time.i + dT2 - dT3 - dT4;
+    const T4 = G.time.i + dT4 - dT5 - dT6;
     const timeMark = {
-        times: [T1, T2, T3, T5],
-        colors: ["orange", "red", "pink", "blue"],
+        times: [T1, T2, T3, T4],
+        colors: ["orange", "pink", "purple", "cyan"],
     };
 
     // const rABC = BC / AB;
@@ -619,40 +616,36 @@ function calcReversalPattern() {
     const eBreak = mf.cmp(E.price, side, C.price);
     const gBreak = mf.cmp(G.price, side, E.price);
 
-    const purpleConfirmed =
-        mf.cmp(E.price, side, C.price, true) ||
-        (rCDE > 0.7 && dT5 > dT4 && mf.cmp(G.price, side, E.price));
-    const cyanConfirmed = mf.cmp(G.price, side, E.price);
-    const pinkConfirmed = D.time1.i > T3 || E.time1.i > T3 || G.time1.i > T3;
-    const blueConfirmed = F.time1.i > T5 || G.time1.i > T5;
+    // const purpleConfirmed =
+    //     mf.cmp(E.price, side, C.price, true) ||
+    //     (rCDE > 0.7 && dT5 > dT4 && mf.cmp(G.price, side, E.price));
+    // const cyanConfirmed = mf.cmp(G.price, side, E.price);
+    // const pinkConfirmed = D.time1.i > T3 || E.time1.i > T3 || G.time1.i > T3;
+    // const blueConfirmed = F.time1.i > T5 || G.time1.i > T5;
 
     const progressSteps = [
-        [
-            // red
-            isBoxValid({ pr: BC, tr: dT2 }, phase1),
-        ],
         [
             // pink
             isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
             rBCD < 1.5,
-            pinkConfirmed,
         ],
         [
             // purple
             isBoxValid({ pr: DE, tr: dT4 }, phase3),
             rCDE >= 0.7,
-            purpleConfirmed,
+            dT4 >= dT2 - dT3,
         ],
         [
             // blue
             isBoxValid({ pr: EF, tr: dT5 }, { pr: PR4, tr: TR4 }),
-            blueConfirmed,
         ],
         [
             // cyan
             isBoxValid({ pr: FG, tr: dT6 }, phase5),
+            dT6 >= dT4 - dT5,
             dT6 >= dT1 - dT2 - dT3 - dT4 - dT5,
-            cyanConfirmed,
+            gBreak,
+            mf.cmp(G.price, side, C.price),
         ],
     ];
 
@@ -666,7 +659,7 @@ function calcReversalPattern() {
         "green",
         "green",
     ];
-    const progress = checkProgress("reversal", progressSteps, colors);
+    const progress = checkProgress("reversal", progressSteps, colors, 2);
     //
     const points = buildViewPoints([A, phase1.R, C, D, E, F, G, H], colors);
     //
@@ -759,7 +752,7 @@ function calcSidewayPattern() {
     const T1 = E.time.i + dT1 - dT2 - dT3 - dT4;
     const T2 = E.time.i + dT2 - dT3 - dT4;
     const T3 = props.timeToIndex(pickTime ?? props.bars.at(-1).time);
-    const timeMark = { times: [T1, T2], colors: ["orange", "red"] };
+    const timeMark = { times: [T1, T2], colors: ["orange", "pink"] };
 
     const rABC = BC / AB;
     const confirmed1 = dT2 > dT1 && rABC >= 0.75;
@@ -767,7 +760,7 @@ function calcSidewayPattern() {
         dT2 > dT1 &&
         isBoxValid(phase1, phase2) &&
         mf.cmp(C.price, side, phase1.S1.price) &&
-        rABC >= 0.7;
+        rABC >= 0.6;
     const confirmed3 = dT2 < dT1 && T3 < T1 && rABC < 0.4;
 
     const progressSteps = [
@@ -776,11 +769,11 @@ function calcSidewayPattern() {
             isBoxValid({ pr: BC, tr: dT2 }, phase1),
             BC >= 3,
             T2 > T3,
-            confirmed1 || confirmed2 || confirmed3,
+            [confirmed1, confirmed2, confirmed3],
         ],
     ];
     const colors = ["orange", "red", "pink", "purple", "purple"];
-    const progress = checkProgress("sideway", progressSteps, colors);
+    const progress = checkProgress("sideway", progressSteps, colors, 1);
     //
     const points = buildViewPoints([A, phase1.R, phase2.R, D, E], colors);
     //
@@ -973,7 +966,7 @@ function buildViewPoints(points, colors) {
     });
     return viewPoints;
 }
-function checkProgress(subPattern, steps, colors) {
+function checkProgress(subPattern, steps, colors, offset = 0) {
     let progress = {
         pattern: patternType.value,
         subPattern,
@@ -984,12 +977,19 @@ function checkProgress(subPattern, steps, colors) {
     progress.steps.map((step, idx) => {
         if (progress.result) {
             progress.step = idx + 1;
-            progress.result = step.every(Boolean);
+            progress.result = getStepResult(step);
         }
         return step;
     });
-    progress.color = progress.result ? "green" : colors[progress.step];
+    progress.color = progress.result
+        ? "green"
+        : colors[progress.step + offset - 1];
     return progress;
+}
+function getStepResult(step) {
+    return step
+        .map((cond) => (Array.isArray(cond) ? cond.some(Boolean) : cond))
+        .every(Boolean);
 }
 function isTimeInChart(time) {
     if (!props.bars.length) return false;
@@ -1061,7 +1061,7 @@ function remove() {
     props.pickTimeToolRef.remove();
     removePatternTool();
     setTimeMark({ times: [] });
-    emit("setProgress", {});
+    emit("setProgress", false);
     emit("setPatternOrder", {});
     series.pattern.setData([]);
 }
