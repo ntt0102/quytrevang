@@ -218,7 +218,7 @@ function loadPatternTool() {
     };
     const {
         entry,
-        target: [[x, X], [y, Y], [z, Z], [t, T]],
+        target: { x, y, z, w, t },
     } = calculatePattern();
     //
     option.point = "O";
@@ -228,33 +228,50 @@ function loadPatternTool() {
     option.draggable = false;
     lines[option.point] = series.pattern.createPriceLine(option);
     //
-    option.point = "X";
-    option.price = x;
-    option.title = `X ${X}`;
-    option.color = mc.CHART_COLOR_MAP.blue;
-    option.draggable = false;
-    lines[option.point] = series.pattern.createPriceLine(option);
+    if (mf.isSet(x)) {
+        option.point = "X";
+        option.price = x[0];
+        option.title = `X ${x[1]}`;
+        option.color = mc.CHART_COLOR_MAP.blue;
+        option.draggable = false;
+        lines[option.point] = series.pattern.createPriceLine(option);
+    }
     //
-    option.point = "Y";
-    option.price = y;
-    option.title = `Y ${Y}`;
-    option.color = mc.CHART_COLOR_MAP.purple;
-    option.draggable = false;
-    lines[option.point] = series.pattern.createPriceLine(option);
+    if (mf.isSet(y)) {
+        option.point = "Y";
+        option.price = y[0];
+        option.title = `Y ${y[1]}`;
+        option.color = mc.CHART_COLOR_MAP.purple;
+        option.draggable = false;
+        lines[option.point] = series.pattern.createPriceLine(option);
+    }
     //
-    option.point = "Z";
-    option.price = z;
-    option.title = `Z ${Z}`;
-    option.color = mc.CHART_COLOR_MAP.pink;
-    option.draggable = false;
-    lines[option.point] = series.pattern.createPriceLine(option);
+    if (mf.isSet(z)) {
+        option.point = "Z";
+        option.price = z[0];
+        option.title = `Z ${z[1]}`;
+        option.color = mc.CHART_COLOR_MAP.pink;
+        option.draggable = false;
+        lines[option.point] = series.pattern.createPriceLine(option);
+    }
     //
-    option.point = "T";
-    option.price = t;
-    option.title = `T ${T}`;
-    option.color = mc.CHART_COLOR_MAP.orange;
-    option.draggable = false;
-    lines[option.point] = series.pattern.createPriceLine(option);
+    if (mf.isSet(w)) {
+        option.point = "W";
+        option.price = w[0];
+        option.title = `Z ${w[1]}`;
+        option.color = mc.CHART_COLOR_MAP.lime;
+        option.draggable = false;
+        lines[option.point] = series.pattern.createPriceLine(option);
+    }
+    //
+    if (mf.isSet(t)) {
+        option.point = "T";
+        option.price = t[0];
+        option.title = `T ${t[1]}`;
+        option.color = mc.CHART_COLOR_MAP.orange;
+        option.draggable = false;
+        lines[option.point] = series.pattern.createPriceLine(option);
+    }
 }
 function refresh(autoAdjust = false) {
     if (mf.isSet(lines.X)) {
@@ -463,8 +480,10 @@ function calcContinuePattern() {
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(G.price, range, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
+    const z = adjustTargetPrice(G.price, 1.25 * range, orderSide);
     const Z = mf.fmtNum(z - entry);
+    const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
+    const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
         (fBreak
             ? hBreak
@@ -495,12 +514,13 @@ function calcContinuePattern() {
         order,
         points: makeUnique(points),
         entry,
-        target: [
-            [x, X],
-            [y, Y],
-            [z, Z],
-            [t, T],
-        ],
+        target: {
+            x: [x, X],
+            y: [y, Y],
+            z: [z, Z],
+            w: [w, W],
+            t: [t, T],
+        },
     };
 }
 function calcReversalPattern() {
@@ -668,8 +688,10 @@ function calcReversalPattern() {
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(F.price, range, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(F.price, 1.5 * range, orderSide);
+    const z = adjustTargetPrice(F.price, 1.25 * range, orderSide);
     const Z = mf.fmtNum(z - entry);
+    const w = adjustTargetPrice(F.price, 1.5 * range, orderSide);
+    const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
         (eBreak
             ? gBreak
@@ -699,12 +721,13 @@ function calcReversalPattern() {
         order,
         points: makeUnique(points),
         entry,
-        target: [
-            [x, X],
-            [y, Y],
-            [z, Z],
-            [t, T],
-        ],
+        target: {
+            x: [x, X],
+            y: [y, Y],
+            z: [z, Z],
+            w: [w, W],
+            t: [t, T],
+        },
     };
 }
 function calcSidewayPattern() {
@@ -784,8 +807,6 @@ function calcSidewayPattern() {
     const Y = mf.fmtNum(y - entry);
     const z = mf.fmtNum(B.price - orderSide * range);
     const Z = mf.fmtNum(z - entry);
-    const t = C.price;
-    const T = mf.fmtNum(t - entry);
     //
     let order = {};
     if (progress.result) {
@@ -807,12 +828,11 @@ function calcSidewayPattern() {
         order,
         points: makeUnique(points),
         entry,
-        target: [
-            [x, X],
-            [y, Y],
-            [z, Z],
-            [t, T],
-        ],
+        target: {
+            x: [x, X],
+            y: [y, Y],
+            z: [z, Z],
+        },
     };
 }
 function scanPhase({ side, start, end }) {
@@ -1063,11 +1083,22 @@ function remove() {
     series.pattern.setData([]);
 }
 function removePatternTool() {
-    if (mf.isSet(lines.X)) {
+    if (mf.isSet(lines.O)) {
         series.pattern.removePriceLine(lines.O);
+    }
+    if (mf.isSet(lines.X)) {
         series.pattern.removePriceLine(lines.X);
+    }
+    if (mf.isSet(lines.Y)) {
         series.pattern.removePriceLine(lines.Y);
+    }
+    if (mf.isSet(lines.Z)) {
         series.pattern.removePriceLine(lines.Z);
+    }
+    if (mf.isSet(lines.W)) {
+        series.pattern.removePriceLine(lines.W);
+    }
+    if (mf.isSet(lines.T)) {
         series.pattern.removePriceLine(lines.T);
     }
     lines = {};

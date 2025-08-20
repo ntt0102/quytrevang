@@ -9,6 +9,7 @@ export default {
     MAX_SIZE_IMAGE_UPLOAD: 1000,
     LOGGEDIN_USERS_COOKIE_NAME: "loggedinUsers",
     CHART_COLOR_MAP: {
+        lime: "rgba(154, 205, 50, 0.9)",
         yellow: "rgba(255, 255, 0, 0.9)",
         orange: "rgba(255, 127, 0, 0.9)",
         red: "rgba(255, 0, 0, 0.9)",
