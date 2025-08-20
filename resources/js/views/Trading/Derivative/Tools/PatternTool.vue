@@ -397,7 +397,7 @@ function calcContinuePattern() {
     // const rFGGs = GGs / FG;
     // const rFGH = GH / FG;
 
-    // const dBreak = mf.cmp(D.price, side, B.price);
+    const dBreak = mf.cmp(D.price, side, B.price);
     // const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
@@ -416,8 +416,7 @@ function calcContinuePattern() {
         [
             // red
             isBoxValid({ pr: CD, tr: dT3 }, phase2),
-            rBCD >= 0.5,
-            rBCD <= 2,
+            [dBreak && rBCD <= 2, rBCD >= 0.5 && dT5 + dT4 > dT3],
         ],
         [
             // pink
@@ -426,8 +425,7 @@ function calcContinuePattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            rDEF >= 0.7,
-            dT5 >= dT3 - dT4,
+            [fBreak, rDEF >= 0.7 && dT7 + dT6 > dT5],
         ],
         [
             // blue
@@ -436,7 +434,6 @@ function calcContinuePattern() {
         [
             // cyan
             isBoxValid({ pr: GH, tr: dT7 }, phase6),
-            dT7 >= dT5 - dT6,
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
             hBreak,
             mf.cmp(H.price, side, D.price),

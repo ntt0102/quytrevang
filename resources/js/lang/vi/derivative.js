@@ -4,8 +4,14 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP > 50%",
-            "ΔP < 200%",
+            {
+                name: "Xác nhận",
+                subs: [
+                    //
+                    "P > Pvàng",
+                    "T > Ttím",
+                ],
+            },
         ],
     },
     {
@@ -20,8 +26,14 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP > 70%",
-            "T > Ttím",
+            {
+                name: "Xác nhận",
+                subs: [
+                    //
+                    "P > Pđỏ",
+                    "T > Tlam",
+                ],
+            },
         ],
     },
     {
@@ -36,7 +48,6 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "T > Tlam",
             "T > Tvàng",
             "P > Pđỏ",
             "P > Ptím",
