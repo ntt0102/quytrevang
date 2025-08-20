@@ -264,7 +264,7 @@ function loadPatternTool() {
     if (mf.isSet(w)) {
         option.point = "W";
         option.price = w[0];
-        option.title = `Z ${w[1]}`;
+        option.title = `W ${w[1]}`;
         option.color = mc.CHART_COLOR_MAP.lime;
         option.draggable = false;
         lines[option.point] = series.pattern.createPriceLine(option);
