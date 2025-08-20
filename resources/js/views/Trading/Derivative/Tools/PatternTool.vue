@@ -388,13 +388,9 @@ function calcContinuePattern() {
 
     // const rABC = BC / AB;
     const rBCD = CD / BC;
-    // const rBCCs = CCs / BC;
-    // const rBCBm = CBm / BC;
-    // const rCDE = DE / CD;
+    const rCDE = DE / CD;
     const rDEF = EF / DE;
-    // const rDEEs = EEs / DE;
     // const rEFG = FG / EF;
-    // const rFGGs = GGs / FG;
     // const rFGH = GH / FG;
 
     const dBreak = mf.cmp(D.price, side, B.price);
@@ -421,6 +417,7 @@ function calcContinuePattern() {
         [
             // pink
             isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
+            rCDE < 1.5,
         ],
         [
             // purple

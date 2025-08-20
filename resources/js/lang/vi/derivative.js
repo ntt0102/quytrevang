@@ -19,6 +19,7 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
+            "P < 150%",
         ],
     },
     {
