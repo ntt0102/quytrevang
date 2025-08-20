@@ -63,6 +63,14 @@ const continuePattern = {
 
 const reversal1 = [
     {
+        name: "Bước red",
+        conds: [
+            //
+            "B > Bmin",
+            "T > Ttím",
+        ],
+    },
+    {
         name: "Bước hồng",
         conds: [
             //
@@ -75,8 +83,14 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
-            "P > 70%",
-            "T > Ttím",
+            {
+                name: "Xác nhận",
+                subs: [
+                    //
+                    "P > Pđỏ",
+                    "T > Tlam",
+                ],
+            },
         ],
     },
     {
@@ -91,7 +105,6 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
-            "T > Tlam",
             "T > Tcam",
             "P > Pđỏ",
             "P > Ptím",

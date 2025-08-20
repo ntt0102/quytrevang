@@ -622,6 +622,11 @@ function calcReversalPattern() {
 
     const progressSteps = [
         [
+            // red
+            isBoxValid({ pr: BC, tr: dT2 }, phase1),
+            dT4 >= dT2 - dT3,
+        ],
+        [
             // pink
             isBoxValid({ pr: CD, tr: dT3 }, { pr: PR2, tr: TR2 }),
             rBCD < 1.5,
@@ -629,8 +634,7 @@ function calcReversalPattern() {
         [
             // purple
             isBoxValid({ pr: DE, tr: dT4 }, phase3),
-            rCDE >= 0.7,
-            dT4 >= dT2 - dT3,
+            [eBreak, rCDE >= 0.7 && dT6 >= dT4 - dT5],
         ],
         [
             // blue
@@ -639,7 +643,6 @@ function calcReversalPattern() {
         [
             // cyan
             isBoxValid({ pr: FG, tr: dT6 }, phase5),
-            dT6 >= dT4 - dT5,
             dT6 >= dT1 - dT2 - dT3 - dT4 - dT5,
             gBreak,
             mf.cmp(G.price, side, C.price),
@@ -656,7 +659,7 @@ function calcReversalPattern() {
         "green",
         "green",
     ];
-    const progress = checkProgress("reversal", progressSteps, colors, 2);
+    const progress = checkProgress("reversal", progressSteps, colors, 1);
     //
     const points = buildViewPoints([A, phase1.R, C, D, E, F, G, H], colors);
     //
