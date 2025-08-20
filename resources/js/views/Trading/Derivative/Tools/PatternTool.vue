@@ -295,7 +295,7 @@ function calcContinuePattern() {
         end: { time: Math.min(pickTime ?? B.time.t, B.time.t), price: B.price },
     });
     const dT1 = phase1.R.time1.i - phase1.S.time.i;
-    const stopTime = props.indexToTime(phase1.R.time.i + 2 * dT1);
+    const stopTime = props.indexToTime(phase1.R.time.i + 3 * dT1);
     const phase2 = scanPhase({
         side: !side,
         start: B,
@@ -517,7 +517,7 @@ function calcReversalPattern() {
         end: { time: Math.min(pickTime ?? B.time.t, B.time.t), price: B.price },
     });
     const dT1 = phase1.R.time1.i - phase1.S.time.i;
-    const stopTime = props.indexToTime(phase1.R.time.i + 2 * dT1);
+    const stopTime = props.indexToTime(phase1.R.time.i + 3 * dT1);
     const phase2 = scanPhase({
         side,
         start: { time: B.time },
