@@ -488,12 +488,11 @@ function calcContinuePattern() {
     const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
     const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
-        (fBreak
-            ? hBreak
-                ? H.price + I.price
-                : F.price + G.price
-            : D.price + E.price) / 2,
-        1
+        (hBreak
+            ? H.price + I.price
+            : fBreak
+            ? F.price + G.price
+            : D.price + E.price) / 2
     );
     const T = mf.fmtNum(t - entry, 1);
     //
@@ -732,12 +731,11 @@ function calcVlinePattern() {
     const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
     const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
-        (fBreak
-            ? hBreak
-                ? H.price + I.price
-                : F.price + G.price
-            : D.price + E.price) / 2,
-        1
+        (hBreak
+            ? H.price + I.price
+            : fBreak
+            ? F.price + G.price
+            : D.price + E.price) / 2
     );
     const T = mf.fmtNum(t - entry, 1);
     //
@@ -945,10 +943,10 @@ function calcReversalPattern() {
     const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
     const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
-        (fBreak
-            ? hBreak
-                ? H.price + I.price
-                : F.price + G.price
+        (hBreak
+            ? H.price + I.price
+            : fBreak
+            ? F.price + G.price
             : D.price + E.price) / 2
     );
     const T = mf.fmtNum(t - entry);
