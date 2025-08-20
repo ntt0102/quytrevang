@@ -110,7 +110,7 @@ function isObject(val) {
 
 <style lang="scss">
 .pattern-context {
-    min-width: 180px;
+    min-width: 145px;
     min-height: 20px;
 
     .pattern-name {

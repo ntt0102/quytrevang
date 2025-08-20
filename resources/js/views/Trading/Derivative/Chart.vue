@@ -175,7 +175,6 @@ import { useRoute } from "vue-router";
 import { useI18n } from "vue-i18n";
 import {
     format,
-    // formatISO,
     getUnixTime,
     addHours,
     subSeconds,
@@ -255,7 +254,7 @@ params.interval = setInterval(() => {
             if (config.value.autoRefresh) patternToolRef.value.refresh();
             params.refreshAt = new Date();
         }
-        if (differenceInSeconds(new Date(), new Date(params.statusAt)) > 20) {
+        if (differenceInSeconds(new Date(), new Date(params.statusAt)) > 10) {
             getStatus();
             params.statusAt = new Date();
         }

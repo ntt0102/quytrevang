@@ -57,7 +57,13 @@ const continue1 = [
 ];
 const continuePattern = {
     continue: {
-        name: "Mẫu hình tiếp diễn",
+        name: "Mẫu hình <br> tiếp diễn",
+        steps: continue1,
+    },
+};
+const vlinePattern = {
+    continue: {
+        name: "Mẫu hình <br> tiếp diễn ngược",
         steps: continue1,
     },
 };
@@ -115,7 +121,7 @@ const reversal1 = [
 
 const reversalPattern = {
     reversal: {
-        name: "Mẫu hình đảo chiều",
+        name: "Mẫu hình <br> đảo chiều",
         steps: reversal1,
     },
 };
@@ -143,9 +149,14 @@ const sideway1 = [
 
 const sidewayPattern = {
     sideway: {
-        name: "Mẫu hình đi ngang",
+        name: "Mẫu hình <br> đi ngang",
         steps: sideway1,
     },
 };
 
-export default { C: continuePattern, R: reversalPattern, S: sidewayPattern };
+export default {
+    C: continuePattern,
+    V: vlinePattern,
+    R: reversalPattern,
+    S: sidewayPattern,
+};
