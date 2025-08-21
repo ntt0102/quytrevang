@@ -455,8 +455,8 @@ function calcContinuePattern() {
             // cyan
             isBoxValid({ pr: GH, tr: dT7 }, phase6),
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
-            hBreak,
             mf.cmp(H.price, side, D.price),
+            hBreak,
         ],
     ];
 
@@ -694,8 +694,9 @@ function calcVlinePattern() {
             // cyan
             isBoxValid({ pr: GH, tr: dT7 }, phase6),
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
-            hBreak,
             mf.cmp(H.price, side, D.price),
+            hBreak,
+
         ],
     ];
 
@@ -911,8 +912,8 @@ function calcReversalPattern() {
             // cyan
             isBoxValid({ pr: GH, tr: dT7 }, phase6),
             dT7 >= dT2 - dT3 - dT4 - dT5 - dT6,
-            hBreak,
             mf.cmp(H.price, side, D.price),
+            hBreak,
         ],
     ];
 
