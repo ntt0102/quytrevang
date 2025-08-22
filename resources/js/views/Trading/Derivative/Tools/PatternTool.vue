@@ -62,25 +62,9 @@ const patternTypes = [
     `N - ${t("trading.derivative.patternTool.nestedContinue")}`,
     `R - ${t("trading.derivative.patternTool.reversal")}`,
     `S - ${t("trading.derivative.patternTool.sideway")}`,
-    // {
-    //     value: "C",
-    //     name: `C - ${t("trading.derivative.patternTool.continue")}`,
-    // },
-    // {
-    //     value: "N",
-    //     name: `N - ${t("trading.derivative.patternTool.nestedContinue")}`,
-    // },
-    // {
-    //     value: "R",
-    //     name: `R - ${t("trading.derivative.patternTool.reversal")}`,
-    // },
-    // {
-    //     value: "S",
-    //     name: `S - ${t("trading.derivative.patternTool.sideway")}`,
-    // },
 ];
 const scanThreshold = 1;
-const boxPriceRatio = 0.75;
+const boxPriceRatio = 0.8;
 let scanPoints = {};
 let lines = {};
 let series = {};
