@@ -55,7 +55,7 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const symbol = "VN30F1M";
-const patternTypes = ["C", "V", "R", "S"];
+const patternTypes = ["C", "N", "R", "S"];
 const scanThreshold = 1;
 const boxPriceRatio = 0.75;
 let scanPoints = {};
@@ -286,7 +286,7 @@ function calculatePattern() {
         case "C":
             result = calcContinuePattern();
             break;
-        case "V":
+        case "N":
             result = calcNestedContinuePattern();
             break;
         case "R":

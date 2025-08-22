@@ -156,7 +156,7 @@ const sidewayPattern = {
 
 export default {
     C: continuePattern,
-    V: nestedContinuePattern,
+    N: nestedContinuePattern,
     R: reversalPattern,
     S: sidewayPattern,
 };
