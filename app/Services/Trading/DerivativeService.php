@@ -490,7 +490,7 @@ class DerivativeService extends CoreService
                 "json" => [
                     "operationName" => "GetKrxTicksBySymbols",
                     "query" => "query GetKrxTicksBySymbols {
-                        GetKrxTicksBySymbols(symbols: \"{$vn30f1m}\", date: \"{$date}\", limit: 100000, board: 2) {
+                        GetKrxTicksBySymbols(symbols: \"{$vn30f1m}\", date: \"{$date}\", limit: 1000000, board: 2) {
                             ticks {
                                 totalVolumeTraded
                                 sendingTime
