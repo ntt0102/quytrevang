@@ -61,7 +61,7 @@ const continuePattern = {
         steps: continue1,
     },
 };
-const vlinePattern = {
+const nestedContinuePattern = {
     continue: {
         name: "Mẫu hình <br> tiếp diễn ngược",
         steps: continue1,
@@ -156,7 +156,7 @@ const sidewayPattern = {
 
 export default {
     C: continuePattern,
-    V: vlinePattern,
+    V: nestedContinuePattern,
     R: reversalPattern,
     S: sidewayPattern,
 };

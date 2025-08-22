@@ -287,7 +287,7 @@ function calculatePattern() {
             result = calcContinuePattern();
             break;
         case "V":
-            result = calcVlinePattern();
+            result = calcNestedContinuePattern();
             break;
         case "R":
             result = calcReversalPattern();
@@ -526,7 +526,7 @@ function calcContinuePattern() {
         },
     };
 }
-function calcVlinePattern() {
+function calcNestedContinuePattern() {
     const { A: P1, B: P2, C: P3 } = scanPoints;
     let side = P1.price - P2.price > 0;
     let pickTime = props.pickTimeToolRef.get();
@@ -608,7 +608,7 @@ function calcVlinePattern() {
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
     const I = isBreak3 ? phase7.S1 : phase7.ext.S;
 
-    console.log("calcVlinePattern", [
+    console.log("calcNestedContinuePattern", [
         phase0,
         phase1,
         phase2,
