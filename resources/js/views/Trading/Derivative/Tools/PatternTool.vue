@@ -1403,20 +1403,16 @@ function makeUnique(arr) {
     });
 }
 function changePatternType({ itemData }) {
-    const patternValue = itemData.split(" - ")[0];
-    store
-        .dispatch("tradingDerivative/setPatternType", patternValue)
-        .then((isOk) => {
-            if (isOk) {
-                refresh();
-            }
-        });
+    const value = itemData.split(" - ")[0];
+    store.dispatch("tradingDerivative/setPatternType", value).then((isOk) => {
+        if (isOk) {
+            refresh();
+        }
+    });
 }
 function togglePatternType() {
-    const nextType =
-        patternType.value === patternTypes[0]
-            ? patternTypes[1]
-            : patternTypes[0];
+    const values = patternTypes.map((item) => item.split(" - ")[0]);
+    const nextType = patternType.value === values[0] ? values[1] : values[0];
     store
         .dispatch("tradingDerivative/setPatternType", nextType)
         .then((isOk) => {
