@@ -459,7 +459,7 @@ function calcContinuePattern() {
         [
             // red
             isBoxValid({ pr: CD, tr: dT3 }, phase2),
-            [dBreak && rBCD <= 2, rBCD >= 0.5 && dT5 >= dT3 - dT4],
+            [dBreak && rBCD <= 2, !dBreak && rBCD >= 0.5 && dT5 >= dT3 - dT4],
         ],
         [
             // pink
@@ -469,7 +469,7 @@ function calcContinuePattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, rDEF >= 0.7 && dT7 >= dT5 - dT6],
+            [fBreak, !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6],
         ],
         [
             // blue
@@ -698,7 +698,7 @@ function calcNestedContinuePattern() {
         [
             // red
             isBoxValid({ pr: CD, tr: dT3 }, phase2),
-            [dBreak && rBCD <= 2, rBCD >= 0.5 && dT5 >= dT3 - dT4],
+            [dBreak && rBCD <= 2, !dBreak && rBCD >= 0.5 && dT5 >= dT3 - dT4],
         ],
         [
             // pink
@@ -708,7 +708,7 @@ function calcNestedContinuePattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, rDEF >= 0.7 && dT7 >= dT5 - dT6],
+            [fBreak, !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6],
         ],
         [
             // blue
@@ -925,7 +925,7 @@ function calcReversalPattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, rDEF >= 0.7 && dT7 >= dT5 - dT6],
+            [fBreak, !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6],
         ],
         [
             // blue
