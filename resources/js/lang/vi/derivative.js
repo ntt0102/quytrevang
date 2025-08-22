@@ -52,6 +52,7 @@ const continue1 = [
             "T > Tvàng",
             "P > Pđỏ",
             "P > Ptím",
+            "P > ETmin",
         ],
     },
 ];
@@ -115,6 +116,7 @@ const reversal1 = [
             "T > Tcam",
             "P > Pđỏ",
             "P > Ptím",
+            "P > ETmin",
         ],
     },
 ];

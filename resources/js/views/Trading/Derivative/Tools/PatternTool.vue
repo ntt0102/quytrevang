@@ -65,6 +65,7 @@ const patternTypes = [
 ];
 const scanThreshold = 1;
 const boxPriceRatio = 0.8;
+const chartColors = Object.keys(mc.CHART_COLOR_MAP);
 let scanPoints = {};
 let lines = {};
 let series = {};
@@ -428,16 +429,26 @@ function calcContinuePattern() {
     // const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
-
-    // const redConfirmed =
-    //     (dBreak && rBCD <= 2) ||
-    //     (rBCD >= 0.5 && dT5 + dT4 > dT3) ||
-    //     (eBreak && !dBreak && rBCD >= 0.7);
-    // const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
-    // const purpleConfirmed = fBreak || (rDEF >= 0.7 && dT7 + dT6 > dT5);
-    // const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
-    // const cyanConfirmed =
-    //     (hBreak && mf.cmp(H.price, side, D.price)) || (eBreak && rFGH >= 0.7);
+    //
+    const orderSide = side ? 1 : -1;
+    const refPrice = H.price;
+    const entry = mf.fmtNum(refPrice + orderSide * 0.1);
+    const range = getRange("continue", { B, C, E, H }, side);
+    const x = adjustTargetPrice(G.price, 0.75 * range, orderSide);
+    const X = mf.fmtNum(x - entry);
+    const y = adjustTargetPrice(G.price, range, orderSide);
+    const Y = mf.fmtNum(y - entry);
+    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
+    const Z = mf.fmtNum(z - entry);
+    const t = mf.fmtNum(
+        (hBreak
+            ? H.price + I.price
+            : fBreak
+            ? F.price + G.price
+            : D.price + E.price) / 2
+    );
+    const T = mf.fmtNum(t - entry, 1);
+    const entryThreshold = mf.fmtNum(G.price + 0.5 * orderSide * range);
 
     const progressSteps = [
         [
@@ -465,44 +476,16 @@ function calcContinuePattern() {
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
             mf.cmp(H.price, side, D.price),
             hBreak,
+            mf.cmp(H.price, side, entryThreshold),
         ],
     ];
 
-    const colors = [
-        "yellow",
-        "orange",
-        "red",
-        "pink",
-        "purple",
-        "blue",
-        "cyan",
-        "green",
-        "green",
-    ];
-    const progress = checkProgress("continue", progressSteps, colors, 2);
-    //
-    const patternPoints = buildViewPoints([A, B, C, D, E, F, G, H, I], colors);
-    //
-    const orderSide = side ? 1 : -1;
-    const refPrice = H.price;
-    const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = getRange("continue", { B, C, E, H }, side);
-    const x = adjustTargetPrice(G.price, 0.75 * range, orderSide);
-    const X = mf.fmtNum(x - entry);
-    const y = adjustTargetPrice(G.price, range, orderSide);
-    const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
-    const Z = mf.fmtNum(z - entry);
-    // const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
-    // const W = mf.fmtNum(w - entry);
-    const t = mf.fmtNum(
-        (hBreak
-            ? H.price + I.price
-            : fBreak
-            ? F.price + G.price
-            : D.price + E.price) / 2
+    const progress = checkProgress("continue", progressSteps, chartColors, 3);
+    const patternPoints = buildViewPoints(
+        [A, B, C, D, E, F, G, H, I],
+        chartColors,
+        1
     );
-    const T = mf.fmtNum(t - entry, 1);
     //
     let order = {};
     if (progress.result) {
@@ -528,7 +511,6 @@ function calcContinuePattern() {
             x: [x, X],
             y: [y, Y],
             z: [z, Z],
-            // w: [w, W],
             t: [t, T],
         },
     };
@@ -668,16 +650,27 @@ function calcNestedContinuePattern() {
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
-    // const redConfirmed =
-    //     (dBreak && rBCD <= 2) ||
-    //     (rBCD >= 0.5 && dT5 + dT4 > dT3) ||
-    //     (eBreak && !dBreak && rBCD >= 0.7);
-    // const pinkConfirmed = E.time1.i > T4 || F.time1.i > T4 || H.time1.i > T4;
-    // const purpleConfirmed = fBreak || (rDEF >= 0.7 && dT7 + dT6 > dT5);
-    // const blueConfirmed = G.time1.i > T6 || H.time1.i > T6;
-    // const cyanConfirmed =
-    //     (hBreak && mf.cmp(H.price, side, D.price)) || (eBreak && rFGH >= 0.7);
-
+    //
+    const orderSide = side ? 1 : -1;
+    const refPrice = H.price;
+    const entry = mf.fmtNum(refPrice + orderSide * 0.1);
+    const range = getRange("continue", { B, C, E, H }, side);
+    const x = adjustTargetPrice(G.price, 0.75 * range, orderSide);
+    const X = mf.fmtNum(x - entry);
+    const y = adjustTargetPrice(G.price, range, orderSide);
+    const Y = mf.fmtNum(y - entry);
+    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
+    const Z = mf.fmtNum(z - entry);
+    const t = mf.fmtNum(
+        (hBreak
+            ? H.price + I.price
+            : fBreak
+            ? F.price + G.price
+            : D.price + E.price) / 2
+    );
+    const T = mf.fmtNum(t - entry, 1);
+    const entryThreshold = mf.fmtNum(G.price + 0.5 * orderSide * range);
+    //
     const progressSteps = [
         [
             // red
@@ -704,48 +697,15 @@ function calcNestedContinuePattern() {
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
             mf.cmp(H.price, side, D.price),
             hBreak,
+            mf.cmp(H.price, side, entryThreshold),
         ],
     ];
 
-    const colors = [
-        "lime",
-        "yellow",
-        "orange",
-        "red",
-        "pink",
-        "purple",
-        "blue",
-        "cyan",
-        "green",
-        "green",
-    ];
-    const progress = checkProgress("continue", progressSteps, colors, 3);
-    //
+    const progress = checkProgress("continue", progressSteps, chartColors, 3);
     const patternPoints = buildViewPoints(
         [O, A, B, C, D, E, F, G, H, I],
-        colors
+        chartColors
     );
-    //
-    const orderSide = side ? 1 : -1;
-    const refPrice = H.price;
-    const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = getRange("continue", { B, C, E, H }, side);
-    const x = adjustTargetPrice(G.price, 0.75 * range, orderSide);
-    const X = mf.fmtNum(x - entry);
-    const y = adjustTargetPrice(G.price, range, orderSide);
-    const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
-    const Z = mf.fmtNum(z - entry);
-    // const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
-    // const W = mf.fmtNum(w - entry);
-    const t = mf.fmtNum(
-        (hBreak
-            ? H.price + I.price
-            : fBreak
-            ? F.price + G.price
-            : D.price + E.price) / 2
-    );
-    const T = mf.fmtNum(t - entry, 1);
     //
     let order = {};
     if (progress.result) {
@@ -887,14 +847,27 @@ function calcReversalPattern() {
     // const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
-
-    // const purpleConfirmed =
-    //     mf.cmp(F.price, side, D.price, true) ||
-    //     (rDEF > 0.7 && dT6 > dT5 && mf.cmp(H.price, side, F.price));
-    // const cyanConfirmed = mf.cmp(H.price, side, F.price);
-    // const pinkConfirmed = E.time1.i > T3 || F.time1.i > T3 || H.time1.i > T3;
-    // const blueConfirmed = G.time1.i > T5 || H.time1.i > T5;
-
+    //
+    const orderSide = side ? 1 : -1;
+    const refPrice = H.price;
+    const entry = mf.fmtNum(refPrice + orderSide * 0.1);
+    const range = getRange("reversal", { C, E, H }, side);
+    const x = adjustTargetPrice(G.price, 0.75 * range, orderSide);
+    const X = mf.fmtNum(x - entry);
+    const y = adjustTargetPrice(G.price, range, orderSide);
+    const Y = mf.fmtNum(y - entry);
+    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
+    const Z = mf.fmtNum(z - entry);
+    const t = mf.fmtNum(
+        (hBreak
+            ? H.price + I.price
+            : fBreak
+            ? F.price + G.price
+            : D.price + E.price) / 2
+    );
+    const T = mf.fmtNum(t - entry);
+    const entryThreshold = mf.fmtNum(G.price + 0.5 * orderSide * range);
+    //
     const progressSteps = [
         [
             // red
@@ -921,43 +894,16 @@ function calcReversalPattern() {
             dT7 >= dT2 - dT3 - dT4 - dT5 - dT6,
             mf.cmp(H.price, side, D.price),
             hBreak,
+            mf.cmp(H.price, side, entryThreshold),
         ],
     ];
 
-    const colors = [
-        "orange",
-        "red",
-        "pink",
-        "purple",
-        "blue",
-        "cyan",
-        "green",
-        "green",
-    ];
-    const progress = checkProgress("reversal", progressSteps, colors, 1);
-    //
-    const patternPoints = buildViewPoints([B, C, D, E, F, G, H, I], colors);
-    //
-    const orderSide = side ? 1 : -1;
-    const refPrice = H.price;
-    const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = getRange("reversal", { C, E, H }, side);
-    const x = adjustTargetPrice(G.price, 0.75 * range, orderSide);
-    const X = mf.fmtNum(x - entry);
-    const y = adjustTargetPrice(G.price, range, orderSide);
-    const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
-    const Z = mf.fmtNum(z - entry);
-    // const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
-    // const W = mf.fmtNum(w - entry);
-    const t = mf.fmtNum(
-        (hBreak
-            ? H.price + I.price
-            : fBreak
-            ? F.price + G.price
-            : D.price + E.price) / 2
+    const progress = checkProgress("reversal", progressSteps, chartColors, 3);
+    const patternPoints = buildViewPoints(
+        [B, C, D, E, F, G, H, I],
+        chartColors,
+        2
     );
-    const T = mf.fmtNum(t - entry);
     //
     let order = {};
     if (progress.result) {
@@ -983,7 +929,6 @@ function calcReversalPattern() {
             x: [x, X],
             y: [y, Y],
             z: [z, Z],
-            // w: [w, W],
             t: [t, T],
         },
     };
@@ -1125,7 +1070,6 @@ function scanPhase({ side, start, end }) {
                     },
                     S: {
                         price: top,
-                        // price1: top,
                         time: { t, d, i },
                         time1: { t, d, i },
                     },
@@ -1162,7 +1106,6 @@ function scanPhase({ side, start, end }) {
                     },
                     S: {
                         price: top,
-                        // price1: top,
                         time: { t, d, i },
                         time1: { t, d, i },
                     },
@@ -1174,17 +1117,11 @@ function scanPhase({ side, start, end }) {
                     box.S.time = { t, d, i };
                     if (bottom !== box.S.price) {
                         box.S.price = bottom;
-                        // box.S.price1 = bottom;
                         box.S.time1 = { t, d, i };
                         box.pr = mf.fmtNum(box.S.price - box.R.price, 1, true);
                         box.tr = box.S.time1.i - box.R.time.i;
                     }
                 }
-                // else {
-                //     if (mf.cmp(top, side, box.S.price1)) {
-                //         box.S.price1 = top;
-                //     }
-                // }
             }
             return true;
         });
@@ -1221,12 +1158,36 @@ function isBoxValid(box1, box2, isNot = false) {
     );
     return isNot ? score < 1.0 : score >= 1.0;
 }
-function buildViewPoints(points, colors) {
+function checkProgress(subPattern, steps, colors, offset = 0) {
+    let progress = {
+        pattern: patternType.value,
+        subPattern,
+        steps,
+        step: 0,
+        result: true,
+    };
+    progress.steps.map((step, idx) => {
+        if (progress.result) {
+            progress.step = idx + 1;
+            progress.result = getStepResult(step);
+        }
+        return step;
+    });
+    progress.color = progress.result
+        ? "green"
+        : colors[progress.step + offset - 1];
+    return progress;
+}
+function buildViewPoints(points, colors, offset = 0) {
     const viewPoints = [];
+    const lastIndex = points.length - 1;
     points.forEach((p, idx) => {
         const point = {
             value: p.price,
-            color: mc.CHART_COLOR_MAP[colors[idx]],
+            color:
+                idx !== lastIndex
+                    ? mc.CHART_COLOR_MAP[colors[idx + offset]]
+                    : null,
         };
         if (idx !== 0) {
             viewPoints.push({ ...point, time: p.time1.t });
@@ -1248,26 +1209,6 @@ function getRange(type, { B, C, E, H }, side) {
         ? Math.min(C.price, E.price)
         : Math.max(C.price, E.price);
     return mf.fmtNum(rangeR - rangeS, 1, true);
-}
-function checkProgress(subPattern, steps, colors, offset = 0) {
-    let progress = {
-        pattern: patternType.value,
-        subPattern,
-        steps,
-        step: 0,
-        result: true,
-    };
-    progress.steps.map((step, idx) => {
-        if (progress.result) {
-            progress.step = idx + 1;
-            progress.result = getStepResult(step);
-        }
-        return step;
-    });
-    progress.color = progress.result
-        ? "green"
-        : colors[progress.step + offset - 1];
-    return progress;
 }
 function getStepResult(step) {
     return step
