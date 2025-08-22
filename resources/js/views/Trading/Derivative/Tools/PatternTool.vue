@@ -3,7 +3,7 @@
         <DxDropDownButton
             :items="patternTypes"
             :drop-down-options="{
-                width: 33,
+                width: 145,
                 wrapperAttr: { class: 'select-pattern-popup' },
                 position: {
                     my: 'top left',
@@ -35,9 +35,11 @@
 import DxDropDownButton from "devextreme-vue/drop-down-button";
 import { ref, inject, computed, watch } from "vue";
 import { useStore } from "vuex";
+import { useI18n } from "vue-i18n";
 import { formatISO } from "date-fns";
 
 const store = useStore();
+const { t } = useI18n();
 const mf = inject("mf");
 const mc = inject("mc");
 const props = defineProps([
@@ -55,7 +57,28 @@ const patternType = computed(
     () => store.state.tradingDerivative.config.patternType
 );
 const symbol = "VN30F1M";
-const patternTypes = ["C", "N", "R", "S"];
+const patternTypes = [
+    `C - ${t("trading.derivative.patternTool.continue")}`,
+    `N - ${t("trading.derivative.patternTool.nestedContinue")}`,
+    `R - ${t("trading.derivative.patternTool.reversal")}`,
+    `S - ${t("trading.derivative.patternTool.sideway")}`,
+    // {
+    //     value: "C",
+    //     name: `C - ${t("trading.derivative.patternTool.continue")}`,
+    // },
+    // {
+    //     value: "N",
+    //     name: `N - ${t("trading.derivative.patternTool.nestedContinue")}`,
+    // },
+    // {
+    //     value: "R",
+    //     name: `R - ${t("trading.derivative.patternTool.reversal")}`,
+    // },
+    // {
+    //     value: "S",
+    //     name: `S - ${t("trading.derivative.patternTool.sideway")}`,
+    // },
+];
 const scanThreshold = 1;
 const boxPriceRatio = 0.75;
 let scanPoints = {};
@@ -1380,8 +1403,9 @@ function makeUnique(arr) {
     });
 }
 function changePatternType({ itemData }) {
+    const patternValue = itemData.split(" - ")[0];
     store
-        .dispatch("tradingDerivative/setPatternType", itemData)
+        .dispatch("tradingDerivative/setPatternType", patternValue)
         .then((isOk) => {
             if (isOk) {
                 refresh();
