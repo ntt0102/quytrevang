@@ -425,7 +425,7 @@ function calcContinuePattern() {
     // const rFGH = GH / FG;
 
     const dBreak = mf.cmp(D.price, side, B.price);
-    // const eBreak = mf.cmp(E.price, !side, C.price);
+    const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
@@ -486,7 +486,7 @@ function calcContinuePattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = mf.fmtNum((fBreak ? F.price : D.price) - C.price, 1, true);
+    const range = mf.fmtNum((fBreak ? F.price : D.price) - (eBreak ? E.price : C.price), 1, true);
     const x = adjustTargetPrice(G.price, 0.5 * range, orderSide);
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(G.price, range, orderSide);
@@ -664,7 +664,7 @@ function calcNestedContinuePattern() {
     // const rFGH = GH / FG;
 
     const dBreak = mf.cmp(D.price, side, B.price);
-    // const eBreak = mf.cmp(E.price, !side, C.price);
+    const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
@@ -729,7 +729,7 @@ function calcNestedContinuePattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = mf.fmtNum((fBreak ? F.price : D.price) - C.price, 1, true);
+    const range = mf.fmtNum((fBreak ? F.price : D.price) - (eBreak ? E.price : C.price), 1, true);
     const x = adjustTargetPrice(G.price, 0.5 * range, orderSide);
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(G.price, range, orderSide);
@@ -884,7 +884,7 @@ function calcReversalPattern() {
     const rDEF = EF / DE;
     // const rEFG = FG / EF;
 
-    // const eBreak = mf.cmp(E.price, !side, C.price);
+    const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
@@ -941,7 +941,7 @@ function calcReversalPattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = mf.fmtNum((fBreak ? F.price : D.price) - E.price, 1, true);
+    const range = mf.fmtNum((fBreak ? F.price : D.price) - (eBreak ? E.price : C.price), 1, true);
     const x = adjustTargetPrice(G.price, 0.5 * range, orderSide);
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(G.price, range, orderSide);
