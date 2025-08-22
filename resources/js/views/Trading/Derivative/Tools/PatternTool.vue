@@ -425,7 +425,7 @@ function calcContinuePattern() {
     // const rFGH = GH / FG;
 
     const dBreak = mf.cmp(D.price, side, B.price);
-    const eBreak = mf.cmp(E.price, !side, C.price);
+    // const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
@@ -486,15 +486,15 @@ function calcContinuePattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = mf.fmtNum((fBreak ? F.price : D.price) - (eBreak ? E.price : C.price), 1, true);
-    const x = adjustTargetPrice(G.price, 0.5 * range, orderSide);
+    const range = getRange("continue", { B, C, E, H }, side);
+    const x = adjustTargetPrice(G.price, 0.75 * range, orderSide);
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(G.price, range, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(G.price, 1.25 * range, orderSide);
+    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
     const Z = mf.fmtNum(z - entry);
-    const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
-    const W = mf.fmtNum(w - entry);
+    // const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
+    // const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
         (hBreak
             ? H.price + I.price
@@ -506,7 +506,7 @@ function calcContinuePattern() {
     //
     let order = {};
     if (progress.result) {
-        const tp = mf.cmp(H.price, !side, x) ? y : z;
+        const tp = mf.cmp(H.price, !side, y) ? z : w;
         const sl = G.price;
         order = {
             type: "SLO",
@@ -528,7 +528,7 @@ function calcContinuePattern() {
             x: [x, X],
             y: [y, Y],
             z: [z, Z],
-            w: [w, W],
+            // w: [w, W],
             t: [t, T],
         },
     };
@@ -664,7 +664,7 @@ function calcNestedContinuePattern() {
     // const rFGH = GH / FG;
 
     const dBreak = mf.cmp(D.price, side, B.price);
-    const eBreak = mf.cmp(E.price, !side, C.price);
+    // const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
@@ -729,15 +729,15 @@ function calcNestedContinuePattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = mf.fmtNum((fBreak ? F.price : D.price) - (eBreak ? E.price : C.price), 1, true);
-    const x = adjustTargetPrice(G.price, 0.5 * range, orderSide);
+    const range = getRange("continue", { B, C, E, H }, side);
+    const x = adjustTargetPrice(G.price, 0.75 * range, orderSide);
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(G.price, range, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(G.price, 1.25 * range, orderSide);
+    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
     const Z = mf.fmtNum(z - entry);
-    const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
-    const W = mf.fmtNum(w - entry);
+    // const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
+    // const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
         (hBreak
             ? H.price + I.price
@@ -749,7 +749,7 @@ function calcNestedContinuePattern() {
     //
     let order = {};
     if (progress.result) {
-        const tp = mf.cmp(H.price, !side, x) ? y : z;
+        const tp = mf.cmp(H.price, !side, y) ? z : w;
         const sl = G.price;
         order = {
             type: "SLO",
@@ -771,7 +771,7 @@ function calcNestedContinuePattern() {
             x: [x, X],
             y: [y, Y],
             z: [z, Z],
-            w: [w, W],
+            // w: [w, W],
             t: [t, T],
         },
     };
@@ -884,7 +884,7 @@ function calcReversalPattern() {
     const rDEF = EF / DE;
     // const rEFG = FG / EF;
 
-    const eBreak = mf.cmp(E.price, !side, C.price);
+    // const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
@@ -941,15 +941,15 @@ function calcReversalPattern() {
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
     const entry = mf.fmtNum(refPrice + orderSide * 0.1);
-    const range = mf.fmtNum((fBreak ? F.price : D.price) - (eBreak ? E.price : C.price), 1, true);
-    const x = adjustTargetPrice(G.price, 0.5 * range, orderSide);
+    const range = getRange("reversal", { C, E, H }, side);
+    const x = adjustTargetPrice(G.price, 0.75 * range, orderSide);
     const X = mf.fmtNum(x - entry);
     const y = adjustTargetPrice(G.price, range, orderSide);
     const Y = mf.fmtNum(y - entry);
-    const z = adjustTargetPrice(G.price, 1.25 * range, orderSide);
+    const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
     const Z = mf.fmtNum(z - entry);
-    const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
-    const W = mf.fmtNum(w - entry);
+    // const w = adjustTargetPrice(G.price, 1.5 * range, orderSide);
+    // const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
         (hBreak
             ? H.price + I.price
@@ -961,7 +961,7 @@ function calcReversalPattern() {
     //
     let order = {};
     if (progress.result) {
-        const tp = mf.cmp(H.price, !side, x) ? y : z;
+        const tp = mf.cmp(H.price, !side, y) ? z : w;
         const sl = G.price;
         order = {
             type: "SLO",
@@ -983,7 +983,7 @@ function calcReversalPattern() {
             x: [x, X],
             y: [y, Y],
             z: [z, Z],
-            w: [w, W],
+            // w: [w, W],
             t: [t, T],
         },
     };
@@ -1236,6 +1236,18 @@ function buildViewPoints(points, colors) {
         }
     });
     return viewPoints;
+}
+function getRange(type, { B, C, E, H }, side) {
+    const rangeR =
+        type === "continue"
+            ? side
+                ? Math.max(B.price, H.price)
+                : Math.min(B.price, H.price)
+            : H.price;
+    const rangeS = side
+        ? Math.min(C.price, E.price)
+        : Math.max(C.price, E.price);
+    return mf.fmtNum(rangeR - rangeS, 1, true);
 }
 function checkProgress(subPattern, steps, colors, offset = 0) {
     let progress = {
