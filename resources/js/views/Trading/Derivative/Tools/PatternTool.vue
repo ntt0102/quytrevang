@@ -506,7 +506,7 @@ function calcContinuePattern() {
     //
     let order = {};
     if (progress.result) {
-        const tp = mf.cmp(H.price, !side, y) ? z : w;
+        const tp = mf.cmp(H.price, !side, x) ? y : z;
         const sl = G.price;
         order = {
             type: "SLO",
@@ -749,7 +749,7 @@ function calcNestedContinuePattern() {
     //
     let order = {};
     if (progress.result) {
-        const tp = mf.cmp(H.price, !side, y) ? z : w;
+        const tp = mf.cmp(H.price, !side, x) ? y : z;
         const sl = G.price;
         order = {
             type: "SLO",
@@ -961,7 +961,7 @@ function calcReversalPattern() {
     //
     let order = {};
     if (progress.result) {
-        const tp = mf.cmp(H.price, !side, y) ? z : w;
+        const tp = mf.cmp(H.price, !side, x) ? y : z;
         const sl = G.price;
         order = {
             type: "SLO",
