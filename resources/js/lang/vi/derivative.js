@@ -42,7 +42,7 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 80",
+            "ΔP < 80%",
         ],
     },
     {
@@ -51,7 +51,6 @@ const continue1 = [
             //
             "B > Bmin",
             "T > Tvàng",
-            "P > Pđỏ",
             "P > Ptím",
             "P > ETmin",
         ],
@@ -107,7 +106,7 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 80",
+            "ΔP < 80%",
         ],
     },
     {
@@ -116,7 +115,6 @@ const reversal1 = [
             //
             "B > Bmin",
             "T > Tcam",
-            "P > Pđỏ",
             "P > Ptím",
             "P > ETmin",
         ],

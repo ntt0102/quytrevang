@@ -464,7 +464,7 @@ function calcContinuePattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6],
+            [fBreak, !fBreak && rDEF >= 0.5 && dT7 >= dT5 - dT6],
         ],
         [
             // blue
@@ -475,7 +475,6 @@ function calcContinuePattern() {
             // cyan
             isBoxValid({ pr: GH, tr: dT7 }, phase6),
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
-            mf.cmp(H.price, side, D.price),
             hBreak,
             mf.cmp(H.price, side, entryThreshold),
         ],
@@ -686,7 +685,7 @@ function calcNestedContinuePattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6],
+            [fBreak, !fBreak && rDEF >= 0.5 && dT7 >= dT5 - dT6],
         ],
         [
             // blue
@@ -697,7 +696,6 @@ function calcNestedContinuePattern() {
             // cyan
             isBoxValid({ pr: GH, tr: dT7 }, phase6),
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
-            mf.cmp(H.price, side, D.price),
             hBreak,
             mf.cmp(H.price, side, entryThreshold),
         ],
@@ -733,7 +731,6 @@ function calcNestedContinuePattern() {
             x: [x, X],
             y: [y, Y],
             z: [z, Z],
-            // w: [w, W],
             t: [t, T],
         },
     };
@@ -884,7 +881,7 @@ function calcReversalPattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6],
+            [fBreak, !fBreak && rDEF >= 0.5 && dT7 >= dT5 - dT6],
         ],
         [
             // blue
@@ -895,7 +892,6 @@ function calcReversalPattern() {
             // cyan
             isBoxValid({ pr: GH, tr: dT7 }, phase6),
             dT7 >= dT2 - dT3 - dT4 - dT5 - dT6,
-            mf.cmp(H.price, side, D.price),
             hBreak,
             mf.cmp(H.price, side, entryThreshold),
         ],
