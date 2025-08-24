@@ -142,16 +142,15 @@ function scanPattern(data) {
         const d = data[ix].date;
         const i = props.timeToIndex(t);
         const time = { t, d, i };
-        if (ix === data.length - 1) {
-            start = { time, high, low };
-        }
         if (side === undefined) {
             if (
-                (high <= start.high && low >= start.low) ||
-                (high > start.high && low < start.low)
+                ix === data.length - 1 ||
+                (high >= start.high && low <= start.low)
             ) {
+                start = { time, high, low };
                 continue;
             }
+            if (high < start.high && low > start.low) continue;
             if (high > start.high && low >= start.low) side = true;
             if (low < start.low && high <= start.high) side = false;
             C = {
