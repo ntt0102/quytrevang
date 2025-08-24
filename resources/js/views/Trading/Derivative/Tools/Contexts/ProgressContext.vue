@@ -158,7 +158,7 @@ function isObject(val) {
                 font-size: 15px;
 
                 .subs {
-                    padding-left: 15px;
+                    padding-left: 5px;
                 }
             }
         }
