@@ -19,8 +19,8 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 150% đỏ",
-            "ΔP > 50% cam",
+            "ΔP < 150% đ",
+            "ΔP > 50% c",
         ],
     },
     {
@@ -43,7 +43,7 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 80% hồng",
+            "ΔP < 80% h",
         ],
     },
     {
@@ -84,8 +84,8 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 150% đỏ",
-            "ΔP > 50% đỏ",
+            "ΔP < 150% đ",
+            "ΔP > 50% đ",
         ],
     },
     {
@@ -108,7 +108,7 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 80% hồng",
+            "ΔP < 80% h",
         ],
     },
     {
