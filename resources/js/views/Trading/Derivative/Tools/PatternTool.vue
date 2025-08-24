@@ -459,6 +459,7 @@ function calcContinuePattern() {
             // pink
             isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
             rCDE < 1.5,
+            DE / BC >= 0.5,
         ],
         [
             // purple
@@ -468,7 +469,7 @@ function calcContinuePattern() {
         [
             // blue
             isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            FG / DE < 0.8,
+            FG / DE <= 0.8,
         ],
         [
             // cyan
@@ -680,6 +681,7 @@ function calcNestedContinuePattern() {
             // pink
             isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
             rCDE < 1.5,
+            DE / BC >= 0.5,
         ],
         [
             // purple
@@ -689,7 +691,7 @@ function calcNestedContinuePattern() {
         [
             // blue
             isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            FG / DE < 0.8,
+            FG / DE <= 0.8,
         ],
         [
             // cyan
@@ -876,6 +878,7 @@ function calcReversalPattern() {
             // pink
             isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
             rCDE < 1.5,
+            rCDE >= 0.5,
         ],
         [
             // purple
@@ -885,7 +888,7 @@ function calcReversalPattern() {
         [
             // blue
             isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            FG / DE < 0.8,
+            FG / DE <= 0.8,
         ],
         [
             // cyan
