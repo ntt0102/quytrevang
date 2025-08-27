@@ -73,7 +73,7 @@ import { ref, computed, onMounted } from "vue";
 
 const props = defineProps(["progress", "chartHeightEnough"]);
 const emit = defineEmits(["refreshPattern"]);
-const patterns = ref({});
+const patterns = ref([]);
 const pattern = computed(() => {
     return (
         patterns.value[props.progress.pattern]?.[props.progress.subPattern] ||
