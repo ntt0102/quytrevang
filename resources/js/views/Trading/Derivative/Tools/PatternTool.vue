@@ -128,6 +128,10 @@ function draw({ time, price }) {
             : props.bars;
         points = scanPattern(data);
     }
+    const pickTime = props.indexToTime(
+        props.timeToIndex(points.C.time.t) + points.C.time.i - points.A.time.i
+    );
+    props.pickTimeToolRef.set(pickTime);
     load(points, { isSave: true });
     patternToolRef.value.classList.remove("selected");
 }
@@ -319,9 +323,6 @@ function calcContinuePattern() {
     });
     const A = phase1.S;
     const B = phase1.R;
-    const stopTime = props.indexToTime(
-        props.timeToIndex(P3.time.t) + P3.time.i - P1.time.i
-    );
     const phase2 = scanPhase({
         side: !side,
         start: B,
@@ -331,7 +332,7 @@ function calcContinuePattern() {
     const phase3 = scanPhase({
         side,
         start: { time: C.time },
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak1 = isBoxValid(phase3.ext, phase3, true);
@@ -349,7 +350,7 @@ function calcContinuePattern() {
     const phase5 = scanPhase({
         side,
         start: E,
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak2 = isBoxValid(phase5.ext, phase5, true);
@@ -367,7 +368,7 @@ function calcContinuePattern() {
     const phase7 = scanPhase({
         side,
         start: G,
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak3 = isBoxValid(phase7.ext, phase7, true);
@@ -531,13 +532,10 @@ function calcNestedContinuePattern() {
     });
     const O = phase0.S;
     const A = phase0.R;
-    const stopTime = props.indexToTime(
-        props.timeToIndex(P3.time.t) + P3.time.i - P1.time.i
-    );
     const phase1 = scanPhase({
         side,
         start: A,
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
     const isBreak0 = isBoxValid(phase1.ext, phase1, true);
 
@@ -554,7 +552,7 @@ function calcNestedContinuePattern() {
     const phase3 = scanPhase({
         side,
         start: C,
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak1 = isBoxValid(phase3.ext, phase3, true);
@@ -574,7 +572,7 @@ function calcNestedContinuePattern() {
     const phase5 = scanPhase({
         side,
         start: E,
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak2 = isBoxValid(phase5.ext, phase5, true);
@@ -594,7 +592,7 @@ function calcNestedContinuePattern() {
     const phase7 = scanPhase({
         side,
         start: G,
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak3 = isBoxValid(phase7.ext, phase7, true);
@@ -760,13 +758,10 @@ function calcReversalPattern() {
     });
     const B = phase2.S;
     const C = phase2.R;
-    const stopTime = props.indexToTime(
-        props.timeToIndex(P3.time.t) + P3.time.i - P1.time.i
-    );
     const phase3 = scanPhase({
         side,
         start: { time: C.time },
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak1 = isBoxValid(phase3.ext, phase3, true);
@@ -786,7 +781,7 @@ function calcReversalPattern() {
     const phase5 = scanPhase({
         side,
         start: E,
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak2 = isBoxValid(phase5.ext, phase5, true);
@@ -806,7 +801,7 @@ function calcReversalPattern() {
     const phase7 = scanPhase({
         side,
         start: G,
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak3 = isBoxValid(phase7.ext, phase7, true);
@@ -968,13 +963,10 @@ function calcSidewayPattern() {
         end: { time: P3.time },
     });
     const D = phase3.R;
-    const stopTime = props.indexToTime(
-        props.timeToIndex(P3.time.t) + P3.time.i - P1.time.i
-    );
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: { time: { t: pickTime ?? stopTime } },
+        end: { time: { t: pickTime } },
     });
 
     const isBreak1 = isBoxValid(phase4.ext, phase4, true);

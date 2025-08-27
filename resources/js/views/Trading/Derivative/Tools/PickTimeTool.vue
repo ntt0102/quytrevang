@@ -32,6 +32,7 @@ defineExpose({
     draw,
     remove: removePickTimeTool,
     get,
+    set,
 });
 
 watch(pickTimeStore, (data) => {
@@ -53,6 +54,16 @@ function createSeries(chart) {
 function get() {
     return pickTime;
 }
+function set(time) {
+    store.dispatch("tradingDerivative/drawTools", {
+        isRemove: false,
+        symbol,
+        name: "pickTime",
+        points: [0],
+        data: [time],
+    });
+    load(time);
+}
 function pickTimeToolClick(e) {
     emit("hideContext");
     const selected = e.target.classList.contains("selected");
@@ -67,14 +78,7 @@ function pickTimeToolContextmenu(e) {
     emit("refreshPattern");
 }
 function draw({ time }) {
-    store.dispatch("tradingDerivative/drawTools", {
-        isRemove: false,
-        symbol,
-        name: "pickTime",
-        points: [0],
-        data: [time],
-    });
-    load(time);
+    set(time);
     emit("refreshPattern");
     pickTimeToolRef.value.classList.remove("selected");
 }
