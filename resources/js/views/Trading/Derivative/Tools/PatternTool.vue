@@ -199,10 +199,6 @@ function scanPattern(data) {
             }
         }
     }
-    delete A.time1;
-    delete A.time.i;
-    delete B.time.i;
-    delete C.time.i;
     return { A, B, C };
 }
 function load(data, { isSave = false, isCheck = false } = {}) {
@@ -323,8 +319,9 @@ function calcContinuePattern() {
     });
     const A = phase1.S;
     const B = phase1.R;
-    const dT1 = B.time1.i - A.time.i;
-    const stopTime = props.indexToTime(B.time.i + 3 * dT1);
+    const stopTime = props.indexToTime(
+        props.timeToIndex(P3.time.t) + P3.time.i - P1.time.i
+    );
     const phase2 = scanPhase({
         side: !side,
         start: B,
@@ -396,6 +393,7 @@ function calcContinuePattern() {
     const FG = mf.fmtNum(G.price - F.price, 1, true);
     const GH = mf.fmtNum(H.price - G.price, 1, true);
 
+    const dT1 = B.time1.i - A.time.i;
     const dT2 = C.time1.i - B.time.i;
     const dT3 = D.time1.i - C.time.i;
     const dT4 = E.time1.i - D.time.i;
@@ -533,8 +531,9 @@ function calcNestedContinuePattern() {
     });
     const O = phase0.S;
     const A = phase0.R;
-    const dT0 = A.time1.i - O.time.i;
-    const stopTime = props.indexToTime(A.time.i + 2 * dT0);
+    const stopTime = props.indexToTime(
+        props.timeToIndex(P3.time.t) + P3.time.i - P1.time.i
+    );
     const phase1 = scanPhase({
         side,
         start: A,
@@ -749,7 +748,7 @@ function calcNestedContinuePattern() {
     };
 }
 function calcReversalPattern() {
-    const { A: P1, B: P2 } = scanPoints;
+    const { A: P1, B: P2, C: P3 } = scanPoints;
     const bc = P1.price - P2.price;
     let side = bc > 0;
     let pickTime = props.pickTimeToolRef.get();
@@ -761,8 +760,9 @@ function calcReversalPattern() {
     });
     const B = phase2.S;
     const C = phase2.R;
-    const dT2 = C.time1.i - B.time.i;
-    const stopTime = props.indexToTime(C.time.i + 3 * dT2);
+    const stopTime = props.indexToTime(
+        props.timeToIndex(P3.time.t) + P3.time.i - P1.time.i
+    );
     const phase3 = scanPhase({
         side,
         start: { time: C.time },
@@ -831,6 +831,7 @@ function calcReversalPattern() {
     const GH = mf.fmtNum(H.price - G.price, 1, true);
     // const HI = mf.fmtNum(I.price - H.price, 1, true);
 
+    const dT2 = C.time1.i - B.time.i;
     const dT3 = D.time1.i - C.time.i;
     const dT4 = E.time1.i - D.time.i;
     const dT5 = F.time1.i - E.time.i;
@@ -967,9 +968,9 @@ function calcSidewayPattern() {
         end: { time: P3.time },
     });
     const D = phase3.R;
-    const dT2 = C.time1.i - B.time.i;
-    const dT3 = D.time1.i - C.time.i;
-    const stopTime = props.indexToTime(C.time.i + (dT3 > dT2 ? 4 : 2) * dT2);
+    const stopTime = props.indexToTime(
+        props.timeToIndex(P3.time.t) + P3.time.i - P1.time.i
+    );
     const phase4 = scanPhase({
         side: !side,
         start: D,
@@ -986,6 +987,8 @@ function calcSidewayPattern() {
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
 
+    const dT2 = C.time1.i - B.time.i;
+    const dT3 = D.time1.i - C.time.i;
     const dT4 = E.time1.i - D.time.i;
     const dT5 = F.time1.i - E.time.i;
 
