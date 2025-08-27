@@ -452,6 +452,7 @@ function calcContinuePattern() {
         [
             // red
             isBoxValid({ pr: CD, tr: dT3 }, phase2),
+            CD < AB,
             [
                 dBreak && rBCD <= 2,
                 !dBreak && rBCD >= 0.7 && dT5 >= dT3 - dT4,
@@ -678,6 +679,7 @@ function calcNestedContinuePattern() {
         [
             // red
             isBoxValid({ pr: CD, tr: dT3 }, phase2),
+            CD < AB,
             [dBreak && rBCD <= 2, !dBreak && rBCD >= 0.5 && dT5 >= dT3 - dT4],
         ],
         [

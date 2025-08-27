@@ -4,6 +4,7 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
+            "ΔP < Pvàng",
             {
                 name: "Xác nhận",
                 subs: [
@@ -19,8 +20,8 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 150%đ",
-            "ΔP > 50%c",
+            "ΔP < 1.5Pđỏ",
+            "ΔP > 0.5Pcam",
         ],
     },
     {
@@ -44,7 +45,7 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 80%h",
+            "ΔP < 0.8Phồng",
         ],
     },
     {
@@ -85,8 +86,8 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 150%đ",
-            "ΔP > 50%đ",
+            "ΔP < 1.5Pđỏ",
+            "ΔP > 0.5Pđỏ",
         ],
     },
     {
@@ -109,7 +110,7 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 80%h",
+            "ΔP < 0.8Phồng",
         ],
     },
     {
@@ -143,9 +144,9 @@ const sideway1 = [
                 name: "Xác nhận",
                 subs: [
                     //
-                    "> 75% vàng",
-                    "> 60% vàng",
-                    "< 40% vàng",
+                    "> 0.75Pvàng",
+                    "> 0.6Pvàng",
+                    "< 0.4Pvàng",
                 ],
             },
         ],
