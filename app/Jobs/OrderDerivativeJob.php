@@ -29,14 +29,12 @@ class OrderDerivativeJob implements ShouldQueue
      */
     public function handle()
     {
-        $tpDefault = floatval(get_global_value('tpDefault'));
-        $slDefault = floatval(get_global_value('slDefault'));
         $activeOrders = DerivativeOrder::active()->get();
         if (count($activeOrders) === 0) return false;
         $lastPrice = $this->getLastPrice();
         if (!$lastPrice) return false;
         $vos = new VpsOrderService();
-        $activeOrders->each(function ($order) use ($vos, $lastPrice, $tpDefault, $slDefault) {
+        $activeOrders->each(function ($order) use ($vos, $lastPrice) {
             $sideBool = $order->side > 0;
             if (!$vos->connection) return;
             if ($vos->position !== 0) {
@@ -45,11 +43,13 @@ class OrderDerivativeJob implements ShouldQueue
                         if ($order->tp_price) {
                             $tpPrice = $order->tp_price;
                         } else {
+                            $tpDefault = floatval(get_global_value('tpDefault'));
                             $tpPrice = $order->entry_price + $order->side * $tpDefault;
                         }
                         if ($order->sl_price) {
                             $slPrice = $order->sl_price;
                         } else {
+                            $slDefault = floatval(get_global_value('slDefault'));
                             $slPrice = $order->entry_price - $order->side * $slDefault;
                         }
                         $tpNo = $vos->order(["cmd" => "new", "price" => $tpPrice]);
