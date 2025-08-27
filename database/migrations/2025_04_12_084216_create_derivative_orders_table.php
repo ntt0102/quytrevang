@@ -19,6 +19,7 @@ return new class extends Migration
             $table->float('entry_price', 6, 1);
             $table->float('tp_price', 6, 1);
             $table->float('sl_price', 6, 1);
+            $table->float('sl1_price', 6, 1)->nullable();
             $table->string('entry_no');
             $table->string('tp_no');
             $table->string('sl_no');

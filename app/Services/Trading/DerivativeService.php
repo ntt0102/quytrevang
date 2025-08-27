@@ -273,6 +273,7 @@ class DerivativeService extends CoreService
                             $data['side'] = $payload->data->side;
                             $data['tp_price'] = $payload->data->tpPrice;
                             $data['sl_price'] = $payload->data->slPrice;
+                            $data['sl1_price'] = $payload->data->sl1Price;
                         }
                         $order = DerivativeOrder::updateOrCreate($key, $data);
                         if (!$order) {

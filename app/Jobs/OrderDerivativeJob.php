@@ -48,9 +48,11 @@ class OrderDerivativeJob implements ShouldQueue
                         }
                         if ($order->sl_price) {
                             $slPrice = $order->sl_price;
+                            $sl1Price = $order->sl1_price;
                         } else {
                             $slDefault = floatval(get_global_value('slDefault'));
                             $slPrice = $order->entry_price - $order->side * $slDefault;
+                            $sl1Price = ($order->entry_price + $slPrice) / 2;
                         }
                         $tpNo = $vos->order(["cmd" => "new", "price" => $tpPrice]);
                         if (!$tpNo) return;
@@ -60,6 +62,7 @@ class OrderDerivativeJob implements ShouldQueue
                             'status'    => 1,
                             'tp_price'  => $tpPrice,
                             'sl_price'  => $slPrice,
+                            'sl1_price'  => $sl1Price,
                             'tp_no'     => $tpNo,
                             'sl_no'     => $slNo,
                         ];
