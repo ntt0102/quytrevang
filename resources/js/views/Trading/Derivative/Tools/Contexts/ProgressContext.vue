@@ -110,7 +110,7 @@ function isObject(val) {
 
 <style lang="scss">
 .pattern-context {
-    min-width: 150px;
+    min-width: 160px;
     min-height: 20px;
 
     .pattern-name {
@@ -141,7 +141,7 @@ function isObject(val) {
         .step {
             border-radius: 5px;
             padding: 3px 0px;
-            width: 150px;
+            width: 160px;
 
             &.current-success {
                 background: rgba(0, 60, 0, 0.5);
