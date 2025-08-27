@@ -1299,7 +1299,7 @@ function remove() {
     props.pickTimeToolRef.remove();
     removePatternTool();
     setTimeMark({ times: [] });
-    emit("setProgress", false);
+    emit("setProgress", null);
     emit("setPatternOrder", {});
     series.pattern.setData([]);
 }
