@@ -1,6 +1,6 @@
 <template>
     <CoreContext class="pattern-context">
-        <div v-if="progress">
+        <div v-if="progress.step">
             <DxButton
                 type="success"
                 stylingMode="outlined"
@@ -17,12 +17,12 @@
                 :key="i"
                 class="step"
                 :class="[
-                    progress && progress.step === i + 1
+                    progress.step && progress.step === i + 1
                         ? progress.result
                             ? 'current-success'
                             : 'current-fail'
                         : '',
-                    progress
+                    progress.step
                         ? getStepResult(progress.steps[i])
                             ? 'success'
                             : 'fail'
@@ -36,7 +36,7 @@
                         :key="j"
                         class="cond"
                         :class="[
-                            progress
+                            progress.step
                                 ? getCondResult(progress.steps[i][j])
                                     ? 'success'
                                     : 'fail'
@@ -50,7 +50,7 @@
                                 :key="j"
                                 class="sub"
                                 :class="[
-                                    progress
+                                    progress.step
                                         ? progress.steps[i][j][k]
                                             ? 'success'
                                             : 'fail'
