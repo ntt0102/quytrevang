@@ -425,7 +425,7 @@ function calcContinuePattern() {
     // const rFGH = GH / FG;
 
     const dBreak = mf.cmp(D.price, side, B.price);
-    // const eBreak = mf.cmp(E.price, !side, C.price);
+    const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
     //
@@ -453,7 +453,11 @@ function calcContinuePattern() {
         [
             // red
             isBoxValid({ pr: CD, tr: dT3 }, phase2),
-            [dBreak && rBCD <= 2, !dBreak && rBCD >= 0.5 && dT5 >= dT3 - dT4],
+            [
+                dBreak && rBCD <= 2,
+                !dBreak && rBCD >= 0.7 && dT5 >= dT3 - dT4,
+                !dBreak && eBreak && rBCD >= 0.5 && dT4 >= dT3,
+            ],
         ],
         [
             // pink
@@ -646,7 +650,7 @@ function calcNestedContinuePattern() {
     // const rFGH = GH / FG;
 
     const dBreak = mf.cmp(D.price, side, B.price);
-    // const eBreak = mf.cmp(E.price, !side, C.price);
+    const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
 
@@ -686,7 +690,11 @@ function calcNestedContinuePattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, !fBreak && rDEF >= 0.5 && dT7 >= dT5 - dT6],
+            [
+                fBreak,
+                !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6,
+                !dBreak && eBreak && rBCD >= 0.5 && dT4 >= dT3,
+            ],
         ],
         [
             // blue
@@ -883,7 +891,7 @@ function calcReversalPattern() {
         [
             // purple
             isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, !fBreak && rDEF >= 0.5 && dT7 >= dT5 - dT6],
+            [fBreak, !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6],
         ],
         [
             // blue

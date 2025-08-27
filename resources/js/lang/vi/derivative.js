@@ -33,7 +33,8 @@ const continue1 = [
                 subs: [
                     //
                     "P > Pđỏ",
-                    "T > Tlam",
+                    "T1 > Tlam",
+                    "T2 > Tlam",
                 ],
             },
         ],
