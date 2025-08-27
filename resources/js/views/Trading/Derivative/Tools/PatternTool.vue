@@ -386,7 +386,7 @@ function calcContinuePattern() {
         phase7,
     ]);
 
-    // const AB = mf.fmtNum(B.price - A.price, 1, true);
+    const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
@@ -612,7 +612,7 @@ function calcNestedContinuePattern() {
         phase7,
     ]);
 
-    // const AB = mf.fmtNum(B.price - A.price, 1, true);
+    const AB = mf.fmtNum(B.price - A.price, 1, true);
     const BC = mf.fmtNum(C.price - B.price, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
