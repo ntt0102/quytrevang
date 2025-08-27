@@ -681,7 +681,7 @@ function configFIREANTSocket() {
                 item.target === "UpdateTrades" &&
                 item.arguments[0] === "VN30F1M"
             ) {
-                console.log("FIREANT", item.arguments[1]);
+                // console.log("FIREANT", item.arguments[1]);
                 orderToolRef.value.scan(item.arguments[1].at(-1).price);
                 let updatedData = item.arguments[1];
                 updatedData.sort((a, b) =>
@@ -730,7 +730,7 @@ function configVpsSocket() {
                 if (event[0] === "stockps") {
                     const data = event[1].data;
                     if (data.id === 3220) {
-                        console.log("VPS", data);
+                        // console.log("VPS", data);
                         orderToolRef.value.scan(data.lastPrice);
                         updateChartData([data]);
                     }
@@ -768,7 +768,7 @@ function configDnseSocket() {
             orderToolRef.value.scan(tick.matchprice);
             const time = new Date(tick.sendingtime.seconds * 1000);
             tick.sendingtime = time.toISOString();
-            console.log("DNSE: ", tick);
+            // console.log("DNSE: ", tick);
             updateChartData([tick]);
         }
     });
