@@ -172,8 +172,6 @@ const actions = {
         });
     },
     executeOrder({ commit, dispatch, getters, state, rootGetters }, data) {
-        if (!state.status.connection)
-            return Promise.resolve({ isOk: false, message: "notConnect" });
         return new Promise((resolve, reject) => {
             commit("setLoading", true);
             axios
