@@ -117,7 +117,7 @@ function patternToolContextmenu(e) {
 }
 function draw({ time, price }) {
     let points = {};
-    if (mf.isSet(lines.X)) {
+    if (mf.isSet(lines.O)) {
         points = mf.cloneDeep(scanPoints);
         const date = formatISO(new Date(time * 1000));
         points.A = { time: { t: time, d: date }, price };
@@ -216,7 +216,7 @@ function load(data, { isSave = false, isCheck = false } = {}) {
     }
 }
 function refresh(autoAdjust = false) {
-    if (mf.isSet(lines.X)) {
+    if (mf.isSet(lines.O)) {
         if (autoAdjust) adjustPatternPoints();
         removePatternTool();
         loadPatternTool();
@@ -1257,8 +1257,6 @@ function adjustTargetPrice(price, range, side) {
 }
 function adjustPatternPoints() {
     const pickTime = props.pickTimeToolRef.get();
-    if (pickTime) return false;
-    //
     const side = scanPoints.B.price > scanPoints.A.price;
     const cIndex = props.bars.findIndex(
         (bar) => bar.time === scanPoints.C.time.t
@@ -1266,6 +1264,7 @@ function adjustPatternPoints() {
     let newPoint = mf.cloneDeep(scanPoints.C);
     for (let i = cIndex; i < props.bars.length; i++) {
         const t = props.bars[i].time;
+        if (pickTime && t > pickTime) break;
         const d = props.bars[i].date;
         const price = side ? props.bars[i].low : props.bars[i].high;
         if (mf.cmp(price, !side, newPoint.price, true)) {
