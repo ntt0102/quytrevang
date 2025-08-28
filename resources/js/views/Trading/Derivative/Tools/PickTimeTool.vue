@@ -15,7 +15,7 @@ import { useStore } from "vuex";
 
 const store = useStore();
 // const props = defineProps([]);
-const emit = defineEmits(["refreshPattern", "hideContext"]);
+const emit = defineEmits(["done", "hideContext"]);
 const mc = inject("mc");
 const pickTimeToolRef = ref(null);
 const pickTimeStore = computed(
@@ -75,11 +75,11 @@ function pickTimeToolClick(e) {
 function pickTimeToolContextmenu(e) {
     e.target.classList.remove("selected");
     removePickTimeTool();
-    emit("refreshPattern");
+    emit("done", null);
 }
 function draw({ time }) {
     set(time);
-    emit("refreshPattern");
+    emit("done", time);
     pickTimeToolRef.value.classList.remove("selected");
 }
 function load(time) {

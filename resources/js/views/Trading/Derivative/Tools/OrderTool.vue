@@ -114,14 +114,16 @@ function putOrder() {
             };
         } else {
             if (!props.position) {
-                if (mf.isSet(patternOrder)) {
+                if (patternOrder.isOk) {
                     isExecutable = true;
                     doActions = () => {
-                        const { points, ...payload } = patternOrder;
                         store
                             .dispatch("tradingDerivative/executeOrder", {
                                 action: "entry",
-                                data: { ...{ cmd: "new" }, ...payload },
+                                data: {
+                                    ...{ cmd: "new" },
+                                    ...patternOrder.data,
+                                },
                             })
                             .then((resp) => {
                                 if (resp.isOk) {
@@ -317,7 +319,11 @@ function scanTpSlChange(order, lastPrice) {
         const sideBool = order.side > 0;
         let kind = "",
             newPrice = null;
-        const isNewH = mf.cmp(patternOrder.price, sideBool, order.entry_price);
+        const isNewH = mf.cmp(
+            patternOrder.data.price,
+            sideBool,
+            order.entry_price
+        );
         const isNewF = mf.cmp(
             patternOrder.points.F.price,
             sideBool,
@@ -325,18 +331,18 @@ function scanTpSlChange(order, lastPrice) {
             true
         );
         const isIValid = mf.cmp(
-            patternOrder.sl1Price,
+            patternOrder.data.sl1Price,
             sideBool,
             order.sl1_price
         );
-        const isBreak = mf.cmp(lastPrice, sideBool, patternOrder.price);
+        const isBreak = mf.cmp(lastPrice, sideBool, patternOrder.data.price);
         if ((isNewH && !isIValid) || isNewF) {
             kind = "tp";
             newPrice = patternOrder.points.t;
         }
         if (isNewH && isIValid && isBreak) {
             kind = "sl";
-            newPrice = patternOrder.sl1Price;
+            newPrice = patternOrder.data.sl1Price;
         }
         if (kind) {
             if (!isAutoOrdering) {

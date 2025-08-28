@@ -491,21 +491,21 @@ function calcContinuePattern() {
         1
     );
     //
-    let order = {};
-    if (progress.result) {
-        const tp = mf.cmp(H.price, !side, x) ? y : z;
-        const sl = G.price;
-        order = {
+    const tp = mf.cmp(H.price, !side, x) ? y : z;
+    const sl = G.price;
+    const order = {
+        data: {
             type: "SLO",
             side: orderSide,
             price: entry,
             tpPrice: tp,
             slPrice: mf.fmtNum(sl - orderSide * 0.1),
             sl1Price: I.price,
-            points: { F, t },
-        };
-        console.log("order", order);
-    }
+        },
+        points: { F, t },
+        isOk: progress.result,
+    };
+    console.log("order", order);
 
     return {
         timeMark,
@@ -717,21 +717,21 @@ function calcNestedContinuePattern() {
         chartColors
     );
     //
-    let order = {};
-    if (progress.result) {
-        const tp = mf.cmp(H.price, !side, x) ? y : z;
-        const sl = G.price;
-        order = {
+    const tp = mf.cmp(H.price, !side, x) ? y : z;
+    const sl = G.price;
+    const order = {
+        data: {
             type: "SLO",
             side: orderSide,
             price: entry,
             tpPrice: tp,
             slPrice: mf.fmtNum(sl - orderSide * 0.1),
             sl1Price: I.price,
-            points: { F, t },
-        };
-        console.log("order", order);
-    }
+        },
+        points: { F, t },
+        isOk: progress.result,
+    };
+    console.log("order", order);
 
     return {
         timeMark,
@@ -916,21 +916,21 @@ function calcReversalPattern() {
         2
     );
     //
-    let order = {};
-    if (progress.result) {
-        const tp = mf.cmp(H.price, !side, x) ? y : z;
-        const sl = G.price;
-        order = {
+    const tp = mf.cmp(H.price, !side, x) ? y : z;
+    const sl = G.price;
+    const order = {
+        data: {
             type: "SLO",
             side: orderSide,
             price: entry,
             tpPrice: tp,
             slPrice: mf.fmtNum(sl - orderSide * 0.1),
             sl1Price: I.price,
-            points: { F, t },
-        };
-        console.log("order", order);
-    }
+        },
+        points: { F, t },
+        isOk: progress.result,
+    };
+    console.log("order", order);
 
     return {
         timeMark,
@@ -1025,21 +1025,21 @@ function calcSidewayPattern() {
     const z = mf.fmtNum(C.price - orderSide * range);
     const Z = mf.fmtNum(z - entry);
     //
-    let order = {};
-    if (progress.result) {
-        const tp = x;
-        const sl = z;
-        order = {
+    const tp = x;
+    const sl = z;
+    const order = {
+        data: {
             type: "LO",
             side: orderSide,
             price: entry,
             tpPrice: tp,
             slPrice: sl,
             sl1Price: null,
-            points: {},
-        };
-        console.log("order", order);
-    }
+        },
+        points: {},
+        isOk: progress.result,
+    };
+    console.log("order", order);
 
     return {
         timeMark,

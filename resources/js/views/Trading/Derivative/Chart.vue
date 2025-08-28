@@ -103,7 +103,7 @@
             />
             <PickTimeTool
                 ref="pickTimeToolRef"
-                @refreshPattern="() => refreshPattern()"
+                @done="donePickTime"
                 @hideContext="hideContext"
             />
             <TimeRangeTool
@@ -744,6 +744,7 @@ function getVpsData() {
         differenceInSeconds(new Date(), new Date(params.socketUpdatedAt)) > 60
     ) {
         store.dispatch("tradingDerivative/getVpsData").then((data) => {
+            if (!mf.isSet(data)) data = [];
             updateChartData(data, true);
             console.log("VPS-first: ", data);
         });
@@ -798,11 +799,20 @@ function getDnseData() {
         differenceInSeconds(new Date(), new Date(params.socketUpdatedAt)) > 60
     ) {
         store.dispatch("tradingDerivative/getDnseData").then((data) => {
+            if (!mf.isSet(data)) data = [];
             updateChartData(data, true);
             console.log("DNSE-first: ", data);
         });
         params.socketUpdatedAt = new Date();
     }
+}
+function donePickTime(time) {
+    refreshPattern();
+    const lastBar = time
+        ? state.bars.find((bar) => bar.time === time)
+        : state.bars.at(-1);
+    const price = lastBar?.close;
+    orderToolRef.value.scan(price);
 }
 function refreshPattern(autoAdjust = false) {
     patternToolRef.value.refresh(autoAdjust);
