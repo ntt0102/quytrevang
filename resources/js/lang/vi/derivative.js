@@ -45,7 +45,7 @@ const continue1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 0.8Phồng",
+            "ΔP < 0.7Phồng",
         ],
     },
     {
@@ -110,7 +110,7 @@ const reversal1 = [
         conds: [
             //
             "B > Bmin",
-            "ΔP < 0.8Phồng",
+            "ΔP < 0.7Phồng",
         ],
     },
     {

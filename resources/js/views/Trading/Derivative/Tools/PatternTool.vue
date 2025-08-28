@@ -473,7 +473,7 @@ function calcContinuePattern() {
         [
             // blue
             isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            FG / DE <= 0.8,
+            FG / Math.max(BC, DE) <= 0.7,
         ],
         [
             // cyan
@@ -700,7 +700,7 @@ function calcNestedContinuePattern() {
         [
             // blue
             isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            FG / DE <= 0.8,
+            FG / Math.max(BC, DE) <= 0.7,
         ],
         [
             // cyan
@@ -898,7 +898,7 @@ function calcReversalPattern() {
         [
             // blue
             isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            FG / DE <= 0.8,
+            FG / Math.max(CD, DE) <= 0.7,
         ],
         [
             // cyan
