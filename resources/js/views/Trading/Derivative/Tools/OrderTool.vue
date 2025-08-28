@@ -335,8 +335,13 @@ function scanTpSlChange(order, lastPrice) {
             sideBool,
             order.sl1_price
         );
+        const isGValid = mf.cmp(
+            patternOrder.points.G.price,
+            sideBool,
+            order.sl1_price
+        );
         const isBreak = mf.cmp(lastPrice, sideBool, patternOrder.data.price);
-        if ((isNewH && !isIValid) || isNewF) {
+        if ((isNewH && !isIValid) || (isNewF && !isGValid)) {
             kind = "tp";
             newPrice = patternOrder.points.t;
         }
