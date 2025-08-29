@@ -193,7 +193,7 @@ function scanPattern(data) {
                     const as = mf.fmtNum(A.price - S.price, 1, true);
                     if (as > bc) break;
                     if (
-                        isBoxValid(
+                        boxCmp(
                             { pr: as, tr: A.time1.i - S.time.i },
                             { pr: bc, tr: C.time.i - B.time.i }
                         )
@@ -335,7 +335,7 @@ function calcContinuePattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak1 = isBoxValid(phase3.ext, phase3, true);
+    const isBreak1 = boxCmp(phase3.ext, phase3, { isNot: true });
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
@@ -353,7 +353,7 @@ function calcContinuePattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak2 = isBoxValid(phase5.ext, phase5, true);
+    const isBreak2 = boxCmp(phase5.ext, phase5, { isNot: true });
 
     const F = isBreak2 ? phase5.R1 : phase5.ext.R;
     const G = isBreak2 ? phase5.S1 : phase5.ext.S;
@@ -371,7 +371,7 @@ function calcContinuePattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak3 = isBoxValid(phase7.ext, phase7, true);
+    const isBreak3 = boxCmp(phase7.ext, phase7, { isNot: true });
 
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
     const I = isBreak3 ? phase7.S1 : phase7.ext.S;
@@ -407,6 +407,16 @@ function calcContinuePattern() {
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
     const PR5 = isBreak2 ? phase5.pre.pr : phase5.pr;
 
+    const box1 = { pr: AB, tr: dT1 };
+    const box2 = { pr: BC, tr: dT2 };
+    const box3 = { pr: CD, tr: dT3 };
+    const box4 = { pr: DE, tr: dT4 };
+    const box5 = { pr: EF, tr: dT5 };
+    const box6 = { pr: FG, tr: dT6 };
+    const box7 = { pr: GH, tr: dT7 };
+    const boxS3 = { pr: PR3, tr: TR3 };
+    const boxS5 = { pr: PR5, tr: TR5 };
+
     const T1 = H.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6 - dT7;
     const T2 = C.time.i + dT2;
     const T3 = F.time.i + dT3 - dT4 - dT5;
@@ -415,13 +425,6 @@ function calcContinuePattern() {
         times: [T1, T2, T3, T4],
         colors: ["yellow", "red", "purple", "cyan"],
     };
-
-    // const rABC = BC / AB;
-    const rBCD = CD / BC;
-    const rCDE = DE / CD;
-    const rDEF = EF / DE;
-    // const rEFG = FG / EF;
-    // const rFGH = GH / FG;
 
     const dBreak = mf.cmp(D.price, side, B.price);
     const eBreak = mf.cmp(E.price, !side, C.price);
@@ -447,37 +450,53 @@ function calcContinuePattern() {
     );
     const T = mf.fmtNum(t - entry, 1);
     const entryThreshold = mf.fmtNum(G.price + 0.5 * orderSide * range);
-
+    //
     const progressSteps = [
         [
             // red
-            isBoxValid({ pr: CD, tr: dT3 }, phase2),
-            CD < AB,
+            boxCmp(box3, phase2),
+            boxCmp(box3, box1, { isNot: true }),
             [
-                dBreak && rBCD <= 2,
-                !dBreak && rBCD >= 0.7 && dT5 >= dT3 - dT4,
-                !dBreak && eBreak && rBCD >= 0.5 && dT4 >= dT3,
+                dBreak && boxCmp(box3, box2, { isNot: true, threshold: 2 }),
+                !dBreak &&
+                    boxCmp(box3, box2, { threshold: 0.5 }) &&
+                    dT5 >= dT3 - dT4,
             ],
         ],
         [
             // pink
-            isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
-            rCDE < 1.5,
-            DE / BC >= 0.5,
+            boxCmp(box4, boxS3),
+            boxCmp(box4, box2, { threshold: 0.5 }),
+            boxCmp(box4, box3, { isNot: true, threshold: 1.5 }),
         ],
         [
             // purple
-            isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, !fBreak && rDEF >= 0.5 && dT7 >= dT5 - dT6],
+            boxCmp(box5, phase4),
+            boxCmp(box5, box3, { threshold: 0.5 }),
+            [
+                fBreak,
+                !fBreak &&
+                    boxCmp(box5, box4, { threshold: 0.7 }) &&
+                    dT7 >= dT5 - dT6,
+                !fBreak &&
+                    eBreak &&
+                    boxCmp(box5, box4, { threshold: 0.5 }) &&
+                    dT6 >= dT5,
+            ],
         ],
         [
             // blue
-            isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            FG / Math.max(BC, DE) <= 0.7,
+            boxCmp(box6, boxS5),
+            boxCmp(box6, box4, { threshold: 0.5 }),
+            boxCmp(box6, boxMax(box2, box4), {
+                isNot: true,
+                threshold: 0.7,
+            }),
         ],
         [
             // cyan
-            isBoxValid({ pr: GH, tr: dT7 }, phase6),
+            boxCmp(box7, phase6),
+            boxCmp(box7, box5, { threshold: 0.5 }),
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
             hBreak,
             mf.cmp(H.price, side, entryThreshold),
@@ -538,7 +557,7 @@ function calcNestedContinuePattern() {
         start: A,
         end: { time: { t: pickTime } },
     });
-    const isBreak0 = isBoxValid(phase1.ext, phase1, true);
+    const isBreak0 = boxCmp(phase1.ext, phase1, { isNot: true });
 
     const B = isBreak0 ? phase1.R1 : phase1.ext.R;
     const C = isBreak0 ? phase1.S1 : phase1.ext.S;
@@ -556,7 +575,7 @@ function calcNestedContinuePattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak1 = isBoxValid(phase3.ext, phase3, true);
+    const isBreak1 = boxCmp(phase3.ext, phase3, { isNot: true });
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
@@ -576,7 +595,7 @@ function calcNestedContinuePattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak2 = isBoxValid(phase5.ext, phase5, true);
+    const isBreak2 = boxCmp(phase5.ext, phase5, { isNot: true });
 
     const F = isBreak2 ? phase5.R1 : phase5.ext.R;
     const G = isBreak2 ? phase5.S1 : phase5.ext.S;
@@ -596,7 +615,7 @@ function calcNestedContinuePattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak3 = isBoxValid(phase7.ext, phase7, true);
+    const isBreak3 = boxCmp(phase7.ext, phase7, { isNot: true });
 
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
     const I = isBreak3 ? phase7.S1 : phase7.ext.S;
@@ -633,6 +652,16 @@ function calcNestedContinuePattern() {
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
     const PR5 = isBreak2 ? phase5.pre.pr : phase5.pr;
 
+    const box1 = { pr: AB, tr: dT1 };
+    const box2 = { pr: BC, tr: dT2 };
+    const box3 = { pr: CD, tr: dT3 };
+    const box4 = { pr: DE, tr: dT4 };
+    const box5 = { pr: EF, tr: dT5 };
+    const box6 = { pr: FG, tr: dT6 };
+    const box7 = { pr: GH, tr: dT7 };
+    const boxS3 = { pr: PR3, tr: TR3 };
+    const boxS5 = { pr: PR5, tr: TR5 };
+
     const T1 = H.time.i + dT1 - dT2 - dT3 - dT4 - dT5 - dT6 - dT7;
     const T2 = C.time.i + dT2;
     const T3 = F.time.i + dT3 - dT4 - dT5;
@@ -642,18 +671,10 @@ function calcNestedContinuePattern() {
         colors: ["yellow", "red", "purple", "cyan"],
     };
 
-    // const rABC = BC / AB;
-    const rBCD = CD / BC;
-    const rCDE = DE / CD;
-    const rDEF = EF / DE;
-    // const rEFG = FG / EF;
-    // const rFGH = GH / FG;
-
     const dBreak = mf.cmp(D.price, side, B.price);
     const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
-
     //
     const orderSide = side ? 1 : -1;
     const refPrice = H.price;
@@ -678,33 +699,49 @@ function calcNestedContinuePattern() {
     const progressSteps = [
         [
             // red
-            isBoxValid({ pr: CD, tr: dT3 }, phase2),
-            CD < AB,
-            [dBreak && rBCD <= 2, !dBreak && rBCD >= 0.5 && dT5 >= dT3 - dT4],
+            boxCmp(box3, phase2),
+            boxCmp(box3, box1, { isNot: true }),
+            [
+                dBreak && boxCmp(box3, box2, { isNot: true, threshold: 2 }),
+                !dBreak &&
+                    boxCmp(box3, box2, { threshold: 0.5 }) &&
+                    dT5 >= dT3 - dT4,
+            ],
         ],
         [
             // pink
-            isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
-            rCDE < 1.5,
-            DE / BC >= 0.5,
+            boxCmp(box4, boxS3),
+            boxCmp(box4, box2, { threshold: 0.5 }),
+            boxCmp(box4, box3, { isNot: true, threshold: 1.5 }),
         ],
         [
             // purple
-            isBoxValid({ pr: EF, tr: dT5 }, phase4),
+            boxCmp(box5, phase4),
+            boxCmp(box5, box3, { threshold: 0.5 }),
             [
                 fBreak,
-                !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6,
-                !dBreak && eBreak && rBCD >= 0.5 && dT4 >= dT3,
+                !fBreak &&
+                    boxCmp(box5, box4, { threshold: 0.7 }) &&
+                    dT7 >= dT5 - dT6,
+                !fBreak &&
+                    eBreak &&
+                    boxCmp(box5, box4, { threshold: 0.5 }) &&
+                    dT6 >= dT5,
             ],
         ],
         [
             // blue
-            isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            FG / Math.max(BC, DE) <= 0.7,
+            boxCmp(box6, boxS5),
+            boxCmp(box6, box4, { threshold: 0.5 }),
+            boxCmp(box6, boxMax(box2, box4), {
+                isNot: true,
+                threshold: 0.7,
+            }),
         ],
         [
             // cyan
-            isBoxValid({ pr: GH, tr: dT7 }, phase6),
+            boxCmp(box7, phase6),
+            boxCmp(box7, box5, { threshold: 0.5 }),
             dT7 >= dT1 - dT2 - dT3 - dT4 - dT5 - dT6,
             hBreak,
             mf.cmp(H.price, side, entryThreshold),
@@ -748,7 +785,7 @@ function calcNestedContinuePattern() {
     };
 }
 function calcReversalPattern() {
-    const { A: P1, B: P2, C: P3 } = scanPoints;
+    const { A: P1, B: P2 } = scanPoints;
     const bc = P1.price - P2.price;
     let side = bc > 0;
     let pickTime = props.pickTimeToolRef.get();
@@ -766,7 +803,7 @@ function calcReversalPattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak1 = isBoxValid(phase3.ext, phase3, true);
+    const isBreak1 = boxCmp(phase3.ext, phase3, { isNot: true });
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
     const E = isBreak1 ? phase3.S1 : phase3.ext.S;
@@ -786,7 +823,7 @@ function calcReversalPattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak2 = isBoxValid(phase5.ext, phase5, true);
+    const isBreak2 = boxCmp(phase5.ext, phase5, { isNot: true });
 
     const F = isBreak2 ? phase5.R1 : phase5.ext.R;
     const G = isBreak2 ? phase5.S1 : phase5.ext.S;
@@ -806,7 +843,7 @@ function calcReversalPattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak3 = isBoxValid(phase7.ext, phase7, true);
+    const isBreak3 = boxCmp(phase7.ext, phase7, { isNot: true });
 
     const H = isBreak3 ? phase7.R1 : phase7.ext.R;
     const I = isBreak3 ? phase7.S1 : phase7.ext.S;
@@ -820,7 +857,7 @@ function calcReversalPattern() {
         phase7,
     ]);
 
-    // const BC = mf.fmtNum(bc, 1, true);
+    const BC = mf.fmtNum(bc, 1, true);
     const CD = mf.fmtNum(D.price - C.price, 1, true);
     const DE = mf.fmtNum(E.price - D.price, 1, true);
     const EF = mf.fmtNum(F.price - E.price, 1, true);
@@ -840,6 +877,15 @@ function calcReversalPattern() {
     const TR5 = isBreak2 ? phase5.pre.tr : phase5.tr;
     const PR5 = isBreak2 ? phase5.pre.pr : phase5.pr;
 
+    const box2 = { pr: BC, tr: dT2 };
+    const box3 = { pr: CD, tr: dT3 };
+    const box4 = { pr: DE, tr: dT4 };
+    const box5 = { pr: EF, tr: dT5 };
+    const box6 = { pr: FG, tr: dT6 };
+    const box7 = { pr: GH, tr: dT7 };
+    const boxS3 = { pr: PR3, tr: TR3 };
+    const boxS5 = { pr: PR5, tr: TR5 };
+
     const T1 = H.time.i + dT2 - dT3 - dT4 - dT5 - dT6 - dT7;
     const T2 = D.time.i + dT3;
     const T3 = F.time.i + dT3 - dT4 - dT5;
@@ -849,12 +895,7 @@ function calcReversalPattern() {
         colors: ["orange", "pink", "purple", "cyan"],
     };
 
-    // const rBCD = CD / BC;
-    const rCDE = DE / CD;
-    const rDEF = EF / DE;
-    // const rEFG = FG / EF;
-
-    // const eBreak = mf.cmp(E.price, !side, C.price);
+    const eBreak = mf.cmp(E.price, !side, C.price);
     const fBreak = mf.cmp(F.price, side, D.price);
     const hBreak = mf.cmp(H.price, side, F.price);
     //
@@ -881,28 +922,40 @@ function calcReversalPattern() {
     const progressSteps = [
         [
             // red
-            isBoxValid({ pr: CD, tr: dT3 }, phase2),
+            boxCmp(box3, phase2),
             dT5 >= dT3 - dT4,
         ],
         [
             // pink
-            isBoxValid({ pr: DE, tr: dT4 }, { pr: PR3, tr: TR3 }),
-            rCDE < 1.5,
-            rCDE >= 0.5,
+            boxCmp(box4, boxS3),
+            boxCmp(box4, box2, { isNot: true }),
+            boxCmp(box4, box3, { isNot: true, threshold: 1.5 }),
         ],
         [
             // purple
-            isBoxValid({ pr: EF, tr: dT5 }, phase4),
-            [fBreak, !fBreak && rDEF >= 0.7 && dT7 >= dT5 - dT6],
+            boxCmp(box5, phase4),
+            boxCmp(box5, box3, { threshold: 0.5 }),
+            [
+                fBreak,
+                !fBreak &&
+                    boxCmp(box5, box4, { threshold: 0.7 }) &&
+                    dT7 >= dT5 - dT6,
+                !fBreak &&
+                    eBreak &&
+                    boxCmp(box5, box4, { threshold: 0.5 }) &&
+                    dT6 >= dT5,
+            ],
         ],
         [
             // blue
-            isBoxValid({ pr: FG, tr: dT6 }, { pr: PR5, tr: TR5 }),
-            FG / Math.max(CD, DE) <= 0.7,
+            boxCmp(box6, boxS5),
+            boxCmp(box6, box4, { threshold: 0.5 }),
+            boxCmp(box6, box4, { isNot: true, threshold: 0.7 }),
         ],
         [
             // cyan
-            isBoxValid({ pr: GH, tr: dT7 }, phase6),
+            boxCmp(box7, phase6),
+            boxCmp(box7, box5, { threshold: 0.5 }),
             dT7 >= dT2 - dT3 - dT4 - dT5 - dT6,
             hBreak,
             mf.cmp(H.price, side, entryThreshold),
@@ -971,7 +1024,7 @@ function calcSidewayPattern() {
         end: { time: { t: pickTime } },
     });
 
-    const isBreak1 = isBoxValid(phase4.ext, phase4, true);
+    const isBreak1 = boxCmp(phase4.ext, phase4, { isNot: true });
 
     const E = isBreak1 ? phase4.R1 : phase4.ext.R;
     const F = isBreak1 ? phase4.S1 : phase4.ext.S;
@@ -995,15 +1048,17 @@ function calcSidewayPattern() {
     const confirmed1 = dT3 > dT2 && rBCD >= 0.75;
     const confirmed2 =
         dT3 > dT2 &&
-        isBoxValid(phase2, phase3) &&
+        boxCmp(phase2, phase3) &&
         mf.cmp(D.price, side, phase2.S1.price) &&
         rBCD >= 0.6;
     const confirmed3 = dT3 < dT2 && T3 < T1 && rBCD < 0.4;
 
+    const box3 = { pr: CD, tr: dT3 };
+
     const progressSteps = [
         [
             // red
-            isBoxValid({ pr: CD, tr: dT3 }, phase2),
+            boxCmp(box3, phase2),
             CD >= 3,
             T2 > T3,
             [confirmed1, confirmed2, confirmed3],
@@ -1100,7 +1155,7 @@ function scanPhase({ side, start, end }) {
             }
             if (mf.cmp(top, side, box.R.price, true)) {
                 if (box.pr > 0 && (!end.price || top !== end.price)) {
-                    if (isBoxValid(box, maxBox)) {
+                    if (boxCmp(box, maxBox)) {
                         preBox = mf.cloneDeep(maxBox);
                         maxBox = mf.cloneDeep(box);
                         if (maxBox.tr < preBox.tr) maxBox.tr = preBox.tr;
@@ -1164,13 +1219,20 @@ function scanPhase({ side, start, end }) {
         ext: extBox,
     };
 }
-function isBoxValid(box1, box2, isNot = false) {
-    const score = mf.fmtNum(
+function boxCmp(box1, box2, { isNot = false, threshold = 1.0 } = {}) {
+    const score = boxCmpScore(box1, box2);
+    return isNot ? score < threshold : score >= threshold;
+}
+function boxMax(box1, box2, isNot = false) {
+    const score = boxCmpScore(box1, box2);
+    return score >= 1.0 !== isNot ? box1 : box2;
+}
+function boxCmpScore(box1, box2) {
+    return mf.fmtNum(
         boxPriceRatio * (box1.pr / box2.pr) +
             (1 - boxPriceRatio) * (box1.tr / box2.tr),
         2
     );
-    return isNot ? score < 1.0 : score >= 1.0;
 }
 function checkProgress(subPattern, steps, colors, offset = 0) {
     let progress = {

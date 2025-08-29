@@ -3,8 +3,8 @@ const continue1 = [
         name: "Bước đỏ",
         conds: [
             //
-            "B > Bmin",
-            "ΔP < Pvàng",
+            "B > B1cam",
+            "B < Bvàng",
             {
                 name: "Xác nhận",
                 subs: [
@@ -19,16 +19,17 @@ const continue1 = [
         name: "Bước hồng",
         conds: [
             //
-            "B > Bmin",
-            "ΔP < 1.5Pđỏ",
-            "ΔP > 0.5Pcam",
+            "B > B1đỏ",
+            "B > 0.5Bcam",
+            "B < 1.5Bđỏ",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "B > Bmin",
+            "B > B1hồng",
+            "B > 0.5Bđỏ",
             {
                 name: "Xác nhận",
                 subs: [
@@ -44,18 +45,20 @@ const continue1 = [
         name: "Bước dương",
         conds: [
             //
-            "B > Bmin",
-            "ΔP < 0.7Phồng",
+            "B > B1tím",
+            "B > 0.5Bhồng",
+            "B < 0.7Bcam",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            "B > Bmin",
+            "B > B1dương",
+            "B > 0.5Btím",
             "T > Tvàng",
             "P > Ptím",
-            "P > ETmin",
+            "P > 0.5TP",
         ],
     },
 ];
@@ -74,10 +77,10 @@ const nestedContinuePattern = {
 
 const reversal1 = [
     {
-        name: "Bước red",
+        name: "Bước đỏ",
         conds: [
             //
-            "B > Bmin",
+            "B > B1cam",
             "T > Ttím",
         ],
     },
@@ -85,22 +88,24 @@ const reversal1 = [
         name: "Bước hồng",
         conds: [
             //
-            "B > Bmin",
-            "ΔP < 1.5Pđỏ",
-            "ΔP > 0.5Pđỏ",
+            "B > B1đỏ",
+            "B < Bcam",
+            "B < 1.5Bđỏ",
         ],
     },
     {
         name: "Bước tím",
         conds: [
             //
-            "B > Bmin",
+            "B > B1hồng",
+            "B > 0.5Bđỏ",
             {
                 name: "Xác nhận",
                 subs: [
                     //
                     "P > Pđỏ",
-                    "T > Tlam",
+                    "T1 > Tlam",
+                    "T2 > Tlam",
                 ],
             },
         ],
@@ -109,18 +114,20 @@ const reversal1 = [
         name: "Bước dương",
         conds: [
             //
-            "B > Bmin",
-            "ΔP < 0.7Phồng",
+            "B > B1tím",
+            "B > 0.5Bhồng",
+            "B < 0.7Bhồng",
         ],
     },
     {
         name: "Bước lam",
         conds: [
             //
-            "B > Bmin",
+            "B > B1dương",
+            "B > 0.5Btím",
             "T > Tcam",
             "P > Ptím",
-            "P > ETmin",
+            "P > 0.5TP",
         ],
     },
 ];
