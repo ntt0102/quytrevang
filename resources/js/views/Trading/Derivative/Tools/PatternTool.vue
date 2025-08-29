@@ -44,7 +44,8 @@ const mf = inject("mf");
 const mc = inject("mc");
 const props = defineProps([
     "bars",
-    "pickTimeToolRef",
+    "stopTimeToolRef",
+    "timeRangeToolRef",
     "timeToIndex",
     "indexToTime",
 ]);
@@ -128,10 +129,10 @@ function draw({ time, price }) {
             : props.bars;
         points = scanPattern(data);
     }
-    const pickTime = props.indexToTime(
+    const stopTime = props.indexToTime(
         props.timeToIndex(points.C.time.t) + points.C.time.i - points.A.time.i
     );
-    props.pickTimeToolRef.set(pickTime);
+    props.stopTimeToolRef.set(stopTime);
     load(points, { isSave: true });
     patternToolRef.value.classList.remove("selected");
 }
@@ -314,8 +315,8 @@ function calcContinuePattern() {
     const { A: P1, B: P2, C: P3 } = scanPoints;
     const bc = P2.price - P3.price;
     let side = bc > 0;
-    let pickTime = props.pickTimeToolRef.get();
-    if (pickTime < P3.time.t) pickTime = undefined;
+    let stopTime = props.stopTimeToolRef.get();
+    if (stopTime < P3.time.t) stopTime = undefined;
     const phase1 = scanPhase({
         side,
         start: P1,
@@ -332,7 +333,7 @@ function calcContinuePattern() {
     const phase3 = scanPhase({
         side,
         start: { time: C.time },
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak1 = boxCmp(phase3.ext, phase3, { isNot: true });
@@ -343,14 +344,14 @@ function calcContinuePattern() {
         side: !side,
         start: D,
         end: {
-            time: { t: Math.min(pickTime ?? E.time.t, E.time.t) },
+            time: { t: Math.min(stopTime ?? E.time.t, E.time.t) },
             price: E.price,
         },
     });
     const phase5 = scanPhase({
         side,
         start: E,
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak2 = boxCmp(phase5.ext, phase5, { isNot: true });
@@ -361,14 +362,14 @@ function calcContinuePattern() {
         side: !side,
         start: F,
         end: {
-            time: { t: Math.min(pickTime ?? G.time.t, G.time.t) },
+            time: { t: Math.min(stopTime ?? G.time.t, G.time.t) },
             price: G.price,
         },
     });
     const phase7 = scanPhase({
         side,
         start: G,
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak3 = boxCmp(phase7.ext, phase7, { isNot: true });
@@ -510,7 +511,7 @@ function calcContinuePattern() {
         1
     );
     //
-    const tp = mf.cmp(H.price, !side, x) ? y : z;
+    const tp = mf.cmp(H.price, side, x) ? z : y;
     const sl = G.price;
     const order = {
         data: {
@@ -543,8 +544,8 @@ function calcContinuePattern() {
 function calcNestedContinuePattern() {
     const { A: P1, B: P2, C: P3 } = scanPoints;
     let side = P1.price - P2.price > 0;
-    let pickTime = props.pickTimeToolRef.get();
-    if (pickTime < P2.time.t) pickTime = undefined;
+    let stopTime = props.stopTimeToolRef.get();
+    if (stopTime < P2.time.t) stopTime = undefined;
     const phase0 = scanPhase({
         side: !side,
         start: P1,
@@ -555,7 +556,7 @@ function calcNestedContinuePattern() {
     const phase1 = scanPhase({
         side,
         start: A,
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
     const isBreak0 = boxCmp(phase1.ext, phase1, { isNot: true });
 
@@ -565,14 +566,14 @@ function calcNestedContinuePattern() {
         side: !side,
         start: B,
         end: {
-            time: { t: Math.min(pickTime ?? C.time.t, C.time.t) },
+            time: { t: Math.min(stopTime ?? C.time.t, C.time.t) },
             price: C.price,
         },
     });
     const phase3 = scanPhase({
         side,
         start: C,
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak1 = boxCmp(phase3.ext, phase3, { isNot: true });
@@ -584,7 +585,7 @@ function calcNestedContinuePattern() {
         side: !side,
         start: D,
         end: {
-            time: { t: Math.min(pickTime ?? E.time.t, E.time.t) },
+            time: { t: Math.min(stopTime ?? E.time.t, E.time.t) },
             price: E.price,
         },
     });
@@ -592,7 +593,7 @@ function calcNestedContinuePattern() {
     const phase5 = scanPhase({
         side,
         start: E,
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak2 = boxCmp(phase5.ext, phase5, { isNot: true });
@@ -604,7 +605,7 @@ function calcNestedContinuePattern() {
         side: !side,
         start: F,
         end: {
-            time: { t: Math.min(pickTime ?? G.time.t, G.time.t) },
+            time: { t: Math.min(stopTime ?? G.time.t, G.time.t) },
             price: G.price,
         },
     });
@@ -612,7 +613,7 @@ function calcNestedContinuePattern() {
     const phase7 = scanPhase({
         side,
         start: G,
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak3 = boxCmp(phase7.ext, phase7, { isNot: true });
@@ -754,7 +755,7 @@ function calcNestedContinuePattern() {
         chartColors
     );
     //
-    const tp = mf.cmp(H.price, !side, x) ? y : z;
+    const tp = mf.cmp(H.price, side, x) ? z : y;
     const sl = G.price;
     const order = {
         data: {
@@ -785,11 +786,13 @@ function calcNestedContinuePattern() {
     };
 }
 function calcReversalPattern() {
-    const { A: P1, B: P2 } = scanPoints;
+    const { A: P1, B: P2, C: P3 } = scanPoints;
     const bc = P1.price - P2.price;
     let side = bc > 0;
-    let pickTime = props.pickTimeToolRef.get();
-    if (pickTime < P2.time.t) pickTime = undefined;
+    let stopTime = props.stopTimeToolRef.get();
+    if (stopTime < P2.time.t) stopTime = undefined;
+    let pickTime = props.timeRangeToolRef.getFirstTime();
+    if (pickTime < P3.time.t) pickTime = undefined;
     const phase2 = scanPhase({
         side: !side,
         start: P1,
@@ -800,27 +803,28 @@ function calcReversalPattern() {
     const phase3 = scanPhase({
         side,
         start: { time: C.time },
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak1 = boxCmp(phase3.ext, phase3, { isNot: true });
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
-    const E = isBreak1 ? phase3.S1 : phase3.ext.S;
+    let E = isBreak1 ? phase3.S1 : phase3.ext.S;
 
     const phase4 = scanPhase({
         side: !side,
         start: D,
         end: {
-            time: { t: Math.min(pickTime ?? E.time.t, E.time.t) },
+            time: { t: Math.min(pickTime ?? stopTime ?? E.time.t, E.time.t) },
             price: E.price,
         },
     });
+    E = phase4.R;
 
     const phase5 = scanPhase({
         side,
-        start: E,
-        end: { time: { t: pickTime } },
+        start: { time: E.time },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak2 = boxCmp(phase5.ext, phase5, { isNot: true });
@@ -832,7 +836,7 @@ function calcReversalPattern() {
         side: !side,
         start: F,
         end: {
-            time: { t: Math.min(pickTime ?? G.time.t, G.time.t) },
+            time: { t: Math.min(stopTime ?? G.time.t, G.time.t) },
             price: G.price,
         },
     });
@@ -840,7 +844,7 @@ function calcReversalPattern() {
     const phase7 = scanPhase({
         side,
         start: G,
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak3 = boxCmp(phase7.ext, phase7, { isNot: true });
@@ -909,6 +913,8 @@ function calcReversalPattern() {
     const Y = mf.fmtNum(y - entry);
     const z = adjustTargetPrice(G.price, 1.5 * range, orderSide);
     const Z = mf.fmtNum(z - entry);
+    const w = adjustTargetPrice(G.price, 2 * range, orderSide);
+    const W = mf.fmtNum(w - entry);
     const t = mf.fmtNum(
         (hBreak
             ? H.price + I.price
@@ -929,7 +935,7 @@ function calcReversalPattern() {
             // pink
             boxCmp(box4, boxS3),
             boxCmp(box4, box2, { isNot: true }),
-            boxCmp(box4, box3, { isNot: true, threshold: 1.5 }),
+            boxCmp(box4, box3, { isNot: true, threshold: 2 }),
         ],
         [
             // purple
@@ -950,7 +956,7 @@ function calcReversalPattern() {
             // blue
             boxCmp(box6, boxS5),
             boxCmp(box6, box4, { threshold: 0.5 }),
-            boxCmp(box6, box4, { isNot: true, threshold: 0.7 }),
+            boxCmp(box6, box4, { isNot: true, threshold: 0.8 }),
         ],
         [
             // cyan
@@ -969,7 +975,7 @@ function calcReversalPattern() {
         2
     );
     //
-    const tp = mf.cmp(H.price, !side, x) ? y : z;
+    const tp = mf.cmp(H.price, side, y) ? w : mf.cmp(H.price, side, x) ? z : y;
     const sl = G.price;
     const order = {
         data: {
@@ -995,6 +1001,7 @@ function calcReversalPattern() {
             x: [x, X],
             y: [y, Y],
             z: [z, Z],
+            w: [w, W],
             t: [t, T],
         },
     };
@@ -1003,8 +1010,8 @@ function calcSidewayPattern() {
     const { A: P1, B: P2, C: P3 } = scanPoints;
     const bc = P1.price - P2.price;
     let side = bc > 0;
-    let pickTime = props.pickTimeToolRef.get();
-    if (pickTime < P2.time.t) pickTime = undefined;
+    let stopTime = props.stopTimeToolRef.get();
+    if (stopTime < P2.time.t) stopTime = undefined;
     const phase2 = scanPhase({
         side: !side,
         start: P1,
@@ -1021,7 +1028,7 @@ function calcSidewayPattern() {
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: { time: { t: pickTime } },
+        end: { time: { t: stopTime } },
     });
 
     const isBreak1 = boxCmp(phase4.ext, phase4, { isNot: true });
@@ -1041,7 +1048,7 @@ function calcSidewayPattern() {
 
     const T1 = F.time.i + dT2 - dT3 - dT4 - dT5;
     const T2 = F.time.i + dT3 - dT4 - dT5;
-    const T3 = props.timeToIndex(pickTime ?? props.bars.at(-1).time);
+    const T3 = props.timeToIndex(stopTime ?? props.bars.at(-1).time);
     const timeMark = { times: [T1, T2], colors: ["orange", "pink"] };
 
     const rBCD = CD / BC;
@@ -1318,7 +1325,7 @@ function adjustTargetPrice(price, range, side) {
     return mf.fmtNum(adjusted);
 }
 function adjustPatternPoints() {
-    const pickTime = props.pickTimeToolRef.get();
+    const stopTime = props.stopTimeToolRef.get();
     const side = scanPoints.B.price > scanPoints.A.price;
     const cIndex = props.bars.findIndex(
         (bar) => bar.time === scanPoints.C.time.t
@@ -1326,7 +1333,7 @@ function adjustPatternPoints() {
     let newPoint = mf.cloneDeep(scanPoints.C);
     for (let i = cIndex; i < props.bars.length; i++) {
         const t = props.bars[i].time;
-        if (pickTime && t > pickTime) break;
+        if (stopTime && t > stopTime) break;
         const d = props.bars[i].date;
         const price = side ? props.bars[i].low : props.bars[i].high;
         if (mf.cmp(price, !side, newPoint.price, true)) {
@@ -1357,7 +1364,7 @@ function savePattern(isRemove = false) {
 }
 function remove() {
     savePattern(true);
-    props.pickTimeToolRef.remove();
+    props.stopTimeToolRef.remove();
     removePatternTool();
     setTimeMark({ times: [] });
     emit("setProgress", {});

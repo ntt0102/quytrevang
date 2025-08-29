@@ -90,7 +90,7 @@ const reversal1 = [
             //
             "B > B1đỏ",
             "B < Bcam",
-            "B < 1.5Bđỏ",
+            "B < 2Bđỏ",
         ],
     },
     {
@@ -116,7 +116,7 @@ const reversal1 = [
             //
             "B > B1tím",
             "B > 0.5Bhồng",
-            "B < 0.7Bhồng",
+            "B < 0.8Bhồng",
         ],
     },
     {

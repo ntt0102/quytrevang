@@ -94,22 +94,24 @@
             <PatternTool
                 ref="patternToolRef"
                 :bars="state.bars"
-                :pickTimeToolRef="pickTimeToolRef"
+                :stopTimeToolRef="stopTimeToolRef"
+                :timeRangeToolRef="timeRangeToolRef"
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
                 @setProgress="setProgress"
                 @setPatternOrder="setPatternOrder"
                 @hideContext="hideContext"
             />
-            <PickTimeTool
-                ref="pickTimeToolRef"
-                @done="donePickTime"
+            <StopTimeTool
+                ref="stopTimeToolRef"
+                @done="doneStopTime"
                 @hideContext="hideContext"
             />
             <TimeRangeTool
                 ref="timeRangeToolRef"
                 :timeToIndex="timeToIndex"
                 :indexToTime="indexToTime"
+                @done="() => refreshPattern()"
                 @hideContext="hideContext"
             />
             <LineTool
@@ -151,7 +153,7 @@ import FullscreenTool from "./Tools/FullscreenTool.vue";
 import TradingviewTool from "./Tools/TradingviewTool.vue";
 import ProgressTool from "./Tools/ProgressTool.vue";
 import PatternTool from "./Tools/PatternTool.vue";
-import PickTimeTool from "./Tools/PickTimeTool.vue";
+import StopTimeTool from "./Tools/StopTimeTool.vue";
 import LineTool from "./Tools/LineTool.vue";
 import TimeRangeTool from "./Tools/TimeRangeTool.vue";
 import TargetTool from "./Tools/TargetTool.vue";
@@ -200,7 +202,7 @@ const fullscreenToolRef = ref(null);
 const tradingviewToolRef = ref(null);
 const progressToolRef = ref(null);
 const patternToolRef = ref(null);
-const pickTimeToolRef = ref(null);
+const stopTimeToolRef = ref(null);
 const lineToolRef = ref(null);
 const timeRangeToolRef = ref(null);
 const targetToolRef = ref(null);
@@ -267,7 +269,7 @@ onMounted(() => {
     drawChart();
     patternToolRef.value.createSeries(params.chart);
     timeRangeToolRef.value.createSeries(params.chart);
-    pickTimeToolRef.value.createSeries(params.chart);
+    stopTimeToolRef.value.createSeries(params.chart);
     new ResizeObserver(chartResize).observe(chartContainerRef.value);
     document.addEventListener("keydown", chartShortcut);
 });
@@ -346,8 +348,8 @@ function chartClick(e) {
 
     if (patternToolRef.value.isSelected()) {
         patternToolRef.value.draw(params.crosshair);
-    } else if (pickTimeToolRef.value.isSelected()) {
-        pickTimeToolRef.value.draw(params.crosshair);
+    } else if (stopTimeToolRef.value.isSelected()) {
+        stopTimeToolRef.value.draw(params.crosshair);
     } else if (lineToolRef.value.isSelected()) {
         lineToolRef.value.draw(params.crosshair);
     } else if (timeRangeToolRef.value.isSelected()) {
@@ -806,7 +808,7 @@ function getDnseData() {
         params.socketUpdatedAt = new Date();
     }
 }
-function donePickTime(time) {
+function doneStopTime(time) {
     refreshPattern();
     const lastBar = time
         ? state.bars.find((bar) => bar.time === time)
