@@ -500,9 +500,9 @@ function calcContinuePattern() {
             price: entry,
             tpPrice: tp,
             slPrice: mf.fmtNum(sl - orderSide * 0.1),
-            sl1Price: I.price,
+            sl1Price: mf.fmtNum(I.price - orderSide * 0.1),
         },
-        points: { F, G, t },
+        points: { F, G, H, I, t },
         isOk: progress.result,
     };
     console.log("order", order);
@@ -726,9 +726,9 @@ function calcNestedContinuePattern() {
             price: entry,
             tpPrice: tp,
             slPrice: mf.fmtNum(sl - orderSide * 0.1),
-            sl1Price: I.price,
+            sl1Price: mf.fmtNum(I.price - orderSide * 0.1),
         },
-        points: { F, G, t },
+        points: { F, G, H, I, t },
         isOk: progress.result,
     };
     console.log("order", order);
@@ -925,9 +925,9 @@ function calcReversalPattern() {
             price: entry,
             tpPrice: tp,
             slPrice: mf.fmtNum(sl - orderSide * 0.1),
-            sl1Price: I.price,
+            sl1Price: mf.fmtNum(I.price - orderSide * 0.1),
         },
-        points: { F, G, t },
+        points: { F, G, H, I, t },
         isOk: progress.result,
     };
     console.log("order", order);

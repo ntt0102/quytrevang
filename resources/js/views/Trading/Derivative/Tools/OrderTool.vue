@@ -320,9 +320,20 @@ function scanTpSlChange(order, lastPrice) {
         let kind = "",
             newPrice = null;
         const isNewH = mf.cmp(
-            patternOrder.data.price,
+            patternOrder.points.H.price,
             sideBool,
-            order.entry_price
+            order.entry_price,
+            true
+        );
+        const isValidI = mf.cmp(
+            patternOrder.points.I.price,
+            sideBool,
+            order.sl1_price
+        );
+        const isBreakH = mf.cmp(
+            lastPrice,
+            sideBool,
+            patternOrder.points.H.price
         );
         const isNewF = mf.cmp(
             patternOrder.points.F.price,
@@ -330,22 +341,28 @@ function scanTpSlChange(order, lastPrice) {
             order.entry_price,
             true
         );
-        const isIValid = mf.cmp(
-            patternOrder.data.sl1Price,
-            sideBool,
-            order.sl1_price
-        );
-        const isGValid = mf.cmp(
+        const isValidG = mf.cmp(
             patternOrder.points.G.price,
             sideBool,
             order.sl1_price
         );
-        const isBreak = mf.cmp(lastPrice, sideBool, patternOrder.data.price);
-        if ((isNewH && !isIValid) || (isNewF && !isGValid)) {
+        const isBreakF = mf.cmp(
+            lastPrice,
+            sideBool,
+            patternOrder.points.F.price
+        );
+        if (
+            order.tp_price !== patternOrder.points.t &&
+            ((isNewH && !isValidI) || (isNewF && !isValidG))
+        ) {
             kind = "tp";
             newPrice = patternOrder.points.t;
         }
-        if (isNewH && isIValid && isBreak) {
+        if (
+            order.sl_price !== patternOrder.data.sl1Price &&
+            ((isNewH && isValidI && isBreakH) ||
+                (isNewF && isValidG && isBreakF))
+        ) {
             kind = "sl";
             newPrice = patternOrder.data.sl1Price;
         }
