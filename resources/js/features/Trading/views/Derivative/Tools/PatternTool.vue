@@ -322,7 +322,7 @@ function calcContinuePattern() {
     const phase1 = scanPhase({
         side,
         start: P1,
-        end: { time: P2.time, price: P2.price },
+        end: P2,
     });
     const A = phase1.S;
     const B = phase1.R;
@@ -347,10 +347,7 @@ function calcContinuePattern() {
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: {
-            time: { t: Math.min(stopTime ?? E.time.t, E.time.t) },
-            price: E.price,
-        },
+        end: E,
     });
     const phase5 = scanPhase({
         side,
@@ -365,10 +362,7 @@ function calcContinuePattern() {
     const phase6 = scanPhase({
         side: !side,
         start: F,
-        end: {
-            time: { t: Math.min(stopTime ?? G.time.t, G.time.t) },
-            price: G.price,
-        },
+        end: G,
     });
     const phase7 = scanPhase({
         side,
@@ -562,20 +556,18 @@ function calcNestedContinuePattern() {
     const phase1 = scanPhase({
         side,
         start: A,
-        end: { time: { t: stopTime } },
+        end: { time: { t: pickTime ?? stopTime } },
     });
     const isBreak0 = boxCmp(phase1.ext, phase1, { isNot: true });
 
     const B = isBreak0 ? phase1.R1 : phase1.ext.R;
-    let C = isBreak0 ? phase1.S1 : phase1.ext.S;
+    const C = isBreak0 ? phase1.S1 : phase1.ext.S;
     const phase2 = scanPhase({
         side: !side,
         start: B,
-        end: {
-            time: { t: Math.min(pickTime ?? stopTime ?? C.time.t, C.time.t) },
-        },
+        end: C,
     });
-    C = phase2.R;
+    
     const phase3 = scanPhase({
         side,
         start: { time: C.time },
@@ -590,10 +582,7 @@ function calcNestedContinuePattern() {
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: {
-            time: { t: Math.min(stopTime ?? E.time.t, E.time.t) },
-            price: E.price,
-        },
+        end: E,
     });
 
     const phase5 = scanPhase({
@@ -610,10 +599,7 @@ function calcNestedContinuePattern() {
     const phase6 = scanPhase({
         side: !side,
         start: F,
-        end: {
-            time: { t: Math.min(stopTime ?? G.time.t, G.time.t) },
-            price: G.price,
-        },
+        end: G,
     });
 
     const phase7 = scanPhase({
@@ -802,30 +788,26 @@ function calcReversalPattern() {
     const phase2 = scanPhase({
         side: !side,
         start: P1,
-        end: { time: P2.time, price: P2.price },
+        end: P2,
     });
     const B = phase2.S;
     const C = phase2.R;
     const phase3 = scanPhase({
         side,
         start: { time: C.time },
-        end: { time: { t: stopTime } },
+        end: { time: { t: pickTime ?? stopTime } },
     });
 
     const isBreak1 = boxCmp(phase3.ext, phase3, { isNot: true });
 
     const D = isBreak1 ? phase3.R1 : phase3.ext.R;
-    let E = isBreak1 ? phase3.S1 : phase3.ext.S;
+    const E = isBreak1 ? phase3.S1 : phase3.ext.S;
 
     const phase4 = scanPhase({
         side: !side,
         start: D,
-        end: {
-            time: { t: Math.min(pickTime ?? stopTime ?? E.time.t, E.time.t) },
-            price: E.price,
-        },
+        end: E,
     });
-    E = phase4.R;
 
     const phase5 = scanPhase({
         side,
@@ -841,10 +823,7 @@ function calcReversalPattern() {
     const phase6 = scanPhase({
         side: !side,
         start: F,
-        end: {
-            time: { t: Math.min(stopTime ?? G.time.t, G.time.t) },
-            price: G.price,
-        },
+        end: G,
     });
 
     const phase7 = scanPhase({
