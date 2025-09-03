@@ -211,8 +211,8 @@
 <script setup>
 import DxAccordion from "devextreme-vue/accordion";
 import DxLoadIndicator from "devextreme-vue/load-indicator";
-import CorePopup from "../../../components/Popups/CorePopup.vue";
-import Photoswipe from "../../../components/Photoswipe.vue";
+import CorePopup from "../../../../components/Popups/CorePopup.vue";
+import Photoswipe from "../../../../components/Photoswipe.vue";
 import { inject, ref, reactive, onMounted, computed } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
@@ -337,7 +337,7 @@ function onHidden() {
 defineExpose({ show });
 </script>
 <style lang="scss">
-@import "../../../../sass/variables.scss";
+@import "../../../../../sass/variables.scss";
 .paying-contract-popup {
     .caution {
         padding: 10px;

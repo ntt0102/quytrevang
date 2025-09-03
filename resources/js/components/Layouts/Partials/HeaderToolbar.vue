@@ -219,9 +219,9 @@
 <script setup>
 import DxDropDownButton from "devextreme-vue/drop-down-button";
 import DxSwitch from "devextreme-vue/switch";
-import ChangeAvatarPopup from "../../../views/User/Profile/ChangeAvatarPopup.vue";
-import ChangePinPopup from "../../../views/User/Profile/ChangePinPopup.vue";
-import ChangePasswordPopup from "../../../views/User/Profile/ChangePasswordPopup.vue";
+import ChangeAvatarPopup from "../../../features/User/views/Profile/ChangeAvatarPopup.vue";
+import ChangePinPopup from "../../../features/User/views/Profile/ChangePinPopup.vue";
+import ChangePasswordPopup from "../../../features/User/views/Profile/ChangePasswordPopup.vue";
 import { ref, computed, inject, watch, onUnmounted } from "vue";
 import { useStore } from "vuex";
 import { useRouter, useRoute } from "vue-router";

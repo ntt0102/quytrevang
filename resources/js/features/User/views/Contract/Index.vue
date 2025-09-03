@@ -248,7 +248,7 @@ import { DxDataGrid, DxColumn } from "devextreme-vue/data-grid";
 import ContractConditionsPopup from "./ContractConditionsPopup.vue";
 import PayingContractPopup from "./PayingContractPopup.vue";
 import WithdrawingContractPopup from "./WithdrawingContractPopup.vue";
-import ContractDetailPopup from "../../../components/Popups/ContractDetailPopup.vue";
+import ContractDetailPopup from "../../../../components/Popups/ContractDetailPopup.vue";
 import { inject, ref, reactive, watch } from "vue";
 import { useStore } from "vuex";
 import { useRoute } from "vue-router";

@@ -124,7 +124,7 @@
 import DxRadioGroup from "devextreme-vue/radio-group";
 import DxNumberBox from "devextreme-vue/number-box";
 import DxValidator from "devextreme-vue/validator";
-import CorePopup from "../../../components/Popups/CorePopup.vue";
+import CorePopup from "../../../../components/Popups/CorePopup.vue";
 import { inject, ref, reactive, computed } from "vue";
 import { useStore } from "vuex";
 import { useI18n } from "vue-i18n";
@@ -185,7 +185,7 @@ function onHidden() {}
 defineExpose({ show });
 </script>
 <style lang="scss">
-@import "../../../../sass/variables.scss";
+@import "../../../../../sass/variables.scss";
 .withdrawing-contract-popup {
     .duration-fail {
         padding: 10px;
