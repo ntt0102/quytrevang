@@ -10,7 +10,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\User;
 use App\Models\DerivativeStat;
-use App\Services\Special\VpsOrderService;
+use App\Services\VpsOrderService;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\UpdatedTradesNotification;
 use App\Events\UpdateStatisticEvent;

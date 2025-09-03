@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\Trading;
+namespace App\Features\Trading\Services;
 
 use App\Services\CoreService;
 use App\Services\VpsOrderService;

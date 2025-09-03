@@ -40,7 +40,7 @@ Route::get('test', function (\Illuminate\Http\Request $request) {
     //     return ' ' . $s;
     // })->toArray();
     // $copyist = \App\Models\User::find(1)->copyist;
-    // $vos = new \App\Services\Special\VpsOrderService($copyist);
+    // $vos = new \App\Services\VpsOrderService($copyist);
     // // dd($vos->hasOrder());
     // dd($vos->hasOrder() || $vos->hasConditionOrder());
     // dd(strtotime("2022-04-04"));
@@ -99,7 +99,7 @@ Route::get('test', function (\Illuminate\Http\Request $request) {
     // $s = \App\Models\ShareOrder::getProfitChart('quarter', '2023-03-04', '2024-03-04');
     // $o = \App\Models\ShareOrder::find(1);
     // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
-    $s = app(\App\Services\Special\VpsOrderService::class)->loginVps($a);
+    $s = app(\App\Services\VpsOrderService::class)->loginVps($a);
     // $o = (object)[
     //     'receiver' => 1,
     //     'title' => 'test',
@@ -155,7 +155,7 @@ Route::get('test', function (\Illuminate\Http\Request $request) {
 
     // echo $rsp->token;
     // set_global_value('dnseAccessToken', $rsp->token);
-    // $s = new \App\Services\Special\VpsOrderService('756428');
+    // $s = new \App\Services\VpsOrderService('756428');
     // $s = new \App\Services\Special\SocketService();
     // $s->connectSocket();
     // \App\Jobs\ConnectSocketJob::dispatch();
