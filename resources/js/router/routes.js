@@ -2,11 +2,15 @@ import lang from "../lang";
 
 import AuthLayout from "../components/Layouts/AuthLayout.vue";
 import GuestLayout from "../components/Layouts/GuestLayout.vue";
-import Policy from "../views/Policy/Index.vue";
+import Policy from "../features/Policy/views/Index.vue";
 
 function loadView(name1, name2, name3) {
-    if (!!name3) return () => import(`../views/${name1}/${name2}/${name3}.vue`);
-    if (!!name2) return () => import(`../views/${name1}/${name2}.vue`);
+    if (!!name3) {
+        return () => import(`../features/${name1}/views/${name2}/${name3}.vue`);
+    }
+    if (!!name2) {
+        return () => import(`../features/${name1}/views/${name2}.vue`);
+    }
     return () => import(`../views/${name1}.vue`);
 }
 const guestRoute = [

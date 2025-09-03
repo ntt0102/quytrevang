@@ -5,30 +5,30 @@ import getters from "./getters";
 import mutations from "./mutations";
 import actions from "./actions";
 // MODULES
-import auth from "./modules/Auth";
-import policy from "./modules/Policy";
+import auth from "../features/Auth/store/Auth";
+import policy from "../features/Policy/store/Policy";
 // User
-import userProfile from "./modules/User/Profile";
-import userContract from "./modules/User/Contract";
-import userCopyist from "./modules/User/Copyist";
-import userTrade from "./modules/User/Trade";
+import userProfile from "../features/User/store/Profile";
+import userContract from "../features/User/store/Contract";
+import userCopyist from "../features/User/store/Copyist";
+import userTrade from "../features/User/store/Trade";
 // Admin
-import adminUser from "./modules/Admin/User";
-import adminContract from "./modules/Admin/Contract";
-import adminCopyist from "./modules/Admin/Copyist";
-import adminComment from "./modules/Admin/Comment";
+import adminUser from "../features/Admin/store/User";
+import adminContract from "../features/Admin/store/Contract";
+import adminCopyist from "../features/Admin/store/Copyist";
+import adminComment from "../features/Admin/store/Comment";
 // Trading
-import tradingDerivative from "./modules/Trading/Derivative";
-import tradingDerstat from "./modules/Trading/Derstat";
-import tradingShare from "./modules/Trading/Share";
-import tradingShrstat from "./modules/Trading/Shrstat";
-import tradingFinbook from "./modules/Trading/Finbook";
-// Setting
-import setting from "./modules/Setting/Index";
-import settingFaq from "./modules/Setting/Faq";
-import settingParameter from "./modules/Setting/Parameter";
-import settingRole from "./modules/Setting/Role";
-import settingPermission from "./modules/Setting/Permission";
+import tradingDerivative from "../features/Trading/store/Derivative";
+import tradingDerstat from "../features/Trading/store/Derstat";
+import tradingShare from "../features/Trading/store/Share";
+import tradingShrstat from "../features/Trading/store/Shrstat";
+import tradingFinbook from "../features/Trading/store/Finbook";
+// Settings
+import setting from "../features/Settings/store/Index";
+import settingFaq from "../features/Settings/store/Faq";
+import settingParameter from "../features/Settings/store/Parameter";
+import settingRole from "../features/Settings/store/Role";
+import settingPermission from "../features/Settings/store/Permission";
 
 export default createStore({
     state,
@@ -54,7 +54,7 @@ export default createStore({
         tradingShrstat,
         tradingDerstat,
         tradingFinbook,
-        // Setting
+        // Settings
         setting,
         settingFaq,
         settingParameter,
