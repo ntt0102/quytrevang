@@ -31,6 +31,7 @@ defineExpose({
     createSeries,
     getFirstTime,
     draw,
+    remove: removeTimeRangeTool,
 });
 
 watch(timeRangeStore, (data) => {

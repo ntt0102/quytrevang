@@ -317,6 +317,8 @@ function calcContinuePattern() {
     let side = bc > 0;
     let stopTime = props.stopTimeToolRef.get();
     if (stopTime < P3.time.t) stopTime = undefined;
+    let pickTime = props.timeRangeToolRef.getFirstTime();
+    if (pickTime < P2.time.t) pickTime = undefined;
     const phase1 = scanPhase({
         side,
         start: P1,
@@ -327,7 +329,9 @@ function calcContinuePattern() {
     const phase2 = scanPhase({
         side: !side,
         start: B,
-        end: { time: P3.time, price: P3.price },
+        end: {
+            time: { t: Math.min(pickTime ?? P3.time.t, P3.time.t) },
+        },
     });
     const C = phase2.R;
     const phase3 = scanPhase({
@@ -546,6 +550,8 @@ function calcNestedContinuePattern() {
     let side = P1.price - P2.price > 0;
     let stopTime = props.stopTimeToolRef.get();
     if (stopTime < P2.time.t) stopTime = undefined;
+    let pickTime = props.timeRangeToolRef.getFirstTime();
+    if (pickTime < P2.time.t) pickTime = undefined;
     const phase0 = scanPhase({
         side: !side,
         start: P1,
@@ -561,18 +567,18 @@ function calcNestedContinuePattern() {
     const isBreak0 = boxCmp(phase1.ext, phase1, { isNot: true });
 
     const B = isBreak0 ? phase1.R1 : phase1.ext.R;
-    const C = isBreak0 ? phase1.S1 : phase1.ext.S;
+    let C = isBreak0 ? phase1.S1 : phase1.ext.S;
     const phase2 = scanPhase({
         side: !side,
         start: B,
         end: {
-            time: { t: Math.min(stopTime ?? C.time.t, C.time.t) },
-            price: C.price,
+            time: { t: Math.min(pickTime ?? stopTime ?? C.time.t, C.time.t) },
         },
     });
+    C = phase2.R;
     const phase3 = scanPhase({
         side,
-        start: C,
+        start: { time: C.time },
         end: { time: { t: stopTime } },
     });
 
@@ -1365,6 +1371,7 @@ function savePattern(isRemove = false) {
 function remove() {
     savePattern(true);
     props.stopTimeToolRef.remove();
+    props.timeRangeToolRef.remove();
     removePatternTool();
     setTimeMark({ times: [] });
     emit("setProgress", {});
