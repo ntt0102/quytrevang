@@ -2,7 +2,7 @@
 
 namespace App\Features\Trading\Controllers;
 
-use App\Http\Controllers\Api\CoreController;
+use App\Http\Controllers\CoreController;
 use Illuminate\Http\Request;
 use App\Features\Trading\Services\DerstatService;
 

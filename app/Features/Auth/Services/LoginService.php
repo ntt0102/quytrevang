@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Foundation\Application;
 use App\Models\User;
-use App\Services\Special\WebauthnService;
+use App\Services\WebauthnService;
 use Carbon\Carbon;
 
 

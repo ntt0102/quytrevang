@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\CoreController;
 use Illuminate\Http\Request;
 use App\Services\AppService;
-use App\Services\Admin\ContractService;
+use App\Features\Admin\Services\ContractService;
 
 class AppController extends CoreController
 {
