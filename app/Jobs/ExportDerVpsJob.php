@@ -29,7 +29,7 @@ class ExportDerVpsJob implements ShouldQueue
      */
     public function handle()
     {
-        $data = app(\App\Services\Trading\DerivativeService::class)->cloneVpsData();
+        $data = app(\App\Features\Trading\Services\DerivativeService::class)->cloneVpsData();
         if (!count($data)) return false;
 
 

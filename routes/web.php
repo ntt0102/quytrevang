@@ -48,22 +48,22 @@ Route::get('test', function (\Illuminate\Http\Request $request) {
     // $s = App\Jobs\CsvJob::dispatch();
     // dd(strtotime('02-04-2024') . '-' . strtotime('2024-04-02'));
     // dd(date('Y-m-d H:i:s', 1712028936));
-    // // $filter = app(\App\Services\Trading\ShareService::class)->getSymbols(false);
-    // // $filter = app(\App\Services\Trading\ShareService::class)->filterSymbols($payload);
-    // $s = app(\App\Services\Trading\ShareService::class)->getEvents($payload);
-    // $s = app(\App\Services\Trading\ShareService::class)->getDataFireAnt($payload);
+    // // $filter = app(\App\Features\Trading\Services\ShareService::class)->getSymbols(false);
+    // // $filter = app(\App\Features\Trading\Services\ShareService::class)->filterSymbols($payload);
+    // $s = app(\App\Features\Trading\Services\ShareService::class)->getEvents($payload);
+    // $s = app(\App\Features\Trading\Services\ShareService::class)->getDataFireAnt($payload);
     // $s = 'THO';
-    // $s = app(\App\Services\Trading\DerivativeService::class)->getHolidays();
+    // $s = app(\App\Features\Trading\Services\DerivativeService::class)->getHolidays();
     // $s = get_holidays('2025');
-    // $s = app(\App\Services\Trading\DerivativeService::class)->getVn30f1mSymbol();
-    // $s = app(\App\Services\Trading\DerivativeService::class)->cloneVpsData();
-    // $s = app(\App\Services\Trading\DerivativeService::class)->getVn30f1mSymbol();
-    // $s = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData('2025-05-12');
-    // $s = app(\App\Services\Trading\ShareService::class)->getStock('VN30', 1578058160, 1694649600);
-    // $s = app(\App\Services\Trading\ShareService::class)->getStock('CTG', '2021-05-25', '2024-12-24');
-    // $s = app(\App\Services\Trading\ShareService::class)->calcStock('CTG', strtotime('2021-05-25'), strtotime('2024-06-12'), strtotime('2024-09-27'), strtotime('2024-12-20'));
-    // $s = app(\App\Services\Trading\ShareService::class)->checkStock('CTG', strtotime('2021-05-25'), strtotime('2024-06-12'), strtotime('2024-09-27'), strtotime('2024-12-20'));
-    // $s = app(\App\Services\Trading\ShareService::class)->filterStock('VNX50', strtotime('2021-05-25'), strtotime('2024-06-12'), strtotime('2024-09-27'), strtotime('2024-12-20'));
+    // $s = app(\App\Features\Trading\Services\DerivativeService::class)->getVn30f1mSymbol();
+    // $s = app(\App\Features\Trading\Services\DerivativeService::class)->cloneVpsData();
+    // $s = app(\App\Features\Trading\Services\DerivativeService::class)->getVn30f1mSymbol();
+    // $s = app(\App\Features\Trading\Services\DerivativeService::class)->cloneDnseData('2025-05-12');
+    // $s = app(\App\Features\Trading\Services\ShareService::class)->getStock('VN30', 1578058160, 1694649600);
+    // $s = app(\App\Features\Trading\Services\ShareService::class)->getStock('CTG', '2021-05-25', '2024-12-24');
+    // $s = app(\App\Features\Trading\Services\ShareService::class)->calcStock('CTG', strtotime('2021-05-25'), strtotime('2024-06-12'), strtotime('2024-09-27'), strtotime('2024-12-20'));
+    // $s = app(\App\Features\Trading\Services\ShareService::class)->checkStock('CTG', strtotime('2021-05-25'), strtotime('2024-06-12'), strtotime('2024-09-27'), strtotime('2024-12-20'));
+    // $s = app(\App\Features\Trading\Services\ShareService::class)->filterStock('VNX50', strtotime('2021-05-25'), strtotime('2024-06-12'), strtotime('2024-09-27'), strtotime('2024-12-20'));
     // $s = \App\Jobs\UpdateHolidaysJob::dispatch();
     // $s = \App\Jobs\UpdateOpeningMarketJob::dispatch();
     // $s = \App\Jobs\UpdateVn30f1mSymbolJob::dispatch();
@@ -72,9 +72,9 @@ Route::get('test', function (\Illuminate\Http\Request $request) {
     // $s = new \App\Jobs\FilterShareJob($payload);
     // $s = $s->getForeignRatio($payload);
     // $s = $s->getRatio($payload);
-    // $s = app(\App\Services\Special\CsvService::class)->removeSide();
-    // $s = app(\App\Services\Trading\OrderChartService::class)->export((object)['date' => '2024-08-05']);
-    // $s = app(\App\Services\Trading\OrderChartService::class)->generateDataFromApi();
+    // $s = app(\App\Services\CsvService::class)->removeSide();
+    // $s = app(\App\Features\Trading\Services\OrderChartService::class)->export((object)['date' => '2024-08-05']);
+    // $s = app(\App\Features\Trading\Services\OrderChartService::class)->generateDataFromApi();
     // $s = file_exists(storage_path('app'));
     // $token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSIsImtpZCI6IkdYdExONzViZlZQakdvNERWdjV4QkRITHpnSSJ9.eyJpc3MiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4iLCJhdWQiOiJodHRwczovL2FjY291bnRzLmZpcmVhbnQudm4vcmVzb3VyY2VzIiwiZXhwIjoxODg5NjIyNTMwLCJuYmYiOjE1ODk2MjI1MzAsImNsaWVudF9pZCI6ImZpcmVhbnQudHJhZGVzdGF0aW9uIiwic2NvcGUiOlsiYWNhZGVteS1yZWFkIiwiYWNhZGVteS13cml0ZSIsImFjY291bnRzLXJlYWQiLCJhY2NvdW50cy13cml0ZSIsImJsb2ctcmVhZCIsImNvbXBhbmllcy1yZWFkIiwiZmluYW5jZS1yZWFkIiwiaW5kaXZpZHVhbHMtcmVhZCIsImludmVzdG9wZWRpYS1yZWFkIiwib3JkZXJzLXJlYWQiLCJvcmRlcnMtd3JpdGUiLCJwb3N0cy1yZWFkIiwicG9zdHMtd3JpdGUiLCJzZWFyY2giLCJzeW1ib2xzLXJlYWQiLCJ1c2VyLWRhdGEtcmVhZCIsInVzZXItZGF0YS13cml0ZSIsInVzZXJzLXJlYWQiXSwianRpIjoiMjYxYTZhYWQ2MTQ5Njk1ZmJiYzcwODM5MjM0Njc1NWQifQ.dA5-HVzWv-BRfEiAd24uNBiBxASO-PAyWeWESovZm_hj4aXMAZA1-bWNZeXt88dqogo18AwpDQ-h6gefLPdZSFrG5umC1dVWaeYvUnGm62g4XS29fj6p01dhKNNqrsu5KrhnhdnKYVv9VdmbmqDfWR8wDgglk5cJFqalzq6dJWJInFQEPmUs9BW_Zs8tQDn-i5r4tYq2U8vCdqptXoM7YgPllXaPVDeccC9QNu2Xlp9WUvoROzoQXg25lFub1IYkTrM66gJ6t9fJRZToewCt495WNEOQFa_rwLCZ1QwzvL0iYkONHS_jZ0BOhBCdW9dWSawD6iF1SIQaFROvMDH1rg";
     // $client = new \GuzzleHttp\Client(['headers' => ['authorization' => "Bearer {$token}"]]);
@@ -82,7 +82,7 @@ Route::get('test', function (\Illuminate\Http\Request $request) {
     // // $url = "https://svr5.fireant.vn/api/Data/Companies/TimescaleMarks?symbol=TPB&startDate=2023-3-14&endDate=2037-1-1";
     // $url = "https://restv2.fireant.vn/symbols/TPB/timescale-marks?startDate=2022-12-29&endDate=2037-01-01";
     // $s = json_decode($res->getBody());
-    // $s = app(\App\Services\Trading\ShareService::class)->getDataSsiWithTimeframe($rsp, 'W');
+    // $s = app(\App\Features\Trading\Services\ShareService::class)->getDataSsiWithTimeframe($rsp, 'W');
     // dd($filter);
     // $date = date('Y-m-d');
     // dd(get_global_value('openingMarketFlag'));
@@ -98,14 +98,14 @@ Route::get('test', function (\Illuminate\Http\Request $request) {
     // \Log::info('Hello world!!');
     // $s = \App\Models\ShareOrder::getProfitChart('quarter', '2023-03-04', '2024-03-04');
     // $o = \App\Models\ShareOrder::find(1);
-    // $s = app(\App\Services\Trading\StatisticService::class)->getOpening($o);
+    // $s = app(\App\Features\Trading\Services\StatisticService::class)->getOpening($o);
     $s = app(\App\Services\VpsOrderService::class)->loginVps($a);
     // $o = (object)[
     //     'receiver' => 1,
     //     'title' => 'test',
     //     'body' => 'OK'
     // ];
-    // $s = app(\App\Services\Setting\NotificationService::class)->send($o);
+    // $s = app(\App\Features\Setting\Services\NotificationService::class)->send($o);
     // $params = [
     //     'test' => 'tho',
     // ];
@@ -156,7 +156,7 @@ Route::get('test', function (\Illuminate\Http\Request $request) {
     // echo $rsp->token;
     // set_global_value('dnseAccessToken', $rsp->token);
     // $s = new \App\Services\VpsOrderService('756428');
-    // $s = new \App\Services\Special\SocketService();
+    // $s = new \App\Services\SocketService();
     // $s->connectSocket();
     // \App\Jobs\ConnectSocketJob::dispatch();
     // $s = '2024-07-15' || date('Y-m-d');

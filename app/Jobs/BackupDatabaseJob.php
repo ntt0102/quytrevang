@@ -8,7 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Services\Setting\DatabaseService;
+use App\Features\Setting\Services\DatabaseService;
 
 class BackupDatabaseJob implements ShouldQueue
 {
@@ -26,9 +26,7 @@ class BackupDatabaseJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct()
-    {
-    }
+    public function __construct() {}
 
     /**
      * Execute the job.

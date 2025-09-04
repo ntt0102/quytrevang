@@ -4,7 +4,7 @@ namespace App\Features\Auth\Controllers;
 
 use App\Http\Controllers\CoreController;
 use Illuminate\Http\Request;
-use App\Services\Auth\ResetPasswordService;
+use App\Features\Auth\Services\ResetPasswordService;
 use App\Features\Auth\Services\ChangePasswordService;
 
 class ResetPasswordController extends CoreController

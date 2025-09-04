@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\ShareSymbol;
-use App\Services\Trading\ShareService;
+use App\Features\Trading\Services\ShareService;
 use App\Notifications\FilteredShareNotification;
 use Illuminate\Support\Facades\Notification;
 use App\Models\User;

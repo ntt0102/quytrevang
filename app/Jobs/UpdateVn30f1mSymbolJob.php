@@ -34,7 +34,7 @@ class UpdateVn30f1mSymbolJob implements ShouldQueue
      */
     public function handle()
     {
-        $symbol = app(\App\Services\Trading\DerivativeService::class)->getVn30f1mSymbol();
+        $symbol = app(\App\Features\Trading\Services\DerivativeService::class)->getVn30f1mSymbol();
         set_global_value('vn30f1m', $symbol);
     }
 }

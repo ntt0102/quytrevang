@@ -34,7 +34,7 @@ class ExportDerDnseJob implements ShouldQueue
      */
     public function handle()
     {
-        $data = app(\App\Services\Trading\DerivativeService::class)->cloneDnseData($this->date);
+        $data = app(\App\Features\Trading\Services\DerivativeService::class)->cloneDnseData($this->date);
         if (!count($data)) return false;
 
         $date = substr($data[0]->sendingTime, 0, 10);
