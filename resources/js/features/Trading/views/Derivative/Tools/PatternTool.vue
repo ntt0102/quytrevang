@@ -705,7 +705,7 @@ function calcNestedContinuePattern() {
             // pink
             boxCmp(box4, boxS3),
             boxCmp(box4, box2, { threshold: 0.5 }),
-            boxCmp(box4, box3, { isNot: true, threshold: 1.5 }),
+            boxCmp(box4, box3, { isNot: true, threshold: 2 }),
         ],
         [
             // purple
@@ -728,7 +728,7 @@ function calcNestedContinuePattern() {
             boxCmp(box6, box4, { threshold: 0.5 }),
             boxCmp(box6, boxMax(box2, box4), {
                 isNot: true,
-                threshold: 0.7,
+                threshold: 0.8,
             }),
         ],
         [

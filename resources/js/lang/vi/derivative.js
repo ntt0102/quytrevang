@@ -21,7 +21,7 @@ const continue1 = [
             //
             "B > B1đỏ",
             "B > 0.5Bcam",
-            "B < 1.5Bđỏ",
+            "B < 2Bđỏ",
         ],
     },
     {
@@ -47,7 +47,7 @@ const continue1 = [
             //
             "B > B1tím",
             "B > 0.5Bhồng",
-            "B < 0.7Bcam",
+            "B < 0.8Bcam",
         ],
     },
     {
