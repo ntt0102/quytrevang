@@ -777,7 +777,7 @@ function calcNestedContinuePattern() {
     };
 }
 function calcReversalPattern() {
-    const { A: P1, B: P2, C: P3 } = scanPoints;
+    const { A: P1, B: P2 } = scanPoints;
     const bc = P1.price - P2.price;
     let side = bc > 0;
     const stopTime = props.stopTimeToolRef.get(P2.time.t);
