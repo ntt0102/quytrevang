@@ -318,10 +318,8 @@ function calcContinuePattern() {
     const { A: P1, B: P2, C: P3 } = scanPoints;
     const bc = P2.price - P3.price;
     let side = bc > 0;
-    let stopTime = props.stopTimeToolRef.get();
-    if (stopTime < P3.time.t) stopTime = undefined;
-    let pickTime = props.timeRangeToolRef.getFirstTime();
-    if (pickTime < P2.time.t) pickTime = undefined;
+    const stopTime = props.stopTimeToolRef.get(P3.time.t);
+    const pickTime = props.timeRangeToolRef.get(P2.time.t);
     const phase1 = scanPhase({
         side,
         start: P1,
@@ -545,10 +543,8 @@ function calcContinuePattern() {
 function calcNestedContinuePattern() {
     const { A: P1, B: P2, C: P3 } = scanPoints;
     let side = P1.price - P2.price > 0;
-    let stopTime = props.stopTimeToolRef.get();
-    if (stopTime < P2.time.t) stopTime = undefined;
-    let pickTime = props.timeRangeToolRef.getFirstTime();
-    if (pickTime < P2.time.t) pickTime = undefined;
+    const stopTime = props.stopTimeToolRef.get(P2.time.t);
+    const pickTime = props.timeRangeToolRef.get(P2.time.t);
     const phase0 = scanPhase({
         side: !side,
         start: P1,
@@ -784,10 +780,8 @@ function calcReversalPattern() {
     const { A: P1, B: P2, C: P3 } = scanPoints;
     const bc = P1.price - P2.price;
     let side = bc > 0;
-    let stopTime = props.stopTimeToolRef.get();
-    if (stopTime < P2.time.t) stopTime = undefined;
-    let pickTime = props.timeRangeToolRef.getFirstTime();
-    if (pickTime < P3.time.t) pickTime = undefined;
+    const stopTime = props.stopTimeToolRef.get(P2.time.t);
+    const pickTime = props.timeRangeToolRef.get(P2.time.t);
     const phase2 = scanPhase({
         side: !side,
         start: P1,
@@ -998,8 +992,7 @@ function calcSidewayPattern() {
     const { A: P1, B: P2, C: P3 } = scanPoints;
     const bc = P1.price - P2.price;
     let side = bc > 0;
-    let stopTime = props.stopTimeToolRef.get();
-    if (stopTime < P2.time.t) stopTime = undefined;
+    const stopTime = props.stopTimeToolRef.get(P2.time.t);
     const phase2 = scanPhase({
         side: !side,
         start: P1,

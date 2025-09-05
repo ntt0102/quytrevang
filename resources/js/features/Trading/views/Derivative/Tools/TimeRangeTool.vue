@@ -29,7 +29,7 @@ const symbol = "VN30F1M";
 defineExpose({
     isSelected,
     createSeries,
-    getFirstTime,
+    get,
     draw,
     remove: removeTimeRangeTool,
 });
@@ -50,8 +50,16 @@ function createSeries(chart) {
         priceLineVisible: false,
     });
 }
-function getFirstTime() {
-    return timeRanges[0] ? timeRanges[0].time : null;
+function get(cmpTimes) {
+    if (Array.isArray(cmpTimes)) {
+        return cmpTimes.map((item, index) => {
+            const time = timeRanges[index]?.time;
+            return time && time > item ? time : null;
+        });
+    } else {
+        const time = timeRanges[0]?.time;
+        return time && time > cmpTimes ? time : null;
+    }
 }
 function timeRangeToolClick(e) {
     emit("hideContext");

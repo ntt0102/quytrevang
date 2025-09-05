@@ -51,8 +51,8 @@ function createSeries(chart) {
         priceLineVisible: false,
     });
 }
-function get() {
-    return stopTime;
+function get(cmpTime) {
+    return (stopTime && stopTime > cmpTime) || !cmpTime ? stopTime : null;
 }
 function set(time) {
     store.dispatch("tradingDerivative/drawTools", {
