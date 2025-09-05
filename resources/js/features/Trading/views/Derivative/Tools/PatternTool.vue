@@ -129,10 +129,13 @@ function draw({ time, price }) {
             : props.bars;
         points = scanPattern(data);
     }
+    const lastTime = props.bars.at(-1).time;
     const stopTime = props.indexToTime(
         props.timeToIndex(points.C.time.t) + points.C.time.i - points.A.time.i
     );
-    props.stopTimeToolRef.set(stopTime);
+    if (stopTime < lastTime) {
+        props.stopTimeToolRef.set(stopTime);
+    }
     load(points, { isSave: true });
     patternToolRef.value.classList.remove("selected");
 }
