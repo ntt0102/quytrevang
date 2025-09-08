@@ -476,9 +476,11 @@ function calcContinuePattern() {
             [
                 fBreak,
                 !fBreak &&
+                    !(dBreak && eBreak) &&
                     boxCmp(box5, box4, { threshold: 0.7 }) &&
                     dT7 >= dT5 - dT6,
                 !fBreak &&
+                    !(dBreak && eBreak) &&
                     eBreak &&
                     boxCmp(box5, box4, { threshold: 0.5 }) &&
                     dT6 >= dT5,
@@ -713,9 +715,11 @@ function calcNestedContinuePattern() {
             [
                 fBreak,
                 !fBreak &&
+                    !(dBreak && eBreak) &&
                     boxCmp(box5, box4, { threshold: 0.7 }) &&
                     dT7 >= dT5 - dT6,
                 !fBreak &&
+                    !(dBreak && eBreak) &&
                     eBreak &&
                     boxCmp(box5, box4, { threshold: 0.5 }) &&
                     dT6 >= dT5,
