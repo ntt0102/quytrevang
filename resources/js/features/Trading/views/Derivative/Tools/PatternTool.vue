@@ -65,7 +65,7 @@ const patternTypes = [
     `S - ${t("trading.derivative.patternTool.sideway")}`,
 ];
 const scanThreshold = 1;
-const boxPriceRatio = 0.9;
+const boxPriceRatio = 0.7;
 const chartColors = Object.keys(mc.CHART_COLOR_MAP);
 let scanPoints = {};
 let lines = {};
