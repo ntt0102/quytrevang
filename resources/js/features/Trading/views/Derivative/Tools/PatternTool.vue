@@ -395,11 +395,11 @@ function calcContinuePattern() {
     const GH = mf.fmtNum(H.price - G.price, 1, true);
 
     const dT1 = B.time1.i - A.time.i;
-    const dT2 = C.time1.i - B.time.i;
+    const dT2 = C.time.i - B.time.i;
     const dT3 = D.time1.i - C.time.i;
-    const dT4 = E.time1.i - D.time.i;
+    const dT4 = E.time.i - D.time.i;
     const dT5 = F.time1.i - E.time.i;
-    const dT6 = G.time1.i - F.time.i;
+    const dT6 = G.time.i - F.time.i;
     const dT7 = H.time1.i - G.time.i;
 
     const TR3 = isBreak1 ? phase3.pre.tr : phase3.tr;
